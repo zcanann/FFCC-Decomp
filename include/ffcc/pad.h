@@ -115,6 +115,30 @@ public:
      * --INFO--
      * PAL Address: UNUSED
      * PAL Size: TODO
+     * EN Address: 0x801016A4
+     * EN Size: 164b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    int IsOrAnalog(long port)
+    {
+        bool suppress = false;
+        if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
+            suppress = true;
+        }
+        int result;
+        if (suppress) {
+            result = 0;
+        } else {
+            unsigned int index = (port == m_debugPadPort) ? 0 : static_cast<unsigned int>(port);
+            result = m_padInputs[index].digitalStickOverride;
+        }
+        return result;
+    }
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
      * EN Address: 0x80053964
      * EN Size: 8b
      * JP Address: TODO
@@ -135,6 +159,9 @@ public:
     int m_debugPadPort;
     int m_debugPadLock;
     int m_stickDigitalThreshold;
+
+    void SetAnalogDepth(int depth) { m_stickDigitalThreshold = depth; }
+    void ResetAnalogDepth() { m_stickDigitalThreshold = 1; }
 };
 
 typedef char CPad_PadInput_size_check[(sizeof(CPad::PadInput) == 0x54) ? 1 : -1];

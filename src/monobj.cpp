@@ -15,6 +15,7 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/sound.h"
 #include "ffcc/gbaque.h"
+#include "ffcc/joybusconst.h"
 #include "ffcc/linkage.h"
 #include "ffcc/vector.h"
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
@@ -35,8 +36,8 @@ u8 CGMonObj::m_boss[0x8C];
 
 extern "C" float g_hit_t;
 extern "C" float g_hit_t_slide_min;
-extern float kMonObjDefaultScale;
-extern float FLOAT_803319C4;
+extern "C" const float kMonObjDefaultScale = 1.0f;
+extern "C" const float kMonObjPi = 3.1415927f;
 extern "C" const float kMonObjEpsilon = 0.0000001f;
 extern "C" const float kMonObjHundredth = 0.01f;
 extern "C" const double kMonObjSmallStepF64 = 0.000009999999747378752;
@@ -63,2973 +64,7 @@ extern "C" const float kMonObjTwoThirdsPi = 2.0943952f;
 static const char s_monObjTexAnimU0[3] = "u0";
 extern "C" const float kMonObjPercentMax = 100.0f;
 extern "C" const float kMonObjOne = 1.0f;
-static const char s_pctd_pctc_pctd_pctc_801DCA2C[] = "%d %c %d %c";
-static const char s_pctd_pctd_pctd_801DCA38[] = "%d %d/%d";
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 576b
- * EN Address: 0x80139454
- * EN Size: 336b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CGMonObj::setUndeadEffect(int weaponMode, int enabled)
-{
-	int isUndead = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB;
-	if (!isUndead) {
-		weaponMode = 1;
-	}
-	endPSlotBit(0x1000);
-	int count = weaponMode ?
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1AC) :
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1AE);
-	int particleBase = weaponMode ? 0x46 : 0x3C;
-	if (enabled) {
-		for (int i = 0; i < count; i++) {
-			int dataNo = m_charaModelHandle->GetPdtSlot();
-			int particleId = particleBase + i;
-			putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[12], this, kMonObjDefaultScale, 0);
-		}
-	} else if (isUndead && count != 0) {
-		int dataNo = m_charaModelHandle->GetPdtSlot();
-		putParticleBindTrace((particleBase + 9) | (dataNo << 8), m_particleSlots[12], this, kMonObjDefaultScale, 0);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80112d54
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::GetCID()
-{
-	return 0xAD;
-}
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::footSe()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80112D5C
- * PAL Size: 376b
- * EN Address: 0x8013A5E8
- * EN Size: 136b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onChangePrg(int value)
-{
-	if ((m_weaponNodeFlagBits.m_prg != value) &&
-		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB)) {
-		int enabled = m_unk6BA == 0;
-		setUndeadEffect(value, enabled);
-	}
-	CGCharaObj::onChangePrg(value);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80112ED4
- * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::sysControl(int controlType)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
-	switch (controlType) {
-	case 6:
-		m_repop.delay = 0;
-		break;
-
-	case 7:
-		m_unk6BE = 1;
-		m_chaseState = 4;
-		m_chaseTimer = 0;
-		m_chaseDirty = 1;
-		object->m_bgColMask &= 0xFFF7FFFD;
-		object->m_displayFlags &= 0xFFFFFFFE;
-		break;
-
-	case 8:
-		m_unk6BE = 0;
-		break;
-
-	case 0xD:
-		m_unk6C1 = 0;
-		break;
-
-	case 0xC:
-		m_unk6C1 = 1;
-		break;
-
-	case 0xF:
-		setRepop(0);
-		break;
-
-	case 0x10:
-		object->m_displayFlags |= 0x400000;
-		break;
-
-	case 0x11:
-		object->m_displayFlags &= 0xFFBFFFFF;
-		break;
-
-	case 0x16:
-		object->m_weaponNodeFlagBits.m_control3 = 0;
-		break;
-
-	case 0x15:
-		object->m_weaponNodeFlagBits.m_control3 = 1;
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80112FD4
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncDefault(int branchType)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	int result = 0;
-
-	if (branchType == 1) {
-		unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
-		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
-		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
-		if (static_cast<int>(current) < static_cast<int>(static_cast<unsigned int>(max) >> 1)) {
-			result = 1;
-		}
-	} else if (branchType == 2) {
-		unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
-		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
-		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
-		if (current < (max / 3)) {
-			result = 2;
-		} else if (current < ((max * 2) / 3)) {
-			result = 1;
-		}
-	} else if (branchType != 0) {
-		result = 0;
-	}
-
-	return result;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8011306C
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::logicFuncDefault()
-{
-	int targetIndex = 0;
-	statMove(&targetIndex);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80113098
- * PAL Size: 1508b
- * EN Address: 0x80139CC0
- * EN Size: 1812b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::moveFrame()
-{
-	unsigned int& moveStateFlags = m_moveWork.m_stateFlags;
-	unsigned int& moveFlags = m_moveWork.m_flags;
-	float& moveSpeed = m_moveWork.m_speed;
-	float& moveRange = m_moveWork.m_range;
-	unsigned int& moveLimitFrame = m_moveWork.m_limitFrame;
-	int& moveFrame = m_moveWork.m_frame;
-	int& moveChangeStat = m_moveWork.m_changeStat;
-	float& moveSpeedRate = m_pushScale;
-	short& aStarGroupId = m_aStarGroupId;
-
-	CVector targetPos;
-	CVector moveDirection;
-	float targetDist = 0.0f;
-
-	if ((moveStateFlags & 1) != 0) {
-		return;
-	}
-
-	(this->*m_funcs->moveFrame)();
-
-	if ((moveFlags & 1) != 0) {
-		targetPos = CVector(m_moveWork.m_target->m_worldPosition);
-		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
-
-		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
-			short targetAStarGroupId = m_moveWork.m_target->m_aStarGroupId;
-			moveAStar(aStarGroupId, targetAStarGroupId, targetPos);
-		}
-	} else if ((moveFlags & 2) != 0) {
-		targetPos = CVector(m_moveWork.m_targetPos);
-		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
-
-		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
-			int polygonGroup = AStar.calcPolygonGroup(static_cast<Vec*>(targetPos), static_cast<int>(m_bgHitMask));
-			moveAStar(aStarGroupId, polygonGroup, targetPos);
-		}
-	} else if ((moveFlags & 0x2000) != 0) {
-		targetPos = CVector(m_worldPosition) + CVector(m_moveWork.m_targetPos);
-		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
-	}
-
-	moveDirection = targetPos - CVector(m_worldPosition);
-	if ((moveFlags & 0x40) != 0) {
-		moveDirection = CVector(-moveDirection.x, -moveDirection.y, -moveDirection.z);
-	}
-
-	float rotY = moveDirection.GetRotateY();
-	float distance = PSVECMag(static_cast<Vec*>(moveDirection));
-
-	if ((((moveFlags & 0x20) != 0) && (targetDist < moveRange)) ||
-		(((moveFlags & 0x40) != 0) && (targetDist >= moveRange))) {
-	moveCancelExit:
-		moveStateFlags |= 1;
-		(this->*m_funcs->moveCancel)();
-		moveStateFlags |= 2;
-		if ((moveFlags & 0x100) != 0) {
-			changeStat(moveChangeStat, 0, 0);
-		}
-		return;
-	}
-
-	if ((moveFlags & 4) != 0) {
-		float oldRotY = m_rotBaseY;
-		if ((moveFlags & 0x8000) != 0) {
-			oldRotY += 3.1415927f;
-		}
-
-		float dstRot = Math.DstRot(rotY, oldRotY);
-		float turnFactor = m_turnFactor;
-		float baseDelta = dstRot * turnFactor;
-		float rotDelta = dstRot * (1.0f - turnFactor);
-		m_rotBaseY = m_rotBaseY + baseDelta;
-		rotY = rotY - rotDelta;
-		m_rotTargetY = m_rotBaseY;
-
-		float s = sinf(dstRot);
-		float c = cosf(dstRot);
-		float x = moveDirection.x;
-		moveDirection.x = (c * x) - (s * moveDirection.z);
-		moveDirection.z = (s * x) + (c * moveDirection.z);
-		distance = PSVECMag(static_cast<Vec*>(moveDirection));
-	}
-
-	if (((moveFlags & 0x80) != 0) && (m_stateFlags0Bits.unk1 != 0)) {
-		goto moveCancelExit;
-	}
-
-	float stepDist;
-	if ((moveFlags & 0x200) != 0) {
-		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
-		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
-	} else if ((moveFlags & 0x800) != 0) {
-		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
-		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
-	} else {
-		stepDist = moveSpeed;
-	}
-
-	CVector moveDelta;
-	if ((moveFlags & 0x1000) != 0) {
-		moveDelta = moveDirection;
-	} else {
-		if (__fabs(distance) < kMonObjSmallStepF64) {
-			moveDelta = CVector(0.0f, 0.0f, 0.0f);
-		} else {
-			moveDelta = moveDirection * ((1.0f / distance) * stepDist);
-		}
-	}
-
-	if ((moveFlags & 0x4000) != 0) {
-		PSVECAdd(&m_groundHitOffset, static_cast<Vec*>(moveDelta), &m_groundHitOffset);
-	} else {
-		m_groundHitOffset.x += moveDelta.x;
-		m_groundHitOffset.z += moveDelta.z;
-	}
-
-	float stepRemaining = targetDist - stepDist;
-	if ((moveFlags & 0x8000) != 0) {
-		m_rotTargetY = 3.1415927f + rotY;
-	} else {
-		m_rotTargetY = rotY;
-	}
-
-	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
-		((moveFlags & 0x40) == 0 || !(stepRemaining >= moveRange))) {
-		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
-			reqAnim(1, 1, 0);
-		}
-
-		moveFrame++;
-		if (((moveFlags & 0x10) == 0) || ((int)moveLimitFrame > moveFrame)) {
-			return;
-		}
-	}
-
-	goto moveCancelExit;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8011367C
- * PAL Size: 740b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
-	short& routeFrom = m_moveWork.m_routeFrom;
-	short& routePrev = m_moveWork.m_routePrev;
-
-	if (((m_moveWork.m_flags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
-		if (routeFrom == 0) {
-			routeFrom = static_cast<short>(startGroup);
-		}
-		if (((m_moveWork.m_flags & 0x10000) != 0) && ((m_moveWork.m_flags & 0x40) == 0)) {
-			short currentRoute = routeFrom;
-			if ((currentRoute != 0) && (forbiddenGroup != 0) && (currentRoute != forbiddenGroup)) {
-				unsigned char* routeStep = AStar.m_routeTable[currentRoute][forbiddenGroup];
-				CAStar::CAPos* portalPos = &AStar.m_portals[routeStep[1]];
-				float portalDist = PSVECDistance(&object->m_worldPosition, &portalPos->m_position);
-				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
-					routeFrom = routeStep[0];
-					portalPos = &AStar.m_portals[AStar.m_routeTable[routeStep[0]][forbiddenGroup][1]];
-				}
-				targetPos.x = portalPos->m_position.x;
-				targetPos.y = portalPos->m_position.y;
-				targetPos.z = portalPos->m_position.z;
-			}
-		} else {
-			CAStar::CAPos* escapePos;
-			if ((routeFrom != 0) && (forbiddenGroup != 0) &&
-				((escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev)) != NULL)) {
-				unsigned short nextGroup = escapePos->m_groupA;
-				if (nextGroup == routeFrom) {
-					nextGroup = escapePos->m_groupB;
-				}
-				unsigned char* routeStep = AStar.m_routeTable[routeFrom][static_cast<unsigned char>(nextGroup)];
-				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
-				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
-					routePrev = routeFrom;
-					routeFrom = routeStep[0];
-					escapePos = &AStar.m_portals[AStar.m_routeTable[routeStep[0]][forbiddenGroup][1]];
-				}
-
-				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
-				CVector dir = CVector(object->m_worldPosition) - CVector(escapePos->m_position);
-				dir.Normalize();
-				targetPos = CVector(object->m_worldPosition) + dir * targetDist;
-			}
-		}
-	}
-}
-
-
-/*
- * --INFO--
- * PAL Address: 0x80113960
- * PAL Size: 1436b
- * EN Address: 0x80139608
- * EN Size: 924b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::setRepop(int mode)
-{
-#define object (reinterpret_cast<CGObject*>(this))
-	void** scriptHandle = object->m_scriptHandle;
-	int classId = reinterpret_cast<int>(scriptHandle[4]);
-
-	int spawnIndex = reinterpret_cast<int>(scriptHandle[2]);
-	int option;
-	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
-		u64 bit = 1ULL << spawnIndex;
-		u64 spawnBits = CFlatSpawnBits(option);
-		if ((spawnBits & bit) != 0) {
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
-			object->m_bgColMask = 0;
-			object->m_displayFlags = 0;
-			object->m_weaponNodeFlagBits.m_unk10 = 0;
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x28, 0, 0);
-			return;
-		}
-	}
-
-	if (mode == 0) {
-		m_homePosition.x = object->unk_0x168;
-		m_homePosition.y = object->unk_0x16C;
-		m_homePosition.z = object->unk_0x170;
-		object->m_worldPosition = m_homePosition;
-		float baseRot = object->m_homeRotY;
-		object->m_rotBaseY = baseRot;
-		object->m_rotTargetY = baseRot;
-
-		void** repopHandle = object->m_scriptHandle;
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1C) =
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1A);
-		m_targetPartyIndex = -1;
-		m_aiState = 0;
-		m_aiStatePrev = 0;
-		m_unk6C8 = 0;
-		m_unk6CC = 0;
-		m_actionBranch = 0;
-		m_unk6B8 = 0;
-		m_unk6B9 = 0;
-		m_unk6BA = 0;
-		m_unk6BC = 0;
-		m_unk6BD = 0;
-		m_unk6BE = 0;
-		m_attackDelay = 0;
-		m_aliveFrames = 0;
-		m_unk6BF = 0;
-		m_unk6C0 = 0;
-		m_unk6C2 = 0;
-		m_unk6C3 = 0;
-		m_chaseState = 0;
-		m_chaseTimer = 0;
-		m_chaseDirty = 0;
-		m_stepSeHandle = 0;
-		memset(&m_moveWork, 0, sizeof(m_moveWork));
-	}
-
-	enableAttackCol(0, 0, 0);
-	enableDamageCol(1);
-	reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-
-	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
-
-	if ((scriptFlags & 0x80) != 0 || (scriptFlags & 0x20) != 0) {
-		if (mode == 0) {
-			object->m_bgColMask |= 0x10002;
-		}
-		m_chaseState = 4;
-		m_chaseTimer = 0;
-		m_chaseDirty = 1;
-		enableDamageCol(0);
-	} else {
-		if ((scriptFlags & 0x40) != 0 || classId == 0x39) {
-			m_chaseState = 4;
-			m_chaseTimer = 0;
-			m_chaseDirty = 1;
-			enableDamageCol(0);
-			if ((scriptFlags & 0x40) != 0) {
-				object->SetAnimSlot(10, 0);
-			}
-		}
-
-		if ((scriptFlags & 0x200) != 0) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x36, 0, 0);
-		}
-
-		if (mode == 0) {
-			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x18, 0x32, 0x96, 0, (Vec*)0);
-			reinterpret_cast<CGPrgObj*>(this)->putParticle(300, 0, &object->m_worldPosition, kMonObjDefaultScale, 0);
-			object->m_bgColMask |= 0x90002;
-			m_alpha = 1.0f;
-		}
-	}
-
-	switch (classId) {
-	case 0x55:
-		m_chaseState = 4;
-		m_chaseTimer = 0;
-		m_chaseDirty = 1;
-		break;
-	}
-
-	unsigned short countA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A8);
-	for (int i = 0; i < static_cast<int>(countA); i++) {
-		int particleBase = 0;
-		switch (classId) {
-		case 0xA9:
-			particleBase = 0;
-			break;
-		case 0x9C:
-			particleBase = 1;
-			break;
-		case 0xA7:
-		case 0xA8:
-			particleBase = 2;
-			break;
-		}
-
-		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		int particleId = i + particleBase + 0x50;
-		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[16], object, kMonObjDefaultScale, 0);
-	}
-
-	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
-
-	unsigned short countB = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
-	for (int i = 0; i < static_cast<int>(countB); i++) {
-		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + 0x5A) | (dataNo << 8), m_particleSlots[17], object, kMonObjDefaultScale, 0);
-	}
-
-	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 1) == 0) {
-		return;
-	}
-
-	m_alpha = kMonObjTwoFifths;
-	scriptHandle = object->m_scriptHandle;
-	classId = reinterpret_cast<int>(scriptHandle[4]);
-	setUndeadEffect(m_weaponNodeFlagBits.m_prg, 1);
-
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
-		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
-	}
-
-	if (object->m_weaponNodeFlagBits.m_prg != 0) {
-		if (classId == 0x83) {
-			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
-		} else if (classId == 0x7F) {
-			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
-		}
-	}
-
-	m_unk6BA = 0;
-#undef object
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80113EFC
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CGMonObj::IsDispRader()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char result = 0;
-	int isDispRader = object->CGObject::IsDispRader();
-	if (isDispRader != 0 &&
-	    static_cast<signed char>(
-	        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) &
-	                         0xC0000000) >>
-	        31) != 0) {
-		result = 1;
-	}
-	return result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::setFlyEffect(int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80113F58
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::setIceJEffect(int enabled)
-{
-#define object (reinterpret_cast<CGObject*>(this))
-	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
-
-	if (enabled != 0) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
-		for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
-			int dataNo = object->m_charaModelHandle->GetPdtSlot();
-			reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x5A8), object, kMonObjDefaultScale, 0);
-		}
-	}
-#undef object
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80114004
- * PAL Size: 516b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::initFinishedFuncDefault()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	// Script value is authored in centi-units.
-	object->m_turnFactor = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
-
-	CCharaPcs::CHandle* handle = object->m_charaModelHandle;
-	if (handle != NULL) {
-		CChara::CModel* model = handle->m_model;
-		if (model != NULL) {
-			int nodeIdx = model->SearchNode(const_cast<char*>(s_monObjHeadNode));
-			if (nodeIdx >= 0) {
-				m_bind = reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_model->m_nodes + nodeIdx);
-			}
-		}
-	}
-
-	int animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
-	if (animPoint != 0xFFFF) {
-		object->AddAnimPoint(1, animPoint, 0xB);
-	}
-
-	animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
-	if (animPoint != 0xFFFF) {
-		object->AddAnimPoint(1, animPoint, 0xA);
-	}
-
-	m_forcedAction = -1;
-	for (int forcedAction = 0; forcedAction < 8; forcedAction++) {
-		int attackId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionItems[forcedAction];
-		if ((attackId != 0xFFFF) &&
-			(static_cast<int>(reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackId].m_actionType) == 4)) {
-			m_forcedAction = forcedAction;
-			break;
-		}
-	}
-
-	setRepop(1);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80114208
- * PAL Size: 456b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::InitFinished()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	m_homePosition.x = object->unk_0x168;
-	m_homePosition.y = object->unk_0x16C;
-	m_homePosition.z = object->unk_0x170;
-
-	void* classId = object->m_scriptHandle[4];
-	switch (reinterpret_cast<unsigned int>(classId)) {
-	default:
-		m_funcs = &funcsDefault;
-		break;
-	case 0x5B:
-		m_funcs = &funcsGiantCrab;
-		break;
-	case 0x71:
-		m_funcs = &funcsGolem;
-		break;
-	case 0x6B:
-		m_funcs = &funcsArmstrong;
-		break;
-	case 0x63:
-		m_funcs = &funcsOrcKing;
-		break;
-	case 0x67:
-		m_funcs = &funcsGoblinKing;
-		break;
-	case 0x5F:
-		m_funcs = &funcsMolbol;
-		break;
-	case 0x73:
-		m_funcs = &funcsLizardmanKing;
-		break;
-	case 0x77:
-		m_funcs = &funcsCaveWorm;
-		break;
-	case 0x6F:
-		m_funcs = &funcsGigasLoad;
-		break;
-	case 0x70:
-		m_funcs = &funcsWifeLamia;
-		break;
-	case 0x88:
-		m_funcs = &funcsMeteoParasiteC;
-		break;
-	case 0x85:
-	case 0x86:
-	case 0x87:
-		m_funcs = &funcsMeteoParasite;
-		break;
-	case 0x8E:
-	case 0x8F:
-	case 0x90:
-	case 0x91:
-	case 0x92:
-	case 0x93:
-	case 0x94:
-	case 0x95:
-	case 0x96:
-	case 0x97:
-	case 0x98:
-	case 0x99:
-		m_funcs = &funcsDuct;
-		break;
-	case 0x83:
-		m_funcs = &funcsDragonZombie;
-		break;
-	case 0x7B:
-		m_funcs = &funcsAntrion;
-		break;
-	case 0x79:
-		m_funcs = &funcsTetsukyojin;
-		break;
-	case 0x7F:
-		m_funcs = &funcsLich;
-		break;
-	case 0x9B:
-		m_funcs = &funcsRamoe;
-		break;
-	case 0x9A:
-		m_funcs = &funcsLastBoss;
-		break;
-	case 0x9E:
-		m_funcs = &funcsSaw;
-		break;
-	case 0x74:
-	case 0x75:
-		m_funcs = &funcsLKShooter;
-		break;
-	}
-
-	(this->*m_funcs->initFinished)();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801143D0
- * PAL Size: 512b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onFrameAlways()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	void** scriptHandle = object->m_scriptHandle;
-
-	if (scriptHandle != nullptr) {
-		if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFE) & 4) != 0) {
-			int hasNearParty = 0;
-			if (m_unk6B9 == 0) {
-				for (int i = 0; i < 4; i++) {
-					CGPartyObj* party = Game.m_partyObjArr[i];
-					if (party != nullptr && party->m_comboState != 0) {
-						float dist = PSVECDistance(&party->m_comboCenter, &object->m_worldPosition);
-						if (dist < kMonObjHomeSnapDistance + object->m_bodyEllipsoidRadius) {
-							hasNearParty = 1;
-							break;
-						}
-					}
-				}
-			}
-
-			if (hasNearParty != m_unk6C3) {
-				if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
-					reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x200000);
-					if (hasNearParty != 0) {
-						reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
-							0x146,
-							*reinterpret_cast<int*>(mon + 0x5B8),
-							object,
-							1.0f,
-							0
-						);
-					}
-				}
-				m_unk6C3 = hasNearParty;
-			}
-		}
-
-		reinterpret_cast<CMonWork*>(object->m_scriptHandle)->CalcStatus();
-		(this->*m_funcs->always)();
-
-		unsigned short stepSeRaw = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1BE);
-		int stepSeId;
-		if (stepSeRaw == 0xFFFF) {
-			stepSeId = 0;
-		} else {
-			stepSeId = (stepSeRaw & 0xFF) + ((stepSeRaw >> 8) * 1000);
-		}
-
-		if (stepSeId != 0) {
-			int& stepSeHandle = m_stepSeHandle;
-			if (object->m_currentAnimSlot == object->m_animSlots[1]) {
-				if (stepSeHandle != 0) {
-					Sound.ChangeSe3DPos(stepSeHandle, &object->m_worldPosition);
-				} else {
-					stepSeHandle = reinterpret_cast<CGPrgObj*>(this)->playSe3D(stepSeId, 0x32, 0x96, 0, (Vec*)0);
-				}
-			} else if (stepSeHandle != 0) {
-				Sound.FadeOutSe3D(stepSeHandle, 0x32);
-				stepSeHandle = 0;
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::setAI(int, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::statAway()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801145D0
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, int chance, int fallbackState)
-{
-	int& aiState = m_unk6C8;
-#define aiPriority (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0))
-#define aiBranch (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
-
-	if (priority <= aiPriority) {
-		return 0;
-	}
-
-	if (currentState == aiState) {
-		if (Math.Rand(100) <= static_cast<unsigned int>(chance)) {
-			if (aiPriority < priority) {
-				aiBranch = seqId;
-				aiPriority = priority;
-			}
-			aiState = nextState;
-			return 1;
-		}
-		if (fallbackState >= 0) {
-			aiState = fallbackState;
-		}
-	}
-
-	return 0;
-#undef aiPriority
-#undef aiBranch
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8011467C
- * PAL Size: 1272b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::statMove(int* targetIndex)
-{
-#define monObj (this)
-#define mon (reinterpret_cast<unsigned char*>(this))
-#define object (reinterpret_cast<CGObject*>(this))
-#define prgObj (reinterpret_cast<CGPrgObj*>(this))
-	int* chaseState = &monObj->m_chaseState;
-	int* chaseTimer = &monObj->m_chaseTimer;
-	int* targetPartyIdx = &monObj->m_targetPartyIndex;
-
-	int state = *chaseState;
-	switch (state) {
-	case 4:
-		monObj->seKiduki();
-		break;
-
-	case 0: {
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-		}
-		if (*chaseTimer == 0) {
-			object->m_rotTargetY = object->m_homeRotY;
-		}
-
-		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
-
-		int hitPartyIndex;
-		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
-			int colIndex;
-			float hitScale;
-			monObj->checkCol(6, object->m_rotBaseY,
-				static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xC8)),
-				&hitScale, &colIndex);
-			hitPartyIndex = colIndex;
-		} else {
-			hitPartyIndex = -1;
-		}
-
-		if (hitPartyIndex >= 0) {
-			*targetPartyIdx = hitPartyIndex;
-			*chaseState = 2;
-			*chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-			if (monObj->m_unk6B8 == 0) {
-				void** scriptHandle = object->m_scriptHandle;
-				int randVal = Math.Rand(3);
-				unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-				prgObj->playSe3D(
-					*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal +
-						*reinterpret_cast<unsigned short*>(script + 0x192),
-					0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
-				monObj->m_unk6B8 = 1;
-			}
-		} else {
-			unsigned char* aiData;
-			if (monObj->m_aiState == 0) {
-				aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-			} else {
-				aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-					(monObj->m_aiState +
-					 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) *
-						0x1D0 +
-					0x10;
-			}
-			unsigned short alertMode = *reinterpret_cast<unsigned short*>(aiData + 0x104);
-			switch (alertMode) {
-			case 0:
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-				break;
-			case 1:
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x10;
-				break;
-			case 2: {
-				double soundLimit2 = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
-				if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit2) {
-					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1D;
-					float repopDist =
-						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
-					float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
-					if (static_cast<double>(repopDist) <= static_cast<double>(homeDist)) {
-						monObj->isValidTarget();
-					}
-				} else {
-					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-				}
-				break;
-			}
-			}
-		}
-		break;
-	}
-
-	case 2:
-		monObj->statAround();
-		break;
-
-	case 1:
-		monObj->statWatch();
-		break;
-
-	case 3:
-		monObj->isValidTarget();
-		break;
-
-	case 5: {
-		{
-			if (*targetPartyIdx >= 0) {
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
-				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
-				if (monObj->m_moveWork.m_mode != 4) {
-					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-					monObj->m_moveWork.m_flags = 0x855;
-					if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
-						monObj->m_moveWork.m_flags |= 0x400;
-					}
-					unsigned char* aiData;
-					if (monObj->m_aiState == 0) {
-						aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-					} else {
-						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(monObj->m_aiState +
-							 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) *
-								0x1D0 +
-							0x10;
-					}
-					if ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x80) != 0) {
-						monObj->m_moveWork.m_flags |= 0x20000;
-					}
-					monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
-					monObj->m_moveWork.m_mode = 4;
-					monObj->m_moveWork.m_range =
-						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));
-					monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B6);
-				}
-				monObj->m_moveWork.m_target = partyObj;
-				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
-					(object->m_stateFlags0Bits.unk1 != 0)) {
-					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-					if (*targetPartyIdx >= 0) {
-						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));
-					}
-					*chaseState = 1;
-					*chaseTimer = 0;
-					monObj->m_chaseDirty = 1;
-				}
-			} else {
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-				*chaseState = 0;
-				*chaseTimer = 0;
-				monObj->m_chaseDirty = 1;
-			}
-		}
-		break;
-	}
-
-	}
-
-	if (monObj->m_chaseDirty != 0) {
-		monObj->m_chaseDirty = 0;
-	} else {
-		*chaseTimer += 1;
-	}
-#undef prgObj
-#undef object
-#undef mon
-#undef monObj
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80114B74
- * PAL Size: 2328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::statWatch()
-{
-	CGMonObj* monObj = this;
-#define mon (reinterpret_cast<unsigned char*>(monObj))
-#define object (reinterpret_cast<CGObject*>(monObj))
-	int& targetPartyIndex = monObj->m_targetPartyIndex;
-	int& chaseState = monObj->m_chaseState;
-	int& chaseTimer = monObj->m_chaseTimer;
-#define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
-#define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
-
-	if (reinterpret_cast<CGPrgObj*>(monObj)->m_lastStateId == 0) {
-		monObj->m_unk6BD = 0;
-		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
-		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
-		if (homeRange <= homeDist) {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 3;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-			return;
-		}
-
-		unsigned char* aiScript;
-		short aiState0 = monObj->m_aiState;
-		if (aiState0 == 0) {
-			aiScript = script;
-		} else {
-			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(aiState0 + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
-		}
-
-		int targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
-		int selectedTarget = -1;
-		if (targetMode == 0xFFFF) {
-			chaseState = 0;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-			return;
-		}
-
-		if (targetMode >= 10) {
-			selectedTarget = (monObj->*monObj->m_funcs->target)(targetMode);
-		} else {
-			// Pass 1: count valid party members.
-			int validCount = 0;
-			for (int slot = 0; slot < 4; slot++) {
-				CGPartyObj* party = Game.m_partyObjArr[m_partyRank[slot]];
-				if ((party != NULL) &&
-					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
-					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
-					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
-					((Game.m_gameWork.m_menuStageMode == 0) ||
-					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
-					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
-					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
-					validCount++;
-				}
-			}
-
-			int pick = Math.Rand(validCount);
-			int minHp = 10000000;
-			int accum = -1;
-			int validIndex = 0;
-			float homeRange2 = static_cast<float>(
-				*reinterpret_cast<unsigned short*>(script + 0xCC));
-
-			// Pass 2: select target.
-			selectedTarget = -1;
-			for (int slot = 0; slot < 4; slot++) {
-				int partyIndex = m_partyRank[slot];
-				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
-				if ((party != NULL) &&
-					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
-					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
-					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
-					((Game.m_gameWork.m_menuStageMode == 0) ||
-					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
-					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
-					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
-					if (monObj->m_partyDistance[partyIndex] < homeRange2) {
-						selectedTarget = partyIndex;
-						if (targetMode == 0) {
-							break;
-						}
-					}
-					if ((targetMode == 3) &&
-						((reinterpret_cast<CGPrgObj*>(party)->m_lastStateId == 6) ||
-						 (reinterpret_cast<CGPrgObj*>(party)->m_lastStateId == 2))) {
-						accum = partyIndex;
-					} else if (targetMode == 2) {
-						int hp = *reinterpret_cast<unsigned short*>(
-							reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7);
-						if (hp < minHp) {
-							minHp = hp;
-							accum = partyIndex;
-						}
-					} else if ((targetMode == 4) && (validIndex == pick)) {
-						accum = partyIndex;
-					}
-					validIndex++;
-				}
-			}
-
-			switch (targetMode) {
-			case 1:
-				selectedTarget = targetPartyIndex;
-				break;
-			case 2:
-			case 3:
-			case 4:
-				if (accum >= 0) {
-					selectedTarget = accum;
-				}
-				break;
-			}
-		}
-
-		if (selectedTarget >= 0) {
-
-		targetPartyIndex = selectedTarget;
-		short aiState1 = monObj->m_aiState;
-		if (aiState1 == 0) {
-			aiScript = script;
-		} else {
-			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(static_cast<int>(aiState1) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
-		}
-
-		if (static_cast<int>(*reinterpret_cast<unsigned short*>(aiScript + 0x10A)) == 1) {
-			if (monObj->m_unk6BC == 0) {
-				unsigned char* scriptBase = script;
-				if (monObj->m_partyDistance[targetPartyIndex] <
-					static_cast<float>(*reinterpret_cast<unsigned short*>(scriptBase + 0xCE))) {
-					if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
-						chaseState = 5;
-						chaseTimer = 0;
-						monObj->m_chaseDirty = 1;
-					} else {
-						actionState = 0x1E;
-					}
-					monObj->m_unk6BC = 1;
-					return;
-				}
-			} else {
-				monObj->m_unk6BC = 0;
-			}
-		}
-
-		int attackResult = monObj->mlAttackCheck(selectedTarget);
-		if (attackResult == -2) {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 0;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-		} else if (attackResult == -1) {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 2;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-		} else {
-			void** handle = object->m_scriptHandle;
-			unsigned char* scriptBase = reinterpret_cast<unsigned char*>(handle[9]);
-			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
-				if (attackResult >= 100) {
-					actionState = attackResult;
-				} else {
-					short aiState = monObj->m_aiState;
-					unsigned char* aiData;
-					if (aiState == 0) {
-						aiData = scriptBase;
-					} else {
-						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
-					}
-					int actionOff = attackResult * 0x10;
-					unsigned char* actionData = aiData + actionOff;
-					if ((*reinterpret_cast<unsigned short*>(actionData + 0x110) & 0x20) != 0) {
-						actionState = 0x21;
-						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
-						if (monObj->m_moveWork.m_mode != 4) {
-							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-							monObj->m_moveWork.m_flags = 0x855;
-							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
-								monObj->m_moveWork.m_flags |= 0x400;
-							}
-							unsigned char* aiData2;
-							short aiState2 = monObj->m_aiState;
-							if (aiState2 == 0) {
-								aiData2 = script;
-							} else {
-								aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-									(static_cast<int>(aiState2) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
-							}
-							if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x80) != 0) {
-								monObj->m_moveWork.m_flags |= 0x20000;
-							}
-							monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
-							monObj->m_moveWork.m_mode = 4;
-							monObj->m_moveWork.m_range =
-								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
-							monObj->m_moveWork.m_limitFrame =
-								*reinterpret_cast<unsigned short*>(script + 0x1B6);
-						}
-						monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
-						chaseState = 5;
-						chaseTimer = 0;
-						monObj->m_chaseDirty = 1;
-						return;
-					}
-					unsigned char* aiData3;
-					if (aiState == 0) {
-						aiData3 = reinterpret_cast<unsigned char*>(handle[9]);
-					} else {
-						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x100)) * 0x1D0 + 0x10;
-					}
-					float range = static_cast<float>(
-						*reinterpret_cast<unsigned short*>(aiData3 + actionOff + 0x11C));
-					unsigned char* aiData4;
-					if (aiState == 0) {
-						aiData4 = reinterpret_cast<unsigned char*>(handle[9]);
-					} else {
-						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x100)) * 0x1D0 + 0x10;
-					}
-					short changeStat = static_cast<short>(*reinterpret_cast<unsigned short*>(aiData4 + actionOff + 0x11E));
-					actionState = 0x21;
-					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
-					if (monObj->m_moveWork.m_mode != 2) {
-						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-						monObj->m_moveWork.m_flags = 0x325;
-						unsigned char* aiData5;
-						short aiState5 = monObj->m_aiState;
-						if (aiState5 == 0) {
-							aiData5 = script;
-						} else {
-							aiData5 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-								(static_cast<int>(aiState5) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
-						}
-						if ((*reinterpret_cast<unsigned short*>(aiData5 + 0x102) & 0x40) != 0) {
-							monObj->m_moveWork.m_flags |= 0x10000;
-						}
-						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
-						monObj->m_moveWork.m_mode = 2;
-					}
-					monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
-					monObj->m_moveWork.m_range = range;
-					monObj->m_moveWork.m_changeStat = static_cast<int>(changeStat);
-				}
-			} else {
-				actionState = attackResult - 0xE;
-			}
-			chaseState = 1;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-		}
-		} else {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 3;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-		}
-		return;
-	}
-
-	if (reinterpret_cast<CGPrgObj*>(monObj)->m_lastStateId == 0x21) {
-		if ((*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) &&
-			(((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
-			 (monObj->m_moveWork.m_frame >=
-			  static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC))))) {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 3;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-		}
-	}
-#undef script
-#undef actionState
-#undef object
-#undef mon
-}
-
-
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::aiAddDefault(int&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlAttack()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8011467C
- * PAL Size: 1272b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-/*
- * --INFO--
- * PAL Address: 0x8011548C
- * PAL Size: 1908b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-typedef struct MonObjWords8 { unsigned int w[8]; } MonObjWords8;
-typedef struct MonObjMlAttackPool {
-	char gbaDir[12];
-	char gbaClient[16];
-	char gbaObjdat[12];
-	MonObjWords8 groupTableInit;
-	MonObjWords8 groupCountInit;
-	char classNames[0x54];
-	char actFlagFmt[0x20];
-} MonObjMlAttackPool;
-static const MonObjMlAttackPool lbl_801DC950 = {
-	"dvd/gba/", "ffcc_cli.bin", "objdat.spt",
-	{ { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF } },
-	{ { 0, 0, 0, 0, 0, 0, 0, 0 } },
-	"CGMonObj\0\0\0\0CFlatRuntime::CObject\0\0\0CGBaseObj\0\0\0CGObject\0\0\0\0CGPrgObj\0\0\0\0CGCharaObj\0",
-	"ACT_FLAG_ROT_CHECK \x8d\xb7\x95\xaa=%f\x93x\x81\x42\n"
-};
-
-int CGMonObj::mlAttackCheck(int partyIndex)
-{
-	CGMonObj* monObj = this;
-	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
-	CGObject* object = reinterpret_cast<CGObject*>(monObj);
-#define baseScript (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
-#define aiScript (monObj->m_aiState == 0 \
-		? baseScript \
-		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
-			(monObj->m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
-	const MonObjMlAttackPool* mlPool = &lbl_801DC950;
-	int selectedAction = -1;
-	if (monObj->m_funcs->attackCheck != 0) {
-		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
-		if (result == -2) {
-			return -1;
-		}
-		if (result != -1) {
-			return result;
-		}
-	}
-
-	float targetDist = monObj->m_partyDistance[partyIndex];
-
-	int selectorType = *reinterpret_cast<unsigned short*>(aiScript + 0x108);
-	if (selectorType == 0xFFFF) {
-		return -1;
-	}
-
-	unsigned int groupTable[8];
-	int groupCount[8];
-	groupTable[0] = mlPool->groupTableInit.w[0];
-	groupTable[1] = mlPool->groupTableInit.w[1];
-	groupTable[2] = mlPool->groupTableInit.w[2];
-	groupTable[3] = mlPool->groupTableInit.w[3];
-	groupTable[4] = mlPool->groupTableInit.w[4];
-	groupTable[5] = mlPool->groupTableInit.w[5];
-	groupTable[6] = mlPool->groupTableInit.w[6];
-	groupTable[7] = mlPool->groupTableInit.w[7];
-	groupCount[0] = static_cast<int>(mlPool->groupCountInit.w[0]);
-	groupCount[1] = static_cast<int>(mlPool->groupCountInit.w[1]);
-	groupCount[2] = static_cast<int>(mlPool->groupCountInit.w[2]);
-	groupCount[3] = static_cast<int>(mlPool->groupCountInit.w[3]);
-	groupCount[4] = static_cast<int>(mlPool->groupCountInit.w[4]);
-	groupCount[5] = static_cast<int>(mlPool->groupCountInit.w[5]);
-	groupCount[6] = static_cast<int>(mlPool->groupCountInit.w[6]);
-	groupCount[7] = static_cast<int>(mlPool->groupCountInit.w[7]);
-	int* groupPtr = reinterpret_cast<int*>(groupTable);
-
-	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
-		int actionOffset = actionIndex * 0x10;
-		int actionFlags = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110);
-		if (actionFlags == 0xFFFF) {
-			if (actionIndex == 0) {
-				return -2;
-			}
-			continue;
-		}
-
-		int actionType;
-		if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
-			actionType = actionFlags & 3;
-		} else {
-			actionType = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118);
-		}
-
-		if ((actionType == 3) && (Game.m_gameWork.m_menuStageMode != 0)) {
-			continue;
-		}
-
-		int artifactLevel;
-		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			int idx = Game.m_gameWork.m_bossArtifactStageIndex;
-			int stage = Game.m_gameWork.m_bossArtifactStageTable[idx];
-			artifactLevel = stage < 2 ? stage : 2;
-		} else {
-			artifactLevel = 0;
-		}
-
-		if (((actionType == 1) && (artifactLevel <= 0)) ||
-			((actionType == 2) && (artifactLevel <= 1))) {
-			continue;
-		}
-
-		if ((actionFlags & 0x40) != 0) {
-			float targetRot = monObj->m_partyAngle[partyIndex];
-			float baseRot =
-				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
-				object->m_rotBaseY;
-			float angleDelta = (float)__fabs(Math.DstRot(targetRot, baseRot));
-			System.Printf(const_cast<char*>(mlPool->actFlagFmt), kMonObjRadToDeg * angleDelta);
-			float angleLimit =
-				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
-			if (!(angleDelta < angleLimit)) {
-				continue;
-			}
-			System.Printf(const_cast<char*>(s_monObjPassThroughText));
-		}
-
-		if (selectorType == 0) {
-			int maxDistRaw = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x114);
-			float minDist = static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x112)));
-			unsigned int chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
-
-			if ((targetDist < static_cast<float>(maxDistRaw)) && (minDist < targetDist)) {
-
-			int forceAction = 0;
-			CGPartyObj* party = Game.m_partyObjArr[partyIndex];
-			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
-			if (((partyState == 1) || (partyState == 7)) &&
-				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > kMonObjHalfPi)) {
-				if (((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) &&
-						(monObj->m_forcedAction ==
-							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E)))) ||
-					((*reinterpret_cast<unsigned short*>(
-							reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) +
-							0x10C) != 1) &&
-						(monObj->m_forcedAction == actionIndex))) {
-					forceAction = 1;
-				}
-			}
-
-			if (forceAction || (Math.Rand(100) <= chance)) {
-				selectedAction = actionIndex;
-				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
-					break;
-				}
-				if (forceAction) {
-					break;
-				}
-			}
-			}
-		} else {
-			unsigned int groupIndex;
-			if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
-				groupIndex = (actionFlags >> 2) & 7;
-			} else {
-				groupIndex = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A);
-			}
-
-			groupTable[actionIndex] = groupIndex;
-			groupCount[groupIndex] += 1;
-		}
-	}
-
-	if (selectorType == 1) {
-		int& groupCursor = monObj->m_unk6CC;
-		int count;
-		for (;;) {
-			int cursor = groupCursor;
-			count = groupCount[cursor];
-			if (count != 0) {
-				break;
-			}
-			groupCursor = cursor + 1;
-			if (groupCursor >= 8) {
-				groupCursor = 0;
-			}
-		}
-
-		int pick = Math.Rand(count);
-		int seen = 0;
-		int i = 0;
-		for (int pass = 0; pass < 2; pass++) {
-			for (int j = 0; j < 4; j++) {
-				int cursor = groupCursor;
-				if (cursor == groupPtr[j]) {
-					if (seen == pick) {
-						selectedAction = i;
-						groupCursor = cursor + 1;
-						goto mlDone;
-					}
-					seen += 1;
-				}
-				i += 1;
-			}
-			groupPtr += 4;
-		}
-	}
-
-mlDone:
-	return selectedAction;
-#undef aiScript
-#undef baseScript
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80115C00
- * PAL Size: 1716b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::statAround()
-{
-	CGMonObj* monObj = this;
-	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
-	CGObject* object = reinterpret_cast<CGObject*>(monObj);
-	int& targetPartyIndex = monObj->m_targetPartyIndex;
-#define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
-#define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
-
-	if (targetPartyIndex >= 0) {
-		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
-		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
-		if (!(homeRange <= homeDist)) {
-			goto body;
-		}
-	}
-
-	targetPartyIndex = -1;
-	actionState = 0;
-	memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-	monObj->m_chaseState = 3;
-	monObj->m_chaseTimer = 0;
-	monObj->m_chaseDirty = 1;
-	return;
-
-body:
-	{
-			if (monObj->m_unk6BD != 0) {
-				float reacquireRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8));
-				int hitPartyIndex;
-				monObj->checkCol(6, object->m_rotBaseY, reacquireRange, (float*)NULL, &hitPartyIndex);
-				if (hitPartyIndex >= 0) {
-					targetPartyIndex = hitPartyIndex;
-					monObj->m_unk6BD = 0;
-				}
-			}
-
-			int nextAction = monObj->mlAttackCheck(targetPartyIndex);
-			if (nextAction == -2) {
-				actionState = 0;
-				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-				monObj->m_chaseState = 0;
-				monObj->m_chaseTimer = 0;
-				monObj->m_chaseDirty = 1;
-				return;
-			}
-			if (nextAction == -1) {
-				void** handle = object->m_scriptHandle;
-				unsigned char* scriptB = reinterpret_cast<unsigned char*>(handle[9]);
-				if (*reinterpret_cast<unsigned short*>(scriptB + 0x10C) == 1) {
-					unsigned char* aiScript;
-					short aiState = monObj->m_aiState;
-					if (aiState == 0) {
-						aiScript = scriptB;
-					} else {
-						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(scriptB + 0x100)) * 0x1D0 + 0x10;
-					}
-					unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
-					if (((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0xFE) & 8) != 0) ||
-						((aiFlags & 0x100) != 0)) {
-						actionState = 0;
-						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-						monObj->m_chaseState = 2;
-						monObj->m_chaseTimer = 0;
-						monObj->m_chaseDirty = 1;
-						return;
-					}
-
-					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-					actionState = 0x21;
-					if (monObj->m_moveWork.m_mode != 1) {
-						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-						monObj->m_moveWork.m_flags = 0x205;
-						short aiState2 = monObj->m_aiState;
-						if (aiState2 == 0) {
-							aiScript = script;
-						} else {
-							aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-								(static_cast<int>(aiState2) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
-						}
-						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
-							monObj->m_moveWork.m_flags |= 0x10000;
-						}
-						monObj->m_moveWork.m_mode = 1;
-					}
-					monObj->m_moveWork.m_target = target;
-					if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
-						(monObj->m_moveWork.m_frame >=
-						 static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)))) {
-						actionState = 0;
-						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-						monObj->m_chaseState = 3;
-						monObj->m_chaseTimer = 0;
-						monObj->m_chaseDirty = 1;
-					}
-					return;
-				}
-
-				if (monObj->m_chaseTimer >=
-					static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA))) {
-					monObj->m_chaseState = 3;
-					monObj->m_chaseTimer = 0;
-					monObj->m_chaseDirty = 1;
-					return;
-				}
-				actionState = 3;
-				return;
-			}
-
-			void** handleB = object->m_scriptHandle;
-			unsigned char* scriptC = reinterpret_cast<unsigned char*>(handleB[9]);
-			if (*reinterpret_cast<unsigned short*>(scriptC + 0x10C) == 1) {
-				if (nextAction >= 100) {
-					actionState = nextAction;
-				} else {
-#define AISCRIPT ((monObj->m_aiState == 0) \
-	? script \
-	: (reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
-		(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10))
-					short aiState = monObj->m_aiState;
-					int aiStateI = aiState;
-					unsigned char* aiScript;
-					if (aiState == 0) {
-						aiScript = scriptC;
-					} else {
-						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiStateI + *reinterpret_cast<unsigned short*>(scriptC + 0x100)) * 0x1D0 + 0x10;
-					}
-					int actionOffset = nextAction * 0x10;
-					if ((*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110) & 0x20) != 0) {
-						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-						actionState = 0x21;
-						if (monObj->m_moveWork.m_mode != 4) {
-							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-							monObj->m_moveWork.m_flags = 0x855;
-							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
-								monObj->m_moveWork.m_flags |= 0x400;
-							}
-							if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x80) != 0) {
-								monObj->m_moveWork.m_flags |= 0x20000;
-							}
-							monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
-							monObj->m_moveWork.m_mode = 4;
-							monObj->m_moveWork.m_range = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
-							monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
-						}
-						monObj->m_moveWork.m_target = target;
-						monObj->m_chaseState = 5;
-						monObj->m_chaseTimer = 0;
-						monObj->m_chaseDirty = 1;
-						return;
-					}
-
-					unsigned char* aiScript3;
-					if (aiState == 0) {
-						aiScript3 = reinterpret_cast<unsigned char*>(handleB[9]);
-					} else {
-						aiScript3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiStateI + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handleB[9]) + 0x100)) * 0x1D0 + 0x10;
-					}
-					float actionRange = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript3 + actionOffset + 0x11C));
-					unsigned char* aiScript4;
-					if (aiState == 0) {
-						aiScript4 = reinterpret_cast<unsigned char*>(handleB[9]);
-					} else {
-						aiScript4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiStateI + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handleB[9]) + 0x100)) * 0x1D0 + 0x10;
-					}
-					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-					int actionParam = static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript4 + actionOffset + 0x11E));
-					actionState = 0x21;
-					if (monObj->m_moveWork.m_mode != 2) {
-						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-						monObj->m_moveWork.m_flags = 0x325;
-						if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x40) != 0) {
-							monObj->m_moveWork.m_flags |= 0x10000;
-						}
-						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
-						monObj->m_moveWork.m_mode = 2;
-					}
-					monObj->m_moveWork.m_target = target;
-					monObj->m_moveWork.m_range = actionRange;
-					monObj->m_moveWork.m_changeStat = actionParam;
-#undef AISCRIPT
-				}
-			} else {
-				actionState = nextAction - 0xE;
-			}
-			monObj->m_chaseState = 1;
-			monObj->m_chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-			return;
-	}
-#undef script
-#undef actionState
-}
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlMove()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveChaseAndStat(CGCharaObj*, int, float, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveAway(CGCharaObj*, int, int, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveEscape()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveChase(CGCharaObj*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancel()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlEscape()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlEscapeCheck()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlWaiting()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlHide()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlAway()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlWaitingCheck()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlSet(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801162B4
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::resetWork()
-{
-	*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-	memset(&m_moveWork, 0, sizeof(m_moveWork));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::isValidTarget()
-{
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-#define script9 (reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]))
-	float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCC));
-	float homeDist = PSVECDistance(&m_homePosition, reinterpret_cast<Vec*>(mon + 0x15C));
-	unsigned char* aiData;
-
-	short aiState = m_aiState;
-	if (aiState == 0) {
-		aiData = script9;
-	} else {
-		aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-		         (aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) *
-		             0x1D0 +
-		         0x10;
-	}
-
-	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiData + 0x102);
-	if ((m_targetPartyIndex >= 0) &&
-	    ((aiFlags & 0x20) != 0)) {
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-		memset(&m_moveWork, 0, sizeof(m_moveWork));
-		m_chaseState = 2;
-		m_chaseTimer = 0;
-		m_chaseDirty = 1;
-		return;
-	}
-
-	if (((aiFlags & 0x20) != 0) ||
-	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-		memset(&m_moveWork, 0, sizeof(m_moveWork));
-		m_chaseState = 0;
-		m_chaseTimer = 0;
-		m_chaseDirty = 1;
-		return;
-	}
-
-	if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
-		if (m_moveWork.m_mode != 3) {
-			memset(&m_moveWork, 0, sizeof(m_moveWork));
-			m_moveWork.m_flags = 0x806;
-			m_moveWork.m_mode = 3;
-		}
-		m_moveWork.m_targetPos = m_homePosition;
-	}
-
-	if (((*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
-	    ((*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) || !(homeDist < kMonObjHalf * maxDist))) {
-		goto check_home;
-	}
-
-	{
-		int partyIndex;
-		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) <
-			(Game.m_gameWork.m_soundOptionFlag != 0 ? kMonObjWideSoundRange : kMonObjNormalSoundRange)) {
-			int colIndex;
-			float hitScale;
-			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
-			         static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)),
-			         &hitScale, &colIndex);
-			partyIndex = colIndex >= 0 ? colIndex : -1;
-		} else {
-			partyIndex = -1;
-		}
-
-		if (partyIndex >= 0) {
-			m_targetPartyIndex = partyIndex;
-			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
-				m_chaseState = 2;
-				m_chaseTimer = 0;
-				m_chaseDirty = 1;
-			} else {
-				m_chaseState = 1;
-				m_chaseTimer = 0;
-				m_chaseDirty = 1;
-			}
-			return;
-		}
-	}
-
-check_home:
-	if ((homeDist < kMonObjHomeSnapDistance) ||
-	    (m_chaseTimer == static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x1B8)))) {
-		m_homePosition = *reinterpret_cast<Vec*>(mon + 0x15C);
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-		memset(&m_moveWork, 0, sizeof(m_moveWork));
-		m_chaseState = 0;
-		m_chaseTimer = 0;
-		m_chaseDirty = 1;
-	} else if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) {
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1C;
-	}
-#undef script9
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80116654
- * PAL Size: 540b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::seKiduki()
-{
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	if (m_unk6BE != 0) {
-		return;
-	}
-
-	int notice = false;
-	int partyIndex;
-
-	if (m_unk6BD != 0) {
-		partyIndex = m_targetPartyIndex;
-	} else {
-		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
-
-		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
-			int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
-			unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-			int colIndex;
-			float hitScale;
-
-			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
-			         static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8)),
-			         &hitScale, &colIndex);
-			partyIndex = colIndex;
-			if (partyIndex >= 0) {
-				goto haveNotice;
-			}
-		}
-		partyIndex = -1;
-	}
-
-haveNotice:
-	if (partyIndex >= 0) {
-		int action = m_actionBranch;
-		int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
-		unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-		unsigned short noticeFlags = *reinterpret_cast<unsigned short*>(script + 0xFE);
-
-		if ((action == 0) && ((noticeFlags & 0x80) != 0)) {
-			notice = true;
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x32;
-		} else if ((action == 0) && ((noticeFlags & 0x20) != 0)) {
-			notice = true;
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x33;
-		} else if ((action == 0) && (((noticeFlags & 0x40) != 0) || (scriptHandle[4] == 0x39))) {
-			notice = true;
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x34;
-		}
-	}
-
-	int classId = (*reinterpret_cast<int**>(mon + 0x58))[4];
-	switch (classId) {
-	case 0x6A:
-		notice = true;
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x35;
-		break;
-	case 0x70:
-	case 0x7B:
-		notice = true;
-		break;
-	}
-
-	if (notice) {
-		if (classId == 0x7B) {
-			m_chaseState = 0;
-			m_chaseTimer = 0;
-			m_chaseDirty = 1;
-		} else if (m_unk6BD == 0) {
-			m_chaseState = 2;
-			m_chaseTimer = 0;
-			m_chaseDirty = 1;
-		} else {
-			m_chaseState = 2;
-			m_chaseTimer = 0;
-			m_chaseDirty = 1;
-		}
-
-		m_targetPartyIndex = partyIndex;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80116870
- * PAL Size: 2004b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, int* hitPartyIndex)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	if (hitScale != NULL) {
-		*hitScale = kMonObjDefaultScale;
-	}
-	if (hitPartyIndex != NULL) {
-		*hitPartyIndex = -1;
-	}
-
-	CVector startPos;
-	CVector forward;
-	CVector move;
-	{
-		CVector tmp(object->m_worldPosition.x, object->m_worldPosition.y, object->m_worldPosition.z);
-		startPos.x = tmp.x;
-		startPos.y = tmp.y;
-		startPos.z = tmp.z;
-	}
-	{
-		float sinY = static_cast<float>(sin(static_cast<double>(rotY)));
-		float cosY = static_cast<float>(cos(static_cast<double>(rotY)));
-		CVector tmp(sinY, kMonObjZero, cosY);
-		forward.x = tmp.x;
-		forward.y = tmp.y;
-		forward.z = tmp.z;
-	}
-	{
-		CVector scaled;
-		PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), distance);
-		move.x = scaled.x;
-		move.y = scaled.y;
-		move.z = scaled.z;
-	}
-
-	unsigned char* aiScript;
-	if (m_aiState == 0) {
-		aiScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-	} else {
-		aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-			(static_cast<int>(m_aiState) +
-			 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
-	}
-
-	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
-	if ((m_bind != 0) &&
-		(((m_chaseState == 4) && ((aiFlags & 8) == 0)) ||
-		 ((m_chaseState != 4) && ((aiFlags & 4) == 0)))) {
-		unsigned char* bind = m_bind;
-		unsigned char* modelData = *reinterpret_cast<unsigned char**>(
-			reinterpret_cast<unsigned char*>(object->m_charaModelHandle) + 0x168);
-		Mtx bindMtx;
-		PSMTXCopy(*reinterpret_cast<Mtx*>(bind + 0x6C), bindMtx);
-		bindMtx[0][3] = bindMtx[0][3] + *reinterpret_cast<float*>(modelData + 0x74);
-		bindMtx[1][3] = bindMtx[1][3] + *reinterpret_cast<float*>(modelData + 0x84);
-		bindMtx[2][3] = bindMtx[2][3] + *reinterpret_cast<float*>(modelData + 0x94);
-		startPos.x = bindMtx[0][3];
-		startPos.y = bindMtx[1][3];
-		startPos.z = bindMtx[2][3];
-
-		PSMTXMultVecSR(bindMtx, CVector(kMonObjDefaultScale, kMonObjZero, kMonObjZero), reinterpret_cast<Vec*>(&forward));
-		forward.y = kMonObjZero;
-		forward.Normalize();
-		{
-			CVector scaled;
-			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), distance);
-			move.x = scaled.x;
-			move.y = scaled.y;
-			move.z = scaled.z;
-		}
-	}
-
-	if ((flags & 1) != 0) {
-		unsigned short cylHitArg = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
-		float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
-		CMapCylinder hitCylinder;
-		hitCylinder.m_bottom.x = startPos.x;
-		hitCylinder.m_bottom.y = startPos.y;
-		hitCylinder.m_bottom.z = startPos.z;
-		hitCylinder.m_axis.x = move.x;
-		hitCylinder.m_axis.y = move.y;
-		hitCylinder.m_axis.z = move.z;
-		hitCylinder.m_radius = cylRadius;
-
-		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), cylHitArg);
-		if (hit != 0) {
-			float hitT = g_hit_t_slide_min;
-			if (hitScale != NULL) {
-				*hitScale = hitT;
-			}
-			PSVECScale(reinterpret_cast<Vec*>(&move), reinterpret_cast<Vec*>(&move), hitT);
-			distance = distance * hitT;
-		}
-		CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), cylRadius, 1, hit);
-	}
-
-	if ((flags & 2) != 0) {
-		float halfAngle = kMonObjHalf * (kMonObjDegToRad *
-			static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCA)));
-		float sideDist = kMonObjZero;
-		if (kMonObjZero != halfAngle) {
-			sideDist = kMonObjConeSideRadius / static_cast<float>(tan(static_cast<double>(halfAngle)));
-		}
-
-		Vec coneStart;
-		coneStart.x = startPos.x;
-		coneStart.y = startPos.y;
-		coneStart.z = startPos.z;
-		{
-			CVector scaled;
-			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
-			Vec sideOffset;
-			sideOffset.x = scaled.x;
-			sideOffset.y = scaled.y;
-			sideOffset.z = scaled.z;
-			PSVECSubtract(&coneStart, &sideOffset, &coneStart);
-		}
-
-		float coneLength = distance + sideDist;
-		{
-			CVector scaled;
-			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
-			Vec sideOffset;
-			sideOffset.x = scaled.x;
-			sideOffset.y = scaled.y;
-			sideOffset.z = scaled.z;
-			PSVECAdd(reinterpret_cast<Vec*>(&move), &sideOffset, reinterpret_cast<Vec*>(&move));
-		}
-
-		int didHit = 0;
-		for (int rank = 0; rank < 4; rank++) {
-			if (((flags & 4) != 0) && (((m_updateCounter + rank) % 4) != 0)) {
-				continue;
-			}
-
-			int partyIndex = m_partyRank[rank];
-			CGPartyObj* partyObj = Game.m_partyObjArr[partyIndex];
-			if (partyObj == NULL) {
-				continue;
-			}
-
-			if (((Game.m_gameWork.m_menuStageMode != 0) &&
-				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				 partyObj->IsKindOf(0x6D) &&
-				 (reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0)) ||
-				(reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_hp == 0) ||
-				(partyObj->m_lastStateId == 9) ||
-				(partyObj->m_lastStateId == 0x22) ||
-				((Game.m_gameWork.m_menuStageMode != 0) &&
-				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				 partyObj->IsKindOf(0x6D) &&
-				 (reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0)) ||
-				!(m_partyDistance[partyIndex] <
-				 (coneLength - sideDist))) {
-				continue;
-			}
-
-			Vec partyPos;
-			{
-				CVector partyPosVec(partyObj->m_worldPosition.x,
-					partyObj->m_worldPosition.y + partyObj->unk_0x184, partyObj->m_worldPosition.z);
-				partyPos.x = partyPosVec.x;
-				partyPos.y = partyPosVec.y;
-				partyPos.z = partyPosVec.z;
-			}
-
-			Vec targetDelta;
-			{
-				CVector delta;
-				PSVECSubtract(&partyPos, &coneStart, reinterpret_cast<Vec*>(&delta));
-				targetDelta.x = delta.x;
-				targetDelta.y = delta.y;
-				targetDelta.z = delta.z;
-			}
-			float targetDist = PSVECMag(&targetDelta);
-			if (!(kMonObjZero < targetDist)) {
-				continue;
-			}
-
-			CVector targetDir;
-			PSVECNormalize(&targetDelta, reinterpret_cast<Vec*>(&targetDir));
-			float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&targetDir));
-			if (!((sideDist - object->m_bodyEllipsoidRadius) <= targetDist) ||
-				((halfAngle != kMonObjZero) &&
-				 !(kMonObjZero < dot))) {
-				continue;
-			}
-
-			float angle = static_cast<float>(acos(static_cast<double>(dot)));
-			if ((halfAngle != kMonObjZero) &&
-				!(angle < halfAngle)) {
-				continue;
-			}
-
-			didHit = 1;
-			float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
-			unsigned short hitMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
-			Vec cylTop;
-			{
-				CVector delta;
-				PSVECSubtract(&partyPos, reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&delta));
-				cylTop.x = delta.x;
-				cylTop.y = delta.y;
-				cylTop.z = delta.z;
-			}
-			CMapCylinder hitCylinder;
-			hitCylinder.m_bottom.x = startPos.x;
-			hitCylinder.m_bottom.y = startPos.y;
-			hitCylinder.m_bottom.z = startPos.z;
-			hitCylinder.m_axis.x = cylTop.x;
-			hitCylinder.m_axis.y = cylTop.y;
-			hitCylinder.m_axis.z = cylTop.z;
-			hitCylinder.m_radius = cylRadius;
-
-			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, &cylTop, hitMask);
-			Vec debugDelta;
-			debugDelta.x = targetDelta.x;
-			debugDelta.y = targetDelta.y;
-			debugDelta.z = targetDelta.z;
-			if (mapHit != 0) {
-				PSVECScale(&debugDelta, &debugDelta, g_hit_t_slide_min);
-			}
-			CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), &debugDelta, cylRadius, 1, mapHit == 0);
-
-			if (mapHit == 0) {
-				if (hitPartyIndex != NULL) {
-					*hitPartyIndex = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId;
-				}
-				break;
-			}
-		}
-
-		if (halfAngle != kMonObjZero) {
-			float debugRadius = coneLength * static_cast<float>(tan(static_cast<double>(halfAngle)));
-			CFlat.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80117044
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::aiTargetAttackRomMon(int classId)
-{
-	int partyIndex = getNearParty(-1, 0x47, 0.0f, 0.0f, classId);
-	if (partyIndex >= 0) {
-		m_targetPartyIndex = partyIndex;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80117090
- * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::aiTarget()
-{
-	int partyIndex = getNearParty(0, 7, 0.0f, INFINITY, -1);
-	if (partyIndex >= 0) {
-		m_targetPartyIndex = partyIndex;
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::link(CGPartyObj*, CGMonObj*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801170E0
- * PAL Size: 724b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onDamaged(CGPrgObj* prgObj)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-#define prgScript (*reinterpret_cast<void***>(reinterpret_cast<unsigned char*>(prgObj) + 0x58))
-
-	m_unk6BF = 1;
-
-	unsigned short prgFlags = static_cast<unsigned short>(prgObj->GetCID());
-	if ((prgFlags & 0x6D) == 0x6D) {
-		unsigned char* aiData;
-		if (m_aiState == 0) {
-			aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-		} else {
-			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(m_aiState +
-					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
-		}
-
-		int attackerIndex = reinterpret_cast<int>(prgScript[0xED]);
-		if ((static_cast<int>(*reinterpret_cast<unsigned short*>(aiData + 0x106)) == 1) || (m_targetPartyIndex < 0)) {
-			if ((static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode) != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-				prgFlags = static_cast<unsigned short>(prgObj->GetCID());
-				if ((prgFlags & 0x6D) == 0x6D) {
-					if (reinterpret_cast<int>(prgScript[0xED]) != 0) {
-						goto skip_target_update;
-					}
-				}
-			}
-			m_targetPartyIndex = attackerIndex;
-		}
-
-skip_target_update:
-		int teamNo = reinterpret_cast<int>(object->m_scriptHandle[2]);
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(prgObj) + 0x6C0) = teamNo;
-		GbaQue.SetHitEnemy(reinterpret_cast<int>(prgScript[0xED]), teamNo);
-
-		unsigned short groupTag = m_groupTag;
-		if ((groupTag & 0x7FFF) != 0) {
-			for (CGMonObj* other = CFlat.FindGMonObjFirst(); other != nullptr;
-				other = CFlat.FindGMonObjNext(other)) {
-				if (other == this) {
-					continue;
-				}
-
-				if ((other->m_groupTag & 0x7FFF) == 0) {
-					continue;
-				}
-				if ((groupTag & 0x7FFF) != (other->m_groupTag & 0x7FFF)) {
-					continue;
-				}
-
-				void** otherScript = reinterpret_cast<CGObject*>(other)->m_scriptHandle;
-				if (*reinterpret_cast<unsigned short*>(otherScript + 7) == 0) {
-					continue;
-				}
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(otherScript) + 0x3E) != 0) {
-					continue;
-				}
-				if (*reinterpret_cast<unsigned short*>(otherScript + 0x14) != 0) {
-					continue;
-				}
-				if (*reinterpret_cast<unsigned short*>(otherScript + 0x11) != 0) {
-					continue;
-				}
-
-				other->m_targetPartyIndex = reinterpret_cast<int>(prgScript[0xED]);
-				other->m_unk6BD = 1;
-
-				int otherClassId = reinterpret_cast<int>(reinterpret_cast<CGObject*>(other)->m_scriptHandle[4]);
-				if (other->m_chaseState != 4) {
-					other->m_chaseState = 2;
-					other->m_chaseTimer = 0;
-					other->m_chaseDirty = 1;
-				} else if ((other->m_actionBranch == 0) && (otherClassId == 0x55)) {
-					reinterpret_cast<CGPrgObj*>(other)->changeStat(0x18, 0, 0);
-					other->m_chaseState = 2;
-					other->m_chaseTimer = 0;
-					other->m_chaseDirty = 1;
-				}
-			}
-		}
-	}
-
-	if (*reinterpret_cast<int*>(mon + 0x520) == 0x11) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-	}
-
-	int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-	if ((m_actionBranch == 0) && (classId == 0x55)) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(0x18, 0, 0);
-	}
-
-	m_chaseState = 2;
-	m_chaseTimer = 0;
-	m_chaseDirty = 1;
-
-	if (m_funcs->damaged != 0) {
-		(this->*m_funcs->damaged)();
-	}
-#undef prgScript
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801173B4
- * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onAttacked(CGPrgObj*)
-{
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	m_unk6C0 = 1;
-
-	if (m_funcs->attacked != 0) {
-		(this->*m_funcs->attacked)();
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8011740C
- * PAL Size: 644b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
-{
-	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	charaObj->CGCharaObj::onDrawDebug(font, posX, posY, posZ);
-
-	if ((static_cast<signed char>((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31)) != 0) &&
-			(static_cast<int>(CFlatCenterState()) == 0) &&
-		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x4) & 0x80) != 0)) {
-		char text[0x100];
-		unsigned short aiState = m_groupTag;
-		int targetIndex = m_targetPartyIndex;
-		int targetChar = '-';
-		int aiMasked = aiState & 0x7FFF;
-
-		if (targetIndex >= 0) {
-			targetChar = targetIndex + '0';
-		}
-		int aiChar;
-		if (aiMasked == 0) {
-			aiChar = '-';
-		} else {
-			aiChar = aiMasked + 0x40;
-		}
-
-		sprintf(text, s_pctd_pctc_pctd_pctc_801DCA2C, (int)object->m_scriptHandle[2], aiChar,
-		        m_chaseState, targetChar);
-		float curPosY = posY;
-		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
-		font->SetPosY(curPosY);
-		font->SetPosZ(posZ);
-		font->Draw(text);
-		float lineH = static_cast<float>(font->m_glyphHeight) * font->scaleY;
-		posY = posY - lineH;
-
-		int targetDist;
-		if (m_targetPartyIndex >= 0) {
-			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + m_targetPartyIndex * 4 + 0x5D0));
-		} else {
-			targetDist = 0;
-		}
-
-		int chaseRange = static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC)));
-		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &object->m_worldPosition));
-		sprintf(text, s_pctd_pctd_pctd_801DCA38, targetDist, spawnDist, chaseRange);
-		float curPosY2 = posY;
-		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
-		font->SetPosY(curPosY2);
-		font->SetPosZ(posZ);
-		font->Draw(text);
-		float lineH2 = static_cast<float>(font->m_glyphHeight) * font->scaleY;
-		posY = posY - lineH2;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80117690
- * PAL Size: 812b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onStatDie()
-{
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	int subState = *reinterpret_cast<int*>(mon + 0x52C);
-
-	switch (subState) {
-	case 0:
-		if (*reinterpret_cast<int*>(mon + 0x530) == 0) {
-			unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-			reinterpret_cast<CGPrgObj*>(this)->playSe3D(
-				*reinterpret_cast<unsigned short*>(aiData + 0x190) * 1000 + *reinterpret_cast<unsigned short*>(aiData + 0x192) + 9,
-				0x32,
-				0x96,
-				0,
-				(Vec*)0
-			);
-
-			int pId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19E);
-			if (pId != 0xFFFF) {
-				int dataNo = -1;
-				dataNo = object->m_charaModelHandle->GetPdtSlot();
-				reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, kMonObjParticleRadiusScale * object->m_attackColRadius, 0);
-			}
-
-			int option = *reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
-			if (option < 9 && m_repop.delay == 0) {
-				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
-				CFlatSpawnBits(option) |= 1ULL << shift;
-			}
-			return;
-		}
-
-		if (reinterpret_cast<CGPrgObj*>(this)->isLoopAnimDirect() != 0) {
-			reinterpret_cast<CGPrgObj*>(this)->changeSubStat(1);
-		}
-		return;
-
-	case 1: {
-		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-#define subFrame (*reinterpret_cast<int*>(mon + 0x530))
-
-		if ((*reinterpret_cast<unsigned short*>(aiData + 0xFE) & 2) == 0) {
-			goto deathElse;
-		}
-		if (subFrame == 0) {
-			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-			int particleId;
-			switch (classId) {
-			case 4:
-				particleId = 0x253;
-				break;
-			case 5:
-				particleId = 599;
-				break;
-			case 6:
-				particleId = 0x25B;
-				break;
-			}
-
-			*reinterpret_cast<int*>(mon + 0x560) = particleId;
-			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-			return;
-		}
-		if (subFrame != 0x19) {
-			return;
-		}
-
-	deathCleanup:
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
-		*reinterpret_cast<float*>(mon + 0x694) = kMonObjZero;
-		enableAttackCol(0, 0, 0);
-		object->m_bgColMask &= 0xFFF6FFFD;
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
-		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, kMonObjParticleRadiusScale * object->m_attackColRadius, 0);
-		CGItemObj::CreateFromScript(1, 0, 0, object, kMonObjZero, 0);
-		object->PutDropItem();
-		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(2);
-		return;
-
-	deathElse:
-		if (subFrame == 0) {
-			goto deathCleanup;
-		}
-		return;
-#undef subFrame
-	}
-
-	case 2: {
-		unsigned short repopDelay = m_repop.delay;
-		if ((repopDelay != 0) && (*reinterpret_cast<int*>(mon + 0x530) == static_cast<int>(repopDelay) * 0x1E)) {
-			setRepop(0);
-		}
-		return;
-	}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801179BC
- * PAL Size: 92b
- * EN Address: 0x80116D1C
- * EN Size: 92b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onStatShield()
-{
-	if (m_subState == 1) {
-		int subFrame = m_subFrame;
-		int action = m_itemId;
-		int waitFrame = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[action].m_power;
-
-		if (subFrame == waitFrame) {
-			changeSubStat(3);
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80117A18
- * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::getReplaceStat(int state)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
-	switch (state) {
-	case 0:
-	case 3:
-	case 0x1C:
-		if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == state) {
-			state = -1;
-		}
-		break;
-	case -0xE:
-	case -0xD:
-	case -0xC:
-	case -0xB:
-	case -0xA:
-	case -9:
-	case -8:
-	case -7:
-	case -6:
-	case -5:
-		{
-			unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
-			unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0xE));
-			switch (actionType) {
-			case 0:
-			case 1:
-				state = 1;
-				break;
-			case 2:
-				state = 2;
-				break;
-			case 3:
-				state = 0x12;
-				break;
-			case 4:
-				state = 8;
-				break;
-			}
-		}
-		break;
-	default:
-		return CGCharaObj::getReplaceStat(state);
-	}
-
-	return state;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80117B08
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::enableDamageCol(int enabled)
-{
-	if (enabled != 0) {
-		m_damageColliders[0].m_hitMask = 1;
-		m_damageColliders[1].m_hitMask = 1;
-	} else {
-		m_damageColliders[0].m_hitMask = 0;
-		m_damageColliders[1].m_hitMask = 0;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80117B30
- * PAL Size: 256b
- * EN Address: 0x80116E90
- * EN Size: 256b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::enableAttackCol(int enabled, int, int)
-{
-	if (enabled != 0) {
-		int attackKind = m_itemId;
-		const SCharaItemRow* attackData = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackKind];
-		int colValue;
-		int colMask = attackData->m_particleFlags;
-		if (attackKind >= 0x1F5) {
-			colValue = attackData->m_kind;
-		} else {
-			colValue = 1;
-		}
-
-		for (int i = 0; i < 8; i++) {
-			if (((colMask >> i) & 1) != 0) {
-				SetAttackColMask(i, colValue);
-			}
-		}
-	} else {
-		SetAttackColMask(-1, 0);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80117C30
- * PAL Size: 300b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onAnimPoint(int param2, int param3)
-{
-#define object (reinterpret_cast<CGObject*>(this))
-	int soundEffect;
-	int particleId = 0xFFFF;
-	int soundId = 0xFFFF;
-
-	switch (param3) {
-	case 10:
-	case 11:
-		particleId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A4);
-		if ((particleId != 0xFFFF) && (param3 == 10)) {
-			particleId += 1;
-		}
-		soundId = *reinterpret_cast<unsigned short*>(
-			reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) + 0x1A6);
-		break;
-	}
-
-	if (particleId != 0xFFFF) {
-		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticle(particleId | (dataNo << 8), 0, object, kMonObjDefaultScale, 0);
-	}
-
-	if (soundId != 0xFFFF) {
-		if (soundId == 0xFFFF) {
-			soundEffect = 0;
-		} else {
-			soundEffect = (soundId & 0xFF) + ((int)soundId >> 8) * 1000;
-		}
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(
-			soundEffect,
-			0x32,
-			0x96,
-			0,
-			(Vec*)0
-		);
-	}
-
-	CGCharaObj::onAnimPoint(param2, param3);
-#undef object
-}
 
 static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 {
@@ -3069,70 +104,535 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 	}
 }
 
-
 /*
  * --INFO--
- * PAL Address: 0x80117D5C
- * PAL Size: 756b
+ * PAL Address: 0x8011A4CC
+ * PAL Size: 168b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::onStatMagic()
+void CGMonObj::onCreate()
+{
+	CGCharaObj::onCreate();
+
+	m_targetPartyIndex = -1;
+	m_aiState = 0;
+	m_aiStatePrev = 0;
+	m_unk6C8 = 0;
+	m_unk6CC = 0;
+	m_actionBranch = 0;
+	m_unk6B8 = 0;
+	m_unk6B9 = 0;
+	m_unk6BA = 0;
+	m_unk6BC = 0;
+	m_unk6BD = 0;
+	m_unk6BE = 0;
+	m_attackDelay = 0;
+	m_aliveFrames = 0;
+	m_unk6BF = 0;
+	m_unk6C0 = 0;
+	m_unk6C2 = 0;
+	m_unk6C3 = 0;
+	m_chaseState = 0;
+	m_chaseTimer = 0;
+	m_chaseDirty = 0;
+	m_stepSeHandle = 0;
+	m_moveWork.Clear();
+	m_unk6E0 = 0;
+	m_unk6C1 = 0;
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011A4AC
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onDestroy()
+{
+	CGCharaObj::onDestroy();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011A290
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onFramePreCalc()
+{
+#define object (reinterpret_cast<CGObject*>(this))
+#define mon (reinterpret_cast<unsigned char*>(this))
+
+	CGCharaObj::onFramePreCalc();
+	m_aliveFrames += 1;
+
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+		unsigned char* aiData;
+		short& aiState = m_aiState;
+		short& aiStatePrev = m_aiStatePrev;
+
+		if (aiState == 0) {
+			aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		} else {
+			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+				(aiState + *reinterpret_cast<unsigned short*>(
+					reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
+		}
+
+		aiState = (this->*m_funcs->calcBranch)(*reinterpret_cast<unsigned short*>(aiData + 0x102) & 3);
+
+		if (aiState != aiStatePrev) {
+			aiStatePrev = aiState;
+			m_unk6CC = 0;
+		}
+	}
+
+	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x3E) == 0) &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x50) == 0) &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x44) == 0) &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x46) == 0) &&
+		(static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(mon[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
+		(m_unk6B9 == 0) &&
+		(m_unk6C1 == 0)) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = -1;
+		} else {
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		}
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
+
+		int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+		int aiLocal = 0;
+		if ((0x9A <= classId) ||
+			(classId < 0x8E)) {
+			(this->*m_funcs->logic)();
+		} else {
+			aiAddDuct(aiLocal);
+		}
+
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+			if ((*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != -1) && (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId)) {
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
+			}
+		} else if (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
+		}
+	}
+#undef object
+#undef mon
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011A248
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::flyDown()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	prgObj->changeStat(0x17, 0, 0);
+	m_unk6B9 = 1;
+	charaObj->damageDelete();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011A21C
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::flyUp()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	prgObj->changeStat(0x16, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011A0F4
+ * PAL Size: 296b
+ * EN Address: 0x80133144
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::undeadOff()
+{
+	m_alpha = 1.0f;
+
+	setUndeadEffect(m_weaponNodeFlagBits.m_prg, 0);
+
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB) {
+		SetTexAnim(const_cast<char*>(s_monObjTexAnimU0));
+	}
+
+	m_unk6BA = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80119F74
+ * PAL Size: 384b
+ * EN Address: 0x801331B8
+ * EN Size: 240b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::undeadOn()
+{
+	m_alpha = kMonObjTwoFifths;
+	int classId = reinterpret_cast<int>(m_scriptHandle[4]);
+	setUndeadEffect(m_weaponNodeFlagBits.m_prg, 1);
+
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB) {
+		SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
+	}
+
+	if (m_weaponNodeFlagBits.m_prg != 0) {
+		if (classId == 0x83) {
+			playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
+		} else if (classId == 0x7F) {
+			playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
+		}
+	}
+
+	m_unk6BA = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80119EC0
+ * PAL Size: 180b
+ * EN Address: 0x801332A8
+ * EN Size: 284b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
+{
+	if (targetPartyIndex >= 0) {
+		float targetRot = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[targetPartyIndex]));
+		if (rotLimit > kMonObjTwoThirdsPi) {
+			m_rotTargetY = targetRot;
+		} else {
+			float delta = Math.DstRot(targetRot, m_homeRotY);
+			float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
+			m_rotTargetY = m_homeRotY + clamped;
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80119A64
+ * PAL Size: 1116b
+ * EN Address: 0x801333C4
+ * EN Size: 664b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onStatAttack(int state)
 {
 #define prgObj (reinterpret_cast<CGPrgObj*>(this))
 #define object (reinterpret_cast<CGObject*>(this))
-#define mon (reinterpret_cast<unsigned char*>(this))
-	switch (prgObj->m_subState) {
-	case 0:
-		if (prgObj->m_subFrame == 0) {
-			int targetPartyIndex = m_targetPartyIndex;
-			if (targetPartyIndex >= 0) {
-				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-				m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+	SCharaItemRow* attackData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
+	int attackType = attackData->m_actionType;
+	unsigned short attackFlags = attackData->m_flags32;
 
-				if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x32)) & 2) == 0) {
-					float rotLimit = kMonObjDegToRad *
-						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
-					if (m_targetPartyIndex >= 0) {
-						float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
-						if (rotLimit > kMonObjTwoThirdsPi) {
-							object->m_rotTargetY = targetRot;
-						} else {
-							float delta = Math.DstRot(targetRot, object->m_homeRotY);
-							float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
-							object->m_rotTargetY = object->m_homeRotY + clamped;
-						}
-					}
-				}
-
-				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]);
-				targetPrg->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), targetPrg);
+	if (state == 0) {
+		if ((prgObj->m_stateFrame == 0) && (m_targetPartyIndex >= 0)) {
+			CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
+			m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+			if (state == 3) {
+				return;
 			}
 
-			CGCharaObj::putParticleFromItem(
-				*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
-			CGCharaObj::putParticleFromItem(
-				*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
-		}
-		return;
+			if ((attackFlags & 2) == 0) {
+				float rotLimit = kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
+				if (m_targetPartyIndex >= 0) {
+					float targetRot = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+					if (rotLimit > kMonObjTwoThirdsPi) {
+						m_rotTargetY = targetRot;
+					} else {
+						float delta = Math.DstRot(targetRot, m_homeRotY);
+						float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
+						m_rotTargetY = m_homeRotY + clamped;
+					}
+				}
+			}
 
-	case 1:
-		if (prgObj->m_subFrame > *reinterpret_cast<int*>(mon + 0x68C)) {
-			prgObj->changeSubStat(2);
+			target = Game.m_partyObjArr[m_targetPartyIndex];
+			reinterpret_cast<CGPrgObj*>(target)->bonus(0x17, m_itemId, reinterpret_cast<CGPrgObj*>(target));
 		}
 		return;
+	}
 
-	case 2:
-		if (prgObj->isLoopAnim() != 0) {
-			CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
+	if (attackType == 3) {
+		switch (prgObj->m_subState) {
+		case 0:
+			if (prgObj->isLoopAnim() != 0) {
+				prgObj->addSubStat();
+			}
+			break;
+		case 1:
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(m_unk554, 1, 0);
+			}
+			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (m_itemId * 0x48 + 0x2E))) {
+				prgObj->addSubStat();
+			}
+			break;
+		case 2:
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(m_unk558, 0, 0);
+				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
+			}
+			if (prgObj->isLoopAnim() != 0) {
+				CGMonObj_SetAttackAfter(this, m_itemId);
+			}
+			break;
 		}
 		return;
+	}
+
+	if ((__cntlzw(prgObj->m_stateArg) >> 5 & 1) && (prgObj->isLoopAnim() != 0)) {
+		CGMonObj_SetAttackAfter(this, m_itemId);
 	}
 #undef prgObj
 #undef object
 #undef mon
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80119930
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::setAttackAfter(int attackKind)
+{
+	CGMonObj_SetAttackAfter(this, attackKind);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80119674
+ * PAL Size: 700b
+ * EN Address: 0x80133808
+ * EN Size: 756b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float maxDist, int classId)
+{
+	int foundCount = 0;
+	int selectedPartyIndex = -1;
+
+	for (int slot = 0; slot < 4; slot++) {
+		int partyIndex = m_partyRank[slot];
+		CGPartyObj* party = Game.m_partyObjArr[partyIndex];
+
+		if ((party != NULL) &&
+			(((Game.m_gameWork.m_menuStageMode == 0) ||
+				(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
+				!party->IsKindOf(0x6D) ||
+				(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0))) &&
+			(((flags & 1) == 0) ||
+				((reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_hp != 0) &&
+					(party->m_lastStateId != 9) && (party->m_lastStateId != 0x22) &&
+					((Game.m_gameWork.m_menuStageMode == 0) ||
+						(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
+						!party->IsKindOf(0x6D) ||
+						(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0)))) &&
+			(((flags & 0x10) == 0) ||
+				(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_statusTimers[8] != 0)) &&
+			(((flags & 0x20) == 0) ||
+				(((party->m_lastStateId == 6) || (party->m_lastStateId == 2)) &&
+					(party->m_subState == 1))) &&
+			(((flags & 0x40) == 0) ||
+				((party->m_partyData.unk6C0 >= 0) &&
+					(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_baseDataIndex == classId))) &&
+			(((flags & 2) != 0) || !(m_partyDistance[partyIndex] < minDist)) &&
+			(((flags & 4) != 0) || !(maxDist < m_partyDistance[partyIndex]))) {
+			if (((flags & 8) != 0) && (0.0f < m_partyDistance[partyIndex])) {
+				Vec toParty;
+				Vec facing;
+				PSVECSubtract(&party->m_worldPosition, &m_worldPosition, &toParty);
+				PSVECScale(&toParty, &toParty, kMonObjDefaultScale / m_partyDistance[partyIndex]);
+				facing.x = sin(m_rotTargetY);
+				facing.y = 0.0f;
+				facing.z = cos(m_rotTargetY);
+				if (PSVECDotProduct(&toParty, &facing) <= 0.0f) {
+					continue;
+				}
+			}
+
+			if ((targetOrdinal == -1) || (targetOrdinal == foundCount)) {
+				selectedPartyIndex = partyIndex;
+				if (targetOrdinal == foundCount) {
+					break;
+				}
+			}
+			foundCount++;
+		}
+	}
+
+	return selectedPartyIndex;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80119528
+ * PAL Size: 332b
+ * EN Address: 0x80118888
+ * EN Size: 332b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onChangeStat(int state)
+{
+	(this->*m_funcs->changeStat)(state);
+
+	switch (state) {
+	case 0:
+	case 1:
+	case 2:
+		break;
+	case -14:
+	case -13:
+	case -12:
+	case -11:
+	case -10:
+	case -9:
+	case -8:
+	case -7:
+	case -6:
+	case -5:
+		setActionParam(state);
+		break;
+	}
+
+	CGCharaObj::onChangeStat(state);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80119428
+ * PAL Size: 256b
+ * EN Address: 0x80118788
+ * EN Size: 256b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::setActionParam(int state)
+{
+	state += 0xE;
+	CMonWork* work = reinterpret_cast<CMonWork*>(m_scriptHandle);
+	m_itemId = work->m_actionItems[state];
+	work = reinterpret_cast<CMonWork*>(m_scriptHandle);
+	m_attackAnimId = work->m_actionAnimations[state];
+	m_unk554 = m_attackAnimId + 1;
+	m_unk558 = m_unk554 + 1;
+	m_unk55C = m_unk558 + 1;
+
+	const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+	int actionType = items[m_itemId].m_actionType;
+	switch (actionType) {
+	case 0:
+	case 1:
+	case 3:
+		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		m_castFrameStart = items[m_itemId].m_attackStartFrame;
+		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		m_castFrameEnd = items[m_itemId].m_attackEndFrame;
+		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		m_castFrameCurrent = items[m_itemId].m_attackEndFrame;
+		break;
+	case 2:
+		m_unk68C = CGCharaObj::calcCastTime(m_itemId);
+		break;
+	case 4:
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80119278
+ * PAL Size: 432b
+ * EN Address: 0x801185D8
+ * EN Size: 432b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onCancelStat(int state)
+{
+	(this->*m_funcs->cancelStat)();
+
+	switch (m_lastStateId) {
+	case 0x1D:
+		CancelMove(1);
+		break;
+
+	case 0x16:
+		m_unk6B9 = 0;
+		SetAnimSlot(0, 0);
+		SetAnimSlot(1, 1);
+		SetAnimSlot(4, 4);
+		SetAnimSlot(6, 6);
+		break;
+
+	case 0x17:
+		m_unk6B9 = 1;
+		SetAnimSlot(0x28, 0);
+		SetAnimSlot(0x29, 1);
+		SetAnimSlot(0x2A, 4);
+		SetAnimSlot(0x2B, 6);
+		break;
+
+	case 0x21:
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		m_moveWork.Clear();
+		if ((m_moveWork.m_stateFlags & 2) == 0) {
+			(this->*m_funcs->moveCancel)();
+		}
+		break;
+
+	case 0x18:
+		m_actionBranch = 1;
+		SetAnimSlot(0, 0);
+		SetAnimSlot(4, 4);
+		m_bgColMask |= 0x50000;
+		m_bgColMask &= 0xFFFFFFF7;
+		m_objectFlags &= 0xFFFFFFEF;
+		break;
+	}
+
+	CGCharaObj::onCancelStat(state);
 }
 
 /*
@@ -3259,7 +759,7 @@ void CGMonObj::onFrameStat()
 					}
 					CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
 					if (m_moveWork.m_mode != 4) {
-						memset(&m_moveWork, 0, 0x34);
+						m_moveWork.Clear();
 						m_moveWork.m_flags = 0x855;
 						if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
 							m_moveWork.m_flags |= 0x400;
@@ -3356,7 +856,7 @@ void CGMonObj::onFrameStat()
 					float randF = Math.RandF();
 					float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
 						(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
-					object->moveVectorRot(kMonObjTwo * (FLOAT_803319C4 * randF), 0.0f, kMonObjQuarter * speedScale, rand + 10);
+					object->moveVectorRot(kMonObjTwo * (kMonObjPi * randF), 0.0f, kMonObjQuarter * speedScale, rand + 10);
 				} else {
 					unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
 					if ((object->m_weaponNodeFlagAll.m_bits1.m_bit20 == 0) ||
@@ -3617,292 +1117,66 @@ void CGMonObj::onFrameStat()
 #undef SET_DRAW_FLAG
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80119278
- * PAL Size: 432b
- * EN Address: 0x801185D8
- * EN Size: 432b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onCancelStat(int state)
-{
-	(this->*m_funcs->cancelStat)();
-
-	switch (m_lastStateId) {
-	case 0x1D:
-		CancelMove(1);
-		break;
-
-	case 0x16:
-		m_unk6B9 = 0;
-		SetAnimSlot(0, 0);
-		SetAnimSlot(1, 1);
-		SetAnimSlot(4, 4);
-		SetAnimSlot(6, 6);
-		break;
-
-	case 0x17:
-		m_unk6B9 = 1;
-		SetAnimSlot(0x28, 0);
-		SetAnimSlot(0x29, 1);
-		SetAnimSlot(0x2A, 4);
-		SetAnimSlot(0x2B, 6);
-		break;
-
-	case 0x21:
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-		memset(&m_moveWork, 0, sizeof(m_moveWork));
-		if ((m_moveWork.m_stateFlags & 2) == 0) {
-			(this->*m_funcs->moveCancel)();
-		}
-		break;
-
-	case 0x18:
-		m_actionBranch = 1;
-		SetAnimSlot(0, 0);
-		SetAnimSlot(4, 4);
-		m_bgColMask |= 0x50000;
-		m_bgColMask &= 0xFFFFFFF7;
-		m_objectFlags &= 0xFFFFFFEF;
-		break;
-	}
-
-	CGCharaObj::onCancelStat(state);
-}
 
 /*
  * --INFO--
- * PAL Address: 0x80119428
- * PAL Size: 256b
- * EN Address: 0x80118788
- * EN Size: 256b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::setActionParam(int state)
-{
-	state += 0xE;
-	CMonWork* work = reinterpret_cast<CMonWork*>(m_scriptHandle);
-	m_itemId = work->m_actionItems[state];
-	work = reinterpret_cast<CMonWork*>(m_scriptHandle);
-	m_attackAnimId = work->m_actionAnimations[state];
-	m_unk554 = m_attackAnimId + 1;
-	m_unk558 = m_unk554 + 1;
-	m_unk55C = m_unk558 + 1;
-
-	const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
-	int actionType = items[m_itemId].m_actionType;
-	switch (actionType) {
-	case 0:
-	case 1:
-	case 3:
-		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
-		m_castFrameStart = items[m_itemId].m_attackStartFrame;
-		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
-		m_castFrameEnd = items[m_itemId].m_attackEndFrame;
-		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
-		m_castFrameCurrent = items[m_itemId].m_attackEndFrame;
-		break;
-	case 2:
-		m_unk68C = CGCharaObj::calcCastTime(m_itemId);
-		break;
-	case 4:
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80119528
- * PAL Size: 332b
- * EN Address: 0x80118888
- * EN Size: 332b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onChangeStat(int state)
-{
-	(this->*m_funcs->changeStat)(state);
-
-	switch (state) {
-	case 0:
-	case 1:
-	case 2:
-		break;
-	case -14:
-	case -13:
-	case -12:
-	case -11:
-	case -10:
-	case -9:
-	case -8:
-	case -7:
-	case -6:
-	case -5:
-		setActionParam(state);
-		break;
-	}
-
-	CGCharaObj::onChangeStat(state);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80119674
- * PAL Size: 700b
- * EN Address: 0x80133808
- * EN Size: 756b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float maxDist, int classId)
-{
-	int foundCount = 0;
-	int selectedPartyIndex = -1;
-
-	for (int slot = 0; slot < 4; slot++) {
-		int partyIndex = m_partyRank[slot];
-		CGPartyObj* party = Game.m_partyObjArr[partyIndex];
-
-		if ((party != NULL) &&
-			(((Game.m_gameWork.m_menuStageMode == 0) ||
-				(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
-				!party->IsKindOf(0x6D) ||
-				(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0))) &&
-			(((flags & 1) == 0) ||
-				((reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_hp != 0) &&
-					(party->m_lastStateId != 9) && (party->m_lastStateId != 0x22) &&
-					((Game.m_gameWork.m_menuStageMode == 0) ||
-						(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
-						!party->IsKindOf(0x6D) ||
-						(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0)))) &&
-			(((flags & 0x10) == 0) ||
-				(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_statusTimers[8] != 0)) &&
-			(((flags & 0x20) == 0) ||
-				(((party->m_lastStateId == 6) || (party->m_lastStateId == 2)) &&
-					(party->m_subState == 1))) &&
-			(((flags & 0x40) == 0) ||
-				((party->m_partyData.unk6C0 >= 0) &&
-					(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_baseDataIndex == classId))) &&
-			(((flags & 2) != 0) || !(m_partyDistance[partyIndex] < minDist)) &&
-			(((flags & 4) != 0) || !(maxDist < m_partyDistance[partyIndex]))) {
-			if (((flags & 8) != 0) && (0.0f < m_partyDistance[partyIndex])) {
-				Vec toParty;
-				Vec facing;
-				PSVECSubtract(&party->m_worldPosition, &m_worldPosition, &toParty);
-				PSVECScale(&toParty, &toParty, kMonObjDefaultScale / m_partyDistance[partyIndex]);
-				facing.x = sin(m_rotTargetY);
-				facing.y = 0.0f;
-				facing.z = cos(m_rotTargetY);
-				if (PSVECDotProduct(&toParty, &facing) <= 0.0f) {
-					continue;
-				}
-			}
-
-			if ((targetOrdinal == -1) || (targetOrdinal == foundCount)) {
-				selectedPartyIndex = partyIndex;
-				if (targetOrdinal == foundCount) {
-					break;
-				}
-			}
-			foundCount++;
-		}
-	}
-
-	return selectedPartyIndex;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80119930
- * PAL Size: 308b
+ * PAL Address: 0x80117D5C
+ * PAL Size: 756b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::setAttackAfter(int attackKind)
-{
-	CGMonObj_SetAttackAfter(this, attackKind);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80119A64
- * PAL Size: 1116b
- * EN Address: 0x801333C4
- * EN Size: 664b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::onStatAttack(int state)
+void CGMonObj::onStatMagic()
 {
 #define prgObj (reinterpret_cast<CGPrgObj*>(this))
 #define object (reinterpret_cast<CGObject*>(this))
-	SCharaItemRow* attackData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
-	int attackType = attackData->m_actionType;
-	unsigned short attackFlags = attackData->m_flags32;
+#define mon (reinterpret_cast<unsigned char*>(this))
+	switch (prgObj->m_subState) {
+	case 0:
+		if (prgObj->m_subFrame == 0) {
+			int targetPartyIndex = m_targetPartyIndex;
+			if (targetPartyIndex >= 0) {
+				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+				m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 
-	if (state == 0) {
-		if ((prgObj->m_stateFrame == 0) && (m_targetPartyIndex >= 0)) {
-			CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
-			m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
-			if (state == 3) {
-				return;
-			}
-
-			if ((attackFlags & 2) == 0) {
-				float rotLimit = kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
-				if (m_targetPartyIndex >= 0) {
-					float targetRot = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
-					if (rotLimit > kMonObjTwoThirdsPi) {
-						m_rotTargetY = targetRot;
-					} else {
-						float delta = Math.DstRot(targetRot, m_homeRotY);
-						float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
-						m_rotTargetY = m_homeRotY + clamped;
+				if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x32)) & 2) == 0) {
+					float rotLimit = kMonObjDegToRad *
+						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
+					if (m_targetPartyIndex >= 0) {
+						float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+						if (rotLimit > kMonObjTwoThirdsPi) {
+							object->m_rotTargetY = targetRot;
+						} else {
+							float delta = Math.DstRot(targetRot, object->m_homeRotY);
+							float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
+							object->m_rotTargetY = object->m_homeRotY + clamped;
+						}
 					}
 				}
+
+				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]);
+				targetPrg->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), targetPrg);
 			}
 
-			target = Game.m_partyObjArr[m_targetPartyIndex];
-			reinterpret_cast<CGPrgObj*>(target)->bonus(0x17, m_itemId, reinterpret_cast<CGPrgObj*>(target));
+			CGCharaObj::putParticleFromItem(
+				*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+			CGCharaObj::putParticleFromItem(
+				*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
 		}
 		return;
-	}
 
-	if (attackType == 3) {
-		switch (prgObj->m_subState) {
-		case 0:
-			if (prgObj->isLoopAnim() != 0) {
-				prgObj->addSubStat();
-			}
-			break;
-		case 1:
-			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(m_unk554, 1, 0);
-			}
-			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (m_itemId * 0x48 + 0x2E))) {
-				prgObj->addSubStat();
-			}
-			break;
-		case 2:
-			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(m_unk558, 0, 0);
-				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
-			}
-			if (prgObj->isLoopAnim() != 0) {
-				CGMonObj_SetAttackAfter(this, m_itemId);
-			}
-			break;
+	case 1:
+		if (prgObj->m_subFrame > *reinterpret_cast<int*>(mon + 0x68C)) {
+			prgObj->changeSubStat(2);
 		}
 		return;
-	}
 
-	if ((__cntlzw(prgObj->m_stateArg) >> 5 & 1) && (prgObj->isLoopAnim() != 0)) {
-		CGMonObj_SetAttackAfter(this, m_itemId);
+	case 2:
+		if (prgObj->isLoopAnim() != 0) {
+			CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
+		}
+		return;
 	}
 #undef prgObj
 #undef object
@@ -3911,241 +1185,2926 @@ void CGMonObj::onStatAttack(int state)
 
 /*
  * --INFO--
- * PAL Address: 0x80119EC0
- * PAL Size: 180b
- * EN Address: 0x801332A8
- * EN Size: 284b
+ * PAL Address: 0x80117C30
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
+void CGMonObj::onAnimPoint(int param2, int param3)
 {
-	if (targetPartyIndex >= 0) {
-		float targetRot = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[targetPartyIndex]));
-		if (rotLimit > kMonObjTwoThirdsPi) {
-			m_rotTargetY = targetRot;
+#define object (reinterpret_cast<CGObject*>(this))
+	int soundEffect;
+	int particleId = 0xFFFF;
+	int soundId = 0xFFFF;
+
+	switch (param3) {
+	case 10:
+	case 11:
+		particleId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A4);
+		if ((particleId != 0xFFFF) && (param3 == 10)) {
+			particleId += 1;
+		}
+		soundId = *reinterpret_cast<unsigned short*>(
+			reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) + 0x1A6);
+		break;
+	}
+
+	if (particleId != 0xFFFF) {
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(particleId | (dataNo << 8), 0, object, kMonObjDefaultScale, 0);
+	}
+
+	if (soundId != 0xFFFF) {
+		if (soundId == 0xFFFF) {
+			soundEffect = 0;
 		} else {
-			float delta = Math.DstRot(targetRot, m_homeRotY);
-			float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
-			m_rotTargetY = m_homeRotY + clamped;
+			soundEffect = (soundId & 0xFF) + ((int)soundId >> 8) * 1000;
+		}
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(
+			soundEffect,
+			0x32,
+			0x96,
+			0,
+			(Vec*)0
+		);
+	}
+
+	CGCharaObj::onAnimPoint(param2, param3);
+#undef object
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80117B30
+ * PAL Size: 256b
+ * EN Address: 0x80116E90
+ * EN Size: 256b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::enableAttackCol(int enabled, int, int)
+{
+	if (enabled != 0) {
+		int attackKind = m_itemId;
+		const SCharaItemRow* attackData = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackKind];
+		int colMask = attackData->m_particleFlags;
+		int colValue = (attackKind >= 0x1F5) ? attackData->m_kind : 1;
+
+		for (int i = 0; i < 8; i++) {
+			if (((colMask >> i) & 1) != 0) {
+				SetAttackColMask(i, colValue);
+			}
+		}
+	} else {
+		SetAttackColMask(-1, 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80117B08
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::enableDamageCol(int enabled)
+{
+	if (enabled != 0) {
+		m_damageColliders[0].m_hitMask = 1;
+		m_damageColliders[1].m_hitMask = 1;
+	} else {
+		m_damageColliders[0].m_hitMask = 0;
+		m_damageColliders[1].m_hitMask = 0;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80117A18
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::getReplaceStat(int state)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	switch (state) {
+	case 0:
+	case 3:
+	case 0x1C:
+		if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == state) {
+			state = -1;
+		}
+		break;
+	case -0xE:
+	case -0xD:
+	case -0xC:
+	case -0xB:
+	case -0xA:
+	case -9:
+	case -8:
+	case -7:
+	case -6:
+	case -5:
+		{
+			unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
+			unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0xE));
+			switch (actionType) {
+			case 0:
+			case 1:
+				state = 1;
+				break;
+			case 2:
+				state = 2;
+				break;
+			case 3:
+				state = 0x12;
+				break;
+			case 4:
+				state = 8;
+				break;
+			}
+		}
+		break;
+	default:
+		return CGCharaObj::getReplaceStat(state);
+	}
+
+	return state;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801179BC
+ * PAL Size: 92b
+ * EN Address: 0x80116D1C
+ * EN Size: 92b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onStatShield()
+{
+	if (m_subState == 1) {
+		SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+		if (m_subFrame == rows[m_itemId].m_power) {
+			changeSubStat(3);
 		}
 	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80119F74
- * PAL Size: 384b
- * EN Address: 0x801331B8
- * EN Size: 240b
+ * PAL Address: 0x80117690
+ * PAL Size: 812b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::undeadOn()
+void CGMonObj::onStatDie()
 {
-	m_alpha = kMonObjTwoFifths;
-	int classId = reinterpret_cast<int>(m_scriptHandle[4]);
-	setUndeadEffect(m_weaponNodeFlagBits.m_prg, 1);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	int subState = *reinterpret_cast<int*>(mon + 0x52C);
 
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB) {
-		SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
-	}
+	switch (subState) {
+	case 0:
+		if (*reinterpret_cast<int*>(mon + 0x530) == 0) {
+			unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(
+				*reinterpret_cast<unsigned short*>(aiData + 0x190) * 1000 + *reinterpret_cast<unsigned short*>(aiData + 0x192) + 9,
+				0x32,
+				0x96,
+				0,
+				(Vec*)0
+			);
 
-	if (m_weaponNodeFlagBits.m_prg != 0) {
-		if (classId == 0x83) {
-			playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
-		} else if (classId == 0x7F) {
-			playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
+			int pId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19E);
+			if (pId != 0xFFFF) {
+				int dataNo = -1;
+				dataNo = object->m_charaModelHandle->GetPdtSlot();
+				reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, kMonObjParticleRadiusScale * object->m_attackColRadius, 0);
+			}
+
+			int option = *reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
+			if (option < 9 && m_repop.delay == 0) {
+				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
+				CFlatSpawnBits(option) |= 1ULL << shift;
+			}
+			return;
 		}
+
+		if (reinterpret_cast<CGPrgObj*>(this)->isLoopAnimDirect() != 0) {
+			reinterpret_cast<CGPrgObj*>(this)->changeSubStat(1);
+		}
+		return;
+
+	case 1: {
+		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+#define subFrame (*reinterpret_cast<int*>(mon + 0x530))
+
+		if ((*reinterpret_cast<unsigned short*>(aiData + 0xFE) & 2) == 0) {
+			goto deathElse;
+		}
+		if (subFrame == 0) {
+			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+			int particleId;
+			switch (classId) {
+			case 4:
+				particleId = 0x253;
+				break;
+			case 5:
+				particleId = 599;
+				break;
+			case 6:
+				particleId = 0x25B;
+				break;
+			}
+
+			*reinterpret_cast<int*>(mon + 0x560) = particleId;
+			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+			return;
+		}
+		if (subFrame != 0x19) {
+			return;
+		}
+
+	deathCleanup:
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
+		*reinterpret_cast<float*>(mon + 0x694) = kMonObjZero;
+		enableAttackCol(0, 0, 0);
+		object->m_bgColMask &= 0xFFF6FFFD;
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, kMonObjParticleRadiusScale * object->m_attackColRadius, 0);
+		CGItemObj::CreateFromScript(1, 0, 0, object, kMonObjZero, 0);
+		object->PutDropItem();
+		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(2);
+		return;
+
+	deathElse:
+		if (subFrame == 0) {
+			goto deathCleanup;
+		}
+		return;
+#undef subFrame
 	}
 
-	m_unk6BA = 0;
+	case 2: {
+		unsigned short repopDelay = m_repop.delay;
+		if ((repopDelay != 0) && (*reinterpret_cast<int*>(mon + 0x530) == static_cast<int>(repopDelay) * 0x1E)) {
+			setRepop(0);
+		}
+		return;
+	}
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8011A0F4
- * PAL Size: 296b
- * EN Address: 0x80133144
- * EN Size: 116b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::undeadOff()
-{
-	m_alpha = 1.0f;
-
-	setUndeadEffect(m_weaponNodeFlagBits.m_prg, 0);
-
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB) {
-		SetTexAnim(const_cast<char*>(s_monObjTexAnimU0));
-	}
-
-	m_unk6BA = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8011A21C
- * PAL Size: 44b
+ * PAL Address: 0x8011740C
+ * PAL Size: 644b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::flyUp()
+void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	prgObj->changeStat(0x16, 0, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8011A248
- * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::flyDown()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
-	prgObj->changeStat(0x17, 0, 0);
-	m_unk6B9 = 1;
-	charaObj->damageDelete();
+	charaObj->CGCharaObj::onDrawDebug(font, posX, posY, posZ);
+
+	if ((static_cast<signed char>((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31)) != 0) &&
+			(static_cast<int>(CFlatCenterState()) == 0) &&
+		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x4) & 0x80) != 0)) {
+		char text[0x100];
+		unsigned short aiState = m_groupTag;
+		int targetIndex = m_targetPartyIndex;
+		int targetChar = '-';
+		int aiMasked = aiState & 0x7FFF;
+
+		if (targetIndex >= 0) {
+			targetChar = targetIndex + '0';
+		}
+		int aiChar;
+		if (aiMasked == 0) {
+			aiChar = '-';
+		} else {
+			aiChar = aiMasked + 0x40;
+		}
+
+		sprintf(text, "%d %c %d %c", (int)object->m_scriptHandle[2], aiChar,
+		        m_chaseState, targetChar);
+		float curPosY = posY;
+		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
+		font->SetPosY(curPosY);
+		font->SetPosZ(posZ);
+		font->Draw(text);
+		float lineH = static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		posY = posY - lineH;
+
+		int targetDist;
+		if (m_targetPartyIndex >= 0) {
+			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + m_targetPartyIndex * 4 + 0x5D0));
+		} else {
+			targetDist = 0;
+		}
+
+		int chaseRange = static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC)));
+		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &object->m_worldPosition));
+		sprintf(text, "%d %d/%d", targetDist, spawnDist, chaseRange);
+		float curPosY2 = posY;
+		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
+		font->SetPosY(curPosY2);
+		font->SetPosZ(posZ);
+		font->Draw(text);
+		float lineH2 = static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		posY = posY - lineH2;
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8011A290
+ * PAL Address: 0x801173B4
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onAttacked(CGPrgObj*)
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	m_unk6C0 = 1;
+
+	if (m_funcs->attacked != 0) {
+		(this->*m_funcs->attacked)();
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801170E0
+ * PAL Size: 724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onDamaged(CGPrgObj* prgObj)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+#define prgScript (*reinterpret_cast<void***>(reinterpret_cast<unsigned char*>(prgObj) + 0x58))
+
+	m_unk6BF = 1;
+
+	unsigned short prgFlags = static_cast<unsigned short>(prgObj->GetCID());
+	if ((prgFlags & 0x6D) == 0x6D) {
+		unsigned char* aiData;
+		if (m_aiState == 0) {
+			aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		} else {
+			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+				(m_aiState +
+					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
+		}
+
+		int attackerIndex = reinterpret_cast<int>(prgScript[0xED]);
+		if ((static_cast<int>(*reinterpret_cast<unsigned short*>(aiData + 0x106)) == 1) || (m_targetPartyIndex < 0)) {
+			if ((static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode) != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
+				prgFlags = static_cast<unsigned short>(prgObj->GetCID());
+				if ((prgFlags & 0x6D) == 0x6D) {
+					if (reinterpret_cast<int>(prgScript[0xED]) != 0) {
+						goto skip_target_update;
+					}
+				}
+			}
+			m_targetPartyIndex = attackerIndex;
+		}
+
+skip_target_update:
+		int teamNo = reinterpret_cast<int>(object->m_scriptHandle[2]);
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(prgObj) + 0x6C0) = teamNo;
+		GbaQue.SetHitEnemy(reinterpret_cast<int>(prgScript[0xED]), teamNo);
+
+		unsigned short groupTag = m_groupTag;
+		if ((groupTag & 0x7FFF) != 0) {
+			for (CGMonObj* other = CFlat.FindGMonObjFirst(); other != nullptr;
+				other = CFlat.FindGMonObjNext(other)) {
+				if (other == this) {
+					continue;
+				}
+
+				if ((other->m_groupTag & 0x7FFF) == 0) {
+					continue;
+				}
+				if ((groupTag & 0x7FFF) != (other->m_groupTag & 0x7FFF)) {
+					continue;
+				}
+
+				void** otherScript = reinterpret_cast<CGObject*>(other)->m_scriptHandle;
+				if (*reinterpret_cast<unsigned short*>(otherScript + 7) == 0) {
+					continue;
+				}
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(otherScript) + 0x3E) != 0) {
+					continue;
+				}
+				if (*reinterpret_cast<unsigned short*>(otherScript + 0x14) != 0) {
+					continue;
+				}
+				if (*reinterpret_cast<unsigned short*>(otherScript + 0x11) != 0) {
+					continue;
+				}
+
+				other->m_targetPartyIndex = reinterpret_cast<int>(prgScript[0xED]);
+				other->m_unk6BD = 1;
+
+				int otherClassId = reinterpret_cast<int>(reinterpret_cast<CGObject*>(other)->m_scriptHandle[4]);
+				if (other->m_chaseState != 4) {
+					other->m_chaseState = 2;
+					other->m_chaseTimer = 0;
+					other->m_chaseDirty = 1;
+				} else if ((other->m_actionBranch == 0) && (otherClassId == 0x55)) {
+					reinterpret_cast<CGPrgObj*>(other)->changeStat(0x18, 0, 0);
+					other->m_chaseState = 2;
+					other->m_chaseTimer = 0;
+					other->m_chaseDirty = 1;
+				}
+			}
+		}
+	}
+
+	if (*reinterpret_cast<int*>(mon + 0x520) == 0x11) {
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+	}
+
+	int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	if ((m_actionBranch == 0) && (classId == 0x55)) {
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0x18, 0, 0);
+	}
+
+	m_chaseState = 2;
+	m_chaseTimer = 0;
+	m_chaseDirty = 1;
+
+	if (m_funcs->damaged != 0) {
+		(this->*m_funcs->damaged)();
+	}
+#undef prgScript
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::link(CGPartyObj*, CGMonObj*)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80117090
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::aiTarget()
+{
+	int partyIndex = getNearParty(0, 7, 0.0f, INFINITY, -1);
+	if (partyIndex >= 0) {
+		m_targetPartyIndex = partyIndex;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80117044
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::aiTargetAttackRomMon(int classId)
+{
+	int partyIndex = getNearParty(-1, 0x47, 0.0f, 0.0f, classId);
+	if (partyIndex >= 0) {
+		m_targetPartyIndex = partyIndex;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80116870
+ * PAL Size: 2004b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, int* hitPartyIndex)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	if (hitScale != NULL) {
+		*hitScale = kMonObjDefaultScale;
+	}
+	if (hitPartyIndex != NULL) {
+		*hitPartyIndex = -1;
+	}
+
+	CVector startPos;
+	CVector forward;
+	CVector move;
+	{
+		CVector tmp(object->m_worldPosition.x, object->m_worldPosition.y, object->m_worldPosition.z);
+		startPos.x = tmp.x;
+		startPos.y = tmp.y;
+		startPos.z = tmp.z;
+	}
+	{
+		float sinY = static_cast<float>(sin(static_cast<double>(rotY)));
+		float cosY = static_cast<float>(cos(static_cast<double>(rotY)));
+		CVector tmp(sinY, kMonObjZero, cosY);
+		forward.x = tmp.x;
+		forward.y = tmp.y;
+		forward.z = tmp.z;
+	}
+	{
+		CVector scaled;
+		PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), distance);
+		move.x = scaled.x;
+		move.y = scaled.y;
+		move.z = scaled.z;
+	}
+
+	unsigned char* aiScript;
+	if (m_aiState == 0) {
+		aiScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+	} else {
+		aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+			(static_cast<int>(m_aiState) +
+			 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
+	}
+
+	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
+	if ((m_bind != 0) &&
+		(((m_chaseState == 4) && ((aiFlags & 8) == 0)) ||
+		 ((m_chaseState != 4) && ((aiFlags & 4) == 0)))) {
+		unsigned char* bind = m_bind;
+		unsigned char* modelData = *reinterpret_cast<unsigned char**>(
+			reinterpret_cast<unsigned char*>(object->m_charaModelHandle) + 0x168);
+		Mtx bindMtx;
+		PSMTXCopy(*reinterpret_cast<Mtx*>(bind + 0x6C), bindMtx);
+		bindMtx[0][3] = bindMtx[0][3] + *reinterpret_cast<float*>(modelData + 0x74);
+		bindMtx[1][3] = bindMtx[1][3] + *reinterpret_cast<float*>(modelData + 0x84);
+		bindMtx[2][3] = bindMtx[2][3] + *reinterpret_cast<float*>(modelData + 0x94);
+		startPos.x = bindMtx[0][3];
+		startPos.y = bindMtx[1][3];
+		startPos.z = bindMtx[2][3];
+
+		PSMTXMultVecSR(bindMtx, CVector(kMonObjDefaultScale, kMonObjZero, kMonObjZero), reinterpret_cast<Vec*>(&forward));
+		forward.y = kMonObjZero;
+		forward.Normalize();
+		{
+			CVector scaled;
+			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), distance);
+			move.x = scaled.x;
+			move.y = scaled.y;
+			move.z = scaled.z;
+		}
+	}
+
+	if ((flags & 1) != 0) {
+		unsigned short cylHitArg = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
+		float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
+		CMapCylinder hitCylinder;
+		hitCylinder.m_bottom.x = startPos.x;
+		hitCylinder.m_bottom.y = startPos.y;
+		hitCylinder.m_bottom.z = startPos.z;
+		hitCylinder.m_axis.x = move.x;
+		hitCylinder.m_axis.y = move.y;
+		hitCylinder.m_axis.z = move.z;
+		hitCylinder.m_radius = cylRadius;
+
+		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), cylHitArg);
+		if (hit != 0) {
+			float hitT = g_hit_t_slide_min;
+			if (hitScale != NULL) {
+				*hitScale = hitT;
+			}
+			PSVECScale(reinterpret_cast<Vec*>(&move), reinterpret_cast<Vec*>(&move), hitT);
+			distance = distance * hitT;
+		}
+		CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), cylRadius, 1, hit);
+	}
+
+	if ((flags & 2) != 0) {
+		float halfAngle = kMonObjHalf * (kMonObjDegToRad *
+			static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCA)));
+		float sideDist = kMonObjZero;
+		if (kMonObjZero != halfAngle) {
+			sideDist = kMonObjConeSideRadius / static_cast<float>(tan(static_cast<double>(halfAngle)));
+		}
+
+		Vec coneStart;
+		coneStart.x = startPos.x;
+		coneStart.y = startPos.y;
+		coneStart.z = startPos.z;
+		{
+			CVector scaled;
+			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
+			Vec sideOffset;
+			sideOffset.x = scaled.x;
+			sideOffset.y = scaled.y;
+			sideOffset.z = scaled.z;
+			PSVECSubtract(&coneStart, &sideOffset, &coneStart);
+		}
+
+		float coneLength = distance + sideDist;
+		{
+			CVector scaled;
+			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
+			Vec sideOffset;
+			sideOffset.x = scaled.x;
+			sideOffset.y = scaled.y;
+			sideOffset.z = scaled.z;
+			PSVECAdd(reinterpret_cast<Vec*>(&move), &sideOffset, reinterpret_cast<Vec*>(&move));
+		}
+
+		int didHit = 0;
+		for (int rank = 0; rank < 4; rank++) {
+			if (((flags & 4) != 0) && (((m_updateCounter + rank) % 4) != 0)) {
+				continue;
+			}
+
+			int partyIndex = m_partyRank[rank];
+			CGPartyObj* partyObj = Game.m_partyObjArr[partyIndex];
+			if (partyObj == NULL) {
+				continue;
+			}
+
+			if (((Game.m_gameWork.m_menuStageMode != 0) &&
+				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
+				 partyObj->IsKindOf(0x6D) &&
+				 (reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0)) ||
+				(reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_hp == 0) ||
+				(partyObj->m_lastStateId == 9) ||
+				(partyObj->m_lastStateId == 0x22) ||
+				((Game.m_gameWork.m_menuStageMode != 0) &&
+				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
+				 partyObj->IsKindOf(0x6D) &&
+				 (reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0)) ||
+				!(m_partyDistance[partyIndex] <
+				 (coneLength - sideDist))) {
+				continue;
+			}
+
+			Vec partyPos;
+			{
+				CVector partyPosVec(partyObj->m_worldPosition.x,
+					partyObj->m_worldPosition.y + partyObj->unk_0x184, partyObj->m_worldPosition.z);
+				partyPos.x = partyPosVec.x;
+				partyPos.y = partyPosVec.y;
+				partyPos.z = partyPosVec.z;
+			}
+
+			Vec targetDelta;
+			{
+				CVector delta;
+				PSVECSubtract(&partyPos, &coneStart, reinterpret_cast<Vec*>(&delta));
+				targetDelta.x = delta.x;
+				targetDelta.y = delta.y;
+				targetDelta.z = delta.z;
+			}
+			float targetDist = PSVECMag(&targetDelta);
+			if (!(kMonObjZero < targetDist)) {
+				continue;
+			}
+
+			CVector targetDir;
+			PSVECNormalize(&targetDelta, reinterpret_cast<Vec*>(&targetDir));
+			float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&targetDir));
+			if (!((sideDist - object->m_bodyEllipsoidRadius) <= targetDist) ||
+				((halfAngle != kMonObjZero) &&
+				 !(kMonObjZero < dot))) {
+				continue;
+			}
+
+			float angle = static_cast<float>(acos(static_cast<double>(dot)));
+			if ((halfAngle != kMonObjZero) &&
+				!(angle < halfAngle)) {
+				continue;
+			}
+
+			didHit = 1;
+			float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
+			unsigned short hitMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
+			Vec cylTop;
+			{
+				CVector delta;
+				PSVECSubtract(&partyPos, reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&delta));
+				cylTop.x = delta.x;
+				cylTop.y = delta.y;
+				cylTop.z = delta.z;
+			}
+			CMapCylinder hitCylinder;
+			hitCylinder.m_bottom.x = startPos.x;
+			hitCylinder.m_bottom.y = startPos.y;
+			hitCylinder.m_bottom.z = startPos.z;
+			hitCylinder.m_axis.x = cylTop.x;
+			hitCylinder.m_axis.y = cylTop.y;
+			hitCylinder.m_axis.z = cylTop.z;
+			hitCylinder.m_radius = cylRadius;
+
+			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, &cylTop, hitMask);
+			Vec debugDelta;
+			debugDelta.x = targetDelta.x;
+			debugDelta.y = targetDelta.y;
+			debugDelta.z = targetDelta.z;
+			if (mapHit != 0) {
+				PSVECScale(&debugDelta, &debugDelta, g_hit_t_slide_min);
+			}
+			CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), &debugDelta, cylRadius, 1, mapHit == 0);
+
+			if (mapHit == 0) {
+				if (hitPartyIndex != NULL) {
+					*hitPartyIndex = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId;
+				}
+				break;
+			}
+		}
+
+		if (halfAngle != kMonObjZero) {
+			float debugRadius = coneLength * static_cast<float>(tan(static_cast<double>(halfAngle)));
+			CFlat.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80116654
  * PAL Size: 540b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::onFramePreCalc()
+void CGMonObj::seKiduki()
 {
-#define object (reinterpret_cast<CGObject*>(this))
-#define mon (reinterpret_cast<unsigned char*>(this))
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
-	CGCharaObj::onFramePreCalc();
-	m_aliveFrames += 1;
-
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-		unsigned char* aiData;
-		short& aiState = m_aiState;
-		short& aiStatePrev = m_aiStatePrev;
-
-		if (aiState == 0) {
-			aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-		} else {
-			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(aiState + *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
-		}
-
-		aiState = (this->*m_funcs->calcBranch)(*reinterpret_cast<unsigned short*>(aiData + 0x102) & 3);
-
-		if (aiState != aiStatePrev) {
-			aiStatePrev = aiState;
-			m_unk6CC = 0;
-		}
+	if (m_unk6BE != 0) {
+		return;
 	}
 
-	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x3E) == 0) &&
-		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x50) == 0) &&
-		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x44) == 0) &&
-		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x46) == 0) &&
-		(static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(mon[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
-		(m_unk6B9 == 0) &&
-		(m_unk6C1 == 0)) {
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = -1;
-		} else {
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-		}
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
+	int notice = false;
+	int partyIndex;
 
-		int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-		int aiLocal = 0;
-		if ((0x9A <= classId) ||
-			(classId < 0x8E)) {
-			(this->*m_funcs->logic)();
-		} else {
-			aiAddDuct(aiLocal);
-		}
+	if (m_unk6BD != 0) {
+		partyIndex = m_targetPartyIndex;
+	} else {
+		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
 
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			if ((*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != -1) && (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId)) {
-				reinterpret_cast<CGPrgObj*>(this)->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
+		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
+			int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
+			unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+			int colIndex;
+			float hitScale;
+
+			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
+			         static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8)),
+			         &hitScale, &colIndex);
+			partyIndex = colIndex;
+			if (partyIndex >= 0) {
+				goto haveNotice;
 			}
-		} else if (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
+		}
+		partyIndex = -1;
+	}
+
+haveNotice:
+	if (partyIndex >= 0) {
+		int action = m_actionBranch;
+		int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
+		unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+		unsigned short noticeFlags = *reinterpret_cast<unsigned short*>(script + 0xFE);
+
+		if ((action == 0) && ((noticeFlags & 0x80) != 0)) {
+			notice = true;
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x32;
+		} else if ((action == 0) && ((noticeFlags & 0x20) != 0)) {
+			notice = true;
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x33;
+		} else if ((action == 0) && (((noticeFlags & 0x40) != 0) || (scriptHandle[4] == 0x39))) {
+			notice = true;
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x34;
 		}
 	}
+
+	int classId = (*reinterpret_cast<int**>(mon + 0x58))[4];
+	switch (classId) {
+	case 0x6A:
+		notice = true;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x35;
+		break;
+	case 0x70:
+	case 0x7B:
+		notice = true;
+		break;
+	}
+
+	if (notice) {
+		if (classId == 0x7B) {
+			m_chaseState = 0;
+			m_chaseTimer = 0;
+			m_chaseDirty = 1;
+		} else if (m_unk6BD != 0) {
+			m_chaseState = 2;
+			m_chaseTimer = 0;
+			m_chaseDirty = 1;
+		} else {
+			m_chaseState = 2;
+			m_chaseTimer = 0;
+			m_chaseDirty = 1;
+		}
+
+		m_targetPartyIndex = partyIndex;
+	}
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::isValidTarget()
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+#define script9 (reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]))
+	float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCC));
+	float homeDist = PSVECDistance(&m_homePosition, reinterpret_cast<Vec*>(mon + 0x15C));
+	unsigned char* aiData;
+
+	short aiState = m_aiState;
+	if (aiState == 0) {
+		aiData = script9;
+	} else {
+		aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+		         (aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) *
+		             0x1D0 +
+		         0x10;
+	}
+
+	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiData + 0x102);
+	if ((m_targetPartyIndex >= 0) &&
+	    ((aiFlags & 0x20) != 0)) {
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		m_moveWork.Clear();
+		m_chaseState = 2;
+		m_chaseTimer = 0;
+		m_chaseDirty = 1;
+		return;
+	}
+
+	if (((aiFlags & 0x20) != 0) ||
+	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		m_moveWork.Clear();
+		m_chaseState = 0;
+		m_chaseTimer = 0;
+		m_chaseDirty = 1;
+		return;
+	}
+
+	if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
+		if (m_moveWork.m_mode != 3) {
+			m_moveWork.Clear();
+			m_moveWork.m_flags = 0x806;
+			m_moveWork.m_mode = 3;
+		}
+		m_moveWork.m_targetPos = m_homePosition;
+	}
+
+	if (((*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
+	    ((*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) || !(homeDist < kMonObjHalf * maxDist))) {
+		goto check_home;
+	}
+
+	{
+		int partyIndex;
+		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) <
+			(Game.m_gameWork.m_soundOptionFlag != 0 ? kMonObjWideSoundRange : kMonObjNormalSoundRange)) {
+			int colIndex;
+			float hitScale;
+			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
+			         static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)),
+			         &hitScale, &colIndex);
+			partyIndex = colIndex >= 0 ? colIndex : -1;
+		} else {
+			partyIndex = -1;
+		}
+
+		if (partyIndex >= 0) {
+			m_targetPartyIndex = partyIndex;
+			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
+				m_chaseState = 2;
+				m_chaseTimer = 0;
+				m_chaseDirty = 1;
+			} else {
+				m_chaseState = 1;
+				m_chaseTimer = 0;
+				m_chaseDirty = 1;
+			}
+			return;
+		}
+	}
+
+check_home:
+	if ((homeDist < kMonObjHomeSnapDistance) ||
+	    (m_chaseTimer == static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x1B8)))) {
+		m_homePosition = *reinterpret_cast<Vec*>(mon + 0x15C);
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		m_moveWork.Clear();
+		m_chaseState = 0;
+		m_chaseTimer = 0;
+		m_chaseDirty = 1;
+	} else if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) {
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1C;
+	}
+#undef script9
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801162B4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::resetWork()
+{
+	*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+	m_moveWork.Clear();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80115C00
+ * PAL Size: 1716b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::statAround()
+{
+	CGMonObj* monObj = this;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	CGObject* object = reinterpret_cast<CGObject*>(monObj);
+	int& targetPartyIndex = monObj->m_targetPartyIndex;
+#define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
+#define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
+
+	if (targetPartyIndex >= 0) {
+		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
+		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
+		if (!(homeRange <= homeDist)) {
+			goto body;
+		}
+	}
+
+	targetPartyIndex = -1;
+	actionState = 0;
+	monObj->m_moveWork.Clear();
+	monObj->m_chaseState = 3;
+	monObj->m_chaseTimer = 0;
+	monObj->m_chaseDirty = 1;
+	return;
+
+body:
+	{
+			if (monObj->m_unk6BD != 0) {
+				float reacquireRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8));
+				int hitPartyIndex;
+				monObj->checkCol(6, object->m_rotBaseY, reacquireRange, (float*)NULL, &hitPartyIndex);
+				if (hitPartyIndex >= 0) {
+					targetPartyIndex = hitPartyIndex;
+					monObj->m_unk6BD = 0;
+				}
+			}
+
+			int nextAction = monObj->mlAttackCheck(targetPartyIndex);
+			if (nextAction == -2) {
+				actionState = 0;
+				monObj->m_moveWork.Clear();
+				monObj->m_chaseState = 0;
+				monObj->m_chaseTimer = 0;
+				monObj->m_chaseDirty = 1;
+				return;
+			}
+			if (nextAction == -1) {
+				void** handle = object->m_scriptHandle;
+				unsigned char* scriptB = reinterpret_cast<unsigned char*>(handle[9]);
+				if (*reinterpret_cast<unsigned short*>(scriptB + 0x10C) == 1) {
+					unsigned char* aiScript;
+					short aiState = monObj->m_aiState;
+					if (aiState == 0) {
+						aiScript = scriptB;
+					} else {
+						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(scriptB + 0x100)) * 0x1D0 + 0x10;
+					}
+					unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
+					if (((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0xFE) & 8) != 0) ||
+						((aiFlags & 0x100) != 0)) {
+						actionState = 0;
+						monObj->m_moveWork.Clear();
+						monObj->m_chaseState = 2;
+						monObj->m_chaseTimer = 0;
+						monObj->m_chaseDirty = 1;
+						return;
+					}
+
+					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+					actionState = 0x21;
+					if (monObj->m_moveWork.m_mode != 1) {
+						monObj->m_moveWork.Clear();
+						monObj->m_moveWork.m_flags = 0x205;
+						short aiState2 = monObj->m_aiState;
+						if (aiState2 == 0) {
+							aiScript = script;
+						} else {
+							aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+								(static_cast<int>(aiState2) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+						}
+						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
+							monObj->m_moveWork.m_flags |= 0x10000;
+						}
+						monObj->m_moveWork.m_mode = 1;
+					}
+					monObj->m_moveWork.m_target = target;
+					if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
+						(monObj->m_moveWork.m_frame >=
+						 static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)))) {
+						actionState = 0;
+						monObj->m_moveWork.Clear();
+						monObj->m_chaseState = 3;
+						monObj->m_chaseTimer = 0;
+						monObj->m_chaseDirty = 1;
+					}
+					return;
+				}
+
+				if (monObj->m_chaseTimer >=
+					static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA))) {
+					monObj->m_chaseState = 3;
+					monObj->m_chaseTimer = 0;
+					monObj->m_chaseDirty = 1;
+					return;
+				}
+				actionState = 3;
+				return;
+			}
+
+			void** handleB = object->m_scriptHandle;
+			unsigned char* scriptC = reinterpret_cast<unsigned char*>(handleB[9]);
+			if (*reinterpret_cast<unsigned short*>(scriptC + 0x10C) == 1) {
+				if (nextAction >= 100) {
+					actionState = nextAction;
+				} else {
+#define AISCRIPT ((monObj->m_aiState == 0) \
+	? script \
+	: (reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
+		(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10))
+					short aiState = monObj->m_aiState;
+					int aiStateI = aiState;
+					unsigned char* aiScript;
+					if (aiState == 0) {
+						aiScript = scriptC;
+					} else {
+						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateI + *reinterpret_cast<unsigned short*>(scriptC + 0x100)) * 0x1D0 + 0x10;
+					}
+					int actionOffset = nextAction * 0x10;
+					if ((reinterpret_cast<unsigned short*>(aiScript)[nextAction * 8 + 0x88] & 0x20) != 0) {
+						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+						actionState = 0x21;
+						if (monObj->m_moveWork.m_mode != 4) {
+							monObj->m_moveWork.Clear();
+							monObj->m_moveWork.m_flags = 0x855;
+							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
+								monObj->m_moveWork.m_flags |= 0x400;
+							}
+							if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x80) != 0) {
+								monObj->m_moveWork.m_flags |= 0x20000;
+							}
+							monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
+							monObj->m_moveWork.m_mode = 4;
+							monObj->m_moveWork.m_range = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
+							monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
+						}
+						monObj->m_moveWork.m_target = target;
+						monObj->m_chaseState = 5;
+						monObj->m_chaseTimer = 0;
+						monObj->m_chaseDirty = 1;
+						return;
+					}
+
+					unsigned char* aiScript3;
+					if (aiState == 0) {
+						aiScript3 = reinterpret_cast<unsigned char*>(handleB[9]);
+					} else {
+						aiScript3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateI + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handleB[9]) + 0x100)) * 0x1D0 + 0x10;
+					}
+					aiScript3 += actionOffset;
+					float actionRange = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript3 + 0x11C));
+					unsigned char* aiScript4;
+					if (aiState == 0) {
+						aiScript4 = reinterpret_cast<unsigned char*>(handleB[9]);
+					} else {
+						aiScript4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateI + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handleB[9]) + 0x100)) * 0x1D0 + 0x10;
+					}
+					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+					aiScript4 += actionOffset;
+					int actionParam = static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript4 + 0x11E));
+					actionState = 0x21;
+					if (monObj->m_moveWork.m_mode != 2) {
+						monObj->m_moveWork.Clear();
+						monObj->m_moveWork.m_flags = 0x325;
+						if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x40) != 0) {
+							monObj->m_moveWork.m_flags |= 0x10000;
+						}
+						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
+						monObj->m_moveWork.m_mode = 2;
+					}
+					monObj->m_moveWork.m_target = target;
+					monObj->m_moveWork.m_range = actionRange;
+					monObj->m_moveWork.m_changeStat = actionParam;
+#undef AISCRIPT
+				}
+			} else {
+				actionState = nextAction - 0xE;
+			}
+			monObj->m_chaseState = 1;
+			monObj->m_chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+			return;
+	}
+#undef script
+#undef actionState
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlSet(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlWaitingCheck()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlAway()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlHide()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlWaiting()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlEscapeCheck()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlEscape()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancel()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveChase(CGCharaObj*)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveEscape()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveAway(CGCharaObj*, int, int, int, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveChaseAndStat(CGCharaObj*, int, float, int, int)
+{
+	// TODO
+}
+
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlMove()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011467C
+ * PAL Size: 1272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+/*
+ * --INFO--
+ * PAL Address: 0x8011548C
+ * PAL Size: 1908b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+
+int CGMonObj::mlAttackCheck(int partyIndex)
+{
+	CGMonObj* monObj = this;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	CGObject* object = reinterpret_cast<CGObject*>(monObj);
+#define baseScript (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
+#define aiScript (monObj->m_aiState == 0 \
+		? baseScript \
+		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
+			(monObj->m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
+	int selectedAction = -1;
+	if (monObj->m_funcs->attackCheck != 0) {
+		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
+		if (result == -2) {
+			return -1;
+		}
+		if (result != -1) {
+			return result;
+		}
+	}
+
+	float targetDist = monObj->m_partyDistance[partyIndex];
+
+	int selectorType = *reinterpret_cast<unsigned short*>(aiScript + 0x108);
+	if (selectorType == 0xFFFF) {
+		return -1;
+	}
+
+	unsigned int groupTable[8] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+	int groupCount[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	int* groupPtr = reinterpret_cast<int*>(groupTable);
+
+	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
+		int actionOffset = actionIndex * 0x10;
+		int actionFlags = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110);
+		if (actionFlags == 0xFFFF) {
+			if (actionIndex == 0) {
+				return -2;
+			}
+			continue;
+		}
+
+		int actionType;
+		if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
+			actionType = actionFlags & 3;
+		} else {
+			actionType = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118);
+		}
+
+		if ((actionType == 3) && (Game.m_gameWork.m_menuStageMode != 0)) {
+			continue;
+		}
+
+		int artifactLevel;
+		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			int idx = Game.m_gameWork.m_bossArtifactStageIndex;
+			int stage = Game.m_gameWork.m_bossArtifactStageTable[idx];
+			artifactLevel = stage < 2 ? stage : 2;
+		} else {
+			artifactLevel = 0;
+		}
+
+		if (((actionType == 1) && (artifactLevel <= 0)) ||
+			((actionType == 2) && (artifactLevel <= 1))) {
+			continue;
+		}
+
+		if ((actionFlags & 0x40) != 0) {
+			float targetRot = monObj->m_partyAngle[partyIndex];
+			float baseRot =
+				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
+				object->m_rotBaseY;
+			float angleDelta = (float)__fabs(Math.DstRot(targetRot, baseRot));
+			System.Printf("ACT_FLAG_ROT_CHECK 差分=%f度。\n", kMonObjRadToDeg * angleDelta);
+			float angleLimit =
+				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
+			if (!(angleDelta < angleLimit)) {
+				continue;
+			}
+			System.Printf(const_cast<char*>(s_monObjPassThroughText));
+		}
+
+		if (selectorType == 0) {
+			int maxDistRaw = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x114);
+			float minDist = static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x112)));
+			unsigned int chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
+
+			if ((targetDist < static_cast<float>(maxDistRaw)) && (minDist < targetDist)) {
+
+			int forceAction = 0;
+			CGPartyObj* party = Game.m_partyObjArr[partyIndex];
+			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
+			if (((partyState == 1) || (partyState == 7)) &&
+				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > kMonObjHalfPi)) {
+				if (((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) &&
+						(monObj->m_forcedAction ==
+							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E)))) ||
+					((*reinterpret_cast<unsigned short*>(
+							reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) +
+							0x10C) != 1) &&
+						(monObj->m_forcedAction == actionIndex))) {
+					forceAction = 1;
+				}
+			}
+
+			if (forceAction || (Math.Rand(100) <= chance)) {
+				selectedAction = actionIndex;
+				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
+					break;
+				}
+				if (forceAction) {
+					break;
+				}
+			}
+			}
+		} else {
+			unsigned int groupIndex;
+			if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
+				groupIndex = (actionFlags >> 2) & 7;
+			} else {
+				groupIndex = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A);
+			}
+
+			groupTable[actionIndex] = groupIndex;
+			groupCount[groupIndex] += 1;
+		}
+	}
+
+	if (selectorType == 1) {
+		int& groupCursor = monObj->m_unk6CC;
+		int count;
+		for (;;) {
+			int cursor = groupCursor;
+			count = groupCount[cursor];
+			if (count != 0) {
+				break;
+			}
+			groupCursor = cursor + 1;
+			if (groupCursor >= 8) {
+				groupCursor = 0;
+			}
+		}
+
+		int pick = Math.Rand(count);
+		int seen = 0;
+		int i = 0;
+		for (int pass = 0; pass < 2; pass++) {
+			for (int j = 0; j < 4; j++) {
+				int cursor = groupCursor;
+				if (cursor == groupPtr[j]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor + 1;
+						goto mlDone;
+					}
+					seen += 1;
+				}
+				i += 1;
+			}
+			groupPtr += 4;
+		}
+	}
+
+mlDone:
+	return selectedAction;
+#undef aiScript
+#undef baseScript
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80114B74
+ * PAL Size: 2328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::statWatch()
+{
+	CGMonObj* monObj = this;
+#define mon (reinterpret_cast<unsigned char*>(monObj))
+#define object (reinterpret_cast<CGObject*>(monObj))
+	int& targetPartyIndex = monObj->m_targetPartyIndex;
+	int& chaseState = monObj->m_chaseState;
+	int& chaseTimer = monObj->m_chaseTimer;
+#define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
+#define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
+
+	if (reinterpret_cast<CGPrgObj*>(monObj)->m_lastStateId == 0) {
+		monObj->m_unk6BD = 0;
+		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
+		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
+		if (homeRange <= homeDist) {
+			actionState = 0;
+			monObj->m_moveWork.Clear();
+			chaseState = 3;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+			return;
+		}
+
+		unsigned char* aiScript;
+		short aiState0 = monObj->m_aiState;
+		if (aiState0 == 0) {
+			aiScript = script;
+		} else {
+			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+				(aiState0 + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+		}
+
+		int targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
+		int selectedTarget = -1;
+		if (targetMode == 0xFFFF) {
+			chaseState = 0;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+			return;
+		}
+
+		if (targetMode >= 10) {
+			selectedTarget = (monObj->*monObj->m_funcs->target)(targetMode);
+		} else {
+			// Pass 1: count valid party members.
+			int validCount = 0;
+			for (int slot = 0; slot < 4; slot++) {
+				CGPartyObj* party = Game.m_partyObjArr[m_partyRank[slot]];
+				if ((party != NULL) &&
+					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
+					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
+					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
+					((Game.m_gameWork.m_menuStageMode == 0) ||
+					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
+					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
+					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
+					validCount++;
+				}
+			}
+
+			int pick = Math.Rand(validCount);
+			int minHp = 10000000;
+			int accum = -1;
+			int validIndex = 0;
+			float homeRange2 = static_cast<float>(
+				*reinterpret_cast<unsigned short*>(script + 0xCC));
+
+			// Pass 2: select target.
+			selectedTarget = -1;
+			for (int slot = 0; slot < 4; slot++) {
+				int partyIndex = m_partyRank[slot];
+				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
+				if ((party != NULL) &&
+					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
+					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
+					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
+					((Game.m_gameWork.m_menuStageMode == 0) ||
+					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
+					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
+					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
+					if (monObj->m_partyDistance[partyIndex] < homeRange2) {
+						selectedTarget = partyIndex;
+						if (targetMode == 0) {
+							break;
+						}
+					}
+					if ((targetMode == 3) &&
+						((reinterpret_cast<CGPrgObj*>(party)->m_lastStateId == 6) ||
+						 (reinterpret_cast<CGPrgObj*>(party)->m_lastStateId == 2))) {
+						accum = partyIndex;
+					} else if (targetMode == 2) {
+						int hp = *reinterpret_cast<unsigned short*>(
+							reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7);
+						if (hp < minHp) {
+							minHp = hp;
+							accum = partyIndex;
+						}
+					} else if ((targetMode == 4) && (validIndex == pick)) {
+						accum = partyIndex;
+					}
+					validIndex++;
+				}
+			}
+
+			switch (targetMode) {
+			case 1:
+				selectedTarget = targetPartyIndex;
+				break;
+			case 2:
+			case 3:
+			case 4:
+				if (accum >= 0) {
+					selectedTarget = accum;
+				}
+				break;
+			}
+		}
+
+		if (selectedTarget >= 0) {
+
+		targetPartyIndex = selectedTarget;
+		short aiState1 = monObj->m_aiState;
+		if (aiState1 == 0) {
+			aiScript = script;
+		} else {
+			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+				(static_cast<int>(aiState1) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+		}
+
+		if (static_cast<int>(*reinterpret_cast<unsigned short*>(aiScript + 0x10A)) == 1) {
+			if (monObj->m_unk6BC == 0) {
+				unsigned char* scriptBase = script;
+				if (monObj->m_partyDistance[targetPartyIndex] <
+					static_cast<float>(*reinterpret_cast<unsigned short*>(scriptBase + 0xCE))) {
+					if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
+						chaseState = 5;
+						chaseTimer = 0;
+						monObj->m_chaseDirty = 1;
+					} else {
+						actionState = 0x1E;
+					}
+					monObj->m_unk6BC = 1;
+					return;
+				}
+			} else {
+				monObj->m_unk6BC = 0;
+			}
+		}
+
+		int attackResult = monObj->mlAttackCheck(selectedTarget);
+		if (attackResult == -2) {
+			actionState = 0;
+			monObj->m_moveWork.Clear();
+			chaseState = 0;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		} else if (attackResult == -1) {
+			actionState = 0;
+			monObj->m_moveWork.Clear();
+			chaseState = 2;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		} else {
+			void** handle = object->m_scriptHandle;
+			unsigned char* scriptBase = reinterpret_cast<unsigned char*>(handle[9]);
+			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
+				if (attackResult >= 100) {
+					actionState = attackResult;
+				} else {
+					short aiState = monObj->m_aiState;
+					unsigned char* aiData;
+					if (aiState == 0) {
+						aiData = scriptBase;
+					} else {
+						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
+					}
+					int actionOff = attackResult * 0x10;
+					unsigned char* actionData = aiData + actionOff;
+					if ((*reinterpret_cast<unsigned short*>(actionData + 0x110) & 0x20) != 0) {
+						actionState = 0x21;
+						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
+						if (monObj->m_moveWork.m_mode != 4) {
+							monObj->m_moveWork.Clear();
+							monObj->m_moveWork.m_flags = 0x855;
+							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
+								monObj->m_moveWork.m_flags |= 0x400;
+							}
+							unsigned char* aiData2;
+							short aiState2 = monObj->m_aiState;
+							if (aiState2 == 0) {
+								aiData2 = script;
+							} else {
+								aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+									(static_cast<int>(aiState2) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							}
+							if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x80) != 0) {
+								monObj->m_moveWork.m_flags |= 0x20000;
+							}
+							monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
+							monObj->m_moveWork.m_mode = 4;
+							monObj->m_moveWork.m_range =
+								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
+							monObj->m_moveWork.m_limitFrame =
+								*reinterpret_cast<unsigned short*>(script + 0x1B6);
+						}
+						monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
+						chaseState = 5;
+						chaseTimer = 0;
+						monObj->m_chaseDirty = 1;
+						return;
+					}
+					unsigned char* aiData3;
+					if (aiState == 0) {
+						aiData3 = reinterpret_cast<unsigned char*>(handle[9]);
+					} else {
+						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x100)) * 0x1D0 + 0x10;
+					}
+					aiData3 += actionOff;
+					float range = static_cast<float>(*reinterpret_cast<unsigned short*>(aiData3 + 0x11C));
+					unsigned char* aiData4;
+					if (aiState == 0) {
+						aiData4 = reinterpret_cast<unsigned char*>(handle[9]);
+					} else {
+						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x100)) * 0x1D0 + 0x10;
+					}
+					aiData4 += actionOff;
+					short changeStat = static_cast<short>(*reinterpret_cast<unsigned short*>(aiData4 + 0x11E));
+					actionState = 0x21;
+					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
+					if (monObj->m_moveWork.m_mode != 2) {
+						monObj->m_moveWork.Clear();
+						monObj->m_moveWork.m_flags = 0x325;
+						unsigned char* aiData5;
+						short aiState5 = monObj->m_aiState;
+						if (aiState5 == 0) {
+							aiData5 = script;
+						} else {
+							aiData5 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+								(static_cast<int>(aiState5) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+						}
+						if ((*reinterpret_cast<unsigned short*>(aiData5 + 0x102) & 0x40) != 0) {
+							monObj->m_moveWork.m_flags |= 0x10000;
+						}
+						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
+						monObj->m_moveWork.m_mode = 2;
+					}
+					monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
+					monObj->m_moveWork.m_range = range;
+					monObj->m_moveWork.m_changeStat = static_cast<int>(changeStat);
+				}
+			} else {
+				actionState = attackResult - 0xE;
+			}
+			chaseState = 1;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		}
+		} else {
+			actionState = 0;
+			monObj->m_moveWork.Clear();
+			chaseState = 3;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		}
+		return;
+	}
+
+	if (reinterpret_cast<CGPrgObj*>(monObj)->m_lastStateId == 0x21) {
+		if ((*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) &&
+			(((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
+			 (monObj->m_moveWork.m_frame >=
+			  static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC))))) {
+			actionState = 0;
+			monObj->m_moveWork.Clear();
+			chaseState = 3;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		}
+	}
+#undef script
+#undef actionState
 #undef object
 #undef mon
 }
 
-
 /*
  * --INFO--
- * PAL Address: 0x8011A4AC
- * PAL Size: 32b
+ * PAL Address: 0x8011467C
+ * PAL Size: 1272b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::onDestroy()
+void CGMonObj::statMove(int* targetIndex)
 {
-	CGCharaObj::onDestroy();
+#define monObj (this)
+#define mon (reinterpret_cast<unsigned char*>(this))
+#define object (reinterpret_cast<CGObject*>(this))
+#define prgObj (reinterpret_cast<CGPrgObj*>(this))
+	int* chaseState = &monObj->m_chaseState;
+	int* chaseTimer = &monObj->m_chaseTimer;
+	int* targetPartyIdx = &monObj->m_targetPartyIndex;
+
+	int state = *chaseState;
+	switch (state) {
+	case 4:
+		monObj->seKiduki();
+		break;
+
+	case 0: {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+			monObj->m_moveWork.Clear();
+		}
+		if (*chaseTimer == 0) {
+			object->m_rotTargetY = object->m_homeRotY;
+		}
+
+		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
+
+		int hitPartyIndex;
+		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
+			int colIndex;
+			float hitScale;
+			monObj->checkCol(6, object->m_rotBaseY,
+				static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xC8)),
+				&hitScale, &colIndex);
+			hitPartyIndex = colIndex;
+		} else {
+			hitPartyIndex = -1;
+		}
+
+		if (hitPartyIndex >= 0) {
+			*targetPartyIdx = hitPartyIndex;
+			*chaseState = 2;
+			*chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+			if (monObj->m_unk6B8 == 0) {
+				void** scriptHandle = object->m_scriptHandle;
+				int randVal = Math.Rand(3);
+				unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+				prgObj->playSe3D(
+					*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal +
+						*reinterpret_cast<unsigned short*>(script + 0x192),
+					0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+				monObj->m_unk6B8 = 1;
+			}
+		} else {
+			unsigned char* aiData;
+			if (monObj->m_aiState == 0) {
+				aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+			} else {
+				aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+					(monObj->m_aiState +
+					 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) *
+						0x1D0 +
+					0x10;
+			}
+			unsigned short alertMode = *reinterpret_cast<unsigned short*>(aiData + 0x104);
+			switch (alertMode) {
+			case 0:
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+				break;
+			case 1:
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x10;
+				break;
+			case 2: {
+				double soundLimit2 = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
+				if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit2) {
+					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1D;
+					float repopDist =
+						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
+					float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
+					if (static_cast<double>(repopDist) <= static_cast<double>(homeDist)) {
+						monObj->isValidTarget();
+					}
+				} else {
+					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+				}
+				break;
+			}
+			}
+		}
+		break;
+	}
+
+	case 2:
+		monObj->statAround();
+		break;
+
+	case 1:
+		monObj->statWatch();
+		break;
+
+	case 3:
+		monObj->isValidTarget();
+		break;
+
+	case 5: {
+		{
+			if (*targetPartyIdx >= 0) {
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
+				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
+				if (monObj->m_moveWork.m_mode != 4) {
+					monObj->m_moveWork.Clear();
+					monObj->m_moveWork.m_flags = 0x855;
+					if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
+						monObj->m_moveWork.m_flags |= 0x400;
+					}
+					unsigned char* aiData;
+					if (monObj->m_aiState == 0) {
+						aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+					} else {
+						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(monObj->m_aiState +
+							 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) *
+								0x1D0 +
+							0x10;
+					}
+					if ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x80) != 0) {
+						monObj->m_moveWork.m_flags |= 0x20000;
+					}
+					monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
+					monObj->m_moveWork.m_mode = 4;
+					monObj->m_moveWork.m_range =
+						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));
+					monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B6);
+				}
+				monObj->m_moveWork.m_target = partyObj;
+				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
+					(object->m_stateFlags0Bits.unk1 != 0)) {
+					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+					monObj->m_moveWork.Clear();
+					if (*targetPartyIdx >= 0) {
+						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));
+					}
+					*chaseState = 1;
+					*chaseTimer = 0;
+					monObj->m_chaseDirty = 1;
+				}
+			} else {
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+				monObj->m_moveWork.Clear();
+				*chaseState = 0;
+				*chaseTimer = 0;
+				monObj->m_chaseDirty = 1;
+			}
+		}
+		break;
+	}
+
+	}
+
+	if (monObj->m_chaseDirty != 0) {
+		monObj->m_chaseDirty = 0;
+	} else {
+		*chaseTimer += 1;
+	}
+#undef prgObj
+#undef object
+#undef mon
+#undef monObj
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8011A4CC
- * PAL Size: 168b
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::mlAttack()
+{
+	// TODO
+}
+
+
+
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::aiAddDefault(int&)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801145D0
+ * PAL Size: 172b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::onCreate()
+int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, int chance, int fallbackState)
 {
-	CGCharaObj::onCreate();
+	int& aiState = m_unk6C8;
+#define aiPriority (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0))
+#define aiBranch (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
 
-	m_targetPartyIndex = -1;
-	m_aiState = 0;
-	m_aiStatePrev = 0;
-	m_unk6C8 = 0;
-	m_unk6CC = 0;
-	m_actionBranch = 0;
-	m_unk6B8 = 0;
-	m_unk6B9 = 0;
+	if (priority <= aiPriority) {
+		return 0;
+	}
+
+	if (currentState == aiState) {
+		if (Math.Rand(100) <= static_cast<unsigned int>(chance)) {
+			if (aiPriority < priority) {
+				aiBranch = seqId;
+				aiPriority = priority;
+			}
+			aiState = nextState;
+			return 1;
+		}
+		if (fallbackState >= 0) {
+			aiState = fallbackState;
+		}
+	}
+
+	return 0;
+#undef aiPriority
+#undef aiBranch
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::statAway()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::setAI(int, int, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801143D0
+ * PAL Size: 512b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onFrameAlways()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	void** scriptHandle = object->m_scriptHandle;
+
+	if (scriptHandle != nullptr) {
+		if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFE) & 4) != 0) {
+			int hasNearParty = 0;
+			if (m_unk6B9 == 0) {
+				for (int i = 0; i < 4; i++) {
+					CGPartyObj* party = Game.m_partyObjArr[i];
+					if (party != nullptr && party->m_comboState != 0) {
+						float dist = PSVECDistance(&party->m_comboCenter, &object->m_worldPosition);
+						if (dist < kMonObjHomeSnapDistance + object->m_bodyEllipsoidRadius) {
+							hasNearParty = 1;
+							break;
+						}
+					}
+				}
+			}
+
+			if (hasNearParty != m_unk6C3) {
+				if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
+					reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x200000);
+					if (hasNearParty != 0) {
+						reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
+							0x146,
+							*reinterpret_cast<int*>(mon + 0x5B8),
+							object,
+							1.0f,
+							0
+						);
+					}
+				}
+				m_unk6C3 = hasNearParty;
+			}
+		}
+
+		reinterpret_cast<CMonWork*>(object->m_scriptHandle)->CalcStatus();
+		(this->*m_funcs->always)();
+
+		unsigned short stepSeRaw = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1BE);
+		int stepSeId;
+		if (stepSeRaw == 0xFFFF) {
+			stepSeId = 0;
+		} else {
+			stepSeId = (stepSeRaw & 0xFF) + ((stepSeRaw >> 8) * 1000);
+		}
+
+		if (stepSeId != 0) {
+			int& stepSeHandle = m_stepSeHandle;
+			if (object->m_currentAnimSlot == object->m_animSlots[1]) {
+				if (stepSeHandle != 0) {
+					Sound.ChangeSe3DPos(stepSeHandle, &object->m_worldPosition);
+				} else {
+					stepSeHandle = reinterpret_cast<CGPrgObj*>(this)->playSe3D(stepSeId, 0x32, 0x96, 0, (Vec*)0);
+				}
+			} else if (stepSeHandle != 0) {
+				Sound.FadeOutSe3D(stepSeHandle, 0x32);
+				stepSeHandle = 0;
+			}
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80114208
+ * PAL Size: 456b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::InitFinished()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	m_homePosition.x = object->unk_0x168;
+	m_homePosition.y = object->unk_0x16C;
+	m_homePosition.z = object->unk_0x170;
+
+	void* classId = object->m_scriptHandle[4];
+	switch (reinterpret_cast<unsigned int>(classId)) {
+	default:
+		m_funcs = &funcsDefault;
+		break;
+	case 0x5B:
+		m_funcs = &funcsGiantCrab;
+		break;
+	case 0x71:
+		m_funcs = &funcsGolem;
+		break;
+	case 0x6B:
+		m_funcs = &funcsArmstrong;
+		break;
+	case 0x63:
+		m_funcs = &funcsOrcKing;
+		break;
+	case 0x67:
+		m_funcs = &funcsGoblinKing;
+		break;
+	case 0x5F:
+		m_funcs = &funcsMolbol;
+		break;
+	case 0x73:
+		m_funcs = &funcsLizardmanKing;
+		break;
+	case 0x77:
+		m_funcs = &funcsCaveWorm;
+		break;
+	case 0x6F:
+		m_funcs = &funcsGigasLoad;
+		break;
+	case 0x70:
+		m_funcs = &funcsWifeLamia;
+		break;
+	case 0x88:
+		m_funcs = &funcsMeteoParasiteC;
+		break;
+	case 0x85:
+	case 0x86:
+	case 0x87:
+		m_funcs = &funcsMeteoParasite;
+		break;
+	case 0x8E:
+	case 0x8F:
+	case 0x90:
+	case 0x91:
+	case 0x92:
+	case 0x93:
+	case 0x94:
+	case 0x95:
+	case 0x96:
+	case 0x97:
+	case 0x98:
+	case 0x99:
+		m_funcs = &funcsDuct;
+		break;
+	case 0x83:
+		m_funcs = &funcsDragonZombie;
+		break;
+	case 0x7B:
+		m_funcs = &funcsAntrion;
+		break;
+	case 0x79:
+		m_funcs = &funcsTetsukyojin;
+		break;
+	case 0x7F:
+		m_funcs = &funcsLich;
+		break;
+	case 0x9B:
+		m_funcs = &funcsRamoe;
+		break;
+	case 0x9A:
+		m_funcs = &funcsLastBoss;
+		break;
+	case 0x9E:
+		m_funcs = &funcsSaw;
+		break;
+	case 0x74:
+	case 0x75:
+		m_funcs = &funcsLKShooter;
+		break;
+	}
+
+	(this->*m_funcs->initFinished)();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80114004
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::initFinishedFuncDefault()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	// Script value is authored in centi-units.
+	object->m_turnFactor = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
+
+	CCharaPcs::CHandle* handle = object->m_charaModelHandle;
+	if (handle != NULL) {
+		CChara::CModel* model = handle->m_model;
+		if (model != NULL) {
+			int nodeIdx = model->SearchNode(const_cast<char*>(s_monObjHeadNode));
+			if (nodeIdx >= 0) {
+				m_bind = reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_model->m_nodes + nodeIdx);
+			}
+		}
+	}
+
+	int animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
+	if (animPoint != 0xFFFF) {
+		object->AddAnimPoint(1, animPoint, 0xB);
+	}
+
+	animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
+	if (animPoint != 0xFFFF) {
+		object->AddAnimPoint(1, animPoint, 0xA);
+	}
+
+	m_forcedAction = -1;
+	for (int forcedAction = 0; forcedAction < 8; forcedAction++) {
+		int attackId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionItems[forcedAction];
+		if ((attackId != 0xFFFF) &&
+			(static_cast<int>(reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackId].m_actionType) == 4)) {
+			m_forcedAction = forcedAction;
+			break;
+		}
+	}
+
+	setRepop(1);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80113F58
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::setIceJEffect(int enabled)
+{
+#define object (reinterpret_cast<CGObject*>(this))
+	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
+
+	if (enabled != 0) {
+		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
+		for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
+			int dataNo = object->m_charaModelHandle->GetPdtSlot();
+			reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x5A8), object, kMonObjDefaultScale, 0);
+		}
+	}
+#undef object
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::setFlyEffect(int, int)
+{
+	// TODO
+}
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 576b
+ * EN Address: 0x80139454
+ * EN Size: 336b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGMonObj::setUndeadEffect(int weaponMode, int enabled)
+{
+	int isUndead = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB;
+	if (!isUndead) {
+		weaponMode = 1;
+	}
+	endPSlotBit(0x1000);
+	int count = weaponMode ?
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1AC) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1AE);
+	int particleBase = weaponMode ? 0x46 : 0x3C;
+	if (enabled) {
+		for (int i = 0; i < count; i++) {
+			int dataNo = m_charaModelHandle->GetPdtSlot();
+			int particleId = particleBase + i;
+			putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[12], this, kMonObjDefaultScale, 0);
+		}
+	} else if (isUndead && count != 0) {
+		int dataNo = m_charaModelHandle->GetPdtSlot();
+		putParticleBindTrace((particleBase + 9) | (dataNo << 8), m_particleSlots[12], this, kMonObjDefaultScale, 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80113EFC
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CGMonObj::IsDispRader()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char result = 0;
+	int isDispRader = object->CGObject::IsDispRader();
+	if (isDispRader != 0 &&
+	    static_cast<signed char>(
+	        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) &
+	                         0xC0000000) >>
+	        31) != 0) {
+		result = 1;
+	}
+	return result;
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: 0x80113960
+ * PAL Size: 1436b
+ * EN Address: 0x80139608
+ * EN Size: 924b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::setRepop(int mode)
+{
+#define object (reinterpret_cast<CGObject*>(this))
+	void** scriptHandle = object->m_scriptHandle;
+	int classId = reinterpret_cast<int>(scriptHandle[4]);
+
+	int spawnIndex = reinterpret_cast<int>(scriptHandle[2]);
+	int option;
+	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
+		u64 bit = 1ULL << spawnIndex;
+		u64 spawnBits = CFlatSpawnBits(option);
+		if ((spawnBits & bit) != 0) {
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
+			object->m_bgColMask = 0;
+			object->m_displayFlags = 0;
+			object->m_weaponNodeFlagBits.m_unk10 = 0;
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x28, 0, 0);
+			return;
+		}
+	}
+
+	if (mode == 0) {
+		m_homePosition.x = object->unk_0x168;
+		m_homePosition.y = object->unk_0x16C;
+		m_homePosition.z = object->unk_0x170;
+		object->m_worldPosition = m_homePosition;
+		float baseRot = object->m_homeRotY;
+		object->m_rotBaseY = baseRot;
+		object->m_rotTargetY = baseRot;
+
+		void** repopHandle = object->m_scriptHandle;
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1C) =
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1A);
+		m_targetPartyIndex = -1;
+		m_aiState = 0;
+		m_aiStatePrev = 0;
+		m_unk6C8 = 0;
+		m_unk6CC = 0;
+		m_actionBranch = 0;
+		m_unk6B8 = 0;
+		m_unk6B9 = 0;
+		m_unk6BA = 0;
+		m_unk6BC = 0;
+		m_unk6BD = 0;
+		m_unk6BE = 0;
+		m_attackDelay = 0;
+		m_aliveFrames = 0;
+		m_unk6BF = 0;
+		m_unk6C0 = 0;
+		m_unk6C2 = 0;
+		m_unk6C3 = 0;
+		m_chaseState = 0;
+		m_chaseTimer = 0;
+		m_chaseDirty = 0;
+		m_stepSeHandle = 0;
+		m_moveWork.Clear();
+	}
+
+	enableAttackCol(0, 0, 0);
+	enableDamageCol(1);
+	reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+
+	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
+
+	if ((scriptFlags & 0x80) != 0 || (scriptFlags & 0x20) != 0) {
+		if (mode == 0) {
+			object->m_bgColMask |= 0x10002;
+		}
+		m_chaseState = 4;
+		m_chaseTimer = 0;
+		m_chaseDirty = 1;
+		enableDamageCol(0);
+	} else {
+		if ((scriptFlags & 0x40) != 0 || classId == 0x39) {
+			m_chaseState = 4;
+			m_chaseTimer = 0;
+			m_chaseDirty = 1;
+			enableDamageCol(0);
+			if ((scriptFlags & 0x40) != 0) {
+				object->SetAnimSlot(10, 0);
+			}
+		}
+
+		if ((scriptFlags & 0x200) != 0) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x36, 0, 0);
+		}
+
+		if (mode == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x18, 0x32, 0x96, 0, (Vec*)0);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle(300, 0, &object->m_worldPosition, kMonObjDefaultScale, 0);
+			object->m_bgColMask |= 0x90002;
+			m_alpha = 1.0f;
+		}
+	}
+
+	switch (classId) {
+	case 0x55:
+		m_chaseState = 4;
+		m_chaseTimer = 0;
+		m_chaseDirty = 1;
+		break;
+	}
+
+	unsigned short countA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A8);
+	for (int i = 0; i < static_cast<int>(countA); i++) {
+		int particleBase = 0;
+		switch (classId) {
+		case 0xA9:
+			particleBase = 0;
+			break;
+		case 0x9C:
+			particleBase = 1;
+			break;
+		case 0xA7:
+		case 0xA8:
+			particleBase = 2;
+			break;
+		}
+
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
+		int particleId = i + particleBase + 0x50;
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[16], object, kMonObjDefaultScale, 0);
+	}
+
+	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
+
+	unsigned short countB = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
+	for (int i = 0; i < static_cast<int>(countB); i++) {
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + 0x5A) | (dataNo << 8), m_particleSlots[17], object, kMonObjDefaultScale, 0);
+	}
+
+	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 1) == 0) {
+		return;
+	}
+
+	m_alpha = kMonObjTwoFifths;
+	scriptHandle = object->m_scriptHandle;
+	classId = reinterpret_cast<int>(scriptHandle[4]);
+	setUndeadEffect(m_weaponNodeFlagBits.m_prg, 1);
+
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
+		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
+	}
+
+	if (object->m_weaponNodeFlagBits.m_prg != 0) {
+		if (classId == 0x83) {
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
+		} else if (classId == 0x7F) {
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
+		}
+	}
+
 	m_unk6BA = 0;
-	m_unk6BC = 0;
-	m_unk6BD = 0;
-	m_unk6BE = 0;
-	m_attackDelay = 0;
-	m_aliveFrames = 0;
-	m_unk6BF = 0;
-	m_unk6C0 = 0;
-	m_unk6C2 = 0;
-	m_unk6C3 = 0;
-	m_chaseState = 0;
-	m_chaseTimer = 0;
-	m_chaseDirty = 0;
-	m_stepSeHandle = 0;
-	memset(&m_moveWork, 0, sizeof(m_moveWork));
-	m_unk6E0 = 0;
-	m_unk6C1 = 0;
+#undef object
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011367C
+ * PAL Size: 740b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	short& routeFrom = m_moveWork.m_routeFrom;
+	short& routePrev = m_moveWork.m_routePrev;
+
+	if (((m_moveWork.m_flags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
+		if (routeFrom == 0) {
+			routeFrom = static_cast<short>(startGroup);
+		}
+		if (((m_moveWork.m_flags & 0x10000) != 0) && ((m_moveWork.m_flags & 0x40) == 0)) {
+			short currentRoute = routeFrom;
+			if ((currentRoute != 0) && (forbiddenGroup != 0) && (currentRoute != forbiddenGroup)) {
+				unsigned char* routeStep = AStar.m_routeTable[currentRoute][forbiddenGroup];
+				CAStar::CAPos* portalPos = &AStar.m_portals[routeStep[1]];
+				float portalDist = PSVECDistance(&object->m_worldPosition, &portalPos->m_position);
+				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
+					routeFrom = routeStep[0];
+					portalPos = &AStar.m_portals[AStar.m_routeTable[routeStep[0]][forbiddenGroup][1]];
+				}
+				targetPos.x = portalPos->m_position.x;
+				targetPos.y = portalPos->m_position.y;
+				targetPos.z = portalPos->m_position.z;
+			}
+		} else {
+			CAStar::CAPos* escapePos;
+			if ((routeFrom != 0) && (forbiddenGroup != 0) &&
+				((escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev)) != NULL)) {
+				unsigned short nextGroup = escapePos->m_groupA;
+				if (nextGroup == routeFrom) {
+					nextGroup = escapePos->m_groupB;
+				}
+				unsigned char* routeStep = AStar.m_routeTable[routeFrom][static_cast<unsigned char>(nextGroup)];
+				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
+				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
+					routePrev = routeFrom;
+					routeFrom = routeStep[0];
+					escapePos = &AStar.m_portals[AStar.m_routeTable[routeStep[0]][forbiddenGroup][1]];
+				}
+
+				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
+				CVector dir = CVector(object->m_worldPosition) - CVector(escapePos->m_position);
+				dir.Normalize();
+				targetPos = CVector(object->m_worldPosition) + dir * targetDist;
+			}
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80113098
+ * PAL Size: 1508b
+ * EN Address: 0x80139CC0
+ * EN Size: 1812b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::moveFrame()
+{
+	unsigned int& moveStateFlags = m_moveWork.m_stateFlags;
+	unsigned int& moveFlags = m_moveWork.m_flags;
+	float& moveSpeed = m_moveWork.m_speed;
+	float& moveRange = m_moveWork.m_range;
+	unsigned int& moveLimitFrame = m_moveWork.m_limitFrame;
+	int& moveFrame = m_moveWork.m_frame;
+	int& moveChangeStat = m_moveWork.m_changeStat;
+	float& moveSpeedRate = m_pushScale;
+	short& aStarGroupId = m_aStarGroupId;
+
+	CVector targetPos;
+	CVector moveDirection;
+	float targetDist = 0.0f;
+
+	if ((moveStateFlags & 1) != 0) {
+		return;
+	}
+
+	(this->*m_funcs->moveFrame)();
+
+	if ((moveFlags & 1) != 0) {
+		targetPos = CVector(m_moveWork.m_target->m_worldPosition);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
+
+		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
+			short targetAStarGroupId = m_moveWork.m_target->m_aStarGroupId;
+			moveAStar(aStarGroupId, targetAStarGroupId, targetPos);
+		}
+	} else if ((moveFlags & 2) != 0) {
+		targetPos = CVector(m_moveWork.m_targetPos);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
+
+		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
+			int polygonGroup = AStar.calcPolygonGroup(static_cast<Vec*>(targetPos), static_cast<int>(m_bgHitMask));
+			moveAStar(aStarGroupId, polygonGroup, targetPos);
+		}
+	} else if ((moveFlags & 0x2000) != 0) {
+		targetPos = CVector(m_worldPosition) + CVector(m_moveWork.m_targetPos);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
+	}
+
+	moveDirection = targetPos - CVector(m_worldPosition);
+	if ((moveFlags & 0x40) != 0) {
+		moveDirection = CVector(-moveDirection.x, -moveDirection.y, -moveDirection.z);
+	}
+
+	float rotY = moveDirection.GetRotateY();
+	float distance = PSVECMag(static_cast<Vec*>(moveDirection));
+
+	if ((((moveFlags & 0x20) != 0) && (targetDist < moveRange)) ||
+		(((moveFlags & 0x40) != 0) && (targetDist >= moveRange))) {
+	moveCancelExit:
+		moveStateFlags |= 1;
+		(this->*m_funcs->moveCancel)();
+		moveStateFlags |= 2;
+		if ((moveFlags & 0x100) != 0) {
+			changeStat(moveChangeStat, 0, 0);
+		}
+		return;
+	}
+
+	if ((moveFlags & 4) != 0) {
+		float oldRotY = m_rotBaseY;
+		if ((moveFlags & 0x8000) != 0) {
+			oldRotY += 3.1415927f;
+		}
+
+		float dstRot = Math.DstRot(rotY, oldRotY);
+		float turnFactor = m_turnFactor;
+		float baseDelta = dstRot * turnFactor;
+		float rotDelta = dstRot * (1.0f - turnFactor);
+		m_rotBaseY = m_rotBaseY + baseDelta;
+		rotY = rotY - rotDelta;
+		m_rotTargetY = m_rotBaseY;
+
+		float s = sinf(dstRot);
+		float c = cosf(dstRot);
+		float x = moveDirection.x;
+		moveDirection.x = (c * x) - (s * moveDirection.z);
+		moveDirection.z = (s * x) + (c * moveDirection.z);
+		distance = PSVECMag(static_cast<Vec*>(moveDirection));
+	}
+
+	if (((moveFlags & 0x80) != 0) && (m_stateFlags0Bits.unk1 != 0)) {
+		goto moveCancelExit;
+	}
+
+	float stepDist;
+	if ((moveFlags & 0x200) != 0) {
+		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
+		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
+	} else if ((moveFlags & 0x800) != 0) {
+		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
+		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
+	} else {
+		stepDist = moveSpeed;
+	}
+
+	CVector moveDelta;
+	if ((moveFlags & 0x1000) != 0) {
+		moveDelta = moveDirection;
+	} else {
+		if (__fabs(distance) < kMonObjSmallStepF64) {
+			moveDelta = CVector(0.0f, 0.0f, 0.0f);
+		} else {
+			moveDelta = moveDirection * ((1.0f / distance) * stepDist);
+		}
+	}
+
+	if ((moveFlags & 0x4000) != 0) {
+		PSVECAdd(&m_groundHitOffset, static_cast<Vec*>(moveDelta), &m_groundHitOffset);
+	} else {
+		m_groundHitOffset.x += moveDelta.x;
+		m_groundHitOffset.z += moveDelta.z;
+	}
+
+	float stepRemaining = targetDist - stepDist;
+	if ((moveFlags & 0x8000) != 0) {
+		m_rotTargetY = 3.1415927f + rotY;
+	} else {
+		m_rotTargetY = rotY;
+	}
+
+	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
+		((moveFlags & 0x40) == 0 || !(stepRemaining >= moveRange))) {
+		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
+			reqAnim(1, 1, 0);
+		}
+
+		moveFrame++;
+		if (((moveFlags & 0x10) == 0) || ((int)moveLimitFrame > moveFrame)) {
+			return;
+		}
+	}
+
+	goto moveCancelExit;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011306C
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::logicFuncDefault()
+{
+	int targetIndex = 0;
+	statMove(&targetIndex);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80112FD4
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::calcBranchFuncDefault(int branchType)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	int result = 0;
+
+	if (branchType == 1) {
+		unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
+		if (static_cast<int>(current) < static_cast<int>(static_cast<unsigned int>(max) >> 1)) {
+			result = 1;
+		}
+	} else if (branchType == 2) {
+		unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
+		if (current < (max / 3)) {
+			result = 2;
+		} else if (current < ((max * 2) / 3)) {
+			result = 1;
+		}
+	} else if (branchType != 0) {
+		result = 0;
+	}
+
+	return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80112ED4
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::sysControl(int controlType)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	switch (controlType) {
+	case 6:
+		m_repop.delay = 0;
+		break;
+
+	case 7:
+		m_unk6BE = 1;
+		m_chaseState = 4;
+		m_chaseTimer = 0;
+		m_chaseDirty = 1;
+		object->m_bgColMask &= 0xFFF7FFFD;
+		object->m_displayFlags &= 0xFFFFFFFE;
+		break;
+
+	case 8:
+		m_unk6BE = 0;
+		break;
+
+	case 0xD:
+		m_unk6C1 = 0;
+		break;
+
+	case 0xC:
+		m_unk6C1 = 1;
+		break;
+
+	case 0xF:
+		setRepop(0);
+		break;
+
+	case 0x10:
+		object->m_displayFlags |= 0x400000;
+		break;
+
+	case 0x11:
+		object->m_displayFlags &= 0xFFBFFFFF;
+		break;
+
+	case 0x16:
+		object->m_weaponNodeFlagBits.m_control3 = 0;
+		break;
+
+	case 0x15:
+		object->m_weaponNodeFlagBits.m_control3 = 1;
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80112D5C
+ * PAL Size: 376b
+ * EN Address: 0x8013A5E8
+ * EN Size: 136b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::onChangePrg(int value)
+{
+	if ((m_weaponNodeFlagBits.m_prg != value) &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB)) {
+		int enabled = m_unk6BA == 0;
+		setUndeadEffect(value, enabled);
+	}
+	CGCharaObj::onChangePrg(value);
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::footSe()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80112d54
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::GetCID()
+{
+	return 0xAD;
 }
 
 

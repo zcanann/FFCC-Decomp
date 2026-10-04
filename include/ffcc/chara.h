@@ -389,6 +389,7 @@ public:
 		void SetDynaVector(Vec* vec) { m_dynJitter = CVector(*vec); }
 		CNode* GetNode(unsigned long index) { return &m_nodes[index]; }
 		CAnim* GetAnim() { return m_anim; }
+		CTextureSet* GetTextureSet() { return m_texSet; }
 		void CalcFurColor();
 		void InitMogFurTex();
 		void CopyFurTex(int loadFromTexture);

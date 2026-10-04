@@ -57,8 +57,9 @@ Their section boundaries follow the compiled objects' sizes and alignments,
 checked against the recovered symbol addresses and retail image. These are
 reconstructed units; no original GBA MAP is available. Gaps between objects are
 linker padding and are excluded from the per-unit data totals. Unclaimed common
-storage remains in the separate `bss` unit. Recovered common storage uses a
-`.common` range under its owning source unit. The final linker selects that
+storage remains in the separate `bss` unit. Its disconnected ranges stay separate
+in objdiff so combining them cannot add artificial alignment bytes to progress.
+Recovered common storage uses a `.common` range under its owning source unit. The final linker selects that
 object's `COMMON` symbols directly. For objdiff only, a relocatable link allocates
 them in a `.common` section; the final image still uses the original object so
 common definitions can coalesce across units. An optional `align:` on a split

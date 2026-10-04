@@ -481,6 +481,10 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                         "progress_categories": [category],
                     },
                 }
+                if unit == "bss":
+                    # These fallback ranges are disconnected in the image.
+                    # Combining them adds synthetic alignment bytes to progress.
+                    unit_config["options"] = {"combine_data_sections": False}
                 if unit in bases:
                     objects.append(comparison_bases[unit])
                     unit_config["base_path"] = comparison_bases[unit]

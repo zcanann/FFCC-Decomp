@@ -603,7 +603,14 @@ def lift(script, func):
         elif op in STORES:
             val = pop()
             ref = pop()
-            stack.append(E("%s %s %s" % (ref.text, STORES[op], val.wrap(2)), 1, True))
+            sym = STORES[op]
+            if i + 1 < len(insns) and insns[i + 1][1] == 0x0C:
+                stack.append(E("%s %s %s" % (ref.text, sym, val.wrap(2)), 1, True))
+            elif sym != "=" and val.text == "1":
+                # a store yields the old value: x += 1 used as a value is x++
+                stack.append(E("%s%s" % (ref.text, "++" if sym == "+=" else "--"), 15, True))
+            else:
+                stack.append(E("postassign(%s %s %s)" % (ref.text, sym, val.wrap(2)), 100, True))
         elif op in BINOPS:
             rhs = pop()
             lhs = pop()

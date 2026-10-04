@@ -81,7 +81,7 @@ void GilScreen_Setup(void)
     sGilWaiting = 0;
     sGilQuit = 0;
     for (i = 0; i <= 9; i++) {
-        n = Link_SendEvent(21, 0, 0);
+        n = Link_SendEvent(EVT_GIL_RESEND, 0, 0);
         if (n == 0)
             break;
     }
@@ -119,7 +119,7 @@ s32 GilScreen_Main(void)
 
     if (sGilSynced == 0) {
         for (i = 0; i <= 9; i++) {
-            ret = Link_SendEvent(21, 0, 0);
+            ret = Link_SendEvent(EVT_GIL_RESEND, 0, 0);
             if (ret == 0)
                 break;
         }
@@ -319,7 +319,7 @@ void GilScreen_HandleInput(void)
             return;
         if (gKeysNew & A_BUTTON) {
             if (win->cursor < win->rows - 1) {
-                Link_SendGil(1, sGilAmount);
+                Link_SendGil(GIL_OP_PUT, sGilAmount);
                 sGilWaiting = 1;
                 Reply_Clear();
                 gReplyWaiting = 1;

@@ -207,12 +207,17 @@ void Session_OnPlayerStat(u8 *data)
         p += 2;
     }
 
-    gSession.appearance = *p++;
+    dst = (u8 *)&gSession.appearance;
+    *dst = *p++;
     memcpy(gSession.stats, p, 3);
     p += 3;
     dst = (u8 *)&gSession.memories;
-    for (i = 2; i != 0; i--)
+    i = 2;
+    do {
         *dst++ = *p++;
+        if (--i == 0)
+            break;
+    } while (1);
 
     n = Session_OnCompatibility(p);
     p += n;

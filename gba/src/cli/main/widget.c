@@ -646,15 +646,15 @@ void Menu_OnOpen(u32 data)
     struct JoyArgs *cmd = (struct JoyArgs *)&data;
 
     gScreen = cmd->arg;
-    if (gScreen == 11) {
+    if (gScreen == SCREEN_PAUSE) {
         if (gMode != MODE_FIELD) {
-            gSavedScreen = 0;
+            gSavedScreen = SCREEN_RADAR;
             gMode = MODE_FIELD;
         } else {
             gSavedScreen = prev;
         }
-        gMsgScreenId = 6;
-    } else if (gScreen == 12) {
+        gMsgScreenId = NOTICE_PAUSE;
+    } else if (gScreen == SCREEN_UNPAUSE) {
         gScreen = gSavedScreen;
     } else {
         gSavedScreen = gScreen;

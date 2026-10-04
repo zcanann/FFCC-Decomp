@@ -123,7 +123,7 @@ void Mode_Init(void)
     gMode = MODE_FIELD;
     CMake_Reset();
     Smith_ResetList();
-    gScreen = 0;
+    gScreen = SCREEN_RADAR;
     Screen_Reset();
     gShopMenuPos[0] = 0;
     gShopMenuPos[1] = -1;
@@ -139,7 +139,7 @@ void Mode_Init(void)
     Bg_ClearMaps();
     gSavedScreen = gScreen;
     gOpenMenuReq = 0;
-    MenuScreen_SetReturn(0);
+    MenuScreen_SetReturn(SCREEN_RADAR);
 }
 
 s32 Mode_Update(void)
@@ -187,19 +187,19 @@ s32 FieldMode_Update(void)
 
     ret = 0;
     if (gScreenPhase == PHASE_INIT) {
-        if (gLinkStarted || gScreen == 13) {
-            if (gScreen == 0 && gRadarType == 2)
+        if (gLinkStarted || gScreen == SCREEN_WAITING) {
+            if (gScreen == SCREEN_RADAR && gRadarType == RADAR_SCOUTER)
                 ret = ScouterScreen_Init();
             else
                 ret = gFieldScreens[gScreen].init();
         }
     } else if (gScreenPhase == PHASE_MAIN) {
-        if (gScreen == 0 && gRadarType == 2)
+        if (gScreen == SCREEN_RADAR && gRadarType == RADAR_SCOUTER)
             ret = ScouterScreen_Main();
         else
             ret = gFieldScreens[gScreen].main();
     } else {
-        if (gScreen == 0 && gRadarType == 2)
+        if (gScreen == SCREEN_RADAR && gRadarType == RADAR_SCOUTER)
             ret = ScouterScreen_Exit();
         else
             ret = gFieldScreens[gScreen].exit();
@@ -211,27 +211,27 @@ s32 FieldMode_Update(void)
         } else {
             if (gOpenMenuReq) {
                 MenuScreen_SetReturn(gScreen);
-                gScreen = 10;
-            } else if (gScreen == 10) {
+                gScreen = SCREEN_MENU;
+            } else if (gScreen == SCREEN_MENU) {
                 gScreen = gWindows[0].cursor;
-            } else if (gScreen == 9 && gLetterAttachKind == 2) {
-                gScreen = 6;
-            } else if (gScreen != 9 && gLetterAttachKind) {
-                gScreen = 9;
+            } else if (gScreen == SCREEN_LETTERS && gLetterAttachKind == 2) {
+                gScreen = SCREEN_GIL;
+            } else if (gScreen != SCREEN_LETTERS && gLetterAttachKind) {
+                gScreen = SCREEN_LETTERS;
             } else {
                 Xfer_ClearLetterData();
                 if (gScreenStep > 0) {
                     gScreen++;
                     if (gFieldScreens[gScreen].init == 0)
                         gScreen++;
-                    if (gScreen > 9)
-                        gScreen = 0;
+                    if (gScreen > SCREEN_LETTERS)
+                        gScreen = SCREEN_RADAR;
                 } else {
                     gScreen--;
                     if (gFieldScreens[gScreen].init == 0)
                         gScreen--;
-                    if (gScreen < 0)
-                        gScreen = 9;
+                    if (gScreen < SCREEN_RADAR)
+                        gScreen = SCREEN_LETTERS;
                 }
             }
             gScreenStep = 0;
@@ -268,11 +268,11 @@ s32 CMakeMode_Update(void)
         if (gScreenPhase <= 1) {
             gScreenPhase++;
         } else {
-            if (gScreen == 0 && ret < 0) {
+            if (gScreen == SCREEN_CMAKE_NAME && ret < 0) {
                 gLinkStarted = 0;
                 gMenuHasInput = 0;
-                gScreen = 5;
-            } else if (gScreen != 4) {
+                gScreen = SCREEN_CMAKE_DONE;
+            } else if (gScreen != SCREEN_CMAKE_CONFIRM) {
                 if (ret > 0)
                     gScreen++;
                 else
@@ -280,7 +280,7 @@ s32 CMakeMode_Update(void)
             } else if (ret > 0) {
                 gLinkStarted = 0;
                 gMenuHasInput = 0;
-                gScreen = 5;
+                gScreen = SCREEN_CMAKE_DONE;
             } else {
                 gScreen = gSubState;
             }
@@ -319,22 +319,22 @@ s32 ShopMode_Update(void)
         if (gScreenPhase <= 1) {
             gScreenPhase++;
         } else {
-            if (gScreen == 0 && ret < 0) {
+            if (gScreen == SCREEN_SHOP_TOP && ret < 0) {
                 gLinkStarted = 0;
                 gMenuHasInput = 0;
-                gScreen = 3;
-            } else if (gScreen == 0 && ret != 0) {
+                gScreen = SCREEN_SHOP_DONE;
+            } else if (gScreen == SCREEN_SHOP_TOP && ret != 0) {
                 gShopMenuPos[0] = gWindows[0].cursor;
                 switch (gShopMenuPos[0]) {
                 case 0:
-                    gScreen = 1;
+                    gScreen = SCREEN_SHOP_BUY;
                     break;
                 case 1:
-                    gScreen = 2;
+                    gScreen = SCREEN_SHOP_SELL;
                     break;
                 }
             } else {
-                gScreen = 0;
+                gScreen = SCREEN_SHOP_TOP;
             }
             Screen_Restart();
             Bg_ClearMaps();
@@ -372,20 +372,20 @@ s32 SmithMode_Update(void)
         if (gScreenPhase <= 1) {
             gScreenPhase++;
         } else {
-            if (gScreen == 0) {
+            if (gScreen == SCREEN_SMITH_TOP) {
                 if (ret > 0) {
-                    gScreen = 1;
+                    gScreen = SCREEN_SMITH_FORGE;
                 } else {
                     gMenuHasInput = 0;
-                    gScreen = 3;
+                    gScreen = SCREEN_SMITH_DONE;
                 }
-            } else if (gScreen == 1) {
+            } else if (gScreen == SCREEN_SMITH_FORGE) {
                 if (ret > 0)
-                    gScreen = 2;
+                    gScreen = SCREEN_SMITH_EQUIP;
                 else
-                    gScreen = 0;
+                    gScreen = SCREEN_SMITH_TOP;
             } else {
-                gScreen = 0;
+                gScreen = SCREEN_SMITH_TOP;
             }
             Screen_Restart();
             Bg_ClearMaps();
@@ -410,7 +410,7 @@ s32 CtrlMode_Update(void)
     ret = 0;
     if (gScreenPhase == PHASE_INIT) {
         if (gLinkStarted) {
-            gMsgScreenId = 3;
+            gMsgScreenId = NOTICE_SEE_TV;
             ret = MsgScreen_Init();
         }
     } else {
@@ -433,7 +433,7 @@ s32 CtrlMode_Update(void)
 
 void Screen_Reset(void)
 {
-    if (gWasConnected || gScreen != 13) {
+    if (gWasConnected || gScreen != SCREEN_WAITING) {
         Screen_Restart();
         Obj_FreeAllPalettes();
     }
@@ -445,7 +445,7 @@ void Screen_Restart(void)
     s32 i;
     u16 *map;
 
-    if (gWasConnected || gScreen != 13) {
+    if (gWasConnected || gScreen != SCREEN_WAITING) {
         gScreenUnused = 0;
         gScreenPhase = PHASE_INIT;
         gScreenInitDone = 0;

@@ -10,6 +10,51 @@
 #define MODE_SMITH      3
 #define MODE_CONTROLLER 4
 
+/* gScreen in MODE_FIELD; the GameCube keys its data feeds off this id */
+#define SCREEN_RADAR         0
+#define SCREEN_CMD_LIST      1
+#define SCREEN_ITEMS         2
+#define SCREEN_EQUIP         3
+#define SCREEN_ARTIFACTS     4
+#define SCREEN_TMP_ARTIFACTS 5
+#define SCREEN_GIL           6
+#define SCREEN_FAVORITES     7
+#define SCREEN_FAMILY        8
+#define SCREEN_LETTERS       9
+#define SCREEN_MENU          10
+#define SCREEN_PAUSE         11
+#define SCREEN_UNPAUSE       12 /* request only: return to the screen before the pause */
+#define SCREEN_WAITING       13
+
+/* gScreen in MODE_CMAKE */
+#define SCREEN_CMAKE_NAME    0
+#define SCREEN_CMAKE_GENDER  1
+#define SCREEN_CMAKE_LOOK    2
+#define SCREEN_CMAKE_JOB     3
+#define SCREEN_CMAKE_CONFIRM 4
+#define SCREEN_CMAKE_DONE    5
+
+/* gScreen in MODE_SHOP */
+#define SCREEN_SHOP_TOP      0
+#define SCREEN_SHOP_BUY      1
+#define SCREEN_SHOP_SELL     2
+#define SCREEN_SHOP_DONE     3
+
+/* gScreen in MODE_SMITH */
+#define SCREEN_SMITH_TOP     0
+#define SCREEN_SMITH_FORGE   1
+#define SCREEN_SMITH_EQUIP   2
+#define SCREEN_SMITH_DONE    3
+
+/* Msg_GetNotice ids; gMsgScreenId is the one the message screen shows */
+#define NOTICE_NAME_TAKEN  0
+#define NOTICE_LOOK_TAKEN  1
+#define NOTICE_JOB_TAKEN   2
+#define NOTICE_SEE_TV      3
+#define NOTICE_WAITING     4
+#define NOTICE_DOWNLOADING 5
+#define NOTICE_PAUSE       6
+
 /* gScreenPhase */
 #define PHASE_INIT 0
 #define PHASE_MAIN 1

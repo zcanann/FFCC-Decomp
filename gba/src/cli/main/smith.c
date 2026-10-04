@@ -63,7 +63,7 @@ void SmithTopScreen_Setup(void)
     s32 i;
 
     Bg_SetScroll(15, 0, 0);
-    Link_SendRequest(8, 0);
+    Link_SendRequest(REQ_SMITH_LIST, 0);
     gSubState = 0;
     DmaClear32(0, 0, gWindows, sizeof(struct Window) * 5);
     ListWin_Setup(0, 16, 0, 2);
@@ -128,7 +128,7 @@ s32 SmithTopScreen_Main(void)
         if (gKeysNew & B_BUTTON) {
             sSmithResult = -1;
             m4aSongNumStart(3);
-            Link_SendEvent(11, 0, 0);
+            Link_SendEvent(EVT_SMITH_LEAVE, 0, 0);
             return 1;
         }
         return 0;
@@ -266,7 +266,7 @@ s32 SmithTopScreen_HandleInput(void)
             gInputLockFrames = 6;
             sSmithResult = -1;
             ret = 1;
-            Link_SendEvent(11, 0, 0);
+            Link_SendEvent(EVT_SMITH_LEAVE, 0, 0);
             m4aSongNumStart(3);
         }
     }
@@ -495,7 +495,7 @@ s32 SmithForge_HandleInput(void)
     if (gSubMode == 0 || !(gKeysRepeat & (DPAD_UP | DPAD_DOWN))) {
         if (gKeysNew & A_BUTTON) {
             if (gSubMode == 0) {
-                if (gScreen == 1) {
+                if (gScreen == SCREEN_SMITH_FORGE) {
                     if (sSmithCanForge == 0) {
                         m4aSongNumStart(0);
                         return 0;
@@ -513,12 +513,12 @@ s32 SmithForge_HandleInput(void)
             } else if (gSubMode == 1) {
                 switch (win->cursor) {
                 case 0:
-                    if (gScreen == 1) {
+                    if (gScreen == SCREEN_SMITH_FORGE) {
                         sel = win->cursor;
                         if (win->items[sel].enabled != 0) {
                             s32 slot = gSession.appearance & 3;
                             p = &LIST_BUF[sSmithSel];
-                            Link_SendEvent(10, p[1], slot);
+                            Link_SendEvent(EVT_SMITH_FORGE, p[1], slot);
                             sSmithWaiting = 1;
                             Reply_Clear();
                             gReplyWaiting = 1;
@@ -557,7 +557,7 @@ s32 SmithForge_HandleInput(void)
                 sSmithResult = -1;
                 ret = 1;
             } else {
-                if (gScreen == 2)
+                if (gScreen == SCREEN_SMITH_EQUIP)
                     sSmithResult = -1;
                 gSubState++;
             }
@@ -749,7 +749,7 @@ void SmithForge_DrawRow(s32 idx, s32 pal)
     s32 row;
     u16 *map;
 
-    if (gScreen == 2 && idx != 0)
+    if (gScreen == SCREEN_SMITH_EQUIP && idx != 0)
         y++;
     w = win->width - 2;
     for (i = 0; i < 2; i++) {

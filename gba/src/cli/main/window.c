@@ -1068,54 +1068,57 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
                 k += 6;
             buf[i] = k | pal;
         }
-        k = win->y + (win->anim >> 3);
-        map = Bg_GetMapPtr(win->bg, win->x, k);
-        DmaCopy16(0, buf, map, win->width << 1);
-    } else if (n < win->height - 3) {
-        k = n & 1;
-        attr = Window_GetItemPalette(1, win->slot);
-        for (i = 0; i < win->width; i++) {
-            if (i <= 1 || i >= win->width - 2) {
-                if (i <= 1)
-                    a = i + 12;
-                else
-                    a = i - win->width + 16;
-                t = tile + a;
-                if (k)
-                    t += 4;
-                a = pal;
-            } else {
-                if (!(i & 2))
-                    t = tile - 4;
-                else
-                    t = tile - 2;
-                if (k)
-                    t += 1;
-                a = attr;
-            }
-            buf[i] = t | a;
-        }
-        map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
+        tile = win->y + (win->anim >> 3);
+        map = Bg_GetMapPtr(win->bg, win->x, tile);
         DmaCopy16(0, buf, map, win->width << 1);
     } else {
-        for (i = 0; i < win->width; i++) {
-            if (i == 0)
-                k = tile + 20;
-            else if (i == 1)
-                k = tile + 21;
-            else if (i == win->width - 2)
-                k = tile + 24;
-            else if (i >= win->width - 1)
-                k = tile + 25;
-            else if (i & 2)
-                k = tile + 22;
-            else
-                k = tile + 23;
-            k += (n - (win->height - 3)) * 6;
-            buf[i] = k | pal;
+        s32 row = win->anim >> 3;
+        if (row < win->height - 3) {
+            k = row & 1;
+            attr = Window_GetItemPalette(1, win->slot);
+            for (i = 0; i < win->width; i++) {
+                if (i <= 1 || i >= win->width - 2) {
+                    if (i <= 1)
+                        a = i + 12;
+                    else
+                        a = i - win->width + 16;
+                    t = tile + a;
+                    if (k)
+                        t += 4;
+                    a = pal;
+                } else {
+                    if (!(i & 2))
+                        t = tile - 4;
+                    else
+                        t = tile - 2;
+                    if (k)
+                        t += 1;
+                    a = attr;
+                }
+                buf[i] = t | a;
+            }
+            map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
+            DmaCopy16(0, buf, map, win->width << 1);
+        } else {
+            for (i = 0; i < win->width; i++) {
+                if (i == 0)
+                    k = tile + 20;
+                else if (i == 1)
+                    k = tile + 21;
+                else if (i == win->width - 2)
+                    k = tile + 24;
+                else if (i >= win->width - 1)
+                    k = tile + 25;
+                else if (i & 2)
+                    k = tile + 22;
+                else
+                    k = tile + 23;
+                k += (row - (win->height - 3)) * 6;
+                buf[i] = k | pal;
+            }
+            map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
+            DmaCopy16(0, buf, map, win->width << 1);
         }
-        map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
-        DmaCopy16(0, buf, map, win->width << 1);
     }
     if ((py >> 3) - win->y < win->height) {
         for (i = 0; i < win->width; i++, px += 8) {
@@ -2018,6 +2021,8 @@ void Obj_DrawBanner(s32 prio, s32 x, s32 y, s32 n, s32 offset, s32 mode)
     s32 t;
     s32 i;
     s32 frame;
+    s32 count;
+    s32 palette;
 
     px = x + offset;
     t = y + 10;
@@ -2025,22 +2030,23 @@ void Obj_DrawBanner(s32 prio, s32 x, s32 y, s32 n, s32 offset, s32 mode)
         for (i = 0; i <= 9; i++, px += 16)
             Obj_Draw(px, t, 22, i, 0, 0, 0);
     }
+    count = n;
     px = x;
     t = mode;
     if (t == 0)
         t = 15;
     else
         t = 18;
-    for (i = 0; i < n; i++, px += 8) {
-        x = i;
+    palette = 0;
+    for (i = 0; i < count; i++, px += 8) {
         if (i <= 2)
             frame = i;
-        else if (i >= n - 3)
-            frame = 7 - (n - i);
+        else if (i >= count - 3)
+            frame = 7 - (count - i);
         else
             frame = 3;
-        Obj_Draw(px, y, t, frame, 0, prio, x);
-        Obj_Draw(px, y + 16, t, frame + 7, 0, prio, x);
+        Obj_Draw(px, y, t, frame, palette, prio, 0);
+        Obj_Draw(px, y + 16, t, frame + 7, palette, prio, 0);
     }
 }
 

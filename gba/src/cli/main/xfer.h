@@ -17,6 +17,16 @@
 #define DATA_BASE_POS     0x0400 /* map base position received */
 #define DATA_REPLY        0x8000 /* the GameCube answered with an ACK/NAK */
 
+/* Bulk download types (cmd 11) */
+#define XFER_OBJ          0
+#define XFER_MAP          1
+#define XFER_LETTER       2
+#define XFER_LETTER_LIST  3
+#define XFER_SELL_LIST    6
+#define XFER_BUY_LIST     7
+#define XFER_SMITH_LIST   8
+#define XFER_ARTIFACTS    9
+
 /* State of a GameCube bulk download (cmd 11). */
 struct BulkXfer {
     s8 type;

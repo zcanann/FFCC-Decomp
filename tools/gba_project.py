@@ -151,7 +151,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libgcc/_umodsi3", "libgcc/_lshrdi3", "libgcc/_muldi3", "libgcc/_negdi2",
             "libc/stdio/vfprintf", "libc/stdlib/dtoa", "libc/locale/locale", "libc/stdlib/mprec",
             "libc/stdlib/mallocr", "libc/reent/sbrkr", "libgcc/dp-bit", "libgcc/fp-bit",
-            "libc/reent/impure",
+            "libc/reent/impure", "chunk", "effect", "fixmath", "text",
         ],
     },
     "GCCJGC": {
@@ -179,7 +179,8 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libgcc/_divsi3", "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3",
             "libgcc/_umodsi3", "libgcc/_lshrdi3", "libgcc/_muldi3", "libgcc/_negdi2",
             "libc/stdio/findfp", "libc/stdio/vfprintf", "libc/stdlib/dtoa", "libc/stdlib/mprec",
-            "libgcc/dp-bit", "libgcc/fp-bit",
+            "libgcc/dp-bit", "libgcc/fp-bit", "chunk", "effect", "libc/locale/locale",
+            "libc/stdlib/mallocr",
         ],
     },
 }

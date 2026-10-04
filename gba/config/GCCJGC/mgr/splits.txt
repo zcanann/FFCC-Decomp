@@ -218,7 +218,19 @@ libgcc/_negdi2:
 	.text       start:0x0200EC40 end:0x0200EC58
 
 regional_data:
-	.rodata     start:0x0200EC58 end:0x020139C0
+	.rodata     start:0x0200EC58 end:0x0200ED8C
+
+effect:
+	.rodata     start:0x0200ED8C end:0x0200EDD4
+
+regional_data:
+	.rodata     start:0x0200EDD4 end:0x020101D4
+
+chunk:
+	.rodata     start:0x020101D4 end:0x020101F4
+
+regional_data:
+	.rodata     start:0x020101F4 end:0x020139C0
 
 libc/stdio/vfprintf:
 	.rodata     start:0x020139C0 end:0x02013A3C
@@ -226,14 +238,29 @@ libc/stdio/vfprintf:
 libc/stdlib/dtoa:
 	.rodata     start:0x02013A3C end:0x02013A50
 
-regional_data:
+libc/locale/locale:
 	.rodata     start:0x02013A50 end:0x02013A8C
 
 libc/stdlib/mprec:
 	.rodata     start:0x02013A8C end:0x02013BB0
 
 regional_data:
-	.rodata     start:0x02013BB0 end:0x02021E68
+	.rodata     start:0x02013BB0 end:0x0201596C
+
+effect:
+	.data       start:0x0201596C end:0x02015978
+
+regional_data:
+	.rodata     start:0x02015978 end:0x02015CF8
+
+libc/locale/locale:
+	.data       start:0x02015CF8 end:0x02015D0C
+
+libc/stdlib/mallocr:
+	.data       start:0x02015D0C end:0x02016150
+
+regional_data:
+	.rodata     start:0x02016150 end:0x02021E68
 
 regional_bss:
 	.bss        start:0x03000000 end:0x030070F8

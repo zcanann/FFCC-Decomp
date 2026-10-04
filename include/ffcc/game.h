@@ -152,7 +152,7 @@ public:
     const char* GetLangString();
     void SetNextScript(CGame::CNextScript* nextScript);
     void SetNextScriptNewGame();
-    int IsWorldMap();
+    int IsWorldMap() { return m_currentMapId == 0x21; }
     int IsPartyExist(int);
     char* GetItemName(int);
     char* GetItemArt(int);

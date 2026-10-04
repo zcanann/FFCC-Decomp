@@ -9,6 +9,27 @@ struct Vec;
 
 void VECMultAdd(Vec*, Vec*, Vec*, float);
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void VECNormalizeZero(Vec* src, Vec* dst)
+{
+    float magnitude = PSVECMag(src);
+    if (magnitude == 0.0f) {
+        dst->x = 0.0f;
+        dst->y = 0.0f;
+        dst->z = 0.0f;
+    } else {
+        PSVECScale(src, dst, 1.0f / magnitude);
+    }
+}
+
 class SRT
 {
 public:

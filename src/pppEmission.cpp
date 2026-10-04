@@ -330,7 +330,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* stateContext, v
 
         pppInitBlendMode();
         pppSetBlendMode(step->m_emission.m_blendMode);
-        MaterialMan.SetEnvTexObj(&texture->m_texObj);
+        MaterialMan.SetStoneTexObj(texture->GetTexObj());
 
         Mtx viewMtx0;
         Mtx objMtx0;

@@ -230,27 +230,6 @@ static inline unsigned int LoadU32(u8* base, int offset)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void VECNormalizeZero(Vec* src, Vec* dst)
-{
-	float magnitude = PSVECMag(src);
-	if (magnitude == 0.0f) {
-		dst->x = 0.0f;
-		dst->y = 0.0f;
-		dst->z = 0.0f;
-	} else {
-		PSVECScale(src, dst, 1.0f / magnitude);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 96b
  * EN Address: TODO
  * EN Size: TODO

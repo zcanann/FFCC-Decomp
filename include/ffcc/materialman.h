@@ -117,7 +117,10 @@ public:
     void SetMaterialCharaShadow(CMaterial*);
     void SetMaterialPart(CMaterialSet*, int, int);
     void SetMaterialMenu(CMaterialSet*, int, int);
-    void SetStoneTexObj(_GXTexObj*);
+    void SetStoneTexObj(_GXTexObj* texObj)
+    {
+        m_manaParaboloidTexObj0 = texObj;
+    }
     void SetObjMatrix(float(*)[4], float(*)[4]);
     void SetTexScroll(float, float, float, float);
     void SetFullScreenShadow(CFullScreenShadow&, float(*)[4], long);
@@ -153,22 +156,9 @@ public:
     void ErrorTexMtxCur();
     void ErrorTexMapIdCur();
     CMemory::CStage* GetMemoryStage();
-    void SetManaReflectionVec(Vec* reflectionVec)
+    void SetReflectionVector(Vec* reflectionVec)
     {
         m_manaReflectionVec = reflectionVec;
-    }
-    void SetManaParaboloidTexObj0(_GXTexObj* texObj)
-    {
-        m_manaParaboloidTexObj0 = texObj;
-    }
-    void SetManaParaboloidTexObj1(_GXTexObj* texObj)
-    {
-        m_manaParaboloidTexObj1 = texObj;
-    }
-    void ClearManaParaboloidTexObjs()
-    {
-        m_manaParaboloidTexObj0 = 0;
-        m_manaParaboloidTexObj1 = 0;
     }
     void SetReflectionAlpha(unsigned char alpha)
     {
@@ -197,7 +187,7 @@ public:
      */
     void SetEnvTexObj(_GXTexObj* texObj)
     {
-        m_manaParaboloidTexObj0 = texObj;
+        m_manaParaboloidTexObj1 = texObj;
     }
 private:
     S16Vec* m_normals;                  // 0x04

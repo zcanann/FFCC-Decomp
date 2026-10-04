@@ -58,31 +58,6 @@ STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
 static void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
 
-static inline float CameraWorldX()
-{
-    return CameraPcs.m_positionX;
-}
-
-static inline float CameraWorldY()
-{
-    return CameraPcs.m_positionY;
-}
-
-static inline float CameraWorldZ()
-{
-    return CameraPcs.m_positionZ;
-}
-
-static inline Mtx& CameraMatrix()
-{
-    return CameraPcs.m_cameraMatrix;
-}
-
-static inline Mtx44& CameraScreenMatrix()
-{
-    return CameraPcs.m_screenMatrix;
-}
-
 static inline Mana2DataOffsets* GetMana2DataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<Mana2DataOffsets*>(ctrl->m_serializedDataOffsets);
@@ -103,14 +78,14 @@ static inline Mana2SetupBlock* GetMana2SetupBlock(pppMana2* mana, _pppCtrlTable*
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
-    model->m_beforeDrawModelCallback = 0;
+    model->SetBeforeDrawCallback(0);
     model->SetDrawMeshDLCallback(0);
 }
 
 static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2Step* step)
 {
     model->SetCallbackContext(work, step);
-    model->m_beforeDrawModelCallback = Mana2_BeforeDrawCallback;
+    model->SetBeforeDrawCallback(Mana2_BeforeDrawCallback);
     model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
 
@@ -163,9 +138,7 @@ static void CalcWaterReflectionVector(
         cameraPos.y = ppvCameraMatrix[1][3];
         cameraPos.z = ppvCameraMatrix[2][3];
     } else {
-        cameraPos.x = CameraWorldX();
-        cameraPos.y = CameraWorldY();
-        cameraPos.z = CameraWorldZ();
+        CameraPcs.GetPosition(&cameraPos);
     }
 
     transformedCameraPos.x = 0.0f;
@@ -363,7 +336,7 @@ static int RenderWaterMesh(VMana2* mana2)
     GXSetTevDirect(GX_TEVSTAGE0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXLoadTexObj(&envTexture1->m_texObj, GX_TEXMAP0);
+    GXLoadTexObj(envTexture1->GetTexObj(), GX_TEXMAP0);
     GXSetTevKColor(GX_KCOLOR1, modulateColor);
     GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K1);
     GXSetTevKAlphaSel(GX_TEVSTAGE0, GX_TEV_KASEL_K1_A);
@@ -606,12 +579,10 @@ static void CalcReflectionVector2(
     u16* dl = (u16*)displayList;
     u16* dlEnd;
 
-    cameraPos.x = CameraWorldX();
-    cameraPos.y = CameraWorldY();
-    cameraPos.z = CameraWorldZ();
+    CameraPcs.GetPosition(&cameraPos);
 
     PSMTXCopy(matrix, nodeMtx);
-    nodeMatrix = node->m_mtx;
+    nodeMatrix = node->GetWorldMatrix();
     nodeOffset.x = nodeMatrix[0][3];
     nodeOffset.y = nodeMatrix[1][3];
     nodeOffset.z = nodeMatrix[2][3];
@@ -631,7 +602,7 @@ static void CalcReflectionVector2(
     nodeRotMtx[1][3] = 0.0f;
     nodeRotMtx[2][3] = 0.0f;
 
-    PSMTXCopy(CameraMatrix(), cameraMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
     PSMTXConcat(cameraMtx, matrix, cameraModelMtx);
 
     const float half = 0.5f;
@@ -815,8 +786,8 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
     }
 
     PSMTXIdentity(identityMtx);
-    PSMTXCopy(CameraMatrix(), savedCameraMtx);
-    PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
+    CameraPcs.GetViewMatrix(savedCameraMtx);
+    CameraPcs.GetProjectionMatrix(savedScreenMtx);
     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 
     gObject = mana2->m_object;
@@ -826,7 +797,7 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
 
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
-    model->m_beforeDrawModelCallback = 0;
+    model->SetBeforeDrawCallback(0);
     model->SetDrawMeshDLCallback(0);
 
     if ((int)Game.m_currentSceneId == 7) {
@@ -834,9 +805,7 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
         centerPos.y = 0.0f;
         centerPos.x = 0.0f;
     } else {
-        centerPos.x = gObject->m_worldPosition.x;
-        centerPos.y = gObject->m_worldPosition.y;
-        centerPos.z = gObject->m_worldPosition.z;
+        gObject->GetPos(&centerPos);
     }
     centerPos.x = centerPos.x;
     centerPos.y = 5.0f + centerPos.y;
@@ -904,7 +873,7 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
             baseParaboloidTexObjs++;
         }
 
-        PSMTXCopy(savedCameraMtx, CameraMatrix());
+        CameraPcs.SetViewMatrix(savedCameraMtx);
         Graphic.SetViewport();
         GXSetScissor(0, 0, 0x280, 0x1C0);
         GXSetZTexture(GX_ZT_REPLACE, GX_TF_Z24X8, 0);
@@ -954,12 +923,12 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
         GXInitTexObj(mana2->m_generatedTexObj1, mana2->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP,
                      GX_CLAMP, GX_FALSE);
         drawParaboloidMap(sourceTexObjs, mana2->m_generatedTexObj1, mana2->m_paraboloidMap, mana2->m_paraboloidMapSize,
-                          &envTexture0->m_texObj, 1);
+                          envTexture0->GetTexObj(), 1);
         drawParaboloidMap(sourceTexObjs, mana2->m_generatedTexObj0, mana2->m_paraboloidMap, mana2->m_paraboloidMapSize,
-                          &envTexture0->m_texObj, 0);
+                          envTexture0->GetTexObj(), 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, GX_PERSPECTIVE);
-        PSMTXCopy(savedCameraMtx, CameraMatrix());
+        CameraPcs.SetViewMatrix(savedCameraMtx);
     } else {
         if (mana2->m_paraboloidReady == 0) {
             GXInitTexObj(mana2->m_generatedTexObj0, mana2->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_REPEAT,
@@ -967,9 +936,9 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
             GXInitTexObj(mana2->m_generatedTexObj1, mana2->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_REPEAT,
                          GX_REPEAT, GX_FALSE);
             drawParaboloidMap(mana2->m_baseParaboloidTexObjs, mana2->m_generatedTexObj1, mana2->m_paraboloidMap,
-                              mana2->m_paraboloidMapSize, &envTexture0->m_texObj, 1);
+                              mana2->m_paraboloidMapSize, envTexture0->GetTexObj(), 1);
             drawParaboloidMap(mana2->m_baseParaboloidTexObjs, mana2->m_generatedTexObj0, mana2->m_paraboloidMap,
-                              mana2->m_paraboloidMapSize, &envTexture0->m_texObj, 0);
+                              mana2->m_paraboloidMapSize, envTexture0->GetTexObj(), 0);
             mana2->m_paraboloidReady = 1;
         }
     }
@@ -977,7 +946,7 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
-    model->m_beforeDrawModelCallback = Mana2_BeforeDrawCallback;
+    model->SetBeforeDrawCallback(Mana2_BeforeDrawCallback);
     model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
 
@@ -1021,7 +990,6 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
     CChara::CMesh* mesh;
     CChara::CMesh::CRefData* meshData;
     u32 meshIndex;
-    u32 vertexIndex;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -1038,7 +1006,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
     model = GetCharaModelPtr(handle);
     step->m_rippleLevel = 0;
     mana2Work->m_step = step;
-    if (Game.m_currentMapId == 0x21) {
+    if (Game.IsWorldMap()) {
         step->m_rippleLevel = 0;
     }
 
@@ -1092,14 +1060,14 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
         }
         dstTexObj = mana2Work->m_baseParaboloidTexObjs;
         for (i = 0; i < 6; i++, dstTexObj++) {
-            memcpy(dstTexObj, &mana2Work->m_sourceTextures[i]->m_texObj, sizeof(GXTexObj));
+            memcpy(dstTexObj, mana2Work->m_sourceTextures[i]->GetTexObj(), sizeof(GXTexObj));
         }
 
         CTexture* envTexture0 = mana2Work->m_envTexture0;
         CTexture* envTexture1 = mana2Work->m_envTexture1;
-        envTexture0->m_wrapMode = 0;
+        envTexture0->SetWrapMode(GX_CLAMP);
         envTexture0->InitTexObj();
-        envTexture1->m_wrapMode = 0;
+        envTexture1->SetWrapMode(GX_CLAMP);
         envTexture1->InitTexObj();
 
         if (mana2Work->m_paraboloidMap == 0) {
@@ -1108,10 +1076,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
             genParaboloidMap(mana2Work->m_paraboloidMap, &mana2Work->m_paraboloidMapSize, 0x1E, GX_VTXFMT7);
         }
 
-        mesh = model->m_meshes;
+        mesh = model->GetMesh();
         if (mana2Work->m_positions == 0 && mana2Work->m_normals == 0 && mana2Work->m_waterHeightA == 0) {
-            for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
-                meshData = mesh->m_data;
+            for (meshIndex = 0; meshIndex < model->GetRefData()->m_meshCount; meshIndex++, mesh++) {
+                meshData = mesh->GetRefData();
 
                 if (((step->m_type == 1) && strcmp(meshData->m_name, "obj5") == 0) ||
                     ((step->m_type == 2) && strcmp(meshData->m_name, "obj3") == 0) ||
@@ -1122,10 +1090,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                                                           const_cast<char*>(s_pppMana2_cpp), 0x232));
                         Vec* reflectionVec = mana2Work->m_meshReflectionVec;
                         float zero = 0.0f;
-                        for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
-                            reflectionVec[vertexIndex].z = zero;
-                            reflectionVec[vertexIndex].y = zero;
-                            reflectionVec[vertexIndex].x = zero;
+                        for (u32 j = 0; j < meshData->m_vertexCount; j++) {
+                            reflectionVec[j].z = zero;
+                            reflectionVec[j].y = zero;
+                            reflectionVec[j].x = zero;
                         }
                     }
 
@@ -1134,11 +1102,11 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                             static_cast<GXColor*>(pppMemAlloc(meshData->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
                                                               const_cast<char*>(s_pppMana2_cpp), 0x23B));
                         GXColor* color = mana2Work->m_meshColors;
-                        for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
-                            color[vertexIndex].r = 0xFF;
-                            color[vertexIndex].g = 0xFF;
-                            color[vertexIndex].b = 0xFF;
-                            color[vertexIndex].a = 0xFF;
+                        for (u32 j = 0; j < meshData->m_vertexCount; j++) {
+                            color[j].r = 0xFF;
+                            color[j].g = 0xFF;
+                            color[j].b = 0xFF;
+                            color[j].a = 0xFF;
                         }
                     }
 
@@ -1147,8 +1115,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                             static_cast<S16Vec2d*>(pppMemAlloc(meshData->m_vertexCount * 6, ppvEnv->m_stagePtr,
                                                                const_cast<char*>(s_pppMana2_cpp), 0x244));
                         S16Vec* texCoord = reinterpret_cast<S16Vec*>(mana2Work->m_meshTexCoords);
-                        for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
-                            texCoord[vertexIndex].x = texCoord[vertexIndex].y = 0;
+                        for (u32 j = 0; j < meshData->m_vertexCount; j++) {
+                            texCoord[j].x = texCoord[j].y = 0;
                         }
                     }
 
@@ -1156,7 +1124,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                         static_cast<void**>(pppMemAlloc(meshData->m_displayListCount * sizeof(void*), ppvEnv->m_stagePtr,
                                                         const_cast<char*>(s_pppMana2_cpp), 0x24B));
                     CChara::CMesh::CDisplayList* displayList = meshData->m_displayLists;
-                    for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
+                    for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--, displayList++) {
                         void* copiedDisplayList =
                             pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
                         mana2Work->m_displayListCopies[dlIndex] = copiedDisplayList;
@@ -1166,7 +1134,6 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                         memcpy(mana2Work->m_displayListCopies[dlIndex], displayList->m_data, displayList->m_size);
                         DCFlushRange(mana2Work->m_displayListCopies[dlIndex], displayList->m_size);
                         gUtil.ReWriteDisplayList(mana2Work->m_displayListCopies[dlIndex], displayList->m_size, 1);
-                        displayList++;
                     }
                 }
 
@@ -1185,16 +1152,15 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                     float* waterHeightA = mana2Work->m_waterHeightA;
                     float* waterHeightB = mana2Work->m_waterHeightB;
                     float zero = 0.0f;
-                    for (vertexIndex = 0; vertexIndex < kWaterVertexCount; vertexIndex++) {
-                        waterHeightA[vertexIndex] = zero;
-                        waterHeightB[vertexIndex] = zero;
+                    for (u32 j = 0; j < kWaterVertexCount; j++) {
+                        waterHeightA[j] = zero;
+                        waterHeightB[j] = zero;
                     }
 
                     CreateWaterMesh(mana2Work->m_positions, mana2Work->m_normals, mana2Work->m_texCoord0,
                                     mana2Work->m_indices, step->m_waterScale);
                 }
 
-                mesh++;
             }
         }
 
@@ -1212,9 +1178,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
             UpdateWaterMesh(mana2Work);
         }
 
-        mesh = model->m_meshes;
-        for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
-            meshData = mesh->m_data;
+        CChara::CMesh* drawMesh = model->GetMesh();
+        for (u32 i = 0; i < model->GetRefData()->m_meshCount; i++, drawMesh++) {
+            meshData = drawMesh->GetRefData();
 
             if (((step->m_type == 1) && strcmp(meshData->m_name, "obj5") == 0) ||
                 ((step->m_type == 2) && strcmp(meshData->m_name, "obj3") == 0) ||
@@ -1222,15 +1188,13 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                 for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
                         mana2Work->m_meshReflectionVec, meshData->m_vertices, meshData->m_normals,
-                        meshData->m_vertexCount, model->m_data->m_posQuant,
-                        model->m_data->m_normQuant, model->m_matrix,
+                        meshData->m_vertexCount, model->GetRefData()->m_posQuant,
+                        model->GetRefData()->m_normQuant, model->m_matrix,
                         mana2Work->m_displayListCopies[dlIndex], mana2Work->m_displayListSize,
                         mana2Work->m_meshColors, mana2Work->m_meshTexCoords,
-                        &model->m_nodes[meshData->m_nodeIndex]);
+                        model->GetNode(meshData->m_nodeIndex));
                 }
             }
-
-            mesh++;
         }
     }
 }
@@ -1254,7 +1218,8 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
     u32 i;
 
     work = GetMana2Work(pppMana2, ctrl);
-    MaterialMan.ClearManaParaboloidTexObjs();
+    MaterialMan.SetStoneTexObj(0);
+    MaterialMan.SetEnvTexObj(0);
 
     if (work->m_generatedTexObj0 != NULL) {
         pppMemFree(work->m_generatedTexObj0);
@@ -1335,13 +1300,13 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
     gObject = (CGObject*)ppvMng->m_lookTarget;
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    model->m_beforeDrawModelCallback = 0;
+    model->SetBeforeDrawCallback(0);
     model->SetDrawMeshDLCallback(0);
-    mesh = model->m_meshes;
+    mesh = model->GetMesh();
     step = work->m_step;
-    for (i = 0; i < model->m_data->m_meshCount; i++, mesh++) {
+    for (i = 0; i < model->GetRefData()->m_meshCount; i++, mesh++) {
         u8 stepType = step->m_type;
-        CChara::CMesh::CRefData* meshData = mesh->m_data;
+        CChara::CMesh::CRefData* meshData = mesh->GetRefData();
 
         if (stepType == 1) {
             if (strcmp(meshData->m_name, "obj5") == 0) {
@@ -1464,7 +1429,7 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
  */
 static void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
-    CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
+    CChara::CMesh::CRefData* meshData = model->GetMesh()[partIndex].m_data;
     VMana2* mana2 = (VMana2*)work;
     CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
     int draw = 0;
@@ -1501,7 +1466,7 @@ static void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* st
         Mtx rotMtx;
         Vec offset;
 
-        PSMTXCopy(CameraMatrix(), cameraMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
         PSMTXRotRad(rotMtx, 'z', -1.5707964f);
         float x = mtx[0][3];
         float y = mtx[1][3];
@@ -1541,20 +1506,20 @@ static void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* st
                 DCFlushRange(&mana2->m_runtimeColor, 4);
                 GXSetArray(GX_VA_CLR0, mana2->m_meshColors, 4);
                 GXSetArray(GX_VA_TEX0, mana2->m_meshTexCoords, 4);
-                MaterialMan.SetManaReflectionVec(mana2->m_meshReflectionVec);
+                MaterialMan.SetReflectionVector(mana2->m_meshReflectionVec);
                 MaterialMan.InitEnv();
                 MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x200000));
                 MaterialMan.LockEnv();
-                MaterialMan.SetEnvTexObj(mana2->m_baseParaboloidTexObjs);
+                MaterialMan.SetStoneTexObj(mana2->m_baseParaboloidTexObjs);
                 GXSetCullMode(GX_CULL_FRONT);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-                MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, GX_CS_SCALE_1);
+                MaterialMan.SetMaterial(model->GetRefData()->m_materialSet, displayList->m_material, 0, GX_CS_SCALE_1);
                 GXCallDisplayList(mana2->m_displayListCopies[dlIndex], displayList->m_size);
             }
         } else {
             if (strcmp(meshData->m_name, "obj") == 0) {
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
-                MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, GX_CS_SCALE_1);
+                MaterialMan.SetMaterial(model->GetRefData()->m_materialSet, displayList->m_material, 0, GX_CS_SCALE_1);
                 GXCallDisplayList(displayList->m_data, displayList->m_size);
             }
         }

@@ -36,11 +36,6 @@ struct ChangeTexStep {
     u8 _pad1[1];
 };
 
-static inline ChangeTexMeshRef* ChangeTexMeshes(CChara::CModel* model)
-{
-	return model->m_meshes;
-}
-
 static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
 {
 	model->SetCallbackContext(0, 0);

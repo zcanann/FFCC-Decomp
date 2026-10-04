@@ -154,6 +154,11 @@ public:
         PSMTXCopy(m_cameraMatrix, out);
     }
 
+    void SetViewMatrix(Mtx in)
+    {
+        PSMTXCopy(in, m_cameraMatrix);
+    }
+
     /*
      * --INFO--
      * PAL Address: UNUSED

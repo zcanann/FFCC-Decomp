@@ -1,5 +1,5 @@
 # Regional function identities are mapped from retail code and call/table references.
-# Unknown functions and unclassified data remain retail fallback; source linkage is not claimed.
+# Unknown functions and unclassified data remain retail fallback.
 # A size:0x1 data symbol records a verified start only; its full extent remains unverified.
 _start = .text:0x02000000; // type:function size:0xC0
 start_vector = .text:0x020000C0; // type:function size:0x3C
@@ -287,8 +287,8 @@ fflush = .text:0x0200B28C; // type:function size:0x94 thumb
 std = .text:0x0200B320; // type:function size:0x38 thumb scope:local
 __sfmoreglue = .text:0x0200B358; // type:function size:0x30 thumb
 __sfp = .text:0x0200B388; // type:function size:0x74 thumb
-fn_0200B3FC = .text:0x0200B3FC; // type:function size:0x10 thumb
-fn_0200B40C = .text:0x0200B40C; // type:function size:0x10 thumb
+_cleanup_r = .text:0x0200B3FC; // type:function size:0x10 thumb
+_cleanup = .text:0x0200B40C; // type:function size:0x10 thumb
 __sinit = .text:0x0200B41C; // type:function size:0x60 thumb
 _free_r = .text:0x0200B47C; // type:function size:0x1BE thumb
 _malloc_trim_r = .text:0x0200B63C; // type:function size:0xC0 thumb
@@ -567,3 +567,9 @@ gPointLists = .bss:0x030063E0; // type:object size:0x1 data:byte
 gSound = .bss:0x030063F8; // type:object size:0x1 data:byte
 gMtState = .bss:0x03006400; // type:object size:0x1 data:byte
 gMtIndex = .bss:0x03006DC0; // type:object size:0x1 data:byte
+blanks.12 = .rodata:0x020139C0; // type:object size:0x10 scope:local data:byte
+zeroes.13 = .rodata:0x020139D0; // type:object size:0x10 scope:local data:byte
+p05.27 = .rodata:0x02013A8C; // type:object size:0xC scope:local data:byte
+__mprec_tinytens = .rodata:0x02013B88; // type:object size:0x28 data:byte
+thenan.3 = .bss:0x030070F8; // type:object size:0x14 scope:local data:byte
+thenan.3 = .bss:0x03007110; // type:object size:0x10 scope:local data:byte

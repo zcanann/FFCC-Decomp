@@ -218,7 +218,49 @@ libgcc/_negdi2:
 	.text       start:0x0200EC80 end:0x0200EC98
 
 regional_data:
-	.rodata     start:0x0200EC98 end:0x02021F4C
+	.rodata     start:0x0200EC98 end:0x020139F8
+
+libc/reent/impure:
+	.rodata     start:0x020139F8 end:0x020139FC
+
+libc/stdio/vfprintf:
+	.rodata     start:0x020139FC end:0x02013A78
+
+libc/stdlib/dtoa:
+	.rodata     start:0x02013A78 end:0x02013A8C
+
+libc/locale/locale:
+	.rodata     start:0x02013A8C end:0x02013AC8
+
+libc/stdlib/mprec:
+	.rodata     start:0x02013AC8 end:0x02013BEC
+
+regional_data:
+	.rodata     start:0x02013BEC end:0x020158A0
+
+libc/reent/sbrkr:
+	.common     start:0x020158A0 end:0x020158A4 align:4
+
+regional_data:
+	.rodata     start:0x020158A4 end:0x02015A54
+
+libc/reent/impure:
+	.data       start:0x02015A54 end:0x02015D44
+
+libc/locale/locale:
+	.data       start:0x02015D44 end:0x02015D58
+
+libc/stdlib/mallocr:
+	.data       start:0x02015D58 end:0x0201619C
+
+regional_data:
+	.rodata     start:0x0201619C end:0x02021F4C
 
 regional_bss:
-	.bss        start:0x03000000 end:0x03006DC1
+	.bss        start:0x03000000 end:0x030070F8
+
+libgcc/dp-bit:
+	.bss        start:0x030070F8 end:0x0300710C
+
+libgcc/fp-bit:
+	.bss        start:0x03007110 end:0x03007120

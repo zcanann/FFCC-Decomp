@@ -43,7 +43,8 @@ class GbaRegionTests(unittest.TestCase):
         config = ProjectConfig()
         config.version = version
         config.build_dir = Path("build")
-        with patch.dict(gba_project.PROGRAMS, {version: {"gba_cli": info}}, clear=True):
+        with patch.dict(gba_project.PROGRAMS, {version: {"gba_cli": info}}, clear=True), \
+                patch.dict(gba_project.VERSION_COMPLETE, {"GCCP01": gba_project.COMPLETE}, clear=True):
             gba_project.configure_gba(config, Path("binutils"), compilers)
         ninja = (work / "build" / version / "gba/build.ninja").read_text()
         return config, re.sub(r"\$\n\s*", "", ninja)
@@ -112,6 +113,15 @@ class GbaRegionTests(unittest.TestCase):
                 self.assertIn("--object libgcc/_udivsi3=build/GCCP01/gba/cli/src/libgcc/_udivsi3.o", ninja)
             finally:
                 os.chdir(previous)
+
+    def test_regional_claims_are_explicit_and_program_scoped(self):
+        claims = {"GCCE01": {"cli": ["libgcc/_udivsi3"]}}
+        units = ["libgcc/_udivsi3", "libgcc/_divsi3", "main/main"]
+        with patch.dict(gba_project.VERSION_COMPLETE, claims, clear=True):
+            self.assertEqual(gba_project._complete_units("GCCE01", "cli", units),
+                             {"libgcc/_udivsi3"})
+            self.assertEqual(gba_project._complete_units("GCCE01", "mgr", units), set())
+            self.assertEqual(gba_project._complete_units("GCCJGC", "cli", units), set())
 
 
 if __name__ == "__main__":

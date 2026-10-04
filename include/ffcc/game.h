@@ -52,6 +52,7 @@ public:
         bool IsBattleStage() { return m_bossArtifactStageIndex < 0xF; }
         bool IsMogStage() { return m_bossArtifactStageIndex == 0x19; }
         bool IsBonusStage() { return m_bossArtifactStageIndex < 0xE; }
+        unsigned char GetLanguage() { return m_languageId; }
 
         unsigned char m_menuStageMode;                   // 0x00
         unsigned char m_gameInitFlag;                    // 0x01

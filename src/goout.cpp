@@ -745,7 +745,7 @@ unsigned char CGoOutMenu::SetMemCardError()
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 0),
                        GetGoOutMessageLine(languageId, 1),
@@ -846,7 +846,7 @@ unsigned char CGoOutMenu::SetMemCardError()
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 0),
                        GetGoOutMessageLine(languageId, 1),
@@ -1059,7 +1059,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
     }
     case 2:
         if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) != 1) {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 5),
                        GetGoOutMessageLine(languageId, 6),
@@ -1072,7 +1072,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         do {
             if (Game.m_caravanWorkArr[i].m_shopState != 0 &&
                 static_cast<signed char>(Game.m_caravanWorkArr[i].unk_0xc1e) != 1) {
-                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 5,
                            GetGoOutMessageLine(languageId, 9),
                            GetGoOutMessageLine(languageId, 10),
@@ -1257,7 +1257,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_watchCardDisconnect = 0;
         m_saveLoadMenuOpen = 0;
         {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 7,
                        GetGoOutMessageLine(languageId, 14),
                        GetGoOutMessageLine(languageId, 15),
@@ -1344,7 +1344,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x10:
         if (m_returnTransfer == 0) {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 21),
                        GetGoOutMessageLine(languageId, 22),
@@ -1352,7 +1352,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 24),
                        GetGoOutMessageLine(languageId, 25));
         } else {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 26),
                        GetGoOutMessageLine(languageId, 27),
@@ -1403,7 +1403,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             m_memCardProc = 2;
         }
         {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 31),
                        GetGoOutMessageLine(languageId, 32),
@@ -1436,7 +1436,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             m_memCardProc = 2;
         }
         {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 35),
                        GetGoOutMessageLine(languageId, 36),
@@ -1547,7 +1547,7 @@ void CGoOutMenu::CalcGoOut()
             m_messageTimer = 0;
             m_messageState = 1;
             {
-                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 5,
                            GetGoOutMessageLine(languageId, 39),
                            GetGoOutMessageLine(languageId, 40),
@@ -1613,7 +1613,7 @@ card_connected:;
             return;
         }
         if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(0) == -3) {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 2,
                        GetGoOutMessageLine(languageId, 44),
                        GetGoOutMessageLine(languageId, 45));
@@ -1631,7 +1631,7 @@ card_connected:;
 
             MenuPcs.GetMcAccessPos(&m_accessCardChannel, &m_accessSaveIndex);
             if (m_accessCardChannel == -1) {
-                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 5,
                            GetGoOutMessageLine(languageId, 0),
                            GetGoOutMessageLine(languageId, 1),
@@ -1659,7 +1659,7 @@ card_connected:;
             return;
         }
         if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(1) == -3) {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 2,
                        GetGoOutMessageLine(languageId, 46),
                        GetGoOutMessageLine(languageId, 47));
@@ -1677,7 +1677,7 @@ card_connected:;
                 MenuPcs.CalcGoOutSelCharInit();
                 if (MenuPcs.CheckSameMcFormatID(MenuPcs.m_goOutTransferSaveData,
                                                 static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)) != 0) {
-                    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                    int languageId = Game.m_gameWork.GetLanguage() - 1;
                     SetMenuStr(0, 2,
                                GetGoOutMessageLine(languageId, 48),
                                GetGoOutMessageLine(languageId, 49));
@@ -1699,7 +1699,7 @@ card_connected:;
                 MenuGoOutState().m_resultSelect = 0;
                 MenuPcs.InitSaveLoadMenu();
                 MenuPcs.CalcGoOutSelCharInit();
-                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 7,
                            GetGoOutMessageLine(languageId, 50),
                            GetGoOutMessageLine(languageId, 51),
@@ -1724,7 +1724,7 @@ card_connected:;
         }
         if (m_selectedTransferChara != -1) {
             if (GoOutSaveDat(static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)).m_caravan[m_selectedTransferChara].m_odekakeOutFlag != 0) {
-                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 2,
                            GetGoOutMessageLine(languageId, 57),
                            GetGoOutMessageLine(languageId, 58));
@@ -1738,7 +1738,7 @@ card_connected:;
                     if (sameChara == -3) {
                         m_returnGoOutMode = 0xF;
                         m_goOutMode = 0;
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 3,
                                    GetGoOutMessageLine(languageId, 59),
                                    GetGoOutMessageLine(languageId, 60),
@@ -1750,7 +1750,7 @@ card_connected:;
                     if (g_freeCaravanIdx < 0) {
                         m_returnGoOutMode = 0xF;
                         m_goOutMode = 0;
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 6,
                                    GetGoOutMessageLine(languageId, 62),
                                    GetGoOutMessageLine(languageId, 63),
@@ -1767,7 +1767,7 @@ card_connected:;
                         m_goOutMode = 0;
                         m_returnGoOutMode = 0xF;
                         m_goOutMode = 0;
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 2,
                                    GetGoOutMessageLine(languageId, 68),
                                    GetGoOutMessageLine(languageId, 69));
@@ -2016,7 +2016,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
             }
 
             if (activeMainCharacterCount <= 1) {
-                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 4,
                            GetGoOutMessageLine(languageId, 70),
                            GetGoOutMessageLine(languageId, 71),
@@ -2029,7 +2029,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         }
 
         {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 2,
                        GetGoOutMessageLine(languageId, 74),
                        GetGoOutMessageLine(languageId, 75));
@@ -2039,7 +2039,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
     }
     case 4:
         {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 76),
                        GetGoOutMessageLine(languageId, 77),
@@ -2050,7 +2050,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         break;
     case 5:
         if (Game.m_caravanWorkArr[m_selectedChara].m_caravanLocalFlags != 0) {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 8,
                        GetGoOutMessageLine(languageId, 80),
                        GetGoOutMessageLine(languageId, 81),
@@ -2061,15 +2061,15 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 86),
                        GetGoOutMessageLine(languageId, 87));
         } else {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-            SetMenuStr(0, 1, GetGoOutMessageLine(languageId, 88));
+            const char** mes = &g_strGooutMes[(Game.m_gameWork.GetLanguage() - 1) * 0x6E];
+            SetMenuStr(0, 1, mes[88]);
         }
         m_cursorChoice = 1;
         MenuPcs.SetMenuCharaAnim(m_selectedChara, 5);
         break;
     case 6:
         {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 6,
                        GetGoOutMessageLine(languageId, 89),
                        GetGoOutMessageLine(languageId, 90),
@@ -2082,7 +2082,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         break;
     case 7:
         {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 95),
                        GetGoOutMessageLine(languageId, 96),
@@ -2095,8 +2095,8 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
     case 8:
         MenuPcs.SetMenuCharaAnim(m_selectedChara, 3);
         {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-            SetMenuStr(0, 1, GetGoOutMessageLine(languageId, 100));
+            const char** mes = &g_strGooutMes[(Game.m_gameWork.GetLanguage() - 1) * 0x6E];
+            SetMenuStr(0, 1, mes[100]);
         }
         break;
     default:
@@ -2374,7 +2374,7 @@ void CGoOutMenu::Calc()
                     }
 
                     if (characterCount <= 0) {
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 7,
                                    GetGoOutMessageLine(languageId, 101),
                                    GetGoOutMessageLine(languageId, 102),
@@ -2394,7 +2394,7 @@ void CGoOutMenu::Calc()
                         }
 
                         if (transferableCount >= 8) {
-                            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                            int languageId = Game.m_gameWork.GetLanguage() - 1;
                             SetMenuStr(0, 6,
                                        GetGoOutMessageLine(languageId, 62),
                                        GetGoOutMessageLine(languageId, 63),
@@ -2432,7 +2432,7 @@ void CGoOutMenu::Calc()
                         m_messageCloseMode = 0;
                         m_pendingMessageTimer = 0;
                     } else {
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 2,
                                    GetGoOutMessageLine(languageId, 108),
                                    GetGoOutMessageLine(languageId, 109));

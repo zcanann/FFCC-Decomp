@@ -538,7 +538,7 @@ config.libs = [
             Object(NonMatching, "gbaque.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "gobject.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "gobjwork.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "goout.cpp", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "goout.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "graphic.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(Matching, "gxfunc.cpp"),
             Object(NonMatching, "itemobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),

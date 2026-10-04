@@ -565,7 +565,7 @@ void Xfer_DrawProgress(s32 show)
         memset(buf, 0, sizeof(buf));
         if (xfer->type == 1) {
             memcpy(buf, sMapLoadText, sizeof(sMapLoadText));
-            percent = (xfer->cur - (u8 *)0x02038000) * 100 / xfer->total;
+            percent = (xfer->cur - DOWNLOAD_BUF) * 100 / xfer->total;
             if (percent > 99) {
                 Header_Clear();
             } else {

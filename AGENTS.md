@@ -58,7 +58,19 @@ python3 tools/download_tool.py objdiff-cli tools/objdiff-cli --tag v3.6.1
 tools/objdiff-cli --version
 ```
 
-PAL (`GCCP01`) is the only active target.
+Supported targets are PAL (`GCCP01`), USA (`GCCE01`) and Japan (`GCCJGC`). PAL
+remains the primary target with the most mature matching and linkage; USA and
+Japan have partial regional configs and retail fallbacks. Matching claims,
+symbol addresses and checksums belong to the selected region. Do not promote a
+unit in another region based only on its PAL score.
+
+For shared source, headers or build-tool changes, configure each version and run
+`ninja all_source progress build/<version>/report.json` before publishing. All
+configured GameCube source must compile even when a regional split is still
+unmapped. Require all nine final checksums (three DOLs and six GBA images), as
+well as the source builds; retail fallbacks alone do not validate changed source.
+See [README.md](README.md), [gba/README.md](gba/README.md) and
+[docs/github_actions.md](docs/github_actions.md) for inputs and CI.
 
 ## Contribution Loop
 
@@ -100,7 +112,7 @@ Agents are explicitly allowed, and expected, to go on a **crusade around the tar
 - fix signedness, typedefs, enums, constants, and ABI-relevant types
 - replace hard-coded offsets with real member variables and member access
 - repair nearby structs, globals, constructors, vtables, and helper functions
-- update `config/GCCP01/symbols.txt` when symbol naming is the real issue
+- update the selected region's `config/<version>/symbols.txt` when symbol naming is the real issue
 - adjust `configure.py` flags when flags are the blocker, not the source
 - If working on data, ALWAYS reference .MAP files as ground-truth for how data was laid out (.sdata, .bss, .rodata, etc. appear in these)
 
@@ -156,7 +168,7 @@ ninja
 git push origin HEAD:staging
 ```
 
-If the remote advances and rejects the push, fetch, rebase, and validate again. Never force-push to bypass it. Both the source build and PAL checksum check must pass; a successful retail-object link alone is not sufficient validation of changed C/C++.
+If the remote advances and rejects the push, fetch, rebase, and validate again. Never force-push to bypass it. Both source compilation and the affected regional checksum checks must pass; shared changes require the three-region validation described above. A successful retail-object link alone is not sufficient validation of changed C/C++.
 
 Outside contributors push the topic branch to their fork and open or update a coherent PR:
 

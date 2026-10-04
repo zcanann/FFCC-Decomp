@@ -4,17 +4,77 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
+  gba-compilers:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    container:
+      image: ghcr.io/zcanann/ffcc-decomp-build:main
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+
+    # One compiler build shared by every region. The key changes only when
+    # the pinned compiler build recipe changes.
+    - name: Cache GBA compilers
+      uses: actions/cache@v4
+      with:
+        path: build/tools/gba-agbcc
+        key: ${{ runner.os }}-gba-compilers-v1-${{ hashFiles('gba/tools/build_cc1plus.sh') }}
+
+    - name: Prepare GBA compilers
+      run: |
+        tool_dir="$GITHUB_WORKSPACE/build/tools/gba-agbcc"
+        if [ ! -x "$tool_dir/cc1" ] || [ ! -x "$tool_dir/cc1plus" ] || \
+           [ ! -x "$tool_dir/gcc2-cpp" ]; then
+          apk add --no-cache bash make bison m4 binutils coreutils curl xz
+          work_dir=$(mktemp -d)
+          curl --fail --location --retry 3 \
+            https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz \
+            -o "$work_dir/zig.tar.xz"
+          echo "d45312e61ebcc48032b77bc4cf7fd6915c11fa16e4aad116b66c9468211230ea  $work_dir/zig.tar.xz" \
+            | sha256sum -c -
+          tar -xf "$work_dir/zig.tar.xz" -C "$work_dir"
+          ZIG="$work_dir/zig-linux-x86_64-0.13.0/zig" \
+            bash gba/tools/build_cc1plus.sh "$work_dir/compiler" "$tool_dir"
+        fi
+        cp -p /agbcc/old_agbcc "$tool_dir/old_agbcc"
+        for tool in cc1 cc1plus gcc2-cpp old_agbcc; do
+          test -x "$tool_dir/$tool" || exit 1
+        done
+
+    - name: Share GBA compilers
+      uses: actions/upload-artifact@v4
+      with:
+        name: gba-compilers
+        path: build/tools/gba-agbcc/
+        retention-days: 1
+
   build:
+    needs: gba-compilers
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     # This is a *private* build container.
     # See docs/github_actions.md for more information.
-    container: ghcr.io/zcanann/ffcc-decomp-build:main
+    container:
+      image: ghcr.io/zcanann/ffcc-decomp-build:main
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        version: [GCCP01] #, GCCE01, GCCJGC] # Enable these eventually
+        version: [GCCP01, GCCE01, GCCJGC]
 
     steps:
     # Checkout the repository
@@ -23,6 +83,7 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
+        persist-credentials: false
 
     # Set Git config
     - name: Git config
@@ -36,43 +97,31 @@ jobs:
 
     # Copy the original files to the workspace
     - name: Prepare
-      run: cp -a /orig .
+      run: |
+        cp -a /orig .
+        sha1sum -c orig/SHA1SUMS
 
-    # Restore cached files
-    - name: Cache build
+    # Cache tools only. Retail split objects and extracted assets must not
+    # enter the public repository's Actions cache.
+    - name: Cache build tools
       uses: actions/cache@v4
       with:
-        path: |
-          build
-          .ninja_deps
-          .ninja_log
-        key: ${{ runner.os }}-${{ matrix.version }}-${{ github.sha }}
-        restore-keys: ${{ runner.os }}-${{ matrix.version }}-
+        path: build/tools
+        key: ${{ runner.os }}-build-tools-v1-${{ hashFiles('configure.py', 'tools/project.py') }}
+        restore-keys: ${{ runner.os }}-build-tools-v1-
 
-    # Build the original GBA frontends instead of depending on the private
-    # container's compiler snapshot. The existing build cache retains them.
-    - name: Prepare GBA compilers
+    - name: Download GBA compilers
+      uses: actions/download-artifact@v4
+      with:
+        name: gba-compilers
+        path: build/tools/gba-agbcc
+
+    # Artifact downloads do not preserve executable permissions.
+    - name: Check GBA compilers
       run: |
         tool_dir="$GITHUB_WORKSPACE/build/tools/gba-agbcc"
-        source_key=$(sha256sum gba/tools/build_cc1plus.sh | cut -d ' ' -f 1)
-        if [ ! -f "$tool_dir/.source-key" ] || \
-           [ "$(cat "$tool_dir/.source-key")" != "$source_key" ] || \
-           [ ! -x "$tool_dir/cc1" ] || [ ! -x "$tool_dir/cc1plus" ] || \
-           [ ! -x "$tool_dir/gcc2-cpp" ]; then
-          apk add --no-cache bash make bison m4 binutils coreutils curl xz
-          work_dir=$(mktemp -d)
-          curl --fail --location --retry 3 \
-            https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz \
-            -o "$work_dir/zig.tar.xz"
-          echo "d45312e61ebcc48032b77bc4cf7fd6915c11fa16e4aad116b66c9468211230ea  $work_dir/zig.tar.xz" \
-            | sha256sum -c -
-          tar -xf "$work_dir/zig.tar.xz" -C "$work_dir"
-          ZIG="$work_dir/zig-linux-x86_64-0.13.0/zig" \
-            bash gba/tools/build_cc1plus.sh "$work_dir/compiler" "$tool_dir"
-          echo "$source_key" > "$tool_dir/.source-key"
-        fi
-        cp -p /agbcc/old_agbcc "$tool_dir/old_agbcc"
         for tool in cc1 cc1plus gcc2-cpp old_agbcc; do
+          chmod +x "$tool_dir/$tool"
           test -x "$tool_dir/$tool" || exit 1
         done
 
@@ -83,14 +132,16 @@ jobs:
             --binutils /binutils --compilers /compilers --gba-binutils /usr/bin \
             --gba-compilers build/tools/gba-agbcc
         ninja all_source progress build/${{ matrix.version }}/report.json
-        python -m unittest tools.tests.test_gba_common -v
+        python -m unittest tools.tests.test_gba_common tools.tests.test_gba_regions tools.tests.test_gba_checker tools.tests.test_project_sources -v
 
     # Upload map files
     - name: Upload map
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.version }}_maps
-        path: build/${{ matrix.version }}/**/*.MAP
+        path: |
+          build/${{ matrix.version }}/**/*.MAP
+          build/${{ matrix.version }}/**/*.map
 
     # Upload progress report
     - name: Upload report

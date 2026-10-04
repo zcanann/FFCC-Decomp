@@ -17,10 +17,24 @@ placeholders until real names are recovered.
 
 ## Building
 
-The programs are part of the PAL (`GCCP01`) build: `python configure.py --version GCCP01`
-then `ninja` splits, reassembles, links and verifies both images. Their units appear
-in `objdiff.json` and the progress report under the "GBA Client" and "GBA Minigame"
-categories.
+Both programs are built for PAL (`GCCP01`), USA (`GCCE01`) and Japan (`GCCJGC`).
+Select a region and build all source plus its checked images:
+
+```sh
+python configure.py --version GCCP01
+ninja all_source progress build/GCCP01/report.json
+```
+
+Substitute `GCCE01` or `GCCJGC` in both commands for another region. Outputs live
+under `build/<version>/gba/<program>/`; `objdiff.json` and the regional report
+include the "GBA Client" and "GBA Minigame" categories. Each image has its own
+retail hash. PAL has the most mature source linkage; regional layouts and
+completion claims are independent, and unproven units use retail fallbacks.
+
+Regional comparisons require mapped target objects with verified ownership.
+Compiling an unmapped source validates the build without establishing a match
+or source linkage. USA and Japan still have incomplete data and asset ownership;
+asset units without proven regional extents retain their own retail fallbacks.
 
 Requirements:
 - Python package `capstone` (`pip install capstone`). Without it, configure prints a
@@ -32,26 +46,45 @@ Requirements:
   from [pret/agbcc](https://github.com/pret/agbcc) for libraries. Place them in
   `build/tools/gba-agbcc/` or `--gba-compilers <dir>`. Without the required tools,
   sources are not compiled. See [the toolchain notes](toolchain.md).
-- The images are extracted from `orig/GCCP01/FFCC_PAL.iso` into `orig/GCCP01/gba/`;
-  pre-extracted images there are used as-is.
+- Supply `ffcc_cli.bin` and `mgr00.bin` in `orig/<version>/gba/`, or let the build
+  extract them from the region's uncompressed ISO/GCM:
+
+  | Version | Disc path |
+  |---|---|
+  | `GCCP01` | `orig/GCCP01/FFCC_PAL.iso` |
+  | `GCCE01` | `orig/GCCE01/FFCC_USA.gcm` |
+  | `GCCJGC` | `orig/GCCJGC/FFCC_JP.iso` |
+
+  Existing extracted images are read as-is. They must match the selected
+  region's hashes; substituting PAL images into another region is not valid.
 
 ## Sources
 
 - `src/<program>/<unit>.c`: C code, compiled with `cc1 -mthumb-interwork -O2`.
 - `src/<program>/<unit>.cpp`: C++ code (the minigame's game code), compiled with
   `cc1plus -mthumb-interwork -O2 -fno-exceptions`.
-  Add the unit to `COMPLETE` in `tools/gba_project.py` once every function matches,
-  so it links into the checked image.
+  Source paths remain shared across regions. Add a unit to the selected region's
+  `VERSION_COMPLETE` entry in `tools/gba_project.py` only after its full code,
+  data and final linked placement are verified. The existing `COMPLETE` lists
+  supply the PAL entry; they do not automatically promote USA or Japan.
 - `lib/libgcc/`: agbcc's libgcc, built like agbcc does. Units named `libgcc/<object>`
-  in `splits.txt` build from it and always link.
+  in `splits.txt` build from it. Library linkage is selected for the region too;
+  sharing library source is not proof that every regional object matches.
 - `include/`: shared headers.
 
 The client game files are separate units under `gba/cli/main/`, so a fully
-matched file can link independently of the remaining holdouts. For example:
+matched file can link independently of the remaining holdouts. The single-file
+checker defaults to PAL; select another built region with `--version`:
 
 ```sh
 python gba/tools/check.py gba/src/cli/main/main.c AgbMain
+python gba/tools/check.py --version GCCE01 gba/src/cli/main/main.c AgbMain
 ```
+
+The checker uses the selected region's target objects and `VERSION_<version>`
+preprocessor definition. Its config must already map the requested source unit;
+a missing regional unit cannot be checked against a PAL substitute. It does not
+change source-link completion claims.
 
 Their section boundaries follow the compiled objects' sizes and alignments,
 checked against the recovered symbol addresses and retail image. These are
@@ -71,11 +104,15 @@ the loaded image and that workspace is not counted as a source object.
 
 ## Layout
 
-- `config/<program>/symbols.txt`: symbol names, addresses, sizes; `thumb` marks Thumb functions.
+- PAL retains `config/<program>/`; USA and Japan use
+  `config/<version>/<program>/`. Each contains its own `symbols.txt` and
+  `splits.txt`; region paths select configuration, never a separate source tree.
+- `symbols.txt`: symbol names, addresses, sizes; `thumb` marks Thumb functions.
   C++ functions carry their g++ 2.9 mangled names (`Init__6Camera`, `Crc8__FUi`).
-  After changing a C++ signature, `python gba/tools/syncnames.py <program> --defined --apply`
-  renames the entries to what the compiled objects define.
-- `config/<program>/splits.txt`: address ranges per unit. Units become objdiff units.
+  The PAL name-sync helper is `python gba/tools/syncnames.py <program> --defined --apply`.
+  For regional work, diff the configured region in objdiff and verify that any
+  symbol update applies to its own layout.
+- `splits.txt`: address ranges per unit. Units become objdiff units.
 - `tools/split.py`: generates per-unit assembly and the linker script. Instructions are
   emitted with `.inst`, and calls and pointers become relocations against symbols,
   so target objects diff cleanly against compiled code.

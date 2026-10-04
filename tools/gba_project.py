@@ -12,8 +12,9 @@ Units with source are compiled and diffed against their target objects:
   order given by gba/config/<program>/link_order.txt (data layout follows it)
 - libgcc/<object>, built from gba/lib/libgcc like agbcc's own libgcc
 - libagbsyscall/<routine>, libc/<dir>/<file>, m4a/<file>: libraries in gba/lib
-Units listed in COMPLETE, and all libgcc, libagbsyscall and libc units, link
-their compiled objects into the checked image.
+Units proven complete for the selected region link their compiled objects into
+the checked image. PAL also links its verified libgcc, libagbsyscall and libc
+units; other regions must verify those libraries independently.
 Symbols marked `asset` (or `asset:asm`) in symbols.txt are extracted from the
 retail image into build/<version>/gba/<program>/assets/ (gba/tools/assets.py),
 for assembly files in the source directory to .incbin (or .include).
@@ -77,7 +78,23 @@ PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
     },
 }
 
-DISC_IMAGES = {"GCCP01": "FFCC_PAL.iso"}
+# Regional images have independently recovered layouts. Source files remain
+# shared under cli/ and mgr/; config paths must never select a source directory.
+for _version, _hashes in {
+    "GCCE01": ("2d15c34bccdf3a10cccc4d083b7d91ae5e40671a", "08c785380287242e976ca0ca7120c04e03b330c0"),
+    "GCCJGC": ("661c9658ac75431e80d06be61dd0187c45f34415", "c742001f1069efb9e7115d09bc3d27d5a24b148f"),
+}.items():
+    PROGRAMS[_version] = {
+        _category: {
+            **PROGRAMS["GCCP01"][_category],
+            "program": _program,
+            "config": f"{_version}/{_program}",
+            "sha1": _sha1,
+        }
+        for _category, _program, _sha1 in zip(("gba_cli", "gba_mgr"), ("cli", "mgr"), _hashes)
+    }
+
+DISC_IMAGES = {"GCCP01": "FFCC_PAL.iso", "GCCE01": "FFCC_USA.gcm", "GCCJGC": "FFCC_JP.iso"}
 ASFLAGS = "-mcpu=arm7tdmi -mthumb-interwork"
 CPPFLAGS = "-I gba/include -I gba/lib/m4a/include -I gba/lib/ginclude"
 CFLAGS = "-quiet -mthumb-interwork -O2"
@@ -102,6 +119,16 @@ COMPLETE: Dict[str, List[str]] = {
             "sound_assets", "m4a/m4a_1", "m4a/m4a", "joy_reset", "course", "menu_gfx", "obj_gfx",
             "config", "field_gfx", "font_gfx"],
 }
+
+# PAL's source and library claims do not carry over merely because a regional
+# function has the same name. Add regional units after checking their full link.
+VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {"GCCP01": COMPLETE}
+
+
+def _complete_units(version: str, program: str, units) -> set:
+    proven = VERSION_COMPLETE.get(version, {}).get(program, [])
+    return {unit for unit in units if unit in proven or (
+        version == "GCCP01" and unit.startswith(("libgcc/", "libagbsyscall/", "libc/")))}
 
 # libgcc routines assembled from lib1thumb.asm; the rest are C.
 LIBGCC_ASM = {"_udivsi3", "_divsi3", "_umodsi3", "_modsi3", "_dvmd_tls", "_call_via_rX"}
@@ -204,6 +231,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
 
     exe = ".exe" if sys.platform == "win32" else ""
     build = config.build_dir / config.version / "gba"
+    source_cppflags = f"{CPPFLAGS} -DVERSION_{config.version}"
     orig = Path("orig") / config.version / "gba"
     tools = GBA_DIR / "tools"
     if binutils_dir is not None:
@@ -381,6 +409,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             if not files or (not have_cxx and any(f.suffix == ".cpp" for f in files)):
                 return None
             objects = []
+            compiled_game_sources.update(files)
             for file in files:
                 file_stem = stem if file == source else _path(out / "src" / unit / file.stem)
                 obj = file_stem + ".o" if file != source else base
@@ -392,7 +421,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     pre = file_stem + ".ii"
                     asm = file_stem + ".s"
                     n.build(pre, "gba_cpp", _path(file), implicit=cpp_inputs,
-                            variables={"cppflags": f"--language c++ {CPPFLAGS}"})
+                            variables={"cppflags": f"--language c++ {source_cppflags}"})
                     n.build(asm, "gba_cc", pre, implicit=[_path(cc1plus)],
                             variables={"cc": os.path.normpath(cc1plus),
                                                            "cflags": CXXFLAGS})
@@ -401,7 +430,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     pre = file_stem + ".i"
                     asm = file_stem + ".s"
                     n.build(pre, "gba_cpp", _path(file), implicit=cpp_inputs,
-                            variables={"cppflags": CPPFLAGS})
+                            variables={"cppflags": source_cppflags})
                     n.build(asm, "gba_cc", pre, implicit=[_path(cc1)],
                             variables={"cc": os.path.normpath(cc1),
                                                            "cflags": f"{CFLAGS} {info.get('cflags', '')}".strip()})
@@ -419,9 +448,10 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
 
         split_deps = [_path(tools / "split.py"), _path(tools / "gbaanalysis.py")]
         for category, info in programs.items():
+            program = info.get("program", info["config"])
             config_dir = GBA_DIR / "config" / info["config"]
-            src_dir = GBA_DIR / "src" / info["config"]
-            out = build / info["config"]
+            src_dir = GBA_DIR / "src" / program
+            out = build / program
             units = _units(config_dir)
             arm_units = _arm_units(config_dir)
             link_order = _link_order(config_dir)
@@ -435,13 +465,29 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                                                                  "references.txt") if (config_dir / name).is_file()],
                         variables={"config": _path(config_dir), "outdir": _path(out / "assets")})
             bases = {}
+            compiled_game_sources = set()
+            source_only = []
             if have_compilers:
                 for unit in units:
                     base = compile_source(unit, src_dir, out, info)
                     if base:
                         bases[unit] = base
-            complete = {u for u in bases if u.startswith(("libgcc/", "libagbsyscall/", "libc/"))
-                        or u in COMPLETE.get(info["config"], [])}
+                # Regional data ownership can remain unresolved while its C/C++
+                # source still compiles. Aggregate units above retain their normal
+                # file/link order; track their actual inputs to avoid rebuilding
+                # those files as independent units.
+                for source in sorted(src_dir.rglob("*")):
+                    if (not source.is_file() or source.suffix not in (".c", ".cpp")
+                            or source.name.startswith("_")
+                            or source in compiled_game_sources):
+                        continue
+                    unit = source.relative_to(src_dir).with_suffix("").as_posix()
+                    base = compile_source(unit, src_dir, out, info)
+                    if base:
+                        source_only.append(base)
+                # Asset-only assembly requires recovered regional asset extents.
+                # Do not guess those ranges or borrow another revision's assets.
+            complete = _complete_units(config.version, program, bases)
             # Objdiff needs section-backed storage to compare COMMON symbols.
             # Keep this view separate: linking it would turn tentative definitions
             # into strong definitions and prevent normal cross-object coalescing.
@@ -474,7 +520,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 objects.append(obj)
                 linked.append(bases[unit] if unit in complete else obj)
                 unit_config: Dict[str, Any] = {
-                    "name": f"gba/{info['config']}/{unit}",
+                    "name": f"gba/{program}/{unit}",
                     "target_path": obj,
                     "metadata": {
                         "complete": unit in complete,
@@ -497,9 +543,9 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     unit_config["metadata"]["auto_generated"] = True
                 config.extra_objdiff_units.append(unit_config)
 
-            elf = _path(out / f"{info['config']}.elf")
+            elf = _path(out / f"{program}.elf")
             n.build(elf, "gba_ld", implicit=linked + [ldscript],
-                    variables={"ldscript": ldscript, "map": _path(out / f"{info['config']}.map")})
+                    variables={"ldscript": ldscript, "map": _path(out / f"{program}.map")})
             image = _path(out / bins[category].name)
             n.build(image, "gba_objcopy", elf)
             ok = _path(out / "ok")
@@ -507,7 +553,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     variables={"sha1": info["sha1"]})
             n.newline()
 
-            config.extra_source_inputs += objects + [ok]
+            config.extra_source_inputs += objects + source_only + [ok]
             config.progress_categories.append(ProgressCategory(category, info["name"]))
             config.reconfig_deps = (config.reconfig_deps or []) + [config_dir / "splits.txt",
                                                                    config_dir / "symbols.txt"]

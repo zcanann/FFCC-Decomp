@@ -3,10 +3,12 @@
 
     python gba/tools/check.py gba/src/mgr/sound.cpp            # all functions in the file
     python gba/tools/check.py gba/src/mgr/sound.cpp fn_0200022C  # instruction diff for one
+    python gba/tools/check.py --version GCCE01 gba/src/cli/main/shop.c
 
 Works without ninja (safe to run in parallel): the file is compiled into a private
 temporary directory with the same gcc2-cpp/cc1 (or cc1plus)/as pipeline as the build, and diffed
-against the unit's target object in build/GCCP01/gba (run `ninja` once first).
+against the selected region's target object in build/<version>/gba. Build that
+region first; its config must map the unit. PAL (GCCP01) remains the default.
 """
 
 import argparse
@@ -22,6 +24,7 @@ from preprocess import preprocess
 ROOT = Path(__file__).resolve().parents[2]
 EXE = ".exe" if sys.platform == "win32" else ""
 TOOLS = ROOT / "build" / "tools"
+VERSIONS = ("GCCP01", "GCCE01", "GCCJGC")
 CFLAGS = ["-quiet", "-mthumb-interwork", "-O2"]
 # Per-program extra C flags, as in tools/gba_project.py.
 PROGRAM_CFLAGS = {"mgr": ["-fno-common"]}
@@ -33,13 +36,17 @@ def binutil(name):
 
 
 def compile_c(source: Path, out_dir: Path, program: str,
-              compilers: Path = TOOLS / "gba-agbcc") -> Path:
+              compilers: Path = TOOLS / "gba-agbcc", *,
+              version: str = "GCCP01") -> Path:
+    if version not in VERSIONS:
+        raise ValueError(f"Unsupported GBA version: {version}")
     pre = out_dir / "a.i"
     asm = out_dir / "a.s"
     obj = out_dir / "a.o"
     preprocess(compilers / f"gcc2-cpp{EXE}", source, pre,
                [ROOT / "gba/include", ROOT / "gba/lib/m4a/include", ROOT / "gba/lib/ginclude"],
-               language="c++" if source.suffix == ".cpp" else "c")
+               language="c++" if source.suffix == ".cpp" else "c",
+               defines=(f"VERSION_{version}",))
     if source.suffix == ".cpp":
         cc = [str(compilers / f"cc1plus{EXE}"), *CXXFLAGS]
     else:
@@ -66,6 +73,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
     parser.add_argument("function", nargs="?")
+    parser.add_argument("--version", choices=VERSIONS, default="GCCP01",
+                        help="retail region to compare (default: GCCP01)")
     parser.add_argument("--gba-compilers", type=Path, default=TOOLS / "gba-agbcc",
                         help="compiler directory, as passed to configure.py")
     args = parser.parse_args()
@@ -74,16 +83,16 @@ def main():
     parts = source.relative_to(ROOT / "gba" / "src").parts
     program = parts[0]
     unit = Path(*parts[1:]).with_suffix("").as_posix()
-    target = ROOT / "build" / "GCCP01" / "gba" / program / "obj" / f"{unit}.o"
+    target = ROOT / "build" / args.version / "gba" / program / "obj" / f"{unit}.o"
     if not target.exists() and len(parts) > 2:
         # A directory can also represent an aggregate unit.
         unit = parts[1]
-        target = ROOT / "build" / "GCCP01" / "gba" / program / "obj" / f"{unit}.o"
+        target = ROOT / "build" / args.version / "gba" / program / "obj" / f"{unit}.o"
     if not target.exists():
-        sys.exit(f"{target} missing; run ninja first")
+        sys.exit(f"{target} missing; build {args.version} first and verify that its config maps this unit")
 
     with tempfile.TemporaryDirectory() as tmp:
-        obj = compile_c(source, Path(tmp), program, args.gba_compilers)
+        obj = compile_c(source, Path(tmp), program, args.gba_compilers, version=args.version)
         # Units with several code ranges use per-range section names (.text.<addr>);
         # objdiff pairs code by section name, so rename them to match the compiled object.
         sections = subprocess.run([binutil("objdump"), "-h", str(target)], capture_output=True, text=True).stdout

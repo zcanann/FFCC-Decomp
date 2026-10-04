@@ -29,9 +29,17 @@ Avoid leaving hardcoded offset-based member access (for example `(this + 0x28)`)
 ## Advanced Contribution Guide
 For experienced reverse-engineers, there are still quite a few harder tasks remaining.
 
-### EN & JPN Versions
+### Regional builds
 
-The EN & JPN versions are deliberately being left for last. However, if someone wishes to begin this effort early, this is more than welcome.
+PAL, USA and Japan build from shared source with separate retail inputs, symbol
+configs, output directories and matching claims. PAL remains the primary target
+with the most mature matching and linkage. USA and Japan have partial recovered
+configs and retain retail objects for unproven units. A passing retail checksum
+with those fallbacks does not mean that the region is fully decompiled.
+
+Changes to shared source or build tooling must compile all configured source and
+verify the GameCube executable and both GBA images for all three regions. See
+[the GBA guide](gba/README.md) and [CI documentation](docs/github_actions.md).
 
 # Dependencies
 
@@ -66,26 +74,46 @@ When running under WSL, [objdiff](#diffing) is unable to get filesystem notifica
 - Clone the repository:
 
   ```sh
-  git clone https://github.com/my/repo.git
+  git clone https://github.com/zcanann/FFCC-Decomp.git
   ```
 
-- Copy your game's disc image to `orig/GAMEID`.
-  - Supported formats: ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ, TGC
-  - After the initial build, the disc image can be deleted to save space.
+- Supply the retail inputs for each region you want to build:
 
-- Configure:
+  | Region | Version | Disc image under `orig/<version>/` |
+  |---|---|---|
+  | PAL (default) | `GCCP01` | `FFCC_PAL.iso` |
+  | USA | `GCCE01` | `FFCC_USA.gcm` |
+  | Japan | `GCCJGC` | `FFCC_JP.iso` |
+
+  The GameCube build can also read disc formats supported by decomp-toolkit,
+  including RVZ. The GBA extractor reads the ISO/GCM files named above. For an
+  extracted-only build, supply `orig/<version>/sys/main.dol` and both
+  `orig/<version>/gba/ffcc_cli.bin` and `orig/<version>/gba/mgr00.bin`.
+  Existing extracted GBA inputs are used without modifying them. Each region's
+  inputs are checked against its own expected hashes.
+
+- Install the GBA dependencies and pinned compilers described in
+  [gba/README.md](gba/README.md). They are required to include GBA source in
+  validation and progress.
+
+- Configure and build the selected region, for example PAL:
 
   ```sh
-  python configure.py
+  python configure.py --version GCCP01
+  ninja all_source progress build/GCCP01/report.json
   ```
 
-  To use a version other than `GAMEID` (USA), specify it with `--version`.
+  Use `GCCE01` or `GCCJGC` in both commands for another region. Outputs are kept
+  under `build/<version>/`; the root `build.ninja` and `objdiff.json` describe
+  the most recently configured region. Use separate worktrees for simultaneous
+  regional builds. The compiler tools are shared across regions.
 
-- Build:
-
-  ```sh
-  ninja
-  ```
+  `all_source` compiles configured source, including GameCube units not yet
+  mapped into the selected region's splits. `progress` verifies the linked
+  GameCube executable and both GBA images, then generates the report. Shared
+  changes require all three regional builds: three DOL and six GBA checksum
+  checks, plus source compilation. Match and linkage claims remain independent
+  for each region.
 
 ## Diffing
 

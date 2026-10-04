@@ -1,0 +1,149 @@
+crt0:
+	.text       start:0x02000000 end:0x0200025C
+
+main/main:
+	.text       start:0x0200025C end:0x02000EE8
+
+main/link:
+	.text       start:0x02000EE8 end:0x02002154
+
+main/xfer:
+	.text       start:0x02002154 end:0x020027B8
+
+main/session:
+	.text       start:0x020027B8 end:0x02003478
+
+main/text:
+	.text       start:0x02003478 end:0x02003CA4
+
+main/radarmap:
+	.text       start:0x02003CA4 end:0x02004940
+
+main/obj:
+	.text       start:0x02004940 end:0x0200529C
+
+main/mode:
+	.text       start:0x0200529C end:0x02005AEC
+
+main/window:
+	.text       start:0x02005AEC end:0x02009324
+
+main/widget:
+	.text       start:0x02009324 end:0x0200A0F8
+
+main/cmdlist:
+	.text       start:0x0200A0F8 end:0x0200B2BC
+
+main/radar:
+	.text       start:0x0200B2BC end:0x0200BA80
+
+main/favorite:
+	.text       start:0x0200BA80 end:0x0200BFB4
+
+main/family:
+	.text       start:0x0200BFB4 end:0x0200C354
+
+main/letter:
+	.text       start:0x0200C354 end:0x0200F204
+
+main/item:
+	.text       start:0x0200F204 end:0x0200FF14
+
+main/gil:
+	.text       start:0x0200FF14 end:0x0201080C
+
+main/cmake:
+	.text       start:0x0201080C end:0x020143B4
+
+main/equip:
+	.text       start:0x020143B4 end:0x020151FC
+
+main/shop:
+	.text       start:0x020151FC end:0x0201722C
+
+main/smith:
+	.text       start:0x0201722C end:0x0201913C
+
+main/scouter:
+	.text       start:0x0201913C end:0x02019784
+
+main/artifact:
+	.text       start:0x02019784 end:0x02019FDC
+
+main/tmpartifact:
+	.text       start:0x02019FDC end:0x0201A400
+
+main/menu:
+	.text       start:0x0201A400 end:0x0201A80C
+
+m4a/m4a_1:
+	.text       start:0x0201A80C end:0x0201ADD4
+
+m4a/m4a:
+	.text       start:0x0201ADD4 end:0x0201C290
+
+libagbsyscall/CpuFastSet:
+	.text       start:0x0201C290 end:0x0201C294
+
+libagbsyscall/CpuSet:
+	.text       start:0x0201C294 end:0x0201C298
+
+libagbsyscall/LZ77UnCompVram:
+	.text       start:0x0201C298 end:0x0201C29C
+
+libagbsyscall/LZ77UnCompWram:
+	.text       start:0x0201C29C end:0x0201C2A0
+
+libagbsyscall/MidiKey2Freq:
+	.text       start:0x0201C2A0 end:0x0201C2A4
+
+libagbsyscall/MusicPlayerContinue:
+	.text       start:0x0201C2A4 end:0x0201C2A8
+
+libagbsyscall/VBlankIntrWait:
+	.text       start:0x0201C2A8 end:0x0201C2B0
+
+joy_reset:
+	.text       start:0x0201C2B0 end:0x0201C318
+
+libc/string/memcpy:
+	.text       start:0x0201C318 end:0x0201C378
+
+libc/string/memset:
+	.text       start:0x0201C378 end:0x0201C3CC
+
+libc/string/strcat:
+	.text       start:0x0201C3CC end:0x0201C414
+
+libc/string/strchr:
+	.text       start:0x0201C414 end:0x0201C4FC
+
+libc/string/strcpy:
+	.text       start:0x0201C4FC end:0x0201C548
+
+libc/string/strlen:
+	.text       start:0x0201C548 end:0x0201C5D0
+
+libgcc/_call_via_rX:
+	.text       start:0x0201C5D0 end:0x0201C60C
+
+libgcc/_divsi3:
+	.text       start:0x0201C60C end:0x0201C6A0
+
+libgcc/_dvmd_tls:
+	.text       start:0x0201C6A0 end:0x0201C6A4
+
+libgcc/_modsi3:
+	.text       start:0x0201C6A4 end:0x0201C774
+
+libgcc/_udivsi3:
+	.text       start:0x0201C774 end:0x0201C7EC
+
+libgcc/_umodsi3:
+	.text       start:0x0201C7EC end:0x0201C8AC
+
+regional_data:
+	.rodata     start:0x0201C8AC end:0x0202CA24
+
+regional_bss:
+	.bss        start:0x03002990 end:0x030044C1

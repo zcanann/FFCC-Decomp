@@ -473,7 +473,9 @@ def RedSoundLib(objects: List[Object]) -> Dict[str, Any]:
     }
 
 
-Matching = True                   # Object matches and should be linked
+# Existing matching claims were verified against PAL. Other revisions must be
+# verified separately and opted in with MatchingFor before linking source.
+Matching = config.version == "GCCP01"
 NonMatching = False               # Object does not match and should not be linked
 Equivalent = config.non_matching  # Object should be linked when configured with --non-matching
 
@@ -1243,8 +1245,8 @@ config.libs = [
                     "-multibyte",
                     "-i include",
                     f"-i build/{config.version}/include",
-                    "-DBUILD_VERSION=1",
-                    "-DVERSION_GCCP01",
+                    f"-DBUILD_VERSION={version_num}",
+                    f"-DVERSION_{config.version}",
                     "-DNDEBUG=1",
                     "-use_lmw_stmw on",
                     "-rostr",

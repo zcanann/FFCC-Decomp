@@ -509,6 +509,9 @@ public:
     void calcWorld();
     void calcSingleMenu();
     void calcVillageMenu();
+#ifndef VERSION_GCCP01
+    void createVillageMenu();
+#endif
     void CalcMainMenu();
     void CalcDiaryMenu();
     void CalcMCardMenu();

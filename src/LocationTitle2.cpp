@@ -111,9 +111,7 @@ extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLoc
         matrixPos.y = ppvMng->m_matrix.value[1][3];
         matrixPos.z = ppvMng->m_matrix.value[2][3];
 
-        cameraPos.x = CameraPcs.m_positionX;
-        cameraPos.y = CameraPcs.m_positionY;
-        cameraPos.z = CameraPcs.m_positionZ;
+        CameraPcs.GetPosition(&cameraPos);
 
         PSVECSubtract(&cameraPos, &matrixPos, &look);
         if ((look.x == 0.0f) && (look.y == 0.0f) && (look.z == 0.0f)) {
@@ -266,16 +264,16 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
         }
 
         nodeIndex = model->SearchNode(const_cast<char*>(s_locationNodeName));
-        node = model->m_nodes + nodeIndex;
+        node = model->GetNode(nodeIndex);
         zOffset = 1.0f;
 
-        for (frameIndex = 0; frameIndex < model->m_anim->m_frameCount; frameIndex++) {
+        for (frameIndex = 0; frameIndex < model->GetAnim()->GetTotalFrame(); frameIndex++) {
             Mtx nodeMtx;
 
             node->CalcBind(model);
             model->SetFrame((float)(s32)frameIndex);
             model->CalcMatrix();
-            PSMTXCopy(node->m_localRuntimeMtx, nodeMtx);
+            PSMTXCopy(node->GetLocalMatrix(), nodeMtx);
 
             particles[work->m_count].m_pos.x = nodeMtx[0][3];
             particles[work->m_count].m_pos.y = nodeMtx[1][3];

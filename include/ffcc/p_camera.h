@@ -217,6 +217,9 @@ public:
         return m_cameraMatrix;
     }
 
+    float GetFov() { return m_fov; }
+    int GetFullScreenShadowEnable() { return m_fullScreenShadowEnabled; }
+
     // Chara
     void createChara();
     void destroyChara();

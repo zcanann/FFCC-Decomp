@@ -13,6 +13,11 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+inline int CSystem::GetErrorLevel()
+{
+	return m_execParam;
+}
+
 namespace {
 static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
 {
@@ -1652,7 +1657,7 @@ inline void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int&
  */
 void CCaravanWork::SafeDeleteTempItem()
 {
-	if ((unsigned int)System.m_execParam >= 3U) {
+	if (System.GetErrorLevel() >= 3U) {
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
@@ -1667,7 +1672,7 @@ void CCaravanWork::SafeDeleteTempItem()
 	for (int slotIndex = totalSlots; slotIndex < 8; slotIndex++) {
 		if (m_commandListInventorySlotRef[slotIndex] >= 0) {
 			m_commandListInventorySlotRef[slotIndex] = -1;
-			if ((unsigned int)System.m_execParam >= 3U) {
+			if (System.GetErrorLevel() >= 3U) {
 				System.Printf(const_cast<char*>(sTempArtifactIndexWarning), slotIndex);
 			}
 		}
@@ -2047,8 +2052,7 @@ const char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
 		return MenuPcs.GetSkillStr(weaponType);
 	}
 
-	int itemId = GetCmdListItem(cmdListIdx);
-	return Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
+	return Game.GetShortItemName(GetCmdListItem(cmdListIdx));
 }
 
 /*

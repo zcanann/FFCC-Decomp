@@ -26,6 +26,11 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+inline int CSystem::GetErrorLevel()
+{
+	return m_execParam;
+}
+
 class CAStar {
 public:
 	void addRealTime(CGPartyObj*);
@@ -207,7 +212,7 @@ inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmed
 
 static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 {
-	if (((static_cast<unsigned short>(attacker->GetCID()) & 0xAD) == 0xAD) && Game.m_gameWork.m_menuStageMode != 0) {
+	if (attacker->IsKindOf(0xAD) && Game.m_gameWork.m_menuStageMode != 0) {
 		CGPartyObj::m_ghostWork.counters[0]++;
 		CGPartyObj::m_ghostWork.counters[1]++;
 		CGPartyObj::m_ghostWork.counters[2]++;
@@ -233,11 +238,6 @@ static int getPadConnectedForSlot(int slot)
 static bool isMenuPcsCommandBusy()
 {
 	return MenuPcs.m_mode != 0;
-}
-
-static CRingMenu* getBattleRingMenuForPort(int port)
-{
-	return MenuPcs.m_battleRingMenus[port];
 }
 
 static int getPartyJoybusPort(CGPartyObj* self)
@@ -847,7 +847,7 @@ void CGPartyObj::menu()
 		return;
 	}
 
-	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+	if (System.GetErrorLevel() >= 3U) {
 		System.Printf(const_cast<char*>(lbl_801DCD78), portIndex, Joybus.GetCtrlMode(m_animStateMisc));
 	}
 
@@ -921,7 +921,7 @@ void CGPartyObj::onFrameAlways()
 	if ((Game.m_gameWork.m_menuStageMode != 0) &&
 	    (Game.m_gameWork.m_menuStageMode != 0) &&
 	    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
-	    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) &&
+	    IsKindOf(0x6D) &&
 	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 		showTraceParticle = 0;
 	} else {
@@ -1071,8 +1071,8 @@ void CGPartyObj::onFramePostCalc()
 
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-	    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
+	    IsKindOf(0x6D) &&
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		ghostPartyMog();
 	} else {
 		command();
@@ -1305,9 +1305,9 @@ void CGPartyObj::command()
 		}
 	}
 
-	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(0, primaryCommand, -1);
-	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(1, secondaryCommand, -1);
-	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(2, ringCommand, ringCommandArg);
+	MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(0, primaryCommand, -1);
+	MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(1, secondaryCommand, -1);
+	MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(2, ringCommand, ringCommandArg);
 
 	}
 
@@ -1714,7 +1714,7 @@ void CGPartyObj::onFrameStat()
 		}
 		if ((m_weaponNodeFlagAll.m_bits1.m_shield != 0) &&
 		    Game.m_gameWork.m_menuStageMode != 0 &&
-		    reinterpret_cast<int*>(m_scriptHandle)[0xED] == 0) {
+		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0) {
 			CGPartyObj* gbaParty = Game.m_partyObjArr[1];
 			CGObject* chaliceObj = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 			if (gbaParty != nullptr && gbaParty->m_lastStateId == 0) {
@@ -1767,8 +1767,8 @@ void CGPartyObj::onFrameStat()
 	case 0x0B:
 		if (Game.m_gameWork.m_menuStageMode != 0 &&
 		    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-		    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-		    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
+		    IsKindOf(0x6D) &&
+		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 			static float d;
 			static float h;
 			CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
@@ -2050,8 +2050,8 @@ void CGPartyObj::enableDamageCol(int onOff)
 	if (onOff != 0 &&
 	    (Game.m_gameWork.m_menuStageMode == 0 ||
 	     Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F ||
-	     (static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D ||
-	     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
+	     !IsKindOf(0x6D) ||
+	     reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0)) {
 		m_damageColliders[0].m_hitMask = hitMask;
 		m_damageColliders[1].m_hitMask = hitMask;
 	} else {
@@ -2586,8 +2586,8 @@ void CGPartyObj::checkTargetParticle()
 
 	if ((Game.m_gameWork.m_menuStageMode == 0) ||
 	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
-	    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
-	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
+	    !IsKindOf(0x6D) ||
+	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0)) {
 		if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
 			input.x -= Pad.GetLeftStickX(m_animStateMisc);
 			input.z += Pad.GetLeftStickY(m_animStateMisc);
@@ -2847,7 +2847,7 @@ void CGPartyObj::onStatMagic()
 				}
 			} else {
 				if (m_comboFrame == 1) {
-					putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
+					putParticleTrace(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId + 0x4FU | 0x100,
 					    m_particleSlots[8], this, kMonObjOne, 0);
 					playSe3D(0x3E, 0x32, 0x96, 0, 0);
 				}
@@ -2865,7 +2865,7 @@ void CGPartyObj::onStatMagic()
 	if (m_subState == 1 && m_comboState != 0 &&
 	    CGPartyObj::m_ghostWork.flagBits.flag40 != 0) {
 		if (m_comboFrame == 1) {
-			putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
+			putParticleTrace(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId + 0x4FU | 0x100,
 			    m_particleSlots[8], this, kMonObjOne, 0);
 			playSe3D(0x3E, 0x32, 0x96, 0, 0);
 		}
@@ -2908,7 +2908,7 @@ void CGPartyObj::onStatDie()
 		break;
 	case 2:
 		if (m_subFrame >= 0xBB) {
-			if ((unsigned int)System.m_execParam >= 2) {
+			if (System.GetErrorLevel() >= 2U) {
 				System.Printf(const_cast<char*>(lbl_801DCCB0));
 			}
 			changeStat(0x22, 0, 0);
@@ -2964,7 +2964,7 @@ void CGPartyObj::onPush(CGBaseObj* other, int pushType)
 void CGPartyObj::onTalk(CGBaseObj* other, int talkType)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((static_cast<unsigned short>(reinterpret_cast<CGObject*>(other)->GetCID()) & 5) == 5) {
+	if (reinterpret_cast<CGObject*>(other)->IsKindOf(5)) {
 		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(other) + 0x500) == 0x23) {
 			*reinterpret_cast<CGBaseObj**>(self + 0x6E8) = other;
 		} else {
@@ -3136,8 +3136,8 @@ void CGPartyObj::statPut()
 {
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-	    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
+	    IsKindOf(0x6D) &&
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
 		static float h;
 		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
@@ -3245,7 +3245,7 @@ inline void CGPartyObj::statPickup()
 void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 {
 	const char* msgBase = lbl_801DCA48;
-	if (source != nullptr && (static_cast<unsigned short>(source->GetCID()) & 0x2D) != 0x2D) {
+	if (source != nullptr && !source->IsKindOf(0x2D)) {
 		return;
 	}
 
@@ -3800,8 +3800,8 @@ void CGPartyObj::CheckGameOver()
 		}
 
 		if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
-		    ((static_cast<unsigned short>(party->GetCID()) & 0x6D) == 0x6D) &&
-		    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) != 0)) {
+		    party->IsKindOf(0x6D) &&
+		    (reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId != 0)) {
 			continue;
 		}
 
@@ -3869,7 +3869,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)
 			    ->SetBonusCondition(bossArtifacts->m_bonusConditions[bonusIndex]);
-			if ((unsigned int)System.m_execParam >= 3) {
+			if (System.GetErrorLevel() >= 3U) {
 				System.Printf(const_cast<char*>(msgBase + 0x134), slot, bonusIndex,
 				    bossArtifacts->m_bonusConditions[bonusIndex]);
 			}
@@ -3891,7 +3891,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			}
 
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->SetBonusCondition(bonus);
-			if ((unsigned int)System.m_execParam >= 3) {
+			if (System.GetErrorLevel() >= 3U) {
 				System.Printf(const_cast<char*>(msgBase + 0x154), slot, bonus);
 			}
 		}
@@ -3920,8 +3920,8 @@ void CGPartyObj::InitFinished()
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
+	    IsKindOf(0x6D) &&
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		*reinterpret_cast<unsigned char*>(self + 0xE6) = 0;
 		*reinterpret_cast<float*>(self + 0x144) = FLOAT_80331AB0;
 		*reinterpret_cast<float*>(self + 0x134) = FLOAT_80331AB0;
@@ -3970,22 +3970,12 @@ void CGPartyObj::ChangeCommandMode(int mode)
 	if (party.commandMode != mode) {
 		party.commandMode = static_cast<short>(mode);
 
-		CRingMenu** battleMenus = MenuPcs.m_battleRingMenus;
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-		int port = caravanWork->m_joybusCaravanId;
-		CRingMenu* ring = battleMenus[port];
-		if (ring != 0) {
-			ring->SetBattleCommand(0, -1, -1);
-
-			caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-			port = caravanWork->m_joybusCaravanId;
-			battleMenus[port]->SetBattleCommand(1, -1, -1);
-
-			caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-			port = caravanWork->m_joybusCaravanId;
-			battleMenus[port]->SetBattleCommand(2, -1, -1);
+		if (MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId) != 0) {
+			MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(0, -1, -1);
+			MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(1, -1, -1);
+			MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(2, -1, -1);
 		} else {
-			if ((unsigned int)System.m_execParam >= 2) {
+			if (System.GetErrorLevel() >= 2U) {
 				System.Printf(const_cast<char*>(sMissingRingMenuFmt));
 			}
 		}
@@ -5031,7 +5021,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		char text[256];
 		if ((Game.m_gameWork.m_menuStageMode != 0) &&
 		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
-		    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) && (reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0)) {
+		    IsKindOf(0x6D) && (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 			unsigned int bossKind;
 			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 			default:

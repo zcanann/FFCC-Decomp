@@ -25,9 +25,13 @@ Confirmed from the scripts unless marked otherwise.
   `G88 ^= 2` toggle. `printFlag_EVsF` has a duplicate `case 0`.
 - **`uma_1.cft`:** a test town with 17 generic NPCs, a shop, a smith and
   `loadCFD('test')`. Its `send_int` still calls `printf` (line 117).
-- **`miya_0..3.cft`:** a monster, effect and map viewer on the River Belle map
+- **`miya_0..3.cft`:** standalone monster, effect and map viewer scripts
   (`DrawMenu`: "ACTION MON / SELECT MAGIC / EFFECT NO", monster HP forced to
-  16), with `Map_Load_*` for every map. They carry the full player library.
+  16), with `Map_Load_*` for every map. They load the River Belle Path map as a
+  backdrop, but they are separate from the real River Belle Path script
+  (`river_0`) and never run in normal play: only `startmap`'s test-jump menu
+  (`debug_jump_tst`, option 4) loads `miya_0`. They carry the full player
+  library.
 - **`map_test`:** loads map `G83`/`G84`. With no party it builds 8 test
   caravans with random food and names slots 0, 1, 2 and **4** (slot 3 is
   skipped) "1st/2nd/3rd/4th person" in Shift-JIS. Player 2's pad bit `0x100`

@@ -17,7 +17,7 @@ static struct StageNo sStageNo;
 
 extern s8 gReplyTimer;
 
-const s8 sStaticMapStages[12][2] __attribute__((aligned(4))) = {
+const s8 sStaticMapStages[12][2] = {
     { 1, 0 }, { 1, 2 }, { 12, 0 }, { 13, 0 }, { 33, 0 }, { 34, 0 },
     { 34, 1 }, { 34, 2 }, { 34, 3 }, { 34, 4 }, { 34, 5 }, { -1, -1 },
 };

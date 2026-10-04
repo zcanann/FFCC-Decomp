@@ -2,6 +2,7 @@
 #define GUARD_GLOBAL_H
 
 #include "gba_types.h"
+#include <stddef.h>
 
 #define ARRAY_COUNT(array) (sizeof(array) / sizeof((array)[0]))
 #define ABS(x) ((x) < 0 ? -(x) : (x))
@@ -83,17 +84,7 @@ void CpuFastSet(const void *src, void *dst, u32 control);
 void LZ77UnCompWram(const void *src, void *dst);
 void LZ77UnCompVram(const void *src, void *dst);
 
-/*
- * libc. Most of the program declared these with u32 sizes, which the compiler
- * does not treat as its builtins; files that define USE_BUILTIN_STRING before
- * including this header get the standard prototypes and so inline expansion of
- * small constant-size copies.
- */
-#ifdef USE_BUILTIN_STRING
-typedef unsigned long size_t;
-#else
-typedef u32 size_t;
-#endif
+/* libc */
 void *memcpy(void *dst, const void *src, size_t n);
 void *memset(void *dst, int c, size_t n);
 char *strcat(char *dst, const char *src);

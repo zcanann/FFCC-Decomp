@@ -312,11 +312,13 @@ void Radar_OnMapObjDrawFlags(u8 *msg)
 
 void Session_OnItemAll(u8 *p)
 {
+    void *snapshot;
     s32 i;
 
     memcpy(gSession.items, p, sizeof(gSession.items));
     p += sizeof(gSession.items);
-    memcpy(gSession.prevArtifacts, gSession.artifacts, 12);
+    snapshot = gSession.prevArtifacts;
+    memcpy(snapshot, gSession.artifacts, sizeof(gSession.prevArtifacts));
     memcpy(gSession.artifacts, p, 12);
     p += 12;
     memcpy(gSession.stageArtifacts, p, 8);
@@ -527,7 +529,10 @@ s32 Item_IsPercentKind(s32 id)
 
 void Session_OnArtifacts(u8 *p)
 {
-    memcpy(gSession.prevArtifacts, gSession.artifacts, 12);
+    void *snapshot;
+
+    snapshot = gSession.prevArtifacts;
+    memcpy(snapshot, gSession.artifacts, sizeof(gSession.prevArtifacts));
     memcpy(gSession.artifacts, p, 12);
     if (gScreen == 4)
         ArtifactScreen_Refresh();

@@ -244,10 +244,10 @@ void Radar_ScrollMap(s32 dx, s32 dy)
             edge = tx - 1;
         else
             edge = tx + 21;
-        k = 0;
+        n = 0;
         for (i = 0; i < ty - 1 && i < mapH; i++)
-            k += sMapRowLen[i];
-        data = sMapData + k;
+            n += sMapRowLen[i];
+        data = sMapData + n;
         tmp = (ty - 1) % 32;
         row = tmp;
         if (tmp < 0)
@@ -297,10 +297,10 @@ void Radar_ScrollMap(s32 dx, s32 dy)
             edge = ty - 1;
         else
             edge = ty + 16;
-        k = 0;
+        n = 0;
         for (i = 0; i < edge && i < mapH; i++)
-            k += sMapRowLen[i];
-        data = sMapData + k;
+            n += sMapRowLen[i];
+        data = sMapData + n;
         if (edge >= 0 && edge < mapH) {
             n = 0;
             for (i = 0; i < sMapRowLen[edge]; i++) {

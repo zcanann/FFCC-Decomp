@@ -125,6 +125,9 @@ jobs:
           test -x "$tool_dir/$tool" || exit 1
         done
 
+    - name: Install split audit dependencies
+      run: apk add --no-cache py3-pyelftools
+
     # Build the project
     - name: Build
       run: |
@@ -132,7 +135,7 @@ jobs:
             --binutils /binutils --compilers /compilers --gba-binutils /usr/bin \
             --gba-compilers build/tools/gba-agbcc
         ninja all_source progress build/${{ matrix.version }}/report.json
-        python -m unittest tools.tests.test_gba_common tools.tests.test_gba_regions tools.tests.test_gba_checker tools.tests.test_project_sources tools.tests.test_report -v
+        python -m unittest tools.tests.test_gba_common tools.tests.test_gba_regions tools.tests.test_gba_checker tools.tests.test_project_sources tools.tests.test_report tools.tests.test_gba_recover_splits -v
 
     # Upload map files
     - name: Upload map

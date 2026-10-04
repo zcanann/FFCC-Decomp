@@ -12,3 +12,21 @@ Sections:
 	.sbss       type:bss align:32
 	.sdata2     type:rodata align:16
 	.sbss2      type:bss align:8
+
+Runtime.PPCEABI.H/__va_arg.c:
+	.text start:0x801AABB4 end:0x801AAC7C
+
+Runtime.PPCEABI.H/CPlusLibPPC.cp:
+	.text start:0x801AACDC end:0x801AAD0C
+
+MSL_C/PPCEABI/bare/H/mem_funcs.c:
+	.text start:0x801B1B78 end:0x801B1E48
+
+MSL_C/PPCEABI/bare/H/s_copysign.c:
+	.text start:0x801B6EB8 end:0x801B6EE0
+
+MSL_C/PPCEABI/bare/H/s_modf.c:
+	.text start:0x801B734C end:0x801B7448
+
+MSL_C/PPCEABI/bare/H/wchar_io.c:
+	.text start:0x801B44EC end:0x801B4574

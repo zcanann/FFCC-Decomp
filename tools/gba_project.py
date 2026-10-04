@@ -132,7 +132,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libagbsyscall/VBlankIntrWait", "joy_reset", "libc/string/memcpy",
             "libc/string/memset", "libc/string/strcat", "libc/string/strchr", "libc/string/strcpy",
             "libc/string/strlen", "libgcc/_call_via_rX", "libgcc/_divsi3", "libgcc/_dvmd_tls",
-            "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
+            "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3", "main/artifact",
         ],
         "mgr": [
             "crt0", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2", "libagbsyscall/CpuFastSet",
@@ -152,6 +152,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libc/stdio/vfprintf", "libc/stdlib/dtoa", "libc/locale/locale", "libc/stdlib/mprec",
             "libc/stdlib/mallocr", "libc/reent/sbrkr", "libgcc/dp-bit", "libgcc/fp-bit",
             "libc/reent/impure", "chunk", "effect", "fixmath", "text",
+            "camera", "field", "route", "sound", "obj",
         ],
     },
     "GCCJGC": {
@@ -164,6 +165,8 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
         ],
         "mgr": [
+            "camera", "sound", "text", "libc/reent/impure",
+            "libc/arm/syscalls", "libc/reent/sbrkr",
             "crt0", "fixmath", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2",
             "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet", "libagbsyscall/LZ77UnCompVram",
             "libagbsyscall/LZ77UnCompWram", "libagbsyscall/MidiKey2Freq",
@@ -588,7 +591,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                         "progress_categories": [category],
                     },
                 }
-                if unit == "bss":
+                if unit not in bases and unit in ("bss", "regional_bss"):
                     # These fallback ranges are disconnected in the image.
                     # Combining them adds synthetic alignment bytes to progress.
                     unit_config["options"] = {"combine_data_sections": False}

@@ -230,7 +230,10 @@ chunk:
 	.rodata     start:0x020101D4 end:0x020101F4
 
 regional_data:
-	.rodata     start:0x020101F4 end:0x020139C0
+	.rodata     start:0x020101F4 end:0x020139BC
+
+libc/reent/impure:
+	.rodata     start:0x020139BC end:0x020139C0
 
 libc/stdio/vfprintf:
 	.rodata     start:0x020139C0 end:0x02013A3C
@@ -245,13 +248,28 @@ libc/stdlib/mprec:
 	.rodata     start:0x02013A8C end:0x02013BB0
 
 regional_data:
-	.rodata     start:0x02013BB0 end:0x0201596C
+	.rodata     start:0x02013BD8 end:0x02015860
+
+libc/reent/sbrkr:
+	.common     start:0x02015860 end:0x02015864
+
+regional_data:
+	.rodata     start:0x02015864 end:0x0201596C
+
+libc/arm/syscalls:
+	.rodata     start:0x02013BB0 end:0x02013BD8
 
 effect:
 	.data       start:0x0201596C end:0x02015978
 
+text:
+	.data       start:0x02015978 end:0x02015A00
+
 regional_data:
-	.rodata     start:0x02015978 end:0x02015CF8
+	.rodata     start:0x02015A00 end:0x02015A08
+
+libc/reent/impure:
+	.data       start:0x02015A08 end:0x02015CF8
 
 libc/locale/locale:
 	.data       start:0x02015CF8 end:0x02015D0C
@@ -260,10 +278,31 @@ libc/stdlib/mallocr:
 	.data       start:0x02015D0C end:0x02016150
 
 regional_data:
-	.rodata     start:0x02016150 end:0x02021E68
+	.rodata     start:0x02016150 end:0x02021E60
+
+camera:
+	.ctors      start:0x02021E60 end:0x02021E64
+
+sound:
+	.ctors      start:0x02021E64 end:0x02021E68
 
 regional_bss:
-	.bss        start:0x03000000 end:0x030070F8
+	.bss        start:0x03000000 end:0x030060F8
+
+camera:
+	.bss        start:0x030060F8 end:0x03006144
+
+regional_bss:
+	.bss        start:0x03006144 end:0x030063F8
+
+sound:
+	.bss        start:0x030063F8 end:0x03006400
+
+regional_bss:
+	.bss        start:0x03006400 end:0x03007048
+
+libc/arm/syscalls:
+	.bss        start:0x03007048 end:0x030070F8
 
 libgcc/dp-bit:
 	.bss        start:0x030070F8 end:0x0300710C

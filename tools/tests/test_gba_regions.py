@@ -10,7 +10,7 @@ from tools.project import ProjectConfig
 
 
 class GbaRegionTests(unittest.TestCase):
-    def generate(self, work, version, aggregate=False):
+    def generate(self, work, version, aggregate=False, fallback=False):
         info = gba_project.PROGRAMS[version]["gba_cli"]
         config_dir = work / "gba/config" / info["config"]
         config_dir.mkdir(parents=True)
@@ -18,6 +18,11 @@ class GbaRegionTests(unittest.TestCase):
         (config_dir / "splits.txt").write_text(
             f"{unit}:\n\t.text start:0x02000000 end:0x02000004\n"
             "libgcc/_udivsi3:\n\t.text start:0x02000004 end:0x02000008\n")
+        if fallback:
+            with (config_dir / "splits.txt").open("a") as splits:
+                for unit, start in (("bss", 0x03000000), ("regional_bss", 0x03000100)):
+                    splits.write(f"{unit}:\n\t.bss start:0x{start:08X} end:0x{start+4:08X}\n"
+                                 f"{unit}:\n\t.bss start:0x{start+16:08X} end:0x{start+24:08X}\n")
         (config_dir / "symbols.txt").write_text(
             "Entry = .text:0x02000000; // type:function size:0x4 thumb\n")
         source_dir = work / "gba/src/cli"
@@ -111,6 +116,24 @@ class GbaRegionTests(unittest.TestCase):
                 self.assertTrue(all(u["metadata"]["complete"] for u in config.extra_objdiff_units))
                 self.assertIn("--object main/main=build/GCCP01/gba/cli/src/main/main.o", ninja)
                 self.assertIn("--object libgcc/_udivsi3=build/GCCP01/gba/cli/src/libgcc/_udivsi3.o", ninja)
+            finally:
+                os.chdir(previous)
+
+    def test_disconnected_fallback_bss_keeps_physical_ranges(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            previous = Path.cwd()
+            try:
+                os.chdir(tmp)
+                for version in ("GCCP01", "GCCE01", "GCCJGC"):
+                    with self.subTest(version=version):
+                        config, _ = self.generate(Path(tmp), version, fallback=True)
+                        units = {u["name"]: u for u in config.extra_objdiff_units}
+                        for name in ("bss", "regional_bss"):
+                            fallback = units["gba/cli/" + name]
+                            self.assertEqual(fallback["options"], {"combine_data_sections": False})
+                            self.assertNotIn("base_path", fallback)
+                            self.assertFalse(fallback["metadata"]["complete"])
+                        self.assertNotIn("options", units["gba/cli/main/main"])
             finally:
                 os.chdir(previous)
 

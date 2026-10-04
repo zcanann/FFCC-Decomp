@@ -146,7 +146,16 @@ libgcc/_umodsi3:
 	.text       start:0x0201C954 end:0x0201CA14
 
 regional_data:
-	.rodata     start:0x0201CA14 end:0x0202E058
+	.rodata     start:0x0201CA14 end:0x0201CD04
+
+main/artifact:
+	.rodata     start:0x0201CD04 end:0x0201CD0C align:4
+
+regional_data:
+	.rodata     start:0x0201CD0C end:0x0202E058
+
+main/artifact:
+	.bss        start:0x03002774 end:0x0300277C align:4
 
 regional_bss:
-	.bss        start:0x03002990 end:0x030044C1
+	.bss        start:0x0300277C end:0x030044C1

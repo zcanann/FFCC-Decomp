@@ -218,7 +218,10 @@ libgcc/_negdi2:
 	.text       start:0x0200EC80 end:0x0200EC98
 
 regional_data:
-	.rodata     start:0x0200EC98 end:0x0200EDC8
+	.rodata     start:0x0200EC98 end:0x0200EDAC
+
+obj:
+	.rodata     start:0x0200EDAC end:0x0200EDC8 align:4
 
 effect:
 	.rodata     start:0x0200EDC8 end:0x0200EE10 align:4
@@ -254,7 +257,10 @@ libc/reent/sbrkr:
 	.common     start:0x020158A0 end:0x020158A4 align:4
 
 regional_data:
-	.rodata     start:0x020158A4 end:0x020159AC
+	.rodata     start:0x020158A4 end:0x020159A4
+
+obj:
+	.data       start:0x020159A4 end:0x020159AC align:4
 
 effect:
 	.data       start:0x020159AC end:0x020159B8 align:4
@@ -275,10 +281,37 @@ libc/stdlib/mallocr:
 	.data       start:0x02015D58 end:0x0201619C
 
 regional_data:
-	.rodata     start:0x0201619C end:0x02021F4C
+	.rodata     start:0x0201619C end:0x02021F40
+
+obj:
+	.ctors      start:0x02021F40 end:0x02021F44 align:1
+
+camera:
+	.ctors      start:0x02021F44 end:0x02021F48 align:1
+
+sound:
+	.ctors      start:0x02021F48 end:0x02021F4C align:1
 
 regional_bss:
-	.bss        start:0x03000000 end:0x030070F8
+	.bss        start:0x03000000 end:0x03005DF4
+
+obj:
+	.bss        start:0x03005DF4 end:0x030060F8 align:4
+
+camera:
+	.bss        start:0x030060F8 end:0x03006144 align:4
+
+field:
+	.bss        start:0x03006144 end:0x030063C8 align:4
+
+route:
+	.bss        start:0x030063C8 end:0x030063F8 align:4
+
+sound:
+	.bss        start:0x030063F8 end:0x03006400 align:4
+
+regional_bss:
+	.bss        start:0x03006400 end:0x030070F8
 
 libgcc/dp-bit:
 	.bss        start:0x030070F8 end:0x0300710C

@@ -79,6 +79,8 @@ public:
     COrder* GetFirstOrder();
     COrder* GetNextOrder(COrder*);
     COrder* GetOrder(int);
+    int GetNumOrder() { return m_orderCount; }
+    int GetIdxCurrentOrder() { return m_currentOrderIndex; }
     unsigned int GetCounter();
     int GetErrorLevel();
     int IsGdev();

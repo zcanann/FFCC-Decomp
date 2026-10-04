@@ -66,6 +66,7 @@ public:
 	void Close(CHandle* handle);
 	int IsCompleted(CHandle* handle);
 	int IsDiskError();
+	int IsFatalError() { return m_fatalDiskErrorFlag; }
 	void SyncCompleted(CHandle* handle);
 
 	void kick();

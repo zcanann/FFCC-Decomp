@@ -96,8 +96,8 @@ s32 Xfer_Receive(u32 packet, u8 *out)
         return -1;
     }
     cur = sBulkXfer.cur;
-    if ((u32)(cur - (u8 *)0x02038000) > 0x7FFF
-        || (s32)sBulkXfer.base <= 0x02037FFF || (s32)sBulkXfer.base > 0x0203FFFF) {
+    if ((u32)(cur - DOWNLOAD_BUF) > DOWNLOAD_SIZE - 1
+        || (s32)sBulkXfer.base <= DOWNLOAD_START - 1 || (s32)sBulkXfer.base > DOWNLOAD_END - 1) {
         Xfer_Begin();
         gXferActive = 0;
         Xfer_OnError();

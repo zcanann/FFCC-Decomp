@@ -98,7 +98,8 @@ them in a `.common` section; the final image still uses the original object so
 common definitions can coalesce across units. An optional `align:` on a split
 records a known input-section alignment.
 
-The client's fixed download workspace occupies `0x02038000–0x02040000`, as
+The client's fixed download workspace ends at `0x02040000` and starts at
+`0x02038000` (PAL), `0x02034000` (US), or `0x0202E000` (Japan), as
 bounded by `Xfer_Receive`. It remains an anonymous reservation; the gap between
 the loaded image and that workspace is not counted as a source object.
 

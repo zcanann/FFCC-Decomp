@@ -2,7 +2,11 @@
 #include "main.h"
 #include "text.h"
 
+#if defined(VERSION_GCCJGC)
+u8 gCharset[] = "!@#$%^&()-+*/=:       0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+#else
 u8 gCharset[] = "!@#$%^&()-+*/=:abcdefg0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ. ";
+#endif
 
 struct Glyph gGlyphs[] = {
     { 0xF2, 2, 2 },
@@ -13,16 +17,24 @@ struct Glyph gGlyphs[] = {
     { 0x4, 4, 4 },
     { 0x8, 4, 4 },
     { 0xC, 4, 4 },
+#if defined(VERSION_GCCJGC)
+    { 0x80, 15, 6 },
+#else
     { 0x80, 10, 6 },
+#endif
     { 0x140, 15, 6 },
     { 0x10, 2, 2 },
     { 0x50, 2, 2 },
     { 0x90, 2, 2 },
     { 0xD0, 2, 2 },
     { 0x12, 4, 2 },
+#if defined(VERSION_GCCJGC)
+    { 0x72, 9, 2 },
+#else
     { 0x8A, 6, 2 },
     { 0xCA, 6, 2 },
     { 0x10A, 1, 2 },
+#endif
     { 0x16, 3, 3 },
     { 0x19, 3, 3 },
     { 0x12F, 11, 2 },

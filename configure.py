@@ -189,7 +189,7 @@ config.compilers_tag = "20250812"
 config.dtk_tag = "v1.8.3"
 config.objdiff_tag = "v3.6.1"
 config.sjiswrap_tag = "v1.2.2"
-config.wibo_tag = "1.0.0-beta.5"
+config.wibo_tag = "1.0.3"
 
 # Project
 config.config_path = Path("config") / config.version / "config.yml"
@@ -473,7 +473,9 @@ def RedSoundLib(objects: List[Object]) -> Dict[str, Any]:
     }
 
 
-Matching = True                   # Object matches and should be linked
+# Existing matching claims were verified against PAL. Other revisions must be
+# verified separately and opted in with MatchingFor before linking source.
+Matching = config.version == "GCCP01"
 NonMatching = False               # Object does not match and should not be linked
 Equivalent = config.non_matching  # Object should be linked when configured with --non-matching
 
@@ -508,7 +510,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "astar.cpp"),
             Object(Matching, "baseobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "bonus_menu.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly"]),
+            Object(NonMatching, "bonus_menu.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "cflat_data.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "cflat_r2class.cpp"),
             Object(
@@ -523,11 +525,11 @@ config.libs = [
                 "chara_anim.cpp",
                 extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"],
             ),
-            Object(NonMatching, "chara_fur.cpp", extra_cflags=["-str reuse,nopool,readonly"]),
+            Object(NonMatching, "chara_fur.cpp", extra_cflags=["-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "charaobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "charaobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "chunkfile.cpp", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "cmake.cpp"),
+            Object(NonMatching, "cmake.cpp", extra_cflags=["-inline noauto,deferred"]),
             Object(Matching, "color.cpp"),
             Object(NonMatching, "file.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(Matching, "strcase.c"),
@@ -564,7 +566,7 @@ config.libs = [
             Object(NonMatching, "memorycard.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(Matching, "menu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "menu_arti.cpp"),
-            Object(NonMatching, "menu_cmd.cpp", extra_cflags=["-str reuse,nopool,readonly", "-pool off"]),
+            Object(NonMatching, "menu_cmd.cpp", extra_cflags=["-str reuse,nopool,readonly", "-pool off", "-inline auto,deferred"]),
             Object(NonMatching, "menu_compa.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "menu_equip.cpp"),
             Object(NonMatching, "menu_favo.cpp", extra_cflags=["-str reuse,readonly"]),
@@ -573,10 +575,10 @@ config.libs = [
             Object(NonMatching, "menu_lst.cpp"),
             Object(NonMatching, "menu_money.cpp"),
             Object(NonMatching, "menu_tmparti.cpp"),
-            Object(NonMatching, "MenuUtil.cpp", extra_cflags=["-sdata2 8", "-char unsigned", "-str reuse,readonly"]),
+            Object(NonMatching, "MenuUtil.cpp", extra_cflags=["-sdata2 8", "-char unsigned", "-str reuse,readonly", "-inline noauto,deferred"]),
             Object(NonMatching, "mes.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "mesmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "monobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "monobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "monobj_boss.cpp"),
             Object(Matching, "monobj_table.cpp", extra_cflags=["-pooldata off"]),
             Object(NonMatching, "p_camera.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
@@ -769,7 +771,7 @@ config.libs = [
             Object(Matching, "quadobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ringmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "shopmenu.cpp"),
+            Object(NonMatching, "shopmenu.cpp", extra_cflags=["-inline noauto,deferred"]),
             Object(NonMatching, "singmenu.cpp", extra_cflags=["-pool off"]),
             Object(Matching, "sound.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,nopool,readonly", "-sdata 8"]),
             Object(Matching, "stopwatch.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
@@ -790,7 +792,7 @@ config.libs = [
             Object(Matching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "vector.cpp"),
             Object(Matching, "wind.cpp"),
-            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
+            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
             # Retail addresses local message tables separately and stores literals read-only.
             Object(Matching, "wmm_str.cpp", extra_cflags=["-str reuse,readonly", "-pooldata off", "-inline auto,deferred"]),
             Object(Matching, "zlist.cpp"),
@@ -1243,8 +1245,8 @@ config.libs = [
                     "-multibyte",
                     "-i include",
                     f"-i build/{config.version}/include",
-                    "-DBUILD_VERSION=1",
-                    "-DVERSION_GCCP01",
+                    f"-DBUILD_VERSION={version_num}",
+                    f"-DVERSION_{config.version}",
                     "-DNDEBUG=1",
                     "-use_lmw_stmw on",
                     "-rostr",

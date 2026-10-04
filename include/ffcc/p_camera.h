@@ -203,6 +203,11 @@ public:
         return m_screenMatrix;
     }
 
+    void SetProjectionMatrix(Mtx44 in)
+    {
+        PSMTX44Copy(in, m_screenMatrix);
+    }
+
     /*
      * --INFO--
      * PAL Address: UNUSED

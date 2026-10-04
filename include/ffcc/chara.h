@@ -371,6 +371,19 @@ public:
 		void dynamics(CChara::CNode*, CChara::CNode*);
 		void calcSkin();
 		void SetMatrix(float (*)[4]);
+		void SetFur(int fur) { m_flags10CBits.m_flag10C_40 = fur; }
+		void SetFurParam(float lenScale, float step)
+		{
+			m_furLenScale = lenScale;
+			m_furStep = step;
+		}
+		void SetFurColor(float target, int setCur)
+		{
+			m_furTarget = target;
+			if (setCur != 0) {
+				m_furCur = target;
+			}
+		}
 		int SearchNode(char*);
 		int SearchNodeSk(char*);
 		void Draw(float (*)[4], int, int);
@@ -389,6 +402,7 @@ public:
 		void SetDynaVector(Vec* vec) { m_dynJitter = CVector(*vec); }
 		CNode* GetNode(unsigned long index) { return &m_nodes[index]; }
 		CAnim* GetAnim() { return m_anim; }
+		CTextureSet* GetTextureSet() { return m_texSet; }
 		void CalcFurColor();
 		void InitMogFurTex();
 		void CopyFurTex(int loadFromTexture);

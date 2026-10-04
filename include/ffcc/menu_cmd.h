@@ -56,6 +56,9 @@ struct CmdState {
 	short scrollTop;
 };
 
-bool IsMagicArti(int);
+inline bool IsMagicArti(int itemId)
+{
+	return (0xdf <= itemId) && (itemId <= 0xe3);
+}
 
 #endif // _FFCC_MENU_CMD_H_

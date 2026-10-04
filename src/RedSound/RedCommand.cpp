@@ -1113,7 +1113,7 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
  * EN Size: 408b
  * JP Address: TODO
  */
-int SeStopG(int group)
+inline int SeStopG(int group)
 {
 	RedSoundCONTROL* soundControl;
 	RedTrackDATA* track;
@@ -1159,7 +1159,7 @@ int SeStopG(int group)
  * EN Size: 104b
  * JP Address: TODO
  */
-void SetMusicTempo(int tempo, int frameCount)
+inline void SetMusicTempo(int tempo, int frameCount)
 {
 	tempo <<= REDSOUND_FIXED_SHIFT;
 	tempo |= REDSOUND_FIXED_HALF;
@@ -1183,7 +1183,7 @@ void SetMusicTempo(int tempo, int frameCount)
  * EN Size: 92b
  * JP Address: TODO
  */
-void SetMusicPitch(int pitch, int frameCount)
+inline void SetMusicPitch(int pitch, int frameCount)
 {
 	pitch <<= REDSOUND_FIXED_SHIFT;
 	pitch |= REDSOUND_FIXED_HALF;
@@ -1206,7 +1206,7 @@ void SetMusicPitch(int pitch, int frameCount)
  * EN Size: 476b
  * JP Address: TODO
  */
-void MusicPause(int musicId, int pause)
+inline void MusicPause(int musicId, int pause)
 {
 	RedSoundCONTROL* music;
 	RedVoiceDATA* voice;

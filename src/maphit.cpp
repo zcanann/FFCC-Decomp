@@ -112,9 +112,8 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
     int i;
-    int faceIndex = 0;
     CMapHitFace* face = m_faces;
-    while (faceIndex < m_faceCount) {
+    for (int faceIndex = 0; faceIndex < m_faceCount; faceIndex++, face++) {
         if ((face->m_drawFlags & 1) == 0) {
             const CMapIdGrp* mapIdGrp = &MapMng.m_mapIdGrpArray[face->m_groupIndex];
             GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
@@ -140,9 +139,6 @@ void CMapHit::Draw()
                 i--;
             }
         }
-
-        faceIndex++;
-        face++;
     }
 
     GXClearVtxDesc();
@@ -152,7 +148,7 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
     face = m_faces;
-    for (faceIndex = 0; faceIndex < static_cast<int>(m_faceCount); face++, faceIndex++) {
+    for (int faceIndex = 0; faceIndex < m_faceCount; faceIndex++, face++) {
         if ((face->m_drawFlags & 1) != 0) {
             face->m_drawFlags = 0;
         } else {

@@ -2206,9 +2206,9 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
         CMes::m_tempVar[i] = caravanWork->m_letters[letterIndex].TempVar(i);
     }
 
-    int mesIndex = caravanWork->m_letters[letterIndex].HeaderBitsRef().m_messageType * 2;
+    int letterType = caravanWork->m_letters[letterIndex].HeaderBitsRef().m_messageType;
 
-    strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x10));
+    strcpy(srcText, Game.GetLetter(letterType));
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
     totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
@@ -2216,7 +2216,7 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
-    strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x11));
+    strcpy(srcText, Game.GetLetterReply(letterType));
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
     int line2Size = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, line2Size);

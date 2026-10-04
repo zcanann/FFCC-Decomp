@@ -12,6 +12,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+extern "C" int toupperLatin1(unsigned char character);
+
 class CGObject;
 class CGPrgObj;
 class CGPartyObj;
@@ -162,12 +164,22 @@ public:
     char* GetItemArts(int);
     char* GetItemName(int, int);
     int GetGbaSP(int idx) { return m_gameWork.m_spModeFlags[idx]; }
+    void SetGbaSP(int idx, int sp) { m_gameWork.m_spModeFlags[idx] = sp; }
+    int GetMark() { return m_gameWork.m_gameInitFlag; }
+    void SetMark(int mark) { m_gameWork.m_gameInitFlag = mark; }
     char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 4]; }
     char* GetRingName(int ringIndex) { return m_cFlatDataArr[1].TableStrings(4)[ringIndex]; }
     char* GetHelpName(int helpIndex) { return m_cFlatDataArr[1].TableStrings(6)[helpIndex]; }
     char* GetBonusName(int bonusIndex) { return m_cFlatDataArr[1].TableStrings(7)[bonusIndex]; }
     char* GetNPCName(int npcIndex) { return m_cFlatDataArr[1].TableStrings(2)[npcIndex]; }
     char* GetLetterSubject(int subjectIndex) { return m_cFlatDataArr[1].TableStrings(5)[subjectIndex]; }
+    char* GetPlaceName(int placeIndex) { return m_cFlatDataArr[1].TableStrings(3)[placeIndex]; }
+    void UpperItemName(char* name)
+    {
+        if (name[0] != '\0') {
+            name[0] = toupperLatin1(name[0]);
+        }
+    }
     char* GetLetter(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x10); }
     char* GetLetterReply(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x11); }
     char* GetMonName(int);
@@ -257,6 +269,106 @@ STATIC_ASSERT(offsetof(CGame, m_monObjects) == 0xC5D0);
 STATIC_ASSERT(offsetof(CGame, m_monWorkRefs) == 0xC6D0);
 STATIC_ASSERT(offsetof(CGame, m_bossArtifactBase) == 0xC7E4);
 STATIC_ASSERT(sizeof(CGame) == 0x11F88);
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetItemName(int itemIndex)
+{
+    return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 1];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetItemArt(int itemIndex)
+{
+    return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetItemNames(int itemIndex)
+{
+    return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 3];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetItemArts(int itemIndex)
+{
+    return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 2];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetItemName(int itemIndex, int count)
+{
+    return count > 1 ? GetItemNames(itemIndex) : GetItemName(itemIndex);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetMonName(int monIndex)
+{
+    return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 1];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetMonArt(int monIndex)
+{
+    return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetMonNames(int monIndex)
+{
+    return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 3];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetMonArts(int monIndex)
+{
+    return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 2];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline char* CGame::GetMonName(int monIndex, int count)
+{
+    return count > 1 ? GetMonNames(monIndex) : GetMonName(monIndex);
+}
 
 extern CGame Game;
 

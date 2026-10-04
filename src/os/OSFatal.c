@@ -2,6 +2,7 @@
 #include <dolphin/os.h>
 #include <dolphin/gx.h>
 #include <dolphin/exi.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 #include "dolphin/os/__os.h"
 

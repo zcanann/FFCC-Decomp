@@ -51,6 +51,12 @@ public:
 	void SetPosX(float);
 	void SetPosY(float);
 	void SetPosZ(float);
+	void SetPos(float x, float y, float z)
+	{
+		SetPosX(x);
+		SetPosY(y);
+		SetPosZ(z);
+	}
 
 	void SetZMode(int, int);
 
@@ -78,6 +84,7 @@ public:
 	float GetWidth(char*);
 	float GetWidth(const char* text) { return GetWidth(const_cast<char*>(text)); }
 	float GetWidth(unsigned short);
+	float GetHeight() { return m_glyphHeight * scaleY; }
 
 	CFontGlyphEntry* searchChar(unsigned short);
 	int getNextChar(char**, unsigned short*);

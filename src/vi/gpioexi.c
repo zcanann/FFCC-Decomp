@@ -2,7 +2,7 @@
 #include <dolphin/os.h>
 #include <dolphin/vi.h>
 
-#include "__vi.h"
+#include "dolphin/vi/__vi.h"
 
 static u8 shadowGPIOOE;
 static u8 shadowGPIOData;

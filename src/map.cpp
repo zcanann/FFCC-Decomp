@@ -95,23 +95,6 @@ static const char s_map_manager_label[] = "CMapMng.mapmng";
 extern const char s_CMapObjAtrName[] = "CMapObjAtr";
 extern const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
 
-namespace {
-static inline float MapObjWorldX(CMapObj* mapObj)
-{
-    return mapObj->m_worldMtx[0][3];
-}
-
-static inline float MapObjWorldY(CMapObj* mapObj)
-{
-    return mapObj->m_worldMtx[1][3];
-}
-
-static inline float MapObjWorldZ(CMapObj* mapObj)
-{
-    return mapObj->m_worldMtx[2][3];
-}
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -833,9 +816,9 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
     while (true) {
         CMapObjAtrPlaySta* mapObjAtr = static_cast<CMapObjAtrPlaySta*>(mapObj->m_attribute);
         if (mapObjAtr->m_playStaNo == playStaNo) {
-            vec->x = MapObjWorldX(mapObj);
-            vec->y = MapObjWorldY(mapObj);
-            vec->z = MapObjWorldZ(mapObj);
+            vec->x = mapObj->m_worldMtx[0][3];
+            vec->y = mapObj->m_worldMtx[1][3];
+            vec->z = mapObj->m_worldMtx[2][3];
             return 1;
         }
         mapObj++;
@@ -882,9 +865,9 @@ void CMapMng::SetLightSource()
                 CMapObjAtrPointLight* pointAttr = static_cast<CMapObjAtrPointLight*>(attr);
                 CLightPcs::CLight light;
                 light.m_type = 0;
-                light.m_position.x = MapObjWorldX(mapObj);
-                light.m_position.y = MapObjWorldY(mapObj);
-                light.m_position.z = MapObjWorldZ(mapObj);
+                light.m_position.x = mapObj->m_worldMtx[0][3];
+                light.m_position.y = mapObj->m_worldMtx[1][3];
+                light.m_position.z = mapObj->m_worldMtx[2][3];
                 light.m_direction.x = kMapZero;
                 light.m_direction.y = kMapZero;
                 light.m_direction.z = kMapViewScaleZ;
@@ -908,16 +891,16 @@ void CMapMng::SetLightSource()
                     CLightPcs::CLight* light = spotAttr->m_light;
                     light->m_type = 1;
                     light->m_targetColor[1] = spotAttr->m_color;
-                    light->m_position.x = MapObjWorldX(mapObj);
-                    light->m_position.y = MapObjWorldY(mapObj);
-                    light->m_position.z = MapObjWorldZ(mapObj);
+                    light->m_position.x = mapObj->m_worldMtx[0][3];
+                    light->m_position.y = mapObj->m_worldMtx[1][3];
+                    light->m_position.z = mapObj->m_worldMtx[2][3];
                     light->m_direction.x = kMapZero;
                     light->m_direction.y = kMapZero;
                     light->m_direction.z = kMapViewScaleZ;
 
-                    light->m_targetPosition.x = MapObjWorldX(spotAttr->m_target);
-                    light->m_targetPosition.y = MapObjWorldY(spotAttr->m_target);
-                    light->m_targetPosition.z = MapObjWorldZ(spotAttr->m_target);
+                    light->m_targetPosition.x = spotAttr->m_target->m_worldMtx[0][3];
+                    light->m_targetPosition.y = spotAttr->m_target->m_worldMtx[1][3];
+                    light->m_targetPosition.z = spotAttr->m_target->m_worldMtx[2][3];
                     PSVECSubtract(reinterpret_cast<Vec*>(&light->m_targetPosition),
                                   reinterpret_cast<Vec*>(&light->m_position),
                                   reinterpret_cast<Vec*>(&light->m_direction));
@@ -925,18 +908,18 @@ void CMapMng::SetLightSource()
                 } else {
                     CLightPcs::CLight light;
                     light.m_type = 1;
-                    light.m_position.x = MapObjWorldX(mapObj);
-                    light.m_position.y = MapObjWorldY(mapObj);
-                    light.m_position.z = MapObjWorldZ(mapObj);
+                    light.m_position.x = mapObj->m_worldMtx[0][3];
+                    light.m_position.y = mapObj->m_worldMtx[1][3];
+                    light.m_position.z = mapObj->m_worldMtx[2][3];
 
                     light.m_direction.x = kMapZero;
                     light.m_direction.y = kMapZero;
                     light.m_direction.z = kMapViewScaleZ;
 
                     CMapObj* targetObj = spotAttr->m_target;
-                    light.m_targetPosition.x = MapObjWorldX(targetObj);
-                    light.m_targetPosition.y = MapObjWorldY(targetObj);
-                    light.m_targetPosition.z = MapObjWorldZ(targetObj);
+                    light.m_targetPosition.x = targetObj->m_worldMtx[0][3];
+                    light.m_targetPosition.y = targetObj->m_worldMtx[1][3];
+                    light.m_targetPosition.z = targetObj->m_worldMtx[2][3];
 
                     PSVECSubtract(reinterpret_cast<Vec*>(&light.m_targetPosition),
                                   reinterpret_cast<Vec*>(&light.m_position),
@@ -1406,9 +1389,8 @@ int CMapMng::ReadOtm(char* mapName)
     PSMTXIdentity(identity);
     m_rootMapObj->CalcMtx(identity, 1);
 
-    CMapObjAtr* attr;
     for (int i = 0; i < m_mapObjCount; i++) {
-        attr = m_mapObjArray[i].m_attribute;
+        CMapObjAtr* attr = m_mapObjArray[i].m_attribute;
         if (attr == 0) {
             continue;
         }
@@ -1419,46 +1401,46 @@ int CMapMng::ReadOtm(char* mapName)
                 break;
             }
 
-        CLightPcs::CBumpLight light;
-        light.m_type = 1;
-        light.m_position.x = MapObjWorldX(&m_mapObjArray[i]);
-        light.m_position.y = MapObjWorldY(&m_mapObjArray[i]);
-        light.m_position.z = MapObjWorldZ(&m_mapObjArray[i]);
+            CLightPcs::CBumpLight light;
+            light.m_type = 1;
+            light.m_position.x = m_mapObjArray[i].m_worldMtx[0][3];
+            light.m_position.y = m_mapObjArray[i].m_worldMtx[1][3];
+            light.m_position.z = m_mapObjArray[i].m_worldMtx[2][3];
 
-        CMapObj* targetObj = spotAttr->m_target;
-        light.m_targetPosition.x = MapObjWorldX(targetObj);
-        light.m_targetPosition.y = MapObjWorldY(targetObj);
-        light.m_targetPosition.z = MapObjWorldZ(targetObj);
-        PSVECSubtract(
-            reinterpret_cast<Vec*>(&light.m_targetPosition),
-            reinterpret_cast<Vec*>(&light.m_position),
-            reinterpret_cast<Vec*>(&light.m_direction));
-        PSVECNormalize(
-            reinterpret_cast<Vec*>(&light.m_direction),
-            reinterpret_cast<Vec*>(&light.m_direction));
+            CMapObj* targetObj = spotAttr->m_target;
+            light.m_targetPosition.x = targetObj->m_worldMtx[0][3];
+            light.m_targetPosition.y = targetObj->m_worldMtx[1][3];
+            light.m_targetPosition.z = targetObj->m_worldMtx[2][3];
+            PSVECSubtract(
+                reinterpret_cast<Vec*>(&light.m_targetPosition),
+                reinterpret_cast<Vec*>(&light.m_position),
+                reinterpret_cast<Vec*>(&light.m_direction));
+            PSVECNormalize(
+                reinterpret_cast<Vec*>(&light.m_direction),
+                reinterpret_cast<Vec*>(&light.m_direction));
 
-        *reinterpret_cast<unsigned int*>(&light.m_bumpShade) =
-            *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
-        light.m_offsetX = spotAttr->m_intensity;
-        light.m_offsetZ = spotAttr->m_falloff;
-        light.m_specularScale = spotAttr->m_angle;
-        light.m_targetColor[1].r = spotAttr->m_color.r;
-        light.m_targetColor[1].g = spotAttr->m_color.g;
-        light.m_targetColor[1].b = spotAttr->m_color.b;
-        light.m_targetColor[1].a = spotAttr->m_color.a;
+            *reinterpret_cast<unsigned int*>(&light.m_bumpShade) =
+                *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
+            light.m_offsetX = spotAttr->m_intensity;
+            light.m_offsetZ = spotAttr->m_falloff;
+            light.m_specularScale = spotAttr->m_angle;
+            light.m_targetColor[1].r = spotAttr->m_color.r;
+            light.m_targetColor[1].g = spotAttr->m_color.g;
+            light.m_targetColor[1].b = spotAttr->m_color.b;
+            light.m_targetColor[1].a = spotAttr->m_color.a;
 
-        CLightPcs::CBumpLight* bump = LightPcs.AddBump(
-            &light,
-            static_cast<CLightPcs::TARGET>(1),
-            m_stage,
-            1);
-        spotAttr->m_light = bump;
+            CLightPcs::CBumpLight* bump = LightPcs.AddBump(
+                &light,
+                static_cast<CLightPcs::TARGET>(1),
+                m_stage,
+                1);
+            spotAttr->m_light = bump;
 
-        for (int j = 0; j < m_mapObjCount; j++) {
-            if (m_mapObjArray[j].m_bumpObjId == i) {
-                m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
+            for (int j = 0; j < m_mapObjCount; j++) {
+                if (m_mapObjArray[j].m_bumpObjId == i) {
+                    m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
+                }
             }
-        }
             break;
         }
         }
@@ -1478,9 +1460,10 @@ int CMapMng::ReadOtm(char* mapName)
 int CMapMng::ReadMid(char* mapName)
 {
     unsigned long size;
+    int ok;
     char* strTmp = g_StrTmp;
     sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
-    int ok = 1;
+    ok = 1;
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_mid_fmt), strTmp);
@@ -1620,9 +1603,8 @@ int CMapMng::ReadMid(char* mapName)
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        CMapObj* mapObj = m_octTreeArray[i].GetMapObject();
-        if (mapObj != 0) {
-            mapObj->m_octTreeIndex = static_cast<signed char>(i);
+        if (m_octTreeArray[i].GetMapObject() != 0) {
+            m_octTreeArray[i].GetMapObject()->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 

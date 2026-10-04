@@ -1543,19 +1543,21 @@ charaobj.cpp:
 	extab       start:0x800091EC end:0x800092E4
 	extabindex  start:0x8000FFAC end:0x80010120
 	.text       start:0x8010B660 end:0x80112D54
+	.rodata     start:0x801DC548 end:0x801DC950
 	.data       start:0x80211370 end:0x802115D0
 	.sdata      start:0x8032E948 end:0x8032E970
 	.sbss       start:0x8032EE60 end:0x8032EE70
-	.sdata2     start:0x80331960 end:0x803319C8
+	.sdata2     start:0x80331960 end:0x803319C0
 
 monobj.cpp:
 	extab       start:0x800092E4 end:0x8000944C
 	extabindex  start:0x80010120 end:0x8001033C
 	.text       start:0x80112D54 end:0x8011A574
+	.rodata     start:0x801DC950 end:0x801DCA48
 	.data       start:0x802115D0 end:0x80211958
 	.bss        start:0x80300140 end:0x803001D8
 	.sdata      start:0x8032E970 end:0x8032E9A0
-	.sdata2     start:0x803319C8 end:0x80331A58
+	.sdata2     start:0x803319C0 end:0x80331A58
 
 partyobj.cpp:
 	extab       start:0x8000944C end:0x800095FC

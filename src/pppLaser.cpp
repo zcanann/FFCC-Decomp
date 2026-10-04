@@ -20,13 +20,6 @@
 
 #include <string.h>
 
-static const f32 kPppLaserZero = 0.0f;
-static const f32 kPppLaserOne = 1.0f;
-static const f32 kPppLaserDebugPointScale = 2.0f;
-static const f32 kPppLaserMaxLengthDisabled = -1.0f;
-static const f32 kPppLaserAxisScale = 1.2f;
-static const f32 kPppLaserMaxLengthMargin = 15.5f;
-static const f32 kPppLaserTau = 6.2831855f;
 
 static const char s_pppLaser_cpp[] = "pppLaser.cpp";
 
@@ -38,11 +31,6 @@ STATIC_ASSERT(offsetof(CMapCylinder, m_bottom) == 0x0);
 STATIC_ASSERT(offsetof(CMapCylinder, m_axis) == 0x18);
 STATIC_ASSERT(offsetof(CMapCylinder, m_radius) == 0x24);
 STATIC_ASSERT(offsetof(CMapCylinder, m_bound) == 0x28);
-
-static inline f32 LaserConst(const f32& value)
-{
-    return value;
-}
 
 static inline pppLaserDataOffsets* GetLaserDataOffsets(_pppCtrlTable* ctrlTable)
 {
@@ -62,7 +50,7 @@ STATIC_ASSERT(offsetof(pppLaser, m_workArea) == 0x80);
  */
 void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
 {
-    f32 zero = LaserConst(kPppLaserZero);
+    f32 zero = 0.0f;
     LaserWork* work = reinterpret_cast<LaserWork*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_workOffset);
     int particleIndex;
     int playerIndex;
@@ -70,7 +58,7 @@ void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
     Vec playerPosition;
     Vec targetCursorPosB;
 
-    work->m_length = LaserConst(kPppLaserZero);
+    work->m_length = 0.0f;
     work->m_graphValue3 = zero;
     work->m_graphValue2 = zero;
     work->m_halfWidth = zero;
@@ -89,7 +77,7 @@ void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
     work->m_shapeArg2 = 0;
     work->m_shapeArg1 = 0;
 
-    work->m_shapeRotation = Math.RandF(LaserConst(kPppLaserTau));
+    work->m_shapeRotation = Math.RandF(6.2831855f);
     work->m_spawnEnabled = 1;
 
     hasSpecialInfo = Game.GetParticleSpecialInfo(ppvMng->m_hitParams, particleIndex, playerIndex);
@@ -101,10 +89,10 @@ void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
         if (particleIndex == 0x200) {
             work->m_maxLength = PSVECDistance(&work->m_targetPosition, &playerPosition);
         } else {
-            work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
+            work->m_maxLength = -1.0f;
         }
     } else {
-        work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
+        work->m_maxLength = -1.0f;
         ppvMng->m_hitBgFlag = 1;
         pppStopSe(ppvMng, &ppvMng->m_soundEffectData);
     }
@@ -121,10 +109,10 @@ void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
  */
 void pppConstruct2Laser(pppLaser *laser, _pppCtrlTable *ctrlTable)
 {
-    f32 zero = LaserConst(kPppLaserZero);
+    f32 zero = 0.0f;
     LaserWork* work = reinterpret_cast<LaserWork*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_workOffset);
 
-    work->m_graphValue3 = LaserConst(kPppLaserZero);
+    work->m_graphValue3 = 0.0f;
     work->m_graphValue2 = zero;
     work->m_halfWidth = zero;
     work->m_graphValue1 = zero;
@@ -186,7 +174,7 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
 
     work = reinterpret_cast<LaserWork*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_workOffset);
     emptyHistory = 0;
-    f32 maxLengthDisabled = LaserConst(kPppLaserMaxLengthDisabled);
+    f32 maxLengthDisabled = -1.0f;
     if (maxLengthDisabled == work->m_maxLength) {
         return;
     }
@@ -214,8 +202,8 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
             pppCopyVector(work->m_points[j + 1], work->m_points[j]);
         }
 
-        beamEndLocal.x = LaserConst(kPppLaserZero);
-        beamEndLocal.y = LaserConst(kPppLaserZero);
+        beamEndLocal.x = 0.0f;
+        beamEndLocal.y = 0.0f;
         beamEndLocal.z = work->m_length;
 
         if (i == 0) {
@@ -229,7 +217,7 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
                 continue;
             }
             s32 frameCount = step->m_laser.m_historyFrameCount + 1;
-            float t = LaserConst(kPppLaserMaxLengthDisabled) / (float)frameCount;
+            float t = -1.0f / (float)frameCount;
             t *= (float)i;
             if (GetCharaNodeFrameMatrix(ppvMng, t, charaMtx) == 0) {
                 emptyHistory = 1;
@@ -241,12 +229,12 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
         }
 
         pppSubVector(beamAxis, work->m_points[i], work->m_origin);
-        PSVECScale(&beamAxis, &beamAxis, LaserConst(kPppLaserAxisScale));
+        PSVECScale(&beamAxis, &beamAxis, 1.2f);
 
         CMapCylinder cyl;
         cyl.m_bottom = work->m_origin;
         cyl.m_axis = beamAxis;
-        cyl.m_radius = LaserConst(kPppLaserZero);
+        cyl.m_radius = 0.0f;
 
         int check = MapMng.CheckHitCylinderNear(&cyl, &beamAxis, 0xffffffff);
         int hit = 0;
@@ -256,10 +244,10 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0) {
             if (work->m_spawnEnabled != 0) {
-                if (work->m_maxLength - LaserConst(kPppLaserMaxLengthMargin) < work->m_length) {
+                if (work->m_maxLength - 15.5f < work->m_length) {
                     _pppMngSt* mngSt = ppvMng;
                     s32 partIndex = static_cast<s32>(mngSt - PartMng.m_pppMng);
-                    work->m_length = work->m_maxLength - LaserConst(kPppLaserMaxLengthMargin);
+                    work->m_length = work->m_maxLength - 15.5f;
                     Game.ParticleFrameCallback(
                         partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3, laser->m_graphId / 0x1000,
                         work->m_points);
@@ -272,8 +260,8 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
         }
 
         if (i == 0) {
-            beamEndLocal.x = LaserConst(kPppLaserZero);
-            beamEndLocal.y = LaserConst(kPppLaserZero);
+            beamEndLocal.x = 0.0f;
+            beamEndLocal.y = 0.0f;
             beamEndLocal.z = work->m_length;
             PSMTXMultVec(laserWorldMtx, &beamEndLocal, &work->m_points[i]);
         }
@@ -363,6 +351,8 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
     Vec debugSource;
     _GXColor color;
     CTexture* texture;
+    f32 zero = 0.0f;
+    f32 one = 1.0f;
 
     if (dataValIndex == 0xFFFF) {
         return;
@@ -372,7 +362,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
     pppSetBlendMode(step->m_laser.m_blendMode);
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
-        &colorData->m_color, &laser->m_localMatrix, LaserConst(kPppLaserZero), step->m_laser.m_drawEnvColor1,
+        &colorData->m_color, &laser->m_localMatrix, zero, step->m_laser.m_drawEnvColor1,
         step->m_laser.m_drawEnvColor0, step->m_laser.m_blendMode, 0, 1, 1, 0);
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
@@ -399,32 +389,34 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
     GXLoadPosMtxImm(mtxOut.value, 0);
 
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(negHalfWidth, LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
+    GXPosition3f32(negHalfWidth, zero, zero);
     GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
-    GXPosition3f32(negHalfWidth, LaserConst(kPppLaserZero), length);
+    GXTexCoord2f32(zero, zero);
+    GXPosition3f32(negHalfWidth, zero, length);
     GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserZero), work->m_length);
-    GXPosition3f32(halfWidth, LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
+    GXTexCoord2f32(zero, work->m_length);
+    GXPosition3f32(halfWidth, zero, zero);
     GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserOne), LaserConst(kPppLaserZero));
-    GXPosition3f32(halfWidth, LaserConst(kPppLaserZero), length);
+    GXTexCoord2f32(one, zero);
+    GXPosition3f32(halfWidth, zero, length);
     GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserOne), work->m_length);
+    GXTexCoord2f32(one, work->m_length);
+    GXEnd();
 
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(LaserConst(kPppLaserZero), negHalfWidth, LaserConst(kPppLaserZero));
+    GXPosition3f32(zero, negHalfWidth, zero);
     GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
-    GXPosition3f32(LaserConst(kPppLaserZero), negHalfWidth, length);
+    GXTexCoord2f32(zero, zero);
+    GXPosition3f32(zero, negHalfWidth, length);
     GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserZero), work->m_length);
-    GXPosition3f32(LaserConst(kPppLaserZero), halfWidth, LaserConst(kPppLaserZero));
+    GXTexCoord2f32(zero, work->m_length);
+    GXPosition3f32(zero, halfWidth, zero);
     GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserOne), LaserConst(kPppLaserZero));
-    GXPosition3f32(LaserConst(kPppLaserZero), halfWidth, length);
+    GXTexCoord2f32(one, zero);
+    GXPosition3f32(zero, halfWidth, length);
     GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserOne), work->m_length);
+    GXTexCoord2f32(one, work->m_length);
+    GXEnd();
 
     if (step->m_stepValue != 0xFFFF) {
         pppShapeSt* shape = ppvEnv->m_shapeTablePtr[step->m_stepValue];
@@ -432,7 +424,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
         shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
         shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;
         shapeMtx[2][2] = shapeMtx[0][0];
-        if (kPppLaserZero != work->m_shapeRotation) {
+        if (zero != work->m_shapeRotation) {
             PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
             PSMTXConcat(shapeMtx, rotateMtx, shapeMtx);
         }
@@ -445,7 +437,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
                    step->m_laser.m_blendMode);
 
         count = step->m_laser.m_pointCount;
-        uvStep = LaserConst(kPppLaserOne) / (float)count;
+        uvStep = one / (float)count;
         if (step->m_initWOrk == 0xFFFF) {
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -484,16 +476,17 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
 
             GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
             GXColor1u32(*(u32*)&trailStartColor);
-            GXTexCoord2f32(u0, LaserConst(kPppLaserOne));
+            GXTexCoord2f32(u0, one);
 
             GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
             GXColor1u32(*(u32*)&trailStartColor);
-            GXTexCoord2f32(u0, LaserConst(kPppLaserZero));
+            GXTexCoord2f32(u0, zero);
 
             GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
             GXColor1u32(*(u32*)&trailEndColor);
-            GXTexCoord2f32(u1, LaserConst(kPppLaserZero));
+            GXTexCoord2f32(u1, zero);
         }
+        GXEnd();
 
         if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
             gUtil.SetVtxFmt_POS_CLR();
@@ -513,6 +506,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
                 GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
                 GXColor1u32(*(u32*)&color);
             }
+            GXEnd();
 
             color.r = 0x80;
             color.g = 0x80;
@@ -531,6 +525,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
                 GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
                 GXColor1u32(*(u32*)&color);
             }
+            GXEnd();
 
             GXSetLineWidth(8, GX_TO_ZERO);
             GXSetPointSize(8, GX_TO_ZERO);
@@ -539,9 +534,9 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
                 float radius = ppvMng->m_hitScale * step->m_laser.m_hitScale;
                 float distance = PSVECDistance(work->m_points, &work->m_origin);
-                debugSource.x = LaserConst(kPppLaserZero);
-                debugSource.y = LaserConst(kPppLaserZero);
-                debugSource.z = LaserConst(kPppLaserOne);
+                debugSource.x = zero;
+                debugSource.y = zero;
+                debugSource.z = one;
                 color.r = 0xFF;
                 color.g = 0xFF;
                 color.b = 0xFF;
@@ -566,12 +561,12 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
             color.b = 0xFF;
             color.a = 0xFF;
             for (i = 0; i < (int)(u32)step->m_laser.m_pointCount; i++) {
-                if ((work->m_points[i].x == LaserConst(kPppLaserZero)) && (work->m_points[i].y == LaserConst(kPppLaserZero)) && (work->m_points[i].z == LaserConst(kPppLaserZero))) {
+                if ((work->m_points[i].x == zero) && (work->m_points[i].y == zero) && (work->m_points[i].z == zero)) {
                     continue;
                 }
                 PSMTXScale(
-                    pointMtx, LaserConst(kPppLaserDebugPointScale), LaserConst(kPppLaserDebugPointScale),
-                    LaserConst(kPppLaserDebugPointScale));
+                    pointMtx, 2.0f, 2.0f,
+                    2.0f);
                 pointMtx[0][3] = work->m_points[i].x;
                 pointMtx[1][3] = work->m_points[i].y;
                 pointMtx[2][3] = work->m_points[i].z;

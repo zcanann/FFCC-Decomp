@@ -26,16 +26,22 @@ records the source revision, host compiler, patch and binary hashes in
 Copy `cc1`, `cc1plus` and `gcc2-cpp` (the `.exe` versions on Windows) beside
 `old_agbcc`, in `build/tools/gba-agbcc` or the directory passed to
 `configure.py --gba-compilers`. The single-file checker accepts the same
-`--gba-compilers` option. The script also produces a Linux reference driver and
+`--gba-compilers` option and selects regional objects and preprocessing with
+`--version GCCP01`, `--version GCCE01` or `--version GCCJGC` (PAL by default).
+The script also produces a Linux reference driver and
 its C, C++ and assembler predefines for toolchain comparisons. `cc1-reference`
 is retained as an alias of the Linux C compiler for older audit workflows.
 
-CI builds these tools from source when the compiler-build script changes or the
-cached executables are missing. It downloads Zig 0.13.0 with a pinned SHA-256,
-uses the same build script, and checks that all required tools are executable
-before configuring the project. `old_agbcc` still comes from the private build
-container. This prevents missing tools from silently excluding GBA source from
-the progress report.
+CI prepares these tools once in a `gba-compilers` job and shares them with the
+PAL, USA and Japan build jobs through a short-lived artifact. Its tools-only
+cache is keyed by `gba/tools/build_cc1plus.sh`; changing that recipe or missing
+executables triggers a source build, not every game-source commit. The build
+uses Zig 0.13.0 with a pinned download SHA-256 and the same script described
+above. `old_agbcc` comes from the private build container. Each regional job
+restores executable permissions after downloading the artifact and checks all
+four required tools before configuring. Retail inputs and split objects are
+not cached or uploaded with the compiler artifact. See
+[CI documentation](../docs/github_actions.md).
 
 Both hosts use 32-bit binaries because this old tree assumes 32-bit host types.
 The only compiler source change makes `.align` request explicit zero fill,
@@ -120,6 +126,14 @@ against retail placement when recovering small non-power-of-two objects, rather
 than compensating with artificial source padding or per-object alignment hacks.
 
 ## What the matching link establishes
+
+Toolchain inputs and source files are shared across the three regions; layouts,
+retail hashes and source-completion claims are not. PAL keeps `gba/config/cli`
+and `gba/config/mgr`; USA and Japan use `gba/config/<version>/<program>`.
+Validate each selected region's source build and both final image hashes before
+promoting its units. Across the full matrix this accompanies three GameCube DOL
+checks, for nine final retail image checks in total. A fallback-based exact
+image does not establish that every compiled source object matches.
 
 The generated linker script concatenates input object sections in reconstructed
 order. Loaded read-only and writable ranges retain separate output sections;

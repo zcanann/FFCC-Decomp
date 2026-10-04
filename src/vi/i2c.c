@@ -1,6 +1,6 @@
 #include <dolphin/vi.h>
 
-#include "__vi.h"
+#include "dolphin/vi/__vi.h"
 
 static int lastError;
 

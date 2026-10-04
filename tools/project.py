@@ -1201,6 +1201,19 @@ def generate_build_ninja(
                 link_steps.append(module_link_step)
         n.newline()
 
+        # Compile configured sources even before their regional object boundaries
+        # are recovered. These objects validate source through all_source, but
+        # only add_unit above may put them in the retail link.
+        for obj in objects.values():
+            if (
+                obj.options["add_to_all"]
+                and obj.src_path is not None
+                and obj.src_path.is_file()
+                and file_is_c_cpp(obj.src_path)
+            ):
+                check_path_case(obj.src_path)
+                c_build(obj, obj.src_path)
+
         # Check if all compiler versions exist
         for mw_version in used_compiler_versions:
             mw_path = compilers / mw_version / "mwcceppc.exe"
@@ -1670,6 +1683,7 @@ def generate_objdiff_config(
 
         obj = objects.get(obj_name)
         if obj is None:
+            progress_categories.append("unclassified_gc")
             objdiff_config["units"].append(unit_config)
             return
 
@@ -1724,6 +1738,8 @@ def generate_objdiff_config(
             progress_categories.extend(category_opt)
         elif category_opt is not None:
             progress_categories.append(category_opt)
+        if not category_opt:
+            progress_categories.append("unclassified_gc")
         unit_config["metadata"].update(
             {
                 "complete": obj.completed if src_exists else None,
@@ -1754,8 +1770,16 @@ def generate_objdiff_config(
 
     objdiff_config["units"].extend(config.extra_objdiff_units)
 
+    used_categories = {
+        category
+        for unit in objdiff_config["units"]
+        for category in unit.get("metadata", {}).get("progress_categories", [])
+    }
+
     # Add progress categories
     def add_category(id: str, name: str):
+        if id not in used_categories:
+            return
         objdiff_config["progress_categories"].append(
             {
                 "id": id,
@@ -1772,6 +1796,7 @@ def generate_objdiff_config(
                 add_category(module["name"], module["name"])
     for category in config.progress_categories:
         add_category(category.id, category.name)
+    add_category("unclassified_gc", "Unclassified GameCube")
 
     def cleandict(d):
         if isinstance(d, dict):
@@ -2065,6 +2090,11 @@ def calculate_progress(config: ProjectConfig) -> None:
 
     print_category("All", report_data["measures"])
     for category in report_data.get("categories", []):
+        if not any(
+            int(category["measures"].get(key, 0))
+            for key in ("total_units", "total_code", "total_data", "total_functions")
+        ):
+            continue
         if config.print_progress_categories is True or (
             isinstance(config.print_progress_categories, list)
             and category["id"] in config.print_progress_categories

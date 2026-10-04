@@ -1,4 +1,3 @@
-#define USE_BUILTIN_STRING
 #include "global.h"
 #include "link.h"
 #include "xfer.h"

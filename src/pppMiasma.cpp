@@ -113,6 +113,26 @@ static inline float CalcSphereRadius(Vec* vertices, u16 count)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 104b
+ * EN Address: 0x80128a68
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void CreateScaleMatrix(_pppPObject* pObject, float scale)
+{
+    Mtx scaleMtx;
+    Mtx localMtx;
+
+    PSMTXScale(scaleMtx, scale, scale, scale);
+    PSMTXConcat(scaleMtx, pObject->m_localMatrix.value, localMtx);
+    PSMTXConcat(ppvWorldMatrix, localMtx, pObject->m_drawMatrix.value);
+    GXLoadPosMtxImm(pObject->m_drawMatrix.value, 0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80109930
  * PAL Size: 368b
  * EN Address: TODO
@@ -234,18 +254,16 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     u32 scissorWidth;
     int texHeight;
     int textureIndex;
-    int sceneTexSize;
+    u32 sceneTexSize;
     Vec cameraPos;
     PackedMiasmaColor packedColor;
-    Mtx firstLocalMtx;
     float height;
     float scaledRadius;
-    Mtx firstScaleMtx;
     float maxRadius;
     GXTexObj backSceneTex;
     int secondaryOffset;
     VColor* colorWork;
-    int maskTexSize;
+    u32 maskTexSize;
     int maskOffset;
     Vec managerPos;
     pppModelSt* model;
@@ -256,9 +274,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     GXTexObj miasmaMaskTex;
     float secondaryScale;
     GXTexObj secondaryMaskTex;
-    Mtx secondLocalMtx;
     GXColor stepColor;
-    Mtx secondScaleMtx;
     CGraphic* graphicPtr;
     u32 scissorHeight;
     MiasmaFrameWork* work;
@@ -303,9 +319,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         cameraPos.z = ppvCameraMatrix[2][3];
         maxRadius = CalcSphereRadius(model->m_vertices, model->m_vertexCount);
     } else {
-        cameraPos.x = CameraPcs.m_positionX;
-        cameraPos.y = CameraPcs.m_positionY;
-        cameraPos.z = CameraPcs.m_positionZ;
+        CameraPcs.GetPosition(&cameraPos);
         maxRadius = 1200.0f;
     }
 
@@ -353,9 +367,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
         _GXSetTevOrder(0, 0xFF, 0xFF, 4);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-        GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-        GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX2, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+        GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+        GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
+        GXSetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX2, GX_IDENTITY);
 
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -374,12 +388,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
         GXSetNumTevStages(1);
         GXSetNumTexGens(0);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        CameraPcs.GetProjectionMatrix(screenMtx);
         GXSetProjection(screenMtx, GX_PERSPECTIVE);
-        PSMTXScale(firstScaleMtx, 1.0f, 1.0f, 1.0f);
-        PSMTXConcat(firstScaleMtx, pppMiasma->m_localMatrix.value, firstLocalMtx);
-        PSMTXConcat(ppvWorldMatrix, firstLocalMtx, pppMiasma->m_drawMatrix.value);
-        GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
+        CreateScaleMatrix(pppMiasma, 1.0f);
 
         GXSetTevDirect((GXTevStageID)tevStage);
         pppInitBlendMode();
@@ -455,10 +466,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
             secondaryScale = 1.0f - step->m_stepValue;
-            PSMTXScale(secondScaleMtx, secondaryScale, secondaryScale, secondaryScale);
-            PSMTXConcat(secondScaleMtx, pppMiasma->m_localMatrix.value, secondLocalMtx);
-            PSMTXConcat(ppvWorldMatrix, secondLocalMtx, pppMiasma->m_drawMatrix.value);
-            GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
+            CreateScaleMatrix(pppMiasma, secondaryScale);
 
             _GXSetTevColorIn(
                 0, 0xF, 0xF, 0xF, 0xC);
@@ -524,7 +532,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
             GXSetTevDirect(GX_TEVSTAGE0);
             GXLoadTexObj(&miasmaMaskTex, GX_TEXMAP0);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+            GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
             _GXSetTevOrder(0, 0, 0, 4);
             _GXSetTevSwapMode(0, 0, 1);
             _GXSetTevColorIn(0, 0xF, 8, 0xC, 0xC);
@@ -535,7 +543,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             GXSetTevDirect(GX_TEVSTAGE1);
             GXSetTevKColorSel(GX_TEVSTAGE1, GX_TEV_KCSEL_K0);
             GXSetTevKAlphaSel(GX_TEVSTAGE1, GX_TEV_KASEL_K0_A);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+            GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
             _GXSetTevOrder(1, 0, 0, 4);
             _GXSetTevSwapMode(1, 0, 1);
             _GXSetTevColorIn(1, 2, 0xE, 0xE, 0xF);
@@ -546,7 +554,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             GXSetTevDirect(GX_TEVSTAGE2);
             GXSetTevKColorSel(GX_TEVSTAGE2, GX_TEV_KCSEL_K0);
             GXSetTevKAlphaSel(GX_TEVSTAGE2, GX_TEV_KASEL_K0_A);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+            GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
             _GXSetTevOrder(2, 0, 0, 4);
             _GXSetTevSwapMode(2, 0, 1);
             _GXSetTevColorIn(2, 0xE, 2, 2, 0);
@@ -555,7 +563,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             _GXSetTevAlphaOp(2, 8, 0, 0, 1, 0);
 
             GXSetTevDirect(GX_TEVSTAGE3);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+            GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
             _GXSetTevOrder(3, 0, 0, 4);
             _GXSetTevSwapMode(3, 0, 1);
             _GXSetTevColorIn(3, 0xF, 0, 10, 0xF);
@@ -593,7 +601,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         if (step->m_arg3 != 1) {
             GXSetTevDirect(GX_TEVSTAGE0);
             GXLoadTexObj(&miasmaMaskTex, GX_TEXMAP0);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+            GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
             _GXSetTevOrder(0, 0, 0, 4);
             _GXSetTevSwapModeTable(
                 2, tevSwapChannel, tevSwapChannel, tevSwapChannel, tevSwapChannel);
@@ -616,7 +624,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
                 GXSetTevDirect(GX_TEVSTAGE0);
                 _GXSetTevOrder(0, 0, 0, 4);
-                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+                GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
                 _GXSetTevSwapMode(0, 0, 0);
                 _GXSetTevColorIn(0, 0xF, 10, 8, 0xF);
                 _GXSetTevColorOp(0, 0, 0, 0, 1, 0);
@@ -648,7 +656,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
                 GXSetTevDirect(GX_TEVSTAGE0);
                 GXLoadTexObj(&miasmaMaskTex, GX_TEXMAP0);
                 _GXSetTevOrder(0, 0, 0, 4);
-                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+                GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
                 _GXSetTevSwapMode(0, 0, 0);
                 _GXSetTevColorIn(0, 0xF, 0xF, 0xF, 10);
                 _GXSetTevColorOp(0, 0, 0, 0, 1, 0);
@@ -666,7 +674,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
                 GXSetTevDirect(GX_TEVSTAGE2);
                 _GXSetTevSwapMode(2, 0, 0);
-                GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+                GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
                 _GXSetTevOrder(2, 1, 1, 4);
                 _GXSetTevColorIn(2, 0xF, 0xB, 0, 0xF);
                 _GXSetTevColorOp(2, 0, 0, 0, 1, 0);

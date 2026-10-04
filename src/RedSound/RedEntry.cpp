@@ -1468,10 +1468,12 @@ void CRedEntry::DisplaySePlayInfo()
 					data = (u8*)RedSeBlockDataGet(seBlockBankNo);
 					displayWaveNo = ((RedSeBlockHEAD*)data)->m_seCount;
 					data = (u8*)((RedSeBlockHEAD*)data)->m_entries;
-					seBlockId = ((int*)data)[seBlockSequenceNo] & REDSOUND_SE_BLOCK_ENTRY_MASK;
+					seBlockId = ((int*)data)[seBlockSequenceNo];
+					seBlockId &= REDSOUND_SE_BLOCK_ENTRY_MASK;
 					data += displayWaveNo * REDSOUND_SE_BLOCK_ENTRY_SIZE;
 					data += seBlockId;
-					displayWaveNo = RedSeInfoGetWaveNo((RedSeINFO*)data);
+					RedSeINFO* seInfo = (RedSeINFO*)data;
+					displayWaveNo = RedSeInfoGetWaveNo(seInfo);
 					OSReport(sRedEntrySeBlockPlayInfoFmt, sRedEntryLogPrefix,
 					         (seTrack - *seTrackBasePtr) + REDSOUND_SE_VOICE_BASE_INDEX, seBlockBankNo,
 					         seBlockSequenceNo, displayWaveNo);
@@ -1959,7 +1961,7 @@ void CRedEntry::DisplayMMemoryInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedEntry::ClearMusicData(int musicNo)
+inline int CRedEntry::ClearMusicData(int musicNo)
 {
 	int clearResult = 0;
 
@@ -1992,7 +1994,7 @@ int CRedEntry::ClearMusicData(int musicNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedEntry::DisplayMusicInfo()
+inline void CRedEntry::DisplayMusicInfo()
 {
 	if (RedReportPrintIsEnabled()) {
 		OSReport(sRedEntryNewline);

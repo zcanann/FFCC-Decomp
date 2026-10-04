@@ -1,0 +1,224 @@
+crt0:
+	.text       start:0x02000000 end:0x020001A0
+
+main:
+	.text       start:0x020001A0 end:0x02001B68
+
+MgJoyBus:
+	.text       start:0x02001B68 end:0x0200265C
+
+obj:
+	.text       start:0x0200265C end:0x02004EC4
+
+effect:
+	.text       start:0x02004EC4 end:0x02005CE8
+
+camera:
+	.text       start:0x02005CE8 end:0x02006228
+
+field:
+	.text       start:0x02006228 end:0x02006AF0
+
+route:
+	.text       start:0x02006AF0 end:0x02006ECC
+
+text:
+	.text       start:0x02006ECC end:0x020072A4
+
+sound:
+	.text       start:0x020072A4 end:0x020072DC
+
+random:
+	.text       start:0x020072DC end:0x02007494
+
+fixmath:
+	.text       start:0x02007494 end:0x02007568
+
+chunk:
+	.text       start:0x02007568 end:0x020076AC
+
+m4a/m4a_1:
+	.text       start:0x020076AC end:0x02007C74
+
+m4a/m4a:
+	.text       start:0x02007C74 end:0x02009130
+
+joy_reset:
+	.text       start:0x02009130 end:0x02009150
+
+libagbsyscall/ArcTan2:
+	.text       start:0x02009150 end:0x02009154
+
+libagbsyscall/CpuFastSet:
+	.text       start:0x02009154 end:0x02009158
+
+libagbsyscall/CpuSet:
+	.text       start:0x02009158 end:0x0200915C
+
+libagbsyscall/LZ77UnCompVram:
+	.text       start:0x0200915C end:0x02009160
+
+libagbsyscall/LZ77UnCompWram:
+	.text       start:0x02009160 end:0x02009164
+
+libagbsyscall/MidiKey2Freq:
+	.text       start:0x02009164 end:0x02009168
+
+libagbsyscall/MusicPlayerContinue:
+	.text       start:0x02009168 end:0x0200916C
+
+libagbsyscall/RegisterRamReset:
+	.text       start:0x0200916C end:0x02009170
+
+libagbsyscall/SoundBiasReset:
+	.text       start:0x02009170 end:0x02009178
+
+libagbsyscall/SoundBiasSet:
+	.text       start:0x02009178 end:0x02009180
+
+libagbsyscall/Sqrt:
+	.text       start:0x02009180 end:0x02009184
+
+libagbsyscall/VBlankIntrWait:
+	.text       start:0x02009184 end:0x0200918C
+
+libc/string/memcpy:
+	.text       start:0x0200918C end:0x020091EC
+
+libc/stdio/vsprintf:
+	.text       start:0x020091EC end:0x02009220
+
+libc/stdio/vfprintf:
+	.text       start:0x02009220 end:0x0200A38C
+
+libc/stdio/wsetup:
+	.text       start:0x0200A38C end:0x0200A438
+
+libc/stdlib/dtoa:
+	.text       start:0x0200A438 end:0x0200B28C
+
+libc/stdio/fflush:
+	.text       start:0x0200B28C end:0x0200B320
+
+libc/stdio/findfp:
+	.text       start:0x0200B320 end:0x0200B47C
+
+libc/stdlib/freer:
+	.text       start:0x0200B47C end:0x0200B6FC
+
+libc/stdio/fvwrite:
+	.text       start:0x0200B6FC end:0x0200B928
+
+libc/stdio/fwalk:
+	.text       start:0x0200B928 end:0x0200B968
+
+libc/locale/locale:
+	.text       start:0x0200B968 end:0x0200B9D4
+
+libc/stdio/makebuf:
+	.text       start:0x0200B9D4 end:0x0200BAB0
+
+libc/stdlib/mallocr:
+	.text       start:0x0200BAB0 end:0x0200BFCC
+
+libc/stdlib/mbtowc_r:
+	.text       start:0x0200BFCC end:0x0200BFF8
+
+libc/string/memchr:
+	.text       start:0x0200BFF8 end:0x0200C078
+
+libc/string/memmove:
+	.text       start:0x0200C078 end:0x0200C100
+
+libc/string/memset:
+	.text       start:0x0200C100 end:0x0200C154
+
+libc/stdlib/mlock:
+	.text       start:0x0200C154 end:0x0200C15C
+
+libc/stdlib/mprec:
+	.text       start:0x0200C15C end:0x0200CA2C
+
+libc/math/s_isinf:
+	.text       start:0x0200CA2C end:0x0200CA50
+
+libc/math/s_isnan:
+	.text       start:0x0200CA50 end:0x0200CA70
+
+libc/reent/sbrkr:
+	.text       start:0x0200CA70 end:0x0200CA9C
+
+libc/stdio/stdio:
+	.text       start:0x0200CA9C end:0x0200CB60
+
+libc/string/strcmp:
+	.text       start:0x0200CB60 end:0x0200CBBC
+
+libc/string/strlen:
+	.text       start:0x0200CBBC end:0x0200CC00
+
+libc/arm/syscalls:
+	.text       start:0x0200CC00 end:0x0200D064
+
+libc/reent/writer:
+	.text       start:0x0200D064 end:0x0200D094
+
+libc/stdlib/callocr:
+	.text       start:0x0200D094 end:0x0200D0EC
+
+libc/reent/closer:
+	.text       start:0x0200D0EC end:0x0200D118
+
+libc/errno/errno:
+	.text       start:0x0200D118 end:0x0200D124
+
+libc/reent/fstatr:
+	.text       start:0x0200D124 end:0x0200D150
+
+libc/arm/libcfunc:
+	.text       start:0x0200D150 end:0x0200D178
+
+libc/reent/lseekr:
+	.text       start:0x0200D178 end:0x0200D1A8
+
+libc/reent/readr:
+	.text       start:0x0200D1A8 end:0x0200D1D8
+
+libgcc/_call_via_rX:
+	.text       start:0x0200D1D8 end:0x0200D214
+
+libgcc/_divsi3:
+	.text       start:0x0200D214 end:0x0200D2A8
+
+libgcc/_dvmd_tls:
+	.text       start:0x0200D2A8 end:0x0200D2AC
+
+libgcc/_modsi3:
+	.text       start:0x0200D2AC end:0x0200D37C
+
+libgcc/_udivsi3:
+	.text       start:0x0200D37C end:0x0200D3F4
+
+libgcc/_umodsi3:
+	.text       start:0x0200D3F4 end:0x0200D4B4
+
+libgcc/dp-bit:
+	.text       start:0x0200D4B4 end:0x0200E250
+
+libgcc/fp-bit:
+	.text       start:0x0200E250 end:0x0200EB9C
+
+libgcc/_lshrdi3:
+	.text       start:0x0200EB9C end:0x0200EBD0
+
+libgcc/_muldi3:
+	.text       start:0x0200EBD0 end:0x0200EC40
+
+libgcc/_negdi2:
+	.text       start:0x0200EC40 end:0x0200EC58
+
+regional_data:
+	.rodata     start:0x0200EC58 end:0x02021E68
+
+regional_bss:
+	.bss        start:0x03000000 end:0x03006DC1

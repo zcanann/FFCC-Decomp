@@ -275,6 +275,22 @@ public:
     void CalcStatus();
     int CanPlayerUseItem();
     int IsUseItem() { return 1; }
+    int CanAddItem(int count) { return m_inventoryItemCount + count <= 0x40; }
+    int GetTotalBonus()
+    {
+        int bonus = m_artifactRelated[3] + m_artifactRelated[4];
+        int total;
+        if (bonus < 0) {
+            total = 0;
+        } else {
+            total = 100;
+            if (bonus <= 100) {
+                total = bonus;
+            }
+        }
+        return total;
+    }
+    int GetTotalBonus2() { return m_artifactRelated[0] + m_artifactRelated[1] - m_artifactRelated[2]; }
     void ValidCmdList(int);
     int GetIdxCmdList();
     int GetNumCmdList() { return m_numCmdListSlots; }

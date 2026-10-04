@@ -113,6 +113,10 @@ boss-HP effect), the low half of gil when you set gil to `k·65536 + 381…391`
 inventory. Pointers whose low half is `0x0180` or `0x0184` would be corrupted
 and most likely crash.
 
+[cles-targets.md](cles-targets.md) goes further: "food" is decided by a table
+lookup that heap contents can change, so some fixed targets can be made
+edible, and it includes a scanner for live memory.
+
 ## A stronger primitive with no known GBA trigger
 
 `ChgCmdLst` doesn't bounds-check the **index** either. That array is

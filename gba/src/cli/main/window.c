@@ -1123,19 +1123,19 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
     if ((py >> 3) - win->y < win->height) {
         for (i = 0; i < win->width; i++, px += 8) {
             if (i == 0)
-                k = 32;
+                tile = 32;
             else if (i == 1)
-                k = 33;
+                tile = 33;
             else if (i > 1 && i <= win->width - 3) {
                 if (i & 2)
-                    k = 34;
+                    tile = 34;
                 else
-                    k = 35;
+                    tile = 35;
             } else if (i == win->width - 2)
-                k = 36;
+                tile = 36;
             else
-                k = 37;
-            Obj_Draw(px, py, 11, k, win->variant, win->bg, 0);
+                tile = 37;
+            Obj_Draw(px, py, 11, tile, win->variant, win->bg, 0);
         }
     }
 }

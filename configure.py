@@ -529,7 +529,7 @@ config.libs = [
             Object(NonMatching, "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "charaobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "chunkfile.cpp", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "cmake.cpp"),
+            Object(NonMatching, "cmake.cpp", extra_cflags=["-inline noauto,deferred"]),
             Object(Matching, "color.cpp"),
             Object(NonMatching, "file.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(Matching, "strcase.c"),

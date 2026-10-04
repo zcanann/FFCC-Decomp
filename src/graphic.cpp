@@ -432,7 +432,7 @@ void CGraphic::EndFrame()
  */
 void CGraphic::SetDrawDoneDebugData(signed char drawDoneId)
 {
-    unsigned int token = (unsigned int)System.m_currentOrderIndex << 8;
+    unsigned int token = (unsigned int)System.GetIdxCurrentOrder() << 8;
     token = (token & 0xFFFFFF00) | (u8)drawDoneId;
     GXSetDrawSync(token);
 }
@@ -546,9 +546,12 @@ void CGraphic::Thread()
                 }
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
-                int drawSyncByte = static_cast<int>(static_cast<char>(drawSyncPart));
+                char drawSyncByte = drawSyncPart & 0xFF;
                 int orderIndex = (order != nullptr) ? order->m_insertIndex : -1;
-                const char* orderName = (order != nullptr) ? order->m_debugName : sGraphicUnknownOrderName;
+                const char* orderName = sGraphicUnknownOrderName;
+                if (order != nullptr) {
+                    orderName = order->m_debugName;
+                }
                 System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);
             }
@@ -567,7 +570,7 @@ void CGraphic::Thread()
             }
         }
 
-        if ((bReset != 0) && (File.m_fatalDiskErrorFlag == 0) && (MemoryCardMan.m_currentSlot == -1)) {
+        if ((bReset != 0) && (File.IsFatalError() == 0) && (MemoryCardMan.IsMcMount() == 0)) {
             VISetBlack(TRUE);
             VIFlush();
             VIWaitForRetrace();
@@ -1327,13 +1330,13 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     }
     {
         int textureSize = GXGetTexBufferSize(width, height, format, GX_FALSE, GX_FALSE);
-        dstBuffer = static_cast<u8*>(dstBuffer) + OSRoundUp32B(dstOffset);
-        dstBuffer = reinterpret_cast<void*>(OSRoundUp32B(dstBuffer));
+        void* buffer = static_cast<u8*>(dstBuffer) + OSRoundUp32B(dstOffset);
+        buffer = reinterpret_cast<void*>(OSRoundUp32B(buffer));
 
         GXSetTexCopySrc(x, y, width, height);
         GXSetTexCopyDst(width, height, format, GX_FALSE);
-        DCInvalidateRange(dstBuffer, textureSize);
-        GXCopyTex(dstBuffer, doClear);
+        DCInvalidateRange(buffer, textureSize);
+        GXCopyTex(buffer, doClear);
         GXPixModeSync();
         GXInvalidateTexAll();
 
@@ -1358,7 +1361,7 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         }
 
         if (texObj != nullptr) {
-            GXInitTexObj(texObj, dstBuffer, width, height, format, GX_CLAMP, GX_CLAMP,
+            GXInitTexObj(texObj, buffer, width, height, format, GX_CLAMP, GX_CLAMP,
                          GX_FALSE);
             float zero = LoadFloat(kGraphicZeroF);
             GXInitTexObjLOD(texObj, filter, filter, zero, zero, zero, GX_FALSE, GX_FALSE,

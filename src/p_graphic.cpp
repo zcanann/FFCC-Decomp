@@ -629,7 +629,7 @@ void CGraphicPcs::drawBar()
     int hue;
     int y;
     CSystem::COrder* order = System.GetFirstOrder();
-    const int orderCount = System.m_orderCount;
+    const int orderCount = System.GetNumOrder();
     int i = 0;
     hue = 0;
     y = 0x10;

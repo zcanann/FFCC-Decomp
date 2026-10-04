@@ -69,6 +69,13 @@ compiler tools and a report/map allowlist, with each region's reports named
 `<version>_report` and maps named `<version>_maps`. Reports are generated from
 `build/<version>/report.json`.
 
+`tools/report.py` runs objdiff separately for the GameCube executable and each
+GBA image, then combines the unchanged unit results. Symbol deduplication stays
+within each linked image: independent implementations of names such as `memcpy`
+must count in each executable, while duplicate weak functions within one image
+remain deduplicated. Aggregate and category measures follow objdiff's report
+formulas; this changes counting scope, not matching or source-linkage claims.
+
 ## Local validation
 
 Prepare the selected region's inputs and GBA dependencies as described in

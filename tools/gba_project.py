@@ -122,7 +122,68 @@ COMPLETE: Dict[str, List[str]] = {
 
 # PAL's source and library claims do not carry over merely because a regional
 # function has the same name. Add regional units after checking their full link.
-VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {"GCCP01": COMPLETE}
+VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
+    "GCCP01": COMPLETE,
+    "GCCE01": {
+        "cli": [
+            "crt0", "m4a/m4a_1", "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet",
+            "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
+            "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",
+            "libagbsyscall/VBlankIntrWait", "joy_reset", "libc/string/memcpy",
+            "libc/string/memset", "libc/string/strcat", "libc/string/strchr", "libc/string/strcpy",
+            "libc/string/strlen", "libgcc/_call_via_rX", "libgcc/_divsi3", "libgcc/_dvmd_tls",
+            "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
+        ],
+        "mgr": [
+            "crt0", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2", "libagbsyscall/CpuFastSet",
+            "libagbsyscall/CpuSet", "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
+            "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",
+            "libagbsyscall/RegisterRamReset", "libagbsyscall/SoundBiasReset",
+            "libagbsyscall/SoundBiasSet", "libagbsyscall/Sqrt", "libagbsyscall/VBlankIntrWait",
+            "libc/string/memcpy", "libc/stdio/vsprintf", "libc/stdio/wsetup", "libc/stdio/fflush",
+            "libc/stdio/findfp", "libc/stdlib/freer", "libc/stdio/fvwrite", "libc/stdio/fwalk",
+            "libc/stdio/makebuf", "libc/stdlib/mbtowc_r", "libc/string/memchr",
+            "libc/string/memmove", "libc/string/memset", "libc/stdlib/mlock", "libc/math/s_isinf",
+            "libc/math/s_isnan", "libc/stdio/stdio", "libc/string/strcmp", "libc/string/strlen",
+            "libc/reent/writer", "libc/stdlib/callocr", "libc/reent/closer", "libc/errno/errno",
+            "libc/reent/fstatr", "libc/reent/lseekr", "libc/reent/readr", "libgcc/_call_via_rX",
+            "libgcc/_divsi3", "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3",
+            "libgcc/_umodsi3", "libgcc/_lshrdi3", "libgcc/_muldi3", "libgcc/_negdi2",
+            "libc/stdio/vfprintf", "libc/stdlib/dtoa", "libc/locale/locale", "libc/stdlib/mprec",
+            "libc/stdlib/mallocr", "libc/reent/sbrkr", "libgcc/dp-bit", "libgcc/fp-bit",
+            "libc/reent/impure", "chunk", "effect", "fixmath", "text",
+        ],
+    },
+    "GCCJGC": {
+        "cli": [
+            "crt0", "m4a/m4a_1", "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet",
+            "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
+            "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",
+            "libagbsyscall/VBlankIntrWait", "libc/string/memcpy", "libc/string/memset",
+            "libc/string/strcat", "libc/string/strcpy", "libgcc/_call_via_rX", "libgcc/_divsi3",
+            "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
+        ],
+        "mgr": [
+            "crt0", "fixmath", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2",
+            "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet", "libagbsyscall/LZ77UnCompVram",
+            "libagbsyscall/LZ77UnCompWram", "libagbsyscall/MidiKey2Freq",
+            "libagbsyscall/MusicPlayerContinue", "libagbsyscall/RegisterRamReset",
+            "libagbsyscall/SoundBiasReset", "libagbsyscall/SoundBiasSet", "libagbsyscall/Sqrt",
+            "libagbsyscall/VBlankIntrWait", "libc/string/memcpy", "libc/stdio/vsprintf",
+            "libc/stdio/wsetup", "libc/stdio/fflush", "libc/stdlib/freer", "libc/stdio/fvwrite",
+            "libc/stdio/fwalk", "libc/stdio/makebuf", "libc/stdlib/mbtowc_r", "libc/string/memchr",
+            "libc/string/memmove", "libc/string/memset", "libc/stdlib/mlock", "libc/math/s_isinf",
+            "libc/math/s_isnan", "libc/stdio/stdio", "libc/string/strcmp", "libc/string/strlen",
+            "libc/reent/writer", "libc/stdlib/callocr", "libc/reent/closer", "libc/errno/errno",
+            "libc/reent/fstatr", "libc/reent/lseekr", "libc/reent/readr", "libgcc/_call_via_rX",
+            "libgcc/_divsi3", "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3",
+            "libgcc/_umodsi3", "libgcc/_lshrdi3", "libgcc/_muldi3", "libgcc/_negdi2",
+            "libc/stdio/findfp", "libc/stdio/vfprintf", "libc/stdlib/dtoa", "libc/stdlib/mprec",
+            "libgcc/dp-bit", "libgcc/fp-bit", "chunk", "effect", "libc/locale/locale",
+            "libc/stdlib/mallocr",
+        ],
+    },
+}
 
 
 def _complete_units(version: str, program: str, units) -> set:

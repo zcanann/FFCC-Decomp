@@ -1,11 +1,10 @@
 # Regional function identities are mapped from retail code and call/table references.
-# Unknown functions and unclassified data remain retail fallback; source linkage is not claimed.
+# Unknown functions and unclassified data remain retail fallback; source linkage is verified separately.
 # A size:0x1 data symbol records a verified start only; its full extent remains unverified.
 _start = .text:0x02000000; // type:function size:0xE0
 joybus_entry = .text:0x020000E0; // type:function size:0x64
 start_vector = .text:0x02000144; // type:function size:0x3C
-fn_02000180 = .text:0x02000180; // type:function size:0xC8
-fn_02000248 = .text:0x02000248; // type:function size:0x14
+intr_main = .text:0x02000180; // type:function size:0xDC
 AgbMain = .text:0x0200025C; // type:function size:0x39C thumb
 IntrDummy = .text:0x020005F8; // type:function size:0x2 thumb
 VBlankIntr = .text:0x020005FC; // type:function size:0x4C thumb
@@ -655,7 +654,7 @@ __div0 = .text:0x0201C808; // type:function size:0x2 thumb
 __modsi3 = .text:0x0201C80C; // type:function size:0xCE thumb
 __udivsi3 = .text:0x0201C8DC; // type:function size:0x78 thumb
 __umodsi3 = .text:0x0201C954; // type:function size:0xC0 thumb
-raw_0201CA14 = .rodata:0x0201CA14; // type:object size:0x34 data:byte
+IntrTable = .rodata:0x0201CA14; // type:object size:0x34
 gSinTable = .rodata:0x0201CA48; // type:object size:0x50 data:byte
 sShakeAmpTable = .rodata:0x0201CA98; // type:object size:0xC data:byte
 sMapLoadText = .rodata:0x0201CAB4; // type:object size:0xA data:byte

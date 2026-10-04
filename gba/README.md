@@ -117,3 +117,36 @@ the loaded image and that workspace is not counted as a source object.
   emitted with `.inst`, and calls and pointers become relocations against symbols,
   so target objects diff cleanly against compiled code.
 - `../tools/gba_project.py`: build rules, included into `build.ninja` with `subninja`.
+
+## Recovering regional splits
+
+After configuring and building the selected region, audit a whole program's
+compiled objects against its retail image:
+
+```sh
+python gba/tools/recover_splits.py \
+    --image orig/GCCE01/gba/ffcc_cli.bin --config gba/config/GCCE01/cli \
+    --project objdiff.json --program cli \
+    --output build/GCCE01/gba/cli/recovered-splits.json
+```
+
+The image may also be supplied from an extracted disc directory. The tool
+requires `pyelftools` and `capstone`. For a focused audit, use repeated
+`--object UNIT=PATH` arguments instead of project discovery.
+
+The JSON contains section placements, symbol proposals, consolidated split
+edits, input hashes, and reasons for rejecting candidates. A proposed initialized
+section must reproduce every retail byte, including its supported relocations.
+Ambiguous placements, unsupported relocations, and conflicting ownership block
+proposals. Compiler mapping symbols identify literal pools that were mistaken
+for functions. Fully resolved absolute relocations can locate small pointer-only
+sections such as constructor tables, with the same uniqueness and dependency
+checks. Object symbols without relocations receive raw-byte annotations so
+numeric values resembling addresses do not become spurious pointers. Mixed
+objects whose numeric words could be mistaken for pointers require manual
+metadata recovery and block proposals. BSS and COMMON sizes remain unverified
+storage extents.
+
+This is a dry run: it changes neither configuration nor completion claims.
+Review the proposed edits, rebuild, and check objdiff plus the full regional
+image hashes before promoting any units in `VERSION_COMPLETE`.

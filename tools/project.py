@@ -1377,15 +1377,16 @@ def generate_build_ninja(
         # Generate progress report
         ###
         n.comment("Generate progress report")
+        report_tool = config.tools_dir / "report.py"
         n.rule(
             name="report",
-            command=f"{objdiff} report generate $objdiff_report_args -o $out",
+            command=f"$python {report_tool} --objdiff {objdiff} --output $out -- $objdiff_report_args",
             description="REPORT",
         )
         n.build(
             outputs=report_path,
             rule="report",
-            implicit=[objdiff, "objdiff.json", "all_source"],
+            implicit=[objdiff, report_tool, "objdiff.json", "all_source"],
             order_only="post-build",
         )
 
@@ -1412,7 +1413,7 @@ def generate_build_ninja(
         n.build(
             outputs=report_baseline_path,
             rule="report",
-            implicit=[objdiff, "all_source", "always"],
+            implicit=[objdiff, report_tool, "objdiff.json", "all_source", "always"],
             order_only="post-build",
         )
         n.build(

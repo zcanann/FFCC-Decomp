@@ -26,6 +26,11 @@ public:
     {
     public:
         void Clear() { memset(this, 0, sizeof(CMoveWork)); }
+        void SetFlags(unsigned int on, unsigned int off)
+        {
+            m_flags |= on;
+            m_flags &= ~off;
+        }
 
         unsigned int m_flags;       // 0x00
         unsigned int m_stateFlags;  // 0x04

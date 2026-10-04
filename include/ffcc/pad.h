@@ -86,7 +86,30 @@ public:
     unsigned short GetButtonRepeat(long);
     unsigned short GetButton(long);
     unsigned short GetButtonUp(long);
-    int IsGba(long);
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: 96b
+     * EN Address: TODO
+     * EN Size: TODO
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    int IsGba(long port)
+    {
+        bool suppress = false;
+        if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
+            suppress = true;
+        }
+        int result;
+        if (suppress) {
+            result = 0;
+        } else {
+            unsigned int index = (m_debugPadPort == port) ? 0 : static_cast<unsigned int>(port);
+            result = m_padInputs[index].gbaMode;
+        }
+        return result;
+    }
     /*
      * --INFO--
      * PAL Address: UNUSED
@@ -132,6 +155,30 @@ public:
         } else {
             unsigned int index = (port == m_debugPadPort) ? 0 : static_cast<unsigned int>(port);
             result = m_padInputs[index].digitalStickOverride;
+        }
+        return result;
+    }
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x80132AFC
+     * EN Size: 164b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    unsigned short GetButtonDownAnalog(long port)
+    {
+        bool suppress = false;
+        if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
+            suppress = true;
+        }
+        int result;
+        if (suppress) {
+            result = 0;
+        } else {
+            unsigned int index = (m_debugPadPort == port) ? 0 : static_cast<unsigned int>(port);
+            result = m_padInputs[index].stickBitsDown;
         }
         return result;
     }

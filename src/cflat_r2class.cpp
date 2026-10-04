@@ -177,31 +177,6 @@ static inline unsigned int LoadU32(u8* base, int offset)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline int CPad::IsGba(long port)
-{
-	bool suppress = false;
-	if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
-		suppress = true;
-	}
-	int result;
-	if (suppress) {
-		result = 0;
-	} else {
-		unsigned int index = (m_debugPadPort == port) ? 0 : static_cast<unsigned int>(port);
-		result = m_padInputs[index].gbaMode;
-	}
-	return result;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 124b
  * EN Address: TODO
  * EN Size: TODO

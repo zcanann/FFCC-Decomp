@@ -220,7 +220,7 @@ CSYS_NAMES = {
     -0x1: "posX", -0x2: "posY", -0x3: "posZ", -0x4: "rotTargetY", -0x6: "classId",
     -0xF: "worldParamA", -0x10: "worldParamB",
     -0x40: "maxHp", -0x41: "hp", -0x43: "strength", -0x44: "magic", -0x45: "defense",
-    -0x82: "objId",
+    -0x82: "objId", -0x19C: "gil",
 }
 CSYS_ARRAYS = [
     (-0x14, -0x11, "dropItemCodes", 1),
@@ -492,6 +492,8 @@ def lift(script, func):
     pending = {}
     switches = []  # active: dict(subject, end, sites)
     targets = []   # objects entered with objcall
+    jump_node = {}  # label -> index of the first value-less jump node to it
+    else_starts = []
     skip_until = -1
 
     def add(kind, *data, pc=None):
@@ -502,7 +504,9 @@ def lift(script, func):
 
     def branch(target):
         if stack and target not in snapshots:
-            snapshots[target] = list(stack)
+            snapshots[target] = (list(stack), len(nodes))
+        if target not in jump_node:
+            jump_node[target] = len(nodes)
 
     for i, (pc, op, arg) in enumerate(insns):
         if i < skip_until:
@@ -519,8 +523,24 @@ def lift(script, func):
             live = False
             continue
         if pc in labels:
+            snap = snapshots.get(pc)
             if not live:
-                stack = list(snapshots.get(pc, []))
+                stack = list(snap[0]) if snap else []
+                else_from = jump_node.get(pc)
+                if else_from is not None:
+                    else_starts.append((else_from, len(stack)))
+            elif (snap and else_starts and len(snap[0]) == len(stack) and stack
+                  and snap[0][-1] is not stack[-1] and else_starts[-1][1] == len(stack) - 1):
+                # cond ? a : b  ->  then-value in the snapshot, else-value on the stack
+                if_idx, _ = else_starts.pop()
+                goto_idx = snap[1]
+                if (nodes[if_idx][0] == "if" and nodes[goto_idx][0] == "goto"):
+                    then_cond = negate(nodes[if_idx][1][0])
+                    a, b = snap[0][-1], stack.pop()
+                    stack.append(E("%s ? %s : %s" % (then_cond.wrap(4), a.wrap(4), b.wrap(3)), 3,
+                                   then_cond.effect or a.effect or b.effect))
+                    nodes[if_idx] = ("nop", (), None)
+                    nodes[goto_idx] = ("nop", (), None)
             add("label", pc)
         live = True
 
@@ -583,7 +603,14 @@ def lift(script, func):
         elif op in STORES:
             val = pop()
             ref = pop()
-            stack.append(E("%s %s %s" % (ref.text, STORES[op], val.wrap(2)), 1, True))
+            sym = STORES[op]
+            if i + 1 < len(insns) and insns[i + 1][1] == 0x0C:
+                stack.append(E("%s %s %s" % (ref.text, sym, val.wrap(2)), 1, True))
+            elif sym != "=" and val.text == "1":
+                # a store yields the old value: x += 1 used as a value is x++
+                stack.append(E("%s%s" % (ref.text, "++" if sym == "+=" else "--"), 15, True))
+            else:
+                stack.append(E("postassign(%s %s %s)" % (ref.text, sym, val.wrap(2)), 100, True))
         elif op in BINOPS:
             rhs = pop()
             lhs = pop()
@@ -639,7 +666,7 @@ def lift(script, func):
 
 def _place_defaults(nodes):
     """Move 'default: goto D' to label D and drop empty defaults."""
-    out = list(nodes)
+    out = [n for n in nodes if n[0] != "nop"]
     k = 0
     while k < len(out):
         if out[k][0] == "default" and k + 1 < len(out) and out[k + 1][0] == "goto":
@@ -968,6 +995,8 @@ def _select(script, patterns):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("info")

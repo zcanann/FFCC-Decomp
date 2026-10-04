@@ -217,9 +217,8 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     s32 col;
     s32 row;
     s32 tmp;
-    s32 oldFine;
+    s16 oldFine;
     s32 cnt;
-    u16 v;
 
     if (!(gDataFlags & DATA_MAP))
         return;
@@ -264,10 +263,10 @@ void Radar_ScrollMap(s32 dx, s32 dy)
                 for (k = 0; k < sMapRowLen[i + ty]; k++) {
                     if (data[k] & 0x8000) {
                         cnt = data[k] & 0x3FF;
-                        v = (data[k] >> 10) & 3;
+                        tmp = (data[k] >> 10) & 3;
                         n += cnt;
                         if (n > edge) {
-                            line[0] = v | 0x1000;
+                            line[0] = tmp | 0x1000;
                             break;
                         }
                     } else {
@@ -306,9 +305,9 @@ void Radar_ScrollMap(s32 dx, s32 dy)
             for (i = 0; i < sMapRowLen[edge]; i++) {
                 if (data[i] & 0x8000) {
                     cnt = data[i] & 0x3FF;
-                    v = (data[i] >> 10) & 3;
+                    tmp = (data[i] >> 10) & 3;
                     for (k = 0; k < cnt; k++)
-                        line[n++] = v | 0x1000;
+                        line[n++] = tmp | 0x1000;
                 } else {
                     line[n++] = data[i];
                 }

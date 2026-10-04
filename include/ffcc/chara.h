@@ -57,6 +57,7 @@ public:
          * JP Size: TODO
          */
         void SetAmemAddress(int address) { m_bankAddress = address; }
+        int GetTotalFrame() { return m_frameCount; }
         /*
          * --INFO--
          * PAL Address: UNUSED
@@ -387,6 +388,7 @@ public:
 		float GetStartFrame() { return m_animStart; }
 		void SetDynaVector(Vec* vec) { m_dynJitter = CVector(*vec); }
 		CNode* GetNode(unsigned long index) { return &m_nodes[index]; }
+		CAnim* GetAnim() { return m_anim; }
 		void CalcFurColor();
 		void InitMogFurTex();
 		void CopyFurTex(int loadFromTexture);
@@ -394,7 +396,7 @@ public:
 		int PickFur(float (*)[4], _GXColor, int, int, _GXColor*, _GXColor*, Vec*);
 		void DrawFur(float (*)[4], int);
 		int GetDispIndex(CChara::CNode*);
-		void GetMatrix();
+		MtxPtr GetMatrix() { return m_matrix; }
 		void GetMatrix(float (*mtx)[4]) { PSMTXCopy(m_matrix, mtx); }
 		void GetMatrixT(float (*mtx)[4]) { PSMTXCopy(m_drawMtx, mtx); }
 		void SetBeforeDrawCallback(void (*callback)(CChara::CModel*, void*, void*, float (*)[4], int))
@@ -517,7 +519,7 @@ public:
     CDrawBuffer& GetDrawBuffer(int index) { return m_drawBuffers[index]; }
     u32& AmemAnimSize() { return m_amemAnimSize; }
     u32 GetAmemAnimSize() const { return m_amemAnimSize; }
-    void ResetAmem(int) { m_amemSize = 0; }
+    void ResetAmem(int size) { m_amemAnimSize = size; }
     void TimeMogFur();
     void CalcMogScore();
     void ChangeMogMode(int);

@@ -27,7 +27,7 @@ public:
     int IsUse();
     int GetValue(int);
     void SetValue(int, int);
-    void SetBattleIndex(int index)
+    void SetIndex(int index)
     {
         m_menuIndex = index;
         m_mes.SetPlayerIndex(index);

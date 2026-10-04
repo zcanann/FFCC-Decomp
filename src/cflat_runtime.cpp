@@ -380,6 +380,24 @@ done:
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFlatRuntime::createVal(CChunkFile& chunkFile, int count, CFlatRuntime::CVal* val)
+{
+	for (int i = 0; i < count; i++, val++) {
+		val->m_type = chunkFile.Get1();
+		val->m_flags = chunkFile.Get1();
+		val->m_value = chunkFile.Get2();
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 140b
  * EN Address: TODO
  * EN Size: TODO
@@ -589,6 +607,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 	int watchdog = 100000;
 	u8* code;
 	int systemResult;
+	CStack returnValue;
 
 	if (object->m_waitCounter != 0) {
 		goto callSystemFunction;
@@ -1080,7 +1099,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		case 0x39: {
 			--object->m_sp;
-			const u32 returnValue = *object->m_sp;
+			returnValue = *reinterpret_cast<CStack*>(object->m_sp);
 			--object->m_sp;
 			const u32 classWord = *object->m_sp;
 			CObject* target = reinterpret_cast<CObject*>(intToClass(classWord >> 16));
@@ -1089,7 +1108,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			--object->m_sp;
 			object->m_thisBase = reinterpret_cast<unsigned int*>(*object->m_sp);
 			--object->m_sp;
-			*object->m_sp = returnValue;
+			*reinterpret_cast<CStack*>(object->m_sp) = returnValue;
 			object->m_sp++;
 			break;
 		}
@@ -1103,7 +1122,6 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			CStack previousCodePos;
 			CStack previousActive;
 			CStack packedFlags;
-			CStack returnValue;
 			CStack codePosTemp;
 			CStack returnTemp;
 			const int oldCallFlag = object->m_flagBits.m_callFlag;
@@ -1694,14 +1712,7 @@ void CFlatRuntime::Create(void* filePtr)
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
 				        CVal[m_permanentVarCount];
 
-				int i = 0;
-				CVal* variableDef = m_permanentVarDefs;
-				const int variableCount = m_permanentVarCount;
-				for (; i < variableCount; i++, variableDef++) {
-					variableDef->m_type = chunkFile.Get1();
-					variableDef->m_flags = chunkFile.Get1();
-					variableDef->m_value = chunkFile.Get2();
-				}
+				createVal(chunkFile, m_permanentVarCount, m_permanentVarDefs);
 				break;
 			}
 
@@ -1712,11 +1723,10 @@ void CFlatRuntime::Create(void* filePtr)
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x9E)
 				        CClass[m_classCount];
 
-				int classOffset = 0;
 				int classIndex = 0;
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					CClass* classBase = reinterpret_cast<CClass*>(reinterpret_cast<u8*>(m_classes) + classOffset);
+					CClass* classBase = &m_classes[classIndex];
 					classBase->m_index = classIndex;
 					switch (chunk.m_id) {
 					case 'BLCK': {
@@ -1743,7 +1753,6 @@ void CFlatRuntime::Create(void* filePtr)
 						}
 						chunkFile.PopChunk();
 
-						classOffset += 0x22C;
 						classIndex++;
 						break;
 					}
@@ -2098,10 +2107,6 @@ CFlatRuntime::CFlatRuntime()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::createVal(CChunkFile&, int, CFlatRuntime::CVal*)
-{
-	// TODO
-}
 
 /*
  * --INFO--

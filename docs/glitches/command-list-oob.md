@@ -83,7 +83,35 @@ Addresses are relative to the player's `CCaravanWork`, with
 | 167–174 | `0x204` | `m_commandListInventorySlotRef[8]` |
 | 183 / 184 | `0x224` / `0x226` | `m_currentCmdListIndex` / `m_weaponIdx` |
 | 185–… | `0x228`… | Backup equipment, backup inventory, then letters (`0x3EC`) |
-| negative / >~1500 | outside the object | Neighbouring heap objects (for example another entity's HP) |
+| negative / >~1500 | outside the object | The rest of the static `Game` object and the `.bss` around it (see below) |
+
+The caravan works are not heap objects: they are `Game.m_caravanWorkArr[9]`
+(PAL `0x802202B0`, stride `0xC30` = 1,560 slots). The slot is a signed 16-bit
+index, so each caravan reaches ±64 KB around its inventory. For caravan 0 that
+is `0x80210366`–`0x80230362`: about 60 KB of `.bss` before `Game`, and all of
+`Game` up to `+0x114A2`. Higher caravans shift the window up by `0xC30` each,
+reaching the start of `Graphic` (`0x80230E48`) from caravan 1 on. Script
+globals (`CFlat.m_permanentVarValues`) are on the heap and out of reach.
+
+In reach (PAL, slot numbers for caravan 0; subtract 1,560 per caravan index):
+
+| Target | Address | Slot |
+|---|---|---|
+| Year (low half) | `Game+0x12` | −2,634 |
+| Chalice element (low half) | `Game+0x10BE` | −500 |
+| Story flags / story counters | `Game+0x10D4` / `Game+0x11D4` | −489 / −361 |
+| Current stage index | `Game+0x13D4` | −105 |
+| Other caravans (inventory, gil, HP) | `Game+0x13F0 + 0xC30·k` | 1,560·k − 91 … |
+| Monster HP, monster `i` | `Game+0x81BC + 0x110·i` | 13,963 + 68·i |
+| Party object pointers | `Game+0xC5B0` | 22,661 … |
+
+Only a halfword that currently holds a food ID (`0x17D`–`0x187`, 381–391)
+is eaten, and it always becomes `0xFFFF`. That is why the reach is wide but
+the useful targets are few: monster HP that happens to be 381–391 (the known
+boss-HP effect), the low half of gil when you set gil to `k·65536 + 381…391`
+(it jumps to `k·65536 + 65535`; untested), and food in another caravan's
+inventory. Pointers whose low half is `0x0180` or `0x0184` would be corrupted
+and most likely crash.
 
 ## A stronger primitive with no known GBA trigger
 

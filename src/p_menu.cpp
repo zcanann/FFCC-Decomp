@@ -108,12 +108,7 @@ CProcessCallbackTable CMenuPcs::m_table = {
 
 static const char sMenuCommonName[] = "common";
 static const char sMenuWinName[] = "win";
-const char* sMenuCommonTextureNames[] = {
-    sMenuCommonName, sMenuWinName,
-};
 
-extern const char* sMenuTextureRegionNameTable[];
-extern CMenuPcs::CTmp sMenuTextureInfoTable[];
 
 static inline void ReleaseRefObject(void* object)
 {
@@ -248,7 +243,7 @@ int CMenuPcs::GetTable(unsigned long index)
 void CMenuPcs::create()
 {
     char fontPath[0x80];
-    char texPath[0x100];
+    static char* tName[] = { const_cast<char*>(sMenuCommonName), const_cast<char*>(sMenuWinName) };
     static CMenuPcs::CTmp tTmp[] = {
         { 0, const_cast<char*>(sMenuTexKasoru) },
         { 0, const_cast<char*>(sMenuTexPause) },
@@ -288,31 +283,7 @@ void CMenuPcs::create()
     sprintf(fontPath, const_cast<char*>(sMenuGc22FontPathFmt), Game.GetLangString());
     loadFont(0, fontPath, 0, 0);
 
-    for (int i = 0; i < 2; i++) {
-        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), Game.GetLangString(), sMenuCommonTextureNames[i]);
-
-        CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
-        if (fileHandle != 0) {
-            File.Read(fileHandle);
-            File.SyncCompleted(fileHandle);
-
-            void* stage = m_mode == 1 ? MapMng.m_stage : m_menuStage;
-
-            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
-            m_textureSets[i] = textureSet;
-            m_textureSets[i]->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
-
-            File.Close(fileHandle);
-        }
-    }
-
-    for (int i = 0; i < 0x16; i++) {
-        const unsigned long textureIndex = static_cast<unsigned long>(
-            m_textureSets[tTmp[i].m_textureSetIndex]->Find(tTmp[i].m_textureName));
-        CTexture* texture = m_textureSets[tTmp[i].m_textureSetIndex]->GetTexture(textureIndex);
-        texture->AddRef();
-        m_textures[i] = texture;
-    }
+    loadTexture(tName, 0, 2, tTmp, 0, 0x16, 0);
 
     changeMode(static_cast<CMenuPcs::MENUMODE>(0));
 }
@@ -375,8 +346,8 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         break;
     }
 
-    if ((slot == 0) && (FontMan.m_font != 0 ? 1 : 0)) {
-        m_fonts[0] = FontMan.m_font;
+    if ((slot == 0) && FontMan.IsInternal22()) {
+        m_fonts[0] = FontMan.GetInternal22();
         m_fonts[0]->AddRef();
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
@@ -497,22 +468,28 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 
 #pragma pop
 
-const char* sMenuTextureRegionNameTable[] = {
-    sMenuRegionShibuya, sMenuRegionFace, 0, 0, 0, 0, 0, 0, 0
-};
-
-CMenuPcs::CTmp sMenuTextureInfoTable[] = {
-    { 2, const_cast<char*>(sMenuTexBattle) },
-    { 2, const_cast<char*>(sMenuTexHeart) },
-    { 3, const_cast<char*>(sMenuRegionFace) },
-    { 2, const_cast<char*>(sMenuTexNavi) },
-    { 2, const_cast<char*>(sMenuTexHp0) },
-    { 2, const_cast<char*>(sMenuTexHp1) },
-    { 2, const_cast<char*>(sMenuTexHp2) },
-    { 2, const_cast<char*>(sMenuTexSuna) },
-    { 2, const_cast<char*>(sMenuTexGba) },
-    { 2, const_cast<char*>(sMenuTexBattle2) }
-};
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x80061B80
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMemory::CStage* CMenuPcs::GetStage(int stageSelect)
+{
+    if (stageSelect == 3) {
+        return MapMng.m_stage;
+    }
+    if ((Game.m_gameWork.m_menuStageMode != 0) && (stageSelect != 0)) {
+        if (stageSelect == 1) {
+            return m_stageF0;
+        }
+        return m_stageF4;
+    }
+    return m_menuStage;
+}
 
 /*
  * --INFO--
@@ -526,33 +503,17 @@ CMenuPcs::CTmp sMenuTextureInfoTable[] = {
 void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCount, CMenuPcs::CTmp* tmp,
                            int textureStart, int textureCount, int stageSelect)
 {
-    char texPath[0x104];
+    char texPath[0x100];
 
     for (int i = 0; i < textureSetCount; i++) {
-        const char* language = Game.GetLangString();
-        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), language, paths[i]);
+        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), Game.GetLangString(), paths[i]);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
 
-            CMemory::CStage* stage;
-            if (m_mode == 1) {
-                stage = MapMng.m_stage;
-            } else if (stageSelect == 3) {
-                stage = MapMng.m_stage;
-            } else {
-                if ((Game.m_gameWork.m_menuStageMode != 0) && (stageSelect != 0)) {
-                    if (stageSelect == 1) {
-                        stage = m_stageF0;
-                    } else {
-                        stage = m_stageF4;
-                    }
-                } else {
-                    stage = m_menuStage;
-                }
-            }
+            CMemory::CStage* stage = (m_mode == 1) ? MapMng.m_stage : GetStage(stageSelect);
 
             m_textureSets[i + textureSetStart] =
                 new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
@@ -1337,48 +1298,36 @@ inline void CMenuPcs::drawPause()
  */
 void CMenuPcs::createBattle()
 {
-    char path[0x104];
     char fontPath[0x80];
+    static char* tName[] = {
+        const_cast<char*>(sMenuRegionShibuya), const_cast<char*>(sMenuRegionFace), 0, 0, 0, 0, 0, 0, 0
+    };
+    static CMenuPcs::CTmp tTmp[] = {
+        { 2, const_cast<char*>(sMenuTexBattle) },
+        { 2, const_cast<char*>(sMenuTexHeart) },
+        { 3, const_cast<char*>(sMenuRegionFace) },
+        { 2, const_cast<char*>(sMenuTexNavi) },
+        { 2, const_cast<char*>(sMenuTexHp0) },
+        { 2, const_cast<char*>(sMenuTexHp1) },
+        { 2, const_cast<char*>(sMenuTexHp2) },
+        { 2, const_cast<char*>(sMenuTexSuna) },
+        { 2, const_cast<char*>(sMenuTexGba) },
+        { 2, const_cast<char*>(sMenuTexBattle2) }
+    };
 
-    for (int i = 0; i < 2; i++) {
-        const char* language = Game.GetLangString();
-        sprintf(path, const_cast<char*>(sMenuTexturePathFmt), language, sMenuTextureRegionNameTable[i]);
-
-        CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-        if (fileHandle != 0) {
-            File.Read(fileHandle);
-            File.SyncCompleted(fileHandle);
-
-            void* stage = m_mode == 1 ? MapMng.m_stage : m_menuStage;
-
-            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
-            m_textureSets[i + 2] = textureSet;
-            m_textureSets[i + 2]->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
-
-            File.Close(fileHandle);
-        }
-    }
-
-    for (int i = 0; i < 10; i++) {
-        const unsigned long textureIndex = static_cast<unsigned long>(
-            m_textureSets[sMenuTextureInfoTable[i].m_textureSetIndex]->Find(sMenuTextureInfoTable[i].m_textureName));
-        CTexture* texture =
-            m_textureSets[sMenuTextureInfoTable[i].m_textureSetIndex]->GetTexture(textureIndex);
-        texture->AddRef();
-        m_textures[i + 0x16] = texture;
-    }
+    loadTexture(tName, 2, 2, tTmp, 0x16, 10, 0);
 
     for (int i = 0; i < 12; i++) {
         CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x48B) CMesMenu;
         m_battleMesMenus[i] = menu;
-        m_battleMesMenus[i]->SetBattleIndex(i);
+        m_battleMesMenus[i]->SetIndex(i);
         m_battleMesMenus[i]->Create();
     }
 
     for (int i = 0; i < 4; i++) {
         CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x492) CRingMenu;
         m_battleRingMenus[i] = menu;
-        m_battleRingMenus[i]->m_menuIndex = i;
+        m_battleRingMenus[i]->SetIndex(i);
         m_battleRingMenus[i]->Create();
     }
 
@@ -1386,13 +1335,13 @@ void CMenuPcs::createBattle()
     loadFont(0, fontPath, 1, 1);
 
     for (int i = 0; i < 0x100; i++) {
-        _GXColor color = m_textures[0x18]->GetTlutColor(i);
+        _GXColor color = GetTexture(static_cast<TEX>(0x18))->GetTlutColor(i);
         const int avg2 = (((int)color.r + (int)color.g + (int)color.b) / 3) * 2;
         color.r = static_cast<u8>(((int)color.r + avg2) / 3);
         color.g = static_cast<u8>(((int)color.g + avg2) / 3);
         color.b = static_cast<u8>(((int)color.b + avg2) / 3);
 
-        const unsigned long tlutFmt = m_textures[0x18]->m_format;
+        const unsigned long tlutFmt = GetTexture(static_cast<TEX>(0x18))->m_format;
         int tlutOffset;
         if (tlutFmt == 9) {
             tlutOffset = 0x100;
@@ -1405,7 +1354,7 @@ void CMenuPcs::createBattle()
         CTexture::SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, color);
     }
 
-    m_textures[0x18]->FlushExternalTlut(m_externalFontTlut);
+    GetTexture(static_cast<TEX>(0x18))->FlushExternalTlut(m_externalFontTlut);
     m_battleStateFlag = 0;
 }
 
@@ -1573,20 +1522,6 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
     }
 
     Game.m_gameWork.m_menuStageMode = static_cast<u8>(isScriptMode);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: TODO
- * EN Address: 0x800AA498
- * EN Size: 16b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
-{
-    return m_textures[static_cast<int>(tex)];
 }
 
 #pragma pool_data off

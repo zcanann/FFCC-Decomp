@@ -227,8 +227,8 @@ public:
     void SetMapObjWorldMapLightID(int, _GXColor, Vec);
     void SetDrawRangeOctTree(float);
     void SetDrawRangeMapObj(float);
-    void SetDraw(unsigned char);
-    void GetFogEnable();
+    void SetDraw(unsigned char draw) { m_mapReadReady = draw; }
+    unsigned char GetFogEnable() { return m_fogEnable; }
 };
 
 extern CMapMng MapMng;

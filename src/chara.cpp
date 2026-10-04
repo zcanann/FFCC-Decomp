@@ -16,8 +16,10 @@
 #include <math.h>
 #include <string.h>
 
-
-
+inline int CSystem::GetErrorLevel()
+{
+	return m_execParam;
+}
 
 namespace {
 
@@ -243,16 +245,6 @@ static inline u8* CharaDrawBufferBase(int bufferIndex)
 static inline u32 AlignCharaWorkBytes(u32 size)
 {
 	return (size + 0x1F) & ~0x1Fu;
-}
-
-static inline void InitCharaMaterialState()
-{
-	MaterialMan.InitEnv();
-}
-
-static inline void CopyCharaMaterialEnv()
-{
-	MaterialMan.LockEnv();
 }
 
 static inline u32 CharaFourCC(char a, char b, char c, char d)
@@ -812,7 +804,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			continue;
 		}
 		if (chunk.m_version < 5) {
-			if (2 <= static_cast<u32>(System.m_execParam)) {
+			if (System.GetErrorLevel() >= 2U) {
 				System.Printf("古いモデル形式です。\n");
 			}
 			return;
@@ -1776,7 +1768,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			continue;
 		}
 
-		InitCharaMaterialState();
+		MaterialMan.InitEnv();
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount != 0) {
@@ -1807,15 +1799,14 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		const int zWriteEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0x60) << 25) >> 31;
 		if (lastZWrite != zWriteEnable) {
 			lastZWrite = zWriteEnable;
-			int zOff = zWriteEnable == 0;
-			GXSetZMode((u8)1, (GXCompare)3, (GXBool)zOff);
+			GXSetZMode((u8)1, (GXCompare)3, (zWriteEnable == 0) ? GX_TRUE : GX_FALSE);
 		}
 
 		if (m_beforeMeshLockEnvCallback != 0) {
 			m_beforeMeshLockEnvCallback(this, m_callbackContext, m_callbackParam, meshIndex);
 		}
 
-		CopyCharaMaterialEnv();
+		MaterialMan.LockEnv();
 		if (mesh->m_data->m_infoWord1 != 0) {
 			LightPcs.SetBumpTexMatirx(meshMtx, g_pLight, 0, 0);
 		}
@@ -1878,7 +1869,7 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 			continue;
 		}
 
-		InitCharaMaterialState();
+		MaterialMan.InitEnv();
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount != 0) {
@@ -1891,7 +1882,7 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 			m_beforeDrawShadowLockEnvCallback(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
 		}
 
-		CopyCharaMaterialEnv();
+		MaterialMan.LockEnv();
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
 		MaterialMan.SetNRM(mesh->m_workNormals);
@@ -2741,7 +2732,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 			s_charaMeshWorkOverflowSeen = 1;
 		}
 
-		if ((s_charaMeshWorkWarnArmed != 0) && (s_charaMeshWorkWarnArmed = 0, 2 <= static_cast<u32>(System.m_execParam))) {
+		if ((s_charaMeshWorkWarnArmed != 0) && (s_charaMeshWorkWarnArmed = 0, System.GetErrorLevel() >= 2U)) {
 			System.Printf("CChara.CMesh.Calc: 描画バッファがあふれました。\n");
 		}
 		return;

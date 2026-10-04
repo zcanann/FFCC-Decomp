@@ -1873,8 +1873,9 @@ void CMenuPcs::SingleCalcFadeIn()
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
+        SingleFadeEntry* e;
         int idx = 0;
-        SingleFadeEntry* e = &m_singleFadeState->entries[idx++];
+        e = &m_singleFadeState->entries[idx++];
         e->startFrame = 0;
         e->duration = 10;
         e = &m_singleFadeState->entries[idx++];
@@ -1956,8 +1957,9 @@ void CMenuPcs::SingleCalcFadeOut()
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
+        SingleFadeEntry* e;
         int idx = 0;
-        SingleFadeEntry* e = &m_singleFadeState->entries[idx++];
+        e = &m_singleFadeState->entries[idx++];
         e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         e->duration = 10;
         e = &m_singleFadeState->entries[idx++];
@@ -3323,7 +3325,7 @@ void CMenuPcs::DrawSingLife()
         }
         phaseScale *= static_cast<float>(phase);
         angleScale *= phaseScale;
-        y += 64.0f * static_cast<float>(sin(angleScale));
+        y += 64.0f * sinf(angleScale);
     } else if (lifeTimer < 0x28) {
         y = 32.0f;
     } else {
@@ -3341,7 +3343,7 @@ void CMenuPcs::DrawSingLife()
         }
         phaseScale *= static_cast<float>(phase);
         angleScale *= phaseScale;
-        y += 64.0f * static_cast<float>(sin(angleScale));
+        y += 64.0f * sinf(angleScale);
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;

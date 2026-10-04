@@ -468,7 +468,8 @@ public:
 
     void ChgPlayModeFromScript(bool);
 
-    CTexture* GetTexture(TEX);
+    CTexture* GetTexture(TEX tex) { return m_textures[tex]; }
+    CMemory::CStage* GetStage(int);
     McCtrl* GetMcCtrl() { return &m_mcCtrl; }
 
     void WmInit();

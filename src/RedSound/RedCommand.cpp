@@ -245,7 +245,9 @@ static int _EraseTime(int eraseTrack)
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_attrMask == REDSOUND_TRACK_ATTR_NONE) &&
 		    (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime > minEraseTrack)) {
-			minEraseTrack = track->m_playTime;
+			int playTime = track->m_playTime;
+
+			minEraseTrack = playTime;
 			sepId = track->m_seSepId;
 		}
 		track++;

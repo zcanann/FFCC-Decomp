@@ -1191,7 +1191,7 @@ void CMenuPcs::loadData()
 	for (int i = 4; i < 6; i++) {
 		m_battleMesMenus[i] = new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x2EA) CMesMenu;
 		CMesMenu* const cur = m_battleMesMenus[i];
-		cur->SetBattleIndex(i);
+		cur->SetIndex(i);
 		cur->Create();
 	}
 

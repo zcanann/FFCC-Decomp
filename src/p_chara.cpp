@@ -41,6 +41,31 @@ static const char lbl_8033025C[] = "l";
 
 CCharaPcs CharaPcs;
 
+inline int CSystem::GetErrorLevel()
+{
+    return m_execParam;
+}
+
+inline void CMemory::ResetDefaultGroup()
+{
+    m_defaultGroup = 0;
+}
+
+inline void CMemory::SetDefaultGroup(int group)
+{
+    m_defaultGroup = group;
+}
+
+inline void* CFile::GetBuffer()
+{
+    return m_readBuffer;
+}
+
+inline unsigned char* CGraphic::GetTmpFrameBuffer()
+{
+    return static_cast<unsigned char*>(m_scratchTextureBuffer);
+}
+
 static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
 static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
 static const char s_CCharaPcs_PART_801D914C[] = "CCharaPcs(PART)";
@@ -91,46 +116,6 @@ STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
 
 namespace {
-static inline CPtrArray<CCharaPcs::CLoadModel*>* LoadModelArray(CCharaPcs* self)
-{
-    return &self->m_loadModels;
-}
-
-static inline CPtrArray<CCharaPcs::CLoadAnim*>* LoadAnimArray(CCharaPcs* self)
-{
-    return &self->m_loadAnims;
-}
-
-static inline CPtrArray<CCharaPcs::CLoadTexture*>* LoadTextureArray(CCharaPcs* self)
-{
-    return &self->m_loadTextures;
-}
-
-static inline CPtrArray<CCharaPcs::CLoadPdt*>* LoadPdtArray(CCharaPcs* self)
-{
-    return &self->m_loadPdts;
-}
-
-static inline u32& FreeMergeMask(CCharaPcs* self)
-{
-    return self->m_noFreeMergeMask;
-}
-
-static inline u32& LoadStreamCursor(CCharaPcs* self)
-{
-    return self->m_loadStreamCursor;
-}
-
-static inline u32 CurrentSceneId()
-{
-    return Game.m_currentSceneId;
-}
-
-static inline u32& CharaAmemSize()
-{
-    return Chara.AmemSize();
-}
-
 static inline void* StageBase(CMemory::CStage* stage)
 {
     return reinterpret_cast<void*>(stage->m_heapTop);
@@ -167,28 +152,6 @@ static inline void ReleaseHandleAnimSlot(CCharaPcs::CHandle* handle, int slot)
     CRef* animRef = handle->m_animSlot[slot];
     if (animRef != 0) {
         ReleaseShared(handle->m_animSlot[slot]);
-    }
-}
-
-static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* target)
-{
-    for (int i = LoadAnimArray(self)->GetSize() - 1; i >= 0; i--) {
-        CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim->m_mergeFileId >= 0) {
-            continue;
-        }
-        switch (loadAnim->GetRef()) {
-        case 1:
-            if (target == 0 || target == loadAnim) {
-                CCharaPcs::CLoadAnim* releasedAnim = loadAnim;
-                ReleaseSharedNonNull(releasedAnim);
-                LoadAnimArray(self)->RemoveAt(static_cast<unsigned long>(i));
-                if (target != 0) {
-                    return;
-                }
-            }
-            break;
-        }
     }
 }
 
@@ -268,21 +231,21 @@ void CCharaPcs::Init()
     m_amemWorkStage = Memory.CreateStage(0x70000, "CCharaPcs.amemw", 2);
     Chara.SetAmemStage(m_amemStage);
 
-    LoadModelArray(this)->SetStage(m_stage);
-    LoadModelArray(this)->SetDefaultSize(0x80);
-    LoadModelArray(this)->SetGrow(0);
+    m_loadModels.SetStage(m_stage);
+    m_loadModels.SetDefaultSize(0x80);
+    m_loadModels.SetGrow(0);
 
-    LoadAnimArray(this)->SetStage(m_stage);
-    LoadAnimArray(this)->SetDefaultSize(0x200);
-    LoadAnimArray(this)->SetGrow(0);
+    m_loadAnims.SetStage(m_stage);
+    m_loadAnims.SetDefaultSize(0x200);
+    m_loadAnims.SetGrow(0);
 
-    LoadTextureArray(this)->SetStage(m_stage);
-    LoadTextureArray(this)->SetDefaultSize(0x100);
-    LoadTextureArray(this)->SetGrow(0);
+    m_loadTextures.SetStage(m_stage);
+    m_loadTextures.SetDefaultSize(0x100);
+    m_loadTextures.SetGrow(0);
 
-    LoadPdtArray(this)->SetStage(m_stage);
-    LoadPdtArray(this)->SetDefaultSize(0x80);
-    LoadPdtArray(this)->SetGrow(0);
+    m_loadPdts.SetStage(m_stage);
+    m_loadPdts.SetDefaultSize(0x80);
+    m_loadPdts.SetGrow(0);
 
     for (unsigned int i = 0; i < 2; i++) {
         _GXColor& ambientColor = m_viewerAmbientColor[i];
@@ -326,7 +289,7 @@ void CCharaPcs::Init()
  */
 void CCharaPcs::Quit()
 {
-    CharaAmemSize() = 0;
+    Chara.AmemSize() = 0;
     Memory.DestroyStage(m_amemWorkStage);
     Memory.DestroyStage(m_amemStage);
     Memory.DestroyStage(m_stage);
@@ -374,7 +337,7 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
  */
 void CCharaPcs::create()
 {
-    FreeMergeMask(this) = 0;
+    m_noFreeMergeMask = 0;
 
     m_loadStages[CCharaPcs::LOAD_STAGE_MODEL] = Memory.CreateStage(0x177000, "CCharaPcs LoadModel", 0);
     m_loadStages[CCharaPcs::LOAD_STAGE_TEXTURE] = Memory.CreateStage(0x130000, "CCharaPcs LoadTex", 0);
@@ -382,7 +345,7 @@ void CCharaPcs::create()
     m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_MODEL] = Memory.CreateStage(0x18000, "CCharaPcs LoadWepModel", 0);
     m_loadStages[CCharaPcs::LOAD_STAGE_FAMILY_MODEL] = Memory.CreateStage(0x10000, "CCharaPcs LoadFaModel", 0);
     m_loadStages[CCharaPcs::LOAD_STAGE_ANIM] =
-        Memory.CreateStage(static_cast<s32>(CurrentSceneId()) == 4 ? 0x190000UL : 0x1E0000UL,
+        Memory.CreateStage(static_cast<s32>(Game.m_currentSceneId) == 4 ? 0x190000UL : 0x1E0000UL,
                            "CCharaPcs LoadAnim", 0);
 
     CHandle* sentinel = reinterpret_cast<CHandle*>(
@@ -456,9 +419,9 @@ void CCharaPcs::create()
 void CCharaPcs::createLoad()
 {
     CharaPcs.m_loadStreamCursor = 0;
-    Memory.DefaultGroup() = 2;
+    Memory.SetDefaultGroup(2);
     CharaPcs.LoadMergeFile(0, 0x10000000, 1);
-    Memory.DefaultGroup() = 0;
+    Memory.ResetDefaultGroup();
 }
 
 /*
@@ -503,14 +466,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
 {
     const int resetMode = static_cast<int>(mode);
 
-    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        CChara::CAnim* anim = loadAnim->m_anim;
-        if (anim->m_bank != 0) {
-            operator delete(anim->m_bank);
-            anim->m_bank = 0;
-        }
-    }
+    ReleaseAllAnimBank();
 
     for (int i = 0; i < 4; i++) {
         m_cameraFrameCount[i] = 0;
@@ -530,31 +486,31 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     switch (resetMode) {
     case 1:
     releaseAllArrays:
-        LoadModelArray(this)->ReleaseAndRemoveAll();
-        LoadAnimArray(this)->ReleaseAndRemoveAll();
-        LoadTextureArray(this)->ReleaseAndRemoveAll();
-        LoadPdtArray(this)->ReleaseAndRemoveAll();
-        Chara.AmemAnimSize() = 0;
+        m_loadModels.ReleaseAndRemoveAll();
+        m_loadAnims.ReleaseAndRemoveAll();
+        m_loadTextures.ReleaseAndRemoveAll();
+        m_loadPdts.ReleaseAndRemoveAll();
+        Chara.ResetAmem(0);
         break;
     case 0: {
-        FreeMergeFile(~(FreeMergeMask(this) | 0x10000000U));
-        LoadPdtArray(this)->ReleaseAndRemoveAll();
+        FreeMergeFile(~(m_noFreeMergeMask | 0x10000000U));
+        m_loadPdts.ReleaseAndRemoveAll();
         int charaAmemSize = correctLoadAnimAmem();
         if (charaAmemSize < 0) {
-            if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+            if (System.GetErrorLevel() >= 2U) {
                 System.Printf("ガベージコレクションに失敗したので、全て消去します。\n");
             }
             goto releaseAllArrays;
         }
 
-        Chara.AmemAnimSize() = static_cast<unsigned int>(charaAmemSize);
+        Chara.ResetAmem(charaAmemSize);
         goto complete;
     }
     }
 
 complete:
     g_pLight->m_bumpShade[3] = 0xFF;
-    FreeMergeMask(this) = 0;
+    m_noFreeMergeMask = 0;
 }
 
 /*
@@ -568,28 +524,28 @@ complete:
  */
 int CCharaPcs::correctLoadAnimAmem()
 {
-    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("amem anim ガベージコレクション開始。\n");
     }
 
     unsigned char* tempBuffer = reinterpret_cast<unsigned char*>(
         Memory._Alloc(0x80000, m_loadStages[CCharaPcs::LOAD_STAGE_ANIM], "p_chara.cpp", 0x162, 1));
     if (tempBuffer == 0) {
-        if (static_cast<unsigned int>(System.m_execParam) >= 2U) {
+        if (System.GetErrorLevel() >= 2U) {
             System.Printf("\x1b[31mamem anim ガベージコレクションのためのテンポラリバッファが確保できません。\n\x1b[0m");
         }
         return -1;
     }
 
     int i;
-    int loadAnimCount = LoadAnimArray(this)->GetSize();
+    int loadAnimCount = m_loadAnims.GetSize();
     int validAnimCount = 0;
     int maxEnd = 0;
     int compactedSize = 0;
     int scanOffset = 0;
     int chunkSize = 0;
     for (i = 0; i < loadAnimCount; i++) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
         const int animEnd = static_cast<int>(anim->GetBankSize()) + anim->GetAmemAddress();
         if (maxEnd < animEnd) {
@@ -598,7 +554,7 @@ int CCharaPcs::correctLoadAnimAmem()
         validAnimCount++;
     }
 
-    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("amem anim ガベージコレクションしようとしているアニメーションの総数は%dです。\n", validAnimCount);
     }
 
@@ -608,7 +564,7 @@ int CCharaPcs::correctLoadAnimAmem()
         const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
         for (i = 0; i < loadAnimCount; i++) {
-            CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+            CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
             const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->GetAmemAddress());
             const int animSize = static_cast<int>(loadAnim->m_anim->GetBankSize());
             if (animOffset < static_cast<unsigned int>(scanOffset)) {
@@ -638,7 +594,7 @@ int CCharaPcs::correctLoadAnimAmem()
             Memory.CopyToAMemorySync(
                 tempBuffer, reinterpret_cast<void*>(writeBase),
                 static_cast<unsigned long>(chunkSize));
-            if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+            if (System.GetErrorLevel() >= 3U) {
                 System.Printf(
                     "書き戻し %d個 %x - %x\n", chunkLoadCount, writeBase, writeBase + chunkSize);
             }
@@ -652,7 +608,7 @@ int CCharaPcs::correctLoadAnimAmem()
     if (tempBuffer != 0) {
         delete tempBuffer;
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("amem anim ガベージコレクション終了。new size =%dbyte\n", compactedSize);
     }
     return compactedSize;
@@ -709,16 +665,16 @@ void CCharaPcs::calcAfter()
 {
     Chara.FlipDBuffer();
 
-    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+    for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
+        CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
         if (anim->GetRef() == 1) {
             anim->ReleaseBank();
         }
     }
 
-    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+    for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
+        CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
         const int bankRefCount = loadAnim->m_anim->GetRef();
         if (bankRefCount == 1) {
             loadAnim->m_anim->AddHistory();
@@ -733,13 +689,8 @@ void CCharaPcs::calcAfter()
  */
 void CCharaPcs::ReleaseAllAnimBank()
 {
-    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_anim == 0) {
-            continue;
-        }
-
-        loadAnim->m_anim->ReleaseBank();
+    for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
+        m_loadAnims[i]->m_anim->ReleaseBank();
     }
 }
 
@@ -750,14 +701,10 @@ void CCharaPcs::ReleaseAllAnimBank()
  */
 void CCharaPcs::ReleaseUnusedAnimBank()
 {
-    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_anim == 0) {
-            continue;
-        }
-
-        if (loadAnim->m_anim->GetRef() == 1) {
-            loadAnim->m_anim->ReleaseBank();
+    for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
+        CChara::CAnim* anim = m_loadAnims[static_cast<unsigned long>(i)]->m_anim;
+        if (anim->GetRef() == 1) {
+            anim->ReleaseBank();
         }
     }
 }
@@ -775,12 +722,12 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
 {
     (void)requiredSize;
 
-    int i = LoadAnimArray(this)->GetSize() - 1;
+    int i = m_loadAnims.GetSize() - 1;
     int releaseSize = -1;
     CLoadAnim* releaseAnim = 0;
 
     for (; i >= 0; i--) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
 
         if (anim->IsBanked() && releaseSize < anim->GetHistory()) {
@@ -792,7 +739,7 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
     if (releaseAnim != 0) {
         releaseAnim->m_anim->ReleaseBank();
 
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf("ヒストリー%dのアニメーション%sを開放しました。\n", releaseSize, releaseAnim->m_name);
         }
 
@@ -844,7 +791,7 @@ void CCharaPcs::InitEnv(int envMode)
     }
 
     if (envMode == 4) {
-        GXSetProjection(CameraPcs.m_screenMatrix, GX_PERSPECTIVE);
+        GXSetProjection(CameraPcs.GetProjectionMatrix(), GX_PERSPECTIVE);
     }
 }
 
@@ -899,7 +846,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
                     GX_FALSE);
 
                 Mtx modelMtx;
-                PSMTXCopy(handle->m_model->m_matrix, modelMtx);
+                PSMTXCopy(handle->m_model->GetMatrix(), modelMtx);
                 worldPositions[outIndex].x = modelMtx[0][3];
                 worldPositions[outIndex].y = modelMtx[1][3];
                 worldPositions[outIndex].z = modelMtx[2][3];
@@ -973,7 +920,7 @@ void CCharaPcs::drawMakeTexShadow()
     _GXTexObj backBufferTexObj;
 
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTexObj, 0, 0, m_texShadowSize, m_texShadowSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &backBufferTexObj, 0, 0, m_texShadowSize, m_texShadowSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
@@ -983,18 +930,17 @@ void CCharaPcs::drawMakeTexShadow()
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
-    _GXColor savedCopyClearColor = Graphic.m_defaultCopyClearColor;
+    _GXColor savedCopyClearColor = Graphic.GetCopyClearColor();
     GXSetAlphaUpdate(GX_TRUE);
     GXSetViewport(0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), 0.0f, 1.0f);
     GXSetScissor(0, 0, static_cast<unsigned int>(m_texShadowSize), static_cast<unsigned int>(m_texShadowSize));
-    CColor clearColor(0x00, 0x00, 0x00, 0x00);
-    Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
+    Graphic.SetCopyClear(CColor(0x00, 0x00, 0x00, 0x00).color, 0xFFFFFF);
 
     m_texShadowTextureOffset = 0;
-    m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
+    m_texShadowTextureBase = Graphic.GetTmpFrameBuffer();
     m_texShadowTextureSize = 0xD2000;
     m_texShadowTextureOffset += m_texShadowSize * m_texShadowSize * 4;
-    C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 4.0f / 3.0f, 0.5f,
+    C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.GetFov(), 4.0f / 3.0f, 0.5f,
                           -0.5f, 0.5f, 0.5f);
 
     handle = m_handleList->m_next;
@@ -1020,7 +966,7 @@ void CCharaPcs::drawMakeTexShadow()
  */
 void CCharaPcs::drawShadow()
 {
-    if (static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) == 0) {
+    if (CameraPcs.GetFullScreenShadowEnable() == 0) {
         return;
     }
 
@@ -1070,8 +1016,8 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 {
     int activeCount = 0;
 
-    for (int i = LoadModelArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
+    for (int i = m_loadModels.GetSize() - 1; i >= 0; i--) {
+        CLoadModel* loadModel = m_loadModels[static_cast<unsigned long>(i)];
         if ((((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
             (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0)) {
             if (loadModel->m_streamMode != 0 && loadModel->GetRef() == 1) {
@@ -1079,15 +1025,15 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
             } else {
                 CLoadModel* releasedModel = loadModel;
                 ReleaseSharedNonNull(releasedModel);
-                LoadModelArray(this)->RemoveAt(static_cast<unsigned long>(i));
+                m_loadModels.RemoveAt(static_cast<unsigned long>(i));
             }
         } else {
             activeCount++;
         }
     }
 
-    for (int i = LoadTextureArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
+    for (int i = m_loadTextures.GetSize() - 1; i >= 0; i--) {
+        CLoadTexture* loadTexture = m_loadTextures[static_cast<unsigned long>(i)];
         if ((((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
             (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0)) {
             if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
@@ -1095,20 +1041,20 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
             } else {
                 CLoadTexture* releasedTexture = loadTexture;
                 ReleaseSharedNonNull(releasedTexture);
-                LoadTextureArray(this)->RemoveAt(static_cast<unsigned long>(i));
+                m_loadTextures.RemoveAt(static_cast<unsigned long>(i));
             }
         } else {
             activeCount++;
         }
     }
 
-    for (int i = LoadPdtArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
+    for (int i = m_loadPdts.GetSize() - 1; i >= 0; i--) {
+        CLoadPdt* loadPdt = m_loadPdts[static_cast<unsigned long>(i)];
         if ((loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
             (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0)) {
             CLoadPdt* releasedPdt = loadPdt;
             ReleaseSharedNonNull(releasedPdt);
-            LoadPdtArray(this)->RemoveAt(static_cast<unsigned long>(i));
+            m_loadPdts.RemoveAt(static_cast<unsigned long>(i));
         } else {
             activeCount++;
         }
@@ -1122,9 +1068,24 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int)
+void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim* target, int releaseMask)
 {
-	// TODO
+    for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
+        CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
+        if (((loadAnim->m_mergeFileId < 0) && (loadAnim->GetRef() == 1)) ||
+            ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & loadAnim->m_mergeFlags) != 0))) {
+            if (target == 0 || target == loadAnim) {
+                CRef* loadAnimRef = loadAnim;
+                if (loadAnimRef->DecRef() == 0) {
+                    delete loadAnimRef;
+                }
+                m_loadAnims.RemoveAt(static_cast<unsigned long>(i));
+                if (target != 0) {
+                    return;
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -1134,19 +1095,19 @@ void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int)
  */
 void CCharaPcs::DumpLoad()
 {
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("model\n");
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("no  t num lv  mask     addr     a a-addr   a-size\n");
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("--- - --- --- -------- -------- - -------- --------\n");
     }
-    int modelCount = LoadModelArray(this)->GetSize();
+    int modelCount = m_loadModels.GetSize();
     for (int i = 0; i < modelCount; i++) {
-        CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        CLoadModel* loadModel = m_loadModels[static_cast<unsigned long>(i)];
+        if (System.GetErrorLevel() >= 3U) {
             int streamMode = loadModel->m_streamMode;
             unsigned int streamSize = streamMode != 0 ? static_cast<unsigned int>(loadModel->m_streamSize) : 0;
             unsigned int streamAddr = streamMode != 0 ? loadModel->m_streamOffset : 0;
@@ -1158,19 +1119,19 @@ void CCharaPcs::DumpLoad()
         }
     }
 
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("texture\n");
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("no  t num t lv  mask     addr     a a-addr   a-size\n");
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("--- - --- - --- -------- -------- - -------- --------\n");
     }
-    int textureCount = LoadTextureArray(this)->GetSize();
+    int textureCount = m_loadTextures.GetSize();
     for (int i = 0; i < textureCount; i++) {
-        CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        CLoadTexture* loadTexture = m_loadTextures[static_cast<unsigned long>(i)];
+        if (System.GetErrorLevel() >= 3U) {
             int streamMode = loadTexture->m_streamMode;
             unsigned int streamSize = streamMode != 0 ? static_cast<unsigned int>(loadTexture->m_streamSize) : 0;
             unsigned int streamAddr = streamMode != 0 ? loadTexture->m_streamOffset : 0;
@@ -1182,19 +1143,19 @@ void CCharaPcs::DumpLoad()
         }
     }
 
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("pdt\n");
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("no  t num t pdt hdl  lv  mask    \n");
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("--- - --- - -------- --- --------\n");
     }
-    int pdtCount = LoadPdtArray(this)->GetSize();
+    int pdtCount = m_loadPdts.GetSize();
     for (int i = 0; i < pdtCount; i++) {
-        CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        CLoadPdt* loadPdt = m_loadPdts[static_cast<unsigned long>(i)];
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(
                 "%3d %1d %3d %1d %8d %3d %08x\n", i, loadPdt->m_keyTag, loadPdt->m_keyId,
                 loadPdt->m_variantTag, loadPdt->m_pdtSlot, loadPdt->m_mergeFileId,
@@ -1202,27 +1163,26 @@ void CCharaPcs::DumpLoad()
         }
     }
 
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("anim\n");
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("no  t num name           lv  mask     addr     banksize banksum  histroy\n");
     }
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (System.GetErrorLevel() >= 3U) {
         System.Printf("--- - --- -------------- --- -------- -------- -------- -------- --------\n");
     }
-    int animCount = LoadAnimArray(this)->GetSize();
+    int animCount = m_loadAnims.GetSize();
     int totalBankSize = 0;
     for (int i = 0; i < animCount; i++) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            CChara::CAnim* anim = loadAnim->m_anim;
+        CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(
                 "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n", i, loadAnim->m_keyTag, loadAnim->m_keyId,
                 loadAnim->m_name, loadAnim->m_mergeFileId, loadAnim->m_mergeFlags,
-                reinterpret_cast<unsigned int>(anim), anim->m_bankSize, totalBankSize, anim->m_lastFrame);
+                reinterpret_cast<unsigned int>(loadAnim->m_anim), loadAnim->m_anim->GetBankSize(), totalBankSize, loadAnim->m_anim->GetHistory());
         }
-        totalBankSize += loadAnim->m_anim->m_bankSize;
+        totalBankSize += loadAnim->m_anim->GetBankSize();
     }
 }
 
@@ -1320,7 +1280,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
     File.Read(fileHandle);
     File.SyncCompleted(fileHandle);
 
-    CChunkFile chunkFile(File.m_readBuffer);
+    CChunkFile chunkFile(File.GetBuffer());
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 'CAM ': {
@@ -1375,7 +1335,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
 
-            CChunkFile chunkFile(File.m_readBuffer);
+            CChunkFile chunkFile(File.GetBuffer());
             CChunkFile::CChunk chunk;
             while (chunkFile.GetNextChunk(chunk)) {
                 switch (chunk.m_id) {
@@ -1476,7 +1436,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                 loadPdt->m_mergeFlags = mergeFlags;
                                 loadPdt->m_pdtSlot = PartPcs.LoadMonsterPdt(
                                     keyId, variantTag, primaryData, primarySize, secondaryData, secondarySize);
-                                LoadPdtArray(&CharaPcs)->Add(loadPdt);
+                                CharaPcs.m_loadPdts.Add(loadPdt);
                             }
                             break;
                         }
@@ -1505,21 +1465,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 void CCharaPcs::FreeMergeFile(int releaseMask)
 {
     releaseUnuseLoadModel(releaseMask);
-
-    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (!(((loadAnim->m_mergeFileId < 0) && (loadAnim->GetRef() == 1)) ||
-              ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & loadAnim->m_mergeFlags) != 0)))) {
-            continue;
-        }
-
-        CRef* loadAnimRef = loadAnim;
-        if (loadAnimRef->DecRef() == 0) {
-            delete loadAnimRef;
-        }
-        LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
-    }
-
+    releaseUnuseLoadAnim(0, releaseMask);
     System.Printf("CCharaPcs.FreeMergeFile: 0x%08x\n", releaseMask);
 }
 
@@ -1572,20 +1518,20 @@ CCharaPcs::CLoadModel* CCharaPcs::loadModel(void* data, int keyTag, int keyId, i
     loadModel->m_keyId = keyId;
     loadModel->m_mergeFileId = mergeFileId;
     loadModel->m_mergeFlags = mergeFlags;
-    LoadModelArray(&CharaPcs)->Add(loadModel);
+    CharaPcs.m_loadModels.Add(loadModel);
 
     if (streamToAmem == 0) {
         CChara::CModel* model = new (CharaPcs.m_stage, "p_chara.cpp", 0x5F1) CChara::CModel;
         model->Create(data, GET_CHARA_ALLOC_STAGE_S(CharaPcs.GetCharaAllocStage(), CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]));
         loadModel->m_model = model;
     } else {
-        loadModel->m_streamOffset = LoadStreamCursor(this);
+        loadModel->m_streamOffset = m_loadStreamCursor;
         loadModel->m_streamSize = size;
         loadModel->m_streamMode = 1;
         Memory.CopyToAMemorySync(
-            data, reinterpret_cast<void*>(LoadStreamCursor(this) + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
+            data, reinterpret_cast<void*>(m_loadStreamCursor + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
             static_cast<unsigned long>(size));
-        LoadStreamCursor(this) += static_cast<unsigned int>(size);
+        m_loadStreamCursor += static_cast<unsigned int>(size);
     }
     return loadModel;
 }
@@ -1604,18 +1550,18 @@ CCharaPcs::CLoadTexture* CCharaPcs::loadTexture(void* data, int keyTag, int keyI
     loadTexture->m_variantTag = variantTag;
     loadTexture->m_mergeFileId = mergeFileId;
     loadTexture->m_mergeFlags = mergeFlags;
-    LoadTextureArray(&CharaPcs)->Add(loadTexture);
+    CharaPcs.m_loadTextures.Add(loadTexture);
 
     if (streamToAmem == 0) {
         loadTexture->m_textureSet = CharaPcs.createTextureSet(data, keyTag == 4);
     } else {
-        loadTexture->m_streamOffset = LoadStreamCursor(this);
+        loadTexture->m_streamOffset = m_loadStreamCursor;
         loadTexture->m_streamSize = size;
         loadTexture->m_streamMode = 1;
         Memory.CopyToAMemorySync(
-            data, reinterpret_cast<void*>(LoadStreamCursor(this) + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
+            data, reinterpret_cast<void*>(m_loadStreamCursor + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
             static_cast<unsigned long>(size));
-        LoadStreamCursor(this) += static_cast<unsigned int>(size);
+        m_loadStreamCursor += static_cast<unsigned int>(size);
     }
     return loadTexture;
 }
@@ -1638,7 +1584,7 @@ CCharaPcs::CLoadAnim* CCharaPcs::loadAnimBuffer(void* data, char* name, int keyT
     loadAnim->m_anim = anim;
     loadAnim->m_mergeFileId = mergeFileId;
     loadAnim->m_mergeFlags = mergeFlags;
-    LoadAnimArray(&CharaPcs)->Add(loadAnim);
+    CharaPcs.m_loadAnims.Add(loadAnim);
     return loadAnim;
 }
 
@@ -1665,7 +1611,7 @@ void CCharaPcs::drawOverlap()
     Mtx44 projectionMtx;
     Mtx identityMtx;
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
+    CameraPcs.GetViewMatrix(savedCameraMtx);
 
     C_MTXOrtho(projectionMtx, 0.0f, 448.0f, 0.0f, 640.0f, 10.0f, 100010.0f);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
@@ -1702,7 +1648,7 @@ void CCharaPcs::drawOverlap()
         GXPosition3f32(width, height, depth);
     }
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
+    CameraPcs.GetProjectionMatrix(projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 
     Vec up;
@@ -1710,7 +1656,7 @@ void CCharaPcs::drawOverlap()
     up.y = 1.0f;
     up.z = 0.0f;
     C_MTXLookAt(lookAtMtx, &m_overlapEyePos, &up, &m_overlapTargetPos);
-    PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+    CameraPcs.SetViewMatrix(lookAtMtx);
 
     InitEnv(0);
 
@@ -1787,9 +1733,9 @@ void CCharaPcs::drawOverlap()
         GXTexCoord2u16(0x280, 0x1C0);
     }
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
+    CameraPcs.GetProjectionMatrix(projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-    PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+    CameraPcs.SetViewMatrix(savedCameraMtx);
 }
 
 /*
@@ -1927,8 +1873,8 @@ void CCharaPcs::CHandle::ChangeTexture(
     BuildCharaBasePath(charaKind, charaNo, basePath);
 
     CLoadTexture* loadTexture;
-    for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
-        CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
+    for (unsigned int i = 0; i < static_cast<unsigned int>(CharaPcs.m_loadTextures.GetSize()); i++) {
+        CLoadTexture* it = CharaPcs.m_loadTextures[i];
         if (it->m_keyTag == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo &&
             static_cast<unsigned long>(it->m_variantTag) == textureVariant) {
             loadTexture = it;
@@ -1942,19 +1888,18 @@ foundTexture:
         if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
             File.LockBuffer();
             Memory.CopyFromAMemorySync(
-                File.m_readBuffer,
+                File.GetBuffer(),
                 reinterpret_cast<void*>(
                     loadTexture->m_streamOffset +
                     reinterpret_cast<unsigned int>(StageBase(CharaPcs.m_amemWorkStage))),
                 static_cast<unsigned long>(loadTexture->m_streamSize));
-            void* readBuffer = File.m_readBuffer;
-            loadTexture->m_textureSet = CharaPcs.createTextureSet(readBuffer, charaKind == 4);
+            loadTexture->m_textureSet = CharaPcs.createTextureSet(File.GetBuffer(), charaKind == 4);
             File.UnlockBuffer();
-        }
 
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf("Merge: \x1b[32mテクスチャをAMEMから読み込みました。type = %d number = %d tex = %d\n\x1b[0m", charaKind, static_cast<unsigned int>(charaNo),
-                          static_cast<int>(textureVariant));
+            if (System.GetErrorLevel() >= 3U) {
+                System.Printf("Merge: \x1b[32mテクスチャをAMEMから読み込みました。type = %d number = %d tex = %d\n\x1b[0m", charaKind, static_cast<unsigned int>(charaNo),
+                              static_cast<int>(textureVariant));
+            }
         }
 
         m_texLoadRef = loadTexture;
@@ -1963,7 +1908,7 @@ foundTexture:
         m_textureSet->AddRef();
         goto attach;
     } else {
-        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+        if (System.GetErrorLevel() >= 1U) {
             System.Printf("\x1b[31mMerge: テクスチャをDVDから読み込みました。type = %d number = %d tex = %d\n\x1b[0m", charaKind, static_cast<unsigned int>(charaNo),
                           static_cast<int>(textureVariant));
         }
@@ -1980,7 +1925,7 @@ foundTexture:
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
 
-            m_texLoadRef = CharaPcs.loadTexture(File.m_readBuffer, charaKind, charaNo, textureVariant, mergeFileId,
+            m_texLoadRef = CharaPcs.loadTexture(File.GetBuffer(), charaKind, charaNo, textureVariant, mergeFileId,
                                                 mergeFlags, 0, 0);
             File.Close(fileHandle);
 
@@ -1989,7 +1934,7 @@ foundTexture:
             m_textureSet->AddRef();
         } else {
             m_textureSet = 0;
-            if (charaKind != 5 && static_cast<unsigned int>(System.m_execParam) >= 2) {
+            if (charaKind != 5 && System.GetErrorLevel() >= 2U) {
                 System.Printf("テクスチャがありません。場合によってはハングするかもしれません。%s\n", path);
             }
         }
@@ -2023,16 +1968,7 @@ int CCharaPcs::CHandle::LoadModel(
     char path[0x100];
     BuildCharaBasePath(charaKind, charaNo, basePath);
 
-    CLoadModel* loadModel;
-    for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(&CharaPcs)->GetSize()); i++) {
-        CLoadModel* it = (*LoadModelArray(&CharaPcs))[i];
-        if (it->m_keyTag == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo) {
-            loadModel = it;
-            goto foundModel;
-        }
-    }
-    loadModel = 0;
-foundModel:
+    CLoadModel* loadModel = CharaPcs.searchModel(charaKind, static_cast<int>(charaNo));
 
     if (loadModel != 0) {
         m_modelLoadRef = loadModel;
@@ -2052,21 +1988,20 @@ foundModel:
             if (loadModel->m_streamMode != 0) {
                 File.LockBuffer();
                 Memory.CopyFromAMemorySync(
-                    File.m_readBuffer,
+                    File.GetBuffer(),
                     reinterpret_cast<void*>(
                         loadModel->m_streamOffset +
                         reinterpret_cast<unsigned int>(StageBase(CharaPcs.m_amemWorkStage))),
                     static_cast<unsigned long>(loadModel->m_streamSize));
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, "p_chara.cpp", 0x7C7) CChara::CModel;
-                void* amemBuffer = File.m_readBuffer;
-                model->Create(amemBuffer, GET_CHARA_ALLOC_STAGE_S(CharaPcs.GetCharaAllocStage(), CharaPcs.m_loadStages[modelStageIndex]));
+                model->Create(File.GetBuffer(), GET_CHARA_ALLOC_STAGE_S(CharaPcs.GetCharaAllocStage(), CharaPcs.m_loadStages[modelStageIndex]));
                 loadModel->m_model = model;
                 File.UnlockBuffer();
-            }
 
-            if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-                System.Printf("Merge: \x1b[32mモデルをAMEMから読み込みました。type = %d number = %d\n\x1b[0m", charaKind, static_cast<int>(charaNo));
+                if (System.GetErrorLevel() >= 3U) {
+                    System.Printf("Merge: \x1b[32mモデルをAMEMから読み込みました。type = %d number = %d\n\x1b[0m", charaKind, static_cast<int>(charaNo));
+                }
             }
 
             loadModel->AddRef();
@@ -2078,7 +2013,7 @@ foundModel:
             m_model = loadModel->m_model->Duplicate(GET_CHARA_ALLOC_STAGE_S(CharaPcs.GetCharaAllocStage(), CharaPcs.m_loadStages[modelStageIndex]));
         }
     } else {
-        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+        if (System.GetErrorLevel() >= 1U) {
             System.Printf("\x1b[31mMerge: モデルをDVDから読み込みました。type = %d number = %d\n\x1b[0m", charaKind, static_cast<int>(charaNo));
         }
 
@@ -2090,20 +2025,7 @@ foundModel:
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
 
-            void* readBuffer = File.m_readBuffer;
-            loadModel = new (CharaPcs.m_stage, "p_chara.cpp", 0x5E8) CLoadModel;
-            loadModel->m_keyTag = charaKind;
-            loadModel->m_keyId = static_cast<int>(charaNo);
-            loadModel->m_mergeFileId = mergeFileId;
-            loadModel->m_mergeFlags = mergeFlags;
-            LoadModelArray(&CharaPcs)->Add(loadModel);
-
-            CChara::CModel* model =
-                new (CharaPcs.m_stage, "p_chara.cpp", 0x5F1) CChara::CModel;
-            model->Create(readBuffer, HandleModelStage(charaKind, 0));
-            loadModel->m_model = model;
-
-            m_modelLoadRef = loadModel;
+            m_modelLoadRef = CharaPcs.loadModel(File.GetBuffer(), charaKind, static_cast<int>(charaNo), mergeFileId, mergeFlags, 0, 0);
             File.Close(fileHandle);
             m_modelLoadRef->AddRef();
             m_model = m_modelLoadRef->m_model;
@@ -2115,10 +2037,9 @@ foundModel:
             if (fileHandle != 0) {
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                void* dynamicsBuffer = File.m_readBuffer;
-                m_model->CreateDynamics(dynamicsBuffer, HandleModelStage(charaKind, 0));
+                m_model->CreateDynamics(File.GetBuffer(), HandleModelStage(charaKind, 0));
                 File.Close(fileHandle);
-                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                if (System.GetErrorLevel() >= 1U) {
                     System.Printf("\x1b[31mMerge: ダイナミクスをDVDから読み込みました。type = %d number = %d\n", charaKind, static_cast<int>(charaNo));
                 }
             }
@@ -2132,18 +2053,8 @@ foundModel:
         m_model->InitMogFurTex();
     }
 
-    if (static_cast<s32>(CurrentSceneId()) != 7 && charaKind == 1) {
-        CLoadPdt* loadPdt;
-        for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(&CharaPcs)->GetSize()); i++) {
-            CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[i];
-            if (it->m_keyTag == charaKind && it->m_keyId == static_cast<int>(charaNo) &&
-                it->m_variantTag == static_cast<int>(textureVariant)) {
-                loadPdt = it;
-                goto foundPdt;
-            }
-        }
-        loadPdt = 0;
-    foundPdt:
+    if (static_cast<s32>(Game.m_currentSceneId) != 7 && charaKind == 1) {
+        CLoadPdt* loadPdt = CharaPcs.searchPdt(charaKind, static_cast<int>(charaNo), static_cast<int>(textureVariant));
 
         if (loadPdt != 0) {
             m_pdtLoadRef = loadPdt;
@@ -2158,10 +2069,10 @@ foundModel:
             m_pdtLoadRef->m_mergeFlags = mergeFlags;
             m_pdtLoadRef->m_pdtSlot =
                 PartPcs.LoadMonsterPdt(static_cast<int>(charaNo), static_cast<int>(textureVariant), 0, 0, 0, 0);
-            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf("\x1b[31mMerge: モンスターPDTをDVDから読み込みました。type = %d number = %d idxTexture = %d\n\x1b[0m", charaKind, static_cast<int>(charaNo), static_cast<int>(textureVariant));
+            if (System.GetErrorLevel() >= 1U) {
+                System.Printf("\x1b[31mMerge: モンスターPDTをDVDから読み込みました。type = %d number = %d idxTexture = %d\n\x1b[0m", charaKind, static_cast<int>(charaNo), textureVariant);
             }
-            LoadPdtArray(&CharaPcs)->Add(m_pdtLoadRef);
+            CharaPcs.m_loadPdts.Add(m_pdtLoadRef);
             m_pdtLoadRef->AddRef();
         }
     }
@@ -2221,10 +2132,10 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int, int mer
         if (fileHandle != 0) {
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
-            loadAnimBuffer(File.m_readBuffer, animName, charaKind, charaNo, mergeFileId, mergeFlags);
+            loadAnimBuffer(File.GetBuffer(), animName, charaKind, charaNo, mergeFileId, mergeFlags);
             File.Close(fileHandle);
 
-            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            if (System.GetErrorLevel() >= 1U) {
                 System.Printf("\x1b[31mMerge: アニメーションをDVDから読み込みました。name = %s type = %d number = %d\n\x1b[0m", animName, charaKind, charaNo);
             }
         } else {
@@ -2249,7 +2160,7 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
         for (int i = 0; i < 64; i++) {
             ReleaseHandleAnimSlot(this, i);
         }
-        PruneUnsharedAnimRefs(&CharaPcs, 0);
+        CharaPcs.releaseUnuseLoadAnim(0, 0);
         return;
     }
 
@@ -2259,7 +2170,7 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
     }
 
     ReleaseSharedNonNull(m_animSlot[animIndex]);
-    PruneUnsharedAnimRefs(&CharaPcs, m_animSlot[animIndex]);
+    CharaPcs.releaseUnuseLoadAnim(m_animSlot[animIndex], 0);
     m_animSlot[animIndex] = 0;
 }
 
@@ -2310,7 +2221,7 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
         }
 
         if (anim == 0) {
-            if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) >= 2) {
+            if (m_charaKind != 3 && System.GetErrorLevel() >= 2U) {
                 System.Printf("アニメーションがありません。type=%d number=%d animno=%d\n", m_charaKind, m_charaNo, animIndex);
             }
             return 0;
@@ -2349,21 +2260,6 @@ void CCharaPcs::CHandle::Draw(int drawPass)
 		}
 		draw(drawPass, (4U - drawPass | drawPass - 4U) >> 0x1F);
 	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-static inline void GetCameraClipPlanes(float* nearOut, float* farOut)
-{
-    if (nearOut) {
-        *nearOut = CameraPcs.m_nearZ;
-    }
-    if (farOut) {
-        *farOut = CameraPcs.m_farZ;
-    }
 }
 
 /*
@@ -2440,7 +2336,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     Mtx viewMtx;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
+    CameraPcs.GetViewMatrix(viewMtx);
 
     if (drawPass == 3) {
         if ((m_flags & 4) != 0) {
@@ -2481,7 +2377,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         float nearZ;
         float farZ;
-        GetCameraClipPlanes(&nearZ, &farZ);
+        CameraPcs.GetClip(&nearZ, &farZ);
         CColor shadowFog;
         shadowFog.color.a = 0xFF;
         shadowFog.color.b = static_cast<unsigned char>(static_cast<int>(255.0f * shadowFade));
@@ -2500,7 +2396,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         _GXColor graphicFogColor;
         float nearZ;
         float farZ;
-        GetCameraClipPlanes(&nearZ, &farZ);
+        CameraPcs.GetClip(&nearZ, &farZ);
         graphicFogColor = Graphic.GetFogColor();
         Graphic.GetFogParam(fogStart, fogEnd);
 
@@ -2534,13 +2430,13 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
     } else {
         unsigned char charmFlag = 0;
+        unsigned char effectFlag = 0;
         if (drawPass == 3 && (m_flags & 0x0C) != 0) {
             charmFlag = 1;
         }
         const unsigned int drawFlags = m_flags;
         int modelDrawFlags = (charmFlag != 0) | (((drawFlags & 0x400) != 0) ? 2 : 0);
         modelDrawFlags |= ((drawFlags & 0x2000) != 0) ? 4 : 0;
-        unsigned char effectFlag = 0;
         if (drawPass == 3 && (drawFlags & 0x8000) != 0) {
             effectFlag = 1;
         }
@@ -2569,7 +2465,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
  */
 void CCharaPcs::CHandle::LoadModelASync(int charaKind, unsigned long charaNo, unsigned long textureVariant)
 {
-    if (static_cast<unsigned int>(System.m_execParam) >= 3)
+    if (System.GetErrorLevel() >= 3U)
     {
         System.Printf("非同期読み込みエントリー\n");
     }
@@ -2630,19 +2526,16 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     }
 
     if (m_asyncState == 2) {
-        void* readBuffer = File.m_readBuffer;
-        m_modelLoadRef = CharaPcs.loadModel(readBuffer, m_asyncCharaKind, m_asyncCharaNo, -1, 0, 0, 0);
+        m_modelLoadRef = CharaPcs.loadModel(File.GetBuffer(), m_asyncCharaKind, m_asyncCharaNo, -1, 0, 0, 0);
         m_modelLoadRef->AddRef();
         m_model = m_modelLoadRef->m_model;
         m_model->AddRef();
         m_charaKind = m_asyncCharaKind;
         m_charaNo = m_asyncCharaNo;
     } else if (m_asyncState == 4) {
-        void* readBuffer = File.m_readBuffer;
-        m_model->CreateDynamics(readBuffer, HandleModelStage(m_asyncCharaKind, 0));
+        m_model->CreateDynamics(File.GetBuffer(), HandleModelStage(m_asyncCharaKind, 0));
     } else {
-        void* readBuffer = File.m_readBuffer;
-        m_texLoadRef = CharaPcs.loadTexture(readBuffer, m_asyncCharaKind, m_asyncCharaNo, m_asyncTextureVariant, -1, 0, 0, 0);
+        m_texLoadRef = CharaPcs.loadTexture(File.GetBuffer(), m_asyncCharaKind, m_asyncCharaNo, m_asyncTextureVariant, -1, 0, 0, 0);
         m_texLoadRef->AddRef();
         m_textureSet = m_texLoadRef->m_textureSet;
         m_textureSet->AddRef();
@@ -2654,7 +2547,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     m_asyncFileHandle = 0;
     if (m_asyncState == 6) {
         m_asyncState = 7;
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf("非同期読み込み完了\n");
         }
     } else {
@@ -2693,7 +2586,7 @@ int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
 void CCharaPcs::CHandle::CancelLoadModelASync()
 {
     if (m_asyncFileHandle != 0) {
-        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+        if (System.GetErrorLevel() >= 2U) {
             System.Printf("モデル非同期読み込み中にキャンセルされました。\n");
         }
         File.Close(m_asyncFileHandle);

@@ -92,7 +92,7 @@ COMPLETE: Dict[str, List[str]] = {
         "crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a",
         "main/main", "main/xfer", "main/link", "main/text", "main/obj", "main/mode", "main/widget",
         "main/artifact", "main/cmake", "main/cmdlist", "main/equip", "main/family", "main/item", "main/letter", "main/menu",
-        "main/radar", "main/gil", "main/scouter", "main/session", "main/smith", "main/favorite",
+        "main/radar", "main/radarmap", "main/gil", "main/scouter", "main/session", "main/smith", "main/favorite",
         "main/tmpartifact", "main/msg", "main/textmask", "main/msg_sys", "main/msg_item",
         "main/msg_monster", "main/backdrop_gfx", "main/m4a_tables", "main/sound_assets",
         "main/sound_data", "main/sound_assets_2", "main/backdrop", "main/font_gfx",
@@ -481,6 +481,10 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                         "progress_categories": [category],
                     },
                 }
+                if unit == "bss":
+                    # These fallback ranges are disconnected in the image.
+                    # Combining them adds synthetic alignment bytes to progress.
+                    unit_config["options"] = {"combine_data_sections": False}
                 if unit in bases:
                     objects.append(comparison_bases[unit])
                     unit_config["base_path"] = comparison_bases[unit]

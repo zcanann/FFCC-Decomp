@@ -274,6 +274,7 @@ public:
     void ClampStatus(short&, unsigned short&);
     void CalcStatus();
     int CanPlayerUseItem();
+    int IsUseItem() { return 1; }
     void ValidCmdList(int);
     int GetIdxCmdList();
     int GetNumCmdList() { return m_numCmdListSlots; }

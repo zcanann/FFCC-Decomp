@@ -123,7 +123,6 @@ void Radar_DrawMap(void)
     u16 out[24];
     u16 line[256];
     u16 *data;
-    u16 *src;
     s16 x;
     s16 y;
     s16 tx;
@@ -168,15 +167,14 @@ void Radar_DrawMap(void)
     for (i = -1; i <= 16; i++) {
         if (i + ty >= 0 && i + ty < mapH) {
             n = 0;
-            src = data;
-            for (k = 0; k < sMapRowLen[i + ty]; src++, k++) {
-                if (*src & 0x8000) {
-                    cnt = *src & 0x3FF;
-                    v = (*src >> 10) & 3;
+            for (m = 0; m < sMapRowLen[i + ty]; m++) {
+                if (data[m] & 0x8000) {
+                    cnt = data[m] & 0x3FF;
+                    v = (data[m] >> 10) & 3;
                     for (; cnt != 0; cnt--)
                         line[n++] = v | 0x1000;
                 } else {
-                    line[n++] = *src;
+                    line[n++] = data[m];
                 }
             }
             data += sMapRowLen[i + ty];

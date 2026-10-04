@@ -94,7 +94,7 @@ void LetterScreen_Setup(void)
 {
     DmaClear32(0, 0, gWindows, sizeof(struct Window) * 5);
     Xfer_ClearLetterData();
-    Link_SendRequest(3, 0);
+    Link_SendRequest(REQ_LETTER_LIST, 0);
     sLetterPollTimer = 0;
     Text_SetFill(1, 0);
     Text_Clear();
@@ -271,7 +271,7 @@ s32 LetterList_Main(void)
     s32 ret;
 
     if (gNewLetter) {
-        Link_SendRequest(3, 0);
+        Link_SendRequest(REQ_LETTER_LIST, 0);
         DmaClear16(0, 0x3FF, 0x0600E800, 0x800);
         gNewLetter = 0;
         sLetterRow = 0;
@@ -298,7 +298,7 @@ s32 LetterList_Main(void)
         if (sLetterRow)
             LetterList_DrawIcons();
         if (++sLetterPollTimer >= 300) {
-            Link_SendRequest(3, 0);
+            Link_SendRequest(REQ_LETTER_LIST, 0);
             sLetterPollTimer = 0;
         }
         return 0;
@@ -409,7 +409,7 @@ s32 LetterRead_Main(void)
             return 1;
         }
         if (++sLetterPollTimer >= 60) {
-            Link_SendRequest(2, sLetterSel);
+            Link_SendRequest(REQ_LETTER, sLetterSel);
             sLetterPollTimer = 0;
         }
         return 0;
@@ -981,7 +981,7 @@ s32 LetterTake_Main(void)
             if (!(gKeysRepeat & (DPAD_UP | DPAD_DOWN))) {
                 if (gKeysNew & A_BUTTON) {
                     if (win->cursor == 1) {
-                        if (Link_SendEvent(0, sLetterSel, 0) == 0) {
+                        if (Link_SendEvent(EVT_TAKE_ATTACHMENT, sLetterSel, 0) == 0) {
                             sLetterResult = 1;
                             Reply_Clear();
                             gReplyWaiting = 1;
@@ -1595,7 +1595,7 @@ s32 LetterList_HandleInput(void)
             sel = win->cursor + sLetterTop;
             if (sel < list->count) {
                 sLetterSel = sel;
-                Link_SendRequest(2, sel);
+                Link_SendRequest(REQ_LETTER, sel);
                 ret = 1;
                 m4aSongNumStart(2);
             } else {

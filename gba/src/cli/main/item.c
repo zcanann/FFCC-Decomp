@@ -310,11 +310,11 @@ void ItemScreen_HandleInput(void)
                 if (idx < 0)
                     idx += 64;
                 if (win->cursor == 0)
-                    Link_SendItemOp(1, idx, 0);
+                    Link_SendItemOp(ITEM_OP_USE, idx, 0);
                 else if (win->cursor == 1)
-                    Link_SendItemOp(2, idx, 0);
+                    Link_SendItemOp(ITEM_OP_PUT, idx, 0);
                 else
-                    Link_SendItemOp(3, idx, 0);
+                    Link_SendItemOp(ITEM_OP_DISCARD, idx, 0);
                 gInputLockFrames = 6;
             }
             gSubState++;

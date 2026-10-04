@@ -52,7 +52,7 @@ void ArtifactScreen_Setup(void)
     HelpWin_Clear(1, 1);
     HelpWin_DrawFrame(1, 1, 8);
     gDataFlags &= ~DATA_ARTIFACTS;
-    Link_SendRequest(9, 0);
+    Link_SendRequest(REQ_ARTIFACTS, 0);
     sArtifactLoaded = 0;
     sArtifactPollTimer = 0;
     gScreenInitDone = 1;
@@ -108,7 +108,7 @@ s32 ArtifactScreen_Main(void)
             return ret;
         }
         if (++sArtifactPollTimer >= 60) {
-            Link_SendRequest(9, 0);
+            Link_SendRequest(REQ_ARTIFACTS, 0);
             sArtifactPollTimer = 0;
         }
         return 0;

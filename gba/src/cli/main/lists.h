@@ -11,7 +11,7 @@ struct ItemInfo {
     u16 flags;
     u16 count;
     u16 kind;
-    u16 unk6;
+    u16 pad;
 };
 
 /* Letter list (bulk type 3): header, entries, subjects (24 bytes), senders (16). */

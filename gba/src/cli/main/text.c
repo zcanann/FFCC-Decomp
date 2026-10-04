@@ -4,9 +4,11 @@
 
 /* 2bpp proportional font; offsets are relative to the start of the font. */
 struct Font {
-    u8 unk0[10];
+    u32 magic;      /* "PCD " */
+    u32 version;    /* "0.50" */
+    u16 count;      /* glyphs in map */
     u16 split;      /* glyphs from here on use the second bit plane */
-    u32 unkC;
+    u32 paletteCount;
     u32 widths;
     u32 palettes;
     u16 glyphWidth;
@@ -19,12 +21,11 @@ struct Font {
 
 /* Text background patterns and palettes; offsets are relative to the start. */
 struct TextGfx {
-    u32 unk0;
-    u32 unk4;
-    u32 unk8;
+    u32 magic;      /* "FBD " */
+    u32 version;    /* "0.10" */
+    u32 count;      /* fill patterns, and palettes */
     u32 fills;
-    u32 unk10;
-    u32 unk14;
+    u16 palettes[1][16];
 };
 
 extern struct Font gFont;

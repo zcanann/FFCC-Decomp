@@ -104,19 +104,20 @@ s32 Xfer_Receive(u32 packet, u8 *out)
     if (kind == 0) {
         if (sBulkXfer.step == 0) {
             sBulkXfer.type = pkt->arg;
-            if (sBulkXfer.type == 3 || sBulkXfer.type == 6 || sBulkXfer.type == 7
-                || sBulkXfer.type == 8 || sBulkXfer.type == 9) {
+            if (sBulkXfer.type == XFER_LETTER_LIST || sBulkXfer.type == XFER_SELL_LIST
+                || sBulkXfer.type == XFER_BUY_LIST || sBulkXfer.type == XFER_SMITH_LIST
+                || sBulkXfer.type == XFER_ARTIFACTS) {
                 sBulkXfer.cur = sBulkXfer.base = LIST_BUF;
-            } else if (sBulkXfer.type == 2) {
+            } else if (sBulkXfer.type == XFER_LETTER) {
                 sBulkXfer.cur = sBulkXfer.base = DETAIL_BUF;
             }
-            if (sBulkXfer.type == 6) {
+            if (sBulkXfer.type == XFER_SELL_LIST) {
                 gDataFlags &= ~DATA_SELL_LIST;
-            } else if (sBulkXfer.type == 7) {
+            } else if (sBulkXfer.type == XFER_BUY_LIST) {
                 gDataFlags &= ~DATA_BUY_LIST;
-            } else if (sBulkXfer.type == 8) {
+            } else if (sBulkXfer.type == XFER_SMITH_LIST) {
                 gDataFlags &= ~DATA_SMITH_LIST;
-            } else if (sBulkXfer.type == 9) {
+            } else if (sBulkXfer.type == XFER_ARTIFACTS) {
                 gDataFlags &= ~DATA_ARTIFACTS;
             } else {
                 gDataFlags &= ~(1 << sBulkXfer.type);
@@ -164,24 +165,24 @@ s32 Xfer_Receive(u32 packet, u8 *out)
             if (sBulkXfer.index + 1 >= sBulkXfer.count) {
                 gXferActive = 0;
                 Header_Clear();
-                if (sBulkXfer.type == 6) {
+                if (sBulkXfer.type == XFER_SELL_LIST) {
                     gDataFlags |= DATA_SELL_LIST;
-                } else if (sBulkXfer.type == 7) {
+                } else if (sBulkXfer.type == XFER_BUY_LIST) {
                     gDataFlags |= DATA_BUY_LIST;
-                } else if (sBulkXfer.type == 8) {
+                } else if (sBulkXfer.type == XFER_SMITH_LIST) {
                     gDataFlags |= DATA_SMITH_LIST;
-                } else if (sBulkXfer.type == 9) {
+                } else if (sBulkXfer.type == XFER_ARTIFACTS) {
                     gDataFlags |= DATA_ARTIFACTS;
                 } else {
                     gDataFlags |= DATA_OBJ << sBulkXfer.type;
                 }
-                if (sBulkXfer.type == 0) {
+                if (sBulkXfer.type == XFER_OBJ) {
                     Obj_Init();
-                } else if (sBulkXfer.type == 1) {
-                    if (gScreen == 0) {
+                } else if (sBulkXfer.type == XFER_MAP) {
+                    if (gScreen == SCREEN_RADAR) {
                         Screen_Reset();
                     }
-                } else if (sBulkXfer.type == 3) {
+                } else if (sBulkXfer.type == XFER_LETTER_LIST) {
                     gNewLetter = 0;
                 }
             }
@@ -203,11 +204,11 @@ u8 map;
     gDataFlags &= ~DATA_BASE_POS;
     Scouter_SetDirty(0);
     Header_Clear();
-    if (sStageNo.area != (s8)area && gScreen != 0) {
+    if (sStageNo.area != (s8)area && gScreen != SCREEN_RADAR) {
         if (gWasConnected) {
-            gScreen = 0;
+            gScreen = SCREEN_RADAR;
         } else {
-            gSavedScreen = 0;
+            gSavedScreen = SCREEN_RADAR;
         }
     }
     Bg_SetBlend(0);
@@ -220,7 +221,7 @@ u8 map;
         sStageNo.area = area;
         sStageNo.map = map;
         gDataFlags &= ~DATA_MAP;
-        sXferCrc[1] = 0;
+        sXferCrc[XFER_MAP] = 0;
         gStaticMap = 0;
         for (i = 0; table[i][0] >= 0; i++) {
             if ((s8)area == table[i][0] && (s8)map == table[i][1]) {
@@ -279,9 +280,9 @@ struct BulkXfer *Xfer_GetWork(void)
 void Xfer_ClearLetterData(void)
 {
     gDataFlags &= ~DATA_LETTER_LIST;
-    sXferCrc[3] = 0;
+    sXferCrc[XFER_LETTER_LIST] = 0;
     gDataFlags &= ~DATA_LETTER;
-    sXferCrc[2] = 0;
+    sXferCrc[XFER_LETTER] = 0;
 }
 
 void Xfer_OnError(void)

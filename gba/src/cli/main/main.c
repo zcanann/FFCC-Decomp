@@ -148,13 +148,13 @@ void AgbMain(void)
                 m4aMPlayAllStop();
                 Bg_SetBlend(0);
                 REG_DISPCNT = 0x9F40;
-                gScreen = 0;
+                gScreen = SCREEN_RADAR;
                 Bg_ClearMaps();
                 Screen_Reset();
                 gMode = MODE_FIELD;
-                gSavedScreen = 0;
-                gMsgScreenId = 4;
-                gScreen = 13;
+                gSavedScreen = SCREEN_RADAR;
+                gMsgScreenId = NOTICE_WAITING;
+                gScreen = SCREEN_WAITING;
             }
             Bg_LoadBackdrop(gSession.appearance & 3);
             gWasConnected = value;
@@ -331,7 +331,7 @@ void Bg_CopyBackdropToRadar(void)
 
 void Bg_ClearMaps(void)
 {
-    if (Link_IsConnected() || gScreen != 13) {
+    if (Link_IsConnected() || gScreen != SCREEN_WAITING) {
         DmaClear16(0, 0x3FF, 0x0600E000, 0x800);
         DmaClear16(0, 0x3FF, 0x0600E800, 0x800);
         DmaClear16(0, 0x2FF, 0x0600F000, 0x800);

@@ -119,7 +119,7 @@ void CMakeNameScreen_Setup(void)
         gWindows[1].items[i].text = Msg_GetSystem(0);
     }
     gWindows[4].items[0].enabled = 1;
-    gWindows[4].items[0].text = Msg_GetNotice(0);
+    gWindows[4].items[0].text = Msg_GetNotice(NOTICE_NAME_TAKEN);
 
     MsgBox_Layout();
     Text_SetFill(1, 0);
@@ -801,7 +801,7 @@ void CMakeLookScreen_Setup(void)
     gWindows[0].cursor = gCMakeData.look & 3;
     gWindows[1].cursor = (gCMakeData.look >> 2) & 3;
     gWindows[4].items[0].enabled = 1;
-    gWindows[4].items[0].text = Msg_GetNotice(1);
+    gWindows[4].items[0].text = Msg_GetNotice(NOTICE_LOOK_TAKEN);
     MsgBox_Layout();
     sCMakeResult = 0;
     sCMakeWaiting = 0;
@@ -1791,7 +1791,7 @@ void CMakeJobScreen_Setup(void)
         gWindows->items[i].text = Msg_GetSystem(0);
     }
     gWindows[4].items[0].enabled = 1;
-    gWindows[4].items[0].text = Msg_GetNotice(2);
+    gWindows[4].items[0].text = Msg_GetNotice(NOTICE_JOB_TAKEN);
     MsgBox_Layout();
     gWindows->cursor = gCMakeData.job[0];
 

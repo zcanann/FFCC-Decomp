@@ -5,15 +5,15 @@
 
 /* Header of a downloaded background image (the radar map is one). */
 struct BgHeader {
-    u32 unk0;
-    u32 unk4;
+    u32 magic;      /* "MCD " for a radar map */
+    u32 version;
     u32 tileOffset;
     u32 mapOffset;
     u32 unk10;
     u16 width;
     u16 height;
     u32 unk18;
-    u32 unk1C;
+    u32 mapSize;    /* bytes of run-length map rows */
     u16 palette[16];
 };
 
@@ -55,6 +55,12 @@ struct ScouterInfo {
     s16 maxHp;
     s16 dropItem;
 };
+
+/* gRadarType: each player's role, assigned by the GameCube */
+#define RADAR_MAP      0 /* map and map objects */
+#define RADAR_MONSTER  1 /* enemies */
+#define RADAR_SCOUTER  2 /* enemy details instead of the radar screen */
+#define RADAR_TREASURE 3 /* enemies and treasures */
 
 extern struct Marker gEnemyMarkers[64];
 extern struct Marker gTreasureMarkers[16];

@@ -15,7 +15,7 @@ struct LinkWork {
     vu8 firstReset : 8;
     u8 resetCount;      /* JOY resets in quick succession */
     u8 resetGap;        /* other JOY interrupts since the last reset */
-    u8 unk7;
+    u8 pad;
     vu32 idleWord;      /* word presented to the GameCube before the handshake */
     u32 gameCode;
     u32 idleCode;
@@ -205,8 +205,8 @@ void Link_Reset(void)
     for (i = 0; i < 3; i++)
         sPartyPosIn[i] = 0;
     gDataFlags &= ~(DATA_LETTER | DATA_LETTER_LIST);
-    gMsgScreenId = 4;
-    gScreen = 13;
+    gMsgScreenId = NOTICE_WAITING;
+    gScreen = SCREEN_WAITING;
     gLetterAttachKind = 0;
     sGilIn = 0;
     sGilOp = 0;
@@ -258,7 +258,7 @@ s32 Link_Recv(u32 data)
         if (sLinkWork.step == 2) {
             sLinkWork.gameCode = data;
             p = (u8 *)&pkt;
-            p[0] = 1;
+            p[0] = LINK_CONTEXT;
             p[1] = (sLinkWork.bootMode << 6) | (sLinkWork.multiboot << 4) | sLinkWork.playerNo;
             p[2] = 0;
             p[3] = 0;
@@ -325,7 +325,7 @@ void Link_SendPad(u16 keys)
     REG_IE = 0;
     pkt = 0;
     p = (u8 *)&pkt;
-    p[0] = 4;
+    p[0] = LINK_PAD;
     p[1] = ((u8 *)&keys)[0];
     p[2] = ((u8 *)&keys)[1];
     Link_Write(pkt);
@@ -342,8 +342,8 @@ u8 screen;
     REG_IE = 0;
     pkt = 0;
     p = (u8 *)&pkt;
-    p[0] = 14;
-    p[1] = 0;
+    p[0] = LINK_STATE;
+    p[1] = STATE_SCREEN;
     p[2] = screen;
     Link_Write(pkt);
     REG_IE = ie;
@@ -454,21 +454,21 @@ void Link_ProcessRecv(void)
 restart:
     for (i = sRxDone; i < sRxCount; i++) {
         msg = (u8 *)&sRxBuf[i];
-        if ((msg[0] & 0x3F) == 8) {
+        if ((msg[0] & LINK_CMD_MASK) == LINK_FLUSH) {
             for (k = 0; k < sRxCount - (1 + i); k++)
                 sRxBuf[k] = sRxBuf[k + i + 1];
             sRxCount = sRxCount - (1 + i);
             sRxDone = 0;
             goto restart;
-        } else if ((msg[0] & 0x3F) == 9) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_CTRL_MODE) {
             if (gMode == MODE_FIELD)
                 gMenuHasInput = msg[1];
-        } else if ((msg[0] & 0x3F) == 10) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_START) {
             if (msg[1] != 0)
                 gLinkStarted = 1;
             else
                 gLinkStarted = 0;
-        } else if ((msg[0] & 0x3F) == 5) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_MESSAGE) {
             v = msg[0] & 0xC0;
             if (v == 0) {
                 memset(&sMsgXfer, 0, sizeof(sMsgXfer));
@@ -490,7 +490,7 @@ restart:
                 sMsgXfer.count++;
                 if (sMsgXfer.pos + 3 > sizeof(sMsgXfer.data)) {
                     p = (u8 *)&pkt;
-                    p[0] = 7;
+                    p[0] = LINK_NAK;
                     p[1] = 0;
                     if (Link_Write(pkt) != 0) {
                         sMsgXfer.pending = pkt;
@@ -507,7 +507,7 @@ restart:
                     if (sMsgXfer.crc != sum
                         || sMsgXfer.size > sMsgXfer.pos) {
                         p = (u8 *)&pkt;
-                        p[0] = 7;
+                        p[0] = LINK_NAK;
                         p[1] = 0;
                         if (Link_Write(pkt) != 0) {
                             sMsgXfer.pending = pkt;
@@ -516,7 +516,7 @@ restart:
                     } else {
                         pkt = 0;
                         p = (u8 *)&pkt;
-                        p[0] = 6;
+                        p[0] = LINK_ACK;
                         p[1] = 0;
                         if (Link_Write(pkt) != 0) {
                             sMsgXfer.pending = pkt;
@@ -529,23 +529,23 @@ restart:
             } else {
                 pkt = 0;
                 p = (u8 *)&pkt;
-                p[0] = 7;
+                p[0] = LINK_NAK;
                 p[1] = 0xFF;
                 if (Link_Write(pkt) != 0) {
                     sMsgXfer.pending = pkt;
                     goto resend;
                 }
             }
-        } else if ((msg[0] & 0x3F) == 13) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_CHECK_CRC) {
             gXferActive = 0;
             if (Xfer_CheckCrc(*(u32 *)msg) != 0) {
                 p = (u8 *)&pkt;
-                p[0] = 7;
+                p[0] = LINK_NAK;
                 p[1] = 3;
                 ret = Link_Write(pkt);
             } else {
                 p = (u8 *)&pkt;
-                p[0] = 6;
+                p[0] = LINK_ACK;
                 p[1] = 3;
                 ret = Link_Write(pkt);
             }
@@ -553,44 +553,44 @@ restart:
                 sMsgXfer.pending = pkt;
                 goto resend;
             }
-        } else if ((msg[0] & 0x3F) == 11) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_DATA) {
             ret = Xfer_Receive(*(u32 *)msg, &result);
             if (ret != 0) {
                 p = (u8 *)&pkt;
                 pkt = 0;
                 if (ret < 0)
-                    p[0] = 7;
+                    p[0] = LINK_NAK;
                 else
-                    p[0] = 6;
+                    p[0] = LINK_ACK;
                 p[1] = result;
                 if (Link_Write(pkt) != 0) {
                     sMsgXfer.pending = pkt;
                     goto resend;
                 }
             }
-        } else if ((msg[0] & 0x3F) == 14) {
-            if (msg[1] == 1) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_STATE) {
+            if (msg[1] == STATE_MAP) {
                 sGilIn = 0;
                 sGilOp = 0;
                 sGilUnused = 0;
                 gXferActive = 0;
                 Map_SetStage((s8)msg[2], (s8)msg[3]);
             }
-        } else if ((msg[0] & 0x3F) == 15) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_BASE_POS) {
             sBasePosIn[msg[0] >> 6] = *(u16 *)&msg[2];
             if (msg[0] & 0xC0)
                 Radar_SetBasePos((s16)sBasePosIn[0], (s16)sBasePosIn[1]);
-        } else if ((msg[0] & 0x3F) == 16) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_CANCEL) {
             gXferActive = 0;
             memset(&sMsgXfer, 0, sizeof(sMsgXfer));
             Header_Clear();
-        } else if ((msg[0] & 0x3F) == 8) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_FLUSH) {
             memset(&sMsgXfer, 0, sizeof(sMsgXfer));
-        } else if ((msg[0] & 0x3F) == 17) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_PARTY_POS) {
             n = msg[0] >> 6;
             if (n != 0 && n - 1 != (s8)sPartyPosSeq) {
                 p = (u8 *)&pkt;
-                p[0] = 7;
+                p[0] = LINK_NAK;
                 p[1] = 0xFF;
                 if (Link_Write(pkt) != 0) {
                     sMsgXfer.pending = pkt;
@@ -601,51 +601,51 @@ restart:
             sPartyPosIn[n] = sRxBuf[i];
             if (n == 2)
                 Radar_OnPartyPos((s8 *)sPartyPosIn);
-        } else if ((msg[0] & 0x3F) == 18) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_ENEMY_POS) {
             Radar_OnEnemyPos((s8 *)&sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 33) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_TREASURE_POS) {
             Radar_OnTreasurePos((s8 *)&sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 19) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_PARTY_HP) {
             Session_OnPartyHp((s8 *)&sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 12) {
-            if (msg[1] == 14 && msg[2] == 0)
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_REQUEST) {
+            if (msg[1] == REQ_STATE && msg[2] == STATE_SCREEN)
                 Link_SendScreenId((s8)gScreen);
-        } else if ((msg[0] & 0x3F) == 6) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_ACK) {
             Reply_Set(0);
-        } else if ((msg[0] & 0x3F) == 7) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_NAK) {
             Reply_Set(-1);
-        } else if ((msg[0] & 0x3F) == 22) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_MAPOBJ_FLAGS) {
             Radar_OnMapObjDrawFlags((u8 *)&sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 20) {
-            if (msg[1] == 1) {
-                if (gScreen == 9) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_EVENT) {
+            if (msg[1] == EVT_ADD_LETTER) {
+                if (gScreen == SCREEN_LETTERS) {
                     gNewLetter = 1;
                     gDataFlags &= ~DATA_LETTER_LIST;
                 }
-            } else if (msg[1] == 12) {
+            } else if (msg[1] == EVT_USE_ITEM) {
                 Session_OnUseItem(sRxBuf[i]);
-            } else if (msg[1] == 13) {
+            } else if (msg[1] == EVT_RADAR_TYPE) {
                 Radar_OnType(sRxBuf[i]);
-            } else if (msg[1] == 14) {
+            } else if (msg[1] == EVT_RADAR_MODE) {
                 Radar_OnMode(sRxBuf[i]);
-            } else if (msg[1] == 15) {
+            } else if (msg[1] == EVT_OPEN_MENU) {
                 Menu_OnOpen(sRxBuf[i]);
-            } else if (msg[1] == 16) {
+            } else if (msg[1] == EVT_ITEM_USE_FLAGS) {
                 Session_OnItemUseFlags(sRxBuf[i]);
-            } else if (msg[1] == 17) {
+            } else if (msg[1] == EVT_SP_MODE) {
                 Session_OnSpMode(sRxBuf[i]);
-            } else if (msg[1] == 18) {
+            } else if (msg[1] == EVT_CMD_NUM) {
                 Session_OnCmdNum(sRxBuf[i]);
-            } else if (msg[1] == 19) {
+            } else if (msg[1] == EVT_MEMORIES) {
                 Session_OnMemories(sRxBuf[i]);
-            } else if (msg[1] == 20) {
+            } else if (msg[1] == EVT_START_BONUS) {
                 Session_OnStartBonus();
-            } else if (msg[1] == 22) {
+            } else if (msg[1] == EVT_LANGUAGE) {
                 Session_OnLanguage(sRxBuf[i]);
             }
-        } else if ((msg[0] & 0x3F) == 23) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_ITEM) {
             Session_OnItemChange(sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 26) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_GIL) {
             if ((msg[0] >> 6) == 0) {
                 sGilOp = msg[1] | 0x80;
                 sGilIn = msg[2] << 24;
@@ -653,7 +653,7 @@ restart:
             } else {
                 v = sGilOp;
                 if (sGilOp == 0) {
-                    if (Link_SendEvent(21, 0, 0) != 0) {
+                    if (Link_SendEvent(EVT_GIL_RESEND, 0, 0) != 0) {
                         sMsgXfer.pending = pkt;
                         goto resend;
                     }
@@ -668,27 +668,27 @@ restart:
                 sGilOp = 0;
                 sGilIn = 0;
             }
-        } else if ((msg[0] & 0x3F) == 24) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_MASK) {
             Session_OnMask(*(struct JoyBytes *)&sRxBuf[i]);
             pkt = 0;
             p = (u8 *)&pkt;
-            p[0] = 6;
-            p[1] = 24;
+            p[0] = LINK_ACK;
+            p[1] = LINK_MASK;
             if (Link_Write(pkt) != 0) {
                 sMsgXfer.pending = pkt;
                 goto resend;
             }
-        } else if ((msg[0] & 0x3F) == 27) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_MODE) {
             Mode_OnSet(sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 25) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_STRENGTH) {
             Session_OnStrength(sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 30) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_EQUIP_SLOT) {
             Session_OnEquipSlot(sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 31) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_CMD_SLOT) {
             Session_OnCmdSlot(sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 32) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_TMP_ARTIFACT) {
             Session_OnTmpArtifact(sRxBuf[i]);
-        } else if ((msg[0] & 0x3F) == 34) {
+        } else if ((msg[0] & LINK_CMD_MASK) == LINK_HIT_ENEMY) {
             Scouter_OnHitEnemy(sRxBuf[i]);
         }
     }
@@ -710,29 +710,29 @@ void Link_DispatchMessage(void)
 {
     struct MsgXfer *cmd = &sMsgXfer;
 
-    if (cmd->data[0] == 1)
+    if (cmd->data[0] == MSG_PLAYER_STAT)
         Session_OnPlayerStat(&cmd->data[1]);
-    else if (cmd->data[0] == 3)
+    else if (cmd->data[0] == MSG_MAP_OBJ)
         Radar_OnMapObj(&cmd->data[1]);
-    else if (cmd->data[0] == 2)
+    else if (cmd->data[0] == MSG_ITEM_ALL)
         Session_OnItemAll(&cmd->data[1]);
-    else if (cmd->data[0] == 4)
+    else if (cmd->data[0] == MSG_FAVORITE)
         Session_OnFavorite(&cmd->data[1]);
-    else if (cmd->data[0] == 5)
+    else if (cmd->data[0] == MSG_COMPATIBILITY)
         Session_OnCompatibility(&cmd->data[1]);
-    else if (cmd->data[0] == 6)
+    else if (cmd->data[0] == MSG_EQUIP_LIST)
         Session_OnEquipList(&cmd->data[1]);
-    else if (cmd->data[0] == 7)
+    else if (cmd->data[0] == MSG_BONUS_STR)
         Session_OnBonusStr(&cmd->data[1]);
-    else if (cmd->data[0] == 8)
+    else if (cmd->data[0] == MSG_ARTIFACTS)
         Session_OnArtifacts(&cmd->data[1]);
-    else if (cmd->data[0] == 9)
+    else if (cmd->data[0] == MSG_TMP_ARTIFACTS)
         Session_OnTmpArtifacts(&cmd->data[1]);
-    else if (cmd->data[0] == 10)
+    else if (cmd->data[0] == MSG_MARKER_KINDS)
         Radar_OnMarkerKinds(&cmd->data[1]);
-    else if (cmd->data[0] == 11)
+    else if (cmd->data[0] == MSG_SCOUTER_INFO)
         Scouter_OnInfo(&cmd->data[1]);
-    else if (cmd->data[0] == 12)
+    else if (cmd->data[0] == MSG_CMD_LIST)
         Session_OnCmdList(&cmd->data[1]);
 }
 
@@ -741,38 +741,38 @@ s32 Link_GetPlayerNo(void)
     return sLinkWork.playerNo;
 }
 
-s32 Link_SendRequest(u8 a, u8 b)
+s32 Link_SendRequest(u8 type, u8 arg)
 {
     u32 packet;
     u8 *p;
 
     packet = 0;
     p = (u8 *)&packet;
-    p[0] = 12;
-    p[1] = a;
-    p[2] = b;
+    p[0] = LINK_REQUEST;
+    p[1] = type;
+    p[2] = arg;
     return Link_Write(packet);
 }
 
-s32 Link_SendEvent(u8 a, u8 b, u8 c)
+s32 Link_SendEvent(u8 sub, u8 a, u8 b)
 {
     u32 packet;
     u8 *p;
 
     packet = 0;
     p = (u8 *)&packet;
-    p[0] = 20;
-    p[1] = a;
-    p[2] = b;
-    p[3] = c;
+    p[0] = LINK_EVENT;
+    p[1] = sub;
+    p[2] = a;
+    p[3] = b;
     return Link_Write(packet);
 }
 
-s32 Link_SendLetterReply(a, b, c, d)
-u8 a;
-u8 b;
-u8 c;
-u32 d;
+s32 Link_SendLetterReply(letter, answer, isGil, value)
+u8 letter;
+u8 answer;
+u8 isGil;
+u32 value;
 {
     u8 buf[9];
     u16 crc;
@@ -784,18 +784,18 @@ u32 d;
     for (i = 0; i < 9; i++)
         buf[i] = 0;
     i = 0;
-    buf[i++] = a;
-    buf[i++] = b;
-    buf[i++] = c;
-    buf[i++] = d >> 24;
-    buf[i++] = d >> 16;
-    buf[i++] = d >> 8;
-    buf[i++] = d;
+    buf[i++] = letter;
+    buf[i++] = answer;
+    buf[i++] = isGil;
+    buf[i++] = value >> 24;
+    buf[i++] = value >> 16;
+    buf[i++] = value >> 8;
+    buf[i++] = value;
     crc = 0xFFFF;
     sum = Crc16(7, buf, &crc);
     packet = 0;
     p = (u8 *)&packet;
-    p[0] = 21;
+    p[0] = LINK_LETTER_REPLY;
     p[1] = sum >> 8;
     p[2] = sum;
     i = 0;
@@ -803,48 +803,48 @@ u32 d;
     if (Link_Write(packet) != 0)
         return -1;
     packet = 0;
-    p[0] = 0x55;
+    p[0] = LINK_LETTER_REPLY | LINK_KIND_SECOND;
     p[1] = buf[i++];
     p[2] = buf[i++];
     p[3] = buf[i++];
     if (Link_Write(packet) != 0)
         return -1;
     packet = 0;
-    p[0] = 0x95;
+    p[0] = LINK_LETTER_REPLY | LINK_KIND_DATA;
     p[1] = buf[i++];
     p[2] = buf[i++];
     p[3] = buf[i++];
     return Link_Write(packet);
 }
 
-void Link_SendItemOp(u8 a, u8 b, u8 c)
+void Link_SendItemOp(u8 op, u8 slot, u8 arg)
 {
     u32 packet;
     u8 *p = (u8 *)&packet;
 
-    p[0] = 23;
-    p[1] = a;
-    p[2] = b;
-    p[3] = c;
+    p[0] = LINK_ITEM;
+    p[1] = op;
+    p[2] = slot;
+    p[3] = arg;
     while (Link_Write(packet) != 0)
         ;
 }
 
-void Link_SendGil(u8 a, u32 b)
+void Link_SendGil(u8 op, u32 gil)
 {
     u32 packet;
     u8 *p = (u8 *)&packet;
 
-    p[0] = 26;
-    p[1] = a;
-    p[2] = b >> 24;
-    p[3] = b >> 16;
+    p[0] = LINK_GIL;
+    p[1] = op;
+    p[2] = gil >> 24;
+    p[3] = gil >> 16;
     while (Link_Write(packet) != 0)
         ;
     packet = 0;
-    p[0] = 0x5A;
-    p[1] = b >> 8;
-    p[2] = b;
+    p[0] = LINK_GIL | LINK_KIND_SECOND;
+    p[1] = gil >> 8;
+    p[2] = gil;
     while (Link_Write(packet) != 0)
         ;
 }
@@ -860,7 +860,7 @@ void Link_SendCMakeName(u8 *data)
     crc = 0xFFFF;
     sum = Crc16(16, data, &crc);
     p = (u8 *)&packet;
-    p[0] = 28;
+    p[0] = LINK_CMAKE_NAME;
     p[1] = sum >> 8;
     p[2] = sum;
     p[3] = *data++;
@@ -868,7 +868,7 @@ void Link_SendCMakeName(u8 *data)
         ;
     for (i = 0; i < 5; i++) {
         packet = 0;
-        p[0] = 0x5C;
+        p[0] = LINK_CMAKE_NAME | LINK_KIND_SECOND;
         p[1] = *data++;
         p[2] = *data++;
         p[3] = *data++;
@@ -877,34 +877,34 @@ void Link_SendCMakeName(u8 *data)
     }
 }
 
-void Link_SendCMakeLook(a)
-u8 a;
+void Link_SendCMakeLook(look)
+u8 look;
 {
-    while (Link_SendEvent(2, a, 0) != 0)
+    while (Link_SendEvent(EVT_CMAKE_LOOK, look, 0) != 0)
         ;
 }
 
-void Link_SendCMakeJob(u8 a)
+void Link_SendCMakeJob(u8 job)
 {
-    while (Link_SendEvent(3, a, 0) != 0)
+    while (Link_SendEvent(EVT_CMAKE_JOB, job, 0) != 0)
         ;
 }
 
 void Link_SendCMakeCancel(void)
 {
-    while (Link_SendEvent(4, 0, 0) != 0)
+    while (Link_SendEvent(EVT_CMAKE_CANCEL, 0, 0) != 0)
         ;
 }
 
 void Link_SendCMakeEnd(void)
 {
-    while (Link_SendEvent(5, 0, 0) != 0)
+    while (Link_SendEvent(EVT_CMAKE_END, 0, 0) != 0)
         ;
 }
 
-void Link_SendCMakeBirthday(s32 a, s32 b)
+void Link_SendCMakeBirthday(s32 month, s32 day)
 {
-    while (Link_SendEvent(6, a, b) != 0)
+    while (Link_SendEvent(EVT_CMAKE_BIRTHDAY, month, day) != 0)
         ;
 }
 
@@ -918,14 +918,14 @@ void Link_SendCMakeFavorite(u8 *data)
     crc = 0xFFFF;
     sum = Crc16(4, data, &crc);
     p = (u8 *)&packet;
-    p[0] = 29;
+    p[0] = LINK_CMAKE_FOODS;
     p[1] = sum >> 8;
     p[2] = sum;
     p[3] = *data++;
     while (Link_Write(packet) != 0)
         ;
     packet = 0;
-    p[0] = 0x5D;
+    p[0] = LINK_CMAKE_FOODS | LINK_KIND_SECOND;
     p[1] = *data++;
     p[2] = data[0];
     p[3] = data[1];
@@ -933,29 +933,29 @@ void Link_SendCMakeFavorite(u8 *data)
         ;
 }
 
-void Link_SendEquipSlot(u8 a, u8 b)
+void Link_SendEquipSlot(u8 slot, u8 item)
 {
     u32 packet;
     u8 *p = (u8 *)&packet;
 
-    p[0] = 30;
-    p[1] = a;
-    p[2] = b;
+    p[0] = LINK_EQUIP_SLOT;
+    p[1] = slot;
+    p[2] = item;
     p[3] = 0;
     while (Link_Write(packet) != 0)
         ;
 }
 
-void Link_SendCmdSlot(a, b)
-u8 a;
-u16 b;
+void Link_SendCmdSlot(slot, item)
+u8 slot;
+u16 item;
 {
     u32 packet;
     u8 *p = (u8 *)&packet;
 
-    p[0] = 31;
-    p[1] = a;
-    *(u16 *)&p[2] = b;
+    p[0] = LINK_CMD_SLOT;
+    p[1] = slot;
+    *(u16 *)&p[2] = item;
     while (Link_Write(packet) != 0)
         ;
 }

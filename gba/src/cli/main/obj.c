@@ -4,16 +4,16 @@
 #include "main.h"
 #include "obj.h"
 
-/* Header of the downloaded sprite data (bulk type 0); offsets from its start. */
+/* Header of the downloaded sprite data (bulk type 0, objdat.spt); offsets from its start. */
 struct ObjHeader {
-    u32 unk0;
-    u32 unk4;
-    u16 palMapCount;
+    u32 magic;              /* "SPRT" */
+    u32 version;            /* "0.13" */
+    u16 palMapCount;        /* frames in the frame-palette map */
     u8 unkA;
     u8 unkB;
     u8 cellCount;
     u8 paletteCount;
-    u16 unkE;
+    u16 cellPaletteCount;
     u8 *palettesOffset;
     u8 *cellsOffset;
     u8 *cellPalettesOffset;
@@ -28,7 +28,7 @@ struct ObjCell {
     u8 firstPalette;
     u8 paletteCount;
     u8 palLoaded;
-    u16 unk6;
+    u16 firstFrame;         /* index of its first frame in the frame-palette map */
     u8 *tiles;
 };
 

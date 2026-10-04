@@ -220,7 +220,7 @@ CSYS_NAMES = {
     -0x1: "posX", -0x2: "posY", -0x3: "posZ", -0x4: "rotTargetY", -0x6: "classId",
     -0xF: "worldParamA", -0x10: "worldParamB",
     -0x40: "maxHp", -0x41: "hp", -0x43: "strength", -0x44: "magic", -0x45: "defense",
-    -0x82: "objId",
+    -0x82: "objId", -0x19C: "gil",
 }
 CSYS_ARRAYS = [
     (-0x14, -0x11, "dropItemCodes", 1),
@@ -988,6 +988,8 @@ def _select(script, patterns):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("info")

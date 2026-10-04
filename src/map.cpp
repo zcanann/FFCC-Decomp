@@ -1005,7 +1005,7 @@ int CMapMng::ReadMtx(char* mapName)
 {
     int append = 0;
 
-    MapMng.m_mapReadReady = 1;
+    MapMng.SetDraw(1);
 
     if (m_asyncLoadState.m_mapReadMode != 2 && m_asyncLoadState.m_mapReadMode != 3) {
         CMemory::CStage* stage = MapMng.m_stage;
@@ -1100,7 +1100,7 @@ int CMapMng::ReadMpl(char* mapName)
     int loadIndex = 0;
     int size = 0;
 
-    MapMng.m_mapReadReady = 1;
+    MapMng.SetDraw(1);
 
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
@@ -1238,7 +1238,7 @@ int CMapMng::ReadOtm(char* mapName)
 {
     unsigned long size;
 
-    MapMng.m_mapReadReady = 1;
+    MapMng.SetDraw(1);
     char* strTmp = g_StrTmp;
     void* filePtr;
     sprintf(strTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
@@ -1849,7 +1849,7 @@ void CMapMng::Draw()
             CharaPcs.drawMakeTexShadow();
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_S16, 0xE, GX_S16, 10);
             MaterialMan.InitEnv();
-            Graphic.SetFog(MapMng.m_fogEnable, 0);
+            Graphic.SetFog(MapMng.GetFogEnable(), 0);
 
             GXSetColorUpdate(1);
             GXSetAlphaUpdate(0);
@@ -2747,26 +2747,6 @@ void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
  * Size:	TODO
  */
 void CMapMng::SetMapObjWorldMapLightIdx(int, _GXColor, Vec)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::SetDraw(unsigned char)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::GetFogEnable()
 {
 	// TODO
 }

@@ -127,39 +127,6 @@ inline CMapObjAtrMeshName::~CMapObjAtrMeshName()
 
 /*
  * --INFO--
- * PAL Address: 0x8002BEFC
- * PAL Size: 48b
- * EN Address: 0x80033780
- * EN Size: 52b
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObj::CMapObj()
-{
-    Init();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002BE7C
- * PAL Size: 128b
- * EN Address: 0x800337B4
- * EN Size: 152b
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObj::~CMapObj()
-{
-    if (m_attribute != 0) {
-        delete m_attribute;
-        m_attribute = 0;
-    }
-
-    Init();
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8002BF2C
  * PAL Size: 196b
  * EN Address: 0x80033658
@@ -212,6 +179,39 @@ void CMapObj::Init()
     m_cameraSemiTransBeyondMax = 1;
     m_cameraSemiTransActive = 0;
     m_lightSetIndex = -1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002BEFC
+ * PAL Size: 48b
+ * EN Address: 0x80033780
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapObj::CMapObj()
+{
+    Init();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002BE7C
+ * PAL Size: 128b
+ * EN Address: 0x800337B4
+ * EN Size: 152b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapObj::~CMapObj()
+{
+    if (m_attribute != 0) {
+        delete m_attribute;
+        m_attribute = 0;
+    }
+
+    Init();
 }
 
 /*

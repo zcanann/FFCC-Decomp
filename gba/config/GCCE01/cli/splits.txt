@@ -145,8 +145,14 @@ libgcc/_udivsi3:
 libgcc/_umodsi3:
 	.text       start:0x0201C954 end:0x0201CA14
 
+main/main:
+	.rodata     start:0x0201CA14 end:0x0201CAC4 align:4
+
+main/xfer:
+	.rodata     start:0x0201CAC4 end:0x0201CADC align:4
+
 regional_data:
-	.rodata     start:0x0201CA14 end:0x0201CD04
+	.rodata     start:0x0201CADC end:0x0201CD04
 
 main/artifact:
 	.rodata     start:0x0201CD04 end:0x0201CD0C align:4
@@ -154,8 +160,41 @@ main/artifact:
 regional_data:
 	.rodata     start:0x0201CD0C end:0x0202E058
 
+main/main:
+	.bss        start:0x03000000 end:0x03000011 align:4
+
+main/xfer:
+	.bss        start:0x03000018 end:0x03000054 align:8
+
+main/radarmap:
+	.bss        start:0x03000054 end:0x03000070 align:4
+
+regional_bss:
+	.bss        start:0x03000070 end:0x03002750
+
+main/session:
+	.bss        start:0x03002750 end:0x03002771 align:8
+
 main/artifact:
 	.bss        start:0x03002774 end:0x0300277C align:4
 
 regional_bss:
-	.bss        start:0x0300277C end:0x030044C1
+	.bss        start:0x0300277C end:0x030029C0
+
+main/main:
+	.common     start:0x030029C0 end:0x03002AC0 align:16
+
+regional_bss:
+	.bss        start:0x03002AC0 end:0x03002AF0
+
+main/xfer:
+	.common     start:0x03002AF0 end:0x03002AFC align:4
+
+regional_bss:
+	.bss        start:0x03002AFC end:0x03002CA0
+
+main/session:
+	.common     start:0x03002CA0 end:0x03002DD0 align:16
+
+regional_bss:
+	.bss        start:0x03002DD0 end:0x030044C1

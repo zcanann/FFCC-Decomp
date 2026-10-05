@@ -58,6 +58,26 @@ class ConstraintTests(unittest.TestCase):
         sec.bss, sec.name = False, '.sdata'
         self.assertTrue(initialized_map_issues('mapmesh.cpp', sec, rows))
 
+    def test_rel14_signed_replay_preserves_condition_prediction_and_link(self):
+        sec = Section(1, '.text', bytes.fromhex('40a20001386012344e800020'), 12, 4, False, True, [])
+        sec.relocs = [dict(offset=0, kind=11, key=('global', 'Destination'), value=4, symbol={})]
+        self.assertEqual(masks(sec)[:4], bytes.fromhex('ffff0003'))
+        base = 0x80008000
+        for disp in (-32768, -4, 0, 32764):
+            with self.subTest(displacement=disp):
+                word = 0x40a20001 | (disp & 0xfffc)
+                actual = word.to_bytes(4, 'big') + sec.body[4:]
+                values = dict(inferred_constraints(sec, base, actual, {}))
+                self.assertEqual(values[('global', 'Destination')], base + disp - 4)
+                self.assertEqual(replay(sec, base, values, {}, {}), actual)
+        for disp in (-32772, 32768, 2):
+            with self.subTest(displacement=disp), self.assertRaisesRegex(ValueError, 'REL14 target is out of range'):
+                replay(sec, base, {('global', 'Destination'): base + disp - 4}, {}, {})
+        target = bytes.fromhex('40a20011386012344e800020')
+        self.assertEqual(placements(sec, dol(target))[0], [0x80004000])
+        for word in (0x40820011, 0x40a30011, 0x40a20010, 0x40a20013, 0x48a20011):
+            self.assertEqual(placements(sec, dol(word.to_bytes(4, 'big') + target[4:]))[0], [])
+
     def test_overlapping_ambiguous_placements_are_reported(self):
         sec = Section(1, '.text', b'1234' * 4, 16, 4, False, True, [])
         self.assertEqual(placements(sec, dol(b'1234' * 5))[0], [0x80004000, 0x80004004])
@@ -158,6 +178,25 @@ blr
         self.assertEqual(retained['initialized_bytes'], 32)
         bad = solve([dict(unit='unit.c', data=full, pal_object=hint)], dol(body[:-1] + b'!'))
         self.assertFalse(any(r['status'] == 'review_ready' for r in bad['objects']))
+
+    def test_rel14_object_replay_and_invalid_branch_encodings(self):
+        source = self.functions().split('.global Last')[0].replace('li 3,17', 'bne External')
+        obj = self.assemble(source)
+        sections, _, _ = read_object(obj)
+        sec = next(iter(sections.values()))
+        self.assertEqual(sec.relocs[0]['kind'], 11)
+        actual = bytes.fromhex('4082fff0') + sec.body[4:]
+        known = symbol_records('External = .text:0x80003FF0; // type:function size:4')
+        row = solve([dict(unit='unit.c', data=obj)], dol(actual), known)['objects'][0]
+        self.assertEqual(row['status'], 'review_ready')
+        self.assertEqual(row['relocation_count'], 1)
+        elf = ELFFile(io.BytesIO(obj))
+        offset = elf.get_section_by_name('.text')['sh_offset']
+        for word in (0x40820002, 0x48000000, 0x38600000):
+            corrupt = bytearray(obj)
+            struct.pack_into('>I', corrupt, offset, word)
+            with self.subTest(word=word), self.assertRaisesRegex(ValueError, 'REL14 requires a relative branch'):
+                read_object(bytes(corrupt))
 
     def test_kept_reference_to_discarded_function_is_rejected(self):
         source = self.functions('.global Unused\n.type Unused,@function\nUnused:\nblr\n.size Unused,.-Unused\n')

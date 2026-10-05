@@ -56,8 +56,12 @@ Exported data and partial data-section trimming are not silently discarded.
 Searches preserve every opcode bit outside supported relocation fields. They
 report ambiguity, including overlapping matches, rather than taking the first
 hit. A truncated candidate search cannot establish uniqueness without an
-independent named base anchor. Supported RELA types are ADDR32 (1), ADDR16_LO/HI/HA (4/5/6), REL24 (10), and
-EMB_SDA21 (109). Both word and old MWCC immediate-halfword SDA21 offsets work.
+independent named base anchor. Supported RELA types are ADDR32 (1),
+ADDR16_LO/HI/HA (4/5/6), REL24 (10), REL14 (11), and EMB_SDA21 (109).
+REL14 conditional branches retain their condition, prediction and link bits;
+absolute branches, invalid opcodes, unaligned targets and displacements outside
+the signed 16-bit range are rejected. Both word and old MWCC immediate-halfword
+SDA21 offsets work.
 SDA register selection uses section/register evidence; overlapping r2/r13
 windows cannot be distinguished by distance alone.
 

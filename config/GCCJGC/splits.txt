@@ -315,3 +315,9 @@ ax/AXSPB.c:
 	.text start:0x8018D2C8 end:0x8018D790
 	.bss start:0x80330200 end:0x80330238
 	.sbss start:0x8034C048 end:0x8034C06C
+
+ax/AXVPB.c:
+	.text start:0x8018D790 end:0x8018E350
+	.bss start:0x80330240 end:0x80341640
+	.data start:0x802335E0 end:0x802336B4
+	.sbss start:0x8034C070 end:0x8034C07C

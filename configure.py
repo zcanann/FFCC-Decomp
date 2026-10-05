@@ -933,7 +933,7 @@ config.libs = [
             Object(Matching, "ax/AXOut.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXProf.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXSPB.c"),
-            Object(Matching, "ax/AXVPB.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXVPB.c"),
             Object(Matching, "ax/AXComp.c"),
             Object(Matching, "ax/DSPCode.c"),
         ],

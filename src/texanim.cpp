@@ -394,9 +394,7 @@ inline CTexAnim::CTexAnim()
     m_seqIndex = 0;
     m_frame = zero;
     m_mode = -2;
-    m_texGen.z = zero;
-    m_texGen.y = zero;
-    m_texGen.x = zero;
+    m_texGen.x = m_texGen.y = m_texGen.z = zero;
 }
 
 /*

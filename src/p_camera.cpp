@@ -1643,10 +1643,10 @@ void CCameraPcs::CalcQuake()
  * --INFO--
  * PAL Address: 0x80039FA0
  * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80039D94
+ * EN Size: 256b
+ * JP Address: 0x80039778
+ * JP Size: 260b
  */
 void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTime, short endTime,
                                    float posAmpX, float posAmpY, float posAmpZ,
@@ -1666,12 +1666,8 @@ void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTi
         }
 
         m_quake.m_mode = 0;
-        m_quake.m_positionAmplitude.z = 0.0f;
-        m_quake.m_positionAmplitude.y = 0.0f;
-        m_quake.m_positionAmplitude.x = 0.0f;
-        m_quake.m_jitterAmplitude.z = 0.0f;
-        m_quake.m_jitterAmplitude.y = 0.0f;
-        m_quake.m_jitterAmplitude.x = 0.0f;
+        m_quake.m_positionAmplitude.x = m_quake.m_positionAmplitude.y = m_quake.m_positionAmplitude.z = 0.0f;
+        m_quake.m_jitterAmplitude.x = m_quake.m_jitterAmplitude.y = m_quake.m_jitterAmplitude.z = 0.0f;
         return;
     }
 

@@ -99,6 +99,68 @@ object extents and distinguish linker padding from owned storage.
 
 ## Validation and current limits
 
+### Broad fuzzy placement of game translation units
+
+`tools/locate_regional_tus.py` ranks regional compiled code against a selected
+retail DOL before exact section ownership is available. Start with the largest
+game objects, then add independent function rankings to expose internal drift:
+
+```sh
+python tools/locate_regional_tus.py \
+  --dol orig/GCCE01/sys/main.dol --source-dir build/GCCE01/src \
+  --symbols config/GCCE01/symbols.txt --top 30 --functions \
+  --output build/GCCE01/fuzzy-game.json
+```
+
+Use the corresponding `GCCJGC` paths for Japan. The default `*.o` glob selects
+objects directly inside the source directory; `--include '**/*.o'` also includes
+SDK subdirectories. `--top 0` selects every matching object. Compile the selected
+region first; the output records each object hash and the retail DOL hash.
+
+The locator indexes eight-instruction windows over executable DOL sections.
+Distinctive windows vote on a common section base, then every candidate with a
+full in-bounds window receives whole-window normalized, opcode and raw-word
+scores. Register shapes remain significant; branch displacements, D-form
+immediates and SDA base registers are masked. This deliberately masks some
+ordinary constants too: **a normalized match is not an exact code match**.
+Very common anchors are excluded rather than truncated into false uniqueness.
+Candidate display limits do not limit scoring or runner-up calculation.
+
+Results include anchor distribution across sixteen relative bins, runner-up
+margin, and existing global named-function agreement or conflicts. A single
+surviving base means unique among the sampled distinctive-anchor candidates,
+not exhaustive proof against all possible fuzzy placements. Low whole-window
+scores or narrowly clustered anchors often indicate changed function lengths,
+dead stripping or reordered code. They do not establish TU boundaries.
+
+`--functions` ranks functions separately, reports provisional compiled-size
+envelopes, source-order neighbor agreement and per-function base shifts. Its
+`strong_ranking` filter requires at least 80% normalized score, two distinctive
+anchors spanning eight bins, no known-name conflicts, and a ten-percentage-point
+runner-up margin when a runner-up exists. These are review heuristics, not
+probabilities or verified identity. REL24 call destinations provide additional
+checks where independent function rankings or existing named externs resolve
+the target and the call site's neighboring instruction shapes still agree.
+Call disagreement remains visible; it does not silently alter a ranking.
+
+An initial thirty-object batch covered 881,436 compiled code bytes in each of
+USA and Japan in about nine seconds per region. Adding function rankings took
+about fifteen seconds: 1,329 functions were examined, with 766 USA and 591 Japan
+strong rankings covering 521,744 and 335,812 compiled bytes respectively. These
+measure discovery coverage, **not objdiff or linkage progress**; source and
+retail revisions affect both coverage and timing.
+Including callgraph checks took about seventeen seconds and found 2,179 USA
+and 1,309 Japan resolved call destinations in agreement with the ranked or
+previously named targets.
+
+COMMON and mixed data are allowed because only executable sections are being
+ranked. No data/BSS ownership, function end, symbol name, split or `Matching`
+claim follows automatically. Review MAP ownership and regional retail
+boundaries, then validate proposed claims with DTK/objdiff and the exact solver
+where applicable. Source-generated tables and linker padding still need their
+own evidence. Run focused tests with
+`python -m unittest tools.tests.test_locate_regional_tus`.
+
 After reviewing and applying a coherent subset, compile all three regions with
 `ninja all_source progress build/<version>/report.json`, inspect affected objdiff
 units and require all nine DOL/GBA checksums. Promote only regions whose complete

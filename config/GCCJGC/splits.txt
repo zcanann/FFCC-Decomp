@@ -1734,9 +1734,14 @@ graphic_dbgfont.cpp:
 
 pppRain.cpp:
 	.text start:0x800DA728 end:0x800DADD4
+	.rodata start:0x801D6100 end:0x801D6110
+	.sdata2 start:0x8034DD28 end:0x8034DD40
 
 pppColum.cpp:
 	.text start:0x800DBF40 end:0x800DC564
+	.rodata start:0x801D6128 end:0x801D6138
+	.sdata2 start:0x8034DD88 end:0x8034DDC8
 
 pppLight.cpp:
 	.text start:0x800D7E94 end:0x800D8434
+	.sdata2 start:0x8034DC78 end:0x8034DC88

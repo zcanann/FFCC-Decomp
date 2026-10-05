@@ -207,9 +207,11 @@ blr
     def test_source_optimizer_pragma_prevents_review_ready(self):
         obj = self.assemble(self.functions())
         body = ELFFile(io.BytesIO(obj)).get_section_by_name('.text').data()
-        row = solve([dict(unit='unit.c', data=obj, source=b'#pragma dont_inline on\n')], dol(body))['objects'][0]
-        self.assertEqual(row['status'], 'hypothesis')
-        self.assertTrue(any('optimizer pragmas' in s for s in row['review_issues']))
+        for pragma in (b'#pragma dont_inline on\n', b'#pragma push\n#pragma inline_depth(6)\n'):
+            with self.subTest(pragma=pragma):
+                row = solve([dict(unit='unit.c', data=obj, source=pragma)], dol(body))['objects'][0]
+                self.assertEqual(row['status'], 'hypothesis')
+                self.assertTrue(any('optimizer pragmas' in s for s in row['review_issues']))
 
     def test_conflicting_cross_object_definitions_remain_hypotheses(self):
         first_source = self.functions().split('.global Last')[0]

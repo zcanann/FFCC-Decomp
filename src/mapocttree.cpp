@@ -403,8 +403,6 @@ void COctTree::ClearShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma inline_depth(6)
 static void ClearShadow_r(COctNode* node)
 {
 	int i;
@@ -419,7 +417,6 @@ static void ClearShadow_r(COctNode* node)
 		ClearShadow_r(node->m_children[i]);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -506,8 +503,6 @@ void COctTree::ClearLight()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma inline_depth(6)
 static void ClearLight_r(COctNode* octNode)
 {
 	int i;
@@ -522,7 +517,6 @@ static void ClearLight_r(COctNode* octNode)
 		ClearLight_r(octNode->m_children[i]);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

@@ -476,3 +476,6 @@ os/OSSemaphore.c:
 
 wm_menu.cpp:
 	.text start:0x800E3E28 end:0x800FEFE8
+
+mapocttree.cpp:
+	.text start:0x8002BE38 end:0x8002EB80

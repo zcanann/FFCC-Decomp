@@ -543,3 +543,6 @@ os/OSSemaphore.c:
 
 wm_menu.cpp:
 	.text start:0x800E6364 end:0x80102378
+
+mapocttree.cpp:
+	.text start:0x8002C4F8 end:0x8002F250

@@ -590,7 +590,7 @@ def solve(objects, dol, records=(), bases=None, maps=()):
                 row['discarded_sections'] = omitted
                 if obj.get('source') is not None:
                     row['source_sha256'] = hashlib.sha256(obj['source']).hexdigest()
-                    if re.search(rb'^\s*#pragma\s+(?:optimization_level|scheduling|dont_inline|inline_max_size)\b', obj['source'], re.M):
+                    if re.search(rb'^\s*#pragma\s+(?:optimization_level|scheduling|dont_inline|inline_max_size|inline_depth)\b', obj['source'], re.M):
                         row['review_issues'].append('source contains optimizer pragmas; do not promote without runbook-compliant source repair')
                         row['status'] = 'hypothesis'
                 for sec in row['sections']:

@@ -229,14 +229,14 @@ obj:
 effect:
 	.rodata     start:0x0200EDC8 end:0x0200EE10 align:4
 
-regional_data:
-	.rodata     start:0x0200EE10 end:0x02010210
+sintable:
+	.rodata     start:0x0200EE10 end:0x02010210 align:4
 
 chunk:
 	.rodata     start:0x02010210 end:0x02010230 align:4
 
-regional_data:
-	.rodata     start:0x02010230 end:0x02010388
+param:
+	.rodata     start:0x02010230 end:0x02010388 align:4
 
 m4a_tables:
 	.rodata     start:0x02010388 end:0x020104EC align:4
@@ -265,8 +265,11 @@ libc/stdlib/mprec:
 libc/arm/syscalls:
 	.rodata     start:0x02013BEC end:0x02013C14 align:4
 
+course:
+	.rodata     start:0x02013C14 end:0x02014684 align:4
+
 regional_data:
-	.rodata     start:0x02013C14 end:0x02014690
+	.rodata     start:0x02014684 end:0x02014690
 
 sound_data:
 	.data       start:0x02014690 end:0x020158A0 align:4
@@ -299,7 +302,13 @@ libc/stdlib/mallocr:
 	.data       start:0x02015D58 end:0x0201619C
 
 regional_data:
-	.rodata     start:0x0201619C end:0x02021F40
+	.rodata     start:0x0201619C end:0x0201C2D0
+
+config:
+	.rodata     start:0x0201C2D0 end:0x0201C2FC align:4
+
+regional_data:
+	.rodata     start:0x0201C2FC end:0x02021F40
 
 obj:
 	.ctors      start:0x02021F40 end:0x02021F44 align:1

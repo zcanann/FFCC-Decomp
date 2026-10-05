@@ -45,3 +45,15 @@ TRK_MINNOW_DOLPHIN/flush_cache.c:
 
 amcstubs/AmcExi2Stubs.c:
 	.text start:0x801B76CC end:0x801B76FC
+
+base/PPCArch.c:
+	.text start:0x80175A90 end:0x80175BA4
+
+dolphin/os/__ppc_eabi_init.cpp:
+	.init start:0x80003400 end:0x80003458
+
+TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:
+	.text start:0x801A9C78 end:0x801A9FF0
+
+TRK_MINNOW_DOLPHIN/targcont.c:
+	.text start:0x801AA544 end:0x801AA578

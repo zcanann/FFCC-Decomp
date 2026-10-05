@@ -801,7 +801,7 @@ config.libs = [
     DolphinLib(
         "base",
         [
-            Object(Matching, "base/PPCArch.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "base/PPCArch.c"),
         ],
     ),
     DolphinLib(
@@ -814,7 +814,7 @@ config.libs = [
             ),
             Object(Matching, "os/__ppc_eabi_init.c"),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "dolphin/os/__ppc_eabi_init.cpp",
                 source="os/__ppc_eabi_init.cpp",
                 cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
@@ -1196,15 +1196,15 @@ config.libs = [
                 cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
             ),
             Object(Matching, "TRK_MINNOW_DOLPHIN/main_TRK.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/mainloop.c"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/mainloop.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/mem_TRK.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c"),
+            Object(MatchingFor("GCCP01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/msg.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/msgbuf.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/msghndlr.c", mw_version="GC/2.6"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/mslsupp.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/mutex_TRK.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c", mw_version="GC/2.6"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c", mw_version="GC/2.6"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/MWTrace.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/notify.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/nubevent.c"),
@@ -1220,7 +1220,7 @@ config.libs = [
                 "TRK_MINNOW_DOLPHIN/support.c",
                 mw_version="GC/2.6",
             ),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/targcont.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/targcont.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
             Object(
                 Matching,

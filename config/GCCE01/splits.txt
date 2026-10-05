@@ -48,3 +48,18 @@ amcstubs/AmcExi2Stubs.c:
 
 TRK_MINNOW_DOLPHIN/UDP_Stubs.c:
 	.text start:0x801ADB9C end:0x801ADBE4
+
+base/PPCArch.c:
+	.text start:0x8017A3E4 end:0x8017A4F8
+
+dolphin/os/__ppc_eabi_init.cpp:
+	.init start:0x80003400 end:0x80003458
+
+TRK_MINNOW_DOLPHIN/mainloop.c:
+	.text start:0x801A7EE8 end:0x801A7FE0
+
+TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c:
+	.text start:0x801AE52C end:0x801AE584
+
+TRK_MINNOW_DOLPHIN/targcont.c:
+	.text start:0x801AD50C end:0x801AD540

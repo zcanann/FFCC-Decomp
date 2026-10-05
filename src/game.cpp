@@ -396,12 +396,21 @@ void CGame::Create()
     m_nextScriptFlags = 1;
     clearWork();
 
+#ifdef VERSION_GCCJGC
+    memset(&m_gameWork.m_languageId, 0,
+           sizeof(CGameWork) - offsetof(CGameWork, m_languageId));
+#else
     memset(&m_gameWork.m_gameDataStartMarker, 0, kGameWorkDataClearSize);
+#endif
     memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
 
     m_gameWork.m_scriptSysVal0 = 1;
     m_gameWork.m_chaliceElement = 1;
+#ifdef VERSION_GCCJGC
+    strcpy(m_gameWork.m_townName, "（はじまり）");
+#else
     strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
+#endif
 
     m_gameWork.m_gameInitFlag = 1;
 
@@ -415,7 +424,11 @@ void CGame::Create()
         mapVariant = m_currentMapVariantId;
         mapId = m_currentMapId;
 
+#ifdef VERSION_GCCJGC
+        Graphic._WaitDrawDone("game.cpp", 0x22C);
+#else
         Graphic._WaitDrawDone("game.cpp", 0x24E);
+#endif
         System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
@@ -460,12 +473,21 @@ void CGame::InitNewGame()
     CGame* game = &Game;
 
     CGameWork* work = &game->m_gameWork;
+#ifdef VERSION_GCCJGC
+    memset(&work->m_languageId, 0,
+           sizeof(CGameWork) - offsetof(CGameWork, m_languageId));
+#else
     memset(&work->m_gameDataStartMarker, 0, kGameWorkDataClearSize);
+#endif
     memset(work->m_wmBackupParams, 0xFF, sizeof(work->m_wmBackupParams));
 
     game->m_gameWork.m_scriptSysVal0 = 1;
     game->m_gameWork.m_chaliceElement = 1;
+#ifdef VERSION_GCCJGC
+    strcpy(work->m_townName, "（はじまり）");
+#else
     strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
+#endif
     CFlatRuntime2Storage().ResetNewGame();
     Chara.InitFurTexBuffer();
 }
@@ -601,7 +623,11 @@ void CGame::CheckScriptChange()
     }
 
     m_newGameFlag = 0;
+#ifdef VERSION_GCCJGC
+    Graphic._WaitDrawDone("game.cpp", 0x1EA);
+#else
     Graphic._WaitDrawDone("game.cpp", 0x205);
+#endif
 
     if ((u32)System.m_execParam >= 3) {
         System.Printf("スクリプトが切り替わります\n");
@@ -643,12 +669,21 @@ void CGame::CheckScriptChange()
         CGame* game = &Game;
 
         CGameWork* work = &game->m_gameWork;
+#ifdef VERSION_GCCJGC
+        memset(&work->m_languageId, 0,
+               sizeof(CGameWork) - offsetof(CGameWork, m_languageId));
+#else
         memset(&work->m_gameDataStartMarker, 0, kGameWorkDataClearSize);
+#endif
         memset(work->m_wmBackupParams, 0xFF, sizeof(work->m_wmBackupParams));
 
         game->m_gameWork.m_scriptSysVal0 = 1;
         game->m_gameWork.m_chaliceElement = 1;
+#ifdef VERSION_GCCJGC
+        strcpy(work->m_townName, "（はじまり）");
+#else
         strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
+#endif
         CFlatRuntime2Storage().ResetNewGame();
         Chara.InitFurTexBuffer();
         m_nextScriptFlags = 0;

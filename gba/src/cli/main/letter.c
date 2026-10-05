@@ -1096,13 +1096,15 @@ s32 LetterTaken_Init(void)
         memset(win, 0, sizeof(struct Window));
         memset(buf, 0, sizeof(buf));
         entry = &LETTER_ENTRIES[sLetterSel];
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
         if (entry->flags & 8) {
             strcpy(buf, Msg_GetItemName(entry->attachment));
             strcat(buf, Msg_GetLetter(8));
         } else {
             IntToStr(buf, entry->attachment);
+#if !defined(VERSION_GCCJGC)
             strcat(buf, sSpaceText);
+#endif
             strcat(buf, Msg_GetSystem(5));
             strcat(buf, Msg_GetLetter(8));
         }
@@ -1114,7 +1116,9 @@ s32 LetterTaken_Init(void)
         } else {
             w = strlen(buf);
             IntToStr(buf + w, entry->attachment);
+#if !defined(VERSION_GCCJGC)
             strcat(buf, sSpaceText);
+#endif
             strcat(buf, Msg_GetSystem(5));
         }
         if (!(gLanguage & 15))
@@ -1122,7 +1126,7 @@ s32 LetterTaken_Init(void)
 #endif
         Text_SetFill(1, 1);
         Text_Clear();
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
         w2 = Text_Print(Msg_GetLetter(9), TEXT_WIDTH);
         str = buf;
 #else
@@ -1156,7 +1160,7 @@ s32 LetterTaken_Init(void)
             win->items[i].text = Msg_GetSystem(0);
         }
         Window_PutText(win, 0, 0);
-#if !defined(VERSION_GCCE01)
+#if defined(VERSION_GCCP01)
         if (!(gLanguage & 15)) {
             Text_Clear();
             Text_Print(buf, TEXT_DRAW);
@@ -1169,7 +1173,7 @@ s32 LetterTaken_Init(void)
     }
     Text_SetFill(1, 1);
     w = win->anim >> 3;
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
     if (w == 1) {
 #else
     if (w == 1 && (gLanguage & 15)) {

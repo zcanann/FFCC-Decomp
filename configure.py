@@ -1026,7 +1026,7 @@ config.libs = [
             Object(Matching, "gx/GXSave.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXStubs.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXTev.c"),
-            Object(Matching, "gx/GXTexture.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXTexture.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "gx/GXTransform.c",

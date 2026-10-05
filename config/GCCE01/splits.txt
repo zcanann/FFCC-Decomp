@@ -1136,3 +1136,9 @@ axart/axart.c:
 axart/axart3d.c:
 	.text	start:0x801968F0 end:0x80196900
 	.sbss	start:0x8032E298 end:0x8032E2A0
+
+gx/GXTexture.c:
+	.text	start:0x801A2A5C end:0x801A3A28
+	.data	start:0x8021B5F0 end:0x8021B818
+	.sdata	start:0x8032DB80 end:0x8032DBC0
+	.sdata2	start:0x80332850 end:0x80332878

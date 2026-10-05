@@ -1056,3 +1056,9 @@ TRK_MINNOW_DOLPHIN/dolphin_trk.c:
 	.text	start:0x801A9B20 end:0x801A9C78
 	.data	start:0x80238910 end:0x8023894C
 	.bss	start:0x80345FA8 end:0x80345FAC
+
+gx/GXTexture.c:
+	.text	start:0x8019E0A0 end:0x8019F06C
+	.data	start:0x80238030 end:0x80238258
+	.sdata	start:0x8034B988 end:0x8034B9C8
+	.sdata2	start:0x8034FCB8 end:0x8034FCE0

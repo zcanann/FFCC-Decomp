@@ -27,7 +27,11 @@ static const char s_diskReadErrorDe1[] = "Bitte lesen Sie die Bedienungsanleitun
 static const char s_diskReadErrorDe2[] = "Nintendo GameCube, um weitere Informationen zu erhalten.";
 static const char s_diskReadErrorIt0[] = "Impossibile leggere il disco di gioco.";
 static const char s_diskReadErrorIt1[] = "Consulta il manuale di istruzioni del Nintendo GameCube";
+#ifdef VERSION_GCCE01
+static const char s_diskReadErrorIt2[] = " per ulteriori indicazioni.";
+#else
 static const char s_diskReadErrorIt2[] = "per ulteriori indicazioni.";
+#endif
 static const char s_diskReadErrorFr0[] = {0x4C, 0x61, 0x20, 0x6C, 0x65, 0x63, 0x74, 0x75, 0x72, 0x65, 0x20, 0x64, 0x75, 0x20, 0x64, 0x69, 0x73, 0x71, 0x75, 0x65, 0x20, 0x61, 0x20, 0xE9, 0x63, 0x68, 0x6F, 0x75, 0xE9, 0x2E, 0x00};
 static const char s_diskReadErrorFr1[] = {0x56, 0x65, 0x75, 0x69, 0x6C, 0x6C, 0x65, 0x7A, 0x20, 0x76, 0x6F, 0x75, 0x73, 0x20, 0x72, 0xE9, 0x66, 0xE9, 0x72, 0x65, 0x72, 0x20, 0x61, 0x75, 0x20, 0x6D, 0x61, 0x6E, 0x75, 0x65, 0x6C, 0x20, 0x64, 0x27, 0x69, 0x6E, 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x69, 0x6F, 0x6E, 0x73, 0x00};
 static const char s_diskReadErrorFr2[] = "Nintendo GameCube pour de plus amples informations.";
@@ -58,9 +62,17 @@ static const char s_wrongDiscJp1[] = {0x83, 0x5A, 0x83, 0x62, 0x83, 0x67, 0x82, 
 static const char s_wrongDiscEn0[] = "Please insert the FINAL FANTASY";
 static const char s_wrongDiscEn1[] = "Crystal Chronicles Game Disc.";
 static const char s_wrongDiscDe0[] = "Bitte legen Sie die FINAL FANTASY";
+#ifdef VERSION_GCCE01
+static const char s_wrongDiscDe1[] = "Crystal Chronicles Disc ein.";
+#else
 static const char s_wrongDiscDe1[] = "Crystal Chronicles-Disc ein.";
+#endif
 static const char s_wrongDiscIt0[] = "Inserisci il disco di gioco ";
+#ifdef VERSION_GCCE01
+static const char s_wrongDiscIt1[] = "FINAL FANTASY Crystal Chronicles";
+#else
 static const char s_wrongDiscIt1[] = "FINAL FANTASY Crystal Chronicles.";
+#endif
 static const char s_wrongDiscFr0[] = {0x56, 0x65, 0x75, 0x69, 0x6C, 0x6C, 0x65, 0x7A, 0x20, 0x69, 0x6E, 0x73, 0xE9, 0x72, 0x65, 0x72, 0x20, 0x6C, 0x65, 0x20, 0x64, 0x69, 0x73, 0x71, 0x75, 0x65, 0x00};
 static const char s_wrongDiscEs0[] = "Coloca el disco de";
 
@@ -495,8 +507,12 @@ void CFile::kick()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013258
+ * PAL Size: 668b
+ * EN Address: 0x80013238
+ * EN Size: 668b
+ * JP Address: 0x80013288
+ * JP Size: 668b
  */
 CFile::CHandle* CFile::CheckQueue()
 {
@@ -513,7 +529,11 @@ CFile::CHandle* CFile::CheckQueue()
             if (dvdStatus == 0x0B || ((u32)(dvdStatus - 4) <= 2U) || dvdStatus == -1)
             {
                 DrawError(handle->m_dvdFileInfo, dvdStatus);
+#ifdef VERSION_GCCJGC
+                goto next;
+#else
                 continue;
+#endif
             }
             else if (dvdStatus == 0)
             {

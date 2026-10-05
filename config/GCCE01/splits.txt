@@ -482,6 +482,7 @@ partMng.cpp:
 	.text start:0x80057184 end:0x8005F084
 
 memory.cpp:
+	.bss start:0x8023B848 end:0x80242FE8
 	.text start:0x8001C0E4 end:0x8001FC68
 
 materialman.cpp:
@@ -492,6 +493,7 @@ mapobj.cpp:
 	.text start:0x800285C4 end:0x8002C4F8
 
 p_camera.cpp:
+	.bss start:0x80267750 end:0x80267C30
 	.text start:0x80036084 end:0x8003A3F0
 
 gobject.cpp:
@@ -541,6 +543,7 @@ sound.cpp:
 	.text start:0x800C4860 end:0x800C82F0
 
 textureman.cpp:
+	.sbss start:0x8032DCC0 end:0x8032DCC8
 	.text start:0x8003A3F0 end:0x8003BFAC
 
 maphit.cpp:

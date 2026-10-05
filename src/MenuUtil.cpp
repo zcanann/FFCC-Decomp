@@ -1153,7 +1153,11 @@ void CMenuPcs::DrawOptionMenu()
 	font->SetScaleX(1.0f);
 #endif
 	gUtil.RenderTextureQuad(0.0f, 384.0f, 640.0f, 40.0f,
+#ifdef VERSION_GCCJGC
+	                        m_textures[30], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+#else
 	                        m_textures[31], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+#endif
 
 #ifdef VERSION_GCCJGC
 	{

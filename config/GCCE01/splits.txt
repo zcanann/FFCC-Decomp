@@ -1030,3 +1030,6 @@ dvd/fstload.c:
 
 auto_09_8032DAE3_sdata:
 	.sdata start:0x8032DAE3 end:0x8032DAE8 align:1
+
+TRK_MINNOW_DOLPHIN/targsupp.s:
+	.text start:0x801AC590 end:0x801AC5B0

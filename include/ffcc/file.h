@@ -65,7 +65,9 @@ public:
 	void ReadASync(CHandle* handle);
 	void Close(CHandle* handle);
 	int IsCompleted(CHandle* handle);
+#ifndef VERSION_GCCJGC
 	int IsDiskError();
+#endif
 	int IsFatalError() { return m_fatalDiskErrorFlag; }
 	void SyncCompleted(CHandle* handle);
 
@@ -80,7 +82,9 @@ public:
     CHandle m_freeHandle;          // 0xb8-0x163
     CHandle* m_handlePool;          // 0x164
     int m_fatalDiskErrorFlag;      // 0x168
+#ifndef VERSION_GCCJGC
     int m_isDiskError;             // 0x16c
+#endif
 };
 
 extern CFile File;

@@ -120,25 +120,37 @@ static const char* l_tError[4][6][3] = {
     },
 };
 
+enum {
+#ifdef VERSION_GCCJGC
+    FileReadBufferAllocationLine = 0x29,
+    FileHandlePoolAllocationLine = 0x2C
+#else
+    FileReadBufferAllocationLine = 0x2B,
+    FileHandlePoolAllocationLine = 0x2E
+#endif
+};
+
 CFile File;
 
 /*
  * --INFO--
  * PAL Address: 0x80013bb8
  * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80013B98
+ * EN Size: 408b
+ * JP Address: 0x80013BE8
+ * JP Size: 404b
  */
 void CFile::Init()
 {
     DVDInit();
     m_allocStage = Memory.CreateStage(0x10ac00, "CFile", 0);
     m_fatalDiskErrorFlag = 0;
+#ifndef VERSION_GCCJGC
     m_isDiskError = 0;
-    m_readBuffer = new (m_allocStage, "file.cpp", 0x2b) unsigned char[0x100000];
-    m_handlePool = new (m_allocStage, "file.cpp", 0x2e) CHandle[0x80];
+#endif
+    m_readBuffer = new (m_allocStage, "file.cpp", FileReadBufferAllocationLine) unsigned char[0x100000];
+    m_handlePool = new (m_allocStage, "file.cpp", FileHandlePoolAllocationLine) CHandle[0x80];
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
@@ -541,15 +553,17 @@ next:
  * --INFO--
  * PAL Address: 0x80012bb8
  * PAL Size: 1696b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80012B98
+ * EN Size: 1696b
+ * JP Address: 0x80012B58
+ * JP Size: 1840b
  */
 void CFile::DrawError(DVDFileInfo& info, int errorCode)
 {
     _GXTexObj backupTexObj;
+#ifndef VERSION_GCCJGC
     m_isDiskError = 1;
+#endif
 
     while (true)
     {
@@ -569,7 +583,9 @@ retry:
 
         if (font == 0)
         {
+#ifndef VERSION_GCCJGC
             m_isDiskError = 0;
+#endif
             return;
         }
 
@@ -729,7 +745,9 @@ retry:
     }
 
     Sound.PauseDiscError(0);
+#ifndef VERSION_GCCJGC
     m_isDiskError = 0;
+#endif
 }
 
 /*

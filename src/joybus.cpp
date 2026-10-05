@@ -6614,10 +6614,12 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCJGC
 int CFile::IsDiskError()
 {
 	return m_isDiskError;
 }
+#endif
 
 namespace JoyBusConst {
 extern const unsigned int CTRL_GBA = 0x1;

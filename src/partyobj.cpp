@@ -5024,11 +5024,12 @@ void CGPartyObj::gpmMove()
 		}
 	}
 
-	CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
 	{
+		int slot = 0;
+		CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
 		GhostPartyWork& ghostWork = CGPartyObj::m_ghostWork;
 		const int slotSel = CGPartyObj::m_ghostWork.slotSel;
-		for (int slot = 0; slot < 3; slot++) {
+		for (; slot < 3; slot++) {
 			if (slot == slotSel) {
 				ghostWork.counters[slot] = 0;
 			} else {

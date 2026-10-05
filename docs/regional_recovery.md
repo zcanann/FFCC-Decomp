@@ -168,14 +168,16 @@ function-boundary list. The output preserves competing votes, actual regional
 function sizes, existing-name conflicts and gaps. When PAL has exception-index
 records, the locator searches the entire retail DOL for the complete proposed
 function-pointer/length sequence and checks that its EH pointers address
-initialized storage. This supplies useful independent evidence for many
-functions even when their code differs.
+initialized storage. This corroborates boundary extents and table structure;
+it does not establish function identities or prove that PAL's order survives.
 
-PAL order and function count remain hypotheses. The report flags first/last
-functions without independent code or exception-index anchors, fuzzy call
+PAL order and function count remain hypotheses. The report flags every function
+identity without an independent code ranking or existing named anchor, as well
+as unsupported first/last functions, fuzzy call
 disagreements, and overlaps between different unit proposals. A complete EH
-subsequence alone does not establish ownership of adjacent tiny functions that
-lack EH records. Missing PAL objects or unsupported exception references remain
+subsequence alone does not establish names, even if every function has an EH
+record. Review each unanchored identity through actual code, calls or other
+retail references. Missing PAL objects or unsupported exception references remain
 explicit errors for that hint. These diagnostics must be reviewed before any
 config changes; an empty issue list is not a matching or source-linkage claim.
 

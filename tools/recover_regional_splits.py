@@ -43,14 +43,14 @@ def map_objects(text):
     result, section = [], None
     scopes = {}
     for line in text.splitlines():
-        m = re.search(r'] (\S+) \(object,(local|global)\) found in \S+ (\S+)', line)
+        m = re.search(r'] (\S+) \(object,(local|global)\) found in (?:\S+\s+)?(\S+)\s*$', line)
         if m:
             scopes[(m[3], m[1])] = m[2] == 'local'
     for line in text.splitlines():
         m = re.match(r'(\.\S+) section layout', line)
         if m:
             section = m[1]
-        m = re.match(r'\s+[\dA-Fa-f]{8}\s+([\dA-Fa-f]{6,8})\s+[\dA-Fa-f]{8}\s+(\d+)\s+(\S+)\s+\S+\s+(\S+)\s*$', line)
+        m = re.match(r'\s+[\dA-Fa-f]{8}\s+([\dA-Fa-f]{6,8})\s+[\dA-Fa-f]{8}\s+(\d+)\s+(\S+)\s+(?:\S+\s+)?(\S+)\s*$', line)
         if m and section and not m[3].startswith('.'):
             result.append(dict(section=section, size=int(m[1], 16), align=int(m[2]),
                                name=m[3], owner=m[4], local=scopes.get((m[4], m[3]))))
@@ -353,7 +353,7 @@ def bss_ownership(unit, sec, address, maps):
                      key=lambda s: s['offset'])
     cursor, unsupported, padding, alignments = 0, [], [], []
     for sym in objects:
-        evidence = [m for m in maps if m['owner'] == Path(unit).name and m['name'] == sym['name']
+        evidence = [m for m in maps if m['owner'] in (Path(unit).name, Path(unit).with_suffix('.o').name) and m['name'] == sym['name']
                     and m['section'] == sec.name and m['size'] == sym['size']
                     and m['local'] == sym['local']]
         if not evidence:
@@ -393,7 +393,7 @@ def initialized_map_issues(unit, sec, maps):
     for sym in sec.symbols:
         if sym['kind'] != 'STT_OBJECT' or not sym['size'] or sym['name'].startswith('@'):
             continue
-        evidence = [m for m in maps if m['owner'] == Path(unit).name
+        evidence = [m for m in maps if m['owner'] in (Path(unit).name, Path(unit).with_suffix('.o').name)
                     and identity(m['name']) == identity(sym['name'])]
         if evidence and not any(m['section'] == sec.name and m['size'] == sym['size']
                                 and (m['local'] is None or m['local'] == sym['local']) for m in evidence):

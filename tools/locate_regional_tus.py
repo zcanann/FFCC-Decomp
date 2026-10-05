@@ -342,11 +342,16 @@ def sequence_proposals(pal_code, function_report, records, dol, eh_names=()):
         elif len(hits) != 1 or missing_eh:
             issues.append('complete exception-index pointer/length sequence is not uniquely located')
         anchored_names = {canonical(a['name']) for a in agreeing}
-        eh_anchored = {canonical(n) for n in eh_names} if len(hits) == 1 else set()
+        known_names = {canonical(r['name']) for r in bindings
+                       if canonical(r['name']) == canonical(r['previous_name'])}
+        identity_anchors = anchored_names | known_names
         unsupported_edges = [dict(edge=edge, name=fn['name']) for edge, fn in [('first', pal[0]), ('last', pal[-1])]
-                             if canonical(fn['name']) not in anchored_names | eh_anchored]
+                             if canonical(fn['name']) not in identity_anchors]
         if unsupported_edges:
-            issues.append('first or last function identity lacks an independent code or exception-index anchor')
+            issues.append('first or last function identity lacks an independent code or named anchor')
+        unsupported_identities = [fn['name'] for fn in pal if canonical(fn['name']) not in identity_anchors]
+        if unsupported_identities:
+            issues.append('unanchored function identities require code or call-graph review; EH records only support boundaries')
         call_conflicts = [c for c in function_report.get('callgraph_checks', ()) if not c['consistent']]
         if call_conflicts:
             issues.append('fuzzy function rankings contain call-destination disagreements')
@@ -360,6 +365,7 @@ def sequence_proposals(pal_code, function_report, records, dol, eh_names=()):
                               exception_records=len(eh_names), exception_table_candidates=hits,
                               boundary_gaps=gaps, named_conflicts=conflicts, review_issues=issues,
                               unsupported_edges=unsupported_edges, callgraph_conflicts=call_conflicts,
+                              unanchored_identities=unsupported_identities,
                               executable_window_supported=executable_window,
                               functions=bindings))
     proposals.sort(key=lambda r: (r['agreeing_anchors'], len(r['exception_table_candidates']) == 1,

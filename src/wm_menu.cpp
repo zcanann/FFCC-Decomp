@@ -7773,36 +7773,40 @@ inline void CMenuPcs::SetParty()
  * --INFO--
  * PAL Address: 0x800eee34
  * PAL Size: 108b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800EE530
+ * EN Size: 24b
+ * JP Address: 0x800EBA08
+ * JP Size: 24b
  */
 void CMenuPcs::SetCMakeEnd(int channel)
 {
 	m_wm.m_charaSelectData[channel].m_cmakeReady = 1;
+#ifdef VERSION_GCCP01
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf("SetCMakeEnd : chan = %d  cur = %d\n", channel,
 		               (int)m_wm.m_charaSelectData[channel].m_currentSlot);
 	}
+#endif
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800eed84
  * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800EE4C8
+ * EN Size: 104b
+ * JP Address: 0x800EB9A0
+ * JP Size: 104b
  */
 void CMenuPcs::ClrCMakeFlg(int channel)
 {
 	m_wm.m_charaSelectData[channel].m_cmakePending = 0;
 	const int current = m_wm.m_charaSelectData[channel].m_currentSlot;
+#ifdef VERSION_GCCP01
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf("ClrCMakeFlg : chan = %d  cur = %d\n", channel, current);
 	}
+#endif
 	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[current];
 	modelData->m_modelChanged = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);

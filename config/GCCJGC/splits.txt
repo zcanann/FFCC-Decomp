@@ -473,3 +473,6 @@ mapmesh.cpp:
 
 os/OSSemaphore.c:
 	.text start:0x8017AC20 end:0x8017ADA4
+
+wm_menu.cpp:
+	.text start:0x800E3E28 end:0x800FEFE8

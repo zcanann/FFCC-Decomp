@@ -1707,3 +1707,13 @@ auto_chara_anim_8034B63C_sdata:
 
 prgobj.cpp:
 	.text start:0x80122EEC end:0x80123A38
+	.rodata start:0x801D8780 end:0x801D87C0
+	.sdata2 start:0x8034E860 end:0x8034E880
+	.data start:0x8022F898 end:0x8022F970
+	.sdata start:0x8034B7F0 end:0x8034B810
+
+baseobj.cpp:
+	.text start:0x801071C8 end:0x8010731C
+	.rodata start:0x801D7C30 end:0x801D7C58
+	.data start:0x8022EAB0 end:0x8022EAE8
+	.sdata start:0x8034B700 end:0x8034B710

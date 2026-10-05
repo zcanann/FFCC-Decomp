@@ -80,6 +80,15 @@ It does not mean zero bytes proved BSS ownership. Missing MAP evidence,
 unlocated sections, inferred external identities, existing symbol overlap and
 detected source optimizer pragmas remain review issues.
 
+Named initialized objects are also compared with available MAP size, section and
+scope evidence. A matching extra zero can still be a fabricated array element:
+for example, the original interrupt-priority table has 11 entries and the TEV
+channel table has nine. Such contradictions remain review issues even when all
+initialized bytes replay. Function-static numeric suffixes are normalized for
+this diagnostic because MWCC's counters differ between builds; MAP addresses
+remain unused. This check does not replace a source audit or infer ownership
+from absent MAP entries.
+
 `review_ready` means this solver found no outstanding checks in its supported
 model. It is **not** a source audit or matching claim. Inspect source plausibility,
 compiler-generated tables, actual linker dead stripping and section alignment;

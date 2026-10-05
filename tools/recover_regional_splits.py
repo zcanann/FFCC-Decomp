@@ -383,6 +383,29 @@ def bss_ownership(unit, sec, address, maps):
     return unsupported, padding
 
 
+def initialized_map_issues(unit, sec, maps):
+    """Surface named-data contradictions even when extra padding bytes match."""
+    def identity(name):
+        # MWCC's function-static counter changes between release/debug builds.
+        return re.sub(r'\$\d+$', '', name)
+
+    issues = []
+    for sym in sec.symbols:
+        if sym['kind'] != 'STT_OBJECT' or not sym['size'] or sym['name'].startswith('@'):
+            continue
+        evidence = [m for m in maps if m['owner'] == Path(unit).name
+                    and identity(m['name']) == identity(sym['name'])]
+        if evidence and not any(m['section'] == sec.name and m['size'] == sym['size']
+                                and (m['local'] is None or m['local'] == sym['local']) for m in evidence):
+            layouts = sorted({f'{m["section"]}/{m["size"]} bytes/'
+                              + ('local' if m['local'] else 'global' if m['local'] is False else 'unknown scope')
+                              for m in evidence})
+            issues.append(f'{sym["name"]}: compiled {sec.name}/{sym["size"]} bytes/'
+                          + ('local' if sym['local'] else 'global')
+                          + ' differs from MAP layout ' + ', '.join(layouts))
+    return issues
+
+
 def solve_hypothesis(unit, sections, discarded, dol, records, bases, maps, globals_):
     values = {('absolute', 0): 0, **{('global', k): v for k, v in globals_.items()}}
     for sym in records:
@@ -463,6 +486,10 @@ def solve_hypothesis(unit, sections, discarded, dol, records, bases, maps, globa
             if row['status'] != 'map_supported_bss':
                 result['review_issues'].append(f'{sec.name}: BSS needs independent MAP ownership, scope and extent evidence')
         else:
+            layout_issues = initialized_map_issues(unit, sec, maps)
+            if layout_issues:
+                row['map_layout_issues'] = layout_issues
+                result['review_issues'].extend(f'{sec.name}: {issue}' for issue in layout_issues)
             try:
                 actual = retail_bytes(dol, address, sec.size, sec.code)
                 if replay(sec, address, values, bases, sections) != actual:

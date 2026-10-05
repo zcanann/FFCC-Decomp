@@ -8,7 +8,7 @@ import unittest
 from elftools.elf.elffile import ELFFile
 
 from tools.recover_regional_splits import (Section, bss_ownership, constrain, inferred_constraints,
-    map_objects, masks, placements, read_object, replay, sda_bases, solve, symbol_records)
+    initialized_map_issues, map_objects, masks, placements, read_object, replay, sda_bases, solve, symbol_records)
 from tools.tests.test_recover_code_splits import AS, LD, OBJCOPY, dol
 
 
@@ -82,6 +82,17 @@ class ConstraintTests(unittest.TestCase):
         evidence[1]['align'] = 16
         self.assertEqual(bss_ownership('unit.c', sec, 0x80005000, evidence),
                          ([], [dict(offset=4, size=12)]))
+
+    def test_function_static_map_counters_do_not_hide_padding_elements(self):
+        sym = dict(name='c2r$287', size=40, kind='STT_OBJECT', local=True)
+        sec = Section(2, '.data', bytes(40), 40, 8, False, False, [sym])
+        evidence = [dict(owner='GXTev.c', name='c2r$194', size=36, section='.data', local=True)]
+        issues = initialized_map_issues('gx/GXTev.c', sec, evidence)
+        self.assertEqual(len(issues), 1)
+        self.assertIn('40 bytes/local differs from MAP layout .data/36 bytes/local', issues[0])
+        sym['size'] = 36
+        self.assertEqual(initialized_map_issues('gx/GXTev.c', sec, evidence), [])
+        self.assertEqual(initialized_map_issues('other.c', sec, evidence), [])
 
 
 @unittest.skipUnless(AS.is_file(), 'PowerPC GNU assembler required')
@@ -238,6 +249,11 @@ blr
         self.assertEqual(row['status'], 'review_ready')
         self.assertEqual(row['initialized_bytes'], 20)
         self.assertEqual(row['relocation_count'], 2)
+        mismatched_map = [dict(owner='unit.c', name='table', size=8, section='.data', local=True)]
+        contradiction = solve([dict(unit='unit.c', data=obj)], bytes(image), maps=mismatched_map)['objects'][0]
+        self.assertEqual(contradiction['initialized_bytes'], 20)
+        self.assertEqual(contradiction['status'], 'hypothesis')
+        self.assertTrue(any('differs from MAP layout' in s for s in contradiction['review_issues']))
         image[-1] ^= 1
         bad = solve([dict(unit='unit.c', data=obj)], bytes(image))['objects'][0]
         self.assertEqual(bad['status'], 'rejected')

@@ -208,3 +208,40 @@ MSL_C/PPCEABI/bare/H/s_sin.c:
 MSL_C/PPCEABI/bare/H/s_tan.c:
 	.text start:0x801BAF44 end:0x801BAFBC
 	.sdata2 start:0x80332CA8 end:0x80332CB0
+
+MSL_C/PPCEABI/bare/H/float.c:
+	.sdata start:0x8032DC00 end:0x8032DC08
+
+MSL_C/PPCEABI/bare/H/errno.c:
+	.sbss start:0x8032E370 end:0x8032E374
+
+MSL_C/PPCEABI/bare/H/e_acos.c:
+	.text start:0x801B80F0 end:0x801B832C
+	.sdata2 start:0x803328F0 end:0x80332978
+
+MSL_C/PPCEABI/bare/H/e_pow.c:
+	.text start:0x801B88F8 end:0x801B9128
+	.rodata start:0x801E6330 end:0x801E6360
+	.sdata2 start:0x803329D0 end:0x80332AE0
+
+MSL_C/PPCEABI/bare/H/e_sqrt.c:
+	.text start:0x801BB03C end:0x801BB260
+	.sdata2 start:0x80332CB0 end:0x80332CB8
+
+MSL_C/PPCEABI/bare/H/w_acos.c:
+	.text start:0x801BAFBC end:0x801BAFDC
+
+MSL_C/PPCEABI/bare/H/w_atan2.c:
+	.text start:0x801BAFDC end:0x801BAFFC
+
+MSL_C/PPCEABI/bare/H/w_fmod.c:
+	.text start:0x801BAFFC end:0x801BB01C
+
+MSL_C/PPCEABI/bare/H/w_pow.c:
+	.text start:0x801BB01C end:0x801BB03C
+
+MSL_C/PPCEABI/bare/H/math_ppc.c:
+	.text start:0x801BB260 end:0x801BB314
+
+MSL_C/PPCEABI/bare/H/w_sqrt.c:
+	.text start:0x801BB314 end:0x801BB334

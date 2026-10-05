@@ -480,6 +480,7 @@ partyobj.cpp:
 
 partMng.cpp:
 	.text start:0x80057184 end:0x8005F084
+	.bss start:0x80274EA8 end:0x80298EF0
 
 memory.cpp:
 	.bss start:0x8023B848 end:0x80242FE8
@@ -1328,6 +1329,9 @@ pppShape.cpp:
 
 pppsintbl.cpp:
 	.data	start:0x801EB870 end:0x801FB870
+
+auto_08_80298EF0_bss:
+	.bss start:0x80298EF0 end:0x80298F00
 
 pppYmEnv.cpp:
 	.text start:0x800E3EA8 end:0x800E582C

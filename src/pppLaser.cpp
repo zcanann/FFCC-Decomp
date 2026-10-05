@@ -325,7 +325,6 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
     float length;
     float halfWidth;
     float u0;
-    float u1;
     float uvStep;
     pppFMATRIX mtxOut;
     pppFMATRIX unitMtx;
@@ -448,8 +447,6 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
         u8 trailColorG = color.g;
         u8 trailColorB = color.b;
         for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
-            u0 = uvStep * (float)j;
-            u1 = uvStep * (float)(j + 1);
             _GXColor trailStartColor;
             trailStartColor.r = trailColorR;
             trailStartColor.g = trailColorG;
@@ -464,6 +461,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
 
             GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
             GXColor1u32(*(u32*)&trailStartColor);
+            u0 = uvStep * (float)j;
             GXTexCoord2f32(u0, one);
 
             GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
@@ -472,7 +470,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
 
             GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
             GXColor1u32(*(u32*)&trailEndColor);
-            GXTexCoord2f32(u1, zero);
+            GXTexCoord2f32(uvStep * (float)(j + 1), zero);
         }
         GXEnd();
 

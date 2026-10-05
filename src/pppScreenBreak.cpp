@@ -396,9 +396,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         float speed = Math.RandF(step->m_speedRand);
         PSVECScale(&piece->m_velocity, &piece->m_velocity, step->m_speedBase + speed);
 
-        piece->m_offset.z = kScreenBreakZero;
-        piece->m_offset.y = kScreenBreakZero;
-        piece->m_offset.x = kScreenBreakZero;
+        piece->m_offset.x = piece->m_offset.y = piece->m_offset.z = kScreenBreakZero;
         piece->m_timer = kScreenBreakZero;
 
         float angle = Math.RandF(static_cast<float>(step->m_angleRand));

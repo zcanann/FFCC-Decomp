@@ -169,8 +169,11 @@ regional_data:
 main/obj:
 	.data       start:0x02025AA4 end:0x02025ABC align:4
 
+main/mode:
+	.data       start:0x02025ABC end:0x02025C18 align:4
+
 regional_data:
-	.rodata     start:0x02025ABC end:0x02025DF0
+	.rodata     start:0x02025C18 end:0x02025DF0
 
 main/msg_sys:
 	.data       start:0x02025DF0 end:0x02025FC8 align:4
@@ -212,4 +215,10 @@ main/xfer:
 	.common     start:0x03002AF0 end:0x03002AFC align:4
 
 regional_bss:
-	.bss        start:0x03002AFC end:0x030044C1
+	.bss        start:0x03002AFC end:0x030030B0
+
+main/mode:
+	.common     start:0x030030B0 end:0x030032E8 align:16
+
+regional_bss:
+	.bss        start:0x030032E8 end:0x030044C1 align:4

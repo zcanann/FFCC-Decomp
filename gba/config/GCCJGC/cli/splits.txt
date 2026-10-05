@@ -293,7 +293,13 @@ main/gil:
 	.bss        start:0x030027C0 end:0x030027CE align:4
 
 regional_bss:
-	.bss        start:0x030027CE end:0x03002800 align:1
+	.bss        start:0x030027CE end:0x030027D0 align:1
+
+main/cmake:
+	.bss        start:0x030027D0 end:0x030027FD align:8
+
+regional_bss:
+	.bss        start:0x030027FD end:0x03002800 align:1
 
 main/equip:
 	.bss        start:0x03002800 end:0x03002805 align:4
@@ -341,7 +347,13 @@ main/xfer:
 	.common     start:0x03002AF0 end:0x03002AFC align:4
 
 regional_bss:
-	.bss        start:0x03002AFC end:0x030030B0
+	.bss        start:0x03002AFC end:0x03002FB0
+
+main/cmake:
+	.common     start:0x03002FB0 end:0x03002FCC align:16
+
+regional_bss:
+	.bss        start:0x03002FCC end:0x030030B0
 
 main/mode:
 	.common     start:0x030030B0 end:0x030032E8 align:16

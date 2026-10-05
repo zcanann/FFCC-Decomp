@@ -8,7 +8,7 @@
 #include "window.h"
 #include "screen.h"
 
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
 #define CMAKE_NAME_BUTTON_X 24
 #define CMAKE_NAME_BUTTON_WIDTH 5
 #define CMAKE_NAME_LABEL_TILES 10
@@ -60,6 +60,8 @@ char *gNameCharTables[] = {
     "            ",
 };
 #endif
+
+#define CMAKE_NAME_PAGE_COUNT ((s32)ARRAY_COUNT(gNameCharTables) / 5)
 
 const s8 sDaysInMonth[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
@@ -339,6 +341,15 @@ s32 CMakeNameScreen_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200AD90
+ * PAL Size: 316b
+ * EN Address: 0x0200ACC0
+ * EN Size: 316b
+ * JP Address: 0x02010D94
+ * JP Size: 316b
+ */
 void CMakeNameScreen_DrawCursor(void)
 {
     s32 x;
@@ -357,7 +368,11 @@ void CMakeNameScreen_DrawCursor(void)
         id = 45;
         win = gWindows;
         if (sCMakeCursor[1] == 5 && sCMakeCursor[0] > 9) {
+#if defined(VERSION_GCCJGC)
+            x = win[1].x * 8 - 10;
+#else
             x = win[1].x * 8 - 18;
+#endif
             y = win[1].y * 8 + 5;
         } else {
             x = (win->x + sCMakeCursor[0] * 2) * 8;
@@ -372,6 +387,15 @@ void CMakeNameScreen_DrawCursor(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200AECC
+ * PAL Size: 664b
+ * EN Address: 0x0200ADFC
+ * EN Size: 664b
+ * JP Address: 0x02010ED0
+ * JP Size: 664b
+ */
 s32 CMakeNameScreen_HandleInput(void)
 {
     s32 ret;
@@ -431,13 +455,13 @@ s32 CMakeNameScreen_HandleInput(void)
         m4aSongNumStart(2);
     } else if (gKeysNew & L_BUTTON) {
         if (sCMakeCharPage <= 0)
-            sCMakeCharPage = 2;
+            sCMakeCharPage = CMAKE_NAME_PAGE_COUNT - 1;
         else
             sCMakeCharPage--;
         sCMakeCharRow = 0;
         m4aSongNumStart(6);
     } else if (gKeysNew & R_BUTTON) {
-        if (sCMakeCharPage > 1)
+        if (sCMakeCharPage > CMAKE_NAME_PAGE_COUNT - 2)
             sCMakeCharPage = 0;
         else
             sCMakeCharPage++;
@@ -2068,8 +2092,8 @@ s32 CMakeJobScreen_HandleInput(void)
  * PAL Size: 392b
  * EN Address: 0x0200D864
  * EN Size: 392b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x02013B84
+ * JP Size: 360b
  */
 void CMakeConfirmScreen_Setup(void)
 {

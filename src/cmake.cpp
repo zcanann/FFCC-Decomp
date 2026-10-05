@@ -526,9 +526,13 @@ static inline int GetCharaType(char* text, int index)
     if (length == 0) {
         return -1;
     }
-    int character = 0;
-    int state = 0;
-    for (int position = 0; length > 0; --length, ++position) {
+    int position;
+    int state;
+    int character;
+    character = 0;
+    state = 0;
+    position = 0;
+    for (; length > 0; --length, ++position) {
         if ((state == 0 || state == 2) &&
             ((static_cast<unsigned char>(text[position]) >= 0x81 && static_cast<unsigned char>(text[position]) <= 0x9F) || (static_cast<unsigned char>(text[position]) >= 0xE0 && static_cast<unsigned char>(text[position]) <= 0xFC))) {
             state = 1;
@@ -575,9 +579,13 @@ static inline int GetCharaCnt(char* text)
     if (length == 0) {
         return 0;
     }
-    int character = 0;
-    int state = 0;
-    for (int position = 0; length > 0; --length, ++position) {
+    int position;
+    int state;
+    int character;
+    character = 0;
+    state = 0;
+    position = 0;
+    for (; length > 0; --length, ++position) {
         if ((state == 0 || state == 2) &&
             ((static_cast<unsigned char>(text[position]) >= 0x81 && static_cast<unsigned char>(text[position]) <= 0x9F) || (static_cast<unsigned char>(text[position]) >= 0xE0 && static_cast<unsigned char>(text[position]) <= 0xFC))) {
             state = 1;

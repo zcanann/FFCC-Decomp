@@ -5238,6 +5238,10 @@ void CMenuPcs::CalcPitcher()
 
 static inline void SetPortTownName(char* dst, const char* townName)
 {
+#ifdef VERSION_GCCJGC
+	strcpy(dst, townName);
+	strcat(dst, "\x82\xCC\x8D\x60");
+#else
 	static const char* s_port[] = {"Port ", "-Hafen", "Porto ", "Port ", "Puerto "};
 	const int language = Game.m_gameWork.GetLanguage();
 	if (language == 2) {
@@ -5247,16 +5251,17 @@ static inline void SetPortTownName(char* dst, const char* townName)
 		strcpy(dst, s_port[language - 1]);
 		strcat(dst, townName);
 	}
+#endif
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800f554c
+ * PAL Address: 0x800F554C
  * PAL Size: 4080b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F4AEC
+ * EN Size: 4112b
+ * JP Address: 0x800F1978
+ * JP Size: 3944b
  */
 void CMenuPcs::CalcFukidashi()
 {
@@ -5576,12 +5581,12 @@ void CMenuPcs::CalcFukidashi()
 
 /*
  * --INFO--
- * PAL Address: 0x800f4b24
+ * PAL Address: 0x800F4B24
  * PAL Size: 2600b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F40A4
+ * EN Size: 2632b
+ * JP Address: 0x800F1048
+ * JP Size: 2352b
  */
 void CMenuPcs::DrawFukidashi()
 {
@@ -8618,12 +8623,12 @@ inline int CMenuPcs::ChkMcDataCnt()
 
 /*
  * --INFO--
- * PAL Address: 0x800eb6f8
+ * PAL Address: 0x800EB6F8
  * PAL Size: 6328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800EADFC
+ * EN Size: 6392b
+ * JP Address: 0x800E875C
+ * JP Size: 5320b
  */
 void CMenuPcs::DrawMCList()
 {
@@ -9193,9 +9198,13 @@ nextListEntry:
 				fontF8->SetPosX(*pPx520);
 				const double* pOff4 = &DOUBLE_80331510;
 				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - *pOff4));
+#ifdef VERSION_GCCJGC
+				fontF8->Draw(const_cast<char*>(slotData->m_townName));
+#else
 				strcpy(locationStr, slotData->m_townName);
 				Game.UpperItemName(locationStr);
 				fontF8->Draw(locationStr);
+#endif
 
 				const float* pMa3 = &FLOAT_803313e8;
 				fontF8->SetMargin(*pMa3);
@@ -9209,10 +9218,20 @@ nextListEntry:
 				if (locationIndex == 0x0F) {
 					strcpy(locationStr, slotData->m_townName);
 				} else if (locationIndex == 0x16) {
+#ifdef VERSION_GCCJGC
+					strcpy(locationStr, slotData->m_townName);
+					strcpy(locationStr + strlen(locationStr) - 4, "\x82\xCC\x8D\x60");
+#else
 					SetPortTownName(locationStr, slotData->m_townName);
+#endif
 				} else {
 					strcpy(locationStr, Game.GetPlaceName(locationIndex));
 				}
+#ifdef VERSION_GCCJGC
+				fontF8->SetPosX(FLOAT_80331518 - fontF8->GetWidth(locationStr));
+				fontF8->SetPosY(FLOAT_80331558 + slotY);
+				fontF8->Draw(locationStr);
+#else
 				Game.UpperItemName(locationStr);
 				const float locationWidth = fontF8->GetWidth(locationStr);
 				const float* p558b = &FLOAT_80331558;
@@ -9239,42 +9258,52 @@ nextListEntry:
 					fontF8->SetPosY(locationY);
 					fontF8->Draw(line2);
 				}
+#endif
 			}
 		}
 	}
 	if (worldState->m_subState == 0x11) {
 		short mode = worldState->m_menuMode;
 		if (mode == 5) {
+#ifdef VERSION_GCCJGC
+			char text[256] = "\x83\x8D\x81\x5B\x83\x68\x82\xB7\x82\xE9\x83\x66\x81\x5B\x83\x5E\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
+			DrawFont((int)CalcCenteringPos(text, 22), 391,
+			         CColor(255, 255, 255, 255).color, 7, text, 1.0f, 1.0f);
+#else
 			GXColor color = CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
 			char* text = const_cast<char*>(GetMcStr(2));
 			char* text2 = const_cast<char*>(GetMcStr(2));
 			const float* pWf1 = &FLOAT_80331594;
 			const float* pHf3 = &FLOAT_803313e8;
-#ifdef VERSION_GCCJGC
-			const int x = static_cast<int>(CalcCenteringPos(text2, 22));
-#else
 			const int x = static_cast<int>(CalcCenteringPos2(text2, *pWf1, *pHf3));
-#endif
 			const float* pWf2 = &FLOAT_80331594;
 			const float* pHf4 = &FLOAT_803313e8;
 			DrawFont2(x, 0x187, color, 7, text, *pWf2, *pHf4, *pHf4);
+#endif
 		} else if (mode == 2) {
+#ifdef VERSION_GCCJGC
+			char text[256] = "\x83\x66\x81\x5B\x83\x5E\x82\xF0\x82\xC7\x82\xB1\x82\xC9\x83\x5A\x81\x5B\x83\x75\x82\xB5\x82\xDC\x82\xB7\x82\xA9\x81\x48";
+			DrawFont((int)CalcCenteringPos(text, 22), 391,
+			         CColor(255, 255, 255, 255).color, 7, text, 1.0f, 1.0f);
+#else
 			GXColor color = CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
 			char* text = const_cast<char*>(GetMcStr(3));
 			char* text2 = const_cast<char*>(GetMcStr(3));
 			const float* pWf3 = &FLOAT_80331594;
 			const float* pHf5 = &FLOAT_803313e8;
-#ifdef VERSION_GCCJGC
-			const int x = static_cast<int>(CalcCenteringPos(text2, 22));
-#else
 			const int x = static_cast<int>(CalcCenteringPos2(text2, *pWf3, *pHf5));
-#endif
 			const float* pWf4 = &FLOAT_80331594;
 			const float* pHf6 = &FLOAT_803313e8;
 			DrawFont2(x, 0x187, color, 7, text, *pWf4, *pHf6, *pHf6);
+#endif
 		}
+#ifdef VERSION_GCCJGC
+		DrawInit();
+#endif
 	}
+#ifndef VERSION_GCCJGC
 	DrawInit();
+#endif
 #undef worldState
 }
 

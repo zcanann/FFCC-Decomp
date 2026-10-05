@@ -202,3 +202,7 @@ MSL_C/PPCEABI/bare/H/w_pow.c:
 
 MSL_C/PPCEABI/bare/H/math_ppc.c:
 	.text start:0x801B7618 end:0x801B76CC
+
+MSL_C/PPCEABI/bare/H/mbstring.c:
+	.text start:0x801B18F0 end:0x801B1A08
+	.sdata2 start:0x8034FD48 end:0x8034FD4C

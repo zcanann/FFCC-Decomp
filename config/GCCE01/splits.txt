@@ -245,3 +245,10 @@ MSL_C/PPCEABI/bare/H/math_ppc.c:
 
 MSL_C/PPCEABI/bare/H/w_sqrt.c:
 	.text start:0x801BB314 end:0x801BB334
+
+MSL_C/PPCEABI/bare/H/mbstring.c:
+	.text start:0x801B5378 end:0x801B5490
+	.sdata2 start:0x803328E0 end:0x803328E4
+
+MSL_C/PPCEABI/bare/H/FILE_POS.c:
+	.text start:0x801B4FB8 end:0x801B5378

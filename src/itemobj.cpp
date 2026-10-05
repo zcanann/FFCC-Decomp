@@ -190,20 +190,18 @@ void CGItemObj::onChangeStat(int state)
 
 /*
  * --INFO--
- * PAL Address: 0x80126eb4
+ * PAL Address: 0x80126EB4
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801261E4
+ * EN Size: 44b
+ * JP Address: 0x80122D98
+ * JP Size: 44b
  */
 void CGItemObj::onCancelStat(int)
 {
 	if (m_lastStateId == 0x1b) {
 		m_bgColMask |= 2;
-		m_rotationZ = kItemObjUnitScale;
-		m_rotationY = kItemObjUnitScale;
-		m_rotationX = kItemObjUnitScale;
+		m_rotationX = m_rotationY = m_rotationZ = kItemObjUnitScale;
 	}
 }
 

@@ -314,3 +314,16 @@ axfx/reverb_hi_4ch.c:
 	.text start:0x80195904 end:0x8019683C
 	.data start:0x8021AE10 end:0x8021AE34
 	.sdata2 start:0x80332788 end:0x803327C8
+
+gx/GXAttr.c:
+	.text start:0x8019F9F4 end:0x801A0B64
+	.data start:0x8021B340 end:0x8021B4A0
+	.sdata start:0x8032DB70 end:0x8032DB7C
+
+gx/GXGeometry.c:
+	.text start:0x801A1308 end:0x801A16B8
+
+gx/GXPixel.c:
+	.text start:0x801A48A0 end:0x801A4ED8
+	.sdata2 start:0x80332880 end:0x803328B8
+	.data start:0x8021B890 end:0x8021B8B0

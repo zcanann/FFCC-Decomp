@@ -1115,3 +1115,6 @@ auto_07_802388A0_data:
 
 auto_08_80345A1C_bss:
     .bss start:0x80345A1C end:0x80345A20 align:4
+
+pppPart.cpp:
+	.text start:0x80053458 end:0x80056BF0

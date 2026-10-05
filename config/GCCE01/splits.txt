@@ -1178,3 +1178,6 @@ axfx/reverb_hi.c:
 
 itemobj.cpp:
 	.text start:0x80123EA8 end:0x80126338
+
+pppPart.cpp:
+	.text start:0x800539EC end:0x80057184

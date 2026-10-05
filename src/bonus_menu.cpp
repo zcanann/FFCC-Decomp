@@ -2382,13 +2382,20 @@ void CMenuPcs::CalcSelectOpenAnim()
  * --INFO--
  * PAL Address: 0x80135258
  * PAL Size: 2824b
- * EN Address: 0x8015A968
- * EN Size: 2976b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80134578
+ * EN Size: 2804b
+ * JP Address: 0x801310D4
+ * JP Size: 2724b
  */
 void CMenuPcs::DrawSelectOpenAnim()
 {
+#ifdef VERSION_GCCJGC
+	enum { kSourceAllocLine = 0x9CD, kSourceErrorLine = 0x9D0,
+	       kConvertedAllocLine = 0x9D6, kConvertedErrorLine = 0x9D9 };
+#else
+	enum { kSourceAllocLine = 0xA9C, kSourceErrorLine = 0xA9F,
+	       kConvertedAllocLine = 0xAA5, kConvertedErrorLine = 0xAA8 };
+#endif
 	if (this->m_bonusState->m_initialized == 0) {
 		return;
 	}
@@ -2516,11 +2523,17 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 			float x = (float)sprite->x + sprite->motionX;
 			float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
 			if (textIndex < activePartyCount) {
 				y -= 4.0f;
 			}
+#endif
 			font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+			font->SetPosY(y);
+#else
 			font->SetPosY(y - 4.0f);
+#endif
 			font->Draw(text);
 			textIndex++;
 		}
@@ -2540,28 +2553,36 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font = this->m_fonts[1];
 		font->SetMargin(1.0f);
 		font->SetShadow(0);
+#ifdef VERSION_GCCJGC
+		font->SetScale(0.9f);
+#else
 		font->SetScaleX(0.7200000286102295f);
 		font->SetScaleY(0.8999999761581421f);
+#endif
 		font->DrawInit();
 		CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 		font->SetColor(color.color);
 
 		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
-		char* title = Game.m_cFlatDataArr[1].TableStrings(0)[idx * 5 + 4];
+		char* title = Game.GetShortItemName(idx);
 		float centerX = (float)((double)sprite->x + (double)(float)sprite->w * 0.5);
 		float centerY = (float)((double)sprite->y + (double)(float)sprite->h * 0.5);
 		font->SetPosX((float)-(0.5 * (double)font->GetWidth(title) - (double)centerX));
+#ifdef VERSION_GCCJGC
+		font->SetPosY(centerY - 44.0f);
+#else
 		font->SetPosY(centerY - 44.0f - 4.0f);
+#endif
 		font->Draw(title);
 
-		char* source = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xA9C) char[0x200];
+		char* source = new (MenuPcs.m_menuStage, "bonus_menu.cpp", kSourceAllocLine) char[0x200];
 		if ((source == 0) && ((unsigned int)System.m_execParam >= 1)) {
-			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", 0xA9F);
+			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", kSourceErrorLine);
 		}
 		memset(source, 0, 0x200);
-		char* converted = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xAA5) char[0x200];
+		char* converted = new (MenuPcs.m_menuStage, "bonus_menu.cpp", kConvertedAllocLine) char[0x200];
 		if ((converted == 0) && ((unsigned int)System.m_execParam >= 1)) {
-			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", 0xAA8);
+			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", kConvertedErrorLine);
 		}
 		memset(converted, 0, 0x200);
 		strcpy(source, Game.m_cFlatDataArr[1].TableStrings(6)[idx]);
@@ -2572,14 +2593,22 @@ void CMenuPcs::DrawSelectOpenAnim()
 #endif
 		strlen(converted);
 
+#ifdef VERSION_GCCJGC
+		float lineY = centerY - 11.0f;
+#else
 		float lineY = centerY - 11.0f - 7.0f;
+#endif
 		for (int line = 0;; line++) {
 			char* lineText = (line != 0) ? strtok(0, const_cast<char*>("\n")) : strtok(converted, const_cast<char*>("\n"));
 			if (lineText == 0) {
 				break;
 			}
 			font->SetPosX((float)-(0.5 * (double)font->GetWidth(lineText) - (double)centerX));
+#ifdef VERSION_GCCJGC
+			font->SetPosY(lineY);
+#else
 			font->SetPosY(lineY - 4.0f);
+#endif
 			font->Draw(lineText);
 			lineY += 22.0f;
 		}
@@ -2597,8 +2626,13 @@ void CMenuPcs::DrawSelectOpenAnim()
 	if (this->m_menuWindowInfo->state == 1) {
 		DrawMcWinMess(0x18, 1);
 		DrawInit();
+#ifdef VERSION_GCCJGC
+		float cursorX = (float)(this->m_menuWindowInfo->x + 32) + (float)(this->m_bonusState->m_confirmSelection * 80);
+		float cursorY = (float)(this->m_menuWindowInfo->y + 76);
+#else
 		float cursorY = (float)(this->m_menuWindowInfo->y + this->m_menuWindowInfo->height - 0x3e);
 		float cursorX = (float)GetYesNoXPos((int)this->m_bonusState->m_confirmSelection);
+#endif
 		DrawCursor((int)cursorX, (int)cursorY, 1.0f);
 	}
 }

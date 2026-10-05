@@ -126,7 +126,7 @@ extern ProcessorState_PPC gTRKCPUState;
 extern ProcessorRestoreFlags_PPC gTRKRestoreFlags;
 extern u8 gTRKInterruptVectorTable[];
 extern TRKState gTRKState;
-extern TRKBuffer gTRKMessageBuffers[3];
+extern TRKBuffer gTRKMsgBufs[3];
 
 #ifdef __cplusplus
 }

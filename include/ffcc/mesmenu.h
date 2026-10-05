@@ -30,7 +30,9 @@ public:
     void SetIndex(int index)
     {
         m_menuIndex = index;
+#ifndef VERSION_GCCJGC
         m_mes.SetPlayerIndex(index);
+#endif
     }
     int IsActiveMessage() { return (m_active != 0) && (m_state <= 1) && (m_mes.GetWait() != 4); }
 
@@ -41,10 +43,13 @@ private:
     int m_stateTimerMax;       // 0x0014
     int m_menuIndex;           // 0x0018
     CMes m_mes;                // 0x001C
+    // Offset comments below describe the PAL layout.
     float m_baseX;             // 0x3D6C
     float m_baseY;             // 0x3D70
+#ifdef VERSION_GCCP01
     float m_offsetX;           // 0x3D74
     float m_offsetY;           // 0x3D78
+#endif
     float m_windowWidth;       // 0x3D7C
     float m_windowHeight;      // 0x3D80
     float m_windowScale;       // 0x3D84
@@ -64,5 +69,11 @@ private:
     int m_stageFadeTimer;      // 0x3DF4
     int m_stageFadeOut;        // 0x3DF8
 };
+
+#ifdef VERSION_GCCJGC
+typedef char CMesMenu_size_check[(sizeof(CMesMenu) == 0x1DD8) ? 1 : -1];
+#elif defined(VERSION_GCCE01)
+typedef char CMesMenu_size_check[(sizeof(CMesMenu) == 0x3DF4) ? 1 : -1];
+#endif
 
 #endif // _FFCC_MESMENU_H_

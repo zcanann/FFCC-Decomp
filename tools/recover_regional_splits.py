@@ -186,7 +186,7 @@ def read_object(data, retained=None, retained_sections=None):
         occupied = set()
         for r in table.iter_relocations():
             kind = r['r_info_type']
-            if kind not in (1, 4, 5, 6, 10, 109):
+            if kind not in (1, 4, 5, 6, 10, 11, 109):
                 raise ValueError(f'unsupported PowerPC relocation {kind}')
             original_offset = r['r_offset']
             # Old MWCC points SDA21 at the immediate halfword, GNU at the word.
@@ -206,10 +206,11 @@ def read_object(data, retained=None, retained_sections=None):
                 raise ValueError('relocation crosses a retained/discarded boundary')
             if offset is None:
                 continue
-            if kind == 10:
+            if kind in (10, 11):
                 word = int.from_bytes(sec.body[offset:offset + 4], 'big')
-                if word >> 26 != 18 or word & 2:
-                    raise ValueError('REL24 requires a relative branch instruction')
+                opcode, label = (18, 'REL24') if kind == 10 else (16, 'REL14')
+                if word >> 26 != opcode or word & 2:
+                    raise ValueError(f'{label} requires a relative branch instruction')
             sym = symbols[r['r_info_sym']]
             value = sym['offset'] + r['r_addend']
             if sym['index'] in sections:
@@ -234,7 +235,7 @@ def masks(sec):
     for r in sec.relocs:
         offset, kind = r['offset'], r['kind']
         bits = {1: 0xffffffff, 4: 0xffff, 5: 0xffff, 6: 0xffff,
-                10: 0x03fffffc, 109: 0x001fffff}[kind]
+                10: 0x03fffffc, 11: 0x0000fffc, 109: 0x001fffff}[kind]
         width = 2 if kind in (4, 5, 6) else 4
         mask[offset:offset + width] = ((~bits) & ((1 << (width * 8)) - 1)).to_bytes(width, 'big')
     return bytes(mask)
@@ -275,13 +276,14 @@ def inferred_constraints(sec, address, actual, bases):
     for r in sec.relocs:
         off, kind = r['offset'], r['kind']
         value = None
-        if kind in (1, 10, 109):
+        if kind in (1, 10, 11, 109):
             word = int.from_bytes(actual[off:off + 4], 'big')
             if kind == 1:
                 value = word
-            elif kind == 10:
-                disp = word & 0x03fffffc
-                value = address + off + (disp - 0x04000000 if disp & 0x02000000 else disp)
+            elif kind in (10, 11):
+                bits = 26 if kind == 10 else 16
+                disp = word & ((1 << bits) - 4)
+                value = address + off + (disp - (1 << bits) if disp & (1 << (bits - 1)) else disp)
             else:
                 reg, disp = (word >> 16) & 31, word & 0xffff
                 if reg not in bases:
@@ -319,11 +321,13 @@ def replay(sec, address, values, bases, sections):
             body[offset:offset + 4] = target.to_bytes(4, 'big')
         else:
             word = int.from_bytes(body[offset:offset + 4], 'big')
-            if kind == 10:
+            if kind in (10, 11):
+                bits, label = (26, 'REL24') if kind == 10 else (16, 'REL14')
                 disp = target - address - offset
-                if disp % 4 or not -0x2000000 <= disp < 0x2000000:
-                    raise ValueError('REL24 target is out of range')
-                word = (word & ~0x03fffffc) | (disp & 0x03fffffc)
+                if disp % 4 or not -(1 << (bits - 1)) <= disp < (1 << (bits - 1)):
+                    raise ValueError(f'{label} target is out of range')
+                mask = (1 << bits) - 4
+                word = (word & ~mask) | (disp & mask)
             else:
                 if r['key'][0] == 'section':
                     name = sections[r['key'][1]].name

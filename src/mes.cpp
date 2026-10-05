@@ -7,6 +7,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/strcase.h"
 #include "ffcc/system.h"
+#include "ffcc/util.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
@@ -108,13 +109,53 @@ static inline CColor& MesColorRef(const CColor& color)
 
 /*
  * --INFO--
- * PAL Address: 0x800981f0
+ * PAL Address: 0x800981F0
  * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80097B8C
+ * EN Size: 380b
+ * JP Address: 0x800976FC
+ * JP Size: 444b
  */
+#ifdef VERSION_GCCJGC
+unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
+{
+    int width = 0;
+    bool continueDraw = true;
+    unsigned short ch;
+    int lineStartX = (int)font->posX;
+    while (continueDraw) {
+        unsigned short c = (unsigned char)*text++;
+        if (c == 0) {
+            continueDraw = false;
+        } else if (((c >= 0x80) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xFF))) {
+            ch = (c << 8) | (unsigned char)*text++;
+            goto drawChar;
+        } else if (c >= 0xA0) {
+            int tag = (c - 0xA0) & 0xFFFF;
+            switch (tag) {
+            case 0:
+                if (breakOnLineTag != 0) {
+                    font->SetPosX((float)lineStartX);
+                    float lineAdvance = (float)font->m_glyphHeight * font->scaleY;
+                    font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
+                }
+                break;
+            case 1:
+                continueDraw = false;
+                break;
+            }
+        } else {
+            ch = gUtil.AsciiToMulti(c);
+        drawChar:
+            if (drawChars != 0) {
+                font->Draw(ch);
+            }
+            width = (int)((float)width + font->GetWidth(ch));
+        }
+    }
+    return width;
+}
+#else
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
 	int width = 0;
@@ -160,6 +201,8 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 
 	return width;
 }
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x8009836c
@@ -610,12 +653,12 @@ inline void CMes::addFlag(CFlag& flag)
 
 /*
  * --INFO--
- * PAL Address: 0x80098bc4
+ * PAL Address: 0x80098BC4
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80098568
+ * EN Size: 192b
+ * JP Address: 0x80097D20
+ * JP Size: 192b
  */
 int CMes::useFlag(int maxCount, int stopOnClear)
 {
@@ -652,8 +695,12 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80098C84
+ * PAL Size: 12b
+ * EN Address: 0x80098628
+ * EN Size: 12b
+ * JP Address: 0x80097DE0
+ * JP Size: 12b
  */
 void CMes::SetPosition(float x, float y)
 {
@@ -686,10 +733,15 @@ inline CFont* CMes::getFont(int fontIndex, int draw)
 		break;
 	}
 	font->SetShadow(mShadow);
+#ifdef VERSION_GCCJGC
+	font->SetMargin(1.0f);
+	font->SetScale(mScaleX);
+#else
 	font->SetMargin(0.0f);
 	float scaleY = mScaleY;
 	font->SetScaleX(mScaleX);
 	font->SetScaleY(scaleY);
+#endif
 	if (draw)
 	{
 		font->DrawInit();
@@ -699,12 +751,12 @@ inline CFont* CMes::getFont(int fontIndex, int draw)
 
 /*
  * --INFO--
- * PAL Address: 0x80098c90
+ * PAL Address: 0x80098C90
  * PAL Size: 1600b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80098634
+ * EN Size: 1228b
+ * JP Address: 0x80097DEC
+ * JP Size: 612b
  */
 void CMes::Draw()
 {
@@ -734,6 +786,7 @@ void CMes::Draw()
 		{
 			if (mDrawCursor >= glyph->m_reveal)
 			{
+#ifndef VERSION_GCCJGC
 				if ((unsigned int)glyph->m_char < 0x20)
 				{
 					if (font != 0)
@@ -838,6 +891,7 @@ void CMes::Draw()
 					}
 				}
 				else
+#endif
 				{
 					int fontId = (int)glyph->m_fontIndex;
 					if (activeFontId != fontId)
@@ -874,9 +928,13 @@ void CMes::Draw()
 
 					font->SetPosX(mBaseX + glyph->m_x);
 					font->SetPosY(mBaseY + (float)glyph->m_y);
+#ifdef VERSION_GCCJGC
+					font->SetScale(glyph->m_scale);
+#else
 					float glyphScaleY = 0.01f * (float)glyph->m_scaleY;
 					font->SetScaleX(0.01f * (float)glyph->m_scaleX);
 					font->SetScaleY(glyphScaleY);
+#endif
 					font->renderFlags.snapPosition = 1;
 					font->Draw((unsigned short)glyph->m_char);
 					font->renderFlags.snapPosition = 0;
@@ -890,12 +948,12 @@ void CMes::Draw()
 
 /*
  * --INFO--
- * PAL Address: 0x800992d0
+ * PAL Address: 0x800992D0
  * PAL Size: 368b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80098B00
+ * EN Size: 368b
+ * JP Address: 0x80098050
+ * JP Size: 356b
  */
 void CMes::Calc()
 {
@@ -952,10 +1010,10 @@ void CMes::Calc()
  * --INFO--
  * PAL Address: 0x80099440
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80098C70
+ * EN Size: 32b
+ * JP Address: 0x800981B4
+ * JP Size: 32b
  */
 int CMes::GetWait()
 {
@@ -970,11 +1028,14 @@ int CMes::GetWait()
  * --INFO--
  * PAL Address: 0x80099460
  * PAL Size: 6900b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80098C90
+ * EN Size: 7076b
+ * JP Address: 0x800981D4
+ * JP Size: 3956b
  */
+#ifdef VERSION_GCCJGC
+#include "src/mes_jp.inc"
+#else
 void CMes::addString(char** text, int branchMode)
 {
 	CFont* font = getFont(mFontIndex, 0);
@@ -1580,15 +1641,16 @@ void CMes::addString(char** text, int branchMode)
 		mLineHeight = (mCurrentY < mLineHeight) ? mLineHeight : mCurrentY;
 	}
 }
+#endif
 
 /*
  * --INFO--
- * PAL Address: 0x8009af54
- * PAL Size: 528b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * PAL Address: 0x8009AF54
+ * PAL Size: 532b
+ * EN Address: 0x8009A834
+ * EN Size: 532b
+ * JP Address: 0x80099148
+ * JP Size: 524b
  */
 void CMes::Next()
 {
@@ -1599,7 +1661,7 @@ void CMes::Next()
 	int i;
 	CMesCharCell* start;
 	CMesCharCell* curr;
-	char tempFlags[0x50];
+	char tempFlags[sizeof(mFlagVars)];
 
 	if (mText != 0)
 	{
@@ -1608,10 +1670,15 @@ void CMes::Next()
 		halfVal = 0.0f;
 		mFlagCursor = 0;
 		mFlagCount = 0;
+#ifdef VERSION_GCCJGC
+		mCurrentX = mCurrentY = 0.0f;
+		mLineWidth = mLineHeight = 0.0f;
+#else
 		mCurrentY = halfVal;
 		mCurrentX = halfVal;
 		mLineHeight = halfVal;
 		mLineWidth = halfVal;
+#endif
 		mDrawCursor = 0;
 		mRevealCursor = 0;
 		mFadeEnabled = 0;
@@ -1654,28 +1721,42 @@ void CMes::Next()
 
 /*
  * --INFO--
- * Address: 8009b168
- * Size: 436b
+ * PAL Address: 0x8009B168
+ * PAL Size: 436b
+ * EN Address: 0x8009AA48
+ * EN Size: 436b
+ * JP Address: 0x80099354
+ * JP Size: 404b
  */
 void CMes::Set(char* text, int param)
 {
 	mText = text;
 	mWaitActive = 0;
+#ifdef VERSION_GCCJGC
+	mMaxWidth = mMaxHeight = 0.0f;
+#else
 	mMaxHeight = 0.0f;
 	mMaxWidth = 0.0f;
+#endif
 	mCounter = 0;
 	mFlagCursor = 0;
 	mFlagCount = 0;
 	mRubyEnabled = 0;
 	mFontCount = param;
+#ifdef VERSION_GCCJGC
+	mLineSpacing = 1.0f;
+#else
 	mLineSpacing = 0.0f;
+#endif
 	mFontIndex = 0;
 	mScaleX = 1.0f;
+#ifndef VERSION_GCCJGC
 	mScaleY = 1.0f;
 	mAdvanceEnabled = 1;
+#endif
 
 	if (text != 0) {
-		unsigned char flagBackup[0x50];
+		unsigned char flagBackup[sizeof(mFlagVars)];
 		memcpy(flagBackup, mFlagVars, sizeof(flagBackup));
 		float lineZero = 0.0f;
 
@@ -1683,10 +1764,15 @@ void CMes::Set(char* text, int param)
 			mCounter = 0;
 			mFlagCursor = 0;
 			mFlagCount = 0;
+#ifdef VERSION_GCCJGC
+			mCurrentX = mCurrentY = 0.0f;
+			mLineWidth = mLineHeight = 0.0f;
+#else
 			mCurrentY = lineZero;
 			mCurrentX = lineZero;
 			mLineHeight = lineZero;
 			mLineWidth = lineZero;
+#endif
 
 			addString(&mText, 1);
 
@@ -1695,7 +1781,11 @@ void CMes::Set(char* text, int param)
 		}
 
 		memcpy(mFlagVars, flagBackup, sizeof(flagBackup));
+#ifdef VERSION_GCCJGC
+		float lineSkip = 8.0f;
+#else
 		float lineSkip = -2.0f;
+#endif
 		mMaxWidth = mMaxWidth - mLineSpacing;
 		mMaxHeight = mMaxHeight - lineSkip;
 
@@ -1707,29 +1797,42 @@ void CMes::Set(char* text, int param)
 		mRubyEnabled = 0;
 		mFontAlign = 0;
 		mColor = 7;
+#ifdef VERSION_GCCJGC
+		mLineSpacing = 1.0f;
+#else
 		mLineSpacing = 0.0f;
+#endif
 		mFontIndex = 0;
 		mScaleX = 1.0f;
+#ifndef VERSION_GCCJGC
 		mScaleY = 1.0f;
 		mAdvanceEnabled = 1;
+#endif
 		Next();
 	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009B31C
+ * PAL Size: 60b
+ * EN Address: 0x8009ABFC
+ * EN Size: 60b
+ * JP Address: 0x800994E8
+ * JP Size: 60b
  */
 CMes::~CMes()
 {
-	// Destructor - no dynamic allocation to clean up in basic implementation
 }
 
 /*
  * --INFO--
- * Address: 8009b358
- * Size: 92b
+ * PAL Address: 0x8009B358
+ * PAL Size: 92b
+ * EN Address: 0x8009AC38
+ * EN Size: 92b
+ * JP Address: 0x80099524
+ * JP Size: 92b
  */
 CMes::CMes()
 {

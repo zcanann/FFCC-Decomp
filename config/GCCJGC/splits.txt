@@ -497,8 +497,6 @@ cmake.cpp:
 	.sdata2 start:0x8034F770 end:0x8034F7B8
 	.sdata start:0x8034B860 end:0x8034B868
 
-mes.cpp:
-	.text start:0x800978B8 end:0x80097D20
 
 shopmenu.cpp:
 	.text start:0x8014B634 end:0x80153EA0
@@ -653,6 +651,9 @@ menu_lst.cpp:
 
 ringmenu.cpp:
 	.text start:0x800A0D6C end:0x800A32D0
+	.rodata start:0x801D4B60 end:0x801D4B6C
+	.data start:0x8022CCE0 end:0x8022CD34
+	.sdata start:0x8034B618 end:0x8034B630
 
 MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text start:0x801AE1CC end:0x801AE4DC
@@ -705,3 +706,35 @@ Runtime.PPCEABI.H/NMWException.cp:
 	extab start:0x8000A25C end:0x8000A2C4
 	extabindex start:0x80011734 end:0x800117A0
 	.sdata start:0x8034B9D0 end:0x8034B9D8
+
+Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
+	.text start:0x801ABBC0 end:0x801ACFF8
+	extab start:0x8000A2C4 end:0x8000A338
+	extabindex start:0x800117A0 end:0x800117F4
+	.rodata start:0x801DB2D0 end:0x801DB368
+	.data start:0x80238980 end:0x80238A68
+	.bss start:0x803481E8 end:0x803481F4
+	.sdata start:0x8034B9E0 end:0x8034B9F0
+
+mesmenu.cpp:
+	.text start:0x800996B0 end:0x8009C2A8
+
+MSL_C/PPCEABI/bare/H/gamecube.c:
+	.text	start:0x801B075C end:0x801B0768
+
+TRK_MINNOW_DOLPHIN/mem_TRK.c:
+	.text	start:0x801A7EC4 end:0x801A7F7C
+	.init	start:0x80003458 end:0x800034AC
+
+mes.cpp:
+	.text start:0x800976FC end:0x80099580
+
+util.cpp:
+	.text start:0x80024778 end:0x80024790
+	.data start:0x801DCB78 end:0x801DCC38
+
+TRK_MINNOW_DOLPHIN/usr_put.c:
+	.text	start:0x801A4B54 end:0x801A4BE0
+
+memorycard.cpp:
+	.text start:0x800BF1C8 end:0x800C2514

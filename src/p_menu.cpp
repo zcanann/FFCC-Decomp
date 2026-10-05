@@ -97,7 +97,9 @@ static const char sMenuTexWin2_5[] = "win2_5";
 static const char sMenuTexWin2_6[] = "win2_6";
 static const char sMenuTexWin2_7[] = "win2_7";
 static const char sMenuTexWin2_8[] = "win2_8";
+#ifndef VERSION_GCCJGC
 static const char sMenuTexButton[] = "button";
+#endif
 static const char sMenuRegionShibuya[] = "shibuya";
 static const char sMenuRegionFace[] = "face";
 static const char sMenuTexBattle[] = "battle";
@@ -120,6 +122,17 @@ CProcessCallbackTable CMenuPcs::m_table = {
         {reinterpret_cast<CProcessCallback>(&CMenuPcs::loadTextureAsync), 0x1A, 0x10},
         {static_cast<CProcessCallback>(&CMenuPcs::drawSingleMenu), 0x49, 0x11},
     },
+};
+
+enum
+{
+#ifdef VERSION_GCCJGC
+    MenuCommonTextureCount = 21,
+#else
+    MenuCommonTextureCount = 22,
+#endif
+    MenuBattleTextureStart = MenuCommonTextureCount,
+    MenuFaceTexture = MenuBattleTextureStart + 2
 };
 
 static const char sMenuCommonName[] = "common";
@@ -282,7 +295,9 @@ void CMenuPcs::create()
         { 1, const_cast<char*>(sMenuTexWin2_7) },
         { 1, const_cast<char*>(sMenuTexWin2_8) },
         { 1, const_cast<char*>(sMenuTexWinKazari) },
+#ifndef VERSION_GCCJGC
         { 0, const_cast<char*>(sMenuTexButton) }
+#endif
     };
 
     unsigned long menuHeapSize = 0xC4000;
@@ -303,7 +318,7 @@ void CMenuPcs::create()
     loadFont(0, fontPath, 0, 0);
 #endif
 
-    loadTexture(tName, 0, 2, tTmp, 0, 0x16, 0);
+    loadTexture(tName, 0, 2, tTmp, 0, MenuCommonTextureCount, 0);
 
     changeMode(static_cast<CMenuPcs::MENUMODE>(0));
 }
@@ -321,7 +336,7 @@ void CMenuPcs::destroy()
 {
     changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
 
-    freeTexture(0, 2, 0, 0x16);
+    freeTexture(0, 2, 0, MenuCommonTextureCount);
 
     CFont* font = m_fonts[0];
     if (font != nullptr) {
@@ -611,7 +626,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
             break;
         case 0:
             ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
-            freeTexture(2, 2, 0x16, 10);
+            freeTexture(2, 2, MenuBattleTextureStart, 10);
 
             for (i = 0; i < 4; i++) {
                 ReleaseRefSlot(reinterpret_cast<void**>(&m_battleRingMenus[i]));
@@ -1343,7 +1358,7 @@ void CMenuPcs::createBattle()
         { 2, const_cast<char*>(sMenuTexBattle2) }
     };
 
-    loadTexture(tName, 2, 2, tTmp, 0x16, 10, 0);
+    loadTexture(tName, 2, 2, tTmp, MenuBattleTextureStart, 10, 0);
 
     for (int i = 0; i < 12; i++) {
         CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x48B) CMesMenu;
@@ -1367,13 +1382,13 @@ void CMenuPcs::createBattle()
 #endif
 
     for (int i = 0; i < 0x100; i++) {
-        _GXColor color = GetTexture(static_cast<TEX>(0x18))->GetTlutColor(i);
+        _GXColor color = GetTexture(static_cast<TEX>(MenuFaceTexture))->GetTlutColor(i);
         const int avg2 = (((int)color.r + (int)color.g + (int)color.b) / 3) * 2;
         color.r = static_cast<u8>(((int)color.r + avg2) / 3);
         color.g = static_cast<u8>(((int)color.g + avg2) / 3);
         color.b = static_cast<u8>(((int)color.b + avg2) / 3);
 
-        const unsigned long tlutFmt = GetTexture(static_cast<TEX>(0x18))->m_format;
+        const unsigned long tlutFmt = GetTexture(static_cast<TEX>(MenuFaceTexture))->m_format;
         int tlutOffset;
         if (tlutFmt == 9) {
             tlutOffset = 0x100;
@@ -1386,7 +1401,7 @@ void CMenuPcs::createBattle()
         CTexture::SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, color);
     }
 
-    GetTexture(static_cast<TEX>(0x18))->FlushExternalTlut(m_externalFontTlut);
+    GetTexture(static_cast<TEX>(MenuFaceTexture))->FlushExternalTlut(m_externalFontTlut);
     m_battleStateFlag = 0;
 }
 
@@ -1404,7 +1419,7 @@ inline void CMenuPcs::destroyBattle()
     int i;
 
     for (i = 0; i < 10; i++) {
-        ReleaseRefSlot(reinterpret_cast<void**>(m_textures + 0x16 + i));
+        ReleaseRefSlot(reinterpret_cast<void**>(m_textures + MenuBattleTextureStart + i));
     }
 
     for (i = 0; i < 2; i++) {

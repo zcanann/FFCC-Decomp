@@ -166,7 +166,7 @@ TRK_MINNOW_DOLPHIN/main.c:
 
 TRK_MINNOW_DOLPHIN/main_TRK.c:
 	.text start:0x801ACF5C end:0x801ACFB4
-	.rodata start:0x801E5A40 end:0x801E5A4C
+	.rodata start:0x801E5A40 end:0x801E5A50
 	.bss start:0x80329688 end:0x8032968C
 
 MSL_C/PPCEABI/bare/H/e_atan2.c:
@@ -722,6 +722,9 @@ menu_lst.cpp:
 
 ringmenu.cpp:
 	.text start:0x800A26A8 end:0x800A4C34
+	.rodata start:0x801D8F50 end:0x801D8F5C
+	.data start:0x8020E948 end:0x8020E99C
+	.sdata start:0x8032D7F8 end:0x8032D810
 
 exi/EXIUart.c:
 	.text	start:0x80182970 end:0x80182F44
@@ -750,3 +753,75 @@ Runtime.PPCEABI.H/NMWException.cp:
 	extab start:0x8000A1F4 end:0x8000A25C
 	extabindex start:0x80011788 end:0x800117F4
 	.sdata start:0x8032DBC8 end:0x8032DBD0
+
+Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
+	.text start:0x801AF598 end:0x801B09D0
+	extab start:0x8000A25C end:0x8000A2D0
+	extabindex start:0x800117F4 end:0x80011848
+	.rodata start:0x801E5D60 end:0x801E5DF8
+	.data start:0x8021BF30 end:0x8021C018
+	.bss start:0x8032A3E0 end:0x8032A3EC
+	.sdata start:0x8032DBD8 end:0x8032DBE8
+
+mesmenu.cpp:
+	.text start:0x8009ADC4 end:0x8009DAE4
+
+MSL_C/PPCEABI/bare/H/gamecube.c:
+	.text	start:0x801B4174 end:0x801B4180
+
+TRK_MINNOW_DOLPHIN/mem_TRK.c:
+	.text	start:0x801AA948 end:0x801AAA00
+	.init	start:0x80003458 end:0x800034AC
+
+mes.cpp:
+	.text start:0x80097B8C end:0x8009AC94
+
+TRK_MINNOW_DOLPHIN/msghndlr.c:
+	.text	start:0x801A90DC end:0x801AA14C
+	.rodata	start:0x801E5718 end:0x801E5900
+	.data	start:0x8021BE50 end:0x8021BE88
+	.bss start:0x803290F8 end:0x803290FC
+
+TRK_MINNOW_DOLPHIN/usr_put.c:
+	.text	start:0x801A8ED8 end:0x801A8F64
+
+TRK_MINNOW_DOLPHIN/msgbuf.c:
+	.text start:0x801A83E4 end:0x801A8C20
+	.rodata start:0x801E5528 end:0x801E5548
+	.bss start:0x80327730 end:0x803290E0
+
+TRK_MINNOW_DOLPHIN/nubevent.c:
+	.text start:0x801A7FE0 end:0x801A8208
+	.bss start:0x80327700 end:0x80327728
+
+TRK_MINNOW_DOLPHIN/msg.c:
+	.text start:0x801A83A0 end:0x801A83E4
+	.rodata start:0x801E5500 end:0x801E5528
+
+TRK_MINNOW_DOLPHIN/mutex_TRK.c:
+	.text start:0x801AA860 end:0x801AA878
+
+TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
+	.text start:0x801ACFB4 end:0x801AD50C
+	.rodata start:0x801E5A50 end:0x801E5B58
+	.data start:0x8021BEF8 end:0x8021BF20
+	.bss start:0x80329690 end:0x80329698
+
+TRK_MINNOW_DOLPHIN/serpoll.c:
+	.text start:0x801A8C20 end:0x801A8ED8
+	.rodata start:0x801E5548 end:0x801E56D8
+	.bss start:0x803290E0 end:0x803290F4
+	.sbss start:0x8032E338 end:0x8032E33C
+
+TRK_MINNOW_DOLPHIN/nubinit.c:
+	.text start:0x801A8208 end:0x801A83A0
+	.rodata start:0x801E54D0 end:0x801E54FC
+	.bss start:0x80327728 end:0x8032772C
+
+TRK_MINNOW_DOLPHIN/dispatch.c:
+	.text start:0x801A8F64 end:0x801A90DC
+	.rodata start:0x801E56D8 end:0x801E5718
+	.data start:0x8021BDE0 end:0x8021BE4C
+
+memorycard.cpp:
+	.text start:0x800C1040 end:0x800C4660

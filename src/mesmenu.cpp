@@ -17,6 +17,21 @@
 #include <math.h>
 #include <string.h>
 
+enum
+{
+#ifdef VERSION_GCCJGC
+    MesMenuBattleTexture = 0x15,
+    MesMenuHeartTexture = 0x16,
+    MesMenuFaceTexture = 0x17,
+    MesMenuGbaTexture = 0x1D
+#else
+    MesMenuBattleTexture = 0x16,
+    MesMenuHeartTexture = 0x17,
+    MesMenuFaceTexture = 0x18,
+    MesMenuGbaTexture = 0x1E
+#endif
+};
+
 static const char sMesMenuClassName[] = "CMesMenu";
 extern "C" {
 const char s_mesMenuOnOffChangedFmt[] =
@@ -43,16 +58,45 @@ inline void CMenuPcs::SetTlut(CMenuPcs::TEX tex, _GXColor* tlut)
  * --INFO--
  * PAL Address: 0x8009b4e4
  * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009ADC4
+ * EN Size: 204b
+ * JP Address: UNUSED
+ * JP Size: UNUSED
  */
+#ifndef VERSION_GCCJGC
 void CMesMenu::SetPos(float x, float y)
 {
-	m_offsetX = x;
-	m_offsetY = y;
+#ifndef VERSION_GCCP01
+    m_baseX = x;
+    m_baseY = y;
+    unsigned int menuIndex = (unsigned int)m_menuIndex;
+    float yPos;
+    if ((int)menuIndex < 4) {
+        if ((menuIndex & 2) != 0) {
+            yPos = ((m_baseY - 40.0f) + m_marginY) - m_windowHeight;
+        } else {
+            yPos = (m_baseY + m_marginY) + 40.0f;
+        }
+    } else {
+        yPos = m_baseY + m_marginY;
+    }
+    bool alignRight = false;
+    if (((int)menuIndex < 4) && ((menuIndex & 1) != 0)) {
+        alignRight = true;
+    }
+    float xPos;
+    if (alignRight) {
+        xPos = (m_baseX + m_marginX) - m_windowWidth;
+    } else {
+        xPos = m_baseX + m_marginX;
+    }
+    m_mes.SetPosition(xPos, yPos);
+#else
+    m_offsetX = x;
+    m_offsetY = y;
+#endif
 }
+#endif
 
 /*
  * --INFO--
@@ -82,10 +126,10 @@ inline void CMesMenu::close(int closeReason)
  * --INFO--
  * PAL Address: 0x8009b4f0
  * PAL Size: 268b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009AE90
+ * EN Size: 268b
+ * JP Address: 0x800996B0
+ * JP Size: 268b
  */
 void CMesMenu::CloseRequest(int closeReason)
 {
@@ -109,10 +153,10 @@ void CMesMenu::CloseRequest(int closeReason)
  * --INFO--
  * PAL Address: 0x8009b5fc
  * PAL Size: 744b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009AF9C
+ * EN Size: 692b
+ * JP Address: 0x800997BC
+ * JP Size: 708b
  */
 void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int itemIndex, int nameIndex)
 {
@@ -122,8 +166,10 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     float yPos;
 
     zero = 0.0f;
+#ifdef VERSION_GCCP01
     m_offsetY = 0.0f;
     m_offsetX = zero;
+#endif
     m_active = 1;
     m_closeReason = 0;
     m_flags = (unsigned int)flags;
@@ -139,7 +185,11 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     } else {
         MenuPcs.GetRingMenu(m_menuIndex)->SetFade(0);
         float marginX = 16.0f;
+#ifdef VERSION_GCCJGC
+        float marginY = 16.0f;
+#else
         float marginY = 8.0f;
+#endif
         m_marginX = marginX;
         m_marginY = marginY;
     }
@@ -169,12 +219,32 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     menuIndex = (unsigned int)m_menuIndex;
     if ((int)menuIndex < 4) {
         if ((menuIndex & 2) != 0) {
+#ifndef VERSION_GCCP01
+#ifdef VERSION_GCCJGC
+            yPos = ((m_baseY - 60.0f) + m_marginY) - m_windowHeight;
+#else
+            yPos = ((m_baseY - 40.0f) + m_marginY) - m_windowHeight;
+#endif
+#else
             yPos = ((m_baseY - 44.0f) + m_offsetY + m_marginY) - m_windowHeight;
+#endif
         } else {
+#ifndef VERSION_GCCP01
+#ifdef VERSION_GCCJGC
+            yPos = (m_baseY + m_marginY) + 60.0f;
+#else
+            yPos = (m_baseY + m_marginY) + 40.0f;
+#endif
+#else
             yPos = (m_baseY + m_offsetY + m_marginY) + 40.0f;
+#endif
         }
     } else {
+#ifndef VERSION_GCCP01
+        yPos = (m_baseY) + m_marginY;
+#else
         yPos = (m_baseY + m_offsetY) + m_marginY;
+#endif
     }
 
     alignRight = false;
@@ -183,9 +253,17 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     }
     float xPos;
     if (alignRight) {
+#ifndef VERSION_GCCP01
+        xPos = ((m_baseX) + m_marginX) - m_windowWidth;
+#else
         xPos = ((m_baseX + m_offsetX) + m_marginX) - m_windowWidth;
+#endif
     } else {
+#ifndef VERSION_GCCP01
+        xPos = (m_baseX) + m_marginX;
+#else
         xPos = (m_baseX + m_offsetX) + m_marginX;
+#endif
     }
     m_mes.SetPosition(xPos, yPos);
 
@@ -207,10 +285,10 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
  * --INFO--
  * PAL Address: 0x8009b8e4
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B250
+ * EN Size: 4b
+ * JP Address: 0x80099A80
+ * JP Size: 4b
  */
 void CMesMenu::onScriptChanged(char*, int)
 {
@@ -221,10 +299,10 @@ void CMesMenu::onScriptChanged(char*, int)
  * --INFO--
  * PAL Address: 0x8009b8e8
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B254
+ * EN Size: 112b
+ * JP Address: 0x80099A84
+ * JP Size: 112b
  */
 void CMesMenu::onScriptChanging(char*)
 {
@@ -243,10 +321,10 @@ void CMesMenu::onScriptChanging(char*)
  * --INFO--
  * PAL Address: 0x8009b958
  * PAL Size: 916b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B2C4
+ * EN Size: 916b
+ * JP Address: 0x80099AF4
+ * JP Size: 820b
  */
 void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
@@ -259,7 +337,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 
     if (0.0f < alpha) {
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).Ref());
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuHeartTexture));
 
         int heartOffset = 0x4C;
         if ((m_menuIndex & 1) != 0) {
@@ -326,10 +404,10 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
  * --INFO--
  * PAL Address: 0x8009bcec
  * PAL Size: 496b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B658
+ * EN Size: 496b
+ * JP Address: 0x80099E28
+ * JP Size: 496b
  */
 void CMesMenu::CalcHeart()
 {
@@ -406,10 +484,10 @@ void CMesMenu::CalcHeart()
  * --INFO--
  * PAL Address: 0x8009bedc
  * PAL Size: 6080b
- * EN Address: 0x800aedf0
- * EN Size: 6896b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B848
+ * EN Size: 6048b
+ * JP Address: 0x8009A018
+ * JP Size: 6028b
  */
 void CMesMenu::onDraw()
 {
@@ -506,7 +584,11 @@ void CMesMenu::onDraw()
             pulseX = -pulse;
         }
         int maskY = m_menuIndex & 2;
+#ifndef VERSION_GCCP01
+        float posX = m_baseX;
+#else
         float posX = m_baseX + m_offsetX;
+#endif
         float baseX = posX + pulseX;
         float pulseY;
         if (maskY != 0) {
@@ -514,7 +596,11 @@ void CMesMenu::onDraw()
         } else {
             pulseY = -pulse;
         }
+#ifndef VERSION_GCCP01
+        float baseY = (m_baseY) + pulseY;
+#else
         float baseY = (m_baseY + m_offsetY) + pulseY;
+#endif
 
         if (0.0f < stateBlend) {
             width = m_windowWidth * stateBlend;
@@ -529,9 +615,21 @@ void CMesMenu::onDraw()
 
             float edgeY;
             if (maskY != 0) {
+#ifndef VERSION_GCCP01
+#ifdef VERSION_GCCJGC
+                edgeY = ((-60.0f) - m_windowHeight) + (m_windowHeight - height);
+#else
+                edgeY = ((-40.0f) - m_windowHeight) + (m_windowHeight - height);
+#endif
+#else
                 edgeY = ((-44.0f) - m_windowHeight) + (m_windowHeight - height);
+#endif
             } else {
+#ifdef VERSION_GCCJGC
+                edgeY = 60.0f;
+#else
                 edgeY = 40.0f;
+#endif
             }
             drawY = baseY + edgeY;
 
@@ -583,8 +681,8 @@ void CMesMenu::onDraw()
                     int itemU = (itemIndex % 8) * 0x30;
                     int itemV = (itemIndex / 8) * 0x30;
                     MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
-                    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-                    MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(0x18), 0);
+                    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuFaceTexture));
+                    MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(MesMenuFaceTexture), 0);
                     int itemMaskX = m_menuIndex & 1;
                     int itemOffsetX = 83;
                     if (itemMaskX != 0) {
@@ -602,7 +700,7 @@ void CMesMenu::onDraw()
             }
         }
 
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuBattleTexture));
         float titleAlpha = 255.0f * stageBlend;
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
         unsigned int frameMask = m_menuIndex;
@@ -629,7 +727,7 @@ void CMesMenu::onDraw()
                 Game.m_scriptFoodBase[m_menuIndex];
             if ((heartFood != 0) && (0.0f < stageBlend)) {
                 MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * stageBlend)).Ref());
-                MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
+                MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuHeartTexture));
 
                 int heartOffset = 0x4C;
                 if ((m_menuIndex & 1) != 0) {
@@ -713,8 +811,8 @@ void CMesMenu::onDraw()
         }
         float shakeY = (float)foodShakeY;
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-        MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(0x18), (scriptFood->m_hp != 0) ? 0 : MenuPcs.GetFaceTlut());
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuFaceTexture));
+        MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(MesMenuFaceTexture), (scriptFood->m_hp != 0) ? 0 : MenuPcs.GetFaceTlut());
         int foodMaskX = m_menuIndex & 1;
         int foodOffsetX = 5;
         if (foodMaskX != 0) {
@@ -728,8 +826,16 @@ void CMesMenu::onDraw()
     } else {
         width = m_windowWidth * stateBlend;
         height = m_windowHeight * stateBlend;
+#ifndef VERSION_GCCP01
+        drawX = (0.5f * m_windowWidth + (m_baseX)) - 0.5f * width;
+#else
         drawX = (0.5f * m_windowWidth + (m_baseX + m_offsetX)) - 0.5f * width;
+#endif
+#ifndef VERSION_GCCP01
+        drawY = (0.5f * m_windowHeight + (m_baseY)) - 0.5f * height;
+#else
         drawY = (0.5f * m_windowHeight + (m_baseY + m_offsetY)) - 0.5f * height;
+#endif
 
         if ((m_flags & 1) == 0) {
             float stateAlpha = 255.0f * stateBlend;
@@ -786,8 +892,8 @@ void CMesMenu::onDraw()
                         int itemU = (itemIndex % 8) * 0x30;
                         int itemV = (itemIndex / 8) * 0x30;
                         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-                        MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(0x18), 0);
+                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuFaceTexture));
+                        MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(MesMenuFaceTexture), 0);
                         int itemOffsetX = 83;
                         if (anchorX != 0) {
                             itemOffsetX = 13;
@@ -815,7 +921,7 @@ void CMesMenu::onDraw()
             float angle = 3.1415927f * time;
             float sinY = sinf(angle);
             float sinX = sinf((-1.5707964f) + angle);
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuGbaTexture));
             float alpha255 = 255.0f * windowScale;
             MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * alpha255) * stageBlend)).Ref());
             float fadeScale = 1.0f - pulseScale;
@@ -862,10 +968,10 @@ void CMesMenu::onDraw()
  * --INFO--
  * PAL Address: 0x8009d69c
  * PAL Size: 2292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009CFE8
+ * EN Size: 2264b
+ * JP Address: 0x8009B7A4
+ * JP Size: 2264b
  */
 void CMesMenu::onCalc()
 {
@@ -884,7 +990,9 @@ void CMesMenu::onCalc()
 
     int desiredStageFlag = stageBit != 0;
     if (desiredStageFlag != m_stageFadeOut) {
+#ifdef VERSION_GCCP01
         System.Printf(const_cast<char*>(s_mesMenuOnOffChangedFmt));
+#endif
         m_stageFadeOut = !m_stageFadeOut;
         m_stageFadeTimer = 0x10 - m_stageFadeTimer;
     }
@@ -1110,10 +1218,10 @@ void CMesMenu::onCalc()
  * --INFO--
  * PAL Address: 0x8009df90
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009D8C0
+ * EN Size: 64b
+ * JP Address: 0x8009C07C
+ * JP Size: 64b
  */
 void CMesMenu::Destroy()
 {
@@ -1125,10 +1233,10 @@ void CMesMenu::Destroy()
  * --INFO--
  * PAL Address: 0x8009dfd0
  * PAL Size: 300b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009D900
+ * EN Size: 288b
+ * JP Address: 0x8009C0BC
+ * JP Size: 296b
  */
 void CMesMenu::Create()
 {
@@ -1136,8 +1244,10 @@ void CMesMenu::Create()
     CMenu::Create();
 
     float defaultValue = 0.0f;
+#ifdef VERSION_GCCP01
     m_offsetY = defaultValue;
     m_offsetX = defaultValue;
+#endif
     m_active = 0;
     m_state = 4;
     m_stageFadeTimer = 0;
@@ -1176,10 +1286,10 @@ void CMesMenu::Create()
  * --INFO--
  * PAL Address: 0x8009e0fc
  * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009DA20
+ * EN Size: 128b
+ * JP Address: 0x8009C1E4
+ * JP Size: 128b
  */
 CMesMenu::~CMesMenu()
 {
@@ -1190,10 +1300,10 @@ CMesMenu::~CMesMenu()
  * --INFO--
  * PAL Address: 0x8009e17c
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009DAA0
+ * EN Size: 68b
+ * JP Address: 0x8009C264
+ * JP Size: 68b
  */
 CMesMenu::CMesMenu()
 {

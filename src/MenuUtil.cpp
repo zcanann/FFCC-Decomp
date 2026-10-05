@@ -979,6 +979,22 @@ void CMenuPcs::CalcOptionMenu()
 	}
 }
 
+#ifdef VERSION_GCCJGC
+static inline void DrawOptionLabel(CFont* font, int x, int y, _GXColor color,
+                                   int tlut, char* text, float scale)
+{
+	font->SetMargin(1.0f);
+	font->SetShadow(1);
+	font->SetScale(scale);
+	font->DrawInit();
+	font->SetTlut(tlut);
+	font->SetColor(color);
+	font->SetPosX(static_cast<float>(x));
+	font->SetPosY(static_cast<float>(y));
+	font->Draw(text);
+}
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x8017698C
@@ -1210,11 +1226,17 @@ void CMenuPcs::DrawOptionMenu()
 
 	switch (m_optionIndex) {
 	case 0: {
+#ifdef VERSION_GCCJGC
+		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 189.0f }, { 496.0f, 189.0f } };
+#else
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 0.0f }, { 496.0f, 0.0f } };
+#endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
 		rightXi = static_cast<int>(w * 0.5f + row.rightIcon.x - 472.0f);
+#ifndef VERSION_GCCJGC
 		row.leftText.y = 185.0f;
 		row.rightText.y = 185.0f;
+#endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
@@ -1242,6 +1264,23 @@ void CMenuPcs::DrawOptionMenu()
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+		if (m_gameInitMode == 0) {
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x - 2.0f),
+			                static_cast<int>(row.leftText.y - 2.0f), color, 0x17,
+			                "\202\156\202\155", 1.2f);
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x),
+			                static_cast<int>(row.rightText.y), color, 6,
+			                "\202\156\202\145\202\145", 1.0f);
+		} else {
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x),
+			                static_cast<int>(row.leftText.y), color, 6,
+			                "\202\156\202\155", 1.0f);
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x - 2.0f),
+			                static_cast<int>(row.rightText.y - 2.0f), color, 0x17,
+			                "\202\156\202\145\202\145", 1.2f);
+		}
+#else
 		unsigned char isAlt = (langRow + 1 == 4) || (langRow + 1 == 5);
 		float scale = isAlt ? 0.8 : 1.0;
 
@@ -1300,6 +1339,7 @@ void CMenuPcs::DrawOptionMenu()
 				          1.0f, 1.0f);
 			}
 		}
+#endif
 		break;
 	}
 	case 1: {

@@ -788,8 +788,9 @@ inline void CGItemObj::safeDetach(int throwItem, float speed)
 	Vec safePos;
 	float safeDist = CalcSafePos(0x41, m_owner, &safePos);
 
-	if (safeDist > kItemObjZero) {
-		m_owner->moveVectorHRot(kItemObjPi + m_owner->m_rotBaseY, kItemObjZero,
+	float zero = kItemObjZero;
+	if (safeDist > zero) {
+		m_owner->moveVectorHRot(kItemObjPi + m_owner->m_rotBaseY, zero,
 		                        safeDist / kItemObjSafeMoveDivisor, 3);
 	}
 

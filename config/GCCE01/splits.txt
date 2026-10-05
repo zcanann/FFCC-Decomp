@@ -546,3 +546,9 @@ wm_menu.cpp:
 
 mapocttree.cpp:
 	.text start:0x8002C4F8 end:0x8002F250
+
+shopmenu.cpp:
+	.text start:0x8014F4BC end:0x801586D0
+
+cmake.cpp:
+	.text start:0x8016BCC4 end:0x801736C8

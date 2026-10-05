@@ -586,3 +586,7 @@ gobjwork.cpp:
 MSL_C/PPCEABI/bare/H/mem.c:
 	.text start:0x801B1A08 end:0x801B1B78
 	.init start:0x80005504 end:0x8000563C
+
+Runtime.PPCEABI.H/runtime.c:
+	.text start:0x801AB44C end:0x801ABB44
+	.rodata start:0x801DB2B8 end:0x801DB2D0

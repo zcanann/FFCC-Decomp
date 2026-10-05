@@ -655,3 +655,7 @@ MSL_C/PPCEABI/bare/H/string.c:
 MSL_C/PPCEABI/bare/H/mem.c:
 	.text start:0x801B5490 end:0x801B5600
 	.init start:0x8000540C end:0x80005544
+
+Runtime.PPCEABI.H/runtime.c:
+	.text start:0x801AEE24 end:0x801AF51C
+	.rodata start:0x801E5D48 end:0x801E5D60

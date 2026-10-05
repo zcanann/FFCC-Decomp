@@ -1091,7 +1091,7 @@ config.libs = [
                 extra_cflags=["-inline auto,deferred"],
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/ptmf.c"),
-            Object(Matching, "Runtime.PPCEABI.H/runtime.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/runtime.c"),
         ],
     },
     {

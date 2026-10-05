@@ -811,7 +811,11 @@ s32 LetterSend_Main(void)
             sLetterFailed = 1;
             ret = 1;
         }
+#if defined(VERSION_GCCJGC)
+        Letter_DrawCursor((win->x + 1) * 8, (win->y + 1) * 8 + win->cursor * 16);
+#else
         Letter_DrawCursor((win->x + 1) * 8 - 2, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     }
     return ret;
 }
@@ -1401,7 +1405,11 @@ s32 LetterAnswer_Main(void)
                 }
             }
         }
+#if defined(VERSION_GCCJGC)
+        Letter_DrawCursor((win->x - 1) * 8, (win->y + 1) * 8 + win->cursor * 16);
+#else
         Letter_DrawCursor(win->x * 8 - 10, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     }
     return ret;
 }
@@ -1516,7 +1524,11 @@ s32 LetterAttach_Main(void)
                 }
             }
         }
+#if defined(VERSION_GCCJGC)
+        Letter_DrawCursor((win->x - 1) * 8, (win->y + 1) * 8 + win->cursor * 16);
+#else
         Letter_DrawCursor(win->x * 8 - 10, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     }
     return ret;
 }

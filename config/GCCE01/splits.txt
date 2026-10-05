@@ -516,3 +516,6 @@ map.cpp:
 
 monobj.cpp:
 	.text start:0x801120b4 end:0x801198d4
+
+monobj_boss.cpp:
+	.text start:0x8012d90c end:0x80132428

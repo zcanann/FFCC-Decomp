@@ -108,3 +108,19 @@ MSL_C/PPCEABI/bare/H/misc_io.c:
 Runtime.PPCEABI.H/ptmf.c:
 	.text start:0x801AB3F4 end:0x801AB44C
 	.rodata start:0x801DB2A8 end:0x801DB2B4
+
+MSL_C/PPCEABI/bare/H/k_cos.c:
+	.text start:0x801B5AA4 end:0x801B5B98
+	.sdata2 start:0x8034FFA8 end:0x8034FFF0
+
+MSL_C/PPCEABI/bare/H/k_sin.c:
+	.text start:0x801B69EC end:0x801B6A8C
+	.sdata2 start:0x80350030 end:0x80350068
+
+MSL_C/PPCEABI/bare/H/s_floor.c:
+	.text start:0x801B6FB4 end:0x801B70FC
+	.sdata2 start:0x803500D0 end:0x803500E0
+
+MSL_C/PPCEABI/bare/H/s_frexp.c:
+	.text start:0x801B70FC end:0x801B7188
+	.sdata2 start:0x803500E0 end:0x803500E8

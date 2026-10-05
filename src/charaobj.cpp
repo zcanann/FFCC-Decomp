@@ -2626,9 +2626,7 @@ checkParticle:
 			if (effectArg0 == 2) {
 				if (m_stateFrame >= kLateItemParticleFrame) {
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
-					float rand0 = Math.RandFPM(60.0f);
-					float rand1 = Math.RandFPM(60.0f);
-					CVector randomPos = CVector(0.0f, 7.0f, 165.0f) + CVector(rand1, 0.0f, rand0);
+					CVector randomPos = CVector(0.0f, 7.0f, 165.0f) + CVector(Math.RandFPM(60.0f), 0.0f, Math.RandFPM(60.0f));
 					CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
 					CFlatRuntime2Storage().PutParticleWork();
 				}

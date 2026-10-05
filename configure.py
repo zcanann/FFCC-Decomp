@@ -951,12 +951,12 @@ config.libs = [
                 ),
             ),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "axfx/reverb_hi_4ch.c",
                 cflags=replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"),
             ),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "axfx/reverb_std.c",
                 cflags=replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"),
             ),

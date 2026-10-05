@@ -237,3 +237,13 @@ axfx/chorus.c:
 
 axfx/delay.c:
 	.text start:0x80190A40 end:0x80190EEC
+
+axfx/reverb_std.c:
+	.text start:0x8018F45C end:0x80190058
+	.data start:0x80237040 end:0x80237050
+	.sdata2 start:0x8034FBA8 end:0x8034FBE8
+
+axfx/reverb_hi_4ch.c:
+	.text start:0x80190F48 end:0x80191E80
+	.data start:0x80237850 end:0x80237874
+	.sdata2 start:0x8034FBF0 end:0x8034FC30

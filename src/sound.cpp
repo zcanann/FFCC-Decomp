@@ -1747,12 +1747,12 @@ void CSound::LoadStream(int streamID)
 
 /*
  * --INFO--
- * PAL Address: 0x800c51f8
+ * PAL Address: 0x800C51F8
  * PAL Size: 288b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C4A80
+ * EN Size: 252b
+ * JP Address: 0x800C2934
+ * JP Size: 252b
  */
 void CSound::PlayStreamASync()
 {
@@ -1772,23 +1772,35 @@ void CSound::PlayStreamASync()
     case 4:
     case 6:
         volume = 0x7f;
+#ifdef VERSION_GCCP01
         if (streamId == 6) {
             volume = 0x70;
         }
+#endif
         break;
     case 1:
     case 5:
         int bgmVolume;
         bgmVolume = m_bgmMasterVolume;
         volume = bgmVolume;
+#ifdef VERSION_GCCP01
         if (streamId == 1) {
             volume = bgmVolume - (bgmVolume * 0x19) / 0x7f;
         }
+#endif
         break;
     default:
         volume = m_seMasterVolume;
         break;
     }
+#ifndef VERSION_GCCP01
+    if (streamId == 1) {
+        volume -= 0x19;
+    }
+    if (streamId == 6) {
+        volume -= 0x0f;
+    }
+#endif
     void* streamBuffer = m_streamBuffer;
     CRedSound* redSound = &m_redSound;
     int streamNo = redSound->StreamPlay(streamBuffer, 0x20000, 0x40, volume < 0 ? 0 : (volume <= 0x7f ? volume : 0x7f));

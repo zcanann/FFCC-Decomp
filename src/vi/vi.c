@@ -277,7 +277,6 @@ VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback cb) {
     return oldcb;
 }
 
-#pragma dont_inline on
 static VITiming* getTiming(VITVMode mode) {
     switch (mode) {
     case VI_TVMODE_NTSC_INT:        return &timing[0];
@@ -298,7 +297,6 @@ static VITiming* getTiming(VITVMode mode) {
         return NULL;
     }
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1248,7 +1246,6 @@ void __VISetLatchMode(u32 mode) {
     __VIRegs[1] = reg;
 }
 
-#pragma dont_inline on
 int __VIGetLatch0Position(s16* px, s16* py) {
     u32 hcount;
     u32 vcount;
@@ -1265,9 +1262,7 @@ int __VIGetLatch0Position(s16* px, s16* py) {
     *px = *py = -1;
     return 0;
 }
-#pragma dont_inline reset
 
-#pragma dont_inline on
 int __VIGetLatch1Position(s16* px, s16* py) {
     u32 hcount;
     u32 vcount;
@@ -1284,7 +1279,6 @@ int __VIGetLatch1Position(s16* px, s16* py) {
     *px = *py = -1;
     return 0;
 }
-#pragma dont_inline reset
 
 int __VIGetLatchPosition(u32 port, s16* px, s16* py) {
     if (port == 0) {

@@ -414,6 +414,7 @@ partyobj.cpp:
 partMng.cpp:
 	.text start:0x80056BF0 end:0x8005EB34
 	.bss start:0x802917E8 end:0x802B5830
+	.sbss start:0x8034BB90 end:0x8034BB98
 
 memory.cpp:
 	.bss start:0x80258188 end:0x8025F928

@@ -116,12 +116,7 @@ extern int ppvSysGoPartF;
 extern void* ppvHookFuncTbl;
 unsigned char gPppDefaultValueBuffer[0x40] = {0};
 int gPppHeapUseRateWords[3] = {0, 0, 0};
-unsigned char gPppInConstructor = 0;
-signed char gPppInSubFrameCalc = 0;
 extern int ppvEmptyLoop;
-unsigned char gPppEditorAnimIndex = 0;
-unsigned char gPppEditorAnimIndexInitialized = 0;
-int gPppCalcDisabled = 0;
 }
 CPartMng PartMng;
 static PPPCREATEPARAM g_dcp;
@@ -2113,15 +2108,12 @@ void CPartMng::pppEditBeforeCalc()
     case 0x1a:
         if (*editorObj != 0) {
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x7ce);
-            if (gPppInSubFrameCalc == 0) {
-                gPppInConstructor = 0;
-                gPppInSubFrameCalc = 1;
-            }
+            static unsigned char cLoadAnmCnt = 0;
 
 #define handle ((*editorObj)->m_charaModelHandle)
-            handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppInConstructor, 0, -1, -1, -1, 0);
-            handle->SetAnim(gPppInConstructor, -1, -1, -1, 0);
-            gPppInConstructor++;
+            handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), cLoadAnmCnt, 0, -1, -1, -1, 0);
+            handle->SetAnim(cLoadAnmCnt, -1, -1, -1, 0);
+            cLoadAnmCnt++;
 #undef handle
         }
         break;

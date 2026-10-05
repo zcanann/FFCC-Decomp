@@ -991,3 +991,29 @@ os/OSReboot.c:
 	.text	start:0x8017E06C end:0x8017E3C8
 	.bss	start:0x8030AC00 end:0x8030AC20
 	.sbss	start:0x8032DF78 end:0x8032DF84
+
+dvd/dvd.c:
+	.text	start:0x80187954 end:0x8018A050
+	.data	start:0x80216428 end:0x802165A8
+	.bss	start:0x8030BA00 end:0x8030BA98
+	.sdata	start:0x8032DAC0 end:0x8032DAD8
+	.sbss	start:0x8032E060 end:0x8032E0A8
+
+dvd/dvdfs.c:
+	.text	start:0x801871B4 end:0x80187954
+	.data	start:0x802162F0 end:0x80216424
+	.sdata	start:0x8032DAB8 end:0x8032DAC0
+	.sbss	start:0x8032E040 end:0x8032E060
+
+dvd/dvdidutils.c:
+	.text	start:0x8018A3E0 end:0x8018A4D8
+
+dvd/dvdlow.c:
+	.text	start:0x80186374 end:0x801871B4
+	.bss	start:0x8030B930 end:0x8030BA00
+	.sdata	start:0x8032DAB0 end:0x8032DAB4
+	.sbss	start:0x8032DFF8 end:0x8032E040
+
+dvd/dvdFatal.c:
+	.text	start:0x8018A4D8 end:0x8018A508
+	.sbss	start:0x8032E0A8 end:0x8032E0AC

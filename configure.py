@@ -885,12 +885,12 @@ config.libs = [
     DolphinLib(
         "dvd",
         [
-            Object(Matching, "dvd/dvd.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvd.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvderror.c"),
-            Object(Matching, "dvd/dvdFatal.c"),
-            Object(Matching, "dvd/dvdfs.c"),
-            Object(Matching, "dvd/dvdidutils.c"),
-            Object(Matching, "dvd/dvdlow.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdFatal.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdfs.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdidutils.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdlow.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdqueue.c"),
             Object(Matching, "dvd/fstload.c"),
         ],

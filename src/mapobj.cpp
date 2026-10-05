@@ -129,10 +129,10 @@ inline CMapObjAtrMeshName::~CMapObjAtrMeshName()
  * --INFO--
  * PAL Address: 0x8002BF2C
  * PAL Size: 196b
- * EN Address: 0x80033658
- * EN Size: 296b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8002BD20
+ * EN Size: 196b
+ * JP Address: 0x8002B658
+ * JP Size: 204b
  */
 void CMapObj::Init()
 {
@@ -156,8 +156,7 @@ void CMapObj::Init()
     m_unknown19 = 1;
     m_meshId = 0xFFFF;
 
-    m_cameraSemiTransFar = 1000000000000000.0f;
-    m_cameraSemiTransNear = 1000000000000000.0f;
+    m_cameraSemiTransNear = m_cameraSemiTransFar = 1000000000000000.0f;
     m_cameraSemiTransMinAlpha = 1000000000000000.0f;
     m_cameraSemiTransMaxAlpha = -1.0f;
 
@@ -171,9 +170,7 @@ void CMapObj::Init()
     m_enableFullScreenShadow = 1;
     m_shadowTarget = -1;
 
-    m_transRateZ = 0.0f;
-    m_transRateY = 0.0f;
-    m_transRateX = 0.0f;
+    m_transRateX = m_transRateY = m_transRateZ = 0.0f;
     m_bumpTexMatrixMode = 0;
     m_zBufferOffset = 0.0f;
     m_cameraSemiTransBeyondMax = 1;

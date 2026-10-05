@@ -34,10 +34,7 @@ struct CFlatPathPoint
 	Vec m_position;
 };
 
-extern int gCFlatRuntime2DebugDrawOverflowFrame;
-extern char gCFlatRuntime2DebugDrawOverflowInit;
 extern const char sCFlatRuntime2DebugDrawOverflowMsg[];
-extern u32 CFlatFlags;
 
 class CFlatRuntime2 : public CFlatRuntime
 {

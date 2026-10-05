@@ -238,20 +238,18 @@ void CGMonObj::onFramePreCalc()
  * --INFO--
  * PAL Address: 0x8011A248
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801195A8
+ * EN Size: 72b
+ * JP Address: 0x80116200
+ * JP Size: 64b
  */
 void CGMonObj::flyDown()
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	prgObj->changeStat(0x17, 0, 0);
+	changeStat(0x17, 0, 0);
 	m_unk6B9 = 1;
-	charaObj->damageDelete();
+#ifndef VERSION_GCCJGC
+	damageDelete();
+#endif
 }
 
 /*

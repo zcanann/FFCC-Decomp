@@ -2934,18 +2934,15 @@ inline CTexScroll::~CTexScroll()
  * --INFO--
  * PAL Address: 0x8003C66C
  * PAL Size: 36b
- * EN Address: 0x8004EDA8
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8003C460
+ * EN Size: 36b
+ * JP Address: 0x8003BE54
+ * JP Size: 40b
  */
 inline CTexScroll::CTexScroll()
 {
-    float zero = 0.0f;
-    m_v0 = zero;
-    m_u0 = zero;
-    m_v1 = zero;
-    m_u1 = zero;
+    m_u0 = m_v0 = 0.0f;
+    m_u1 = m_v1 = 0.0f;
     m_type1 = 0;
     m_type0 = 0;
 }
@@ -3001,19 +2998,17 @@ CMaterial::~CMaterial()
  * --INFO--
  * PAL Address: 0x8003DC10
  * PAL Size: 40b
- * EN Address: 0x8004CF28
- * EN Size: 52b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8003DA04
+ * EN Size: 40b
+ * JP Address: 0x8003D3FC
+ * JP Size: 40b
  */
 void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
 {
     m_tevBit = static_cast<unsigned long>(tevBit);
-    float scale = 1.0f;
     m_bumpLight = 0;
     m_textureCount = 0;
-    m_scaleV = scale;
-    m_scaleU = scale;
+    m_scaleU = m_scaleV = 1.0f;
     m_singleTextureFlag = 0;
     m_textureCount = static_cast<unsigned short>(tag);
 }

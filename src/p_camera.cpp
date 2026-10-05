@@ -302,12 +302,12 @@ void CCameraPcs::destroyFunnyShape()
 
 /*
  * --INFO--
- * PAL Address: 0x800366bc
+ * PAL Address: 0x800366BC
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800364B0
+ * EN Size: 68b
+ * JP Address: 0x80035E08
+ * JP Size: 76b
  */
 void CCameraPcs::createFunnyShape()
 {
@@ -315,15 +315,9 @@ void CCameraPcs::createFunnyShape()
     float one = 1.0f;
     float zero = 0.0f;
     m_viewerOverride = 0;
-    m_viewer.m_position.z = zero;
-    m_viewer.m_position.y = zero;
-    m_viewer.m_position.x = zero;
-    m_viewer.m_distance = zero;
-    m_viewer.m_rotY = zero;
-    m_viewer.m_rotX = zero;
-    m_viewer.m_scale.z = one;
-    m_viewer.m_scale.y = one;
-    m_viewer.m_scale.x = one;
+    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = zero;
+    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = zero;
+    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = one;
     m_viewer.m_position.y = zero;
     m_viewer.m_position.z = negThirty;
 }
@@ -403,12 +397,12 @@ void CCameraPcs::destroyMaterialEditor()
 
 /*
  * --INFO--
- * PAL Address: 0x800369d4
+ * PAL Address: 0x800369D4
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800367C8
+ * EN Size: 68b
+ * JP Address: 0x8003612C
+ * JP Size: 76b
  */
 void CCameraPcs::createMaterialEditor()
 {
@@ -416,15 +410,9 @@ void CCameraPcs::createMaterialEditor()
     float one = 1.0f;
     float zero = 0.0f;
     m_viewerOverride = 0;
-    m_viewer.m_position.z = zero;
-    m_viewer.m_position.y = zero;
-    m_viewer.m_position.x = zero;
-    m_viewer.m_distance = zero;
-    m_viewer.m_rotY = zero;
-    m_viewer.m_rotX = zero;
-    m_viewer.m_scale.z = one;
-    m_viewer.m_scale.y = one;
-    m_viewer.m_scale.x = one;
+    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = zero;
+    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = zero;
+    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = one;
     m_viewer.m_position.y = zero;
     m_viewer.m_position.z = negThirty;
 }
@@ -1072,12 +1060,12 @@ void CCameraPcs::destroyMap()
 
 /*
  * --INFO--
- * PAL Address: 0x80038b1c
+ * PAL Address: 0x80038B1C
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80038910
+ * EN Size: 76b
+ * JP Address: 0x800382DC
+ * JP Size: 84b
  */
 void CCameraPcs::createMap()
 {
@@ -1090,16 +1078,12 @@ void CCameraPcs::createMap()
 
     zero = 0.0f;
     distance = 240.0f;
-    m_mapRotZ = zero;
     pitch = 0.61086524f;
-    m_mapRotY = zero;
     fov = 25.0f;
-    m_mapRotX = zero;
     nearZ = 10.0f;
-    m_positionZ = zero;
     farZ = 10000.0f;
-    m_positionY = zero;
-    m_positionX = zero;
+    m_mapRotX = m_mapRotY = m_mapRotZ = zero;
+    m_positionX = m_positionY = m_positionZ = zero;
     m_yaw = zero;
     m_distance = distance;
     m_pitch = pitch;
@@ -1194,8 +1178,12 @@ void CCameraPcs::destroyChara()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80038F00
+ * PAL Size: 96b
+ * EN Address: 0x80038CF4
+ * EN Size: 96b
+ * JP Address: 0x800386CC
+ * JP Size: 100b
  */
 void CCameraPcs::createChara()
 {
@@ -1207,15 +1195,9 @@ void CCameraPcs::createChara()
     float one = 1.0f;
     float zero = 0.0f;
     m_viewerOverride = 0;
-    m_viewer.m_position.z = zero;
-    m_viewer.m_position.y = zero;
-    m_viewer.m_position.x = zero;
-    m_viewer.m_distance = zero;
-    m_viewer.m_rotY = zero;
-    m_viewer.m_rotX = zero;
-    m_viewer.m_scale.z = one;
-    m_viewer.m_scale.y = one;
-    m_viewer.m_scale.x = one;
+    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = zero;
+    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = zero;
+    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = one;
     m_viewer.m_position.y = negTen;
     m_viewer.m_distance = fifty;
     m_fov = fov;
@@ -1661,10 +1643,10 @@ void CCameraPcs::CalcQuake()
  * --INFO--
  * PAL Address: 0x80039FA0
  * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80039D94
+ * EN Size: 256b
+ * JP Address: 0x80039778
+ * JP Size: 260b
  */
 void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTime, short endTime,
                                    float posAmpX, float posAmpY, float posAmpZ,
@@ -1684,12 +1666,8 @@ void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTi
         }
 
         m_quake.m_mode = 0;
-        m_quake.m_positionAmplitude.z = 0.0f;
-        m_quake.m_positionAmplitude.y = 0.0f;
-        m_quake.m_positionAmplitude.x = 0.0f;
-        m_quake.m_jitterAmplitude.z = 0.0f;
-        m_quake.m_jitterAmplitude.y = 0.0f;
-        m_quake.m_jitterAmplitude.x = 0.0f;
+        m_quake.m_positionAmplitude.x = m_quake.m_positionAmplitude.y = m_quake.m_positionAmplitude.z = 0.0f;
+        m_quake.m_jitterAmplitude.x = m_quake.m_jitterAmplitude.y = m_quake.m_jitterAmplitude.z = 0.0f;
         return;
     }
 
@@ -1731,10 +1709,10 @@ void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTi
  * --INFO--
  * PAL Address: 0x8003A0A0
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80039E94
+ * EN Size: 168b
+ * JP Address: 0x8003987C
+ * JP Size: 176b
  */
 void CCameraPcs::onScriptChanged(char*, int fromScript)
 {
@@ -1745,9 +1723,7 @@ void CCameraPcs::onScriptChanged(char*, int fromScript)
 
     float refValue = 100.0f;
     float zero;
-    m_targetZ = zero = 0.0f;
-    m_targetY = zero;
-    m_targetX = zero;
+    m_targetX = m_targetY = m_targetZ = zero = 0.0f;
     m_positionX = zero;
     m_positionY = refValue;
     m_positionZ = refValue;
@@ -1786,8 +1762,12 @@ void CCameraPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A158
+ * PAL Size: 220b
+ * EN Address: 0x80039F4C
+ * EN Size: 220b
+ * JP Address: 0x8003993C
+ * JP Size: 224b
  */
 void CCameraPcs::create()
 {
@@ -1796,9 +1776,7 @@ void CCameraPcs::create()
     float zero = 0.0f;
     float valueb0 = 0.61086524f;
 
-    m_targetZ = zero;
-    m_targetY = zero;
-    m_targetX = zero;
+    m_targetX = m_targetY = m_targetZ = zero;
 
     float valueb4 = 25.0f;
     m_yaw = value18;
@@ -1823,12 +1801,8 @@ void CCameraPcs::create()
     m_fromScript = 0;
     m_quake.m_state = 0;
     m_quake.m_keepMoving = 0;
-    m_quake.m_positionAmplitude.z = value18;
-    m_quake.m_positionAmplitude.y = value18;
-    m_quake.m_positionAmplitude.x = value18;
-    m_quake.m_jitterAmplitude.z = value18;
-    m_quake.m_jitterAmplitude.y = value18;
-    m_quake.m_jitterAmplitude.x = value18;
+    m_quake.m_positionAmplitude.x = m_quake.m_positionAmplitude.y = m_quake.m_positionAmplitude.z = value18;
+    m_quake.m_jitterAmplitude.x = m_quake.m_jitterAmplitude.y = m_quake.m_jitterAmplitude.z = value18;
     m_quake.m_startTimer = 0;
     m_quake.m_startDuration = 0;
     m_quake.m_endTimer = 0;

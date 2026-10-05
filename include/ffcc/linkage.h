@@ -46,7 +46,6 @@ class CUSB;
 extern CUSB USB;
 class CAmemCacheSet;
 extern CAmemCacheSet ppvAmemCacheSet;
-extern u32 CFlatFlags;
 extern CFlatRuntime2& gCFlatRuntime2;
 class CChara;
 extern CChara& gChara;

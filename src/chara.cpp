@@ -744,22 +744,23 @@ CChara::CModel::~CModel()
  * --INFO--
  * PAL Address: 0x80073480
  * PAL Size: 192b
- * EN Address: 0x8007ee6c
- * EN Size: 316b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80072DE8
+ * EN Size: 192b
+ * JP Address: 0x8007285C
+ * JP Size: 228b
  */
 void CChara::CModel::Init()
 {
 	m_time = 0.0f;
 	m_curFrame = 0.0f;
-	m_dynJitter.z = m_dynJitter.y = m_dynJitter.x = 0.0f;
+	m_dynJitter.x = 0.0f;
+	m_dynJitter.y = 0.0f;
+	m_dynJitter.z = 0.0f;
 	m_blendMax = m_blendCur = 0;
 	m_meshVisibleMask = 0xFFFFFFFF;
 	m_animStart = 0.0f;
 	m_animEnd = 0.0f;
-	m_chestAmp = 0.0f;
-	m_chestTilt = 0.0f;
+	m_chestTilt = m_chestAmp = 0.0f;
 	m_lightAlpha = 1.0f;
 	m_callbackContext = 0;
 	m_callbackParam = 0;
@@ -776,8 +777,7 @@ void CChara::CModel::Init()
 	m_flagsA0Bits.m_flagA0_40 = 0;
 	m_flagsA0Bits.m_flagA0_20 = 1;
 	m_flags10CBits.m_flag10C_40 = 0;
-	m_furTarget = 1.0f;
-	m_furCur = 1.0f;
+	m_furCur = m_furTarget = 1.0f;
 	m_attachMode = 0;
 	m_twistAngle = 0.0f;
 }

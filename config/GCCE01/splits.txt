@@ -287,3 +287,12 @@ db/db.c:
 axfx/axfx.c:
 	.text start:0x801958A8 end:0x80195904
 	.sdata start:0x8032DB40 end:0x8032DB48
+
+thp/THPDec.c:
+	.text start:0x801CC85C end:0x801D3DC4
+	.rodata start:0x801E6FC0 end:0x801E7050
+	.data start:0x8021DCB0 end:0x8021DCEC
+	.bss start:0x8032D260 end:0x8032D390
+	.sdata start:0x8032DC18 end:0x8032DC1C
+	.sbss start:0x8032E4C0 end:0x8032E5D8
+	.sdata2 start:0x80332D58 end:0x80332D74

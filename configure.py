@@ -1288,7 +1288,7 @@ config.libs = [
         "cflags": cflags_thp,
         "progress_category": "sdk",
         "objects": [
-            Object(Matching, "thp/THPDec.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "thp/THPDec.c"),
             Object(Matching, "thp/THPAudio.c"),
         ],
     },

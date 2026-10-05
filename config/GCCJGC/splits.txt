@@ -220,3 +220,12 @@ db/db.c:
 axfx/axfx.c:
 	.text start:0x80190EEC end:0x80190F48
 	.sdata start:0x8034B948 end:0x8034B950
+
+thp/THPDec.c:
+	.text start:0x801C8B6C end:0x801D00D4
+	.rodata start:0x801DC530 end:0x801DC5C0
+	.data start:0x8023A600 end:0x8023A63C
+	.bss start:0x8034B080 end:0x8034B1B0
+	.sdata start:0x8034BA20 end:0x8034BA24
+	.sbss start:0x8034C2A0 end:0x8034C3B8
+	.sdata2 start:0x803501C0 end:0x803501DC

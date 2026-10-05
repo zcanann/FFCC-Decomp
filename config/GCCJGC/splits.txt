@@ -1287,3 +1287,19 @@ pppYmEnv.cpp:
 
 auto_10_8034BC84_sbss:
 	.sbss start:0x8034BC84 end:0x8034BC88 align:4
+
+p_sample.cpp:
+	.text	start:0x8001F6CC end:0x8001F708
+	.rodata	start:0x801D1820 end:0x801D1841
+	.data	start:0x801DC758 end:0x801DC94C
+	.sdata	start:0x8034B228 end:0x8034B240
+	.sbss	start:0x8034BA60 end:0x8034BA64
+
+auto_07_801DC94C_data:
+	.data start:0x801DC94C end:0x801DC950 align:4
+
+auto_10_8034BA64_sbss:
+	.sbss start:0x8034BA64 end:0x8034BA68 align:4
+
+auto_06_801D1841_rodata:
+	.rodata start:0x801D1841 end:0x801D1848 align:1

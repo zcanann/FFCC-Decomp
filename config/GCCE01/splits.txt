@@ -532,6 +532,7 @@ monobj_boss.cpp:
 
 p_menu.cpp:
 	.text start:0x80093814 end:0x80097174
+	.bss start:0x802E9160 end:0x802E9A20
 
 p_minigame.cpp:
 	.text start:0x80126EA4 end:0x8012A57C
@@ -685,4 +686,67 @@ MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.sdata2 start:0x803328D8 end:0x803328E0
 
 MSL_C/PPCEABI/bare/H/printf.c:
+	.text start:0x801B58F0 end:0x801B79F0
 	.rodata start:0x801E5F68 end:0x801E5F90
+	.data start:0x8021C580 end:0x8021C7AC
+	.sdata start:0x8032DBE8 end:0x8032DBF0
+	.sdata2 start:0x803328E8 end:0x803328F0
+
+menu_arti.cpp:
+	.text start:0x8015EAA4 end:0x8015FF58
+	.sdata2 start:0x80331F48 end:0x80331F98
+
+menu_tmparti.cpp:
+	.text start:0x8015C814 end:0x8015D3F8
+	.sdata2 start:0x80331EC0 end:0x80331F00
+
+menu_money.cpp:
+	.text start:0x8015D3F8 end:0x8015EAA4
+	.bss start:0x8030AA38 end:0x8030AA48
+	.sbss start:0x8032DEC0 end:0x8032DEC4
+	.sdata2 start:0x80331F00 end:0x80331F48
+
+menu_compa.cpp:
+	.text start:0x8015FF58 end:0x801613D0
+	.rodata start:0x801DDDB0 end:0x801DDDE0
+	.sdata2 start:0x80331F98 end:0x80331FD8
+
+menu_favo.cpp:
+	.text start:0x801613D0 end:0x801629BC
+	.bss start:0x8030AA48 end:0x8030AA68
+	.sdata2 start:0x80331FD8 end:0x80332020
+
+menu_lst.cpp:
+	.text start:0x801736C8 end:0x8017445C
+	.sdata2 start:0x80332370 end:0x803323C8
+
+ringmenu.cpp:
+	.text start:0x800A26A8 end:0x800A4C34
+
+exi/EXIUart.c:
+	.text	start:0x80182970 end:0x80182F44
+	.sbss	start:0x8032DFD0 end:0x8032DFE0
+
+MSL_C/PPCEABI/bare/H/alloc.c:
+	.text start:0x801B0CCC end:0x801B1BA4
+	.rodata start:0x801E5E70 end:0x801E5E88
+	.bss start:0x8032A4F0 end:0x8032A528
+	.sbss start:0x8032E368 end:0x8032E370
+
+Runtime.PPCEABI.H/GCN_mem_alloc.c:
+	.text start:0x801B09D0 end:0x801B0B40
+	.rodata start:0x801E5DF8 end:0x801E5E70
+
+Runtime.PPCEABI.H/New.cp:
+	.text start:0x801AE6DC end:0x801AE75C
+	extab start:0x8000A1CC end:0x8000A1F4
+	extabindex start:0x8001177C end:0x80011788
+	.rodata start:0x801E5D18 end:0x801E5D38
+	.data start:0x8021BF20 end:0x8021BF30
+	.sdata start:0x8032DBC0 end:0x8032DBC8
+
+Runtime.PPCEABI.H/NMWException.cp:
+	.text start:0x801AE75C end:0x801AEDCC
+	extab start:0x8000A1F4 end:0x8000A25C
+	extabindex start:0x80011788 end:0x800117F4
+	.sdata start:0x8032DBC8 end:0x8032DBD0

@@ -924,8 +924,13 @@ public:
     CMesMenu* m_battleMesMenus[12];
     CRingMenu* m_battleRingMenus[4];
     CTextureSet* m_textureSets[16];
+#ifdef VERSION_GCCJGC
+    CTexture* m_textures[103];
+    unsigned char m_pad328[0x340 - 0x328];
+#else
     CTexture* m_textures[105];
     unsigned char m_pad330[0x340 - 0x330];
+#endif
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
     WmStorage m_wm;

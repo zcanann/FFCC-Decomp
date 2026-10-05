@@ -9,6 +9,22 @@
 #include "ffcc/system.h"
 #include <string.h>
 
+#ifdef VERSION_GCCJGC
+enum {
+    kArtiPanelTexture = 0x2D,
+    kArtiIconTexture = 0x43,
+    kArtiRowTexture = 0x36,
+    kArtiEmptyRowTexture = 0x33
+};
+#else
+enum {
+    kArtiPanelTexture = 0x2E,
+    kArtiIconTexture = 0x44,
+    kArtiRowTexture = 0x37,
+    kArtiEmptyRowTexture = 0x34
+};
+#endif
+
 typedef unsigned char u8;
 
 static const float kArtiZero = 0.0f;
@@ -59,10 +75,10 @@ STATIC_ASSERT(sizeof(ArtiOpenAnimList) == 0x1008);
  * --INFO--
  * PAL Address: 0x8015fa28
  * PAL Size: 812b
- * EN Address: 0x80183198
- * EN Size: 800b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015EAA4
+ * EN Size: 812b
+ * JP Address: 0x8015A460
+ * JP Size: 812b
  */
 int CMenuPcs::ArtiCtrlCur()
 {
@@ -135,10 +151,10 @@ int CMenuPcs::ArtiCtrlCur()
  * --INFO--
  * PAL Address: 0x8015fd54
  * PAL Size: 2308b
- * EN Address: 0x80182684
- * EN Size: 2836b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015EDD0
+ * EN Size: 2308b
+ * JP Address: 0x8015A78C
+ * JP Size: 2284b
  */
 void CMenuPcs::ArtiDraw()
 {
@@ -227,16 +243,16 @@ void CMenuPcs::ArtiDraw()
 				float animAlpha = entry->alpha;
 				int texId = tex;
 				float itemAlpha = animAlpha;
-				if (tex == 0x37) {
+				if (tex == kArtiRowTexture) {
 					int itemCount = caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + (drawIndex + m_artiState->scrollOffset)];
 					if (itemCount > 0) {
 					} else {
-						texId = 0x34;
+						texId = kArtiEmptyRowTexture;
 						double half = kArtiHalfDouble;
 						itemAlpha = (float)(half * (double)animAlpha);
 					}
 
-					if (texId == 0x37 && drawIndex == m_artiState->selections[0]) {
+					if (texId == kArtiRowTexture && drawIndex == m_artiState->selections[0]) {
 						v += h;
 					}
 					drawIndex++;
@@ -263,7 +279,7 @@ void CMenuPcs::ArtiDraw()
 
 	for (i = 0; i < m_artiList->count; i++) {
 		entry = &m_artiList->entries[i];
-		if (entry->tex == 0x37) {
+		if (entry->tex == kArtiRowTexture) {
 			break;
 		}
 	}
@@ -289,7 +305,11 @@ void CMenuPcs::ArtiDraw()
 		x = (float)(entry[i].x + 0x1c);
 		y = (float)(entry[i].y + 0xb);
 		listFont->SetPosX(x);
+#ifdef VERSION_GCCJGC
+		listFont->SetPosY(y);
+#else
 		listFont->SetPosY(y - kArtiTextYOffset);
+#endif
 		listFont->Draw(text);
 	}
 
@@ -315,7 +335,7 @@ void CMenuPcs::ArtiDraw()
 	if (artiState == 1) {
 		for (i = 0; i < m_artiList->count; i++) {
 			entry = &m_artiList->entries[i];
-			if (m_artiList->entries[i].tex == 0x37) {
+			if (m_artiList->entries[i].tex == kArtiRowTexture) {
 				break;
 			}
 		}
@@ -350,10 +370,10 @@ void CMenuPcs::ArtiDraw()
  * --INFO--
  * PAL Address: 0x80160658
  * PAL Size: 380b
- * EN Address: 0x8018245C
- * EN Size: 552b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015F6D4
+ * EN Size: 380b
+ * JP Address: 0x8015B078
+ * JP Size: 396b
  */
 int CMenuPcs::ArtiClose()
 {
@@ -402,10 +422,10 @@ int CMenuPcs::ArtiClose()
  * --INFO--
  * PAL Address: 0x801607d4
  * PAL Size: 84b
- * EN Address: 0x801823FC
- * EN Size: 96b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015F850
+ * EN Size: 84b
+ * JP Address: 0x8015B204
+ * JP Size: 84b
  */
 int CMenuPcs::ArtiCtrl()
 {
@@ -425,10 +445,10 @@ int CMenuPcs::ArtiCtrl()
  * --INFO--
  * PAL Address: 0x80160828
  * PAL Size: 432b
- * EN Address: 0x801821C4
- * EN Size: 568b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015F8A4
+ * EN Size: 432b
+ * JP Address: 0x8015B258
+ * JP Size: 444b
  */
 int CMenuPcs::ArtiOpen()
 {
@@ -480,10 +500,10 @@ int CMenuPcs::ArtiOpen()
  * --INFO--
  * PAL Address: 0x801609d8
  * PAL Size: 604b
- * EN Address: 0x80182028
- * EN Size: 412b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015FA54
+ * EN Size: 604b
+ * JP Address: 0x8015B414
+ * JP Size: 636b
  */
 void CMenuPcs::ArtiInit1()
 {
@@ -493,61 +513,61 @@ void CMenuPcs::ArtiInit1()
 
 	index = 0;
 	entry = &m_artiList->entries[index++];
-	entry->tex = 0x2e;
+	entry->tex = kArtiPanelTexture;
 	entry->startFrame = 2;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
-	entry->tex = 0x44;
+	entry->tex = kArtiIconTexture;
 	entry->startFrame = 7;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
-	entry->tex = 0x44;
-	entry->startFrame = 7;
-	entry->duration = 5;
-	entry = &m_artiList->entries[index++];
-	entry->flags = 2;
-	entry->tex = 0x2e;
+	entry->tex = kArtiIconTexture;
 	entry->startFrame = 7;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x37;
+	entry->tex = kArtiPanelTexture;
+	entry->startFrame = 7;
+	entry->duration = 5;
+	entry = &m_artiList->entries[index++];
+	entry->flags = 2;
+	entry->tex = kArtiRowTexture;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x37;
+	entry->tex = kArtiRowTexture;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x37;
+	entry->tex = kArtiRowTexture;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x37;
+	entry->tex = kArtiRowTexture;
 	alpha = kArtiOne;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x37;
+	entry->tex = kArtiRowTexture;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x37;
+	entry->tex = kArtiRowTexture;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x37;
+	entry->tex = kArtiRowTexture;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index];
 	entry->flags = 2;
-	entry->tex = 0x37;
+	entry->tex = kArtiRowTexture;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = m_artiList->entries;
@@ -562,10 +582,10 @@ void CMenuPcs::ArtiInit1()
  * --INFO--
  * PAL Address: 0x80160c34
  * PAL Size: 680b
- * EN Address: 0x80181D40
- * EN Size: 744b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015FCB0
+ * EN Size: 680b
+ * JP Address: 0x8015B690
+ * JP Size: 748b
  */
 void CMenuPcs::ArtiInit()
 {
@@ -583,7 +603,7 @@ void CMenuPcs::ArtiInit()
 
 	index = 0;
 	entry = &m_artiList->entries[index++];
-	entry->tex = 0x2e;
+	entry->tex = kArtiPanelTexture;
 	entry->x = 0x68;
 	entry->y = 0x28;
 	entry->w = 0x78;
@@ -599,7 +619,7 @@ void CMenuPcs::ArtiInit()
 	entry->duration = 5;
 
 	entry = &m_artiList->entries[index++];
-	entry->tex = 0x44;
+	entry->tex = kArtiIconTexture;
 	entry->x = 0x50;
 	entry->y = 0xe;
 	entry->w = 0x30;
@@ -611,7 +631,7 @@ void CMenuPcs::ArtiInit()
 	entry->duration = 5;
 
 	entry = &m_artiList->entries[index++];
-	entry->tex = 0x44;
+	entry->tex = kArtiIconTexture;
 	entry->x = 0x55;
 	entry->w = 0x30;
 	entry->h = 0x30;
@@ -625,7 +645,7 @@ void CMenuPcs::ArtiInit()
 
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x2e;
+	entry->tex = kArtiPanelTexture;
 	entry->x = 0x50;
 	entry->y = 8;
 	entry->w = 0x48;
@@ -639,7 +659,7 @@ void CMenuPcs::ArtiInit()
 	for (int loopCount = 0; loopCount < 8; loopCount++) {
 		entry = &m_artiList->entries[index++];
 		entry->flags = 2;
-		entry->tex = 0x37;
+		entry->tex = kArtiRowTexture;
 		entry->x = entry0->x + 0x24;
 		entry->y = entry0->y + loopCount * 0x20;
 		entry->w = 200;

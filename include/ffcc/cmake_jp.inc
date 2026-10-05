@@ -45,8 +45,3 @@ static const char* s_NameEntryStr[] = {
 };
 
 static const char* s_NameEntryVoiced[] = { s_nameEntryDakuten, s_nameEntryHandakuten };
-
-static const char s_nameDakutenMark[] = "\x81\x4A";
-static const char s_nameHandakutenMark[] = "\x81\x4B";
-static const char s_nameKatakanaU[] = "\x83\x45";
-static const char s_nameKatakanaVu[] = "\x83\x94";

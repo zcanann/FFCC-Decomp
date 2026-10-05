@@ -10,6 +10,18 @@
 #include <string.h>
 #include "ffcc/fontman.h"
 
+enum {
+#ifdef VERSION_GCCJGC
+    EQUIP_TEX_FRAME = 0x2D,
+    EQUIP_TEX_TAB = 0x2E,
+    EQUIP_TEX_LIST = 0x36,
+#else
+    EQUIP_TEX_FRAME = 0x2E,
+    EQUIP_TEX_TAB = 0x2F,
+    EQUIP_TEX_LIST = 0x37,
+#endif
+};
+
 typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -38,10 +50,10 @@ STATIC_ASSERT(sizeof(EquipOpenAnimList) == 0x1008);
  * --INFO--
  * PAL Address: 0x8015b158
  * PAL Size: 268b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015A1D4
+ * EN Size: 268b
+ * JP Address: 0x80155A1C
+ * JP Size: 268b
  */
 bool CMenuPcs::ChkEquipActive(int index)
 {
@@ -83,10 +95,10 @@ bool CMenuPcs::ChkEquipActive(int index)
  * --INFO--
  * PAL Address: 0x8015b264
  * PAL Size: 516b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015A2E0
+ * EN Size: 516b
+ * JP Address: 0x80155B28
+ * JP Size: 532b
  */
 int CMenuPcs::EquipClose0()
 {
@@ -148,10 +160,10 @@ int CMenuPcs::EquipClose0()
  * --INFO--
  * PAL Address: 0x8015b468
  * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015A4E4
+ * EN Size: 432b
+ * JP Address: 0x80155D3C
+ * JP Size: 444b
  */
 int CMenuPcs::EquipOpen0()
 {
@@ -211,10 +223,10 @@ int CMenuPcs::EquipOpen0()
  * --INFO--
  * PAL Address: 0x8015b618
  * PAL Size: 1592b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015A694
+ * EN Size: 1592b
+ * JP Address: 0x80155EF8
+ * JP Size: 1592b
  */
 int CMenuPcs::EquipCtrlCur()
 {
@@ -342,10 +354,10 @@ int CMenuPcs::EquipCtrlCur()
  * --INFO--
  * PAL Address: 0x8015bc50
  * PAL Size: 4280b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015ACCC
+ * EN Size: 4280b
+ * JP Address: 0x80156530
+ * JP Size: 4260b
  */
 void CMenuPcs::EquipDraw()
 {
@@ -487,7 +499,7 @@ void CMenuPcs::EquipDraw()
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				} else {
 					float alpha = listItem->alpha;
-					if (tex == 0x37) {
+					if (tex == EQUIP_TEX_LIST) {
 						int idx = drawIndex + m_equipState->scroll;
 						if ((idx < 1) || (idx >= letterCount)) {
 							if ((idx >= letterCount) || !ChkEquipActive(idx)) {
@@ -507,7 +519,7 @@ void CMenuPcs::EquipDraw()
 								alpha = (float)(0.5 * (double)listItem->alpha);
 							}
 						}
-						if ((tex == 0x37) && (drawIndex == m_equipState->selected[1])) {
+						if ((tex == EQUIP_TEX_LIST) && (drawIndex == m_equipState->selected[1])) {
 							v += h;
 						}
 						drawIndex++;
@@ -541,7 +553,7 @@ void CMenuPcs::EquipDraw()
 		EquipOpenAnim* listStart;
 		for (int i = list->count; i < list->listEnd; i++) {
 			listStart = &list->entries[i];
-			if (listStart->tex == 0x37) {
+			if (listStart->tex == EQUIP_TEX_LIST) {
 				break;
 			}
 		}
@@ -617,7 +629,7 @@ void CMenuPcs::EquipDraw()
 			EquipOpenAnim* found;
 			for (int i = list->count; i < list->listEnd; i++) {
 				found = &list->entries[i];
-				if (found->tex == 0x37) {
+				if (found->tex == EQUIP_TEX_LIST) {
 					break;
 				}
 			}
@@ -667,10 +679,10 @@ void CMenuPcs::EquipDraw()
  * --INFO--
  * PAL Address: 0x8015cd08
  * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015BD84
+ * EN Size: 428b
+ * JP Address: 0x801575D4
+ * JP Size: 460b
  */
 int CMenuPcs::EquipClose()
 {
@@ -754,10 +766,10 @@ inline void CMenuPcs::EquipInit0()
  * --INFO--
  * PAL Address: 0x8015ceb4
  * PAL Size: 596b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015BF30
+ * EN Size: 596b
+ * JP Address: 0x801577A0
+ * JP Size: 600b
  */
 int CMenuPcs::EquipCtrl()
 {
@@ -791,10 +803,10 @@ int CMenuPcs::EquipCtrl()
  * --INFO--
  * PAL Address: 0x8015d108
  * PAL Size: 948b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015C184
+ * EN Size: 948b
+ * JP Address: 0x801579F8
+ * JP Size: 1032b
  */
 int CMenuPcs::EquipOpen()
 {
@@ -894,10 +906,10 @@ int CMenuPcs::EquipOpen()
  * --INFO--
  * PAL Address: 0x8015d4bc
  * PAL Size: 732b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015C538
+ * EN Size: 732b
+ * JP Address: 0x80157E00
+ * JP Size: 804b
  */
 void CMenuPcs::EquipInit1()
 {
@@ -912,7 +924,7 @@ void CMenuPcs::EquipInit1()
 	i = (int)m_equipList->count;
 
 	e = &m_equipList->entries[i++];
-	e->tex = 0x2e;
+	e->tex = EQUIP_TEX_FRAME;
 	e->x = 0xb8;
 	e->y = 0x28;
 	e->w = 0x78;
@@ -924,7 +936,7 @@ void CMenuPcs::EquipInit1()
 	e->duration = 5;
 
 	e = &m_equipList->entries[i++];
-	e->tex = 0x2f;
+	e->tex = EQUIP_TEX_TAB;
 	e->x = 0xa0;
 	e->y = 0xe;
 	e->w = 0x30;
@@ -936,7 +948,7 @@ void CMenuPcs::EquipInit1()
 	e->duration = 5;
 
 	e = &m_equipList->entries[i++];
-	e->tex = 0x2f;
+	e->tex = EQUIP_TEX_TAB;
 	e->w = 0x30;
 	e->h = 0x30;
 	e->x = 0xa5;
@@ -949,7 +961,7 @@ void CMenuPcs::EquipInit1()
 
 	e = &m_equipList->entries[i++];
 	e->flags = 2;
-	e->tex = 0x2e;
+	e->tex = EQUIP_TEX_FRAME;
 	e->x = 0xa0;
 	e->y = 8;
 	e->w = 0x48;
@@ -963,7 +975,7 @@ void CMenuPcs::EquipInit1()
 	for (n = 0; n < 8; n++) {
 		e = &m_equipList->entries[i];
 		e->flags = 2;
-		e->tex = 0x37;
+		e->tex = EQUIP_TEX_LIST;
 		e->x = anchor->x + 0x24;
 		e->y = anchor->y + n * 0x20;
 		e->w = 200;

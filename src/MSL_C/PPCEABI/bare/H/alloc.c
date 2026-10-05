@@ -82,9 +82,6 @@ typedef struct mem_pool_obj {
 
 } mem_pool_obj;
 
-static int initialized;
-
-
 static void SubBlock_construct(SubBlock* ths, unsigned long size, Block* bp, int prev_alloc, int this_alloc);
 static SubBlock* SubBlock_split(SubBlock* ths, unsigned long sz);
 static SubBlock* SubBlock_merge_prev(SubBlock*, SubBlock**);
@@ -100,8 +97,6 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
 static void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size);
 
 static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
-
-#define initialized_flag (*(unsigned char*)&initialized)
 
 #define SubBlock_size(ths) ((ths)->size & 0xFFFFFFF8)
 #define SubBlock_block(ths) ((Block*)((unsigned long)((ths)->block) & ~0x1))
@@ -251,9 +246,9 @@ static void __init_pool_obj(__mem_pool* pool_obj) {
 static __mem_pool* get_malloc_pool(void) {
     static __mem_pool protopool;
     static unsigned char init = 0;
-    if (!initialized_flag) {
+    if (!init) {
         __init_pool_obj(&protopool);
-        initialized_flag = 1;
+        init = 1;
     }
 
     return &protopool;
@@ -801,7 +796,6 @@ void __malloc_free_all(void) {
     __begin_critical_region(malloc_pool_access);
     __pool_free_all(get_malloc_pool());
     __end_critical_region(malloc_pool_access);
-    initialized_flag = 0;
 }
 
 void* calloc(size_t count, size_t size) {

@@ -290,12 +290,12 @@ void CMapHit::CalcHitPosition(Vec* position)
 
 /*
  * --INFO--
- * PAL Address: 0x80025a4c
+ * PAL Address: 0x80025A4C
  * PAL Size: 904b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80025840
+ * EN Size: 904b
+ * JP Address: 0x80025378
+ * JP Size: 904b
  */
 int CMapHit::CalcHitSlide(Vec* out, float y)
 {
@@ -341,9 +341,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
                 PSVECAdd(&nearestPoint, &slideDir, &nearestPoint);
                 PSVECSubtract(&nearestPoint, &g_hit_cyl_min.m_bottom, out);
             } else {
-                out->z = kMapHitZero;
-                out->y = kMapHitZero;
-                out->x = kMapHitZero;
+                out->x = out->y = out->z = kMapHitZero;
             }
 
             return 1;
@@ -356,9 +354,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
     if (gMapHitFace->m_normal.y < y) {
         if (g_hit_t_slide_min <= kMapHitSlideTLimit) {
-            out->z = kMapHitZero;
-            out->y = kMapHitZero;
-            out->x = kMapHitZero;
+            out->x = out->y = out->z = kMapHitZero;
             return 1;
         } else {
             Vec push;

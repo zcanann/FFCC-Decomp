@@ -8,21 +8,32 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-extern "C" const float kMLstZero = 0.0f;
-extern "C" const float kMLstColorMax = 255.0f;
-extern "C" const double kMLstSelectedOffsetX = 20.0;
-extern "C" const float kMLstRowHeight = 40.0f;
-extern "C" const double kMLstHalfDouble = 0.5;
-extern "C" const float kMLstOne = 1.0f;
-extern "C" const float kMLstTextYOffset = 4.0f;
-extern "C" const float kMLstHelpCenterX = 320.0f;
-extern "C" const float kMLstHalf = 0.5f;
-extern "C" const float kMLstHelpY = 352.0f;
-extern "C" const float kMLstHelpScale = 3.0f;
-extern "C" const double kMLstIntToDoubleBias = 4503601774854144.0;
-extern "C" const double kMLstOneDouble = 1.0;
-extern "C" const double kMLstZeroDouble = 0.0;
-extern "C" const double kMLstWindowCenterX = 216.0;
+#ifdef VERSION_GCCJGC
+enum {
+    kMLstCursorTexture = 0x5B,
+    kMLstRowTexture = 0x5A
+};
+#else
+enum {
+    kMLstCursorTexture = 0x5C,
+    kMLstRowTexture = 0x5B
+};
+#endif
+
+static const float kMLstZero = 0.0f;
+static const float kMLstColorMax = 255.0f;
+static const double kMLstSelectedOffsetX = 20.0;
+static const float kMLstRowHeight = 40.0f;
+static const double kMLstHalfDouble = 0.5;
+static const float kMLstOne = 1.0f;
+static const float kMLstTextYOffset = 4.0f;
+static const float kMLstHelpCenterX = 320.0f;
+static const float kMLstHalf = 0.5f;
+static const float kMLstHelpY = 352.0f;
+static const float kMLstHelpScale = 3.0f;
+static const double kMLstOneDouble = 1.0;
+static const double kMLstZeroDouble = 0.0;
+static const double kMLstWindowCenterX = 216.0;
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
@@ -44,10 +55,10 @@ STATIC_ASSERT(offsetof(MenuLstState, cursor) == 0x26);
  * --INFO--
  * PAL Address: 0x8017474c
  * PAL Size: 1436b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801736C8
+ * EN Size: 1436b
+ * JP Address: 0x8016F384
+ * JP Size: 1436b
  */
 void CMenuPcs::MLstDraw()
 {
@@ -93,7 +104,7 @@ void CMenuPcs::MLstDraw()
 
 			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);
 
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMLstCursorTexture));
 			w = kMLstRowHeight;
 			float iconX = item->x - w / 2.0;
 			float iconY = (float)(item->y - 6);
@@ -125,7 +136,11 @@ void CMenuPcs::MLstDraw()
 		}
 
 		font->SetPosX(textX);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(textY);
+#else
 		font->SetPosY(textY - kMLstTextYOffset);
+#endif
 		font->Draw(text);
 	}
 
@@ -158,10 +173,10 @@ void CMenuPcs::MLstDraw()
  * --INFO--
  * PAL Address: 0x80174ce8
  * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO  
- * JP Size: TODO
+ * EN Address: 0x80173C64
+ * EN Size: 428b
+ * JP Address: 0x8016F920
+ * JP Size: 460b
  */
 int CMenuPcs::MLstClose()
 {
@@ -303,10 +318,10 @@ inline int CMenuPcs::MLstCtrlCur()
  * --INFO--
  * PAL Address: 0x80174e94
  * PAL Size: 892b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80173E10
+ * EN Size: 892b
+ * JP Address: 0x8016FAEC
+ * JP Size: 896b
  */
 int CMenuPcs::MLstCtrl()
 {
@@ -353,7 +368,7 @@ inline void CMenuPcs::MLstInit()
 	for (i = 0; i < 9; i++) {
 		entry = &this->m_menuLstList->entries[initializedCount++];
 		entry->unk_2C = 2;
-		entry->tex = 0x5B;
+		entry->tex = kMLstRowTexture;
 		entry->width = 0xE0;
 		entry->height = 0x28;
 		entry->x = (short)(int)-(((double)entry->width * itemCenter) - xOrigin);
@@ -372,10 +387,10 @@ inline void CMenuPcs::MLstInit()
  * --INFO--
  * PAL Address: 0x80175210
  * PAL Size: 720b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO  
- * JP Size: TODO
+ * EN Address: 0x8017418C
+ * EN Size: 720b
+ * JP Address: 0x8016FE6C
+ * JP Size: 784b
  */
 int CMenuPcs::MLstOpen()
 {

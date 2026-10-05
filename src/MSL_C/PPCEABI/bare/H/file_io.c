@@ -3,6 +3,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/buffer_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/FILE_POS.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h"
 
 
 inline FILE* freopen(const char* name, const char* mode, FILE* file)
@@ -22,7 +23,7 @@ inline FILE* freopen(const char* name, const char* mode, FILE* file)
         return NULL;
     }
 
-    __init_file(file, modes, 0, 0x400);
+    __init_file(file, modes, 0, BUFSIZ);
 
     if (__open_file(name, modes, &file->handle)) {
         file->file_mode.file_kind = __closed_file;

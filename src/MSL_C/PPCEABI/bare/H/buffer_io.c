@@ -19,7 +19,9 @@ void __prep_buffer(FILE* file)
 int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
 {
 	int ioresult;
+#ifndef VERSION_GCCJGC
 	unsigned char* buffer_start;
+#endif
 
 	__prep_buffer(file);
 
@@ -43,6 +45,7 @@ int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
 
 	file->position += file->buffer_length;
 
+#ifndef VERSION_GCCJGC
 	if (!file->file_mode.binary_io) {
 		int i;
 
@@ -55,6 +58,7 @@ int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
 			}
 		}
 	}
+#endif
 
 	return 0;
 }

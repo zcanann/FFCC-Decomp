@@ -8,6 +8,24 @@
 #include "ffcc/system.h"
 #include <string.h>
 
+#ifdef VERSION_GCCJGC
+enum {
+    kCompaWindowTexture = 0x50,
+    kCompaBorderTexture = 0x51,
+    kCompaIconTexture = 0x5D,
+    kCompaPanelTexture = 0x2D,
+    kCompaFoodTexture = 0x39
+};
+#else
+enum {
+    kCompaWindowTexture = 0x51,
+    kCompaBorderTexture = 0x52,
+    kCompaIconTexture = 0x5E,
+    kCompaPanelTexture = 0x2E,
+    kCompaFoodTexture = 0x3A
+};
+#endif
+
 typedef unsigned char u8;
 
 static const float kCompaZero = 0.0f;
@@ -30,7 +48,7 @@ STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
 static inline void CompaDrawWindow(CompaOpenAnim* entry, float x, float y, float w, float h, float u, float v, GXColor* colors)
 {
-	if (entry->tex == 0x51) {
+	if (entry->tex == kCompaWindowTexture) {
 		int yStep = static_cast<int>(y);
 		float end = y + h;
 		while (static_cast<float>(yStep) < end) {
@@ -54,10 +72,10 @@ static inline void CompaDrawWindow(CompaOpenAnim* entry, float x, float y, float
  * --INFO--
  * PAL Address: 0x80160edc
  * PAL Size: 3024b
- * EN Address: 0x80183DF4
- * EN Size: 3816b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015FF58
+ * EN Size: 3012b
+ * JP Address: 0x8015B97C
+ * JP Size: 2992b
  */
 void CMenuPcs::CompaDraw()
 {
@@ -157,7 +175,7 @@ void CMenuPcs::CompaDraw()
 	colors[0].b = 0xFF;
 	colors[0].a = static_cast<unsigned char>(this->m_compaList->entries[0].alpha * kCompaColorMax);
 	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCompaFoodTexture));
 
 	compaList = this->m_compaList;
 	for (i = familyCount = 2; i < 7; i++) {
@@ -237,8 +255,12 @@ void CMenuPcs::CompaDraw()
 	compaList = this->m_compaList;
 	font->SetMargin(kCompaOne);
 	font->SetShadow(0);
+#ifdef VERSION_GCCP01
 	font->SetScaleX(kCompaNameFontScaleX);
 	font->SetScaleY(kCompaOne);
+#else
+	font->SetScale(kCompaOne);
+#endif
 	font->DrawInit();
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
@@ -266,12 +288,24 @@ void CMenuPcs::CompaDraw()
 		y = static_cast<float>(compaList->entries[0].y + 0x45);
 		y += static_cast<float>(shown * 0x28);
 		font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(y);
+#else
 		font->SetPosY(y - kCompaTextYOffset);
+#endif
 		font->Draw(name);
 
 		value = Game.GetNPCName(caravanWork->m_evtWordArr[19 + drawIndex]);
+#ifdef VERSION_GCCP01
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
+#else
+		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x80));
+#endif
+#ifdef VERSION_GCCJGC
+		font->SetPosY(y);
+#else
 		font->SetPosY(y - kCompaTextYOffset);
+#endif
 		font->Draw(value);
 
 		shown++;
@@ -280,8 +314,13 @@ void CMenuPcs::CompaDraw()
 
 	font = m_fonts[4];
 	font->SetMargin(kCompaOne);
+#ifdef VERSION_GCCJGC
+	font->SetShadow(1);
+	font->SetScale(kCompaOne);
+#else
 	font->SetShadow(0);
 	font->SetScale(kCompaJobFontScale);
+#endif
 	font->DrawInit();
 	compaList = this->m_compaList;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
@@ -290,7 +329,11 @@ void CMenuPcs::CompaDraw()
 	font->GetWidth(job);
 	jobY = static_cast<float>(compaList->entries[0].y + 0x20);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
+#ifdef VERSION_GCCJGC
+	font->SetPosY(jobY);
+#else
 	font->SetPosY(jobY - kCompaTextYOffset - kCompaJobYOffset);
+#endif
 	font->Draw(job);
 
 	DrawInit();
@@ -299,10 +342,10 @@ void CMenuPcs::CompaDraw()
  * --INFO--
  * PAL Address: 80161aac
  * PAL Size: 380b
- * EN Address: 0x80183BCC
- * EN Size: 552b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80160B1C
+ * EN Size: 380b
+ * JP Address: 0x8015C52C
+ * JP Size: 396b
  */
 int CMenuPcs::CompaClose()
 {
@@ -427,10 +470,10 @@ inline int CMenuPcs::CompaCtrlCur()
  * --INFO--
  * PAL Address: 0x80161C28
  * PAL Size: 800b
- * EN Address: 0x80183B7C
- * EN Size: 80b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80160C98
+ * EN Size: 800b
+ * JP Address: 0x8015C6B8
+ * JP Size: 832b
  */
 int CMenuPcs::CompaCtrl()
 {
@@ -445,10 +488,10 @@ int CMenuPcs::CompaCtrl()
  * --INFO--
  * PAL Address: 80161f48
  * PAL Size: 432b
- * EN Address: 0x80183944
- * EN Size: 568b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80160FB8
+ * EN Size: 432b
+ * JP Address: 0x8015C9F8
+ * JP Size: 444b
  */
 int CMenuPcs::CompaOpen()
 {
@@ -498,10 +541,10 @@ int CMenuPcs::CompaOpen()
  * --INFO--
  * PAL Address: 801620f8
  * PAL Size: 616b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80161168
+ * EN Size: 616b
+ * JP Address: 0x8015CBB4
+ * JP Size: 696b
  */
 void CMenuPcs::CompaInit()
 {
@@ -519,7 +562,7 @@ void CMenuPcs::CompaInit()
 
 	entryIndex = 0;
 	setupEntry = &m_compaList->entries[entryIndex++];
-	setupEntry->tex = 0x52;
+	setupEntry->tex = kCompaBorderTexture;
 	setupEntry->drawFlags = 4;
 	setupEntry->x = 0x28;
 	setupEntry->y = 0x30;
@@ -532,7 +575,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->duration = 5;
 
 	setupEntry = &m_compaList->entries[entryIndex++];
-	setupEntry->tex = 0x51;
+	setupEntry->tex = kCompaWindowTexture;
 	setupEntry->x = 0x28;
 	setupEntry->y = 0x48;
 	setupEntry->w = 0x198;
@@ -544,7 +587,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->duration = 5;
 
 	setupEntry = &m_compaList->entries[entryIndex++];
-	setupEntry->tex = 0x52;
+	setupEntry->tex = kCompaBorderTexture;
 	setupEntry->x = 0x28;
 	setupEntry->y = 0x110;
 	setupEntry->w = 0x198;
@@ -556,7 +599,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->duration = 5;
 
 	setupEntry = &m_compaList->entries[entryIndex++];
-	setupEntry->tex = 0x5e;
+	setupEntry->tex = kCompaIconTexture;
 	setupEntry->x = 0x10;
 	setupEntry->y = 0xe;
 	setupEntry->w = 0x30;
@@ -568,7 +611,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->duration = 5;
 
 	setupEntry = &m_compaList->entries[entryIndex++];
-	setupEntry->tex = 0x5e;
+	setupEntry->tex = kCompaIconTexture;
 	setupEntry->x = 0x15;
 	setupEntry->w = 0x30;
 	setupEntry->h = 0x30;
@@ -581,7 +624,7 @@ void CMenuPcs::CompaInit()
 
 	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->flags = 2;
-	setupEntry->tex = 0x2e;
+	setupEntry->tex = kCompaPanelTexture;
 	setupEntry->x = 0x10;
 	setupEntry->y = 8;
 	setupEntry->w = 0x30;

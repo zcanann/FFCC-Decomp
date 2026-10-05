@@ -9,6 +9,18 @@
 #include "ffcc/system.h"
 #include <string.h>
 
+enum {
+#ifdef VERSION_GCCJGC
+    ITEM_TEX_FRAME = 0x2D,
+    ITEM_TEX_TAB = 0x46,
+    ITEM_TEX_LIST = 0x36,
+#else
+    ITEM_TEX_FRAME = 0x2E,
+    ITEM_TEX_TAB = 0x47,
+    ITEM_TEX_LIST = 0x37,
+#endif
+};
+
 typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -93,10 +105,10 @@ STATIC_ASSERT(sizeof(ItemMenuAnimList) == 0x1008);
  * --INFO--
  * PAL Address: 0x80159654
  * PAL Size: 1952b
- * EN Address: 0x8017C77C
- * EN Size: 2144b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801586D0
+ * EN Size: 1952b
+ * JP Address: 0x80153EA0
+ * JP Size: 1952b
  */
 int CMenuPcs::ItemCtrlCur()
 {
@@ -273,10 +285,10 @@ int CMenuPcs::ItemCtrlCur()
  * --INFO--
  * PAL Address: 0x80159df4
  * PAL Size: 2596b
- * EN Address: 0x8017BB1C
- * EN Size: 3168b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80158E70
+ * EN Size: 2596b
+ * JP Address: 0x80154640
+ * JP Size: 2588b
  */
 void CMenuPcs::ItemDraw()
 {
@@ -375,7 +387,7 @@ void CMenuPcs::ItemDraw()
         } else {
             texId = tex;
             itemAlpha = entry->alpha;
-            if (tex == 0x37) {
+            if (tex == ITEM_TEX_LIST) {
                 menuIndex = drawIndex + m_itemMenuState->scroll;
                 if (menuIndex >= 0x40) {
                     menuIndex -= 0x40;
@@ -391,7 +403,7 @@ void CMenuPcs::ItemDraw()
                     itemAlpha = (float)((double)entry->alpha * kItemHalfDouble);
                 }
 
-                if (texId == 0x37 && drawIndex == m_itemMenuState->cursorIndex[0]) {
+                if (texId == ITEM_TEX_LIST && drawIndex == m_itemMenuState->cursorIndex[0]) {
                     v += h;
                 }
                 drawIndex++;
@@ -415,7 +427,7 @@ void CMenuPcs::ItemDraw()
 
     for (i = 0; i < m_itemList->count; i++) {
         entry = &m_itemList->anims[i];
-        if (entry->tex == 0x37) {
+        if (entry->tex == ITEM_TEX_LIST) {
             break;
         }
     }
@@ -484,7 +496,7 @@ void CMenuPcs::ItemDraw()
         if (mode == 0) {
             for (i = 0; i < m_itemList->count; i++) {
                 entry = &m_itemList->anims[i];
-                if (m_itemList->anims[i].tex == 0x37) {
+                if (m_itemList->anims[i].tex == ITEM_TEX_LIST) {
                     break;
                 }
             }
@@ -519,10 +531,10 @@ void CMenuPcs::ItemDraw()
  * --INFO--
  * PAL Address: 0x8015a818
  * PAL Size: 380b
- * EN Address: 0x8017B8F4
- * EN Size: 552b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80159894
+ * EN Size: 380b
+ * JP Address: 0x8015505C
+ * JP Size: 396b
  */
 int CMenuPcs::ItemClose()
 {
@@ -568,10 +580,10 @@ int CMenuPcs::ItemClose()
  * --INFO--
  * PAL Address: 0x8015a994
  * PAL Size: 260b
- * EN Address: 0x8017B7C0
- * EN Size: 308b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80159A10
+ * EN Size: 260b
+ * JP Address: 0x801551E8
+ * JP Size: 260b
  */
 int CMenuPcs::ItemCtrl()
 {
@@ -608,10 +620,10 @@ int CMenuPcs::ItemCtrl()
  * --INFO--
  * PAL Address: 0x8015aa98
  * PAL Size: 444b
- * EN Address: 0x8017B57C
- * EN Size: 580b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80159B14
+ * EN Size: 444b
+ * JP Address: 0x801552EC
+ * JP Size: 456b
  */
 int CMenuPcs::ItemOpen()
 {
@@ -659,10 +671,10 @@ int CMenuPcs::ItemOpen()
  * --INFO--
  * PAL Address: 0x8015ac54
  * PAL Size: 604b
- * EN Address: 0x8017B3E0
- * EN Size: 412b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80159CD0
+ * EN Size: 604b
+ * JP Address: 0x801554B4
+ * JP Size: 636b
  */
 void CMenuPcs::ItemInit1()
 {
@@ -672,61 +684,61 @@ void CMenuPcs::ItemInit1()
 
     index = 0;
     entry = &this->m_itemList->anims[index++];
-    entry->tex = 0x2E;
+    entry->tex = ITEM_TEX_FRAME;
     entry->startFrame = 2;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
-    entry->tex = 0x47;
+    entry->tex = ITEM_TEX_TAB;
     entry->startFrame = 7;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
-    entry->tex = 0x47;
-    entry->startFrame = 7;
-    entry->duration = 5;
-    entry = &this->m_itemList->anims[index++];
-    entry->flags = 2;
-    entry->tex = 0x2E;
+    entry->tex = ITEM_TEX_TAB;
     entry->startFrame = 7;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
     entry->flags = 2;
-    entry->tex = 0x37;
+    entry->tex = ITEM_TEX_FRAME;
+    entry->startFrame = 7;
+    entry->duration = 5;
+    entry = &this->m_itemList->anims[index++];
+    entry->flags = 2;
+    entry->tex = ITEM_TEX_LIST;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
     entry->flags = 2;
-    entry->tex = 0x37;
+    entry->tex = ITEM_TEX_LIST;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
     entry->flags = 2;
-    entry->tex = 0x37;
+    entry->tex = ITEM_TEX_LIST;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
     entry->flags = 2;
-    entry->tex = 0x37;
+    entry->tex = ITEM_TEX_LIST;
     progress = kItemOne;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
     entry->flags = 2;
-    entry->tex = 0x37;
+    entry->tex = ITEM_TEX_LIST;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
     entry->flags = 2;
-    entry->tex = 0x37;
+    entry->tex = ITEM_TEX_LIST;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
     entry->flags = 2;
-    entry->tex = 0x37;
+    entry->tex = ITEM_TEX_LIST;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index];
     entry->flags = 2;
-    entry->tex = 0x37;
+    entry->tex = ITEM_TEX_LIST;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = this->m_itemList->anims;
@@ -741,10 +753,10 @@ void CMenuPcs::ItemInit1()
  * --INFO--
  * PAL Address: 0x8015aeb0
  * PAL Size: 680b
- * EN Address: 0x8017B0F8
- * EN Size: 744b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80159F2C
+ * EN Size: 680b
+ * JP Address: 0x80155730
+ * JP Size: 748b
  */
 void CMenuPcs::ItemInit()
 {
@@ -761,7 +773,7 @@ void CMenuPcs::ItemInit()
 
     index = 0;
     entry = &m_itemList->anims[index++];
-    entry->tex = 0x2E;
+    entry->tex = ITEM_TEX_FRAME;
     entry->x = 0x68;
     entry->y = 0x28;
     entry->w = 0x78;
@@ -773,7 +785,7 @@ void CMenuPcs::ItemInit()
     entry->duration = 5;
 
     entry = &m_itemList->anims[index++];
-    entry->tex = 0x47;
+    entry->tex = ITEM_TEX_TAB;
     entry->x = 0x50;
     entry->y = 0xE;
     entry->w = 0x30;
@@ -785,7 +797,7 @@ void CMenuPcs::ItemInit()
     entry->duration = 5;
 
     entry = &m_itemList->anims[index++];
-    entry->tex = 0x47;
+    entry->tex = ITEM_TEX_TAB;
     entry->x = 0x55;
     entry->w = 0x30;
     entry->h = 0x30;
@@ -798,7 +810,7 @@ void CMenuPcs::ItemInit()
 
     entry = &m_itemList->anims[index++];
     entry->flags = 2;
-    entry->tex = 0x2E;
+    entry->tex = ITEM_TEX_FRAME;
     entry->x = 0x50;
     entry->y = 8;
     entry->w = 0x48;
@@ -812,7 +824,7 @@ void CMenuPcs::ItemInit()
     for (int loopCount = 0; loopCount < 8; loopCount++) {
         entry = &m_itemList->anims[index++];
         entry->flags = 2;
-        entry->tex = 0x37;
+        entry->tex = ITEM_TEX_LIST;
         entry->x = firstEntry->x + 0x24;
         entry->y = firstEntry->y + loopCount * 0x20;
         entry->w = 200;

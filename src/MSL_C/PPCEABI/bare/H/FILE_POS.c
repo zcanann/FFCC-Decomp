@@ -5,8 +5,10 @@
 
 inline fpos_t _ftell(FILE* file) {
     int charsInUndoBuffer = 0;
+#ifndef VERSION_GCCJGC
     int charsToCheck;
     unsigned char* curChar;
+#endif
     fpos_t position;
     unsigned char tmp_kind = file->file_mode.file_kind;
 
@@ -25,6 +27,7 @@ inline fpos_t _ftell(FILE* file) {
         position -= charsInUndoBuffer;
     }
 
+#ifndef VERSION_GCCJGC
     if (!file->file_mode.binary_io) {
         charsToCheck = (int)(file->buffer_ptr - file->buffer) - charsInUndoBuffer;
         curChar = file->buffer;
@@ -34,6 +37,7 @@ inline fpos_t _ftell(FILE* file) {
                 ++position;
         }
     }
+#endif
 
     return (position);
 }

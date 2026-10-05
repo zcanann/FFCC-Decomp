@@ -4093,8 +4093,12 @@ int JoyBus::SendCancel(ThreadParam* threadParam)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ABD50
+ * PAL Size: 3364b
+ * EN Address: 0x800AB5F8
+ * EN Size: 3364b
+ * JP Address: 0x800A9C30
+ * JP Size: 3344b
  */
 int JoyBus::SendDataFile(ThreadParam* threadParam)
 {
@@ -4330,10 +4334,12 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             {
                 int remaining = totalSize % 0x2FD;
 
+#ifndef VERSION_GCCJGC
                 if (totalSize != 0 && remaining == 0)
                 {
                     remaining = 0x2FD;
                 }
+#endif
 
                 int rows = remaining / 3;
 

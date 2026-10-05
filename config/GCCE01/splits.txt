@@ -693,21 +693,30 @@ MSL_C/PPCEABI/bare/H/printf.c:
 
 menu_arti.cpp:
 	.text start:0x8015EAA4 end:0x8015FF58
+	.sdata2 start:0x80331F48 end:0x80331F98
 
 menu_tmparti.cpp:
 	.text start:0x8015C814 end:0x8015D3F8
+	.sdata2 start:0x80331EC0 end:0x80331F00
 
 menu_money.cpp:
 	.text start:0x8015D3F8 end:0x8015EAA4
+	.bss start:0x8030AA38 end:0x8030AA48
+	.sbss start:0x8032DEC0 end:0x8032DEC4
+	.sdata2 start:0x80331F00 end:0x80331F48
 
 menu_compa.cpp:
 	.text start:0x8015FF58 end:0x801613D0
+	.rodata start:0x801DDDB0 end:0x801DDDE0
 
 menu_favo.cpp:
 	.text start:0x801613D0 end:0x801629BC
+	.bss start:0x8030AA48 end:0x8030AA68
+	.sdata2 start:0x80331FD8 end:0x80332020
 
 menu_lst.cpp:
 	.text start:0x801736C8 end:0x8017445C
+	.sdata2 start:0x80332370 end:0x803323C8
 
 ringmenu.cpp:
 	.text start:0x800A26A8 end:0x800A4C34

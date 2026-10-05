@@ -28,6 +28,8 @@ void std_cosf(float);
 class CGraphic : public CManager
 {
 public:
+    static u8 m_tDebugFont[0xC00] ATTRIBUTE_ALIGN(32);
+
     struct DebugStringPosition
     {
         s16 x;

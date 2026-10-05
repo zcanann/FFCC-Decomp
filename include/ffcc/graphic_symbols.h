@@ -11,7 +11,6 @@ extern "C" {
 extern GXRenderModeObj _GXPal528IntDf;
 extern const char sGraphicInitData[];
 extern const char sGraphicSourceStrings[];
-extern u8 gGraphicNoiseTextureI8_64x96[];
 
 #ifdef __cplusplus
 }

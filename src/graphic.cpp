@@ -834,7 +834,7 @@ void CGraphic::DrawDebugString()
     GXSetCullMode(GX_CULL_NONE);
     GXSetCurrentMtx(0);
 
-    GXInitTexObj(&texObj, gGraphicNoiseTextureI8_64x96, 0x40, 0x60, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(&texObj, m_tDebugFont, 0x40, 0x60, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
 
@@ -900,7 +900,7 @@ void CGraphic::InitDebugString()
     GXLoadPosMtxImm(model, 0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetCurrentMtx(0);
-    GXInitTexObj(&texObj, gGraphicNoiseTextureI8_64x96, 0x40, 0x60, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(&texObj, m_tDebugFont, 0x40, 0x60, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
 

@@ -2942,8 +2942,8 @@ int CGCharaObj::calcCastTime(int itemId)
 	}
 
 	SCharaItemRow* typeRows = castRows;
-	int itemNo = typeRows[itemId].m_effect;
 	int itemType = typeRows[itemId].m_actionType;
+	int itemNo = typeRows[itemId].m_effect;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCA];

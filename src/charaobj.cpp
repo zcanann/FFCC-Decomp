@@ -3288,10 +3288,10 @@ inline int CGCharaObj::scCheckTime(CCombi2Set* set, CGCharaObj* first, CGCharaOb
  * --INFO--
  * PAL Address: 0x8010B690
  * PAL Size: 552b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010AA08
+ * EN Size: 552b
+ * JP Address: 0x80107708
+ * JP Size: 552b
  */
 int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 {
@@ -3311,7 +3311,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		int reqLast = reqCount - 1;
 		int slot = 0;
 		CCombi2Set* slotCursor = combiCursor->m_sets;
-		for (; slot < reqCount; slot++) {
+		for (; slot < reqCount; slot++, slotCursor++) {
 			CGCharaObj* partyObj = partyList[slot];
 			if (partyObj->m_comboFrame == 0) {
 				CCombi2Set* fallbackCursor = slotCursor;
@@ -3345,7 +3345,6 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			if (slot == reqLast) {
 				found = combiIndex;
 			}
-			slotCursor++;
 		}
 	}
 

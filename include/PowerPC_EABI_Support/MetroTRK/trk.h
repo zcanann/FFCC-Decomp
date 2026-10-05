@@ -56,7 +56,7 @@ void TRKConstructEvent(TRKEvent* event, NubEventType eventType);
 void TRKDestructEvent(TRKEvent* event);
 DSError TRKPostEvent(TRKEvent* event);
 BOOL TRKGetNextEvent(TRKEvent* event);
-BOOL TRKDispatchMessage(TRKBuffer*);
+DSError TRKDispatchMessage(TRKBuffer*);
 void* TRKGetBuffer(int);
 void TRKReleaseBuffer(int);
 void TRKGetInput(void);

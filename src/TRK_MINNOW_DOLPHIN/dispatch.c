@@ -6,14 +6,86 @@
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/dispatch.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msgbuf.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWTrace.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msghndlr.h"
 
-/* 8036DD0C-8036DD14 36864C 0008+00 0/0 1/1 0/0 .text            TRKInitializeDispatcher */
+#ifdef VERSION_GCCJGC
+typedef DSError (*TRKDispatchFunc)(TRKBuffer*);
+
+static TRKDispatchFunc gTRKDispatchTable[] = {
+    TRKDoUnsupported,
+    TRKDoConnect,
+    TRKDoDisconnect,
+    TRKDoReset,
+    TRKDoVersions,
+    TRKDoSupportMask,
+    TRKDoCPUType,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoReadMemory,
+    TRKDoWriteMemory,
+    TRKDoReadRegisters,
+    TRKDoWriteRegisters,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoFlushCache,
+    TRKDoSetOption,
+    TRKDoContinue,
+    TRKDoStep,
+    TRKDoStop,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+    TRKDoUnsupported,
+};
+static u32 gTRKDispatchTableSize;
+#endif
+
+/*
+ * --INFO--
+ * PAL Address: 0x801AA1F0
+ * PAL Size: 8b
+ * EN Address: 0x801A90D4
+ * EN Size: 8b
+ * JP Address: 0x801A4C64
+ * JP Size: 24b
+ */
 DSError TRKInitializeDispatcher() {
+#ifdef VERSION_GCCJGC
+    gTRKDispatchTableSize = sizeof(gTRKDispatchTable) / sizeof(gTRKDispatchTable[0]);
+#endif
     return DS_NoError;
 }
 
-/* 8036DB9C-8036DD0C 3684DC 0170+00 1/0 1/1 0/0 .text            TRKDispatchMessage */
-BOOL TRKDispatchMessage(TRKBuffer* msg) {
+/*
+ * --INFO--
+ * PAL Address: 0x801AA080
+ * PAL Size: 368b
+ * EN Address: 0x801A8F64
+ * EN Size: 368b
+ * JP Address: 0x801A4BE0
+ * JP Size: 132b
+ */
+DSError TRKDispatchMessage(TRKBuffer* msg) {
+#ifdef VERSION_GCCJGC
+    u32 err;
+    u8 command;
+
+    err = DS_DispatchError;
+    TRKSetBufferPosition(msg, 0);
+    TRKReadBuffer1_ui8(msg, &command);
+    if (command < gTRKDispatchTableSize) {
+        err = gTRKDispatchTable[command](msg);
+    }
+    return err;
+#else
     u32 err;
 
 	err = DS_DispatchError;
@@ -66,4 +138,5 @@ BOOL TRKDispatchMessage(TRKBuffer* msg) {
 	}
 	MWTRACE(1, "Dispatch complete err = %ld\n", err);
 	return err;
+#endif
 }

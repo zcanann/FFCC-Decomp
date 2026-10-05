@@ -5,4 +5,10 @@
 
 DSError TRKStandardACK(TRKBuffer* buffer, MessageCommandID commandID, DSReplyError replyError);
 
+#ifdef VERSION_GCCJGC
+DSError TRKDoUnsupported(TRKBuffer* buffer);
+DSError TRKDoCPUType(TRKBuffer* buffer);
+DSError TRKDoFlushCache(TRKBuffer* buffer);
+#endif
+
 #endif /* METROTRK_PORTABLE_MSGHNDLR_H */

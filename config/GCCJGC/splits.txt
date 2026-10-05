@@ -834,3 +834,17 @@ TRK_MINNOW_DOLPHIN/msgbuf.c:
 
 fontman.cpp:
 	.text start:0x800912D4 end:0x80092648
+
+os/OSCache.c:
+	.text start:0x801774A8 end:0x80177AF4
+	.data start:0x802322A0 end:0x802324CA
+
+auto_07_802324CA_data:
+	.data start:0x802324CA end:0x802324D0 align:2
+
+os/OSFont.c:
+	.text start:0x801788E4 end:0x8017893C
+	.sdata start:0x8034B890 end:0x8034B892
+
+auto_09_8034B892_sdata:
+	.sdata start:0x8034B892 end:0x8034B898 align:2

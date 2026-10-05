@@ -920,3 +920,17 @@ auto_10_8032E2C2_sbss:
 
 fontman.cpp:
 	.text start:0x800917F4 end:0x80092AC8
+
+os/OSCache.c:
+	.text start:0x8017BDFC end:0x8017C448
+	.data start:0x80215868 end:0x80215A92
+
+auto_07_80215A92_data:
+	.data start:0x80215A92 end:0x80215A98 align:2
+
+os/OSFont.c:
+	.text start:0x8017D238 end:0x8017D290
+	.sdata start:0x8032DA88 end:0x8032DA8A
+
+auto_09_8032DA8A_sdata:
+	.sdata start:0x8032DA8A end:0x8032DA90 align:2

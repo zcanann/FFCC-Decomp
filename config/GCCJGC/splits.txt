@@ -939,3 +939,9 @@ TRK_MINNOW_DOLPHIN/targsupp.s:
 file.cpp:
 	.text start:0x80012B4C end:0x80013D9C
 	.bss start:0x8023A640 end:0x8023A7B0
+
+TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
+	.text	start:0x801AA034 end:0x801AA544
+	.rodata	start:0x801DB238 end:0x801DB288
+	.data	start:0x80238950 end:0x8023896C
+	.bss	start:0x80345FB8 end:0x803481DE

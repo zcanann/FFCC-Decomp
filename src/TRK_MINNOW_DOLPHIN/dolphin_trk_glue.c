@@ -5,8 +5,17 @@
 #include "dolphin/base/PPCArch.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
+#ifdef VERSION_GCCJGC
+static u8 gWriteBuf[0x110A];
+static u8 gReadBuf[0x110A];
+BOOL _MetroTRK_Has_Framing;
+static int gReadCount;
+static int gReadPos;
+static int gWritePos;
+#else
 volatile u8 TRK_Use_BBA = 0;
 BOOL _MetroTRK_Has_Framing = FALSE;
+#endif
 int ddh_cc_initinterrupts(void);
 int ddh_cc_initialize(void*, __OSInterruptHandler);
 int ddh_cc_shutdown(void);
@@ -90,6 +99,31 @@ void TRKEXICallBack(__OSInterrupt param_0, OSContext* ctx)
 
 int InitMetroTRKCommTable(int hwId)
 {
+#ifdef VERSION_GCCJGC
+    int result;
+    if (hwId == HARDWARE_GDEV) {
+        OSReport("MetroTRK : Set to GDEV hardware\n");
+        result = Hu_IsStub();
+        gDBCommTable.initialize_func = (DBCommInitFunc)DBInitComm;
+        gDBCommTable.init_interrupts_func = (DBCommFunc)DBInitInterrupts;
+        gDBCommTable.peek_func = (DBCommFunc)DBQueryData;
+        gDBCommTable.read_func = (DBCommReadFunc)DBRead;
+        gDBCommTable.write_func = (DBCommWriteFunc)DBWrite;
+        gDBCommTable.post_stop_func = (DBCommFunc)DBOpen;
+        gDBCommTable.pre_continue_func = (DBCommFunc)DBClose;
+    } else {
+        OSReport("MetroTRK : Set to AMC DDH hardware\n");
+        result = AMC_IsStub();
+        gDBCommTable.initialize_func = (DBCommInitFunc)EXI2_Init;
+        gDBCommTable.init_interrupts_func = (DBCommFunc)EXI2_EnableInterrupts;
+        gDBCommTable.peek_func = (DBCommFunc)EXI2_Poll;
+        gDBCommTable.read_func = (DBCommReadFunc)EXI2_ReadN;
+        gDBCommTable.write_func = (DBCommWriteFunc)EXI2_WriteN;
+        gDBCommTable.post_stop_func = (DBCommFunc)EXI2_Reserve;
+        gDBCommTable.pre_continue_func = (DBCommFunc)EXI2_Unreserve;
+    }
+    return result;
+#else
     int result = 1;
 
     OSReport("Devkit set to : %ld\n", hwId);
@@ -148,20 +182,27 @@ int InitMetroTRKCommTable(int hwId)
     }
 
     return result;
+#endif
 }
 
 DSError TRKInitializeIntDrivenUART(u32 param_0, u32 param_1, u32 param_2, void* param_3)
 {
     gDBCommTable.initialize_func(param_3, TRKEXICallBack);
+#ifndef VERSION_GCCJGC
     gDBCommTable.open_func();
+#endif
     return DS_NoError;
 }
 
 void EnableEXI2Interrupts(void)
 {
+#ifdef VERSION_GCCJGC
+    gDBCommTable.init_interrupts_func();
+#else
     if (TRK_Use_BBA == 0 && gDBCommTable.init_interrupts_func != NULL) {
         gDBCommTable.init_interrupts_func();
     }
+#endif
 }
 
 int TRKPollUART(void) 
@@ -180,6 +221,81 @@ UARTError TRKWriteUARTN(const void* bytes, u32 length)
     int writeErr = gDBCommTable.write_func(bytes, length);
     return writeErr == 0 ? 0 : -1;
 }
+
+#ifdef VERSION_GCCJGC
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x801AA2C0
+ * JP Size: 224b
+ */
+UARTError WriteUARTFlush(void)
+{
+    UARTError err = UART_NoError;
+    for (; gWritePos < 0x800; gWritePos++) {
+        gWriteBuf[gWritePos] = 0;
+    }
+    if (gWritePos != 0) {
+        int writeErr = gDBCommTable.write_func(gWriteBuf, gWritePos);
+        err = writeErr == 0 ? 0 : -1;
+        gWritePos = 0;
+    }
+    return err;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x801AA298
+ * JP Size: 40b
+ */
+UARTError WriteUART1(u8 byte)
+{
+    gWriteBuf[gWritePos++] = byte;
+    return UART_NoError;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x801AA1A8
+ * JP Size: 240b
+ */
+UARTError TRKReadUARTPoll(u8* byte)
+{
+    UARTError err = UART_NoData;
+
+    if (gReadPos >= gReadCount) {
+        gReadPos = 0;
+        gReadCount = gDBCommTable.peek_func();
+        if (gReadCount > 0) {
+            int readErr;
+            if (gReadCount > (int)sizeof(gReadBuf)) {
+                gReadCount = sizeof(gReadBuf);
+            }
+            readErr = gDBCommTable.read_func(gReadBuf, gReadCount);
+            err = readErr == 0 ? 0 : -1;
+            if (err != UART_NoError) {
+                gReadCount = 0;
+            }
+        }
+    }
+    if (gReadPos < gReadCount) {
+        *byte = gReadBuf[gReadPos++];
+        err = UART_NoError;
+    }
+    return err;
+}
+#endif
 
 void ReserveEXI2Port(void) { gDBCommTable.post_stop_func(); }
 

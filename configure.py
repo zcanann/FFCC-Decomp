@@ -1193,7 +1193,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/CircleBuffer.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dispatch.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/flush_cache.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01"),
@@ -1270,7 +1270,7 @@ config.libs = [
                     "-sdata2 0",
                 ],
             ),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/targsupp.s"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/targsupp.s"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/UDP_Stubs.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/usr_put.c"),
         ],

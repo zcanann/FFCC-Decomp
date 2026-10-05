@@ -490,6 +490,13 @@ p_minigame.cpp:
 sound.cpp:
 	.text start:0x800C2714 end:0x800C60A4
 	.bss start:0x8030DFB8 end:0x8031029C
+	.ctors start:0x801D06AC end:0x801D06B0
+	extab start:0x80008580 end:0x8000874C
+	extabindex start:0x8000EC38 end:0x8000EECC
+	.rodata start:0x801D5B98 end:0x801D5DC6
+	.data start:0x8022D780 end:0x8022D79C
+	.sdata start:0x8034B680 end:0x8034B690
+	.sdata2 start:0x8034DA08 end:0x8034DA54
 
 textureman.cpp:
 	.sbss start:0x8034BAE0 end:0x8034BAE8
@@ -1564,3 +1571,12 @@ pppLaser.cpp:
 
 pppScreenBreak.cpp:
 	.text start:0x801293B0 end:0x8012A4D8
+
+auto_8022D79C_data:
+	.data start:0x8022D79C end:0x8022D7A0 align:1
+
+auto_801D5DC6_rodata:
+	.rodata start:0x801D5DC6 end:0x801D5DC8 align:1
+
+auto_8034DA54_sdata2:
+	.sdata2 start:0x8034DA54 end:0x8034DA58 align:1

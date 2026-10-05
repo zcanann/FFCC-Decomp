@@ -1371,3 +1371,8 @@ auto_8025FC3C_bss:
 
 auto_8034C5AB_sdata2:
 	.sdata2 start:0x8034C5AB end:0x8034C5B0 align:1
+
+goout.cpp:
+	.bss start:0x80327408 end:0x80327458
+	.sbss start:0x8034BCE8 end:0x8034BCF0
+	.text start:0x80162A00 end:0x80166CFC

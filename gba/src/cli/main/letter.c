@@ -916,7 +916,9 @@ s32 LetterError_Exit(void)
 s32 LetterTake_Init(void)
 {
     char buf[256];
+#if !defined(VERSION_GCCJGC)
     s32 mode = gLanguage & 15;
+#endif
     struct Window *win = &gWindows[1];
     struct LetterEntry *entry;
     s32 w;
@@ -926,6 +928,16 @@ s32 LetterTake_Init(void)
     if (sLetterSubInit == 0) {
         memset(win, 0, sizeof(struct Window));
         entry = &LETTER_ENTRIES[sLetterSel];
+#if defined(VERSION_GCCJGC)
+        if (entry->flags & 8) {
+            strcpy(buf, Msg_GetItemName(entry->attachment));
+            strcat(buf, Msg_GetLetter(0));
+        } else {
+            IntToStr(buf, entry->attachment);
+            strcat(buf, Msg_GetSystem(5));
+            strcat(buf, Msg_GetLetter(0));
+        }
+#else
         memset(buf, 0, sizeof(buf));
         if (mode != 1)
             strcpy(buf, Msg_GetLetter(0));
@@ -945,6 +957,7 @@ s32 LetterTake_Init(void)
             strcat(buf, Msg_GetLetter(0));
         else
             strcat(buf, sQuestionText);
+#endif
         Text_SetFill(1, 1);
         Text_Clear();
         Text_Print(buf, TEXT_DRAW);

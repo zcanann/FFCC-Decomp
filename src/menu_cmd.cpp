@@ -831,21 +831,19 @@ void CMenuPcs::CmdDraw()
 							    Game.m_scriptFoodBase[0];
 							const s16* canBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 							const s16* canItems = canBuf + 1;
-							u8 canUse;
+							bool canUse;
 							if ((sel < 0) || (sel >= canBuf[0])) {
-								canUse = 0;
+								canUse = false;
 							} else if (sel == 0) {
-								canUse = static_cast<u32>(
-								    caravan2->m_commandListInventorySlotRef[m_cmdState->selected[0]] >= 0);
+								canUse = caravan2->m_commandListInventorySlotRef[m_cmdState->selected[0]] >= 0;
 							} else if (sel == 1) {
 								int combo[5][2];
-								canUse = static_cast<u32>(
-								    ChkUnite(m_cmdState->selected[0], combo) != 0);
+								canUse = ChkUnite(m_cmdState->selected[0], combo) != 0;
 							} else {
 								canUse = !EquipChk(static_cast<int>(canItems[sel - 2]));
 							}
 
-							if (canUse == 0) {
+							if (!canUse) {
 								rowAlpha = 0.5 * row->alpha;
 								rowTex = 0x34;
 							}

@@ -671,3 +671,9 @@ Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
 	.ctors start:0x801d4300 end:0x801D4304
 	.dtors start:0x801d43c0 end:0x801D43C8
 	.sdata start:0x8032dbd0 end:0x8032DBD4
+
+menu_equip.cpp:
+	.text start:0x8015A1D4 end:0x8015C814
+
+menu_item.cpp:
+	.text start:0x801586D0 end:0x8015A1D4

@@ -422,6 +422,7 @@ memory.cpp:
 	.sdata2 start:0x8034C4F8 end:0x8034C520
 
 materialman.cpp:
+	.bss start:0x80284570 end:0x8028478C
 	.text start:0x8003B9A0 end:0x800434FC
 
 mapobj.cpp:
@@ -487,7 +488,12 @@ maphit.cpp:
 	.text start:0x800247A8 end:0x80026E94
 
 mapmesh.cpp:
-	.text start:0x80026E94 end:0x80027EF0
+	.text	start:0x80026E94 end:0x80027EF0
+	extab	start:0x80005EF8 end:0x80005F60
+	extabindex	start:0x8000B7B8 end:0x8000B854
+	.rodata	start:0x801D1C08 end:0x801D1C14
+	.sbss	start:0x8034BA98 end:0x8034BA9C
+	.sdata2	start:0x8034C690 end:0x8034C698
 
 os/OSSemaphore.c:
 	.text start:0x8017AC20 end:0x8017ADA4
@@ -1211,3 +1217,12 @@ auto_06_801D1BB1_rodata:
 
 auto_11_8034C5E5_sdata2:
 	.sdata2 start:0x8034C5E5 end:0x8034C5E8 align:1
+
+auto_08_8028478C_bss:
+	.bss start:0x8028478C end:0x80284790 align:4
+
+auto_10_8034BA9C_sbss:
+	.sbss start:0x8034BA9C end:0x8034BAA0 align:4
+
+auto_06_801D1C14_rodata:
+	.rodata start:0x801D1C14 end:0x801D1C18 align:4

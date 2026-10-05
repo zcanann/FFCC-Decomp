@@ -486,6 +486,7 @@ memory.cpp:
 
 materialman.cpp:
 	.text start:0x8003BFAC end:0x80043B04
+	.bss start:0x80267C30 end:0x80267E4C
 
 mapobj.cpp:
 	.text start:0x800285C4 end:0x8002C4F8
@@ -537,6 +538,11 @@ maphit.cpp:
 
 mapmesh.cpp:
 	.text start:0x80027568 end:0x800285C4
+	extab start:0x80005E50 end:0x80005EB8
+	extabindex start:0x8000B7AC end:0x8000B848
+	.rodata start:0x801D5FF0 end:0x801D5FFC
+	.sbss start:0x8032DC78 end:0x8032DC7C
+	.sdata2 start:0x8032E8F8 end:0x8032E900
 
 os/OSSemaphore.c:
 	.text start:0x8017F574 end:0x8017F6F8

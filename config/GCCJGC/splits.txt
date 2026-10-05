@@ -485,3 +485,6 @@ cmake.cpp:
 
 mes.cpp:
 	.text start:0x800978B8 end:0x80097D20
+
+shopmenu.cpp:
+	.text start:0x8014B634 end:0x80153EA0

@@ -1857,10 +1857,17 @@ void CShopMenu::DrawShop0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x8014F8F8
+ * JP Size: 68b
  */
-inline void CShopMenu::DrawBuy()
+#ifndef VERSION_GCCJGC
+inline
+#endif
+void CShopMenu::DrawBuy()
 {
     DrawShopBase();
     DrawItemList();
@@ -1870,10 +1877,17 @@ inline void CShopMenu::DrawBuy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x8014F8B4
+ * JP Size: 68b
  */
-inline void CShopMenu::DrawSell()
+#ifndef VERSION_GCCJGC
+inline
+#endif
+void CShopMenu::DrawSell()
 {
     DrawShopBase();
     DrawItemList();

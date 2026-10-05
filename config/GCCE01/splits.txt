@@ -1695,3 +1695,6 @@ wind.cpp:
 	.rodata start:0x801DA440 end:0x801DA4A0
 	.sdata2 start:0x8032FEA8 end:0x8032FF00
 	.bss start:0x802F66E0 end:0x802FE368
+
+chara_anim.cpp:
+	.text start:0x800BEEBC end:0x800BF700

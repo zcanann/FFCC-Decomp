@@ -983,10 +983,10 @@ void CMenuPcs::CalcOptionMenu()
  * --INFO--
  * PAL Address: 0x8017698C
  * PAL Size: 10652b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80175908
+ * EN Size: 10432b
+ * JP Address: 0x80171684
+ * JP Size: 11260b
  */
 void CMenuPcs::DrawOptionMenu()
 {
@@ -1000,14 +1000,32 @@ void CMenuPcs::DrawOptionMenu()
 	Vec2d uv0;
 	Vec2d uv1;
 
+#ifndef VERSION_GCCJGC
 	font->SetScale(0.88f);
 	font->SetMargin(0.0f);
+#endif
 
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
 	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionOpenAnim));
 
+#ifdef VERSION_GCCJGC
+	char optionText[5][256] = {
+		"\x83\x7C\x83\x57\x83\x56\x83\x87\x83\x93\x83\x7D\x81\x5B\x83\x4E",
+		"\x83\x54\x83\x45\x83\x93\x83\x68\x8F\x6F\x97\xCD",
+		"\x82\x61\x82\x66\x82\x6C\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80",
+		"\x82\x72\x82\x64\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80",
+		"\x82\x66\x82\x61\x82\x60\x83\x4A\x83\x89\x81\x5B\x83\x6F\x83\x89\x83\x93\x83\x58"
+	};
+	char helpText[5][256] = {
+		"\x83\x76\x83\x8C\x83\x43\x83\x84\x81\x5B\x82\xCC\x91\xAB\x8C\xB3\x82\xC9\x8F\x6F\x82\xE9\x83\x7D\x81\x5B\x83\x4A\x81\x5B\x82\xCC\x82\x6E\x82\x6D\x81\x5E\x82\x6E\x82\x65\x82\x65\x82\xC5\x82\xB7",
+		"\x83\x54\x83\x45\x83\x93\x83\x68\x82\xCC\x8F\x6F\x97\xCD\x82\xF0\x83\x58\x83\x65\x83\x8C\x83\x49\x82\xA9\x83\x82\x83\x6D\x83\x89\x83\x8B\x82\xC9\x82\xB5\x82\xDC\x82\xB7",
+		"\x82\x61\x82\x66\x82\x6C\x82\xCC\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80\x82\xCC\x91\xE5\x82\xAB\x82\xB3\x82\xF0\x95\xCF\x8D\x58\x82\xB5\x82\xDC\x82\xB7",
+		"\x8C\xF8\x89\xCA\x89\xB9\x82\xCC\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80\x82\xCC\x91\xE5\x82\xAB\x82\xB3\x82\xF0\x95\xCF\x8D\x58\x82\xB5\x82\xDC\x82\xB7",
+		"\x82\x66\x82\x61\x82\x60\x82\xCC\x83\x4A\x83\x89\x81\x5B\x83\x6F\x83\x89\x83\x93\x83\x58\x82\xF0\x95\xCF\x8D\x58\x82\xB5\x82\xDC\x82\xB7"
+	};
+#else
 	char* optionText[5] = { 0, 0, 0, 0, 0 };
 	char** mes = &g_strMenuUtilMes[langRow * 20];
 	int idx = 2;
@@ -1018,6 +1036,8 @@ void CMenuPcs::DrawOptionMenu()
 	for (int n = 0; n < 5; n++) {
 		helpText[n] = mes[idx++];
 	}
+
+#endif
 
 	CTexture* banner = m_wmOptionTextures[5];
 	w = static_cast<float>(banner->m_width);
@@ -1074,8 +1094,12 @@ void CMenuPcs::DrawOptionMenu()
 	                        w, static_cast<float>(marker->m_height), marker, 0, 0,
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+	char (*option)[256] = optionText;
+#else
 	font->SetScaleX(0.8f);
 	char** option = optionText;
+#endif
 	int i = 0;
 	int rowY = 0x70;
 	int selectedY = 0x73;
@@ -1101,7 +1125,9 @@ void CMenuPcs::DrawOptionMenu()
 		}
 	}
 
+#ifndef VERSION_GCCJGC
 	font->SetScaleX(1.0f);
+#endif
 	gUtil.RenderTextureQuad(0.0f, 384.0f, 640.0f, 40.0f,
 	                        m_textures[31], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 

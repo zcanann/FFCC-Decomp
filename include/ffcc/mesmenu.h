@@ -43,8 +43,10 @@ private:
     CMes m_mes;                // 0x001C
     float m_baseX;             // 0x3D6C
     float m_baseY;             // 0x3D70
+#ifndef VERSION_GCCE01
     float m_offsetX;           // 0x3D74
     float m_offsetY;           // 0x3D78
+#endif
     float m_windowWidth;       // 0x3D7C
     float m_windowHeight;      // 0x3D80
     float m_windowScale;       // 0x3D84
@@ -64,5 +66,9 @@ private:
     int m_stageFadeTimer;      // 0x3DF4
     int m_stageFadeOut;        // 0x3DF8
 };
+
+#ifdef VERSION_GCCE01
+typedef char CMesMenu_size_check[(sizeof(CMesMenu) == 0x3DF4) ? 1 : -1];
+#endif
 
 #endif // _FFCC_MESMENU_H_

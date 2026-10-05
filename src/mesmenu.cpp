@@ -43,15 +43,42 @@ inline void CMenuPcs::SetTlut(CMenuPcs::TEX tex, _GXColor* tlut)
  * --INFO--
  * PAL Address: 0x8009b4e4
  * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8009ADC4
+ * EN Size: 204b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMesMenu::SetPos(float x, float y)
 {
-	m_offsetX = x;
-	m_offsetY = y;
+#ifdef VERSION_GCCE01
+    m_baseX = x;
+    m_baseY = y;
+    unsigned int menuIndex = (unsigned int)m_menuIndex;
+    float yPos;
+    if ((int)menuIndex < 4) {
+        if ((menuIndex & 2) != 0) {
+            yPos = ((m_baseY - 40.0f) + m_marginY) - m_windowHeight;
+        } else {
+            yPos = (m_baseY + m_marginY) + 40.0f;
+        }
+    } else {
+        yPos = m_baseY + m_marginY;
+    }
+    bool alignRight = false;
+    if (((int)menuIndex < 4) && ((menuIndex & 1) != 0)) {
+        alignRight = true;
+    }
+    float xPos;
+    if (alignRight) {
+        xPos = (m_baseX + m_marginX) - m_windowWidth;
+    } else {
+        xPos = m_baseX + m_marginX;
+    }
+    m_mes.SetPosition(xPos, yPos);
+#else
+    m_offsetX = x;
+    m_offsetY = y;
+#endif
 }
 
 /*
@@ -82,10 +109,10 @@ inline void CMesMenu::close(int closeReason)
  * --INFO--
  * PAL Address: 0x8009b4f0
  * PAL Size: 268b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009AE90
+ * EN Size: 268b
+ * JP Address: 0x800996B0
+ * JP Size: 268b
  */
 void CMesMenu::CloseRequest(int closeReason)
 {
@@ -109,10 +136,10 @@ void CMesMenu::CloseRequest(int closeReason)
  * --INFO--
  * PAL Address: 0x8009b5fc
  * PAL Size: 744b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009AF9C
+ * EN Size: 692b
+ * JP Address: 0x800997BC
+ * JP Size: 708b
  */
 void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int itemIndex, int nameIndex)
 {
@@ -122,8 +149,10 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     float yPos;
 
     zero = 0.0f;
+#ifndef VERSION_GCCE01
     m_offsetY = 0.0f;
     m_offsetX = zero;
+#endif
     m_active = 1;
     m_closeReason = 0;
     m_flags = (unsigned int)flags;
@@ -169,12 +198,24 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     menuIndex = (unsigned int)m_menuIndex;
     if ((int)menuIndex < 4) {
         if ((menuIndex & 2) != 0) {
+#ifdef VERSION_GCCE01
+            yPos = ((m_baseY - 40.0f) + m_marginY) - m_windowHeight;
+#else
             yPos = ((m_baseY - 44.0f) + m_offsetY + m_marginY) - m_windowHeight;
+#endif
         } else {
+#ifdef VERSION_GCCE01
+            yPos = (m_baseY + m_marginY) + 40.0f;
+#else
             yPos = (m_baseY + m_offsetY + m_marginY) + 40.0f;
+#endif
         }
     } else {
+#ifdef VERSION_GCCE01
+        yPos = (m_baseY) + m_marginY;
+#else
         yPos = (m_baseY + m_offsetY) + m_marginY;
+#endif
     }
 
     alignRight = false;
@@ -183,9 +224,17 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     }
     float xPos;
     if (alignRight) {
+#ifdef VERSION_GCCE01
+        xPos = ((m_baseX) + m_marginX) - m_windowWidth;
+#else
         xPos = ((m_baseX + m_offsetX) + m_marginX) - m_windowWidth;
+#endif
     } else {
+#ifdef VERSION_GCCE01
+        xPos = (m_baseX) + m_marginX;
+#else
         xPos = (m_baseX + m_offsetX) + m_marginX;
+#endif
     }
     m_mes.SetPosition(xPos, yPos);
 
@@ -207,10 +256,10 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
  * --INFO--
  * PAL Address: 0x8009b8e4
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B250
+ * EN Size: 4b
+ * JP Address: 0x80099A80
+ * JP Size: 4b
  */
 void CMesMenu::onScriptChanged(char*, int)
 {
@@ -221,10 +270,10 @@ void CMesMenu::onScriptChanged(char*, int)
  * --INFO--
  * PAL Address: 0x8009b8e8
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B254
+ * EN Size: 112b
+ * JP Address: 0x80099A84
+ * JP Size: 112b
  */
 void CMesMenu::onScriptChanging(char*)
 {
@@ -243,10 +292,10 @@ void CMesMenu::onScriptChanging(char*)
  * --INFO--
  * PAL Address: 0x8009b958
  * PAL Size: 916b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B2C4
+ * EN Size: 916b
+ * JP Address: 0x80099AF4
+ * JP Size: 820b
  */
 void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
@@ -326,10 +375,10 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
  * --INFO--
  * PAL Address: 0x8009bcec
  * PAL Size: 496b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B658
+ * EN Size: 496b
+ * JP Address: 0x80099E28
+ * JP Size: 496b
  */
 void CMesMenu::CalcHeart()
 {
@@ -406,10 +455,10 @@ void CMesMenu::CalcHeart()
  * --INFO--
  * PAL Address: 0x8009bedc
  * PAL Size: 6080b
- * EN Address: 0x800aedf0
- * EN Size: 6896b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009B848
+ * EN Size: 6048b
+ * JP Address: 0x8009A018
+ * JP Size: 6028b
  */
 void CMesMenu::onDraw()
 {
@@ -506,7 +555,11 @@ void CMesMenu::onDraw()
             pulseX = -pulse;
         }
         int maskY = m_menuIndex & 2;
+#ifdef VERSION_GCCE01
+        float posX = m_baseX;
+#else
         float posX = m_baseX + m_offsetX;
+#endif
         float baseX = posX + pulseX;
         float pulseY;
         if (maskY != 0) {
@@ -514,7 +567,11 @@ void CMesMenu::onDraw()
         } else {
             pulseY = -pulse;
         }
+#ifdef VERSION_GCCE01
+        float baseY = (m_baseY) + pulseY;
+#else
         float baseY = (m_baseY + m_offsetY) + pulseY;
+#endif
 
         if (0.0f < stateBlend) {
             width = m_windowWidth * stateBlend;
@@ -529,7 +586,11 @@ void CMesMenu::onDraw()
 
             float edgeY;
             if (maskY != 0) {
+#ifdef VERSION_GCCE01
+                edgeY = ((-40.0f) - m_windowHeight) + (m_windowHeight - height);
+#else
                 edgeY = ((-44.0f) - m_windowHeight) + (m_windowHeight - height);
+#endif
             } else {
                 edgeY = 40.0f;
             }
@@ -728,8 +789,16 @@ void CMesMenu::onDraw()
     } else {
         width = m_windowWidth * stateBlend;
         height = m_windowHeight * stateBlend;
+#ifdef VERSION_GCCE01
+        drawX = (0.5f * m_windowWidth + (m_baseX)) - 0.5f * width;
+#else
         drawX = (0.5f * m_windowWidth + (m_baseX + m_offsetX)) - 0.5f * width;
+#endif
+#ifdef VERSION_GCCE01
+        drawY = (0.5f * m_windowHeight + (m_baseY)) - 0.5f * height;
+#else
         drawY = (0.5f * m_windowHeight + (m_baseY + m_offsetY)) - 0.5f * height;
+#endif
 
         if ((m_flags & 1) == 0) {
             float stateAlpha = 255.0f * stateBlend;
@@ -862,10 +931,10 @@ void CMesMenu::onDraw()
  * --INFO--
  * PAL Address: 0x8009d69c
  * PAL Size: 2292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009CFE8
+ * EN Size: 2264b
+ * JP Address: 0x8009B7A4
+ * JP Size: 2264b
  */
 void CMesMenu::onCalc()
 {
@@ -884,7 +953,9 @@ void CMesMenu::onCalc()
 
     int desiredStageFlag = stageBit != 0;
     if (desiredStageFlag != m_stageFadeOut) {
+#ifndef VERSION_GCCE01
         System.Printf(const_cast<char*>(s_mesMenuOnOffChangedFmt));
+#endif
         m_stageFadeOut = !m_stageFadeOut;
         m_stageFadeTimer = 0x10 - m_stageFadeTimer;
     }
@@ -1110,10 +1181,10 @@ void CMesMenu::onCalc()
  * --INFO--
  * PAL Address: 0x8009df90
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009D8C0
+ * EN Size: 64b
+ * JP Address: 0x8009C07C
+ * JP Size: 64b
  */
 void CMesMenu::Destroy()
 {
@@ -1125,10 +1196,10 @@ void CMesMenu::Destroy()
  * --INFO--
  * PAL Address: 0x8009dfd0
  * PAL Size: 300b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009D900
+ * EN Size: 288b
+ * JP Address: 0x8009C0BC
+ * JP Size: 296b
  */
 void CMesMenu::Create()
 {
@@ -1136,8 +1207,10 @@ void CMesMenu::Create()
     CMenu::Create();
 
     float defaultValue = 0.0f;
+#ifndef VERSION_GCCE01
     m_offsetY = defaultValue;
     m_offsetX = defaultValue;
+#endif
     m_active = 0;
     m_state = 4;
     m_stageFadeTimer = 0;
@@ -1176,10 +1249,10 @@ void CMesMenu::Create()
  * --INFO--
  * PAL Address: 0x8009e0fc
  * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009DA20
+ * EN Size: 128b
+ * JP Address: 0x8009C1E4
+ * JP Size: 128b
  */
 CMesMenu::~CMesMenu()
 {
@@ -1190,10 +1263,10 @@ CMesMenu::~CMesMenu()
  * --INFO--
  * PAL Address: 0x8009e17c
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009DAA0
+ * EN Size: 68b
+ * JP Address: 0x8009C264
+ * JP Size: 68b
  */
 CMesMenu::CMesMenu()
 {

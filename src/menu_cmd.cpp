@@ -117,13 +117,17 @@ namespace {
 enum {
     kCmdPanelTexture = 0x2D,
     kCmdTabTexture = 0x45,
-    kCmdRowTexture = 0x36
+    kCmdRowTexture = 0x36,
+    kCmdUniteRowTexture = 0x37,
+    kCmdUnitePanelTexture = 0x38
 };
 #else
 enum {
     kCmdPanelTexture = 0x2E,
     kCmdTabTexture = 0x46,
-    kCmdRowTexture = 0x37
+    kCmdRowTexture = 0x37,
+    kCmdUniteRowTexture = 0x38,
+    kCmdUnitePanelTexture = 0x39
 };
 #endif
 
@@ -2110,7 +2114,7 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		CmdListEntry* const endEntry = &GetCmdListStorage(this)->entries[i];
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCmdUniteRowTexture));
 
 		const s32 labelAnchor =
 		    (groupStart == GetCmdStateView(this)->selected[0]) ? groupStart + 1 : groupStart;
@@ -2415,7 +2419,7 @@ unsigned int CMenuPcs::CmdOpen1()
 		                                 3.0);
 		animEntry->u = 0.0f;
 		animEntry->v = 0.0f;
-		animEntry->tex = 0x39;
+		animEntry->tex = kCmdUnitePanelTexture;
 		m_cmdState->unitePanelInitialized = 1;
 	}
 

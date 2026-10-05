@@ -25,7 +25,6 @@ static OSInterruptMask InterruptPrioTable[] = {
     OS_INTERRUPTMASK_DSP_AI,
     OS_INTERRUPTMASK_PI_CP,
     0xFFFFFFFF,
-    0,
 };
 
 #if DEBUG

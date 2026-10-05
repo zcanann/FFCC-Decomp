@@ -2120,7 +2120,7 @@ void CMenuPcs::InitSaveLoadMenu()
 void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char playOpenSe = 0;
+	int playOpenSe = 0;
 	m_textureLocIndex = 0;
 
 	unsigned int buttonsDown = Pad.GetButtonDown(0);

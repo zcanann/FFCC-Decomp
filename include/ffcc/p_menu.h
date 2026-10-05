@@ -860,12 +860,12 @@ public:
     unsigned char m_pad76[0x78 - 0x76];
     float m_wmMenuTargetRotation;
     float m_wmMenuRotation;
-    unsigned char m_effectTimer;
+    signed char m_effectTimer;
     unsigned char m_pad81[0x84 - 0x81];
     int m_crystalElem;
     short m_crystalPart;
     short m_crystalAttr;
-    unsigned char m_bonusAlpha;
+    signed char m_bonusAlpha;
     unsigned char m_bonusCursorFlag;
     signed char m_optionIndex;
     signed char m_gameInitMode;

@@ -163,8 +163,11 @@ regional_data:
 main/msg_sys:
 	.rodata     start:0x0201D188 end:0x0201D72C align:4
 
+main/msg_item:
+	.rodata     start:0x0201D72C end:0x02020240 align:4
+
 regional_data:
-	.rodata     start:0x0201D72C end:0x02025AA4
+	.rodata     start:0x02020240 end:0x02025AA4
 
 main/obj:
 	.data       start:0x02025AA4 end:0x02025ABC align:4
@@ -178,8 +181,11 @@ regional_data:
 main/msg_sys:
 	.data       start:0x02025DF0 end:0x02025FC8 align:4
 
+main/msg_item:
+	.data       start:0x02025FC8 end:0x02027288 align:4
+
 regional_data:
-	.rodata     start:0x02025FC8 end:0x0202CA24
+	.rodata     start:0x02027288 end:0x0202CA24
 
 main/main:
 	.bss        start:0x03000000 end:0x03000011 align:4

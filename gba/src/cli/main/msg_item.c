@@ -1,5 +1,9 @@
 #include "global.h"
 
+#if defined(VERSION_GCCJGC)
+#include "msg_item_jp.inc"
+#else
+
 #if defined(VERSION_GCCE01)
 #include "msg_item_us.inc"
 #else
@@ -2559,3 +2563,5 @@ const u8 gItemIcons[] = {
     48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
     48, 48, 48, 48, 48,
 };
+
+#endif

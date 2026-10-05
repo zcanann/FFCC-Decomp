@@ -323,10 +323,10 @@ void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
  * --INFO--
  * PAL Address: 0x8001b99c
  * PAL Size: 1084b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001B790
+ * EN Size: 1084b
+ * JP Address: 0x8001B1FC
+ * JP Size: 1068b
  */
 int CBound::CheckFrustum0(CBound& outBound)
 {
@@ -343,12 +343,8 @@ int CBound::CheckFrustum0(CBound& outBound)
 
     maxInit = 10000000000.0f;
     minInit = -10000000000.0f;
-    outBound.m_min.z = maxInit;
-    outBound.m_min.y = maxInit;
-    outBound.m_min.x = maxInit;
-    outBound.m_max.z = minInit;
-    outBound.m_max.y = minInit;
-    outBound.m_max.x = minInit;
+    outBound.m_min.x = outBound.m_min.y = outBound.m_min.z = maxInit;
+    outBound.m_max.x = outBound.m_max.y = outBound.m_max.z = minInit;
 
     if ((s_f_vpos.x <= m_max.x) && (s_f_vpos.y <= m_max.y) && (s_f_vpos.z <= m_max.z) &&
         (s_f_vpos.x >= m_min.x) && (s_f_vpos.y >= m_min.y) && (s_f_vpos.z >= m_min.z)) {

@@ -7601,7 +7601,7 @@ void CMenuPcs::WMChgMenu()
 
 	float windowXf = FLOAT_803315B0;
 	m_wmWorldState->m_frameCounter = 0;
-	double windowYf = (double)FLOAT_80331430;
+	float windowYf = FLOAT_80331430;
 	int xInt = (int)windowXf;
 	m_wmWorldState->m_titleState = 0;
 	float kZero = FLOAT_803313dc;
@@ -7663,13 +7663,13 @@ void CMenuPcs::WMChgMenu()
 		break;
 	}
 	case 3: {
-			double initialRotY = (double)FLOAT_80331664;
+			float initialRotY = FLOAT_80331664;
 			int slot = 0;
 			WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[32];
 			do {
 				const int handleIdx = slot + 0x20;
 				m_wm.m_charaModelData[slot].m_modelChanged = 1;
-				worldObj->m_transform.m_rotation.y = (float)initialRotY;
+				worldObj->m_transform.m_rotation.y = initialRotY;
 				WmCharaSelectEntry* const selectData = &m_wm.m_charaSelectData[slot];
 				selectData->m_displaySlot = selectData->m_currentSlot;
 				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1)) {
@@ -7749,9 +7749,9 @@ void CMenuPcs::WMChgMenu()
 
 	newMenuMode = m_wmWorldState->m_menuMode;
 	if (newMenuMode == 6) {
-		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 0;
+		MapMng.SetDraw(0);
 	} else if (prevMenuMode == 6 && newMenuMode != 6) {
-		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 1;
+		MapMng.SetDraw(1);
 	}
 }
 

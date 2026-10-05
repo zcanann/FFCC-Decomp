@@ -516,6 +516,9 @@ joybus.cpp:
 	.text start:0x800A593C end:0x800B218C
 
 gbaque.cpp:
+	.rodata start:0x801DA1F8 end:0x801DA3C7
+	.bss start:0x802F3970 end:0x802F66E0
+	.sdata2 start:0x8032FCF0 end:0x8032FD30
 	.text start:0x800C82F0 end:0x800D0DD8
 
 map.cpp:
@@ -628,3 +631,6 @@ menu_cmd.cpp:
 
 chara_fur.cpp:
 	.text start:0x800DEDE4 end:0x800E3EA8
+
+pppYmLaser.cpp:
+	.rodata start:0x801DA3C8 end:0x801DA3D8

@@ -3232,8 +3232,12 @@ inline void JoyBus::SetRecvBuffer(ThreadParam* threadParam, unsigned int data)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800AD11C
+ * PAL Size: 2700b
+ * EN Address: 0x800AC9C4
+ * EN Size: 2700b
+ * JP Address: 0x800AAFE8
+ * JP Size: 2200b
  */
 int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 {
@@ -3437,6 +3441,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
 
+#ifndef VERSION_GCCJGC
         const int state = threadParam->m_state;
 
         if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
@@ -3488,6 +3493,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             threadParam->m_subState = 0;
             threadParam->m_skipProcessingFlag = 1;
         }
+#endif
     }
 
     return (recvResult == 2) | (sendResult != 0 ? 2 : 0);
@@ -3822,8 +3828,8 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * PAL Size: 2392b
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800AF030
+ * JP Size: 2164b
  */
 int JoyBus::InitialCode(ThreadParam* threadParam)
 {
@@ -3948,6 +3954,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             }
             else
             {
+#ifndef VERSION_GCCJGC
                 err = SendLanguage(threadParam);
 
                 if (err < 0)
@@ -3955,6 +3962,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                     result = 1;
                 }
                 else
+#endif
                 {
                     threadParam->m_subState  = 0;
                     threadParam->m_state     = 0x14;

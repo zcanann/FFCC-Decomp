@@ -567,3 +567,9 @@ cflat_r2system.cpp:
 
 cflat_r2class.cpp:
 	.text start:0x800B9B98 end:0x800BD0E4
+
+gba/GBARead.c:
+	.text start:0x801A7660 end:0x801A77C0
+
+gba/GBAWrite.c:
+	.text start:0x801A77C0 end:0x801A7948

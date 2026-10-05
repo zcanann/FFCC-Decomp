@@ -304,8 +304,8 @@ libc/stdlib/mallocr:
 menu_gfx:
 	.rodata     start:0x02016150 end:0x020173A0 align:4
 
-regional_data:
-	.rodata     start:0x020173A0 end:0x0201C2AC
+obj_gfx:
+	.rodata     start:0x020173A0 end:0x0201C2AC align:4
 
 config:
 	.rodata     start:0x0201C2AC end:0x0201C2D8 align:4

@@ -136,6 +136,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "main/xfer", "main/radarmap", "main/main", "main/session",
         ],
         "mgr": [
+            "obj_gfx",
             "menu_gfx", "field_gfx",
             "sintable", "param", "course", "config",
             "random", "sound_data",
@@ -171,6 +172,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
         ],
         "mgr": [
+            "obj_gfx",
             "menu_gfx", "field_gfx",
             "sintable", "param", "course", "config",
             "random", "sound_data",

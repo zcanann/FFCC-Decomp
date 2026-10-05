@@ -1062,7 +1062,11 @@ s32 LetterTake_Main(void)
                 ret = 1;
             }
         }
+#if defined(VERSION_GCCJGC)
+        Letter_DrawCursor((win->x + 1) * 8, (win->y + 1) * 8 + win->cursor * 16);
+#else
         Letter_DrawCursor((win->x + 1) * 8 - 2, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     }
     if (ret)
         Reply_Clear();

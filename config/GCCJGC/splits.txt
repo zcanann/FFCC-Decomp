@@ -559,3 +559,6 @@ pppYmMana.cpp:
 
 pppMana2.cpp:
 	.text start:0x80102220 end:0x801052F8
+
+chara_fur.cpp:
+	.text start:0x800DC85C end:0x800E1A00

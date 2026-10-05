@@ -236,7 +236,13 @@ chunk:
 	.rodata     start:0x02010210 end:0x02010230 align:4
 
 regional_data:
-	.rodata     start:0x02010230 end:0x020139F8
+	.rodata     start:0x02010230 end:0x02010388
+
+m4a_tables:
+	.rodata     start:0x02010388 end:0x020104EC align:4
+
+regional_data:
+	.rodata     start:0x020104EC end:0x020139F8
 
 libc/reent/impure:
 	.rodata     start:0x020139F8 end:0x020139FC

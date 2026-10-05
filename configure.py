@@ -839,7 +839,7 @@ config.libs = [
             Object(Matching, "os/OSReset.c"),
             Object(Matching, "os/OSResetSW.c"),
             Object(Matching, "os/OSRtc.c"),
-            Object(Matching, "os/OSSemaphore.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSSemaphore.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSStopwatch.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSSync.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSThread.c"),

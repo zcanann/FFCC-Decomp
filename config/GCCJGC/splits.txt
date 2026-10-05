@@ -470,3 +470,6 @@ maphit.cpp:
 
 mapmesh.cpp:
 	.text start:0x80026E94 end:0x80027EF0
+
+os/OSSemaphore.c:
+	.text start:0x8017AC20 end:0x8017ADA4

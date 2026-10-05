@@ -136,6 +136,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "main/xfer", "main/radarmap", "main/main", "main/session",
         ],
         "mgr": [
+            "MgJoyBus",
             "crt0", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2", "libagbsyscall/CpuFastSet",
             "libagbsyscall/CpuSet", "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
             "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",
@@ -166,6 +167,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
         ],
         "mgr": [
+            "MgJoyBus",
             "field", "route", "obj",
             "camera", "sound", "text", "libc/reent/impure",
             "libc/arm/syscalls", "libc/reent/sbrkr",

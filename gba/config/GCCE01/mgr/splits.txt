@@ -218,7 +218,10 @@ libgcc/_negdi2:
 	.text       start:0x0200EC80 end:0x0200EC98
 
 regional_data:
-	.rodata     start:0x0200EC98 end:0x0200EDAC
+	.rodata     start:0x0200EC98 end:0x0200ED70
+
+MgJoyBus:
+	.rodata     start:0x0200ED70 end:0x0200EDAC align:4
 
 obj:
 	.rodata     start:0x0200EDAC end:0x0200EDC8 align:4
@@ -293,7 +296,10 @@ sound:
 	.ctors      start:0x02021F48 end:0x02021F4C align:1
 
 regional_bss:
-	.bss        start:0x03000000 end:0x03005DF4
+	.bss        start:0x03000000 end:0x03005C78
+
+MgJoyBus:
+	.bss        start:0x03005C78 end:0x03005DF4 align:4
 
 obj:
 	.bss        start:0x03005DF4 end:0x030060F8 align:4

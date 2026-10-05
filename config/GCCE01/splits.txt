@@ -1616,3 +1616,9 @@ auto_8032D85C_sdata:
 
 auto_8032FC8F_sdata2:
 	.sdata2 start:0x8032FC8F end:0x8032FC90 align:1
+
+pppYmMelt.cpp:
+	.text start:0x800A4C34 end:0x800A5874
+
+pppYmTracer.cpp:
+	.text start:0x80092AC8 end:0x800936A0

@@ -62,10 +62,10 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
  * --INFO--
  * PAL Address: 0x800A538C
  * PAL Size: 1716b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A4C34
+ * EN Size: 1716b
+ * JP Address: 0x800A32D0
+ * JP Size: 1692b
  */
 void pppRenderYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offsets)
 {
@@ -286,10 +286,10 @@ inline void InitPolygonData(PYmMelt* ctrl, VERTEX_DATA* vertexData, s16 phaseOff
  * --INFO--
  * PAL Address: 0x800A5A40
  * PAL Size: 680b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A52E8
+ * EN Size: 680b
+ * JP Address: 0x800A396C
+ * JP Size: 664b
  */
 void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offsets)
 {
@@ -349,10 +349,10 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
  * --INFO--
  * PAL Address: 0x800A5CE8
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A5590
+ * EN Size: 56b
+ * JP Address: 0x800A3C04
+ * JP Size: 56b
  */
 void pppDestructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
@@ -367,10 +367,10 @@ void pppDestructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
  * --INFO--
  * PAL Address: 0x800A5D20
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A55C8
+ * EN Size: 60b
+ * JP Address: 0x800A3C3C
+ * JP Size: 60b
  */
 void pppConstructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
@@ -392,10 +392,10 @@ void pppConstructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
  * --INFO--
  * PAL Address: 0x800A5D5C
  * PAL Size: 624b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A5604
+ * EN Size: 624b
+ * JP Address: 0x800A3C78
+ * JP Size: 564b
  */
 void CalcPolygonHeight(
     PYmMelt* ctrl, VERTEX_DATA* vertexBuffer, _GXColor* color, float yOffset)

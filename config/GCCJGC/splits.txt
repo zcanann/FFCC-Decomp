@@ -1604,3 +1604,9 @@ auto_8034B67C_sdata:
 
 auto_8034D9FF_sdata2:
 	.sdata2 start:0x8034D9FF end:0x8034DA00 align:1
+
+pppYmMelt.cpp:
+	.text start:0x800A32D0 end:0x800A3EAC
+
+pppYmTracer.cpp:
+	.text start:0x80092648 end:0x80093228

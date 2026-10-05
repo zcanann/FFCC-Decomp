@@ -439,6 +439,7 @@ static const int kMcSlotLeftTexture = 35;
 static const int kMcSlotMiddleTexture = 36;
 static const int kMcCharacterFrameTexture = 37;
 static const int kMcCharacterFillTexture = 41;
+static const int kCharacterNamePlateTexture = 39;
 static const int kWorldFrameTexture = 29;
 static const int kWorldWoodTexture = 21;
 static const int kMcYearTexture = 22;
@@ -451,6 +452,7 @@ static const int kMcSlotLeftTexture = 36;
 static const int kMcSlotMiddleTexture = 37;
 static const int kMcCharacterFrameTexture = 38;
 static const int kMcCharacterFillTexture = 42;
+static const int kCharacterNamePlateTexture = 40;
 static const int kWorldFrameTexture = 30;
 static const int kWorldWoodTexture = 22;
 static const int kMcYearTexture = 23;
@@ -7276,23 +7278,28 @@ void CMenuPcs::CalcCharaSelect()
  * --INFO--
  * PAL Address: 0x800f0274
  * PAL Size: 2044b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800EF91C
+ * EN Size: 2044b
+ * JP Address: 0x800ECD84
+ * JP Size: 1896b
  */
 void CMenuPcs::DrawCharaName()
 {
+#ifdef VERSION_GCCJGC
+	static const char* STR_TBL[] = {"\x82\xC8\x82\xB5", "\x83\x4C\x83\x83\x83\x89\x83\x81\x83\x43\x83\x4E\x92\x86"};
+#else
 	static const char* STR_TBL_us[] = {"Empty", "Creating..."};
 	static const char* STR_TBL_ge[] = {"Frei", "Wird kreiert"};
 	static const char* STR_TBL_it[] = {"Vuoto", "Creazione..."};
 	static const char* STR_TBL_fr[] = {"Vide", "Cr\351ation..."};
 	static const char* STR_TBL_sp[] = {"Vac\355o", "Creando..."};
+#endif
 
 	CFont* const font = GetWmFont(this);
 	WmCharaSelectEntry* const selectEntries = m_wm.m_charaSelectData;
 	unsigned char nameBuf[0x20];
 
+#ifndef VERSION_GCCJGC
 	const char** emptyText;
 	switch (Game.m_gameWork.GetLanguage()) {
 	case 2:
@@ -7312,6 +7319,7 @@ void CMenuPcs::DrawCharaName()
 		emptyText = STR_TBL_us;
 		break;
 	}
+#endif
 
 	float fade;
 	if (m_wmWorldState->m_mainState == 1) {
@@ -7352,7 +7360,7 @@ void CMenuPcs::DrawCharaName()
 	shade.b = 0xFF;
 	shade.a = static_cast<unsigned char>(static_cast<int>(alphaF));
 	GXSetChanMatColor(GX_COLOR0A0, shade);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterNamePlateTexture));
 	const float yBase1 = FLOAT_80331478;
 	const double xOffsetDefault =
 	    -(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678);
@@ -7422,7 +7430,9 @@ void CMenuPcs::DrawCharaName()
 		if (row2 != 0) {
 			y += FLOAT_80331548;
 		}
+#ifndef VERSION_GCCJGC
 		y = static_cast<float>(y - ySub2);
+#endif
 		int col = 0;
 		int slot = slotBase2;
 		int xCounter2 = col;
@@ -7456,7 +7466,11 @@ void CMenuPcs::DrawCharaName()
 				}
 			} else if ((pendingMask & (1u << slot)) != 0) {
 				font->SetTlut(0x10);
+#ifdef VERSION_GCCJGC
+				text = STR_TBL[1];
+#else
 				text = emptyText[1];
+#endif
 				const int phase = static_cast<int>(sys->m_frameCounter) % 20 - 10;
 				if (this->m_wmWorldState->m_mainState == 2) {
 					const int absPhase = abs(phase);
@@ -7470,7 +7484,11 @@ void CMenuPcs::DrawCharaName()
 				} else {
 					font->SetTlut(8);
 				}
+#ifdef VERSION_GCCJGC
+				text = STR_TBL[0];
+#else
 				text = emptyText[0];
+#endif
 			}
 
 			const float widthDiff = xMax2 - font->GetWidth(text);

@@ -1689,6 +1689,16 @@ pppYmDrawMdlTexAnm.cpp:
 
 vi/vi.c:
 	.text start:0x8018A748 end:0x8018C17C
+	.data start:0x80216660 end:0x80216A30
+	.bss start:0x8030BB28 end:0x8030BC70
+	.sdata start:0x8032DAE8 end:0x8032DAF4
+	.sbss start:0x8032E0C0 end:0x8032E118
+
+auto_8032DAF4_sdata:
+	.sdata start:0x8032DAF4 end:0x8032DAF8 align:1
+
+auto_8032E0BC_sbss:
+	.sbss start:0x8032E0BC end:0x8032E0C0 align:1
 
 wind.cpp:
 	.text start:0x800D8AC8 end:0x800D9880

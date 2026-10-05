@@ -906,7 +906,7 @@ config.libs = [
             Object(Matching, "vi/gpioexi.c"),
             Object(Matching, "vi/i2c.c"),
             Object(Matching, "vi/initphilips.c"),
-            Object(Matching, "vi/vi.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "vi/vi.c"),
         ],
     ),
     DolphinLib(

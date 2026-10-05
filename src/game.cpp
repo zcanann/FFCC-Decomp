@@ -780,19 +780,23 @@ void CGame::MapChanged(int, int, int)
  * --INFO--
  * PAL Address: 0x80013E70
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80013D50
+ * EN Size: 8b
+ * JP Address: UNUSED
+ * JP Size: UNUSED
  */
 const char* CGame::GetLangString()
 {
+#ifdef VERSION_GCCE01
+    return "";
+#else
     const char* localLangDirs[] = {
         "jp/", "uk/", "gr/",
         "it/", "fr/", "sp/",
     };
 
     return localLangDirs[m_gameWork.m_languageId];
+#endif
 }
 
 /*

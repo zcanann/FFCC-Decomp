@@ -657,10 +657,10 @@ void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
  * --INFO--
  * PAL Address: 0x80048644
  * PAL Size: 1656b
- * EN Address: 0x80055908
- * EN Size: 1608b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80048438
+ * EN Size: 1656b
+ * JP Address: 0x80047F88
+ * JP Size: 1328b
  */
 void CLightPcs::CBumpLight::MakeLightMap()
 {
@@ -797,15 +797,15 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 float xd0 = x0 / dInv;
                 float zd = z0 / dInv;
                 float t1 = dFactor * (float)(y + 1);
-                float x1 = t1 / 32.0f - dHalf;
-                float xd1 = x1 / dInv;
                 float dist0 = z0 * z0 + x0 * x0;
                 dist0 = dist0 < dHalf ? sqrtf(dHalf - dist0) : 0.0f;
 
-                float dist1 = z0 * z0 + x1 * x1;
                 GXPosition3f32(x0, z0, dW);
                 GXNormal3f32(xd0, zd, dist0);
 
+                float x1 = t1 / 32.0f - dHalf;
+                float xd1 = x1 / dInv;
+                float dist1 = z0 * z0 + x1 * x1;
                 dist1 = dist1 < dHalf ? sqrtf(dHalf - dist1) : 0.0f;
 
                 GXPosition3f32(x1, z0, dW);

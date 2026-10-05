@@ -998,7 +998,7 @@ TRK_MINNOW_DOLPHIN/serpoll.c:
 	.bss	start:0x80345A00 end:0x80345A18
 
 TRK_MINNOW_DOLPHIN/msghndlr.c:
-	.text	start:0x801A7100 end:0x801A74DC
+	.text	start:0x801A4C7C end:0x801A74DC
 	.bss	start:0x80345A20 end:0x80345A24
 
 dsp/dsp.c:
@@ -1084,3 +1084,41 @@ auto_09_8034B984_sdata:
 
 auto_11_8034FCB4_sdata2:
 	.sdata2 start:0x8034FCB4 end:0x8034FCB8
+
+charaobj.cpp:
+	.text start:0x801076D8 end:0x8010ED3C
+
+auto_07_8023894C_data:
+	.data start:0x8023894C end:0x80238950 align:4
+
+TRK_MINNOW_DOLPHIN/targimpl.c:
+	.text start:0x801A8A18 end:0x801A8B44
+	.data start:0x802388E0 end:0x80238910
+
+p_chara.cpp:
+	.text start:0x80072F18 end:0x8007AF9C
+
+axfx/reverb_hi.c:
+	.text	start:0x8018E398 end:0x8018F45C
+	.data	start:0x80237020 end:0x80237040
+	.sdata2	start:0x8034FB60 end:0x8034FBA8
+
+itemobj.cpp:
+	.text start:0x80120A24 end:0x80122EEC
+
+TRK_MINNOW_DOLPHIN/dispatch.c:
+    .text start:0x801A4BE0 end:0x801A4C7C
+    .data start:0x80238820 end:0x802388A0
+    .bss start:0x80345A18 end:0x80345A1C
+
+auto_07_802388A0_data:
+    .data start:0x802388A0 end:0x802388A8 align:4
+
+auto_08_80345A1C_bss:
+    .bss start:0x80345A1C end:0x80345A20 align:4
+
+pppPart.cpp:
+	.text start:0x80053458 end:0x80056BF0
+
+game.cpp:
+	.text start:0x80013D9C end:0x80015DD8

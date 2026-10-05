@@ -1164,3 +1164,23 @@ auto_09_8032DB7C_sdata:
 
 auto_11_8033284C_sdata2:
 	.sdata2 start:0x8033284C end:0x80332850
+
+charaobj.cpp:
+	.text start:0x8010A9D8 end:0x801120B4
+
+p_chara.cpp:
+	.text start:0x8007345C end:0x8007B570
+
+axfx/reverb_hi.c:
+	.text	start:0x80192D54 end:0x80193E18
+	.data	start:0x8021A5E0 end:0x8021A600
+	.sdata2	start:0x803326F8 end:0x80332740
+
+itemobj.cpp:
+	.text start:0x80123EA8 end:0x80126338
+
+pppPart.cpp:
+	.text start:0x800539EC end:0x80057184
+
+game.cpp:
+	.text start:0x80013D50 end:0x800161FC

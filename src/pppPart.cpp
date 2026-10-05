@@ -1620,10 +1620,10 @@ static void pppCalcPartStd(_pppMngSt* pppMngSt)
  * --INFO--
  * PAL Address: 0x80054B30
  * PAL Size: 296b
- * EN Address: 0x800650B0
- * EN Size: 464b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80054818
+ * EN Size: 280b
+ * JP Address: 0x80054284
+ * JP Size: 280b
  */
 static void pppDrawPartStd(_pppMngSt* pppMngSt)
 {
@@ -1667,7 +1667,9 @@ static void pppDrawPartStd(_pppMngSt* pppMngSt)
 						}
 						while (count != 0);
 
+#ifdef VERSION_GCCP01
 						Graphic.SetDrawDoneDebugDataPartControl(0x7FFF);
+#endif
 					}
 				}
 				else

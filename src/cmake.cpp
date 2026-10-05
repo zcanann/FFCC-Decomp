@@ -438,7 +438,9 @@ static const char s_world44[] = "world44";
 static const char s_world45[] = "world45";
 static const char s_world48[] = "world48";
 static const char s_world49[] = "world49";
+#ifndef VERSION_GCCJGC
 static const char s_world51[] = "world51";
+#endif
 
 char* PTR_s_world2[] = {
     (char*)s_world2,
@@ -1687,7 +1689,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
         GetChara(text, column, picked);
         int count = GetCharaCnt(s_CmakeInfo.m_name);
         if (count >= 7) {
-            if (strcmp(picked, s_nameDakutenMark) != 0 && strcmp(picked, s_nameHandakutenMark) != 0) {
+            if (strcmp(picked, "\x81\x4A") != 0 && strcmp(picked, "\x81\x4B") != 0) {
                 return -1;
             }
         } else {
@@ -1701,7 +1703,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
         if (type == 0 && count >= 7) {
             return -1;
         }
-        if (type != 0 && strcmp(picked, s_nameDakutenMark) == 0) {
+        if (type != 0 && strcmp(picked, "\x81\x4A") == 0) {
             char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
             for (int group = 0; group < 2; ++group) {
                 const char* characters = s_NameEntryVoiced[group];
@@ -1713,8 +1715,8 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
                     }
                 }
             }
-            if (memcmp(last, s_nameKatakanaU, 2) == 0) {
-                strcpy(last, s_nameKatakanaVu);
+            if (memcmp(last, "\x83\x45", 2) == 0) {
+                strcpy(last, "\x83\x94");
             } else {
                 if (count >= 7) {
                     return -1;
@@ -1722,7 +1724,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
                 strcat(s_CmakeInfo.m_name, picked);
             }
             return 0;
-        } else if (type != 0 && strcmp(picked, s_nameHandakutenMark) == 0) {
+        } else if (type != 0 && strcmp(picked, "\x81\x4B") == 0) {
             char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
             int length = strlen(s_NameEntryVoiced[1]);
             const char* characters = s_NameEntryVoiced[1];

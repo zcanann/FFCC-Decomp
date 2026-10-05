@@ -493,7 +493,7 @@ mapocttree.cpp:
 cmake.cpp:
 	.text start:0x80167050 end:0x8016F384
 	.rodata start:0x801DA370 end:0x801DA5BC
-	.data start:0x80231F20 end:0x80231FD4
+	.data start:0x80231F20 end:0x8023200C
 	.sdata2 start:0x8034F770 end:0x8034F7B8
 	.sdata start:0x8034B860 end:0x8034B868
 

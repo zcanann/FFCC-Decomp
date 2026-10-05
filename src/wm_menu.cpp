@@ -4742,10 +4742,8 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		bytes[0x15] = 1;
 		break;
 	case 0x17: {
-		const unsigned int disabled = value == 0;
-		CameraPcs.m_worldMapEffect.m_flags =
-		    static_cast<unsigned char>(disabled << 7) |
-		    (CameraPcs.m_worldMapEffect.m_flags & 0x7F);
+		const char disabled = value == 0;
+		CameraPcs.m_worldMapEffect.m_paused = disabled;
 		CameraPcs.m_worldMapEffect.m_timer = 0x4B;
 		CameraPcs.m_worldMapEffect.m_duration = 0x4B;
 		CameraPcs.m_worldMapEffect.m_rotX = FLOAT_80331618;

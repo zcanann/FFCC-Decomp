@@ -969,3 +969,8 @@ gx/GXTransform.c:
 
 gx/GXStubs.c:
 	.text start:0x801A4ED8 end:0x801A4EDC
+
+gxfunc.cpp:
+	.text start:0x80102378 end:0x801029A0
+	.bss start:0x802FE410 end:0x802FEA30
+	.sbss start:0x8032DE20 end:0x8032DE28

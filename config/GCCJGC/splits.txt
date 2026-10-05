@@ -883,3 +883,8 @@ gx/GXTransform.c:
 
 gx/GXStubs.c:
 	.text start:0x801A051C end:0x801A0520
+
+gxfunc.cpp:
+	.text start:0x800FEFE8 end:0x800FF610
+	.bss start:0x8031AD40 end:0x8031B360
+	.sbss start:0x8034BC28 end:0x8034BC30

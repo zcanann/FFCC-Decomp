@@ -146,12 +146,14 @@ void CMenuPcs::BonusInit()
  */
 void CMenuPcs::createBonus()
 {
+	int i;
+	int j;
 #ifndef VERSION_GCCJGC
 	char fontPath[128];
 #endif
 
 	Pad.SetAnalogDepth(0x28);
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		GbaQue.OpenMenu(i, 0, 0);
 #ifndef VERSION_GCCJGC
 		GbaQue.SetRadarMode(i, 0);
@@ -202,7 +204,7 @@ void CMenuPcs::createBonus()
 
 	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xDD) BonusSummaryData;
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
-	for (int i = 0; i < BonusSummaryData::kArtifactCount; i++) {
+	for (i = 0; i < BonusSummaryData::kArtifactCount; i++) {
 		s_Rinfo->m_artifacts[i] = -1;
 	}
 
@@ -220,7 +222,7 @@ void CMenuPcs::createBonus()
 	memset(this->m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 	const float depth = 100.0f;
 	const float zero = 0.0f;
-	for (int i = 0; i < 0x18; i++) {
+	for (i = 0; i < 0x18; i++) {
 		m_wm.m_worldObjData[i].m_transform.Identity();
 		m_wm.m_worldObjData[i].m_active = 0;
 		m_wm.m_worldObjData[i].m_frameCounter = 0;
@@ -237,17 +239,17 @@ void CMenuPcs::createBonus()
 		m_wm.m_worldObjData[i].m_scissorHeight = 0x1c0;
 	}
 
-	if (s_Rinfo != 0) {
-		int activeCount = 0;
+	{
+		int activeCount;
 		int totalValue = 0;
 		int tempArtifactCount = 0;
 
-		for (int i = 0; i < 4; i++) {
+		for (i = activeCount = 0; i < 4; i++) {
 			CCaravanWork* caravanWork = Game.m_scriptFoodBase[i];
 			if (caravanWork == 0) {
 				continue;
 			}
-			if (Game.m_gameWork.m_menuStageMode != 0 && activeCount != 0) {
+			if (Game.m_gameWork.m_menuStageMode != 0 && i != 0) {
 				break;
 			}
 
@@ -278,8 +280,8 @@ void CMenuPcs::createBonus()
 			activeCount++;
 
 			CCaravanWork** slot = &Game.m_scriptFoodBase[i];
-			for (int artifactIndex = 0; artifactIndex < BonusSummaryData::kTemporaryArtifactCount; artifactIndex++) {
-				int itemId = (*slot)->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + artifactIndex];
+			for (j = 0; j < BonusSummaryData::kTemporaryArtifactCount; j++) {
+				int itemId = (*slot)->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + j];
 				if (itemId > 0) {
 					s_Rinfo->m_artifacts[tempArtifactCount++] = (short)itemId;
 				}
@@ -289,12 +291,12 @@ void CMenuPcs::createBonus()
 		s_Rinfo->m_partyCount = activeCount;
 
 		CGame::CBossArtifactEntry* bossArtifact = Game.GetBossArtifact(s_Rinfo->m_partyCount, totalValue);
-		for (int i = 0; i < BonusSummaryData::kBossArtifactCount; i++) {
+		for (i = 0; i < BonusSummaryData::kBossArtifactCount; i++) {
 			s_Rinfo->m_artifacts[BonusSummaryData::kTemporaryArtifactCount + i] = bossArtifact->m_values[i];
 		}
 
 		s_Rinfo->m_missingArtifactMask = 0;
-		for (int i = 0; i < BonusSummaryData::kArtifactCount; i++) {
+		for (i = 0; i < BonusSummaryData::kArtifactCount; i++) {
 			if (s_Rinfo->m_artifacts[i] < 0) {
 				s_Rinfo->m_missingArtifactMask =
 				    (unsigned char)(s_Rinfo->m_missingArtifactMask | (1 << i));
@@ -302,24 +304,24 @@ void CMenuPcs::createBonus()
 		}
 
 		{
-			int i = 0;
+			i = 0;
 
 			for (; i < s_Rinfo->m_partyCount; i++) {
 				CCaravanWork** slot = &Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot];
 
-				for (int artifactIndex = 0; artifactIndex < BonusSummaryData::kArtifactCount; artifactIndex++) {
-					short itemId = s_Rinfo->m_artifacts[artifactIndex];
+				for (j = 0; j < BonusSummaryData::kArtifactCount; j++) {
+					short itemId = s_Rinfo->m_artifacts[j];
 					if (itemId <= 0) {
 						continue;
 					}
 
 					if (GetItemType(itemId, 1) == 2) {
-						int artifactSlot = s_Rinfo->m_artifacts[artifactIndex] - 0x9F;
-						if ((*slot)->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[artifactIndex]) {
-							s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
+						int artifactSlot = s_Rinfo->m_artifacts[j] - 0x9F;
+						if ((*slot)->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[j]) {
+							s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << j);
 						}
 					} else if (!(*slot)->CanAddItem(1)) {
-						s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
+						s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << j);
 					}
 				}
 			}
@@ -330,9 +332,9 @@ void CMenuPcs::createBonus()
 		order[1] = 1;
 		order[2] = 2;
 		order[3] = 3;
-		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+		for (i = 0; i < s_Rinfo->m_partyCount; i++) {
 			int leftIndex = order[i];
-			for (int j = i + 1; j < s_Rinfo->m_partyCount; j++) {
+			for (j = i + 1; j < s_Rinfo->m_partyCount; j++) {
 				int aTotal = s_Rinfo->m_party[leftIndex].m_totalValue;
 				int aFood = s_Rinfo->m_party[leftIndex].m_foodValue;
 				int bTotal = s_Rinfo->m_party[order[j]].m_totalValue;
@@ -353,19 +355,18 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+		for (i = 0; i < s_Rinfo->m_partyCount; i++) {
 			s_Rinfo->m_party[order[i]].m_rank = i;
 			if (i == 0) {
 				s_Rinfo->m_winnerTotalValue = s_Rinfo->m_party[order[i]].m_totalValue;
 			}
 		}
 
-		for (int i = 0; i < 0x18; i++) {
+		for (i = 0; i < 0x18; i++) {
 			this->m_wm.m_handles[i] = 0;
 		}
 
 		int slotIdx = 0;
-		int i;
 		for (i = 0; i < 0x18; i++) {
 			int pc = s_Rinfo->m_partyCount;
 			if (pc * 2 <= i) {
@@ -384,24 +385,23 @@ void CMenuPcs::createBonus()
 			slotIdx++;
 		}
 
-		int handleIndex = i;
-		for (int artifactIndex = 0; artifactIndex < BonusSummaryData::kArtifactCount; artifactIndex++, handleIndex++) {
-			int itemId = s_Rinfo->m_artifacts[artifactIndex];
+		for (j = 0; j < BonusSummaryData::kArtifactCount; j++, i++) {
+			int itemId = s_Rinfo->m_artifacts[j];
 			if (itemId <= 0) {
-				m_wm.m_handles[handleIndex] = 0;
+				m_wm.m_handles[i] = 0;
 			} else {
 				CCharaPcs::CHandle* itemHandle =
 				    new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0x19C) CCharaPcs::CHandle;
-				m_wm.m_handles[handleIndex] = itemHandle;
-				m_wm.m_handles[handleIndex]->Add();
+				m_wm.m_handles[i] = itemHandle;
+				m_wm.m_handles[i]->Add();
 				unsigned short itemModelCode =
 				    reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_model;
 				int modelNo = itemModelCode & 0x0FFF;
-				m_wm.m_handles[handleIndex]->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
-				m_wm.m_handles[handleIndex]->m_flags = 0x300543;
+				m_wm.m_handles[i]->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
+				m_wm.m_handles[i]->m_flags = 0x300543;
 
 				if (modelNo == 0x79) {
-					short itemId2 = s_Rinfo->m_artifacts[artifactIndex];
+					short itemId2 = s_Rinfo->m_artifacts[j];
 					int effectNo;
 					if (itemId2 == 0xDF) {
 						effectNo = 0x75;
@@ -416,7 +416,7 @@ void CMenuPcs::createBonus()
 					} else {
 						continue;
 					}
-					BindEffect(handleIndex, effectNo, -1);
+					BindEffect(i, effectNo, -1);
 				}
 			}
 		}

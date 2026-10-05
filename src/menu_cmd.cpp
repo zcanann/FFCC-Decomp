@@ -74,9 +74,15 @@ static const char* s_SkillStr_us[] = {
 };
 
 static const char* s_SkillStr_ge[] = {
+#ifdef VERSION_GCCE01
+    "Feuer-Klinge",
+    "Eis-Klinge",
+    "Blitz-Klinge",
+#else
     "Feuer-Hieb",
     "Eis-Hieb",
     "Blitz-Hieb",
+#endif
     "",
     "",
 };

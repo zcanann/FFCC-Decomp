@@ -255,7 +255,7 @@ UARTError WriteUARTFlush(void)
  * JP Address: 0x801AA298
  * JP Size: 40b
  */
-UARTError WriteUART1(u8 byte)
+UARTError WriteUART1(char byte)
 {
     gWriteBuf[gWritePos++] = byte;
     return UART_NoError;

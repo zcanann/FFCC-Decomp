@@ -13,7 +13,7 @@ void EnableEXI2Interrupts(void);
 void TRKUARTInterruptHandler();
 #ifdef VERSION_GCCJGC
 UARTError TRKReadUARTPoll(u8* byte);
-UARTError WriteUART1(u8 byte);
+UARTError WriteUART1(char byte);
 UARTError WriteUARTFlush(void);
 #endif
 

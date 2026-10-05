@@ -163,8 +163,8 @@ main/artifact:
 main/cmake:
 	.rodata     start:0x0201CD0C end:0x0201CE10 align:4
 
-regional_data:
-	.rodata     start:0x0201CE10 end:0x0201CE18
+main/letter:
+	.rodata     start:0x0201CE10 end:0x0201CE18 align:4
 
 main/scouter:
 	.rodata     start:0x0201CE18 end:0x0201CE1C align:4
@@ -187,8 +187,11 @@ main/mode:
 main/cmake:
 	.data       start:0x02028C4C end:0x02028C88 align:4
 
+main/letter:
+	.data       start:0x02028C88 end:0x02028CF4 align:4
+
 regional_data:
-	.rodata     start:0x02028C88 end:0x0202E058
+	.rodata     start:0x02028CF4 end:0x0202E058
 
 main/main:
 	.bss        start:0x03000000 end:0x03000011 align:4
@@ -242,7 +245,10 @@ main/item:
 	.bss        start:0x030027CC end:0x030027D6 align:4
 
 regional_bss:
-	.bss        start:0x030027D6 end:0x030027F4 align:1
+	.bss        start:0x030027D6 end:0x030027D8 align:1
+
+main/letter:
+	.bss        start:0x030027D8 end:0x030027F4 align:4
 
 main/menu:
 	.bss        start:0x030027F4 end:0x030027F6 align:4

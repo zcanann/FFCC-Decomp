@@ -57,10 +57,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
  * --INFO--
  * PAL Address: 0x800ddaf8
  * PAL Size: 1460b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DD2C4
+ * EN Size: 1460b
+ * JP Address: 0x800DADD4
+ * JP Size: 1460b
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrlTable* ctrl)
 {
@@ -215,10 +215,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
  * --INFO--
  * PAL Address: 0x800de0ac
  * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DD878
+ * EN Size: 232b
+ * JP Address: 0x800DB388
+ * JP Size: 232b
  */
 void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrlTable* ctrl)
 {
@@ -255,10 +255,10 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrl
  * --INFO--
  * PAL Address: 0x800de194
  * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DD960
+ * EN Size: 152b
+ * JP Address: 0x800DB470
+ * JP Size: 152b
  */
 void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
 {
@@ -287,10 +287,10 @@ void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x800de22c
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DD9F8
+ * EN Size: 112b
+ * JP Address: 0x800DB508
+ * JP Size: 112b
  */
 void pppConstructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
 {
@@ -313,10 +313,10 @@ void pppConstructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x800de29c
  * PAL Size: 1084b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DDA68
+ * EN Size: 1084b
+ * JP Address: 0x800DB578
+ * JP Size: 1084b
  */
 void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void* param)
 {
@@ -415,10 +415,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
  * --INFO--
  * PAL Address: 0x800de6d8
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DDEA4
+ * EN Size: 64b
+ * JP Address: 0x800DB9B4
+ * JP Size: 64b
  */
 void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {

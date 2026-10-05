@@ -110,10 +110,10 @@ static inline void ClearEmissionModelCallbacks(CChara::CModel* model)
  * --INFO--
  * PAL Address: 0x800E6060
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E582C
+ * EN Size: 32b
+ * JP Address: 0x800E3320
+ * JP Size: 32b
  */
 void pppRenderEmission(pppEmission*, PEmission*, _pppCtrlTable*) {
     pppInitBlendMode();
@@ -122,10 +122,10 @@ void pppRenderEmission(pppEmission*, PEmission*, _pppCtrlTable*) {
  * --INFO--
  * PAL Address: 0x800E6080
  * PAL Size: 1040b
- * EN Address: 0x80103FE4
- * EN Size: 1444b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E584C
+ * EN Size: 1040b
+ * JP Address: 0x800E3340
+ * JP Size: 1008b
  */
 void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctrl) {
     if (ppvUserStopPartF != 0) {
@@ -236,10 +236,10 @@ void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctr
  * --INFO--
  * PAL Address: 0x800E6490
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E5C5C
+ * EN Size: 160b
+ * JP Address: 0x800E3730
+ * JP Size: 160b
  */
 void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale;
@@ -266,10 +266,10 @@ void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
  * --INFO--
  * PAL Address: 0x800E6530
  * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E5CFC
+ * EN Size: 36b
+ * JP Address: 0x800E37D0
+ * JP Size: 36b
  */
 void pppConstruct2Emission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
@@ -283,10 +283,10 @@ void pppConstruct2Emission(pppEmission* emission, _pppCtrlTable* ctrl) {
  * --INFO--
  * PAL Address: 0x800E6554
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E5D20
+ * EN Size: 160b
+ * JP Address: 0x800E37F4
+ * JP Size: 160b
  */
 void pppConstructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
@@ -316,8 +316,8 @@ void pppConstructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
  * PAL Size: 1216b
  * EN Address: 0x800E5DC0
  * EN Size: 1216b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800E3894
+ * JP Size: 1200b
  */
 void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* stateContext, void* stepContext, int meshIndex, float (*meshMtx)[4]) {
     Graphic.SetDrawDoneDebugData(0x66);
@@ -425,10 +425,10 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* stateContext, v
  * --INFO--
  * PAL Address: 0x800E6AB4
  * PAL Size: 228b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E6280
+ * EN Size: 228b
+ * JP Address: 0x800E3D44
+ * JP Size: 228b
  */
 void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
     Graphic.SetDrawDoneDebugData(0x64);

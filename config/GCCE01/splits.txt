@@ -772,3 +772,6 @@ MSL_C/PPCEABI/bare/H/gamecube.c:
 TRK_MINNOW_DOLPHIN/mem_TRK.c:
 	.text	start:0x801AA948 end:0x801AAA00
 	.init	start:0x80003458 end:0x800034AC
+
+mes.cpp:
+	.text start:0x80097B8C end:0x8009AC94

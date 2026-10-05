@@ -497,8 +497,6 @@ cmake.cpp:
 	.sdata2 start:0x8034F770 end:0x8034F7B8
 	.sdata start:0x8034B860 end:0x8034B868
 
-mes.cpp:
-	.text start:0x800978B8 end:0x80097D20
 
 shopmenu.cpp:
 	.text start:0x8014B634 end:0x80153EA0
@@ -727,3 +725,6 @@ MSL_C/PPCEABI/bare/H/gamecube.c:
 TRK_MINNOW_DOLPHIN/mem_TRK.c:
 	.text	start:0x801A7EC4 end:0x801A7F7C
 	.init	start:0x80003458 end:0x800034AC
+
+mes.cpp:
+	.text start:0x800976FC end:0x80099580

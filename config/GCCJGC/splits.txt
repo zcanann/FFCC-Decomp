@@ -624,25 +624,31 @@ menu_item.cpp:
 
 menu_arti.cpp:
 	.text start:0x8015A460 end:0x8015B97C
+	.sdata2 start:0x8034F5A8 end:0x8034F5F0
 
 menu_tmparti.cpp:
 	.text start:0x80158124 end:0x80158D78
+	.sdata2 start:0x8034F528 end:0x8034F560
 
 menu_money.cpp:
 	.text start:0x80158D78 end:0x8015A460
 	.bss start:0x80327358 end:0x80327368
 	.sbss start:0x8034BCC0 end:0x8034BCC4
+	.sdata2 start:0x8034F560 end:0x8034F5A8
 
 menu_compa.cpp:
 	.text start:0x8015B97C end:0x8015CE6C
 	.rodata start:0x801D9788 end:0x801D97B8
+	.sdata2 start:0x8034F5F0 end:0x8034F628
 
 menu_favo.cpp:
 	.text start:0x8015CE6C end:0x8015E4DC
 	.bss start:0x80327368 end:0x80327388
+	.sdata2 start:0x8034F628 end:0x8034F668
 
 menu_lst.cpp:
 	.text start:0x8016F384 end:0x8017017C
+	.sdata2 start:0x8034F948 end:0x8034F9A0
 
 ringmenu.cpp:
 	.text start:0x800A0D6C end:0x800A32D0

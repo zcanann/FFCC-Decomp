@@ -172,3 +172,33 @@ MSL_C/PPCEABI/bare/H/s_sin.c:
 MSL_C/PPCEABI/bare/H/s_tan.c:
 	.text start:0x801B7520 end:0x801B7598
 	.sdata2 start:0x80350118 end:0x80350120
+
+MSL_C/PPCEABI/bare/H/float.c:
+	.sdata start:0x8034BA08 end:0x8034BA10
+
+MSL_C/PPCEABI/bare/H/errno.c:
+	.sbss start:0x8034C158 end:0x8034C15C
+
+MSL_C/PPCEABI/bare/H/e_acos.c:
+	.text start:0x801B4574 end:0x801B4884
+	.sdata2 start:0x8034FD58 end:0x8034FDE8
+
+MSL_C/PPCEABI/bare/H/e_pow.c:
+	.text start:0x801B4E50 end:0x801B5704
+	.rodata start:0x801DB8A0 end:0x801DB8D0
+	.sdata2 start:0x8034FE40 end:0x8034FF50
+
+MSL_C/PPCEABI/bare/H/w_acos.c:
+	.text start:0x801B7598 end:0x801B75B8
+
+MSL_C/PPCEABI/bare/H/w_atan2.c:
+	.text start:0x801B75B8 end:0x801B75D8
+
+MSL_C/PPCEABI/bare/H/w_fmod.c:
+	.text start:0x801B75D8 end:0x801B75F8
+
+MSL_C/PPCEABI/bare/H/w_pow.c:
+	.text start:0x801B75F8 end:0x801B7618
+
+MSL_C/PPCEABI/bare/H/math_ppc.c:
+	.text start:0x801B7618 end:0x801B76CC

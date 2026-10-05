@@ -16,6 +16,13 @@
 #include <math.h>
 #include <string.h>
 #include "ffcc/fontman.h"
+#ifdef VERSION_GCCP01
+static const int kItemObjExpandFrames = 8;
+static const int kItemObjReleaseLifetime = 4500;
+#else
+static const int kItemObjExpandFrames = 10;
+static const int kItemObjReleaseLifetime = 5400;
+#endif
 
 extern const float kItemObjUnitScale = 1.0f;
 extern const float kItemObjHeightOffset = 10.0f;
@@ -252,10 +259,10 @@ void CGItemObj::onFrame()
  * --INFO--
  * PAL Address: 0x80125fb0
  * PAL Size: 3416b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801252E0
+ * EN Size: 3416b
+ * JP Address: 0x80121E60
+ * JP Size: 3468b
  */
 void CGItemObj::onFrameStat()
 {
@@ -265,16 +272,20 @@ void CGItemObj::onFrameStat()
 
 	switch (stateId) {
 	case 0x1b:
-		if (m_stateFrame <= 8) {
+		if (m_stateFrame <= kItemObjExpandFrames) {
 			float wobble = kItemObjHalfPi * (float)m_stateFrame;
+#ifdef VERSION_GCCP01
 			wobble *= kItemObjWobblePhaseScale;
+#else
+			wobble /= 10.0f;
+#endif
 			wobble = (float)sin((double)wobble);
 
 			m_rotationZ = wobble;
 			m_rotationY = wobble;
 			m_rotationX = wobble;
 
-			if (m_stateFrame == 8) {
+			if (m_stateFrame == kItemObjExpandFrames) {
 				changeStat(0, 0, 0);
 			}
 		}
@@ -349,7 +360,7 @@ void CGItemObj::onFrameStat()
 			}
 
 			safeDetach(1, launchSpeed);
-			m_itemJumpCountdown = 8;
+			m_itemJumpCountdown = kItemObjExpandFrames;
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}
 
@@ -391,7 +402,7 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 9:
-		if (m_stateFrame == 8) {
+		if (m_stateFrame == kItemObjExpandFrames) {
 			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
 		break;
@@ -441,16 +452,20 @@ void CGItemObj::onFrameStat()
 				handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 			}
 
-			if (m_subFrame <= 8) {
+			if (m_subFrame <= kItemObjExpandFrames) {
 				float wobble = kItemObjHalfPi * (float)m_subFrame;
+#ifdef VERSION_GCCP01
 				wobble *= kItemObjWobblePhaseScale;
+#else
+				wobble /= 10.0f;
+#endif
 				wobble = (float)sin((double)wobble);
 
 				m_rotationZ = wobble;
 				m_rotationY = wobble;
 				m_rotationX = wobble;
 
-				if (m_subFrame == 8) {
+				if (m_subFrame == kItemObjExpandFrames) {
 					m_bgColMask |= 0x80000;
 					changeStat(0x24, 0, 0);
 				}
@@ -797,10 +812,10 @@ inline void CGItemObj::safeDetach(int throwItem, float speed)
  * --INFO--
  * PAL Address: 0x80125650
  * PAL Size: 916b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80124980
+ * EN Size: 916b
+ * JP Address: 0x801214FC
+ * JP Size: 916b
  */
 void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
@@ -839,13 +854,13 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		if (carryMode == 0) {
 			safeDetach(0, kItemObjZero);
 			changeStat(0, 0, 0);
-			m_itemJumpCountdown = 8;
+			m_itemJumpCountdown = kItemObjExpandFrames;
 			m_bodyEllipsoidRadius = kItemObjZero;
 		} else {
 			changeStat(carryState == 1 ? 0xC : 0xD, 0, 0);
 		}
 
-		m_lifeTimer = 0x1194;
+		m_lifeTimer = kItemObjReleaseLifetime;
 	}
 
 	if ((m_objectFlags & 0x10) != 0 && canSystemCall != 0) {
@@ -874,21 +889,27 @@ void CGItemObj::onChangePrg(int)
  * --INFO--
  * PAL Address: 0x801254cc
  * PAL Size: 384b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801247FC
+ * EN Size: 384b
+ * JP Address: 0x80121378
+ * JP Size: 384b
  */
 void CGItemObj::onFrameAlways()
 {
 	int countdown = m_itemJumpCountdown;
 
 	if (countdown != 0) {
+#ifdef VERSION_GCCP01
 		const float& scale = kItemObjWobblePhaseScale;
+#endif
 		countdown--;
 		m_itemJumpCountdown = countdown < 0 ? 0 : countdown;
-		float radius = m_savedBodyRadius * (float)(8 - m_itemJumpCountdown);
+		float radius = m_savedBodyRadius * (float)(kItemObjExpandFrames - m_itemJumpCountdown);
+#ifdef VERSION_GCCP01
 		m_bodyEllipsoidRadius = radius * scale;
+#else
+		m_bodyEllipsoidRadius = radius / 10.0f;
+#endif
 	}
 
 	if (m_worldParamA == 0xA) {
@@ -987,10 +1008,10 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
  * --INFO--
  * PAL Address: 0x80124FE0
  * PAL Size: 700b
- * EN Address: 0x80146A20
- * EN Size: 892b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80124310
+ * EN Size: 700b
+ * JP Address: 0x80120E8C
+ * JP Size: 700b
  */
 void CGItemObj::loadModel()
 {
@@ -1037,7 +1058,7 @@ void CGItemObj::loadModel()
 		modelNo = itemEntry & 0xFFF;
 		modelVariant = itemEntry >> 0xC;
 		m_stateFlags0Bits.unk4 = 1;
-		m_lifeTimer = 0x1194;
+		m_lifeTimer = kItemObjReleaseLifetime;
 		animFlags = 0x12;
 		modelFlag = 1;
 		break;

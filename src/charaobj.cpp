@@ -1944,18 +1944,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	damageClamp = 0;
 	if (m_lastStateId == 8 && m_subState == 1 &&
 	    ((CharaObjItemRow(itemId)->m_flags2C & 8) == 0)) {
-		CVector selfPos(m_worldPosition);
-		const CVector& sourcePos = CVector(sourceObj->m_worldPosition);
-		CVector deltaVec;
-		PSVECSubtract((Vec*)&sourcePos, reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&deltaVec));
-		Vec frontDelta;
-		frontDelta.x = deltaVec.x;
-		frontDelta.y = deltaVec.y;
-		frontDelta.z = deltaVec.z;
-		float frontMag = PSVECMag(&frontDelta);
+		CVector frontDelta = CVector(sourceObj->m_worldPosition) - CVector(m_worldPosition);
+		float frontMag = PSVECMag(frontDelta);
 		if (frontMag > 0.0f) {
 			CVector scaledVec;
-			PSVECScale(&frontDelta, reinterpret_cast<Vec*>(&scaledVec), 1.0f / frontMag);
+			PSVECScale(frontDelta, reinterpret_cast<Vec*>(&scaledVec), 1.0f / frontMag);
 			frontDelta.x = scaledVec.x;
 			frontDelta.y = scaledVec.y;
 			frontDelta.z = scaledVec.z;
@@ -1963,7 +1956,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			facing.x = sinf(m_rotBaseY);
 			facing.y = 0.0f;
 			facing.z = cosf(m_rotBaseY);
-			if (PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing)) > 0.0f) {
+			if (PSVECDotProduct(frontDelta, reinterpret_cast<Vec*>(&facing)) > 0.0f) {
 				playSe3D(0x1D, 0x32, 0x96, 0, 0);
 				putParticle(0x200, 0, hitPos, 0.1f * m_attackColRadius, 0);
 				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {

@@ -481,6 +481,7 @@ partyobj.cpp:
 partMng.cpp:
 	.text start:0x80057184 end:0x8005F084
 	.bss start:0x80274EA8 end:0x80298EF0
+	.sbss start:0x8032DD70 end:0x8032DD78
 
 memory.cpp:
 	.bss start:0x8023B848 end:0x80242FE8
@@ -490,6 +491,7 @@ memory.cpp:
 	.sdata2 start:0x8032E760 end:0x8032E788
 
 materialman.cpp:
+	.sbss start:0x8032DCC8 end:0x8032DCDC
 	.rodata start:0x801D6968 end:0x801D6A10
 	.data start:0x801E8A30 end:0x801E8A88
 	.sdata start:0x8032D548 end:0x8032D578
@@ -1258,8 +1260,15 @@ usb.cpp:
 	.sdata2 start:0x8032E848 end:0x8032E84D
 
 system.cpp:
-	.text start:0x80021CF0 end:0x80021DA8
-	.bss start:0x80243300 end:0x8024457C
+	.text	start:0x800212A8 end:0x80022240
+	.ctors	start:0x801D4324 end:0x801D4328
+	extab	start:0x80005C98 end:0x80005D08
+	extabindex	start:0x8000B530 end:0x8000B5C0
+	.rodata	start:0x801D5CC8 end:0x801D5EC9
+	.data	start:0x801E76F8 end:0x801E7714
+	.bss	start:0x80243300 end:0x8024457C
+	.sdata	start:0x8032D448 end:0x8032D458
+	.sdata2	start:0x8032E830 end:0x8032E844
 
 auto_07_801E7734_data:
 	.data start:0x801E7734 end:0x801E7738 align:4
@@ -1343,3 +1352,51 @@ auto_10_8032DE7C_sbss:
 
 auto_11_8032EAEC_sdata2:
 	.sdata2 start:0x8032EAEC end:0x8032EAF0 align:1
+
+auto_10_8032DCDC_sbss:
+	.sbss start:0x8032DCDC end:0x8032DCE0 align:1
+
+pppYmDeformationShp.cpp:
+	.text start:0x8008E864 end:0x8008FF78
+	.sdata2 start:0x8032F5B0 end:0x8032F5F8
+
+auto_801D5EC9_rodata:
+	.rodata start:0x801D5EC9 end:0x801D5ED0 align:1
+
+auto_801E7714_data:
+	.data start:0x801E7714 end:0x801E7718 align:1
+
+auto_8032E844_sdata2:
+	.sdata2 start:0x8032E844 end:0x8032E848 align:4
+
+stopwatch.cpp:
+	.text	start:0x80020FC8 end:0x800212A8
+	extab	start:0x80005C34 end:0x80005C98
+	extabindex	start:0x8000B4B8 end:0x8000B530
+	.sdata2	start:0x8032E818 end:0x8032E830
+
+pppCharaBreak.cpp:
+	.text start:0x8013EC64 end:0x80140374
+
+pad.cpp:
+	.text start:0x80020288 end:0x80020FC8
+	.ctors start:0x801D4320 end:0x801D4324
+	extab start:0x80005C1C end:0x80005C34
+	extabindex start:0x8000B494 end:0x8000B4B8
+	.rodata start:0x801D5C70 end:0x801D5CC5
+	.data start:0x801E76D8 end:0x801E76F4
+	.bss start:0x80243100 end:0x802432FC
+	.sdata start:0x8032D438 end:0x8032D448
+	.sdata2 start:0x8032E7E0 end:0x8032E813
+
+auto_801D5CC5_rodata:
+	.rodata start:0x801D5CC5 end:0x801D5CC8 align:1
+
+auto_801E76F4_data:
+	.data start:0x801E76F4 end:0x801E76F8 align:1
+
+auto_802432FC_bss:
+	.bss start:0x802432FC end:0x80243300 align:1
+
+auto_8032E813_sdata2:
+	.sdata2 start:0x8032E813 end:0x8032E818 align:1

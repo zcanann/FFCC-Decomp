@@ -404,10 +404,10 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
  * --INFO--
  * PAL Address: 0x800462B8
  * PAL Size: 596b
- * EN Address: 0x800522E0
- * EN Size: 812b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800460AC
+ * EN Size: 596b
+ * JP Address: 0x80045BB4
+ * JP Size: 588b
  */
 void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor innerColor, _GXColor outerColor)
 {
@@ -415,8 +415,9 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
     const float step = 0.19634955f;
 
     for (int i = 0; i < 32; i++) {
+        float s;
         const float angle = step * (float)i;
-        const float s = (float)sin(angle);
+        s = (float)sin(angle);
         const float c = (float)cos(angle);
 
         ringPoints[i][0] = s * (float)innerRadius + (float)centerX;
@@ -426,7 +427,7 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
     }
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 0x80);
-    const float z = kGraphicZero;
+    float z = 0.0f;
     for (int i = 0; i < 32; i++) {
         const float* cur = ringPoints[i];
         const float* nxt = ringPoints[(i + 1) % 32];

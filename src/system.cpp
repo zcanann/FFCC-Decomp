@@ -1,4 +1,6 @@
 #include "ffcc/system.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 
 #include "ffcc/file.h"
 #include "ffcc/fontman.h"
@@ -25,51 +27,35 @@
 
 CSystem System;
 
-extern const unsigned char s_systemDebugResources[0x194] = {
-    0x64, 0x76, 0x64, 0x2F, 0x67, 0x62, 0x61, 0x2F, 0x00, 0x00, 0x00, 0x00,
-    0x66, 0x66, 0x63, 0x63, 0x5F, 0x63, 0x6C, 0x69, 0x2E, 0x62, 0x69, 0x6E,
-    0x00, 0x00, 0x00, 0x00, 0x6F, 0x62, 0x6A, 0x64, 0x61, 0x74, 0x2E, 0x73,
-    0x70, 0x74, 0x00, 0x00, 0x69, 0x63, 0x6F, 0x6E, 0x2E, 0x64, 0x61, 0x74,
-    0x00, 0x00, 0x00, 0x00, 0x46, 0x46, 0x20, 0x43, 0x72, 0x79, 0x73, 0x74,
-    0x61, 0x6C, 0x20, 0x43, 0x68, 0x72, 0x6F, 0x6E, 0x69, 0x63, 0x6C, 0x65,
-    0x73, 0x00, 0x00, 0x00, 0x83, 0x56, 0x83, 0x58, 0x83, 0x65, 0x83, 0x80,
-    0x83, 0x8A, 0x83, 0x5A, 0x83, 0x62, 0x83, 0x67, 0x97, 0xE1, 0x8A, 0x4F,
-    0x00, 0x00, 0x00, 0x00, 0x83, 0x7D, 0x83, 0x56, 0x83, 0x93, 0x83, 0x60,
-    0x83, 0x46, 0x83, 0x62, 0x83, 0x4E, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00,
-    0x8A, 0x4F, 0x95, 0x94, 0x8A, 0x84, 0x82, 0xE8, 0x8D, 0x9E, 0x82, 0xDD,
-    0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00, 0x00, 0x00, 0x83, 0x41, 0x83, 0x89,
-    0x83, 0x43, 0x83, 0x81, 0x83, 0x93, 0x83, 0x67, 0x97, 0xE1, 0x8A, 0x4F,
-    0x00, 0x00, 0x00, 0x00, 0x83, 0x76, 0x83, 0x8D, 0x83, 0x4F, 0x83, 0x89,
-    0x83, 0x80, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00, 0x95, 0x82, 0x93, 0xAE,
-    0x8F, 0xAC, 0x90, 0x94, 0x93, 0x5F, 0x97, 0x98, 0x97, 0x70, 0x95, 0x73,
-    0x89, 0xC2, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00, 0x83, 0x66, 0x83, 0x4E,
-    0x83, 0x8A, 0x83, 0x81, 0x83, 0x93, 0x83, 0x5E, 0x97, 0xE1, 0x8A, 0x4F,
-    0x00, 0x00, 0x00, 0x00, 0x83, 0x56, 0x83, 0x58, 0x83, 0x65, 0x83, 0x80,
-    0x83, 0x52, 0x81, 0x5B, 0x83, 0x8B, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00,
-    0x83, 0x67, 0x83, 0x8C, 0x81, 0x5B, 0x83, 0x58, 0x97, 0xE1, 0x8A, 0x4F,
-    0x00, 0x00, 0x00, 0x00, 0x83, 0x70, 0x83, 0x74, 0x83, 0x48, 0x81, 0x5B,
-    0x83, 0x7D, 0x83, 0x93, 0x83, 0x58, 0x83, 0x82, 0x83, 0x6A, 0x83, 0x5E,
-    0x81, 0x5B, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00, 0x96, 0xBD, 0x97, 0xDF,
-    0x83, 0x41, 0x83, 0x68, 0x83, 0x8C, 0x83, 0x58, 0x83, 0x75, 0x83, 0x8C,
-    0x81, 0x5B, 0x83, 0x4E, 0x83, 0x7C, 0x83, 0x43, 0x83, 0x93, 0x83, 0x67,
-    0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00, 0x00, 0x00, 0x83, 0x56, 0x83, 0x58,
-    0x83, 0x65, 0x83, 0x80, 0x8A, 0xC7, 0x97, 0x9D, 0x8A, 0x84, 0x82, 0xE8,
-    0x8D, 0x9E, 0x82, 0xDD, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00, 0x00, 0x00,
-    0x89, 0xB7, 0x93, 0x78, 0x8A, 0x84, 0x82, 0xE8, 0x8D, 0x9E, 0x82, 0xDD,
-    0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00, 0x00, 0x00, 0x83, 0x81, 0x83, 0x82,
-    0x83, 0x8A, 0x95, 0xDB, 0x8C, 0xEC, 0x83, 0x47, 0x83, 0x89, 0x81, 0x5B,
-    0x00, 0x00, 0x00, 0x00, 0x95, 0x82, 0x93, 0xAE, 0x8F, 0xAC, 0x90, 0x94,
-    0x93, 0x5F, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00,
+#ifdef VERSION_GCCP01
+#define SYSTEM_MAP_FILE "gamePalM.map"
+#else
+#define SYSTEM_MAP_FILE "gameM.map"
+#endif
+#ifdef VERSION_GCCJGC
+enum {
+    SystemMapAllocationLine = 0x10E,
+    SystemFrameWaitLine = 0x204,
+    SystemMetricWaitLine = 0x2B5,
+    SystemFinalWaitLine = 0x2E1
 };
+#else
+enum {
+    SystemMapAllocationLine = 0x123,
+    SystemFrameWaitLine = 0x219,
+    SystemMetricWaitLine = 0x2CA,
+    SystemFinalWaitLine = 0x2F6
+};
+#endif
 
 /*
  * --INFO--
- * PAL Address: 0x800223dc
+ * PAL Address: 0x800223DC
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800221D0
+ * EN Size: 80b
+ * JP Address: 0x80021C68
+ * JP Size: 80b
  */
 void OSPanic(const char* file, int line, const char* msg, ...)
 {
@@ -77,11 +63,34 @@ void OSPanic(const char* file, int line, const char* msg, ...)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800223D8
+ * PAL Size: 4b
+ * EN Address: 0x800221CC
+ * EN Size: 4b
+ * JP Address: 0x80021C64
+ * JP Size: 4b
  */
 void CSystem::errorHandler(unsigned short, OSContext*, unsigned long, unsigned long)
 {
+    static const char* pTable[17] = {
+        "システムリセット例外",
+        "マシンチェック例外",
+        "DSI",
+        "ISI",
+        "外部割り込み例外",
+        "アライメント例外",
+        "プログラム例外",
+        "浮動小数点利用不可例外",
+        "デクリメンタ例外",
+        "システムコール例外",
+        "トレース例外",
+        "パフォーマンスモニター例外",
+        "命令アドレスブレークポイント例外",
+        "システム管理割り込み例外",
+        "温度割り込み例外",
+        "メモリ保護エラー",
+        "浮動小数点例外",
+    };
 	return;
 }
 
@@ -102,10 +111,10 @@ void systemTemplateDebug()
  * --INFO--
  * PAL Address: 0x80022080
  * PAL Size: 856b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80021E74
+ * EN Size: 856b
+ * JP Address: 0x8002190C
+ * JP Size: 856b
  */
 void CSystem::Init()
 {
@@ -158,7 +167,7 @@ void CSystem::Init()
     {
         m_mapStage = (CStage*)Memory.CreateStage(0x400000, "CSystem", 1);
         unsigned int count;
-        CFile::CHandle* fileHandle = File.Open("gamePalM.map", 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open(SYSTEM_MAP_FILE, 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
             unsigned int remaining;
@@ -168,7 +177,7 @@ void CSystem::Init()
             mapSize = File.GetLength(fileHandle);
             m_mapSize = mapSize;
             remaining = mapSize;
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, "system.cpp", 0x123) unsigned char[mapSize];
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, "system.cpp", SystemMapAllocationLine) unsigned char[mapSize];
             for (offset = 0; (int)remaining != 0; remaining -= count)
             {
                 if (remaining >= 0x100000)
@@ -188,21 +197,18 @@ void CSystem::Init()
                 offset += count;
             }
             File.Close(fileHandle);
-            Printf("\203\122\203\223\203\160\203\103\203\211\202\314\155\141\160\217\356"
-                   "\225\361\202\360\147\141\155\145\120\141\154\115\056\155\141\160\202"
-                   "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"
-                   "\201\102\012");
+            Printf("コンパイラのmap情報を" SYSTEM_MAP_FILE "から読み込みました。\n");
         }
     }
 }
 /*
  * --INFO--
- * PAL Address: 0x80021fb4
+ * PAL Address: 0x80021FB4
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80021DA8
+ * EN Size: 204b
+ * JP Address: 0x80021840
+ * JP Size: 204b
  */
 void CSystem::Quit()
 {
@@ -230,8 +236,12 @@ void CSystem::Quit()
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80021EFC
+ * PAL Size: 184b
+ * EN Address: 0x80021CF0
+ * EN Size: 184b
+ * JP Address: 0x80021788
+ * JP Size: 184b
  */
 void CSystem::Printf(char* fmt, ...)
 {
@@ -252,10 +262,10 @@ void CSystem::Printf(char* fmt, ...)
  * --INFO--
  * PAL Address: 0x80021934
  * PAL Size: 1480b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80021728
+ * EN Size: 1480b
+ * JP Address: 0x800211C0
+ * JP Size: 1480b
  */
 void CSystem::ExecScenegraph()
 {
@@ -268,7 +278,7 @@ void CSystem::ExecScenegraph()
 
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
         {
-            Graphic._WaitDrawDone("system.cpp", 0x219);
+            Graphic._WaitDrawDone("system.cpp", SystemFrameWaitLine);
             Game.m_gameWork.m_gamePaused = Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
             if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 1)
             {
@@ -442,7 +452,7 @@ void CSystem::ExecScenegraph()
                 watch.Start();
                 if (perfEnabled != 0)
                 {
-                    Graphic._WaitDrawDone("system.cpp", 0x2CA);
+                    Graphic._WaitDrawDone("system.cpp", SystemMetricWaitLine);
                     GXReadGP0Metric();
                     GXReadGP1Metric();
                 }
@@ -463,16 +473,16 @@ void CSystem::ExecScenegraph()
         m_frameCounter++;
     } while (m_exitFlag == 0);
 
-    Graphic._WaitDrawDone("system.cpp", 0x2F6);
+    Graphic._WaitDrawDone("system.cpp", SystemFinalWaitLine);
 }
 /*
  * --INFO--
  * PAL Address: 0x8002182C
  * PAL Size: 264b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80021620
+ * EN Size: 264b
+ * JP Address: 0x800210B8
+ * JP Size: 264b
  */
 unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 {
@@ -521,10 +531,10 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
  * --INFO--
  * PAL Address: 0x80021760
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80021554
+ * EN Size: 204b
+ * JP Address: 0x80020FEC
+ * JP Size: 204b
  */
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
@@ -552,8 +562,12 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800216E4
+ * PAL Size: 124b
+ * EN Address: 0x800214D8
+ * EN Size: 124b
+ * JP Address: 0x80020F70
+ * JP Size: 124b
  */
 void CSystem::ScriptChanging(char* script)
 {
@@ -567,8 +581,12 @@ void CSystem::ScriptChanging(char* script)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80021658
+ * PAL Size: 140b
+ * EN Address: 0x8002144C
+ * EN Size: 140b
+ * JP Address: 0x80020EE4
+ * JP Size: 140b
  */
 void CSystem::ScriptChanged(char* script, int value)
 {
@@ -582,8 +600,12 @@ void CSystem::ScriptChanged(char* script, int value)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800215CC
+ * PAL Size: 140b
+ * EN Address: 0x800213C0
+ * EN Size: 140b
+ * JP Address: 0x80020E58
+ * JP Size: 140b
  */
 void CSystem::MapChanging(int mapId, int mapVariant)
 {
@@ -597,8 +619,12 @@ void CSystem::MapChanging(int mapId, int mapVariant)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80021550
+ * PAL Size: 124b
+ * EN Address: 0x80021344
+ * EN Size: 124b
+ * JP Address: 0x80020DDC
+ * JP Size: 124b
  */
 void CSystem::MapChanged(int mapId, int mapVariant, int changedByForce)
 {
@@ -612,8 +638,12 @@ void CSystem::MapChanged(int mapId, int mapVariant, int changedByForce)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80021530
+ * PAL Size: 32b
+ * EN Address: 0x80021324
+ * EN Size: 32b
+ * JP Address: 0x80020DBC
+ * JP Size: 32b
  */
 CSystem::COrder* CSystem::GetFirstOrder()
 {
@@ -628,8 +658,12 @@ CSystem::COrder* CSystem::GetFirstOrder()
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80021510
+ * PAL Size: 32b
+ * EN Address: 0x80021304
+ * EN Size: 32b
+ * JP Address: 0x80020D9C
+ * JP Size: 32b
  */
 CSystem::COrder* CSystem::GetNextOrder(CSystem::COrder* order)
 {
@@ -642,8 +676,12 @@ CSystem::COrder* CSystem::GetNextOrder(CSystem::COrder* order)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800214D8
+ * PAL Size: 56b
+ * EN Address: 0x800212CC
+ * EN Size: 56b
+ * JP Address: 0x80020D64
+ * JP Size: 56b
  */
 CSystem::COrder* CSystem::GetOrder(int index)
 {
@@ -672,8 +710,12 @@ CSystem::COrder* CSystem::GetOrder(int index)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800214B4
+ * PAL Size: 36b
+ * EN Address: 0x800212A8
+ * EN Size: 36b
+ * JP Address: 0x80020D40
+ * JP Size: 36b
  */
 int CSystem::IsGdev()
 {

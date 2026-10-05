@@ -2498,17 +2498,17 @@ void CGoOutMenu::Calc()
 
 /*
  * --INFO--
- * PAL Address: 0x801683d4
+ * PAL Address: 0x801683D4
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016737C
+ * EN Size: 44b
+ * JP Address: 0x80162BF8
+ * JP Size: 48b
  */
 void CalcGoOutMenu()
 {
     g_pGoOutMenu = &g_GoOutMenu;
-    g_GoOutMenu.Calc();
+    g_pGoOutMenu->Calc();
 }
 
 /*

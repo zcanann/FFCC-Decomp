@@ -616,6 +616,10 @@ s32 LetterGift_Main(void)
     s32 id;
     s32 attr;
     s32 ret;
+#if defined(VERSION_GCCJGC)
+    s32 y;
+    s32 x;
+#endif
 
     if (sLetterRow < win->rows) {
         id = gSession.items[sLetterRow];
@@ -640,7 +644,13 @@ s32 LetterGift_Main(void)
     }
     Text_SetFill(1, 0);
     ret = LetterGift_HandleInput();
+#if defined(VERSION_GCCJGC)
+    x = win->x * 8;
+    y = (win->y + 1) * 8 + win->cursor * 16;
+    Letter_DrawCursor(x - 10, y);
+#else
     Letter_DrawCursor(win->x * 8 - 10, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     attr = sLetterGiftTop + win->rows < 64;
     Window_DrawScrollArrows(1, win->bg, (u8)((attr << 8) | 64));
     LetterGift_DrawIcons();
@@ -2020,6 +2030,15 @@ void Letter_SetItemAttachment(s32 ok, u32 value, s32 idx)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02013C54
+ * PAL Size: 284b
+ * EN Address: 0x02013ABC
+ * EN Size: 284b
+ * JP Address: 0x0200ED70
+ * JP Size: 264b
+ */
 void LetterGift_DrawIcons(void)
 {
     struct Window *win = &gWindows[1];
@@ -2028,7 +2047,7 @@ void LetterGift_DrawIcons(void)
     s32 i;
     s32 id;
     s32 pal;
-    s16 v;
+    s32 v;
 
     for (i = 0; i < win->rows; i++, y += 16) {
         v = gSession.items[i + sLetterGiftTop];

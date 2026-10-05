@@ -1185,7 +1185,7 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/flush_cache.c"),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01"),
                 "TRK_MINNOW_DOLPHIN/main.c",
                 cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
             ),
@@ -1195,7 +1195,7 @@ config.libs = [
                 mw_version="GC/1.3.2",
                 cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
             ),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/main_TRK.c"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/main_TRK.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/mainloop.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/mem_TRK.c"),
             Object(MatchingFor("GCCP01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c"),

@@ -157,3 +157,14 @@ TRK_MINNOW_DOLPHIN/target_options.c:
 MSL_C/PPCEABI/bare/H/rand.c:
 	.text start:0x801B79F0 end:0x801B7A10
 	.sdata start:0x8032DBF0 end:0x8032DBF4
+
+TRK_MINNOW_DOLPHIN/main.c:
+	.text start:0x801ADBE4 end:0x801ADF28
+	.rodata start:0x801E5B58 end:0x801E5C38
+	.bss start:0x803296A0 end:0x80329EBC
+	.sbss start:0x8032E340 end:0x8032E344
+
+TRK_MINNOW_DOLPHIN/main_TRK.c:
+	.text start:0x801ACF5C end:0x801ACFB4
+	.rodata start:0x801E5A40 end:0x801E5A4C
+	.bss start:0x80329688 end:0x8032968C

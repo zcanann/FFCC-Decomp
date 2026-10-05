@@ -745,3 +745,63 @@ OdemuExi2/DebuggerDriver.c:
 	.text start:0x801B7704 end:0x801B8184
 	.sdata start:0x8034BA10 end:0x8034BA18
 	.sbss start:0x8034C168 end:0x8034C180
+
+card/CARDBios.c:
+	.text       start:0x80192AA8 end:0x80193E10
+	.data       start:0x80237A38 end:0x80237A90
+	.bss        start:0x80342E40 end:0x80343080
+	.sdata      start:0x8034B958 end:0x8034B95C
+	.sbss       start:0x8034C0C0 end:0x8034C0C2
+
+card/CARDBlock.c:
+	.text       start:0x801952F0 end:0x801956F4
+
+card/CARDCheck.c:
+	.text       start:0x80195958 end:0x80196894
+
+card/CARDCreate.c:
+	.text       start:0x80198140 end:0x801984D8
+
+card/CARDDelete.c:
+	.text       start:0x80198CCC end:0x80198EC8
+
+card/CARDDir.c:
+	.text       start:0x801956F4 end:0x80195958
+
+card/CARDFormat.c:
+	.text       start:0x80197354 end:0x80197B8C
+
+card/CARDMount.c:
+	.text       start:0x80196894 end:0x80197354
+	.data       start:0x80237C00 end:0x80237C40
+
+card/CARDNet.c:
+	.text       start:0x801993A8 end:0x8019946C
+	.sdata      start:0x8034B968 end:0x8034B96A
+
+card/CARDOpen.c:
+	.text       start:0x80197B8C end:0x80198140
+
+card/CARDRdwr.c:
+	.text       start:0x80195070 end:0x801952F0
+
+card/CARDRead.c:
+	.text       start:0x801984D8 end:0x80198950
+
+card/CARDStat.c:
+	.text       start:0x80198EC8 end:0x801993A8
+
+card/CARDUnlock.c:
+	.text       start:0x80193E10 end:0x80195070
+	.data       start:0x80237AA0 end:0x80237C00
+	.sdata      start:0x8034B960 end:0x8034B964
+
+card/CARDWrite.c:
+	.text       start:0x80198950 end:0x80198CCC
+
+
+auto_09_8034B96A_sdata:
+	.sdata start:0x8034B96A end:0x8034B970 align:2
+
+auto_10_8034C0C2_sbss:
+	.sbss start:0x8034C0C2 end:0x8034C0C8 align:2

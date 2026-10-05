@@ -8456,7 +8456,9 @@ void CMenuPcs::DrawMainMenuSub()
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
 			unsigned int idx = drawOrder[orderIndex];
 			float frameWidth = s_sprt_w[idx];
-			MenuPcs.DrawRect3d(0, -(FLOAT_80331414 * (frameWidth / FLOAT_803315B8) - FLOAT_803313dc), FLOAT_803315BC,
+			float frameX = FLOAT_803313dc;
+			frameX -= FLOAT_80331414 * (frameWidth / FLOAT_803315B8);
+			MenuPcs.DrawRect3d(0, frameX, FLOAT_803315BC,
 			           static_cast<float>(DOUBLE_80331418 + static_cast<double>(s_MMenuPos[idx].z) - DOUBLE_803315C0),
 			           frameWidth, FLOAT_80331554, FLOAT_803313dc,
 			           FLOAT_80331554 * static_cast<float>(static_cast<int>(idx)) + FLOAT_80331528,

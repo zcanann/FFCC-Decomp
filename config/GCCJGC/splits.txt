@@ -610,4 +610,8 @@ MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.sdata2 start:0x8034FD40 end:0x8034FD48
 
 MSL_C/PPCEABI/bare/H/printf.c:
+	.text start:0x801B1E68 end:0x801B3EC8
 	.rodata start:0x801DB4D8 end:0x801DB500
+	.data start:0x80238ED0 end:0x802390FC
+	.sdata start:0x8034B9F0 end:0x8034B9F8
+	.sdata2 start:0x8034FD50 end:0x8034FD58

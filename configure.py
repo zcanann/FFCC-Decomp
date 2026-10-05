@@ -1140,7 +1140,12 @@ config.libs = [
                 ),
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/misc_io.c", mw_version="GC/2.6"),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/printf.c", mw_version="GC/2.6"),
+            Object(
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
+                "MSL_C/PPCEABI/bare/H/printf.c",
+                # Japan retains the older MSL formatter; all 13 functions verify.
+                mw_version="GC/2.0" if config.version == "GCCJGC" else "GC/2.6",
+            ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/rand.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/signal.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/string.c"),

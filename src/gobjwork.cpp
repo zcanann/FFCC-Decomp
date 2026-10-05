@@ -2154,10 +2154,10 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
  * --INFO--
  * PAL Address: 0x8009f384
  * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009ECA8
+ * EN Size: 200b
+ * JP Address: 0x8009D360
+ * JP Size: 200b
  */
 void CCaravanWork::DelCmdListAndItem(int cmdListIdx, int updateJoybus)
 {
@@ -2168,13 +2168,17 @@ void CCaravanWork::DelCmdListAndItem(int cmdListIdx, int updateJoybus)
 	}
 
 	short inventorySlot = *slotRef;
+#ifdef VERSION_GCCP01
 	if (m_inventoryItems[inventorySlot] != -1) {
+#endif
 		m_inventoryItems[inventorySlot] = 0xFFFF;
 		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
 		if (updateJoybus != 0) {
 			Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(inventorySlot));
 		}
+#ifdef VERSION_GCCP01
 	}
+#endif
 
 	*slotRef = 0xFFFF;
 	if (updateJoybus != 0) {

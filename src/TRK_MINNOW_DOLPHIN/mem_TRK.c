@@ -5,7 +5,6 @@
 
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/mem_TRK.h"
 
-#pragma dont_inline on
 /* 8036F580-8036F638 369EC0 00B8+00 0/0 1/1 0/0 .text            TRK_fill_mem */
 void TRK_fill_mem(void* dst, int val, u32 n) {
     u32 v;
@@ -68,7 +67,6 @@ void TRK_fill_mem(void* dst, int val, u32 n) {
             *++p.p8 = (u8)v;
         } while (--n);
 }
-#pragma dont_inline reset
 
 /* 800035C0-800035E4 0004C0 0024+00 0/0 12/12 0/0 .init            TRK_memcpy */
 __declspec(section ".init") void* TRK_memcpy(void* dst, const void* src, unsigned int n) {

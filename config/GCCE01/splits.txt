@@ -762,3 +762,10 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 
 mesmenu.cpp:
 	.text start:0x8009ADC4 end:0x8009DAE4
+
+MSL_C/PPCEABI/bare/H/gamecube.c:
+	.text	start:0x801B4174 end:0x801B4180
+
+TRK_MINNOW_DOLPHIN/mem_TRK.c:
+	.text	start:0x801AA948 end:0x801AAA00
+	.init	start:0x80003458 end:0x800034AC

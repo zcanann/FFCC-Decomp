@@ -131,10 +131,10 @@ inline void DisableIndWarp()
  * --INFO--
  * PAL Address: 0x800d19f0
  * PAL Size: 1384b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D11BC
+ * EN Size: 1384b
+ * JP Address: 0x800CEDA4
+ * JP Size: 1384b
  */
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* step, _pppCtrlTable* ctrl)
 {
@@ -252,10 +252,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
  * --INFO--
  * PAL Address: 0x800d1f58
  * PAL Size: 308b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D1724
+ * EN Size: 308b
+ * JP Address: 0x800CF30C
+ * JP Size: 308b
  */
 void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* step, _pppCtrlTable* ctrl)
 {
@@ -293,10 +293,10 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
  * --INFO--
  * PAL Address: 0x800d208c
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D1858
+ * EN Size: 4b
+ * JP Address: 0x800CF440
+ * JP Size: 4b
  */
 void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
 {
@@ -307,10 +307,10 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x800d2090
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D185C
+ * EN Size: 48b
+ * JP Address: 0x800CF444
+ * JP Size: 52b
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* ctrl)
 {
@@ -329,10 +329,10 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _p
  * --INFO--
  * PAL Address: 0x800d20c0
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D188C
+ * EN Size: 64b
+ * JP Address: 0x800CF478
+ * JP Size: 68b
  */
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* ctrl)
 {

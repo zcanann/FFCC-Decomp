@@ -1662,3 +1662,12 @@ pppYmChangeTex.cpp:
 	.text start:0x800D0C5C end:0x800D1684
 	.rodata start:0x801D5FB0 end:0x801D5FC8
 	.sdata2 start:0x8034DB18 end:0x8034DB38
+
+pppYmDeformationMdl.cpp:
+	.text start:0x800CEDA4 end:0x800CF4BC
+
+pppYmDeformationScreen.cpp:
+	.text start:0x80090994 end:0x800912D4
+
+pppYmDrawMdlTexAnm.cpp:
+	.text start:0x80089788 end:0x80089FD4

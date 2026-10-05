@@ -1277,30 +1277,45 @@ auto_09_8032D61C_sdata:
 
 pppGetRotMatrixX.cpp:
 	.text start:0x8005F0FC end:0x8005F158
+	.sdata2 start:0x8032EE78 end:0x8032EE80
 
 pppGetRotMatrixXYZ.cpp:
 	.text start:0x8005F084 end:0x8005F0FC
+	extab start:0x80007008 end:0x80007010
+	extabindex start:0x8000CEBC end:0x8000CEC8
 
 pppGetRotMatrixXZY.cpp:
 	.text start:0x8005F158 end:0x8005F1D0
+	extab start:0x80007010 end:0x80007018
+	extabindex start:0x8000CEC8 end:0x8000CED4
 
 pppGetRotMatrixY.cpp:
 	.text start:0x8005F1D0 end:0x8005F22C
+	.sdata2 start:0x8032EE80 end:0x8032EE88
 
 pppGetRotMatrixYXZ.cpp:
 	.text start:0x8005F22C end:0x8005F2A4
+	extab start:0x80007018 end:0x80007020
+	extabindex start:0x8000CED4 end:0x8000CEE0
 
 pppGetRotMatrixYZX.cpp:
 	.text start:0x8005F2A4 end:0x8005F31C
+	extab start:0x80007020 end:0x80007028
+	extabindex start:0x8000CEE0 end:0x8000CEEC
 
 pppGetRotMatrixZ.cpp:
 	.text start:0x8005F31C end:0x8005F378
+	.sdata2 start:0x8032EE88 end:0x8032EE90
 
 pppGetRotMatrixZXY.cpp:
 	.text start:0x8005F378 end:0x8005F3F0
+	extab start:0x80007028 end:0x80007030
+	extabindex start:0x8000CEEC end:0x8000CEF8
 
 pppGetRotMatrixZYX.cpp:
 	.text start:0x8005F3F0 end:0x8005F468
+	extab start:0x80007030 end:0x80007038
+	extabindex start:0x8000CEF8 end:0x8000CF04
 
 pppShape.cpp:
 	.text start:0x80064FE0 end:0x80065614

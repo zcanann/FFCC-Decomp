@@ -4,7 +4,8 @@ import tempfile
 from pathlib import Path
 import unittest
 
-from tools.locate_regional_tus import Locator, locate_functions, read_code, token, words
+from tools.locate_regional_tus import (Locator, annotate_sequence_overlaps, exception_functions, exception_table_hits,
+                                     locate_functions, read_code, sequence_proposals, token, words)
 from tools.tests.test_recover_code_splits import AS, dol
 
 
@@ -135,6 +136,82 @@ class LocatorTests(unittest.TestCase):
             self.assertEqual(len(sections), 1)
             self.assertEqual(sections[0]['words'], [0x48000001, 0x4e800020])
             self.assertEqual(sections[0]['functions'], [dict(name='F', offset=0, size=8)])
+
+
+class SequenceTests(unittest.TestCase):
+    def fixture(self, second=0x80004040, extra=()):
+        pal = code(instructions(32), [dict(name='F', offset=0, size=64), dict(name='G', offset=64, size=64)])
+        report = dict(functions=[dict(name=name, strong_ranking=True, candidates=[dict(address=address)])
+                                 for name, address in [('F', 0x80004000), ('G', second)]])
+        records = [dict(name=f'fn_{address:08X}', kind='function', address=address, size=64)
+                   for address in [0x80004000, second]] + list(extra)
+        table = struct.pack('>6I', 0x80004000, 64, 0x80004098, second, 64, 0x80004098)
+        image = dol(bytes(128) + table + bytes(16))
+        return pal, report, records, image
+
+    def test_boundary_votes_and_complete_exception_sequence(self):
+        pal, report, records, image = self.fixture()
+        row = sequence_proposals(pal, report, records, image, ['F', 'G'])
+        best = row['candidates'][0]
+        self.assertEqual(best['agreeing_anchors'], 2)
+        self.assertEqual(best['exception_table_candidates'], [0x80004080])
+        self.assertFalse(best['review_issues'])
+
+    def test_extra_retail_function_exposes_count_drift(self):
+        extra = dict(name='fn_80004040', kind='function', address=0x80004040, size=64)
+        pal, report, records, image = self.fixture(second=0x80004080, extra=[extra])
+        row = sequence_proposals(pal, report, records, image, ['F', 'G'])
+        self.assertEqual(len(row['candidates']), 2)
+        self.assertTrue(all(c['agreeing_anchors'] == 1 for c in row['candidates']))
+        self.assertTrue(all(c['review_issues'] for c in row['candidates']))
+
+    def test_named_conflict_is_not_hidden_by_order_votes(self):
+        pal, report, records, image = self.fixture()
+        records[0]['name'] = 'DifferentIdentity'
+        row = sequence_proposals(pal, report, records, image, ['F', 'G'])
+        self.assertEqual(len(row['candidates'][0]['named_conflicts']), 1)
+
+    def test_exception_table_requires_valid_eh_pointers_and_preserves_ambiguity(self):
+        _, _, _, image = self.fixture()
+        fields = [(0x80004000, 64), (0x80004040, 64)]
+        self.assertEqual(exception_table_hits(image, fields), [0x80004080])
+        invalid = bytearray(image)
+        struct.pack_into('>I', invalid, 0x188, 0)
+        self.assertEqual(exception_table_hits(bytes(invalid), fields), [])
+        doubled = dol(image[0x100:], copies=2)
+        self.assertEqual(len(exception_table_hits(doubled, fields)), 2)
+
+    def test_ambiguous_boundary_alias_is_not_selected_silently(self):
+        pal, report, records, image = self.fixture()
+        records.append(dict(records[0], name='Alias'))
+        row = sequence_proposals(pal, report, records, image, ['F', 'G'])
+        self.assertFalse(row['candidates'])
+
+    def test_missing_edge_anchor_is_explicit_even_when_internal_eh_matches(self):
+        pal, report, records, image = self.fixture()
+        report['functions'][0]['strong_ranking'] = False
+        row = sequence_proposals(pal, report, records, image, ['G'])
+        self.assertEqual(row['candidates'][0]['unsupported_edges'], [dict(edge='first', name='F')])
+        self.assertTrue(row['candidates'][0]['review_issues'])
+
+    def test_competing_unit_envelopes_flag_both_owners(self):
+        rows = [dict(unit=unit, sections=[dict(name='.text', boundary_sequence=dict(candidates=[
+            dict(start=start, end=end, review_issues=[])]))])
+                for unit, start, end in [('A', 0, 100), ('B', 80, 120), ('C', 120, 160)]]
+        annotate_sequence_overlaps(rows)
+        for row, count in zip(rows, [1, 1, 0]):
+            candidate = row['sections'][0]['boundary_sequence']['candidates'][0]
+            self.assertEqual(len(candidate['competing_unit_envelopes']), count)
+            self.assertEqual(bool(candidate['review_issues']), bool(count))
+
+    @unittest.skipUnless(AS.is_file(), 'PowerPC GNU assembler required')
+    def test_reads_exception_identity_without_trusting_old_address(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp)
+            (path / 'unit.s').write_text('.text\n.global F\n.type F,@function\nF:\nblr\n.size F,.-F\n.section extabindex,"a"\n.long F,4,0\n')
+            subprocess.run([str(AS), '-mgekko', '-o', str(path / 'unit.o'), str(path / 'unit.s')],
+                           check=True, capture_output=True)
+            self.assertEqual(exception_functions((path / 'unit.o').read_bytes()), ['F'])
 
 
 if __name__ == '__main__':

@@ -161,6 +161,30 @@ where applicable. Source-generated tables and linker padding still need their
 own evidence. Run focused tests with
 `python -m unittest tools.tests.test_locate_regional_tus`.
 
+Add `--pal-target-dir build/GCCP01/obj` to propose whole-unit boundaries from
+PAL retail function order. This implies `--functions`. Independently ranked
+source function names vote on a common offset into the regional configuration's
+function-boundary list. The output preserves competing votes, actual regional
+function sizes, existing-name conflicts and gaps. When PAL has exception-index
+records, the locator searches the entire retail DOL for the complete proposed
+function-pointer/length sequence and checks that its EH pointers address
+initialized storage. This supplies useful independent evidence for many
+functions even when their code differs.
+
+PAL order and function count remain hypotheses. The report flags first/last
+functions without independent code or exception-index anchors, fuzzy call
+disagreements, and overlaps between different unit proposals. A complete EH
+subsequence alone does not establish ownership of adjacent tiny functions that
+lack EH records. Missing PAL objects or unsupported exception references remain
+explicit errors for that hint. These diagnostics must be reviewed before any
+config changes; an empty issue list is not a matching or source-linkage claim.
+
+The initial hundred-object batch covered 1,388,876 compiled code bytes and
+2,280 functions per region in about sixteen seconds. Boundary sequence and EH
+checks took about twenty-three seconds and produced 99 USA and 90 Japan unit
+hypotheses. Their competing envelopes and unsupported edges illustrate why
+discovery coverage must remain separate from verified regional ownership.
+
 After reviewing and applying a coherent subset, compile all three regions with
 `ninja all_source progress build/<version>/report.json`, inspect affected objdiff
 units and require all nine DOL/GBA checksums. Promote only regions whose complete

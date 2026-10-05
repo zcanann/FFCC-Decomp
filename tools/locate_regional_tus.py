@@ -7,6 +7,7 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import re
 import struct
 import time
 
@@ -96,6 +97,7 @@ class Locator:
         if window < 4 or max_occurrences < 1:
             raise ValueError('window must be >= 4 and occurrences >= 1')
         self.window, self.max_occurrences = window, max_occurrences
+        self.dol = dol
         self.sections, self.index = [], defaultdict(list)
         for sec in dol_sections(dol):
             if sec['index'] >= 7:
@@ -232,6 +234,154 @@ def locate_functions(locator, code, known=(), anchors=128):
                 callgraph_checks=call_evidence)
 
 
+def exception_functions(data, code_section='.text'):
+    """Read PAL retail EH function order, without trusting PAL addresses."""
+    elf = ELFFile(io.BytesIO(data))
+    index = elf.get_section_by_name('extabindex')
+    if index is None:
+        return []
+    if index['sh_size'] % 12:
+        raise ValueError('invalid exception-index extent')
+    names = {}
+    for table in elf.iter_sections():
+        if table['sh_type'] != 'SHT_RELA' or table['sh_info'] != elf.get_section_index('extabindex'):
+            continue
+        symbols = elf.get_section(table['sh_link'])
+        for rel in table.iter_relocations():
+            off = rel['r_offset']
+            if off % 12:
+                continue
+            symbol = symbols.get_symbol(rel['r_info_sym'])
+            section = symbol['st_shndx']
+            if (rel['r_info_type'] != 1 or rel['r_addend'] or not isinstance(section, int)
+                    or elf.get_section(section).name != code_section):
+                raise ValueError('unsupported exception-index function reference')
+            if off in names or off >= index['sh_size']:
+                raise ValueError('invalid exception-index relocation extent')
+            names[off] = symbol.name
+    if len(names) * 12 != index['sh_size']:
+        raise ValueError('incomplete exception-index function references')
+    return [names[off] for off in range(0, index['sh_size'], 12)]
+
+
+def exception_table_hits(dol, fields):
+    """Find complete regional pointer/length sequences; ignore EH data pointers."""
+    if not fields:
+        return []
+    prefix = struct.pack('>II', *fields[0])
+    hits = []
+    sections = dol_sections(dol)
+    for sec in sections:
+        body = dol[sec['offset']:sec['offset'] + sec['size']]
+        pos = body.find(prefix)
+        while pos >= 0:
+            if pos % 4 == 0 and pos + 12 * len(fields) <= len(body):
+                pointers = [struct.unpack_from('>I', body, pos + 12 * i + 8)[0] for i in range(len(fields))]
+                valid_pointers = all(p % 4 == 0 and any(s['address'] <= p and p + 8 <= s['address'] + s['size']
+                                                      for s in sections) for p in pointers)
+                if valid_pointers and all(struct.unpack_from('>II', body, pos + 12 * i) == field for i, field in enumerate(fields)):
+                    hits.append(sec['address'] + pos)
+            pos = body.find(prefix, pos + 1)
+    return hits
+
+
+def sequence_proposals(pal_code, function_report, records, dol, eh_names=()):
+    """Vote on retail boundary indices using independently ranked source names.
+
+    PAL's function order/count is a hypothesis, never a regional retain-set
+    conclusion. Changed counts, unresolved edges and competing votes stay visible.
+    """
+    canonical = lambda name: re.sub(r'\$\d+', '$_', name)
+    pal = sorted(pal_code['functions'], key=lambda f: f['offset'])
+    by_name = defaultdict(list)
+    for i, fn in enumerate(pal):
+        by_name[canonical(fn['name'])].append(i)
+    by_address = defaultdict(list)
+    for rec in records:
+        if rec['kind'] == 'function' and rec['size'] > 0:
+            by_address[rec['address']].append(rec)
+    # Ambiguous aliases/extents cannot silently supply a unique boundary index.
+    regional = [rows[0] for _, rows in sorted(by_address.items()) if len(rows) == 1]
+    indices = {r['address']: i for i, r in enumerate(regional)}
+    anchors, votes = [], defaultdict(list)
+    for row in function_report['functions']:
+        names = by_name.get(canonical(row['name']), ())
+        if not row['strong_ranking'] or len(names) != 1:
+            continue
+        address = row['candidates'][0]['address']
+        if address not in indices:
+            continue
+        anchor = dict(name=row['name'], address=address, pal_index=names[0],
+                      index_delta=indices[address] - names[0])
+        anchors.append(anchor)
+        votes[anchor['index_delta']].append(anchor)
+    proposals = []
+    for delta, agreeing in votes.items():
+        if delta < 0 or delta + len(pal) > len(regional):
+            continue
+        target = regional[delta:delta + len(pal)]
+        bindings = [dict(name=f['name'], address=r['address'], size=r['size'],
+                         pal_size=f['size'], previous_name=r['name']) for f, r in zip(pal, target)]
+        gaps = [dict(after=a['name'], end=a['address'] + a['size'], next=b['address'])
+                for a, b in zip(bindings, bindings[1:]) if a['address'] + a['size'] != b['address']]
+        conflicts = [r for r in bindings if not re.fullmatch(r'(?:fn|dtor)_[0-9A-Fa-f]{8}', r['previous_name'])
+                     and canonical(r['name']) != canonical(r['previous_name'])]
+        bound_names = {r['name']: r for r in bindings}
+        missing_eh = [name for name in eh_names if name not in bound_names]
+        fields = [(bound_names[name]['address'], bound_names[name]['size']) for name in eh_names if name in bound_names]
+        hits = exception_table_hits(dol, fields) if not missing_eh else []
+        issues = []
+        if len(agreeing) != len(anchors):
+            issues.append('independent function anchors disagree on PAL order/count')
+        if gaps:
+            issues.append('regional boundary sequence contains gaps or overlaps')
+        if conflicts:
+            issues.append('existing named identities disagree with proposed sequence')
+        if not eh_names:
+            issues.append('no PAL exception-index sequence supplied')
+        elif len(hits) != 1 or missing_eh:
+            issues.append('complete exception-index pointer/length sequence is not uniquely located')
+        anchored_names = {canonical(a['name']) for a in agreeing}
+        eh_anchored = {canonical(n) for n in eh_names} if len(hits) == 1 else set()
+        unsupported_edges = [dict(edge=edge, name=fn['name']) for edge, fn in [('first', pal[0]), ('last', pal[-1])]
+                             if canonical(fn['name']) not in anchored_names | eh_anchored]
+        if unsupported_edges:
+            issues.append('first or last function identity lacks an independent code or exception-index anchor')
+        call_conflicts = [c for c in function_report.get('callgraph_checks', ()) if not c['consistent']]
+        if call_conflicts:
+            issues.append('fuzzy function rankings contain call-destination disagreements')
+        start, end = bindings[0]['address'], bindings[-1]['address'] + bindings[-1]['size']
+        executable_window = any(sec['index'] < 7 and sec['address'] <= start and end <= sec['address'] + sec['size']
+                                for sec in dol_sections(dol))
+        if not executable_window:
+            issues.append('proposed code envelope is outside a single executable DOL section')
+        proposals.append(dict(start=bindings[0]['address'], end=bindings[-1]['address'] + bindings[-1]['size'],
+                              agreeing_anchors=len(agreeing), total_anchors=len(anchors),
+                              exception_records=len(eh_names), exception_table_candidates=hits,
+                              boundary_gaps=gaps, named_conflicts=conflicts, review_issues=issues,
+                              unsupported_edges=unsupported_edges, callgraph_conflicts=call_conflicts,
+                              executable_window_supported=executable_window,
+                              functions=bindings))
+    proposals.sort(key=lambda r: (r['agreeing_anchors'], len(r['exception_table_candidates']) == 1,
+                                   -len(r['review_issues'])), reverse=True)
+    return dict(status='boundary_sequence_hypothesis', anchors=anchors, candidates=proposals)
+
+
+def annotate_sequence_overlaps(rows):
+    """Flag competing whole-unit envelopes; never silently select an owner."""
+    candidates = [(row['unit'], sec['name'], sec['boundary_sequence']['candidates'][0])
+                  for row in rows for sec in row['sections']
+                  if sec.get('boundary_sequence', {}).get('candidates')]
+    for unit, section, candidate in candidates:
+        overlaps = [dict(unit=other_unit, section=other_section, start=other['start'], end=other['end'])
+                    for other_unit, other_section, other in candidates
+                    if (unit, section) != (other_unit, other_section)
+                    and candidate['start'] < other['end'] and other['start'] < candidate['end']]
+        candidate['competing_unit_envelopes'] = overlaps
+        if overlaps:
+            candidate['review_issues'].append('proposed envelope overlaps another unit hypothesis')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--dol', type=Path, required=True)
@@ -242,10 +392,12 @@ def main():
     parser.add_argument('--window', type=int, default=8)
     parser.add_argument('--anchors', type=int, default=1024)
     parser.add_argument('--functions', action='store_true', help='Also rank functions independently to expose layout drift')
+    parser.add_argument('--pal-target-dir', type=Path, help='Optional PAL retail object directory for boundary-order hypotheses; implies --functions')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if args.top < 0 or args.anchors < 2 or args.window < 4:
         parser.error('top must be >= 0, anchors >= 2 and window >= 4')
+    args.functions = args.functions or args.pal_target_dir is not None
     started = time.perf_counter()
     objects, rejected = [], []
     for path in args.source_dir.glob(args.include):
@@ -264,17 +416,35 @@ def main():
     known = symbol_records(args.symbols.read_text()) if args.symbols else []
     rows = []
     for size, path, data, sections in objects:
-        rows.append(dict(unit=path.relative_to(args.source_dir).as_posix(), code_bytes=size,
+        row = dict(unit=path.relative_to(args.source_dir).as_posix(), code_bytes=size,
                          object_sha256=hashlib.sha256(data).hexdigest(),
                          sections=[dict(name=sec['name'], size=len(sec['words']) * 4,
                                         **locator.rank(sec, known, args.anchors),
                                         **(locate_functions(locator, sec, known) if args.functions else {}))
-                                   for sec in sections]))
+                                   for sec in sections])
+        if args.pal_target_dir:
+            pal_path = args.pal_target_dir / path.relative_to(args.source_dir)
+            if pal_path.is_file():
+                pal_data = pal_path.read_bytes()
+                row['pal_object_sha256'] = hashlib.sha256(pal_data).hexdigest()
+                try:
+                    for pal_sec in read_code(pal_data):
+                        report = next((s for s in row['sections'] if s['name'] == pal_sec['name']), None)
+                        if report:
+                            report['boundary_sequence'] = sequence_proposals(pal_sec, report, known, dol,
+                                                                           exception_functions(pal_data, pal_sec['name']))
+                except ValueError as exc:
+                    row['pal_hint_error'] = str(exc)
+            else:
+                row['pal_hint_error'] = 'PAL retail object is absent'
+        rows.append(row)
+    annotate_sequence_overlaps(rows)
     result = dict(schema=1, source_linkage_claims=False, placement_claims=False,
                   model='whole_section_same_offset_masked_instruction_anchors',
                   dol_sha256=hashlib.sha256(dol).hexdigest(), window_instructions=args.window,
                   symbols_sha256=hashlib.sha256(args.symbols.read_bytes()).hexdigest() if args.symbols else None,
                   source_directory=str(args.source_dir), include=args.include, top=args.top,
+                  pal_target_directory=str(args.pal_target_dir) if args.pal_target_dir else None,
                   whole_section_anchors=args.anchors, function_anchors=128 if args.functions else None,
                   max_anchor_occurrences=locator.max_occurrences,
                   index_seconds=indexed-started, total_seconds=time.perf_counter()-started,

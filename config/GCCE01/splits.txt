@@ -1705,3 +1705,6 @@ chara_anim.cpp:
 
 auto_chara_anim_8032D81C_sdata:
 	.sdata start:0x8032D81C end:0x8032D820 align:4
+
+prgobj.cpp:
+	.text start:0x80126338 end:0x80126E84

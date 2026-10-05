@@ -846,3 +846,6 @@ TRK_MINNOW_DOLPHIN/main_gdev.c:
 	.rodata start:0x801E5C38 end:0x801E5D18
 	.bss start:0x80329EC0 end:0x8032A3DC
 	.sbss start:0x8032E348 end:0x8032E34C
+
+MenuUtil.cpp:
+	.text start:0x801757B8 end:0x80179E64

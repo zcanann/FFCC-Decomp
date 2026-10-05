@@ -486,6 +486,7 @@ memory.cpp:
 	.text start:0x8001C0E4 end:0x8001FC68
 	.data start:0x801E72F0 end:0x801E7318
 	.sdata start:0x8032D3F0 end:0x8032D408
+	.sdata2 start:0x8032E760 end:0x8032E788
 
 materialman.cpp:
 	.text start:0x8003BFAC end:0x80043B04

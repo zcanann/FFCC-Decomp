@@ -21,6 +21,16 @@ inline void* operator new[](unsigned long size, CMemory::CStage* stage, const ch
 
 CMemory Memory;
 
+static const char* amem_typeName[] = {
+    "TEXTURE",
+    "MODEL  ",
+    "PDT    ",
+};
+static const char* amem_stateName[2] = {
+    "USE  ",
+    "NOUSE",
+};
+
 extern "C" const char s_memory_cpp[] = "memory.cpp";
 extern "C" const char sGetDataTimeoutBanner[] =
     "===================================================================\n"
@@ -63,24 +73,10 @@ extern char sCurrentMemoryStageName[];
 extern char sMainMemoryStageName[];
 extern char sDrawHeapUseUnuseFmt[];
 extern char sDrawHeapAmemAnimFmt[];
-extern const char sAmemCacheTypeTexture[] = "TEXTURE";
-extern const char sAmemCacheTypeModel[] = "MODEL  ";
-extern const char sAmemCacheTypePdt[] = "PDT    ";
-extern const char sAmemCacheStateUse[] = "USE  ";
-extern const char sAmemCacheStateNoUse[] = "NOUSE";
 extern const char sMemoryClassName[] = "CMemory";
 extern const char sAmemCacheSeparator[3] = "\n\n";
 extern const char sMemoryNoNameStopwatchName[8] = "no name";
 extern const char sEmptyAllocSourceName[4] = "";
-static const char* amem_typeName[] = {
-    sAmemCacheTypeTexture,
-    sAmemCacheTypeModel,
-    sAmemCacheTypePdt,
-};
-static const char* amem_stateName[2] = {
-    sAmemCacheStateUse,
-    sAmemCacheStateNoUse,
-};
 extern const char sHeapWalkerNewline[] = "\n";
 static const char sHeapWalkerFree[] = "FREE";
 static const char sHeapWalkerUsed[] = "USE ";

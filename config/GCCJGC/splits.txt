@@ -431,3 +431,9 @@ gobject.cpp:
 
 chara.cpp:
 	.text start:0x8006DE6C end:0x80072F18
+
+cflat_runtime2.cpp:
+	.text start:0x80068f5c end:0x8006de6c
+
+cflat_runtime.cpp:
+	.text start:0x80065100 end:0x80068f5c

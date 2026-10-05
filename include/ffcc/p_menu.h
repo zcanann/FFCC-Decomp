@@ -150,7 +150,11 @@ struct WmCharaSelectEntry
     int m_padType;                   // 0x00
     short m_currentSlot;             // 0x04
     short m_displaySlot;             // 0x06
+#ifdef VERSION_GCCP01
     unsigned short m_disconnectTime; // 0x08
+#else
+    short m_disconnectTime;          // 0x08
+#endif
     unsigned char m_confirmed;       // 0x0A
     unsigned char m_cmakePending;    // 0x0B
     unsigned char m_cmakeReady;      // 0x0C

@@ -7054,9 +7054,13 @@ void CMenuPcs::CalcCharaSelect()
 				entry.m_confirmed = 0;
 				entry.m_cmakePending = 0;
 				entry.m_cmakeReady = 0;
+#ifdef VERSION_GCCP01
 				if (entry.m_disconnectTime < 0x3C) {
 					entry.m_disconnectTime++;
 				}
+#else
+				entry.m_disconnectTime++;
+#endif
 				(*pRep) = 0;
 				(*pTrig) = 0;
 				continue;

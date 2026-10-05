@@ -1378,10 +1378,10 @@ void CGCharaObj::setSta(int staIndex, int value)
  * --INFO--
  * PAL Address: 0x8010FD54
  * PAL Size: 2172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010F0B4
+ * EN Size: 2172b
+ * JP Address: 0x8010BD40
+ * JP Size: 2172b
  */
 void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& outValue)
 {
@@ -1402,15 +1402,8 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) != 0xAD ||
 				(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 8) == 0) {
-				CVector sourcePos(sourceObj->m_worldPosition);
-				const CVector& selfPos = CVector(m_worldPosition);
-				CVector deltaVec;
-				PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
-				Vec delta;
-				delta.x = deltaVec.x;
-				delta.y = deltaVec.y;
-				delta.z = deltaVec.z;
-				moveVectorH(&delta, 2.0f, 8);
+				CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
+				moveVectorH(delta, 2.0f, 8);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x19, 0, 0);
 			}

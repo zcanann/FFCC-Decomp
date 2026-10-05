@@ -432,8 +432,6 @@ struct CDynParam
 	float m_max[2];
 };
 
-static int s_charaMeshWorkWarnArmed;
-static char s_charaMeshWorkOverflowSeen;
 
 } // namespace
 
@@ -2727,13 +2725,13 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 		mesh->m_workPositions = 0;
 		mesh->m_workNormals = 0;
 
-		if (!s_charaMeshWorkOverflowSeen) {
-			s_charaMeshWorkWarnArmed = 1;
-			s_charaMeshWorkOverflowSeen = 1;
-		}
+		static int bFirst = 1;
 
-		if ((s_charaMeshWorkWarnArmed != 0) && (s_charaMeshWorkWarnArmed = 0, System.GetErrorLevel() >= 2U)) {
-			System.Printf("CChara.CMesh.Calc: 描画バッファがあふれました。\n");
+		if (bFirst != 0) {
+			bFirst = 0;
+			if (System.GetErrorLevel() >= 2U) {
+				System.Printf("CChara.CMesh.Calc: 描画バッファがあふれました。\n");
+			}
 		}
 		return;
 	}

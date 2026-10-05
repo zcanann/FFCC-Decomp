@@ -11,6 +11,12 @@ struct _pppPObject;
 
 typedef _pppPObject pppYmDeformationShp;
 
+struct pppYmDeformationShpGraphState {
+    f32 m_value;
+    f32 m_velocity;
+    f32 m_acceleration;
+};
+
 struct VYmDeformationShp {
     GXTexObj* m_backBuffer;
     int m_pad0;
@@ -18,8 +24,8 @@ struct VYmDeformationShp {
     s16 m_angle;
     u8 m_direction;
     u8 m_pad2;
-    float m_scale;
-    float m_values[5];
+    pppYmDeformationShpGraphState m_scale;
+    pppYmDeformationShpGraphState m_angleStep;
 };
 
 struct pppYmDeformationShpGraphArgs {

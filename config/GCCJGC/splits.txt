@@ -1319,3 +1319,6 @@ auto_11_8034C884_sdata2:
 
 auto_10_8034BAFC_sbss:
 	.sbss start:0x8034BAFC end:0x8034BB00 align:1
+
+pppYmDeformationShp.cpp:
+	.text start:0x8008E2EC end:0x8008F9B8

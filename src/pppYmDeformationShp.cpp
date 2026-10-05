@@ -27,7 +27,7 @@ static const float kPppYmDeformationShpHalf = 0.5f;
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
+static int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
 STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_colorInfoOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_stateOffset) == 0x8);
@@ -232,11 +232,11 @@ inline void SetUpIndWarp(VYmDeformationShp* state)
 	}
 
 	PSMTXRotRad(drawMtx, 'z', kPppYmDeformationShpDegToRad * (float)state->m_angle);
-	indMtx[0][0] = drawMtx[0][0] * state->m_scale;
-	indMtx[0][1] = drawMtx[0][1] * state->m_scale;
+	indMtx[0][0] = drawMtx[0][0] * state->m_scale.m_value;
+	indMtx[0][1] = drawMtx[0][1] * state->m_scale.m_value;
 	indMtx[0][2] = kPppYmDeformationShpZero;
-	indMtx[1][0] = drawMtx[1][0] * state->m_scale;
-	indMtx[1][1] = drawMtx[1][1] * state->m_scale;
+	indMtx[1][0] = drawMtx[1][0] * state->m_scale.m_value;
+	indMtx[1][1] = drawMtx[1][1] * state->m_scale.m_value;
 	indMtx[1][2] = kPppYmDeformationShpZero;
 	GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
@@ -326,7 +326,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* object, pppYmDeformationShpS
  * JP Address: TODO
  * JP Size: TODO
  */
-int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state, Vec* vertices, Vec2d* uvs)
+static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state, Vec* vertices, Vec2d* uvs)
 {
 	int screenIndex;
 	Vec4d screenPos[4];
@@ -500,11 +500,11 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* object, pppYmDeformationShpSt
 	state = DeformationShpState(object, ctrl);
 
 	CalcGraphValue(
-		object, step->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
+		object, step->m_graphId, state->m_scale.m_value, state->m_scale.m_velocity, state->m_scale.m_acceleration,
 		step->m_deformation.m_scale.m_valueAdd, step->m_deformation.m_scale.m_velocityAdd,
 		step->m_deformation.m_scale.m_accelerationAdd);
 	CalcGraphValue(
-		object, step->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
+		object, step->m_graphId, state->m_angleStep.m_value, state->m_angleStep.m_velocity, state->m_angleStep.m_acceleration,
 		step->m_deformation.m_angle.m_valueAdd, step->m_deformation.m_angle.m_velocityAdd,
 		step->m_deformation.m_angle.m_accelerationAdd);
 
@@ -513,14 +513,14 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* object, pppYmDeformationShpSt
 	}
 
 	if (state->m_direction != 0) {
-		int angleStep = (int)state->m_values[2];
+		int angleStep = (int)state->m_angleStep.m_value;
 
 		state->m_angle = state->m_angle + angleStep;
 		if (state->m_angle > step->m_angleLimit) {
 			state->m_direction = 0;
 		}
 	} else {
-		int angleStep = (int)state->m_values[2];
+		int angleStep = (int)state->m_angleStep.m_value;
 
 		state->m_angle = state->m_angle - angleStep;
 		if ((int)state->m_angle < -(int)step->m_angleLimit) {
@@ -557,12 +557,8 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* object, _pppCtrlTable* c
 	float zero = kPppYmDeformationShpZero;
 	VYmDeformationShp* state = DeformationShpState(object, ctrl);
 
-	state->m_values[1] = zero;
-	state->m_values[0] = zero;
-	state->m_scale = zero;
-	state->m_values[4] = zero;
-	state->m_values[3] = zero;
-	state->m_values[2] = zero;
+	state->m_scale.m_value = state->m_scale.m_velocity = state->m_scale.m_acceleration = zero;
+	state->m_angleStep.m_value = state->m_angleStep.m_velocity = state->m_angleStep.m_acceleration = zero;
 }
 
 /*
@@ -584,10 +580,6 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* object, _pppCtrlTable* ct
 	state->m_pad1 = 0;
 	state->m_angle = 0;
 	state->m_direction = 1;
-	state->m_values[1] = zero;
-	state->m_values[0] = zero;
-	state->m_scale = zero;
-	state->m_values[4] = zero;
-	state->m_values[3] = zero;
-	state->m_values[2] = zero;
+	state->m_scale.m_value = state->m_scale.m_velocity = state->m_scale.m_acceleration = zero;
+	state->m_angleStep.m_value = state->m_angleStep.m_velocity = state->m_angleStep.m_acceleration = zero;
 }

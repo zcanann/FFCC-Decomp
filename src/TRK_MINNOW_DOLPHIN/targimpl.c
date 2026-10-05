@@ -5,6 +5,10 @@
 #include "PowerPC_EABI_Support/MetroTRK/memmap.h"
 #include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk.h"
 #include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk_glue.h"
+#ifdef VERSION_GCCJGC
+#include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
+#include "TRK_MINNOW_DOLPHIN/ppc/Generic/mpc_7xx_603e.h"
+#endif
 
 typedef struct StopInfo_PPC {
 	u32 PC;
@@ -396,6 +400,92 @@ DSError TRKTargetAccessExtended2(u32 firstRegister, u32 lastRegister, MessageBuf
 	return err;
 }
 
+#ifdef VERSION_GCCJGC
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: UNUSED
+ * EN Size: 40b
+ * JP Address: 0x801A8B1C
+ * JP Size: 40b
+ */
+DSError TRKTargetVersions(DSVersions* versions)
+{
+    versions->kernelMajor = 2;
+    versions->kernelMinor = 0;
+    versions->protocolMajor = 1;
+    versions->protocolMinor = 10;
+    return DS_NoError;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 164b
+ * EN Address: UNUSED
+ * EN Size: 164b
+ * JP Address: 0x801A8A78
+ * JP Size: 164b
+ */
+DSError TRKTargetSupportMask(u8 mask[32])
+{
+    mask[0] = 0x7A;
+    mask[1] = 0x00;
+    mask[2] = 0x4F;
+    mask[3] = 0x07;
+    mask[4] = 0x00;
+    mask[5] = 0x00;
+    mask[6] = 0x00;
+    mask[7] = 0x00;
+    mask[8] = 0x00;
+    mask[9] = 0x00;
+    mask[10] = 0x00;
+    mask[11] = 0x00;
+    mask[12] = 0x00;
+    mask[13] = 0x00;
+    mask[14] = 0x00;
+    mask[15] = 0x00;
+    mask[16] = 0x01;
+    mask[17] = 0x00;
+    mask[18] = 0x03;
+    mask[19] = 0x00;
+    mask[20] = 0x00;
+    mask[21] = 0x00;
+    mask[22] = 0x00;
+    mask[23] = 0x00;
+    mask[24] = 0x00;
+    mask[25] = 0x00;
+    mask[26] = 0x03;
+    mask[27] = 0x00;
+    mask[28] = 0x00;
+    mask[29] = 0x00;
+    mask[30] = 0x00;
+    mask[31] = 0x80;
+    return DS_NoError;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 96b
+ * EN Address: UNUSED
+ * EN Size: 96b
+ * JP Address: 0x801A8A18
+ * JP Size: 96b
+ */
+DSError TRKTargetCPUType(DSCPUType* cpuType)
+{
+    cpuType->cpuMajor = 0;
+    cpuType->cpuMinor = TRKTargetCPUMinorType();
+    cpuType->bigEndian = gTRKBigEndian;
+    cpuType->defaultTypeSize = sizeof(u32);
+    cpuType->fpTypeSize = sizeof(u64);
+    cpuType->extended1TypeSize = sizeof(u32);
+    cpuType->extended2TypeSize = sizeof(u64);
+    return DS_NoError;
+}
+#else
 /**
  * @note Address: N/A
  * @note Size: 0x28
@@ -422,6 +512,8 @@ void TRKTargetCPUType(void)
 {
 	// UNUSED FUNCTION
 }
+
+#endif
 
 /**
  * @note Address: N/A
@@ -736,14 +828,30 @@ DSError TRKTargetSupportRequest()
 	return error;
 }
 
-/**
- * @note Address: N/A
- * @note Size: 0x3C
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: UNUSED
+ * EN Size: 60b
+ * JP Address: 0x801A8358
+ * JP Size: 60b
  */
+#ifdef VERSION_GCCJGC
+DSError TRKTargetFlushCache(u8 options, void* start, void* end)
+{
+    if (start < end) {
+        TRK_flush_cache(start, (u8*)end - (u8*)start);
+        return DS_NoError;
+    }
+    return DS_InvalidMemory;
+}
+#else
 void TRKTargetFlushCache(void)
 {
 	// UNUSED FUNCTION
 }
+#endif
 
 /**
  * @note Address: 0x800BE380
@@ -767,10 +875,10 @@ void TRKTargetSetStopped(uint stopped)
  * @note Address: 0x800BE358
  * @note Size: 0x18
  */
-BOOL TRKTargetStop()
+DSError TRKTargetStop(void)
 {
-	gTRKState.isStopped = 1;
-	return FALSE;
+	gTRKState.isStopped = TRUE;
+	return DS_NoError;
 }
 
 /**

@@ -998,7 +998,7 @@ TRK_MINNOW_DOLPHIN/serpoll.c:
 	.bss	start:0x80345A00 end:0x80345A18
 
 TRK_MINNOW_DOLPHIN/msghndlr.c:
-	.text	start:0x801A7100 end:0x801A74DC
+	.text	start:0x801A6860 end:0x801A74DC
 	.bss	start:0x80345A20 end:0x80345A24
 
 dsp/dsp.c:
@@ -1087,3 +1087,9 @@ auto_11_8034FCB4_sdata2:
 
 charaobj.cpp:
 	.text start:0x801076D8 end:0x8010ED3C
+
+auto_07_8023894C_data:
+	.data start:0x8023894C end:0x80238950 align:4
+
+TRK_MINNOW_DOLPHIN/targimpl.c:
+	.text start:0x801A8A18 end:0x801A8B44

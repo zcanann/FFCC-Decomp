@@ -4,6 +4,9 @@
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWTrace.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 #include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk.h"
+#ifdef VERSION_GCCJGC
+#include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
+#endif
 #include <string.h>
 
 /* 8044F288-8044F290 07BFA8 0004+04 4/4 0/0 0/0 .bss             IsTRKConnected */
@@ -149,15 +152,133 @@ DSError TRKDoOverride(TRKBuffer* buffer) {
     return DS_NoError;
 }
 
-/* 8036EB2C-8036EB34 36946C 0008+00 0/0 1/1 0/0 .text            TRKDoVersions */
-DSError TRKDoVersions(TRKBuffer*) {
+/*
+ * --INFO--
+ * PAL Address: 0x801AB010
+ * PAL Size: 8b
+ * EN Address: 0x801A9EF4
+ * EN Size: 8b
+ * JP Address: 0x801A6E28
+ * JP Size: 728b
+ */
+DSError TRKDoVersions(TRKBuffer* buffer) {
+#ifdef VERSION_GCCJGC
+    DSError err;
+    DSVersions versions;
+
+    if (buffer->length != 1) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKResetBuffer(buffer, TRUE);
+    TRKAppendBuffer1_ui8(buffer, DSMSG_ReplyACK);
+    TRKAppendBuffer1_ui8(buffer, DSREPLY_NoError);
+    err = TRKTargetVersions(&versions);
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, versions.kernelMajor);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, versions.kernelMinor);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, versions.protocolMajor);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, versions.protocolMinor);
+    }
+    if (err != DS_NoError) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_CWDSError);
+    }
+    return TRKSendACK(buffer);
+#else
     return DS_NoError;
+#endif
 }
 
-/* 8036EB24-8036EB2C 369464 0008+00 0/0 1/1 0/0 .text            TRKDoSupportMask */
-DSError TRKDoSupportMask(TRKBuffer*) {
+/*
+ * --INFO--
+ * PAL Address: 0x801AB008
+ * PAL Size: 8b
+ * EN Address: 0x801A9EEC
+ * EN Size: 8b
+ * JP Address: 0x801A6BF8
+ * JP Size: 560b
+ */
+DSError TRKDoSupportMask(TRKBuffer* buffer) {
+#ifdef VERSION_GCCJGC
+    DSError err;
+    u8 mask[32];
+
+    if (buffer->length != 1) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKResetBuffer(buffer, TRUE);
+    TRKAppendBuffer1_ui8(buffer, DSMSG_ReplyACK);
+    TRKAppendBuffer1_ui8(buffer, DSREPLY_NoError);
+    err = TRKTargetSupportMask(mask);
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer(buffer, mask, sizeof(mask));
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, 2);
+    }
+    if (err != DS_NoError) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_CWDSError);
+    }
+    return TRKSendACK(buffer);
+#else
     return DS_NoError;
+#endif
 }
+
+#ifdef VERSION_GCCJGC
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: UNUSED
+ * EN Size: 8b
+ * JP Address: 0x801A6860
+ * JP Size: 920b
+ */
+DSError TRKDoCPUType(TRKBuffer* buffer) {
+    DSError err;
+    DSCPUType cpuType;
+
+    if (buffer->length != 1) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKResetBuffer(buffer, TRUE);
+    TRKAppendBuffer1_ui8(buffer, DSMSG_ReplyACK);
+    TRKAppendBuffer1_ui8(buffer, DSREPLY_NoError);
+    err = TRKTargetCPUType(&cpuType);
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, cpuType.cpuMajor);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, cpuType.cpuMinor);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, cpuType.bigEndian);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, cpuType.defaultTypeSize);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, cpuType.fpTypeSize);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, cpuType.extended1TypeSize);
+    }
+    if (err == DS_NoError) {
+        err = TRKAppendBuffer1_ui8(buffer, cpuType.extended2TypeSize);
+    }
+    if (err != DS_NoError) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_CWDSError);
+    }
+    return TRKSendACK(buffer);
+}
+
+#endif
 
 /* 8036E8E0-8036EB24 369220 0244+00 1/0 1/1 0/0 .text            TRKDoReadMemory */
 DSError TRKDoReadMemory(TRKBuffer* buffer) {
@@ -183,7 +304,7 @@ DSError TRKDoReadMemory(TRKBuffer* buffer) {
     tempLength = length;
 
     if (options & DSMSGMEMORY_Space_data) {
-        result = TRKTargetAccessARAM(buf, start, &tempLength, TRUE);
+        result = TRKTargetAccessARAM((u32)buf, start, &tempLength, TRUE);
     } else {
         result = TRKTargetAccessMemory(buf, start, &tempLength,
                                        options & DSMSGMEMORY_Userview ? 0 : 1, TRUE);
@@ -259,7 +380,7 @@ DSError TRKDoWriteMemory(TRKBuffer* b) {
     TRKSetBufferPosition(b, DSMSGMEMORY_Space_data);
     if (options & DSMSGMEMORY_Space_data) {
         TRKReadBuffer(b, buf + (start & 0x1f), tempLength);
-        result = TRKTargetAccessARAM(buf, start, &tempLength, FALSE);
+        result = TRKTargetAccessARAM((u32)buf, start, &tempLength, FALSE);
     } else {
         TRKReadBuffer(b, buf, tempLength);
         result = TRKTargetAccessMemory(buf, start, &tempLength,

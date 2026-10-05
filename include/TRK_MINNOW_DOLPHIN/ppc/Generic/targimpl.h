@@ -27,7 +27,7 @@ DSError TRKTargetAccessExtended2(u32 firstRegister, u32 lastRegister,
 u32 TRKTargetGetPC();
 DSError TRKTargetSingleStep(u32 count, BOOL stepOver);
 DSError TRKTargetStepOutOfRange(u32 rangeStart, u32 rangeEnd, BOOL stepOver);
-u32 TRKTargetStop();
+DSError TRKTargetStop(void);
 void TRKPostInterruptEvent(void);
 
 DSError TRKTargetVersions(DSVersions* versions);

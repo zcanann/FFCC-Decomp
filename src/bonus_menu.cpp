@@ -689,7 +689,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		// zeroed model sprites; startFrame fixed up later
 		idx += activePartyCount;
 		int zeroBase = idx;
-		if (0 < activePartyCount) {
+		{
 			for (int i = 0; i < activePartyCount; i++) {
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
@@ -749,7 +749,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		idx += activePartyCount;
 
 		// frame rows start after their icons
-		if (0 < activePartyCount) {
+		{
 			for (int i = 0; i < activePartyCount; i++) {
 				Sprt2* spr = &m_bonusAnim->sprites[i + 1];
 				Sprt2* src = spr + activePartyCount;
@@ -956,8 +956,8 @@ void CMenuPcs::CalcResultOpenAnim()
 					this->m_bonusAlpha = 1;
 				}
 				if (sprite->timer >= 0x18) {
-					modelScale = (float)(0.5 * (double)((float)(sprite->timer - 0x18) /
-					                 (float)(sprite->duration - 0x18)) + (double)modelScale);
+					modelScale += 0.5 * ((float)(sprite->timer - 0x18) /
+					                    (float)(sprite->duration - 0x18));
 				}
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
@@ -977,12 +977,12 @@ void CMenuPcs::CalcResultOpenAnim()
 				scaleMtx[2][3] = 0.0f;
 				scaleMtx[1][3] = s_PCYpos[tribeId];
 			} else if (i >= total2) {
-				double tx = GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
+				float tx = GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
 				scaleMtx[0][3] = tx;
 				if (sprite->timer - 1 == 7) {
 					Sound.PlaySe(0x47, 0x40, 0x7f, 0);
 				}
-				double ty = GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
+				float ty = GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
 				int itemIndex = i - total2;
 				scaleMtx[1][3] = ty;
 				scaleMtx[2][3] = 0.0f;

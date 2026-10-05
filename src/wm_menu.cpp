@@ -492,17 +492,15 @@ static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
 
 /*
  * --INFO--
- * PAL Address: 0x80102ed8
+ * PAL Address: 0x80102ED8
  * PAL Size: 220b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010229C
+ * EN Size: 220b
+ * JP Address: 0x800FEF2C
+ * JP Size: 188b
  */
 void CMenuPcs::WmInit()
 {
-	const float* pInit = &FLOAT_803313dc;
-	float initValue = *pInit;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	m_wm.m_worldObjData = 0;
@@ -516,7 +514,7 @@ void CMenuPcs::WmInit()
 	m_wmWorldParams = 0;
 	m_effectWork = 0;
 	m_wmWorkBuffer = 0;
-	s_MaxAnimWait = initValue;
+	s_MaxAnimWait = 0.0f;
 	m_wmThpActive = 0;
 	m_textureLocIndex = 0;
 	memset(bytes + 4, 0, 0x1C);
@@ -531,11 +529,13 @@ void CMenuPcs::WmInit()
 	gWmMenuCursorY[0] = 0xFF;
 	gWmMenuCursorY[1] = 0xFF;
 	s_Serial = -1;
+#ifndef VERSION_GCCJGC
 	int scriptValue = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
 	gWmMenuScriptValueCache = scriptValue;
 	if (scriptValue > 99) {
 		gWmMenuScriptValueCache = 100;
 	}
+#endif
 }
 
 /*

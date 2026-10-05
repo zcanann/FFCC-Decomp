@@ -268,7 +268,7 @@ private:
     unsigned char m_sellFlg;          // 0x2D3A
     unsigned char m_buyFlg;           // 0x2D3B
     unsigned char m_mkSmithFlg;       // 0x2D3C
-    unsigned char m_resetFlags;       // 0x2D3D
+    char m_resetFlags;       // 0x2D3D
     unsigned char m_strengthFlags;    // 0x2D3E
     unsigned char m_artiDatFlags;     // 0x2D3F
     unsigned char m_radarTypeFlags;   // 0x2D40

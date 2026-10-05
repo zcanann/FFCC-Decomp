@@ -9421,19 +9421,20 @@ void CMenuPcs::CalcMcObj()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 804b
- * EN Address: 0x8011A654
- * EN Size: 228b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
 inline void CMenuPcs::DrawMcObj()
 {
 	WmWorldObjInfo* view = &m_wm.m_worldObjData[17];
-	for (int i = 0; i < 4; i++, view++) {
+	int viewSlot = 17;
+	for (int i = 0; i < 4; i++, viewSlot++, view++) {
 		if (view->m_active != 0) {
-			SetProjection(i + 17);
+			SetProjection(viewSlot);
 			SetLight(0);
-			m_wm.m_handles[i + 17]->Draw(5);
+			m_wm.m_handles[viewSlot]->Draw(5);
 			int partA = m_effectWork[i + 17].m_partNo;
 			if (partA >= 0) {
 				PartPcs.DrawMenuIdx(partA);

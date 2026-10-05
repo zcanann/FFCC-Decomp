@@ -1059,7 +1059,7 @@ config.libs = [
         "cflags": cflags_runtime,
         "progress_category": "sdk",
         "objects": [
-            Object(Matching, "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/__va_arg.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/CPlusLibPPC.cp"),
             Object(
@@ -1075,7 +1075,7 @@ config.libs = [
                 extab_padding=[0x02, 0x55],
             ),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "Runtime.PPCEABI.H/global_destructor_chain.c",
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),
@@ -1091,7 +1091,7 @@ config.libs = [
                 extra_cflags=["-inline auto,deferred"],
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/ptmf.c"),
-            Object(Matching, "Runtime.PPCEABI.H/runtime.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/runtime.c"),
         ],
     },
     {
@@ -1108,7 +1108,7 @@ config.libs = [
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/errno.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "MSL_C/PPCEABI/bare/H/ansi_files.c", mw_version="GC/2.7"),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/ansi_fp.c", mw_version="GC/2.7"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/ansi_fp.c", mw_version="GC/2.7"),
             Object(MatchingFor("GCCP01", "GCCE01"), "MSL_C/PPCEABI/bare/H/buffer_io.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/gamecube.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/ctype.c"),
@@ -1128,7 +1128,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/k_tan.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/math_ppc.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/mbstring.c"),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/mem.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/mem.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "MSL_C/PPCEABI/bare/H/mem_funcs.c",
@@ -1143,7 +1143,7 @@ config.libs = [
             Object(Matching, "MSL_C/PPCEABI/bare/H/printf.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/rand.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/signal.c"),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/string.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/string.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/float.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/s_atan.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/s_copysign.c"),

@@ -516,6 +516,9 @@ joybus.cpp:
 	.text start:0x800A593C end:0x800B218C
 
 gbaque.cpp:
+	.rodata start:0x801DA1F8 end:0x801DA3C7
+	.bss start:0x802F3970 end:0x802F66E0
+	.sdata2 start:0x8032FCF0 end:0x8032FD30
 	.text start:0x800C82F0 end:0x800D0DD8
 
 map.cpp:
@@ -622,6 +625,64 @@ mtx/vec.c:
 
 bonus_menu.cpp:
 	.text start:0x80132428 end:0x8013D528
+	.rodata start:0x801DC444 end:0x801DC4D4
+	.data start:0x802116A8 end:0x802117FC
+	.sdata start:0x8032DA48 end:0x8032DA58
+	.sbss start:0x8032DE88 end:0x8032DE94
+	.sdata2 start:0x80330D80 end:0x80330E18
 
 menu_cmd.cpp:
 	.text start:0x80149A34 end:0x8014F4BC
+	.bss start:0x8030AA28 end:0x8030AA34
+	.sbss start:0x8032DEA8 end:0x8032DEAC
+	.sdata2 start:0x803319F0 end:0x80331AE0
+	.rodata start:0x801DD8E8 end:0x801DDB18
+	.data start:0x80213BA8 end:0x80213C0C
+
+chara_fur.cpp:
+	.text start:0x800DEDE4 end:0x800E3EA8
+
+pppYmLaser.cpp:
+	.rodata start:0x801DA3C8 end:0x801DA3D8
+
+gobjwork.cpp:
+	.text start:0x8009DAE4 end:0x800A26A8
+
+MSL_C/PPCEABI/bare/H/string.c:
+	.text start:0x801B7AD0 end:0x801B7F98
+	.rodata start:0x801E5F90 end:0x801E5FB0
+	.sdata start:0x8032DBF8 end:0x8032DC00
+
+MSL_C/PPCEABI/bare/H/mem.c:
+	.text start:0x801B5490 end:0x801B5600
+	.init start:0x8000540C end:0x80005544
+
+Runtime.PPCEABI.H/runtime.c:
+	.text start:0x801AEE24 end:0x801AF51C
+	.rodata start:0x801E5D48 end:0x801E5D60
+
+Runtime.PPCEABI.H/global_destructor_chain.c:
+	.text start:0x801ae64c end:0x801AE6AC
+	.dtors start:0x801d43c8 end:0x801D43CC
+	.sbss start:0x8032e350 end:0x8032E354
+
+Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
+	.text start:0x801af51c end:0x801AF598
+	.ctors start:0x801d4300 end:0x801D4304
+	.dtors start:0x801d43c0 end:0x801D43C8
+	.sdata start:0x8032dbd0 end:0x8032DBD4
+
+menu_equip.cpp:
+	.text start:0x8015A1D4 end:0x8015C814
+
+menu_item.cpp:
+	.text start:0x801586D0 end:0x8015A1D4
+
+MSL_C/PPCEABI/bare/H/ansi_fp.c:
+	.text start:0x801B1EB4 end:0x801B3E08
+	.rodata start:0x801E5E88 end:0x801E5F65
+	.data start:0x8021C158 end:0x8021C27C
+	.sdata2 start:0x803328D8 end:0x803328E0
+
+MSL_C/PPCEABI/bare/H/printf.c:
+	.rodata start:0x801E5F68 end:0x801E5F90

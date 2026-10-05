@@ -73,6 +73,57 @@ blr
         known['Function']['address'] += 4
         self.assertIn('disagrees', recover('unit.c', obj, dol(body), known)['reason'])
 
+    def test_complete_text_and_init_sections(self):
+        init_source = '''
+.section .init,"ax"
+.global Initializer
+.type Initializer,@function
+Initializer:
+li 3, 19
+li 4, 29
+li 5, 43
+blr
+.size Initializer,.-Initializer
+'''
+        obj, body = self.fixture(init_source)
+        init = bytes.fromhex('386000133880001d38a0002b4e800020')
+        known = read_symbols('Function = .text:0x80004000; // type:function size:0x10\n'
+                             'Initializer = .init:0x80004010; // type:function size:0x10')
+        row = recover('unit.c', obj, dol(body + init), known)
+        self.assertEqual(row['status'], 'verified', row)
+        self.assertEqual(row['verified_bytes'], 32)
+        self.assertEqual([s['section'] for s in row['sections']], ['.text', '.init'])
+        self.assertEqual(len(row['functions']), 2)
+        self.assertEqual(row['split_snippet'].count('unit.c:'), 1)
+        self.assertIn('.init start:0x80004010 end:0x80004020', row['split_snippet'])
+        for image in (dol(body), dol(body + init[:-1] + b'!'), dol(body + init + init)):
+            rejected = recover('unit.c', obj, image, known)
+            self.assertEqual(rejected['status'], 'rejected', rejected)
+            self.assertNotIn('split_snippet', rejected)
+        for extra in ('.data\n.word 1\n', '.bss\n.space 4\n', '.comm storage,4,4\n'):
+            with self.subTest(storage=extra):
+                unverified, _ = self.fixture(init_source + extra)
+                rejected = recover('unit.c', unverified, dol(body + init), known)
+                self.assertEqual(rejected['status'], 'rejected', rejected)
+                self.assertNotIn('split_snippet', rejected)
+
+    def test_rejects_overlapping_code_section_placements(self):
+        obj, body = self.fixture('''
+.section .init,"ax"
+.global Initializer
+.type Initializer,@function
+Initializer:
+li 3, 17
+li 4, 23
+li 5, 41
+blr
+.size Initializer,.-Initializer
+''')
+        row = recover('unit.c', obj, dol(body), {})
+        self.assertEqual(row['status'], 'rejected', row)
+        self.assertIn('sections overlap', row['reason'])
+        self.assertNotIn('split_snippet', row)
+
     def test_rejects_duplicates_data_only_and_changed_byte(self):
         obj, body = self.fixture()
         self.assertEqual(len(recover('unit.c', obj, dol(body, 2), {})['candidates']), 2)

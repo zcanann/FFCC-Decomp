@@ -448,6 +448,9 @@ joybus.cpp:
 	.text start:0x800A3F74 end:0x800B049C
 
 gbaque.cpp:
+	.rodata start:0x801D5DC8 end:0x801D5F9F
+	.bss start:0x803102A0 end:0x80313010
+	.sdata2 start:0x8034DA58 end:0x8034DA98
 	.text start:0x800C60A4 end:0x800CE9BC
 
 map.cpp:
@@ -488,9 +491,10 @@ mapocttree.cpp:
 
 cmake.cpp:
 	.text start:0x80167050 end:0x8016F384
-	.rodata start:0x801DA598 end:0x801DA5BC
-	.data start:0x80231F70 end:0x80231FD4
+	.rodata start:0x801DA370 end:0x801DA5BC
+	.data start:0x80231F20 end:0x80231FD4
 	.sdata2 start:0x8034F770 end:0x8034F7B8
+	.sdata start:0x8034B860 end:0x8034B868
 
 mes.cpp:
 	.text start:0x800978B8 end:0x80097D20
@@ -499,9 +503,9 @@ shopmenu.cpp:
 	.text start:0x8014B634 end:0x80153EA0
 
 singmenu.cpp:
-	.rodata start:0x801D925C end:0x801D9454
-	.data start:0x802318E8 end:0x802319C8
-	.sdata2 start:0x8034ED70 end:0x8034EE40
+	.rodata start:0x801D8E98 end:0x801D9454
+	.data start:0x802318B8 end:0x80231A98
+	.sdata2 start:0x8034ED40 end:0x8034EE90
 
 cflat_r2system.cpp:
 	.text start:0x800B049C end:0x800B7D34
@@ -548,9 +552,15 @@ mtx/vec.c:
 
 bonus_menu.cpp:
 	.text start:0x8012EF38 end:0x8013A1EC
+	.rodata start:0x801D8CB4 end:0x801D8D30
+	.data start:0x8022FFE8 end:0x80230088
+	.sdata start:0x8034B848 end:0x8034B858
+	.sbss start:0x8034BC90 end:0x8034BC9C
 
 menu_cmd.cpp:
 	.text start:0x80145F34 end:0x8014B634
+	.bss start:0x80327348 end:0x80327354
+	.sbss start:0x8034BCB0 end:0x8034BCB4
 	.rodata start:0x801D94C0 end:0x801D9658
 	.data start:0x80231D70 end:0x80231D84
 
@@ -559,3 +569,45 @@ pppYmMana.cpp:
 
 pppMana2.cpp:
 	.text start:0x80102220 end:0x801052F8
+
+chara_fur.cpp:
+	.text start:0x800DC85C end:0x800E1A00
+
+pppYmLaser.cpp:
+	.rodata start:0x801D5FA0 end:0x801D5FB0
+
+MSL_C/PPCEABI/bare/H/string.c:
+	.text start:0x801B3FA8 end:0x801B4428
+	.rodata start:0x801DB500 end:0x801DB520
+	.sdata start:0x8034BA00 end:0x8034BA08
+
+gobjwork.cpp:
+	.text start:0x8009C2A8 end:0x800A0D6C
+
+MSL_C/PPCEABI/bare/H/mem.c:
+	.text start:0x801B1A08 end:0x801B1B78
+	.init start:0x80005504 end:0x8000563C
+
+Runtime.PPCEABI.H/runtime.c:
+	.text start:0x801AB44C end:0x801ABB44
+	.rodata start:0x801DB2B8 end:0x801DB2D0
+
+Runtime.PPCEABI.H/global_destructor_chain.c:
+	.text start:0x801aac7c end:0x801AACDC
+	.dtors start:0x801d06e8 end:0x801D06EC
+	.sbss start:0x8034c138 end:0x8034C13C
+
+Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
+	.text start:0x801abb44 end:0x801ABBC0
+	.ctors start:0x801d0620 end:0x801D0624
+	.dtors start:0x801d06e0 end:0x801D06E8
+	.sdata start:0x8034b9d8 end:0x8034B9DC
+
+MSL_C/PPCEABI/bare/H/ansi_fp.c:
+	.text start:0x801AE4DC end:0x801B0430
+	.rodata start:0x801DB3F8 end:0x801DB4D5
+	.data start:0x80238BA8 end:0x80238CCC
+	.sdata2 start:0x8034FD40 end:0x8034FD48
+
+MSL_C/PPCEABI/bare/H/printf.c:
+	.rodata start:0x801DB4D8 end:0x801DB500

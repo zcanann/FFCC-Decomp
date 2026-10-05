@@ -158,6 +158,12 @@ unique aligned placement; unknown targets, unsupported relocations, conflicting
 ownership and omitted data/BSS/COMMON are rejected. Repeat `--object` to audit a
 batch and use `--output` to save its JSON evidence.
 
+Objects containing both `.text` and `.init`, such as `mem.c`, are audited as one
+unit. Each complete section must have a unique placement, the placements must
+not overlap, and all sections must pass before the tool proposes a unit split.
+Multi-section results include a `sections` array; single-section output remains
+unchanged. Data, BSS and COMMON storage still require separate verification.
+
 The tool only proposes split and symbol entries. Check MAP ownership, rebuild,
 compare the full unit with objdiff and verify regional image checksums before
 marking it complete. GBA recovery uses [its own relocation audit](gba/README.md).

@@ -17,10 +17,9 @@
 
 static int s_OldMenu;
 extern "C" char s_menuSubfontPathFmt[];
-#ifdef VERSION_GCCJGC
-static const char s_cmakeSubfontPath[] = "dvd/menu/subfont.fnt";
-#endif
+#ifndef VERSION_GCCJGC
 static const char s_cmake_cpp[] = "cmake.cpp";
+#endif
 
 struct CmakeInfo {
     char m_name[0x12];
@@ -383,6 +382,11 @@ static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
     return menu->m_fonts[CMAKE_FONT_LABEL];
 }
 
+#ifdef VERSION_GCCJGC
+#include "ffcc/cmake_jp.inc"
+static const char s_cmakeSubfontPath[] = "dvd/menu/subfont.fnt";
+static const char s_cmake_cpp[] = "cmake.cpp";
+#else
 extern "C" const char s_ABCDEFGHIJKL_801E2F30[];
 extern "C" const char s_MNOPQRSTUVWX_801E2F40[];
 extern "C" const char lbl_801E2F50[];
@@ -416,6 +420,8 @@ static const char* s_NameEntryStr[] = {
     lbl_801E3000,
     lbl_801E3010
 };
+
+#endif
 
 static const char s_world2[] = "world2";
 static const char s_crystal[] = "crystal";
@@ -512,9 +518,48 @@ static inline int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
  * PAL Size: TODO
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8016F244
+ * JP Size: 320b
  */
+#ifdef VERSION_GCCJGC
+static void GetChara(char* text, int index, char* dst)
+{
+    dst[0] = '\0';
+    int length = strlen(text);
+    if (length != 0) {
+        int position;
+        int state;
+        int character;
+        character = 0;
+        state = 0;
+        position = 0;
+        for (; length > 0; --length, ++position) {
+            if ((state == 0 || state == 2) &&
+                ((static_cast<unsigned char>(text[position]) >= 0x81 && static_cast<unsigned char>(text[position]) <= 0x9F) || (static_cast<unsigned char>(text[position]) >= 0xE0 && static_cast<unsigned char>(text[position]) <= 0xFC))) {
+                state = 1;
+            } else if (state == 1 && static_cast<unsigned char>(text[position]) != 0x7F && static_cast<unsigned char>(text[position]) >= 0x40 && static_cast<unsigned char>(text[position]) <= 0xFC) {
+                state = 2;
+            } else {
+                state = 0;
+            }
+            if (character == index) {
+                if (state == 0) {
+                    dst[0] = text[position];
+                    dst[1] = '\0';
+                } else {
+                    dst[0] = text[position];
+                    dst[1] = text[position + 1];
+                    dst[2] = '\0';
+                }
+                break;
+            }
+            if (state != 1) {
+                ++character;
+            }
+        }
+    }
+}
+#else
 inline void GetChara(char* dst, int index, char* table)
 {
     if (dst == nullptr) {
@@ -531,6 +576,8 @@ inline void GetChara(char* dst, int index, char* table)
     dst[stride - 1] = '\0';
 }
 
+#endif
+
 /*
  * --INFO--
  * PAL Address: TODO
@@ -540,6 +587,34 @@ inline void GetChara(char* dst, int index, char* table)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+static inline int GetCharaType(char* text, int index)
+{
+    int length = strlen(text);
+    if (length == 0) {
+        return -1;
+    }
+    int character = 0;
+    int state = 0;
+    for (int position = 0; length > 0; --length, ++position) {
+        if ((state == 0 || state == 2) &&
+            ((static_cast<unsigned char>(text[position]) >= 0x81 && static_cast<unsigned char>(text[position]) <= 0x9F) || (static_cast<unsigned char>(text[position]) >= 0xE0 && static_cast<unsigned char>(text[position]) <= 0xFC))) {
+            state = 1;
+        } else if (state == 1 && static_cast<unsigned char>(text[position]) != 0x7F && static_cast<unsigned char>(text[position]) >= 0x40 && static_cast<unsigned char>(text[position]) <= 0xFC) {
+            state = 2;
+        } else {
+            state = 0;
+        }
+        if (character == index) {
+            return state != 0;
+        }
+        if (state != 1) {
+            ++character;
+        }
+    }
+    return -1;
+}
+#else
 inline void GetCharaType(char* dst, int type)
 {
     if (dst == nullptr) {
@@ -550,6 +625,8 @@ inline void GetCharaType(char* dst, int type)
     dst[1] = '\0';
 }
 
+#endif
+
 /*
  * --INFO--
  * PAL Address: TODO
@@ -559,12 +636,39 @@ inline void GetCharaType(char* dst, int type)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+static inline int GetCharaCnt(char* text)
+{
+    int length = strlen(text);
+    if (length == 0) {
+        return 0;
+    }
+    int character = 0;
+    int state = 0;
+    for (int position = 0; length > 0; --length, ++position) {
+        if ((state == 0 || state == 2) &&
+            ((static_cast<unsigned char>(text[position]) >= 0x81 && static_cast<unsigned char>(text[position]) <= 0x9F) || (static_cast<unsigned char>(text[position]) >= 0xE0 && static_cast<unsigned char>(text[position]) <= 0xFC))) {
+            state = 1;
+        } else if (state == 1 && static_cast<unsigned char>(text[position]) != 0x7F && static_cast<unsigned char>(text[position]) >= 0x40 && static_cast<unsigned char>(text[position]) <= 0xFC) {
+            state = 2;
+        } else {
+            state = 0;
+        }
+        if (state != 1) {
+            ++character;
+        }
+    }
+    return character;
+}
+#else
 inline void GetCharaCnt(char* dst)
 {
     if (dst != nullptr) {
         dst[0] = '\0';
     }
 }
+
+#endif
 
 /*
  * --INFO--
@@ -1327,7 +1431,11 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     tx = static_cast<int>((120.0f - w) / 2.0 + 480.0);
     cursorY = static_cast<int>(cursorYBase);
     font->SetPosX(static_cast<float>(static_cast<int>((120.0f - w) / 2.0 + 480.0)));
+#ifdef VERSION_GCCJGC
+    font->SetPosY(static_cast<float>(cursorY));
+#else
     font->SetPosY(static_cast<float>(cursorY - 4));
+#endif
     font->Draw(txt);
     DrawInit();
 
@@ -1528,7 +1636,11 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 
     textW = font->GetWidth(text);
     font->SetPosX(static_cast<float>(nameX));
+#ifdef VERSION_GCCJGC
+    font->SetPosY(static_cast<float>(baseY));
+#else
     font->SetPosY(static_cast<float>(baseY - 4));
+#endif
     font->Draw(text);
     font->renderFlags.fixedWidth = 0;
     DrawInit();
@@ -1544,10 +1656,87 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
  * PAL Size: TODO
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8016D0E0
+ * JP Size: 1588b
  */
-inline void CMenuPcs::AddNameChara(int c, int slot, int, int)
+#ifdef VERSION_GCCJGC
+int CMenuPcs::AddNameChara(int add, int column, int row, int table)
+{
+    if (add == 0) {
+        int count = GetCharaCnt(s_CmakeInfo.m_name);
+        if (count == 0) {
+            return -1;
+        }
+        int length = strlen(s_CmakeInfo.m_name);
+        if (GetCharaType(s_CmakeInfo.m_name, count - 1) == 0) {
+            s_CmakeInfo.m_name[length - 1] = '\0';
+        } else {
+            s_CmakeInfo.m_name[length - 2] = '\0';
+        }
+    } else {
+        char picked[3];
+        memset(picked, 0, 3);
+        char* text = const_cast<char*>(s_NameEntryStr[row + table * 5]);
+        GetChara(text, column, picked);
+        int count = GetCharaCnt(s_CmakeInfo.m_name);
+        if (count >= 7) {
+            if (strcmp(picked, s_nameDakutenMark) != 0 && strcmp(picked, s_nameHandakutenMark) != 0) {
+                return -1;
+            }
+        } else {
+            GetChara(text, column, picked);
+            if (count == 0) {
+                strcat(s_CmakeInfo.m_name, picked);
+                return 0;
+            }
+        }
+        int type = GetCharaType(text, count - 1);
+        if (type == 0 && count >= 7) {
+            return -1;
+        }
+        if (type != 0 && strcmp(picked, s_nameDakutenMark) == 0) {
+            char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
+            for (int group = 0; group < 2; ++group) {
+                const char* characters = s_NameEntryVoiced[group];
+                int length = strlen(characters);
+                for (int pos = 0; pos < length; pos += 2, characters += 2) {
+                    if (memcmp(characters, last, 2) == 0) {
+                        ++last[1];
+                        return 0;
+                    }
+                }
+            }
+            if (memcmp(last, s_nameKatakanaU, 2) == 0) {
+                strcpy(last, s_nameKatakanaVu);
+            } else {
+                if (count >= 7) {
+                    return -1;
+                }
+                strcat(s_CmakeInfo.m_name, picked);
+            }
+            return 0;
+        } else if (type != 0 && strcmp(picked, s_nameHandakutenMark) == 0) {
+            char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
+            int length = strlen(s_NameEntryVoiced[1]);
+            const char* characters = s_NameEntryVoiced[1];
+            for (int pos = 0; pos < length; pos += 2, characters += 2) {
+                if (memcmp(characters, last, 2) == 0) {
+                    last[1] += 2;
+                    return 0;
+                }
+            }
+            if (count >= 7) {
+                return -1;
+            }
+            strcat(s_CmakeInfo.m_name, picked);
+        } else {
+            strcat(s_CmakeInfo.m_name, picked);
+        }
+    }
+    return 0;
+}
+#else
+inline int CMenuPcs::AddNameChara(int c, int slot, int, int)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int index = slot;
@@ -1558,7 +1747,10 @@ inline void CMenuPcs::AddNameChara(int c, int slot, int, int)
         index = 0x14;
     }
     self[0x85C + index] = static_cast<unsigned char>(c);
+    return 0;
 }
+
+#endif
 
 /*
  * --INFO--
@@ -2328,18 +2520,30 @@ void CMenuPcs::CmakeSexDraw()
 
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
-    float maxWidth = 0.0f;
+#ifdef VERSION_GCCJGC
+    float labelWidth;
+#else
+    float labelWidth = 0.0f;
+#endif
     int y;
     int i;
     for (i = 0, y = 0x9C; i < 2; ++i) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
-        if (maxWidth < width) {
-            maxWidth = width;
+#ifdef VERSION_GCCJGC
+        labelWidth = width;
+#else
+        if (labelWidth < width) {
+            labelWidth = width;
         }
+#endif
         float x = static_cast<float>(-(width / 2.0 - 400.0));
         font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+        font->SetPosY(static_cast<float>(y));
+#else
         font->SetPosY(static_cast<float>(y) - 4.0f);
+#endif
         font->Draw(txt);
         y += 0x28;
     }
@@ -2349,9 +2553,9 @@ void CMenuPcs::CmakeSexDraw()
         int sel = CmakeState(this)->m_select;
         int wobble = static_cast<int>(System.m_frameCounter) % 8;
         int cursorX = static_cast<int>(
-            static_cast<double>(static_cast<float>(400.0 - maxWidth / 2.0) +
+            static_cast<double>(static_cast<float>(400.0 - labelWidth / 2.0) +
                                 static_cast<float>(wobble)) -
-            maxWidth / 2.0);
+            labelWidth / 2.0);
         float cy = 156.0f;
         cy += static_cast<float>(sel * 0x28);
         int cursorY = static_cast<int>(cy);
@@ -2379,12 +2583,12 @@ inline void CMenuPcs::CmakeTribeOpen()
 
 /*
  * --INFO--
- * PAL Address: 0x801708b0
+ * PAL Address: 0x801708B0
  * PAL Size: 1080b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016F838
+ * EN Size: 1080b
+ * JP Address: 0x8016AC20
+ * JP Size: 1192b
  */
 int CMenuPcs::CmakeTribeCtrl()
 {
@@ -2434,14 +2638,15 @@ int CMenuPcs::CmakeTribeCtrl()
                 if (fieldSelect == 0) {
                     CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
                 } else {
-                    unsigned char* base = reinterpret_cast<unsigned char*>(&Game);
                     int slot;
                     for (slot = 0; slot < 8; ++slot) {
-                        if ((*reinterpret_cast<int*>(base + slot * 0xC30 + 0x1794) != 0) &&
-                            (*(base + slot * 0xC30 + 0x1F96) != 1) &&
-                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D0) == CmakeState(this)->m_select) &&
-                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D4) == CmakeState(this)->m_row) &&
-                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D2) == s_CmakeInfo.m_gender)) {
+                        if ((Game.m_caravanWorkArr[slot].m_shopState != 0) &&
+#ifndef VERSION_GCCJGC
+                            (Game.m_caravanWorkArr[slot].m_caravanLocalFlags != 1) &&
+#endif
+                            (Game.m_caravanWorkArr[slot].m_tribeId == CmakeState(this)->m_select) &&
+                            (Game.m_caravanWorkArr[slot].m_appearanceVariant == CmakeState(this)->m_row) &&
+                            (Game.m_caravanWorkArr[slot].m_genderFlag == s_CmakeInfo.m_gender)) {
                             break;
                         }
                     }
@@ -2593,7 +2798,11 @@ void CMenuPcs::CmakeTribeDraw()
     for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         txt = GetTribeStr(i);
         tribeFont->SetPosX(264.0f);
+#ifdef VERSION_GCCJGC
+        tribeFont->SetPosY(static_cast<float>(y));
+#else
         tribeFont->SetPosY(static_cast<float>(y) - 4.0f);
+#endif
         tribeFont->Draw(txt);
     }
 
@@ -2613,7 +2822,11 @@ void CMenuPcs::CmakeTribeDraw()
     for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         const char* txt = GetHairStr(hairBase + i);
         hairFont->SetPosX(384.0f);
+#ifdef VERSION_GCCJGC
+        hairFont->SetPosY(static_cast<float>(y));
+#else
         hairFont->SetPosY(static_cast<float>(y) - 4.0f);
+#endif
         hairFont->Draw(txt);
     }
 
@@ -2665,12 +2878,12 @@ inline void CMenuPcs::CmakeJobOpen()
 
 /*
  * --INFO--
- * PAL Address: 0x8016fb38
+ * PAL Address: 0x8016FB38
  * PAL Size: 1156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016EAC0
+ * EN Size: 1156b
+ * JP Address: 0x80169EF4
+ * JP Size: 1108b
  */
 int CMenuPcs::CmakeJobCtrl()
 {
@@ -2693,46 +2906,42 @@ int CMenuPcs::CmakeJobCtrl()
     } else {
         if ((repeat & 0x8) != 0) {
             if ((CmakeState(this)->m_select % 4) != 0) {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 1);
+                CmakeState(this)->m_select -= 1;
             } else {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 3);
+                CmakeState(this)->m_select += 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
             if ((CmakeState(this)->m_select % 4) < 3) {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 1);
+                CmakeState(this)->m_select += 1;
             } else {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 3);
+                CmakeState(this)->m_select -= 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((repeat & 0x3) != 0) {
             if (CmakeState(this)->m_select <= 3) {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 4);
+                CmakeState(this)->m_select += 4;
             } else {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 4);
+                CmakeState(this)->m_select -= 4;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((repeat & 0xF) == 0) {
             if ((down & 0x100) != 0) {
-                unsigned char* group = reinterpret_cast<unsigned char*>(&Game);
-                int slot = 0;
-                for (int groupCount = 2; groupCount != 0; groupCount--) {
-                    for (int inner = 0; inner < 4; ++inner) {
-                        if ((slot != static_cast<int>(CmakeSlot(this))) &&
-                            (*reinterpret_cast<int*>(group + 0x1794) != 0) &&
-                            (*(group + 0x1F96) != 1) &&
-                            (*reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(CmakeState(this)->m_select))) {
-                            goto found;
-                        }
-                        group += 0xC30;
-                        ++slot;
+                int slot;
+                for (slot = 0; slot < 8; ++slot) {
+                    if (slot != CmakeSlot(this) &&
+                        Game.m_caravanWorkArr[slot].m_shopState != 0 &&
+#ifndef VERSION_GCCJGC
+                        Game.m_caravanWorkArr[slot].m_caravanLocalFlags != 1 &&
+#endif
+                        Game.m_caravanWorkArr[slot].m_jobType == CmakeState(this)->m_select) {
+                        break;
                     }
                 }
-            found:
 
                 if (slot < 8) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -2855,7 +3064,11 @@ void CMenuPcs::CmakeJobDraw()
         int x = (i < 4) ? 0x110 : 0x1A8;
         int row = i % 4;
         font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+        font->SetPosY(static_cast<float>(0x70 + row * 0x28));
+#else
         font->SetPosY(static_cast<float>(0x70 + row * 0x28) - 4.0f);
+#endif
         font->Draw(txt);
     }
 
@@ -3072,15 +3285,25 @@ void CMenuPcs::CmakeResultDraw()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
+#ifndef VERSION_GCCJGC
     char tribeWithSlash[0x10];
+#endif
+#ifndef VERSION_GCCJGC
     float labelWidths[4];
+#endif
     int labelY = 0x70;
     for (int i = 0; i < 4; i++) {
         const char* label = GetMenuStr(i + 0x2A);
 
+#ifndef VERSION_GCCJGC
         labelWidths[i] = 232.0f + labelFont->GetWidth(label);
+#endif
         labelFont->SetPosX(232.0f);
+#ifdef VERSION_GCCJGC
+        labelFont->SetPosY(static_cast<float>(labelY));
+#else
         labelFont->SetPosY(static_cast<float>(labelY) - 4.0f);
+#endif
         labelFont->Draw(label);
         labelY += 0x28;
     }
@@ -3100,18 +3323,30 @@ void CMenuPcs::CmakeResultDraw()
         } else if (i == 1) {
             value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
+#ifdef VERSION_GCCJGC
+            value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
+#else
             strcpy(tribeWithSlash, GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe)));
             strcat(tribeWithSlash, "/");
             value = tribeWithSlash;
+#endif
         } else {
             value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
         }
 
+#ifdef VERSION_GCCJGC
+        float x = 336.0f;
+#else
         float x = 8.0f + labelWidths[i];
+#endif
         float y = static_cast<float>(0x70 + i * 0x28);
         float valueWidth = valueFont->GetWidth(value);
         valueFont->SetPosX(x);
+#ifdef VERSION_GCCJGC
+        valueFont->SetPosY(y);
+#else
         valueFont->SetPosY(y - 4.0f);
+#endif
         valueFont->Draw(value);
 
         if (i == 2) {
@@ -3123,7 +3358,11 @@ void CMenuPcs::CmakeResultDraw()
             const char* hair = GetHairStr(hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
 
             valueFont->SetPosX(16.0f + (x + valueWidth));
+#ifdef VERSION_GCCJGC
+            valueFont->SetPosY(y);
+#else
             valueFont->SetPosY(y - 4.0f);
+#endif
             valueFont->Draw(hair);
         }
     }
@@ -3286,14 +3525,24 @@ void CMenuPcs::CmakeResultDraw1()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
+#ifndef VERSION_GCCJGC
     char tribeWithSlash[0x10];
+#endif
+#ifndef VERSION_GCCJGC
     float labelWidths[4];
+#endif
     for (int i = 0; i < 4; i++) {
         const char* txt = GetMenuStr(0x2A + i);
 
+#ifndef VERSION_GCCJGC
         labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
+#endif
         labelFont->SetPosX(232.0f);
+#ifdef VERSION_GCCJGC
+        labelFont->SetPosY(0x70 + i * 0x28);
+#else
         labelFont->SetPosY(0x70 + i * 0x28 - 4.0f);
+#endif
         labelFont->Draw(txt);
     }
 
@@ -3314,18 +3563,28 @@ void CMenuPcs::CmakeResultDraw1()
             txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
         } else if (i == 2) {
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
+#ifndef VERSION_GCCJGC
             strcpy(tribeWithSlash, txt);
             strcat(tribeWithSlash, "/");
             txt = tribeWithSlash;
+#endif
         } else {
             txt = GetJobStr(s_CmakeInfo.m_job);
         }
 
+#ifdef VERSION_GCCJGC
+        float x = 336.0f;
+#else
         float x = 8.0f + labelWidths[i];
+#endif
         float y = static_cast<float>(0x70 + i * 0x28);
         float valueWidth = static_cast<float>(valueFont->GetWidth(txt));
         valueFont->SetPosX(x);
+#ifdef VERSION_GCCJGC
+        valueFont->SetPosY(y);
+#else
         valueFont->SetPosY(y - 4.0f);
+#endif
         valueFont->Draw(txt);
 
         if (i == 2) {
@@ -3337,7 +3596,11 @@ void CMenuPcs::CmakeResultDraw1()
             const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
 
             valueFont->SetPosX(16.0f + (x + valueWidth));
+#ifdef VERSION_GCCJGC
+            valueFont->SetPosY(y);
+#else
             valueFont->SetPosY(y - 4.0f);
+#endif
             valueFont->Draw(hairTxt);
         }
     }

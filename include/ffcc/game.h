@@ -167,7 +167,11 @@ public:
     void SetGbaSP(int idx, int sp) { m_gameWork.m_spModeFlags[idx] = sp; }
     int GetMark() { return m_gameWork.m_gameInitFlag; }
     void SetMark(int mark) { m_gameWork.m_gameInitFlag = mark; }
+#ifdef VERSION_GCCJGC
+    char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].TableStrings(0)[itemIndex]; }
+#else
     char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 4]; }
+#endif
     char* GetRingName(int ringIndex) { return m_cFlatDataArr[1].TableStrings(4)[ringIndex]; }
     char* GetHelpName(int helpIndex) { return m_cFlatDataArr[1].TableStrings(6)[helpIndex]; }
     char* GetBonusName(int bonusIndex) { return m_cFlatDataArr[1].TableStrings(7)[bonusIndex]; }

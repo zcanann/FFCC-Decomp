@@ -507,9 +507,11 @@ gba/GBAWrite.c:
 
 graphic.cpp:
 	.text start:0x80015DD8 end:0x80019964
+	.bss start:0x8024C748 end:0x80257DD8
 
 p_graphic.cpp:
 	.text start:0x80044978 end:0x8004727C
+	.bss start:0x80284790 end:0x80284884
 
 p_light.cpp:
 	.text start:0x80047728 end:0x80049CB8

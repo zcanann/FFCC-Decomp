@@ -583,9 +583,11 @@ menu_letter.cpp:
 
 graphic.cpp:
 	.text start:0x800161FC end:0x80019D7C
+	.bss start:0x8022FE08 end:0x8023B498
 
 p_graphic.cpp:
 	.text start:0x80044F6C end:0x80047724
+	.bss start:0x80267E50 end:0x80267F44
 
 p_light.cpp:
 	.text start:0x80047BF4 end:0x8004A294

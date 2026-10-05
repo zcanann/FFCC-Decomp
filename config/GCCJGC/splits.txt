@@ -404,3 +404,6 @@ os/OSThread.c:
 	.bss start:0x80327598 end:0x80327F90
 	.sdata start:0x8034B898 end:0x8034B89C
 	.sbss start:0x8034BDB0 end:0x8034BDBC
+
+pppRyjMegaBirthModel.cpp:
+	.text start:0x800835C0 end:0x800872F4

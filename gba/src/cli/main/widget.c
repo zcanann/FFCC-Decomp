@@ -33,7 +33,7 @@ void MsgBox_Layout(void)
     s32 n;
     s32 i;
     s32 len;
-#if !defined(VERSION_GCCE01)
+#if !defined(VERSION_GCCE01) && !defined(VERSION_GCCJGC)
     s32 w;
 #endif
 
@@ -59,20 +59,22 @@ void MsgBox_Layout(void)
     }
     if (max & 7)
         max += 8;
-#if !defined(VERSION_GCCE01)
+#if !defined(VERSION_GCCE01) && !defined(VERSION_GCCJGC)
     w = max >> 3;
 #endif
     win->rows = n + 1;
     win->height = (n + 1) * 2 + 2;
     win->y = (20 - win->height) >> 1;
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
     win->width = (max >> 3) + 2;
 #else
     max = w << 3;
     win->width = w + 2;
 #endif
     win->x = (30 - win->width) >> 1;
+#if !defined(VERSION_GCCJGC)
     win->textX = (max - len) / 2;
+#endif
 }
 
 s32 MsgBox_Open(void)
@@ -130,6 +132,15 @@ void CMake_Reset(void)
     gCMakeData.favorites[3] = 0x76;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02009340
+ * PAL Size: 116b
+ * EN Address: 0x02009270
+ * EN Size: 116b
+ * JP Address: 0x02009480
+ * JP Size: 116b
+ */
 u32 Window_GetTextVram(struct Window *win, s32 row, s32 half)
 {
     u32 addr = GetBgVram(win->bg);
@@ -144,7 +155,7 @@ u32 Window_GetTextVram(struct Window *win, s32 row, s32 half)
     else if (win->slot == 3)
         addr += 0x5380;
     else
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
         addr = 0x06006400;
 #else
         addr = 0x06006800;

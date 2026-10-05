@@ -39,6 +39,9 @@ static s8 sCMakeTileRow;
 static s8 sCMakeSwapping;
 static s8 sCMakeTop;
 static s8 sCMakeWaiting;
+#if defined(VERSION_GCCJGC)
+#include "cmake_jp.inc"
+#else
 char *gNameCharTables[] = {
     "ABCDEFGHIJKL",
     "MNOPQRSTUVWX",
@@ -56,6 +59,7 @@ char *gNameCharTables[] = {
     "|\xAB\xBB\x82\x84       ",
     "            ",
 };
+#endif
 
 const s8 sDaysInMonth[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 

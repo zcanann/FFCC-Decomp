@@ -104,7 +104,10 @@ libagbsyscall/VBlankIntrWait:
 	.text       start:0x0201C2A8 end:0x0201C2B0
 
 joy_reset:
-	.text       start:0x0201C2B0 end:0x0201C318
+	.text       start:0x0201C2B0 end:0x0201C2D0
+
+regional_text:
+	.text       start:0x0201C2D0 end:0x0201C318
 
 libc/string/memcpy:
 	.text       start:0x0201C318 end:0x0201C378
@@ -116,13 +119,19 @@ libc/string/strcat:
 	.text       start:0x0201C3CC end:0x0201C414
 
 libc/string/strchr:
-	.text       start:0x0201C414 end:0x0201C4FC
+	.text       start:0x0201C414 end:0x0201C4A0
+
+libc/string/strcmp:
+	.text       start:0x0201C4A0 end:0x0201C4FC
 
 libc/string/strcpy:
 	.text       start:0x0201C4FC end:0x0201C548
 
 libc/string/strlen:
-	.text       start:0x0201C548 end:0x0201C5D0
+	.text       start:0x0201C548 end:0x0201C58C
+
+regional_text:
+	.text       start:0x0201C58C end:0x0201C5D0
 
 libgcc/_call_via_rX:
 	.text       start:0x0201C5D0 end:0x0201C60C
@@ -158,7 +167,19 @@ main/textmask:
 	.rodata     start:0x0201CB84 end:0x0201CBA4 align:4
 
 regional_data:
-	.rodata     start:0x0201CBA4 end:0x0201D188
+	.rodata     start:0x0201CBA4 end:0x0201CC78
+
+main/cmake:
+	.rodata     start:0x0201CC78 end:0x0201D160 align:4
+
+regional_data:
+	.rodata     start:0x0201D160 end:0x0201D178
+
+main/shop:
+	.rodata     start:0x0201D178 end:0x0201D17C align:4
+
+main/scouter:
+	.rodata     start:0x0201D17C end:0x0201D188 align:4
 
 main/msg_sys:
 	.rodata     start:0x0201D188 end:0x0201D72C align:4
@@ -188,7 +209,10 @@ main/mode:
 	.data       start:0x02025ABC end:0x02025C18 align:4
 
 regional_data:
-	.rodata     start:0x02025C18 end:0x02025DF0
+	.rodata     start:0x02025C18 end:0x02025CBC
+
+main/cmake:
+	.data       start:0x02025CBC end:0x02025DF0 align:4
 
 main/msg_sys:
 	.data       start:0x02025DF0 end:0x02025FC8 align:4
@@ -224,19 +248,55 @@ main/obj:
 	.bss        start:0x03001190 end:0x03002772 align:8
 
 regional_bss:
-	.bss        start:0x03002774 end:0x03002788 align:4
+	.bss        start:0x03002774 end:0x03002784 align:4
+
+main/radar:
+	.bss        start:0x03002784 end:0x03002785 align:4
+
+regional_bss:
+	.bss        start:0x03002785 end:0x03002788 align:1
 
 main/favorite:
 	.bss        start:0x03002788 end:0x03002792 align:8
 
 regional_bss:
-	.bss        start:0x03002792 end:0x030027C0 align:1
+	.bss        start:0x03002792 end:0x03002794 align:1
+
+main/family:
+	.bss        start:0x03002794 end:0x03002796 align:4
+
+regional_bss:
+	.bss        start:0x03002796 end:0x030027B4 align:1
+
+main/item:
+	.bss        start:0x030027B4 end:0x030027BE align:4
+
+regional_bss:
+	.bss        start:0x030027BE end:0x030027C0 align:1
 
 main/gil:
 	.bss        start:0x030027C0 end:0x030027CE align:4
 
 regional_bss:
-	.bss        start:0x030027CE end:0x03002840 align:1
+	.bss        start:0x030027CE end:0x03002800 align:1
+
+main/equip:
+	.bss        start:0x03002800 end:0x03002805 align:4
+
+regional_bss:
+	.bss        start:0x03002805 end:0x03002808 align:1
+
+main/shop:
+	.bss        start:0x03002808 end:0x03002813 align:4
+
+regional_bss:
+	.bss        start:0x03002813 end:0x03002818 align:1
+
+main/smith:
+	.bss        start:0x03002818 end:0x03002838 align:8
+
+main/scouter:
+	.bss        start:0x03002838 end:0x03002840 align:4
 
 main/artifact:
 	.bss        start:0x03002840 end:0x03002848 align:4

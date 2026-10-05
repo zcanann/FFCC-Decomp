@@ -11,13 +11,17 @@
 
 #if defined(VERSION_GCCE01)
 #define SHOP_CURRENCY_MSG 5
+#else
+#define SHOP_CURRENCY_MSG 13
+#endif
+
+#if !defined(VERSION_GCCP01)
 #define SHOP_MENU_X 22
 #define SHOP_MENU_WIDTH 7
 #define SHOP_CONFIRM_X 8
 #define SHOP_ITEM_ICON_OFFSET 0
 #define SHOP_USE_ICON_OFFSET 4
 #else
-#define SHOP_CURRENCY_MSG 13
 #define SHOP_MENU_X 20
 #define SHOP_MENU_WIDTH 9
 #define SHOP_CONFIRM_X 6
@@ -252,9 +256,11 @@ void ShopList_Setup(void)
     gSubMode = 0;
     for (i = 0; i < gWindows[2].rows; i++) {
         gWindows[2].items[i].enabled = 1;
-        if (i == 0)
-            gWindows[2].items[i].text = Msg_GetSystem(gScreen == 1 ? 11 : 12);
-        else
+        if (i == 0) {
+            s32 msg = gScreen == 1 ? 11 : 12;
+
+            gWindows[2].items[i].text = Msg_GetSystem(msg);
+        } else
             gWindows[2].items[i].text = Msg_GetSystem(4);
     }
     Text_SetFill(1, 0);
@@ -585,7 +591,7 @@ s32 ShopSellScreen_Main(void)
     s32 id;
     s32 ret;
 
-#if !defined(VERSION_GCCE01)
+#if defined(VERSION_GCCP01)
     if (!(gDataFlags & DATA_SELL_LIST)) {
         if (gKeysNew & B_BUTTON) {
             sShopResult = -1;
@@ -710,7 +716,11 @@ void ShopList_DrawIcons(void)
     if (gScreen != 1) {
         x = (win->x + 1) * 8;
         y = (win->y + 1) * 8;
+#if defined(VERSION_GCCJGC)
+        t = 4;
+#else
         t = (gLanguage & 15) == 1 ? 24 : 4;
+#endif
         pal = Obj_GetPalette(2, t);
         for (i = 0; i < win->rows; i++, y += 16) {
             if (Session_IsItemInUse(i + sShopTop))
@@ -719,17 +729,28 @@ void ShopList_DrawIcons(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02016E88
+ * PAL Size: 84b
+ * EN Address: 0x02016C98
+ * EN Size: 84b
+ * JP Address: 0x020161EC
+ * JP Size: 92b
+ */
 void ShopList_PrintBuyItem(s32 idx, s32 slot)
 {
     s16 *id;
     struct Window *win;
+    s32 item;
 
     Text_SetFill(1, 0);
     Text_Clear();
     Text_SetX(16);
     id = &BUY_ITEM_IDS[idx];
-    if (*id > 0)
-        Text_Print(Msg_GetItemName(*id), TEXT_DRAW);
+    item = *id;
+    if (item > 0)
+        Text_Print(Msg_GetItemName(item), TEXT_DRAW);
     win = &gWindows[1];
     Text_CopyToVram(0x0600AB80 + 2 * 32 * win->width * slot, win->width);
 }
@@ -1133,7 +1154,11 @@ void InfoWin_PrintNextRow(void)
                             if (items->flags & 0x100)
                                 p = Msg_GetSystem(16);
                             else
+#if defined(VERSION_GCCJGC)
+                                p = Msg_GetSystem(7);
+#else
                                 p = Msg_GetSystem(63);
+#endif
                             Text_SetX(0);
                             Text_Print(p, TEXT_DRAW);
                             n = win->width * 8 - 34;

@@ -83,7 +83,11 @@ s32 RadarScreen_Main(void)
         sRadarMapShown = 0;
     }
     Text_SetFill(1, 0);
-    if (Link_IsConnected() && gRadarMode) {
+    if (Link_IsConnected()
+#if !defined(VERSION_GCCJGC)
+        && gRadarMode
+#endif
+    ) {
         Radar_DrawParty();
         if (gRadarType == RADAR_MONSTER || gRadarType == RADAR_TREASURE) {
             Radar_DrawEnemies();
@@ -93,15 +97,27 @@ s32 RadarScreen_Main(void)
         if (gRadarType == RADAR_MAP)
             Radar_DrawMapObjs();
     }
-    if ((gDataFlags & (DATA_BASE_POS | DATA_MAP)) == (DATA_BASE_POS | DATA_MAP) && sRadarMapShown == 0 && gRadarMode) {
+    if ((gDataFlags & (DATA_BASE_POS | DATA_MAP)) == (DATA_BASE_POS | DATA_MAP) && sRadarMapShown == 0
+#if !defined(VERSION_GCCJGC)
+        && gRadarMode
+#endif
+    ) {
         REG_DISPCNT = 0x9F40;
         if (gRadarType == RADAR_MAP)
             Radar_DrawMap();
         sRadarMapShown = 1;
     }
-    if (gRadarMode && gRadarType == RADAR_MAP && !(gStaticMap & 1) && (gDataFlags & DATA_BASE_POS)) {
+    if (
+#if !defined(VERSION_GCCJGC)
+        gRadarMode &&
+#endif
+        gRadarType == RADAR_MAP && !(gStaticMap & 1) && (gDataFlags & DATA_BASE_POS)) {
         Radar_GetBaseDelta(&dx, &dy);
+#if defined(VERSION_GCCJGC)
+        if (dx < -7 || dx > 7 || dy > 7 || dy <= -8)
+#else
         if (dx < -6 || dx > 6 || dy > 6 || dy <= -7)
+#endif
             Radar_DrawMap();
         else
             Radar_ScrollMap(dx, dy);

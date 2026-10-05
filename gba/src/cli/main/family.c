@@ -138,13 +138,14 @@ void FamilyScreen_PrintRow(s32 idx)
     Text_Clear();
     if (idx == 0) {
         Text_SetX(16);
-        Text_Print(Msg_GetJob(gSession.job), TEXT_DRAW);
+        lv = gSession.job;
+        Text_Print(Msg_GetJob(lv), TEXT_DRAW);
     } else {
         lv = gSession.relationType[idx - 1];
         if (lv <= 0)
             return;
         Text_Print(Msg_GetSystem(lv + 53), TEXT_DRAW);
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
         Text_SetX(56);
 #else
         if ((gLanguage & 15) == 1)

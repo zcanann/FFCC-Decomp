@@ -4251,20 +4251,21 @@ void CMenuPcs::CalcSingleCMakeChara()
  */
 inline void CMenuPcs::DrawSingleCMakeChara(float alpha)
 {
-    int modelBlock = MenuS32(this, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (static_cast<int>(CmakeSlot(this)) + 0x20) * 0x50) == 0) {
+    WmWorldObjInfo* worldObjects = m_wm.m_worldObjData;
+    int handleIndex = static_cast<int>(m_singleCmakeSlot) + 0x20;
+    if (worldObjects[handleIndex].m_active == 0) {
         return;
     }
-    int handleIndex = static_cast<int>(CmakeSlot(this)) + 0x20;
 
-    *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
-    *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
+    WmWorldObjInfo& viewport = worldObjects[22];
+    viewport.m_viewportX = -220;
+    viewport.m_viewportY = 4;
     DrawInit();
 
     if (m_wm.m_handles[handleIndex]->m_charaKind != 3) {
         SetProjection(0x16);
         SetLight(2);
-        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIndex]->m_model) + 0x9C) = alpha;
+        m_wm.m_handles[handleIndex]->m_model->m_lightAlpha = alpha;
         m_wm.m_handles[handleIndex]->Draw(5);
         RestoreProjection();
     } else {

@@ -11,9 +11,6 @@ class CTextureSet;
 class CTexture;
 class CMapTexAnim;
 
-extern "C" const float kMapTexAnimDefaultFrameStep;
-extern "C" const float kMapTexAnimZero;
-
 class CMapTexAnimSet : public CRef
 {
 public:
@@ -37,11 +34,9 @@ class CMapTexAnim : public CRef
 public:
     CMapTexAnim()
     {
-        float frameStep = kMapTexAnimDefaultFrameStep;
-        float currentFrame = kMapTexAnimZero;
         m_frameTable = 0;
-        m_frameStep = frameStep;
-        m_currentFrame = currentFrame;
+        m_frameStep = 1.0f;
+        m_currentFrame = 0.0f;
         m_usesBlendTexture = 0;
         m_usesKeyFrame = 0;
         m_materialId = -1;

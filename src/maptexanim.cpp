@@ -18,8 +18,6 @@ extern const char s_SetMapTexAnim_MaterialIdNotFound[] = {
     0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00, 0x00, 0x00
 };
 static const char s_maptexanim_cpp[] = "maptexanim.cpp";
-extern const float kMapTexAnimDefaultFrameStep;
-extern const float kMapTexAnimZero;
 }
 
 namespace {
@@ -189,8 +187,6 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
     }
 }
 
-extern "C" const float kMapTexAnimDefaultFrameStep = 1.0f;
-extern "C" const float kMapTexAnimZero = 0.0f;
 
 /*
  * --INFO--

@@ -1008,9 +1008,9 @@ config.libs = [
         [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXAttr.c"),
             Object(Matching, "gx/GXBump.c"),
-            Object(Matching, "gx/GXDisplayList.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXDisplayList.c"),
             Object(Matching, "gx/GXFifo.c"),
-            Object(Matching, "gx/GXFrameBuf.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXFrameBuf.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXGeometry.c"),
             Object(Matching, "gx/GXInit.c", extra_cflags=["-opt nopeephole"]),
             Object(Matching, "gx/GXGet.c"),

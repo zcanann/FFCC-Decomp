@@ -260,3 +260,13 @@ gx/GXPixel.c:
 	.text start:0x8019FEE4 end:0x801A051C
 	.sdata2 start:0x8034FCE8 end:0x8034FD20
 	.data start:0x802382D0 end:0x802382F0
+
+gx/GXFrameBuf.c:
+	.text start:0x8019CCFC end:0x8019DA18
+	.sdata2 start:0x8034FC60 end:0x8034FC70
+	.data start:0x80237EE0 end:0x8023800C
+
+gx/GXDisplayList.c:
+	.text start:0x801A0520 end:0x801A072C
+	.bss start:0x803435F8 end:0x80343B14
+	.sbss start:0x8034C128 end:0x8034C12C

@@ -431,6 +431,7 @@ const s8 gItemDescIds[][2] = {
 const char sPlusText[] = "+";
 const char sTenText[] = "10";
 
+#if !defined(VERSION_GCCJGC)
 char *Msg_GetTribe(s32 idx)
 {
     char **tbl;
@@ -586,6 +587,8 @@ char *Msg_GetTrait(s32 idx)
     }
     return tbl[idx];
 }
+
+#endif
 
 char *Msg_GetLook(s32 idx)
 {

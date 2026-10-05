@@ -1,5 +1,9 @@
 #include "global.h"
 
+#if defined(VERSION_GCCJGC)
+#include "msg_sys_jp.inc"
+#else
+
 char *gTribeNames_En[] = {
     "Clavat",
     "Lilty",
@@ -1101,3 +1105,5 @@ char *gLetterText_Es[] = {
     "No enviar nada",
     "Incluir: ",
 };
+
+#endif

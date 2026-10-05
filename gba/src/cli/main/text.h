@@ -27,12 +27,28 @@ void Text_ClearObj(s32 which);
 void Text_SwapFill(void);
 
 /* Localised text tables, indexed by gLanguage & 0xF */
+#if defined(VERSION_GCCJGC)
+extern char *gTribeNames_Jp[];
+extern char *gSystemText_Jp[];
+extern char *gJobNames_Jp[];
+extern char *gStatNames_Jp[];
+extern char *gNoticeText_Jp[];
+extern char *gTraitNames_Jp[];
+
+#define Msg_GetTribe(idx) (gTribeNames_Jp[(idx)])
+#define Msg_GetSystem(idx) (gSystemText_Jp[(idx)])
+#define Msg_GetJob(idx) (gJobNames_Jp[(idx)])
+#define Msg_GetStat(idx) (gStatNames_Jp[(idx)])
+#define Msg_GetNotice(idx) (gNoticeText_Jp[(idx)])
+#define Msg_GetTrait(idx) (gTraitNames_Jp[(idx)])
+#else
 char *Msg_GetTribe(s32 idx);
 char *Msg_GetSystem(s32 idx);
 char *Msg_GetJob(s32 idx);
 char *Msg_GetStat(s32 idx);
 char *Msg_GetNotice(s32 idx);
 char *Msg_GetTrait(s32 idx);
+#endif
 char *Msg_GetLook(s32 idx);
 char *Msg_GetCMake(s32 idx);
 char *Msg_GetLetter(s32 idx);

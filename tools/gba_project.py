@@ -126,6 +126,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
     "GCCP01": COMPLETE,
     "GCCE01": {
         "cli": [
+            "main/cmake", "main/item", "main/gil",
             "main/link", "main/obj",
             "main/menu", "main/radar", "main/favorite",
             "crt0", "m4a/m4a_1", "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet",

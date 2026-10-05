@@ -40,8 +40,13 @@ void GilScreen_Setup(void)
     Window_ResetItems(&gWindows[0], 1);
 
     gWindows[1].active = 1;
+#if defined(VERSION_GCCE01)
+    gWindows[1].width = 7;
+    gWindows[1].x = gWindows[0].x - 7;
+#else
     gWindows[1].width = 9;
     gWindows[1].x = gWindows[0].x - 9;
+#endif
     gWindows[1].y = 10;
     gWindows[1].rows = 2;
     gWindows[1].height = gWindows[1].rows * 2 + 2;

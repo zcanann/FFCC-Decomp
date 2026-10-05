@@ -42,8 +42,13 @@ void ItemScreen_Setup(void)
     Window_ResetItems(&gWindows[1], 1);
 
     gWindows[2].active = 1;
+#if defined(VERSION_GCCE01)
+    gWindows[2].width = 7;
+    gWindows[2].x = 12;
+#else
     gWindows[2].width = 9;
     gWindows[2].x = 11;
+#endif
     gWindows[2].y = 8;
     gWindows[2].rows = 4;
     gWindows[2].height = gWindows[2].rows * 2 + 2;

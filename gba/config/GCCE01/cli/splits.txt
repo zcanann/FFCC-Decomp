@@ -160,14 +160,23 @@ main/textmask:
 main/artifact:
 	.rodata     start:0x0201CD04 end:0x0201CD0C align:4
 
+main/cmake:
+	.rodata     start:0x0201CD0C end:0x0201CE10 align:4
+
 regional_data:
-	.rodata     start:0x0201CD0C end:0x02028AD8
+	.rodata     start:0x0201CE10 end:0x02028AD8
 
 main/obj:
 	.data       start:0x02028AD8 end:0x02028AF0 align:4
 
 regional_data:
-	.rodata     start:0x02028AF0 end:0x0202E058
+	.rodata     start:0x02028AF0 end:0x02028C4C
+
+main/cmake:
+	.data       start:0x02028C4C end:0x02028C88 align:4
+
+regional_data:
+	.rodata     start:0x02028C88 end:0x0202E058
 
 main/main:
 	.bss        start:0x03000000 end:0x03000011 align:4
@@ -194,7 +203,19 @@ main/artifact:
 	.bss        start:0x03002774 end:0x0300277C align:4
 
 regional_bss:
-	.bss        start:0x0300277C end:0x030027F4
+	.bss        start:0x0300277C end:0x03002780
+
+main/cmake:
+	.bss        start:0x03002780 end:0x030027AD align:8
+
+regional_bss:
+	.bss        start:0x030027AD end:0x030027CC align:1
+
+main/item:
+	.bss        start:0x030027CC end:0x030027D6 align:4
+
+regional_bss:
+	.bss        start:0x030027D6 end:0x030027F4 align:1
 
 main/menu:
 	.bss        start:0x030027F4 end:0x030027F6 align:4
@@ -206,7 +227,13 @@ main/radar:
 	.bss        start:0x030027F8 end:0x030027F9 align:4
 
 regional_bss:
-	.bss        start:0x030027F9 end:0x03002840 align:1
+	.bss        start:0x030027F9 end:0x030027FC align:1
+
+main/gil:
+	.bss        start:0x030027FC end:0x0300280A align:4
+
+regional_bss:
+	.bss        start:0x0300280A end:0x03002840 align:1
 
 main/favorite:
 	.bss        start:0x03002840 end:0x0300284A align:8
@@ -230,4 +257,10 @@ main/session:
 	.common     start:0x03002CA0 end:0x03002DD0 align:16
 
 regional_bss:
-	.bss        start:0x03002DD0 end:0x030044C1
+	.bss        start:0x03002DD0 end:0x03002FB0
+
+main/cmake:
+	.common     start:0x03002FB0 end:0x03002FCC align:16
+
+regional_bss:
+	.bss        start:0x03002FCC end:0x030044C1 align:4

@@ -86,6 +86,8 @@ void LZ77UnCompVram(const void *src, void *dst);
 
 /* libc */
 void *memcpy(void *dst, const void *src, size_t n);
+int memcmp(const void *a, const void *b, size_t n);
+char *strstr(const char *str, const char *substr);
 void *memset(void *dst, int c, size_t n);
 char *strcat(char *dst, const char *src);
 char *strchr(const char *s, int c);

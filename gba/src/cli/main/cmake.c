@@ -8,7 +8,7 @@
 #include "window.h"
 #include "screen.h"
 
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
 #define CMAKE_NAME_BUTTON_X 24
 #define CMAKE_NAME_BUTTON_WIDTH 5
 #define CMAKE_NAME_LABEL_TILES 10
@@ -61,6 +61,8 @@ char *gNameCharTables[] = {
 };
 #endif
 
+#define CMAKE_NAME_PAGE_COUNT ((s32)ARRAY_COUNT(gNameCharTables) / 5)
+
 const s8 sDaysInMonth[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 void CMakeNameScreen_DrawCursor(void);
@@ -70,7 +72,7 @@ void CMake_PrintTitle(char *str, s32 x);
 void CMake_ClearTitle(void);
 void CMakeName_AddChar(s32 mode);
 void CMakeName_DeleteChar(void);
-s32 CMakeName_IsFull(void);
+s32 CMakeName_CanApplyDiacritic(void);
 void CMakeName_PrintName(char *str);
 void CMake_DrawFooter(void);
 void CMakeGenderScreen_DrawCursor(void);
@@ -339,6 +341,15 @@ s32 CMakeNameScreen_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200AD90
+ * PAL Size: 316b
+ * EN Address: 0x0200ACC0
+ * EN Size: 316b
+ * JP Address: 0x02010D94
+ * JP Size: 316b
+ */
 void CMakeNameScreen_DrawCursor(void)
 {
     s32 x;
@@ -357,7 +368,11 @@ void CMakeNameScreen_DrawCursor(void)
         id = 45;
         win = gWindows;
         if (sCMakeCursor[1] == 5 && sCMakeCursor[0] > 9) {
+#if defined(VERSION_GCCJGC)
+            x = win[1].x * 8 - 10;
+#else
             x = win[1].x * 8 - 18;
+#endif
             y = win[1].y * 8 + 5;
         } else {
             x = (win->x + sCMakeCursor[0] * 2) * 8;
@@ -372,6 +387,15 @@ void CMakeNameScreen_DrawCursor(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200AECC
+ * PAL Size: 664b
+ * EN Address: 0x0200ADFC
+ * EN Size: 664b
+ * JP Address: 0x02010ED0
+ * JP Size: 664b
+ */
 s32 CMakeNameScreen_HandleInput(void)
 {
     s32 ret;
@@ -431,13 +455,13 @@ s32 CMakeNameScreen_HandleInput(void)
         m4aSongNumStart(2);
     } else if (gKeysNew & L_BUTTON) {
         if (sCMakeCharPage <= 0)
-            sCMakeCharPage = 2;
+            sCMakeCharPage = CMAKE_NAME_PAGE_COUNT - 1;
         else
             sCMakeCharPage--;
         sCMakeCharRow = 0;
         m4aSongNumStart(6);
     } else if (gKeysNew & R_BUTTON) {
-        if (sCMakeCharPage > 1)
+        if (sCMakeCharPage > CMAKE_NAME_PAGE_COUNT - 2)
             sCMakeCharPage = 0;
         else
             sCMakeCharPage++;
@@ -463,7 +487,7 @@ s32 CMakeNameScreen_HandleInput(void)
                     m4aSongNumStart(2);
                 }
             }
-        } else if (sCMakeNameLen > 6 && CMakeName_IsFull() == 0) {
+        } else if (sCMakeNameLen > 6 && CMakeName_CanApplyDiacritic() == 0) {
             m4aSongNumStart(0);
         } else {
             m4aSongNumStart(2);
@@ -571,22 +595,79 @@ void CMake_ClearTitle(void)
     DmaCopy16(3, buf + 30, dst + 32, n * sizeof(u16));
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200B390
+ * PAL Size: 180b
+ * EN Address: 0x0200B2C0
+ * EN Size: 180b
+ * JP Address: 0x02011394
+ * JP Size: 472b
+ */
 void CMakeName_AddChar(s32 mode)
 {
     char ch[4];
     char prev[4];
+#if defined(VERSION_GCCJGC)
+    s32 n;
+#endif
 
     memset(ch, 0, 3);
     memset(prev, 0, 3);
     if (mode == 0) {
         char *str = gNameCharTables[sCMakeCharPage * 5 + sCMakeCursor[1]];
+#if defined(VERSION_GCCJGC)
+        s32 wide;
+        s32 i;
+        s32 j;
+        s32 len;
+#endif
 
         Str_GetChar(str, sCMakeCursor[0], ch);
+#if defined(VERSION_GCCJGC)
+        wide = Str_IsWideChar(sCMakeName, sCMakeNameLen - 1);
+#else
         Str_IsWideChar(sCMakeName, sCMakeNameLen - 1);
+#endif
         Str_GetChar(sCMakeName, sCMakeNameLen - 1, prev);
+#if defined(VERSION_GCCJGC)
+        if (wide && sCMakeNameLen != 0 && strcmp(ch, "\201J") == 0) {
+            for (i = 0; i < 2; i++) {
+                len = strlen(gNameDiacriticChars[i]);
+                str = gNameDiacriticChars[i];
+                for (j = 0; j < len; j += 2, str += 2) {
+                    if (memcmp(str, prev, 2) == 0) {
+                        n = strlen(sCMakeName);
+                        sCMakeName[n - 1]++;
+                        goto redraw;
+                    }
+                }
+            }
+            if (memcmp(prev, "\203E", 2) == 0) {
+                str = sCMakeName + strlen(sCMakeName) - 2;
+                memcpy(str, "\203\224", 3);
+                goto redraw;
+            }
+        } else if (wide && sCMakeNameLen != 0 && strcmp(ch, "\201K") == 0) {
+            len = strlen(gNameDiacriticChars[1]);
+            str = gNameDiacriticChars[1];
+            for (i = 0; i < len; i += 2, str += 2) {
+                if (memcmp(str, prev, 2) == 0) {
+                    n = strlen(sCMakeName);
+                    sCMakeName[n - 1] += 2;
+                    break;
+                }
+            }
+            if (len > i)
+                goto redraw;
+        }
+#endif
         strcat(sCMakeName, ch);
         sCMakeNameLen++;
     }
+#if defined(VERSION_GCCJGC)
+redraw:
+#endif
     Text_SetFill(0, 0);
     Text_Clear();
     CMakeName_PrintName(sCMakeName);
@@ -615,8 +696,54 @@ void CMakeName_DeleteChar(void)
     CMakeName_PrintName(sCMakeName);
 }
 
-s32 CMakeName_IsFull(void)
+/*
+ * --INFO--
+ * PAL Address: 0x0200B4B0
+ * PAL Size: 4b
+ * EN Address: 0x0200B3E0
+ * EN Size: 4b
+ * JP Address: 0x020115D8
+ * JP Size: 316b
+ */
+s32 CMakeName_CanApplyDiacritic(void)
 {
+#if defined(VERSION_GCCJGC)
+    char ch[4];
+    char prev[4];
+    char *str;
+    s32 i;
+    s32 j;
+    s32 len;
+
+    memset(ch, 0, 3);
+    memset(prev, 0, 3);
+    if (!Str_IsWideChar(sCMakeName, sCMakeNameLen - 1))
+        return 0;
+    str = gNameCharTables[sCMakeCharPage * 5 + sCMakeCursor[1]];
+    Str_GetChar(str, sCMakeCursor[0], ch);
+    if (strcmp(ch, "\201J") != 0 && strcmp(ch, "\201K") != 0)
+        return 0;
+    Str_GetChar(sCMakeName, sCMakeNameLen - 1, prev);
+    if (strcmp(ch, "\201J") == 0) {
+        for (i = 0; i < 2; i++) {
+            len = strlen(gNameDiacriticChars[i]);
+            str = gNameDiacriticChars[i];
+            for (j = 0; j < len; j += 2, str += 2) {
+                if (memcmp(str, prev, 2) == 0)
+                    return 1;
+            }
+        }
+        if (memcmp(prev, "\203E", 2) == 0)
+            return 1;
+    } else {
+        len = strlen(gNameDiacriticChars[1]);
+        str = gNameDiacriticChars[1];
+        for (i = 0; i < len; i += 2, str += 2) {
+            if (memcmp(str, prev, 2) == 0)
+                return 1;
+        }
+    }
+#endif
     return 0;
 }
 
@@ -848,6 +975,15 @@ void CMakeLookScreen_Setup(void)
     Header_Clear();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200BA90
+ * PAL Size: 424b
+ * EN Address: 0x0200B9C0
+ * EN Size: 424b
+ * JP Address: 0x02011CF4
+ * JP Size: 428b
+ */
 s32 CMakeLookScreen_Init(void)
 {
     struct Window tmp;
@@ -855,6 +991,7 @@ s32 CMakeLookScreen_Init(void)
     s32 ret = 0;
     struct Window *win = gWindows;
     s32 row;
+    s32 half;
     s32 i;
     s32 tile;
     s32 pal;
@@ -873,9 +1010,9 @@ s32 CMakeLookScreen_Init(void)
         ret = 1;
     }
     row = win->anim >> 3;
-    if (ret == 0 && !(row & 1) && (row >>= 1) <= 4) {
+    if (ret == 0 && !(row & 1) && (half = row >> 1) <= 4) {
         Text_Clear();
-        row--;
+        row = half - 1;
         memcpy(&tmp, win, sizeof(struct Window));
         tmp.bg--;
         Text_SetX(20);
@@ -1362,6 +1499,15 @@ s32 CMakeBirthdayScreen_HandleInput(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200C7F0
+ * PAL Size: 364b
+ * EN Address: 0x0200C720
+ * EN Size: 364b
+ * JP Address: 0x02012A5C
+ * JP Size: 348b
+ */
 void CMakeFavoriteScreen_Setup(void)
 {
     struct Window *win;
@@ -1420,6 +1566,15 @@ void CMakeFavoriteScreen_Setup(void)
     Header_Clear();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200C95C
+ * PAL Size: 196b
+ * EN Address: 0x0200C88C
+ * EN Size: 194b
+ * JP Address: 0x02012BB8
+ * JP Size: 192b
+ */
 s32 CMakeFavoriteScreen_Init(void)
 {
     s32 ret = 0;
@@ -1941,6 +2096,15 @@ s32 CMakeJobScreen_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200D680
+ * PAL Size: 100b
+ * EN Address: 0x0200D5B0
+ * EN Size: 100b
+ * JP Address: 0x020138C8
+ * JP Size: 108b
+ */
 void CMakeJobScreen_PrintNextRow(void)
 {
     struct Window tmp;
@@ -1951,7 +2115,11 @@ void CMakeJobScreen_PrintNextRow(void)
         tmp.width = 8;
         Text_SetFill(0, 0);
         Text_Clear();
+#if defined(VERSION_GCCJGC)
+        Text_Print(Msg_GetCMake(sCMakeTextRow + 12), TEXT_DRAW);
+#else
         Text_Print(Msg_GetJob(sCMakeTextRow), TEXT_DRAW);
+#endif
         Window_PutText(&tmp, sCMakeTextRow, 0);
         sCMakeTextRow++;
     }
@@ -2068,8 +2236,8 @@ s32 CMakeJobScreen_HandleInput(void)
  * PAL Size: 392b
  * EN Address: 0x0200D864
  * EN Size: 392b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x02013B84
+ * JP Size: 360b
  */
 void CMakeConfirmScreen_Setup(void)
 {
@@ -2243,8 +2411,8 @@ s32 CMakeConfirmScreen_Exit(void)
  * PAL Size: 316b
  * EN Address: 0x0200DC74
  * EN Size: 316b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x02013F6C
+ * JP Size: 332b
  */
 void CMakeConfirmScreen_PrintNextRow(void)
 {
@@ -2260,8 +2428,18 @@ void CMakeConfirmScreen_PrintNextRow(void)
         Text_SetFill(0, 0);
         Text_Clear();
         memset(buf, 0, sizeof(buf));
+#if defined(VERSION_GCCJGC)
+        {
+            s32 row = sCMakeTextRow + 1;
+            if (sCMakeTextRow == 3)
+                row = sCMakeTextRow + 3;
+            n = strstr(Msg_GetCMake(row), "\202\360") - Msg_GetCMake(row);
+            memcpy(buf, Msg_GetCMake(row), n);
+        }
+#else
         idx = sCMakeTextRow + 23;
         strcpy(buf, Msg_GetCMake(idx));
+#endif
         Text_Print(buf, TEXT_DRAW);
         Text_AddX(8);
         if (sCMakeTextRow == 0) {
@@ -2271,14 +2449,25 @@ void CMakeConfirmScreen_PrintNextRow(void)
             Text_Print(Msg_GetCMake(n), TEXT_DRAW);
         } else if (sCMakeTextRow == 2) {
             n = gCMakeData.look & 3;
+#if defined(VERSION_GCCJGC)
+            Text_Print(Msg_GetTribe(n), TEXT_DRAW);
+#else
             strcpy(buf, Msg_GetTribe(n));
             strcat(buf, ",");
             Text_Print(buf, TEXT_DRAW);
+#endif
             Text_AddX(8);
             idx = n * 8;
             if (gCMakeData.look & 0x80)
                 idx += 4;
+#if defined(VERSION_GCCJGC)
+            {
+                s32 lookIndex = (gCMakeData.look >> 2) & 3;
+                Text_Print(Msg_GetLook(idx + lookIndex), TEXT_DRAW);
+            }
+#else
             Text_Print(Msg_GetLook(idx + ((gCMakeData.look >> 2) & 3)), TEXT_DRAW);
+#endif
         } else if (sCMakeTextRow == 3) {
             n = gCMakeData.job[0];
             Text_Print(Msg_GetCMake(n + 12), TEXT_DRAW);

@@ -16,7 +16,9 @@ static s32 sCmdTop;
 static s8 sCmdRowOffset;
 static s8 sCmdQuit;
 static s8 sCmdLoaded;
+#if !defined(VERSION_GCCJGC)
 static s8 sCmdPollTimer;
+#endif
 extern const u8 gCmdArtifactIds[];
 
 void CmdListScreen_DrawCursor(void);
@@ -31,6 +33,15 @@ void CmdListScreen_DrawIcons(void);
 s32 CmdList_GetSlotItem(s32);
 void CmdListScreen_PrintDesc(void);
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200E184
+ * PAL Size: 448b
+ * EN Address: 0x0200E0B4
+ * EN Size: 448b
+ * JP Address: 0x0200A0F8
+ * JP Size: 420b
+ */
 void CmdListScreen_Setup(void)
 {
     DmaClear32(0, 0, gWindows, sizeof(struct Window) * 5);
@@ -84,12 +95,25 @@ void CmdListScreen_Setup(void)
     CmdListScreen_BuildCandidates();
     HelpWin_Clear(2, 1);
     HelpWin_DrawFrame(2, 1, 7);
+#if !defined(VERSION_GCCJGC)
     gDataFlags &= ~DATA_CMD_LIST;
+#endif
     sCmdLoaded = 0;
+#if !defined(VERSION_GCCJGC)
     sCmdPollTimer = 0;
+#endif
     gScreenInitDone = 1;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200E344
+ * PAL Size: 276b
+ * EN Address: 0x0200E274
+ * EN Size: 276b
+ * JP Address: 0x0200A29C
+ * JP Size: 288b
+ */
 s32 CmdListScreen_Init(void)
 {
     struct Window *win = gWindows;
@@ -118,8 +142,10 @@ s32 CmdListScreen_Init(void)
             Text_Print(Msg_GetSystem(36), TEXT_DRAW);
             y = 2;
         } else {
-            if (row < win->rows && (s16)gSession.cmdSlots[row] >= 0)
-                Text_Print(Msg_GetItemName(CmdList_GetSlotItem(row)), TEXT_DRAW);
+            if (row < win->rows && (s16)gSession.cmdSlots[row] >= 0) {
+                s32 itemId = CmdList_GetSlotItem(row);
+                Text_Print(Msg_GetItemName(itemId), TEXT_DRAW);
+            }
             y = row * 2;
         }
         win->bg--;
@@ -133,20 +159,34 @@ s32 CmdListScreen_Init(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200E458
+ * PAL Size: 392b
+ * EN Address: 0x0200E388
+ * EN Size: 392b
+ * JP Address: 0x0200A3BC
+ * JP Size: 276b
+ */
 s32 CmdListScreen_Main(void)
 {
     s32 ret;
 
     StatusWin_DrawIcon(0);
     if (!(gDataFlags & DATA_CMD_LIST)) {
+#if !defined(VERSION_GCCJGC)
         if (gKeysNew & A_BUTTON) {
             m4aSongNumStart(0);
-        } else if (gKeysNew & B_BUTTON) {
+        } else
+#endif
+        if (gKeysNew & B_BUTTON) {
             sCmdQuit = 1;
             gOpenMenuReq = 1;
             m4aSongNumStart(3);
             return 1;
-        } else if (gKeysNew & (L_BUTTON | R_BUTTON)) {
+        }
+#if !defined(VERSION_GCCJGC)
+        else if (gKeysNew & (L_BUTTON | R_BUTTON)) {
             if (gKeysNew & R_BUTTON)
                 gScreenStep = 1;
             else
@@ -160,6 +200,7 @@ s32 CmdListScreen_Main(void)
             Link_SendScreenId(*(s8 *)&gScreen);
             sCmdPollTimer = 0;
         }
+#endif
         return 0;
     }
     if (sCmdLoaded == 0) {
@@ -546,6 +587,15 @@ void CmdList_SetSlot(s32 slot, s32 idx)
     CmdListScreen_PrintSlot(slot);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200EE88
+ * PAL Size: 392b
+ * EN Address: 0x0200EDB4
+ * EN Size: 392b
+ * JP Address: 0x0200AD78
+ * JP Size: 376b
+ */
 void CmdListScreen_DrawIcons(void)
 {
     struct Window *win = &gWindows[2];
@@ -559,7 +609,8 @@ void CmdListScreen_DrawIcons(void)
     x = (win->x + win->width) * 8 - 18;
     for (i = 2; i < win->rows; i++) {
         if ((s16)gSession.cmdSlots[i] != -1) {
-            id = Item_GetIcon(CmdList_GetSlotItem(i));
+            s32 itemId = CmdList_GetSlotItem(i);
+            id = Item_GetIcon(itemId);
             pal = Obj_GetPalette(0, id);
             y = win->y * 8 + i * 16;
             Obj_Draw(x, y, 0, id, pal, win->bg, 0);
@@ -567,7 +618,11 @@ void CmdListScreen_DrawIcons(void)
     }
     if (gSubMode && gSubState == 1) {
         win = &gWindows[1];
+#if defined(VERSION_GCCJGC)
+        id = 4;
+#else
         id = (gLanguage & 15) == 1 ? 24 : 4;
+#endif
         pal = Obj_GetPalette(2, id);
         x = win->x * 8 + 6;
         for (i = 0; i < win->rows; i++) {
@@ -588,16 +643,28 @@ void CmdListScreen_DrawIcons(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200F010
+ * PAL Size: 108b
+ * EN Address: 0x0200EF3C
+ * EN Size: 108b
+ * JP Address: 0x0200AEF0
+ * JP Size: 116b
+ */
 void CmdListScreen_PrintSlot(s32 row)
 {
     struct Window *win = &gWindows[2];
+    s32 id;
 
     Text_SetFill(0, 0);
     Text_Clear();
     Window_DrawSlotRow(2, CmdList_GetSlotType(row), row);
     Text_SetX(8);
-    if ((s16)gSession.cmdSlots[row] >= 0)
-        Text_Print(Msg_GetItemName(CmdList_GetSlotItem(row)), TEXT_DRAW);
+    if ((s16)gSession.cmdSlots[row] >= 0) {
+        id = CmdList_GetSlotItem(row);
+        Text_Print(Msg_GetItemName(id), TEXT_DRAW);
+    }
     win->bg--;
     Window_PutText(win, row, 0);
     win->bg++;
@@ -687,7 +754,11 @@ void CmdListScreen_PrintDesc(void)
         if (item->flags & 0x100)
             Text_Print(Msg_GetSystem(16), TEXT_DRAW);
         else if (item->flags & 0xE00)
+#if defined(VERSION_GCCJGC)
+            Text_Print(Msg_GetSystem(7), TEXT_DRAW);
+#else
             Text_Print(Msg_GetSystem(63), TEXT_DRAW);
+#endif
         if (!(item->flags & 0x3000)) {
             Text_AddX(8);
             idx = Text_GetX();
@@ -702,7 +773,7 @@ void CmdListScreen_PrintDesc(void)
                 msg = 39;
                 if (idx)
                     msg = 40;
-#if !defined(VERSION_GCCE01)
+#if defined(VERSION_GCCP01)
                 Text_AddX(8);
 #endif
                 Text_Print(Msg_GetSystem(msg), TEXT_DRAW);

@@ -71,6 +71,25 @@ s32 LetterAttach_Init(void);
 s32 LetterAttach_Main(void);
 s32 LetterAttach_Exit(void);
 
+#if defined(VERSION_GCCJGC)
+char *gLetterText_Jp[] = {
+    "\202\360\202\306\202\350\202\276\202\265\202\334\202\267\202\251?",
+    "\203A\203C\203e\203\200\202\360\202\302\202\257\202\351",
+    "\201w",
+    "\201x",
+    "\202\306\202\250\202\255\202\351",
+    "\202\311",
+    "\202\306\202\250\202\255\202\350\202\334\202\267",
+    "\202\261\202\352\202\305\202\346\202\353\202\265\202\242\202\305\202\267\202\251?",
+    "\202\252",
+    "\202\306\202\350\202\276\202\271\202\334\202\271\202\361\202\305\202\265\202\275",
+    "\202\304\202\252\202\335\202\252\202\250\202\255\202\352\202\334\202\271\202\361\202\305\202\265\202\275",
+    "\203M\203\213\202\360\202\302\202\257\202\351",
+    "\202\310\202\311\202\340\202\302\202\257\202\310\202\242",
+    "\202\360\202\302\202\257\202\334\202\267",
+};
+#endif
+
 struct ScreenFuncs gLetterStates[] = {
     { LetterList_Init, LetterList_Main, LetterList_Exit },
     { LetterRead_Init, LetterRead_Main, LetterRead_Exit },
@@ -604,7 +623,7 @@ s32 LetterGift_Main(void)
         }
         Window_PutText(win, sLetterRow, 0);
         attr = Session_IsItemInUse(sLetterRow) ? 6 : 5;
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
         if (attr == 5 && Session_GetItemCategory(sLetterRow) == 1)
 #else
         if (attr == 5 && (Session_GetItemCategory(sLetterRow) == 1 || Session_GetItemCategory(sLetterRow) == 3))
@@ -792,7 +811,11 @@ s32 LetterSend_Main(void)
             sLetterFailed = 1;
             ret = 1;
         }
+#if defined(VERSION_GCCJGC)
+        Letter_DrawCursor((win->x + 1) * 8, (win->y + 1) * 8 + win->cursor * 16);
+#else
         Letter_DrawCursor((win->x + 1) * 8 - 2, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     }
     return ret;
 }
@@ -897,7 +920,9 @@ s32 LetterError_Exit(void)
 s32 LetterTake_Init(void)
 {
     char buf[256];
+#if !defined(VERSION_GCCJGC)
     s32 mode = gLanguage & 15;
+#endif
     struct Window *win = &gWindows[1];
     struct LetterEntry *entry;
     s32 w;
@@ -907,6 +932,16 @@ s32 LetterTake_Init(void)
     if (sLetterSubInit == 0) {
         memset(win, 0, sizeof(struct Window));
         entry = &LETTER_ENTRIES[sLetterSel];
+#if defined(VERSION_GCCJGC)
+        if (entry->flags & 8) {
+            strcpy(buf, Msg_GetItemName(entry->attachment));
+            strcat(buf, Msg_GetLetter(0));
+        } else {
+            IntToStr(buf, entry->attachment);
+            strcat(buf, Msg_GetSystem(5));
+            strcat(buf, Msg_GetLetter(0));
+        }
+#else
         memset(buf, 0, sizeof(buf));
         if (mode != 1)
             strcpy(buf, Msg_GetLetter(0));
@@ -926,6 +961,7 @@ s32 LetterTake_Init(void)
             strcat(buf, Msg_GetLetter(0));
         else
             strcat(buf, sQuestionText);
+#endif
         Text_SetFill(1, 1);
         Text_Clear();
         Text_Print(buf, TEXT_DRAW);
@@ -1030,7 +1066,11 @@ s32 LetterTake_Main(void)
                 ret = 1;
             }
         }
+#if defined(VERSION_GCCJGC)
+        Letter_DrawCursor((win->x + 1) * 8, (win->y + 1) * 8 + win->cursor * 16);
+#else
         Letter_DrawCursor((win->x + 1) * 8 - 2, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     }
     if (ret)
         Reply_Clear();
@@ -1077,13 +1117,15 @@ s32 LetterTaken_Init(void)
         memset(win, 0, sizeof(struct Window));
         memset(buf, 0, sizeof(buf));
         entry = &LETTER_ENTRIES[sLetterSel];
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
         if (entry->flags & 8) {
             strcpy(buf, Msg_GetItemName(entry->attachment));
             strcat(buf, Msg_GetLetter(8));
         } else {
             IntToStr(buf, entry->attachment);
+#if !defined(VERSION_GCCJGC)
             strcat(buf, sSpaceText);
+#endif
             strcat(buf, Msg_GetSystem(5));
             strcat(buf, Msg_GetLetter(8));
         }
@@ -1095,7 +1137,9 @@ s32 LetterTaken_Init(void)
         } else {
             w = strlen(buf);
             IntToStr(buf + w, entry->attachment);
+#if !defined(VERSION_GCCJGC)
             strcat(buf, sSpaceText);
+#endif
             strcat(buf, Msg_GetSystem(5));
         }
         if (!(gLanguage & 15))
@@ -1103,7 +1147,7 @@ s32 LetterTaken_Init(void)
 #endif
         Text_SetFill(1, 1);
         Text_Clear();
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
         w2 = Text_Print(Msg_GetLetter(9), TEXT_WIDTH);
         str = buf;
 #else
@@ -1137,7 +1181,7 @@ s32 LetterTaken_Init(void)
             win->items[i].text = Msg_GetSystem(0);
         }
         Window_PutText(win, 0, 0);
-#if !defined(VERSION_GCCE01)
+#if defined(VERSION_GCCP01)
         if (!(gLanguage & 15)) {
             Text_Clear();
             Text_Print(buf, TEXT_DRAW);
@@ -1150,7 +1194,7 @@ s32 LetterTaken_Init(void)
     }
     Text_SetFill(1, 1);
     w = win->anim >> 3;
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
     if (w == 1) {
 #else
     if (w == 1 && (gLanguage & 15)) {
@@ -1242,6 +1286,9 @@ s32 LetterAnswer_Init(void)
                 strcat(buf, str);
             }
             strcat(buf, Msg_GetLetter(3));
+#if defined(VERSION_GCCJGC)
+            strcat(buf, Msg_GetLetter(4));
+#endif
             if (i) {
                 len = Text_Print(buf, TEXT_WIDTH);
             } else {
@@ -1251,7 +1298,7 @@ s32 LetterAnswer_Init(void)
             if (w < len)
                 w = len;
         }
-#if !defined(VERSION_GCCE01)
+#if defined(VERSION_GCCP01)
         len = Text_Print(Msg_GetSystem(4), TEXT_WIDTH);
         if (w < len)
             w = len;
@@ -1307,6 +1354,9 @@ s32 LetterAnswer_Init(void)
                 strcat(buf, str);
             }
             strcat(buf, Msg_GetLetter(3));
+#if defined(VERSION_GCCJGC)
+            strcat(buf, Msg_GetLetter(4));
+#endif
             Text_Print(buf, TEXT_DRAW);
         }
         Window_PutText(win, w, 0);
@@ -1361,7 +1411,11 @@ s32 LetterAnswer_Main(void)
                 }
             }
         }
+#if defined(VERSION_GCCJGC)
+        Letter_DrawCursor((win->x - 1) * 8, (win->y + 1) * 8 + win->cursor * 16);
+#else
         Letter_DrawCursor(win->x * 8 - 10, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     }
     return ret;
 }
@@ -1395,6 +1449,7 @@ s32 LetterAttach_Init(void)
     if (sLetterSubInit == 0) {
         memset(win, 0, sizeof(struct Window));
         w = Text_Print(Msg_GetLetter(1), TEXT_WIDTH);
+#if !defined(VERSION_GCCJGC)
         w2 = Text_Print(Msg_GetLetter(11), TEXT_WIDTH);
         if (w < w2)
             w = w2;
@@ -1404,6 +1459,7 @@ s32 LetterAttach_Init(void)
         w2 = Text_Print(Msg_GetSystem(4), TEXT_WIDTH);
         if (w < w2)
             w = w2;
+#endif
         w = (w & 7) ? (w >> 3) + 1 : w >> 3;
         win->active = 1;
         win->cursor = 0;
@@ -1476,7 +1532,11 @@ s32 LetterAttach_Main(void)
                 }
             }
         }
+#if defined(VERSION_GCCJGC)
+        Letter_DrawCursor((win->x - 1) * 8, (win->y + 1) * 8 + win->cursor * 16);
+#else
         Letter_DrawCursor(win->x * 8 - 10, (win->y + 1) * 8 + win->cursor * 16);
+#endif
     }
     return ret;
 }
@@ -1692,7 +1752,11 @@ void LetterList_DrawIcons(void)
     for (i = 0; i < n; i++, entry++) {
         if (entry->flags & 0x18) {
             y = (i * 2 + 1) * 8;
+#if defined(VERSION_GCCJGC)
+            frame = (entry->flags & 2) ? 0x37 : 0x36;
+#else
             frame = (entry->flags & 2) ? 0x35 : 0x34;
+#endif
             Obj_Draw(x, y - 3, 0, frame, Obj_GetPalette(0, frame), 0, 0);
         }
     }
@@ -1820,7 +1884,11 @@ void LetterRead_DrawAttachIcon(void)
         y = win->y + win->height - 4;
         x *= 8;
         y *= 8;
+#if defined(VERSION_GCCJGC)
+        frame = (entry->flags & 2) ? 0x37 : 0x36;
+#else
         frame = (entry->flags & 2) ? 0x35 : 0x34;
+#endif
         Obj_Draw(x, y, 0, frame, Obj_GetPalette(0, frame), win->bg - 1, 0);
     }
 }
@@ -1866,16 +1934,28 @@ void LetterGift_DrawIcons(void)
         if (v > 0) {
             id = Item_GetIcon(v);
             pal = Obj_GetPalette(0, id);
+#if defined(VERSION_GCCJGC)
+            Obj_Draw(x, y, 0, id, pal, win->bg, 0);
+#else
             Obj_Draw(x - 2, y, 0, id, pal, win->bg, 0);
+#endif
         }
     }
     x = (win->x + 1) * 8;
     y = (win->y + 1) * 8;
+#if defined(VERSION_GCCJGC)
+    id = 4;
+#else
     id = ((gLanguage & 15) == 1) ? 24 : 4;
+#endif
     pal = Obj_GetPalette(2, id);
     for (i = 0; i < win->rows; i++, y += 16) {
         if (Session_IsItemInUse(i + sLetterGiftTop))
+#if defined(VERSION_GCCJGC)
+            Obj_Draw(x - 4, y, 2, id, pal, win->bg, 0);
+#else
             Obj_Draw(x - 4, y, 2, id, pal, win->bg - 1, 0);
+#endif
     }
 }
 

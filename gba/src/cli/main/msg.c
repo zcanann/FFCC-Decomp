@@ -656,8 +656,6 @@ char *Msg_GetCMake(s32 idx)
     return tbl[idx];
 }
 
-#endif
-
 char *Msg_GetLetter(s32 idx)
 {
     char **tbl;
@@ -683,7 +681,6 @@ char *Msg_GetLetter(s32 idx)
     return tbl[idx];
 }
 
-#if !defined(VERSION_GCCJGC)
 /*
  * --INFO--
  * PAL Address: 0x0201AAAC

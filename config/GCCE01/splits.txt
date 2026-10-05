@@ -415,3 +415,113 @@ ax/AXOut.c:
 ax/DSPCode.c:
 	.data start:0x802186C0 end:0x8021A5E0
 	.sdata start:0x8032DB38 end:0x8032DB3A
+
+dvd/dvdqueue.c:
+	.text	start:0x8018A050 end:0x8018A248
+	.bss	start:0x8030BA98 end:0x8030BAB8
+
+dvd/dvderror.c:
+	.text	start:0x8018A248 end:0x8018A3E0
+	.data	start:0x802165A8 end:0x802165F0
+
+os/OSInterrupt.c:
+	.text	start:0x8017D290 end:0x8017DAFC
+	.data	start:0x80215F90 end:0x80215FBC
+	.sbss	start:0x8032DF60 end:0x8032DF78
+
+os/OSMemory.c:
+	.text	start:0x8017DD18 end:0x8017DFFC
+	.data	start:0x80215FC0 end:0x80215FD0
+
+os/OSMessage.c:
+	.text	start:0x8017DB14 end:0x8017DD18
+
+os/OSMutex.c:
+	.text	start:0x8017DFFC end:0x8017E06C
+
+gx/GXLight.c:
+	.text	start:0x801A23D4 end:0x801A2A5C
+	.data	start:0x8021B5D0 end:0x8021B5EC
+	.sdata2	start:0x80332808 end:0x8033284C
+
+gx/GXMisc.c:
+	.text	start:0x801A0B64 end:0x801A1308
+	.sbss	start:0x8032E310 end:0x8032E324
+
+gx/GXTev.c:
+	.text	start:0x801A40BC end:0x801A48A0
+	.data	start:0x8021B818 end:0x8021B88C
+
+os/OSError.c:
+	.text start:0x8017CCB8 end:0x8017D238
+	.data start:0x80215C70 end:0x80215F8C
+	.bss start:0x8030ABB0 end:0x8030ABF4
+	.sdata start:0x8032DA80 end:0x8032DA88
+
+os/OSContext.c:
+	.text start:0x8017C448 end:0x8017CCB8
+	.data start:0x80215A98 end:0x80215C70
+
+os/OSAlarm.c:
+	.text start:0x8017B0D0 end:0x8017B838
+	.sbss start:0x8032DF40 end:0x8032DF48
+
+os/OSThread.c:
+	.text start:0x8017F8D8 end:0x80180ADC
+	.bss start:0x8030AC78 end:0x8030B670
+	.sdata start:0x8032DA90 end:0x8032DA94
+	.sbss start:0x8032DFB0 end:0x8032DFBC
+
+pppRyjMegaBirthModel.cpp:
+	.text start:0x80083B80 end:0x8008788C
+
+partyobj.cpp:
+	.text start:0x801198D4 end:0x80123CC8
+
+partMng.cpp:
+	.text start:0x80057184 end:0x8005F084
+
+memory.cpp:
+	.text start:0x8001C0E4 end:0x8001FC68
+
+materialman.cpp:
+	.text start:0x8003BFAC end:0x80043B04
+
+mapobj.cpp:
+	.text start:0x800285C4 end:0x8002C4F8
+
+p_camera.cpp:
+	.text start:0x80036084 end:0x8003A3F0
+
+gobject.cpp:
+	.text start:0x8007B7F4 end:0x80081C14
+
+chara.cpp:
+	.text start:0x8006E46C end:0x8007345C
+
+cflat_runtime2.cpp:
+	.text start:0x80069470 end:0x8006e46c
+
+cflat_runtime.cpp:
+	.text start:0x80065614 end:0x80069470
+
+joybus.cpp:
+	.text start:0x800A593C end:0x800B218C
+
+gbaque.cpp:
+	.text start:0x800C82F0 end:0x800D0DD8
+
+map.cpp:
+	.text start:0x8002f250 end:0x8003477c
+
+monobj.cpp:
+	.text start:0x801120b4 end:0x801198d4
+
+monobj_boss.cpp:
+	.text start:0x8012d90c end:0x80132428
+
+p_menu.cpp:
+	.text start:0x80093814 end:0x80097174
+
+p_minigame.cpp:
+	.text start:0x80126EA4 end:0x8012A57C

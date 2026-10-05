@@ -106,7 +106,7 @@ libagbsyscall/VBlankIntrWait:
 joy_reset:
 	.text       start:0x0201C2B0 end:0x0201C2D0
 
-regional_text:
+libc/string/memcmp:
 	.text       start:0x0201C2D0 end:0x0201C318
 
 libc/string/memcpy:
@@ -130,7 +130,7 @@ libc/string/strcpy:
 libc/string/strlen:
 	.text       start:0x0201C548 end:0x0201C58C
 
-regional_text:
+libc/string/strstr:
 	.text       start:0x0201C58C end:0x0201C5D0
 
 libgcc/_call_via_rX:
@@ -166,14 +166,14 @@ main/artifact:
 main/textmask:
 	.rodata     start:0x0201CB84 end:0x0201CBA4 align:4
 
+main/letter:
+	.rodata     start:0x0201CBA4 end:0x0201CC70 align:4
+
 regional_data:
-	.rodata     start:0x0201CBA4 end:0x0201CC78
+	.rodata     start:0x0201CC70 end:0x0201CC78
 
 main/cmake:
-	.rodata     start:0x0201CC78 end:0x0201D160 align:4
-
-regional_data:
-	.rodata     start:0x0201D160 end:0x0201D178
+	.rodata     start:0x0201CC78 end:0x0201D178 align:4
 
 main/shop:
 	.rodata     start:0x0201D178 end:0x0201D17C align:4
@@ -208,8 +208,8 @@ main/obj:
 main/mode:
 	.data       start:0x02025ABC end:0x02025C18 align:4
 
-regional_data:
-	.rodata     start:0x02025C18 end:0x02025CBC
+main/letter:
+	.data       start:0x02025C18 end:0x02025CBC align:4
 
 main/cmake:
 	.data       start:0x02025CBC end:0x02025DF0 align:4
@@ -236,7 +236,13 @@ main/xfer:
 	.bss        start:0x03000880 end:0x030008BC align:8
 
 regional_bss:
-	.bss        start:0x030008BC end:0x030008E8
+	.bss        start:0x030008BC end:0x030008C0 align:1
+
+main/session:
+	.bss        start:0x030008C0 end:0x030008E1 align:8
+
+regional_bss:
+	.bss        start:0x030008E1 end:0x030008E8 align:1
 
 main/text:
 	.bss        start:0x030008E8 end:0x03001174 align:8
@@ -247,8 +253,11 @@ main/radarmap:
 main/obj:
 	.bss        start:0x03001190 end:0x03002772 align:8
 
+main/cmdlist:
+	.bss        start:0x03002774 end:0x03002783 align:4
+
 regional_bss:
-	.bss        start:0x03002774 end:0x03002784 align:4
+	.bss        start:0x03002783 end:0x03002784 align:1
 
 main/radar:
 	.bss        start:0x03002784 end:0x03002785 align:4
@@ -266,7 +275,10 @@ main/family:
 	.bss        start:0x03002794 end:0x03002796 align:4
 
 regional_bss:
-	.bss        start:0x03002796 end:0x030027B4 align:1
+	.bss        start:0x03002796 end:0x03002798 align:1
+
+main/letter:
+	.bss        start:0x03002798 end:0x030027B4 align:4
 
 main/item:
 	.bss        start:0x030027B4 end:0x030027BE align:4
@@ -278,7 +290,13 @@ main/gil:
 	.bss        start:0x030027C0 end:0x030027CE align:4
 
 regional_bss:
-	.bss        start:0x030027CE end:0x03002800 align:1
+	.bss        start:0x030027CE end:0x030027D0 align:1
+
+main/cmake:
+	.bss        start:0x030027D0 end:0x030027FD align:8
+
+regional_bss:
+	.bss        start:0x030027FD end:0x03002800 align:1
 
 main/equip:
 	.bss        start:0x03002800 end:0x03002805 align:4
@@ -326,7 +344,19 @@ main/xfer:
 	.common     start:0x03002AF0 end:0x03002AFC align:4
 
 regional_bss:
-	.bss        start:0x03002AFC end:0x030030B0
+	.bss        start:0x03002AFC end:0x03002CA0
+
+main/session:
+	.common     start:0x03002CA0 end:0x03002DD0 align:16
+
+regional_bss:
+	.bss        start:0x03002DD0 end:0x03002FB0
+
+main/cmake:
+	.common     start:0x03002FB0 end:0x03002FCC align:16
+
+regional_bss:
+	.bss        start:0x03002FCC end:0x030030B0
 
 main/mode:
 	.common     start:0x030030B0 end:0x030032E8 align:16

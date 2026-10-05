@@ -39,6 +39,7 @@ extern char *gMonsterNames_Jp[];
 extern char *gItemDescs_Jp[];
 extern char *gCMakeText_Jp[];
 extern char *gLookNames_Jp[];
+extern char *gLetterText_Jp[];
 extern const u8 gItemIcons[];
 
 #define Msg_GetTribe(idx) (gTribeNames_Jp[(idx)])
@@ -52,6 +53,7 @@ extern const u8 gItemIcons[];
 #define Item_GetIcon(idx) (gItemIcons[(idx)])
 #define Msg_GetCMake(idx) (gCMakeText_Jp[(idx)])
 #define Msg_GetLook(idx) (gLookNames_Jp[(idx)])
+#define Msg_GetLetter(idx) (gLetterText_Jp[(idx)])
 #else
 char *Msg_GetTribe(s32 idx);
 char *Msg_GetSystem(s32 idx);
@@ -63,8 +65,8 @@ char *Msg_GetTrait(s32 idx);
 #if !defined(VERSION_GCCJGC)
 char *Msg_GetLook(s32 idx);
 char *Msg_GetCMake(s32 idx);
-#endif
 char *Msg_GetLetter(s32 idx);
+#endif
 #if !defined(VERSION_GCCJGC)
 char *Msg_GetItemName(s32 idx);
 s32 Item_GetIcon(s32 idx);

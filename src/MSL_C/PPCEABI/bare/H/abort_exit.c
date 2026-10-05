@@ -7,15 +7,15 @@
 
 void _ExitProcess();
 
-static void (*__atexit_funcs[64])(void);
+void (*__atexit_funcs[64])(void);
 
-static void (*__console_exit)(void);
+void (*__console_exit)(void);
 
 void (*__stdio_exit)(void);
 
-static int __atexit_curr_func;
+int __atexit_curr_func;
 
-static int __aborting;
+int __aborting;
 
 void abort(void) {
     raise(1);

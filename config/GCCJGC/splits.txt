@@ -96,3 +96,11 @@ MSL_C/PPCEABI/bare/H/e_fmod.c:
 MSL_C/PPCEABI/bare/H/signal.c:
 	.text start:0x801B3EE8 end:0x801B3FA8
 	.bss start:0x80348630 end:0x80348648
+
+MSL_C/PPCEABI/bare/H/abort_exit.c:
+	.text start:0x801AD168 end:0x801AD2F4
+	.bss start:0x803481F8 end:0x803482F8
+	.sbss start:0x8034C140 end:0x8034C150
+
+MSL_C/PPCEABI/bare/H/misc_io.c:
+	.text start:0x801B1E48 end:0x801B1E68

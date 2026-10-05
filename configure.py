@@ -1100,7 +1100,7 @@ config.libs = [
         "cflags": cflags_msl,
         "progress_category": "sdk",
         "objects": [
-            Object(Matching, "MSL_C/PPCEABI/bare/H/abort_exit.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/abort_exit.c"),
             Object(
                 Matching,
                 "MSL_C/PPCEABI/bare/H/alloc.c",
@@ -1139,7 +1139,7 @@ config.libs = [
                     "-inline deferred,auto",
                 ),
             ),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/misc_io.c", mw_version="GC/2.6"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/misc_io.c", mw_version="GC/2.6"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/printf.c", mw_version="GC/2.6"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/rand.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/signal.c"),

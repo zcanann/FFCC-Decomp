@@ -2,7 +2,7 @@
 #include <dolphin/os.h>
 #include <dolphin/mix.h>
 
-static AXART_SOUND* __AXARTSoundList;
+AXART_SOUND* __AXARTSoundList;
 
 void AXARTInit(void) {
     __AXARTSoundList = 0;

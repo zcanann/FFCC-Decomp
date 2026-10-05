@@ -966,14 +966,14 @@ config.libs = [
     DolphinLib(
         "mix",
         [
-            Object(Matching, "mix/mix.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mix/mix.c"),
         ],
     ),
     DolphinLib(
         "axart",
         [
-            Object(Matching, "axart/axart.c"),
-            Object(Matching, "axart/axart3d.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axart/axart.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axart/axart3d.c"),
         ],
     ),
     DolphinLib(

@@ -1037,3 +1037,16 @@ thp/THPAudio.c:
 gx/GXBump.c:
 	.text	start:0x8019F06C end:0x8019F700
 	.sdata2	start:0x8034FCE0 end:0x8034FCE8
+
+mix/mix.c:
+	.text	start:0x80191E80 end:0x80191EA0
+	.bss	start:0x80341640 end:0x80342E40
+
+axart/axart.c:
+	.text	start:0x80191EA0 end:0x80191F34
+	.sbss	start:0x8034C090 end:0x8034C094
+	.sdata2	start:0x8034FC30 end:0x8034FC38
+
+axart/axart3d.c:
+	.text	start:0x80191F34 end:0x80191F44
+	.sbss	start:0x8034C098 end:0x8034C0A0

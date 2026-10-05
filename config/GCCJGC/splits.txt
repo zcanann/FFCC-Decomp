@@ -1133,6 +1133,8 @@ auto_08_80345A1C_bss:
 
 pppPart.cpp:
 	.text start:0x80053458 end:0x80056BF0
+	.bss start:0x8028F368 end:0x802917E8
+	.sbss start:0x8034BB50 end:0x8034BB90
 
 game.cpp:
 	.bss start:0x8023A7B0 end:0x8024C748

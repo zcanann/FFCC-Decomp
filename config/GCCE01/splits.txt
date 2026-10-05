@@ -1194,6 +1194,8 @@ itemobj.cpp:
 
 pppPart.cpp:
 	.text start:0x800539EC end:0x80057184
+	.bss start:0x80272A28 end:0x80274EA8
+	.sbss start:0x8032DD30 end:0x8032DD70
 
 game.cpp:
 	.bss start:0x8021DE70 end:0x8022FE08

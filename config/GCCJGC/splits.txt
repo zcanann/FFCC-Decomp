@@ -1636,9 +1636,13 @@ pppYmTracer2.cpp:
 
 pppBlurChara.cpp:
 	.text start:0x800DADD4 end:0x800DB9F4
+	.rodata start:0x801D6110 end:0x801D6128
+	.sdata2 start:0x8034DD40 end:0x8034DD70
 
 pppEmission.cpp:
 	.text start:0x800E3320 end:0x800E3E28
+	.rodata start:0x801D62E0 end:0x801D62F0
+	.sdata2 start:0x8034DF00 end:0x8034DF28
 
 vector.cpp:
 	.text	start:0x800C258C end:0x800C2640

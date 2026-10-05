@@ -3692,10 +3692,10 @@ void CMenuPcs::DrawMCardMenu()
  * --INFO--
  * PAL Address: 0x800f98bc
  * PAL Size: 2320b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F8E60
+ * EN Size: 2324b
+ * JP Address: 0x800F5C18
+ * JP Size: 2176b
  */
 void CMenuPcs::DrawCMakeMenu()
 {
@@ -3777,7 +3777,7 @@ void CMenuPcs::DrawCMakeMenu()
 		const float* p255b = &FLOAT_80331458;
 		helpColor.a = static_cast<unsigned char>(static_cast<int>(*p255b * contentAlpha));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMemoryCardBannerTexture));
 		const float* pZeroR = &FLOAT_803313dc;
 		const float* pOneR = &FLOAT_803313e8;
 		const float* pWideR = &FLOAT_803313e0;
@@ -3787,6 +3787,17 @@ void CMenuPcs::DrawCMakeMenu()
 		         *pWideR, *pFortyR, *pZeroR, *pZeroR, *pOneR, *pOneR, *pZeroR);
 		if (m_wmWorldState->m_menuMode == 3) {
 			if (m_wmWorldState->m_menuMode == 3) {
+#ifdef VERSION_GCCJGC
+			char textList[3][256] = {
+				"\x83\x70\x81\x5B\x83\x65\x83\x42\x82\xCC\x83\x81\x83\x93\x83\x6F\x81\x5B\x82\xF0\x8C\x88\x82\xDF\x82\xC4\x82\xAD\x82\xBE\x82\xB3\x82\xA2",
+				"\x81\x75\x82\xC8\x82\xB5\x81\x76\x82\xF0\x91\x49\x82\xD4\x82\xC6\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x82\xF0\x8D\xEC\x90\xAC\x82\xB5\x82\xDC\x82\xB7",
+				"\x83\x81\x83\x93\x83\x6F\x81\x5B\x82\xAA\x8C\x88\x82\xDC\x82\xC1\x82\xBD\x82\xE7\x83\x58\x83\x5E\x81\x5B\x83\x67\x83\x7B\x83\x5E\x83\x93\x82\xF0\x89\x9F\x82\xB5\x82\xC4\x82\xAD\x82\xBE\x82\xB3\x82\xA2"
+			};
+			const int textIndex = m_wmHelpTimer / 90;
+			DrawFont(static_cast<int>(CalcCenteringPos(textList[textIndex], 22)), 391,
+			         CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
+			         7, textList[textIndex], 1.0f, 1.0f);
+#else
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x4B);
 			char* textList[3] = {0};
 			for (int i = 0; i < 3; i++) {
@@ -3796,16 +3807,13 @@ void CMenuPcs::DrawCMakeMenu()
 			char* const text = textList[textIndex];
 			const float* pW1 = &FLOAT_80331594;
 			const float* pH1 = &FLOAT_803313e8;
-#ifdef VERSION_GCCJGC
-			const int x = static_cast<int>(CalcCenteringPos(text, 22));
-#else
 			const int x = static_cast<int>(CalcCenteringPos2(text, *pW1, *pH1));
-#endif
 			const float* pY1 = &FLOAT_803317D0;
 			const float* pW1b = &FLOAT_80331594;
 			const float* pH1b = &FLOAT_803313e8;
 			DrawFont2(x, static_cast<int>(*pY1), textColor, 7, text,
 			          *pW1b, *pH1b, *pH1b);
+#endif
 			}
 		} else if (m_wmWorldState->m_menuMode == 8) {
 			const int mainMode = g_pGoOutMenu->m_mainMode;
@@ -3813,41 +3821,47 @@ void CMenuPcs::DrawCMakeMenu()
 			case 2:
 				switch (g_pGoOutMenu->m_goOutMode) {
 				case 0x0E: {
+#ifdef VERSION_GCCJGC
+					char text[256] = "\x83\x8D\x81\x5B\x83\x68\x82\xB7\x82\xE9\x83\x66\x81\x5B\x83\x5E\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
+					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(text, 22)), 391,
+					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
+					                 7, text, 1.0f, 1.0f);
+#else
 					char** const caseText = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 				unsigned int ci = 8;
 				char* const text = caseText[ci];
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const float* pWc = &FLOAT_80331594;
 					const float* pHc = &FLOAT_803313e8;
-#ifdef VERSION_GCCJGC
-					const int x = static_cast<int>(MenuPcs.CalcCenteringPos(text, 22));
-#else
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
-#endif
 					const float* pYc = &FLOAT_803317D0;
 					const float* pWc2 = &FLOAT_80331594;
 					const float* pHc2 = &FLOAT_803313e8;
 					MenuPcs.DrawFont2(x, static_cast<int>(*pYc), textColor, 7, text,
 					                  *pWc2, *pHc2, *pHc2);
+#endif
 					break;
 				}
 				case 0x0F: {
+#ifdef VERSION_GCCJGC
+					char text[256] = "\x88\xDA\x93\xAE\x82\xB7\x82\xE9\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
+					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(text, 22)), 391,
+					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
+					                 7, text, 1.0f, 1.0f);
+#else
 					char** const caseText = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 				unsigned int ci = 9;
 				char* const text = caseText[ci];
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const float* pWc = &FLOAT_80331594;
 					const float* pHc = &FLOAT_803313e8;
-#ifdef VERSION_GCCJGC
-					const int x = static_cast<int>(MenuPcs.CalcCenteringPos(text, 22));
-#else
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
-#endif
 					const float* pYc = &FLOAT_803317D0;
 					const float* pWc2 = &FLOAT_80331594;
 					const float* pHc2 = &FLOAT_803313e8;
 					MenuPcs.DrawFont2(x, static_cast<int>(*pYc), textColor, 7, text,
 					                  *pWc2, *pHc2, *pHc2);
+#endif
 					break;
 				}
 				}
@@ -3855,22 +3869,25 @@ void CMenuPcs::DrawCMakeMenu()
 			case 3:
 				switch (g_pGoOutMenu->m_deleteMode) {
 				case 2: {
+#ifdef VERSION_GCCJGC
+					char text[256] = "\x8D\xED\x8F\x9C\x82\xB7\x82\xE9\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
+					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(text, 22)), 391,
+					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
+					                 7, text, 1.0f, 1.0f);
+#else
 					char** const caseText = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 				unsigned int ci = 10;
 				char* const text = caseText[ci];
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const float* pWc = &FLOAT_80331594;
 					const float* pHc = &FLOAT_803313e8;
-#ifdef VERSION_GCCJGC
-					const int x = static_cast<int>(MenuPcs.CalcCenteringPos(text, 22));
-#else
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
-#endif
 					const float* pYc = &FLOAT_803317D0;
 					const float* pWc2 = &FLOAT_80331594;
 					const float* pHc2 = &FLOAT_803313e8;
 					MenuPcs.DrawFont2(x, static_cast<int>(*pYc), textColor, 7, text,
 					                  *pWc2, *pHc2, *pHc2);
+#endif
 					break;
 				}
 				}
@@ -3895,7 +3912,7 @@ void CMenuPcs::DrawCMakeMenu()
 			if (m_wmWorldState->m_delay <= 0) {
 				m_wmWorldState->m_mainState++;
 				m_wmWorldState->m_frameCounter = 0;
-				Sound.PlaySe(0x31 + (static_cast<int>(m_wmWorldState->m_nextMenuMode) >> 31), 0x40, 0x7F, 0);
+				Sound.PlaySe(0x31 + (m_wmWorldState->m_nextMenuMode < 0), 0x40, 0x7F, 0);
 			}
 		}
 	}

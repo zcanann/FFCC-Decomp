@@ -561,3 +561,9 @@ cmake.cpp:
 
 singmenu.cpp:
 	.rodata start:0x801DD684 end:0x801DD87C
+
+cflat_r2system.cpp:
+	.text start:0x800B218C end:0x800B9B98
+
+cflat_r2class.cpp:
+	.text start:0x800B9B98 end:0x800BD0E4

@@ -962,3 +962,10 @@ ref.cpp:
 	.data start:0x801E8A88 end:0x801E8A94
 	.sdata start:0x8032D578 end:0x8032D580
 	.sdata2 start:0x8032EAF0 end:0x8032EAF8
+
+gx/GXTransform.c:
+	.text	start:0x801A50E8 end:0x801A5898
+	.sdata2	start:0x803328B8 end:0x803328D8
+
+gx/GXStubs.c:
+	.text start:0x801A4ED8 end:0x801A4EDC

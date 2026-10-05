@@ -876,3 +876,10 @@ ref.cpp:
 	.data start:0x801DDF88 end:0x801DDF94
 	.sdata start:0x8034B398 end:0x8034B3A0
 	.sdata2 start:0x8034C888 end:0x8034C890
+
+gx/GXTransform.c:
+	.text	start:0x801A072C end:0x801A0EDC
+	.sdata2	start:0x8034FD20 end:0x8034FD40
+
+gx/GXStubs.c:
+	.text start:0x801A051C end:0x801A0520

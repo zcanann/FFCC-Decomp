@@ -1024,11 +1024,11 @@ config.libs = [
             Object(Matching, "gx/GXPerf.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXPixel.c"),
             Object(Matching, "gx/GXSave.c"),
-            Object(Matching, "gx/GXStubs.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXStubs.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXTev.c"),
             Object(Matching, "gx/GXTexture.c"),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "gx/GXTransform.c",
                 cflags=replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"),
             ),

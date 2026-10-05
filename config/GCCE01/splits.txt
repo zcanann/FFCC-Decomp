@@ -952,3 +952,7 @@ os/OSResetSW.c:
 os/OSTime.c:
 	.text	start:0x80180ADC end:0x80180F00
 	.data	start:0x80215FD0 end:0x80216030
+
+os/OSReset.c:
+	.text	start:0x8017E3C8 end:0x8017E7BC
+	.sbss start:0x8032DF88 end:0x8032DF90

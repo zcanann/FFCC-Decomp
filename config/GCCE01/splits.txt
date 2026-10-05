@@ -1181,3 +1181,6 @@ itemobj.cpp:
 
 pppPart.cpp:
 	.text start:0x800539EC end:0x80057184
+
+game.cpp:
+	.text start:0x80013D50 end:0x800161FC

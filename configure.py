@@ -1042,8 +1042,8 @@ config.libs = [
         "gba",
         [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBA.c"),
-            Object(Matching, "gba/GBAGetProcessStatus.c"),
-            Object(Matching, "gba/GBAJoyBoot.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAGetProcessStatus.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAJoyBoot.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBARead.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAWrite.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAXfer.c"),

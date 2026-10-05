@@ -2369,7 +2369,7 @@ gba/GBAGetProcessStatus.c:
 
 gba/GBAJoyBoot.c:
 	.text       start:0x801A7870 end:0x801A877C
-	.data       start:0x8021CB48 end:0x8021CB78
+	.data       start:0x8021CB48 end:0x8021CB75
 
 gba/GBARead.c:
 	.text       start:0x801A877C end:0x801A88DC
@@ -2847,3 +2847,6 @@ auto_10_8032F0DC_sbss:
 
 auto_07_8021C035_data:
 	.data start:0x8021C035 end:0x8021C038 align:1
+
+auto_07_8021CB75_data:
+	.data start:0x8021CB75 end:0x8021CB78 align:1

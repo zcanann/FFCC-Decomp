@@ -1106,3 +1106,13 @@ auto_07_8021AEB5_data:
 
 auto_07_8021AFF3_data:
 	.data start:0x8021AFF3 end:0x8021AFF8 align:1
+
+gba/GBAGetProcessStatus.c:
+	.text	start:0x801A65E0 end:0x801A6754
+
+gba/GBAJoyBoot.c:
+	.text	start:0x801A6754 end:0x801A7660
+	.data	start:0x8021BA08 end:0x8021BA35
+
+auto_07_8021BA35_data:
+	.data start:0x8021BA35 end:0x8021BA38 align:1

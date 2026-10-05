@@ -9,17 +9,9 @@
 
 #define GDEV_BUF_SIZE (0x500)
 
-typedef struct GdevRecvCB {
-    CircleBuffer cb;
-} GdevRecvCB;
-
-typedef struct GdevInitFlag {
-    BOOL value;
-} GdevInitFlag;
-
-static GdevRecvCB gRecvCB ATTRIBUTE_ALIGN(8);
+static CircleBuffer gRecvCB ATTRIBUTE_ALIGN(8);
 static u8 gRecvBuf[GDEV_BUF_SIZE] ATTRIBUTE_ALIGN(32);
-static GdevInitFlag gIsInitialized ATTRIBUTE_ALIGN(8);
+static BOOL gIsInitialized ATTRIBUTE_ALIGN(8);
 
 static const char gdev_cc_write_not_initialized[] = "cc not initialized\n";
 static const char gdev_cc_write_output_data[] = "cc_write : Output data 0x%08x %ld bytes\n";
@@ -43,7 +35,7 @@ int gdev_cc_initialize(void* inputPendingPtrRef, __OSInterruptHandler monitorCal
     MWTRACE(1, (char*)gdev_cc_initialize_calling_exi2_init);
     DBInitComm(inputPendingPtrRef, monitorCallback);
     MWTRACE(1, (char*)gdev_cc_initialize_done_calling_exi2_init);
-    CircleBufferInitialize(&gRecvCB.cb, gRecvBuf, GDEV_BUF_SIZE);
+    CircleBufferInitialize(&gRecvCB, gRecvBuf, GDEV_BUF_SIZE);
     return 0;
 }
 
@@ -72,11 +64,11 @@ int gdev_cc_shutdown()
  */
 int gdev_cc_open()
 {
-    if (gIsInitialized.value) {
+    if (gIsInitialized) {
         return GDEV_ERR_ALREADY_INITIALIZED;
     }
 
-    gIsInitialized.value = TRUE;
+    gIsInitialized = TRUE;
     return 0;
 }
 
@@ -112,7 +104,7 @@ int gdev_cc_read(u8* data, int size)
     int poll;
 
     result = 0;
-    if (!gIsInitialized.value) {
+    if (!gIsInitialized) {
         return GDEV_ERR_NOT_INITIALIZED;
     }
 
@@ -120,19 +112,19 @@ int gdev_cc_read(u8* data, int size)
 
     originalDataSize = size;
     expectedDataSize = size;
-    while ((u32)CBGetBytesAvailableForRead(&gRecvCB.cb) < expectedDataSize) {
+    while ((u32)CBGetBytesAvailableForRead(&gRecvCB) < expectedDataSize) {
         result = 0;
         poll = DBQueryData();
         if (poll != 0) {
             result = DBRead(buff, expectedDataSize);
             if (result == 0) {
-                CircleBufferWriteBytes(&gRecvCB.cb, buff, poll);
+                CircleBufferWriteBytes(&gRecvCB, buff, poll);
             }
         }
     }
 
     if (result == 0) {
-        CircleBufferReadBytes(&gRecvCB.cb, data, originalDataSize);
+        CircleBufferReadBytes(&gRecvCB, data, originalDataSize);
     } else {
         MWTRACE(8, (char*)gdev_cc_read_error, result);
     }
@@ -158,7 +150,7 @@ int gdev_cc_write(const u8* bytes, int length)
     hexCopy = (u32)bytes;
     n_copy = length;
 
-    if (gIsInitialized.value == FALSE) {
+    if (gIsInitialized == FALSE) {
         MWTRACE(8, (char*)gdev_cc_write_not_initialized);
         return GDEV_ERR_NOT_INITIALIZED;
     }
@@ -229,7 +221,7 @@ int gdev_cc_peek()
     }
 
     if (DBRead(buff, poll) == 0) {
-        CircleBufferWriteBytes(&gRecvCB.cb, buff, poll);
+        CircleBufferWriteBytes(&gRecvCB, buff, poll);
     } else {
         return GDEV_ERR_READ_ERROR;
     }

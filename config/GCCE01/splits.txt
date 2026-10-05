@@ -840,3 +840,9 @@ TRK_MINNOW_DOLPHIN/MWTrace.c:
 
 TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:
 	.text start:0x801AC5B0 end:0x801AC920
+
+TRK_MINNOW_DOLPHIN/main_gdev.c:
+	.text start:0x801AE190 end:0x801AE4DC
+	.rodata start:0x801E5C38 end:0x801E5D18
+	.bss start:0x80329EC0 end:0x8032A3DC
+	.sbss start:0x8032E348 end:0x8032E34C

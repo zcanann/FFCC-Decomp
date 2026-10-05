@@ -585,10 +585,10 @@ void CFunnyShape::Render()
  * --INFO--
  * PAL Address: 0x80051968
  * PAL Size: 548b
- * EN Address: 0x8005df78
- * EN Size: 776b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8005175C
+ * EN Size: 548b
+ * JP Address: 0x80051208
+ * JP Size: 552b
  */
 void CFunnyShape::Update()
 {
@@ -612,8 +612,7 @@ void CFunnyShape::Update()
                 work->y = static_cast<float>(r % ShapeRange(this));
                 work->z = kFunnyShapeZero;
                 work->delay = 0x200;
-                work->viewportY = kFunnyShapeZero;
-                work->viewportX = kFunnyShapeZero;
+                work->viewportX = work->viewportY = kFunnyShapeZero;
 
                 r = rand();
                 work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
@@ -631,8 +630,7 @@ void CFunnyShape::Update()
 
                 if (noSpread != 0) {
                     work->frame = 0;
-                    work->y = kFunnyShapeZero;
-                    work->x = kFunnyShapeZero;
+                    work->x = work->y = kFunnyShapeZero;
                 }
             }
 
@@ -654,10 +652,10 @@ void CFunnyShape::Update()
  * --INFO--
  * PAL Address: 0x80051b8c
  * PAL Size: 500b
- * EN Address: 0x8005dd00
- * EN Size: 632b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80051980
+ * EN Size: 500b
+ * JP Address: 0x80051430
+ * JP Size: 448b
  */
 void CFunnyShape::InitAnmWork()
 {
@@ -680,8 +678,7 @@ void CFunnyShape::InitAnmWork()
         const s32 shapeDiv = r / shapeCount;
         work->frame = static_cast<s16>(r - shapeDiv * shapeCount);
         work->delay = 0x200;
-        work->viewportY = kFunnyShapeZero;
-        work->viewportX = kFunnyShapeZero;
+        work->viewportX = work->viewportY = kFunnyShapeZero;
 
         r = rand();
         work->angle = static_cast<float>(r % 0x168);
@@ -699,8 +696,7 @@ void CFunnyShape::InitAnmWork()
 
         if (noSpread != 0) {
             work->frame = 0;
-            work->y = kFunnyShapeZero;
-            work->x = kFunnyShapeZero;
+            work->x = work->y = kFunnyShapeZero;
         }
 
         work++;

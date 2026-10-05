@@ -7,6 +7,8 @@
 #include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk_glue.h"
 #ifdef VERSION_GCCJGC
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/notify.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/support.h"
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/mpc_7xx_603e.h"
 #endif
 
@@ -77,11 +79,20 @@ void __TRK_set_MSR(register u32 msr);
 u32 __TRK_get_MSR();
 void TRK_ppc_memcpy(register void* dest, register const void* src, register int n, register u32 param_4, register u32 param_5);
 
-/**
- * @note Address: 0x800BF790
- * @note Size: 0x2A4
+/*
+ * --INFO--
+ * PAL Address: 0x801AD404
+ * PAL Size: 676b
+ * EN Address: 0x801AC2E8
+ * EN Size: 676b
+ * JP Address: 0x801A9844
+ * JP Size: 688b
  */
+#ifdef VERSION_GCCJGC
+DSError TRKValidMemory32(const void* addr, size_t length, u8 readWriteable)
+#else
 DSError TRKValidMemory32(const void* addr, size_t length, ValidMemoryOptions readWriteable)
+#endif
 {
 	DSError err = DS_InvalidMemory; /* assume range is invalid */
 
@@ -594,6 +605,43 @@ u32* ConvertAddress(u32 addr)
 {
 	return (u32*)(addr | 0x80000000);
 }
+/*
+ * --INFO--
+ * PAL Address: 0x801AC3FC
+ * PAL Size: 140b
+ * EN Address: 0x801AB2E0
+ * EN Size: 140b
+ * JP Address: 0x801A8718
+ * JP Size: 248b
+ */
+#ifdef VERSION_GCCJGC
+DSError TRKTargetAddStopInfo(MessageBuffer* b)
+{
+    DSError error;
+    u32 instruction;
+    int i;
+
+    error = TRKAppendBuffer1_ui32(b, gTRKCPUState.Default.PC);
+    if (error == DS_NoError) {
+        error = TRKTargetReadInstruction(&instruction, gTRKCPUState.Default.PC);
+    }
+    if (error == DS_NoError) {
+        error = TRKAppendBuffer1_ui32(b, instruction);
+    }
+    if (error == DS_NoError) {
+        error = TRKAppendBuffer1_ui16(b, gTRKCPUState.Extended1.exceptionID & 0xFFFF);
+    }
+    if (error == DS_NoError) {
+        for (i = 0; i < 32; i++) {
+            error = TRKAppendBuffer1_ui32(b, (u16)gTRKCPUState.Default.GPR[i]);
+        }
+        for (i = 0; i < 32; i++) {
+            error = TRKAppendBuffer1_ui64(b, (u16)gTRKCPUState.Float.FPR[i]);
+        }
+    }
+    return error;
+}
+#else
 DSError TRKTargetAddStopInfo(MessageBuffer* b)
 {
 	DSError error;
@@ -611,11 +659,36 @@ DSError TRKTargetAddStopInfo(MessageBuffer* b)
 	error            = TRKAppendBuffer_ui8(b, (u8*)&reply, 0x40);
 	return error;
 }
+#endif
 
-/**
- * @note Address: 0x800BE704
- * @note Size: 0x84
+/*
+ * --INFO--
+ * PAL Address: 0x801AC378
+ * PAL Size: 132b
+ * EN Address: 0x801AB25C
+ * EN Size: 132b
+ * JP Address: 0x801A8694
+ * JP Size: 132b
  */
+#ifdef VERSION_GCCJGC
+DSError TRKTargetAddExceptionInfo(MessageBuffer* b)
+{
+    DSError error;
+    u32 instruction;
+
+    error = TRKAppendBuffer1_ui32(b, gTRKExceptionStatus.exceptionInfo.PC);
+    if (error == DS_NoError) {
+        error = TRKTargetReadInstruction(&instruction, gTRKExceptionStatus.exceptionInfo.PC);
+    }
+    if (error == DS_NoError) {
+        error = TRKAppendBuffer1_ui32(b, instruction);
+    }
+    if (error == DS_NoError) {
+        error = TRKAppendBuffer1_ui16(b, gTRKExceptionStatus.exceptionInfo.exceptionID);
+    }
+    return error;
+}
+#else
 void TRKTargetAddExceptionInfo(MessageBuffer* b)
 {
 	size_t local_58;
@@ -635,6 +708,7 @@ void TRKTargetAddExceptionInfo(MessageBuffer* b)
 
 	TRKAppendBuffer_ui8(b, (u8*)&reply, 0x40);
 }
+#endif
 
 /**
  * @note Address: N/A
@@ -777,16 +851,25 @@ u32 TRKTargetGetPC(void)
 	return gTRKCPUState.Default.PC;
 }
 
-/**
- * @note Address: 0x800BE390
- * @note Size: 0x200
+/*
+ * --INFO--
+ * PAL Address: 0x801AC004
+ * PAL Size: 512b
+ * EN Address: 0x801AAEE8
+ * EN Size: 512b
+ * JP Address: 0x801A8394
+ * JP Size: 520b
  */
 
 DSError TRKTargetSupportRequest()
 {
 	DSIOResult ioResult;
 	size_t* length;
+#ifdef VERSION_GCCJGC
+    u8 commandId;
+#else
 	MessageCommandID commandId;
+#endif
 	DSError error;
 	u32 local_28;
 	TRKEvent event;
@@ -798,7 +881,7 @@ DSError TRKTargetSupportRequest()
 		TRKPostEvent(&event);
 		return DS_NoError;
 	} else if (commandId == DSMSG_OpenFile) {
-		error = HandleOpenFileSupportRequest(gTRKCPUState.Default.GPR[4], gTRKCPUState.Default.GPR[5] & 0xff, gTRKCPUState.Default.GPR[6],
+		error = HandleOpenFileSupportRequest((const char*)gTRKCPUState.Default.GPR[4], gTRKCPUState.Default.GPR[5] & 0xff, (u32*)gTRKCPUState.Default.GPR[6],
 		                                     &ioResult);
 
 		if (ioResult == DS_IONoError && error != DS_NoError) {
@@ -826,8 +909,13 @@ DSError TRKTargetSupportRequest()
 		*(u32*)gTRKCPUState.Default.GPR[5] = local_28;
 	} else {
 		length = (size_t*)gTRKCPUState.Default.GPR[5];
+#ifdef VERSION_GCCJGC
+		error  = TRKSuppAccessFile((u8)gTRKCPUState.Default.GPR[4], (u8*)gTRKCPUState.Default.GPR[6], length, &ioResult, TRUE,
+		                           commandId == DSMSG_ReadFile);
+#else
 		error  = TRKSuppAccessFile(gTRKCPUState.Default.GPR[4], (u8*)gTRKCPUState.Default.GPR[6], length, &ioResult, TRUE,
 		                           commandId == DSMSG_ReadFile);
+#endif
 
 		if (ioResult == DS_IONoError && error != DS_NoError) {
 			ioResult = DS_IOError;
@@ -973,11 +1061,13 @@ DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
 
 		error = TRKPPCAccessSpecialReg(srcDestPtr, instructionData1, read);
 	} else if (fpr == 0x20) {
+#ifndef VERSION_GCCJGC
 		if (read) {
 			ReadFPSCR(srcDestPtr);
 		} else {
 			WriteFPSCR(srcDestPtr);
 		}
+#endif
 
 		*(u64*)srcDestPtr &= 0xFFFFFFFF;
 	} else if (fpr == 0x21) {

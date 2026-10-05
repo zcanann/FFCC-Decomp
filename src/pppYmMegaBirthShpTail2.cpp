@@ -67,8 +67,8 @@ inline void U8ToF32(pppFVECTOR4* dest, u8* src)
     dest->w = src[3];
 }
 
-void birth(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
-void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
+static void birth(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
+static void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 
 
 /*
@@ -486,7 +486,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
  * JP Address: TODO
  * JP Size: TODO
  */
-void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
+static void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
           PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA* particleData,
           VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
@@ -581,7 +581,7 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
  * JP Address: TODO
  * JP Size: TODO
  */
-void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
+static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
            PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, VColor* vColor,
            _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat,
            _PARTICLE_COLOR* particleColor)
@@ -992,8 +992,8 @@ void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTabl
  * PAL Size: 124b
  * EN Address: 0x8008C3B8
  * EN Size: 124b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8008BE34
+ * JP Size: 124b
  */
 void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTable* param2)
 {
@@ -1001,9 +1001,7 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTab
         param1->m_workArea + GetYmMegaBirthShpTail2DataOffsets(param2)->m_workOffset);
 
     pppUnitMatrix(work->m_emitterMatrix);
-    work->m_tailScaleDirection.z = 0.0f;
-    work->m_tailScaleDirection.y = 0.0f;
-    work->m_tailScaleDirection.x = 0.0f;
+    work->m_tailScaleDirection.x = work->m_tailScaleDirection.y = work->m_tailScaleDirection.z = 0.0f;
     work->m_particles = 0;
     work->m_wmats = 0;
     work->m_colors = 0;

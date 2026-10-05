@@ -417,6 +417,9 @@ partMng.cpp:
 memory.cpp:
 	.bss start:0x80258188 end:0x8025F928
 	.text start:0x8001BB40 end:0x8001F6CC
+	.data start:0x801DC730 end:0x801DC758
+	.sdata start:0x8034B210 end:0x8034B228
+	.sdata2 start:0x8034C4F8 end:0x8034C520
 
 materialman.cpp:
 	.text start:0x8003B9A0 end:0x800434FC
@@ -999,6 +1002,7 @@ TRK_MINNOW_DOLPHIN/serpoll.c:
 
 TRK_MINNOW_DOLPHIN/msghndlr.c:
 	.text	start:0x801A4C7C end:0x801A74DC
+	.data start:0x802388A8 end:0x802388E0
 	.bss	start:0x80345A20 end:0x80345A24
 
 dsp/dsp.c:
@@ -1092,8 +1096,10 @@ auto_07_8023894C_data:
 	.data start:0x8023894C end:0x80238950 align:4
 
 TRK_MINNOW_DOLPHIN/targimpl.c:
-	.text start:0x801A8A18 end:0x801A8B44
+	.text start:0x801A7F7C end:0x801A9AF4
+	.rodata start:0x801DB1B0 end:0x801DB238
 	.data start:0x802388E0 end:0x80238910
+	.bss start:0x80345A28 end:0x80345FA4
 
 p_chara.cpp:
 	.text start:0x80072F18 end:0x8007AF9C
@@ -1121,4 +1127,44 @@ pppPart.cpp:
 	.text start:0x80053458 end:0x80056BF0
 
 game.cpp:
+	.bss start:0x8023A7B0 end:0x8024C748
 	.text start:0x80013D9C end:0x80015DD8
+
+p_chara_viewer.cpp:
+	.text start:0x800BB280 end:0x800BD02C
+
+FunnyShape.cpp:
+	.text start:0x8004FD98 end:0x800517A8
+
+p_tina.cpp:
+	.text start:0x800517A8 end:0x80053458
+
+p_dbgmenu.cpp:
+	.text start:0x801275FC end:0x80129354
+
+p_map.cpp:
+	.text start:0x800340BC end:0x800359D4
+
+TRK_MINNOW_DOLPHIN/notify.c:
+	.text start:0x801A7DB4 end:0x801A7E8C
+
+TRK_MINNOW_DOLPHIN/support.c:
+	.text start:0x801A74DC end:0x801A7D9C
+
+astar.cpp:
+	.text start:0x8013D2E8 end:0x8013EE34
+
+pppYmMegaBirthShpTail3.cpp:
+	.text start:0x8008BEB0 end:0x8008E0BC
+
+pppYmMegaBirthShpTail2.cpp:
+	.text start:0x8008A0D8 end:0x8008BEB0
+
+pppRyjMegaBirth.cpp:
+	.text start:0x80081648 end:0x800835C0
+
+auto_08_80345A24_bss:
+	.bss start:0x80345A24 end:0x80345A28 align:4
+
+auto_08_80345FA4_bss:
+	.bss start:0x80345FA4 end:0x80345FA8 align:4

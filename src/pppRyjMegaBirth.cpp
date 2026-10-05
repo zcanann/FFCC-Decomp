@@ -7,6 +7,10 @@
 #include "ffcc/pppShape.h"
 #include <string.h>
 
+static void birth(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
+static void calc(VRyjMegaBirth*, PRyjMegaBirth*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
+static void calc_particle(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*);
+
 static Mtx g_matUnit;
 
 static const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
@@ -114,21 +118,16 @@ void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
  * --INFO--
  * PAL Address: 0x800822f4
  * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80081C90
+ * EN Size: 124b
+ * JP Address: 0x800816C4
+ * JP Size: 124b
  */
 void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
 	VRyjMegaBirth* work = (VRyjMegaBirth*)(pObject->m_workArea + GetRyjMegaBirthDataOffsets(offsets)->m_workOffset);
-	float zero;
-
 	PSMTXIdentity(work->m_worldMatrix);
-	zero = 0.0f;
-	work->m_accelerationAxis.z = 0.0f;
-	work->m_accelerationAxis.y = zero;
-	work->m_accelerationAxis.x = zero;
+	work->m_accelerationAxis.x = work->m_accelerationAxis.y = work->m_accelerationAxis.z = 0.0f;
 	work->m_particleBlock = 0;
 	work->m_worldMatrixBlock = 0;
 	work->m_colorBlock = 0;
@@ -519,7 +518,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
  * JP Address: TODO
  * JP Size: TODO
  */
-void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color)
+static void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color)
 {
 	s16 duration;
 	u16 frame;
@@ -615,7 +614,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
  * JP Address: TODO
  * JP Size: TODO
  */
-void calc(
+static void calc(
 	VRyjMegaBirth* work, PRyjMegaBirth* param, _PARTICLE_DATA* particle, VColor* vColor,
 	_PARTICLE_COLOR* colorData)
 {
@@ -749,7 +748,7 @@ void calc(
  * JP Address: TODO
  * JP Size: TODO
  */
-void birth(
+static void birth(
     _pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color, _PARTICLE_DATA* particle,
     _PARTICLE_WMAT* worldMat, _PARTICLE_COLOR* colorData)
 {

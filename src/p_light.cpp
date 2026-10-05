@@ -890,10 +890,10 @@ void CLightPcs::MakeLightMap()
  * --INFO--
  * PAL Address: 0x80047EE0
  * PAL Size: 1180b
- * EN Address: 0x80056270
- * EN Size: 1324b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80047CD4
+ * EN Size: 1180b
+ * JP Address: 0x8004780C
+ * JP Size: 1204b
  */
 void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, Vec* vec, unsigned char mode)
 {
@@ -1020,20 +1020,15 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             float scrollScale = 0.005f;
             m_bumpTexMtx2[0][0] = scrollScale;
             m_bumpTexMtx2[1][2] = scrollScale;
-            m_bumpTexMtx2[2][2] = zero;
-            m_bumpTexMtx2[1][1] = zero;
-            m_bumpTexMtx2[2][1] = zero;
+            m_bumpTexMtx2[2][1] = m_bumpTexMtx2[1][1] = m_bumpTexMtx2[2][2] = zero;
             m_bumpTexMtx2[0][3] =
                 -(scrollScale * (camX + bump->m_offsetX) - half);
             m_bumpTexMtx2[1][3] =
                 -(scrollScale * (camZ + bump->m_offsetZ) - half);
             m_bumpTexMtx2[2][3] = zero;
-            m_bumpIndTexMtx[1][1] = 0.4f;
-            m_bumpIndTexMtx[0][0] = 0.4f;
-            m_bumpIndTexMtx[1][2] = zero;
-            m_bumpIndTexMtx[1][0] = zero;
-            m_bumpIndTexMtx[0][2] = zero;
-            m_bumpIndTexMtx[0][1] = zero;
+            m_bumpIndTexMtx[0][0] = m_bumpIndTexMtx[1][1] = 0.4f;
+            m_bumpIndTexMtx[0][1] = m_bumpIndTexMtx[0][2] =
+                m_bumpIndTexMtx[1][0] = m_bumpIndTexMtx[1][2] = zero;
         }
     }
 }

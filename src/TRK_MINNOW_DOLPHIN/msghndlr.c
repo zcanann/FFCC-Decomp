@@ -280,8 +280,88 @@ DSError TRKDoCPUType(TRKBuffer* buffer) {
 
 #endif
 
-/* 8036E8E0-8036EB24 369220 0244+00 1/0 1/1 0/0 .text            TRKDoReadMemory */
+/*
+ * --INFO--
+ * PAL Address: 0x801AADC4
+ * PAL Size: 580b
+ * EN Address: 0x801A9CA8
+ * EN Size: 580b
+ * JP Address: 0x801A6450
+ * JP Size: 1040b
+ */
 DSError TRKDoReadMemory(TRKBuffer* buffer) {
+#ifdef VERSION_GCCJGC
+    u8 buf[0x800];
+    u32 start;
+    size_t tempLength;
+    u16 length;
+    u8 command;
+    u8 options;
+    DSError result;
+    DSReplyError replyErr;
+
+    if (buffer->length != 8) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKSetBufferPosition(buffer, 0);
+    result = TRKReadBuffer1_ui8(buffer, &command);
+    if (result == DS_NoError) {
+        result = TRKReadBuffer1_ui8(buffer, &options);
+    }
+    if (result == DS_NoError) {
+        result = TRKReadBuffer1_ui16(buffer, &length);
+    }
+    if (result == DS_NoError) {
+        result = TRKReadBuffer1_ui32(buffer, &start);
+    }
+    if (options & DSMSGMEMORY_Extended) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_UnsupportedOptionError);
+    }
+    if (length > sizeof(buf)) {
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_ParameterError);
+    }
+    TRKResetBuffer(buffer, TRUE);
+    TRKAppendBuffer1_ui8(buffer, DSMSG_ReplyACK);
+    TRKAppendBuffer1_ui8(buffer, DSREPLY_NoError);
+    if (result == DS_NoError) {
+        tempLength = length;
+        result = TRKTargetAccessMemory(buf, start, &tempLength,
+                                     options & DSMSGMEMORY_Userview ? 0 : 1, TRUE);
+        length = tempLength;
+        if (result == DS_NoError) {
+            result = TRKAppendBuffer1_ui16(buffer, length);
+        }
+        if (result == DS_NoError) {
+            result = TRKAppendBuffer(buffer, buf, tempLength);
+        }
+    }
+
+    if (result) {
+        switch (result) {
+        case DS_CWDSException:
+            replyErr = DSREPLY_CWDSException;
+            break;
+        case DS_InvalidMemory:
+            replyErr = DSREPLY_InvalidMemoryRange;
+            break;
+        case DS_InvalidProcessID:
+            replyErr = DSREPLY_InvalidProcessID;
+            break;
+        case DS_InvalidThreadID:
+            replyErr = DSREPLY_InvalidThreadID;
+            break;
+        case DS_OSError:
+            replyErr = DSREPLY_OSError;
+            break;
+        default:
+            replyErr = DSREPLY_CWDSError;
+            break;
+        }
+        return TRKStandardACK(buffer, DSMSG_ReplyACK, replyErr);
+    }
+
+    return TRKSendACK(buffer);
+#else
     u8 buf[0x820] __attribute__((aligned(32)));
     size_t tempLength;
     int result;
@@ -352,10 +432,93 @@ DSError TRKDoReadMemory(TRKBuffer* buffer) {
     }
 
     return TRKSendACK(buffer);
+#endif
 }
 
-/* 8036E6A4-8036E8E0 368FE4 023C+00 1/0 1/1 0/0 .text            TRKDoWriteMemory */
+/*
+ * --INFO--
+ * PAL Address: 0x801AAB88
+ * PAL Size: 572b
+ * EN Address: 0x801A9A6C
+ * EN Size: 572b
+ * JP Address: 0x801A6030
+ * JP Size: 1056b
+ */
 DSError TRKDoWriteMemory(TRKBuffer* b) {
+#ifdef VERSION_GCCJGC
+    u8 buf[0x800];
+    u32 start;
+    size_t tempLength;
+    u16 length;
+    u8 command;
+    u8 options;
+    DSError result;
+    DSReplyError replyErr;
+
+    if (b->length <= 8) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKSetBufferPosition(b, 0);
+    result = TRKReadBuffer1_ui8(b, &command);
+    if (result == DS_NoError) {
+        result = TRKReadBuffer1_ui8(b, &options);
+    }
+    if (result == DS_NoError) {
+        result = TRKReadBuffer1_ui16(b, &length);
+    }
+    if (result == DS_NoError) {
+        result = TRKReadBuffer1_ui32(b, &start);
+    }
+    if (options & DSMSGMEMORY_Extended) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_UnsupportedOptionError);
+    }
+    if (b->length != length + 8 || length > sizeof(buf)) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_ParameterError);
+    }
+    if (result == DS_NoError) {
+        tempLength = length;
+        result = TRKReadBuffer(b, buf, tempLength);
+        if (result == DS_NoError) {
+            result = TRKTargetAccessMemory(buf, start, &tempLength,
+                                         options & DSMSGMEMORY_Userview ? 0 : 1, FALSE);
+        }
+        length = tempLength;
+    }
+    if (result == DS_NoError) {
+        TRKResetBuffer(b, TRUE);
+        TRKAppendBuffer1_ui8(b, DSMSG_ReplyACK);
+        TRKAppendBuffer1_ui8(b, DSREPLY_NoError);
+    }
+    if (result == DS_NoError) {
+        result = TRKAppendBuffer1_ui16(b, length);
+    }
+
+    if (result != DS_NoError) {
+        switch (result) {
+        case DS_CWDSException:
+            replyErr = DSREPLY_CWDSException;
+            break;
+        case DS_InvalidMemory:
+            replyErr = DSREPLY_InvalidMemoryRange;
+            break;
+        case DS_InvalidProcessID:
+            replyErr = DSREPLY_InvalidProcessID;
+            break;
+        case DS_InvalidThreadID:
+            replyErr = DSREPLY_InvalidThreadID;
+            break;
+        case DS_OSError:
+            replyErr = DSREPLY_OSError;
+            break;
+        default:
+            replyErr = DSREPLY_CWDSError;
+            break;
+        }
+        return TRKStandardACK(b, DSMSG_ReplyACK, replyErr);
+    }
+
+    return TRKSendACK(b);
+#else
     u8 buf[0x820] __attribute__((aligned(32)));
     size_t tempLength;
     int options;
@@ -423,9 +586,100 @@ DSError TRKDoWriteMemory(TRKBuffer* b) {
     }
 
     return TRKSendACK(b);
+#endif
 }
 
-/* 8036E3C4-8036E6A4 368D04 02E0+00 0/0 1/1 0/0 .text            TRKDoReadRegisters */
+/*
+ * --INFO--
+ * PAL Address: 0x801AA8A8
+ * PAL Size: 736b
+ * EN Address: 0x801A978C
+ * EN Size: 736b
+ * JP Address: 0x801A5C64
+ * JP Size: 972b
+ */
+#ifdef VERSION_GCCJGC
+DSError TRKDoReadRegisters(TRKBuffer* b) {
+    DSError error;
+    DSReplyError replyError;
+    size_t registersLength;
+    u16 firstRegister;
+    u16 lastRegister;
+    u8 command;
+    u8 options;
+
+    if (b->length != 6) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKSetBufferPosition(b, 0);
+    error = TRKReadBuffer1_ui8(b, &command);
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui8(b, &options);
+    }
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui16(b, &firstRegister);
+    }
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui16(b, &lastRegister);
+    }
+    if (firstRegister > lastRegister) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_InvalidRegisterRange);
+    }
+    if (error == DS_NoError) {
+        TRKResetBuffer(b, TRUE);
+        TRKAppendBuffer1_ui8(b, DSMSG_ReplyACK);
+        TRKAppendBuffer1_ui8(b, DSREPLY_NoError);
+    }
+    switch (options & 7) {
+    case DSREG_Default:
+        error = TRKTargetAccessDefault(firstRegister, lastRegister, b, &registersLength, TRUE);
+        break;
+    case DSREG_FP:
+        error = TRKTargetAccessFP(firstRegister, lastRegister, b, &registersLength, TRUE);
+        break;
+    case DSREG_Extended1:
+        error = TRKTargetAccessExtended1(firstRegister, lastRegister, b, &registersLength, TRUE);
+        break;
+    case DSREG_Extended2:
+        error = TRKTargetAccessExtended2(firstRegister, lastRegister, b, &registersLength, TRUE);
+        break;
+    default:
+        error = DS_UnsupportedError;
+        break;
+    }
+
+    // Check if there was an error, and respond accordingly
+    if (error != DS_NoError) {
+        switch (error) {
+        case DS_UnsupportedError:
+            replyError = DSREPLY_UnsupportedOptionError;
+            break;
+        case DS_InvalidRegister:
+            replyError = DSREPLY_InvalidRegisterRange;
+            break;
+        case DS_CWDSException:
+            replyError = DSREPLY_CWDSException;
+            break;
+        case DS_InvalidProcessID:
+            replyError = DSREPLY_InvalidProcessID;
+            break;
+        case DS_InvalidThreadID:
+            replyError = DSREPLY_InvalidThreadID;
+            break;
+        case DS_OSError:
+            replyError = DSREPLY_OSError;
+            break;
+        default:
+            replyError = DSREPLY_CWDSError;
+        }
+
+        return TRKStandardACK(b, DSMSG_ReplyACK, replyError);
+    } else {
+        // No error, send ack
+        return TRKSendACK(b);
+    }
+}
+#else
 DSError TRKDoReadRegisters(TRKBuffer* b) {
     int error;
     u8 options;
@@ -503,8 +757,102 @@ DSError TRKDoReadRegisters(TRKBuffer* b) {
         return TRKSendACK(b);
     }
 }
+#endif
 
-/* 8036E134-8036E3C4 368A74 0290+00 0/0 1/1 0/0 .text            TRKDoWriteRegisters */
+/*
+ * --INFO--
+ * PAL Address: 0x801AA618
+ * PAL Size: 656b
+ * EN Address: 0x801A94FC
+ * EN Size: 656b
+ * JP Address: 0x801A589C
+ * JP Size: 968b
+ */
+#ifdef VERSION_GCCJGC
+DSError TRKDoWriteRegisters(TRKBuffer* b) {
+    DSError error;
+    DSReplyError replyError;
+    size_t registersLength;
+    u16 firstRegister;
+    u16 lastRegister;
+    u8 command;
+    u8 options;
+
+    if (b->length <= 6) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKSetBufferPosition(b, 0);
+    error = TRKReadBuffer1_ui8(b, &command);
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui8(b, &options);
+    }
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui16(b, &firstRegister);
+    }
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui16(b, &lastRegister);
+    }
+    if (firstRegister > lastRegister) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_InvalidRegisterRange);
+    }
+    switch (options) {
+    case DSREG_Default:
+        error = TRKTargetAccessDefault(firstRegister, lastRegister, b, &registersLength, FALSE);
+        break;
+    case DSREG_FP:
+        error = TRKTargetAccessFP(firstRegister, lastRegister, b, &registersLength, FALSE);
+        break;
+    case DSREG_Extended1:
+        error = TRKTargetAccessExtended1(firstRegister, lastRegister, b, &registersLength, FALSE);
+        break;
+    case DSREG_Extended2:
+        error = TRKTargetAccessExtended2(firstRegister, lastRegister, b, &registersLength, FALSE);
+        break;
+    default:
+        error = DS_UnsupportedError;
+        break;
+    }
+    if (error == DS_NoError) {
+        TRKResetBuffer(b, TRUE);
+        TRKAppendBuffer1_ui8(b, DSMSG_ReplyACK);
+        TRKAppendBuffer1_ui8(b, DSREPLY_NoError);
+    }
+
+    // Check if there was an error, and respond accordingly
+    if (error != DS_NoError) {
+        switch (error) {
+        case DS_UnsupportedError:
+            replyError = DSREPLY_UnsupportedOptionError;
+            break;
+        case DS_InvalidRegister:
+            replyError = DSREPLY_InvalidRegisterRange;
+            break;
+        case DS_MessageBufferReadError:
+            replyError = DSREPLY_PacketSizeError;
+            break;
+        case DS_CWDSException:
+            replyError = DSREPLY_CWDSException;
+            break;
+        case DS_InvalidProcessID:
+            replyError = DSREPLY_InvalidProcessID;
+            break;
+        case DS_InvalidThreadID:
+            replyError = DSREPLY_InvalidThreadID;
+            break;
+        case DS_OSError:
+            replyError = DSREPLY_OSError;
+            break;
+        default:
+            replyError = DSREPLY_CWDSError;
+        }
+
+        return TRKStandardACK(b, DSMSG_ReplyACK, replyError);
+    } else {
+        // No error, send ack
+        return TRKSendACK(b);
+    }
+}
+#else
 DSError TRKDoWriteRegisters(TRKBuffer* b) {
     int error;
     int replyError;
@@ -589,6 +937,7 @@ DSError TRKDoWriteRegisters(TRKBuffer* b) {
         return TRKSendACK(b);
     }
 }
+#endif
 
 /*
  * --INFO--

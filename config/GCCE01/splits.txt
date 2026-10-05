@@ -484,6 +484,9 @@ partMng.cpp:
 memory.cpp:
 	.bss start:0x8023B848 end:0x80242FE8
 	.text start:0x8001C0E4 end:0x8001FC68
+	.data start:0x801E72F0 end:0x801E7318
+	.sdata start:0x8032D3F0 end:0x8032D408
+	.sdata2 start:0x8032E760 end:0x8032E788
 
 materialman.cpp:
 	.text start:0x8003BFAC end:0x80043B04
@@ -1183,4 +1186,32 @@ pppPart.cpp:
 	.text start:0x800539EC end:0x80057184
 
 game.cpp:
+	.bss start:0x8021DE70 end:0x8022FE08
 	.text start:0x80013D50 end:0x800161FC
+
+p_chara_viewer.cpp:
+	.text start:0x800BD0E4 end:0x800BEEBC
+
+FunnyShape.cpp:
+	.text start:0x80050310 end:0x80051D2C
+
+p_tina.cpp:
+	.text start:0x80051D2C end:0x800539EC
+
+p_dbgmenu.cpp:
+	.text start:0x8012AA40 end:0x8012C72C
+
+p_map.cpp:
+	.text start:0x8003477C end:0x80036084
+
+astar.cpp:
+	.text start:0x801406C0 end:0x80142208
+
+pppYmMegaBirthShpTail3.cpp:
+	.text start:0x8008C434 end:0x8008E63C
+
+pppYmMegaBirthShpTail2.cpp:
+	.text start:0x8008A660 end:0x8008C434
+
+pppRyjMegaBirth.cpp:
+	.text start:0x80081C14 end:0x80083B80

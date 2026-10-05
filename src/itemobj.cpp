@@ -19,9 +19,19 @@
 #ifdef VERSION_GCCP01
 static const int kItemObjExpandFrames = 8;
 static const int kItemObjReleaseLifetime = 4500;
+static const int kItemObjFadeStartFrame = 4;
+static const int kItemObjDeleteFrame = 12;
+static const int kItemObjHomeStartFrame = 7;
+static const int kItemObjParticleEndFrame = 125;
+static const int kItemObjCapsuleUseFrame = 13;
 #else
 static const int kItemObjExpandFrames = 10;
 static const int kItemObjReleaseLifetime = 5400;
+static const int kItemObjFadeStartFrame = 5;
+static const int kItemObjDeleteFrame = 15;
+static const int kItemObjHomeStartFrame = 9;
+static const int kItemObjParticleEndFrame = 150;
+static const int kItemObjCapsuleUseFrame = 16;
 #endif
 
 extern const float kItemObjUnitScale = 1.0f;
@@ -383,15 +393,19 @@ void CGItemObj::onFrameStat()
 			m_groundHitOffset.z = zero;
 			m_groundHitOffset.y = zero;
 			m_groundHitOffset.x = zero;
-		} else if (m_stateFrame == 4) {
+		} else if (m_stateFrame == kItemObjFadeStartFrame) {
+#ifdef VERSION_GCCP01
 			m_alphaStep = kItemObjWobblePhaseScale;
+#else
+			m_alphaStep = kItemObjMotionStep;
+#endif
 			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
-		} else if (m_stateFrame == 0xC) {
+		} else if (m_stateFrame == kItemObjDeleteFrame) {
 			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
 
-		if (7 < m_stateFrame) {
+		if (kItemObjHomeStartFrame < m_stateFrame) {
 			m_rotTargetY += kItemObjMotionStep;
 			m_worldPosition.x += kItemObjMotionStep * (m_owner->m_worldPosition.x - m_worldPosition.x);
 			m_worldPosition.y += kItemObjMotionStep * (kItemObjHalf * m_owner->unk_0x188 + m_owner->m_worldPosition.y - m_worldPosition.y);
@@ -439,7 +453,7 @@ void CGItemObj::onFrameStat()
 			}
 			break;
 		case 1:
-			if (m_subFrame == 0x7D) {
+			if (m_subFrame == kItemObjParticleEndFrame) {
 				ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 			}
 			break;
@@ -531,7 +545,7 @@ void CGItemObj::onFrameStat()
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
-		} else if (m_stateFrame == 0xD) {
+		} else if (m_stateFrame == kItemObjCapsuleUseFrame) {
 			int ownerSlot = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId;
 
 			if ((unsigned int)System.m_execParam >= 3U) {
@@ -564,7 +578,7 @@ void CGItemObj::onFrameStat()
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 4, m_particleSlot, this, particleScale, 0x12908);
-		} else if (m_stateFrame == 0xD) {
+		} else if (m_stateFrame == kItemObjCapsuleUseFrame) {
 			int ownerSlot = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId;
 
 			if ((unsigned int)System.m_execParam >= 3U) {

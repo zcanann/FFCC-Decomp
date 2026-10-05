@@ -151,8 +151,7 @@ void CGraphic::Init()
     m_fogColor.b = 0;
     m_fogColor.a = 0;
 
-    m_fogEnd = kGraphicZeroF;
-    m_fogStart = kGraphicZeroF;
+    m_fogStart = m_fogEnd = kGraphicZeroF;
 
     m_defaultCopyClearColor.r = m_fogColor.r;
     m_defaultCopyClearColor.g = m_fogColor.g;
@@ -181,16 +180,24 @@ void CGraphic::Init()
     u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
     u16 efbHeight = renderMode->efbHeight;
     u16 xfbHeight = renderMode->xfbHeight;
-    u32 efbBufferSize = alignedWidth * efbHeight * 2;
+#ifdef VERSION_GCCJGC
+    u32 savedBufferSize = alignedWidth * xfbHeight * 2;
+#else
+    u32 savedBufferSize = alignedWidth * efbHeight * 2;
+#endif
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
 
     m_frameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x86) u8[xfbBufferSize];
     memset(m_frameBuffer, 0, 4);
 
-    m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x88) u8[efbBufferSize];
+    m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x88) u8[savedBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
+#ifdef VERSION_GCCJGC
+    u32 scratchBufferSize = (((m_renderMode->fbWidth + 0xF) & 0xFFF0) * m_renderMode->xfbHeight * 2) + 0x46000;
+#else
     u32 scratchBufferSize = (((m_renderMode->fbWidth + 0xF) & 0xFFF0) * m_renderMode->efbHeight * 2) + 0x46000;
+#endif
     m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, 0xB53, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
@@ -202,9 +209,17 @@ void CGraphic::Init()
     GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(m_renderMode->fbWidth),
                   static_cast<f32>(m_renderMode->efbHeight), kGraphicZeroF, kGraphicOneF);
     GXSetScissor(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
+#ifdef VERSION_GCCJGC
+    u16 scaledHeight = GXSetDispCopyYScale(GXGetYScaleFactor(m_renderMode->efbHeight, m_renderMode->xfbHeight));
+#else
     GXSetDispCopyYScale(GXGetYScaleFactor(m_renderMode->efbHeight, m_renderMode->xfbHeight));
+#endif
     GXSetDispCopySrc(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
+#ifdef VERSION_GCCJGC
+    GXSetDispCopyDst(m_renderMode->fbWidth, scaledHeight);
+#else
     GXSetDispCopyDst(m_renderMode->fbWidth, m_renderMode->efbHeight);
+#endif
     GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, GXNtsc480IntDf.vfilter);
 
     if (m_renderMode->aa != 0) {

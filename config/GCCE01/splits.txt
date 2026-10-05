@@ -1037,3 +1037,7 @@ TRK_MINNOW_DOLPHIN/targsupp.s:
 file.cpp:
 	.text start:0x80012B8C end:0x80013D50
 	.bss start:0x8021DD00 end:0x8021DE70
+
+os/OSRtc.c:
+	.text	start:0x8017EB48 end:0x8017F574
+	.bss	start:0x8030AC20 end:0x8030AC74

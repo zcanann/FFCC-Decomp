@@ -1,7 +1,7 @@
 #include "gba/m4a_internal.h"
 
-struct MusicPlayerInfo gMPlayInfo_BGM;
-struct MusicPlayerInfo gMPlayInfo_SE1;
+extern struct MusicPlayerInfo gMPlayInfo_BGM;
+extern struct MusicPlayerInfo gMPlayInfo_SE1;
 
 static struct MusicPlayerTrack sMPlayTrackBgm[2];
 static struct MusicPlayerTrack sMPlayTrackSe[2];

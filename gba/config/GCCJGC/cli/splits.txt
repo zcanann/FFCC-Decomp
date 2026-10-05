@@ -203,7 +203,13 @@ main/obj:
 	.bss        start:0x03001190 end:0x03002772 align:8
 
 regional_bss:
-	.bss        start:0x03002774 end:0x030029C0 align:4
+	.bss        start:0x03002774 end:0x030027C0 align:4
+
+main/gil:
+	.bss        start:0x030027C0 end:0x030027CE align:4
+
+regional_bss:
+	.bss        start:0x030027CE end:0x030029C0 align:1
 
 main/main:
 	.common     start:0x030029C0 end:0x03002AC0 align:16

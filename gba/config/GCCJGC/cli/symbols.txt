@@ -710,7 +710,7 @@ gReplyResult = .bss:0x03002AFC; // type:object size:0x1 data:byte
 gScouterDirty = .bss:0x03002B00; // type:object size:0x1 data:byte
 gItemUseFlags = .bss:0x03002B04; // type:object size:0x1 data:byte
 gMapObjs = .bss:0x03002B10; // type:object size:0x1 data:byte
-gSession = .bss:0x03002CA0; // type:object size:0x1 data:byte
+gSession = .bss:0x03002CA0; // type:object size:0x12C data:byte
 gScouterHit = .bss:0x03002DCC; // type:object size:0x1 data:byte
 gEnemyMarkers = .bss:0x03002DD0; // type:object size:0x1 data:byte
 gRadarType = .bss:0x03002ED0; // type:object size:0x1 data:byte
@@ -782,3 +782,10 @@ sObjPalUsage = .bss:0x03002760; // type:object size:0x12 scope:local data:byte
 sOamCount = .bss:0x03001990; // type:object size:0x4 scope:local data:byte
 
 gScreenUnused = .bss:0x030030A8; // type:object size:0x4 data:byte
+
+sGilAmount = .bss:0x030027C4; // type:object size:0x4 scope:local data:byte
+sGilDigits = .bss:0x030027C8; // type:object size:0x1 scope:local data:byte
+sGilCursorX = .bss:0x030027CA; // type:object size:0x2 scope:local data:byte
+sGilWaiting = .bss:0x030027CD; // type:object size:0x1 scope:local data:byte
+sGilQuit = .bss:0x030027CC; // type:object size:0x1 scope:local data:byte
+sGilSynced = .bss:0x030027C0; // type:object size:0x1 scope:local data:byte

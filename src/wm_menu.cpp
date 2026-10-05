@@ -6248,9 +6248,11 @@ inline void CMenuPcs::DrawMainMenuBase(float alpha)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
 
 	float x = 32.0f;
-	float y = 40.0f - x;
+	float y = 40.0f;
+	y -= x;
 	MenuPcs.DrawRect(0, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	MenuPcs.DrawRect(8, x + 288.0f, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	x += 288.0f;
+	MenuPcs.DrawRect(8, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	y += 184.0f;
 	x = 32.0f;
 	MenuPcs.DrawRect(4, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);

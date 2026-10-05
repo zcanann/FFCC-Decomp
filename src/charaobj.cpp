@@ -2758,10 +2758,10 @@ checkParticle:
  * --INFO--
  * PAL Address: 0x8010CAF0
  * PAL Size: 216b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010BE5C
+ * EN Size: 204b
+ * JP Address: 0x80108B4C
+ * JP Size: 204b
  */
 int la(CGObject* object)
 {
@@ -2788,7 +2788,11 @@ int la(CGObject* object)
 				if (object->m_lastBgAttr < 0.0f) {
 					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frameMod)), 31, 31) & 0xFF;
 				} else {
+#ifdef VERSION_GCCP01
 					bool isPeriod = (period <= frame);
+#else
+					bool isPeriod = (frameMod == 0);
+#endif
 					result = isPeriod;
 				}
 			}
@@ -2804,10 +2808,10 @@ int la(CGObject* object)
  * --INFO--
  * PAL Address: 0x8010C704
  * PAL Size: 1004b
- * EN Address: 0x801310f0
- * EN Size: 880b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010BA7C
+ * EN Size: 992b
+ * JP Address: 0x8010876C
+ * JP Size: 992b
  */
 void CGCharaObj::statAttack()
 {

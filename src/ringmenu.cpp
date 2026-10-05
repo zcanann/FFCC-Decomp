@@ -496,6 +496,11 @@ void CRingMenu::onDraw()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE2));
 		MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase)));
 
+#ifdef VERSION_GCCJGC
+		const float labelWidth = 104.0f;
+#else
+		const float labelWidth = 144.0f;
+#endif
 		float drawX;
 		float drawY;
 		switch (group) {
@@ -503,7 +508,7 @@ void CRingMenu::onDraw()
 			const float wobble = static_cast<float>(sin(static_cast<double>(1.5707963705062866f * buttonAlpha)));
 			drawX = -(16.0f * wobble - (12.0f + posX));
 			drawY = posY;
-			MenuPcs.DrawRect(0, drawX, drawY, 144.0f, 32.0f, 0.0f, 0.0f,
+			MenuPcs.DrawRect(0, drawX, drawY, labelWidth, 32.0f, 0.0f, 0.0f,
 			                                 1.0f, 1.0f, 0.0f);
 			MenuPcs.DrawRect(0, drawX, drawY, 40.0f, 32.0f, 0.0f, 56.0f,
 			                                 1.0f, 1.0f, 0.0f);
@@ -513,7 +518,7 @@ void CRingMenu::onDraw()
 			const float wobble = static_cast<float>(sin(static_cast<double>(1.5707963705062866f * buttonAlpha)));
 			drawX = -(16.0f * wobble - posX);
 			drawY = 24.0f + posY;
-			MenuPcs.DrawRect(0, drawX, drawY, 144.0f, 24.0f, 0.0f, 32.0f,
+			MenuPcs.DrawRect(0, drawX, drawY, labelWidth, 24.0f, 0.0f, 32.0f,
 			                                 1.0f, 1.0f, 0.0f);
 			MenuPcs.DrawRect(0, drawX, drawY, 24.0f, 24.0f, 40.0f, 56.0f,
 			                                 1.0f, 1.0f, 0.0f);
@@ -537,7 +542,11 @@ void CRingMenu::onDraw()
 
 				CFont* font = MenuPcs.GetFont23();
 				font->DrawInit();
+#ifdef VERSION_GCCJGC
+				font->SetMargin(-2.0f);
+#else
 				font->SetMargin(-4.0f);
+#endif
 				font->SetShadow(1);
 				font->SetTlut(4);
 
@@ -596,10 +605,17 @@ void CRingMenu::onDraw()
 		}
 
 		const float textX2 = 64.0f + drawX;
+#ifdef VERSION_GCCJGC
+		const float textX0 = textX2;
+		const float textY0 = 5.0f + drawY;
+		const float textX1 = 56.0f + drawX;
+		const float textY1 = 3.0f + drawY;
+#else
 		const float textX0 = textX2 + 20.0f;
 		const float textY0 = (5.0f + drawY) - 4.0f;
 		const float textX1 = (56.0f + drawX) + 20.0f;
 		const float textY1 = (3.0f + drawY) - 4.0f;
+#endif
 		const float textY2 = 6.0f + drawY;
 		CFont* font = MenuPcs.GetFont23();
 		for (int button = 1; button >= 0; button--) {
@@ -621,7 +637,11 @@ void CRingMenu::onDraw()
 			}
 
 			font->DrawInit();
+#ifdef VERSION_GCCJGC
+			font->SetMargin(-2.0f);
+#else
 			font->SetMargin(-4.0f);
+#endif
 			font->SetShadow(1);
 
 			float textScale;
@@ -712,7 +732,11 @@ void CRingMenu::onDraw()
 									((textX2 - static_cast<float>((caravanWork->GetNumCmdList() * 8) / 2)) +
 									 static_cast<float>(i * 8)),
 								barY, 8.0f, 8.0f,
+#ifdef VERSION_GCCJGC
+								8.0f * (13.0f + blink), 0.0f,
+#else
 								8.0f * (8.0f + blink), 56.0f,
+#endif
 								1.0f, 1.0f, 0.0f);
 						}
 					}

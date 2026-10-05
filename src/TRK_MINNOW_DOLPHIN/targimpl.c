@@ -7,6 +7,7 @@
 #include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk_glue.h"
 #ifdef VERSION_GCCJGC
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/notify.h"
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/mpc_7xx_603e.h"
 #endif
 
@@ -603,6 +604,43 @@ u32* ConvertAddress(u32 addr)
 {
 	return (u32*)(addr | 0x80000000);
 }
+/*
+ * --INFO--
+ * PAL Address: 0x801AC3FC
+ * PAL Size: 140b
+ * EN Address: 0x801AB2E0
+ * EN Size: 140b
+ * JP Address: 0x801A8718
+ * JP Size: 248b
+ */
+#ifdef VERSION_GCCJGC
+DSError TRKTargetAddStopInfo(MessageBuffer* b)
+{
+    DSError error;
+    u32 instruction;
+    int i;
+
+    error = TRKAppendBuffer1_ui32(b, gTRKCPUState.Default.PC);
+    if (error == DS_NoError) {
+        error = TRKTargetReadInstruction(&instruction, gTRKCPUState.Default.PC);
+    }
+    if (error == DS_NoError) {
+        error = TRKAppendBuffer1_ui32(b, instruction);
+    }
+    if (error == DS_NoError) {
+        error = TRKAppendBuffer1_ui16(b, gTRKCPUState.Extended1.exceptionID & 0xFFFF);
+    }
+    if (error == DS_NoError) {
+        for (i = 0; i < 32; i++) {
+            error = TRKAppendBuffer1_ui32(b, (u16)gTRKCPUState.Default.GPR[i]);
+        }
+        for (i = 0; i < 32; i++) {
+            error = TRKAppendBuffer1_ui64(b, (u16)gTRKCPUState.Float.FPR[i]);
+        }
+    }
+    return error;
+}
+#else
 DSError TRKTargetAddStopInfo(MessageBuffer* b)
 {
 	DSError error;
@@ -620,11 +658,36 @@ DSError TRKTargetAddStopInfo(MessageBuffer* b)
 	error            = TRKAppendBuffer_ui8(b, (u8*)&reply, 0x40);
 	return error;
 }
+#endif
 
-/**
- * @note Address: 0x800BE704
- * @note Size: 0x84
+/*
+ * --INFO--
+ * PAL Address: 0x801AC378
+ * PAL Size: 132b
+ * EN Address: 0x801AB25C
+ * EN Size: 132b
+ * JP Address: 0x801A8694
+ * JP Size: 132b
  */
+#ifdef VERSION_GCCJGC
+DSError TRKTargetAddExceptionInfo(MessageBuffer* b)
+{
+    DSError error;
+    u32 instruction;
+
+    error = TRKAppendBuffer1_ui32(b, gTRKExceptionStatus.exceptionInfo.PC);
+    if (error == DS_NoError) {
+        error = TRKTargetReadInstruction(&instruction, gTRKExceptionStatus.exceptionInfo.PC);
+    }
+    if (error == DS_NoError) {
+        error = TRKAppendBuffer1_ui32(b, instruction);
+    }
+    if (error == DS_NoError) {
+        error = TRKAppendBuffer1_ui16(b, gTRKExceptionStatus.exceptionInfo.exceptionID);
+    }
+    return error;
+}
+#else
 void TRKTargetAddExceptionInfo(MessageBuffer* b)
 {
 	size_t local_58;
@@ -644,6 +707,7 @@ void TRKTargetAddExceptionInfo(MessageBuffer* b)
 
 	TRKAppendBuffer_ui8(b, (u8*)&reply, 0x40);
 }
+#endif
 
 /**
  * @note Address: N/A

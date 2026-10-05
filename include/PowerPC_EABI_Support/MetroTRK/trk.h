@@ -121,7 +121,11 @@ void SetUseSerialIO(u8);
 u8 GetUseSerialIO(void);
 
 DSError TRKTargetAddStopInfo(TRKBuffer*);
+#ifdef VERSION_GCCJGC
+DSError TRKTargetAddExceptionInfo(TRKBuffer*);
+#else
 void TRKTargetAddExceptionInfo(TRKBuffer*);
+#endif
 void TRKInterruptHandler(void);
 BOOL usr_puts_serial(const char* msg);
 

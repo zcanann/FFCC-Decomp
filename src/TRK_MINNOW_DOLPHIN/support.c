@@ -91,20 +91,34 @@ DSError TRKSuppAccessFile(u32 file_handle, u8* data, size_t* count, DSIOResult* 
     return error;
 }
 
-/* 8036F098-8036F278 3699D8 01E0+00 4/4 1/1 0/0 .text            TRKRequestSend */
+/*
+ * --INFO--
+ * PAL Address: 0x801AB57C
+ * PAL Size: 480b
+ * EN Address: 0x801AA460
+ * EN Size: 480b
+ * JP Address: 0x801A7934
+ * JP Size: 420b
+ */
 DSError TRKRequestSend(TRKBuffer* msgBuf, int* bufferId, u32 p1, u32 p2, int p3) {
     int error = DS_NoError;
     TRKBuffer* buffer;
     u32 counter;
     int count;
     u8 msgCmd;
+#ifdef VERSION_GCCJGC
+    u8 msgReplyError;
+#else
     int msgReplyError;
+#endif
     BOOL badReply = TRUE;
 
     *bufferId = -1;
 
     for (count = p2 + 1; count != 0 && *bufferId == -1 && error == DS_NoError; count--) {
+#ifndef VERSION_GCCJGC
         MWTRACE(1, "Calling MessageSend\n");
+#endif
         error = TRKMessageSend(msgBuf);
         if (error == DS_NoError) {
             if (p3) {
@@ -125,32 +139,52 @@ DSError TRKRequestSend(TRKBuffer* msgBuf, int* bufferId, u32 p1, u32 p2, int p3)
 
                 buffer = TRKGetBuffer(*bufferId);
                 TRKSetBufferPosition(buffer, 0);
+#ifdef VERSION_GCCJGC
+                error = TRKReadBuffer1_ui8(buffer, &msgCmd);
+                if (error != DS_NoError || msgCmd >= DSMSG_ReplyACK)
+                    break;
+#else
                 OutputData(&buffer->data[0], buffer->length);
                 msgCmd = buffer->data[4];
                 MWTRACE(1, "msg_command : 0x%02x hdr->cmdID 0x%02x\n", msgCmd, msgCmd);
 
                 if (msgCmd >= DSMSG_ReplyACK)
                     break;
+#endif
 
                 TRKProcessInput(*bufferId);
                 *bufferId = -1;
             }
 
             if (*bufferId != -1) {
+#ifdef VERSION_GCCJGC
+                if (buffer->length < p1) {
+#else
                 if (buffer->length < 0x40) {
+#endif
                     // OSReport("MetroTRK - bad reply size %ld\n", buffer->length);
                     badReply = TRUE;
                 }
                 if (error == DS_NoError && !badReply) {
+#ifdef VERSION_GCCJGC
+                    error = TRKReadBuffer1_ui8(buffer, &msgReplyError);
+#else
                     msgReplyError = buffer->data[8];
                     MWTRACE(1, "msg_error : 0x%02x\n", msgReplyError);
+#endif
                 }
                 if (error == DS_NoError && !badReply) {
+#ifdef VERSION_GCCJGC
+                    if (msgCmd != DSMSG_ReplyACK || msgReplyError != DSREPLY_NoError) {
+#else
                     if ((int)msgCmd != DSMSG_ReplyACK || msgReplyError != DSREPLY_NoError) {
+#endif
+#ifndef VERSION_GCCJGC
                         MWTRACE(8,
                                 "RequestSend : Bad ack or non ack received msg_command : 0x%02x "
                                 "msg_error 0x%02x\n",
                                 msgCmd, msgReplyError);
+#endif
                         badReply = TRUE;
                     }
                 }

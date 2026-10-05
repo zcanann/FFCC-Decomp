@@ -601,3 +601,12 @@ Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
 	.ctors start:0x801d0620 end:0x801D0624
 	.dtors start:0x801d06e0 end:0x801D06E8
 	.sdata start:0x8034b9d8 end:0x8034B9DC
+
+MSL_C/PPCEABI/bare/H/ansi_fp.c:
+	.text start:0x801AE4DC end:0x801B0430
+	.rodata start:0x801DB3F8 end:0x801DB4D5
+	.data start:0x80238BA8 end:0x80238CCC
+	.sdata2 start:0x8034FD40 end:0x8034FD48
+
+MSL_C/PPCEABI/bare/H/printf.c:
+	.rodata start:0x801DB4D8 end:0x801DB500

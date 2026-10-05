@@ -677,3 +677,12 @@ menu_equip.cpp:
 
 menu_item.cpp:
 	.text start:0x801586D0 end:0x8015A1D4
+
+MSL_C/PPCEABI/bare/H/ansi_fp.c:
+	.text start:0x801B1EB4 end:0x801B3E08
+	.rodata start:0x801E5E88 end:0x801E5F65
+	.data start:0x8021C158 end:0x8021C27C
+	.sdata2 start:0x803328D8 end:0x803328E0
+
+MSL_C/PPCEABI/bare/H/printf.c:
+	.rodata start:0x801E5F68 end:0x801E5F90

@@ -1108,7 +1108,7 @@ config.libs = [
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/errno.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "MSL_C/PPCEABI/bare/H/ansi_files.c", mw_version="GC/2.7"),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/ansi_fp.c", mw_version="GC/2.7"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/ansi_fp.c", mw_version="GC/2.7"),
             Object(MatchingFor("GCCP01", "GCCE01"), "MSL_C/PPCEABI/bare/H/buffer_io.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/gamecube.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/ctype.c"),

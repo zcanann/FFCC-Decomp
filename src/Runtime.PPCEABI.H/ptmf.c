@@ -2,6 +2,15 @@
 
 const __ptmf __ptmf_null = {0, 0, {0}};
 
+/*
+ * --INFO--
+ * PAL Address: 0x801AFEEC
+ * PAL Size: 48b
+ * EN Address: 0x801AEDCC
+ * EN Size: 48b
+ * JP Address: 0x801AB3F4
+ * JP Size: 48b
+ */
 asm long __ptmf_test(register __ptmf* ptmf) {
     // clang-format off
     nofralloc
@@ -21,6 +30,15 @@ asm long __ptmf_test(register __ptmf* ptmf) {
     // clang-format on
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801AFF1C
+ * PAL Size: 40b
+ * EN Address: 0x801AEDFC
+ * EN Size: 40b
+ * JP Address: 0x801AB424
+ * JP Size: 40b
+ */
 asm void __ptmf_scall(...) {
     // clang-format off
     nofralloc
@@ -30,12 +48,12 @@ asm void __ptmf_scall(...) {
     lwz r12, 8(r12)
     add r3, r3, r0
     cmpwi r11, 0
-    blt lbl_803620A4
+    blt call_member
 
     lwzx r12, r3, r12
     lwzx r12, r12, r11
 
-lbl_803620A4:
+call_member:
     mtctr r12
     bctr
     // clang-format on

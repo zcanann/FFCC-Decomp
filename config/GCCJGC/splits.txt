@@ -104,3 +104,7 @@ MSL_C/PPCEABI/bare/H/abort_exit.c:
 
 MSL_C/PPCEABI/bare/H/misc_io.c:
 	.text start:0x801B1E48 end:0x801B1E68
+
+Runtime.PPCEABI.H/ptmf.c:
+	.text start:0x801AB3F4 end:0x801AB44C
+	.rodata start:0x801DB2A8 end:0x801DB2B4

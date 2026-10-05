@@ -812,7 +812,7 @@ config.libs = [
                 "dolphin/os/__start.c",
                 source="os/__start.c",
             ),
-            Object(Matching, "os/__ppc_eabi_init.c"),
+            Object(NonMatching, "os/__ppc_eabi_init.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "dolphin/os/__ppc_eabi_init.cpp",
@@ -1090,7 +1090,7 @@ config.libs = [
                 "Runtime.PPCEABI.H/NMWException.cp",
                 extra_cflags=["-inline auto,deferred"],
             ),
-            Object(Matching, "Runtime.PPCEABI.H/ptmf.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/ptmf.c"),
             Object(Matching, "Runtime.PPCEABI.H/runtime.c"),
         ],
     },

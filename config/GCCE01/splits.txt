@@ -364,3 +364,7 @@ gba/GBA.c:
 
 gba/GBAXfer.c:
 	.text start:0x801A7948 end:0x801A7C80
+
+gx/GXFifo.c:
+	.text start:0x8019F1AC end:0x8019F9F4
+	.sbss start:0x8032E2F0 end:0x8032E30C

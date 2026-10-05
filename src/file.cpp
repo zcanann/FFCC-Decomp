@@ -1,5 +1,10 @@
 #include "ffcc/file.h"
 
+#ifdef VERSION_GCCJGC
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
+#endif
+
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"

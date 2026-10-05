@@ -171,8 +171,8 @@ s32 Text_Print(const char *str, s32 mode)
         } else if (*p == 0x83) {
             group = 3;
             index = font->firstKatakana;
-            m = font->firstKanji ? font->firstKanji : font->first;
-            m -= index;
+            w = font->firstKanji ? font->firstKanji : font->first;
+            m = w - index;
         } else {
             group = 4;
             index = font->firstKanji;
@@ -193,8 +193,11 @@ s32 Text_Print(const char *str, s32 mode)
             if (k < m) {
                 do {
                     code = *wideMap;
-                    if ((code & 0xFF) == *p && (code >> 8) == p[1])
-                        break;
+                    if ((code & 0xFF) == *p) {
+                        code >>= 8;
+                        if (code == p[1])
+                            break;
+                    }
                     k++;
                     wideMap++;
                 } while (k < m);

@@ -3245,12 +3245,12 @@ void CMenuPcs::DrawDiaryMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x800fa1cc
+ * PAL Address: 0x800FA1CC
  * PAL Size: 4724b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F9774
+ * EN Size: 4724b
+ * JP Address: 0x800F6498
+ * JP Size: 4908b
  */
 void CMenuPcs::DrawMCardMenu()
 {
@@ -3329,8 +3329,13 @@ void CMenuPcs::DrawMCardMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
+#ifdef VERSION_GCCJGC
+				float rectX = (float)(m_menuWindowInfo->x + 28) + (float)(m_wmWorldState->m_cardChannel * 124);
+				float rectY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+#else
 				float rectY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float rectX = (float)GetSlotABXPos((int)m_wmWorldState->m_cardChannel);
+#endif
 				DrawCursor((int)rectX, (int)rectY, 1.0f);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
@@ -3439,6 +3444,18 @@ void CMenuPcs::DrawMCardMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				int msgParam = 0;
+#ifdef VERSION_GCCJGC
+				int msgId;
+				float rectX;
+				short ss = m_wmWorldState->m_subState;
+				if (ss == 8) { msgId = 4; rectX = (float)(m_menuWindowInfo->x + 72); }
+				else if (ss == 0x0B) { msgId = 5; rectX = (float)(m_menuWindowInfo->x + 83); }
+				else if (ss == 0x19) { msgId = 0x19; msgParam = 1; rectX = (float)(m_menuWindowInfo->x + 55); }
+				else { msgId = 0x12; rectX = (float)(m_menuWindowInfo->x + 77); }
+				DrawMcWinMess(msgId, msgParam);
+				rectX += (float)(m_wmWorldState->m_cardChannel * 80);
+				float rectY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+#else
 				int msgId;
 				short ss = m_wmWorldState->m_subState;
 				if (ss == 8) msgId = 4;
@@ -3448,6 +3465,7 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(msgId, msgParam);
 				float rectY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float rectX = (float)GetYesNoXPos((int)m_wmWorldState->m_cardChannel);
+#endif
 				if (m_wmWorldState->m_subState != 0x19) {
 					DrawCursor((int)rectX, (int)rectY, 1.0f);
 				} else {
@@ -3938,12 +3956,12 @@ void CMenuPcs::DrawMoveMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x800f7efc
+ * PAL Address: 0x800F7EFC
  * PAL Size: 4940b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F74A0
+ * EN Size: 4940b
+ * JP Address: 0x800F41D8
+ * JP Size: 5064b
  */
 void CMenuPcs::DrawLoadMenu()
 {
@@ -4038,8 +4056,13 @@ void CMenuPcs::DrawLoadMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
+#ifdef VERSION_GCCJGC
+				float slotX = (float)(m_menuWindowInfo->x + 28) + (float)(m_wmWorldState->m_cardChannel * 124);
+				float slotY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+#else
 				float slotY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float slotX = (float)GetSlotABXPos(m_wmWorldState->m_cardChannel);
+#endif
 				DrawCursor((int)slotX, (int)slotY, 1.0f);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
@@ -4157,6 +4180,16 @@ void CMenuPcs::DrawLoadMenu()
 			if (winState == 1) {
 				int ymsgId = 0;
 				int ymsgParam = 0;
+#ifdef VERSION_GCCJGC
+				float ynX;
+				short ys = m_wmWorldState->m_subState;
+				if (ys == 8) { ymsgId = 4; ynX = (float)(m_menuWindowInfo->x + 72); }
+				else if (ys == 0x19) { ymsgId = 0x19; ymsgParam = 1; ynX = (float)(m_menuWindowInfo->x + 55); }
+				else { ymsgId = 5; ynX = (float)(m_menuWindowInfo->x + 83); }
+				DrawMcWinMess(ymsgId, ymsgParam);
+				ynX += (float)(m_wmWorldState->m_cardChannel * 80);
+				float ynY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+#else
 				short ys = m_wmWorldState->m_subState;
 				if (ys == 8) ymsgId = 4;
 				else if (ys == 0x19) { ymsgId = 0x19; ymsgParam = 1; }
@@ -4166,6 +4199,7 @@ void CMenuPcs::DrawLoadMenu()
 				// Yes/No cursor
 				float ynY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float ynX = (float)GetYesNoXPos(m_wmWorldState->m_cardChannel);
+#endif
 				if (m_wmWorldState->m_subState != 0x19) {
 					DrawCursor((int)ynX, (int)ynY, 1.0f);
 				} else {

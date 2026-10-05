@@ -91,7 +91,7 @@ void Text_Clear(void)
 /*
  * --INFO--
  * PAL Address: 0x02003464
- * PAL Size: 836b
+ * PAL Size: 834b
  * EN Address: 0x02003464
  * EN Size: 834b
  * JP Address: 0x020035A4
@@ -136,7 +136,6 @@ s32 Text_Print(const char *str, s32 mode)
 #if defined(VERSION_GCCJGC)
     s32 group;
     u16 *wideMap;
-    u32 code;
 #endif
 
     if (str == NULL)
@@ -188,10 +187,12 @@ s32 Text_Print(const char *str, s32 mode)
             k = 0;
             if (k < m) {
                 do {
-                    code = *wideMap;
-                    if ((code & 0xFF) == *p) {
-                        code >>= 8;
-                        if (code == p[1])
+                    s32 lo = *wideMap & 0xFF;
+
+                    if (lo == *p) {
+                        s32 hi = *wideMap >> 8;
+
+                        if (hi == p[1])
                             break;
                     }
                     k++;

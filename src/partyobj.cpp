@@ -4755,8 +4755,8 @@ messageMenu:
  * PAL Size: 2332b
  * EN Address: 0x80143488
  * EN Size: 2532b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x801168fc
+ * JP Size: 2332b
  */
 void CGPartyObj::gpmMove()
 {
@@ -4977,7 +4977,11 @@ void CGPartyObj::gpmMove()
 		CGPartyObj::m_ghostWork.carrySpeed = newSpeed;
 
 		CGPartyObj::m_ghostWork.field08++;
+#ifdef VERSION_GCCP01
 		if (CGPartyObj::m_ghostWork.field08 == 4) {
+#else
+		if (CGPartyObj::m_ghostWork.field08 == 5) {
+#endif
 			CGPartyObj::m_ghostWork.field08 = 0;
 		}
 		return;

@@ -532,6 +532,7 @@ monobj_boss.cpp:
 
 p_menu.cpp:
 	.text start:0x80093814 end:0x80097174
+	.bss start:0x802E9160 end:0x802E9A20
 
 p_minigame.cpp:
 	.text start:0x80126EA4 end:0x8012A57C

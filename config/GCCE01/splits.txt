@@ -1621,6 +1621,7 @@ pppYmMelt.cpp:
 	.text start:0x800A4C34 end:0x800A5874
 	.rodata start:0x801D8F60 end:0x801D8F70
 	.sdata2 start:0x8032FAB0 end:0x8032FAE0
+	.sbss2 start:0x80332D80 end:0x80332D84
 
 pppYmTracer.cpp:
 	.text start:0x80092AC8 end:0x800936A0

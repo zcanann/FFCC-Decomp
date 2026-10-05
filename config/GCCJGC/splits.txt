@@ -1084,3 +1084,6 @@ auto_09_8034B984_sdata:
 
 auto_11_8034FCB4_sdata2:
 	.sdata2 start:0x8034FCB4 end:0x8034FCB8
+
+charaobj.cpp:
+	.text start:0x801076D8 end:0x8010ED3C

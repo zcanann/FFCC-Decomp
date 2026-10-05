@@ -383,9 +383,7 @@ void pppConstructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
     work->m_shapeDrawFrame = 0;
     work->m_shapeCurrentFrame = 0;
 
-    work->m_phaseAccel = value;
-    work->m_phaseVelocity = value;
-    work->m_phase = value;
+    work->m_phase = work->m_phaseVelocity = work->m_phaseAccel = value;
 }
 
 /*

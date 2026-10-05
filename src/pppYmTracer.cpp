@@ -49,12 +49,8 @@ static inline void initTracePolygon(PYmTracer* params, TRACE_POLYGON& polygon)
     polygon.life = -1;
     polygon.alpha = params->m_tracer.m_entryAlpha;
     polygon.decay = params->m_tracer.m_entryAlpha / params->m_tracer.m_entryLife;
-    polygon.from.z = 0.0f;
-    polygon.from.y = 0.0f;
-    polygon.from.x = 0.0f;
-    polygon.to.z = 0.0f;
-    polygon.to.y = 0.0f;
-    polygon.to.x = 0.0f;
+    polygon.from.x = polygon.from.y = polygon.from.z = 0.0f;
+    polygon.to.x = polygon.to.y = polygon.to.z = 0.0f;
 }
 
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
@@ -374,13 +370,7 @@ void pppConstructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
     work->arg3Work = 0;
     work->initWork = 0;
     work->count = 0;
-    work->_pad0 = zero;
-    work->from.z = zero;
-    work->from.y = zero;
-    work->from.x = zero;
-    work->_pad1c = zero;
-    work->to.z = zero;
-    work->to.y = zero;
-    work->to.x = zero;
+    work->from.x = work->from.y = work->from.z = work->_pad0 = zero;
+    work->to.x = work->to.y = work->to.z = work->_pad1c = zero;
     work->_pad2e = 0;
 }

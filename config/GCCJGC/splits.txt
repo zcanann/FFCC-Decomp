@@ -1348,3 +1348,26 @@ stopwatch.cpp:
 
 pppCharaBreak.cpp:
 	.text start:0x8013B888 end:0x8013CF9C
+
+pad.cpp:
+	.text start:0x8001FCE8 end:0x80020A60
+	.ctors start:0x801D0640 end:0x801D0644
+	extab start:0x80005CC4 end:0x80005CDC
+	extabindex start:0x8000B4A0 end:0x8000B4C4
+	.rodata start:0x801D1880 end:0x801D18D5
+	.data start:0x801DCB18 end:0x801DCB34
+	.bss start:0x8025FA40 end:0x8025FC3C
+	.sdata start:0x8034B258 end:0x8034B268
+	.sdata2 start:0x8034C578 end:0x8034C5AB
+
+auto_801D18D5_rodata:
+	.rodata start:0x801D18D5 end:0x801D18D8 align:1
+
+auto_801DCB34_data:
+	.data start:0x801DCB34 end:0x801DCB38 align:1
+
+auto_8025FC3C_bss:
+	.bss start:0x8025FC3C end:0x8025FC40 align:1
+
+auto_8034C5AB_sdata2:
+	.sdata2 start:0x8034C5AB end:0x8034C5B0 align:1

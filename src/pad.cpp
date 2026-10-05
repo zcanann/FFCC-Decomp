@@ -34,10 +34,10 @@ typedef char CPad_m_replayFrame_offset_check[(offsetof(CPad, m_replayFrame) == 0
  * --INFO--
  * PAL Address: 0x80021008
  * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80020DFC
+ * EN Size: 416b
+ * JP Address: 0x80020894
+ * JP Size: 416b
  */
 void CPad::Init()
 {
@@ -88,10 +88,10 @@ void CPad::Init()
  * --INFO--
  * PAL Address: 0x80020fb0
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80020DA4
+ * EN Size: 88b
+ * JP Address: 0x8002083C
+ * JP Size: 88b
  */
 void CPad::Quit()
 {
@@ -114,8 +114,8 @@ void CPad::Quit()
  * PAL Size: 2844b
  * EN Address: 0x8002A444
  * EN Size: 3472b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8001FCE8
+ * JP Size: 2900b
  */
 void CPad::Frame()
 {
@@ -213,12 +213,8 @@ void CPad::Frame()
 	merged->stickX = 0;
 	merged->triggerRight = 0;
 	merged->triggerLeft = 0;
-	merged->substickYF = zero;
-	merged->substickXF = zero;
-	merged->stickYF = zero;
-	merged->stickXF = zero;
-	merged->triggerRightF = zero;
-	merged->triggerLeftF = zero;
+	merged->stickXF = merged->stickYF = merged->substickXF = merged->substickYF = zero;
+	merged->triggerLeftF = merged->triggerRightF = zero;
 	merged->lockedButton[2] = 0;
 	merged->lockedButton[1] = 0;
 	merged->lockedButton[0] = 0;

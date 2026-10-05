@@ -79,9 +79,6 @@ enum GraphicCppStringOffset {
     kGraphicCppDrawDoneFmt = 0x1AC,
 };
 
-static inline float LoadFloat(const float& value) {
-    return value;
-}
 
 
 extern const float kGraphicZeroF = 0.0f;
@@ -1259,12 +1256,12 @@ void CGraphic::SetFogParam(float startZ, float endZ)
 
 /*
  * --INFO--
- * PAL Address: 0x80017ea8
+ * PAL Address: 0x80017EA8
  * PAL Size: 148b
- * EN Address: 0x800203D4
- * EN Size: 204b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80017CA4
+ * EN Size: 148b
+ * JP Address: 0x800178D4
+ * JP Size: 148b
  */
 void CGraphic::SetFog(int useFog, int useBlack)
 {
@@ -1292,7 +1289,7 @@ void CGraphic::CopySaveFrameBuffer()
     GXCopyTex(m_savedFrameBuffer, GX_FALSE);
     GXPixModeSync();
     GXInitTexObj(&m_smallBackTexObj, m_savedFrameBuffer, 0x280, 0x1C0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    float zero = LoadFloat(kGraphicZeroF);
+    float zero = 0.0f;
     GXInitTexObjLOD(&m_smallBackTexObj, GX_NEAR, GX_NEAR, zero, zero, zero, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
@@ -1458,7 +1455,7 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         if (texObj != nullptr) {
             GXInitTexObj(texObj, buffer, width, height, format, GX_CLAMP, GX_CLAMP,
                          GX_FALSE);
-            float zero = LoadFloat(kGraphicZeroF);
+            float zero = 0.0f;
             GXInitTexObjLOD(texObj, filter, filter, zero, zero, zero, GX_FALSE, GX_FALSE,
                             GX_ANISO_1);
         }
@@ -1517,12 +1514,12 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
 
 /*
  * --INFO--
- * PAL Address: 0x80016fb0
+ * PAL Address: 0x80016FB0
  * PAL Size: 2112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80016DAC
+ * EN Size: 2112b
+ * JP Address: 0x80016988
+ * JP Size: 2116b
  */
 void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist, float farDist, Vec targetPos, int blurPasses)
 {
@@ -1553,11 +1550,11 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		return;
 	}
 
-	if (nearDist < kGraphicZeroF) {
-		nearDist = kGraphicZeroF;
+	if (nearDist < 0.0f) {
+		nearDist = 0.0f;
 	}
-	if (nearDist > kGraphicOneF) {
-		nearDist = kGraphicOneF;
+	if (nearDist > 1.0f) {
+		nearDist = 1.0f;
 	}
 	if (farDist < nearDist) {
 		farDist = nearDist;

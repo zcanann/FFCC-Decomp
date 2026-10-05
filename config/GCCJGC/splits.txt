@@ -545,3 +545,9 @@ bonus_menu.cpp:
 
 menu_cmd.cpp:
 	.text start:0x80145F34 end:0x8014B634
+
+pppYmMana.cpp:
+	.text start:0x800D2088 end:0x800D5B64
+
+pppMana2.cpp:
+	.text start:0x80102220 end:0x801052F8

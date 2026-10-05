@@ -446,3 +446,6 @@ gbaque.cpp:
 
 map.cpp:
 	.text start:0x8002eb80 end:0x800340bc
+
+monobj.cpp:
+	.text start:0x8010ed3c end:0x80116524

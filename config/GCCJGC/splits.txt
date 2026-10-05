@@ -229,3 +229,11 @@ thp/THPDec.c:
 	.sdata start:0x8034BA20 end:0x8034BA24
 	.sbss start:0x8034C2A0 end:0x8034C3B8
 	.sdata2 start:0x803501C0 end:0x803501DC
+
+axfx/chorus.c:
+	.text start:0x80190058 end:0x80190A40
+	.data start:0x80237050 end:0x80237850
+	.sdata2 start:0x8034FBE8 end:0x8034FBF0
+
+axfx/delay.c:
+	.text start:0x80190A40 end:0x80190EEC

@@ -965,3 +965,26 @@ os/OS.c:
 	.bss	start:0x80327480 end:0x803274D0
 	.sdata	start:0x8034B868 end:0x8034B878
 	.sbss	start:0x8034BD00 end:0x8034BD40
+
+si/SIBios.c:
+	.text	start:0x8017E5F4 end:0x8017FE44
+	.data	start:0x80232B78 end:0x80232C90
+	.bss	start:0x80328050 end:0x80328250
+	.sdata	start:0x8034B8A8 end:0x8034B8AC
+	.sbss	start:0x8034BDE0 end:0x8034BDEC
+
+si/SISamplingRate.c:
+	.text	start:0x8017FE44 end:0x8017FF4C
+	.data	start:0x80232C90 end:0x80232D23
+	.sbss	start:0x8034BDF0 end:0x8034BDF4
+
+pad/Padclamp.c:
+	.text	start:0x8018782C end:0x80187A70
+	.rodata	start:0x801DB160 end:0x801DB16A
+
+pad/Pad.c:
+	.text	start:0x80187A70 end:0x80189398
+	.data	start:0x80233468 end:0x802334C0
+	.bss	start:0x80328590 end:0x803285E0
+	.sdata	start:0x8034B900 end:0x8034B920
+	.sbss	start:0x8034BF18 end:0x8034BF40

@@ -857,8 +857,8 @@ config.libs = [
     DolphinLib(
         "si",
         [
-            Object(Matching, "si/SIBios.c"),
-            Object(Matching, "si/SISamplingRate.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "si/SIBios.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "si/SISamplingRate.c"),
         ],
     ),
     DolphinLib(
@@ -907,8 +907,8 @@ config.libs = [
     DolphinLib(
         "pad",
         [
-            Object(Matching, "pad/Padclamp.c"),
-            Object(Matching, "pad/Pad.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pad/Padclamp.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pad/Pad.c"),
         ],
     ),
     DolphinLib(

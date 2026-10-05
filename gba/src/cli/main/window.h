@@ -46,7 +46,7 @@ void Window_OpenStyle3(struct Window *win, s32 tile, s32 pal);
 void Window_OpenStyle4(struct Window *win, s32 tile, s32 pal);
 void Window_OpenStyle5(struct Window *win, s32 tile, s32 pal);
 void Window_OpenStyle6(struct Window *win, s32 tile, s32 pal);
-void Window_Nop(struct Window *win);
+void Window_DrawEquipTitle(struct Window *win);
 void Window_OpenStyle7(struct Window *win, s32 tile, s32 pal);
 void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal);
 void Window_OpenStyle9(struct Window *win, s32 tile, s32 pal);

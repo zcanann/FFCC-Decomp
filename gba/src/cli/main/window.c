@@ -553,6 +553,15 @@ sprites:
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02006670
+ * PAL Size: 686b
+ * EN Address: 0x02006600
+ * EN Size: 686b
+ * JP Address: 0x020067B4
+ * JP Size: 722b
+ */
 void Window_OpenStyle3(struct Window *win, s32 tile, s32 pal)
 {
     u16 buf[30];
@@ -632,8 +641,18 @@ draw_text_rows:
                 t += 4;
             }
         }
+#if defined(VERSION_GCCJGC)
+        if (win->bg <= 1) {
+            buf[0] = 0x3FF;
+            buf[win->width - 1] = 0x3FF;
+        } else {
+            buf[0] = 0x2FF;
+            buf[win->width - 1] = 0x2FF;
+        }
+#else
         buf[0] = 0x3FF;
         buf[win->width - 1] = 0x3FF;
+#endif
         map = Bg_GetMapPtr(win->bg - 1, win->x, (py - 8) >> 3);
         DmaCopy16(0, buf, map, win->width << 1);
     }
@@ -942,8 +961,30 @@ draw_sprites:
     }
 }
 
-void Window_Nop(struct Window *win)
+/*
+ * --INFO--
+ * PAL Address: 0x0200714C
+ * PAL Size: 2b
+ * EN Address: 0x020070DC
+ * EN Size: 2b
+ * JP Address: 0x020072B4
+ * JP Size: 94b
+ */
+void Window_DrawEquipTitle(struct Window *win)
 {
+#if defined(VERSION_GCCJGC)
+    s32 x;
+    s32 y;
+    s32 pal;
+    s32 i;
+
+    x = win->x * 8;
+    y = win->y * 8;
+    x += (win->width * 8 - 32) >> 1;
+    pal = Obj_GetPalette(0, 48);
+    for (i = 0; i <= 1; i++, x += 16)
+        Obj_Draw(x, y, 0, i + 48, pal, win->bg, 0);
+#endif
 }
 
 void Window_OpenStyle7(struct Window *win, s32 tile, s32 pal)
@@ -964,7 +1005,7 @@ void Window_OpenStyle7(struct Window *win, s32 tile, s32 pal)
     px = win->x * 8;
     y = win->y * 8 + win->anim;
     py = y + 16;
-    Window_Nop(win);
+    Window_DrawEquipTitle(win);
     if ((py >> 3) - win->y >= win->height)
         return;
     if (win->anim == 0) {
@@ -2145,6 +2186,15 @@ void Session_OnMask(struct JoyBytes cmd)
     gMask = v;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02008F8C
+ * PAL Size: 240b
+ * EN Address: 0x02008EBC
+ * EN Size: 240b
+ * JP Address: 0x020090F0
+ * JP Size: 218b
+ */
 void Obj_DrawGil(s32 x, s32 y, s32 len, s32 pal, u32 value, s32 color)
 {
     u32 max;
@@ -2175,10 +2225,14 @@ void Obj_DrawGil(s32 x, s32 y, s32 len, s32 pal, u32 value, s32 color)
         }
         Obj_Draw(x, y, 1, digit, c, pal, 0);
     }
+#if defined(VERSION_GCCJGC)
+    i = 44;
+#else
     if ((gLanguage & 15) == 1)
         i = 54;
     else
         i = 44;
+#endif
     c = Obj_GetPalette(0, i);
     Obj_Draw(x + 1, y, 0, i, c, pal, 0);
 }

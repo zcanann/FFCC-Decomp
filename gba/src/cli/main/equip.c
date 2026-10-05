@@ -106,7 +106,7 @@ s32 EquipScreen_Main(void)
 
     StatusWin_DrawIcon(0);
     win = &gWindows[2];
-    Window_Nop(win);
+    Window_DrawEquipTitle(win);
     if (!(gDataFlags & DATA_EQUIP_LIST) && (gKeysNew & B_BUTTON)) {
         sEquipQuit = 1;
         gOpenMenuReq = 1;
@@ -172,7 +172,7 @@ s32 EquipScreen_Exit(void)
         win[2].anim += 8;
     }
     if (!ret && (win[2].anim >> 3) < win[2].height - 2)
-        Window_Nop(&win[2]);
+        Window_DrawEquipTitle(&win[2]);
     return ret;
 }
 

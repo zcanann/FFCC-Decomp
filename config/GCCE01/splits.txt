@@ -1459,3 +1459,12 @@ auto_801DA1F6_rodata:
 
 auto_8032FCEC_sdata2:
 	.sdata2 start:0x8032FCEC end:0x8032FCF0 align:1
+
+texanim.cpp:
+	.text start:0x80043B64 end:0x80044F6C
+
+mapanim.cpp:
+	.text start:0x8004A294 end:0x8004AFC4
+
+maptexanim.cpp:
+	.text start:0x8004F704 end:0x800501F0

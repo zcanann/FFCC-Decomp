@@ -62,10 +62,10 @@ inline void CMapTexAnim::SetMaterialTextureSlot(CMaterial* material, unsigned lo
  * --INFO--
  * PAL Address: 0x8004f910
  * PAL Size: 276b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004F704
+ * EN Size: 276b
+ * JP Address: 0x8004F18C
+ * JP Size: 276b
  */
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
@@ -87,10 +87,10 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
  * --INFO--
  * PAL Address: 0x8004fa24
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004F818
+ * EN Size: 104b
+ * JP Address: 0x8004F2A0
+ * JP Size: 104b
  */
 void CMapTexAnimSet::Calc()
 {
@@ -105,10 +105,10 @@ static const float kMapTexAnimBlendScale = 256.0f;
  * --INFO--
  * PAL Address: 0x8004fa8c
  * PAL Size: 1496b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004F880
+ * EN Size: 1496b
+ * JP Address: 0x8004F308
+ * JP Size: 1496b
  */
 void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 {
@@ -196,10 +196,10 @@ extern "C" const float kMapTexAnimZero = 0.0f;
  * --INFO--
  * PAL Address: 0x80050064
  * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004FE58
+ * EN Size: 700b
+ * JP Address: 0x8004F8E0
+ * JP Size: 700b
  */
 void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CTextureSet* textureSet)
 {
@@ -269,10 +269,10 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
  * --INFO--
  * PAL Address: 0x80050320
  * PAL Size: 220b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80050114
+ * EN Size: 220b
+ * JP Address: 0x8004FB9C
+ * JP Size: 220b
  */
 CMapTexAnim::~CMapTexAnim()
 {

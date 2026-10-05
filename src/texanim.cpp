@@ -13,10 +13,10 @@
  * --INFO--
  * PAL Address: 0x80044ae8
  * PAL Size: 52b
- * EN Address: 0x80050710
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800448DC
+ * EN Size: 52b
+ * JP Address: 0x800442E8
+ * JP Size: 52b
  */
 template <class T>
 CPtrArray<T>::CPtrArray()
@@ -33,10 +33,10 @@ CPtrArray<T>::CPtrArray()
  * --INFO--
  * PAL Address: 0x80044b1c
  * PAL Size: 92b
- * EN Address: 0x8005074C
- * EN Size: 96b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044910
+ * EN Size: 92b
+ * JP Address: 0x8004431C
+ * JP Size: 92b
  */
 template <class T>
 CPtrArray<T>::~CPtrArray()
@@ -48,10 +48,10 @@ CPtrArray<T>::~CPtrArray()
  * --INFO--
  * PAL Address: 0x80044b78
  * PAL Size: 112b
- * EN Address: 0x800507AC
+ * EN Address: 0x8004496C
  * EN Size: 112b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80044378
+ * JP Size: 112b
  */
 template <class T>
 int CPtrArray<T>::Add(T item)
@@ -68,10 +68,10 @@ int CPtrArray<T>::Add(T item)
  * --INFO--
  * PAL Address: 0x80044be8
  * PAL Size: 8b
- * EN Address: 0x8005081C
+ * EN Address: 0x800449DC
  * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800443E8
+ * JP Size: 8b
  */
 template <class T>
 int CPtrArray<T>::GetSize()
@@ -83,10 +83,10 @@ int CPtrArray<T>::GetSize()
  * --INFO--
  * PAL Address: 0x80044bf0
  * PAL Size: 76b
- * EN Address: 0x80050824
- * EN Size: 80b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800449E4
+ * EN Size: 76b
+ * JP Address: 0x800443F0
+ * JP Size: 76b
  */
 template <class T>
 void CPtrArray<T>::RemoveAll()
@@ -103,10 +103,10 @@ void CPtrArray<T>::RemoveAll()
  * --INFO--
  * PAL Address: 0x80044c3c
  * PAL Size: 204b
- * EN Address: 0x80050874
- * EN Size: 132b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044A30
+ * EN Size: 204b
+ * JP Address: 0x8004443C
+ * JP Size: 204b
  */
 template <class T>
 void CPtrArray<T>::ReleaseAndRemoveAll()
@@ -128,10 +128,10 @@ void CPtrArray<T>::ReleaseAndRemoveAll()
  * --INFO--
  * PAL Address: 0x80044d08
  * PAL Size: 32b
- * EN Address: 0x800508F8
- * EN Size: 48b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044AFC
+ * EN Size: 32b
+ * JP Address: 0x80044508
+ * JP Size: 32b
  */
 template <class T>
 T CPtrArray<T>::operator[](unsigned long index)
@@ -143,10 +143,10 @@ T CPtrArray<T>::operator[](unsigned long index)
  * --INFO--
  * PAL Address: 0x80044d28
  * PAL Size: 8b
- * EN Address: 0x80050928
+ * EN Address: 0x80044B1C
  * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80044528
+ * JP Size: 8b
  */
 template <class T>
 void CPtrArray<T>::SetStage(CMemory::CStage* stage)
@@ -158,10 +158,10 @@ void CPtrArray<T>::SetStage(CMemory::CStage* stage)
  * --INFO--
  * PAL Address: 0x80044d30
  * PAL Size: 240b
- * EN Address: 0x80050930
- * EN Size: 380b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044B24
+ * EN Size: 240b
+ * JP Address: 0x80044530
+ * JP Size: 240b
  */
 template <class T>
 int CPtrArray<T>::setSize(unsigned long newSize)
@@ -201,10 +201,10 @@ int CPtrArray<T>::setSize(unsigned long newSize)
  * --INFO--
  * PAL Address: 0x80045158
  * PAL Size: 16b
- * EN Address: 0x80050E48
- * EN Size: 140b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044F4C
+ * EN Size: 16b
+ * JP Address: 0x80044958
+ * JP Size: 16b
  */
 template <class T>
 T CPtrArray<T>::GetAt(unsigned long index)
@@ -632,10 +632,10 @@ inline float CTexAnim::GetChin()
  * --INFO--
  * PAL Address: 0x80044a9c
  * PAL Size: 76b
- * EN Address: 0x8004F4B8
- * EN Size: 80b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044890
+ * EN Size: 76b
+ * JP Address: 0x8004429C
+ * JP Size: 76b
  */
 CTexAnimSet::CTexAnimSet()
 {
@@ -647,10 +647,10 @@ CTexAnimSet::CTexAnimSet()
  * --INFO--
  * PAL Address: 0x80044a24
  * PAL Size: 120b
- * EN Address: 0x8004F508
+ * EN Address: 0x80044818
  * EN Size: 120b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80044224
+ * JP Size: 120b
  */
 CTexAnimSet::~CTexAnimSet()
 {
@@ -661,10 +661,10 @@ CTexAnimSet::~CTexAnimSet()
  * --INFO--
  * PAL Address: 0x800446a0
  * PAL Size: 900b
- * EN Address: 0x8004F580
- * EN Size: 212b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044494
+ * EN Size: 900b
+ * JP Address: 0x80043E9C
+ * JP Size: 904b
  */
 void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
@@ -690,10 +690,10 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
  * --INFO--
  * PAL Address: 0x80044540
  * PAL Size: 352b
- * EN Address: 0x8004F654
- * EN Size: 200b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044334
+ * EN Size: 352b
+ * JP Address: 0x80043D38
+ * JP Size: 356b
  */
 CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
@@ -714,10 +714,10 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
  * --INFO--
  * PAL Address: 0x80044440
  * PAL Size: 256b
- * EN Address: 0x8004F71C
- * EN Size: 100b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044234
+ * EN Size: 256b
+ * JP Address: 0x80043C38
+ * JP Size: 256b
  */
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
@@ -736,10 +736,10 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
  * --INFO--
  * PAL Address: 0x800440ec
  * PAL Size: 852b
- * EN Address: 0x8004F780
- * EN Size: 204b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80043EE0
+ * EN Size: 852b
+ * JP Address: 0x800438E0
+ * JP Size: 856b
  */
 void CTexAnimSet::AddFrame()
 {
@@ -770,10 +770,10 @@ void CTexAnimSet::AddFrame()
  * --INFO--
  * PAL Address: 0x8004401c
  * PAL Size: 208b
- * EN Address: 0x8004F84C
- * EN Size: 168b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80043E10
+ * EN Size: 208b
+ * JP Address: 0x80043810
+ * JP Size: 208b
  */
 void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
 {
@@ -794,10 +794,10 @@ void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
  * --INFO--
  * PAL Address: 0x80043f48
  * PAL Size: 212b
- * EN Address: 0x8004F8F4
- * EN Size: 92b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80043D3C
+ * EN Size: 212b
+ * JP Address: 0x80043734
+ * JP Size: 220b
  */
 void CTexAnimSet::SetTexGen()
 {
@@ -833,10 +833,10 @@ void CTexAnimSet::SetTexGen()
  * --INFO--
  * PAL Address: 0x80043ea4
  * PAL Size: 164b
- * EN Address: 0x8004F9C0
- * EN Size: 128b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80043C98
+ * EN Size: 164b
+ * JP Address: 0x80043690
+ * JP Size: 164b
  */
 CTexAnim::~CTexAnim()
 {
@@ -853,10 +853,10 @@ CTexAnim::~CTexAnim()
  * --INFO--
  * PAL Address: 0x80043dec
  * PAL Size: 184b
- * EN Address: 0x800500B0
- * EN Size: 148b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80043BE0
+ * EN Size: 184b
+ * JP Address: 0x800435D8
+ * JP Size: 184b
  */
 CTexAnim::CRefData::~CRefData()
 {
@@ -874,10 +874,10 @@ CTexAnim::CRefData::~CRefData()
  * --INFO--
  * PAL Address: 0x80043d70
  * PAL Size: 124b
- * EN Address: 0x80050194
- * EN Size: 128b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80043B64
+ * EN Size: 124b
+ * JP Address: 0x8004355C
+ * JP Size: 124b
  */
 CTexAnimSeq::~CTexAnimSeq()
 {

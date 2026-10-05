@@ -1423,3 +1423,12 @@ auto_8034C294_sbss:
 
 auto_803501BD_sdata2:
 	.sdata2 start:0x803501BD end:0x803501C0 align:1
+
+texanim.cpp:
+	.text start:0x8004355C end:0x80044978
+
+mapanim.cpp:
+	.text start:0x80049CB8 end:0x8004A9E8
+
+maptexanim.cpp:
+	.text start:0x8004F18C end:0x8004FC78

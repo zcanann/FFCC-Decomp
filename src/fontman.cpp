@@ -2,6 +2,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/color.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/util.h"
 #include "global.h"
 #include "ffcc/p_camera.h"
 extern "C" {
@@ -20,6 +21,14 @@ unsigned char g_tFont22[] = {
 #include <dolphin/mtx.h>
 
 static const char s_fontman_cpp[] = "fontman.cpp";
+
+#ifdef VERSION_GCCJGC
+static const unsigned short FontFallbackCharacter = 0x81A1;
+enum { FontGlyphAllocationLine = 0xC7, FontTextureAllocationLine = 0xD7 };
+#else
+static const unsigned short FontFallbackCharacter = '?';
+enum { FontGlyphAllocationLine = 0xCF, FontTextureAllocationLine = 0xDF };
+#endif
 
 CFontMan FontMan;
 
@@ -62,12 +71,27 @@ static inline float FloorF(float value)
  */
 inline int CFont::getNextChar(char** text, unsigned short* ch)
 {
+#ifdef VERSION_GCCJGC
+    unsigned char c = static_cast<unsigned char>(**text);
+    if (c == 0) {
+        return 0;
+    }
+    (*text)++;
+    if (c < 0x80) {
+        *ch = c;
+    } else {
+        *ch = (c << 8) | static_cast<unsigned char>(**text);
+        (*text)++;
+    }
+    return 1;
+#else
 	if (static_cast<unsigned char>(**text) == 0) {
 		return 0;
 	}
 	*ch = static_cast<unsigned char>(**text);
 	(*text)++;
 	return 1;
+#endif
 }
 
 /*
@@ -81,6 +105,11 @@ inline int CFont::getNextChar(char** text, unsigned short* ch)
  */
 inline CFontGlyphEntry* CFont::searchChar(unsigned short ch)
 {
+#ifdef VERSION_GCCJGC
+    if (ch < 0x80) {
+        ch = gUtil.AsciiToMulti(static_cast<unsigned char>(ch));
+    }
+#endif
 	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
 	CFontGlyphEntry* glyph = FirstGlyph(glyphBucket);
 	int count = static_cast<int>(*glyphBucket);
@@ -112,10 +141,10 @@ CFontMan::~CFontMan()
  * --INFO--
  * PAL Address: 0x80092F70
  * PAL Size: 296b
- * EN Address: 0x800A4A00
- * EN Size: 84b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009290C
+ * EN Size: 296b
+ * JP Address: 0x8009248C
+ * JP Size: 296b
  */
 void CFontMan::Init()
 {
@@ -156,10 +185,10 @@ void CFontMan::Quit()
  * --INFO--
  * PAL Address: 0x80092EEC
  * PAL Size: 12b
- * EN Address: 0x800A4AA8
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80092888
+ * EN Size: 12b
+ * JP Address: 0x80092408
+ * JP Size: 12b
  */
 unsigned long CFontMan::GetInternal22Size()
 {
@@ -170,23 +199,19 @@ unsigned long CFontMan::GetInternal22Size()
  * --INFO--
  * PAL Address: 0x80092E3C
  * PAL Size: 176b
- * EN Address: 0x800A4AB0
- * EN Size: 224b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800927D8
+ * EN Size: 176b
+ * JP Address: 0x80092358
+ * JP Size: 176b
  */
 CFont::CFont()
 {
 	m_glyphData = 0;
 	texturePtr = 0;
-	margin = 0.0f;
-	posZ = 0.0f;
-	posY = 0.0f;
-	posX = 0.0f;
+	posX = posY = posZ = margin = 0.0f;
 	CFontRenderFlagBits& bits = renderFlags;
 	bits.shadow = 0;
-	scaleY = 1.0f;
-	scaleX = 1.0f;
+	scaleX = scaleY = 1.0f;
 	bits.snapPosition = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;
@@ -268,7 +293,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     if (m_usesEmbeddedData != 0) {
                         m_glyphData = chunkFile.GetAddress();
                     } else {
-                        m_glyphData = new (stage, const_cast<char*>(s_fontman_cpp), 0xCF) unsigned char[chunk.m_size];
+                        m_glyphData = new (stage, const_cast<char*>(s_fontman_cpp), FontGlyphAllocationLine) unsigned char[chunk.m_size];
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
@@ -280,7 +305,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     }
                     break;
                 case 'TXTR':
-                    texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
+                    texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), FontTextureAllocationLine) CTexture;
                     texturePtr->Create(chunkFile, stage, 0, 0, m_usesEmbeddedData != 0);
                     break;
                 }
@@ -593,10 +618,10 @@ void CFont::DrawQuit()
  * --INFO--
  * PAL Address: 0x8009255C
  * PAL Size: 116b
- * EN Address: 0x800A5458
- * EN Size: 92b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80091EF8
+ * EN Size: 116b
+ * JP Address: 0x80091A58
+ * JP Size: 148b
  */
 void CFont::Draw(char* text)
 {
@@ -611,16 +636,16 @@ void CFont::Draw(char* text)
  * --INFO--
  * PAL Address: 0x8009211C
  * PAL Size: 1088b
- * EN Address: 0x800A54B4
- * EN Size: 1172b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80091AB8
+ * EN Size: 1088b
+ * JP Address: 0x800915FC
+ * JP Size: 1116b
  */
 void CFont::Draw(unsigned short ch)
 {
 	CFontGlyphEntry* drawGlyph = searchChar(ch);
 	if (drawGlyph == 0) {
-		drawGlyph = searchChar('?');
+		drawGlyph = searchChar(FontFallbackCharacter);
 		if (drawGlyph == 0) {
 			return;
 		}
@@ -696,10 +721,10 @@ void CFont::Draw(unsigned short ch)
  * --INFO--
  * PAL Address: 0x80091F88
  * PAL Size: 404b
- * EN Address: 0x800A59E8
- * EN Size: 120b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80091924
+ * EN Size: 404b
+ * JP Address: 0x8009142C
+ * JP Size: 464b
  */
 float CFont::GetWidth(char* text)
 {
@@ -716,10 +741,10 @@ float CFont::GetWidth(char* text)
  * --INFO--
  * PAL Address: 0x80091E58
  * PAL Size: 304b
- * EN Address: 0x800A5A60
- * EN Size: 292b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800917F4
+ * EN Size: 304b
+ * JP Address: 0x800912D4
+ * JP Size: 344b
  */
 float CFont::GetWidth(unsigned short ch)
 {
@@ -747,7 +772,7 @@ found_fallback:
 	return width;
 
 find_fallback:
-	glyph = searchChar('?');
+	glyph = searchChar(FontFallbackCharacter);
 	if (glyph != 0) {
 		goto found_fallback;
 	}

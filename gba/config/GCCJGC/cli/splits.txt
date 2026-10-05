@@ -175,8 +175,11 @@ main/m4a_tables:
 main/sound_data:
 	.rodata     start:0x020226A4 end:0x020227F4 align:4
 
+main/sound_assets_jp:
+	.rodata     start:0x020227F4 end:0x020259A4 align:4
+
 regional_data:
-	.rodata     start:0x020227F4 end:0x02025AA4
+	.rodata     start:0x020259A4 end:0x02025AA4
 
 main/obj:
 	.data       start:0x02025AA4 end:0x02025ABC align:4

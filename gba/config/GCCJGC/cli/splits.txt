@@ -167,7 +167,16 @@ main/msg_item:
 	.rodata     start:0x0201D72C end:0x02020240 align:4
 
 regional_data:
-	.rodata     start:0x02020240 end:0x02025AA4
+	.rodata     start:0x02020240 end:0x02022540
+
+main/m4a_tables:
+	.rodata     start:0x02022540 end:0x020226A4 align:4
+
+main/sound_data:
+	.rodata     start:0x020226A4 end:0x020227F4 align:4
+
+regional_data:
+	.rodata     start:0x020227F4 end:0x02025AA4
 
 main/obj:
 	.data       start:0x02025AA4 end:0x02025ABC align:4
@@ -221,7 +230,13 @@ main/menu:
 	.bss        start:0x0300284C end:0x0300284E align:4
 
 regional_bss:
-	.bss        start:0x0300284E end:0x030029C0 align:1
+	.bss        start:0x0300284E end:0x03002850 align:1
+
+main/sound_data:
+	.bss        start:0x03002850 end:0x03002990 align:8
+
+regional_bss:
+	.bss        start:0x03002990 end:0x030029C0
 
 main/main:
 	.common     start:0x030029C0 end:0x03002AC0 align:16

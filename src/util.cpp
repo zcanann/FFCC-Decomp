@@ -334,14 +334,27 @@ void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
  * --INFO--
  * PAL Address: 0x80024748
  * PAL Size: 172b
- * EN Address: 0x8002DB94
- * EN Size: 180b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8002453C
+ * EN Size: 172b
+ * JP Address: 0x8002403C
+ * JP Size: 212b
  */
 void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 {
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+#ifdef VERSION_GCCJGC
+    GXPosition3f32(pos1.x, pos1.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+
+    GXPosition3f32(pos2.x, pos1.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+
+    GXPosition3f32(pos2.x, pos2.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+
+    GXPosition3f32(pos1.x, pos2.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+#else
     f32 x2;
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
@@ -369,16 +382,17 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
     GXWGFifo.f32 = y2;
     GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
+#endif
 }
 
 /*
  * --INFO--
  * PAL Address: 0x80024608
  * PAL Size: 320b
- * EN Address: 0x8002DC94
- * EN Size: 312b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800243FC
+ * EN Size: 320b
+ * JP Address: 0x80023ED4
+ * JP Size: 360b
  */
 void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
@@ -401,6 +415,23 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+#ifdef VERSION_GCCJGC
+    GXPosition3f32(pos1.x, pos1.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXTexCoord2f32(u0, v0);
+
+    GXPosition3f32(pos2.x, pos1.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXTexCoord2f32(u1, v0);
+
+    GXPosition3f32(pos2.x, pos2.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXTexCoord2f32(u1, v1);
+
+    GXPosition3f32(pos1.x, pos2.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXTexCoord2f32(u0, v1);
+#else
     f32 x2;
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
@@ -435,16 +466,17 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u0;
     GXWGFifo.f32 = v1;
+#endif
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800244a8
+ * PAL Address: 0x800244A8
  * PAL Size: 352b
- * EN Address: 0x8002DDCC
- * EN Size: 360b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8002429C
+ * EN Size: 352b
+ * JP Address: 0x80023D4C
+ * JP Size: 392b
  */
 void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
@@ -467,6 +499,27 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+#ifdef VERSION_GCCJGC
+    GXPosition3f32(pos1.x, pos1.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXTexCoord2f32(u1, v1);
+    GXTexCoord2f32(u1, v1);
+
+    GXPosition3f32(pos2.x, pos1.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXTexCoord2f32(u2, v1);
+    GXTexCoord2f32(u2, v1);
+
+    GXPosition3f32(pos2.x, pos2.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXTexCoord2f32(u2, v2);
+    GXTexCoord2f32(u2, v2);
+
+    GXPosition3f32(pos1.x, pos2.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXTexCoord2f32(u1, v2);
+    GXTexCoord2f32(u1, v2);
+#else
     f32 x2;
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
@@ -509,6 +562,7 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     GXWGFifo.f32 = v2;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v2;
+#endif
 }
 
 /*

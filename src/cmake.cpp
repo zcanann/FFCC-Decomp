@@ -17,6 +17,9 @@
 
 static int s_OldMenu;
 extern "C" char s_menuSubfontPathFmt[];
+#ifdef VERSION_GCCJGC
+static const char s_cmakeSubfontPath[] = "dvd/menu/subfont.fnt";
+#endif
 static const char s_cmake_cpp[] = "cmake.cpp";
 
 struct CmakeInfo {
@@ -3779,17 +3782,27 @@ void CMenuPcs::calcVillageMenu()
     if (MenuU8(this, 0x16) != 0 && CmakeResult(this) == 0) {
         if (CmakeResult(this) == 0 && MenuU8(this, 0x16) != 0) {
             if (Game.m_gameWork.m_menuStageMode == 0) {
+#ifdef VERSION_GCCJGC
+                loadFont(2, const_cast<char*>(s_cmakeSubfontPath), 4, -1);
+#else
                 char path[128];
-                const char* language = Game.GetLangString();
-                sprintf(path, s_menuSubfontPathFmt, language);
+                sprintf(path, s_menuSubfontPathFmt, Game.GetLangString());
                 loadFont(2, path, 4, -1);
+#endif
             }
 
             loadTexture(PTR_s_world2, 8, 1, s_cmakeWorldTextureTable, CMAKE_TEX_VILLAGE_CRYSTAL, CMAKE_VILLAGE_TEXTURE_COUNT, 3);
 
             CMemory::CStage* stage = MenuPcs.m_menuStage;
             void*& villageWork = CmakeVillageWork(this);
-            villageWork = operator new(0x48, stage, const_cast<char*>(s_cmake_cpp), 0xCB3);
+#ifdef VERSION_GCCJGC
+            const int allocationLine = 0xC17;
+#elif defined(VERSION_GCCE01)
+            const int allocationLine = 0xCB1;
+#else
+            const int allocationLine = 0xCB3;
+#endif
+            villageWork = operator new(0x48, stage, const_cast<char*>(s_cmake_cpp), allocationLine);
             memset(villageWork, 0, 0x48);
             LoadCmakeVillageName();
             CmakeResult(this) = 1;
@@ -3798,9 +3811,8 @@ void CMenuPcs::calcVillageMenu()
 
     short active = CmakeResult(this);
     if (active != 0) {
-        if (MenuU8(this, 0x16) == 0) {
+        if (MenuU8(this, 0x16) == 0 && active != 0) {
             if (active != 0) {
-              if (active != 0) {
                 if (Game.m_gameWork.m_menuStageMode == 0) {
                     CFont*& font = m_fonts[CMAKE_FONT_VILLAGE];
                     if (font != 0) {
@@ -3816,7 +3828,6 @@ void CMenuPcs::calcVillageMenu()
                     villageWork = nullptr;
                 }
                 CmakeResult(this) = 0;
-              }
             }
         } else {
             CmakeMenuState* villageWork = CmakeVillageState(this);

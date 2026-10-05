@@ -36,10 +36,40 @@ static u32 TRK_ISR_OFFSETS[15] = { PPC_SystemReset,
  * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800053E0
+ * JP Size: 292b
  */
+#ifdef VERSION_GCCJGC
+__declspec(section ".init") void __TRK_reset(void)
+{
+	u32 maskAddress = lc_base;
+	u32* isrOffsetPtr;
+	int i;
+	u32 mask;
+
+	if (maskAddress <= 0x44 && maskAddress + 0x4000 > 0x44 && gTRKCPUState.Extended1.DBAT3U & 3) {
+		maskAddress = 0x44;
+	} else {
+		maskAddress = EXCEPTIONMASK_ADDR;
+	}
+
+	i            = 0;
+	mask          = *(u32*)maskAddress;
+	isrOffsetPtr = TRK_ISR_OFFSETS;
+
+	do {
+		if (mask & (1 << i)) {
+			void* destPtr = (void*)TRKTargetTranslate(isrOffsetPtr[i]);
+			TRK_memcpy(destPtr, gTRKInterruptVectorTable + isrOffsetPtr[i], 0x100);
+			TRK_flush_cache(destPtr, 0x100);
+		}
+
+		i++;
+	} while (i <= 14);
+}
+#else
 __declspec(section ".init") void __TRK_reset(void) { OSResetSystem(0, 0, 0); }
+#endif
 
 asm void InitMetroTRK()
 {
@@ -100,7 +130,9 @@ asm void InitMetroTRK()
 	blr
 initCommTableSuccess:
 	b TRK_main //Jump to TRK_main
+#ifndef VERSION_GCCJGC
 	blr
+#endif
 #endif // clang-format on
 }
 

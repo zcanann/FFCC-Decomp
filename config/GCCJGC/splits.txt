@@ -1050,3 +1050,9 @@ axart/axart.c:
 axart/axart3d.c:
 	.text	start:0x80191F34 end:0x80191F44
 	.sbss	start:0x8034C098 end:0x8034C0A0
+
+TRK_MINNOW_DOLPHIN/dolphin_trk.c:
+	.init	start:0x800053E0 end:0x80005504
+	.text	start:0x801A9B20 end:0x801A9C78
+	.data	start:0x80238910 end:0x8023894C
+	.bss	start:0x80345FA8 end:0x80345FAC

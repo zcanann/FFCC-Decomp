@@ -3,6 +3,7 @@
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/nubevent.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWTrace.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
+#include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk.h"
 #include <string.h>
 
 /* 8044F288-8044F290 07BFA8 0004+04 4/4 0/0 0/0 .bss             IsTRKConnected */

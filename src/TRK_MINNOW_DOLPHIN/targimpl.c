@@ -24,7 +24,11 @@ typedef struct TRKExceptionStatus {
 
 typedef struct TRKStepStatus {
 	BOOL active;               // 0x0
+#ifdef VERSION_GCCJGC
+    u8 type;                  // 0x4
+#else
 	DSMessageStepOptions type; // 0x4
+#endif
 	u32 count;                 // 0x8
 	u32 rangeStart;            // 0xC
 	u32 rangeEnd;              // 0x10
@@ -681,7 +685,9 @@ BOOL TRKTargetStepDone()
 inline DSError TRKTargetDoStep()
 {
 	gTRKStepStatus.active = TRUE;
+#ifndef VERSION_GCCJGC
 	MWTRACE(1, "TargetDoStep()\n");
+#endif
 	TRKTargetEnableTrace(TRUE);
 
 	if (gTRKStepStatus.type == DSSTEP_IntoCount || gTRKStepStatus.type == DSSTEP_OverCount) {
@@ -711,9 +717,14 @@ static BOOL TRKTargetCheckStep()
 	return gTRKStepStatus.active;
 }
 
-/**
- * @note Address: 0x800BE658
- * @note Size: 0xAC
+/*
+ * --INFO--
+ * PAL Address: 0x801AC2CC
+ * PAL Size: 172b
+ * EN Address: 0x801AB1B0
+ * EN Size: 172b
+ * JP Address: 0x801A8628
+ * JP Size: 108b
  */
 DSError TRKTargetSingleStep(u32 count, BOOL stepOver)
 {
@@ -722,8 +733,13 @@ DSError TRKTargetSingleStep(u32 count, BOOL stepOver)
 	if (stepOver) {
 		error = DS_UnsupportedError;
 	} else {
+#ifdef VERSION_GCCJGC
+        gTRKStepStatus.type  = DSSTEP_IntoCount;
+        gTRKStepStatus.count = count;
+#else
 		gTRKStepStatus.count = count;
 		gTRKStepStatus.type  = DSSTEP_IntoCount;
+#endif
 		error                = TRKTargetDoStep();
 	}
 

@@ -1062,3 +1062,6 @@ gx/GXTexture.c:
 	.data	start:0x80238030 end:0x80238258
 	.sdata	start:0x8034B988 end:0x8034B9C8
 	.sdata2	start:0x8034FCB8 end:0x8034FCE0
+
+auto_10_8034C094_sbss:
+	.sbss start:0x8034C094 end:0x8034C098 align:4

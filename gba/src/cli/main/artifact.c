@@ -283,10 +283,12 @@ void ArtifactScreen_PrintRow(s32 idx, s32 row)
     Text_SetFill(1, 0);
     Text_Clear();
     Text_SetX(24);
-    if (Artifact_IsOwned(idx))
-        str = Msg_GetItemName(idx + 159);
-    else
+    if (Artifact_IsOwned(idx)) {
+        s32 item = idx + 159;
+        str = Msg_GetItemName(item);
+    } else {
         str = Msg_GetSystem(41);
+    }
     Text_Print(str, TEXT_DRAW);
     Text_CopyToVram(Window_GetTextVram(&gWindows[1], row, 0), gWindows[1].width);
 }

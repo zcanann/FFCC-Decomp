@@ -151,8 +151,8 @@ main/link:
 main/xfer:
 	.rodata     start:0x0201CB64 end:0x0201CB7C align:4
 
-regional_data:
-	.rodata     start:0x0201CB7C end:0x0201CB84
+main/artifact:
+	.rodata     start:0x0201CB7C end:0x0201CB84 align:4
 
 main/textmask:
 	.rodata     start:0x0201CB84 end:0x0201CBA4 align:4
@@ -236,7 +236,10 @@ main/gil:
 	.bss        start:0x030027C0 end:0x030027CE align:4
 
 regional_bss:
-	.bss        start:0x030027CE end:0x03002848 align:1
+	.bss        start:0x030027CE end:0x03002840 align:1
+
+main/artifact:
+	.bss        start:0x03002840 end:0x03002848 align:4
 
 main/tmpartifact:
 	.bss        start:0x03002848 end:0x0300284C align:4

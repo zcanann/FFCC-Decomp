@@ -578,3 +578,7 @@ MSL_C/PPCEABI/bare/H/string.c:
 
 gobjwork.cpp:
 	.text start:0x8009C2A8 end:0x800A0D6C
+
+MSL_C/PPCEABI/bare/H/mem.c:
+	.text start:0x801B1A08 end:0x801B1B78
+	.init start:0x80005504 end:0x8000563C

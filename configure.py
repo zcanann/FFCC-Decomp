@@ -1128,7 +1128,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/k_tan.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/math_ppc.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/mbstring.c"),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/mem.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/mem.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "MSL_C/PPCEABI/bare/H/mem_funcs.c",

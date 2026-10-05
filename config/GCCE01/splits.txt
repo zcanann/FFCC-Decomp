@@ -647,3 +647,7 @@ MSL_C/PPCEABI/bare/H/string.c:
 	.text start:0x801B7AD0 end:0x801B7F98
 	.rodata start:0x801E5F90 end:0x801E5FB0
 	.sdata start:0x8032DBF8 end:0x8032DC00
+
+MSL_C/PPCEABI/bare/H/mem.c:
+	.text start:0x801B5490 end:0x801B5600
+	.init start:0x8000540C end:0x80005544

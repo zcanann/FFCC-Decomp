@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Dry-run recovery of complete GameCube code-only objects.
 
-This intentionally small first pass rejects data, BSS and COMMON. Relocations
+This conservative pass rejects data, BSS and COMMON. Relocations
 are rejected by default; --allow-relocations replays supported PPC relocations
 using existing symbol identities, never guessed destinations or masked bytes.
 It searches executable DOL sections for every byte of the complete ELF section,
-requires a unique aligned placement, and checks existing named function anchors.
+requires unique, nonoverlapping aligned placements for all allocated .text and
+.init sections, and checks existing named function anchors.
 It produces reviewable split/symbol snippets, never completion claims or edits.
 Requires pyelftools. Example:
   python tools/recover_code_splits.py --dol orig/GCCE01/sys/main.dol \
@@ -120,14 +121,39 @@ def recover(unit, object_bytes, dol, known, allow_relocations=False):
         row['reason'] = 'requires big-endian ELF32 PowerPC relocatable object'
         return row
     allocated = [(i, s) for i, s in enumerate(elf.iter_sections()) if s['sh_flags'] & 2 and s['sh_size']]
-    if len(allocated) != 1 or allocated[0][1].name not in ('.text', '.init') or not allocated[0][1]['sh_flags'] & 4:
-        row['reason'] = 'requires exactly one allocated executable .text or .init section'
+    if (not allocated or any(s.name not in ('.text', '.init') or not s['sh_flags'] & 4 for _, s in allocated)
+            or len({s.name for _, s in allocated}) != len(allocated)):
+        row['reason'] = 'requires only distinct allocated executable .text and .init sections'
         return row
-    index, section = allocated[0]
     symtab = elf.get_section_by_name('.symtab')
     if symtab is None or any(s['st_shndx'] == 'SHN_COMMON' for s in symtab.iter_symbols()):
         row['reason'] = 'missing symbol table or unverified COMMON storage'
         return row
+    if len(allocated) == 1:
+        index, section = allocated[0]
+        return recover_section(row, unit, elf, index, section, symtab, dol, known, allow_relocations)
+    sections = [recover_section(dict(status='rejected', section=s.name), unit, elf, i, s, symtab,
+                                dol, known, allow_relocations) for i, s in allocated]
+    row['sections'] = sections
+    failed = next((s for s in sections if s['status'] != 'verified'), None)
+    if failed:
+        row['reason'] = f"{failed['section']}: {failed['reason']}"
+        return row
+    ordered = sorted(sections, key=lambda s: s['address'])
+    if any(a['address'] + a['size'] > b['address'] for a, b in zip(ordered, ordered[1:])):
+        row['reason'] = 'recovered executable sections overlap'
+        return row
+    row.update(status='verified', verified_bytes=sum(s['verified_bytes'] for s in sections),
+               relocation_count=sum(s['relocation_count'] for s in sections),
+               functions=[f for s in sections for f in s['functions']],
+               split_snippet=f'{unit}:\n' + ''.join(
+                   f"\t{s['section']} start:0x{s['address']:08X} end:0x{s['address'] + s['size']:08X}\n"
+                   for s in sections))
+    return row
+
+
+def recover_section(row, unit, elf, index, section, symtab, dol, known, allow_relocations):
+    """Verify one complete executable section without certifying other storage."""
     has_relocations = any(s['sh_type'] in ('SHT_REL', 'SHT_RELA') and s['sh_info'] == index and s.num_relocations()
                           for s in elf.iter_sections())
     if has_relocations and not allow_relocations:

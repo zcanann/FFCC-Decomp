@@ -1174,6 +1174,7 @@ FunnyShape.cpp:
 
 p_tina.cpp:
 	.text start:0x800517A8 end:0x80053458
+	.bss start:0x8028F228 end:0x8028F368
 
 p_dbgmenu.cpp:
 	.bss start:0x80322008 end:0x80324A74

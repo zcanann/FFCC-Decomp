@@ -136,7 +136,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "main/xfer", "main/radarmap", "main/main", "main/session",
         ],
         "mgr": [
-            "main", "MgJoyBus", "m4a_tables", "libc/arm/libcfunc",
+            "main", "MgJoyBus", "m4a_tables", "libc/arm/libcfunc", "libc/arm/syscalls",
             "crt0", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2", "libagbsyscall/CpuFastSet",
             "libagbsyscall/CpuSet", "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
             "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",

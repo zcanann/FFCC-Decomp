@@ -259,8 +259,11 @@ libc/locale/locale:
 libc/stdlib/mprec:
 	.rodata     start:0x02013AC8 end:0x02013BEC
 
+libc/arm/syscalls:
+	.rodata     start:0x02013BEC end:0x02013C14 align:4
+
 regional_data:
-	.rodata     start:0x02013BEC end:0x020158A0
+	.rodata     start:0x02013C14 end:0x020158A0
 
 libc/reent/sbrkr:
 	.common     start:0x020158A0 end:0x020158A4 align:4
@@ -323,7 +326,10 @@ sound:
 	.bss        start:0x030063F8 end:0x03006400 align:4
 
 regional_bss:
-	.bss        start:0x03006400 end:0x030070F8
+	.bss        start:0x03006400 end:0x03007048
+
+libc/arm/syscalls:
+	.bss        start:0x03007048 end:0x030070F8 align:4
 
 libgcc/dp-bit:
 	.bss        start:0x030070F8 end:0x0300710C

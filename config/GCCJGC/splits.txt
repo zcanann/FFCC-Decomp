@@ -348,3 +348,11 @@ ax/AXOut.c:
 ax/DSPCode.c:
 	.data start:0x80235100 end:0x80237020
 	.sdata start:0x8034B940 end:0x8034B942
+
+dvd/dvdqueue.c:
+	.text	start:0x80185700 end:0x801858F8
+	.bss	start:0x803283B8 end:0x803283D8
+
+dvd/dvderror.c:
+	.text	start:0x801858F8 end:0x80185A90
+	.data	start:0x80232FE0 end:0x80233028

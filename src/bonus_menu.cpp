@@ -1590,13 +1590,18 @@ void CMenuPcs::DrawResultCountAnim()
  * --INFO--
  * PAL Address: 0x80137930
  * PAL Size: 8676b
- * EN Address: 0x80157E64
- * EN Size: 3280b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80136C4C
+ * EN Size: 8676b
+ * JP Address: 0x801337D4
+ * JP Size: 9072b
  */
 void CMenuPcs::CalcResultCloseAnim()
 {
+#ifdef VERSION_GCCP01
+	enum { kFadeFrames = 8, kFrameStart = 16 };
+#else
+	enum { kFadeFrames = 10, kFrameStart = 20 };
+#endif
 	int doneCount;
 	int delta;
 	const int activePartyCount = s_Rinfo->m_partyCount;
@@ -1617,14 +1622,15 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		for (int i = 0; activePartyCount > i; i++) {
 			Sprt2* sprite = &m_bonusAnim->sprites[i + base];
-			sprite->startFrame = 0x10;
+			sprite->startFrame = kFrameStart;
 		}
 
 		base += activePartyCount;
 
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* spr = &m_bonusAnim->sprites[base + i];
-			Sprt2* src = spr - activePartyCount;
+			delta = base - 1;
+			Sprt2* src = spr - delta;
 			spr->startFrame = src->startFrame + src->duration;
 			spr->flags = 1;
 			spr->targetX = (float)spr->x;
@@ -1635,7 +1641,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
-			Sprt2* source = sprite - activePartyCount;
+			delta = base - (activePartyCount + 1);
+			Sprt2* source = sprite - delta;
 			sprite->startFrame = source->startFrame + source->duration;
 			sprite->flags = 1;
 		}
@@ -1678,8 +1685,8 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
-			sprite->startFrame = 8;
-			sprite->duration = 8;
+			sprite->startFrame = kFadeFrames;
+			sprite->duration = kFadeFrames;
 		}
 
 		base += activePartyCount;
@@ -1705,7 +1712,7 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		base += activePartyCount;
 		{
-			int back = activePartyCount;
+			int back = base - (activePartyCount + 1);
 
 			for (int i = 0; i < activePartyCount; i++) {
 				Sprt2* spr = &m_bonusAnim->sprites[base + i];

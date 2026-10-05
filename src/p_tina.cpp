@@ -632,10 +632,10 @@ void CPartPcs::ClearOt()
  * --INFO--
  * PAL Address: 0x80052FB4
  * PAL Size: 152b
- * EN Address: 0x800603ac
- * EN Size: 164b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80052CBC
+ * EN Size: 120b
+ * JP Address: 0x80052728
+ * JP Size: 120b
  */
 void CPartPcs::drawShadow()
 {
@@ -644,12 +644,16 @@ void CPartPcs::drawShadow()
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
         static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) != 0) {
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+#endif
         pppInitDrawEnv(1);
         PartMng.pppSetRendMatrix();
         PartMng.pppDrawPrio(3);
         pppClearDrawEnv();
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugData(0x7f);
+#endif
     }
 }
 
@@ -657,10 +661,10 @@ void CPartPcs::drawShadow()
  * --INFO--
  * PAL Address: 0x80052F1C
  * PAL Size: 152b
- * EN Address: 0x80060450
- * EN Size: 164b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80052C44
+ * EN Size: 120b
+ * JP Address: 0x800526B0
+ * JP Size: 120b
  */
 void CPartPcs::drawCharaBefore()
 {
@@ -668,13 +672,17 @@ void CPartPcs::drawCharaBefore()
     CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+#endif
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
         PartMng.pppSetRendMatrix();
         PartMng.pppDrawPrio(4);
         pppClearDrawEnv();
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugData(0x7f);
+#endif
     }
 }
 
@@ -682,26 +690,32 @@ void CPartPcs::drawCharaBefore()
  * --INFO--
  * PAL Address: 0x80052E3C
  * PAL Size: 224b
- * EN Address: 0x800604f4
- * EN Size: 452b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80052BB0
+ * EN Size: 148b
+ * JP Address: 0x8005261C
+ * JP Size: 148b
  */
 void CPartPcs::draw()
 {
     CUSBStreamDataState* usb = &m_usbStreamState;
     CGame* game = &Game;
 
+#ifdef VERSION_GCCP01
     Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+#endif
     if (game->m_gameWork.m_gamePaused != 0) {
         ppvDrawMng.DrawOt();
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugData(0x7f);
+#endif
         return;
     }
 
     if (usb->m_disableShokiDraw != 0) {
         ppvDrawMng.DrawOt();
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugData(0x7f);
+#endif
         return;
     }
 
@@ -710,7 +724,9 @@ void CPartPcs::draw()
     PartMng.pppSetRendMatrix();
     PartMng.pppDraw();
     pppClearDrawEnv();
+#ifdef VERSION_GCCP01
     Graphic.SetDrawDoneDebugData(0x7f);
+#endif
 }
 
 /*
@@ -763,23 +779,27 @@ void CPartPcs::drawViewer()
  * --INFO--
  * PAL Address: 0x80052C78
  * PAL Size: 148b
- * EN Address: 0x800607e8
- * EN Size: 160b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80052A0C
+ * EN Size: 116b
+ * JP Address: 0x80052478
+ * JP Size: 116b
  */
 void CPartPcs::drawAfter()
 {
     CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamState.m_disableShokiDraw == 0) {
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+#endif
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
         PartMng.pppSetRendMatrix();
         PartMng.pppPartDrawAfter();
         pppClearDrawEnv();
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugData(0x7f);
+#endif
     }
 }
 
@@ -787,22 +807,26 @@ void CPartPcs::drawAfter()
  * --INFO--
  * PAL Address: 0x80052BD4
  * PAL Size: 164b
- * EN Address: 0x80060888
- * EN Size: 172b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80052988
+ * EN Size: 132b
+ * JP Address: 0x800523F4
+ * JP Size: 132b
  */
 void CPartPcs::DrawMenu(int fpNo)
 {
     if (m_usbStreamState.m_disableShokiDraw == 0) {
         Graphic.SetFog(1, 0);
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+#endif
         pppInitDrawEnv(0);
         PartMng.pppSetRendMatrix();
         PartMng.pppDrawPrioPdtFpno(6, 0, static_cast<short>(fpNo));
         PartMng.drawEnd();
         pppClearDrawEnv();
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugData(0x7f);
+#endif
     }
 }
 
@@ -810,10 +834,10 @@ void CPartPcs::DrawMenu(int fpNo)
  * --INFO--
  * PAL Address: 0x80052B10
  * PAL Size: 196b
- * EN Address: 0x80060934
- * EN Size: 208b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800528E4
+ * EN Size: 164b
+ * JP Address: 0x80052350
+ * JP Size: 164b
  */
 void CPartPcs::DrawShoki()
 {
@@ -823,12 +847,16 @@ void CPartPcs::DrawShoki()
         Graphic.SetFog(1, 0);
         if (Game.m_gameWork.m_gamePaused == 0 &&
             static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) != 0) {
+#ifdef VERSION_GCCP01
             Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+#endif
             pppInitDrawEnv(1);
             PartMng.pppSetRendMatrix();
             PartMng.pppDrawPrio(8);
             pppClearDrawEnv();
+#ifdef VERSION_GCCP01
             Graphic.SetDrawDoneDebugData(0x7f);
+#endif
         }
     }
 }
@@ -837,22 +865,26 @@ void CPartPcs::DrawShoki()
  * --INFO--
  * PAL Address: 0x80052A74
  * PAL Size: 156b
- * EN Address: 0x80060a04
- * EN Size: 240b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80052868
+ * EN Size: 124b
+ * JP Address: 0x800522D4
+ * JP Size: 124b
  */
 void CPartPcs::DrawMenuIdx(int index)
 {
     if (m_usbStreamState.m_disableShokiDraw == 0) {
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+#endif
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
         PartMng.pppSetRendMatrix();
         PartMng.pppDrawIdx(index);
         PartMng.drawEnd();
         pppClearDrawEnv();
+#ifdef VERSION_GCCP01
         Graphic.SetDrawDoneDebugData(0x7f);
+#endif
     }
 }
 

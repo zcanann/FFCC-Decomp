@@ -1194,3 +1194,6 @@ p_chara_viewer.cpp:
 
 FunnyShape.cpp:
 	.text start:0x80050310 end:0x80051D2C
+
+p_tina.cpp:
+	.text start:0x80051D2C end:0x800539EC

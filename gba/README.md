@@ -156,3 +156,42 @@ storage extents.
 This is a dry run: it changes neither configuration nor completion claims.
 Review the proposed edits, rebuild, and check objdiff plus the full regional
 image hashes before promoting any units in `VERSION_COMPLETE`.
+
+When a regional build inserts or removes functions, use the function audit to
+find surviving counterparts without assuming the original section order:
+
+```sh
+python gba/tools/recover_functions.py \
+    --image orig/GCCJGC/gba/ffcc_cli.bin --config gba/config/GCCJGC/cli \
+    --object main/scouter=build/GCCP01/gba/cli/src/main/scouter.o \
+    --output build/GCCJGC/gba/cli/recovered-functions.json
+```
+
+Alternatively, `--project objdiff.json --program cli` selects the compiled source
+objects in that project. The project's region or program may differ from the
+retail image being searched. Build the source objects first; the audit never
+compiles them or substitutes target comparison objects. Synthetic COMMON views
+are resolved to their original source objects, as in the whole-section audit.
+
+Each candidate covers a sized ELF function, including any literal pools within
+its extent. ELF mapping symbols separate code from data. Verification requires
+all bytes, supported relocations, and outgoing PC-relative references to agree.
+References to other functions and named objects use the selected region's
+identities, not their offsets in the source object's sections. Unique,
+independently verified function identities can resolve later candidates. Local
+names require the correct owning unit. Unknown literals, references, or storage
+identities remain unresolved; the tool does not infer BSS sizes from pointers.
+
+`status: verified` means that the function's bytes replay exactly. Its separate
+`identity_status` and `conflicts` fields report stale names, competing ownership,
+interior function boundaries, and overlapping batch candidates. Duplicate bodies
+remain ambiguous, even when one copy has the expected name. Functions with fewer
+than twelve fixed bytes need a configured identity anchor. Unsupported
+relocations, incomplete mapping/disassembly, and references crossing the source
+function boundary require manual recovery. Anonymous pooled data that lacks a
+named owning object is deliberately not assigned a guessed identity.
+
+The function audit reports input hashes and changes no configuration. It does
+not verify neighboring padding, complete sections, BSS, COMMON, or whole-unit
+linkage. Review identities and ownership first, then use `recover_splits.py`,
+objdiff, and the regional image hashes for any eventual source-link promotion.

@@ -482,3 +482,6 @@ mapocttree.cpp:
 
 cmake.cpp:
 	.text start:0x80167050 end:0x8016F384
+
+mes.cpp:
+	.text start:0x800978B8 end:0x80097D20

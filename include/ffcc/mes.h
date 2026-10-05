@@ -89,7 +89,11 @@ public:
     void SetPosition(float, float);
     int useFlag(int, int);
     void addFlag(class CFlag&);
+#ifdef VERSION_GCCJGC
+    static void MakeAgbString(char*, char*);
+#else
     static void MakeAgbString(char*, char*, int, int);
+#endif
     static unsigned long drawTagString(CFont*, char*, int, int, int);
     static unsigned long GetTagStringWidth(CFont* font, char* text) { return drawTagString(font, text, 0, 0, 0); }
     static unsigned long DrawTagString(CFont* font, char* text) { return drawTagString(font, text, 1, 0, 0); }

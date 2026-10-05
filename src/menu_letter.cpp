@@ -976,7 +976,11 @@ int CMenuPcs::LetterCtrlCur()
 			CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 			s16 msgIndex = letter->HeaderWord();
 			strcpy(srcText, Game.GetLetterReply((msgIndex & 0x7FC) >> 2));
+#ifdef VERSION_GCCJGC
+			CMes::MakeAgbString(workText, srcText);
+#else
 			CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
+#endif
 
 			int i = 0;
 			char* line = workText;
@@ -1162,7 +1166,11 @@ void CMenuPcs::LetterMessDraw()
 	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 	u16 msgIndex = letter->HeaderWord();
 	strcpy(srcText, Game.GetLetter((msgIndex & 0x7FC) >> 2));
+#ifdef VERSION_GCCJGC
+	CMes::MakeAgbString(workText, srcText);
+#else
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
+#endif
 	int y = 0x58;
 
 	int i = 0;
@@ -1567,7 +1575,11 @@ int CMenuPcs::LetterReplyWinOpen()
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 		unsigned short msgIndex = letter->HeaderWord();
 		strcpy(srcText, Game.GetLetterReply((msgIndex & 0x7FC) >> 2));
+#ifdef VERSION_GCCJGC
+		CMes::MakeAgbString(workText, srcText);
+#else
 		CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
+#endif
 
 		s_ReplyMax = 0;
 		char* curLine = workText;

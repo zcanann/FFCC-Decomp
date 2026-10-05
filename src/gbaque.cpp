@@ -2211,26 +2211,33 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
  * PAL Size: 592b
  * EN Address: 0x800CCE64
  * EN Size: 592b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800CAAC0
+ * JP Size: 568b
  */
 int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
+#ifdef VERSION_GCCJGC
+    const int sourceAllocLine = 0x840;
+    const int workAllocLine = 0x849;
+#else
+    const int sourceAllocLine = 0x859;
+    const int workAllocLine = 0x862;
+#endif
     CCaravanWork** foodBasePtr;
     int totalSize;
-    char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x859) char[kGbaQueueScratchTextSize];
+    char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), sourceAllocLine) char[kGbaQueueScratchTextSize];
     if (srcText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x85B);
+            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), sourceAllocLine + 2);
         }
         return -1;
     }
     memset(srcText, 0, kGbaQueueScratchTextSize);
 
-    char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x862) char[kGbaQueueScratchTextSize];
+    char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), workAllocLine) char[kGbaQueueScratchTextSize];
     if (workText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x864);
+            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), workAllocLine + 2);
         }
         return -1;
     }
@@ -2246,7 +2253,11 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
     int letterType = caravanWork->m_letters[letterIndex].HeaderBitsRef().m_messageType;
 
     strcpy(srcText, Game.GetLetter(letterType));
+#ifdef VERSION_GCCJGC
+    CMes::MakeAgbString(workText, srcText);
+#else
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
+#endif
     totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
     outData += totalSize;
@@ -2254,7 +2265,11 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
     strcpy(srcText, Game.GetLetterReply(letterType));
+#ifdef VERSION_GCCJGC
+    CMes::MakeAgbString(workText, srcText);
+#else
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
+#endif
     int line2Size = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, line2Size);
     totalSize += line2Size;
@@ -3463,7 +3478,11 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 		const int nameItem = (*foodBasePtr)->m_shopList[i];
 		strcpy(itemNameScratch, Game.GetHelpName(nameItem));
+#ifdef VERSION_GCCJGC
+		CMes::MakeAgbString(agbStringScratch, itemNameScratch);
+#else
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
+#endif
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
 		memcpy(writePtr, agbStringScratch, strSize);
@@ -3565,7 +3584,11 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		work = (*foodBasePtr)->m_inventoryItems[i];
 		if (work > 0) {
 			strcpy(itemNameScratch, Game.GetHelpName(work));
+#ifdef VERSION_GCCJGC
+			CMes::MakeAgbString(agbStringScratch, itemNameScratch);
+#else
 			CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
+#endif
 			packed = strlen(agbStringScratch) + 1;
 			memcpy(writePtr, agbStringScratch, packed);
 			writePtr += packed;

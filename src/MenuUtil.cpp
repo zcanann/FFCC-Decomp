@@ -202,7 +202,11 @@ inline int CMenuPcs::GetLongHelpString(CFont* font, int firstLine, int lineMax)
 	for (int line = firstLine; line < firstLine + lineMax; line++) {
 		char* msg = Game.GetHelpName(line);
 		memset(temp, 0, 0x200);
+#ifdef VERSION_GCCJGC
+		CMes::MakeAgbString(temp, msg);
+#else
 		CMes::MakeAgbString(temp, msg, 0, 1);
+#endif
 		if (strlen(temp) != 0) {
 			int width = static_cast<int>(CMes::GetTagStringWidth(font, msg));
 			if (width < maxWidth) {
@@ -546,7 +550,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		for (int i = 0; i < lineMax; i++) {
 			char* msg = Game.GetHelpName(firstLine + i);
 			memset(temp, 0, 0x200);
+#ifdef VERSION_GCCJGC
+			CMes::MakeAgbString(temp, msg);
+#else
 			CMes::MakeAgbString(temp, msg, 0, 1);
+#endif
 			if (strlen(temp) == 0) {
 				lineCount--;
 				if (firstNonEmptyLine == firstLine + i) {

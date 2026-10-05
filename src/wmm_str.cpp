@@ -31,6 +31,7 @@ const char* CMenuPcs::GetMcStr(int index)
         return s_McStr_us[index];
     }
 }
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x8017B268
@@ -130,6 +131,8 @@ WinMessEntry* CMenuPcs::GetWinMess(int index)
         return &s_WinMess_us[index];
     }
 }
+
+#endif
 
 /*
  * --INFO--

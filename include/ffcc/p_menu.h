@@ -85,6 +85,11 @@ struct WinMessEntry
 };
 STATIC_ASSERT(sizeof(WinMessEntry) == 0x14);
 STATIC_ASSERT(offsetof(WinMessEntry, m_messageIds) == 0x04);
+#ifdef VERSION_GCCJGC
+extern "C" const char* gMcWindowMessagesJp[];
+extern "C" const char* gMcGuestWindowMessagesJp[];
+extern "C" WinMessEntry gMcWindowsJp[];
+#endif
 
 struct MenuWindowInfo
 {
@@ -840,8 +845,16 @@ public:
     void GetWinSize(int, short*, short*, int);
     int GetSlotABXPos(int);
     const char* GetMcStr(int);
+#ifdef VERSION_GCCJGC
+    const char* const* GetMcWinMessBuff(int group)
+    {
+        return group == 0 ? gMcWindowMessagesJp : gMcGuestWindowMessagesJp;
+    }
+    WinMessEntry* GetWinMess(int index) { return &gMcWindowsJp[index]; }
+#else
     const char* const* GetMcWinMessBuff(int);
     WinMessEntry* GetWinMess(int);
+#endif
     int GetYesNoXPos(int);
     void SetTextureLoc(int);
     float GetMaxAnimWait();

@@ -508,6 +508,7 @@ chara.cpp:
 cflat_runtime2.cpp:
 	.text start:0x80069470 end:0x8006e46c
 	.bss start:0x80298F00 end:0x802E68A0
+	.sbss start:0x8032DD78 end:0x8032DD80
 
 cflat_runtime.cpp:
 	.text start:0x80065614 end:0x80069470

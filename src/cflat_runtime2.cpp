@@ -46,7 +46,6 @@ CGObject m_obj[0x38];
 CGItemObj m_objItem[0x20];
 CGPartyObj m_objParty[4];
 CGMonObj m_objMon[0x40];
-u32 CFlatFlags;
 
 enum {
 	kFlatBaseObjCount = sizeof(m_objBase) / sizeof(CGBaseObj),
@@ -65,8 +64,6 @@ STATIC_ASSERT(sizeof(m_obj) == sizeof(CGObject) * kFlatObjectCount);
 STATIC_ASSERT(sizeof(m_objItem) == sizeof(CGItemObj) * kFlatItemObjCount);
 STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 
-int gCFlatRuntime2DebugDrawOverflowFrame = 0;
-char gCFlatRuntime2DebugDrawOverflowInit = 0;
 static const char sCFlatRuntime2LayerMissingMsg[] =
 	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";
 static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
@@ -1380,14 +1377,10 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 		return;
 	}
 
-	if (gCFlatRuntime2DebugDrawOverflowInit == 0) {
-		gCFlatRuntime2DebugDrawOverflowFrame = 0;
-		gCFlatRuntime2DebugDrawOverflowInit = 1;
-	}
-
-	if (gCFlatRuntime2DebugDrawOverflowFrame != static_cast<int>(System.m_frameCounter)) {
+	static int frame = 0;
+	if (frame != static_cast<int>(System.m_frameCounter)) {
 		printf(sCFlatRuntime2DebugDrawOverflowMsg);
-		gCFlatRuntime2DebugDrawOverflowFrame = System.m_frameCounter;
+		frame = System.m_frameCounter;
 	}
 }
 

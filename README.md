@@ -161,3 +161,8 @@ batch and use `--output` to save its JSON evidence.
 The tool only proposes split and symbol entries. Check MAP ownership, rebuild,
 compare the full unit with objdiff and verify regional image checksums before
 marking it complete. GBA recovery uses [its own relocation audit](gba/README.md).
+
+For batches containing retained function subsets, initialized data or BSS, use
+the [regional compiled-object solver](docs/regional_recovery.md). It tests PAL
+retain hints independently against each retail image, propagates relocation
+constraints and separates byte proofs from unresolved ownership hypotheses.

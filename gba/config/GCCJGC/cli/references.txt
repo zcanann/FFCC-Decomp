@@ -1,0 +1,3 @@
+# Text_Print indexes the eight masks with widths 1..8. The compiler folds
+# the final pointer subtraction into the table base, before its first word.
+0x0201CB80 gNibbleMasks-0x4

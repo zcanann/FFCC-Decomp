@@ -152,7 +152,13 @@ main/xfer:
 	.rodata     start:0x0201CB64 end:0x0201CB7C align:4
 
 regional_data:
-	.rodata     start:0x0201CB7C end:0x0202CA24
+	.rodata     start:0x0201CB7C end:0x0201CB84
+
+main/textmask:
+	.rodata     start:0x0201CB84 end:0x0201CBA4 align:4
+
+regional_data:
+	.rodata     start:0x0201CBA4 end:0x0202CA24
 
 main/main:
 	.bss        start:0x03000000 end:0x03000011 align:4

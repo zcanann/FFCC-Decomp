@@ -43,6 +43,12 @@ static u8 sTextFill[0x80];
 static s32 sTextFillOn;
 extern u32 gNibbleMasks[];
 
+#if defined(VERSION_GCCJGC)
+#define TEXT_MASK(width) (*(gNibbleMasks + (width) - 1))
+#else
+#define TEXT_MASK(width) gNibbleMasks[width]
+#endif
+
 void Text_Init(void)
 {
     DmaClear32(0, 0, sTextCanvas, 0x800);
@@ -267,11 +273,11 @@ s32 Text_Print(const char *str, s32 mode)
                         rs = 8 - shift;
                         v = bits;
                         if (rest == 0)
-                            v = gNibbleMasks[shift] & bits;
+                            v = TEXT_MASK(shift) & bits;
                         v = (v >> (shift * 4)) | (v << (32 - shift * 4));
-                        *dst |= v & ~gNibbleMasks[rs];
+                        *dst |= v & ~TEXT_MASK(rs);
                         if (rest != 0) {
-                            *dst2 |= v & gNibbleMasks[rs];
+                            *dst2 |= v & TEXT_MASK(rs);
                             if (rest > rs) {
                                 if (second)
                                     bits = (glyph[1] & 0xCCCCCCCC) >> 2;
@@ -279,11 +285,11 @@ s32 Text_Print(const char *str, s32 mode)
                                     bits = glyph[1] & 0x33333333;
                                 v = bits;
                                 if (over == 0)
-                                    v = gNibbleMasks[rest - rs] & bits;
+                                    v = TEXT_MASK(rest - rs) & bits;
                                 v = (v >> (shift * 4)) | (v << (32 - shift * 4));
-                                *dst2 |= v & ~gNibbleMasks[rs];
+                                *dst2 |= v & ~TEXT_MASK(rs);
                                 if (over != 0)
-                                    *dst3 |= v & gNibbleMasks[rs];
+                                    *dst3 |= v & TEXT_MASK(rs);
                             }
                         }
                     } else {
@@ -293,7 +299,7 @@ s32 Text_Print(const char *str, s32 mode)
                                 bits = (glyph[1] & 0xCCCCCCCC) >> 2;
                             else
                                 bits = glyph[1] & 0x33333333;
-                            *dst2 |= bits & gNibbleMasks[rest];
+                            *dst2 |= bits & TEXT_MASK(rest);
                         }
                     }
                 }

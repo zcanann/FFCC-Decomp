@@ -1652,3 +1652,9 @@ vector.cpp:
 
 auto_vector_8034DA04_sdata2:
 	.sdata2 start:0x8034DA04 end:0x8034DA08 align:4
+
+pppChangeTex.cpp:
+	.text start:0x8013AE44 end:0x8013B888
+
+pppYmChangeTex.cpp:
+	.text start:0x800D0C5C end:0x800D1684

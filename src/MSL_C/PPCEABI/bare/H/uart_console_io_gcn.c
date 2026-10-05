@@ -2,8 +2,8 @@
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
+ * JP Address: 0x801B4428
+ * JP Size: 196b
  * PAL Address: 801b9140
  * PAL Size: 208b
  * EN Address: 
@@ -22,11 +22,15 @@ static int uart_console_initialized = 0;
 
 int __write_console(unsigned int param_1, unsigned int param_2, unsigned int *param_3, unsigned int param_4)
 {
+#ifndef VERSION_GCCJGC
 	unsigned int uVar1;
+#endif
 	int iVar2;
 
+#ifndef VERSION_GCCJGC
 	uVar1 = OSGetConsoleType();
 	if ((uVar1 & 0x20000000) == 0) {
+#endif
 		iVar2 = 0;
 		if ((uart_console_initialized == 0) && (iVar2 = InitializeUART(0xe100), iVar2 == 0)) {
 			uart_console_initialized = 1;
@@ -39,7 +43,9 @@ int __write_console(unsigned int param_1, unsigned int param_2, unsigned int *pa
 			*param_3 = 0;
 			return 1;
 		}
+#ifndef VERSION_GCCJGC
 	}
+#endif
 	__TRK_write_console(param_1, param_2, param_3, param_4);
 	return 0;
 }

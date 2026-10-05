@@ -653,3 +653,27 @@ menu_lst.cpp:
 
 ringmenu.cpp:
 	.text start:0x800A0D6C end:0x800A32D0
+
+MSL_C/PPCEABI/bare/H/ansi_files.c:
+	.text start:0x801AE1CC end:0x801AE4DC
+	.data start:0x80238A68 end:0x80238BA8
+	.bss start:0x80348330 end:0x80348630
+
+MSL_C/PPCEABI/bare/H/buffer_io.c:
+	.text start:0x801B0430 end:0x801B075C
+
+MSL_C/PPCEABI/bare/H/direct_io.c:
+	.text start:0x801B078C end:0x801B0EE0
+
+MSL_C/PPCEABI/bare/H/file_io.c:
+	.text start:0x801B0EE0 end:0x801B15A0
+
+MSL_C/PPCEABI/bare/H/FILE_POS.c:
+	.text start:0x801B15A0 end:0x801B18F0
+
+TRK_MINNOW_DOLPHIN/mslsupp.c:
+	.text start:0x801AA594 end:0x801AABB4
+
+MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
+	.text start:0x801B4428 end:0x801B44EC
+	.sbss start:0x8034C160 end:0x8034C164

@@ -384,3 +384,23 @@ gx/GXMisc.c:
 gx/GXTev.c:
 	.text	start:0x8019F700 end:0x8019FEE4
 	.data	start:0x80238258 end:0x802382CC
+
+os/OSError.c:
+	.text start:0x80178364 end:0x801788E4
+	.data start:0x802326A8 end:0x802329C4
+	.bss start:0x803274D0 end:0x80327514
+	.sdata start:0x8034B888 end:0x8034B890
+
+os/OSContext.c:
+	.text start:0x80177AF4 end:0x80178364
+	.data start:0x802324D0 end:0x802326A8
+
+os/OSAlarm.c:
+	.text start:0x8017677C end:0x80176EE4
+	.sbss start:0x8034BD40 end:0x8034BD48
+
+os/OSThread.c:
+	.text start:0x8017AF84 end:0x8017C188
+	.bss start:0x80327598 end:0x80327F90
+	.sdata start:0x8034B898 end:0x8034B89C
+	.sbss start:0x8034BDB0 end:0x8034BDBC

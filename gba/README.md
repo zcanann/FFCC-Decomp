@@ -70,6 +70,10 @@ Requirements:
 - `lib/libgcc/`: agbcc's libgcc, built like agbcc does. Units named `libgcc/<object>`
   in `splits.txt` build from it. Library linkage is selected for the region too;
   sharing library source is not proof that every regional object matches.
+- `lib/libc/`: newlib sources built with `old_agbcc`. The recovered `memcmp`
+  and `strstr` sources are unchanged from
+  [pret/agbcc at da598c1](https://github.com/pret/agbcc/tree/da598c1d918402c42c0c0d7128ba14567f3175e9/libc/string);
+  their license is included in `lib/libc/COPYING.NEWLIB`.
 - `include/`: shared headers.
 
 The client game files are separate units under `gba/cli/main/`, so a fully

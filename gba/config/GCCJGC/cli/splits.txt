@@ -106,7 +106,7 @@ libagbsyscall/VBlankIntrWait:
 joy_reset:
 	.text       start:0x0201C2B0 end:0x0201C2D0
 
-regional_text:
+libc/string/memcmp:
 	.text       start:0x0201C2D0 end:0x0201C318
 
 libc/string/memcpy:
@@ -130,7 +130,7 @@ libc/string/strcpy:
 libc/string/strlen:
 	.text       start:0x0201C548 end:0x0201C58C
 
-regional_text:
+libc/string/strstr:
 	.text       start:0x0201C58C end:0x0201C5D0
 
 libgcc/_call_via_rX:

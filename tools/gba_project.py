@@ -180,6 +180,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
         "cli": [
             "main/cmdlist",
             "joy_reset", "libc/string/strchr", "libc/string/strcmp", "libc/string/strlen",
+            "libc/string/memcmp", "libc/string/strstr",
             "main/widget", "main/scouter", "main/family", "main/radar", "main/equip",
             "main/smith", "main/text",
             "main/backdrop_gfx", "main/backdrop", "main/font_gfx_jp",

@@ -437,3 +437,9 @@ cflat_runtime2.cpp:
 
 cflat_runtime.cpp:
 	.text start:0x80065100 end:0x80068f5c
+
+joybus.cpp:
+	.text start:0x800A3F74 end:0x800B049C
+
+gbaque.cpp:
+	.text start:0x800C60A4 end:0x800CE9BC

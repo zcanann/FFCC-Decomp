@@ -5,6 +5,25 @@ class CFont;
 class CMenuPcs;
 class CGame;
 
+#ifdef VERSION_GCCJGC
+struct CMesCharCell
+{
+    float m_x;
+    float m_y;
+    float m_width;
+    float m_scale;
+    unsigned short m_char;
+    unsigned short m_reveal;
+    unsigned char m_fontAlign;
+    unsigned char m_fadeFrames;
+    unsigned char m_color;
+    unsigned char m_fontIndex;
+    unsigned char m_fadeCursor;
+    unsigned char m_flagCount;
+};
+
+typedef char CMesCharCell_size_check[(sizeof(CMesCharCell) == 0x1C) ? 1 : -1];
+#else
 struct CMesCharCell
 {
 	float m_x;                      // 0x00
@@ -24,6 +43,7 @@ struct CMesCharCell
 };
 
 typedef char CMesCharCell_size_check[(sizeof(CMesCharCell) == 0x14) ? 1 : -1];
+#endif
 
 class CMes
 {
@@ -54,7 +74,9 @@ public:
     int GET_2(char**);
     char GET_1(char**);
     int GetWait();
+#ifndef VERSION_GCCJGC
     void SetPlayerIndex(int index) { m_playerIndex = index; }
+#endif
     float GetWidth() { return mMaxWidth; }
     float GetHeight() { return mMaxHeight; }
     float GetPosX() { return mBaseX; }
@@ -104,10 +126,17 @@ private:
     void advanceLine(CFont* font);
     void addFlagEntry(unsigned char type, unsigned char index, short value);
 
+#ifndef VERSION_GCCJGC
     int m_playerIndex;
+#endif
     char* mText;
     int mCounter;
+#ifdef VERSION_GCCJGC
+    CMesCharCell m_chars[256];
+#else
     CMesCharCell m_chars[768];
+#endif
+    // Offset comments below describe the PAL/USA layout.
     int mFlagCount;             // 0x3C0C
     int mFlagCursor;            // 0x3C10
     CFlag mFlagEntries[0x10];   // 0x3C14
@@ -129,7 +158,11 @@ private:
     int mTextAlign;             // 0x3CB4
     int mFadeFrames;            // 0x3CB8
     int mFadeCursor;            // 0x3CBC
+#ifdef VERSION_GCCJGC
+    int mFlagVars[0x10];
+#else
     int mFlagVars[0x14];        // 0x3CC0
+#endif
     int mRubyEnabled;           // 0x3D10
     int mRubyLine;              // 0x3D14
     int mRubyHeight;            // 0x3D18
@@ -144,8 +177,14 @@ private:
     float mLineSpacing;         // 0x3D3C
     int mFontIndex;             // 0x3D40
     float mScaleX;              // 0x3D44
+#ifndef VERSION_GCCJGC
     float mScaleY;              // 0x3D48
     int mAdvanceEnabled;        // 0x3D4C
+#endif
 };
+
+#ifdef VERSION_GCCJGC
+typedef char CMes_size_check[(sizeof(CMes) == 0x1D34) ? 1 : -1];
+#endif
 
 #endif // _FFCC_MES_H_

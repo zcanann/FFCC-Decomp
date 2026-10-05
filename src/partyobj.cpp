@@ -1657,10 +1657,10 @@ void CGPartyObj::shouki()
  * --INFO--
  * PAL Address: 0x80120b94
  * PAL Size: 4112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8011fef4
+ * EN Size: 4112b
+ * JP Address: 0x8011ca7c
+ * JP Size: 4116b
  */
 void CGPartyObj::onFrameStat()
 {
@@ -1753,7 +1753,11 @@ void CGPartyObj::onFrameStat()
 			changeStat(1, 0, 0);
 		} else {
 			party.unk6D0++;
+#ifdef VERSION_GCCP01
 			if (party.unk6D0 >= 6) {
+#else
+			if (party.unk6D0 >= 8) {
+#endif
 				changeStat(6, 0, 0);
 			} else {
 				if ((Pad.GetButtonDown(m_animStateMisc) & 0x200) != 0) {
@@ -1776,7 +1780,11 @@ void CGPartyObj::onFrameStat()
 				h = chalice->m_worldPosition.y - m_worldPosition.y;
 			}
 
+#ifdef VERSION_GCCP01
 			if (m_stateFrame <= 0x0B) {
+#else
+			if (m_stateFrame <= 0x0E) {
+#endif
 				const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
 				m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
 				m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
@@ -1839,7 +1847,11 @@ void CGPartyObj::onFrameStat()
 		if (m_stateFrame == 0) {
 			reqAnim(0x29, 0, 0);
 		}
+#ifdef VERSION_GCCP01
 		if (m_stateFrame == 4) {
+#else
+		if (m_stateFrame == 5) {
+#endif
 			changeWeapon(party.pendingWeaponIndex, party.pendingWeaponItemId, 1);
 		}
 		if (isLoopAnim() != 0) {
@@ -1873,7 +1885,11 @@ void CGPartyObj::onFrameStat()
 				enableDamageCol(0);
 			}
 			if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
+#ifdef VERSION_GCCP01
 				if (m_subFrame >= 0x19) {
+#else
+				if (m_subFrame >= 0x1E) {
+#endif
 					playSe3D(0x30, 0x32, 0x96, 0, 0);
 				}
 				m_alpha = 1.0f;
@@ -1897,7 +1913,11 @@ void CGPartyObj::onFrameStat()
 			reqAnim(0x15, 0, 0);
 			enableDamageCol(0);
 		}
+#ifdef VERSION_GCCP01
 		if (m_stateFrame == 3 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+#else
+		if (m_stateFrame == 4 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+#endif
 			moveVectorHRot(FLOAT_80331AB8 + m_rotTargetY, FLOAT_80331a78, 1.0f, 10);
 		}
 		if (isLoopAnim() != 0) {
@@ -3125,10 +3145,10 @@ inline void CGPartyObj::statCarry()
  * --INFO--
  * PAL Address: 0x8011d710
  * PAL Size: 884b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8011ca70
+ * EN Size: 884b
+ * JP Address: 0x80119688
+ * JP Size: 884b
  */
 void CGPartyObj::statPut()
 {
@@ -3145,7 +3165,11 @@ void CGPartyObj::statPut()
 			h = chalice->m_worldPosition.y - m_worldPosition.y;
 		}
 
+#ifdef VERSION_GCCP01
 		if (m_stateFrame <= 0x0B) {
+#else
+		if (m_stateFrame <= 0x0E) {
+#endif
 			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
 			m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
 			m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));

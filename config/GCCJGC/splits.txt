@@ -1619,3 +1619,12 @@ pppYmTracer.cpp:
 
 auto_801D4B6C_rodata:
 	.rodata start:0x801D4B6C end:0x801D4B70 align:4
+
+pppKeShpTail3X.cpp:
+	.text start:0x80088634 end:0x80089788
+
+pppKeShpTail2X.cpp:
+	.text start:0x80087A9C end:0x80088634
+
+pppYmTracer2.cpp:
+	.text start:0x800FF610 end:0x800FFF0C

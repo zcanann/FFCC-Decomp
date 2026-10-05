@@ -57,10 +57,10 @@ static inline KeShpTail2XAlphaWork* GetKeShpTail2XAlphaWork(_pppPObject* obj, _p
  * --INFO--
  * PAL Address: 0x80088698
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80088034
+ * EN Size: 88b
+ * JP Address: 0x80087A9C
+ * JP Size: 88b
  */
 void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
@@ -78,10 +78,10 @@ void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  * --INFO--
  * PAL Address: 0x800886f0
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8008808C
+ * EN Size: 88b
+ * JP Address: 0x80087AF4
+ * JP Size: 88b
  */
 void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
@@ -99,10 +99,10 @@ void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  * --INFO--
  * PAL Address: 0x80088748
  * PAL Size: 1796b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800880E4
+ * EN Size: 1796b
+ * JP Address: 0x80087B4C
+ * JP Size: 1800b
  */
 void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCtrlTable* ctrlTable)
 {
@@ -336,10 +336,10 @@ move_next_segment:
  * --INFO--
  * PAL Address: 0x80088e4c
  * PAL Size: 992b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800887E8
+ * EN Size: 992b
+ * JP Address: 0x80088254
+ * JP Size: 992b
  */
 void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCtrlTable* ctrlTable)
 {

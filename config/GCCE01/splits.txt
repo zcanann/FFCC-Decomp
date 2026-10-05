@@ -542,6 +542,8 @@ p_menu.cpp:
 	.bss start:0x802E9160 end:0x802E9A20
 
 p_minigame.cpp:
+	.bss start:0x802FF248 end:0x803056E8
+	.sbss start:0x8032DE78 end:0x8032DE7C
 	.text start:0x80126EA4 end:0x8012A57C
 
 sound.cpp:
@@ -1325,3 +1327,6 @@ pppsintbl.cpp:
 
 pppYmEnv.cpp:
 	.text start:0x800E3EA8 end:0x800E582C
+
+auto_10_8032DE7C_sbss:
+	.sbss start:0x8032DE7C end:0x8032DE80 align:4

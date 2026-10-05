@@ -319,6 +319,15 @@ void EquipScreen_HandleInput(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200FF54
+ * PAL Size: 92b
+ * EN Address: 0x0200FE58
+ * EN Size: 92b
+ * JP Address: 0x02014B90
+ * JP Size: 100b
+ */
 void EquipScreen_PrintSlot(s32 row)
 {
     struct Window *win = &gWindows[2];
@@ -326,11 +335,23 @@ void EquipScreen_PrintSlot(s32 row)
     Text_SetFill(1, 0);
     Text_Clear();
     Text_SetX(16);
-    if ((s8)gSession.equipment[row] >= 0)
-        Text_Print(Msg_GetItemName(gSession.items[(s8)gSession.equipment[row]]), TEXT_DRAW);
+    if ((s8)gSession.equipment[row] >= 0) {
+        s32 id = gSession.items[(s8)gSession.equipment[row]];
+
+        Text_Print(Msg_GetItemName(id), TEXT_DRAW);
+    }
     Text_CopyToVram(Window_GetTextVram(win, row, 0), win->width);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200FFB0
+ * PAL Size: 572b
+ * EN Address: 0x0200FEB4
+ * EN Size: 572b
+ * JP Address: 0x02014BF4
+ * JP Size: 556b
+ */
 void EquipScreen_DrawIcons(void)
 {
     struct Window *win = &gWindows[2];
@@ -377,10 +398,14 @@ void EquipScreen_DrawIcons(void)
         }
         x = (win->x + 1) * 8;
         y = (win->y + 1) * 8;
+#if defined(VERSION_GCCJGC)
+        icon = 4;
+#else
         if ((gLanguage & 15) == 1)
             icon = 24;
         else
             icon = 4;
+#endif
         pal = Obj_GetPalette(2, icon);
         for (i = 0; i < win->rows; i++, y += 16) {
             idx = i + sEquipTop;
@@ -523,7 +548,7 @@ void EquipScreen_SetSlot(s32 id)
 /*
  * --INFO--
  * PAL Address: 0x02010420
- * PAL Size: 412b
+ * PAL Size: 410b
  * EN Address: 0x02010324
  * EN Size: 402b
  * JP Address: 0x02015058
@@ -582,7 +607,11 @@ void EquipScreen_PrintDesc(void)
     if (item->flags & 0x100)
         Text_Print(Msg_GetSystem(16), TEXT_DRAW);
     else if (item->flags & 0xE00)
+#if defined(VERSION_GCCJGC)
+        Text_Print(Msg_GetSystem(7), TEXT_DRAW);
+#else
         Text_Print(Msg_GetSystem(63), TEXT_DRAW);
+#endif
     if (!(item->flags & 0x3000)) {
         Text_AddX(8);
         offset = Text_GetX();
@@ -593,11 +622,11 @@ void EquipScreen_PrintDesc(void)
             Text_AddX(8);
         Text_Print(Msg_GetStat(item->kind - 1), TEXT_DRAW);
         if ((item->flags & 0x3000) && item->count != 0 && item->kind != 16) {
-            i = Item_IsPercentKind(item->kind);
+            offset = Item_IsPercentKind(item->kind);
             msg = 39;
-            if (i)
+            if (offset)
                 msg = 40;
-#if !defined(VERSION_GCCE01)
+#if defined(VERSION_GCCP01)
             Text_AddX(8);
 #endif
             Text_Print(Msg_GetSystem(msg), TEXT_DRAW);

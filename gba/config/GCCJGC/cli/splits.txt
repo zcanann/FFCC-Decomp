@@ -266,7 +266,13 @@ main/gil:
 	.bss        start:0x030027C0 end:0x030027CE align:4
 
 regional_bss:
-	.bss        start:0x030027CE end:0x03002838 align:1
+	.bss        start:0x030027CE end:0x03002800 align:1
+
+main/equip:
+	.bss        start:0x03002800 end:0x03002805 align:4
+
+regional_bss:
+	.bss        start:0x03002805 end:0x03002838 align:1
 
 main/scouter:
 	.bss        start:0x03002838 end:0x03002840 align:4

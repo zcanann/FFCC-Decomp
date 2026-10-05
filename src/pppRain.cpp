@@ -301,7 +301,5 @@ void pppConstructRain(pppRain* rain, _pppCtrlTable* data)
     zero = 0.0f;
     work = GetRainWork(rain, data);
     work->drops = 0;
-    work->accelZ = zero;
-    work->accelY = zero;
-    work->moveY = zero;
+    work->moveY = work->accelY = work->accelZ = zero;
 }

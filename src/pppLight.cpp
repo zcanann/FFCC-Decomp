@@ -116,18 +116,10 @@ void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 	*(int*)&work->color2R = 0;
 	*(int*)&work->color2B = 0;
 	
-	work->attenFalloffAccel = zero;
-	work->attenFalloffVelocity = zero;
-	work->attenFalloff = zero;
-	work->attenRadiusAccel = zero;
-	work->attenRadiusVelocity = zero;
-	work->attenRadius = zero;
-	work->spotScaleAccel = zero;
-	work->spotScaleVelocity = zero;
-	work->spotScale = zero;
-	work->specularScaleAccel = zero;
-	work->specularScaleVelocity = zero;
-	work->specularScale = zero;
+	work->attenFalloff = work->attenFalloffVelocity = work->attenFalloffAccel = zero;
+	work->attenRadius = work->attenRadiusVelocity = work->attenRadiusAccel = zero;
+	work->spotScale = work->spotScaleVelocity = work->spotScaleAccel = zero;
+	work->specularScale = work->specularScaleVelocity = work->specularScaleAccel = zero;
 }
 
 /*

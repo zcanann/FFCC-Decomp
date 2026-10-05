@@ -490,6 +490,7 @@ memory.cpp:
 	.sdata2 start:0x8032E760 end:0x8032E788
 
 materialman.cpp:
+	.sbss start:0x8032DCC8 end:0x8032DCDC
 	.rodata start:0x801D6968 end:0x801D6A10
 	.data start:0x801E8A30 end:0x801E8A88
 	.sdata start:0x8032D548 end:0x8032D578
@@ -1343,3 +1344,6 @@ auto_10_8032DE7C_sbss:
 
 auto_11_8032EAEC_sdata2:
 	.sdata2 start:0x8032EAEC end:0x8032EAF0 align:1
+
+auto_10_8032DCDC_sbss:
+	.sbss start:0x8032DCDC end:0x8032DCE0 align:1

@@ -222,7 +222,11 @@ void pppLight(_pppPObject* object, PppLightStep* step, _pppCtrlTable* ctrlTable)
 			*(u32*)&light.m_targetColor[0] = 0;
 		}
 
-		if (ppvIsLoopCalc == 0 && ppvIs2ndCalc == 0) {
+		if (ppvIsLoopCalc == 0
+#if !defined(VERSION_GCCJGC)
+			&& ppvIs2ndCalc == 0
+#endif
+		) {
 			if (step->m_type == 0) {
 				light.m_type = 0;
 				light.m_direction.x = 0.0f;

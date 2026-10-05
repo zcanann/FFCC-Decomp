@@ -78,3 +78,9 @@ pppAngle.cpp:
 
 pppBindOnlyPos.cpp:
 	.text start:0x80123A38 end:0x80123A58
+
+pppChangeBGColor.cpp:
+	.text start:0x80129354 end:0x801293B0
+
+pppPObjPoint.cpp:
+	.text start:0x8005FF58 end:0x8005FFEC

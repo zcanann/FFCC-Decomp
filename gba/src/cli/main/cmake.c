@@ -975,6 +975,15 @@ void CMakeLookScreen_Setup(void)
     Header_Clear();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200BA90
+ * PAL Size: 424b
+ * EN Address: 0x0200B9C0
+ * EN Size: 424b
+ * JP Address: 0x02011CF4
+ * JP Size: 428b
+ */
 s32 CMakeLookScreen_Init(void)
 {
     struct Window tmp;
@@ -982,6 +991,7 @@ s32 CMakeLookScreen_Init(void)
     s32 ret = 0;
     struct Window *win = gWindows;
     s32 row;
+    s32 half;
     s32 i;
     s32 tile;
     s32 pal;
@@ -1000,9 +1010,9 @@ s32 CMakeLookScreen_Init(void)
         ret = 1;
     }
     row = win->anim >> 3;
-    if (ret == 0 && !(row & 1) && (row >>= 1) <= 4) {
+    if (ret == 0 && !(row & 1) && (half = row >> 1) <= 4) {
         Text_Clear();
-        row--;
+        row = half - 1;
         memcpy(&tmp, win, sizeof(struct Window));
         tmp.bg--;
         Text_SetX(20);
@@ -1489,6 +1499,15 @@ s32 CMakeBirthdayScreen_HandleInput(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200C7F0
+ * PAL Size: 364b
+ * EN Address: 0x0200C720
+ * EN Size: 364b
+ * JP Address: 0x02012A5C
+ * JP Size: 348b
+ */
 void CMakeFavoriteScreen_Setup(void)
 {
     struct Window *win;
@@ -1547,6 +1566,15 @@ void CMakeFavoriteScreen_Setup(void)
     Header_Clear();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200C95C
+ * PAL Size: 196b
+ * EN Address: 0x0200C88C
+ * EN Size: 194b
+ * JP Address: 0x02012BB8
+ * JP Size: 192b
+ */
 s32 CMakeFavoriteScreen_Init(void)
 {
     s32 ret = 0;
@@ -2068,6 +2096,15 @@ s32 CMakeJobScreen_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200D680
+ * PAL Size: 100b
+ * EN Address: 0x0200D5B0
+ * EN Size: 100b
+ * JP Address: 0x020138C8
+ * JP Size: 108b
+ */
 void CMakeJobScreen_PrintNextRow(void)
 {
     struct Window tmp;
@@ -2078,7 +2115,11 @@ void CMakeJobScreen_PrintNextRow(void)
         tmp.width = 8;
         Text_SetFill(0, 0);
         Text_Clear();
+#if defined(VERSION_GCCJGC)
+        Text_Print(Msg_GetCMake(sCMakeTextRow + 12), TEXT_DRAW);
+#else
         Text_Print(Msg_GetJob(sCMakeTextRow), TEXT_DRAW);
+#endif
         Window_PutText(&tmp, sCMakeTextRow, 0);
         sCMakeTextRow++;
     }

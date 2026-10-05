@@ -56,11 +56,27 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadState) == 0x860);
 static const char sMenuTexWinKazari[] = "win_kazari";
 extern const char sMenuManagerClassName[] = "CManager";
 extern const char sMenuProcessClassName[] = "CProcess";
+#ifdef VERSION_GCCJGC
+static const char sMenuTexturePathFmt[] = "dvd/menu/%s.tex";
+#else
 static const char sMenuTexturePathFmt[] = "dvd/%smenu/%s.tex";
+#endif
 extern "C" const char s_p_menu_cpp[] = "p_menu.cpp";
+#ifdef VERSION_GCCJGC
+static const char sMenuGc23FontPathFmt[] = "dvd/menu/gc23.fnt";
+#else
 static const char sMenuGc23FontPathFmt[] = "dvd/%smenu/gc23.fnt";
+#endif
+#ifdef VERSION_GCCJGC
+static const char sMenuFontPathFmt[] = "dvd/menu/%s.fnt";
+#else
 static const char sMenuFontPathFmt[] = "dvd/%smenu/%s.fnt";
+#endif
+#ifdef VERSION_GCCJGC
+static const char sMenuGc22FontPathFmt[] = "dvd/menu/gc22.fnt";
+#else
 static const char sMenuGc22FontPathFmt[] = "dvd/%smenu/gc22.fnt";
+#endif
 static const char sMenuTexKasoru[] = "kasoru";
 static const char sMenuTexPause[] = "pause";
 static const char sMenuTexWin1_0[] = "win1_0";
@@ -143,10 +159,10 @@ inline CMenuPcs::~CMenuPcs()
  * --INFO--
  * PAL Address: 0x800974a8
  * PAL Size: 368b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80096E44
+ * EN Size: 368b
+ * JP Address: 0x800969B4
+ * JP Size: 376b
  */
 void CMenuPcs::Init()
 {
@@ -235,10 +251,10 @@ int CMenuPcs::GetTable(unsigned long index)
  * --INFO--
  * PAL Address: 0x80097240
  * PAL Size: 592b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80096BDC
+ * EN Size: 592b
+ * JP Address: 0x80096780
+ * JP Size: 540b
  */
 void CMenuPcs::create()
 {
@@ -280,8 +296,12 @@ void CMenuPcs::create()
     memset(m_textureSets, 0, sizeof(m_textureSets));
     memset(m_textures, 0, sizeof(m_textures));
 
+#ifdef VERSION_GCCJGC
+    loadFont(0, const_cast<char*>(sMenuGc22FontPathFmt), 0, 0);
+#else
     sprintf(fontPath, const_cast<char*>(sMenuGc22FontPathFmt), Game.GetLangString());
     loadFont(0, fontPath, 0, 0);
+#endif
 
     loadTexture(tName, 0, 2, tTmp, 0, 0x16, 0);
 
@@ -495,10 +515,10 @@ inline CMemory::CStage* CMenuPcs::GetStage(int stageSelect)
  * --INFO--
  * PAL Address: 0x80096b94
  * PAL Size: 516b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80096530
+ * EN Size: 516b
+ * JP Address: 0x800960E0
+ * JP Size: 504b
  */
 void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCount, CMenuPcs::CTmp* tmp,
                            int textureStart, int textureCount, int stageSelect)
@@ -506,7 +526,11 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
     char texPath[0x100];
 
     for (int i = 0; i < textureSetCount; i++) {
+#ifdef VERSION_GCCJGC
+        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), paths[i]);
+#else
         sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), Game.GetLangString(), paths[i]);
+#endif
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -1214,10 +1238,10 @@ void CMenuPcs::SetColor(CColor& color)
  * --INFO--
  * PAL Address: 0x80094aec
  * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80094488
+ * EN Size: 208b
+ * JP Address: 0x80093FEC
+ * JP Size: 192b
  */
 void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 {
@@ -1231,7 +1255,11 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
         m_fonts[fontNo + 2] = 0;
     }
 
+#ifdef VERSION_GCCJGC
+    sprintf(path, const_cast<char*>(sMenuFontPathFmt), fileName);
+#else
     sprintf(path, const_cast<char*>(sMenuFontPathFmt), Game.GetLangString(), fileName);
+#endif
     loadFont(2, path, fontNo + 2, -1);
 }
 
@@ -1291,10 +1319,10 @@ inline void CMenuPcs::drawPause()
  * --INFO--
  * PAL Address: 0x8009460c
  * PAL Size: 880b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80093FA8
+ * EN Size: 880b
+ * JP Address: 0x80093B44
+ * JP Size: 824b
  */
 void CMenuPcs::createBattle()
 {
@@ -1331,8 +1359,12 @@ void CMenuPcs::createBattle()
         m_battleRingMenus[i]->Create();
     }
 
+#ifdef VERSION_GCCJGC
+    loadFont(0, const_cast<char*>(sMenuGc23FontPathFmt), 1, 1);
+#else
     sprintf(fontPath, const_cast<char*>(sMenuGc23FontPathFmt), Game.GetLangString());
     loadFont(0, fontPath, 1, 1);
+#endif
 
     for (int i = 0; i < 0x100; i++) {
         _GXColor color = GetTexture(static_cast<TEX>(0x18))->GetTlutColor(i);

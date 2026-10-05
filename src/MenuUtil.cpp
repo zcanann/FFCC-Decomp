@@ -1712,6 +1712,13 @@ void CMenuPcs::DrawOptionMenu()
 				gUtil.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(y),
 				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+#ifdef VERSION_GCCJGC
+				const Vec2d* pp4 = &pts[k + 4];
+				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				DrawOptionLabel(m_fonts[0], textXi2 + 8,
+				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(y))), color, 7,
+				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
+#else
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(18);
 				const Vec2d* pp4 = &pts[k + 4];
@@ -1725,7 +1732,13 @@ void CMenuPcs::DrawOptionMenu()
 				         static_cast<int>(-4.0f + (4.0f +
 				                          (pp4->y + static_cast<float>(y)))), color, 7,
 				         txt, 1.0f, 1.0f);
+#endif
 			} else {
+#ifdef VERSION_GCCJGC
+				DrawOptionLabel(m_fonts[0], textXi + 8,
+				                static_cast<int>(4.0f + (pp3->y + static_cast<float>(y))), color, 7,
+				                "\203\211\203\103\203\147\202\156\202\145\202\145", 1.0f);
+#else
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(19);
 				fnt->SetMargin(1.0f);
@@ -1737,6 +1750,7 @@ void CMenuPcs::DrawOptionMenu()
 				         static_cast<int>(-4.0f + (4.0f +
 				                          (pp3->y + static_cast<float>(y)))), color, 7,
 				         txt, 1.0f, 1.0f);
+#endif
 				const Vec2d* pp4e = &pts[k + 4];
 				int panelXi = static_cast<int>(pp4e->x + static_cast<float>(step1) * specialRowCos);
 				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);

@@ -443,3 +443,6 @@ joybus.cpp:
 
 gbaque.cpp:
 	.text start:0x800C60A4 end:0x800CE9BC
+
+map.cpp:
+	.text start:0x8002eb80 end:0x800340bc

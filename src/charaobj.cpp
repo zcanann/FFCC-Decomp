@@ -1879,10 +1879,10 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  * --INFO--
  * PAL Address: 0x8010D700
  * PAL Size: 6984b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010CA60
+ * EN Size: 6984b
+ * JP Address: 0x80109740
+ * JP Size: 6900b
  */
 void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
 {
@@ -1990,15 +1990,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		int currentKind = kindRows1556[m_itemId].m_status & 0xFF;
 		if (currentKind == 2) {
 			if (staType != 0x66 && staType != 0x67 && staType != 7) {
-				CVector sourcePos(sourceObj->m_worldPosition);
-				const CVector& selfPos = CVector(m_worldPosition);
-				CVector deltaVec;
-				PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
-				Vec delta;
-				delta.x = deltaVec.x;
-				delta.y = deltaVec.y;
-				delta.z = deltaVec.z;
-				moveVectorH(&delta, 2.0f, 10);
+				CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
+				moveVectorH(delta, 2.0f, 10);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x1A, 0, 0);
 			}
@@ -2011,15 +2004,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (itemEffect == 0x1F8 &&
 	    sourceObj->m_weaponNodeFlagAll.m_bits1.m_bit20 != 0 &&
 	    ((CharaObjItemRow(m_itemId)->m_status & 0xFF) == 3)) {
-		CVector sourcePos(sourceObj->m_worldPosition);
-		const CVector& selfPos = CVector(m_worldPosition);
-		CVector deltaVec;
-		PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
-		Vec delta;
-		delta.x = deltaVec.x;
-		delta.y = deltaVec.y;
-		delta.z = deltaVec.z;
-		moveVectorH(&delta, 2.0f, 10);
+		CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
+		moveVectorH(delta, 2.0f, 10);
 		m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 		changeStat(0x19, 0, 0);
 	}

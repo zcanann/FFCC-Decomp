@@ -1234,7 +1234,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/targcont.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01"),
                 "TRK_MINNOW_DOLPHIN/targimpl.c",
                 mw_version="GC/2.6",
                 cflags=[

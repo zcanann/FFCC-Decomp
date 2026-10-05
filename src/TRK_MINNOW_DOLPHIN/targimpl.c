@@ -34,7 +34,7 @@ static TRKStepStatus gTRKStepStatus = { FALSE, DSSTEP_IntoCount, 0, 0 };
 
 typedef void (*RegAccessFunc)(void* srcDestPtr, u128 val);
 
-static void TRKExceptionHandler(u16);
+void TRKExceptionHandler(u16);
 void TRKInterruptHandlerEnableInterrupts();
 static void GetThreadInfo(int*, int*);
 DSError TRKPPCAccessSPR(void* srcDestPtr, u32 spr, BOOL read);
@@ -1177,7 +1177,7 @@ L_802CF694:
  * @note Size: 0x9C
  */
 #ifdef __MWERKS__ // clang-format off
-static asm void TRKExceptionHandler(u16 r3){ 
+asm void TRKExceptionHandler(u16 r3){ 
 	nofralloc
 	lis r2, gTRKExceptionStatus@h
 	ori r2, r2, gTRKExceptionStatus@l

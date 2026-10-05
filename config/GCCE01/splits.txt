@@ -1462,12 +1462,27 @@ auto_8032FCEC_sdata2:
 
 texanim.cpp:
 	.text start:0x80043B64 end:0x80044F6C
+	.rodata start:0x801D6A10 end:0x801D6AC0
+	.data start:0x801E8A98 end:0x801E8B10
+	.sdata start:0x8032D580 end:0x8032D5B8
 
 mapanim.cpp:
 	.text start:0x8004A294 end:0x8004AFC4
+	.rodata start:0x801D6BF8 end:0x801D6C58
+	.data start:0x801E9308 end:0x801E9314
+	.sdata start:0x8032D620 end:0x8032D628
 
 maptexanim.cpp:
 	.text start:0x8004F704 end:0x800501F0
+	.rodata start:0x801D6DD8 end:0x801D6E20
+	.data start:0x801E9818 end:0x801E9830
+	.sdata start:0x8032D668 end:0x8032D678
+
+auto_801E9314_data:
+	.data start:0x801E9314 end:0x801E9318
+
+auto_801E8A94_data:
+	.data start:0x801E8A94 end:0x801E8A98
 
 RedSound/RedDriver.cpp:
 	.text start:0x801BBE74 end:0x801BEE9C

@@ -584,6 +584,7 @@ os/OSSemaphore.c:
 	.text start:0x8017F574 end:0x8017F6F8
 
 wm_menu.cpp:
+	.data start:0x8020F6BC end:0x8020F764
 	.text start:0x800E6364 end:0x80102378
 
 mapocttree.cpp:

@@ -440,6 +440,7 @@ static const int kMcSlotMiddleTexture = 36;
 static const int kMcCharacterFrameTexture = 37;
 static const int kMcCharacterFillTexture = 41;
 static const int kCharacterNamePlateTexture = 39;
+static const int kCharacterPlaceholderTexture = 49;
 static const int kCharacterLifeTexture = 38;
 static const int kCharacterAwayTexture = 54;
 static const int kWorldFrameTexture = 29;
@@ -455,6 +456,7 @@ static const int kMcSlotMiddleTexture = 37;
 static const int kMcCharacterFrameTexture = 38;
 static const int kMcCharacterFillTexture = 42;
 static const int kCharacterNamePlateTexture = 40;
+static const int kCharacterPlaceholderTexture = 50;
 static const int kCharacterLifeTexture = 39;
 static const int kCharacterAwayTexture = 56;
 static const int kWorldFrameTexture = 30;
@@ -6739,17 +6741,16 @@ void CMenuPcs::PCAnimCtrl()
  * --INFO--
  * PAL Address: 0x800f2034
  * PAL Size: 1728b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F15B4
+ * EN Size: 1728b
+ * JP Address: 0x800EE7D4
+ * JP Size: 1728b
  */
 void CMenuPcs::DrawChara()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		WmWorldObjInfo* const view = &m_wm.m_worldObjData[32 + i];
+	WmWorldObjInfo* view = &m_wm.m_worldObjData[32];
+	int viewSlot = 32;
+	for (int i = 0; i < kWmMenuPlayerCount; i++, viewSlot++, view++) {
 		if (view->m_active == 0) {
 			continue;
 		}
@@ -6768,25 +6769,23 @@ void CMenuPcs::DrawChara()
 			continue;
 		}
 
-		SetProjection(i + 32);
+		SetProjection(viewSlot);
 		SetLight(0);
 		if (GetWmCharaHandles(this)[i]->m_charaKind != 3) {
-			GetWmCharaHandles(this)[i]->Draw(5);
+			m_wm.m_handles[viewSlot]->Draw(5);
 		} else {
 			DrawInit();
 			GXSetZMode(GX_TRUE, static_cast<GXCompare>(7), GX_TRUE);
-			SetProjection(i + 32);
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
+			SetProjection(viewSlot);
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterPlaceholderTexture));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			float alpha;
 			if (m_wmWorldState->m_mainState == 2) {
 				const float* pOneAl = &FLOAT_803313e8;
 				alpha = *pOneAl;
 			} else {
-				alpha = handle->m_model->m_lightAlpha;
+				alpha = GetWmCharaHandles(this)[i]->m_model->m_lightAlpha;
 			}
-			const float* pRgbMul = &FLOAT_80331458;
-			const float rgbMul = *pRgbMul;
 			double colorScaleD;
 			if (selectedMask != 0) {
 				const double* pFull = &DOUBLE_80331420;
@@ -6798,10 +6797,10 @@ void CMenuPcs::DrawChara()
 			const float colorScale = static_cast<float>(colorScaleD);
 			const double* pAScale = &DOUBLE_80331508;
 			GXColor color;
-			color.r = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
-			color.g = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
-			color.b = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
-			color.a = static_cast<unsigned char>(static_cast<int>(*pAScale * static_cast<double>(alpha)));
+			color.r = static_cast<unsigned char>(FLOAT_80331458 * colorScale);
+			color.g = static_cast<unsigned char>(FLOAT_80331458 * colorScale);
+			color.b = static_cast<unsigned char>(FLOAT_80331458 * colorScale);
+			color.a = static_cast<unsigned char>(*pAScale * static_cast<double>(alpha));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 			const float* pX1 = &FLOAT_8033161C;
 			const float* pX2 = &FLOAT_8033168C;
@@ -6812,16 +6811,12 @@ void CMenuPcs::DrawChara()
 			float scale = *pSc1;
 			if (selectedMask != 0) {
 				const float* pSel = &FLOAT_803315d4;
+				scale *= *pSel;
 				x *= *pSel;
 				y *= *pSel;
-				scale *= *pSel;
 			}
-			const float* pR1 = &FLOAT_80331694;
-			const float* pR2 = &FLOAT_80331578;
-			const float* pR3 = &FLOAT_80331520;
-			const float* pZeroR3 = &FLOAT_803313dc;
-			MenuPcs.DrawRect3d(0, x, y, *pR1, *pR2, *pR3,
-			                   *pZeroR3, *pZeroR3, scale, scale);
+			MenuPcs.DrawRect3d(0, x, y, FLOAT_80331694, FLOAT_80331578, FLOAT_80331520,
+			                   FLOAT_803313dc, FLOAT_803313dc, scale, scale);
 			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 		}
 		if (m_wmWorldState->m_mainState == 2 && selectedMask != 0) {

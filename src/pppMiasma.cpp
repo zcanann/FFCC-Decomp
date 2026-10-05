@@ -115,9 +115,9 @@ static inline float CalcSphereRadius(Vec* vertices, u16 count)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 104b
- * EN Address: 0x80128a68
+ * EN Address: UNUSED
  * EN Size: 120b
- * JP Address: TODO
+ * JP Address: UNUSED
  * JP Size: TODO
  */
 static inline void CreateScaleMatrix(_pppPObject* pObject, float scale)
@@ -135,10 +135,10 @@ static inline void CreateScaleMatrix(_pppPObject* pObject, float scale)
  * --INFO--
  * PAL Address: 0x80109930
  * PAL Size: 368b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80108D40
+ * EN Size: 368b
+ * JP Address: 0x80105A5C
+ * JP Size: 368b
  */
 void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* step, _pppCtrlTable* ctrl)
 {
@@ -180,10 +180,10 @@ void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* step, _pppCtrlTabl
  * --INFO--
  * PAL Address: 0x80109aa0
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80108EB0
+ * EN Size: 4b
+ * JP Address: 0x80105BCC
+ * JP Size: 4b
  */
 void pppDestructMiasma(pppMiasma*, _pppCtrlTable*)
 {
@@ -194,10 +194,10 @@ void pppDestructMiasma(pppMiasma*, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x80109aa4
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80108EB4
+ * EN Size: 100b
+ * JP Address: 0x80105BD0
+ * JP Size: 100b
  */
 void pppConstruct2Miasma(pppMiasma* pppMiasma, _pppCtrlTable* ctrl)
 {
@@ -213,10 +213,10 @@ void pppConstruct2Miasma(pppMiasma* pppMiasma, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x80109b08
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80108F18
+ * EN Size: 100b
+ * JP Address: 0x80105C34
+ * JP Size: 100b
  */
 void pppConstructMiasma(pppMiasma* pppMiasma, _pppCtrlTable* ctrl)
 {
@@ -232,10 +232,10 @@ void pppConstructMiasma(pppMiasma* pppMiasma, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x80109b6c
  * PAL Size: 5604b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80108F7C
+ * EN Size: 5452b
+ * JP Address: 0x80105C98
+ * JP Size: 5424b
  */
 void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTable* ctrl)
 {

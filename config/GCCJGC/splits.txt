@@ -1391,3 +1391,6 @@ auto_8031029C_bss:
 gx/GXPerf.c:
 	.text	start:0x801A1724 end:0x801A1934
 	.data	start:0x802383DC end:0x80238438
+
+pppMiasma.cpp:
+	.text start:0x80105A5C end:0x801071C8

@@ -1302,7 +1302,7 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "thp/THPDec.c"),
-            Object(Matching, "thp/THPAudio.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "thp/THPAudio.c"),
         ],
     },
 ]

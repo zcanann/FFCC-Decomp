@@ -642,3 +642,8 @@ pppYmLaser.cpp:
 
 gobjwork.cpp:
 	.text start:0x8009DAE4 end:0x800A26A8
+
+MSL_C/PPCEABI/bare/H/string.c:
+	.text start:0x801B7AD0 end:0x801B7F98
+	.rodata start:0x801E5F90 end:0x801E5FB0
+	.sdata start:0x8032DBF8 end:0x8032DC00

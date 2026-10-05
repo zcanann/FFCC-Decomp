@@ -568,3 +568,8 @@ chara_fur.cpp:
 
 pppYmLaser.cpp:
 	.rodata start:0x801D5FA0 end:0x801D5FB0
+
+MSL_C/PPCEABI/bare/H/string.c:
+	.text start:0x801B3FA8 end:0x801B4428
+	.rodata start:0x801DB500 end:0x801DB520
+	.sdata start:0x8034BA00 end:0x8034BA08

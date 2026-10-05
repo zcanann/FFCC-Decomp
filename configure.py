@@ -1143,7 +1143,7 @@ config.libs = [
             Object(Matching, "MSL_C/PPCEABI/bare/H/printf.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/rand.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/signal.c"),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/string.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/string.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/float.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/s_atan.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/s_copysign.c"),

@@ -705,3 +705,12 @@ Runtime.PPCEABI.H/NMWException.cp:
 	extab start:0x8000A25C end:0x8000A2C4
 	extabindex start:0x80011734 end:0x800117A0
 	.sdata start:0x8034B9D0 end:0x8034B9D8
+
+Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
+	.text start:0x801ABBC0 end:0x801ACFF8
+	extab start:0x8000A2C4 end:0x8000A338
+	extabindex start:0x800117A0 end:0x800117F4
+	.rodata start:0x801DB2D0 end:0x801DB368
+	.data start:0x80238980 end:0x80238A68
+	.bss start:0x803481E8 end:0x803481F4
+	.sdata start:0x8034B9E0 end:0x8034B9F0

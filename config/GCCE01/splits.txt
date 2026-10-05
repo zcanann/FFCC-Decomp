@@ -477,3 +477,9 @@ pppRyjMegaBirthModel.cpp:
 
 partyobj.cpp:
 	.text start:0x801198D4 end:0x80123CC8
+
+partMng.cpp:
+	.text start:0x80057184 end:0x8005F084
+
+memory.cpp:
+	.text start:0x8001C0E4 end:0x8001FC68

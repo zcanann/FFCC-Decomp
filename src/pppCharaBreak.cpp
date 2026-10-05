@@ -95,10 +95,10 @@ static inline void ClearCharaBreakModelCallbacks(CChara::CModel* model)
  * --INFO--
  * PAL Address: 0x801411E4
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80140360
+ * EN Size: 20b
+ * JP Address: 0x8013CF88
+ * JP Size: 20b
  */
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* modelData, void* meshData)
 {
@@ -116,10 +116,10 @@ static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* mode
  * --INFO--
  * PAL Address: 0x801411E0
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8014035C
+ * EN Size: 4b
+ * JP Address: 0x8013CF84
+ * JP Size: 4b
  */
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
@@ -129,10 +129,10 @@ static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, 
  * --INFO--
  * PAL Address: 0x801411DC
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80140358
+ * EN Size: 4b
+ * JP Address: 0x8013CF80
+ * JP Size: 4b
  */
 static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4])
 {
@@ -142,10 +142,10 @@ static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, in
  * --INFO--
  * PAL Address: 0x80140F18
  * PAL Size: 708b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801400A0
+ * EN Size: 696b
+ * JP Address: 0x8013CCC8
+ * JP Size: 696b
  */
 static void CharaBreak_AfterDrawMeshCallback(
     CChara::CModel* model, void* modelData, void*, int meshIndex, float (*meshMtx)[4])
@@ -243,12 +243,12 @@ static void CharaBreak_AfterDrawMeshCallback(
  * --INFO--
  * PAL Address: 0x80140CC8
  * PAL Size: 592b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013FE50
+ * EN Size: 592b
+ * JP Address: 0x8013CA78
+ * JP Size: 592b
  */
-void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
+static void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
     CharaBreakMeshData* meshData = mesh->GetRefData();
     S16Vec* workPositions;
@@ -349,12 +349,12 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
  * --INFO--
  * PAL Address: 0x8014099C
  * PAL Size: 812b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013FB24
+ * EN Size: 812b
+ * JP Address: 0x8013C758
+ * JP Size: 800b
  */
-void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* polygonData, unsigned long polygonCount,
+static void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* polygonData, unsigned long polygonCount,
                           CChara::CModel* model, CChara::CMesh* mesh)
 {
     CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
@@ -419,12 +419,12 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
  * --INFO--
  * PAL Address: 0x801400f0
  * PAL Size: 2220b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013F278
+ * EN Size: 2220b
+ * JP Address: 0x8013BEAC
+ * JP Size: 2220b
  */
-void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* model)
+static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* model)
 {
     POLYGON_DATA* polygon;
     CharaBreakStep* stepData = (CharaBreakStep*)step;
@@ -611,10 +611,10 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
  * --INFO--
  * PAL Address: 0x801400B0
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013F240
+ * EN Size: 56b
+ * JP Address: 0x8013BE70
+ * JP Size: 60b
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
@@ -635,10 +635,10 @@ void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  * --INFO--
  * PAL Address: 0x80140080
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013F210
+ * EN Size: 48b
+ * JP Address: 0x8013BE3C
+ * JP Size: 52b
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
@@ -657,10 +657,10 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  * --INFO--
  * PAL Address: 0x8013FF14
  * PAL Size: 364b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013F0C0
+ * EN Size: 336b
+ * JP Address: 0x8013BCEC
+ * JP Size: 336b
  */
 void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
@@ -728,10 +728,10 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  * --INFO--
  * PAL Address: 0x8013FAA0
  * PAL Size: 1140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013ED28
+ * EN Size: 920b
+ * JP Address: 0x8013B94C
+ * JP Size: 928b
  */
 void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtrlTable* data)
 {
@@ -894,10 +894,10 @@ fail:
  * --INFO--
  * PAL Address: 0x8013F9D0
  * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013EC64
+ * EN Size: 196b
+ * JP Address: 0x8013B888
+ * JP Size: 196b
  */
 void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTable* data)
 {

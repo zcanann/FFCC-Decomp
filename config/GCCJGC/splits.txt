@@ -1345,3 +1345,6 @@ stopwatch.cpp:
 	extab	start:0x80005CDC end:0x80005D40
 	extabindex	start:0x8000B4C4 end:0x8000B53C
 	.sdata2	start:0x8034C5B0 end:0x8034C5C8
+
+pppCharaBreak.cpp:
+	.text start:0x8013B888 end:0x8013CF9C

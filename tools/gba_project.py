@@ -135,7 +135,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libc/string/memset", "libc/string/strcat", "libc/string/strchr", "libc/string/strcpy",
             "libc/string/strlen", "libgcc/_call_via_rX", "libgcc/_divsi3", "libgcc/_dvmd_tls",
             "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3", "main/artifact",
-            "main/xfer", "main/radarmap", "main/main", "main/session", "main/textmask",
+            "main/xfer", "main/radarmap", "main/main", "main/session", "main/textmask", "main/text",
         ],
         "mgr": [
             "sound_assets",

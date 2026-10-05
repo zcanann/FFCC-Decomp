@@ -181,8 +181,8 @@ main/radarmap:
 main/link:
 	.bss        start:0x03000070 end:0x030008D8 align:8
 
-regional_bss:
-	.bss        start:0x030008D8 end:0x03001168
+main/text:
+	.bss        start:0x030008D8 end:0x03001164 align:8
 
 main/obj:
 	.bss        start:0x03001168 end:0x03002750 align:8

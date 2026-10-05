@@ -728,20 +728,24 @@ int CCaravanWork::FindItem(int itemId)
  * --INFO--
  * PAL Address: 0x800a1d0c
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A1604
+ * EN Size: 88b
+ * JP Address: 0x8009FCC8
+ * JP Size: 88b
  */
 void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 {
+#ifdef VERSION_GCCP01
 	if (m_inventoryItems[itemSlot] != -1) {
+#endif
 		m_inventoryItems[itemSlot] = -1;
 		m_inventoryItemCount = m_inventoryItemCount - 1;
 		if (updateJoybus != 0) {
 			Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(itemSlot));
 		}
+#ifdef VERSION_GCCP01
 	}
+#endif
 }
 
 /*

@@ -1180,7 +1180,7 @@ config.libs = [
         "cflags": cflags_odemuexi,
         "progress_category": "sdk",
         "objects": [
-            Object(Matching, "OdemuExi2/DebuggerDriver.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "OdemuExi2/DebuggerDriver.c"),
         ],
     },
     {

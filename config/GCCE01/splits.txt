@@ -849,3 +849,8 @@ TRK_MINNOW_DOLPHIN/main_gdev.c:
 
 MenuUtil.cpp:
 	.text start:0x801757B8 end:0x80179E64
+
+OdemuExi2/DebuggerDriver.c:
+	.text start:0x801BB3F4 end:0x801BBE74
+	.sdata start:0x8032DC08 end:0x8032DC10
+	.sbss start:0x8032E380 end:0x8032E398

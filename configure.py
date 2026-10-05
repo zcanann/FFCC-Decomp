@@ -534,7 +534,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "color.cpp"),
             Object(NonMatching, "file.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(Matching, "strcase.c"),
-            Object(Matching, "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01"), "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "FS_USB_Process.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "FunnyShape.cpp"),
             Object(NonMatching, "game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),

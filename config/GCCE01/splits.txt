@@ -636,3 +636,6 @@ chara_fur.cpp:
 
 pppYmLaser.cpp:
 	.rodata start:0x801DA3C8 end:0x801DA3D8
+
+gobjwork.cpp:
+	.text start:0x8009DAE4 end:0x800A26A8

@@ -503,3 +503,12 @@ gba/GBARead.c:
 
 gba/GBAWrite.c:
 	.text start:0x801A2E04 end:0x801A2F8C
+
+graphic.cpp:
+	.text start:0x80015DD8 end:0x80019964
+
+p_graphic.cpp:
+	.text start:0x80044978 end:0x8004727C
+
+p_light.cpp:
+	.text start:0x80047728 end:0x80049CB8

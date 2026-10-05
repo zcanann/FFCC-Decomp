@@ -579,3 +579,12 @@ goout.cpp:
 
 menu_letter.cpp:
 	.text start:0x801629BC end:0x80166DC0
+
+graphic.cpp:
+	.text start:0x800161FC end:0x80019D7C
+
+p_graphic.cpp:
+	.text start:0x80044F6C end:0x80047724
+
+p_light.cpp:
+	.text start:0x80047BF4 end:0x8004A294

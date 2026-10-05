@@ -816,3 +816,13 @@ TRK_MINNOW_DOLPHIN/nubinit.c:
 
 MenuUtil.cpp:
 	.text start:0x80171534 end:0x80175A90
+
+TRK_MINNOW_DOLPHIN/nubevent.c:
+	.text	start:0x801A3624 end:0x801A384C
+	.bss	start:0x80344020 end:0x80344048
+
+TRK_MINNOW_DOLPHIN/mainloop.c:
+	.text	start:0x801A352C end:0x801A3624
+
+TRK_MINNOW_DOLPHIN/mutex_TRK.c:
+	.text start:0x801A7D9C end:0x801A7DB4

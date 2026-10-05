@@ -50,6 +50,7 @@ struct WmMenuLightTable
 	Vec m_diffuseDirs[3];
 };
 
+#ifndef VERSION_GCCJGC
 char* g_strWMMenuMes[5][11] = {
 	{
 		"Select party members and create new characters.",
@@ -117,6 +118,8 @@ char* g_strWMMenuMes[5][11] = {
 		"Selecciona el personaje a eliminar.",
 	},
 };
+
+#endif
 
 static const int s_YearWTbl[] = {21, 12, 19, 18, 22, 20, 19, 19, 19, 18, 35};
 
@@ -441,6 +444,7 @@ static const int kMcCharacterFrameTexture = 37;
 static const int kMcCharacterFillTexture = 41;
 static const int kCharacterNamePlateTexture = 39;
 static const int kCharacterPlaceholderTexture = 49;
+static const int kMainMenuFrameTexture = 50;
 static const int kCharacterLifeTexture = 38;
 static const int kCharacterAwayTexture = 54;
 static const int kWorldFrameTexture = 29;
@@ -457,6 +461,7 @@ static const int kMcCharacterFrameTexture = 38;
 static const int kMcCharacterFillTexture = 42;
 static const int kCharacterNamePlateTexture = 40;
 static const int kCharacterPlaceholderTexture = 50;
+static const int kMainMenuFrameTexture = 51;
 static const int kCharacterLifeTexture = 39;
 static const int kCharacterAwayTexture = 56;
 static const int kWorldFrameTexture = 30;
@@ -3135,10 +3140,10 @@ void CMenuPcs::drawWorld()
  * --INFO--
  * PAL Address: 0x800fb910
  * PAL Size: 1952b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800FAEB8
+ * EN Size: 1952b
+ * JP Address: 0x800F7CA4
+ * JP Size: 1848b
  */
 void CMenuPcs::DrawMainMenu()
 {
@@ -3208,7 +3213,7 @@ void CMenuPcs::DrawMainMenu()
 			helpColor.b = 0xFF;
 			helpColor.a = static_cast<unsigned char>(static_cast<int>(helpColorAlpha));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMemoryCardBannerTexture));
 			const float* pZmm6 = &FLOAT_803313dc;
 			const float* pOmm9 = &FLOAT_803313e8;
 			const float* pWmm6 = &FLOAT_803313e0;
@@ -3217,12 +3222,22 @@ void CMenuPcs::DrawMainMenu()
 			MenuPcs.DrawRect(0, *pZmm6, static_cast<float>(*pBmm1 - static_cast<double>(*p440mm)),
 			                 *pWmm6, *p440mm, *pZmm6, *pZmm6, *pOmm9, *pOmm9, *pZmm6);
 
+#ifdef VERSION_GCCJGC
+			char textList[5][256] = {
+				"\220\126\202\265\202\242\203\114\203\203\203\211\203\116\203\136\201\133\202\314\215\354\220\254\202\306\203\160\201\133\203\145\203\102\202\314\203\201\203\223\203\157\201\133\202\360\214\210\222\350\202\265\202\334\202\267",
+				"\203\121\201\133\203\200\222\206\202\311\217\221\202\253\202\306\202\337\202\347\202\352\202\275\223\372\213\114\202\360\214\251\202\351\202\261\202\306\202\252\202\305\202\253\202\334\202\267",
+				"\221\274\202\314\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\360\214\273\215\335\202\314\203\146\201\133\203\136\202\311\210\332\223\256\202\265\202\334\202\267",
+				"\203\124\203\105\203\223\203\150\202\310\202\307\202\314\212\145\216\355\220\335\222\350\202\360\225\317\215\130\202\265\202\334\202\267",
+				"\214\273\215\335\202\314\203\166\203\214\203\103\203\146\201\133\203\136\202\360\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311\203\132\201\133\203\165\202\265\202\334\202\267",
+			};
+#else
 			char* textList[5] = {0};
 			const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
 			char** const langText = g_strWMMenuMes[languageIndex];
 			for (int i = 0; i < 5; i++) {
 				textList[i] = langText[i];
 			}
+#endif
 			unsigned int textAlpha;
 			if (helpAlpha > FLOAT_803313e8) {
 				textAlpha = 0xFF;
@@ -3235,14 +3250,15 @@ void CMenuPcs::DrawMainMenu()
 			const float* pHt1 = &FLOAT_803313e8;
 #ifdef VERSION_GCCJGC
 			const int x = static_cast<int>(CalcCenteringPos(text, 22));
+			DrawFont(x, 391, textColor.color, 7, text, 1.0f, 1.0f);
 #else
 			const int x = static_cast<int>(CalcCenteringPos2(text, *pWt1, *pHt1));
-#endif
 			const float* pYt1 = &FLOAT_803317D0;
 			const float* pWt2 = &FLOAT_80331594;
 			const float* pHt2 = &FLOAT_803313e8;
 			DrawFont2(x, static_cast<int>(*pYt1), textColor.color, 7, text,
 			          *pWt2, *pHt2, *pHt2);
+#endif
 		}
 	}
 
@@ -6397,7 +6413,7 @@ inline void CMenuPcs::DrawMainMenuBase(float alpha)
 	color.b = 0xFF;
 	color.a = static_cast<unsigned char>(static_cast<int>(255.0 * alpha));
 	GXSetChanMatColor(GX_COLOR0A0, color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMainMenuFrameTexture));
 
 	float x = 32.0f;
 	float y = 40.0f;

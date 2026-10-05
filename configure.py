@@ -612,7 +612,7 @@ config.libs = [
             Object(Matching, "pppAngMove.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppBindOnlyPos.cpp"),
             Object(Matching, "pppBlurChara.cpp", extra_cflags=["-str reuse,readonly"]),
-            Object(Matching, "pppBreathModel.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "pppBreathModel.cpp"),
             Object(Matching, "pppCallBackDistance.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppChangeBGColor.cpp"),
             Object(NonMatching, "pppChangeTex.cpp", extra_cflags=["-str reuse,readonly"]),

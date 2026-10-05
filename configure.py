@@ -603,7 +603,7 @@ config.libs = [
             Object(Matching, "p_usb.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "partMng.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
-            Object(Matching, "pppsintbl.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppsintbl.cpp"),
             Object(NonMatching, "partyobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "pppAccele.cpp"),
             Object(Matching, "pppAlignmentScale.cpp"),

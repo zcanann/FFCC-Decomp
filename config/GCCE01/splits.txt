@@ -1304,3 +1304,6 @@ pppGetRotMatrixZYX.cpp:
 
 pppShape.cpp:
 	.text start:0x80064FE0 end:0x80065614
+
+pppsintbl.cpp:
+	.data	start:0x801EB870 end:0x801FB870

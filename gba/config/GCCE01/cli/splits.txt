@@ -151,8 +151,8 @@ main/main:
 main/xfer:
 	.rodata     start:0x0201CAC4 end:0x0201CADC align:4
 
-regional_data:
-	.rodata     start:0x0201CADC end:0x0201CCE0
+main/link:
+	.rodata     start:0x0201CADC end:0x0201CCE0 align:4
 
 main/textmask:
 	.rodata     start:0x0201CCE0 end:0x0201CD04 align:4
@@ -161,7 +161,13 @@ main/artifact:
 	.rodata     start:0x0201CD04 end:0x0201CD0C align:4
 
 regional_data:
-	.rodata     start:0x0201CD0C end:0x0202E058
+	.rodata     start:0x0201CD0C end:0x02028AD8
+
+main/obj:
+	.data       start:0x02028AD8 end:0x02028AF0 align:4
+
+regional_data:
+	.rodata     start:0x02028AF0 end:0x0202E058
 
 main/main:
 	.bss        start:0x03000000 end:0x03000011 align:4
@@ -172,8 +178,14 @@ main/xfer:
 main/radarmap:
 	.bss        start:0x03000054 end:0x03000070 align:4
 
+main/link:
+	.bss        start:0x03000070 end:0x030008D8 align:8
+
 regional_bss:
-	.bss        start:0x03000070 end:0x03002750
+	.bss        start:0x030008D8 end:0x03001168
+
+main/obj:
+	.bss        start:0x03001168 end:0x03002750 align:8
 
 main/session:
 	.bss        start:0x03002750 end:0x03002771 align:8

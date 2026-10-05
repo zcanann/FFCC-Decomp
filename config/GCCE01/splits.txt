@@ -588,3 +588,4 @@ p_graphic.cpp:
 
 p_light.cpp:
 	.text start:0x80047BF4 end:0x8004A294
+	.bss start:0x80267F48 end:0x8026C2F8

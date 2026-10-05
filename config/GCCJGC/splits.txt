@@ -512,6 +512,7 @@ p_graphic.cpp:
 
 p_light.cpp:
 	.text start:0x80047728 end:0x80049CB8
+	.bss start:0x80284888 end:0x80288C38
 
 menu_letter.cpp:
 	.text start:0x8015E4DC end:0x80162690

@@ -168,3 +168,31 @@ TRK_MINNOW_DOLPHIN/main_TRK.c:
 	.text start:0x801ACF5C end:0x801ACFB4
 	.rodata start:0x801E5A40 end:0x801E5A4C
 	.bss start:0x80329688 end:0x8032968C
+
+MSL_C/PPCEABI/bare/H/e_atan2.c:
+	.text start:0x801B832C end:0x801B85BC
+	.sdata2 start:0x80332978 end:0x803329D0
+
+MSL_C/PPCEABI/bare/H/e_rem_pio2.c:
+	.text start:0x801B9128 end:0x801B94C8
+	.sdata2 start:0x80332AE0 end:0x80332B38
+	.rodata start:0x801E6360 end:0x801E64E8
+
+MSL_C/PPCEABI/bare/H/k_rem_pio2.c:
+	.text start:0x801B95BC end:0x801BA410
+	.sdata2 start:0x80332B80 end:0x80332BC0
+	.rodata start:0x801E64E8 end:0x801E6538
+
+MSL_C/PPCEABI/bare/H/k_tan.c:
+	.text start:0x801BA4B0 end:0x801BA6C4
+	.sdata2 start:0x80332BF8 end:0x80332C30
+	.rodata start:0x801E6538 end:0x801E65A0
+
+MSL_C/PPCEABI/bare/H/s_atan.c:
+	.text start:0x801BA6C4 end:0x801BA8DC
+	.rodata start:0x801E65A0 end:0x801E6638
+	.sdata2 start:0x80332C30 end:0x80332C58
+
+MSL_C/PPCEABI/bare/H/s_ldexp.c:
+	.text start:0x801BABAC end:0x801BAD70
+	.sdata2 start:0x80332C78 end:0x80332CA0

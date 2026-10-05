@@ -132,3 +132,31 @@ TRK_MINNOW_DOLPHIN/target_options.c:
 MSL_C/PPCEABI/bare/H/rand.c:
 	.text start:0x801B3EC8 end:0x801B3EE8
 	.sdata start:0x8034B9F8 end:0x8034B9FC
+
+MSL_C/PPCEABI/bare/H/e_atan2.c:
+	.text start:0x801B4884 end:0x801B4B14
+	.sdata2 start:0x8034FDE8 end:0x8034FE40
+
+MSL_C/PPCEABI/bare/H/e_rem_pio2.c:
+	.text start:0x801B5704 end:0x801B5AA4
+	.sdata2 start:0x8034FF50 end:0x8034FFA8
+	.rodata start:0x801DB8D0 end:0x801DBA58
+
+MSL_C/PPCEABI/bare/H/k_rem_pio2.c:
+	.text start:0x801B5B98 end:0x801B69EC
+	.sdata2 start:0x8034FFF0 end:0x80350030
+	.rodata start:0x801DBA58 end:0x801DBAA8
+
+MSL_C/PPCEABI/bare/H/k_tan.c:
+	.text start:0x801B6A8C end:0x801B6CA0
+	.sdata2 start:0x80350068 end:0x803500A0
+	.rodata start:0x801DBAA8 end:0x801DBB10
+
+MSL_C/PPCEABI/bare/H/s_atan.c:
+	.text start:0x801B6CA0 end:0x801B6EB8
+	.rodata start:0x801DBB10 end:0x801DBBA8
+	.sdata2 start:0x803500A0 end:0x803500C8
+
+MSL_C/PPCEABI/bare/H/s_ldexp.c:
+	.text start:0x801B7188 end:0x801B734C
+	.sdata2 start:0x803500E8 end:0x80350110

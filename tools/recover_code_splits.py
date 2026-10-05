@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Dry-run recovery of complete, relocation-free GameCube code-only objects.
+"""Dry-run recovery of complete GameCube code-only objects.
 
-This intentionally small first pass rejects data, BSS, COMMON and relocations.
+This intentionally small first pass rejects data, BSS and COMMON. Relocations
+are rejected by default; --allow-relocations replays supported PPC relocations
+using existing symbol identities, never guessed destinations or masked bytes.
 It searches executable DOL sections for every byte of the complete ELF section,
 requires a unique aligned placement, and checks existing named function anchors.
 It produces reviewable split/symbol snippets, never completion claims or edits.
@@ -56,7 +58,61 @@ def is_placeholder(name, address):
     return bool(re.fullmatch(r'fn_[0-9A-Fa-f]{8}', name)) and int(name[3:], 16) == address
 
 
-def recover(unit, object_bytes, dol, known):
+def code_relocations(elf, index, section, symtab, known):
+    """Resolve all inputs before searching; retain section-relative definitions."""
+    result, occupied = [], set()
+    for table in elf.iter_sections():
+        if table['sh_type'] not in ('SHT_REL', 'SHT_RELA') or table['sh_info'] != index:
+            continue
+        if table['sh_type'] != 'SHT_RELA' or table['sh_link'] != elf.get_section_index('.symtab'):
+            raise ValueError('unsupported relocation table')
+        for rel in table.iter_relocations():
+            kind, offset = rel['r_info_type'], rel['r_offset']
+            if kind not in (4, 5, 6, 10):
+                raise ValueError(f'unsupported PowerPC relocation {kind}')
+            width = 4 if kind == 10 else 2
+            span = set(range(offset, offset + width))
+            if offset + width > section['sh_size'] or offset % width or span & occupied:
+                raise ValueError('invalid or overlapping code relocation extent')
+            occupied.update(span)
+            if kind == 10:
+                word = int.from_bytes(section.data()[offset:offset + 4], 'big')
+                if word >> 26 != 18 or word & 2:
+                    raise ValueError('REL24 requires a relative branch instruction')
+            symbol = symtab.get_symbol(rel['r_info_sym'])
+            relative = symbol['st_shndx'] == index
+            if relative or symbol['st_shndx'] == 'SHN_ABS':
+                value = symbol['st_value']
+            elif symbol['st_shndx'] == 'SHN_UNDEF' and symbol.name in known:
+                value = known[symbol.name]['address']
+            else:
+                raise ValueError('unresolved relocation target: ' + symbol.name)
+            result.append(dict(kind=kind, offset=offset, value=value + rel['r_addend'],
+                               relative=relative, symbol=symbol.name))
+    return result, occupied
+
+
+def relocate_code(body, address, relocations):
+    output = bytearray(body)
+    for rel in relocations:
+        offset, kind = rel['offset'], rel['kind']
+        value = rel['value'] + (address if rel['relative'] else 0)
+        if kind == 10:
+            displacement = value - address - offset
+            if displacement % 4 or not -0x2000000 <= displacement < 0x2000000:
+                raise ValueError('REL24 destination is unaligned or out of range')
+            word = int.from_bytes(body[offset:offset + 4], 'big')
+            output[offset:offset + 4] = ((word & ~0x3FFFFFC) | (displacement & 0x3FFFFFC)).to_bytes(4, 'big')
+        else:
+            if kind == 5:
+                value >>= 16
+            elif kind == 6:
+                value = (value + 0x8000) >> 16
+            output[offset:offset + 2] = (value & 0xFFFF).to_bytes(2, 'big')
+    return bytes(output)
+
+
+def recover(unit, object_bytes, dol, known, allow_relocations=False):
     row = dict(unit=unit, object_sha256=hashlib.sha256(object_bytes).hexdigest(),
                status='rejected')
     elf = ELFFile(io.BytesIO(object_bytes))
@@ -72,27 +128,54 @@ def recover(unit, object_bytes, dol, known):
     if symtab is None or any(s['st_shndx'] == 'SHN_COMMON' for s in symtab.iter_symbols()):
         row['reason'] = 'missing symbol table or unverified COMMON storage'
         return row
-    if any(s['sh_type'] in ('SHT_REL', 'SHT_RELA') and s['sh_info'] == index and s.num_relocations()
-           for s in elf.iter_sections()):
+    has_relocations = any(s['sh_type'] in ('SHT_REL', 'SHT_RELA') and s['sh_info'] == index and s.num_relocations()
+                          for s in elf.iter_sections())
+    if has_relocations and not allow_relocations:
         row['reason'] = 'content relocations require separate verification'
+        return row
+    try:
+        relocations, occupied = code_relocations(elf, index, section, symtab, known) if has_relocations else ([], set())
+    except ValueError as error:
+        row['reason'] = str(error)
         return row
     body = section.data()
     if len(body) < 16:
         row['reason'] = 'insufficient complete code bytes for unanchored identity'
         return row
+    # An unchanged byte run locates candidates cheaply; every relocation and
+    # every other byte must then agree. Never accept wildcard-only comparisons.
+    runs = []
+    start = 0
+    for offset in sorted(occupied) + [len(body)]:
+        if start < offset:
+            runs.append((start, body[start:offset]))
+        start = offset + 1
+    if not runs:
+        row['reason'] = 'no unchanged code bytes to establish placement'
+        return row
+    anchor_offset, anchor = max(runs, key=lambda run: len(run[1]))
     candidates = []
     for segment in dol_sections(dol):
         if segment['index'] >= 7:
             continue
         image = dol[segment['offset']:segment['offset'] + segment['size']]
         start = 0
-        while (at := image.find(body, start)) >= 0:
+        while (hit := image.find(anchor, start)) >= 0:
+            start = hit + 1
+            at = hit - anchor_offset
+            if at < 0 or at + len(body) > len(image):
+                continue
             address = segment['address'] + at
             if address % max(4, section['sh_addralign']) == 0:
+                try:
+                    expected = relocate_code(body, address, relocations)
+                except ValueError:
+                    continue
+                if image[at:at + len(body)] != expected:
+                    continue
                 candidates.append(address)
                 if len(candidates) == 2:
                     break
-            start = at + 1
         if len(candidates) == 2:
             break
     row['candidates'] = candidates
@@ -139,7 +222,7 @@ def recover(unit, object_bytes, dol, known):
             row['reason'] = 'overlapping known definition disagrees: ' + name
             return row
     row.update(status='verified', section=section.name, address=address, size=len(body),
-               verified_bytes=len(body), relocation_count=0, functions=functions,
+               verified_bytes=len(body), relocation_count=len(relocations), functions=functions,
                split_snippet=f'{unit}:\n\t{section.name} start:0x{address:08X} end:0x{address + len(body):08X}\n')
     return row
 
@@ -150,6 +233,8 @@ def main():
     parser.add_argument('--symbols', type=Path, required=True)
     parser.add_argument('--object', action='append', required=True, metavar='UNIT=OBJECT')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--allow-relocations', action='store_true',
+                        help='replay ADDR16_LO/HI/HA and REL24 using known or local targets')
     args = parser.parse_args()
     dol = args.dol.read_bytes()
     dol_sections(dol)
@@ -157,7 +242,7 @@ def main():
     records = []
     for item in sorted(args.object):
         unit, path = item.split('=', 1)
-        record = recover(unit, Path(path).read_bytes(), dol, symbols)
+        record = recover(unit, Path(path).read_bytes(), dol, symbols, args.allow_relocations)
         record['object'] = path
         records.append(record)
     result = dict(schema_version=1, dol_sha1=hashlib.sha1(dol).hexdigest(),

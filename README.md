@@ -141,3 +141,23 @@ python tools/mine_function_order.py --unit main/p_light --details
 The report compares retail split objects with compiled objects, computes a minimal set of function moves, and prioritizes small candidates without missing functions or size differences. It reads existing builds and does not edit sources. `--diff-json` can analyze a saved objdiff diff.
 
 Moves describe **compiled order**: deferred compilation can reverse source order. Generated special members are flagged for review; constant-pool layout requires separate investigation. These are candidates, not guaranteed byte gains. After changing a candidate, rebuild and compare the whole unit with objdiff before committing.
+
+### Recovering regional GameCube code splits
+
+After compiling a region's source, audit a complete code-only object against its
+retail DOL:
+
+```sh
+python tools/recover_code_splits.py --dol orig/GCCE01/sys/main.dol --symbols config/GCCE01/symbols.txt --object base/PPCArch.c=build/GCCE01/src/base/PPCArch.o --allow-relocations
+```
+
+The default accepts relocation-free objects. `--allow-relocations` also replays
+PowerPC `ADDR16_LO`, `ADDR16_HI`, `ADDR16_HA` and `REL24` relocations using local
+definitions or existing regional symbols. Every relocated byte must agree at a
+unique aligned placement; unknown targets, unsupported relocations, conflicting
+ownership and omitted data/BSS/COMMON are rejected. Repeat `--object` to audit a
+batch and use `--output` to save its JSON evidence.
+
+The tool only proposes split and symbol entries. Check MAP ownership, rebuild,
+compare the full unit with objdiff and verify regional image checksums before
+marking it complete. GBA recovery uses [its own relocation audit](gba/README.md).

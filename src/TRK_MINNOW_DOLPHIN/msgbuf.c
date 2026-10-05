@@ -4,7 +4,7 @@
 /* 8044D8C0-8044F270 07A5E0 19B0+00 4/4 0/0 0/0 .bss             gTRKMsgBufs */
 TRKBuffer gTRKMsgBufs[3];
 
-void TRKSetBufferUsed(TRKBuffer* msg, BOOL state) {
+inline void TRKSetBufferUsed(TRKBuffer* msg, BOOL state) {
     msg->isInUse = state;
 }
 
@@ -72,8 +72,21 @@ void TRKReleaseBuffer(int idx) {
     }
 }
 
-/* 8036D64C-8036D68C 367F8C 0040+00 0/0 4/4 0/0 .text            TRKResetBuffer */
-void TRKResetBuffer(TRKBuffer* msg, BOOL keepData) {
+/*
+ * --INFO--
+ * PAL Address: 0x801A9B30
+ * PAL Size: 64b
+ * EN Address: 0x801A8A14
+ * EN Size: 64b
+ * JP Address: 0x801A457C
+ * JP Size: 64b
+ */
+#ifdef VERSION_GCCJGC
+void TRKResetBuffer(TRKBuffer* msg, u8 keepData)
+#else
+void TRKResetBuffer(TRKBuffer* msg, BOOL keepData)
+#endif
+{
     msg->length = 0;
     msg->position = 0;
 
@@ -158,7 +171,7 @@ DSError TRKReadBuffer(TRKBuffer* msg, void* data, unsigned int length) {
     return error;
 }
 
-DSError TRKAppendBuffer1_ui8(TRKBuffer* buffer, const u8 data) {
+inline DSError TRKAppendBuffer1_ui8(TRKBuffer* buffer, const u8 data) {
     if (buffer->position >= 0x880) {
         return DS_MessageBufferOverflow;
     }
@@ -166,6 +179,33 @@ DSError TRKAppendBuffer1_ui8(TRKBuffer* buffer, const u8 data) {
     buffer->data[buffer->position++] = data;
     buffer->length++;
     return DS_NoError;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x801A4354
+ * JP Size: 200b
+ */
+DSError TRKAppendBuffer1_ui16(TRKBuffer* buffer, const u16 data) {
+    u8* bigEndianData;
+    u8* byteData;
+    u8 swapBuffer[sizeof(data)];
+
+    if (gTRKBigEndian) {
+        bigEndianData = (u8*)&data;
+    } else {
+        byteData = (u8*)&data;
+        bigEndianData = swapBuffer;
+
+        bigEndianData[0] = byteData[1];
+        bigEndianData[1] = byteData[0];
+    }
+
+    return TRKAppendBuffer(buffer, (const void*)bigEndianData, sizeof(data));
 }
 
 DSError TRKAppendBuffer1_ui32(TRKBuffer* buffer, const u32 data) {
@@ -238,6 +278,40 @@ DSError TRKAppendBuffer_ui32(TRKBuffer* buffer, const u32* data, int count) {
 
 DSError TRKReadBuffer1_ui8(TRKBuffer* buffer, u8* data) {
     return TRKReadBuffer(buffer, (void*)data, 1);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x801A3EE4
+ * JP Size: 184b
+ */
+DSError TRKReadBuffer1_ui16(TRKBuffer* buffer, u16* data) {
+    DSError err;
+
+    u8* bigEndianData;
+    u8* byteData;
+    u8 swapBuffer[sizeof(data)];
+
+    if (gTRKBigEndian) {
+        bigEndianData = (u8*)data;
+    } else {
+        bigEndianData = swapBuffer;
+    }
+
+    err = TRKReadBuffer(buffer, (void*)bigEndianData, sizeof(*data));
+
+    if (!gTRKBigEndian && err == DS_NoError) {
+        byteData = (u8*)data;
+
+        byteData[0] = bigEndianData[1];
+        byteData[1] = bigEndianData[0];
+    }
+
+    return err;
 }
 
 DSError TRKReadBuffer1_ui32(TRKBuffer* buffer, u32* data) {

@@ -1932,7 +1932,7 @@ os/OSAudioSystem.c:
 
 os/OSCache.c:
 	.text       start:0x8017CEAC end:0x8017D4F8
-	.data       start:0x802169E8 end:0x80216C18
+	.data       start:0x802169E8 end:0x80216C12
 
 os/OSContext.c:
 	.text       start:0x8017D4F8 end:0x8017DD68
@@ -1969,7 +1969,7 @@ os/OSMutex.c:
 os/OSReboot.c:
 	.text       start:0x8017F11C end:0x8017F478
 	.bss        start:0x8030BC20 end:0x8030BC40
-	.sbss       start:0x8032EF98 end:0x8032EFA8
+	.sbss       start:0x8032EF98 end:0x8032EFA4
 
 os/OSReset.c:
 	.text       start:0x8017F478 end:0x8017F86C
@@ -2835,3 +2835,9 @@ thp/THPDec.c:
 
 thp/THPAudio.c:
 	.text       start:0x801D4E5C end:0x801D538C
+
+auto_07_80216C12_data:
+	.data start:0x80216C12 end:0x80216C18 align:2
+
+auto_10_8032EFA4_sbss:
+	.sbss start:0x8032EFA4 end:0x8032EFA8 align:4

@@ -482,6 +482,7 @@ partMng.cpp:
 	.text start:0x80057184 end:0x8005F084
 
 memory.cpp:
+	.bss start:0x8023B848 end:0x80242FE8
 	.text start:0x8001C0E4 end:0x8001FC68
 
 materialman.cpp:
@@ -492,6 +493,7 @@ mapobj.cpp:
 	.text start:0x800285C4 end:0x8002C4F8
 
 p_camera.cpp:
+	.bss start:0x80267750 end:0x80267C30
 	.text start:0x80036084 end:0x8003A3F0
 
 gobject.cpp:
@@ -541,6 +543,7 @@ sound.cpp:
 	.text start:0x800C4860 end:0x800C82F0
 
 textureman.cpp:
+	.sbss start:0x8032DCC0 end:0x8032DCC8
 	.text start:0x8003A3F0 end:0x8003BFAC
 
 maphit.cpp:
@@ -764,6 +767,9 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	.sdata start:0x8032DBD8 end:0x8032DBE8
 
 mesmenu.cpp:
+	.sdata start:0x8032D7C8 end:0x8032D7E0
+	.rodata start:0x801D8DF0 end:0x801D8E00
+	.data start:0x8020E818 end:0x8020E880
 	.text start:0x8009ADC4 end:0x8009DAE4
 
 MSL_C/PPCEABI/bare/H/gamecube.c:
@@ -854,3 +860,163 @@ OdemuExi2/DebuggerDriver.c:
 	.text start:0x801BB3F4 end:0x801BBE74
 	.sdata start:0x8032DC08 end:0x8032DC10
 	.sbss start:0x8032E380 end:0x8032E398
+
+card/CARDBios.c:
+	.text       start:0x80197464 end:0x801987CC
+	.data       start:0x8021AFF8 end:0x8021B050
+	.bss        start:0x80326520 end:0x80326760
+	.sdata      start:0x8032DB50 end:0x8032DB54
+	.sbss       start:0x8032E2C0 end:0x8032E2C2
+
+card/CARDBlock.c:
+	.text       start:0x80199CAC end:0x8019A0B0
+
+card/CARDCheck.c:
+	.text       start:0x8019A314 end:0x8019B250
+
+card/CARDCreate.c:
+	.text       start:0x8019CAFC end:0x8019CE94
+
+card/CARDDelete.c:
+	.text       start:0x8019D688 end:0x8019D884
+
+card/CARDDir.c:
+	.text       start:0x8019A0B0 end:0x8019A314
+
+card/CARDFormat.c:
+	.text       start:0x8019BD10 end:0x8019C548
+
+card/CARDMount.c:
+	.text       start:0x8019B250 end:0x8019BD10
+	.data       start:0x8021B1C0 end:0x8021B200
+
+card/CARDNet.c:
+	.text       start:0x8019DD64 end:0x8019DE28
+	.sdata      start:0x8032DB60 end:0x8032DB62
+
+card/CARDOpen.c:
+	.text       start:0x8019C548 end:0x8019CAFC
+
+card/CARDRdwr.c:
+	.text       start:0x80199A2C end:0x80199CAC
+
+card/CARDRead.c:
+	.text       start:0x8019CE94 end:0x8019D30C
+
+card/CARDStat.c:
+	.text       start:0x8019D884 end:0x8019DD64
+
+card/CARDUnlock.c:
+	.text       start:0x801987CC end:0x80199A2C
+	.data       start:0x8021B060 end:0x8021B1C0
+	.sdata      start:0x8032DB58 end:0x8032DB5C
+
+card/CARDWrite.c:
+	.text       start:0x8019D30C end:0x8019D688
+
+
+auto_09_8032DB62_sdata:
+	.sdata start:0x8032DB62 end:0x8032DB68 align:2
+
+auto_10_8032E2C2_sbss:
+	.sbss start:0x8032E2C2 end:0x8032E2C8 align:2
+
+fontman.cpp:
+	.rodata start:0x801D8C18 end:0x801D8C40
+	.data start:0x801FCF00 end:0x8020DC78
+	.sdata start:0x8032D760 end:0x8032D780
+	.sdata2 start:0x8032F668 end:0x8032F6A0
+	.bss start:0x802E9130 end:0x802E9148
+	.text start:0x800917F4 end:0x80092AC8
+
+os/OSCache.c:
+	.text start:0x8017BDFC end:0x8017C448
+	.data start:0x80215868 end:0x80215A92
+
+auto_07_80215A92_data:
+	.data start:0x80215A92 end:0x80215A98 align:2
+
+os/OSFont.c:
+	.text start:0x8017D238 end:0x8017D290
+	.sdata start:0x8032DA88 end:0x8032DA8A
+
+auto_09_8032DA8A_sdata:
+	.sdata start:0x8032DA8A end:0x8032DA90 align:2
+
+os/OSArena.c:
+	.text	start:0x8017BB48 end:0x8017BB68
+	.sdata	start:0x8032DA78 end:0x8032DA7C
+	.sbss	start:0x8032DF58 end:0x8032DF5C
+
+os/OSResetSW.c:
+	.text	start:0x8017E7BC end:0x8017EB48
+	.sbss	start:0x8032DF90 end:0x8032DFB0
+
+os/OSTime.c:
+	.text	start:0x80180ADC end:0x80180F00
+	.data	start:0x80215FD0 end:0x80216030
+
+os/OSReset.c:
+	.text	start:0x8017E3C8 end:0x8017E7BC
+	.sbss start:0x8032DF88 end:0x8032DF90
+
+ref.cpp:
+	.text start:0x80043B04 end:0x80043B64
+	.data start:0x801E8A88 end:0x801E8A94
+	.sdata start:0x8032D578 end:0x8032D580
+	.sdata2 start:0x8032EAF0 end:0x8032EAF8
+
+gx/GXTransform.c:
+	.text	start:0x801A50E8 end:0x801A5898
+	.sdata2	start:0x803328B8 end:0x803328D8
+
+gx/GXStubs.c:
+	.text start:0x801A4ED8 end:0x801A4EDC
+
+gxfunc.cpp:
+	.text start:0x80102378 end:0x801029A0
+	.bss start:0x802FE410 end:0x802FEA30
+	.sbss start:0x8032DE20 end:0x8032DE28
+
+TRK_MINNOW_DOLPHIN/targimpl.c:
+	.text	start:0x801AAA00 end:0x801AC58C
+	.rodata	start:0x801E59A8 end:0x801E5A40
+	.data	start:0x8021BE88 end:0x8021BEB8
+	.bss	start:0x80329100 end:0x8032967C
+
+TRK_MINNOW_DOLPHIN/dolphin_trk.c:
+	.text	start:0x801AC920 end:0x801ACF5C
+	.init	start:0x800053E0 end:0x8000540C
+	.data	start:0x8021BEB8 end:0x8021BEF4
+	.bss	start:0x80329680 end:0x80329684
+
+os/OSReboot.c:
+	.text	start:0x8017E06C end:0x8017E3C8
+	.bss	start:0x8030AC00 end:0x8030AC20
+	.sbss	start:0x8032DF78 end:0x8032DF84
+
+dvd/dvd.c:
+	.text	start:0x80187954 end:0x8018A050
+	.data	start:0x80216428 end:0x802165A8
+	.bss	start:0x8030BA00 end:0x8030BA98
+	.sdata	start:0x8032DAC0 end:0x8032DAD8
+	.sbss	start:0x8032E060 end:0x8032E0A8
+
+dvd/dvdfs.c:
+	.text	start:0x801871B4 end:0x80187954
+	.data	start:0x802162F0 end:0x80216424
+	.sdata	start:0x8032DAB8 end:0x8032DAC0
+	.sbss	start:0x8032E040 end:0x8032E060
+
+dvd/dvdidutils.c:
+	.text	start:0x8018A3E0 end:0x8018A4D8
+
+dvd/dvdlow.c:
+	.text	start:0x80186374 end:0x801871B4
+	.bss	start:0x8030B930 end:0x8030BA00
+	.sdata	start:0x8032DAB0 end:0x8032DAB4
+	.sbss	start:0x8032DFF8 end:0x8032E040
+
+dvd/dvdFatal.c:
+	.text	start:0x8018A4D8 end:0x8018A508
+	.sbss	start:0x8032E0A8 end:0x8032E0AC

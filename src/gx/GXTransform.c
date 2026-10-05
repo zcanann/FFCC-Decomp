@@ -285,7 +285,6 @@ void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type) {
 #endif
 }
 
-#pragma dont_inline on
 /*
  * --INFO--
  * PAL Address: 0x801A66D8
@@ -343,7 +342,6 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     gx->bpSentNot = 1;
 }
 
-#pragma dont_inline reset
 
 void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
     GXSetViewportJitter(left, top, wd, ht, nearz, farz, 1);

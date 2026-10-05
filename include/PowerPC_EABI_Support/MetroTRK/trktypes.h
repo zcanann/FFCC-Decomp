@@ -57,7 +57,11 @@ typedef struct TRKPacketSeq {
 typedef struct TRKFramingState {
 	MessageBufferID msgBufID;
 	MessageBuffer* buffer;
+#ifdef VERSION_GCCJGC
+	u8 receiveState;
+#else
 	ReceiverState receiveState;
+#endif
 	BOOL isEscape;
 	u8 fcsType;
 } TRKFramingState;
@@ -77,7 +81,11 @@ typedef struct CommandReply {
 } CommandReply;
 
 typedef struct TRKEvent {
+#ifdef VERSION_GCCJGC
+	u8 eventType;
+#else
 	NubEventType eventType;
+#endif
 	NubEventID eventID;
 	MessageBufferID msgBufID;
 } TRKEvent;

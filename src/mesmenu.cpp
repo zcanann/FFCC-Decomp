@@ -32,10 +32,14 @@ enum
 #endif
 };
 
+#ifdef VERSION_GCCP01
 static const char sMesMenuClassName[] = "CMesMenu";
+#endif
 extern "C" {
+#ifdef VERSION_GCCP01
 const char s_mesMenuOnOffChangedFmt[] =
     "mesMenu\x95\x8e\xa6on/off\x82\xaa\x95\xcf\x8d\x58\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42%d-%d\n\0\0\0";
+#endif
 int s_mesMenuShakePattern[4] = {1, 0, -1, 0};
 int s_mesMenuIconFrames[4] = {1, 6, 7, 6};
 }

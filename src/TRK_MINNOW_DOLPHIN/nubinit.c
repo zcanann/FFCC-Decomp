@@ -10,14 +10,24 @@
 /* 8044D8B8-8044D8C0 07A5D8 0004+04 1/1 4/4 0/0 .bss             gTRKBigEndian */
 BOOL gTRKBigEndian;
 
-/* 8036CE8C-8036CFD8 3677CC 014C+00 0/0 1/1 0/0 .text            TRKInitializeNub */
+/*
+ * --INFO--
+ * PAL Address: 0x801A9370
+ * PAL Size: 332b
+ * EN Address: 0x801A8254
+ * EN Size: 332b
+ * JP Address: 0x801A3898
+ * JP Size: 312b
+ */
 DSError TRKInitializeNub(void) {
-    DSError ret;
+    int ret;
     DSError uartErr;
 
     ret = TRKInitializeEndian();
 
+#ifndef VERSION_GCCJGC
     MWTRACE(1, "Initialize NUB\n");
+#endif
     if (ret == DS_NoError) {
         usr_put_initialize();
     }
@@ -31,12 +41,14 @@ DSError TRKInitializeNub(void) {
         ret = TRKInitializeDispatcher();
     }
     InitializeProgramEndTrap();
+#ifndef VERSION_GCCJGC
     if (ret == DS_NoError) {
         ret = TRKInitializeSerialHandler();
     }
     if (ret == DS_NoError) {
         ret = TRKInitializeTarget();
     }
+#endif
     if (ret == DS_NoError) {
         uartErr = TRKInitializeIntDrivenUART(0x0000e100, 1, 0, &gTRKInputPendingPtr);
         TRKTargetSetInputPendingPtr(gTRKInputPendingPtr);
@@ -44,18 +56,46 @@ DSError TRKInitializeNub(void) {
             ret = uartErr;
         }
     }
+#ifdef VERSION_GCCJGC
+    if (ret == DS_NoError) {
+        ret = TRKInitializeSerialHandler();
+    }
+    if (ret == DS_NoError) {
+        ret = TRKInitializeTarget();
+    }
+#endif
     return ret;
 }
 
-/* 8036CE68-8036CE8C 3677A8 0024+00 0/0 1/1 0/0 .text            TRKTerminateNub */
+/*
+ * --INFO--
+ * PAL Address: 0x801A934C
+ * PAL Size: 36b
+ * EN Address: 0x801A8230
+ * EN Size: 36b
+ * JP Address: 0x801A3874
+ * JP Size: 36b
+ */
 DSError TRKTerminateNub(void) {
     TRKTerminateSerialHandler();
     return DS_NoError;
 }
 
-/* 8036CE40-8036CE68 367780 0028+00 0/0 1/1 0/0 .text            TRKNubWelcome */
+/*
+ * --INFO--
+ * PAL Address: 0x801A9324
+ * PAL Size: 40b
+ * EN Address: 0x801A8208
+ * EN Size: 40b
+ * JP Address: 0x801A384C
+ * JP Size: 40b
+ */
 void TRKNubWelcome(void) {
+#ifdef VERSION_GCCJGC
+    TRK_board_display("MetroTRK for GAMECUBE v2.0");
+#else
     TRK_board_display("MetroTRK for GAMECUBE v2.6");
+#endif
     return;
 }
 

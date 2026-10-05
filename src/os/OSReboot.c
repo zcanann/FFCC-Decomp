@@ -5,10 +5,9 @@
 #include "dolphin/os/OSBootRegion.h"
 #include <dolphin/dvd/__dvd.h>
 
-int Prepared[2];
-
-void* SaveEnd;
-void* SaveStart;
+static void* SaveStart;
+static void* SaveEnd;
+static BOOL Prepared;
 
 typedef struct {
     char date[16];
@@ -18,9 +17,18 @@ typedef struct {
     u32 reserved2;
 } AppLoaderStruct;
 
-AppLoaderStruct FatalParam ATTRIBUTE_ALIGN(32);
+static AppLoaderStruct Header ATTRIBUTE_ALIGN(32);
 
-asm void Run(register void* entryPoint) {
+/*
+ * --INFO--
+ * PAL Address: 0x8017F11C
+ * PAL Size: 16b
+ * EN Address: 0x8017E06C
+ * EN Size: 16b
+ * JP Address: 0x80179718
+ * JP Size: 16b
+ */
+static asm void Run(register void* entryPoint) {
     nofralloc
 
     sync
@@ -29,8 +37,17 @@ asm void Run(register void* entryPoint) {
     blr
 }
 
-void Callback(s32, DVDCommandBlock*) {
-    Prepared[0] = TRUE;
+/*
+ * --INFO--
+ * PAL Address: 0x8017F12C
+ * PAL Size: 12b
+ * EN Address: 0x8017E07C
+ * EN Size: 12b
+ * JP Address: 0x80179728
+ * JP Size: 12b
+ */
+static void Callback(s32, DVDCommandBlock*) {
+    Prepared = TRUE;
 }
 
 static inline int IsStreamEnabled(void) {
@@ -45,10 +62,10 @@ static inline int IsStreamEnabled(void) {
  * --INFO--
  * PAL Address: 0x8017F138
  * PAL Size: 832b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8017E088
+ * EN Size: 832b
+ * JP Address: 0x80179734
+ * JP Size: 832b
  */
 void __OSReboot(u32 resetCode, u32 bootDol) {
     OSContext exceptionContext;
@@ -79,7 +96,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     DVDSetAutoInvalidation(TRUE);
     DVDResume();
 
-    Prepared[0] = FALSE;
+    Prepared = FALSE;
     __DVDPrepareResetAsync(Callback);
     __OSMaskInterrupts(0xFFFFFFE0);
     __OSUnmaskInterrupts(0x400);
@@ -89,7 +106,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     start = OSGetTime();
 #endif
 
-    while (Prepared[0] != TRUE) {
+    while (Prepared != TRUE) {
 #if SDK_REVISION < 1
         if (!DVDCheckDisk() || OS_TIMER_CLOCK < (OSGetTime() - start))
 #else
@@ -123,7 +140,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         AISetStreamPlayState(AI_STREAM_STOP);
     }
 
-    DVDReadAbsAsyncPrio(&appLoaderReadBlock, &FatalParam, sizeof(AppLoaderStruct), 0x2440, NULL, 0);
+    DVDReadAbsAsyncPrio(&appLoaderReadBlock, &Header, sizeof(AppLoaderStruct), 0x2440, NULL, 0);
 
 #if SDK_REVISION < 1
     start = OSGetTime();
@@ -140,8 +157,8 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         }
     }
 
-    offset = FatalParam.size + 0x20;
-    rebootSize = OSRoundUp32B(FatalParam.rebootSize);
+    offset = Header.size + 0x20;
+    rebootSize = OSRoundUp32B(Header.rebootSize);
     DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, offset + 0x2440, NULL, 0);
 
 #if SDK_REVISION < 1

@@ -415,6 +415,7 @@ partMng.cpp:
 	.text start:0x80056BF0 end:0x8005EB34
 
 memory.cpp:
+	.bss start:0x80258188 end:0x8025F928
 	.text start:0x8001BB40 end:0x8001F6CC
 
 materialman.cpp:
@@ -424,6 +425,7 @@ mapobj.cpp:
 	.text start:0x80027EF0 end:0x8002BE38
 
 p_camera.cpp:
+	.bss start:0x80284090 end:0x80284570
 	.text start:0x800359D4 end:0x80039DE4
 
 gobject.cpp:
@@ -473,6 +475,7 @@ sound.cpp:
 	.text start:0x800C2714 end:0x800C60A4
 
 textureman.cpp:
+	.sbss start:0x8034BAE0 end:0x8034BAE8
 	.text start:0x80039DE4 end:0x8003B9A0
 
 maphit.cpp:
@@ -717,6 +720,9 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	.sdata start:0x8034B9E0 end:0x8034B9F0
 
 mesmenu.cpp:
+	.sdata start:0x8034B5E8 end:0x8034B600
+	.rodata start:0x801D49F8 end:0x801D4A08
+	.data start:0x8022CBB0 end:0x8022CC18
 	.text start:0x800996B0 end:0x8009C2A8
 
 MSL_C/PPCEABI/bare/H/gamecube.c:
@@ -745,3 +751,174 @@ OdemuExi2/DebuggerDriver.c:
 	.text start:0x801B7704 end:0x801B8184
 	.sdata start:0x8034BA10 end:0x8034BA18
 	.sbss start:0x8034C168 end:0x8034C180
+
+card/CARDBios.c:
+	.text       start:0x80192AA8 end:0x80193E10
+	.data       start:0x80237A38 end:0x80237A90
+	.bss        start:0x80342E40 end:0x80343080
+	.sdata      start:0x8034B958 end:0x8034B95C
+	.sbss       start:0x8034C0C0 end:0x8034C0C2
+
+card/CARDBlock.c:
+	.text       start:0x801952F0 end:0x801956F4
+
+card/CARDCheck.c:
+	.text       start:0x80195958 end:0x80196894
+
+card/CARDCreate.c:
+	.text       start:0x80198140 end:0x801984D8
+
+card/CARDDelete.c:
+	.text       start:0x80198CCC end:0x80198EC8
+
+card/CARDDir.c:
+	.text       start:0x801956F4 end:0x80195958
+
+card/CARDFormat.c:
+	.text       start:0x80197354 end:0x80197B8C
+
+card/CARDMount.c:
+	.text       start:0x80196894 end:0x80197354
+	.data       start:0x80237C00 end:0x80237C40
+
+card/CARDNet.c:
+	.text       start:0x801993A8 end:0x8019946C
+	.sdata      start:0x8034B968 end:0x8034B96A
+
+card/CARDOpen.c:
+	.text       start:0x80197B8C end:0x80198140
+
+card/CARDRdwr.c:
+	.text       start:0x80195070 end:0x801952F0
+
+card/CARDRead.c:
+	.text       start:0x801984D8 end:0x80198950
+
+card/CARDStat.c:
+	.text       start:0x80198EC8 end:0x801993A8
+
+card/CARDUnlock.c:
+	.text       start:0x80193E10 end:0x80195070
+	.data       start:0x80237AA0 end:0x80237C00
+	.sdata      start:0x8034B960 end:0x8034B964
+
+card/CARDWrite.c:
+	.text       start:0x80198950 end:0x80198CCC
+
+
+auto_09_8034B96A_sdata:
+	.sdata start:0x8034B96A end:0x8034B970 align:2
+
+auto_10_8034C0C2_sbss:
+	.sbss start:0x8034C0C2 end:0x8034C0C8 align:2
+
+TRK_MINNOW_DOLPHIN/nubinit.c:
+	.text start:0x801A384C end:0x801A39D0
+	.rodata start:0x801DB170 end:0x801DB190
+	.bss start:0x80344048 end:0x8034404C
+
+MenuUtil.cpp:
+	.text start:0x80171534 end:0x80175A90
+
+TRK_MINNOW_DOLPHIN/nubevent.c:
+	.text	start:0x801A3624 end:0x801A384C
+	.bss	start:0x80344020 end:0x80344048
+
+TRK_MINNOW_DOLPHIN/mainloop.c:
+	.text	start:0x801A352C end:0x801A3624
+
+TRK_MINNOW_DOLPHIN/mutex_TRK.c:
+	.text start:0x801A7D9C end:0x801A7DB4
+
+TRK_MINNOW_DOLPHIN/msgbuf.c:
+	.text	start:0x801A3BAC end:0x801A4788
+	.rodata	start:0x801DB190 end:0x801DB1B0
+	.bss	start:0x80344050 end:0x80345A00
+
+fontman.cpp:
+	.rodata start:0x801D4818 end:0x801D4840
+	.data start:0x801F2400 end:0x8022C2F8
+	.sdata start:0x8034B580 end:0x8034B5A0
+	.sdata2 start:0x8034D3E8 end:0x8034D420
+	.bss start:0x80305A70 end:0x80305A88
+	.text start:0x800912D4 end:0x80092648
+
+os/OSCache.c:
+	.text start:0x801774A8 end:0x80177AF4
+	.data start:0x802322A0 end:0x802324CA
+
+auto_07_802324CA_data:
+	.data start:0x802324CA end:0x802324D0 align:2
+
+os/OSFont.c:
+	.text start:0x801788E4 end:0x8017893C
+	.sdata start:0x8034B890 end:0x8034B892
+
+auto_09_8034B892_sdata:
+	.sdata start:0x8034B892 end:0x8034B898 align:2
+
+os/OSArena.c:
+	.text	start:0x801771F4 end:0x80177214
+	.sdata	start:0x8034B880 end:0x8034B884
+	.sbss	start:0x8034BD58 end:0x8034BD5C
+
+os/OSResetSW.c:
+	.text	start:0x80179E68 end:0x8017A1F4
+	.sbss	start:0x8034BD90 end:0x8034BDB0
+
+os/OSTime.c:
+	.text	start:0x8017C188 end:0x8017C5AC
+	.data	start:0x80232A08 end:0x80232A68
+
+os/OSReset.c:
+	.text	start:0x80179A74 end:0x80179E68
+	.sbss start:0x8034BD88 end:0x8034BD90
+
+ref.cpp:
+	.text start:0x800434FC end:0x8004355C
+	.data start:0x801DDF88 end:0x801DDF94
+	.sdata start:0x8034B398 end:0x8034B3A0
+	.sdata2 start:0x8034C888 end:0x8034C890
+
+gx/GXTransform.c:
+	.text	start:0x801A072C end:0x801A0EDC
+	.sdata2	start:0x8034FD20 end:0x8034FD40
+
+gx/GXStubs.c:
+	.text start:0x801A051C end:0x801A0520
+
+gxfunc.cpp:
+	.text start:0x800FEFE8 end:0x800FF610
+	.bss start:0x8031AD40 end:0x8031B360
+	.sbss start:0x8034BC28 end:0x8034BC30
+
+os/OSReboot.c:
+	.text	start:0x80179718 end:0x80179A74
+	.bss	start:0x80327520 end:0x80327540
+	.sbss	start:0x8034BD78 end:0x8034BD84
+
+dvd/dvd.c:
+	.text	start:0x80183004 end:0x80185700
+	.data	start:0x80232E60 end:0x80232FE0
+	.bss	start:0x80328320 end:0x803283B8
+	.sdata	start:0x8034B8C8 end:0x8034B8E0
+	.sbss	start:0x8034BE60 end:0x8034BEA8
+
+dvd/dvdfs.c:
+	.text	start:0x80182864 end:0x80183004
+	.data	start:0x80232D28 end:0x80232E5C
+	.sdata	start:0x8034B8C0 end:0x8034B8C8
+	.sbss	start:0x8034BE40 end:0x8034BE60
+
+dvd/dvdidutils.c:
+	.text	start:0x80185A90 end:0x80185B88
+
+dvd/dvdlow.c:
+	.text	start:0x80181A24 end:0x80182864
+	.bss	start:0x80328250 end:0x80328320
+	.sdata	start:0x8034B8B8 end:0x8034B8BC
+	.sbss	start:0x8034BDF8 end:0x8034BE40
+
+dvd/dvdFatal.c:
+	.text	start:0x80185B88 end:0x80185BB8
+	.sbss	start:0x8034BEA8 end:0x8034BEAC

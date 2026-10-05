@@ -37,9 +37,14 @@ BOOL GetTRKConnected(void);
 
 DSError TRKGetFreeBuffer(int*, TRKBuffer**);
 void OutputData(void* data, int length);
+#ifdef VERSION_GCCJGC
+void TRKResetBuffer(TRKBuffer* msg, u8 keepData);
+#else
 void TRKResetBuffer(TRKBuffer* msg, BOOL keepData);
+#endif
 
 DSError TRKReadBuffer1_ui64(TRKBuffer* buffer, u64* data);
+DSError TRKAppendBuffer1_ui16(TRKBuffer* buffer, const u16 data);
 DSError TRKAppendBuffer1_ui64(TRKBuffer* buffer, const u64 data);
 
 void TRKLoadContext(OSContext* ctx, u32);

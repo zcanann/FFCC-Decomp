@@ -221,8 +221,34 @@ inline int CMenuPcs::GetLongHelpString(CFont* font, int firstLine, int lineMax)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 124b
+ * EN Address: UNUSED
+ * EN Size: 152b
+ * JP Address: 0x80175A20
+ * JP Size: 112b
+ */
+#ifdef VERSION_GCCJGC
+float CMenuPcs::CalcCenteringPos(char* text, int fontSize)
+{
+	int length = strlen(text);
+	CFont* font = m_fonts[0];
+	float halfWidth = 0.5f;
+	float offset = 320.0f;
+	font->SetMargin(1.0f);
+	font->SetScale(1.0f);
+	float width = font->GetWidth(text);
+	return offset - width * halfWidth;
+}
+#else
+/*
+ * --INFO--
+ * PAL Address: 0x8017AE70
+ * PAL Size: 164b
+ * EN Address: 0x80179DC0
+ * EN Size: 164b
+ * JP Address: UNUSED
+ * JP Size: TODO
  */
 float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
@@ -239,6 +265,7 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 	width = font->GetWidth(text);
 	return offset - width * halfWidth;
 }
+#endif
 
 /*
  * --INFO--
@@ -584,10 +611,17 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 }
 
+#ifdef VERSION_GCCJGC
+#include "src/MenuUtil_jp.inc"
+#else
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80179F90
+ * PAL Size: 52b
+ * EN Address: 0x80178E30
+ * EN Size: 52b
+ * JP Address: 0x80174F08
+ * JP Size: 2552b
  */
 void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXColor color, int tlut, float margin, float scaleY)
 {
@@ -597,6 +631,8 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
 		DrawHelpMessageUS(msgNo, font, posX, posY, color, tlut, margin, scaleY);
 	}
 }
+
+#endif
 
 /*
  * --INFO--
@@ -947,10 +983,10 @@ void CMenuPcs::CalcOptionMenu()
  * --INFO--
  * PAL Address: 0x8017698C
  * PAL Size: 10652b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80175908
+ * EN Size: 10432b
+ * JP Address: 0x80171684
+ * JP Size: 11260b
  */
 void CMenuPcs::DrawOptionMenu()
 {
@@ -964,14 +1000,32 @@ void CMenuPcs::DrawOptionMenu()
 	Vec2d uv0;
 	Vec2d uv1;
 
+#ifndef VERSION_GCCJGC
 	font->SetScale(0.88f);
 	font->SetMargin(0.0f);
+#endif
 
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
 	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionOpenAnim));
 
+#ifdef VERSION_GCCJGC
+	char optionText[5][256] = {
+		"\x83\x7C\x83\x57\x83\x56\x83\x87\x83\x93\x83\x7D\x81\x5B\x83\x4E",
+		"\x83\x54\x83\x45\x83\x93\x83\x68\x8F\x6F\x97\xCD",
+		"\x82\x61\x82\x66\x82\x6C\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80",
+		"\x82\x72\x82\x64\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80",
+		"\x82\x66\x82\x61\x82\x60\x83\x4A\x83\x89\x81\x5B\x83\x6F\x83\x89\x83\x93\x83\x58"
+	};
+	char helpText[5][256] = {
+		"\x83\x76\x83\x8C\x83\x43\x83\x84\x81\x5B\x82\xCC\x91\xAB\x8C\xB3\x82\xC9\x8F\x6F\x82\xE9\x83\x7D\x81\x5B\x83\x4A\x81\x5B\x82\xCC\x82\x6E\x82\x6D\x81\x5E\x82\x6E\x82\x65\x82\x65\x82\xC5\x82\xB7",
+		"\x83\x54\x83\x45\x83\x93\x83\x68\x82\xCC\x8F\x6F\x97\xCD\x82\xF0\x83\x58\x83\x65\x83\x8C\x83\x49\x82\xA9\x83\x82\x83\x6D\x83\x89\x83\x8B\x82\xC9\x82\xB5\x82\xDC\x82\xB7",
+		"\x82\x61\x82\x66\x82\x6C\x82\xCC\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80\x82\xCC\x91\xE5\x82\xAB\x82\xB3\x82\xF0\x95\xCF\x8D\x58\x82\xB5\x82\xDC\x82\xB7",
+		"\x8C\xF8\x89\xCA\x89\xB9\x82\xCC\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80\x82\xCC\x91\xE5\x82\xAB\x82\xB3\x82\xF0\x95\xCF\x8D\x58\x82\xB5\x82\xDC\x82\xB7",
+		"\x82\x66\x82\x61\x82\x60\x82\xCC\x83\x4A\x83\x89\x81\x5B\x83\x6F\x83\x89\x83\x93\x83\x58\x82\xF0\x95\xCF\x8D\x58\x82\xB5\x82\xDC\x82\xB7"
+	};
+#else
 	char* optionText[5] = { 0, 0, 0, 0, 0 };
 	char** mes = &g_strMenuUtilMes[langRow * 20];
 	int idx = 2;
@@ -982,6 +1036,8 @@ void CMenuPcs::DrawOptionMenu()
 	for (int n = 0; n < 5; n++) {
 		helpText[n] = mes[idx++];
 	}
+
+#endif
 
 	CTexture* banner = m_wmOptionTextures[5];
 	w = static_cast<float>(banner->m_width);
@@ -1038,8 +1094,12 @@ void CMenuPcs::DrawOptionMenu()
 	                        w, static_cast<float>(marker->m_height), marker, 0, 0,
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+	char (*option)[256] = optionText;
+#else
 	font->SetScaleX(0.8f);
 	char** option = optionText;
+#endif
 	int i = 0;
 	int rowY = 0x70;
 	int selectedY = 0x73;
@@ -1065,7 +1125,9 @@ void CMenuPcs::DrawOptionMenu()
 		}
 	}
 
+#ifndef VERSION_GCCJGC
 	font->SetScaleX(1.0f);
+#endif
 	gUtil.RenderTextureQuad(0.0f, 384.0f, 640.0f, 40.0f,
 	                        m_textures[31], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1551,16 +1613,17 @@ void CMenuPcs::DrawOptionMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x8017683c
+ * PAL Address: 0x8017683C
  * PAL Size: 336b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801757B8
+ * EN Size: 336b
+ * JP Address: 0x80171534
+ * JP Size: 336b
  */
 void CMenuPcs::BindMcObj(int slotNo)
 {
 	int slot;
+	int iconType;
 	EffectInfo* obj;
 
 	for (slot = 0; slot < 4; slot++) {
@@ -1586,7 +1649,6 @@ void CMenuPcs::BindMcObj(int slotNo)
 
 	for (slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
-			int iconType;
 			EffectEntry* entry = &m_effectEntries[slot];
 			iconType = entry->m_iconType;
 

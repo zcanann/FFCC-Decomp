@@ -822,3 +822,6 @@ TRK_MINNOW_DOLPHIN/dispatch.c:
 	.text start:0x801A8F64 end:0x801A90DC
 	.rodata start:0x801E56D8 end:0x801E5718
 	.data start:0x8021BDE0 end:0x8021BE4C
+
+memorycard.cpp:
+	.text start:0x800C1040 end:0x800C4660

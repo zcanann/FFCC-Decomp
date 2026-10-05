@@ -735,3 +735,6 @@ util.cpp:
 
 TRK_MINNOW_DOLPHIN/usr_put.c:
 	.text	start:0x801A4B54 end:0x801A4BE0
+
+memorycard.cpp:
+	.text start:0x800BF1C8 end:0x800C2514

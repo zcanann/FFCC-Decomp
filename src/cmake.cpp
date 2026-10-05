@@ -17,10 +17,9 @@
 
 static int s_OldMenu;
 extern "C" char s_menuSubfontPathFmt[];
-#ifdef VERSION_GCCJGC
-static const char s_cmakeSubfontPath[] = "dvd/menu/subfont.fnt";
-#endif
+#ifndef VERSION_GCCJGC
 static const char s_cmake_cpp[] = "cmake.cpp";
+#endif
 
 struct CmakeInfo {
     char m_name[0x12];
@@ -383,6 +382,11 @@ static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
     return menu->m_fonts[CMAKE_FONT_LABEL];
 }
 
+#ifdef VERSION_GCCJGC
+#include "ffcc/cmake_jp.inc"
+static const char s_cmakeSubfontPath[] = "dvd/menu/subfont.fnt";
+static const char s_cmake_cpp[] = "cmake.cpp";
+#else
 extern "C" const char s_ABCDEFGHIJKL_801E2F30[];
 extern "C" const char s_MNOPQRSTUVWX_801E2F40[];
 extern "C" const char lbl_801E2F50[];
@@ -416,6 +420,8 @@ static const char* s_NameEntryStr[] = {
     lbl_801E3000,
     lbl_801E3010
 };
+
+#endif
 
 static const char s_world2[] = "world2";
 static const char s_crystal[] = "crystal";
@@ -512,9 +518,48 @@ static inline int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
  * PAL Size: TODO
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8016F244
+ * JP Size: 320b
  */
+#ifdef VERSION_GCCJGC
+static void GetChara(char* text, int index, char* dst)
+{
+    dst[0] = '\0';
+    int length = strlen(text);
+    if (length != 0) {
+        int position;
+        int state;
+        int character;
+        character = 0;
+        state = 0;
+        position = 0;
+        for (; length > 0; --length, ++position) {
+            if ((state == 0 || state == 2) &&
+                ((static_cast<unsigned char>(text[position]) >= 0x81 && static_cast<unsigned char>(text[position]) <= 0x9F) || (static_cast<unsigned char>(text[position]) >= 0xE0 && static_cast<unsigned char>(text[position]) <= 0xFC))) {
+                state = 1;
+            } else if (state == 1 && static_cast<unsigned char>(text[position]) != 0x7F && static_cast<unsigned char>(text[position]) >= 0x40 && static_cast<unsigned char>(text[position]) <= 0xFC) {
+                state = 2;
+            } else {
+                state = 0;
+            }
+            if (character == index) {
+                if (state == 0) {
+                    dst[0] = text[position];
+                    dst[1] = '\0';
+                } else {
+                    dst[0] = text[position];
+                    dst[1] = text[position + 1];
+                    dst[2] = '\0';
+                }
+                break;
+            }
+            if (state != 1) {
+                ++character;
+            }
+        }
+    }
+}
+#else
 inline void GetChara(char* dst, int index, char* table)
 {
     if (dst == nullptr) {
@@ -531,6 +576,8 @@ inline void GetChara(char* dst, int index, char* table)
     dst[stride - 1] = '\0';
 }
 
+#endif
+
 /*
  * --INFO--
  * PAL Address: TODO
@@ -540,6 +587,34 @@ inline void GetChara(char* dst, int index, char* table)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+static inline int GetCharaType(char* text, int index)
+{
+    int length = strlen(text);
+    if (length == 0) {
+        return -1;
+    }
+    int character = 0;
+    int state = 0;
+    for (int position = 0; length > 0; --length, ++position) {
+        if ((state == 0 || state == 2) &&
+            ((static_cast<unsigned char>(text[position]) >= 0x81 && static_cast<unsigned char>(text[position]) <= 0x9F) || (static_cast<unsigned char>(text[position]) >= 0xE0 && static_cast<unsigned char>(text[position]) <= 0xFC))) {
+            state = 1;
+        } else if (state == 1 && static_cast<unsigned char>(text[position]) != 0x7F && static_cast<unsigned char>(text[position]) >= 0x40 && static_cast<unsigned char>(text[position]) <= 0xFC) {
+            state = 2;
+        } else {
+            state = 0;
+        }
+        if (character == index) {
+            return state != 0;
+        }
+        if (state != 1) {
+            ++character;
+        }
+    }
+    return -1;
+}
+#else
 inline void GetCharaType(char* dst, int type)
 {
     if (dst == nullptr) {
@@ -550,6 +625,8 @@ inline void GetCharaType(char* dst, int type)
     dst[1] = '\0';
 }
 
+#endif
+
 /*
  * --INFO--
  * PAL Address: TODO
@@ -559,12 +636,39 @@ inline void GetCharaType(char* dst, int type)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+static inline int GetCharaCnt(char* text)
+{
+    int length = strlen(text);
+    if (length == 0) {
+        return 0;
+    }
+    int character = 0;
+    int state = 0;
+    for (int position = 0; length > 0; --length, ++position) {
+        if ((state == 0 || state == 2) &&
+            ((static_cast<unsigned char>(text[position]) >= 0x81 && static_cast<unsigned char>(text[position]) <= 0x9F) || (static_cast<unsigned char>(text[position]) >= 0xE0 && static_cast<unsigned char>(text[position]) <= 0xFC))) {
+            state = 1;
+        } else if (state == 1 && static_cast<unsigned char>(text[position]) != 0x7F && static_cast<unsigned char>(text[position]) >= 0x40 && static_cast<unsigned char>(text[position]) <= 0xFC) {
+            state = 2;
+        } else {
+            state = 0;
+        }
+        if (state != 1) {
+            ++character;
+        }
+    }
+    return character;
+}
+#else
 inline void GetCharaCnt(char* dst)
 {
     if (dst != nullptr) {
         dst[0] = '\0';
     }
 }
+
+#endif
 
 /*
  * --INFO--
@@ -1552,10 +1656,87 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
  * PAL Size: TODO
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8016D0E0
+ * JP Size: 1588b
  */
-inline void CMenuPcs::AddNameChara(int c, int slot, int, int)
+#ifdef VERSION_GCCJGC
+int CMenuPcs::AddNameChara(int add, int column, int row, int table)
+{
+    if (add == 0) {
+        int count = GetCharaCnt(s_CmakeInfo.m_name);
+        if (count == 0) {
+            return -1;
+        }
+        int length = strlen(s_CmakeInfo.m_name);
+        if (GetCharaType(s_CmakeInfo.m_name, count - 1) == 0) {
+            s_CmakeInfo.m_name[length - 1] = '\0';
+        } else {
+            s_CmakeInfo.m_name[length - 2] = '\0';
+        }
+    } else {
+        char picked[3];
+        memset(picked, 0, 3);
+        char* text = const_cast<char*>(s_NameEntryStr[row + table * 5]);
+        GetChara(text, column, picked);
+        int count = GetCharaCnt(s_CmakeInfo.m_name);
+        if (count >= 7) {
+            if (strcmp(picked, s_nameDakutenMark) != 0 && strcmp(picked, s_nameHandakutenMark) != 0) {
+                return -1;
+            }
+        } else {
+            GetChara(text, column, picked);
+            if (count == 0) {
+                strcat(s_CmakeInfo.m_name, picked);
+                return 0;
+            }
+        }
+        int type = GetCharaType(text, count - 1);
+        if (type == 0 && count >= 7) {
+            return -1;
+        }
+        if (type != 0 && strcmp(picked, s_nameDakutenMark) == 0) {
+            char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
+            for (int group = 0; group < 2; ++group) {
+                const char* characters = s_NameEntryVoiced[group];
+                int length = strlen(characters);
+                for (int pos = 0; pos < length; pos += 2, characters += 2) {
+                    if (memcmp(characters, last, 2) == 0) {
+                        ++last[1];
+                        return 0;
+                    }
+                }
+            }
+            if (memcmp(last, s_nameKatakanaU, 2) == 0) {
+                strcpy(last, s_nameKatakanaVu);
+            } else {
+                if (count >= 7) {
+                    return -1;
+                }
+                strcat(s_CmakeInfo.m_name, picked);
+            }
+            return 0;
+        } else if (type != 0 && strcmp(picked, s_nameHandakutenMark) == 0) {
+            char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
+            int length = strlen(s_NameEntryVoiced[1]);
+            const char* characters = s_NameEntryVoiced[1];
+            for (int pos = 0; pos < length; pos += 2, characters += 2) {
+                if (memcmp(characters, last, 2) == 0) {
+                    last[1] += 2;
+                    return 0;
+                }
+            }
+            if (count >= 7) {
+                return -1;
+            }
+            strcat(s_CmakeInfo.m_name, picked);
+        } else {
+            strcat(s_CmakeInfo.m_name, picked);
+        }
+    }
+    return 0;
+}
+#else
+inline int CMenuPcs::AddNameChara(int c, int slot, int, int)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int index = slot;
@@ -1566,7 +1747,10 @@ inline void CMenuPcs::AddNameChara(int c, int slot, int, int)
         index = 0x14;
     }
     self[0x85C + index] = static_cast<unsigned char>(c);
+    return 0;
 }
+
+#endif
 
 /*
  * --INFO--

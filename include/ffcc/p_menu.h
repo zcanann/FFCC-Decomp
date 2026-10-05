@@ -559,7 +559,7 @@ public:
     void DrawCmakeCharaText(int, float);
     void DrawCmakeCrest(int, int, int, float);
     void DrawCmakeName(int, int, char*, float);
-    void AddNameChara(int, int, int, int);
+    int AddNameChara(int, int, int, int);
     void DrawCmakeYesNo(int, float);
     void DrawMoveMenu();
     void DrawLoadMenu();

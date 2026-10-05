@@ -19,9 +19,9 @@ static BOOL __AI_init_flag;
 static BOOL __AID_Active;
 static OSTime bound_32KHz;
 static OSTime bound_48KHz;
-OSTime buffer;
-OSTime max_wait;
-OSTime min_wait;
+static OSTime min_wait;
+static OSTime max_wait;
+static OSTime buffer;
 
 typedef struct {
     OSTime t_start;
@@ -36,11 +36,11 @@ STRUCT_TIMELOG profile;
 #endif
 
 // prototypes
-void __AI_set_stream_sample_rate(u32 rate);
-void __AIDHandler(__OSInterrupt interrupt, OSContext* context);
-void __AISHandler(__OSInterrupt interrupt, OSContext* context);
-void __AICallbackStackSwitch(void* cb);
-void __AI_SRC_INIT(void);
+static void __AI_set_stream_sample_rate(u32 rate);
+static void __AIDHandler(__OSInterrupt interrupt, OSContext* context);
+static void __AISHandler(__OSInterrupt interrupt, OSContext* context);
+static void __AICallbackStackSwitch(void* cb);
+static void __AI_SRC_INIT(void);
 
 AIDCallback AIRegisterDMACallback(AIDCallback callback) {
     AIDCallback old_callback;
@@ -137,7 +137,7 @@ u32 AIGetDSPSampleRate(void) {
     return GET_REG_FIELD(__AIRegs[0], 1, 6) ^ 1;
 }
 
-void __AI_set_stream_sample_rate(u32 rate) {
+static void __AI_set_stream_sample_rate(u32 rate) {
     BOOL old;
     u32 play_state;
     u8 vol_left;
@@ -221,7 +221,7 @@ void AIReset(void) {
     __AI_init_flag = FALSE;
 }
 
-void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
+static void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
 
     __AIRegs[0] |= 8;
@@ -234,7 +234,7 @@ void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
-void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
+static void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
     u16 tmp;
 
@@ -256,7 +256,7 @@ void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
-asm void __AICallbackStackSwitch(register void* cb) {
+asm static void __AICallbackStackSwitch(register void* cb) {
     nofralloc
     mflr r0
     stw r0, 0x4(r1)
@@ -282,7 +282,7 @@ asm void __AICallbackStackSwitch(register void* cb) {
     blr
 }
 
-void __AI_SRC_INIT(void) {
+static void __AI_SRC_INIT(void) {
     OSTime rising_32khz = 0;
     OSTime rising_48khz = 0;
     OSTime diff = 0;

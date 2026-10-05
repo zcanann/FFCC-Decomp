@@ -8,21 +8,21 @@ const char* __ARVersion = "<< Dolphin SDK - AR\tdebug build: Apr  5 2004 03:56:1
 const char* __ARVersion = "<< Dolphin SDK - AR\trelease build: Sep  5 2002 05:34:27 (0x2301) >>";
 #endif
 
-void (*__AR_Callback)() = NULL;
-u32 __AR_Size = 0;
-u32 __AR_InternalSize = 0;
-u32 __AR_ExpansionSize = 0;
-u32 __AR_StackPointer = 0;
-u32 __AR_FreeBlocks = 0;
-u32* __AR_BlockLength = NULL;
-BOOL __AR_init_flag = FALSE;
+static void (*__AR_Callback)() = NULL;
+static u32 __AR_Size = 0;
+static u32 __AR_InternalSize = 0;
+static u32 __AR_ExpansionSize = 0;
+static u32 __AR_StackPointer = 0;
+static u32 __AR_FreeBlocks = 0;
+static u32* __AR_BlockLength = NULL;
+static BOOL __AR_init_flag = FALSE;
 
 // prototypes
-void __ARHandler(__OSInterrupt exception, OSContext* context);
+static void __ARHandler(__OSInterrupt exception, OSContext* context);
 static inline void __ARWaitForDMA(void);
 static inline void __ARWriteDMA(u32 mmem_addr, u32 aram_addr, u32 length);
 static inline void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length);
-void __ARChecksize(void);
+static void __ARChecksize(void);
 
 ARQCallback ARRegisterDMACallback(ARQCallback callback) {
     ARQCallback old_callback;
@@ -94,7 +94,7 @@ u32 ARInit(u32* stack_index_addr, u32 num_entries) {
     return __AR_StackPointer;
 }
 
-void __ARHandler(__OSInterrupt exception, OSContext* context) {
+static void __ARHandler(__OSInterrupt exception, OSContext* context) {
     OSContext exceptionContext;
     u16 tmp;
 
@@ -164,7 +164,7 @@ static inline void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
     __ARClearInterrupt();
 }
 
-void __ARChecksize(void) {
+static void __ARChecksize(void) {
     u8 test_data_pad[63];
     u8 dummy_data_pad[63];
     u8 buffer_pad[63];

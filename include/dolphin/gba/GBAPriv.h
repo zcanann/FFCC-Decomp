@@ -66,7 +66,6 @@ typedef struct GBAControl {
 extern GBAControl __GBA[4];
 extern BOOL __GBAReset;
 
-void __GBAHandler(s32 chan, u32 error, OSContext* context);
 void __GBASyncCallback(s32 chan, s32 ret);
 s32 __GBASync(s32 chan);
 OSTime __GBASetDelay(s32 chan, OSTime delay);

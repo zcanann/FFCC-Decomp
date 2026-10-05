@@ -913,27 +913,27 @@ config.libs = [
     DolphinLib(
         "ai",
         [
-            Object(Matching, "ai/ai.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ai/ai.c"),
         ],
     ),
     DolphinLib(
         "ar",
         [
-            Object(Matching, "ar/ar.c"),
-            Object(Matching, "ar/arq.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ar/ar.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ar/arq.c"),
         ],
     ),
     DolphinLib(
         "ax",
         [
             Object(Matching, "ax/AX.c"),
-            Object(Matching, "ax/AXAlloc.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXAlloc.c"),
             Object(Matching, "ax/AXAux.c"),
             Object(Matching, "ax/AXCL.c"),
             Object(Matching, "ax/AXOut.c"),
-            Object(Matching, "ax/AXProf.c"),
-            Object(Matching, "ax/AXSPB.c"),
-            Object(Matching, "ax/AXVPB.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXProf.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXSPB.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXVPB.c"),
             Object(Matching, "ax/AXComp.c"),
             Object(Matching, "ax/DSPCode.c"),
         ],
@@ -1009,7 +1009,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXAttr.c"),
             Object(Matching, "gx/GXBump.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXDisplayList.c"),
-            Object(Matching, "gx/GXFifo.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXFifo.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXFrameBuf.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXGeometry.c"),
             Object(Matching, "gx/GXInit.c", extra_cflags=["-opt nopeephole"]),
@@ -1040,12 +1040,12 @@ config.libs = [
     DolphinLib(
         "gba",
         [
-            Object(Matching, "gba/GBA.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBA.c"),
             Object(Matching, "gba/GBAGetProcessStatus.c"),
             Object(Matching, "gba/GBAJoyBoot.c"),
             Object(Matching, "gba/GBARead.c"),
             Object(Matching, "gba/GBAWrite.c"),
-            Object(Matching, "gba/GBAXfer.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAXfer.c"),
                 Object(
                     Matching,
                     "gba/GBAKey.c",

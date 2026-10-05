@@ -10,7 +10,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void __GBAHandler(s32 chan, u32 error, OSContext* context) {
+static void __GBAHandler(s32 chan, u32 error, OSContext* context) {
     GBAControl* gba;
     GBATransferCallback proc;
     GBACallback callback;
@@ -75,7 +75,7 @@ s32 __GBASync(s32 chan) {
     return chan;
 }
 
-void TypeAndStatusCallback(s32 chan, u32 type) {
+static void TypeAndStatusCallback(s32 chan, u32 type) {
     GBAControl* gba;
     GBATransferCallback proc;
     GBACallback callback;

@@ -3989,17 +3989,14 @@ void CMenuPcs::DrawLoadMenu()
 		cursorY0 = FLOAT_803314D8;
 		cursorXbase = cursorY0;
 		cursorY0 = static_cast<float>(static_cast<double>(cursorY0) - DOUBLE_803317D8);
-		cursorXbase = cursorXbase + FLOAT_80331410;
-		unsigned int saveIdx;
+		cursorXbase += FLOAT_80331410;
+		int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {
-			saveIdx = static_cast<unsigned int>(m_wmWorldState->m_cardChannel);
+			saveIdx = m_wmWorldState->m_cardChannel;
 		} else {
-			saveIdx = static_cast<unsigned int>(mcCtrl.m_saveIndex);
+			saveIdx = mcCtrl.m_saveIndex;
 		}
-		double rawIdx;
-		reinterpret_cast<int*>(&rawIdx)[0] = 0x43300000;
-		reinterpret_cast<int*>(&rawIdx)[1] = saveIdx ^ 0x80000000;
-		cursorXbase = static_cast<float>(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + static_cast<double>(cursorXbase));
+		cursorXbase += DOUBLE_80331498 * static_cast<double>(saveIdx);
 		DrawCursor((int)cursorY0, (int)cursorXbase, 1.0f);
 
 		DrawMcObj();
@@ -7292,7 +7289,7 @@ void CMenuPcs::DrawCharaName()
 			}
 
 			const float widthDiff = xMax2 - font->GetWidth(text);
-			xBase = static_cast<float>(widthDiff * k3f8_2 + xBase);
+			xBase += widthDiff * k3f8_2;
 			font->SetPosX(xBase);
 			font->SetPosY(y);
 			font->Draw(text);

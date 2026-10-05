@@ -58,6 +58,10 @@ extern char *gMonsterNames_It[];
 extern char *gMonsterNames_Fr[];
 extern char *gMonsterNames_Es[];
 
+#if !defined(VERSION_GCCJGC)
+#if defined(VERSION_GCCE01)
+#include "msg_desc_us.inc"
+#else
 char *gItemDescs_En[] = {
     "???",
     "Weapon for Clavats",
@@ -362,6 +366,8 @@ char *gItemDescs_Es[] = {
     "Dise\xF1o para todos",
 };
 
+#endif
+
 const s8 gItemDescIds[][2] = {
     { 0, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 },
     { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 0, 0 }, { 1, 0 },
@@ -431,12 +437,24 @@ const s8 gItemDescIds[][2] = {
 const char sPlusText[] = "+";
 const char sTenText[] = "10";
 
-#if !defined(VERSION_GCCJGC)
+/*
+ * --INFO--
+ * PAL Address: 0x0201A6D4
+ * PAL Size: 104b
+ * EN Address: 0x0201A4F8
+ * EN Size: 104b
+ * JP Address: N/A (table lookup is inlined)
+ * JP Size: 0b
+ */
 char *Msg_GetTribe(s32 idx)
 {
     char **tbl;
 
+#if defined(VERSION_GCCE01)
+    switch ((s8)gLanguage) {
+#else
     switch (gLanguage & 0xF) {
+#endif
     case 1:
         tbl = gTribeNames_De;
         break;
@@ -665,8 +683,21 @@ char *Msg_GetLetter(s32 idx)
     return tbl[idx];
 }
 
+#if !defined(VERSION_GCCJGC)
+/*
+ * --INFO--
+ * PAL Address: 0x0201AAAC
+ * PAL Size: 104b
+ * EN Address: 0x0201A8D0
+ * EN Size: 16b
+ * JP Address: N/A (table lookup is inlined)
+ * JP Size: 0b
+ */
 char *Msg_GetItemName(s32 idx)
 {
+#if defined(VERSION_GCCE01)
+    return gItemNames_En[idx];
+#else
     char **tbl;
 
     switch (gLanguage & 0xF) {
@@ -688,6 +719,7 @@ char *Msg_GetItemName(s32 idx)
         break;
     }
     return tbl[idx];
+#endif
 }
 
 s32 Item_GetIcon(s32 idx)
@@ -775,3 +807,4 @@ copy:
         }
     }
 }
+#endif

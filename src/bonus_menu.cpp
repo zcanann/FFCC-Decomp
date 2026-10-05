@@ -1518,19 +1518,19 @@ void CMenuPcs::CalcResultCloseAnim()
 			m_bonusAnim->sprites[i].motionY = 0.0f;
 		}
 
+		int base = 0;
 		{
-			int idx = 0;
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base++];
 			spr->startFrame = 9999;
 			spr->flags = 3;
 		}
 
 		for (int i = 0; activePartyCount > i; i++) {
-			Sprt2* sprite = &m_bonusAnim->sprites[i + 1];
+			Sprt2* sprite = &m_bonusAnim->sprites[i + base];
 			sprite->startFrame = 0x10;
 		}
 
-		int base = activePartyCount + 1;
+		base += activePartyCount;
 
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* spr = &m_bonusAnim->sprites[base + i];
@@ -1989,7 +1989,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		idx = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = 0x16;
 			spr->y = 0;
 			spr->x = 0;
@@ -2001,10 +2001,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->duration = 0;
 			spr->depth = 1.0f;
 			spr->flags = 3;
-			idx = 1;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = -3;
 			spr->x = 0xf0;
 			spr->y = 0x38;
@@ -2015,10 +2014,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->startFrame = 0;
 			spr->duration = 8;
 			spr->depth = 1.0f;
-			idx = 2;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = 0x1f;
 			spr->x = 0;
 			spr->y = 0;
@@ -2032,10 +2030,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->motionX = (-8.0f);
 			spr->motionY = (-8.0f);
 			spr->flags = 2;
-			idx = 3;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = -4;
 			spr->x = 0;
 			spr->y = 0;
@@ -2046,10 +2043,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->startFrame = 0;
 			spr->duration = 8;
 			spr->depth = 1.0f;
-			idx = 4;
 		}
 
-		int top;
 		int y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
 			int partySlot;
@@ -2059,7 +2054,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 					break;
 				}
 			}
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[4 + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			spr->kind = 0x18;
 			spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
 			spr->y = y;
@@ -2078,10 +2073,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 			y += 0x60;
 		}
 
-		top = activePartyCount + 4;
-		s_PlayerTop = top;
+		idx += activePartyCount;
+		s_PlayerTop = idx;
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[top + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			spr->kind = -2;
 			spr->x = 0;
 			spr->y = 0;
@@ -2099,12 +2094,12 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->flags = 1;
 		}
 
-		top += activePartyCount;
-		s_ArtiTop = top;
+		idx += activePartyCount;
+		s_ArtiTop = idx;
 		{
 			int start = 10;
 			for (int i = 0; i < 8; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[top + i];
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
 				spr->x = 0;
 				spr->y = 0;
@@ -2121,10 +2116,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 			}
 		}
 
-		int copyDelta = top + 4;
-		top += 8;
+		int copyDelta = idx + 4;
+		idx += 8;
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[top + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			*spr = *(spr - copyDelta);
 			spr->y = (short)(spr->y + 0x20);
 			spr->w = 0xA8;
@@ -2138,10 +2133,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->flags = 1;
 		}
 
-		top += activePartyCount;
+		idx += activePartyCount;
 		y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[top + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			spr->kind = 0x19;
 			spr->x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			spr->y = y;
@@ -2160,10 +2155,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 			y += 0x60;
 		}
 
-		top += activePartyCount;
-		int nameDelta = top - 4;
+		idx += activePartyCount;
+		int nameDelta = idx - 4;
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[top + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			CMenuPcs::Sprt2* prev = spr - nameDelta;
 			spr->kind = -1;
 			spr->x = (short)(prev->x + 0x50);
@@ -2182,7 +2177,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->flags = 1;
 		}
 
-		top += activePartyCount;
+		idx += activePartyCount;
 		{
 			CMenuPcs::Sprt2* p3 = &m_bonusAnim->sprites[3];
 			ArtiBaseInfoInit(p3 - 2, p3);
@@ -2209,7 +2204,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			}
 		}
 
-		m_bonusAnim->header.count = (short)top;
+		m_bonusAnim->header.count = (short)idx;
 		m_bonusAnim->header.finished = 0;
 		this->m_bonusState->m_initialized = 1;
 	}

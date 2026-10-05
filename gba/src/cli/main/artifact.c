@@ -283,10 +283,12 @@ void ArtifactScreen_PrintRow(s32 idx, s32 row)
     Text_SetFill(1, 0);
     Text_Clear();
     Text_SetX(24);
-    if (Artifact_IsOwned(idx))
-        str = Msg_GetItemName(idx + 159);
-    else
+    if (Artifact_IsOwned(idx)) {
+        s32 item = idx + 159;
+        str = Msg_GetItemName(item);
+    } else {
         str = Msg_GetSystem(41);
+    }
     Text_Print(str, TEXT_DRAW);
     Text_CopyToVram(Window_GetTextVram(&gWindows[1], row, 0), gWindows[1].width);
 }
@@ -305,7 +307,9 @@ s32 Artifact_IsOwned(s32 idx)
 void ArtifactScreen_PrintDesc(void)
 {
     struct Window *win;
+#if !defined(VERSION_GCCJGC)
     char buf[68];
+#endif
     s32 n;
     char *str;
 
@@ -314,10 +318,18 @@ void ArtifactScreen_PrintDesc(void)
     win = &gWindows[1];
     n = sArtifactTop + win->cursor;
     if (Artifact_IsOwned(n)) {
+#if defined(VERSION_GCCJGC)
+        str = gItemDescs_Jp[n + 159];
+#else
         Msg_GetItemDesc(n + 159, buf);
         str = buf;
+#endif
     } else {
+#if defined(VERSION_GCCJGC)
+        str = Msg_GetSystem(42);
+#else
         str = Msg_GetSystem(0);
+#endif
     }
     Text_Print(str, TEXT_DRAW);
     HelpWin_CopyText(1, 1);

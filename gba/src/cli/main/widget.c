@@ -686,24 +686,36 @@ void Menu_OnOpen(u32 data)
 
 void Header_PrintItemDesc(s32 no)
 {
+#if !defined(VERSION_GCCJGC)
     char buf[68];
+#endif
 
     Header_Clear();
     if (no > 0) {
+#if defined(VERSION_GCCJGC)
+        Header_Print(gItemDescs_Jp[no]);
+#else
         Msg_GetItemDesc(no, buf);
         Header_Print(buf);
+#endif
     }
 }
 
 void HelpWin_PrintItemDesc(s32 no, s32 bg, s32 idx)
 {
+#if !defined(VERSION_GCCJGC)
     char buf[68];
+#endif
 
     Text_SetFill(0, 0);
     Text_Clear();
     if (no > 0) {
+#if defined(VERSION_GCCJGC)
+        Text_Print(gItemDescs_Jp[no], TEXT_DRAW);
+#else
         Msg_GetItemDesc(no, buf);
         Text_Print(buf, TEXT_DRAW);
+#endif
     }
     HelpWin_CopyText(bg, idx);
 }

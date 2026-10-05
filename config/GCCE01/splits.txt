@@ -337,3 +337,54 @@ gx/GXDisplayList.c:
 	.text start:0x801A4EDC end:0x801A50E8
 	.bss start:0x80326CD8 end:0x803271F4
 	.sbss start:0x8032E328 end:0x8032E32C
+
+ai/ai.c:
+	.text start:0x8018DCE8 end:0x8018E5F4
+	.sbss start:0x8032E140 end:0x8032E180
+	.sdata start:0x8032DB18 end:0x8032DB1C
+	.data start:0x80216A88 end:0x80216ACC
+
+ar/ar.c:
+	.text start:0x8018E5F4 end:0x801900CC
+	.sdata start:0x8032DB20 end:0x8032DB24
+	.sbss start:0x8032E180 end:0x8032E1A0
+	.data start:0x80216AD0 end:0x80216B14
+
+ar/arq.c:
+	.text start:0x801900CC end:0x80190488
+	.sbss start:0x8032E1A0 end:0x8032E1C8
+	.sdata start:0x8032DB28 end:0x8032DB2C
+	.data start:0x80216B18 end:0x80216B60
+
+gba/GBA.c:
+	.text start:0x801A62F0 end:0x801A65E0
+	.data start:0x8021B9F8 end:0x8021BA08
+	.bss start:0x80327200 end:0x80327700
+	.sbss start:0x8032E330 end:0x8032E334
+
+gba/GBAXfer.c:
+	.text start:0x801A7948 end:0x801A7C80
+
+gx/GXFifo.c:
+	.text start:0x8019F1AC end:0x8019F9F4
+	.sbss start:0x8032E2F0 end:0x8032E30C
+
+ax/AXAlloc.c:
+	.text start:0x801904F8 end:0x801909C0
+	.bss start:0x8030BCC0 end:0x8030BDC0
+	.sbss start:0x8032E1C8 end:0x8032E1CC
+
+ax/AXProf.c:
+	.text start:0x80192D0C end:0x80192D54
+	.sbss start:0x8032E280 end:0x8032E290
+
+ax/AXSPB.c:
+	.text start:0x80191C84 end:0x8019214C
+	.bss start:0x803138E0 end:0x80313918
+	.sbss start:0x8032E248 end:0x8032E26C
+
+ax/AXVPB.c:
+	.text start:0x8019214C end:0x80192D0C
+	.bss start:0x80313920 end:0x80324D20
+	.data start:0x80216BA8 end:0x80216C7C
+	.sbss start:0x8032E270 end:0x8032E27C

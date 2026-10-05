@@ -34,6 +34,10 @@ extern char *gJobNames_Jp[];
 extern char *gStatNames_Jp[];
 extern char *gNoticeText_Jp[];
 extern char *gTraitNames_Jp[];
+extern char *gItemNames_Jp[];
+extern char *gMonsterNames_Jp[];
+extern char *gItemDescs_Jp[];
+extern const u8 gItemIcons[];
 
 #define Msg_GetTribe(idx) (gTribeNames_Jp[(idx)])
 #define Msg_GetSystem(idx) (gSystemText_Jp[(idx)])
@@ -41,6 +45,9 @@ extern char *gTraitNames_Jp[];
 #define Msg_GetStat(idx) (gStatNames_Jp[(idx)])
 #define Msg_GetNotice(idx) (gNoticeText_Jp[(idx)])
 #define Msg_GetTrait(idx) (gTraitNames_Jp[(idx)])
+#define Msg_GetItemName(idx) (gItemNames_Jp[(idx)])
+#define Msg_GetMonsterName(idx) (gMonsterNames_Jp[(idx)])
+#define Item_GetIcon(idx) (gItemIcons[(idx)])
 #else
 char *Msg_GetTribe(s32 idx);
 char *Msg_GetSystem(s32 idx);
@@ -52,9 +59,11 @@ char *Msg_GetTrait(s32 idx);
 char *Msg_GetLook(s32 idx);
 char *Msg_GetCMake(s32 idx);
 char *Msg_GetLetter(s32 idx);
+#if !defined(VERSION_GCCJGC)
 char *Msg_GetItemName(s32 idx);
 s32 Item_GetIcon(s32 idx);
 char *Msg_GetMonsterName(s32 idx);
 void Msg_GetItemDesc(s32 idx, char *buf);
+#endif
 
 #endif

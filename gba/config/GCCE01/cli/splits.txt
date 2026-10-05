@@ -175,8 +175,17 @@ main/shop:
 main/smith:
 	.rodata     start:0x0201CE20 end:0x0201CE24 align:4
 
-regional_data:
-	.rodata     start:0x0201CE24 end:0x02023274
+main/msg_sys:
+	.rodata     start:0x0201CE24 end:0x0201ED40 align:4
+
+main/msg_item:
+	.rodata     start:0x0201ED40 end:0x0202082C align:4
+
+main/msg_monster:
+	.rodata     start:0x0202082C end:0x02021BB8 align:4
+
+main/msg:
+	.rodata     start:0x02021BB8 end:0x02023274 align:4
 
 main/backdrop_gfx:
 	.rodata     start:0x02023274 end:0x02025574 align:4
@@ -208,8 +217,17 @@ main/cmake:
 main/letter:
 	.data       start:0x02028C88 end:0x02028CF4 align:4
 
-regional_data:
-	.rodata     start:0x02028CF4 end:0x0202B7E0
+main/msg_sys:
+	.data       start:0x02028CF4 end:0x02029C10 align:4
+
+main/msg_item:
+	.data       start:0x02029C10 end:0x0202A3E4 align:4
+
+main/msg_monster:
+	.data       start:0x0202A3E4 end:0x0202B35C align:4
+
+main/msg:
+	.data       start:0x0202B35C end:0x0202B7E0 align:4
 
 main/backdrop:
 	.data       start:0x0202B7E0 end:0x0202B800 align:4
@@ -308,7 +326,10 @@ main/favorite:
 	.bss        start:0x03002840 end:0x0300284A align:8
 
 regional_bss:
-	.bss        start:0x0300284A end:0x03002850 align:1
+	.bss        start:0x0300284A end:0x0300284C align:1
+
+main/tmpartifact:
+	.bss        start:0x0300284C end:0x03002850 align:4
 
 main/sound_data:
 	.bss        start:0x03002850 end:0x03002990 align:8

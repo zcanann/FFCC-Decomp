@@ -1081,14 +1081,15 @@ config.libs = [
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "Runtime.PPCEABI.H/New.cp",
                 mw_version="GC/2.6",
                 cflags=replace_flag_prefix(cflags_runtime, "-RTTI ", "-RTTI on"),
             ),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "Runtime.PPCEABI.H/NMWException.cp",
+                mw_version="GC/1.3.2" if config.version == "GCCJGC" else "GC/2.5",
                 extra_cflags=["-inline auto,deferred"],
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/ptmf.c"),

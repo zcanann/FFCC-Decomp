@@ -148,7 +148,7 @@ extern "C" char __throw_catch_compare(const char* throwtype, const char* catchty
 class __partial_array_destructor {
 private:
 	void* p;
-	volatile size_t size;
+	size_t size;
 	size_t n;
 	ConstructorDestructor dtor;
 

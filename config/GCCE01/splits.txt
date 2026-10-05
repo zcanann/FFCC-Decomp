@@ -736,3 +736,17 @@ MSL_C/PPCEABI/bare/H/alloc.c:
 Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text start:0x801B09D0 end:0x801B0B40
 	.rodata start:0x801E5DF8 end:0x801E5E70
+
+Runtime.PPCEABI.H/New.cp:
+	.text start:0x801AE6DC end:0x801AE75C
+	extab start:0x8000A1CC end:0x8000A1F4
+	extabindex start:0x8001177C end:0x80011788
+	.rodata start:0x801E5D18 end:0x801E5D38
+	.data start:0x8021BF20 end:0x8021BF30
+	.sdata start:0x8032DBC0 end:0x8032DBC8
+
+Runtime.PPCEABI.H/NMWException.cp:
+	.text start:0x801AE75C end:0x801AEDCC
+	extab start:0x8000A1F4 end:0x8000A25C
+	extabindex start:0x80011788 end:0x800117F4
+	.sdata start:0x8032DBC8 end:0x8032DBD0

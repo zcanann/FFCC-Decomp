@@ -917,3 +917,6 @@ auto_09_8032DB62_sdata:
 
 auto_10_8032E2C2_sbss:
 	.sbss start:0x8032E2C2 end:0x8032E2C8 align:2
+
+fontman.cpp:
+	.text start:0x800917F4 end:0x80092AC8

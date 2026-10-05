@@ -831,3 +831,6 @@ TRK_MINNOW_DOLPHIN/msgbuf.c:
 	.text	start:0x801A3BAC end:0x801A4788
 	.rodata	start:0x801DB190 end:0x801DB1B0
 	.bss	start:0x80344050 end:0x80345A00
+
+fontman.cpp:
+	.text start:0x800912D4 end:0x80092648

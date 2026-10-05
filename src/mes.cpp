@@ -784,8 +784,8 @@ void CMes::Draw()
 			globalAlpha = 0xFF;
 		}
 
-		CMesCharCell* glyph = m_chars;
 		CFont* font = 0;
+		CMesCharCell* glyph = m_chars;
 		int activeTlut = 0xFFFFFFFF;
 		int activeFontId = 0xFFFFFFFF;
 

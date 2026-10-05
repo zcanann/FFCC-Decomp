@@ -1191,9 +1191,9 @@ config.libs = [
         "objects": [
             Object(Matching, "TRK_MINNOW_DOLPHIN/__exception.s"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/CircleBuffer.c", mw_version="GC/2.6"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/dispatch.c"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dispatch.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/flush_cache.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01"),
@@ -1219,9 +1219,9 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/MWTrace.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/notify.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/nubevent.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/nubinit.c"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/nubinit.c"),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01"),
                 "TRK_MINNOW_DOLPHIN/serpoll.c",
                 mw_version="GC/2.6",
                 cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],

@@ -1431,18 +1431,21 @@ texanim.cpp:
 	.rodata start:0x801D2628 end:0x801D26D8
 	.data start:0x801DDF98 end:0x801DE010
 	.sdata start:0x8034B3A0 end:0x8034B3D8
+	.sdata2 start:0x8034C890 end:0x8034C8B0
 
 mapanim.cpp:
 	.text start:0x80049CB8 end:0x8004A9E8
 	.rodata start:0x801D2810 end:0x801D2870
 	.data start:0x801DE808 end:0x801DE814
 	.sdata start:0x8034B440 end:0x8034B448
+	.sdata2 start:0x8034C9F0 end:0x8034CA00
 
 maptexanim.cpp:
 	.text start:0x8004F18C end:0x8004FC78
 	.rodata start:0x801D29F0 end:0x801D2A38
 	.data start:0x801DED18 end:0x801DED30
 	.sdata start:0x8034B488 end:0x8034B498
+	.sdata2 start:0x8034CA88 end:0x8034CAB0
 
 auto_801DE814_data:
 	.data start:0x801DE814 end:0x801DE818

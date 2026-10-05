@@ -1274,3 +1274,33 @@ auto_07_801E9304_data:
 
 auto_09_8032D61C_sdata:
 	.sdata start:0x8032D61C end:0x8032D620 align:4
+
+pppGetRotMatrixX.cpp:
+	.text start:0x8005F0FC end:0x8005F158
+
+pppGetRotMatrixXYZ.cpp:
+	.text start:0x8005F084 end:0x8005F0FC
+
+pppGetRotMatrixXZY.cpp:
+	.text start:0x8005F158 end:0x8005F1D0
+
+pppGetRotMatrixY.cpp:
+	.text start:0x8005F1D0 end:0x8005F22C
+
+pppGetRotMatrixYXZ.cpp:
+	.text start:0x8005F22C end:0x8005F2A4
+
+pppGetRotMatrixYZX.cpp:
+	.text start:0x8005F2A4 end:0x8005F31C
+
+pppGetRotMatrixZ.cpp:
+	.text start:0x8005F31C end:0x8005F378
+
+pppGetRotMatrixZXY.cpp:
+	.text start:0x8005F378 end:0x8005F3F0
+
+pppGetRotMatrixZYX.cpp:
+	.text start:0x8005F3F0 end:0x8005F468
+
+pppShape.cpp:
+	.text start:0x80064FE0 end:0x80065614

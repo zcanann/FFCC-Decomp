@@ -1229,3 +1229,33 @@ auto_10_8034BA9C_sbss:
 
 auto_06_801D1C14_rodata:
 	.rodata start:0x801D1C14 end:0x801D1C18 align:4
+
+pppGetRotMatrixX.cpp:
+	.text start:0x8005EBAC end:0x8005EC20
+
+pppGetRotMatrixXYZ.cpp:
+	.text start:0x8005EB34 end:0x8005EBAC
+
+pppGetRotMatrixXZY.cpp:
+	.text start:0x8005EC20 end:0x8005EC98
+
+pppGetRotMatrixY.cpp:
+	.text start:0x8005EC98 end:0x8005ED0C
+
+pppGetRotMatrixYXZ.cpp:
+	.text start:0x8005ED0C end:0x8005ED84
+
+pppGetRotMatrixYZX.cpp:
+	.text start:0x8005ED84 end:0x8005EDFC
+
+pppGetRotMatrixZ.cpp:
+	.text start:0x8005EDFC end:0x8005EE70
+
+pppGetRotMatrixZXY.cpp:
+	.text start:0x8005EE70 end:0x8005EEE8
+
+pppGetRotMatrixZYX.cpp:
+	.text start:0x8005EEE8 end:0x8005EF60
+
+pppShape.cpp:
+	.text start:0x80064AB4 end:0x80065100

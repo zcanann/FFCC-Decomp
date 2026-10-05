@@ -789,8 +789,12 @@ void CGraphic::Printf(unsigned long x, unsigned long y, char* fmt, ...)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80018DB4
+ * PAL Size: 588b
+ * EN Address: 0x80018BB0
+ * EN Size: 588b
+ * JP Address: 0x8001879C
+ * JP Size: 588b
  */
 void CGraphic::DrawDebugString()
 {
@@ -802,7 +806,11 @@ void CGraphic::DrawDebugString()
     GXRenderModeObj* renderMode = m_renderMode;
     C_MTXOrtho(proj,
                kGraphicZeroF,
+#ifdef VERSION_GCCJGC
+               static_cast<float>(renderMode->xfbHeight),
+#else
                static_cast<float>(renderMode->efbHeight),
+#endif
                kGraphicZeroF,
                static_cast<float>(renderMode->fbWidth),
                kGraphicZeroF,
@@ -849,12 +857,12 @@ void CGraphic::DrawDebugString()
 
 /*
  * --INFO--
- * PAL Address: 0x80018bf0
+ * PAL Address: 0x80018BF0
  * PAL Size: 452b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800189EC
+ * EN Size: 452b
+ * JP Address: 0x800185D8
+ * JP Size: 452b
  */
 void CGraphic::InitDebugString()
 {
@@ -866,7 +874,11 @@ void CGraphic::InitDebugString()
     GXRenderModeObj* renderMode = m_renderMode;
     C_MTXOrtho(proj,
                kGraphicZeroF,
+#ifdef VERSION_GCCJGC
+               static_cast<float>(renderMode->xfbHeight),
+#else
                static_cast<float>(renderMode->efbHeight),
+#endif
                kGraphicZeroF,
                static_cast<float>(renderMode->fbWidth),
                kGraphicZeroF,

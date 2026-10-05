@@ -235,8 +235,8 @@ float CMenuPcs::CalcCenteringPos(char* text, int fontSize)
 	CFont* font = m_fonts[0];
 	float halfWidth = 0.5f;
 	float offset = 320.0f;
-	font->SetScaleX(1.0f);
-	font->SetScaleY(1.0f);
+	font->SetMargin(1.0f);
+	font->SetScale(1.0f);
 	float width = font->GetWidth(text);
 	return offset - width * halfWidth;
 }

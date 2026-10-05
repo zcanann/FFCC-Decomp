@@ -51,8 +51,6 @@ extern int __float_huge[];
 static const char s_partyObjGhostFmt[] = "%d/%d %d/%d %d/%d";
 static const char s_partyObjGhostAngleFmt[] = "%d/%d a=%d";
 static const char s_partyObjDebugScriptFmt[] = "%d %d %d %d %d %d";
-extern "C" const float kMonObjPercentMax;
-extern "C" const float kMonObjOne;
 extern const float FLOAT_80331A58 = 0.5f;
 extern const float FLOAT_80331A5C = 1800.0f;
 extern const double DOUBLE_80331A60 = 4503601774854144.0;
@@ -569,7 +567,7 @@ void CGPartyObj::onCancelStat(int state)
 		enableDamageCol(1);
 		break;
 	case 0x14:
-		m_alpha = kMonObjOne;
+		m_alpha = 1.0f;
 		enableDamageCol(1);
 		break;
 	case 0x0B:
@@ -692,7 +690,7 @@ void CGPartyObj::onCancelStat(int state)
 		}
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			endPSlotBit(0x10000);
-			m_alpha = kMonObjOne;
+			m_alpha = 1.0f;
 			m_bgColMask |= 0x1000E;
 		} else {
 			m_alpha = FLOAT_80331A7C;
@@ -743,7 +741,7 @@ void CGPartyObj::onCancelStat(int state)
 		}
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			endPSlotBit(0x10000);
-			m_alpha = kMonObjOne;
+			m_alpha = 1.0f;
 			m_bgColMask |= 0x1000E;
 		} else {
 			m_alpha = FLOAT_80331A7C;
@@ -934,7 +932,7 @@ traceJoin:
 
 	if (showTraceParticle && CFlat.m_partyTraceParticleSlot[port] == 0) {
 		CFlat.m_partyTraceParticleSlot[port] = CFlat.GetFreeParticleSlot();
-		putParticleTrace((port + 0x42U) | 0x100, CFlat.m_partyTraceParticleSlot[port], this, kMonObjOne, 0);
+		putParticleTrace((port + 0x42U) | 0x100, CFlat.m_partyTraceParticleSlot[port], this, 1.0f, 0);
 	} else if (!showTraceParticle && CFlat.m_partyTraceParticleSlot[port] != 0) {
 		CFlat.EndParticleSlot(CFlat.m_partyTraceParticleSlot[port], 0);
 		CFlat.m_partyTraceParticleSlot[port] = 0;
@@ -1044,7 +1042,7 @@ void CGPartyObj::onFramePreCalc()
 			if (static_cast<int>(CFlatCenterState()) == 0) {
 				speedScale = FLOAT_80331b08;
 			} else {
-				speedScale = kMonObjOne;
+				speedScale = 1.0f;
 			}
 			m_moveBaseSpeed = static_cast<float>(static_cast<int>(FLOAT_80331b04 * speedScale));
 		} else {
@@ -1878,7 +1876,7 @@ void CGPartyObj::onFrameStat()
 				if (m_subFrame >= 0x19) {
 					playSe3D(0x30, 0x32, 0x96, 0, 0);
 				}
-				m_alpha = kMonObjOne;
+				m_alpha = 1.0f;
 				changeSubStat(2);
 				enableDamageCol(1);
 			}
@@ -1900,7 +1898,7 @@ void CGPartyObj::onFrameStat()
 			enableDamageCol(0);
 		}
 		if (m_stateFrame == 3 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-			moveVectorHRot(FLOAT_80331AB8 + m_rotTargetY, FLOAT_80331a78, kMonObjOne, 10);
+			moveVectorHRot(FLOAT_80331AB8 + m_rotTargetY, FLOAT_80331a78, 1.0f, 10);
 		}
 		if (isLoopAnim() != 0) {
 			changeStat(0, 0, 0);
@@ -1955,7 +1953,7 @@ void CGPartyObj::onFrameStat()
 			}
 			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
 				endPSlotBit(0x10000);
-				m_alpha = kMonObjOne;
+				m_alpha = 1.0f;
 				m_bgColMask |= 0x1000E;
 				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x48) = 0x5A;
 			} else {
@@ -1963,7 +1961,7 @@ void CGPartyObj::onFrameStat()
 				m_bgColMask &= 0xFFFEFFF1;
 				void* port = m_scriptHandle[0xED];
 				endPSlotBit(0x10000);
-				putParticle(reinterpret_cast<int>(port) + 3U | 0x100, m_particleSlots[16], this, kMonObjOne, 0);
+				putParticle(reinterpret_cast<int>(port) + 3U | 0x100, m_particleSlots[16], this, 1.0f, 0);
 				playSe3D(0x2D, 0x32, 0x96, 0, 0);
 			}
 		} else if (isLoopAnim() != 0) {
@@ -2100,7 +2098,7 @@ void CGPartyObj::statCharge()
 		if (m_subFrame == 0) {
 			m_comboFramePrev = 0;
 			reqAnim(m_attackAnimId, 0, 0);
-			putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), kMonObjOne, 0x7EE);
+			putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), 1.0f, 0x7EE);
 		}
 		if (isLoopAnim() != 0) {
 			changeSubStat(1);
@@ -2122,9 +2120,9 @@ void CGPartyObj::statCharge()
 			int window = m_unk68C;
 			int counter = m_comboFramePrev;
 			if (counter == window * 3) {
-				putParticle(0x578, 0, reinterpret_cast<CGObject*>(this), kMonObjOne, 0x80D);
+				putParticle(0x578, 0, reinterpret_cast<CGObject*>(this), 1.0f, 0x80D);
 			} else if (counter == window << 1) {
-				putParticle(0x577, 0, reinterpret_cast<CGObject*>(this), kMonObjOne, 0x80D);
+				putParticle(0x577, 0, reinterpret_cast<CGObject*>(this), 1.0f, 0x80D);
 			}
 		}
 		m_comboFramePrev++;
@@ -2173,7 +2171,7 @@ void CGPartyObj::statCharge()
 					addHp(-1, static_cast<CGPrgObj*>(0));
 				}
 				putParticle((base + reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag) | 0x500, 0,
-				    reinterpret_cast<CGObject*>(this), kMonObjOne, 0);
+				    reinterpret_cast<CGObject*>(this), 1.0f, 0);
 			}
 		}
 
@@ -2202,7 +2200,7 @@ void CGPartyObj::statCharge()
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
 						if (static_cast<float>(maxReach) < mag) {
 							dest = CVector(m_worldPosition) +
-							       (CVector(delta) * (mag - static_cast<float>(maxReach))) * (kMonObjOne / mag);
+							       (CVector(delta) * (mag - static_cast<float>(maxReach))) * (1.0f / mag);
 							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
 						} else {
 							mag = FLOAT_80331a78;
@@ -2448,14 +2446,14 @@ void CGPartyObj::onStatShield()
  * --INFO--
  * PAL Address: 0x8011F9A8
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8011ED08
+ * EN Size: 52b
+ * JP Address: 0x8011B910
+ * JP Size: 52b
  */
 void CGPartyObj::putComboParticle()
 {
-	putParticle(0x153, 0, reinterpret_cast<CGObject*>(this), kMonObjOne, 0);
+	putParticle(0x153, 0, this, 1.0f, 0);
 }
 
 /*
@@ -2596,16 +2594,16 @@ void CGPartyObj::checkTargetParticle()
 			if (input.x == 0.0f && input.z == 0.0f) {
 				unsigned short held = Pad.GetButton(m_animStateMisc);
 			if ((held & 1) != 0) {
-				input.x += kMonObjOne;
+				input.x += 1.0f;
 			}
 			if ((held & 2) != 0) {
-				input.x -= kMonObjOne;
+				input.x -= 1.0f;
 			}
 			if ((held & 8) != 0) {
-				input.z += kMonObjOne;
+				input.z += 1.0f;
 			}
 			if ((held & 4) != 0) {
-				input.z -= kMonObjOne;
+				input.z -= 1.0f;
 			}
 		}
 	} else {
@@ -2848,7 +2846,7 @@ void CGPartyObj::onStatMagic()
 			} else {
 				if (m_comboFrame == 1) {
 					putParticleTrace(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId + 0x4FU | 0x100,
-					    m_particleSlots[8], this, kMonObjOne, 0);
+					    m_particleSlots[8], this, 1.0f, 0);
 					playSe3D(0x3E, 0x32, 0x96, 0, 0);
 				}
 				m_comboFrame++;
@@ -2866,7 +2864,7 @@ void CGPartyObj::onStatMagic()
 	    CGPartyObj::m_ghostWork.flagBits.flag40 != 0) {
 		if (m_comboFrame == 1) {
 			putParticleTrace(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId + 0x4FU | 0x100,
-			    m_particleSlots[8], this, kMonObjOne, 0);
+			    m_particleSlots[8], this, 1.0f, 0);
 			playSe3D(0x3E, 0x32, 0x96, 0, 0);
 		}
 		m_comboFrame++;
@@ -4112,7 +4110,7 @@ void CGPartyObj::changeMotionMode(int mode)
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 		endPSlotBit(0x10000);
-		*reinterpret_cast<float*>(self + 0x694) = kMonObjOne;
+		*reinterpret_cast<float*>(self + 0x694) = 1.0f;
 		m_bgColMask |= 0x1000E;
 	} else {
 		*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331A7C;
@@ -4120,7 +4118,7 @@ void CGPartyObj::changeMotionMode(int mode)
 		int particlePort = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId;
 		endPSlotBit(0x10000);
 		putParticle((particlePort + 3) | 0x100,
-		    *reinterpret_cast<int*>(self + 0x5A4), this, kMonObjOne, 0);
+		    *reinterpret_cast<int*>(self + 0x5A4), this, 1.0f, 0);
 	}
 
 	if (mode == 1 && party.carryObject == 0 &&
@@ -4233,7 +4231,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 		endPSlotBit(0x10000);
-		m_alpha = kMonObjOne;
+		m_alpha = 1.0f;
 		m_bgColMask |= 0x1000E;
 		if (restoreDamageCol == 0) {
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x48) = 0x5A;
@@ -4246,7 +4244,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 		if (restoreDamageCol == 0 || keepTarget != 0) {
 			endPSlotBit(0x10000);
 			putParticle((reinterpret_cast<int>(port) + 3) | 0x100,
-			            m_particleSlots[16], this, kMonObjOne, 0);
+			            m_particleSlots[16], this, 1.0f, 0);
 		}
 
 		if (restoreDamageCol == 0) {
@@ -4545,14 +4543,14 @@ void CGPartyObj::ghostPartyMog()
 		break;
 	}
 
-	float ramp = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
+	float ramp = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
 	float scale;
 	switch (stageMode) {
 	default:
-		scale = kMonObjOne;
+		scale = 1.0f;
 		break;
 	case 1:
-		scale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
+		scale = FLOAT_80331A58 * (1.0f - ramp) + FLOAT_80331A58;
 		break;
 	case 2:
 		scale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
@@ -4576,7 +4574,7 @@ void CGPartyObj::ghostPartyMog()
 		if (exceeded && CGPartyObj::m_ghostWork.flagBits.flag10 == 0) {
 			CGPartyObj::m_ghostWork.flagBits.flag10 = 1;
 			CGPartyObj::m_ghostWork.state = 2;
-			putParticle(299, 0, this, kMonObjOne, 0);
+			putParticle(299, 0, this, 1.0f, 0);
 		} else if (CGPartyObj::m_ghostWork.flagBits.flag08 == 0 &&
 		           static_cast<int>(CGPartyObj::m_ghostWork.pressure) >= 10) {
 			int moodMode;
@@ -4645,10 +4643,10 @@ void CGPartyObj::ghostPartyMog()
 				float innerScale;
 				switch (innerMode) {
 				default:
-					innerScale = kMonObjOne;
+					innerScale = 1.0f;
 					break;
 				case 1:
-					innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
+					innerScale = FLOAT_80331A58 * (1.0f - ramp) + FLOAT_80331A58;
 					break;
 				case 2:
 					innerScale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
@@ -4693,7 +4691,7 @@ messageMenu:
 	if (prevSlot != auraSlot) {
 		endPSlotBit(0x400);
 		if (auraSlot != 0) {
-			putParticle(auraSlot | 0x200, m_particleSlots[10], this, kMonObjOne, 0);
+			putParticle(auraSlot | 0x200, m_particleSlots[10], this, 1.0f, 0);
 		}
 		CGPartyObj::m_ghostWork.auraSlot = auraSlot;
 	}
@@ -4750,14 +4748,14 @@ void CGPartyObj::gpmMove()
 		break;
 	}
 
-	float frameScale = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
+	float frameScale = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
 	float pressureScale;
 	switch (stageMode) {
 	default:
-		pressureScale = kMonObjOne;
+		pressureScale = 1.0f;
 		break;
 	case 1:
-		pressureScale = FLOAT_80331A58 * (kMonObjOne - frameScale) + FLOAT_80331A58;
+		pressureScale = FLOAT_80331A58 * (1.0f - frameScale) + FLOAT_80331A58;
 		break;
 	case 2:
 		pressureScale = FLOAT_80331A58 * frameScale + FLOAT_80331A58;
@@ -4916,7 +4914,7 @@ void CGPartyObj::gpmMove()
 
 		CGPartyObj::m_ghostWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
 		CGPartyObj::m_ghostWork.carrySpeed += FLOAT_80331A70;
-		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? kMonObjOne : FLOAT_80331A88;
+		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? 1.0f : FLOAT_80331A88;
 		float newSpeed = CGPartyObj::m_ghostWork.carrySpeed;
 		if (newSpeed < FLOAT_80331a78) {
 			newSpeed = FLOAT_80331a78;
@@ -5046,14 +5044,14 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 				break;
 			}
 
-			float rate = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
+			float rate = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
 			float angleScale;
 			switch (bossKind) {
 			default:
-				angleScale = kMonObjOne;
+				angleScale = 1.0f;
 				break;
 			case 1:
-				angleScale = FLOAT_80331A58 * (kMonObjOne - rate) + FLOAT_80331A58;
+				angleScale = FLOAT_80331A58 * (1.0f - rate) + FLOAT_80331A58;
 				break;
 			case 2:
 				angleScale = FLOAT_80331A58 * rate + FLOAT_80331A58;

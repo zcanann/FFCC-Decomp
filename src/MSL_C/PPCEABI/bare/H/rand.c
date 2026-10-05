@@ -2,7 +2,7 @@
 
 // rand.c from Runtime library
 
-u32 next = 1;
+static u32 next = 1;
 
 u32 rand(void)
 {

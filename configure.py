@@ -1141,7 +1141,7 @@ config.libs = [
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/misc_io.c", mw_version="GC/2.6"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/printf.c", mw_version="GC/2.6"),
-            Object(Matching, "MSL_C/PPCEABI/bare/H/rand.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/rand.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/signal.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/string.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/float.c"),
@@ -1221,7 +1221,7 @@ config.libs = [
                 mw_version="GC/2.6",
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/targcont.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
             Object(
                 Matching,
                 "TRK_MINNOW_DOLPHIN/targimpl.c",

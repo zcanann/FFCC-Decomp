@@ -149,3 +149,11 @@ p_sample.cpp:
 	.data start:0x801E7318 end:0x801E750C
 	.sdata start:0x8032D408 end:0x8032D420
 	.sbss start:0x8032DC40 end:0x8032DC44
+
+TRK_MINNOW_DOLPHIN/target_options.c:
+	.text start:0x801AD540 end:0x801AD55C
+	.bss start:0x80329698 end:0x8032969C
+
+MSL_C/PPCEABI/bare/H/rand.c:
+	.text start:0x801B79F0 end:0x801B7A10
+	.sdata start:0x8032DBF0 end:0x8032DBF4

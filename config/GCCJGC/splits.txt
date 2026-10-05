@@ -124,3 +124,11 @@ MSL_C/PPCEABI/bare/H/s_floor.c:
 MSL_C/PPCEABI/bare/H/s_frexp.c:
 	.text start:0x801B70FC end:0x801B7188
 	.sdata2 start:0x803500E0 end:0x803500E8
+
+TRK_MINNOW_DOLPHIN/target_options.c:
+	.text start:0x801AA578 end:0x801AA594
+	.bss start:0x803481E0 end:0x803481E4
+
+MSL_C/PPCEABI/bare/H/rand.c:
+	.text start:0x801B3EC8 end:0x801B3EE8
+	.sdata start:0x8034B9F8 end:0x8034B9FC

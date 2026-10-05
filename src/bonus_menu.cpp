@@ -96,6 +96,17 @@ static BonusBaseInfo* s_Base;
 
 namespace {
 
+enum {
+#ifdef VERSION_GCCJGC
+	kBonusBackgroundTexture = 0x15,
+#else
+	kBonusBackgroundTexture = 0x16,
+#endif
+	kBonusFrameTexture,
+	kBonusPlayerTexture,
+	kBonusCountTexture
+};
+
 static inline void InitBonusEffectSlots(CMenuPcs* menu)
 {
 	for (int i = 0; i < 40; i++) {
@@ -605,13 +616,18 @@ void CMenuPcs::drawBonus()
  * --INFO--
  * PAL Address: 0x8013B14C
  * PAL Size: 8316b
- * EN Address: 0x801557EC
- * EN Size: 4540b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013A3E4
+ * EN Size: 8312b
+ * JP Address: 0x80137004
+ * JP Size: 8568b
  */
 void CMenuPcs::CalcResultOpenAnim()
 {
+#ifdef VERSION_GCCP01
+	enum { kFadeFrames = 8, kBallFadeStart = 24, kBallDuration = 32 };
+#else
+	enum { kFadeFrames = 10, kBallFadeStart = 30, kBallDuration = 40 };
+#endif
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (this->m_bonusState->m_initialized == 0) {
@@ -624,7 +640,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		idx = 0;
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x16;
+			spr->kind = kBonusBackgroundTexture;
 			spr->y = 0;
 			spr->x = 0;
 			spr->w = 0x280;
@@ -632,21 +648,23 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->mulY = 0.0f;
 			spr->mulX = 0.0f;
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
+#ifndef VERSION_GCCJGC
 			spr->alpha = 0.0f;
+#endif
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i + idx];
-			spr->kind = 0x17;
+			spr->kind = kBonusFrameTexture;
 			spr->x = 0x80;
 			spr->y = (short)(i * 0x60 + 0x38);
 			spr->w = 0x1a0;
 			spr->h = 0x40;
 			spr->mulX = 0.0f;
 			spr->mulY = 0.0f;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 		}
 		idx += activePartyCount;
@@ -657,7 +675,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			for (; i < activePartyCount; i++) {
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				int partySlot = s_Rinfo->m_party[i].m_partySlot;
-				spr->kind = 0x18;
+				spr->kind = kBonusPlayerTexture;
 				spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
 				spr->y = (short)y;
 				spr->w = 0x60;
@@ -667,11 +685,11 @@ void CMenuPcs::CalcResultOpenAnim()
 				if (i == 0) {
 					CMenuPcs::Sprt2* src = spr - backOffset;
 					spr->startFrame = src->startFrame + src->duration;
-					spr->startFrame += 0x18;
+					spr->startFrame += kBallFadeStart;
 				} else {
 					spr->startFrame = (spr - 1)->startFrame + 3;
 				}
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				y += 0x60;
 				spr->depth = 1.0f;
 			}
@@ -692,7 +710,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
 				spr->startFrame = src->startFrame + src->duration;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -710,7 +728,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->h = 0;
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -735,7 +753,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				if (i != 0) {
 					spr->startFrame += bump;
 				}
-				spr->duration = 0x20;
+				spr->duration = kBallDuration;
 				bump += 3;
 				spr->depth = 1.0f;
 			}
@@ -777,15 +795,21 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		{
 			CMenuPcs::Sprt2* count = &m_bonusAnim->sprites[idx];
-			count->kind = 0x19;
+			count->kind = kBonusCountTexture;
 			count->y = 0x10;
+#ifdef VERSION_GCCJGC
+			count->w = 0xB0;
+#else
 			count->w = 0x140;
+#endif
 			count->x = (short)((0x280 - count->w) >> 1);
 			count->h = 0x28;
 			count->mulX = 0.0f;
 			count->mulY = 80.0f;
 			count->startFrame = m_bonusAnim->sprites[1].startFrame;
-			count->duration = 8;
+#ifndef VERSION_GCCJGC
+			count->duration = kFadeFrames;
+#endif
 			count->duration = 10;
 			count->depth = 1.0f;
 		}
@@ -796,7 +820,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			for (int i = 0; i < activePartyCount; i++) {
 				int delta = idx;
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[countTop + i];
-				spr->kind = 0x19;
+				spr->kind = kBonusCountTexture;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = 0x200;
 				spr->y = (short)(src->y + 0xC);
@@ -805,7 +829,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 40.0f;
 				spr->startFrame = src->startFrame + src->duration;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -825,7 +849,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
 				spr->startFrame = src->startFrame;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -845,7 +869,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
 				spr->startFrame = src->startFrame + src->duration;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -896,6 +920,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
+#ifndef VERSION_GCCJGC
 		{
 			for (int i = 0; i < 0x18; i++) {
 				CCharaPcs::CHandle* handle = m_wm.m_handles[i];
@@ -904,6 +929,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				}
 			}
 		}
+
+#endif
 
 		m_bonusAnim->header.count = (short)idx;
 		m_bonusAnim->header.finished = 0;
@@ -928,7 +955,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
 			}
 
-			if (sprite->kind == 0x17) {
+			if (sprite->kind == kBonusFrameTexture) {
 				for (int j = 0; j < s_Rinfo->m_partyCount; j++) {
 					if (sprite->timer - 1 == 0) {
 						Sound.PlaySe(0x49, 0x40, 0x7f, 0);
@@ -962,13 +989,13 @@ void CMenuPcs::CalcResultOpenAnim()
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else if (i >= total2) {
 				float modelScale = 0.5f;
-				if (sprite->timer == 0x18 && m_bonusAlpha == 0) {
+				if (sprite->timer == kBallFadeStart && m_bonusAlpha == 0) {
 					Sound.PlaySe(0x48, 0x40, 0x7f, 0);
 					this->m_bonusAlpha = 1;
 				}
-				if (sprite->timer >= 0x18) {
-					modelScale += 0.5 * ((float)(sprite->timer - 0x18) /
-					                    (float)(sprite->duration - 0x18));
+				if (sprite->timer >= kBallFadeStart) {
+					modelScale += 0.5 * ((float)(sprite->timer - kBallFadeStart) /
+					                    (float)(sprite->duration - kBallFadeStart));
 				}
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
@@ -1011,9 +1038,9 @@ void CMenuPcs::CalcResultOpenAnim()
 			handle->m_model->CalcMatrix();
 			handle->m_model->CalcSkin();
 			if (i >= total2) {
-				if (sprite->timer >= 0x18) {
-					sprite->alpha = (float)(1.0 - (double)((float)(sprite->timer - 0x18) /
-					                 (float)(sprite->duration - 0x18)));
+				if (sprite->timer >= kBallFadeStart) {
+					sprite->alpha = (float)(1.0 - (double)((float)(sprite->timer - kBallFadeStart) /
+					                 (float)(sprite->duration - kBallFadeStart)));
 					if (sprite->alpha < 0.0) {
 						sprite->alpha = 0.0f;
 					}
@@ -1082,14 +1109,14 @@ void CMenuPcs::DrawResultOpenAnim()
 					if (lastKind < 0) {
 						DrawInit();
 					}
-					if (lastKind != 0x17 && sprite->kind == 0x17) {
+					if (lastKind != kBonusFrameTexture && sprite->kind == kBonusFrameTexture) {
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-					} else if (lastKind == 0x17 && sprite->kind != 0x17) {
+					} else if (lastKind == kBonusFrameTexture && sprite->kind != kBonusFrameTexture) {
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 					}
 
 					_GXColor colors[4];
-					if (sprite->kind == 0x17) {
+					if (sprite->kind == kBonusFrameTexture) {
 						colors[0].r = 0xFF;
 						colors[0].g = 0xFF;
 						colors[0].b = 0xFF;
@@ -1108,7 +1135,7 @@ void CMenuPcs::DrawResultOpenAnim()
 						colors[3].a = 0xFF;
 						GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 					}
-					if (sprite->kind != 0x17) {
+					if (sprite->kind != kBonusFrameTexture) {
 						colors[0].r = 0xFF;
 						colors[0].g = 0xFF;
 						colors[0].b = 0xFF;
@@ -1117,7 +1144,7 @@ void CMenuPcs::DrawResultOpenAnim()
 					}
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
-					if (sprite->kind == 0x17) {
+					if (sprite->kind == kBonusFrameTexture) {
 						float x = (float)sprite->x;
 						float y = (float)sprite->y;
 						float fillWidth;
@@ -1248,11 +1275,7 @@ void CMenuPcs::CalcResultCountAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int rank = s_Rinfo->m_party[i].m_rank;
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
-#ifdef VERSION_GCCJGC
-			sprite->kind = 0x18;
-#else
-			sprite->kind = 0x19;
-#endif
+			sprite->kind = kBonusCountTexture;
 			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			sprite->x = stripX;
 			sprite->y = y;
@@ -1887,14 +1910,14 @@ void CMenuPcs::DrawResultCloseAnim()
 				if (lastKind < 0) {
 					DrawInit();
 				}
-				if (lastKind != 0x17 && sprite->kind == 0x17) {
+				if (lastKind != kBonusFrameTexture && sprite->kind == kBonusFrameTexture) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-				} else if (lastKind == 0x17 && sprite->kind != 0x17) {
+				} else if (lastKind == kBonusFrameTexture && sprite->kind != kBonusFrameTexture) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
 
 				_GXColor colors[4];
-				if (sprite->kind == 0x17) {
+				if (sprite->kind == kBonusFrameTexture) {
 					colors[0].r = 0xFF;
 					colors[0].g = 0xFF;
 					colors[0].b = 0xFF;
@@ -1913,7 +1936,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					colors[3].a = 0xFF;
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				}
-				if (sprite->kind != 0x17) {
+				if (sprite->kind != kBonusFrameTexture) {
 					colors[0].r = 0xFF;
 					colors[0].g = 0xFF;
 					colors[0].b = 0xFF;
@@ -1922,7 +1945,7 @@ void CMenuPcs::DrawResultCloseAnim()
 				}
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
-				if (sprite->kind == 0x17) {
+				if (sprite->kind == kBonusFrameTexture) {
 					if (sprite->duration <= sprite->timer) {
 						lastKind = sprite->kind;
 						continue;

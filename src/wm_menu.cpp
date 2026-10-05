@@ -444,6 +444,7 @@ static const int kMcCharacterFrameTexture = 37;
 static const int kMcCharacterFillTexture = 41;
 static const int kCharacterNamePlateTexture = 39;
 static const int kCharacterPlaceholderTexture = 49;
+static const int kCharacterPanelTexture = 40;
 static const int kMainMenuFrameTexture = 50;
 static const int kCharacterLifeTexture = 38;
 static const int kCharacterAwayTexture = 54;
@@ -461,6 +462,7 @@ static const int kMcCharacterFrameTexture = 38;
 static const int kMcCharacterFillTexture = 42;
 static const int kCharacterNamePlateTexture = 40;
 static const int kCharacterPlaceholderTexture = 50;
+static const int kCharacterPanelTexture = 41;
 static const int kMainMenuFrameTexture = 51;
 static const int kCharacterLifeTexture = 39;
 static const int kCharacterAwayTexture = 56;
@@ -6443,12 +6445,12 @@ inline void CMenuPcs::CalcCharaBase()
 
 /*
  * --INFO--
- * PAL Address: 0x800f31b8
+ * PAL Address: 0x800F31B8
  * PAL Size: 460b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F2738
+ * EN Size: 460b
+ * JP Address: 0x800EF99C
+ * JP Size: 444b
  */
 void CMenuPcs::DrawCharaBase()
 {
@@ -6475,7 +6477,7 @@ void CMenuPcs::DrawCharaBase()
 	color.b = 0xFF;
 	color.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterPanelTexture));
 
 	alpha = FLOAT_803313dc;
 	int yBase;
@@ -8554,12 +8556,12 @@ inline void CMenuPcs::ChkSelectParty()
 
 /*
  * --INFO--
- * PAL Address: 0x800ecff0
+ * PAL Address: 0x800ECFF0
  * PAL Size: 2396b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800EC734
+ * EN Size: 2396b
+ * JP Address: 0x800E9C64
+ * JP Size: 2296b
  */
 void CMenuPcs::DrawMainMenuSub()
 {
@@ -8667,7 +8669,7 @@ void CMenuPcs::DrawMainMenuSub()
 		SetProjection(drawOrder[orderIndex]);
 
 		if (m_wmWorldState->m_mainState == 2) {
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kWorldFrameTexture));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
 			unsigned int idx = drawOrder[orderIndex];

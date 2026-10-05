@@ -956,3 +956,9 @@ os/OSTime.c:
 os/OSReset.c:
 	.text	start:0x8017E3C8 end:0x8017E7BC
 	.sbss start:0x8032DF88 end:0x8032DF90
+
+ref.cpp:
+	.text start:0x80043B04 end:0x80043B64
+	.data start:0x801E8A88 end:0x801E8A94
+	.sdata start:0x8032D578 end:0x8032D580
+	.sdata2 start:0x8032EAF0 end:0x8032EAF8

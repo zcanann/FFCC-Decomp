@@ -1631,12 +1631,14 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
             return -1;
         }
         if (type != 0 && strcmp(picked, "\x81\x4A") == 0) {
+            int group;
+            int pos;
             char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
-            for (int group = 0; group < 2; ++group) {
-                const char* characters = s_NameEntryVoiced[group];
-                int length = strlen(characters);
-                for (int pos = 0; pos < length; pos += 2, characters += 2) {
-                    if (memcmp(characters, last, 2) == 0) {
+            for (group = 0; group < 2; ++group) {
+                text = const_cast<char*>(s_NameEntryVoiced[group]);
+                int length = strlen(text);
+                for (pos = 0; pos < length; pos += 2, text += 2) {
+                    if (memcmp(text, last, 2) == 0) {
                         ++last[1];
                         return 0;
                     }

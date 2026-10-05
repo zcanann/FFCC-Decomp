@@ -1119,8 +1119,8 @@ void GbaQueue::ClrStageFlg(int channel)
  * PAL Size: 684b
  * EN Address: 0x800CEFC8
  * EN Size: 684b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800CCC0C
+ * JP Size: 588b
  */
 void GbaQueue::SetRadarType()
 {
@@ -1184,6 +1184,7 @@ void GbaQueue::SetRadarType()
 		m_radarType[3] = 0;
 	}
 
+#ifndef VERSION_GCCJGC
 	for (i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
 		const int oldMode = m_radarMode;
@@ -1196,6 +1197,7 @@ void GbaQueue::SetRadarType()
 		}
 		OSSignalSemaphore(accessSemaphores + i);
 	}
+#endif
 }
 
 /*
@@ -2884,8 +2886,8 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
  * PAL Size: 560b
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800C98DC
+ * JP Size: 548b
  */
 void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 {
@@ -2924,8 +2926,11 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	}
 
 	for (i = 0; i < 8; i++) {
-		if ((i != playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
-		    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0)) {
+		if ((i != playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0)
+#ifndef VERSION_GCCJGC
+		    && (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0)
+#endif
+		) {
 			unsigned char existingCharaType = Game.m_caravanWorkArr[i].m_tribeId;
 			existingCharaType |= static_cast<signed char>(Game.m_caravanWorkArr[i].m_appearanceVariant << 2);
 			if (Game.m_caravanWorkArr[i].m_genderFlag != 0) {

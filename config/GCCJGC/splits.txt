@@ -1065,3 +1065,22 @@ gx/GXTexture.c:
 
 auto_10_8034C094_sbss:
 	.sbss start:0x8034C094 end:0x8034C098 align:4
+
+math.cpp:
+	.text start:0x80019AE8 end:0x8001BB40
+	.rodata start:0x801D0FF0 end:0x801D1000
+	.data start:0x801DC710 end:0x801DC730
+	.sdata start:0x8034B200 end:0x8034B210
+	.sdata2 start:0x8034C498 end:0x8034C4F8
+	extab start:0x800059C8 end:0x80005A58
+	extabindex start:0x8000B1E8 end:0x8000B2C0
+	.bss start:0x80257DD8 end:0x80258188
+
+auto_07_8023802C_data:
+	.data start:0x8023802C end:0x80238030
+
+auto_09_8034B984_sdata:
+	.sdata start:0x8034B984 end:0x8034B988
+
+auto_11_8034FCB4_sdata2:
+	.sdata2 start:0x8034FCB4 end:0x8034FCB8

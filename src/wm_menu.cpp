@@ -4404,7 +4404,8 @@ void CMenuPcs::DrawTitleMenu()
 
 		state = m_wmWorldState->m_mainState;
 		if (state >= 2) {
-			float fX = FLOAT_80331778 - FLOAT_80331414;
+			float fX = FLOAT_80331778;
+			fX -= FLOAT_80331414;
 			float fY = FLOAT_8033177C;
 			if (m_wmWorldState->m_cardChannel != 0) {
 				fY = FLOAT_8033177C + (float)(m_wmWorldState->m_cardChannel * 0x28 - 8);
@@ -4432,7 +4433,8 @@ void CMenuPcs::DrawTitleMenu()
 			AlphaAdd();
 			state = m_wmWorldState->m_mainState;
 			float secondAlpha = alpha;
-			fX = FLOAT_80331778 - FLOAT_80331414;
+			fX = FLOAT_80331778;
+			fX -= FLOAT_80331414;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
 				fX = static_cast<float>(DOUBLE_80331790 *

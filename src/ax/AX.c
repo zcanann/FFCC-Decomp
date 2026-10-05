@@ -1,18 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 
-void __AXAllocInit(void);
-void __AXVPBInit(void);
-void __AXSPBInit(void);
-void __AXAuxInit(void);
-void __AXClInit(void);
-void __AXOutInit(void);
-void __AXAllocQuit(void);
-void __AXVPBQuit(void);
-void __AXSPBQuit(void);
-void __AXAuxQuit(void);
-void __AXClQuit(void);
-void __AXOutQuit(void);
+#include "dolphin/ax/__ax.h"
 
 #ifdef DEBUG
 const char* __AXVersion = "<< Dolphin SDK - AX\tdebug build: Apr  5 2004 03:56:21 (0x2301) >>";

@@ -334,3 +334,17 @@ ax/AXAux.c:
 
 ax/AXComp.c:
 	.data start:0x802336C0 end:0x80235100
+
+ax/AX.c:
+	.text start:0x8018BACC end:0x8018BB3C
+	.sdata start:0x8034B938 end:0x8034B93C
+	.data start:0x80233598 end:0x802335DC
+
+ax/AXOut.c:
+	.text start:0x8018CBDC end:0x8018D2C8
+	.bss start:0x8032B9E0 end:0x803301E8
+	.sbss start:0x8034C020 end:0x8034C048
+
+ax/DSPCode.c:
+	.data start:0x80235100 end:0x80237020
+	.sdata start:0x8034B940 end:0x8034B942

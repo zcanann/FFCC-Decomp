@@ -926,16 +926,16 @@ config.libs = [
     DolphinLib(
         "ax",
         [
-            Object(Matching, "ax/AX.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AX.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXAlloc.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXAux.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXCL.c"),
-            Object(Matching, "ax/AXOut.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXOut.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXProf.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXSPB.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXVPB.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/AXComp.c"),
-            Object(Matching, "ax/DSPCode.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ax/DSPCode.c"),
         ],
     ),
     DolphinLib(

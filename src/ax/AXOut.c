@@ -4,8 +4,8 @@
 
 #include "dolphin/ax/__ax.h"
 
-static s16 __AXOutBuffer[2][320];
-static s32 __AXOutSBuffer[160];
+static s16 __AXOutBuffer[2][320] ATTRIBUTE_ALIGN(32);
+static s32 __AXOutSBuffer[160] ATTRIBUTE_ALIGN(32);
 static DSPTaskInfo __AXDSPTask;
 static u16 __AXDramImage[8192];
 AXPROFILE __AXLocalProfile;

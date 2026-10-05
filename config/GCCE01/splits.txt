@@ -401,3 +401,17 @@ ax/AXAux.c:
 
 ax/AXComp.c:
 	.data start:0x80216C80 end:0x802186C0
+
+ax/AX.c:
+	.text start:0x80190488 end:0x801904F8
+	.sdata start:0x8032DB30 end:0x8032DB34
+	.data start:0x80216B60 end:0x80216BA4
+
+ax/AXOut.c:
+	.text start:0x80191598 end:0x80191C84
+	.bss start:0x8030F0C0 end:0x803138C8
+	.sbss start:0x8032E220 end:0x8032E248
+
+ax/DSPCode.c:
+	.data start:0x802186C0 end:0x8021A5E0
+	.sdata start:0x8032DB38 end:0x8032DB3A

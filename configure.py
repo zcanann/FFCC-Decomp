@@ -1219,7 +1219,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/MWTrace.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/notify.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/nubevent.c"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/nubinit.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/nubinit.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01"),
                 "TRK_MINNOW_DOLPHIN/serpoll.c",

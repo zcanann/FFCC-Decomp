@@ -169,8 +169,8 @@ regional_data:
 main/scouter:
 	.rodata     start:0x0201CE18 end:0x0201CE1C align:4
 
-regional_data:
-	.rodata     start:0x0201CE1C end:0x0201CE20
+main/shop:
+	.rodata     start:0x0201CE1C end:0x0201CE20 align:4
 
 main/smith:
 	.rodata     start:0x0201CE20 end:0x0201CE24 align:4
@@ -265,8 +265,11 @@ regional_bss:
 main/scouter:
 	.bss        start:0x0300280C end:0x03002814 align:4
 
+main/shop:
+	.bss        start:0x03002814 end:0x0300281F align:4
+
 regional_bss:
-	.bss        start:0x03002814 end:0x03002820
+	.bss        start:0x0300281F end:0x03002820 align:1
 
 main/smith:
 	.bss        start:0x03002820 end:0x03002840 align:8

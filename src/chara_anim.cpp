@@ -370,9 +370,11 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	anim->m_lastFrame = 0;
 
 	float frameFrac = frame - static_cast<float>(frameInt);
+#if defined(VERSION_GCCP01)
 	if (frameInt == anim->m_frameCount - 1) {
 		frameFrac = 0.0f;
 	}
+#endif
 
 	register int flags = static_cast<int>(m_flagsBits.m_channelModes);
 	register unsigned int dataOffset = m_dataOffset;

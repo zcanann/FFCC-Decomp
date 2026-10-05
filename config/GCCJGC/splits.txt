@@ -1687,3 +1687,10 @@ wind.cpp:
 
 chara_anim.cpp:
 	.text start:0x800BD02C end:0x800BD870
+	.rodata start:0x801D54A0 end:0x801D54E0
+	.sdata2 start:0x8034D988 end:0x8034D9A8
+	.data start:0x8022D748 end:0x8022D760
+	.sdata start:0x8034B640 end:0x8034B650
+
+auto_chara_anim_8034B63C_sdata:
+	.sdata start:0x8034B63C end:0x8034B640 align:4

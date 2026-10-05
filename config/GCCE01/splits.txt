@@ -1175,3 +1175,6 @@ axfx/reverb_hi.c:
 	.text	start:0x80192D54 end:0x80193E18
 	.data	start:0x8021A5E0 end:0x8021A600
 	.sdata2	start:0x803326F8 end:0x80332740
+
+itemobj.cpp:
+	.text start:0x80123EA8 end:0x80126338

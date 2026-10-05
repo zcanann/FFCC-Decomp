@@ -532,8 +532,12 @@ void JoyBus::ReleaseSem(int portIndex)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800AE3DC
+ * PAL Size: 12208b
+ * EN Address: 0x800ADC84
+ * EN Size: 12208b
+ * JP Address: 0x800AC0B4
+ * JP Size: 12148b
  */
 void JoyBus::ThreadMain(void* arg)
 {
@@ -580,6 +584,7 @@ sleep_retry:
 loop_body:
     for (;;)
     {
+#ifndef VERSION_GCCJGC
         if (File.IsDiskError() != 0)
         {
             threadParam->m_state = (unsigned char)0x86;
@@ -587,6 +592,7 @@ loop_body:
             ClrRecvBuffer(threadParam->m_portIndex);
             goto sleep_retry;
         }
+#endif
 
         if (threadParam != &m_threadParams[threadParam->m_portIndex])
         {

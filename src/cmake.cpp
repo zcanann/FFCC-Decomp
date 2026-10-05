@@ -1327,7 +1327,11 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     tx = static_cast<int>((120.0f - w) / 2.0 + 480.0);
     cursorY = static_cast<int>(cursorYBase);
     font->SetPosX(static_cast<float>(static_cast<int>((120.0f - w) / 2.0 + 480.0)));
+#ifdef VERSION_GCCJGC
+    font->SetPosY(static_cast<float>(cursorY));
+#else
     font->SetPosY(static_cast<float>(cursorY - 4));
+#endif
     font->Draw(txt);
     DrawInit();
 
@@ -1528,7 +1532,11 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 
     textW = font->GetWidth(text);
     font->SetPosX(static_cast<float>(nameX));
+#ifdef VERSION_GCCJGC
+    font->SetPosY(static_cast<float>(baseY));
+#else
     font->SetPosY(static_cast<float>(baseY - 4));
+#endif
     font->Draw(text);
     font->renderFlags.fixedWidth = 0;
     DrawInit();
@@ -2328,18 +2336,30 @@ void CMenuPcs::CmakeSexDraw()
 
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
-    float maxWidth = 0.0f;
+#ifdef VERSION_GCCJGC
+    float labelWidth;
+#else
+    float labelWidth = 0.0f;
+#endif
     int y;
     int i;
     for (i = 0, y = 0x9C; i < 2; ++i) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
-        if (maxWidth < width) {
-            maxWidth = width;
+#ifdef VERSION_GCCJGC
+        labelWidth = width;
+#else
+        if (labelWidth < width) {
+            labelWidth = width;
         }
+#endif
         float x = static_cast<float>(-(width / 2.0 - 400.0));
         font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+        font->SetPosY(static_cast<float>(y));
+#else
         font->SetPosY(static_cast<float>(y) - 4.0f);
+#endif
         font->Draw(txt);
         y += 0x28;
     }
@@ -2349,9 +2369,9 @@ void CMenuPcs::CmakeSexDraw()
         int sel = CmakeState(this)->m_select;
         int wobble = static_cast<int>(System.m_frameCounter) % 8;
         int cursorX = static_cast<int>(
-            static_cast<double>(static_cast<float>(400.0 - maxWidth / 2.0) +
+            static_cast<double>(static_cast<float>(400.0 - labelWidth / 2.0) +
                                 static_cast<float>(wobble)) -
-            maxWidth / 2.0);
+            labelWidth / 2.0);
         float cy = 156.0f;
         cy += static_cast<float>(sel * 0x28);
         int cursorY = static_cast<int>(cy);
@@ -2593,7 +2613,11 @@ void CMenuPcs::CmakeTribeDraw()
     for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         txt = GetTribeStr(i);
         tribeFont->SetPosX(264.0f);
+#ifdef VERSION_GCCJGC
+        tribeFont->SetPosY(static_cast<float>(y));
+#else
         tribeFont->SetPosY(static_cast<float>(y) - 4.0f);
+#endif
         tribeFont->Draw(txt);
     }
 
@@ -2613,7 +2637,11 @@ void CMenuPcs::CmakeTribeDraw()
     for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         const char* txt = GetHairStr(hairBase + i);
         hairFont->SetPosX(384.0f);
+#ifdef VERSION_GCCJGC
+        hairFont->SetPosY(static_cast<float>(y));
+#else
         hairFont->SetPosY(static_cast<float>(y) - 4.0f);
+#endif
         hairFont->Draw(txt);
     }
 
@@ -2855,7 +2883,11 @@ void CMenuPcs::CmakeJobDraw()
         int x = (i < 4) ? 0x110 : 0x1A8;
         int row = i % 4;
         font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+        font->SetPosY(static_cast<float>(0x70 + row * 0x28));
+#else
         font->SetPosY(static_cast<float>(0x70 + row * 0x28) - 4.0f);
+#endif
         font->Draw(txt);
     }
 
@@ -3080,7 +3112,11 @@ void CMenuPcs::CmakeResultDraw()
 
         labelWidths[i] = 232.0f + labelFont->GetWidth(label);
         labelFont->SetPosX(232.0f);
+#ifdef VERSION_GCCJGC
+        labelFont->SetPosY(static_cast<float>(labelY));
+#else
         labelFont->SetPosY(static_cast<float>(labelY) - 4.0f);
+#endif
         labelFont->Draw(label);
         labelY += 0x28;
     }
@@ -3111,7 +3147,11 @@ void CMenuPcs::CmakeResultDraw()
         float y = static_cast<float>(0x70 + i * 0x28);
         float valueWidth = valueFont->GetWidth(value);
         valueFont->SetPosX(x);
+#ifdef VERSION_GCCJGC
+        valueFont->SetPosY(y);
+#else
         valueFont->SetPosY(y - 4.0f);
+#endif
         valueFont->Draw(value);
 
         if (i == 2) {
@@ -3123,7 +3163,11 @@ void CMenuPcs::CmakeResultDraw()
             const char* hair = GetHairStr(hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
 
             valueFont->SetPosX(16.0f + (x + valueWidth));
+#ifdef VERSION_GCCJGC
+            valueFont->SetPosY(y);
+#else
             valueFont->SetPosY(y - 4.0f);
+#endif
             valueFont->Draw(hair);
         }
     }
@@ -3293,7 +3337,11 @@ void CMenuPcs::CmakeResultDraw1()
 
         labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
         labelFont->SetPosX(232.0f);
+#ifdef VERSION_GCCJGC
+        labelFont->SetPosY(0x70 + i * 0x28);
+#else
         labelFont->SetPosY(0x70 + i * 0x28 - 4.0f);
+#endif
         labelFont->Draw(txt);
     }
 
@@ -3325,7 +3373,11 @@ void CMenuPcs::CmakeResultDraw1()
         float y = static_cast<float>(0x70 + i * 0x28);
         float valueWidth = static_cast<float>(valueFont->GetWidth(txt));
         valueFont->SetPosX(x);
+#ifdef VERSION_GCCJGC
+        valueFont->SetPosY(y);
+#else
         valueFont->SetPosY(y - 4.0f);
+#endif
         valueFont->Draw(txt);
 
         if (i == 2) {
@@ -3337,7 +3389,11 @@ void CMenuPcs::CmakeResultDraw1()
             const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
 
             valueFont->SetPosX(16.0f + (x + valueWidth));
+#ifdef VERSION_GCCJGC
+            valueFont->SetPosY(y);
+#else
             valueFont->SetPosY(y - 4.0f);
+#endif
             valueFont->Draw(hairTxt);
         }
     }

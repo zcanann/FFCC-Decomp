@@ -176,7 +176,19 @@ main/smith:
 	.rodata     start:0x0201CE20 end:0x0201CE24 align:4
 
 regional_data:
-	.rodata     start:0x0201CE24 end:0x02028AD8
+	.rodata     start:0x0201CE24 end:0x02025574
+
+main/m4a_tables:
+	.rodata     start:0x02025574 end:0x020256D8 align:4
+
+regional_data:
+	.rodata     start:0x020256D8 end:0x02028240
+
+main/sound_data:
+	.rodata     start:0x02028240 end:0x02028390 align:4
+
+regional_data:
+	.rodata     start:0x02028390 end:0x02028AD8
 
 main/obj:
 	.data       start:0x02028AD8 end:0x02028AF0 align:4
@@ -284,7 +296,13 @@ main/favorite:
 	.bss        start:0x03002840 end:0x0300284A align:8
 
 regional_bss:
-	.bss        start:0x0300284A end:0x030029C0 align:1
+	.bss        start:0x0300284A end:0x03002850 align:1
+
+main/sound_data:
+	.bss        start:0x03002850 end:0x03002990 align:8
+
+regional_bss:
+	.bss        start:0x03002990 end:0x030029C0
 
 main/main:
 	.common     start:0x030029C0 end:0x03002AC0 align:16

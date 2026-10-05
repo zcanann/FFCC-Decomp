@@ -16,6 +16,9 @@ class CUtil : public CManager
 public:
     CUtil() {}
 
+    unsigned short AsciiToMulti(unsigned char);
+    static unsigned short m_atom[96];
+
     void SetVtxFmt_POS_CLR();
     void SetVtxFmt_POS_CLR_TEX();
     void SetVtxFmt_POS_TEX0_TEX1();

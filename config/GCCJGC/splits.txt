@@ -1339,3 +1339,9 @@ auto_801DCB54_data:
 
 auto_8034C5DC_sdata2:
 	.sdata2 start:0x8034C5DC end:0x8034C5E0 align:4
+
+stopwatch.cpp:
+	.text	start:0x80020A60 end:0x80020D40
+	extab	start:0x80005CDC end:0x80005D40
+	extabindex	start:0x8000B4C4 end:0x8000B53C
+	.sdata2	start:0x8034C5B0 end:0x8034C5C8

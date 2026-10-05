@@ -173,10 +173,7 @@ regional_data:
 	.rodata     start:0x0201CC70 end:0x0201CC78
 
 main/cmake:
-	.rodata     start:0x0201CC78 end:0x0201D160 align:4
-
-regional_data:
-	.rodata     start:0x0201D160 end:0x0201D178
+	.rodata     start:0x0201CC78 end:0x0201D178 align:4
 
 main/shop:
 	.rodata     start:0x0201D178 end:0x0201D17C align:4

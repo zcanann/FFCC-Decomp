@@ -72,7 +72,7 @@ void CMake_PrintTitle(char *str, s32 x);
 void CMake_ClearTitle(void);
 void CMakeName_AddChar(s32 mode);
 void CMakeName_DeleteChar(void);
-s32 CMakeName_IsFull(void);
+s32 CMakeName_CanApplyDiacritic(void);
 void CMakeName_PrintName(char *str);
 void CMake_DrawFooter(void);
 void CMakeGenderScreen_DrawCursor(void);
@@ -487,7 +487,7 @@ s32 CMakeNameScreen_HandleInput(void)
                     m4aSongNumStart(2);
                 }
             }
-        } else if (sCMakeNameLen > 6 && CMakeName_IsFull() == 0) {
+        } else if (sCMakeNameLen > 6 && CMakeName_CanApplyDiacritic() == 0) {
             m4aSongNumStart(0);
         } else {
             m4aSongNumStart(2);
@@ -595,22 +595,79 @@ void CMake_ClearTitle(void)
     DmaCopy16(3, buf + 30, dst + 32, n * sizeof(u16));
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200B390
+ * PAL Size: 180b
+ * EN Address: 0x0200B2C0
+ * EN Size: 180b
+ * JP Address: 0x02011394
+ * JP Size: 472b
+ */
 void CMakeName_AddChar(s32 mode)
 {
     char ch[4];
     char prev[4];
+#if defined(VERSION_GCCJGC)
+    s32 n;
+#endif
 
     memset(ch, 0, 3);
     memset(prev, 0, 3);
     if (mode == 0) {
         char *str = gNameCharTables[sCMakeCharPage * 5 + sCMakeCursor[1]];
+#if defined(VERSION_GCCJGC)
+        s32 wide;
+        s32 i;
+        s32 j;
+        s32 len;
+#endif
 
         Str_GetChar(str, sCMakeCursor[0], ch);
+#if defined(VERSION_GCCJGC)
+        wide = Str_IsWideChar(sCMakeName, sCMakeNameLen - 1);
+#else
         Str_IsWideChar(sCMakeName, sCMakeNameLen - 1);
+#endif
         Str_GetChar(sCMakeName, sCMakeNameLen - 1, prev);
+#if defined(VERSION_GCCJGC)
+        if (wide && sCMakeNameLen != 0 && strcmp(ch, "\201J") == 0) {
+            for (i = 0; i < 2; i++) {
+                len = strlen(gNameDiacriticChars[i]);
+                str = gNameDiacriticChars[i];
+                for (j = 0; j < len; j += 2, str += 2) {
+                    if (memcmp(str, prev, 2) == 0) {
+                        n = strlen(sCMakeName);
+                        sCMakeName[n - 1]++;
+                        goto redraw;
+                    }
+                }
+            }
+            if (memcmp(prev, "\203E", 2) == 0) {
+                str = sCMakeName + strlen(sCMakeName) - 2;
+                memcpy(str, "\203\224", 3);
+                goto redraw;
+            }
+        } else if (wide && sCMakeNameLen != 0 && strcmp(ch, "\201K") == 0) {
+            len = strlen(gNameDiacriticChars[1]);
+            str = gNameDiacriticChars[1];
+            for (i = 0; i < len; i += 2, str += 2) {
+                if (memcmp(str, prev, 2) == 0) {
+                    n = strlen(sCMakeName);
+                    sCMakeName[n - 1] += 2;
+                    break;
+                }
+            }
+            if (len > i)
+                goto redraw;
+        }
+#endif
         strcat(sCMakeName, ch);
         sCMakeNameLen++;
     }
+#if defined(VERSION_GCCJGC)
+redraw:
+#endif
     Text_SetFill(0, 0);
     Text_Clear();
     CMakeName_PrintName(sCMakeName);
@@ -639,8 +696,54 @@ void CMakeName_DeleteChar(void)
     CMakeName_PrintName(sCMakeName);
 }
 
-s32 CMakeName_IsFull(void)
+/*
+ * --INFO--
+ * PAL Address: 0x0200B4B0
+ * PAL Size: 4b
+ * EN Address: 0x0200B3E0
+ * EN Size: 4b
+ * JP Address: 0x020115D8
+ * JP Size: 316b
+ */
+s32 CMakeName_CanApplyDiacritic(void)
 {
+#if defined(VERSION_GCCJGC)
+    char ch[4];
+    char prev[4];
+    char *str;
+    s32 i;
+    s32 j;
+    s32 len;
+
+    memset(ch, 0, 3);
+    memset(prev, 0, 3);
+    if (!Str_IsWideChar(sCMakeName, sCMakeNameLen - 1))
+        return 0;
+    str = gNameCharTables[sCMakeCharPage * 5 + sCMakeCursor[1]];
+    Str_GetChar(str, sCMakeCursor[0], ch);
+    if (strcmp(ch, "\201J") != 0 && strcmp(ch, "\201K") != 0)
+        return 0;
+    Str_GetChar(sCMakeName, sCMakeNameLen - 1, prev);
+    if (strcmp(ch, "\201J") == 0) {
+        for (i = 0; i < 2; i++) {
+            len = strlen(gNameDiacriticChars[i]);
+            str = gNameDiacriticChars[i];
+            for (j = 0; j < len; j += 2, str += 2) {
+                if (memcmp(str, prev, 2) == 0)
+                    return 1;
+            }
+        }
+        if (memcmp(prev, "\203E", 2) == 0)
+            return 1;
+    } else {
+        len = strlen(gNameDiacriticChars[1]);
+        str = gNameDiacriticChars[1];
+        for (i = 0; i < len; i += 2, str += 2) {
+            if (memcmp(str, prev, 2) == 0)
+                return 1;
+        }
+    }
+#endif
     return 0;
 }
 
@@ -2267,8 +2370,8 @@ s32 CMakeConfirmScreen_Exit(void)
  * PAL Size: 316b
  * EN Address: 0x0200DC74
  * EN Size: 316b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x02013F6C
+ * JP Size: 332b
  */
 void CMakeConfirmScreen_PrintNextRow(void)
 {
@@ -2284,8 +2387,18 @@ void CMakeConfirmScreen_PrintNextRow(void)
         Text_SetFill(0, 0);
         Text_Clear();
         memset(buf, 0, sizeof(buf));
+#if defined(VERSION_GCCJGC)
+        {
+            s32 row = sCMakeTextRow + 1;
+            if (sCMakeTextRow == 3)
+                row = sCMakeTextRow + 3;
+            n = strstr(Msg_GetCMake(row), "\202\360") - Msg_GetCMake(row);
+            memcpy(buf, Msg_GetCMake(row), n);
+        }
+#else
         idx = sCMakeTextRow + 23;
         strcpy(buf, Msg_GetCMake(idx));
+#endif
         Text_Print(buf, TEXT_DRAW);
         Text_AddX(8);
         if (sCMakeTextRow == 0) {
@@ -2295,14 +2408,25 @@ void CMakeConfirmScreen_PrintNextRow(void)
             Text_Print(Msg_GetCMake(n), TEXT_DRAW);
         } else if (sCMakeTextRow == 2) {
             n = gCMakeData.look & 3;
+#if defined(VERSION_GCCJGC)
+            Text_Print(Msg_GetTribe(n), TEXT_DRAW);
+#else
             strcpy(buf, Msg_GetTribe(n));
             strcat(buf, ",");
             Text_Print(buf, TEXT_DRAW);
+#endif
             Text_AddX(8);
             idx = n * 8;
             if (gCMakeData.look & 0x80)
                 idx += 4;
+#if defined(VERSION_GCCJGC)
+            {
+                s32 lookIndex = (gCMakeData.look >> 2) & 3;
+                Text_Print(Msg_GetLook(idx + lookIndex), TEXT_DRAW);
+            }
+#else
             Text_Print(Msg_GetLook(idx + ((gCMakeData.look >> 2) & 3)), TEXT_DRAW);
+#endif
         } else if (sCMakeTextRow == 3) {
             n = gCMakeData.job[0];
             Text_Print(Msg_GetCMake(n + 12), TEXT_DRAW);

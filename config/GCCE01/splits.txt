@@ -1191,3 +1191,6 @@ game.cpp:
 
 p_chara_viewer.cpp:
 	.text start:0x800BD0E4 end:0x800BEEBC
+
+FunnyShape.cpp:
+	.text start:0x80050310 end:0x80051D2C

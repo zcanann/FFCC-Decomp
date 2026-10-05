@@ -9913,18 +9913,25 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 
 /*
  * --INFO--
- * PAL Address: 0x800ea150
+ * PAL Address: 0x800EA150
  * PAL Size: 932b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E9854
+ * EN Size: 932b
+ * JP Address: 0x800E7288
+ * JP Size: 844b
  */
 void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
+#ifdef VERSION_GCCJGC
+	int maxWidth;
+	int msgId;
+#else
 	int i;
+#endif
+#ifndef VERSION_GCCJGC
 	static const char* s_SlotStr[] = {"Slot A", "Steckplatz A", "Slot A", "Slot A", "Ranura A"};
 	static const char* s_DataStr[] = {"Data 1", "Datenblock 1", "Salvataggio 1", "sauvegarde 1", "Archivo 1"};
+#endif
 
 	CFont* const font = GetFont22();
 
@@ -9938,25 +9945,42 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	font->SetTlut(0x23);
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);
+#ifndef VERSION_GCCJGC
 	const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
 	const WinMessEntry* const winMess = GetWinMess(winType);
 
 	float lineHeight;
+#endif
 	float posX;
 	if (winType != 0) {
+#ifdef VERSION_GCCJGC
+		const WinMessEntry* const winMess = GetWinMess(winType);
+#endif
+#ifdef VERSION_GCCJGC
+		maxWidth = 0;
+#else
 		int maxWidth = 0;
+#endif
+#ifdef VERSION_GCCJGC
+		for (int i = 0; i < winMess->m_lineCount; i++) {
+#else
 		for (i = 0; i < winMess->m_lineCount; i++) {
+#endif
 			const short msgId = winMess->m_messageIds[i];
 			const char* text = msgTable[msgId];
+#ifndef VERSION_GCCJGC
 			if (text != 0) {
 				if (text[0] == '$') {
 					text++;
 				}
+#endif
 				const int width = font->GetWidth(const_cast<char*>(text));
 				if (width > maxWidth) {
 					maxWidth = width;
 				}
+#ifndef VERSION_GCCJGC
 			}
+#endif
 		}
 		const double* pHalfW = &DOUBLE_803313F8;
 		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - maxWidth) * *pHalfW +
@@ -9964,14 +9988,32 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	}
 
 	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
+#ifdef VERSION_GCCJGC
+	const WinMessEntry* const winMess = GetWinMess(winType);
+#else
 	const float* pLineH = &FLOAT_80331404;
 	lineHeight = *pLineH;
+#endif
 
 	char textBuf[128];
+#ifdef VERSION_GCCJGC
+	for (int i = 0; i < winMess->m_lineCount; i++) {
+#else
 	for (i = 0; i < winMess->m_lineCount; i++) {
+#endif
+#ifdef VERSION_GCCJGC
+		msgId = winMess->m_messageIds[i];
+#else
 		const short msgId = winMess->m_messageIds[i];
+#endif
+#ifndef VERSION_GCCJGC
 		int isDollar = 0;
+#endif
 		if ((int)strlen(msgTable[msgId]) != 0) {
+#ifdef VERSION_GCCJGC
+			strcpy(textBuf, msgTable[msgId]);
+			if (winType == 0 || msgId == 11) {
+#else
 			if (msgTable[msgId][0] == '$') {
 				strcpy(textBuf, msgTable[msgId] + 1);
 				isDollar = 1;
@@ -9980,6 +10022,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 
 			if (winType == 0 || isDollar != 0) {
+#endif
 				const double* pHalfW2 = &DOUBLE_803313F8;
 				const int textWidth = font->GetWidth(textBuf);
 				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - textWidth) * *pHalfW2 +
@@ -9987,6 +10030,19 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 			font->SetPosX(posX);
 			font->SetPosY(y);
+#ifdef VERSION_GCCJGC
+			if (messType == 0) {
+				if (msgId == 3 || msgId == 5 || msgId == 7 || msgId == 15 ||
+				    msgId == 19 || msgId == 22 || msgId == 32) {
+					textBuf[9] += GetMcCtrl()->m_cardChannel;
+				} else if (msgId == 27) {
+					textBuf[1] += 2;
+					textBuf[3] += 2;
+				}
+			} else if (memcmp(textBuf, "\x83\x66\x81\x5B\x83\x5E\x82\x50", 8) == 0) {
+				textBuf[7] += GetMcCtrl()->m_saveIndex;
+			}
+#else
 			if (messType == 0) {
 				char* slotText;
 				if (winType != 0 && (slotText = strstr(textBuf, s_SlotStr[languageIndex])) != 0) {
@@ -10006,9 +10062,14 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 					dataText[len - 1] += GetMcCtrl()->m_saveIndex;
 				}
 			}
+#endif
 			font->Draw(textBuf);
 		}
+#ifdef VERSION_GCCJGC
+		y += 22.0f;
+#else
 		y += lineHeight;
+#endif
 	}
 
 	DrawInit();

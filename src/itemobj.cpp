@@ -390,9 +390,7 @@ void CGItemObj::onFrameStat()
 		if (m_stateFrame == 0) {
 			m_bgColMask = 0;
 			m_weaponNodeFlagBits.m_unk10 = 0;
-			m_groundHitOffset.z = zero;
-			m_groundHitOffset.y = zero;
-			m_groundHitOffset.x = zero;
+			m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = zero;
 		} else if (m_stateFrame == kItemObjFadeStartFrame) {
 #ifdef VERSION_GCCP01
 			m_alphaStep = kItemObjWobblePhaseScale;
@@ -442,8 +440,7 @@ void CGItemObj::onFrameStat()
 				playSe3D(0x1A, 0x32, 0x96, 0, 0);
 				m_displayFlags &= ~1;
 				m_bgColMask &= 0xFFFFFFF1;
-				m_moveOffset.z = zero;
-				m_moveOffset.x = zero;
+				m_moveOffset.x = m_moveOffset.z = zero;
 				m_bgColMask |= 0x80000;
 
 				const CVector& damageOffset = CVector(zero, zero, zero);
@@ -523,18 +520,14 @@ void CGItemObj::onFrameStat()
 			m_groundHitOffset.y += kItemObjMemoryChaseScale * delta.y * moveScale;
 			m_groundHitOffset.z += kItemObjMemoryChaseScale * delta.z * moveScale;
 		} else {
-			m_groundHitOffset.z = zero;
-			m_groundHitOffset.y = zero;
-			m_groundHitOffset.x = zero;
+			m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = zero;
 		}
 		break;
 	}
 	case 0x27: {
 		int pdtNo = -1;
 
-		m_groundHitOffset.z = zero;
-		m_groundHitOffset.y = zero;
-		m_groundHitOffset.x = zero;
+		m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = zero;
 
 		if (m_stateFrame == 0) {
 			m_alphaTarget = zero;
@@ -565,9 +558,7 @@ void CGItemObj::onFrameStat()
 	case 0x26: {
 		int pdtNo = -1;
 
-		m_groundHitOffset.z = zero;
-		m_groundHitOffset.y = zero;
-		m_groundHitOffset.x = zero;
+		m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = zero;
 
 		if (m_stateFrame == 0) {
 			m_alphaTarget = zero;

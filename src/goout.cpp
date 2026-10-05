@@ -17,10 +17,18 @@ int g_freeCaravanIdx;
 static const int kTransferWindowBase = 50;
 static const int kTransferMessageBase = 100;
 static const int kTransferMessageGroup = 0;
+static const int kConfirmationDefault = 0;
+static const int kTransferSaveMessage = 44;
+static const int kTransferCompleteMessage = 45;
+static const int kTransferCheckMessage = 46;
 #else
 static const int kTransferWindowBase = 34;
 static const int kTransferMessageBase = 0;
 static const int kTransferMessageGroup = 2;
+static const int kConfirmationDefault = 1;
+static const int kTransferSaveMessage = 31;
+static const int kTransferCompleteMessage = 32;
+static const int kTransferCheckMessage = 33;
 #endif
 
 #ifndef VERSION_GCCJGC
@@ -1098,10 +1106,16 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
     m_modeFrame = 0;
     switch (mode) {
     case 1: {
-        m_cursorChoice = 1;
+        m_cursorChoice = kConfirmationDefault;
+#ifdef VERSION_GCCJGC
+        if (prevMainMode == 3U) {
+            m_cursorChoice = 1;
+        }
+#else
         if (prevMainMode != 3U) {
             m_cursorChoice = 0;
         }
+#endif
         MenuPcs.ChgAllModel();
         if (m_currentMessage >= 0) {
             MenuPcs.m_menuWindowInfo->state = 2;
@@ -1388,7 +1402,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             MenuGoOutState().m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
-        m_pendingMessage = 0x21;
+        m_pendingMessage = kTransferCheckMessage;
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
         MenuPcs.GetMcAccessPos(&m_accessCardChannel, &m_accessSaveIndex);
@@ -1487,7 +1501,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 30));
 #endif
         }
-        m_cursorChoice = 1;
+        m_cursorChoice = kConfirmationDefault;
         break;
     case 0x11:
         if (m_currentMessage >= 0) {
@@ -1495,10 +1509,10 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             MenuGoOutState().m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
-        m_pendingMessage = 0x1F;
+        m_pendingMessage = kTransferSaveMessage;
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
-        m_cursorChoice = 1;
+        m_cursorChoice = kConfirmationDefault;
         break;
     case 0x12: {
         m_watchCardDisconnect = 0;
@@ -1593,7 +1607,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             MenuGoOutState().m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
-        m_pendingMessage = 0x20;
+        m_pendingMessage = kTransferCompleteMessage;
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
         break;
@@ -1606,7 +1620,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 		m_pendingMessage = 4;
 		m_messageCloseMode = 0;
 		m_pendingMessageTimer = 0;
-		m_cursorChoice = 1;
+		m_cursorChoice = kConfirmationDefault;
 		break;
 	case 4:
         if (m_currentMessage >= 0) {
@@ -1617,7 +1631,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 		m_pendingMessage = 5;
 		m_messageCloseMode = 0;
 		m_pendingMessageTimer = 0;
-		m_cursorChoice = 1;
+		m_cursorChoice = kConfirmationDefault;
 		break;
     case 5:
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
@@ -1644,6 +1658,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_pendingMessageTimer = 0;
         break;
     case 6:
+#ifndef VERSION_GCCJGC
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState().m_animFrame = 0;
@@ -1651,6 +1666,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             m_messageTimer = 0;
             m_messageState = 1;
         }
+#endif
         if (m_currentMessage >= 0) {
             MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState().m_animFrame = 0;
@@ -1659,7 +1675,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_pendingMessage = 0xc;
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
-        m_cursorChoice = 1;
+        m_cursorChoice = kConfirmationDefault;
         break;
 	}
 }
@@ -2267,11 +2283,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 75));
 #endif
         }
-#ifdef VERSION_GCCJGC
-        m_cursorChoice = 0;
-#else
-        m_cursorChoice = 1;
-#endif
+        m_cursorChoice = kConfirmationDefault;
         break;
     }
     case 4:
@@ -2291,11 +2303,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 79));
 #endif
         }
-#ifdef VERSION_GCCJGC
-        m_cursorChoice = 0;
-#else
-        m_cursorChoice = 1;
-#endif
+        m_cursorChoice = kConfirmationDefault;
         break;
     case 5:
         if (Game.m_caravanWorkArr[m_selectedChara].m_caravanLocalFlags != 0) {
@@ -2329,11 +2337,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
             SetMenuStr(0, 1, mes[88]);
 #endif
         }
-#ifdef VERSION_GCCJGC
-        m_cursorChoice = 0;
-#else
-        m_cursorChoice = 1;
-#endif
+        m_cursorChoice = kConfirmationDefault;
         MenuPcs.SetMenuCharaAnim(m_selectedChara, 5);
         break;
     case 6:
@@ -2357,11 +2361,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 94));
 #endif
         }
-#ifdef VERSION_GCCJGC
-        m_cursorChoice = 0;
-#else
-        m_cursorChoice = 1;
-#endif
+        m_cursorChoice = kConfirmationDefault;
         break;
     case 7:
         {
@@ -2382,11 +2382,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 99));
 #endif
         }
-#ifdef VERSION_GCCJGC
-        m_cursorChoice = 0;
-#else
-        m_cursorChoice = 1;
-#endif
+        m_cursorChoice = kConfirmationDefault;
         break;
     case 8:
         MenuPcs.SetMenuCharaAnim(m_selectedChara, 3);

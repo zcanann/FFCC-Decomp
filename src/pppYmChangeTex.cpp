@@ -340,8 +340,7 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 	pppYmChangeTexState* state = GetChangeTexState(ymChangeTex, data);
 
 	state->m_value0 = init;
-	state->m_value2 = init;
-	state->m_value1 = init;
+	state->m_value1 = state->m_value2 = init;
 	state->m_charaObj = 0;
 	state->m_context = ppvMng;
 	state->m_texture = 0;

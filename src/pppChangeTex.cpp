@@ -363,8 +363,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 	float init = 0.0f;
 
 	work->m_value0 = init;
-	work->m_value2 = init;
-	work->m_value1 = init;
+	work->m_value1 = work->m_value2 = init;
 }
 
 /*
@@ -382,8 +381,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
 
 	work->m_value0 = init;
-	work->m_value2 = init;
-	work->m_value1 = init;
+	work->m_value1 = work->m_value2 = init;
 	work->m_charaObj = 0;
 	work->m_context = ppvMng;
 	work->m_texture = 0;

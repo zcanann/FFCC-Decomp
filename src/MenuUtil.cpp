@@ -1196,8 +1196,8 @@ void CMenuPcs::DrawOptionMenu()
 		rightHintOn = 1;
 	}
 
-	int rowAnimStep = static_cast<int>(m_optionRowAnim / 0.125f);
 	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionRowAnim));
+	int rowAnimStep = static_cast<int>(m_optionRowAnim / 0.125f);
 	float rowAngle = static_cast<float>(rowAnimStep) * 11.25f;
 	float rowSin = static_cast<float>(sin(0.017453292f * (2.0f * rowAngle)));
 	float rowCos = static_cast<float>(cos(0.017453292f * rowAngle));

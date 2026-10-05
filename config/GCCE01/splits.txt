@@ -1215,3 +1215,9 @@ pppYmMegaBirthShpTail2.cpp:
 
 pppRyjMegaBirth.cpp:
 	.text start:0x80081C14 end:0x80083B80
+
+pppYmBreath.cpp:
+	.text start:0x800BF700 end:0x800C1040
+
+pppBreathModel.cpp:
+	.text start:0x800DA860 end:0x800DC16C

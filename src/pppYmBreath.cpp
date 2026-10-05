@@ -245,22 +245,16 @@ void pppConstruct2YmBreath(_pppPObject* obj)
  * --INFO--
  * PAL Address: 0x800bff74
  * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800BF7FC
+ * EN Size: 120b
+ * JP Address: 0x800BD96C
+ * JP Size: 120b
  */
 extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOffsets)
 {
     VYmBreath* state = GetYmBreathWork(ymBreath, GetYmBreathDataOffsets(dataOffsets)->m_workOffset);
-    float zero;
-
     PSMTXIdentity(state->m_matrix);
-    zero = kYmBreathZero;
-
-    state->m_direction.z = zero;
-    state->m_direction.y = zero;
-    state->m_direction.x = zero;
+    state->m_direction.x = state->m_direction.y = state->m_direction.z = kYmBreathZero;
 
     state->m_particleData = 0;
     state->m_particleWmats = 0;

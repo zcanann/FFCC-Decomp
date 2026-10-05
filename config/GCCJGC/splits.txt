@@ -1168,3 +1168,9 @@ auto_08_80345A24_bss:
 
 auto_08_80345FA4_bss:
 	.bss start:0x80345FA4 end:0x80345FA8 align:4
+
+pppYmBreath.cpp:
+	.text start:0x800BD870 end:0x800BF1C8
+
+pppBreathModel.cpp:
+	.text start:0x800D8434 end:0x800D9D6C

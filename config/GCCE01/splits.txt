@@ -438,3 +438,16 @@ os/OSMessage.c:
 
 os/OSMutex.c:
 	.text	start:0x8017DFFC end:0x8017E06C
+
+gx/GXLight.c:
+	.text	start:0x801A23D4 end:0x801A2A5C
+	.data	start:0x8021B5D0 end:0x8021B5EC
+	.sdata2	start:0x80332808 end:0x8033284C
+
+gx/GXMisc.c:
+	.text	start:0x801A0B64 end:0x801A1308
+	.sbss	start:0x8032E310 end:0x8032E324
+
+gx/GXTev.c:
+	.text	start:0x801A40BC end:0x801A48A0
+	.data	start:0x8021B818 end:0x8021B88C

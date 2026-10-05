@@ -939,3 +939,16 @@ os/OSFont.c:
 
 auto_09_8032DA8A_sdata:
 	.sdata start:0x8032DA8A end:0x8032DA90 align:2
+
+os/OSArena.c:
+	.text	start:0x8017BB48 end:0x8017BB68
+	.sdata	start:0x8032DA78 end:0x8032DA7C
+	.sbss	start:0x8032DF58 end:0x8032DF5C
+
+os/OSResetSW.c:
+	.text	start:0x8017E7BC end:0x8017EB48
+	.sbss	start:0x8032DF90 end:0x8032DFB0
+
+os/OSTime.c:
+	.text	start:0x80180ADC end:0x80180F00
+	.data	start:0x80215FD0 end:0x80216030

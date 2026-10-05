@@ -853,3 +853,16 @@ os/OSFont.c:
 
 auto_09_8034B892_sdata:
 	.sdata start:0x8034B892 end:0x8034B898 align:2
+
+os/OSArena.c:
+	.text	start:0x801771F4 end:0x80177214
+	.sdata	start:0x8034B880 end:0x8034B884
+	.sbss	start:0x8034BD58 end:0x8034BD5C
+
+os/OSResetSW.c:
+	.text	start:0x80179E68 end:0x8017A1F4
+	.sbss	start:0x8034BD90 end:0x8034BDB0
+
+os/OSTime.c:
+	.text	start:0x8017C188 end:0x8017C5AC
+	.data	start:0x80232A08 end:0x80232A68

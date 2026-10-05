@@ -1221,10 +1221,12 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/nubevent.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/nubinit.c"),
             Object(
-                MatchingFor("GCCP01", "GCCE01"),
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "TRK_MINNOW_DOLPHIN/serpoll.c",
                 mw_version="GC/2.6",
-                cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
+                cflags=cflags_trk if config.version == "GCCJGC" else [
+                    f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")
+                ],
             ),
             Object(
                 MatchingFor("GCCP01", "GCCE01"),

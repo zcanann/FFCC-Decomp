@@ -992,3 +992,11 @@ pad/Pad.c:
 	.bss	start:0x80328590 end:0x803285E0
 	.sdata	start:0x8034B900 end:0x8034B920
 	.sbss	start:0x8034BF18 end:0x8034BF40
+
+TRK_MINNOW_DOLPHIN/serpoll.c:
+	.text	start:0x801A4788 end:0x801A4B54
+	.bss	start:0x80345A00 end:0x80345A18
+
+TRK_MINNOW_DOLPHIN/msghndlr.c:
+	.text	start:0x801A729C end:0x801A74DC
+	.bss	start:0x80345A20 end:0x80345A24

@@ -70,7 +70,7 @@ typedef struct TRKFramingState {
 	ReceiverState receiveState;
 #endif
 	BOOL isEscape;
-	u8 fcsType;
+	u8 checksum;
 } TRKFramingState;
 
 typedef struct CommandReply {

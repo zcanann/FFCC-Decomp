@@ -9494,7 +9494,8 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 		u1 = tx + halfTexel;
 		u0 = (tx + w) - halfTexel;
 	} else {
-		u0 = tx + halfTexel;
+		u0 = tx;
+		u0 += halfTexel;
 		u1 = (tx + w) - halfTexel;
 	}
 
@@ -9502,7 +9503,8 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 		v1 = ty + halfTexel;
 		v0 = (v1 + h) - halfTexel;
 	} else {
-		v0 = ty + halfTexel;
+		v0 = ty;
+		v0 += halfTexel;
 		v1 = (ty + h) - halfTexel;
 	}
 
@@ -9540,8 +9542,9 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 
 	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
 
+	float z = 0.0f;
 	for (int i = 0; i < 4; i++) {
-		GXPosition3f32(out[i].x, out[i].y, out[i].z);
+		GXPosition3f32(out[i].x, out[i].y, z);
 		float uu;
 		if ((i & 1) != 0) {
 			uu = u1;

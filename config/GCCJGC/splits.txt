@@ -1394,3 +1394,4 @@ gx/GXPerf.c:
 
 pppMiasma.cpp:
 	.text start:0x80105A5C end:0x801071C8
+	.sdata2 start:0x8034E5C8 end:0x8034E5F0

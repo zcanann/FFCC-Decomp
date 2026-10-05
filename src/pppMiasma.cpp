@@ -280,7 +280,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     MiasmaFrameWork* work;
     int slice;
 
+#if defined(VERSION_GCCP01)
     Graphic.SetDrawDoneDebugData(0x31);
+#endif
 
     work = GetMiasmaFrameWork(pppMiasma, ctrl);
     colorWork = GetMiasmaColorWork(pppMiasma, ctrl);
@@ -405,9 +407,13 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
 
         if (!isCameraInside) {
+#if defined(VERSION_GCCP01)
             Graphic.SetDrawDoneDebugData(0x32);
+#endif
             pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
+#if defined(VERSION_GCCP01)
             Graphic.SetDrawDoneDebugData(0x33);
+#endif
         }
 
         pppInitBlendMode();
@@ -423,9 +429,13 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             0, 7, 7, 7, 6);
         _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
 
+#if defined(VERSION_GCCP01)
         Graphic.SetDrawDoneDebugData(0x34);
+#endif
         pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
+#if defined(VERSION_GCCP01)
         Graphic.SetDrawDoneDebugData(0x35);
+#endif
 
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &miasmaMaskTex, 0, yOffset, texWidth, texHeight, maskOffset,
                                    GX_LINEAR, GX_CTF_R8, 0);
@@ -476,9 +486,13 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             _GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
 
             if (!isCameraInside) {
+#if defined(VERSION_GCCP01)
                 Graphic.SetDrawDoneDebugData(0x36);
+#endif
                 pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
+#if defined(VERSION_GCCP01)
                 Graphic.SetDrawDoneDebugData(0x37);
+#endif
             }
             tevStage = 0;
 
@@ -494,9 +508,13 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
                 0, 7, 7, 7, 6);
             _GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
 
+#if defined(VERSION_GCCP01)
             Graphic.SetDrawDoneDebugData(0x38);
+#endif
             pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
+#if defined(VERSION_GCCP01)
             Graphic.SetDrawDoneDebugData(0x39);
+#endif
 
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &secondaryMaskTex, 0, yOffset, texWidth, texHeight,
                                        secondaryOffset, GX_LINEAR, GX_CTF_R8, 0);

@@ -894,10 +894,10 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
  * --INFO--
  * PAL Address: 0x8001E4F8
  * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001E2EC
+ * EN Size: 296b
+ * JP Address: 0x8001DD60
+ * JP Size: 280b
  */
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
@@ -907,10 +907,9 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
     CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
     watch.Start();
     extern const float kMemoryDmaTimeout;
-    float timeout = kMemoryDmaTimeout;
     while (Sound.DMACheck(dmaId) != 0) {
         watch.Stop();
-        if (watch.Get() >= timeout) {
+        if (watch.Get() >= kMemoryDmaTimeout) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg));
             }
@@ -1617,10 +1616,9 @@ inline int CAmemCache::GetData(CMemory::CStage* rStage, char* source, int line)
                 CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
                 watch.Start();
                 extern const float kMemoryDmaTimeout;
-                float timeout = kMemoryDmaTimeout;
                 while (Sound.DMACheck(dmaId) != 0) {
                     watch.Stop();
-                    if (watch.Get() >= timeout) {
+                    if (watch.Get() >= kMemoryDmaTimeout) {
                         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                             System.Printf(const_cast<char*>(sGetDataTimeoutBanner));
                         }
@@ -1646,10 +1644,10 @@ inline int CAmemCache::GetData(CMemory::CStage* rStage, char* source, int line)
  * --INFO--
  * PAL Address: 0x8001D278
  * PAL Size: 456b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001D06C
+ * EN Size: 456b
+ * JP Address: 0x8001CAC8
+ * JP Size: 440b
  */
 int CAmemCacheSet::GetData(short index, char* source, int line)
 {

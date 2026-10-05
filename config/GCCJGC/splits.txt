@@ -714,3 +714,6 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	.data start:0x80238980 end:0x80238A68
 	.bss start:0x803481E8 end:0x803481F4
 	.sdata start:0x8034B9E0 end:0x8034B9F0
+
+mesmenu.cpp:
+	.text start:0x800996B0 end:0x8009C2A8

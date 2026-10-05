@@ -893,7 +893,11 @@ void CRingMenu::onCalc()
 						}
 						if ((prevDir != 0) || (nextDir != 0)) {
 							if ((prevDir != 0) && (nextDir != 0)) {
+#ifdef VERSION_GCCP01
 								unsigned short trigger = Pad.GetButton(m_menuIndex);
+#else
+								unsigned short trigger = Pad.GetButton(0);
+#endif
 								if ((trigger & 0x40) != 0) {
 									nextDir = prevDir;
 								}

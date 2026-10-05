@@ -677,3 +677,7 @@ TRK_MINNOW_DOLPHIN/mslsupp.c:
 MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
 	.text start:0x801B4428 end:0x801B44EC
 	.sbss start:0x8034C160 end:0x8034C164
+
+exi/EXIUart.c:
+	.text	start:0x8017E020 end:0x8017E5F4
+	.sbss	start:0x8034BDD0 end:0x8034BDE0

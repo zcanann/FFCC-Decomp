@@ -722,3 +722,7 @@ menu_lst.cpp:
 
 ringmenu.cpp:
 	.text start:0x800A26A8 end:0x800A4C34
+
+exi/EXIUart.c:
+	.text	start:0x80182970 end:0x80182F44
+	.sbss	start:0x8032DFD0 end:0x8032DFE0

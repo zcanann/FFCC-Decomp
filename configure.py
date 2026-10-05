@@ -851,7 +851,7 @@ config.libs = [
         "exi",
         [
             Object(Matching, "exi/EXIBios.c"),
-            Object(Matching, "exi/EXIUart.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "exi/EXIUart.c"),
         ],
     ),
     DolphinLib(

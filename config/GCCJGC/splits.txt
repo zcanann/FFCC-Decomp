@@ -160,3 +160,15 @@ MSL_C/PPCEABI/bare/H/s_atan.c:
 MSL_C/PPCEABI/bare/H/s_ldexp.c:
 	.text start:0x801B7188 end:0x801B734C
 	.sdata2 start:0x803500E8 end:0x80350110
+
+MSL_C/PPCEABI/bare/H/s_cos.c:
+	.text start:0x801B6EE0 end:0x801B6FB4
+	.sdata2 start:0x803500C8 end:0x803500D0
+
+MSL_C/PPCEABI/bare/H/s_sin.c:
+	.text start:0x801B7448 end:0x801B7520
+	.sdata2 start:0x80350110 end:0x80350118
+
+MSL_C/PPCEABI/bare/H/s_tan.c:
+	.text start:0x801B7520 end:0x801B7598
+	.sdata2 start:0x80350118 end:0x80350120

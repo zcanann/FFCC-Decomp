@@ -87,21 +87,34 @@ static const unsigned int s_CrcTable[256] = {
 };
 
 enum {
-    kMemoryCardStageSize = 0x16000,
     kMemoryCardSaveBufferSize = 0xA000,
     kMemoryCardSaveLetterOffset = 0x104,
 #if defined(VERSION_GCCJGC)
+    kMemoryCardStageSize = 0x1E000,
+    kMemoryCardMountAllocationLine = 0x87,
     kMemoryCardRegion = 'J',
+    kMemoryCardSaveFlags = 5,
     kMemoryCardAllocationLine = 0x2A2,
     kMemoryCardAllocationErrorLine = 0x2A4,
     kMemoryCardIconOpenErrorLine = 0x2E4,
     kMemoryCardIconDataErrorLine = 0x2EC,
 #else
-    kMemoryCardRegion = 'E',
+    kMemoryCardStageSize = 0x16000,
+    kMemoryCardMountAllocationLine = 0x88,
+    kMemoryCardSaveFlags = 0,
     kMemoryCardAllocationLine = 0x2AB,
     kMemoryCardAllocationErrorLine = 0x2AD,
     kMemoryCardIconOpenErrorLine = 0x2EF,
     kMemoryCardIconDataErrorLine = 0x2F6,
+#endif
+#if defined(VERSION_GCCP01)
+    kMemoryCardRegion = 'E',
+    kMemoryCardFramesPerMinute = 1500,
+#elif defined(VERSION_GCCE01)
+    kMemoryCardRegion = 'U',
+    kMemoryCardFramesPerMinute = 1800,
+#else
+    kMemoryCardFramesPerMinute = 1800,
 #endif
 };
 
@@ -221,10 +234,10 @@ static inline u32 LoadSwapped(u32* p)
  * --INFO--
  * PAL Address: 0x800C4D24
  * PAL Size: 148b
- * EN Address: 0x800D8D40
- * EN Size: 600b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C45AC
+ * EN Size: 148b
+ * JP Address: 0x800C2460
+ * JP Size: 148b
  */
 void CMemoryCardMan::Init()
 {
@@ -237,7 +250,7 @@ void CMemoryCardMan::Init()
     m_saveBuffer = (char*)nullptr;
     m_stage = Memory.CreateStage(kMemoryCardStageSize, "CMemoryCardMan", 0);
     m_mountWorkArea =
-        new (m_stage, "memorycard.cpp", 0x88)
+        new (m_stage, "memorycard.cpp", kMemoryCardMountAllocationLine)
             char[kMemoryCardSaveBufferSize];
 
     m_currentSlot = -1;
@@ -1089,7 +1102,7 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_region = kMemoryCardRegion;
     saveDat->m_random = Math.Rand(0x7FFFFFFF);
     saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
-    saveDat->m_flags = 0;
+    saveDat->m_flags = kMemoryCardSaveFlags;
 
     CGame* g = &Game;
     for (int i = 0; i < 4; i++)
@@ -1474,10 +1487,10 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
  * --INFO--
  * PAL Address: 0x800C2550
  * PAL Size: 1824b
- * EN Address: 0x800DB8E4
- * EN Size: 1064b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C1DD8
+ * EN Size: 1824b
+ * JP Address: 0x800BFDBC
+ * JP Size: 1728b
  */
 int CMemoryCardMan::DummySave()
 {
@@ -1696,19 +1709,7 @@ int CMemoryCardMan::DummySave()
             System.Printf("McWrite(%d) error(%d)\n", 0, m_result);
         }
 
-        if (m_fileInfo.chan < 0 || m_fileInfo.chan > 1)
-        {
-            m_opDoneFlag = 1;
-            m_state = 4;
-            m_result = -3;
-        }
-        else
-        {
-            result = CARDClose(&m_fileInfo);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 4;
-        }
+        McClose();
 
         result = CARDUnmount(0);
         m_result = result;
@@ -1732,19 +1733,7 @@ int CMemoryCardMan::DummySave()
         m_saveBuffer = 0;
     }
 
-    if (m_fileInfo.chan < 0 || m_fileInfo.chan > 1)
-    {
-        m_opDoneFlag = 1;
-        m_state = 4;
-        m_result = -3;
-    }
-    else
-    {
-        result = CARDClose(&m_fileInfo);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 4;
-    }
+    McClose();
 
     result = CARDUnmount(0);
     m_result = result;
@@ -1759,10 +1748,10 @@ int CMemoryCardMan::DummySave()
  * --INFO--
  * PAL Address: 0x800C21A0
  * PAL Size: 944b
- * EN Address: 0x800DBD0C
- * EN Size: 516b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C1A28
+ * EN Size: 944b
+ * JP Address: 0x800BFA6C
+ * JP Size: 848b
  */
 int CMemoryCardMan::DummyLoad()
 {
@@ -1841,21 +1830,7 @@ int CMemoryCardMan::DummyLoad()
             System.Printf("McRead(%d) error(%d)\n", 0, m_result);
         }
 
-        int chan = m_fileInfo.chan;
-
-        if (chan < 0 || chan > 1)
-        {
-            m_opDoneFlag = 1;
-            m_state = 4;
-            m_result = -3;
-        }
-        else
-        {
-            result = CARDClose(&m_fileInfo);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 4;
-        }
+        McClose();
 
         result = CARDUnmount(0);
         m_result = result;
@@ -1872,21 +1847,7 @@ int CMemoryCardMan::DummyLoad()
         return m_result;
     }
 
-    int chan = m_fileInfo.chan;
-
-    if (chan < 0 || chan > 1)
-    {
-        m_opDoneFlag = 1;
-        m_state = 4;
-        m_result = -3;
-    }
-    else
-    {
-        result = CARDClose(&m_fileInfo);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 4;
-    }
+    McClose();
 
     result = CARDUnmount(0);
     m_result = result;
@@ -1911,14 +1872,14 @@ int CMemoryCardMan::DummyLoad()
  * --INFO--
  * PAL Address: 0x800C2140
  * PAL Size: 96b
- * EN Address: 0x800DBF10
- * EN Size: 128b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C19C8
+ * EN Size: 96b
+ * JP Address: 0x800BFA0C
+ * JP Size: 96b
  */
 void CMemoryCardMan::CnvPlayTime(unsigned int frames, int* hours, int* minutes)
 {
-    int total_minutes = frames / 1500;
+    int total_minutes = frames / kMemoryCardFramesPerMinute;
 
     *minutes = total_minutes % 60;
     *hours = total_minutes / 60;

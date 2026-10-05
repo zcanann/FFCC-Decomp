@@ -8,6 +8,16 @@ CGoOutMenu g_GoOutMenu;
 CGoOutMenu* g_pGoOutMenu;
 int g_freeCaravanIdx;
 
+#ifdef VERSION_GCCJGC
+static const int kTransferWindowBase = 50;
+static const int kTransferMessageBase = 100;
+static const int kTransferMessageGroup = 0;
+#else
+static const int kTransferWindowBase = 34;
+static const int kTransferMessageBase = 0;
+static const int kTransferMessageGroup = 2;
+#endif
+
 static const char s_The_Memory_Card_in_Slot_A_contains_801DEE30[] = "The Memory Card in Slot A contains";
 static const char s_no_save_data_for_your_current_game_801DEE54[] = "no save data for your current game,";
 static const char s_or_contains_corrupt_data_Please_801DEE78[] = "or contains corrupt data. Please";
@@ -882,8 +892,12 @@ void CGoOutMenu::SetMenu(short message, long timer)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016C40C
+ * PAL Size: 344b
+ * EN Address: 0x8016B394
+ * EN Size: 344b
+ * JP Address: 0x80166760
+ * JP Size: 328b
  */
 void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 {
@@ -895,22 +909,32 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     short messageIndex;
 
     m_menuStringSlot ^= 1;
-    winMessage = MenuPcs.GetWinMess(m_menuStringSlot + 0x22);
+#ifdef VERSION_GCCJGC
+    winMessage = MenuPcs.GetWinMess(0);
+    winMessage += m_menuStringSlot;
+    winMessage[kTransferWindowBase].m_lineCount = lineCount;
+#else
+    winMessage = MenuPcs.GetWinMess(m_menuStringSlot + kTransferWindowBase);
     winMessage->m_lineCount = lineCount;
+#endif
 
     if (m_menuStringSlot == 0) {
-        indexBase = 0;
+        indexBase = kTransferMessageBase;
     } else {
-        indexBase = 10;
+        indexBase = kTransferMessageBase + 10;
     }
     va_start(args, lineCount);
-    winMessageBuffer = (const char**)MenuPcs.GetMcWinMessBuff(2);
+    winMessageBuffer = (const char**)MenuPcs.GetMcWinMessBuff(kTransferMessageGroup);
     for (i = 0; i < lineCount; i++) {
+#ifdef VERSION_GCCJGC
+        winMessageBuffer[indexBase++] = va_arg(args, const char*);
+#else
         winMessageBuffer[indexBase + i] = va_arg(args, const char*);
+#endif
     }
     va_end(args);
 
-    messageIndex = m_menuStringSlot + 0x22;
+    messageIndex = m_menuStringSlot + kTransferWindowBase;
     if (m_currentMessage >= 0) {
         MenuPcs.m_menuWindowInfo->state = 2;
         MenuGoOutState().m_animFrame = 0;
@@ -945,7 +969,7 @@ inline void CGoOutMenu::CalcMenu()
         m_currentMessage = m_pendingMessage;
         if (m_pendingMessage != -1) {
             MenuPcs.GetWinSize(static_cast<unsigned short>(m_currentMessage), &x, &y,
-                               (m_currentMessage >= 0x1E) ? 2 : 0);
+                               (m_currentMessage >= 0x1E) ? kTransferMessageGroup : 0);
             MenuPcs.SetMcWinInfo(x, y);
             MenuPcs.m_menuWindowInfo->state = 0;
             MenuGoOutState().m_animFrame = 0;
@@ -1119,9 +1143,12 @@ inline unsigned char CGoOutMenu::SelectYesNo(int cursorY0, int cursorY1, int cur
     m_cursorListY1 = cursorY1;
     m_cursorMode = cursorMode;
 
+#ifndef VERSION_GCCJGC
     if (MenuPcs.m_menuWindowInfo->state != 1) {
         return 0;
     }
+
+#endif
 
     if ((Pad.GetButtonDown(0) & 3) != 0) {
         m_cursorChoice ^= 1;
@@ -1523,12 +1550,12 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 
 /*
  * --INFO--
- * PAL Address: 0x8016a06c
+ * PAL Address: 0x8016A06C
  * PAL Size: 6248b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80169014
+ * EN Size: 6216b
+ * JP Address: 0x80164700
+ * JP Size: 5708b
  */
 void CGoOutMenu::CalcGoOut()
 {
@@ -2106,12 +2133,12 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
 
 /*
  * --INFO--
- * PAL Address: 0x80168e3c
+ * PAL Address: 0x80168E3C
  * PAL Size: 3548b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80167DE4
+ * EN Size: 3548b
+ * JP Address: 0x80163620
+ * JP Size: 3436b
  */
 void CGoOutMenu::CalcDel()
 {
@@ -2289,15 +2316,15 @@ void CGoOutMenu::Calc()
         MenuPcs.m_goOutUnknown888 = 0;
         MenuPcs.m_goOutSaveLoadMode = 0;
         MenuPcs.m_goOutUnknown88A = 0;
-        WinMessEntry* winMessage = MenuPcs.GetWinMess(0x22);
+        WinMessEntry* winMessage = MenuPcs.GetWinMess(kTransferWindowBase);
         winMessage->m_lineCount = 0;
         for (int i = 0; i < 8; i++) {
-            winMessage->m_messageIds[i] = i;
+            winMessage->m_messageIds[i] = i + kTransferMessageBase;
         }
-        winMessage = MenuPcs.GetWinMess(0x23);
+        winMessage = MenuPcs.GetWinMess(kTransferWindowBase + 1);
         winMessage->m_lineCount = 0;
         for (int i = 0; i < 8; i++) {
-            winMessage->m_messageIds[i] = i + 10;
+            winMessage->m_messageIds[i] = i + kTransferMessageBase + 10;
         }
         MenuPcs.m_menuWindowInfo->state = 3;
         m_messageState = 1;

@@ -203,43 +203,24 @@ static void CharaBreak_AfterDrawMeshCallback(
             GXBegin((GXPrimitive)0x90, (GXVtxFmt)7, (*displayListEntry)->m_polygonCount * 3);
             POLYGON_DATA* polygon = vertexData;
             s32 faceIndex = 0;
-            u16 zero = 0;
-            s16 posX;
-            s16 posZ;
-            s16 posY;
             while (faceIndex < (s32)(u32)(*displayListEntry)->m_polygonCount) {
-                posZ = polygon->m_pos[0].z;
-                posY = polygon->m_pos[0].y;
                 faceIndex++;
-                posX = polygon->m_pos[0].x;
-                GXWGFifo.u16 = posX;
-                GXWGFifo.u16 = posY;
-                GXWGFifo.u16 = posZ;
-                GXWGFifo.u16 = polygon->m_nrmIndices[0];
-                GXWGFifo.u16 = zero;
-                GXWGFifo.u16 = polygon->m_texIndices[0];
-                GXWGFifo.u16 = polygon->m_texIndices[0];
-                posZ = polygon->m_pos[1].z;
-                posY = polygon->m_pos[1].y;
-                posX = polygon->m_pos[1].x;
-                GXWGFifo.u16 = posX;
-                GXWGFifo.u16 = posY;
-                GXWGFifo.u16 = posZ;
-                GXWGFifo.u16 = polygon->m_nrmIndices[1];
-                GXWGFifo.u16 = zero;
-                GXWGFifo.u16 = polygon->m_texIndices[1];
-                GXWGFifo.u16 = polygon->m_texIndices[1];
-                posZ = polygon->m_pos[2].z;
-                posY = polygon->m_pos[2].y;
-                posX = polygon->m_pos[2].x;
-                GXWGFifo.u16 = posX;
-                GXWGFifo.u16 = posY;
-                GXWGFifo.u16 = posZ;
-                GXWGFifo.u16 = polygon->m_nrmIndices[2];
-                GXWGFifo.u16 = zero;
-                GXWGFifo.u16 = polygon->m_texIndices[2];
+                GXPosition3s16(polygon->m_pos[0].x, polygon->m_pos[0].y, polygon->m_pos[0].z);
+                GXNormal1x16(polygon->m_nrmIndices[0]);
+                GXColor1x16(0);
+                GXTexCoord1x16(polygon->m_texIndices[0]);
+                GXTexCoord1x16(polygon->m_texIndices[0]);
+                GXPosition3s16(polygon->m_pos[1].x, polygon->m_pos[1].y, polygon->m_pos[1].z);
+                GXNormal1x16(polygon->m_nrmIndices[1]);
+                GXColor1x16(0);
+                GXTexCoord1x16(polygon->m_texIndices[1]);
+                GXTexCoord1x16(polygon->m_texIndices[1]);
+                GXPosition3s16(polygon->m_pos[2].x, polygon->m_pos[2].y, polygon->m_pos[2].z);
+                GXNormal1x16(polygon->m_nrmIndices[2]);
+                GXColor1x16(0);
+                GXTexCoord1x16(polygon->m_texIndices[2]);
+                GXTexCoord1x16(polygon->m_texIndices[2]);
                 polygon++;
-                GXWGFifo.u16 = polygon[-1].m_texIndices[2];
             }
         }
     }

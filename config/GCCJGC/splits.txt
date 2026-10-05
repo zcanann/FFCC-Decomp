@@ -443,6 +443,7 @@ gobject.cpp:
 	.text start:0x8007B220 end:0x80081648
 
 chara.cpp:
+	.sbss start:0x8034BBA0 end:0x8034BBA8
 	.text start:0x8006DE6C end:0x80072F18
 
 cflat_runtime2.cpp:
@@ -488,6 +489,7 @@ p_minigame.cpp:
 
 sound.cpp:
 	.text start:0x800C2714 end:0x800C60A4
+	.bss start:0x8030DFB8 end:0x8031029C
 
 textureman.cpp:
 	.sbss start:0x8034BAE0 end:0x8034BAE8
@@ -770,6 +772,7 @@ TRK_MINNOW_DOLPHIN/usr_put.c:
 
 memorycard.cpp:
 	.text start:0x800BF1C8 end:0x800C2514
+	.bss start:0x8030DF18 end:0x8030DFB4
 
 OdemuExi2/DebuggerDriver.c:
 	.text start:0x801B7704 end:0x801B8184
@@ -1348,6 +1351,8 @@ stopwatch.cpp:
 
 pppCharaBreak.cpp:
 	.text start:0x8013B888 end:0x8013CF9C
+	.rodata start:0x801D8DB8 end:0x801D8E28
+	.sdata2 start:0x8034ECB0 end:0x8034ECE8
 
 pad.cpp:
 	.text start:0x8001FCE8 end:0x80020A60
@@ -1376,3 +1381,21 @@ goout.cpp:
 	.bss start:0x80327408 end:0x80327458
 	.sbss start:0x8034BCE8 end:0x8034BCF0
 	.text start:0x80162A00 end:0x80166CFC
+
+auto_8030DFB4_bss:
+	.bss start:0x8030DFB4 end:0x8030DFB8 align:4
+
+auto_8031029C_bss:
+	.bss start:0x8031029C end:0x803102A0 align:4
+
+gx/GXPerf.c:
+	.text	start:0x801A1724 end:0x801A1934
+	.data	start:0x802383DC end:0x80238438
+
+pppMiasma.cpp:
+	.text start:0x80105A5C end:0x801071C8
+	.sdata2 start:0x8034E5C8 end:0x8034E5F0
+
+wmm_str.cpp:
+	.rodata start:0x801D6370 end:0x801D63CC
+	.data start:0x8022DCB8 end:0x8022DCC8

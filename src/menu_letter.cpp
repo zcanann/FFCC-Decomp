@@ -1900,8 +1900,8 @@ int CMenuPcs::LetterOpen()
  * PAL Size: 408b
  * EN Address: 0x801869D8
  * EN Size: 452b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x801624C8
+ * JP Size: 456b
  */
 void CMenuPcs::LetterInit1()
 {
@@ -1916,7 +1916,11 @@ void CMenuPcs::LetterInit1()
 	SingleFadeEntry* p;
 	int n = 0;
 	p = &m_singleFadeState->entries[n++];
+#ifdef VERSION_GCCJGC
+	p->tex = 0x5E;
+#else
 	p->tex = 0x5F;
+#endif
 	p->width = 0x238;
 	p->height = 0x178;
 	double scale = DOUBLE_803330a8;
@@ -1929,7 +1933,11 @@ void CMenuPcs::LetterInit1()
 	p->duration = 10;
 
 	p = &m_singleFadeState->entries[n++];
+#ifdef VERSION_GCCJGC
+	p->tex = 0x3D;
+#else
 	p->tex = 0x3E;
+#endif
 	p->width = 0xA8;
 	p->height = 0x60;
 	p->x = 0x20;

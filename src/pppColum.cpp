@@ -32,10 +32,10 @@ static inline pppColumDataOffsets* GetColumDataOffsets(_pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x800dec5c
  * PAL Size: 1292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DE428
+ * EN Size: 1292b
+ * JP Address: 0x800DBF40
+ * JP Size: 1132b
  */
 void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
 {
@@ -161,10 +161,10 @@ void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
  * --INFO--
  * PAL Address: 0x800df168
  * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DE934
+ * EN Size: 324b
+ * JP Address: 0x800DC3AC
+ * JP Size: 324b
  */
 void pppFrameColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
 {
@@ -208,10 +208,10 @@ void pppFrameColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
  * --INFO--
  * PAL Address: 0x800df2ac
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEA78
+ * EN Size: 76b
+ * JP Address: 0x800DC4F0
+ * JP Size: 76b
  */
 void pppDestructColum(pppColum *column, _pppCtrlTable *ctrl)
 {
@@ -228,10 +228,10 @@ void pppDestructColum(pppColum *column, _pppCtrlTable *ctrl)
  * --INFO--
  * PAL Address: 0x800df2f8
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEAC4
+ * EN Size: 40b
+ * JP Address: 0x800DC53C
+ * JP Size: 40b
  */
 void pppConstructColum(pppColum *column, _pppCtrlTable *ctrl)
 {

@@ -76,10 +76,10 @@ static inline PppLightWork* GetPppLightWork(_pppPObject* object, _pppCtrlTable* 
  * --INFO--
  * PAL Address: 0x800dab00
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DA2CC
+ * EN Size: 52b
+ * JP Address: 0x800D7E94
+ * JP Size: 64b
  */
 void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
@@ -99,10 +99,10 @@ void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
  * --INFO--
  * PAL Address: 0x800dab34
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DA300
+ * EN Size: 100b
+ * JP Address: 0x800D7ED4
+ * JP Size: 112b
  */
 void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
@@ -134,10 +134,10 @@ void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
  * --INFO--
  * PAL Address: 0x800dab98
  * PAL Size: 1276b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DA364
+ * EN Size: 1276b
+ * JP Address: 0x800D7F44
+ * JP Size: 1264b
  */
 void pppLight(_pppPObject* object, PppLightStep* step, _pppCtrlTable* ctrlTable)
 {

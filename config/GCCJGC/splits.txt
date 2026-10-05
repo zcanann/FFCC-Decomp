@@ -1731,3 +1731,12 @@ pppCrystal2.cpp:
 
 graphic_dbgfont.cpp:
 	.data start:0x801F1800 end:0x801F2400 align:32
+
+pppRain.cpp:
+	.text start:0x800DA728 end:0x800DADD4
+
+pppColum.cpp:
+	.text start:0x800DBF40 end:0x800DC564
+
+pppLight.cpp:
+	.text start:0x800D7E94 end:0x800D8434

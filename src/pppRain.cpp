@@ -118,10 +118,10 @@ inline void UpdateRain(VRain* work, PRain* rain, RAIN_DATA* drop)
  * --INFO--
  * PAL Address: 0x800dd424
  * PAL Size: 548b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DCBF0
+ * EN Size: 548b
+ * JP Address: 0x800DA728
+ * JP Size: 524b
  */
 void pppRenderRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
 {
@@ -197,10 +197,10 @@ void pppRenderRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
  * --INFO--
  * PAL Address: 0x800dd648
  * PAL Size: 1072b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DCE14
+ * EN Size: 1072b
+ * JP Address: 0x800DA934
+ * JP Size: 1056b
  */
 void pppFrameRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
 {
@@ -268,10 +268,10 @@ void pppFrameRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
  * --INFO--
  * PAL Address: 0x800dda78
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DD244
+ * EN Size: 84b
+ * JP Address: 0x800DAD54
+ * JP Size: 84b
  */
 void pppDestructRain(pppRain* rain, _pppCtrlTable* data)
 {
@@ -288,10 +288,10 @@ void pppDestructRain(pppRain* rain, _pppCtrlTable* data)
  * --INFO--
  * PAL Address: 0x800ddacc
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DD298
+ * EN Size: 44b
+ * JP Address: 0x800DADA8
+ * JP Size: 44b
  */
 void pppConstructRain(pppRain* rain, _pppCtrlTable* data)
 {

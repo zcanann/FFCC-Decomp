@@ -496,10 +496,10 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
         ppvEnv->m_shapeTablePtr[pYmMiasma->m_dataValIndex]->m_animData);
     shapeRandom = rand();
     shapeCount = shape->m_frameCount;
-    angle = (s32)(32768.0f * (3.1415927410125732f * (2.0f * randomScale)) - 16384.0f);
     shapeCount = (short)(shapeRandom % shapeCount);
     state->m_shapeDrawFrame = shapeCount;
     state->m_shapeCurrentFrame = shapeCount;
+    angle = (s32)(32768.0f * (3.1415927410125732f * (2.0f * randomScale)) - 16384.0f);
     trigCos = ppvSinTbl[(s32)((angle + 0x4000) & 0xffff) >> 2];
     trigSin = ppvSinTbl[(s32)(angle & 0xffff) >> 2];
     state->m_shapeAngle = (short)(randomValue % 0x168);

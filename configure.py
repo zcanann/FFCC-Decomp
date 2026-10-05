@@ -836,7 +836,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSMemory.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSMessage.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSMutex.c"),
-            Object(Matching, "os/OSReboot.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSReboot.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSReset.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSResetSW.c"),
             Object(Matching, "os/OSRtc.c"),

@@ -888,3 +888,8 @@ gxfunc.cpp:
 	.text start:0x800FEFE8 end:0x800FF610
 	.bss start:0x8031AD40 end:0x8031B360
 	.sbss start:0x8034BC28 end:0x8034BC30
+
+os/OSReboot.c:
+	.text	start:0x80179718 end:0x80179A74
+	.bss	start:0x80327520 end:0x80327540
+	.sbss	start:0x8034BD78 end:0x8034BD84

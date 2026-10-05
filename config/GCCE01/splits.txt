@@ -986,3 +986,8 @@ TRK_MINNOW_DOLPHIN/dolphin_trk.c:
 	.init	start:0x800053E0 end:0x8000540C
 	.data	start:0x8021BEB8 end:0x8021BEF4
 	.bss	start:0x80329680 end:0x80329684
+
+os/OSReboot.c:
+	.text	start:0x8017E06C end:0x8017E3C8
+	.bss	start:0x8030AC00 end:0x8030AC20
+	.sbss	start:0x8032DF78 end:0x8032DF84

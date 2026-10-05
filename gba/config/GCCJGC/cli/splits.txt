@@ -239,7 +239,13 @@ main/xfer:
 	.bss        start:0x03000880 end:0x030008BC align:8
 
 regional_bss:
-	.bss        start:0x030008BC end:0x030008E8
+	.bss        start:0x030008BC end:0x030008C0 align:1
+
+main/session:
+	.bss        start:0x030008C0 end:0x030008E1 align:8
+
+regional_bss:
+	.bss        start:0x030008E1 end:0x030008E8 align:1
 
 main/text:
 	.bss        start:0x030008E8 end:0x03001174 align:8

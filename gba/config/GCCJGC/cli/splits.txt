@@ -143,7 +143,22 @@ libgcc/_umodsi3:
 	.text       start:0x0201C7EC end:0x0201C8AC
 
 regional_data:
-	.rodata     start:0x0201C8AC end:0x0202CA24
+	.rodata     start:0x0201C8AC end:0x0201CB64
+
+main/xfer:
+	.rodata     start:0x0201CB64 end:0x0201CB7C align:4
+
+regional_data:
+	.rodata     start:0x0201CB7C end:0x0202CA24
+
+main/xfer:
+	.bss        start:0x03000880 end:0x030008BC align:8
 
 regional_bss:
-	.bss        start:0x03002990 end:0x030044C1
+	.bss        start:0x030008BC end:0x03002AF0
+
+main/xfer:
+	.common     start:0x03002AF0 end:0x03002AFC align:4
+
+regional_bss:
+	.bss        start:0x03002AFC end:0x030044C1

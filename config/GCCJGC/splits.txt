@@ -833,6 +833,11 @@ TRK_MINNOW_DOLPHIN/msgbuf.c:
 	.bss	start:0x80344050 end:0x80345A00
 
 fontman.cpp:
+	.rodata start:0x801D4818 end:0x801D4840
+	.data start:0x801F2400 end:0x8022C2F8
+	.sdata start:0x8034B580 end:0x8034B5A0
+	.sdata2 start:0x8034D3E8 end:0x8034D420
+	.bss start:0x80305A70 end:0x80305A88
 	.text start:0x800912D4 end:0x80092648
 
 os/OSCache.c:

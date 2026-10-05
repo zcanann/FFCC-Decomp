@@ -919,6 +919,11 @@ auto_10_8032E2C2_sbss:
 	.sbss start:0x8032E2C2 end:0x8032E2C8 align:2
 
 fontman.cpp:
+	.rodata start:0x801D8C18 end:0x801D8C40
+	.data start:0x801FCF00 end:0x8020DC78
+	.sdata start:0x8032D760 end:0x8032D780
+	.sdata2 start:0x8032F668 end:0x8032F6A0
+	.bss start:0x802E9130 end:0x802E9148
 	.text start:0x800917F4 end:0x80092AC8
 
 os/OSCache.c:

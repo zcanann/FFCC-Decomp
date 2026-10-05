@@ -5,8 +5,14 @@
 #include "global.h"
 #include "ffcc/p_camera.h"
 extern "C" {
-unsigned char g_tFont22[0x10D40] = {
+unsigned char g_tFont22[] = {
+#ifdef VERSION_GCCJGC
+#include "src/font_res_archive_jp.inc"
+#elif defined(VERSION_GCCE01)
+#include "src/font_res_archive_us.inc"
+#else
 #include "src/font_res_archive.inc"
+#endif
 };
 }
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
@@ -157,7 +163,7 @@ void CFontMan::Quit()
  */
 unsigned long CFontMan::GetInternal22Size()
 {
-	return 0x10D40;
+	return sizeof(g_tFont22);
 }
 
 /*

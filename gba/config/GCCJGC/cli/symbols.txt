@@ -883,3 +883,4 @@ sScouterActive = .bss:0x03002839; // type:object size:0x1 scope:local data:byte
 sScouterShown = .bss:0x0300283C; // type:object size:0x4 scope:local data:byte
 sFamilyQuit = .bss:0x03002794; // type:object size:0x1 scope:local data:byte
 sFamilyRow = .bss:0x03002795; // type:object size:0x1 scope:local data:byte
+sRadarMapShown = .bss:0x03002784; // type:object size:0x1 scope:local data:byte

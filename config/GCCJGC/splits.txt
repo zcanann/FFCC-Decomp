@@ -949,3 +949,6 @@ TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 os/OSRtc.c:
 	.text	start:0x8017A1F4 end:0x8017AC20
 	.bss	start:0x80327540 end:0x80327594
+
+TRK_MINNOW_DOLPHIN/msg.c:
+	.text	start:0x801A39D0 end:0x801A3BAC

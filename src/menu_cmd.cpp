@@ -55,6 +55,16 @@ static const UniteRecipe s_Unite[] = {
     { -1, -1, -1, { -1, -1, -1 } },
 };
 
+#ifdef VERSION_GCCJGC
+static const char* s_SkillStr_jp[] = {
+    "ファイア剣",
+    "ブリザド剣",
+    "サンダー剣",
+    "ホーリー剣",
+    "グラビデ剣",
+};
+
+#else
 static const char* s_SkillStr_us[] = {
     "Flamestrike",
     "Icestrike",
@@ -94,6 +104,7 @@ static const char* s_SkillStr_sp[] = {
     "",
     "",
 };
+#endif
 namespace {
 
 #ifdef VERSION_GCCJGC
@@ -2691,13 +2702,16 @@ unsigned int CMenuPcs::CmdClose2()
  * --INFO--
  * PAL Address: 0x8014a940
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
+ * EN Address: 0x80149A34
+ * EN Size: 156b
+ * JP Address: UNUSED
  * JP Size: TODO
  */
 const char* CMenuPcs::GetSkillStr(int index)
 {
+#ifdef VERSION_GCCJGC
+	return s_SkillStr_jp[index];
+#else
 	switch (Game.m_gameWork.GetLanguage()) {
 	case 2:
 		return s_SkillStr_ge[index];
@@ -2711,4 +2725,5 @@ const char* CMenuPcs::GetSkillStr(int index)
 	default:
 		return s_SkillStr_us[index];
 	}
+#endif
 }

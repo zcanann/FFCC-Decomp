@@ -440,6 +440,8 @@ static const int kMcSlotMiddleTexture = 36;
 static const int kMcCharacterFrameTexture = 37;
 static const int kMcCharacterFillTexture = 41;
 static const int kCharacterNamePlateTexture = 39;
+static const int kCharacterLifeTexture = 38;
+static const int kCharacterAwayTexture = 54;
 static const int kWorldFrameTexture = 29;
 static const int kWorldWoodTexture = 21;
 static const int kMcYearTexture = 22;
@@ -453,6 +455,8 @@ static const int kMcSlotMiddleTexture = 37;
 static const int kMcCharacterFrameTexture = 38;
 static const int kMcCharacterFillTexture = 42;
 static const int kCharacterNamePlateTexture = 40;
+static const int kCharacterLifeTexture = 39;
+static const int kCharacterAwayTexture = 56;
 static const int kWorldFrameTexture = 30;
 static const int kWorldWoodTexture = 22;
 static const int kMcYearTexture = 23;
@@ -7513,10 +7517,10 @@ void CMenuPcs::DrawCharaName()
  * --INFO--
  * PAL Address: 0x800efc38
  * PAL Size: 1596b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800EF2E0
+ * EN Size: 1596b
+ * JP Address: 0x800EC784
+ * JP Size: 1536b
  */
 void CMenuPcs::DrawCMLife()
 {
@@ -7556,14 +7560,18 @@ void CMenuPcs::DrawCMLife()
 		int i;
 		int row;
 		int col;
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterLifeTexture));
 
 		int count;
 		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
 			if (m_cmakeWork->m_characters[slot].m_exists == 0) {
 				continue;
 			}
+#ifdef VERSION_GCCJGC
+			count = static_cast<int>(m_cmakeWork->m_characters[slot].m_hp) >> 1;
+#else
 			count = static_cast<int>(m_cmakeWork->m_characters[slot].m_maxHp) >> 1;
+#endif
 		} else {
 			CCaravanWork& caravan = Game.m_caravanWorkArr[slot];
 			if (caravan.m_shopState == 0) {
@@ -7615,13 +7623,8 @@ void CMenuPcs::DrawCMLife()
 		x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
 		float step = static_cast<float>(static_cast<double>(8 - count) * *pHalfD);
 
-		const float* pZeroK = &FLOAT_803313dc;
 		const float* pRectSize = &FLOAT_80331558;
-		const double* pStepDelta = &DOUBLE_80331420;
-		double kStepDelta;
 		float kRectSize;
-		const float kZero = *pZeroK;
-		kStepDelta = *pStepDelta;
 		kRectSize = *pRectSize;
 
 		for (i = 0; i < count; i++) {
@@ -7629,8 +7632,8 @@ void CMenuPcs::DrawCMLife()
 
 			MenuPcs.DrawRect(
 			    0, x, yTmp + yAdd, FLOAT_80331558, FLOAT_80331558,
-			                                kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, kZero);
-			step = static_cast<float>(step + kStepDelta);
+			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			step = static_cast<float>(step + DOUBLE_80331420);
 			x += kRectSize;
 		}
 
@@ -7644,7 +7647,7 @@ void CMenuPcs::DrawCMLife()
 			flagB = Game.m_caravanWorkArr[slot].m_caravanLocalFlags;
 		}
 		if (flagA != 0 || flagB != 0) {
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterAwayTexture));
 			float texV;
 			if (flagA != 0) {
 				texV = FLOAT_803313dc;

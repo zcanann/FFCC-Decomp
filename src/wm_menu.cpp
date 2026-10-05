@@ -1552,7 +1552,7 @@ void CMenuPcs::CalcMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	bool playOpenSe = false;
+	int playOpenSe = false;
 	unsigned int buttonsDown = Pad.GetButtonDown(0);
 	unsigned short buttonsRepeat = GetButtonRepeat(0);
 

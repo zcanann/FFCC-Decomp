@@ -11,7 +11,7 @@
 #include <math.h>
 #include <string.h>
 
-static s32 s_unitePanelCount;
+static s32 s_ucnt;
 static s32 s_UniteTop[3];
 
 struct UniteRecipe {
@@ -1077,7 +1077,7 @@ void CMenuPcs::CmdDraw()
 			s32 index = m_cmdState->selected[cmdMode];
 			if (!(caravan->m_commandListExtra[index] == 0)) {
 				s32 uniteIdx;
-				for (uniteIdx = 0; uniteIdx < s_unitePanelCount; uniteIdx++) {
+				for (uniteIdx = 0; uniteIdx < s_ucnt; uniteIdx++) {
 					if (s_UniteTop[uniteIdx] == index) {
 						break;
 					}
@@ -1959,7 +1959,7 @@ void CMenuPcs::DrawUniteList()
 
 	CmdListEntry* unitePanels = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd];
 	const s32 topX = GetCmdListStorage(this)->entries[0].x;
-	s_unitePanelCount = 0;
+	s_ucnt = 0;
 	active = 0;
 
 	for (i = 0; i < 8; i++) {
@@ -2139,15 +2139,15 @@ void CMenuPcs::DrawUniteList()
 		color.a = static_cast<u8>(255.0f * panelAlpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
-		unitePanels[s_unitePanelCount].x = static_cast<u16>(panelX);
-		unitePanels[s_unitePanelCount].y = static_cast<s16>(drawY);
-		unitePanels[s_unitePanelCount].width = static_cast<s16>(drawW);
-		unitePanels[s_unitePanelCount].height = static_cast<s16>(drawH);
-		unitePanels[s_unitePanelCount].u = 0.0f;
-		unitePanels[s_unitePanelCount].v = panelTone;
-		unitePanels[s_unitePanelCount].alpha = panelAlpha;
-		s_UniteTop[s_unitePanelCount] = groupStart;
-		s_unitePanelCount++;
+		unitePanels[s_ucnt].x = static_cast<u16>(panelX);
+		unitePanels[s_ucnt].y = static_cast<s16>(drawY);
+		unitePanels[s_ucnt].width = static_cast<s16>(drawW);
+		unitePanels[s_ucnt].height = static_cast<s16>(drawH);
+		unitePanels[s_ucnt].u = 0.0f;
+		unitePanels[s_ucnt].v = panelTone;
+		unitePanels[s_ucnt].alpha = panelAlpha;
+		s_UniteTop[s_ucnt] = groupStart;
+		s_ucnt++;
 
 		MenuPcs.DrawRect(0,
 			panelX,
@@ -2168,7 +2168,7 @@ void CMenuPcs::DrawUniteList()
 	font->DrawInit();
 	font->SetTlut(6);
 
-	for (i = 0; i < s_unitePanelCount; i++, unitePanels++) {
+	for (i = 0; i < s_ucnt; i++, unitePanels++) {
 		const float alpha = (GetCmdStateView(this)->mode == 3) ? 1.0f : unitePanels->alpha;
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)).color);
 
@@ -2239,7 +2239,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 	float targetX;
 	double step = 12.8;
 
-	if (s_unitePanelCount == 0) {
+	if (s_ucnt == 0) {
 		return 1;
 	}
 
@@ -2264,7 +2264,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 	} else {
 		targetX = 64.0f + baseX;
 		int i;
-		for (i = finished = 0; i < s_unitePanelCount; i++) {
+		for (i = finished = 0; i < s_ucnt; i++) {
 			for (int j = 0; j < 3; j++) {
 				CmdListEntry* entry = &GetCmdListStorage(this)->entries[j + s_UniteTop[i]];
 				int idx = j + s_UniteTop[i];
@@ -2282,7 +2282,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 				}
 			}
 		}
-		if (finished == s_unitePanelCount) {
+		if (finished == s_ucnt) {
 			return 1;
 		}
 	}
@@ -2303,7 +2303,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 {
 	int finished;
 
-	if (s_unitePanelCount == 0) {
+	if (s_ucnt == 0) {
 		return 1;
 	}
 
@@ -2330,7 +2330,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		}
 	} else {
 		int i;
-		for (i = finished = 0; i < s_unitePanelCount; i++) {
+		for (i = finished = 0; i < s_ucnt; i++) {
 			for (int j = 0; j < 3; j++) {
 				int idx = j + s_UniteTop[i];
 				CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
@@ -2347,7 +2347,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 				}
 			}
 		}
-		if (finished == s_unitePanelCount) {
+		if (finished == s_ucnt) {
 			return 1;
 		}
 	}
@@ -2480,7 +2480,7 @@ unsigned int CMenuPcs::CmdClose1()
 	} else if (state == 1) {
 		const s32 selected = GetCmdStateView(this)->selected[0];
 		s32 uniteIdx = 0;
-		s32 topCount = s_unitePanelCount;
+		s32 topCount = s_ucnt;
 		for (; uniteIdx < topCount; uniteIdx++) {
 			if (s_UniteTop[uniteIdx] == selected) {
 				break;
@@ -2511,7 +2511,7 @@ unsigned int CMenuPcs::CmdClose1()
 	} else if (state == 3) {
 		const s16 selected = GetCmdStateView(this)->selected[0];
 		s32 uniteIdx = 0;
-		s32 topCount = s_unitePanelCount;
+		s32 topCount = s_ucnt;
 		for (; uniteIdx < topCount; uniteIdx++) {
 			if (s_UniteTop[uniteIdx] == selected) {
 				break;
@@ -2633,7 +2633,7 @@ unsigned int CMenuPcs::CmdClose2()
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 1) {
 		s32 uniteIdx = 0;
-		for (uniteIdx = 0; uniteIdx < s_unitePanelCount; uniteIdx++) {
+		for (uniteIdx = 0; uniteIdx < s_ucnt; uniteIdx++) {
 			if (selected == s_UniteTop[uniteIdx]) {
 				break;
 			}

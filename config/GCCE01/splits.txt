@@ -628,6 +628,9 @@ bonus_menu.cpp:
 
 menu_cmd.cpp:
 	.text start:0x80149A34 end:0x8014F4BC
+	.bss start:0x8030AA28 end:0x8030AA34
+	.sbss start:0x8032DEA8 end:0x8032DEAC
+	.sdata2 start:0x803319F0 end:0x80331AE0
 	.rodata start:0x801DD8E8 end:0x801DDB18
 	.data start:0x80213BA8 end:0x80213C0C
 

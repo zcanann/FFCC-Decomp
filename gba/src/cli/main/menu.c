@@ -191,14 +191,27 @@ s32 MenuScreen_HandleInput(void)
     return 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02014708
+ * PAL Size: 88b
+ * EN Address: 0x0201454C
+ * EN Size: 88b
+ * JP Address: 0x0201A7A0
+ * JP Size: 96b
+ */
 void MenuScreen_PrintRow(s32 page)
 {
+    s32 index;
+
     Text_SetFill(1, 0);
     Text_Clear();
     Text_SetX(16);
-    Text_Print(Msg_GetSystem(page + 44), TEXT_DRAW);
+    index = page + 44;
+    Text_Print(Msg_GetSystem(index), TEXT_DRAW);
     Text_SetX(120);
-    Text_Print(Msg_GetSystem(page + 49), TEXT_DRAW);
+    index = page + 49;
+    Text_Print(Msg_GetSystem(index), TEXT_DRAW);
     Text_CopyToVram(Window_GetTextVram(gWindows, page, 0), gWindows[0].width);
 }
 

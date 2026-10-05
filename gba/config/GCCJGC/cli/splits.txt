@@ -290,7 +290,10 @@ main/shop:
 	.bss        start:0x03002808 end:0x03002813 align:4
 
 regional_bss:
-	.bss        start:0x03002813 end:0x03002838 align:1
+	.bss        start:0x03002813 end:0x03002818 align:1
+
+main/smith:
+	.bss        start:0x03002818 end:0x03002838 align:8
 
 main/scouter:
 	.bss        start:0x03002838 end:0x03002840 align:4

@@ -9,7 +9,7 @@
 #include "screen.h"
 #include "lists.h"
 
-#if defined(VERSION_GCCE01)
+#if !defined(VERSION_GCCP01)
 #define SMITH_ACTION_WIDTH 7
 #define SMITH_EQUIP_ACTION_X 6
 #define SMITH_CURRENCY_MSG 5
@@ -34,7 +34,9 @@ static s8 sSmithRowOffset;
 static s8 sSmithListValid;
 static s8 sSmithKnownLoaded;
 static u32 sSmithKnown[4];
+#if !defined(VERSION_GCCJGC)
 const char sPluralText[] = "s";
+#endif
 
 void SmithForge_DrawRow(s32, s32);
 s32 SmithForge_OpenConfirm(void);
@@ -283,12 +285,25 @@ s32 SmithTopScreen_HandleInput(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x020184AC
+ * PAL Size: 196b
+ * EN Address: 0x020182BC
+ * EN Size: 196b
+ * JP Address: 0x0201782C
+ * JP Size: 196b
+ */
 void SmithTopScreen_DrawIcons(void)
 {
     struct Window *win = gWindows;
     s32 x = (win->x + 1) * 8;
     s32 y = (win->y + 1) * 8;
+#if defined(VERSION_GCCJGC)
+    s32 frame = 50;
+#else
     s32 frame = 48;
+#endif
     s32 pal = Obj_GetPalette(0, frame);
     s32 count = (s8)LIST_BUF[0];
     s32 i;
@@ -663,14 +678,14 @@ void SmithForgeScreen_PrintNextRow(void)
         SmithForge_DrawRow(sSmithRow, n);
     } else if (sSmithRow == 1) {
         w = Text_Print(Msg_GetSystem(17), TEXT_WIDTH);
-#if defined(VERSION_GCCE01)
+#if !defined(VERSION_GCCP01)
         x = 88;
 #else
         x = 104;
 #endif
         Text_SetX(x - w);
         Text_Print(Msg_GetSystem(17), TEXT_DRAW);
-#if defined(VERSION_GCCE01)
+#if !defined(VERSION_GCCP01)
         Text_SetX(96);
         Text_Print(Msg_GetSystem(19), TEXT_DRAW);
 #endif
@@ -1046,6 +1061,15 @@ s32 SmithEquipScreen_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0201978C
+ * PAL Size: 492b
+ * EN Address: 0x020195B0
+ * EN Size: 492b
+ * JP Address: 0x02018B14
+ * JP Size: 524b
+ */
 void SmithEquipScreen_PrintNextRow(void)
 {
     struct Window *win = gWindows;
@@ -1109,7 +1133,11 @@ void SmithEquipScreen_PrintNextRow(void)
             if (flags & 0x100)
                 str = Msg_GetSystem(16);
             else
+#if defined(VERSION_GCCJGC)
+                str = Msg_GetSystem(7);
+#else
                 str = Msg_GetSystem(63);
+#endif
             Text_SetX(0);
             Text_Print(str, TEXT_DRAW);
             n = win->width * 8 - 34;
@@ -1152,6 +1180,15 @@ s32 Smith_EquipResult(s32 val)
     return 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02019A24
+ * PAL Size: 250b
+ * EN Address: 0x02019848
+ * EN Size: 250b
+ * JP Address: 0x02018DCC
+ * JP Size: 242b
+ */
 s32 SmithEquip_OpenSlots(void)
 {
     struct Window *win = &gWindows[3];
@@ -1176,8 +1213,11 @@ s32 SmithEquip_OpenSlots(void)
         win->slot = 3;
         win->textX = 16;
         for (i = 0; i < win->rows; i++) {
+            s32 id;
+
             win->items[i].enabled = 1;
-            win->items[i].text = Msg_GetItemName(((u8 *)gSession.unkE4)[(s8)gSession.equipment[i + 3]]);
+            id = ((u8 *)gSession.unkE4)[(s8)gSession.equipment[i + 3]];
+            win->items[i].text = Msg_GetItemName(id);
         }
         sSmithSlotsInit = 1;
     }
@@ -1209,6 +1249,15 @@ s32 SmithEquip_CloseSlots(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02019B54
+ * PAL Size: 148b
+ * EN Address: 0x02019978
+ * EN Size: 148b
+ * JP Address: 0x02018EF4
+ * JP Size: 152b
+ */
 void SmithEquip_DrawSlotIcons(void)
 {
     struct Window *win = &gWindows[3];
@@ -1221,7 +1270,10 @@ void SmithEquip_DrawSlotIcons(void)
     x = (win->x + 1) * 8;
     y = (win->y + 1) * 8;
     for (i = 0; i < win->rows; i++, y += 16) {
-        frame = Item_GetIcon(((u8 *)gSession.unkE4)[(s8)gSession.equipment[i + 3]]);
+        s32 id = (s8)gSession.equipment[i + 3];
+
+        id = ((u8 *)gSession.unkE4)[id];
+        frame = Item_GetIcon(id);
         Obj_Draw(x, y, 0, frame, Obj_GetPalette(0, frame), win->bg, 0);
     }
 }
@@ -1244,6 +1296,15 @@ void Smith_ResetList(void)
     sSmithListValid = 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02019C58
+ * PAL Size: 178b
+ * EN Address: 0x02019A7C
+ * EN Size: 178b
+ * JP Address: 0x02019004
+ * JP Size: 162b
+ */
 void Item_FormatWearer(u16 *flags, char *dst)
 {
     s32 lo = *flags & 15;
@@ -1256,8 +1317,10 @@ void Item_FormatWearer(u16 *flags, char *dst)
             for (i = 0; i < 4; i++) {
                 if ((lo >> i) & 1) {
                     strcpy(dst, Msg_GetTribe(i));
+#if !defined(VERSION_GCCJGC)
                     if ((gLanguage & 15) == 1)
                         strcat(dst, sPluralText);
+#endif
                     break;
                 }
             }

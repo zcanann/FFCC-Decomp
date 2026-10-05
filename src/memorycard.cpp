@@ -1474,10 +1474,10 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
  * --INFO--
  * PAL Address: 0x800C2550
  * PAL Size: 1824b
- * EN Address: 0x800DB8E4
- * EN Size: 1064b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C1DD8
+ * EN Size: 1824b
+ * JP Address: 0x800BFDBC
+ * JP Size: 1728b
  */
 int CMemoryCardMan::DummySave()
 {
@@ -1696,19 +1696,7 @@ int CMemoryCardMan::DummySave()
             System.Printf("McWrite(%d) error(%d)\n", 0, m_result);
         }
 
-        if (m_fileInfo.chan < 0 || m_fileInfo.chan > 1)
-        {
-            m_opDoneFlag = 1;
-            m_state = 4;
-            m_result = -3;
-        }
-        else
-        {
-            result = CARDClose(&m_fileInfo);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 4;
-        }
+        McClose();
 
         result = CARDUnmount(0);
         m_result = result;
@@ -1732,19 +1720,7 @@ int CMemoryCardMan::DummySave()
         m_saveBuffer = 0;
     }
 
-    if (m_fileInfo.chan < 0 || m_fileInfo.chan > 1)
-    {
-        m_opDoneFlag = 1;
-        m_state = 4;
-        m_result = -3;
-    }
-    else
-    {
-        result = CARDClose(&m_fileInfo);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 4;
-    }
+    McClose();
 
     result = CARDUnmount(0);
     m_result = result;
@@ -1759,10 +1735,10 @@ int CMemoryCardMan::DummySave()
  * --INFO--
  * PAL Address: 0x800C21A0
  * PAL Size: 944b
- * EN Address: 0x800DBD0C
- * EN Size: 516b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C1A28
+ * EN Size: 944b
+ * JP Address: 0x800BFA6C
+ * JP Size: 848b
  */
 int CMemoryCardMan::DummyLoad()
 {
@@ -1841,21 +1817,7 @@ int CMemoryCardMan::DummyLoad()
             System.Printf("McRead(%d) error(%d)\n", 0, m_result);
         }
 
-        int chan = m_fileInfo.chan;
-
-        if (chan < 0 || chan > 1)
-        {
-            m_opDoneFlag = 1;
-            m_state = 4;
-            m_result = -3;
-        }
-        else
-        {
-            result = CARDClose(&m_fileInfo);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 4;
-        }
+        McClose();
 
         result = CARDUnmount(0);
         m_result = result;
@@ -1872,21 +1834,7 @@ int CMemoryCardMan::DummyLoad()
         return m_result;
     }
 
-    int chan = m_fileInfo.chan;
-
-    if (chan < 0 || chan > 1)
-    {
-        m_opDoneFlag = 1;
-        m_state = 4;
-        m_result = -3;
-    }
-    else
-    {
-        result = CARDClose(&m_fileInfo);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 4;
-    }
+    McClose();
 
     result = CARDUnmount(0);
     m_result = result;

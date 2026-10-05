@@ -135,8 +135,13 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
     VISetBlack(FALSE);
     VIFlush();
 
-    while (DVDGetCommandBlockStatus(&info.cb) == errorCode)
+    while (true)
     {
+        int status = DVDGetCommandBlockStatus(&info.cb);
+        if (status != errorCode)
+        {
+            break;
+        }
         VIWaitForRetrace();
     }
 

@@ -1443,6 +1443,7 @@ s32 LetterAttach_Init(void)
     if (sLetterSubInit == 0) {
         memset(win, 0, sizeof(struct Window));
         w = Text_Print(Msg_GetLetter(1), TEXT_WIDTH);
+#if !defined(VERSION_GCCJGC)
         w2 = Text_Print(Msg_GetLetter(11), TEXT_WIDTH);
         if (w < w2)
             w = w2;
@@ -1452,6 +1453,7 @@ s32 LetterAttach_Init(void)
         w2 = Text_Print(Msg_GetSystem(4), TEXT_WIDTH);
         if (w < w2)
             w = w2;
+#endif
         w = (w & 7) ? (w >> 3) + 1 : w >> 3;
         win->active = 1;
         win->cursor = 0;

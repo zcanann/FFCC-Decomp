@@ -81,3 +81,9 @@ chunkfile.cpp:
 	extab start:0x80005600 end:0x80005610
 	extabindex start:0x8000AD80 end:0x8000AD98
 	.text start:0x80012860 end:0x80012B8C
+
+pppAngle.cpp:
+	.text start:0x8005F5E8 end:0x8005F66C
+
+pppBindOnlyPos.cpp:
+	.text start:0x80126E84 end:0x80126EA4

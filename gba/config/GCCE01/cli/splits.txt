@@ -175,8 +175,8 @@ regional_data:
 main/obj:
 	.data       start:0x02028AD8 end:0x02028AF0 align:4
 
-regional_data:
-	.rodata     start:0x02028AF0 end:0x02028C4C
+main/mode:
+	.data       start:0x02028AF0 end:0x02028C4C align:4
 
 main/cmake:
 	.data       start:0x02028C4C end:0x02028C88 align:4
@@ -290,4 +290,10 @@ main/cmake:
 	.common     start:0x03002FB0 end:0x03002FCC align:16
 
 regional_bss:
-	.bss        start:0x03002FCC end:0x030044C1 align:4
+	.bss        start:0x03002FCC end:0x030030B0 align:4
+
+main/mode:
+	.common     start:0x030030B0 end:0x030032E8 align:16
+
+regional_bss:
+	.bss        start:0x030032E8 end:0x030044C1 align:4

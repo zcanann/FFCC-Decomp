@@ -439,11 +439,22 @@ void Screen_Reset(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200586C
+ * PAL Size: 248b
+ * EN Address: 0x0200586C
+ * EN Size: 200b
+ * JP Address: 0x02005A20
+ * JP Size: 200b
+ */
 void Screen_Restart(void)
 {
     vu16 ie;
     s32 i;
+#if defined(VERSION_GCCP01)
     u16 *map;
+#endif
 
     if (gWasConnected || gScreen != SCREEN_WAITING) {
         gScreenUnused = 0;
@@ -462,10 +473,12 @@ void Screen_Restart(void)
             Obj_SetAffine(i, 0, 256, 256);
         REG_DISPCNT = 0x9F40;
         gDataFlags &= 0xFC0F;
+#if defined(VERSION_GCCP01)
         map = (u16 *)0x06007FE0;
         DmaClear16(0, 0, map, 32);
         map = (u16 *)0x0600DFE0;
         DmaClear16(0, 0, map, 32);
+#endif
         Link_SendScreenId((s8)gScreen);
     }
 }

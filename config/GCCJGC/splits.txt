@@ -621,3 +621,21 @@ menu_equip.cpp:
 
 menu_item.cpp:
 	.text start:0x80153EA0 end:0x80155A1C
+
+menu_arti.cpp:
+	.text start:0x8015A460 end:0x8015B97C
+
+menu_tmparti.cpp:
+	.text start:0x80158124 end:0x80158D78
+
+menu_money.cpp:
+	.text start:0x80158D78 end:0x8015A460
+
+menu_compa.cpp:
+	.text start:0x8015B97C end:0x8015CE6C
+
+menu_favo.cpp:
+	.text start:0x8015CE6C end:0x8015E4DC
+
+menu_lst.cpp:
+	.text start:0x8016F384 end:0x8017017C

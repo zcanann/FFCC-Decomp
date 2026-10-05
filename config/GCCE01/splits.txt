@@ -690,3 +690,21 @@ MSL_C/PPCEABI/bare/H/printf.c:
 	.data start:0x8021C580 end:0x8021C7AC
 	.sdata start:0x8032DBE8 end:0x8032DBF0
 	.sdata2 start:0x803328E8 end:0x803328F0
+
+menu_arti.cpp:
+	.text start:0x8015EAA4 end:0x8015FF58
+
+menu_tmparti.cpp:
+	.text start:0x8015C814 end:0x8015D3F8
+
+menu_money.cpp:
+	.text start:0x8015D3F8 end:0x8015EAA4
+
+menu_compa.cpp:
+	.text start:0x8015FF58 end:0x801613D0
+
+menu_favo.cpp:
+	.text start:0x801613D0 end:0x801629BC
+
+menu_lst.cpp:
+	.text start:0x801736C8 end:0x8017445C

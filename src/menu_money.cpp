@@ -10,6 +10,20 @@
 
 #include <string.h>
 
+#ifdef VERSION_GCCJGC
+enum {
+    kMoneyDigitsTexture = 0x5C,
+    kMoneyCursorTexture = 0x47,
+    kMoneyPanelTexture = 0x3A
+};
+#else
+enum {
+    kMoneyDigitsTexture = 0x5D,
+    kMoneyCursorTexture = 0x48,
+    kMoneyPanelTexture = 0x3B
+};
+#endif
+
 typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
@@ -98,10 +112,10 @@ STATIC_ASSERT(sizeof(MoneyMenuAnimList) == 0x1008);
  * --INFO--
  * PAL Address: 8015e37c
  * PAL Size: 2604b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015D3F8
+ * EN Size: 2604b
+ * JP Address: 0x80158D78
+ * JP Size: 2608b
  */
 int CMenuPcs::MoneyCtrlCur()
 {
@@ -283,10 +297,10 @@ int CMenuPcs::MoneyCtrlCur()
  * --INFO--
  * PAL Address: 8015eda8
  * PAL Size: 1636b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015DE24
+ * EN Size: 1636b
+ * JP Address: 0x801597A8
+ * JP Size: 1632b
  */
 void CMenuPcs::MoneyDraw()
 {
@@ -335,7 +349,7 @@ void CMenuPcs::MoneyDraw()
 	}
 
 	entry = this->m_moneyPanel->anims;
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMoneyDigitsTexture));
 	colors[0].r = 0xFF;
 	colors[0].g = 0xFF;
 	colors[0].b = 0xFF;
@@ -357,7 +371,7 @@ void CMenuPcs::MoneyDraw()
 	}
 
 	if ((mode == 0) && (selectionState == 1)) {
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x48));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMoneyCursorTexture));
 		colors[0].r = 0xFF;
 		colors[0].g = 0xFF;
 		colors[0].b = 0xFF;
@@ -409,10 +423,10 @@ void CMenuPcs::MoneyDraw()
  * --INFO--
  * PAL Address: 8015f40c
  * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015E488
+ * EN Size: 380b
+ * JP Address: 0x80159E08
+ * JP Size: 396b
  */
 int CMenuPcs::MoneyClose()
 {
@@ -466,10 +480,10 @@ int CMenuPcs::MoneyClose()
  * --INFO--
  * PAL Address: 8015f588
  * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015E604
+ * EN Size: 256b
+ * JP Address: 0x80159F94
+ * JP Size: 256b
  */
 int CMenuPcs::MoneyCtrl()
 {
@@ -529,7 +543,7 @@ inline void CMenuPcs::MoneyInit()
 
 	i = 0;
 	anim = &this->m_moneyPanel->anims[i++];
-	anim->tex = 0x3b;
+	anim->tex = kMoneyPanelTexture;
 	anim->y = 0x68;
 	anim->w = 0xf8;
 	anim->h = 0x88;
@@ -554,10 +568,10 @@ inline void CMenuPcs::MoneyInit()
  * --INFO--
  * PAL Address: 8015f688
  * PAL Size: 928b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015E704
+ * EN Size: 928b
+ * JP Address: 0x8015A094
+ * JP Size: 972b
  */
 int CMenuPcs::MoneyOpen()
 {

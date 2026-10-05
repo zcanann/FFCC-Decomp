@@ -9,6 +9,18 @@
 #include "ffcc/linkage.h"
 #include <string.h>
 
+#ifdef VERSION_GCCJGC
+enum {
+    kTmpArtiRowTexture = 0x36,
+    kTmpArtiEmptyRowTexture = 0x33
+};
+#else
+enum {
+    kTmpArtiRowTexture = 0x37,
+    kTmpArtiEmptyRowTexture = 0x34
+};
+#endif
+
 static const double kTmpArtiHalfDouble = 0.5;
 static const float kTmpArtiColorMax = 255.0f;
 static const float kTmpArtiZero = 0.0f;
@@ -135,7 +147,7 @@ inline void CMenuPcs::TmpArtiInit()
     float zero = kTmpArtiZero;
     entry = m_tmpArtiList->entries;
     for (int row = 0; row < 4; row++, entry++) {
-        entry->tex = 0x37;
+        entry->tex = kTmpArtiRowTexture;
         entry->width = 200;
         entry->height = 0x28;
         entry->x = (short)(int)(center - (double)entry->width * half);
@@ -155,10 +167,10 @@ inline void CMenuPcs::TmpArtiInit()
  * --INFO--
  * PAL Address: 0x8015d798
  * PAL Size: 1056b
- * EN Address: 0x8017FE9C
- * EN Size: 1312b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015C814
+ * EN Size: 1056b
+ * JP Address: 0x80158124
+ * JP Size: 1048b
  */
 void CMenuPcs::TmpArtiDraw()
 {
@@ -189,7 +201,7 @@ void CMenuPcs::TmpArtiDraw()
 			float alpha = rawAlpha;
 
 			if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] < 0) {
-				tex = 0x34;
+				tex = kTmpArtiEmptyRowTexture;
 				alpha = (float)(kTmpArtiHalfDouble * (double)rawAlpha);
 			}
 
@@ -249,10 +261,10 @@ void CMenuPcs::TmpArtiDraw()
  * --INFO--
  * PAL Address: 0x8015dbb8
  * PAL Size: 428b
- * EN Address: 0x8017FD20
- * EN Size: 380b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015CC34
+ * EN Size: 428b
+ * JP Address: 0x8015853C
+ * JP Size: 460b
  */
 unsigned int CMenuPcs::TmpArtiClose()
 {
@@ -306,10 +318,10 @@ unsigned int CMenuPcs::TmpArtiClose()
  * --INFO--
  * PAL Address: 0x8015dd64
  * PAL Size: 744b
- * EN Address: 0x8017FCBC
- * EN Size: 100b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015CDE0
+ * EN Size: 744b
+ * JP Address: 0x80158708
+ * JP Size: 748b
  */
 int CMenuPcs::TmpArtiCtrl()
 {
@@ -329,10 +341,10 @@ int CMenuPcs::TmpArtiCtrl()
  * --INFO--
  * PAL Address: 0x8015e04c
  * PAL Size: 816b
- * EN Address: 0x8017FB40
- * EN Size: 380b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8015D0C8
+ * EN Size: 816b
+ * JP Address: 0x801589F4
+ * JP Size: 900b
  */
 unsigned int CMenuPcs::TmpArtiOpen()
 {
@@ -357,7 +369,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		int row = 0;
 		entry = m_tmpArtiList->entries;
 		for (int k = 4; k != 0; k--) {
-			entry->tex = 0x37;
+			entry->tex = kTmpArtiRowTexture;
 			entry->width = 200;
 			entry->height = 0x28;
 			entry->x = (short)(int)-((double)entry->width * half - center);

@@ -8,6 +8,24 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+#ifdef VERSION_GCCJGC
+enum {
+    kFavoWindowTexture = 0x31,
+    kFavoBorderTexture = 0x32,
+    kFavoIconTexture = 0x44,
+    kFavoPanelTexture = 0x2D,
+    kFavoRowTexture = 0x36
+};
+#else
+enum {
+    kFavoWindowTexture = 0x32,
+    kFavoBorderTexture = 0x33,
+    kFavoIconTexture = 0x45,
+    kFavoPanelTexture = 0x2E,
+    kFavoRowTexture = 0x37
+};
+#endif
+
 static FoodRank s_rank[8];
 
 static const float kFavoWideTextureWidth = 384.0f;
@@ -20,7 +38,7 @@ STATIC_ASSERT(sizeof(s_rank) == 0x20);
 
 static inline void FavoDrawWindow(FavoEntry* entry, float x, float y, float w, float h, float u, float v, GXColor* colors)
 {
-	if (entry->tex == 0x32) {
+	if (entry->tex == kFavoWindowTexture) {
 		int yStep = static_cast<int>(y);
 		float end = y + h;
 		while (static_cast<float>(yStep) < end) {
@@ -44,10 +62,10 @@ static inline void FavoDrawWindow(FavoEntry* entry, float x, float y, float w, f
  * --INFO--
  * PAL Address: 0x80162360
  * PAL Size: 2488b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801613D0
+ * EN Size: 2488b
+ * JP Address: 0x8015CE6C
+ * JP Size: 2456b
  */
 void CMenuPcs::FavoDraw()
 {
@@ -136,7 +154,7 @@ void CMenuPcs::FavoDraw()
 
 	for (i = 0; i < m_favoList->count; i++) {
 		entry = &m_favoList->entries[i];
-		if (entry->tex == 0x37) {
+		if (entry->tex == kFavoRowTexture) {
 			break;
 		}
 	}
@@ -199,10 +217,10 @@ void CMenuPcs::FavoDraw()
  * --INFO--
  * PAL Address: 0x80162d18
  * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80161D88
+ * EN Size: 380b
+ * JP Address: 0x8015D804
+ * JP Size: 396b
  */
 int CMenuPcs::FavoClose()
 {
@@ -284,10 +302,10 @@ inline int CMenuPcs::FavoCtrlCur()
  * --INFO--
  * PAL Address: 0x80162E94
  * PAL Size: 400b
- * EN Address: 0x8018580C
- * EN Size: 80b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80161F04
+ * EN Size: 400b
+ * JP Address: 0x8015D990
+ * JP Size: 400b
  */
 int CMenuPcs::FavoCtrl()
 {
@@ -302,10 +320,10 @@ int CMenuPcs::FavoCtrl()
  * --INFO--
  * PAL Address: 0x80163024
  * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80162094
+ * EN Size: 432b
+ * JP Address: 0x8015DB20
+ * JP Size: 444b
  */
 int CMenuPcs::FavoOpen()
 {
@@ -356,10 +374,10 @@ int CMenuPcs::FavoOpen()
  * --INFO--
  * PAL Address: 801631d4
  * PAL Size: 616b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80162244
+ * EN Size: 616b
+ * JP Address: 0x8015DCDC
+ * JP Size: 648b
  */
 void CMenuPcs::FavoInit0()
 {
@@ -436,10 +454,10 @@ void CMenuPcs::FavoInit0()
  * --INFO--
  * PAL Address: 0x8016343c
  * PAL Size: 1296b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801624AC
+ * EN Size: 1296b
+ * JP Address: 0x8015DF64
+ * JP Size: 1400b
  */
 void CMenuPcs::FavoInit()
 {
@@ -457,7 +475,7 @@ void CMenuPcs::FavoInit()
 
 	index = 0;
 	entry = &m_favoList->entries[index++];
-	entry->tex = 0x33;
+	entry->tex = kFavoBorderTexture;
 	entry->drawFlags = 4;
 	entry->x = 0x30;
 	entry->y = 0x28;
@@ -470,7 +488,7 @@ void CMenuPcs::FavoInit()
 	entry->duration = 5;
 
 	entry = &m_favoList->entries[index++];
-	entry->tex = 0x32;
+	entry->tex = kFavoWindowTexture;
 	entry->x = 0x30;
 	entry->y = 0x48;
 	entry->w = 0x158;
@@ -482,7 +500,7 @@ void CMenuPcs::FavoInit()
 	entry->duration = 5;
 
 	entry = &m_favoList->entries[index++];
-	entry->tex = 0x33;
+	entry->tex = kFavoBorderTexture;
 	entry->x = 0x30;
 	entry->y = 0x110;
 	entry->w = 0x158;
@@ -494,7 +512,7 @@ void CMenuPcs::FavoInit()
 	entry->duration = 5;
 
 	entry = &m_favoList->entries[index++];
-	entry->tex = 0x45;
+	entry->tex = kFavoIconTexture;
 	entry->x = 0x18;
 	entry->y = 0xe;
 	entry->w = 0x30;
@@ -506,7 +524,7 @@ void CMenuPcs::FavoInit()
 	entry->duration = 5;
 
 	entry = &m_favoList->entries[index++];
-	entry->tex = 0x45;
+	entry->tex = kFavoIconTexture;
 	entry->x = 0x1d;
 	entry->w = 0x30;
 	entry->h = 0x30;
@@ -519,7 +537,7 @@ void CMenuPcs::FavoInit()
 
 	entry = &m_favoList->entries[index++];
 	entry->flags = 2;
-	entry->tex = 0x2e;
+	entry->tex = kFavoPanelTexture;
 	entry->x = 0x18;
 	entry->y = 8;
 	entry->w = 0x48;
@@ -533,7 +551,7 @@ void CMenuPcs::FavoInit()
 	for (idx = 0; idx < 8; idx++) {
 		entry = &m_favoList->entries[index++];
 		entry->flags = 2;
-		entry->tex = 0x37;
+		entry->tex = kFavoRowTexture;
 		entry->x = firstEntry->x + 0x28;
 		entry->y = firstEntry->y + idx * 0x20;
 		entry->w = 200;

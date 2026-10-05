@@ -1137,7 +1137,7 @@ void CMenuPcs::DrawSingCMake()
     }
 
     if (CmakeState(this)->m_mode < 2) {
-        CmakeState(this)->m_mode = static_cast<short>(CmakeState(this)->m_mode + 1);
+        CmakeState(this)->m_mode++;
         goto resetFrame;
     }
 

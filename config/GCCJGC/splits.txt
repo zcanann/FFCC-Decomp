@@ -1721,9 +1721,13 @@ baseobj.cpp:
 
 pppCrystal.cpp:
 	.text start:0x800D9D6C end:0x800DA728
+	.rodata start:0x801D60A8 end:0x801D6100
+	.sdata2 start:0x8034DCC0 end:0x8034DD28
 
 pppCrystal2.cpp:
 	.text start:0x8013A5FC end:0x8013AE44
+	.rodata start:0x801D8D48 end:0x801D8DA0
+	.sdata2 start:0x8034EC40 end:0x8034EC88
 
 graphic_dbgfont.cpp:
 	.data start:0x801F1800 end:0x801F2400 align:32

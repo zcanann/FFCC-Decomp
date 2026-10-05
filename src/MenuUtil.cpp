@@ -979,6 +979,22 @@ void CMenuPcs::CalcOptionMenu()
 	}
 }
 
+#ifdef VERSION_GCCJGC
+static inline void DrawOptionLabel(CFont* font, int x, int y, _GXColor color,
+                                   int tlut, char* text, float scale)
+{
+	font->SetMargin(1.0f);
+	font->SetShadow(1);
+	font->SetScale(scale);
+	font->DrawInit();
+	font->SetTlut(tlut);
+	font->SetColor(color);
+	font->SetPosX(static_cast<float>(x));
+	font->SetPosY(static_cast<float>(y));
+	font->Draw(text);
+}
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x8017698C
@@ -1116,6 +1132,31 @@ void CMenuPcs::DrawOptionMenu()
 		                        w * 0.5f, h, m_wmOptionTextures[0], &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+		if (i == m_optionIndex) {
+			CFont* titleFont = m_fonts[0];
+			titleFont->SetMargin(1.0f);
+			titleFont->SetShadow(1);
+			titleFont->SetScale(1.2f);
+			titleFont->DrawInit();
+			titleFont->SetTlut(0x16);
+			titleFont->SetColor(color);
+			titleFont->SetPosX(94.0f);
+			titleFont->SetPosY(static_cast<float>(selectedY));
+			titleFont->Draw(*option);
+		} else {
+			CFont* titleFont = m_fonts[0];
+			titleFont->SetMargin(1.0f);
+			titleFont->SetShadow(1);
+			titleFont->SetScale(1.0f);
+			titleFont->DrawInit();
+			titleFont->SetTlut(6);
+			titleFont->SetColor(color);
+			titleFont->SetPosX(96.0f);
+			titleFont->SetPosY(static_cast<float>(normalY));
+			titleFont->Draw(*option);
+		}
+#else
 		if (i == m_optionIndex) {
 			DrawFont(0x5E, static_cast<int>(-4.0f + static_cast<float>(selectedY)), color, 0x16,
 			         *option, 1.0f, 1.0f);
@@ -1123,6 +1164,7 @@ void CMenuPcs::DrawOptionMenu()
 			DrawFont(0x60, static_cast<int>(-4.0f + static_cast<float>(normalY)), color, 6,
 			         *option, 1.0f, 1.0f);
 		}
+#endif
 	}
 
 #ifndef VERSION_GCCJGC
@@ -1131,6 +1173,26 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.RenderTextureQuad(0.0f, 384.0f, 640.0f, 40.0f,
 	                        m_textures[31], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+	{
+		char* help = helpText[m_optionIndex];
+		strlen(help);
+		CFont* helpFont = m_fonts[0];
+		helpFont->SetMargin(1.0f);
+		helpFont->SetScale(1.0f);
+		float width = helpFont->GetWidth(help);
+		helpFont = m_fonts[0];
+		helpFont->SetMargin(1.0f);
+		helpFont->SetShadow(1);
+		helpFont->SetScale(1.0f);
+		helpFont->DrawInit();
+		helpFont->SetTlut(7);
+		helpFont->SetColor(color);
+		helpFont->SetPosX(static_cast<float>(static_cast<int>(320.0f - width * 0.5f)));
+		helpFont->SetPosY(391.0f);
+		helpFont->Draw(help);
+	}
+#else
 	{
 		float helpTextY = 387.0f;
 		char* help = helpText[m_optionIndex];
@@ -1144,6 +1206,8 @@ void CMenuPcs::DrawOptionMenu()
 		          static_cast<int>(helpTextY), color, 7, helpText[m_optionIndex], 0.8f,
 		          1.0f, 1.0f);
 	}
+
+#endif
 
 	int leftHintOn = 0;
 	int rightHintOn = 0;
@@ -1162,11 +1226,17 @@ void CMenuPcs::DrawOptionMenu()
 
 	switch (m_optionIndex) {
 	case 0: {
+#ifdef VERSION_GCCJGC
+		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 189.0f }, { 496.0f, 189.0f } };
+#else
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 0.0f }, { 496.0f, 0.0f } };
+#endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
 		rightXi = static_cast<int>(w * 0.5f + row.rightIcon.x - 472.0f);
+#ifndef VERSION_GCCJGC
 		row.leftText.y = 185.0f;
 		row.rightText.y = 185.0f;
+#endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
@@ -1194,6 +1264,23 @@ void CMenuPcs::DrawOptionMenu()
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+		if (m_gameInitMode == 0) {
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x - 2.0f),
+			                static_cast<int>(row.leftText.y - 2.0f), color, 0x17,
+			                "\202\156\202\155", 1.2f);
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x),
+			                static_cast<int>(row.rightText.y), color, 6,
+			                "\202\156\202\145\202\145", 1.0f);
+		} else {
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x),
+			                static_cast<int>(row.leftText.y), color, 6,
+			                "\202\156\202\155", 1.0f);
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x - 2.0f),
+			                static_cast<int>(row.rightText.y - 2.0f), color, 0x17,
+			                "\202\156\202\145\202\145", 1.2f);
+		}
+#else
 		unsigned char isAlt = (langRow + 1 == 4) || (langRow + 1 == 5);
 		float scale = isAlt ? 0.8 : 1.0;
 
@@ -1252,14 +1339,21 @@ void CMenuPcs::DrawOptionMenu()
 				          1.0f, 1.0f);
 			}
 		}
+#endif
 		break;
 	}
 	case 1: {
+#ifdef VERSION_GCCJGC
+		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 189.0f }, { 488.0f, 189.0f } };
+#else
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 0.0f }, { 488.0f, 0.0f } };
+#endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
 		rightXi = static_cast<int>(w * 0.5f + row.rightIcon.x - 472.0f);
+#ifndef VERSION_GCCJGC
 		row.leftText.y = 185.0f;
 		row.rightText.y = 185.0f;
+#endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
@@ -1287,6 +1381,23 @@ void CMenuPcs::DrawOptionMenu()
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+		if (m_stereoMode == 0) {
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x - 2.0f),
+			                static_cast<int>(row.leftText.y - 2.0f), color, 0x17,
+			                "\203\130\203\145\203\214\203\111", 1.2f);
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x),
+			                static_cast<int>(row.rightText.y), color, 6,
+			                "\203\202\203\155\203\211\203\213", 1.0f);
+		} else {
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x),
+			                static_cast<int>(row.leftText.y), color, 6,
+			                "\203\130\203\145\203\214\203\111", 1.0f);
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x - 2.0f),
+			                static_cast<int>(row.rightText.y - 2.0f), color, 0x17,
+			                "\203\202\203\155\203\211\203\213", 1.2f);
+		}
+#else
 		double stereoScale = 0.8;
 		if (m_stereoMode == 0) {
 			{
@@ -1341,6 +1452,7 @@ void CMenuPcs::DrawOptionMenu()
 				          stereoScale * oneF, 1.0f, 1.0f);
 			}
 		}
+#endif
 		break;
 	}
 	case 2: {
@@ -1358,8 +1470,13 @@ void CMenuPcs::DrawOptionMenu()
 		pos.bar.x = 372.0f;
 		pos.bar.y = 196.0f;
 		pos.minLabel.x = 372.0f;
+#ifdef VERSION_GCCJGC
+		pos.minLabel.y = 172.0f;
+		pos.maxLabel.y = 172.0f;
+#else
 		pos.minLabel.y = 168.0f;
 		pos.maxLabel.y = 168.0f;
+#endif
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
 		rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
@@ -1413,11 +1530,20 @@ void CMenuPcs::DrawOptionMenu()
 			}
 		}
 
+#ifdef VERSION_GCCJGC
+		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.minLabel.x),
+		                static_cast<int>(pos.minLabel.y), color, 7,
+		                "\202\215\202\211\202\216", 1.0f);
+		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.maxLabel.x),
+		                static_cast<int>(pos.maxLabel.y), color, 7,
+		                "\202\215\202\201\202\230", 1.0f);
+#else
 		DrawFont(static_cast<int>(pos.minLabel.x), static_cast<int>(pos.minLabel.y), color, 7,
 		         OPT_MES(16), 1.0f, 1.0f);
 		pos.maxLabel.x = 564.0f - font->GetWidth(OPT_MES(17));
 		DrawFont(static_cast<int>(pos.maxLabel.x), static_cast<int>(pos.maxLabel.y), color, 7, OPT_MES(17), 1.0f,
 		         1.0f);
+#endif
 		break;
 	}
 	case 3: {
@@ -1435,8 +1561,13 @@ void CMenuPcs::DrawOptionMenu()
 		pos.bar.x = 372.0f;
 		pos.bar.y = 196.0f;
 		pos.minLabel.x = 372.0f;
+#ifdef VERSION_GCCJGC
+		pos.minLabel.y = 172.0f;
+		pos.maxLabel.y = 172.0f;
+#else
 		pos.minLabel.y = 168.0f;
 		pos.maxLabel.y = 168.0f;
+#endif
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
 		rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
@@ -1490,11 +1621,20 @@ void CMenuPcs::DrawOptionMenu()
 			}
 		}
 
+#ifdef VERSION_GCCJGC
+		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.minLabel.x),
+		                static_cast<int>(pos.minLabel.y), color, 7,
+		                "\202\215\202\211\202\216", 1.0f);
+		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.maxLabel.x),
+		                static_cast<int>(pos.maxLabel.y), color, 7,
+		                "\202\215\202\201\202\230", 1.0f);
+#else
 		DrawFont(static_cast<int>(pos.minLabel.x), static_cast<int>(pos.minLabel.y), color, 7,
 		         OPT_MES(16), 1.0f, 1.0f);
 		pos.maxLabel.x = 564.0f - font->GetWidth(OPT_MES(17));
 		DrawFont(static_cast<int>(pos.maxLabel.x), static_cast<int>(pos.maxLabel.y), color, 7, OPT_MES(17), 1.0f,
 		         1.0f);
+#endif
 		break;
 	}
 	case 4: {
@@ -1572,6 +1712,13 @@ void CMenuPcs::DrawOptionMenu()
 				gUtil.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(y),
 				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+#ifdef VERSION_GCCJGC
+				const Vec2d* pp4 = &pts[k + 4];
+				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				DrawOptionLabel(m_fonts[0], textXi2 + 8,
+				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(y))), color, 7,
+				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
+#else
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(18);
 				const Vec2d* pp4 = &pts[k + 4];
@@ -1585,7 +1732,13 @@ void CMenuPcs::DrawOptionMenu()
 				         static_cast<int>(-4.0f + (4.0f +
 				                          (pp4->y + static_cast<float>(y)))), color, 7,
 				         txt, 1.0f, 1.0f);
+#endif
 			} else {
+#ifdef VERSION_GCCJGC
+				DrawOptionLabel(m_fonts[0], textXi + 8,
+				                static_cast<int>(4.0f + (pp3->y + static_cast<float>(y))), color, 7,
+				                "\203\211\203\103\203\147\202\156\202\145\202\145", 1.0f);
+#else
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(19);
 				fnt->SetMargin(1.0f);
@@ -1597,6 +1750,7 @@ void CMenuPcs::DrawOptionMenu()
 				         static_cast<int>(-4.0f + (4.0f +
 				                          (pp3->y + static_cast<float>(y)))), color, 7,
 				         txt, 1.0f, 1.0f);
+#endif
 				const Vec2d* pp4e = &pts[k + 4];
 				int panelXi = static_cast<int>(pp4e->x + static_cast<float>(step1) * specialRowCos);
 				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);

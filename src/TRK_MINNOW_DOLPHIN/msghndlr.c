@@ -1,4 +1,5 @@
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msghndlr.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msgbuf.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/nubevent.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWTrace.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
@@ -33,16 +34,35 @@ void SetTRKConnected(BOOL isTRKConnected) {
     IsTRKConnected = isTRKConnected;
 }
 
+#ifdef VERSION_GCCJGC
+inline
+#endif
 DSError TRKSendACK(TRKBuffer* buffer) {
+#ifdef VERSION_GCCJGC
+    int retries = 3;
+    DSError err;
+    do {
+        err = TRKMessageSend(buffer);
+        retries--;
+    } while (err != DS_NoError && retries > 0);
+    return err;
+#else
     DSError err;
     MWTRACE(1, "SendACK : Calling MessageSend\n");
     err = TRKMessageSend(buffer);
     MWTRACE(1, "MessageSend err : %ld\n", err);
     return err;
+#endif
 }
 
 DSError TRKStandardACK(TRKBuffer* buffer, MessageCommandID commandID,
                               DSReplyError replyError) {
+#ifdef VERSION_GCCJGC
+    TRKResetBuffer(buffer, TRUE);
+    TRKAppendBuffer1_ui8(buffer, commandID);
+    TRKAppendBuffer1_ui8(buffer, replyError);
+    return TRKSendACK(buffer);
+#else
     CommandReply reply;
 
     memset(&reply, 0, sizeof(CommandReply));
@@ -51,7 +71,23 @@ DSError TRKStandardACK(TRKBuffer* buffer, MessageCommandID commandID,
     reply.replyError.b = replyError;
     TRKWriteUARTN(&reply, sizeof(CommandReply));
     return DS_NoError;
+#endif
 }
+
+#ifdef VERSION_GCCJGC
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x801A7358
+ * JP Size: 176b
+ */
+DSError TRKDoUnsupported(TRKBuffer* buffer) {
+    return TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_UnsupportedCommandError);
+}
+#endif
 
 /* 8036EC5C-8036ECC0 36959C 0064+00 0/0 1/1 0/0 .text            TRKDoConnect */
 DSError TRKDoConnect(TRKBuffer* buffer) {

@@ -114,7 +114,7 @@ void CGame::Init()
 {
     int languageId;
 
-    switch (static_cast<unsigned char>(OSSetProgressiveMode())) {
+    switch (static_cast<unsigned char>(OSGetLanguage())) {
     case 5:
     default:
         languageId = 1;

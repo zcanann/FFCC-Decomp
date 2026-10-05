@@ -534,7 +534,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "color.cpp"),
             Object(NonMatching, "file.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(Matching, "strcase.c"),
-            Object(Matching, "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01"), "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "FS_USB_Process.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "FunnyShape.cpp"),
             Object(NonMatching, "game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
@@ -820,7 +820,7 @@ config.libs = [
                 source="os/__ppc_eabi_init.cpp",
                 cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
             ),
-            Object(Matching, "os/OS.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OS.c"),
             Object(Matching, "os/OSAddress.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSAlarm.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSAlloc.c"),
@@ -839,7 +839,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSReboot.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSReset.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSResetSW.c"),
-            Object(Matching, "os/OSRtc.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSRtc.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSSemaphore.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSStopwatch.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSSync.c"),
@@ -857,8 +857,8 @@ config.libs = [
     DolphinLib(
         "si",
         [
-            Object(Matching, "si/SIBios.c"),
-            Object(Matching, "si/SISamplingRate.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "si/SIBios.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "si/SISamplingRate.c"),
         ],
     ),
     DolphinLib(
@@ -892,7 +892,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdidutils.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdlow.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdqueue.c"),
-            Object(Matching, "dvd/fstload.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/fstload.c"),
         ],
     ),
     DolphinLib(
@@ -907,8 +907,8 @@ config.libs = [
     DolphinLib(
         "pad",
         [
-            Object(Matching, "pad/Padclamp.c"),
-            Object(Matching, "pad/Pad.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pad/Padclamp.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pad/Pad.c"),
         ],
     ),
     DolphinLib(
@@ -979,9 +979,9 @@ config.libs = [
     DolphinLib(
         "dsp",
         [
-            Object(Matching, "dsp/dsp.c"),
-            Object(Matching, "dsp/dsp_debug.c"),
-            Object(Matching, "dsp/dsp_task.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dsp/dsp.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dsp/dsp_debug.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dsp/dsp_task.c"),
         ],
     ),
     DolphinLib(
@@ -1193,7 +1193,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/CircleBuffer.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dispatch.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/flush_cache.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01"),
@@ -1221,10 +1221,12 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/nubevent.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/nubinit.c"),
             Object(
-                MatchingFor("GCCP01", "GCCE01"),
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "TRK_MINNOW_DOLPHIN/serpoll.c",
                 mw_version="GC/2.6",
-                cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
+                cflags=cflags_trk if config.version == "GCCJGC" else [
+                    f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")
+                ],
             ),
             Object(
                 MatchingFor("GCCP01", "GCCE01"),
@@ -1270,7 +1272,7 @@ config.libs = [
                     "-sdata2 0",
                 ],
             ),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/targsupp.s"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/targsupp.s"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/UDP_Stubs.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/usr_put.c"),
         ],

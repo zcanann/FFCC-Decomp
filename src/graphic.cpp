@@ -275,7 +275,7 @@ int CGraphic::GetProgressive()
 {
     u32 mode = VIGetDTVStatus();
     if (mode != 0) {
-        mode = OSSetSoundMode();
+        mode = OSGetProgressiveMode();
         mode = (static_cast<unsigned int>(__cntlzw(1 - mode)) >> 5) + 1;
     } else {
         mode = 0;
@@ -300,7 +300,7 @@ void CGraphic::ChangeProgressive(int mode)
         VIWaitForRetrace();
         VIWaitForRetrace();
     }
-    OSGetProgressiveMode(mode);
+    OSSetProgressiveMode(mode);
 }
 
 /*

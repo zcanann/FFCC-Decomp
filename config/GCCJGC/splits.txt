@@ -738,8 +738,12 @@ mes.cpp:
 	.rodata start:0x801D4970 end:0x801D49F8
 
 util.cpp:
-	.text start:0x80024778 end:0x80024790
-	.data start:0x801DCB78 end:0x801DCC38
+	.text start:0x80021FB0 end:0x800247A8
+	.rodata start:0x801D1BB8 end:0x801D1BE0
+	.data start:0x801DCB78 end:0x801DCC58
+	.sdata start:0x8034B288 end:0x8034B298
+	.sdata2 start:0x8034C5E8 end:0x8034C620
+	.sbss start:0x8034BA70 end:0x8034BA78
 
 TRK_MINNOW_DOLPHIN/usr_put.c:
 	.text	start:0x801A4B54 end:0x801A4BE0
@@ -922,3 +926,97 @@ dvd/dvdlow.c:
 dvd/dvdFatal.c:
 	.text	start:0x80185B88 end:0x80185BB8
 	.sbss	start:0x8034BEA8 end:0x8034BEAC
+
+dvd/fstload.c:
+	.text	start:0x80185BB8 end:0x80185DF8
+	.data	start:0x80233028 end:0x80233098
+	.sdata	start:0x8034B8E0 end:0x8034B8EB
+	.sbss	start:0x8034BEB0 end:0x8034BEBC
+	.bss start:0x803283D8 end:0x80328448
+
+auto_09_8034B8EB_sdata:
+	.sdata start:0x8034B8EB end:0x8034B8F0 align:1
+
+TRK_MINNOW_DOLPHIN/targsupp.s:
+	.text	start:0x801A9B00 end:0x801A9B20
+
+file.cpp:
+	.data start:0x801DC5C0 end:0x801DC610
+	.sdata start:0x8034B1C0 end:0x8034B1D0
+	.sdata2 start:0x8034C3C0 end:0x8034C3E8
+	extab start:0x800056F0 end:0x80005768
+	extabindex start:0x8000ADF8 end:0x8000AEAC
+	.ctors start:0x801D0624 end:0x801D0628
+	.text start:0x80012B4C end:0x80013D9C
+	.bss start:0x8023A640 end:0x8023A7B0
+
+TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
+	.text	start:0x801AA034 end:0x801AA544
+	.rodata	start:0x801DB238 end:0x801DB288
+	.data	start:0x80238950 end:0x8023896C
+	.bss	start:0x80345FB8 end:0x803481DE
+
+os/OSRtc.c:
+	.text	start:0x8017A1F4 end:0x8017AC20
+	.bss	start:0x80327540 end:0x80327594
+
+TRK_MINNOW_DOLPHIN/msg.c:
+	.text	start:0x801A39D0 end:0x801A3BAC
+
+os/OS.c:
+	.text	start:0x80175C90 end:0x8017677C
+	.data	start:0x80232028 end:0x80232220
+	.bss	start:0x80327480 end:0x803274D0
+	.sdata	start:0x8034B868 end:0x8034B878
+	.sbss	start:0x8034BD00 end:0x8034BD40
+
+si/SIBios.c:
+	.text	start:0x8017E5F4 end:0x8017FE44
+	.data	start:0x80232B78 end:0x80232C90
+	.bss	start:0x80328050 end:0x80328250
+	.sdata	start:0x8034B8A8 end:0x8034B8AC
+	.sbss	start:0x8034BDE0 end:0x8034BDEC
+
+si/SISamplingRate.c:
+	.text	start:0x8017FE44 end:0x8017FF4C
+	.data	start:0x80232C90 end:0x80232D23
+	.sbss	start:0x8034BDF0 end:0x8034BDF4
+
+pad/Padclamp.c:
+	.text	start:0x8018782C end:0x80187A70
+	.rodata	start:0x801DB160 end:0x801DB16A
+
+pad/Pad.c:
+	.text	start:0x80187A70 end:0x80189398
+	.data	start:0x80233468 end:0x802334C0
+	.bss	start:0x80328590 end:0x803285E0
+	.sdata	start:0x8034B900 end:0x8034B920
+	.sbss	start:0x8034BF18 end:0x8034BF40
+
+TRK_MINNOW_DOLPHIN/serpoll.c:
+	.text	start:0x801A4788 end:0x801A4B54
+	.bss	start:0x80345A00 end:0x80345A18
+
+TRK_MINNOW_DOLPHIN/msghndlr.c:
+	.text	start:0x801A729C end:0x801A74DC
+	.bss	start:0x80345A20 end:0x80345A24
+
+dsp/dsp.c:
+	.text	start:0x80191F44 end:0x801921D4
+	.data	start:0x80237878 end:0x802378F5
+	.sdata	start:0x8034B950 end:0x8034B954
+	.sbss	start:0x8034C0A0 end:0x8034C0A4
+
+dsp/dsp_debug.c:
+	.text	start:0x801921D4 end:0x80192224
+
+dsp/dsp_task.c:
+	.text	start:0x80192224 end:0x80192AA8
+	.data	start:0x802378F8 end:0x80237A33
+	.sbss	start:0x8034C0A8 end:0x8034C0C0
+
+auto_07_802378F5_data:
+	.data start:0x802378F5 end:0x802378F8 align:1
+
+auto_07_80237A33_data:
+	.data start:0x80237A33 end:0x80237A38 align:1

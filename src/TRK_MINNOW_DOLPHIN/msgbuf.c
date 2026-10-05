@@ -171,15 +171,6 @@ DSError TRKReadBuffer(TRKBuffer* msg, void* data, unsigned int length) {
     return error;
 }
 
-inline DSError TRKAppendBuffer1_ui8(TRKBuffer* buffer, const u8 data) {
-    if (buffer->position >= 0x880) {
-        return DS_MessageBufferOverflow;
-    }
-
-    buffer->data[buffer->position++] = data;
-    buffer->length++;
-    return DS_NoError;
-}
 
 /*
  * --INFO--

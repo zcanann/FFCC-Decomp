@@ -137,19 +137,35 @@ int __OSSyncSram(void) {
     return Scb.sync;
 }
 
-int __OSReadROM(void* buffer, s32 length, s32 offset) {
+/*
+ * --INFO--
+ * PAL Address: 0x801802BC
+ * PAL Size: 128b
+ * EN Address: 0x8017F20C
+ * EN Size: 128b
+ * JP Address: 0x8017A8B8
+ * JP Size: 128b
+ */
+u32 OSGetSoundMode(void) {
     OSSram* sram;
-    (void)buffer;
-    (void)length;
-    (void)offset;
+    u32 mode;
 
-    sram = (OSSram*)LockSram(0);
-    offset = (sram->flags & 4) ? 1 : 0;
+    sram = __OSLockSram();
+    mode = (sram->flags & 4) ? 1 : 0;
     __OSUnlockSram(0);
-    return offset;
+    return mode;
 }
 
-void OSGetSoundMode(u32 mode) {
+/*
+ * --INFO--
+ * PAL Address: 0x8018033C
+ * PAL Size: 164b
+ * EN Address: 0x8017F28C
+ * EN Size: 164b
+ * JP Address: 0x8017A938
+ * JP Size: 164b
+ */
+void OSSetSoundMode(u32 mode) {
     OSSram* sram;
     int unused;
 
@@ -165,7 +181,16 @@ void OSGetSoundMode(u32 mode) {
     __OSUnlockSram(TRUE);
 }
 
-u32 OSSetSoundMode(void) {
+/*
+ * --INFO--
+ * PAL Address: 0x801803E0
+ * PAL Size: 112b
+ * EN Address: 0x8017F330
+ * EN Size: 112b
+ * JP Address: 0x8017A9DC
+ * JP Size: 112b
+ */
+u32 OSGetProgressiveMode(void) {
     OSSram* sram;
     u32 on;
 
@@ -175,7 +200,16 @@ u32 OSSetSoundMode(void) {
     return on;
 }
 
-void OSGetProgressiveMode(u32 on) {
+/*
+ * --INFO--
+ * PAL Address: 0x80180450
+ * PAL Size: 164b
+ * EN Address: 0x8017F3A0
+ * EN Size: 164b
+ * JP Address: 0x8017AA4C
+ * JP Size: 164b
+ */
+void OSSetProgressiveMode(u32 on) {
     OSSram* sram;
 #ifndef DEBUG
     u16 padding;
@@ -193,7 +227,16 @@ void OSGetProgressiveMode(u32 on) {
     __OSUnlockSram(TRUE);
 }
 
-u32 OSSetProgressiveMode(void) {
+/*
+ * --INFO--
+ * PAL Address: 0x801804F4
+ * PAL Size: 108b
+ * EN Address: UNUSED
+ * EN Size: 0b
+ * JP Address: UNUSED
+ * JP Size: 0b
+ */
+u8 OSGetLanguage(void) {
     OSSram* sram;
     u8 language;
 

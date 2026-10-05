@@ -1020,3 +1020,89 @@ dvd/dvdlow.c:
 dvd/dvdFatal.c:
 	.text	start:0x8018A4D8 end:0x8018A508
 	.sbss	start:0x8032E0A8 end:0x8032E0AC
+
+dvd/fstload.c:
+	.text	start:0x8018A508 end:0x8018A748
+	.data	start:0x802165F0 end:0x80216660
+	.sdata	start:0x8032DAD8 end:0x8032DAE3
+	.sbss	start:0x8032E0B0 end:0x8032E0BC
+	.bss start:0x8030BAB8 end:0x8030BB28
+
+auto_09_8032DAE3_sdata:
+	.sdata start:0x8032DAE3 end:0x8032DAE8 align:1
+
+TRK_MINNOW_DOLPHIN/targsupp.s:
+	.text start:0x801AC590 end:0x801AC5B0
+
+file.cpp:
+	.rodata start:0x801D43E0 end:0x801D4F20
+	.data start:0x801E7060 end:0x801E71D0
+	.sdata start:0x8032D3A0 end:0x8032D3B0
+	.sdata2 start:0x8032E5E0 end:0x8032E610
+	extab start:0x80005610 end:0x80005688
+	extabindex start:0x8000AD98 end:0x8000AE4C
+	.ctors start:0x801D4304 end:0x801D4308
+	.text start:0x80012B8C end:0x80013D50
+	.bss start:0x8021DD00 end:0x8021DE70
+
+os/OSRtc.c:
+	.text	start:0x8017EB48 end:0x8017F574
+	.bss	start:0x8030AC20 end:0x8030AC74
+
+os/OS.c:
+	.text	start:0x8017A5E4 end:0x8017B0D0
+	.data	start:0x802155F0 end:0x802157E8
+	.bss	start:0x8030AB60 end:0x8030ABB0
+	.sdata	start:0x8032DA60 end:0x8032DA70
+	.sbss	start:0x8032DF00 end:0x8032DF40
+
+si/SIBios.c:
+	.text	start:0x80182F44 end:0x80184794
+	.data	start:0x80216140 end:0x80216258
+	.bss	start:0x8030B730 end:0x8030B930
+	.sdata	start:0x8032DAA0 end:0x8032DAA4
+	.sbss	start:0x8032DFE0 end:0x8032DFEC
+
+si/SISamplingRate.c:
+	.text	start:0x80184794 end:0x8018489C
+	.data	start:0x80216258 end:0x802162EB
+	.sbss	start:0x8032DFF0 end:0x8032DFF4
+
+pad/Padclamp.c:
+	.text	start:0x8018C17C end:0x8018C3C0
+	.rodata	start:0x801E54C0 end:0x801E54CA
+
+pad/Pad.c:
+	.text	start:0x8018C3C0 end:0x8018DCE8
+	.data	start:0x80216A30 end:0x80216A88
+	.bss	start:0x8030BC70 end:0x8030BCC0
+	.sdata	start:0x8032DAF8 end:0x8032DB18
+	.sbss	start:0x8032E118 end:0x8032E140
+
+util.cpp:
+	.text start:0x80022518 end:0x80024C54
+	.rodata start:0x801D5FA0 end:0x801D5FC8
+	.data start:0x801E7738 end:0x801E7758
+	.sdata start:0x8032D468 end:0x8032D478
+	.sdata2 start:0x8032E850 end:0x8032E888
+	.sbss start:0x8032DC50 end:0x8032DC58
+
+dsp/dsp.c:
+	.text	start:0x80196900 end:0x80196B90
+	.data	start:0x8021AE38 end:0x8021AEB5
+	.sdata	start:0x8032DB48 end:0x8032DB4C
+	.sbss	start:0x8032E2A0 end:0x8032E2A4
+
+dsp/dsp_debug.c:
+	.text	start:0x80196B90 end:0x80196BE0
+
+dsp/dsp_task.c:
+	.text	start:0x80196BE0 end:0x80197464
+	.data	start:0x8021AEB8 end:0x8021AFF3
+	.sbss	start:0x8032E2A8 end:0x8032E2C0
+
+auto_07_8021AEB5_data:
+	.data start:0x8021AEB5 end:0x8021AEB8 align:1
+
+auto_07_8021AFF3_data:
+	.data start:0x8021AFF3 end:0x8021AFF8 align:1

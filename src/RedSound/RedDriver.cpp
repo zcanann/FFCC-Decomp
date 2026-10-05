@@ -17,10 +17,6 @@
 
 // Global objects that need initialization
 
-extern "C" {
-    int __OSReadROM();
-}
-
 struct RedWaveSettingState {
     int* m_slot;
     int m_waveId;
@@ -1079,9 +1075,9 @@ static void _SetSoundMode(int* command)
 {
     RedSoundModeSet(RedExecCommandArgGet(command, REDSOUND_SOUND_MODE_COMMAND_MODE));
     if (RedExecCommandArgGet(command, REDSOUND_SOUND_MODE_COMMAND_MODE) == REDSOUND_SOUND_MODE_MONO) {
-        OSGetSoundMode(OS_SOUND_MODE_MONO);
+        OSSetSoundMode(OS_SOUND_MODE_MONO);
     } else {
-        OSGetSoundMode(OS_SOUND_MODE_STEREO);
+        OSSetSoundMode(OS_SOUND_MODE_STEREO);
     }
     RedSoundPlayModeSet(RedSoundModeGet());
     switch (RedSoundPlayModeGet()) {
@@ -2596,7 +2592,7 @@ void CRedDriver::SetSoundMode(int soundMode)
  */
 int CRedDriver::GetSoundMode()
 {
-    int soundMode = __OSReadROM();
+    int soundMode = OSGetSoundMode();
 
     if (soundMode == 0) {
         RedSoundPlayModeSet(REDSOUND_SOUND_MODE_MONO);

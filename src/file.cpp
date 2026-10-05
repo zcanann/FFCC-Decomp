@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+#ifndef VERSION_GCCJGC
 static const char s_diskReadErrorJp0[] = {0x83, 0x66, 0x83, 0x42, 0x83, 0x58, 0x83, 0x4E, 0x82, 0xF0, 0x93, 0xC7, 0x82, 0xDF, 0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x82, 0xC5, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42, 0x00};
 static const char s_diskReadErrorJp1[] = {0x82, 0xAD, 0x82, 0xED, 0x82, 0xB5, 0x82, 0xAD, 0x82, 0xCD, 0x81, 0x41, 0x96, 0x7B, 0x91, 0xCC, 0x82, 0xCC, 0x8E, 0xE6, 0x88, 0xB5, 0x90, 0xE0, 0x96, 0xBE, 0x8F, 0x91, 0x82, 0xF0, 0x82, 0xA8, 0x93, 0xC7, 0x82, 0xDD, 0x82, 0xAD, 0x82, 0xBE, 0x82, 0xB3, 0x82, 0xA2, 0x81, 0x42, 0x00};
 static const char s_diskReadErrorEn0[] = "The Game Disc could not be read.";
@@ -27,7 +28,11 @@ static const char s_diskReadErrorDe1[] = "Bitte lesen Sie die Bedienungsanleitun
 static const char s_diskReadErrorDe2[] = "Nintendo GameCube, um weitere Informationen zu erhalten.";
 static const char s_diskReadErrorIt0[] = "Impossibile leggere il disco di gioco.";
 static const char s_diskReadErrorIt1[] = "Consulta il manuale di istruzioni del Nintendo GameCube";
+#ifdef VERSION_GCCE01
+static const char s_diskReadErrorIt2[] = " per ulteriori indicazioni.";
+#else
 static const char s_diskReadErrorIt2[] = "per ulteriori indicazioni.";
+#endif
 static const char s_diskReadErrorFr0[] = {0x4C, 0x61, 0x20, 0x6C, 0x65, 0x63, 0x74, 0x75, 0x72, 0x65, 0x20, 0x64, 0x75, 0x20, 0x64, 0x69, 0x73, 0x71, 0x75, 0x65, 0x20, 0x61, 0x20, 0xE9, 0x63, 0x68, 0x6F, 0x75, 0xE9, 0x2E, 0x00};
 static const char s_diskReadErrorFr1[] = {0x56, 0x65, 0x75, 0x69, 0x6C, 0x6C, 0x65, 0x7A, 0x20, 0x76, 0x6F, 0x75, 0x73, 0x20, 0x72, 0xE9, 0x66, 0xE9, 0x72, 0x65, 0x72, 0x20, 0x61, 0x75, 0x20, 0x6D, 0x61, 0x6E, 0x75, 0x65, 0x6C, 0x20, 0x64, 0x27, 0x69, 0x6E, 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x69, 0x6F, 0x6E, 0x73, 0x00};
 static const char s_diskReadErrorFr2[] = "Nintendo GameCube pour de plus amples informations.";
@@ -58,9 +63,17 @@ static const char s_wrongDiscJp1[] = {0x83, 0x5A, 0x83, 0x62, 0x83, 0x67, 0x82, 
 static const char s_wrongDiscEn0[] = "Please insert the FINAL FANTASY";
 static const char s_wrongDiscEn1[] = "Crystal Chronicles Game Disc.";
 static const char s_wrongDiscDe0[] = "Bitte legen Sie die FINAL FANTASY";
+#ifdef VERSION_GCCE01
+static const char s_wrongDiscDe1[] = "Crystal Chronicles Disc ein.";
+#else
 static const char s_wrongDiscDe1[] = "Crystal Chronicles-Disc ein.";
+#endif
 static const char s_wrongDiscIt0[] = "Inserisci il disco di gioco ";
+#ifdef VERSION_GCCE01
+static const char s_wrongDiscIt1[] = "FINAL FANTASY Crystal Chronicles";
+#else
 static const char s_wrongDiscIt1[] = "FINAL FANTASY Crystal Chronicles.";
+#endif
 static const char s_wrongDiscFr0[] = {0x56, 0x65, 0x75, 0x69, 0x6C, 0x6C, 0x65, 0x7A, 0x20, 0x69, 0x6E, 0x73, 0xE9, 0x72, 0x65, 0x72, 0x20, 0x6C, 0x65, 0x20, 0x64, 0x69, 0x73, 0x71, 0x75, 0x65, 0x00};
 static const char s_wrongDiscEs0[] = "Coloca el disco de";
 
@@ -120,25 +133,61 @@ static const char* l_tError[4][6][3] = {
     },
 };
 
+#endif
+
+enum {
+#ifdef VERSION_GCCJGC
+    FileReadBufferAllocationLine = 0x29,
+    FileHandlePoolAllocationLine = 0x2C
+#else
+    FileReadBufferAllocationLine = 0x2B,
+    FileHandlePoolAllocationLine = 0x2E
+#endif
+};
+
+enum {
+#ifdef VERSION_GCCJGC
+    FileErrorCopySize = 0x23000,
+    FileErrorDrawBeginLine = 0x2BA,
+    FileErrorCopyLine = 0x311,
+    FileErrorDisplayLine = 0x315,
+    FileErrorDrawEndLine = 0x340
+#elif defined(VERSION_GCCE01)
+    FileErrorCopySize = 0x23000,
+    FileErrorDrawBeginLine = 0x2C4,
+    FileErrorCopyLine = 0x321,
+    FileErrorDisplayLine = 0x325,
+    FileErrorDrawEndLine = 0x353
+#else
+    FileErrorCopySize = 0x29400,
+    FileErrorDrawBeginLine = 0x2CC,
+    FileErrorCopyLine = 0x329,
+    FileErrorDisplayLine = 0x32D,
+    FileErrorDrawEndLine = 0x35B
+#endif
+};
+
 CFile File;
 
 /*
  * --INFO--
  * PAL Address: 0x80013bb8
  * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80013B98
+ * EN Size: 408b
+ * JP Address: 0x80013BE8
+ * JP Size: 404b
  */
 void CFile::Init()
 {
     DVDInit();
     m_allocStage = Memory.CreateStage(0x10ac00, "CFile", 0);
     m_fatalDiskErrorFlag = 0;
+#ifndef VERSION_GCCJGC
     m_isDiskError = 0;
-    m_readBuffer = new (m_allocStage, "file.cpp", 0x2b) unsigned char[0x100000];
-    m_handlePool = new (m_allocStage, "file.cpp", 0x2e) CHandle[0x80];
+#endif
+    m_readBuffer = new (m_allocStage, "file.cpp", FileReadBufferAllocationLine) unsigned char[0x100000];
+    m_handlePool = new (m_allocStage, "file.cpp", FileHandlePoolAllocationLine) CHandle[0x80];
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
@@ -483,8 +532,12 @@ void CFile::kick()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013258
+ * PAL Size: 668b
+ * EN Address: 0x80013238
+ * EN Size: 668b
+ * JP Address: 0x80013288
+ * JP Size: 668b
  */
 CFile::CHandle* CFile::CheckQueue()
 {
@@ -501,7 +554,11 @@ CFile::CHandle* CFile::CheckQueue()
             if (dvdStatus == 0x0B || ((u32)(dvdStatus - 4) <= 2U) || dvdStatus == -1)
             {
                 DrawError(handle->m_dvdFileInfo, dvdStatus);
+#ifdef VERSION_GCCJGC
+                goto next;
+#else
                 continue;
+#endif
             }
             else if (dvdStatus == 0)
             {
@@ -541,11 +598,14 @@ next:
  * --INFO--
  * PAL Address: 0x80012bb8
  * PAL Size: 1696b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80012B98
+ * EN Size: 1696b
+ * JP Address: 0x80012B58
+ * JP Size: 1840b
  */
+#ifdef VERSION_GCCJGC
+#include "src/file_jp.inc"
+#else
 void CFile::DrawError(DVDFileInfo& info, int errorCode)
 {
     _GXTexObj backupTexObj;
@@ -573,7 +633,7 @@ retry:
             return;
         }
 
-        Graphic._WaitDrawDone("file.cpp", 0x2CC);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDrawBeginLine);
 
         int hasScratchTexture = (int)Graphic.m_scratchTextureBuffer;
         hasScratchTexture = hasScratchTexture != 0;
@@ -584,8 +644,8 @@ retry:
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
             gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255).color);
-            memcpy((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), (void*)((char*)Graphic.m_frameBuffer + 0x34800), 0x29400);
-            DCFlushRange((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), 0x29400);
+            memcpy((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), (void*)((char*)Graphic.m_frameBuffer + 0x34800), FileErrorCopySize);
+            DCFlushRange((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), FileErrorCopySize);
         }
         else
         {
@@ -672,10 +732,10 @@ retry:
             GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
         }
 
-        Graphic._WaitDrawDone("file.cpp", 0x329);
+        Graphic._WaitDrawDone("file.cpp", FileErrorCopyLine);
         Graphic.SetStdDispCopySrc();
         Graphic.SetStdDispCopyDst();
-        Graphic._WaitDrawDone("file.cpp", 0x32D);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDisplayLine);
         VIWaitForRetrace();
         Sound.PauseDiscError(1);
         VISetBlack(FALSE);
@@ -696,8 +756,8 @@ retry:
         {
             gUtil.RenderTextureQuad(0.0f, 0.0f, 640.0f, 112.0f, &backupTexObj, 0, 0, 0, GX_BL_SRCALPHA,
                                            GX_BL_INVSRCALPHA);
-            memcpy((void*)((char*)Graphic.m_frameBuffer + 0x34800), (void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), 0x29400);
-            DCFlushRange((void*)((char*)Graphic.m_frameBuffer + 0x34800), 0x29400);
+            memcpy((void*)((char*)Graphic.m_frameBuffer + 0x34800), (void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), FileErrorCopySize);
+            DCFlushRange((void*)((char*)Graphic.m_frameBuffer + 0x34800), FileErrorCopySize);
         }
         else
         {
@@ -705,7 +765,7 @@ retry:
             GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
         }
 
-        Graphic._WaitDrawDone("file.cpp", 0x35B);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDrawEndLine);
         m_fatalDiskErrorFlag = 0;
 
         while (true)
@@ -731,6 +791,8 @@ retry:
     Sound.PauseDiscError(0);
     m_isDiskError = 0;
 }
+
+#endif
 
 /*
  * --INFO--

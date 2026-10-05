@@ -32,14 +32,21 @@ typedef struct MessageBuffer {
 typedef struct DBCommTable {
 	DBCommInitFunc initialize_func;
 	DBCommFunc init_interrupts_func;
+#ifndef VERSION_GCCJGC
 	DBCommFunc shutdown_func;
+#endif
 	DBCommFunc peek_func;
 	DBCommReadFunc read_func;
 	DBCommWriteFunc write_func;
+#ifdef VERSION_GCCJGC
+	DBCommFunc post_stop_func;
+	DBCommFunc pre_continue_func;
+#else
 	DBCommFunc open_func;
 	DBCommFunc close_func;
 	DBCommFunc pre_continue_func;
 	DBCommFunc post_stop_func;
+#endif
 } DBCommTable;
 
 typedef struct DSVersions {
@@ -63,7 +70,7 @@ typedef struct TRKFramingState {
 	ReceiverState receiveState;
 #endif
 	BOOL isEscape;
-	u8 fcsType;
+	u8 checksum;
 } TRKFramingState;
 
 typedef struct CommandReply {

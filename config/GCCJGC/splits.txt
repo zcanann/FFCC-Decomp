@@ -1137,3 +1137,9 @@ FunnyShape.cpp:
 
 p_tina.cpp:
 	.text start:0x800517A8 end:0x80053458
+
+p_dbgmenu.cpp:
+	.text start:0x801275FC end:0x80129354
+
+p_map.cpp:
+	.text start:0x800340BC end:0x800359D4

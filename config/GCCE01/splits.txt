@@ -133,3 +133,19 @@ MSL_C/PPCEABI/bare/H/s_floor.c:
 MSL_C/PPCEABI/bare/H/s_frexp.c:
 	.text start:0x801BAB20 end:0x801BABAC
 	.sdata2 start:0x80332C70 end:0x80332C78
+
+pppColor.cpp:
+	extab start:0x80007038 end:0x80007040
+	extabindex start:0x8000CF04 end:0x8000CF10
+	.text start:0x8005F8F4 end:0x8005FABC
+	.sdata2 start:0x8032EE98 end:0x8032EEA0
+
+p_sample.cpp:
+	extab start:0x80005BCC end:0x80005BD4
+	extabindex start:0x8000B41C end:0x8000B428
+	.text start:0x8001FC68 end:0x8001FD60
+	.ctors start:0x801D4318 end:0x801D431C
+	.rodata start:0x801D5C10 end:0x801D5C34
+	.data start:0x801E7318 end:0x801E750C
+	.sdata start:0x8032D408 end:0x8032D420
+	.sbss start:0x8032DC40 end:0x8032DC44

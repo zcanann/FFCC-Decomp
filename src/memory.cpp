@@ -1172,14 +1172,14 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
  * --INFO--
  * PAL Address: 0x8001DB48
  * PAL Size: 1088b
- * EN Address: 0x80027608
- * EN Size: 1536b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001D93C
+ * EN Size: 1088b
+ * JP Address: 0x8001D388
+ * JP Size: 1128b
  */
 void CMemory::CStage::drawHeapBar(int y)
 {
-    extern const float kMemoryDrawZero;
+    float z = 0.0f;
     _GXColor color;
     unsigned int colors[16] = {
         0xFFFFFF80, 0xFF808080, 0x80FF8080, 0xC0C0FF80,
@@ -1270,13 +1270,13 @@ void CMemory::CStage::drawHeapBar(int y)
             }
 
             GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
-            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), kMemoryDrawZero);
+            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), z);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
-            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), kMemoryDrawZero);
+            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), z);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
-            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), kMemoryDrawZero);
+            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), z);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
-            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), kMemoryDrawZero);
+            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), z);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
 
             drawColor = *colorPtr;

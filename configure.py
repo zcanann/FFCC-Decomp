@@ -1192,7 +1192,7 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/__exception.s"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/CircleBuffer.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dispatch.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
             Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "TRK_MINNOW_DOLPHIN/flush_cache.c"),
             Object(

@@ -12,9 +12,9 @@
 
 #define EXCEPTIONMASK_ADDR 0x80000044
 
-static u32 gTRKDBAT3StartAddress;
+static u32 lc_base;
 
-static u32 gTRKExceptionVectorOffsets[15] = { PPC_SystemReset,
+static u32 TRK_ISR_OFFSETS[15] = { PPC_SystemReset,
 	                               PPC_MachineCheck,
 	                               PPC_DataStorage,
 	                               PPC_InstructionStorage,
@@ -192,7 +192,7 @@ void EnableMetroTRKInterrupts(void) { EnableEXI2Interrupts(); }
 
 u32 TRKTargetTranslate(u32 param_0)
 {
-	if (param_0 >= gTRKDBAT3StartAddress && param_0 < gTRKDBAT3StartAddress + 0x4000) {
+	if (param_0 >= lc_base && param_0 < lc_base + 0x4000) {
 		if ((gTRKCPUState.Extended1.DBAT3U & 3) != 0) {
 			return param_0;
 		}
@@ -207,7 +207,7 @@ u32 TRKTargetTranslate(u32 param_0)
 
 void __TRK_copy_vectors(void)
 {
-	u32 r3 = gTRKDBAT3StartAddress;
+	u32 r3 = lc_base;
 	u32* isrOffsetPtr;
 	int i;
 	u32 r29;
@@ -220,7 +220,7 @@ void __TRK_copy_vectors(void)
 
 	i            = 0;
 	r29          = *(u32*)r3;
-	isrOffsetPtr = gTRKExceptionVectorOffsets;
+	isrOffsetPtr = TRK_ISR_OFFSETS;
 
 	do {
 		if ((r29 & (1 << i)) && i != 4) {
@@ -237,7 +237,7 @@ DSError TRKInitializeTarget()
 {
 	gTRKState.isStopped     = TRUE;
 	gTRKState.msr           = __TRK_get_MSR();
-	gTRKDBAT3StartAddress   = 0xE0000000;
+	lc_base   = 0xE0000000;
 	return DS_NoError;
 }
 

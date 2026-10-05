@@ -182,7 +182,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "joy_reset", "libc/string/strchr", "libc/string/strcmp", "libc/string/strlen",
             "libc/string/memcmp", "libc/string/strstr",
             "main/widget", "main/scouter", "main/family", "main/radar", "main/equip",
-            "main/smith", "main/text",
+            "main/smith", "main/text", "main/letter",
             "main/backdrop_gfx", "main/backdrop", "main/font_gfx_jp",
             "main/sound_assets_jp",
             "main/m4a_tables", "main/sound_data",

@@ -486,6 +486,7 @@ memory.cpp:
 
 materialman.cpp:
 	.text start:0x8003BFAC end:0x80043B04
+	.bss start:0x80267C30 end:0x80267E4C
 
 mapobj.cpp:
 	.text start:0x800285C4 end:0x8002C4F8
@@ -506,6 +507,7 @@ cflat_runtime.cpp:
 	.text start:0x80065614 end:0x80069470
 
 joybus.cpp:
+	.rodata start:0x801D8F70 end:0x801D92C4
 	.text start:0x800A593C end:0x800B218C
 
 gbaque.cpp:
@@ -525,3 +527,72 @@ p_menu.cpp:
 
 p_minigame.cpp:
 	.text start:0x80126EA4 end:0x8012A57C
+
+sound.cpp:
+	.text start:0x800C4860 end:0x800C82F0
+
+textureman.cpp:
+	.text start:0x8003A3F0 end:0x8003BFAC
+
+maphit.cpp:
+	.text start:0x80024C54 end:0x80027568
+
+mapmesh.cpp:
+	.text start:0x80027568 end:0x800285C4
+	extab start:0x80005E50 end:0x80005EB8
+	extabindex start:0x8000B7AC end:0x8000B848
+	.rodata start:0x801D5FF0 end:0x801D5FFC
+	.sbss start:0x8032DC78 end:0x8032DC7C
+	.sdata2 start:0x8032E8F8 end:0x8032E900
+
+os/OSSemaphore.c:
+	.text start:0x8017F574 end:0x8017F6F8
+
+wm_menu.cpp:
+	.text start:0x800E6364 end:0x80102378
+
+mapocttree.cpp:
+	.text start:0x8002C4F8 end:0x8002F250
+
+shopmenu.cpp:
+	.text start:0x8014F4BC end:0x801586D0
+
+cmake.cpp:
+	.text start:0x8016BCC4 end:0x801736C8
+
+singmenu.cpp:
+	.rodata start:0x801DD684 end:0x801DD87C
+
+cflat_r2system.cpp:
+	.text start:0x800B218C end:0x800B9B98
+
+cflat_r2class.cpp:
+	.text start:0x800B9B98 end:0x800BD0E4
+
+gba/GBARead.c:
+	.text start:0x801A7660 end:0x801A77C0
+
+gba/GBAWrite.c:
+	.text start:0x801A77C0 end:0x801A7948
+
+goout.cpp:
+	.text start:0x8016711C end:0x8016B970
+
+menu_letter.cpp:
+	.text start:0x801629BC end:0x80166DC0
+
+graphic.cpp:
+	.text start:0x800161FC end:0x80019D7C
+
+p_graphic.cpp:
+	.text start:0x80044F6C end:0x80047724
+
+p_light.cpp:
+	.text start:0x80047BF4 end:0x8004A294
+	.bss start:0x80267F48 end:0x8026C2F8
+
+pppYmMana.cpp:
+	.text start:0x800D4448 end:0x800D7EDC
+
+pppMana2.cpp:
+	.text start:0x8010558C end:0x801085E4

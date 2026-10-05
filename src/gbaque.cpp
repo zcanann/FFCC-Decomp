@@ -583,9 +583,12 @@ inline void GbaQueue::ChgMoneyData(int channel, unsigned int data)
 	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
 	const int moneyCmd = dataBytes[0] >> 6;
 
+#ifdef VERSION_GCCP01
 	if (Game.m_scriptFoodBase[channel] == 0) {
 		Joybus.SendResult(channel, 1, dataBytes[0], dataBytes[1]);
-	} else if (moneyCmd == 0) {
+	} else
+#endif
+	if (moneyCmd == 0) {
 		m_moneyState[channel] = dataBytes[1] | 0x80;
 		m_pendingMoney[channel] = dataBytes[2] << 24;
 		m_pendingMoney[channel] |= dataBytes[3] << 16;
@@ -731,8 +734,8 @@ inline void GbaQueue::CMakeBarthday(int channel, unsigned int value)
  * PAL Size: 2972b
  * EN Address: 0x800CF784
  * EN Size: 2844b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800CD368
+ * JP Size: 2844b
  */
 void GbaQueue::ExecutQueue()
 {
@@ -767,23 +770,38 @@ void GbaQueue::ExecutQueue()
 				int cmd = cmdBytes[0] & 0x3F;
 
 				if (cmd == 0x17) {
-					if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+					if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+					{
 						ChgItemData(channel, queueWords[i]);
 					}
 				} else if (cmd == 0x1A) {
-					if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+					if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+					{
 						ChgMoneyData(channel, queueWords[i]);
 					}
 				} else if (cmd == 0x1E) {
-					if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+					if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+					{
 						ChgEquipPosData(channel, queueWords[i]);
 					}
 				} else if (cmd == 0x1F) {
-					if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+					if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+					{
 						ChgCmdLstData(channel, queueWords[i]);
 					}
 				} else if (cmd == 0x0C) {
-					if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+					if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+					{
 						if (cmdBytes[1] == 3) {
 							ClrLetterLstFlg(channel);
 							MakeLetterList(channel, Joybus.GetLetterBuffer(channel));
@@ -807,7 +825,10 @@ void GbaQueue::ExecutQueue()
 					}
 				} else if (cmd == 0x14) {
 					if (cmdBytes[1] == 0 || cmdBytes[1] == 1) {
-						if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+						if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+						{
 							MoveLetterItem(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 2) {
@@ -822,15 +843,24 @@ void GbaQueue::ExecutQueue()
 						ClrShopFlg(channel);
 						Game.m_scriptFoodBase[channel]->CallShop(0, 0, 0, 0, 0);
 					} else if (cmdBytes[1] == 8) {
-						if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+						if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+						{
 							SetSellData(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 9) {
-						if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+						if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+						{
 							SetBuyData(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 10) {
-						if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+						if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+						{
 							SetSmithData(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 0x0B) {
@@ -846,7 +876,10 @@ void GbaQueue::ExecutQueue()
 						}
 					}
 				} else if (cmd == 0x15) {
-					if (Game.m_scriptFoodBase[channel] != 0) {
+#ifdef VERSION_GCCP01
+					if (Game.m_scriptFoodBase[channel] != 0)
+#endif
+					{
 						ReplyLetter(channel);
 					}
 				} else if ((cmd == 6) && (cmdBytes[1] == 0x18)) {
@@ -962,10 +995,10 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
  * --INFO--
  * PAL Address: 0x800CFB6C
  * PAL Size: 332b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800CF3D0
+ * EN Size: 308b
+ * JP Address: 0x800CCFB4
+ * JP Size: 308b
  */
 void GbaQueue::SetStageNo(int stageId, int mapId)
 {
@@ -1015,8 +1048,10 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
         } while (loadSignalIndex < 4);
     }
 
+#ifdef VERSION_GCCP01
     memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
     m_chgHitFlags = 0;
+#endif
 }
 
 /*
@@ -1084,8 +1119,8 @@ void GbaQueue::ClrStageFlg(int channel)
  * PAL Size: 684b
  * EN Address: 0x800CEFC8
  * EN Size: 684b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800CCC0C
+ * JP Size: 588b
  */
 void GbaQueue::SetRadarType()
 {
@@ -1149,6 +1184,7 @@ void GbaQueue::SetRadarType()
 		m_radarType[3] = 0;
 	}
 
+#ifndef VERSION_GCCJGC
 	for (i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
 		const int oldMode = m_radarMode;
@@ -1161,6 +1197,7 @@ void GbaQueue::SetRadarType()
 		}
 		OSSignalSemaphore(accessSemaphores + i);
 	}
+#endif
 }
 
 /*
@@ -2174,26 +2211,33 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
  * PAL Size: 592b
  * EN Address: 0x800CCE64
  * EN Size: 592b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800CAAC0
+ * JP Size: 568b
  */
 int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
+#ifdef VERSION_GCCJGC
+    const int sourceAllocLine = 0x840;
+    const int workAllocLine = 0x849;
+#else
+    const int sourceAllocLine = 0x859;
+    const int workAllocLine = 0x862;
+#endif
     CCaravanWork** foodBasePtr;
     int totalSize;
-    char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x859) char[kGbaQueueScratchTextSize];
+    char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), sourceAllocLine) char[kGbaQueueScratchTextSize];
     if (srcText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x85B);
+            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), sourceAllocLine + 2);
         }
         return -1;
     }
     memset(srcText, 0, kGbaQueueScratchTextSize);
 
-    char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x862) char[kGbaQueueScratchTextSize];
+    char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), workAllocLine) char[kGbaQueueScratchTextSize];
     if (workText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x864);
+            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), workAllocLine + 2);
         }
         return -1;
     }
@@ -2209,7 +2253,11 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
     int letterType = caravanWork->m_letters[letterIndex].HeaderBitsRef().m_messageType;
 
     strcpy(srcText, Game.GetLetter(letterType));
+#ifdef VERSION_GCCJGC
+    CMes::MakeAgbString(workText, srcText);
+#else
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
+#endif
     totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
     outData += totalSize;
@@ -2217,7 +2265,11 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
     strcpy(srcText, Game.GetLetterReply(letterType));
+#ifdef VERSION_GCCJGC
+    CMes::MakeAgbString(workText, srcText);
+#else
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
+#endif
     int line2Size = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, line2Size);
     totalSize += line2Size;
@@ -2849,8 +2901,8 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
  * PAL Size: 560b
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800C98DC
+ * JP Size: 548b
  */
 void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 {
@@ -2889,8 +2941,11 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	}
 
 	for (i = 0; i < 8; i++) {
-		if ((i != playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
-		    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0)) {
+		if ((i != playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0)
+#ifndef VERSION_GCCJGC
+		    && (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0)
+#endif
+		) {
 			unsigned char existingCharaType = Game.m_caravanWorkArr[i].m_tribeId;
 			existingCharaType |= static_cast<signed char>(Game.m_caravanWorkArr[i].m_appearanceVariant << 2);
 			if (Game.m_caravanWorkArr[i].m_genderFlag != 0) {
@@ -3423,7 +3478,11 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 		const int nameItem = (*foodBasePtr)->m_shopList[i];
 		strcpy(itemNameScratch, Game.GetHelpName(nameItem));
+#ifdef VERSION_GCCJGC
+		CMes::MakeAgbString(agbStringScratch, itemNameScratch);
+#else
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
+#endif
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
 		memcpy(writePtr, agbStringScratch, strSize);
@@ -3525,7 +3584,11 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		work = (*foodBasePtr)->m_inventoryItems[i];
 		if (work > 0) {
 			strcpy(itemNameScratch, Game.GetHelpName(work));
+#ifdef VERSION_GCCJGC
+			CMes::MakeAgbString(agbStringScratch, itemNameScratch);
+#else
 			CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
+#endif
 			packed = strlen(agbStringScratch) + 1;
 			memcpy(writePtr, agbStringScratch, packed);
 			writePtr += packed;

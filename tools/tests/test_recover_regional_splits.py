@@ -42,6 +42,22 @@ class ConstraintTests(unittest.TestCase):
         for word in ('4c000101', '48000100', '48000103'):
             self.assertEqual(placements(sec, dol(bytes.fromhex(word) + target[4:]))[0], [])
 
+    def test_map_direct_game_objects_do_not_require_archive_column(self):
+        rows = map_objects('  7] g_pStage (object,local) found in mapmesh.o \n'
+                           '  8] MaterialMan (object,global) found in materialman.o \n'
+                           '.sbss section layout\n'
+                           '  00000060 000004 80353540 4 g_pStage\tmapmesh.o \n'
+                           '.bss section layout\n'
+                           '  00049f30 00021c 8028d1f0 4 MaterialMan\tmaterialman.o \n')
+        self.assertEqual(rows, [dict(section='.sbss', size=4, align=4, name='g_pStage', owner='mapmesh.o', local=True),
+                                dict(section='.bss', size=540, align=4, name='MaterialMan', owner='materialman.o', local=False)])
+        sec = Section(1, '.sbss', bytes(4), 4, 4, True, False,
+                      [dict(name='g_pStage', size=4, offset=0, kind='STT_OBJECT', local=True)])
+        self.assertEqual(bss_ownership('mapmesh.cpp', sec, 0x80340000, rows), ([], []))
+        self.assertTrue(bss_ownership('unrelated.cpp', sec, 0x80340000, rows)[0])
+        sec.bss, sec.name = False, '.sdata'
+        self.assertTrue(initialized_map_issues('mapmesh.cpp', sec, rows))
+
     def test_overlapping_ambiguous_placements_are_reported(self):
         sec = Section(1, '.text', b'1234' * 4, 16, 4, False, True, [])
         self.assertEqual(placements(sec, dol(b'1234' * 5))[0], [0x80004000, 0x80004004])
@@ -207,9 +223,11 @@ blr
     def test_source_optimizer_pragma_prevents_review_ready(self):
         obj = self.assemble(self.functions())
         body = ELFFile(io.BytesIO(obj)).get_section_by_name('.text').data()
-        row = solve([dict(unit='unit.c', data=obj, source=b'#pragma dont_inline on\n')], dol(body))['objects'][0]
-        self.assertEqual(row['status'], 'hypothesis')
-        self.assertTrue(any('optimizer pragmas' in s for s in row['review_issues']))
+        for pragma in (b'#pragma dont_inline on\n', b'#pragma push\n#pragma inline_depth(6)\n'):
+            with self.subTest(pragma=pragma):
+                row = solve([dict(unit='unit.c', data=obj, source=pragma)], dol(body))['objects'][0]
+                self.assertEqual(row['status'], 'hypothesis')
+                self.assertTrue(any('optimizer pragmas' in s for s in row['review_issues']))
 
     def test_conflicting_cross_object_definitions_remain_hypotheses(self):
         first_source = self.functions().split('.global Last')[0]

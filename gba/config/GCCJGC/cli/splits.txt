@@ -167,10 +167,7 @@ main/textmask:
 	.rodata     start:0x0201CB84 end:0x0201CBA4 align:4
 
 main/letter:
-	.rodata     start:0x0201CBA4 end:0x0201CC70 align:4
-
-regional_data:
-	.rodata     start:0x0201CC70 end:0x0201CC78
+	.rodata     start:0x0201CBA4 end:0x0201CC78 align:4
 
 main/cmake:
 	.rodata     start:0x0201CC78 end:0x0201D178 align:4

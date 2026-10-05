@@ -2554,7 +2554,11 @@ void CMenuPcs::DrawSelectOpenAnim()
 		}
 		memset(converted, 0, 0x200);
 		strcpy(source, Game.m_cFlatDataArr[1].TableStrings(6)[idx]);
+#ifdef VERSION_GCCJGC
+		CMes::MakeAgbString(converted, source);
+#else
 		CMes::MakeAgbString(converted, source, 0, 0);
+#endif
 		strlen(converted);
 
 		float lineY = centerY - 11.0f - 7.0f;

@@ -1857,10 +1857,17 @@ void CShopMenu::DrawShop0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x8014F8F8
+ * JP Size: 68b
  */
-inline void CShopMenu::DrawBuy()
+#ifndef VERSION_GCCJGC
+inline
+#endif
+void CShopMenu::DrawBuy()
 {
     DrawShopBase();
     DrawItemList();
@@ -1870,10 +1877,17 @@ inline void CShopMenu::DrawBuy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x8014F8B4
+ * JP Size: 68b
  */
-inline void CShopMenu::DrawSell()
+#ifndef VERSION_GCCJGC
+inline
+#endif
+void CShopMenu::DrawSell()
 {
     DrawShopBase();
     DrawItemList();
@@ -2998,7 +3012,11 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
         System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, 0xC01);
     }
     memset(helpText, 0, 0x200);
+#ifdef VERSION_GCCJGC
+    CMes::MakeAgbString(helpText, const_cast<char*>(sourceText));
+#else
     CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);
+#endif
 
     CFont* font = MenuPcs.GetFont22();
     font->SetMargin(FLOAT_80332d28);

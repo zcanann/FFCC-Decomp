@@ -166,9 +166,133 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
  * PAL Size: 2136b
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800978B8
+ * JP Size: 1128b
  */
+#ifdef VERSION_GCCJGC
+void CMes::MakeAgbString(char* out, char* src)
+{
+    int charMode = 0;
+    char c;
+    while ((c = *src) != 0) {
+        unsigned char ch = c;
+        if (((charMode == 0) || (charMode == 2)) &&
+            (((ch >= 0x81) && (ch <= 0x9F)) || ((ch >= 0xE0) && (ch <= 0xFC)))) {
+            charMode = 1;
+        } else if ((charMode == 1) && (ch != 0x7F) && (ch >= 0x40) && (ch <= 0xFC)) {
+            charMode = 2;
+        } else {
+            charMode = 0;
+        }
+
+        if ((charMode == 0) && (ch >= 0xA0)) {
+            unsigned int tag = static_cast<unsigned char>(c - 0xA0);
+            switch (tag) {
+            case 0:
+                *out++ = '\n';
+                break;
+            case 4:
+                *out++ = 0x1D;
+                break;
+            case 5:
+                *out++ = 0x1C;
+                break;
+            case 6:
+                *out++ = 0x1E;
+                break;
+            case 8:
+            {
+                char varIndex = GetMesNibbleValue(src + 3);
+                strcpy(out, reinterpret_cast<char*>(Game.m_caravanWorkArr[m_tempVar[varIndex]].m_name));
+                out += strlen(out);
+                src += 4;
+                break;
+            }
+            case 9:
+            {
+                char varIndex = GetMesNibbleValue(src + 3);
+                strcpy(out, Game.GetItemName(m_tempVar[varIndex]));
+                out += strlen(out);
+                src += 4;
+                break;
+            }
+            case 0x2A:
+            {
+                char varIndex = GetMesNibbleValue(src + 3);
+                strcpy(out, Game.GetMonName(m_tempVar[varIndex]));
+                out += strlen(out);
+                src += 4;
+                break;
+            }
+            case 0x2B:
+            {
+                char varIndex = GetMesNibbleValue(src + 3);
+                strcpy(out, Game.GetNPCName(m_tempVar[varIndex]));
+                out += strlen(out);
+                src += 4;
+                break;
+            }
+            case 0x2C:
+            {
+                char varIndex = GetMesNibbleValue(src + 3);
+                strcpy(out, Game.GetPlaceName(m_tempVar[varIndex]));
+                out += strlen(out);
+                src += 4;
+                break;
+            }
+            case 0x2D:
+            {
+                char varIndex = GetMesNibbleValue(src + 3);
+                strcpy(out, (Game.m_cFlatDataArr[1].TableStrings(3) + 0x3C)[m_tempVar[varIndex]]);
+                out += strlen(out);
+                src += 4;
+                break;
+            }
+            case 0x2E:
+            {
+                char varIndex = GetMesNibbleValue(src + 1);
+                strcpy(out, Game.GetLetterSubject(m_tempVar[varIndex]));
+                out += strlen(out);
+                src += 2;
+                break;
+            }
+            case 0x2F:
+                strcpy(out, Game.m_gameWork.m_townName);
+                out += strlen(out);
+                break;
+            case 0x30:
+            {
+                char varIndex = GetMesNibbleValue(src + 1);
+                sprintf(out, "%d", m_tempVar[varIndex]);
+                out += strlen(out);
+                src += 2;
+                break;
+            }
+            case 0x0C: case 0x0E: case 0x13: case 0x14:
+                if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+                    System.Printf(const_cast<char*>(s_This_TAG_is_not_created_pct02x_801D9E10), tag + 0xA0);
+                }
+                break;
+            case 2: case 3: case 7: case 0x0A: case 0x0B: case 0x0D:
+            case 0x0F: case 0x10: case 0x11: case 0x12: case 0x15: case 0x16:
+            case 0x17: case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C:
+            case 0x1D: case 0x1E: case 0x1F: case 0x20: case 0x21: case 0x22:
+            case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: case 0x28:
+            case 0x29: case 0x37:
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                    System.Printf(const_cast<char*>(s_Not_corresponding_TAG_is_used_pct02x_801D9E30), tag + 0xA0);
+                }
+                break;
+            default:
+                break;
+            }
+        } else {
+            *out++ = c;
+        }
+        src++;
+    }
+}
+#else
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
 	static char* ELLIPSIS_STR = "...";
@@ -468,6 +592,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		src++;
 	}
 }
+#endif
 
 /*
  * --INFO--

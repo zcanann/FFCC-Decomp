@@ -264,21 +264,40 @@ inline void JoyBus::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800B22F4
+ * PAL Size: 936b
+ * EN Address: 0x800B1B90
+ * EN Size: 936b
+ * JP Address: 0x800AFEA4
+ * JP Size: 932b
  */
 void JoyBus::CreateInit()
 {
+#ifdef VERSION_GCCJGC
+    const int bootImageSize = 0x30000;
+    const int bootAllocLine = 0x11E;
+    const int bootErrorLine = 0x121;
+    const int fileAllocLine = 0x132;
+    const int mapAllocLine = 0x13E;
+    const int letterAllocLine = 0x14D;
+#else
+    const int bootImageSize = 0x38000;
+    const int bootAllocLine = 0x122;
+    const int bootErrorLine = 0x126;
+    const int fileAllocLine = 0x137;
+    const int mapAllocLine = 0x143;
+    const int letterAllocLine = 0x152;
+#endif
     Init();
 
     if (m_gbaBootImage == 0)
     {
-        m_gbaBootImage = new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x122) char[0x38000];
+        m_gbaBootImage = new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), bootAllocLine) char[bootImageSize];
 
         if (m_gbaBootImage == 0 && (unsigned int)System.m_execParam >= 1)
         {
             System.Printf(const_cast<char*>(s_mem_alloc_error_fmt),
-                const_cast<char*>(s_joybus_cpp), 0x126);
+                const_cast<char*>(s_joybus_cpp), bootErrorLine);
         }
     }
 
@@ -302,11 +321,11 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseA == 0)
     {
-        m_fileBaseA = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x137) char[m_fileBaseA_dup + 0x20]);
+        m_fileBaseA = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), fileAllocLine) char[m_fileBaseA_dup + 0x20]);
 
         if (m_fileBaseA == (unsigned int*)nullptr && (unsigned int)System.m_execParam >= 1)
         {
-            System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x13A);
+            System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), fileAllocLine + 3);
         }
     }
 
@@ -317,11 +336,11 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseB == 0)
     {
-        m_fileBaseB = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x143) char[0x5000]);
+        m_fileBaseB = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), mapAllocLine) char[0x5000]);
 
         if (m_fileBaseB == 0 && (unsigned int)System.m_execParam >= 1)
         {
-            System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x146);
+            System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), mapAllocLine + 3);
         }
     }
 
@@ -337,11 +356,11 @@ void JoyBus::CreateInit()
     {
         if (m_letterBuffer[i] == 0)
         {
-            m_letterBuffer[i] = new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x152) char[0x2800];
+            m_letterBuffer[i] = new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), letterAllocLine) char[0x2800];
 
             if (m_letterBuffer[i] == 0 && (unsigned int)System.m_execParam >= 1)
             {
-                System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x155);
+                System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), letterAllocLine + 3);
             }
 
             m_letterSizeArr[i] = 0;
@@ -532,8 +551,12 @@ void JoyBus::ReleaseSem(int portIndex)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800AE3DC
+ * PAL Size: 12208b
+ * EN Address: 0x800ADC84
+ * EN Size: 12208b
+ * JP Address: 0x800AC0B4
+ * JP Size: 12148b
  */
 void JoyBus::ThreadMain(void* arg)
 {
@@ -580,6 +603,7 @@ sleep_retry:
 loop_body:
     for (;;)
     {
+#ifndef VERSION_GCCJGC
         if (File.IsDiskError() != 0)
         {
             threadParam->m_state = (unsigned char)0x86;
@@ -587,6 +611,7 @@ loop_body:
             ClrRecvBuffer(threadParam->m_portIndex);
             goto sleep_retry;
         }
+#endif
 
         if (threadParam != &m_threadParams[threadParam->m_portIndex])
         {
@@ -3232,8 +3257,12 @@ inline void JoyBus::SetRecvBuffer(ThreadParam* threadParam, unsigned int data)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800AD11C
+ * PAL Size: 2700b
+ * EN Address: 0x800AC9C4
+ * EN Size: 2700b
+ * JP Address: 0x800AAFE8
+ * JP Size: 2200b
  */
 int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 {
@@ -3437,6 +3466,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
 
+#ifndef VERSION_GCCJGC
         const int state = threadParam->m_state;
 
         if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
@@ -3488,6 +3518,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             threadParam->m_subState = 0;
             threadParam->m_skipProcessingFlag = 1;
         }
+#endif
     }
 
     return (recvResult == 2) | (sendResult != 0 ? 2 : 0);
@@ -3822,8 +3853,8 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * PAL Size: 2392b
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x800AF030
+ * JP Size: 2164b
  */
 int JoyBus::InitialCode(ThreadParam* threadParam)
 {
@@ -3948,6 +3979,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             }
             else
             {
+#ifndef VERSION_GCCJGC
                 err = SendLanguage(threadParam);
 
                 if (err < 0)
@@ -3955,6 +3987,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                     result = 1;
                 }
                 else
+#endif
                 {
                     threadParam->m_subState  = 0;
                     threadParam->m_state     = 0x14;

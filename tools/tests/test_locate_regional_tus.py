@@ -194,6 +194,16 @@ class SequenceTests(unittest.TestCase):
         self.assertEqual(row['candidates'][0]['unsupported_edges'], [dict(edge='first', name='F')])
         self.assertTrue(row['candidates'][0]['review_issues'])
 
+    def test_complete_exception_table_does_not_prove_unanchored_names(self):
+        pal, report, records, image = self.fixture()
+        report['functions'][0]['strong_ranking'] = False
+        row = sequence_proposals(pal, report, records, image, ['F', 'G'])
+        best = row['candidates'][0]
+        self.assertEqual(best['exception_table_candidates'], [0x80004080])
+        self.assertEqual(best['unanchored_identities'], ['F'])
+        self.assertEqual(best['unsupported_edges'], [dict(edge='first', name='F')])
+        self.assertTrue(best['review_issues'])
+
     def test_competing_unit_envelopes_flag_both_owners(self):
         rows = [dict(unit=unit, sections=[dict(name='.text', boundary_sequence=dict(candidates=[
             dict(start=start, end=end, review_issues=[])]))])

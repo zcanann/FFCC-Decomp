@@ -277,7 +277,11 @@ STATIC_ASSERT(sizeof(CGame) == 0x11F88);
  */
 inline char* CGame::GetItemName(int itemIndex)
 {
+#ifdef VERSION_GCCJGC
+    return m_cFlatDataArr[1].TableStrings(0)[itemIndex];
+#else
     return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 1];
+#endif
 }
 
 /*
@@ -327,7 +331,11 @@ inline char* CGame::GetItemName(int itemIndex, int count)
  */
 inline char* CGame::GetMonName(int monIndex)
 {
+#ifdef VERSION_GCCJGC
+    return m_cFlatDataArr[1].TableStrings(1)[monIndex];
+#else
     return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 1];
+#endif
 }
 
 /*

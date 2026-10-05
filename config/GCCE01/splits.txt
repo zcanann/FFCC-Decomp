@@ -784,3 +784,19 @@ TRK_MINNOW_DOLPHIN/msghndlr.c:
 
 TRK_MINNOW_DOLPHIN/usr_put.c:
 	.text	start:0x801A8ED8 end:0x801A8F64
+
+TRK_MINNOW_DOLPHIN/msgbuf.c:
+	.text start:0x801A83E4 end:0x801A8C20
+	.rodata start:0x801E5528 end:0x801E5548
+	.bss start:0x80327730 end:0x803290E0
+
+TRK_MINNOW_DOLPHIN/nubevent.c:
+	.text start:0x801A7FE0 end:0x801A8208
+	.bss start:0x80327700 end:0x80327728
+
+TRK_MINNOW_DOLPHIN/msg.c:
+	.text start:0x801A83A0 end:0x801A83E4
+	.rodata start:0x801E5500 end:0x801E5528
+
+TRK_MINNOW_DOLPHIN/mutex_TRK.c:
+	.text start:0x801AA860 end:0x801AA878

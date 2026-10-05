@@ -1351,3 +1351,4 @@ auto_10_8032DCDC_sbss:
 
 pppYmDeformationShp.cpp:
 	.text start:0x8008E864 end:0x8008FF78
+	.sdata2 start:0x8032F5B0 end:0x8032F5F8

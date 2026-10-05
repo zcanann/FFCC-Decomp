@@ -1078,3 +1078,11 @@ pad/Pad.c:
 	.bss	start:0x8030BC70 end:0x8030BCC0
 	.sdata	start:0x8032DAF8 end:0x8032DB18
 	.sbss	start:0x8032E118 end:0x8032E140
+
+util.cpp:
+	.text start:0x80022518 end:0x80024C54
+	.rodata start:0x801D5FA0 end:0x801D5FC8
+	.data start:0x801E7738 end:0x801E7758
+	.sdata start:0x8032D468 end:0x8032D478
+	.sdata2 start:0x8032E850 end:0x8032E888
+	.sbss start:0x8032DC50 end:0x8032DC58

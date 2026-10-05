@@ -1728,7 +1728,11 @@ void LetterList_DrawIcons(void)
     for (i = 0; i < n; i++, entry++) {
         if (entry->flags & 0x18) {
             y = (i * 2 + 1) * 8;
+#if defined(VERSION_GCCJGC)
+            frame = (entry->flags & 2) ? 0x37 : 0x36;
+#else
             frame = (entry->flags & 2) ? 0x35 : 0x34;
+#endif
             Obj_Draw(x, y - 3, 0, frame, Obj_GetPalette(0, frame), 0, 0);
         }
     }
@@ -1856,7 +1860,11 @@ void LetterRead_DrawAttachIcon(void)
         y = win->y + win->height - 4;
         x *= 8;
         y *= 8;
+#if defined(VERSION_GCCJGC)
+        frame = (entry->flags & 2) ? 0x37 : 0x36;
+#else
         frame = (entry->flags & 2) ? 0x35 : 0x34;
+#endif
         Obj_Draw(x, y, 0, frame, Obj_GetPalette(0, frame), win->bg - 1, 0);
     }
 }

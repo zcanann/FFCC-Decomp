@@ -252,3 +252,24 @@ MSL_C/PPCEABI/bare/H/mbstring.c:
 
 MSL_C/PPCEABI/bare/H/FILE_POS.c:
 	.text start:0x801B4FB8 end:0x801B5378
+
+MSL_C/PPCEABI/bare/H/ansi_files.c:
+	.text start:0x801B1BA4 end:0x801B1EB4
+	.data start:0x8021C018 end:0x8021C158
+	.bss start:0x8032A528 end:0x8032A828
+
+MSL_C/PPCEABI/bare/H/buffer_io.c:
+	.text start:0x801B3E08 end:0x801B4174
+
+MSL_C/PPCEABI/bare/H/direct_io.c:
+	.text start:0x801B41A4 end:0x801B48F8
+
+MSL_C/PPCEABI/bare/H/file_io.c:
+	.text start:0x801B48F8 end:0x801B4FB8
+
+TRK_MINNOW_DOLPHIN/mslsupp.c:
+	.text start:0x801AD55C end:0x801ADB9C
+
+MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
+	.text start:0x801B8020 end:0x801B80F0
+	.sbss start:0x8032E378 end:0x8032E37C

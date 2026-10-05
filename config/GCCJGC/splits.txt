@@ -922,3 +922,13 @@ dvd/dvdlow.c:
 dvd/dvdFatal.c:
 	.text	start:0x80185B88 end:0x80185BB8
 	.sbss	start:0x8034BEA8 end:0x8034BEAC
+
+dvd/fstload.c:
+	.text	start:0x80185BB8 end:0x80185DF8
+	.data	start:0x80233028 end:0x80233098
+	.sdata	start:0x8034B8E0 end:0x8034B8EB
+	.sbss	start:0x8034BEB0 end:0x8034BEBC
+	.bss start:0x803283D8 end:0x80328448
+
+auto_09_8034B8EB_sdata:
+	.sdata start:0x8034B8EB end:0x8034B8F0 align:1

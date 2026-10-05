@@ -892,7 +892,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdidutils.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdlow.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/dvdqueue.c"),
-            Object(Matching, "dvd/fstload.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dvd/fstload.c"),
         ],
     ),
     DolphinLib(

@@ -623,7 +623,7 @@ s32 LetterGift_Main(void)
         }
         Window_PutText(win, sLetterRow, 0);
         attr = Session_IsItemInUse(sLetterRow) ? 6 : 5;
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
         if (attr == 5 && Session_GetItemCategory(sLetterRow) == 1)
 #else
         if (attr == 5 && (Session_GetItemCategory(sLetterRow) == 1 || Session_GetItemCategory(sLetterRow) == 3))

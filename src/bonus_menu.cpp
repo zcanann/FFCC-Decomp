@@ -1518,19 +1518,19 @@ void CMenuPcs::CalcResultCloseAnim()
 			m_bonusAnim->sprites[i].motionY = 0.0f;
 		}
 
+		int base = 0;
 		{
-			int idx = 0;
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base++];
 			spr->startFrame = 9999;
 			spr->flags = 3;
 		}
 
 		for (int i = 0; activePartyCount > i; i++) {
-			Sprt2* sprite = &m_bonusAnim->sprites[i + 1];
+			Sprt2* sprite = &m_bonusAnim->sprites[i + base];
 			sprite->startFrame = 0x10;
 		}
 
-		int base = activePartyCount + 1;
+		base += activePartyCount;
 
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* spr = &m_bonusAnim->sprites[base + i];

@@ -1152,3 +1152,12 @@ TRK_MINNOW_DOLPHIN/support.c:
 
 astar.cpp:
 	.text start:0x8013D2E8 end:0x8013EE34
+
+pppYmMegaBirthShpTail3.cpp:
+	.text start:0x8008BEB0 end:0x8008E0BC
+
+pppYmMegaBirthShpTail2.cpp:
+	.text start:0x8008A0D8 end:0x8008BEB0
+
+pppRyjMegaBirth.cpp:
+	.text start:0x80081648 end:0x800835C0

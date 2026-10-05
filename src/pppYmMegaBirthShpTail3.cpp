@@ -67,8 +67,8 @@ static inline YmMegaBirthShpTail3DataOffsets* GetYmMegaBirthShpTail3DataOffsets(
     return reinterpret_cast<YmMegaBirthShpTail3DataOffsets*>(ctrl->m_serializedDataOffsets);
 }
 
-void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
-void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
+static void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
+static void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 
 
 /*
@@ -547,7 +547,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
  * JP Address: TODO
  * JP Size: TODO
  */
-void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
+static void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
           PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, _PARTICLE_DATA* particleData,
           VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
@@ -623,7 +623,7 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
  * JP Address: TODO
  * JP Size: TODO
  */
-void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
+static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
            PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, VColor* vColor,
            _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat,
            _PARTICLE_COLOR* particleColor)
@@ -1038,8 +1038,8 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, _pppCtrlTabl
  * PAL Size: 228b
  * EN Address: 0x8008E558
  * EN Size: 228b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8008DFD8
+ * JP Size: 228b
  */
 void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, _pppCtrlTable* ctrlTable)
 {
@@ -1047,9 +1047,7 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, _pppCtrlTab
         object->m_workArea + GetYmMegaBirthShpTail3DataOffsets(ctrlTable)->m_workOffset);
 
     pppUnitMatrix(work->m_emitterMatrix);
-    work->m_tailScaleDirection.z = 0.0f;
-    work->m_tailScaleDirection.y = 0.0f;
-    work->m_tailScaleDirection.x = 0.0f;
+    work->m_tailScaleDirection.x = work->m_tailScaleDirection.y = work->m_tailScaleDirection.z = 0.0f;
     work->m_particles = 0;
     work->m_wmats = 0;
     work->m_colors = 0;

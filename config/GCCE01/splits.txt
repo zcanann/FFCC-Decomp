@@ -1206,3 +1206,12 @@ p_map.cpp:
 
 astar.cpp:
 	.text start:0x801406C0 end:0x80142208
+
+pppYmMegaBirthShpTail3.cpp:
+	.text start:0x8008C434 end:0x8008E63C
+
+pppYmMegaBirthShpTail2.cpp:
+	.text start:0x8008A660 end:0x8008C434
+
+pppRyjMegaBirth.cpp:
+	.text start:0x80081C14 end:0x80083B80

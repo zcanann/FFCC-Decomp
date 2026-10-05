@@ -1116,6 +1116,31 @@ void CMenuPcs::DrawOptionMenu()
 		                        w * 0.5f, h, m_wmOptionTextures[0], &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+		if (i == m_optionIndex) {
+			CFont* titleFont = m_fonts[0];
+			titleFont->SetMargin(1.0f);
+			titleFont->SetShadow(1);
+			titleFont->SetScale(1.2f);
+			titleFont->DrawInit();
+			titleFont->SetTlut(0x16);
+			titleFont->SetColor(color);
+			titleFont->SetPosX(94.0f);
+			titleFont->SetPosY(static_cast<float>(selectedY));
+			titleFont->Draw(*option);
+		} else {
+			CFont* titleFont = m_fonts[0];
+			titleFont->SetMargin(1.0f);
+			titleFont->SetShadow(1);
+			titleFont->SetScale(1.0f);
+			titleFont->DrawInit();
+			titleFont->SetTlut(6);
+			titleFont->SetColor(color);
+			titleFont->SetPosX(96.0f);
+			titleFont->SetPosY(static_cast<float>(normalY));
+			titleFont->Draw(*option);
+		}
+#else
 		if (i == m_optionIndex) {
 			DrawFont(0x5E, static_cast<int>(-4.0f + static_cast<float>(selectedY)), color, 0x16,
 			         *option, 1.0f, 1.0f);
@@ -1123,6 +1148,7 @@ void CMenuPcs::DrawOptionMenu()
 			DrawFont(0x60, static_cast<int>(-4.0f + static_cast<float>(normalY)), color, 6,
 			         *option, 1.0f, 1.0f);
 		}
+#endif
 	}
 
 #ifndef VERSION_GCCJGC
@@ -1131,6 +1157,26 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.RenderTextureQuad(0.0f, 384.0f, 640.0f, 40.0f,
 	                        m_textures[31], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+	{
+		char* help = helpText[m_optionIndex];
+		strlen(help);
+		CFont* helpFont = m_fonts[0];
+		helpFont->SetMargin(1.0f);
+		helpFont->SetScale(1.0f);
+		float width = helpFont->GetWidth(help);
+		helpFont = m_fonts[0];
+		helpFont->SetMargin(1.0f);
+		helpFont->SetShadow(1);
+		helpFont->SetScale(1.0f);
+		helpFont->DrawInit();
+		helpFont->SetTlut(7);
+		helpFont->SetColor(color);
+		helpFont->SetPosX(static_cast<float>(static_cast<int>(320.0f - width * 0.5f)));
+		helpFont->SetPosY(391.0f);
+		helpFont->Draw(help);
+	}
+#else
 	{
 		float helpTextY = 387.0f;
 		char* help = helpText[m_optionIndex];
@@ -1144,6 +1190,8 @@ void CMenuPcs::DrawOptionMenu()
 		          static_cast<int>(helpTextY), color, 7, helpText[m_optionIndex], 0.8f,
 		          1.0f, 1.0f);
 	}
+
+#endif
 
 	int leftHintOn = 0;
 	int rightHintOn = 0;

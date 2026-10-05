@@ -417,6 +417,8 @@ partMng.cpp:
 memory.cpp:
 	.bss start:0x80258188 end:0x8025F928
 	.text start:0x8001BB40 end:0x8001F6CC
+	.data start:0x801DC730 end:0x801DC758
+	.sdata start:0x8034B210 end:0x8034B228
 
 materialman.cpp:
 	.text start:0x8003B9A0 end:0x800434FC

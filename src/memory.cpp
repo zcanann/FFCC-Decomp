@@ -72,12 +72,12 @@ extern const char sMemoryClassName[] = "CMemory";
 extern const char sAmemCacheSeparator[3] = "\n\n";
 extern const char sMemoryNoNameStopwatchName[8] = "no name";
 extern const char sEmptyAllocSourceName[4] = "";
-extern const char* amem_typeName[] = {
+static const char* amem_typeName[] = {
     sAmemCacheTypeTexture,
     sAmemCacheTypeModel,
     sAmemCacheTypePdt,
 };
-extern const char* amem_stateName[2] = {
+static const char* amem_stateName[2] = {
     sAmemCacheStateUse,
     sAmemCacheStateNoUse,
 };

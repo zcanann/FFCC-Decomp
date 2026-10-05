@@ -1718,3 +1718,9 @@ baseobj.cpp:
 	.rodata start:0x801D7C30 end:0x801D7C58
 	.data start:0x8022EAB0 end:0x8022EAE8
 	.sdata start:0x8034B700 end:0x8034B710
+
+pppCrystal.cpp:
+	.text start:0x800D9D6C end:0x800DA728
+
+pppCrystal2.cpp:
+	.text start:0x8013A5FC end:0x8013AE44

@@ -666,12 +666,12 @@ unsigned int CGItemObj::CanCreateFromScript()
 
 /*
  * --INFO--
- * PAL Address: 0x801259e4
+ * PAL Address: 0x801259E4
  * PAL Size: 1168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80124D14
+ * EN Size: 1168b
+ * JP Address: 0x80121890
+ * JP Size: 1172b
  */
 CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
@@ -722,8 +722,9 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition.z = kItemObjHeightOffset * (float)cos((double)yRot) + owner->m_worldPosition.z;
 
 			safePosDist = newItem->CalcSafePos(0x41, owner, &safePos);
-			if (safePosDist > kItemObjZero) {
-				owner->moveVectorHRot(kItemObjPi + owner->m_rotBaseY, kItemObjZero,
+			float zero = kItemObjZero;
+			if (safePosDist > zero) {
+				owner->moveVectorHRot(kItemObjPi + owner->m_rotBaseY, zero,
 				                       safePosDist / kItemObjSafeMoveDivisor, 3);
 			}
 

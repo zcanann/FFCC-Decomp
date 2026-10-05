@@ -26,12 +26,8 @@ public:
 		float max = -10000000000.0f;
 		float min = 10000000000.0f;
 
-		m_min.z = min;
-		m_min.y = min;
-		m_min.x = min;
-		m_max.z = max;
-		m_max.y = max;
-		m_max.x = max;
+		m_min.x = m_min.y = m_min.z = min;
+		m_max.x = m_max.y = m_max.z = max;
 	}
 	/*
 	 * --INFO--

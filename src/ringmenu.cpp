@@ -21,6 +21,24 @@
 
 #include <math.h>
 
+enum {
+#ifdef VERSION_GCCJGC
+    RING_TEX_BATTLE = 0x15,
+    RING_TEX_FACE = 0x17,
+    RING_TEX_NAVI = 0x18,
+    RING_TEX_SUNA = 0x1C,
+    RING_TEX_GBA = 0x1D,
+    RING_TEX_BATTLE2 = 0x1E,
+#else
+    RING_TEX_BATTLE = 0x16,
+    RING_TEX_FACE = 0x18,
+    RING_TEX_NAVI = 0x19,
+    RING_TEX_SUNA = 0x1D,
+    RING_TEX_GBA = 0x1E,
+    RING_TEX_BATTLE2 = 0x1F,
+#endif
+};
+
 #ifdef VERSION_GCCP01
 static const char sRingMenuDisplayToggleChangedFmt[] = {
 	0x72, 0x69, 0x6E, 0x67, 0x4D, 0x65, 0x6E, 0x75,
@@ -44,10 +62,10 @@ static inline int clampDecToZero(int value)
  * --INFO--
  * PAL Address: 0x800a2dd4
  * PAL Size: 1388b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A26A8
+ * EN Size: 1388b
+ * JP Address: 0x800A0D6C
+ * JP Size: 1388b
  */
 void CRingMenu::DrawIcon()
 {
@@ -119,7 +137,7 @@ void CRingMenu::DrawIcon()
 	float posY = 224.0f - 224.0f * clipPos.y;
 	unsigned char blinkAlpha = color[static_cast<int>(System.m_frameCounter) % 16];
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_NAVI));
 	int iconRow;
 	int iconCol;
 	if ((Game.m_gameWork.m_menuStageMode != 0) && (m_menuIndex >= 1)) {
@@ -143,9 +161,9 @@ void CRingMenu::DrawIcon()
 
 	int uInt = iconCol % 8 * 0x30;
 	int vInt = iconCol / 8 * 0x30;
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_FACE));
 	void* tlut = MenuPcs.m_externalFontTlut;
-	CTexture* iconTexture = MenuPcs.m_textures[0x18];
+	CTexture* iconTexture = MenuPcs.m_textures[RING_TEX_FACE];
 	if (caravanWork->m_hp != 0) {
 		tlut = 0;
 	}
@@ -267,10 +285,10 @@ void CRingMenu::onScriptChanging(char*)
  * --INFO--
  * PAL Address: 0x800a3404
  * PAL Size: 1472b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A2CD8
+ * EN Size: 1472b
+ * JP Address: 0x800A139C
+ * JP Size: 1484b
  */
 void CRingMenu::drawGBA()
 {
@@ -301,7 +319,7 @@ void CRingMenu::drawGBA()
 		return;
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE));
 
 	float gbaAnimRaw = static_cast<float>(
 	    sin(static_cast<double>((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f)));
@@ -337,7 +355,7 @@ void CRingMenu::drawGBA()
 	sinA = static_cast<float>(sin(static_cast<double>(angle)));
 	sinB = static_cast<float>(sin(static_cast<double>(-1.5707963705062866f + angle)));
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_GBA));
 
 	const float alphaBase = 255.0f * gbaAnim;
 	MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>(0.5f * alphaBase * showScale)));
@@ -360,7 +378,7 @@ void CRingMenu::drawGBA()
 	const unsigned int flatFlags = CFlatEnabledEventFlags();
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
 		if (static_cast<unsigned char>(Joybus.IsInitSend(m_menuIndex)) == 0) {
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_SUNA));
 			const float blink = static_cast<float>(sin(static_cast<double>(0.1f * static_cast<float>(m_commonFrameCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(0.5f * (alphaLit * (1.0f + blink))));
@@ -372,7 +390,7 @@ void CRingMenu::drawGBA()
 			if (frameTex >= 4) {
 				frameTex &= 1;
 			}
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_SUNA));
 			MenuPcs.DrawRect(3, drawX, drawY, 48.0f, 48.0f, 0.0f,
 			                                 static_cast<float>(frameTex * 0x30), 1.0f, 1.0f, 0.0f);
 		}
@@ -385,10 +403,10 @@ void CRingMenu::drawGBA()
  * --INFO--
  * PAL Address: 0x800a39c4
  * PAL Size: 3884b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A3298
+ * EN Size: 3884b
+ * JP Address: 0x800A1968
+ * JP Size: 3812b
  */
 void CRingMenu::onDraw()
 {
@@ -416,7 +434,7 @@ void CRingMenu::onDraw()
 		transitionScale = m_transitionCounter / 16.0f;
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE));
 	sin(static_cast<double>((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f));
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -475,7 +493,7 @@ void CRingMenu::onDraw()
 			continue;
 		}
 
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE2));
 		MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase)));
 
 		float drawX;
@@ -662,7 +680,7 @@ void CRingMenu::onDraw()
 			MenuPcs.DrawInit();
 
 			if (group == 2) {
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE2));
 				CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);

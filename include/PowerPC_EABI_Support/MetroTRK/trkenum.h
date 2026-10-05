@@ -43,11 +43,16 @@ typedef enum {
 	DS_Stderr = 2,
 } DSFileHandle;
 
-typedef enum {
+enum DSIOResultCode {
 	DS_IONoError = 0,
 	DS_IOError   = 1,
 	DS_IOEOF     = 2,
-} DSIOResult;
+};
+#ifdef VERSION_GCCJGC
+typedef u8 DSIOResult;
+#else
+typedef enum DSIOResultCode DSIOResult;
+#endif
 
 typedef enum {
 	DSMSG_Ping        = 0x0,

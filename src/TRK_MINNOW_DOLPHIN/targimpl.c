@@ -8,6 +8,7 @@
 #ifdef VERSION_GCCJGC
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/notify.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/support.h"
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/mpc_7xx_603e.h"
 #endif
 
@@ -850,16 +851,25 @@ u32 TRKTargetGetPC(void)
 	return gTRKCPUState.Default.PC;
 }
 
-/**
- * @note Address: 0x800BE390
- * @note Size: 0x200
+/*
+ * --INFO--
+ * PAL Address: 0x801AC004
+ * PAL Size: 512b
+ * EN Address: 0x801AAEE8
+ * EN Size: 512b
+ * JP Address: 0x801A8394
+ * JP Size: 520b
  */
 
 DSError TRKTargetSupportRequest()
 {
 	DSIOResult ioResult;
 	size_t* length;
+#ifdef VERSION_GCCJGC
+    u8 commandId;
+#else
 	MessageCommandID commandId;
+#endif
 	DSError error;
 	u32 local_28;
 	TRKEvent event;
@@ -871,7 +881,7 @@ DSError TRKTargetSupportRequest()
 		TRKPostEvent(&event);
 		return DS_NoError;
 	} else if (commandId == DSMSG_OpenFile) {
-		error = HandleOpenFileSupportRequest(gTRKCPUState.Default.GPR[4], gTRKCPUState.Default.GPR[5] & 0xff, gTRKCPUState.Default.GPR[6],
+		error = HandleOpenFileSupportRequest((const char*)gTRKCPUState.Default.GPR[4], gTRKCPUState.Default.GPR[5] & 0xff, (u32*)gTRKCPUState.Default.GPR[6],
 		                                     &ioResult);
 
 		if (ioResult == DS_IONoError && error != DS_NoError) {
@@ -899,8 +909,13 @@ DSError TRKTargetSupportRequest()
 		*(u32*)gTRKCPUState.Default.GPR[5] = local_28;
 	} else {
 		length = (size_t*)gTRKCPUState.Default.GPR[5];
+#ifdef VERSION_GCCJGC
+		error  = TRKSuppAccessFile((u8)gTRKCPUState.Default.GPR[4], (u8*)gTRKCPUState.Default.GPR[6], length, &ioResult, TRUE,
+		                           commandId == DSMSG_ReadFile);
+#else
 		error  = TRKSuppAccessFile(gTRKCPUState.Default.GPR[4], (u8*)gTRKCPUState.Default.GPR[6], length, &ioResult, TRUE,
 		                           commandId == DSMSG_ReadFile);
+#endif
 
 		if (ioResult == DS_IONoError && error != DS_NoError) {
 			ioResult = DS_IOError;

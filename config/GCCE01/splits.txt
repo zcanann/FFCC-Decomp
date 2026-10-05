@@ -388,3 +388,16 @@ ax/AXVPB.c:
 	.bss start:0x80313920 end:0x80324D20
 	.data start:0x80216BA8 end:0x80216C7C
 	.sbss start:0x8032E270 end:0x8032E27C
+
+ax/AXCL.c:
+	.text start:0x80190E60 end:0x80191598
+	.sbss start:0x8032E208 end:0x8032E21C
+	.bss start:0x8030EAC0 end:0x8030F0C0
+
+ax/AXAux.c:
+	.text start:0x801909C0 end:0x80190E60
+	.bss start:0x8030BDC0 end:0x8030EAC0
+	.sbss start:0x8032E1D0 end:0x8032E204
+
+ax/AXComp.c:
+	.data start:0x80216C80 end:0x802186C0

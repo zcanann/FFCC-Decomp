@@ -495,7 +495,7 @@ config.libs = [
         Object(NonMatching, "RedSound/RedExecute.cpp", cflags=redsound_unit_cflags("RedExecute")),
         Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "RedSound/RedMemory.cpp", cflags=redsound_unit_cflags("RedMemory")),
         Object(Matching, "RedSound/RedMidiCtrl.cpp", cflags=redsound_unit_cflags("RedMidiCtrl")),
-        Object(Matching, "RedSound/RedSound.cpp", cflags=redsound_unit_cflags("RedSound")),
+        Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "RedSound/RedSound.cpp", cflags=redsound_unit_cflags("RedSound")),
         Object(
             NonMatching,
             "RedSound/RedStream.cpp",

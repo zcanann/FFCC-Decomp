@@ -1483,3 +1483,16 @@ auto_8035013D_sdata2:
 
 auto_801DBCF2_rodata:
 	.rodata start:0x801DBCF2 end:0x801DBCF8 align:1
+
+RedSound/RedEntry.cpp:
+	.text start:0x801BB870 end:0x801BE23C
+	extab start:0x8000A650 end:0x8000A7B8
+	extabindex start:0x80011C98 end:0x80011EB4
+	.rodata start:0x801DBCF8 end:0x801DC234
+	.sdata2 start:0x80350140 end:0x80350163
+
+auto_801DC234_rodata:
+	.rodata start:0x801DC234 end:0x801DC238 align:1
+
+auto_80350163_sdata2:
+	.sdata2 start:0x80350163 end:0x80350168 align:1

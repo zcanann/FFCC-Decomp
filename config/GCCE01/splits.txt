@@ -1519,3 +1519,16 @@ auto_80332CD5_sdata2:
 
 auto_801E6782_rodata:
 	.rodata start:0x801E6782 end:0x801E6788 align:1
+
+RedSound/RedEntry.cpp:
+	.text start:0x801BF560 end:0x801C1F2C
+	extab start:0x8000A5E8 end:0x8000A750
+	extabindex start:0x80011CEC end:0x80011F08
+	.rodata start:0x801E6788 end:0x801E6CC4
+	.sdata2 start:0x80332CD8 end:0x80332CFB
+
+auto_801E6CC4_rodata:
+	.rodata start:0x801E6CC4 end:0x801E6CC8 align:1
+
+auto_80332CFB_sdata2:
+	.sdata2 start:0x80332CFB end:0x80332D00 align:1

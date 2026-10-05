@@ -7289,7 +7289,7 @@ void CMenuPcs::DrawCharaName()
 			}
 
 			const float widthDiff = xMax2 - font->GetWidth(text);
-			xBase = static_cast<float>(widthDiff * k3f8_2 + xBase);
+			xBase += widthDiff * k3f8_2;
 			font->SetPosX(xBase);
 			font->SetPosY(y);
 			font->Draw(text);

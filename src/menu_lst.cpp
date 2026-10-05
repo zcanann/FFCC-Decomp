@@ -136,7 +136,11 @@ void CMenuPcs::MLstDraw()
 		}
 
 		font->SetPosX(textX);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(textY);
+#else
 		font->SetPosY(textY - kMLstTextYOffset);
+#endif
 		font->Draw(text);
 	}
 

@@ -397,7 +397,11 @@ void CMenuPcs::MoneyDraw()
 	for (i = 0; i < 2; i++) {
 		y = (32.0f + ((float)(entry->y + 0x18) + 32.0f * (float)i)) - 19.8f;
 		font->SetPosX((float)(entry->x + 0xB6));
+#ifdef VERSION_GCCJGC
+		font->SetPosY(y);
+#else
 		font->SetPosY(y - 4.0f);
+#endif
 		font->Draw(label);
 	}
 

@@ -305,7 +305,11 @@ void CMenuPcs::ArtiDraw()
 		x = (float)(entry[i].x + 0x1c);
 		y = (float)(entry[i].y + 0xb);
 		listFont->SetPosX(x);
+#ifdef VERSION_GCCJGC
+		listFont->SetPosY(y);
+#else
 		listFont->SetPosY(y - kArtiTextYOffset);
+#endif
 		listFont->Draw(text);
 	}
 

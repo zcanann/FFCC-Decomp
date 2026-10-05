@@ -188,7 +188,11 @@ void CMenuPcs::FavoDraw()
 		font->SetMargin(1.0f);
 		sprintf(textBuf, "%d", static_cast<int>(s_rank[i].place));
 		font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(y);
+#else
 		font->SetPosY(y - 4.0f);
+#endif
 		font->Draw(textBuf);
 		font->SetShadow(0);
 	}
@@ -206,7 +210,11 @@ void CMenuPcs::FavoDraw()
 		y = static_cast<float>(entry[i].y + 0xB);
 		x = static_cast<float>(entry[i].x + 0x1C);
 		font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(y);
+#else
 		font->SetPosY(y - 4.0f);
+#endif
 		font->Draw(name);
 	}
 

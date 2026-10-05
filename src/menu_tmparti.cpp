@@ -248,7 +248,11 @@ void CMenuPcs::TmpArtiDraw()
 			top = (float)(entry->y + 11);
 
 			font->SetPosX(posX);
+#ifdef VERSION_GCCJGC
+			font->SetPosY(top);
+#else
 			font->SetPosY(top - kTmpArtiTextYOffset);
+#endif
 			font->Draw(text);
 		}
 		entry++;

@@ -178,7 +178,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
     "GCCJGC": {
         "cli": [
             "main/main", "main/xfer", "main/radarmap", "main/textmask", "main/obj", "main/link", "main/msg_sys",
-            "main/mode", "main/gil",
+            "main/mode", "main/gil", "main/menu",
             "crt0", "m4a/m4a_1", "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet",
             "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
             "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",

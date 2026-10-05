@@ -782,6 +782,8 @@ sObjPalUsage = .bss:0x03002760; // type:object size:0x12 scope:local data:byte
 sOamCount = .bss:0x03001990; // type:object size:0x4 scope:local data:byte
 
 gScreenUnused = .bss:0x030030A8; // type:object size:0x4 data:byte
+sMenuRow = .bss:0x0300284C; // type:object size:0x1 scope:local data:byte
+sMenuReturn = .bss:0x0300284D; // type:object size:0x1 scope:local data:byte
 
 sGilAmount = .bss:0x030027C4; // type:object size:0x4 scope:local data:byte
 sGilDigits = .bss:0x030027C8; // type:object size:0x1 scope:local data:byte

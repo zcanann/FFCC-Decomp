@@ -517,6 +517,7 @@ os/OSSemaphore.c:
 	.text start:0x8017AC20 end:0x8017ADA4
 
 wm_menu.cpp:
+	.rodata start:0x801D777C end:0x801D787C
 	.text start:0x800E3E28 end:0x800FEFE8
 
 mapocttree.cpp:

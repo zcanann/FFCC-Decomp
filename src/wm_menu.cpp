@@ -433,6 +433,11 @@ extern float FLOAT_803314f0;
 
 static const int kMcListEntrySize = sizeof(McListInfo);
 static const int kMcListCount = 4;
+#ifdef VERSION_GCCJGC
+static const int kMemoryCardBannerTexture = 30;
+#else
+static const int kMemoryCardBannerTexture = 31;
+#endif
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
 
@@ -3311,7 +3316,7 @@ void CMenuPcs::DrawMCardMenu()
 			bgColor.b = 0xFF;
 			bgColor.a = (unsigned char)(int)(*p255 * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, bgColor);
-			MenuPcs.SetTexture((TEX)0x1F);
+			MenuPcs.SetTexture((TEX)kMemoryCardBannerTexture);
 			const float* pZeroBg = &FLOAT_803313dc;
 			const float* pOneBg = &FLOAT_803313e8;
 			const float* pWideBg = &FLOAT_803313e0;
@@ -4019,7 +4024,7 @@ void CMenuPcs::DrawLoadMenu()
 			bgColor.b = 0xFF;
 			bgColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
 			GXSetChanMatColor(GX_COLOR0A0, bgColor);
-			MenuPcs.SetTexture((TEX)0x1F);
+			MenuPcs.SetTexture((TEX)kMemoryCardBannerTexture);
 			double bannerY = DOUBLE_803314D0;
 			bannerY -= FLOAT_80331440;
 			MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(bannerY),
@@ -4038,18 +4043,26 @@ void CMenuPcs::DrawLoadMenu()
 	}
 
 	// Header text
-	if (*reinterpret_cast<char*>(reinterpret_cast<int>(g_pGoOutMenu) + 0x18) == 0x0E) {
+#ifdef VERSION_GCCJGC
+	switch (g_pGoOutMenu->m_goOutMode) {
+	case 0x0E: {
+		char text[256] = "\203\215\201\133\203\150\202\267\202\351\203\146\201\133\203\136\202\360\221\111\202\361\202\305\202\255\202\276\202\263\202\242";
+		MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(text, 22)), 391,
+		                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(uAlpha)).color,
+		                  7, text, 1.0f, 1.0f);
+		break;
+	}
+	}
+#else
+	if (g_pGoOutMenu->m_goOutMode == 0x0E) {
 		const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
 		char* text = g_strWMMenuMes[languageIndex][8];
 		_GXColor color = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(uAlpha)).color;
-#ifdef VERSION_GCCJGC
-		const int x = static_cast<int>(MenuPcs.CalcCenteringPos(text, 22));
-#else
 		const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
-#endif
 		MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), color, 7, text,
 		                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 	}
+#endif
 
 	DrawMCList();
 

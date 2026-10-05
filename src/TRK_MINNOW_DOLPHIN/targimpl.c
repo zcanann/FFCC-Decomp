@@ -982,11 +982,13 @@ DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
 
 		error = TRKPPCAccessSpecialReg(srcDestPtr, instructionData1, read);
 	} else if (fpr == 0x20) {
+#ifndef VERSION_GCCJGC
 		if (read) {
 			ReadFPSCR(srcDestPtr);
 		} else {
 			WriteFPSCR(srcDestPtr);
 		}
+#endif
 
 		*(u64*)srcDestPtr &= 0xFFFFFFFF;
 	} else if (fpr == 0x21) {

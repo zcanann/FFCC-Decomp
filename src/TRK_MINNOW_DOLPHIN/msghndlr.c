@@ -589,7 +589,97 @@ DSError TRKDoWriteMemory(TRKBuffer* b) {
 #endif
 }
 
-/* 8036E3C4-8036E6A4 368D04 02E0+00 0/0 1/1 0/0 .text            TRKDoReadRegisters */
+/*
+ * --INFO--
+ * PAL Address: 0x801AA8A8
+ * PAL Size: 736b
+ * EN Address: 0x801A978C
+ * EN Size: 736b
+ * JP Address: 0x801A5C64
+ * JP Size: 972b
+ */
+#ifdef VERSION_GCCJGC
+DSError TRKDoReadRegisters(TRKBuffer* b) {
+    DSError error;
+    DSReplyError replyError;
+    size_t registersLength;
+    u16 firstRegister;
+    u16 lastRegister;
+    u8 command;
+    u8 options;
+
+    if (b->length != 6) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKSetBufferPosition(b, 0);
+    error = TRKReadBuffer1_ui8(b, &command);
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui8(b, &options);
+    }
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui16(b, &firstRegister);
+    }
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui16(b, &lastRegister);
+    }
+    if (firstRegister > lastRegister) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_InvalidRegisterRange);
+    }
+    if (error == DS_NoError) {
+        TRKResetBuffer(b, TRUE);
+        TRKAppendBuffer1_ui8(b, DSMSG_ReplyACK);
+        TRKAppendBuffer1_ui8(b, DSREPLY_NoError);
+    }
+    switch (options & 7) {
+    case DSREG_Default:
+        error = TRKTargetAccessDefault(firstRegister, lastRegister, b, &registersLength, TRUE);
+        break;
+    case DSREG_FP:
+        error = TRKTargetAccessFP(firstRegister, lastRegister, b, &registersLength, TRUE);
+        break;
+    case DSREG_Extended1:
+        error = TRKTargetAccessExtended1(firstRegister, lastRegister, b, &registersLength, TRUE);
+        break;
+    case DSREG_Extended2:
+        error = TRKTargetAccessExtended2(firstRegister, lastRegister, b, &registersLength, TRUE);
+        break;
+    default:
+        error = DS_UnsupportedError;
+        break;
+    }
+
+    // Check if there was an error, and respond accordingly
+    if (error != DS_NoError) {
+        switch (error) {
+        case DS_UnsupportedError:
+            replyError = DSREPLY_UnsupportedOptionError;
+            break;
+        case DS_InvalidRegister:
+            replyError = DSREPLY_InvalidRegisterRange;
+            break;
+        case DS_CWDSException:
+            replyError = DSREPLY_CWDSException;
+            break;
+        case DS_InvalidProcessID:
+            replyError = DSREPLY_InvalidProcessID;
+            break;
+        case DS_InvalidThreadID:
+            replyError = DSREPLY_InvalidThreadID;
+            break;
+        case DS_OSError:
+            replyError = DSREPLY_OSError;
+            break;
+        default:
+            replyError = DSREPLY_CWDSError;
+        }
+
+        return TRKStandardACK(b, DSMSG_ReplyACK, replyError);
+    } else {
+        // No error, send ack
+        return TRKSendACK(b);
+    }
+}
+#else
 DSError TRKDoReadRegisters(TRKBuffer* b) {
     int error;
     u8 options;
@@ -667,8 +757,102 @@ DSError TRKDoReadRegisters(TRKBuffer* b) {
         return TRKSendACK(b);
     }
 }
+#endif
 
-/* 8036E134-8036E3C4 368A74 0290+00 0/0 1/1 0/0 .text            TRKDoWriteRegisters */
+/*
+ * --INFO--
+ * PAL Address: 0x801AA618
+ * PAL Size: 656b
+ * EN Address: 0x801A94FC
+ * EN Size: 656b
+ * JP Address: 0x801A589C
+ * JP Size: 968b
+ */
+#ifdef VERSION_GCCJGC
+DSError TRKDoWriteRegisters(TRKBuffer* b) {
+    DSError error;
+    DSReplyError replyError;
+    size_t registersLength;
+    u16 firstRegister;
+    u16 lastRegister;
+    u8 command;
+    u8 options;
+
+    if (b->length <= 6) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_PacketSizeError);
+    }
+    TRKSetBufferPosition(b, 0);
+    error = TRKReadBuffer1_ui8(b, &command);
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui8(b, &options);
+    }
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui16(b, &firstRegister);
+    }
+    if (error == DS_NoError) {
+        error = TRKReadBuffer1_ui16(b, &lastRegister);
+    }
+    if (firstRegister > lastRegister) {
+        return TRKStandardACK(b, DSMSG_ReplyACK, DSREPLY_InvalidRegisterRange);
+    }
+    switch (options) {
+    case DSREG_Default:
+        error = TRKTargetAccessDefault(firstRegister, lastRegister, b, &registersLength, FALSE);
+        break;
+    case DSREG_FP:
+        error = TRKTargetAccessFP(firstRegister, lastRegister, b, &registersLength, FALSE);
+        break;
+    case DSREG_Extended1:
+        error = TRKTargetAccessExtended1(firstRegister, lastRegister, b, &registersLength, FALSE);
+        break;
+    case DSREG_Extended2:
+        error = TRKTargetAccessExtended2(firstRegister, lastRegister, b, &registersLength, FALSE);
+        break;
+    default:
+        error = DS_UnsupportedError;
+        break;
+    }
+    if (error == DS_NoError) {
+        TRKResetBuffer(b, TRUE);
+        TRKAppendBuffer1_ui8(b, DSMSG_ReplyACK);
+        TRKAppendBuffer1_ui8(b, DSREPLY_NoError);
+    }
+
+    // Check if there was an error, and respond accordingly
+    if (error != DS_NoError) {
+        switch (error) {
+        case DS_UnsupportedError:
+            replyError = DSREPLY_UnsupportedOptionError;
+            break;
+        case DS_InvalidRegister:
+            replyError = DSREPLY_InvalidRegisterRange;
+            break;
+        case DS_MessageBufferReadError:
+            replyError = DSREPLY_PacketSizeError;
+            break;
+        case DS_CWDSException:
+            replyError = DSREPLY_CWDSException;
+            break;
+        case DS_InvalidProcessID:
+            replyError = DSREPLY_InvalidProcessID;
+            break;
+        case DS_InvalidThreadID:
+            replyError = DSREPLY_InvalidThreadID;
+            break;
+        case DS_OSError:
+            replyError = DSREPLY_OSError;
+            break;
+        default:
+            replyError = DSREPLY_CWDSError;
+        }
+
+        return TRKStandardACK(b, DSMSG_ReplyACK, replyError);
+    } else {
+        // No error, send ack
+        return TRKSendACK(b);
+    }
+}
+#else
 DSError TRKDoWriteRegisters(TRKBuffer* b) {
     int error;
     int replyError;
@@ -753,6 +937,7 @@ DSError TRKDoWriteRegisters(TRKBuffer* b) {
         return TRKSendACK(b);
     }
 }
+#endif
 
 /*
  * --INFO--

@@ -3902,30 +3902,31 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 /*
  * --INFO--
- * PAL Address: 0x8011c6e8
+ * PAL Address: 0x8011C6E8
  * PAL Size: 248b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8011BA48
+ * EN Size: 248b
+ * JP Address: 0x80118668
+ * JP Size: 240b
  */
 void CGPartyObj::InitFinished()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(
 	    PartyData(this).weaponIndex,
 	    PartyData(this).weaponItemId);
 	enableDamageCol(1);
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD0) = 0;
+#ifndef VERSION_GCCJGC
+	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tempStatBuffTimer = 0;
+#endif
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
-		*reinterpret_cast<unsigned char*>(self + 0xE6) = 0;
-		*reinterpret_cast<float*>(self + 0x144) = FLOAT_80331AB0;
-		*reinterpret_cast<float*>(self + 0x134) = FLOAT_80331AB0;
-		*reinterpret_cast<float*>(self + 0x13C) = FLOAT_80331A98;
+		m_pushParamA = 0;
+		m_bodyEllipsoidRadius = FLOAT_80331AB0;
+		m_capsuleHalfHeight = FLOAT_80331AB0;
+		m_extraMoveVec.y = FLOAT_80331A98;
 		m_turnFactor = FLOAT_80331AB4;
 		CGPartyObj::m_ghostWork.flagBits.flag80 = PartyData(this).carryObject == 0;
 	}

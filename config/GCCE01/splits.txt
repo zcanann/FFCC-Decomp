@@ -525,3 +525,15 @@ p_menu.cpp:
 
 p_minigame.cpp:
 	.text start:0x80126EA4 end:0x8012A57C
+
+sound.cpp:
+	.text start:0x800C4860 end:0x800C82F0
+
+textureman.cpp:
+	.text start:0x8003A3F0 end:0x8003BFAC
+
+maphit.cpp:
+	.text start:0x80024C54 end:0x80027568
+
+mapmesh.cpp:
+	.text start:0x80027568 end:0x800285C4

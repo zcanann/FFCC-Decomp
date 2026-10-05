@@ -10297,12 +10297,12 @@ inline int CMenuPcs::IsAsyncCharaLoadFinish()
 
 /*
  * --INFO--
- * PAL Address: 0x800e9348
+ * PAL Address: 0x800E9348
  * PAL Size: 1404b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E8A60
+ * EN Size: 1384b
+ * JP Address: 0x800E64C4
+ * JP Size: 1336b
  */
 int McCtrl::LoadMcList()
 {
@@ -10325,8 +10325,10 @@ int McCtrl::LoadMcList()
 		if (MemoryCardMan.AsyncFinished() == 1) {
 			m_lastResult = MemoryCardMan.GetResult();
 			if (m_lastResult < 0) {
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+#endif
 				if (m_lastResult == -6) {
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
@@ -10380,10 +10382,13 @@ int McCtrl::LoadMcList()
 			}
 		} else if (MemoryCardMan.IsBrokenFile()) {
 			const int closeResult = MemoryCardMan.McClose();
+#if !defined(VERSION_GCCJGC)
 			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
-			} else {
+			} else
+#endif
+			{
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				SetBrokenFile(1);
@@ -10431,10 +10436,13 @@ int McCtrl::LoadMcList()
 					m_state = 5;
 				} else {
 					const int closeResult = MemoryCardMan.McClose();
+#if !defined(VERSION_GCCJGC)
 					if (closeResult != 0) {
 						m_lastResult = closeResult;
 						m_state = -1;
-					} else {
+					} else
+#endif
+					{
 						MemoryCardMan.McUnmount(m_cardChannel);
 						MemoryCardMan.DestroyMcBuff();
 						m_state = 7;
@@ -10461,12 +10469,12 @@ int McCtrl::LoadMcList()
 
 /*
  * --INFO--
- * PAL Address: 0x800e902c
+ * PAL Address: 0x800E902C
  * PAL Size: 796b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E8744
+ * EN Size: 796b
+ * JP Address: 0x800E6198
+ * JP Size: 812b
  */
 void McCtrl::SetListDat(int slot, int clearScriptSysVal0)
 {
@@ -10499,6 +10507,9 @@ void McCtrl::SetListDat(int slot, int clearScriptSysVal0)
 			}
 			entry.m_chaliceElement = save->m_chaliceElement;
 			memcpy(entry.m_townName, save->m_townName, sizeof(save->m_townName));
+#if defined(VERSION_GCCJGC)
+			strcat(entry.m_townName, "\x82\xCC\x91\xBA");
+#endif
 			entry.m_hasData = 1;
 		} else {
 			entry.m_isBroken = 1;
@@ -10532,12 +10543,12 @@ inline void McCtrl::SetBrokenFile(int isBroken)
 
 /*
  * --INFO--
- * PAL Address: 0x800e8738
+ * PAL Address: 0x800E8738
  * PAL Size: 2292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E7E5C
+ * EN Size: 2280b
+ * JP Address: 0x800E58C8
+ * JP Size: 2256b
  */
 int McCtrl::SaveDat()
 {
@@ -10559,8 +10570,10 @@ int McCtrl::SaveDat()
 		if (MemoryCardMan.AsyncFinished() == 1) {
 			m_lastResult = MemoryCardMan.GetResult();
 			if (m_lastResult < 0) {
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+#endif
 				if (m_lastResult == -6) {
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
@@ -10787,10 +10800,13 @@ int McCtrl::SaveDat()
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
+#if !defined(VERSION_GCCJGC)
 			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
-			} else {
+			} else
+#endif
+			{
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 			}
@@ -10969,12 +10985,12 @@ int McCtrl::LoadDat()
 
 /*
  * --INFO--
- * PAL Address: 0x800e80f0
+ * PAL Address: 0x800E80F0
  * PAL Size: 528b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E7848
+ * EN Size: 488b
+ * JP Address: 0x800E52C4
+ * JP Size: 488b
  */
 int McCtrl::Format(int unmountAfter)
 {
@@ -10998,13 +11014,17 @@ int McCtrl::Format(int unmountAfter)
 				m_state = 2;
 			} else {
 				if (m_lastResult == -5) {
+#if defined(VERSION_GCCP01)
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+#endif
 					m_state = -1;
 					return -2;
 				}
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+#endif
 				m_state = -1;
 			}
 		}
@@ -11048,12 +11068,12 @@ int McCtrl::Format(int unmountAfter)
 
 /*
  * --INFO--
- * PAL Address: 0x800e7dc8
+ * PAL Address: 0x800E7DC8
  * PAL Size: 808b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E7570
+ * EN Size: 728b
+ * JP Address: 0x800E4FEC
+ * JP Size: 728b
  */
 int McCtrl::ChkEmpty(int requireFile)
 {
@@ -11090,30 +11110,38 @@ int McCtrl::ChkEmpty(int requireFile)
 			{
 				if (m_lastResult == -0x0D)
 				{
+#if defined(VERSION_GCCP01)
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
+#endif
 					m_state = -1;
 					return -3;
 				}
 
 				if (m_lastResult == -6)
 				{
+#if defined(VERSION_GCCP01)
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
+#endif
 					m_state = -1;
 					return -4;
 				}
 
 				if (m_lastResult == -5)
 				{
+#if defined(VERSION_GCCP01)
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
+#endif
 					m_state = -1;
 					return -5;
 				}
 
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = 0xFF;
+#endif
 				m_state = -1;
 			}
 		}
@@ -11254,12 +11282,12 @@ int McCtrl::ChkConnect(int chan)
 
 /*
  * --INFO--
- * PAL Address: 0x800e78f8
+ * PAL Address: 0x800E78F8
  * PAL Size: 1108b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E70AC
+ * EN Size: 1096b
+ * JP Address: 0x800E4B40
+ * JP Size: 1072b
  */
 int McCtrl::ChkNowData()
 {
@@ -11289,8 +11317,10 @@ int McCtrl::ChkNowData()
 
 			if (mountResult < 0)
 			{
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = 0xFF;
+#endif
 
 				if (mountResult == -6)
 				{
@@ -11410,12 +11440,14 @@ int McCtrl::ChkNowData()
 				MemoryCardMan.DecodeData();
 
 				int r = MemoryCardMan.McClose();
+#if !defined(VERSION_GCCJGC)
 				if (r != 0)
 				{
 					m_lastResult = r;
 					m_state = -1;
 				}
 				else
+#endif
 				{
 					MemoryCardMan.McUnmount(m_cardChannel);
 
@@ -11460,12 +11492,12 @@ int McCtrl::ChkNowData()
 
 /*
  * --INFO--
- * PAL Address: 0x800e7430
+ * PAL Address: 0x800E7430
  * PAL Size: 1224b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E6BF0
+ * EN Size: 1212b
+ * JP Address: 0x800E469C
+ * JP Size: 1188b
  */
 int McCtrl::SaveDataBuffer(char* buffer)
 {
@@ -11487,8 +11519,10 @@ int McCtrl::SaveDataBuffer(char* buffer)
 		if (MemoryCardMan.AsyncFinished() == 1) {
 			m_lastResult = MemoryCardMan.GetResult();
 			if (m_lastResult < 0) {
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+#endif
 				if (m_lastResult == -6) {
 					m_state = 2;
 				} else if (m_lastResult == -0xD) {
@@ -11578,10 +11612,13 @@ int McCtrl::SaveDataBuffer(char* buffer)
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
+#if !defined(VERSION_GCCJGC)
 			if (!(closeResult == 0)) {
 				m_lastResult = closeResult;
 				m_state = -1;
-			} else {
+			} else
+#endif
+			{
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 			}
@@ -11629,12 +11666,12 @@ inline void McCtrl::ChkParty(char* buffer)
 
 /*
  * --INFO--
- * PAL Address: 0x800e6b98
+ * PAL Address: 0x800E6B98
  * PAL Size: 2200b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E6364
+ * EN Size: 2188b
+ * JP Address: 0x800E3E28
+ * JP Size: 2164b
  */
 int McCtrl::EraseDat()
 {
@@ -11656,8 +11693,10 @@ int McCtrl::EraseDat()
 		if (MemoryCardMan.AsyncFinished() == 1) {
 			m_lastResult = MemoryCardMan.GetResult();
 			if (m_lastResult < 0) {
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+#endif
 				if (m_lastResult == -6) {
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
@@ -11878,10 +11917,13 @@ int McCtrl::EraseDat()
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
+#if !defined(VERSION_GCCJGC)
 			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
-			} else {
+			} else
+#endif
+			{
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 			}

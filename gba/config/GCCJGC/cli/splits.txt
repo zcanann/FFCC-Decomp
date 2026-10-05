@@ -344,7 +344,13 @@ main/xfer:
 	.common     start:0x03002AF0 end:0x03002AFC align:4
 
 regional_bss:
-	.bss        start:0x03002AFC end:0x03002FB0
+	.bss        start:0x03002AFC end:0x03002CA0
+
+main/session:
+	.common     start:0x03002CA0 end:0x03002DD0 align:16
+
+regional_bss:
+	.bss        start:0x03002DD0 end:0x03002FB0
 
 main/cmake:
 	.common     start:0x03002FB0 end:0x03002FCC align:16

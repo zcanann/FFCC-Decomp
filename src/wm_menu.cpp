@@ -6852,10 +6852,10 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
  * --INFO--
  * PAL Address: 0x800f0a70
  * PAL Size: 5544b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F0118
+ * EN Size: 5248b
+ * JP Address: 0x800ED4EC
+ * JP Size: 4812b
  */
 void CMenuPcs::CalcCharaSelect()
 {
@@ -6868,8 +6868,12 @@ void CMenuPcs::CalcCharaSelect()
 	int requestFinalize;
 
 	m_wmHelpTimer = static_cast<short>(m_wmHelpTimer + 1);
+#ifdef VERSION_GCCJGC
+	if (m_wmHelpTimer >= 270) {
+#else
 	const unsigned int modeIsZero = Game.m_gameWork.m_menuStageMode == 0;
 	if (static_cast<int>(m_wmHelpTimer) >= static_cast<int>((modeIsZero + 2) * 0x4B)) {
+#endif
 		m_wmHelpTimer = 0;
 	}
 
@@ -6931,6 +6935,17 @@ void CMenuPcs::CalcCharaSelect()
 		return;
 	}
 	{
+#ifdef VERSION_GCCJGC
+		for (i = 0; i < 4; i++) {
+			if (Game.m_gameWork.m_menuStageMode != 0) {
+				break;
+			}
+			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
+			if (entry.m_connected != 0 && entry.m_cmakePending == 0 && static_cast<int>(Joybus.GetMType(i)) == 1) {
+				Joybus.SetMType(i, 4);
+			}
+		}
+#else
 		unsigned int pendingMask = 0;
 		for (i = 0; i < 4; i++) {
 			if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -6991,6 +7006,8 @@ void CMenuPcs::CalcCharaSelect()
 				GetWmCharaHandles(this)[slot]->LoadModelASync(3, 0x43, 0);
 			}
 		}
+
+#endif
 
 		int connectedCount = 0;
 		int locallyConfirmedCount = 0;
@@ -7223,13 +7240,28 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (GetWmWorldState(this)->m_nextMenuMode != 0) {
+#ifndef VERSION_GCCJGC
 			GbaQue.SetControllerMode(1);
+#endif
 			for (i = 0; i < kWmMenuControllerCount; i++) {
 				WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 				if (entry.m_cmakePending != 0) {
 					entry.m_confirmed = 0;
 					entry.m_cmakePending = 0;
 					entry.m_cmakeReady = 0;
+#ifdef VERSION_GCCJGC
+					int retry;
+					for (retry = 0; retry < 10; retry++) {
+						if (Joybus.SetMType(i, 4) == 0) {
+							break;
+						}
+					}
+					if (retry >= 10) {
+						m_wmWorldState->m_nextMenuMode = 0;
+						m_wmWorldState->m_delay = 0;
+						Sound.PlaySe(4, 0x40, 0x7F, 0);
+					}
+#endif
 				}
 			}
 		}

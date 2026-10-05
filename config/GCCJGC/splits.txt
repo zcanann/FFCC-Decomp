@@ -84,3 +84,15 @@ pppChangeBGColor.cpp:
 
 pppPObjPoint.cpp:
 	.text start:0x8005FF58 end:0x8005FFEC
+
+MSL_C/PPCEABI/bare/H/ctype.c:
+	.text start:0x801B0768 end:0x801B078C
+	.data start:0x80238CD0 end:0x80238ED0
+
+MSL_C/PPCEABI/bare/H/e_fmod.c:
+	.text start:0x801B4B14 end:0x801B4E50
+	.rodata start:0x801DB890 end:0x801DB8A0
+
+MSL_C/PPCEABI/bare/H/signal.c:
+	.text start:0x801B3EE8 end:0x801B3FA8
+	.bss start:0x80348630 end:0x80348648

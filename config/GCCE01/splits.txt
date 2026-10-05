@@ -555,6 +555,7 @@ p_minigame.cpp:
 
 sound.cpp:
 	.text start:0x800C4860 end:0x800C82F0
+	.bss start:0x802F1688 end:0x802F396C
 
 textureman.cpp:
 	.sbss start:0x8032DCC0 end:0x8032DCC8
@@ -855,6 +856,7 @@ TRK_MINNOW_DOLPHIN/dispatch.c:
 
 memorycard.cpp:
 	.text start:0x800C1040 end:0x800C4660
+	.bss start:0x802F15E8 end:0x802F1684
 
 TRK_MINNOW_DOLPHIN/support.c:
 	.text start:0x801AA14C end:0x801AA860
@@ -1402,3 +1404,13 @@ auto_802432FC_bss:
 
 auto_8032E813_sdata2:
 	.sdata2 start:0x8032E813 end:0x8032E818 align:1
+
+auto_802F1684_bss:
+	.bss start:0x802F1684 end:0x802F1688 align:4
+
+auto_802F396C_bss:
+	.bss start:0x802F396C end:0x802F3970 align:4
+
+gx/GXPerf.c:
+	.text	start:0x801A60E0 end:0x801A62F0
+	.data	start:0x8021B99C end:0x8021B9F8

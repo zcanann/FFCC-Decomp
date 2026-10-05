@@ -489,6 +489,9 @@ void CMesMenu::CalcHeart()
  * JP Address: 0x8009A018
  * JP Size: 6028b
  */
+#ifdef VERSION_GCCJGC
+#include "src/mesmenu_jp.inc"
+#else
 void CMesMenu::onDraw()
 {
     if ((m_menuIndex == 0) &&
@@ -963,6 +966,7 @@ void CMesMenu::onDraw()
         break;
     }
 }
+#endif
 
 /*
  * --INFO--

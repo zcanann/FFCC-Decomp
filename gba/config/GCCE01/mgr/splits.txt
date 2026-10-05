@@ -313,8 +313,8 @@ config:
 field_gfx:
 	.rodata     start:0x0201C2FC end:0x020204C4 align:4
 
-regional_data:
-	.rodata     start:0x020204C4 end:0x02021F40
+font_gfx:
+	.rodata     start:0x020204C4 end:0x02021F40 align:4
 
 obj:
 	.ctors      start:0x02021F40 end:0x02021F44 align:1

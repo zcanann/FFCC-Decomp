@@ -40,8 +40,8 @@ inline
 #endif
 DSError TRKSendACK(TRKBuffer* buffer) {
 #ifdef VERSION_GCCJGC
-    int retries = 3;
     DSError err;
+    int retries = 3;
     do {
         err = TRKMessageSend(buffer);
         retries--;
@@ -96,18 +96,46 @@ DSError TRKDoConnect(TRKBuffer* buffer) {
     return TRKStandardACK(buffer, 0x80, DSREPLY_NoError);
 }
 
-/* 8036EBE4-8036EC5C 369524 0078+00 0/0 1/1 0/0 .text            TRKDoDisconnect */
+/*
+ * --INFO--
+ * PAL Address: 0x801AB0C8
+ * PAL Size: 120b
+ * EN Address: 0x801A9FAC
+ * EN Size: 120b
+ * JP Address: 0x801A71B8
+ * JP Size: 228b
+ */
 DSError TRKDoDisconnect(TRKBuffer* buffer) {
     TRKEvent event;
 
+#ifdef VERSION_GCCJGC
+    DSError err;
+
+    IsTRKConnected = FALSE;
+    err = TRKStandardACK(buffer, DSMSG_ReplyACK, DSREPLY_NoError);
+    if (err == DS_NoError) {
+        TRKConstructEvent(&event, 1);
+        TRKPostEvent(&event);
+    }
+    return err;
+#else
     IsTRKConnected = FALSE;
     TRKStandardACK(buffer, 0x80, DSREPLY_NoError);
     TRKConstructEvent(&event, 1);
     TRKPostEvent(&event);
     return DS_NoError;
+#endif
 }
 
-/* 8036EB8C-8036EBE4 3694CC 0058+00 0/0 1/1 0/0 .text            TRKDoReset */
+/*
+ * --INFO--
+ * PAL Address: 0x801AB070
+ * PAL Size: 88b
+ * EN Address: 0x801A9F54
+ * EN Size: 88b
+ * JP Address: 0x801A7100
+ * JP Size: 184b
+ */
 DSError TRKDoReset(TRKBuffer* buffer) {
     TRKStandardACK(buffer, 0x80, DSREPLY_NoError);
     __TRK_reset();

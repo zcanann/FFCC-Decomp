@@ -2405,10 +2405,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  * --INFO--
  * PAL Address: 0x8010CBC8
  * PAL Size: 2872b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010BF28
+ * EN Size: 2872b
+ * JP Address: 0x80108C18
+ * JP Size: 2856b
  */
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
@@ -2628,14 +2628,7 @@ checkParticle:
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
 					float rand0 = Math.RandFPM(60.0f);
 					float rand1 = Math.RandFPM(60.0f);
-					CVector randomOffset(rand1, 0.0f, rand0);
-					const CVector& randomBase = CVector(0.0f, 7.0f, 165.0f);
-					CVector randomResult;
-					PSVECAdd((Vec*)&randomBase, reinterpret_cast<Vec*>(&randomOffset), reinterpret_cast<Vec*>(&randomResult));
-					Vec randomPos;
-					randomPos.x = randomResult.x;
-					randomPos.y = randomResult.y;
-					randomPos.z = randomResult.z;
+					CVector randomPos = CVector(0.0f, 7.0f, 165.0f) + CVector(rand1, 0.0f, rand0);
 					CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
@@ -2689,9 +2682,8 @@ checkParticle:
 				for (; i < 2; i++) {
 					PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 					int side = (i == 0) ? 76 : -76;
-					const CVector& sidePos = CVector(static_cast<float>(side), 0.0f, 60.0f);
 					Vec offsetPos;
-					PSMTXMultVec(rotMtx, (Vec*)&sidePos, &offsetPos);
+					PSMTXMultVec(rotMtx, CVector(static_cast<float>(side), 0.0f, 60.0f), &offsetPos);
 					flatStorage.m_particleWorkPos.x = m_worldPosition.x + offsetPos.x;
 					flatStorage.m_particleWorkPos.y = m_worldPosition.y + offsetPos.y;
 					flatStorage.m_particleWorkPos.z = m_worldPosition.z + offsetPos.z;

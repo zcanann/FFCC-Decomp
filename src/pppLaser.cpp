@@ -59,16 +59,10 @@ void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
     Vec targetCursorPosB;
 
     work->m_length = 0.0f;
-    work->m_graphValue3 = zero;
-    work->m_graphValue2 = zero;
-    work->m_halfWidth = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_lengthStep = zero;
+    work->m_halfWidth = work->m_graphValue2 = work->m_graphValue3 = zero;
+    work->m_lengthStep = work->m_graphValue0 = work->m_graphValue1 = zero;
     work->m_points = 0;
-    work->m_origin.z = zero;
-    work->m_origin.y = zero;
-    work->m_origin.x = zero;
+    work->m_origin.x = work->m_origin.y = work->m_origin.z = zero;
 
     work->m_shapeReady = 0;
     work->m_hitFrame = 0;
@@ -112,15 +106,9 @@ void pppConstruct2Laser(pppLaser *laser, _pppCtrlTable *ctrlTable)
     f32 zero = 0.0f;
     LaserWork* work = reinterpret_cast<LaserWork*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_workOffset);
 
-    work->m_graphValue3 = 0.0f;
-    work->m_graphValue2 = zero;
-    work->m_halfWidth = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_lengthStep = zero;
-    work->m_origin.z = zero;
-    work->m_origin.y = zero;
-    work->m_origin.x = zero;
+    work->m_halfWidth = work->m_graphValue2 = work->m_graphValue3 = zero;
+    work->m_lengthStep = work->m_graphValue0 = work->m_graphValue1 = zero;
+    work->m_origin.x = work->m_origin.y = work->m_origin.z = zero;
     work->m_shapeReady = 0;
 }
 

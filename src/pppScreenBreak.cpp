@@ -269,9 +269,7 @@ void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
     ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
     VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
     float zero = kScreenBreakZero;
-    value->m_graphValue2 = zero;
-    value->m_graphValue1 = zero;
-    value->m_graphValue0 = zero;
+    value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
 }
 
 /*
@@ -298,12 +296,8 @@ void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
     model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
     value->m_pieces = 0;
     value->m_backBufferTexObj = 0;
-    value->m_extent.z = zero;
-    value->m_extent.y = zero;
-    value->m_extent.x = zero;
-    value->m_graphValue2 = zero;
-    value->m_graphValue1 = zero;
-    value->m_graphValue0 = zero;
+    value->m_extent.x = value->m_extent.y = value->m_extent.z = zero;
+    value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
     value->m_backBufferReady = 0;
     value->m_color.r = 0xFF;
     value->m_color.g = 0xFF;

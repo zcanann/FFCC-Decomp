@@ -1536,12 +1536,12 @@ inline void CMenuPcs::CalcMainMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x800fec40
+ * PAL Address: 0x800FEC40
  * PAL Size: 6552b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800FE13C
+ * EN Size: 6376b
+ * JP Address: 0x800FAE54
+ * JP Size: 6304b
  */
 void CMenuPcs::CalcMCardMenu()
 {
@@ -1741,8 +1741,10 @@ void CMenuPcs::CalcMCardMenu()
 			int chkResultInt = chkResult;
 			m_wmWorldState->m_mcResult = chkResultInt;
 			if (m_wmWorldState->m_mcResult < 0) {
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = 0xFF;
+#endif
 				m_wmWorldState->m_state0E = -1;
 				m_wmWorldState->m_counter1A = 10;
 			}
@@ -1859,24 +1861,34 @@ void CMenuPcs::CalcMCardMenu()
 		} else if (m_menuWindowInfo->state == 1
 		           && m_wmWorldState->m_counter1A == 0) {
 			if (subState == 0xD) {
+#if defined(VERSION_GCCP01)
 				GetMcCtrl()->Format(1);
 				m_wmWorldState->m_mcResult = (short)m_mcCtrl.m_lastResult;
+#else
+				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->Format(1);
+#endif
+#if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
+#endif
 			} else if (subState == 0x1A) {
 				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->EraseDat();
+#if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
+#endif
 			} else {
 				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->SaveDat();
+#if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
+#endif
 			}
 			if (m_wmWorldState->m_mcResult == 0) break;
 			if (m_wmWorldState->m_subState == 0x13) {
@@ -1912,10 +1924,12 @@ void CMenuPcs::CalcMCardMenu()
 			int listResInt = listRes;
 			m_wmWorldState->m_mcResult = listResInt;
 			if (m_wmWorldState->m_mcResult == 0) {
+#if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
+#endif
 				break;
 			}
 			if (m_wmWorldState->m_menuMode == 8) {
@@ -2110,12 +2124,12 @@ void CMenuPcs::InitSaveLoadMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x800fcfb4
+ * PAL Address: 0x800FCFB4
  * PAL Size: 7148b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800FC55C
+ * EN Size: 6976b
+ * JP Address: 0x800F92CC
+ * JP Size: 6888b
  */
 void CMenuPcs::CalcLoadMenu()
 {
@@ -2308,8 +2322,10 @@ void CMenuPcs::CalcLoadMenu()
 			short chkResult = (short)GetMcCtrl()->ChkEmpty(1);
 			m_wmWorldState->m_mcResult = chkResult;
 			if (m_wmWorldState->m_mcResult < 0) {
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = 0xFF;
+#endif
 				m_wmWorldState->m_state0E = -1;
 				m_wmWorldState->m_counter1A = 10;
 			}
@@ -2405,7 +2421,12 @@ void CMenuPcs::CalcLoadMenu()
 			int messType = 0;
 			int winType;
 			if (subState == 0xD) { winType = 7; }
-			else if (subState == 0x1A) { winType = 0x1A; messType = 1; }
+			else if (subState == 0x1A) {
+				winType = 0x1A;
+#if !defined(VERSION_GCCJGC)
+				messType = 1;
+#endif
+			}
 			else { winType = 9; }
 			short windowWidth;
 			short windowHeight;
@@ -2426,26 +2447,32 @@ void CMenuPcs::CalcLoadMenu()
 			if (subState == 0xD) {
 				short fmtRes = (short)GetMcCtrl()->Format(1);
 				m_wmWorldState->m_mcResult = fmtRes;
+#if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
+#endif
 			} else if (subState == 0x1A) {
 				short erRes = (short)GetMcCtrl()->EraseDat();
 				m_wmWorldState->m_mcResult = erRes;
+#if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
+#endif
 			} else {
 				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->LoadDat();
 			}
 
 			if (m_wmWorldState->m_mcResult != 0) {
+#if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
+#endif
 				if (m_wmWorldState->m_subState == 0x16) {
 					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
 						s_Serial = m_mcCtrl.GetSerial();
@@ -2534,8 +2561,10 @@ void CMenuPcs::CalcLoadMenu()
 			short listResult = m_wmWorldState->m_mcResult;
 			if (listResult == 0) {
 				if (listResult < 0) {
+#if defined(VERSION_GCCP01)
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
+#endif
 				}
 			} else {
 				int dataCount = 0;

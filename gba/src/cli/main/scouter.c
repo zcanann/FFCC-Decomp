@@ -8,6 +8,12 @@
 #include "window.h"
 #include "screen.h"
 
+#if defined(VERSION_GCCE01)
+#define SCOUTER_UNKNOWN "???"
+#else
+#define SCOUTER_UNKNOWN Msg_GetSystem(41)
+#endif
+
 static s8 sScouterRow;
 static s8 sScouterActive;
 static struct ScouterHit sScouterShown;
@@ -172,6 +178,15 @@ s32 ScouterScreen_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02015BE4
+ * PAL Size: 528b
+ * EN Address: 0x02015A28
+ * EN Size: 544b
+ * JP Address: 0x020194E4
+ * JP Size: 588b
+ */
 void ScouterScreen_PrintNextRow(void)
 {
     struct Window *win = &gWindows[1];
@@ -205,7 +220,7 @@ void ScouterScreen_PrintNextRow(void)
             Text_PrintNumber(sScouterShown.hp, x + 8, 3);
         } else {
             Text_SetX(x + 8);
-            Text_Print(Msg_GetSystem(41), TEXT_DRAW);
+            Text_Print(SCOUTER_UNKNOWN, TEXT_DRAW);
         }
         Text_Print(Msg_GetSystem(18), TEXT_DRAW);
         x = Text_GetX();
@@ -213,7 +228,7 @@ void ScouterScreen_PrintNextRow(void)
             Text_PrintNumber(item->maxHp, x + 8, 3);
         } else {
             Text_SetX(x + 8);
-            Text_Print(Msg_GetSystem(41), TEXT_DRAW);
+            Text_Print(SCOUTER_UNKNOWN, TEXT_DRAW);
         }
     } else if (sScouterRow <= 4) {
         if (item->traits[0] >= 0 && ((struct ScouterInfo *)LIST_BUF)[idx].traits[row - 2] >= 0) {
@@ -245,7 +260,7 @@ void ScouterScreen_PrintNextRow(void)
         Text_SetX(24);
         idx = item->dropItem;
         if (idx < 0)
-            Text_Print(Msg_GetSystem(41), TEXT_DRAW);
+            Text_Print(SCOUTER_UNKNOWN, TEXT_DRAW);
         else if (idx == 0)
             Text_Print(Msg_GetSystem(62), TEXT_DRAW);
         else

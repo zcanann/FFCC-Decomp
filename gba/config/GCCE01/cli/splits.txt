@@ -164,7 +164,13 @@ main/cmake:
 	.rodata     start:0x0201CD0C end:0x0201CE10 align:4
 
 regional_data:
-	.rodata     start:0x0201CE10 end:0x02028AD8
+	.rodata     start:0x0201CE10 end:0x0201CE18
+
+main/scouter:
+	.rodata     start:0x0201CE18 end:0x0201CE1C align:4
+
+regional_data:
+	.rodata     start:0x0201CE1C end:0x02028AD8
 
 main/obj:
 	.data       start:0x02028AD8 end:0x02028AF0 align:4
@@ -209,13 +215,22 @@ main/cmake:
 	.bss        start:0x03002780 end:0x030027AD align:8
 
 regional_bss:
-	.bss        start:0x030027AD end:0x030027C0 align:1
+	.bss        start:0x030027AD end:0x030027B0 align:1
+
+main/cmdlist:
+	.bss        start:0x030027B0 end:0x030027C0 align:4
 
 main/family:
 	.bss        start:0x030027C0 end:0x030027C2 align:4
 
 regional_bss:
-	.bss        start:0x030027C2 end:0x030027CC align:1
+	.bss        start:0x030027C2 end:0x030027C4 align:1
+
+main/equip:
+	.bss        start:0x030027C4 end:0x030027C9 align:4
+
+regional_bss:
+	.bss        start:0x030027C9 end:0x030027CC align:1
 
 main/item:
 	.bss        start:0x030027CC end:0x030027D6 align:4
@@ -239,7 +254,13 @@ main/gil:
 	.bss        start:0x030027FC end:0x0300280A align:4
 
 regional_bss:
-	.bss        start:0x0300280A end:0x03002840 align:1
+	.bss        start:0x0300280A end:0x0300280C align:1
+
+main/scouter:
+	.bss        start:0x0300280C end:0x03002814 align:4
+
+regional_bss:
+	.bss        start:0x03002814 end:0x03002840
 
 main/favorite:
 	.bss        start:0x03002840 end:0x0300284A align:8

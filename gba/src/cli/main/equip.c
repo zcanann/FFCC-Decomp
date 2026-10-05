@@ -520,6 +520,15 @@ void EquipScreen_SetSlot(s32 id)
     Link_SendEquipSlot(slot, id);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02010420
+ * PAL Size: 412b
+ * EN Address: 0x02010324
+ * EN Size: 402b
+ * JP Address: 0x02015058
+ * JP Size: 420b
+ */
 void EquipScreen_PrintDesc(void)
 {
     struct Window *win;
@@ -588,7 +597,9 @@ void EquipScreen_PrintDesc(void)
             msg = 39;
             if (i)
                 msg = 40;
+#if !defined(VERSION_GCCE01)
             Text_AddX(8);
+#endif
             Text_Print(Msg_GetSystem(msg), TEXT_DRAW);
             offset = Text_GetX();
             if (item->count <= 9)

@@ -457,6 +457,15 @@ void CmdListScreen_BuildCandidates(void)
     sCmdCandidateCount = n + 1;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200ECA8
+ * PAL Size: 96b
+ * EN Address: 0x0200EBD8
+ * EN Size: 90b
+ * JP Address: 0x0200AB9C
+ * JP Size: 90b
+ */
 s32 CmdList_GetSlotType(s32 row)
 {
     s32 id;
@@ -465,7 +474,10 @@ s32 CmdList_GetSlotType(s32 row)
         return 0;
     if (row >= gSession.cmdSlotCount || (id = (s16)gSession.cmdSlots[row]) < 0)
         return -1;
-    if (id < 64) {
+#if defined(VERSION_GCCP01)
+    if (id < 64)
+#endif
+    {
         id = Session_GetItemCategory(id);
         if (id == 3)
             return 1;
@@ -606,6 +618,15 @@ s32 CmdList_GetSlotItem(s32 row)
     return id;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200F0CC
+ * PAL Size: 636b
+ * EN Address: 0x0200EFF8
+ * EN Size: 626b
+ * JP Address: 0x0200AFB4
+ * JP Size: 646b
+ */
 void CmdListScreen_PrintDesc(void)
 {
     struct Window *win;
@@ -681,7 +702,9 @@ void CmdListScreen_PrintDesc(void)
                 msg = 39;
                 if (idx)
                     msg = 40;
+#if !defined(VERSION_GCCE01)
                 Text_AddX(8);
+#endif
                 Text_Print(Msg_GetSystem(msg), TEXT_DRAW);
                 idx = Text_GetX();
                 if (item->count <= 9)

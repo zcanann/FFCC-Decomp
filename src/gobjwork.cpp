@@ -470,17 +470,21 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 
 /*
  * --INFO--
- * PAL Address: 0x800a2290
+ * PAL Address: 0x800A2290
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A1B70
+ * EN Size: 148b
+ * JP Address: 0x800A0234
+ * JP Size: 148b
  */
 void CCaravanWork::FGUseItem(int itemIdx, int updateJoybus)
 {
 	int used = static_cast<CGPartyObj*>(m_ownerObj)->useItem(static_cast<short>(m_inventoryItems[itemIdx]));
-	if ((used != 0) && ((short)m_inventoryItems[itemIdx] != -1)) {
+	if ((used != 0)
+#ifdef VERSION_GCCP01
+	    && ((short)m_inventoryItems[itemIdx] != -1)
+#endif
+	) {
 		m_inventoryItems[itemIdx] = 0xFFFF;
 		m_inventoryItemCount--;
 		if (updateJoybus != 0) {
@@ -491,17 +495,21 @@ void CCaravanWork::FGUseItem(int itemIdx, int updateJoybus)
 
 /*
  * --INFO--
- * PAL Address: 0x800a21f0
+ * PAL Address: 0x800A21F0
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A1ADC
+ * EN Size: 148b
+ * JP Address: 0x800A01A0
+ * JP Size: 148b
  */
 void CCaravanWork::FGPutItem(int itemIdx, int updateJoybus)
 {
 	int put = static_cast<CGPartyObj*>(m_ownerObj)->putItem(static_cast<short>(m_inventoryItems[itemIdx]));
-	if ((put != 0) && ((short)m_inventoryItems[itemIdx] != -1)) {
+	if ((put != 0)
+#ifdef VERSION_GCCP01
+	    && ((short)m_inventoryItems[itemIdx] != -1)
+#endif
+	) {
 		m_inventoryItems[itemIdx] = 0xFFFF;
 		m_inventoryItemCount--;
 		if (updateJoybus != 0) {

@@ -22,7 +22,7 @@ extern DBInterface* __DBInterface;
 
 void DBInit(void);
 void DBInitComm(int* inputFlagPtr, int* mtrCallback);
-static void __DBExceptionDestination(void);
+void __DBExceptionDestination(void);
 BOOL __DBIsExceptionMarked(__OSException exception);
 void DBPrintf(char* format, ...);
 

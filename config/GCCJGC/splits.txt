@@ -206,3 +206,17 @@ MSL_C/PPCEABI/bare/H/math_ppc.c:
 MSL_C/PPCEABI/bare/H/mbstring.c:
 	.text start:0x801B18F0 end:0x801B1A08
 	.sdata2 start:0x8034FD48 end:0x8034FD4C
+
+os/OSAlloc.c:
+	.text start:0x80176EE4 end:0x801771F4
+	.sdata start:0x8034B878 end:0x8034B87C
+	.sbss start:0x8034BD48 end:0x8034BD58
+
+db/db.c:
+	.text start:0x80175BA4 end:0x80175C90
+	.data start:0x80232010 end:0x80232028
+	.sbss start:0x8034BCF8 end:0x8034BD00
+
+axfx/axfx.c:
+	.text start:0x80190EEC end:0x80190F48
+	.sdata start:0x8034B948 end:0x8034B950

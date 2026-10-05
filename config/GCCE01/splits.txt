@@ -273,3 +273,17 @@ TRK_MINNOW_DOLPHIN/mslsupp.c:
 MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
 	.text start:0x801B8020 end:0x801B80F0
 	.sbss start:0x8032E378 end:0x8032E37C
+
+os/OSAlloc.c:
+	.text start:0x8017B838 end:0x8017BB48
+	.sdata start:0x8032DA70 end:0x8032DA74
+	.sbss start:0x8032DF48 end:0x8032DF58
+
+db/db.c:
+	.text start:0x8017A4F8 end:0x8017A5E4
+	.data start:0x802155D8 end:0x802155F0
+	.sbss start:0x8032DEF8 end:0x8032DF00
+
+axfx/axfx.c:
+	.text start:0x801958A8 end:0x80195904
+	.sdata start:0x8032DB40 end:0x8032DB48

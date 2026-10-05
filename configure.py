@@ -822,7 +822,7 @@ config.libs = [
             Object(Matching, "os/OS.c"),
             Object(Matching, "os/OSAddress.c"),
             Object(Matching, "os/OSAlarm.c"),
-            Object(Matching, "os/OSAlloc.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSAlloc.c"),
             Object(Matching, "os/OSArena.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSAudioSystem.c"),
             Object(Matching, "os/OSCache.c"),
@@ -863,7 +863,7 @@ config.libs = [
     DolphinLib(
         "db",
         [
-            Object(Matching, "db/db.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "db/db.c"),
         ],
     ),
     {
@@ -941,7 +941,7 @@ config.libs = [
     DolphinLib(
         "axfx",
         [
-            Object(Matching, "axfx/axfx.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axfx/axfx.c"),
             Object(Matching, "axfx/chorus.c"),
             Object(Matching, "axfx/delay.c"),
             Object(Matching, "axfx/reverb_hi.c",

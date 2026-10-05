@@ -19,10 +19,10 @@ struct HeapDesc {
     Cell* allocated;
 };
 
-void* ArenaEnd;
-void* ArenaStart;
-int NumHeaps;
-HeapDesc* HeapArray;
+static HeapDesc* HeapArray;
+static int NumHeaps;
+static void* ArenaStart;
+static void* ArenaEnd;
 volatile int __OSCurrHeap = -1;
 
 static inline Cell* DLAddFront(Cell* neighbor, Cell* cell) {

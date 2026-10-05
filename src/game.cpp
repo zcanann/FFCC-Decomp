@@ -384,8 +384,8 @@ void CGame::Exec()
  * PAL Size: 408b
  * EN Address: 0x8001545C
  * EN Size: 408b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80015064
+ * JP Size: 396b
  */
 void CGame::Create()
 {
@@ -461,8 +461,8 @@ void CGame::Destroy()
  * PAL Size: 212b
  * EN Address: 0x80015368
  * EN Size: 212b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80014F7C
+ * JP Size: 200b
  */
 void CGame::InitNewGame()
 {
@@ -613,8 +613,8 @@ inline void CGame::clearWorkScript()
  * PAL Size: 648b
  * EN Address: 0x80014E44
  * EN Size: 648b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80014A68
+ * JP Size: 632b
  */
 void CGame::CheckScriptChange()
 {
@@ -919,12 +919,8 @@ void CGame::Calc()
         m_gameWork.m_frameCounter++;
     }
 
-    m_partyBound.m_min.z = 1.0E+10f;
-    m_partyBound.m_min.y = 1.0E+10f;
-    m_partyBound.m_min.x = 1.0E+10f;
-    m_partyBound.m_max.z = -1.0E+10f;
-    m_partyBound.m_max.y = -1.0E+10f;
-    m_partyBound.m_max.x = -1.0E+10f;
+    m_partyBound.m_min.x = m_partyBound.m_min.y = m_partyBound.m_min.z = 1.0E+10f;
+    m_partyBound.m_max.x = m_partyBound.m_max.y = m_partyBound.m_max.z = -1.0E+10f;
 
     for (int i = 0; i < 4; i++) {
         CGPartyObj* partyObj = m_partyObjArr[i];

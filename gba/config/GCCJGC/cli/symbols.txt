@@ -921,7 +921,7 @@ sSmithListValid = .bss:0x03002824; // type:object size:0x1 scope:local data:byte
 sSmithKnownLoaded = .bss:0x03002825; // type:object size:0x1 scope:local data:byte
 sSmithKnown = .bss:0x03002828; // type:object size:0x10 scope:local data:byte
 gLetterText_Jp = .data:0x02025C18; // type:object size:0x38
-letter_strings = .rodata:0x0201CBA4; // type:object size:0xCC literal data:byte
+letter_strings = .rodata:0x0201CBA4; // type:object size:0xD4 literal data:byte
 
 sCmdCandidates = .bss:0x03002774; // type:object size:0x4 scope:local data:byte
 sCmdCandidateCount = .bss:0x03002778; // type:object size:0x2 scope:local data:byte

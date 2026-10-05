@@ -39,7 +39,9 @@ void LetterRead_PrintNextLine(void);
 void LetterRead_DrawAttachIcon(void);
 void LetterGift_DrawIcons(void);
 s32 LetterGift_HandleInput(void);
+#if !defined(VERSION_GCCJGC)
 void Letter_BuildText(char *, s32);
+#endif
 s32 LetterGift_CanGive(s32 idx);
 void LetterGift_PrintItem(s32 idx, s32 row);
 s32 Str_CountLines(s8 *str);
@@ -105,10 +107,12 @@ struct ScreenFuncs gLetterReadStates[] = {
     { LetterAttach_Init, LetterAttach_Main, LetterAttach_Exit },
 };
 
+#if !defined(VERSION_GCCJGC)
 const char sSpaceText[] = " ";
 const char sQuestionText[] = "?";
 #if !defined(VERSION_GCCE01)
 const char sPeriodText[] = ".";
+#endif
 #endif
 
 void LetterScreen_Setup(void)
@@ -664,52 +668,117 @@ s32 LetterGift_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02012120
+ * PAL Size: 580b
+ * EN Address: 0x02012014
+ * EN Size: 578b
+ * JP Address: 0x0200D194
+ * JP Size: 1080b
+ */
 s32 LetterSend_Init(void)
 {
-    struct Window *win = gWindows;
+#if defined(VERSION_GCCJGC)
+    s32 *hdr = (s32 *)LIST_BUF;
+    struct LetterEntry *entry = LETTER_ENTRIES;
+    s32 w = hdr[1] * 24;
+    char *names = (char *)(entry + hdr[0]) + w;
+    char *p;
+    char *nl;
+#endif
+    struct Window *win;
     char buf[256];
+#if !defined(VERSION_GCCJGC)
     s32 w;
+#endif
     s32 len;
     s32 n;
     s32 i;
     s32 row;
     s32 ret;
 
+#if defined(VERSION_GCCJGC)
+    entry += sLetterSel;
+#endif
+    win = gWindows;
     if (sLetterStateInit == 0) {
         memset(win, 0, sizeof(struct Window));
         memset(buf, 0, sizeof(buf));
+#if defined(VERSION_GCCJGC)
+        p = names + entry->sender * 16;
+        memcpy(buf, p, 16);
+        strcat(buf, Msg_GetLetter(5));
+#else
         Letter_BuildText(buf, 0);
+#endif
         Text_SetFill(1, 0);
         Text_Clear();
         Text_Print(buf, TEXT_DRAW);
         w = Text_GetX();
         memset(buf, 0, sizeof(buf));
+#if defined(VERSION_GCCJGC)
+        p = (char *)DETAIL_BUF;
+        p = strlen(p) + (char *)(DETAIL_BUF + 1);
+        for (i = 0; i < sLetterAnswer; i++) {
+            nl = strchr(p, '\n');
+            if (nl)
+                p = nl + 1;
+            else
+                break;
+        }
+        strcpy(buf, Msg_GetLetter(2));
+        nl = strchr(p, '\n');
+        if (nl) {
+            n = nl - p;
+            memcpy(buf + strlen(buf), p, n);
+        } else {
+            strcat(buf, p);
+        }
+        strcat(buf, Msg_GetLetter(3));
+        strcat(buf, Msg_GetLetter(6));
+#else
         Letter_BuildText(buf, 1);
-        len = Text_Print(buf, TEXT_WIDTH);
-        if (len > w)
-            w = len;
-        len = Text_Print(Msg_GetLetter(7), TEXT_WIDTH);
-        if (len > w)
-            w = len;
+#endif
+        n = Text_Print(buf, TEXT_WIDTH);
+        if (n > w)
+            w = n;
+        n = Text_Print(Msg_GetLetter(7), TEXT_WIDTH);
+        if (n > w)
+            w = n;
+#if defined(VERSION_GCCJGC)
+        memset(buf, 0, sizeof(buf));
+        if (sLetterAttachType & 0x10) {
+            IntToStr(buf, sLetterAttachValue);
+            strcat(buf, "\203M\203\213");
+        } else {
+            strcat(buf, Msg_GetItemName((u16)sLetterAttachValue));
+        }
+        strcat(buf, Msg_GetLetter(13));
+        n = Text_Print(buf, TEXT_WIDTH);
+        if (n > w)
+            w = n;
+#else
         if (sLetterAttachType & 0x18) {
             memset(buf, 0, sizeof(buf));
             Letter_BuildText(buf, 2);
-            len = Text_Print(buf, TEXT_WIDTH);
-            if (len > w)
-                w = len;
+            n = Text_Print(buf, TEXT_WIDTH);
+            if (n > w)
+                w = n;
         }
-        n = w >> 3;
+#endif
+        len = w >> 3;
         if (w & 7)
-            n++;
-        w = n;
+            len++;
+        w = len;
         win->active = 1;
         win->x = (28 - w) >> 1;
         win->y = 2;
-        n = sLetterAttachType ? 6 : 5;
-        win->rows = n;
-        win->cursor = n - 2;
+        len = sLetterAttachType ? 6 : 5;
+        win->rows = len;
+        win->cursor = len - 2;
         win->width = w + 2;
-        win->height = n * 2 + 2;
+        win->height = len * 2 + 2;
         win->style = 0;
         win->variant = 0;
         win->bg = 2;
@@ -732,12 +801,44 @@ s32 LetterSend_Init(void)
     if (row != 0 && row < win->rows) {
         memset(buf, 0, sizeof(buf));
         if (row == 1) {
+#if defined(VERSION_GCCJGC)
+            p = (char *)DETAIL_BUF;
+            p = strlen(p) + (char *)(DETAIL_BUF + 1);
+            for (i = 0; i < sLetterAnswer; i++) {
+                nl = strchr(p, '\n');
+                if (nl)
+                    p = nl + 1;
+                else
+                    break;
+            }
+            strcpy(buf, Msg_GetLetter(2));
+            nl = strchr(p, '\n');
+            if (nl) {
+                n = nl - p;
+                memcpy(buf + strlen(buf), p, n);
+            } else {
+                strcat(buf, p);
+            }
+            strcat(buf, Msg_GetLetter(3));
+            strcat(buf, Msg_GetLetter(6));
+#else
             Letter_BuildText(buf, 1);
+#endif
             Text_Print(buf, TEXT_DRAW);
         }
         if (sLetterAttachType && row <= 3) {
             if (row == 2) {
+#if defined(VERSION_GCCJGC)
+                if (sLetterAttachType & 0x10) {
+                    IntToStr(buf, sLetterAttachValue);
+                    strcat(buf, "\203M\203\213");
+                } else {
+                    strcat(buf, Msg_GetItemName((u16)sLetterAttachValue));
+                }
+                strcat(buf, Msg_GetLetter(13));
+#else
                 Letter_BuildText(buf, 2);
+#endif
                 Text_Print(buf, TEXT_DRAW);
             } else if (row == 3) {
                 Text_Print(Msg_GetLetter(7), TEXT_DRAW);
@@ -2089,6 +2190,7 @@ void LetterGift_PrintItem(s32 idx, s32 row)
  * JP Address: TODO
  * JP Size: TODO
  */
+#if !defined(VERSION_GCCJGC)
 void Letter_BuildText(char *buf, s32 type)
 {
     s32 *hdr = (s32 *)LIST_BUF;
@@ -2177,3 +2279,4 @@ void Letter_BuildText(char *buf, s32 type)
             strcat(buf, Msg_GetLetter(13));
     }
 }
+#endif

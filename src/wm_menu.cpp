@@ -3333,19 +3333,17 @@ void CMenuPcs::DrawMCardMenu()
 	DrawMCList();
 
 	if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_subState >= 0x11) {
-		const float* pD8 = &FLOAT_803314D8;
-		const double* pCursOff = &DOUBLE_803317D8;
-		const float* p32c = &FLOAT_80331410;
-		cursorY = (float)((double)*pD8 - *pCursOff);
-		float cursorXbase = *pD8 + *p32c;
-		unsigned int saveIdx;
+		cursorY = FLOAT_803314D8;
+		cursorX = cursorY;
+		cursorY = (float)((double)cursorY - DOUBLE_803317D8);
+		cursorX += FLOAT_80331410;
+		int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {
-			saveIdx = (unsigned int)m_wmWorldState->m_cardChannel;
+			saveIdx = m_wmWorldState->m_cardChannel;
 		} else {
-			saveIdx = (unsigned int)m_mcCtrl.GetDno();
+			saveIdx = m_mcCtrl.GetDno();
 		}
-		const double* pStride = &DOUBLE_80331498;
-		cursorX = (float)(*pStride * (double)(int)saveIdx + (double)cursorXbase);
+		cursorX += DOUBLE_80331498 * (double)saveIdx;
 		DrawCursor((int)cursorY, (int)cursorX, 1.0f);
 
 		DrawMcObj();
@@ -3660,7 +3658,7 @@ void CMenuPcs::DrawMCardMenu()
 				m_wmWorldState->m_nextMenuMode = 0;
 			}
 		}
-	} else if (m_wmWorldState->m_delay != 0) {
+	} else if (state == 2 && m_wmWorldState->m_delay != 0) {
 		m_wmWorldState->m_delay--;
 		if (m_wmWorldState->m_delay <= 0) {
 			m_wmWorldState->m_mainState++;

@@ -91,10 +91,10 @@ static void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
  * --INFO--
  * PAL Address: 0x8012d458
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012C788
+ * EN Size: 168b
+ * JP Address: 0x801293B0
+ * JP Size: 168b
  */
 void pppRenderScreenBreak(pppScreenBreak* screenBreak, PScreenBreak*, _pppCtrlTable* ctrl)
 {
@@ -115,10 +115,10 @@ void pppRenderScreenBreak(pppScreenBreak* screenBreak, PScreenBreak*, _pppCtrlTa
  * --INFO--
  * PAL Address: 0x8012d500
  * PAL Size: 880b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012C830
+ * EN Size: 880b
+ * JP Address: 0x80129458
+ * JP Size: 880b
  */
 void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* step, _pppCtrlTable* ctrl)
 {
@@ -227,10 +227,10 @@ void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* step, _pppCt
  * --INFO--
  * PAL Address: 0x8012d870
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012CBA0
+ * EN Size: 156b
+ * JP Address: 0x801297C8
+ * JP Size: 156b
  */
 void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
 {
@@ -259,29 +259,27 @@ void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x8012d90c
  * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012CC3C
+ * EN Size: 36b
+ * JP Address: 0x80129864
+ * JP Size: 36b
  */
 void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
 {
     ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
     VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
     float zero = kScreenBreakZero;
-    value->m_graphValue2 = zero;
-    value->m_graphValue1 = zero;
-    value->m_graphValue0 = zero;
+    value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x8012d930
  * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012CC60
+ * EN Size: 208b
+ * JP Address: 0x80129888
+ * JP Size: 212b
  */
 void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
 {
@@ -298,12 +296,8 @@ void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
     model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
     value->m_pieces = 0;
     value->m_backBufferTexObj = 0;
-    value->m_extent.z = zero;
-    value->m_extent.y = zero;
-    value->m_extent.x = zero;
-    value->m_graphValue2 = zero;
-    value->m_graphValue1 = zero;
-    value->m_graphValue0 = zero;
+    value->m_extent.x = value->m_extent.y = value->m_extent.z = zero;
+    value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
     value->m_backBufferReady = 0;
     value->m_color.r = 0xFF;
     value->m_color.g = 0xFF;
@@ -315,10 +309,10 @@ void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x8012da00
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012CD30
+ * EN Size: 44b
+ * JP Address: 0x8012995C
+ * JP Size: 44b
  */
 static void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
@@ -329,10 +323,10 @@ static void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  * --INFO--
  * PAL Address: 0x8012da2c
  * PAL Size: 1020b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012CD5C
+ * EN Size: 1020b
+ * JP Address: 0x80129988
+ * JP Size: 916b
  */
 static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
 {
@@ -420,10 +414,10 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
  * --INFO--
  * PAL Address: 0x8012de28
  * PAL Size: 776b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012D158
+ * EN Size: 776b
+ * JP Address: 0x80129D1C
+ * JP Size: 776b
  */
 static void SB_DrawMeshDLCallback(CChara::CModel* model, void* workContext, void*, int meshIndex, int drawListIndex, float (*) [4])
 {
@@ -481,10 +475,10 @@ static void SB_DrawMeshDLCallback(CChara::CModel* model, void* workContext, void
  * --INFO--
  * PAL Address: 0x8012e130
  * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012D460
+ * EN Size: 296b
+ * JP Address: 0x8012A024
+ * JP Size: 296b
  */
 static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
@@ -511,10 +505,10 @@ static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], 
  * --INFO--
  * PAL Address: 0x8012e258
  * PAL Size: 900b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012D588
+ * EN Size: 900b
+ * JP Address: 0x8012A14C
+ * JP Size: 908b
  */
 static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext, void* stepContext)
 {

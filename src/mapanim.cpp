@@ -16,10 +16,10 @@ static const char s_mapanim_cpp[] = "mapanim.cpp";
  * --INFO--
  * PAL Address: 0x8004a4a0
  * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004A294
+ * EN Size: 24b
+ * JP Address: 0x80049CB8
+ * JP Size: 24b
  */
 void CMapAnimRun::Start(int startFrame, int endFrame, int loop)
 {
@@ -33,10 +33,10 @@ void CMapAnimRun::Start(int startFrame, int endFrame, int loop)
  * --INFO--
  * PAL Address: 0x8004a4b8
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004A2AC
+ * EN Size: 168b
+ * JP Address: 0x80049CD0
+ * JP Size: 168b
  */
 void CMapAnimRun::Calc(long frame)
 {
@@ -69,10 +69,10 @@ checkStart:
  * --INFO--
  * PAL Address: 0x8004a560
  * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004A354
+ * EN Size: 120b
+ * JP Address: 0x80049D78
+ * JP Size: 120b
  */
 void CMapAnim::Calc(long frame)
 {
@@ -183,10 +183,10 @@ inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAn
  * --INFO--
  * PAL Address: 0x8004a5d8
  * PAL Size: 728b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004A3CC
+ * EN Size: 728b
+ * JP Address: 0x80049DF0
+ * JP Size: 728b
  */
 void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
 {
@@ -210,10 +210,10 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
  * --INFO--
  * PAL Address: 0x8004a8b0
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004A6A4
+ * EN Size: 192b
+ * JP Address: 0x8004A0C8
+ * JP Size: 192b
  */
 CMapAnim::~CMapAnim()
 {
@@ -233,10 +233,10 @@ CMapAnim::~CMapAnim()
  * --INFO--
  * PAL Address: 0x8004a970
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004A764
+ * EN Size: 68b
+ * JP Address: 0x8004A188
+ * JP Size: 68b
  */
 CMapAnim::CMapAnim()
 {
@@ -302,10 +302,10 @@ inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* keys, int trackCount, in
  * --INFO--
  * PAL Address: 0x8004a9b4
  * PAL Size: 996b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004A7A8
+ * EN Size: 996b
+ * JP Address: 0x8004A1CC
+ * JP Size: 996b
  */
 void CMapAnimNode::Interp(int frame)
 {
@@ -322,10 +322,10 @@ void CMapAnimNode::Interp(int frame)
  * --INFO--
  * PAL Address: 0x8004ad98
  * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004AB8C
+ * EN Size: 148b
+ * JP Address: 0x8004A5B0
+ * JP Size: 148b
  */
 CMapAnimKeyDt::~CMapAnimKeyDt()
 {

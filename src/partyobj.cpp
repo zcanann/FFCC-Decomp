@@ -278,7 +278,11 @@ static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 {
 	if (isGhostPartyTargetMode(self)) {
+#ifdef VERSION_GCCP01
 		return 5;
+#else
+		return 7;
+#endif
 	}
 
 	unsigned short anim;
@@ -1657,10 +1661,10 @@ void CGPartyObj::shouki()
  * --INFO--
  * PAL Address: 0x80120b94
  * PAL Size: 4112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8011fef4
+ * EN Size: 4112b
+ * JP Address: 0x8011ca7c
+ * JP Size: 4116b
  */
 void CGPartyObj::onFrameStat()
 {
@@ -1753,7 +1757,11 @@ void CGPartyObj::onFrameStat()
 			changeStat(1, 0, 0);
 		} else {
 			party.unk6D0++;
+#ifdef VERSION_GCCP01
 			if (party.unk6D0 >= 6) {
+#else
+			if (party.unk6D0 >= 8) {
+#endif
 				changeStat(6, 0, 0);
 			} else {
 				if ((Pad.GetButtonDown(m_animStateMisc) & 0x200) != 0) {
@@ -1776,7 +1784,11 @@ void CGPartyObj::onFrameStat()
 				h = chalice->m_worldPosition.y - m_worldPosition.y;
 			}
 
+#ifdef VERSION_GCCP01
 			if (m_stateFrame <= 0x0B) {
+#else
+			if (m_stateFrame <= 0x0E) {
+#endif
 				const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
 				m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
 				m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
@@ -1839,7 +1851,11 @@ void CGPartyObj::onFrameStat()
 		if (m_stateFrame == 0) {
 			reqAnim(0x29, 0, 0);
 		}
+#ifdef VERSION_GCCP01
 		if (m_stateFrame == 4) {
+#else
+		if (m_stateFrame == 5) {
+#endif
 			changeWeapon(party.pendingWeaponIndex, party.pendingWeaponItemId, 1);
 		}
 		if (isLoopAnim() != 0) {
@@ -1873,7 +1889,11 @@ void CGPartyObj::onFrameStat()
 				enableDamageCol(0);
 			}
 			if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
+#ifdef VERSION_GCCP01
 				if (m_subFrame >= 0x19) {
+#else
+				if (m_subFrame >= 0x1E) {
+#endif
 					playSe3D(0x30, 0x32, 0x96, 0, 0);
 				}
 				m_alpha = 1.0f;
@@ -1897,7 +1917,11 @@ void CGPartyObj::onFrameStat()
 			reqAnim(0x15, 0, 0);
 			enableDamageCol(0);
 		}
+#ifdef VERSION_GCCP01
 		if (m_stateFrame == 3 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+#else
+		if (m_stateFrame == 4 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+#endif
 			moveVectorHRot(FLOAT_80331AB8 + m_rotTargetY, FLOAT_80331a78, 1.0f, 10);
 		}
 		if (isLoopAnim() != 0) {
@@ -2088,8 +2112,8 @@ int CGPartyObj::getReplaceStat(int state)
  * PAL Size: 2560b
  * EN Address: 0x8013D870
  * EN Size: 2412b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8011bef4
+ * JP Size: 2432b
  */
 void CGPartyObj::statCharge()
 {
@@ -2132,7 +2156,11 @@ void CGPartyObj::statCharge()
 			endPSlotBit(8);
 			bonus(0x18, 0, 0);
 		}
+#ifdef VERSION_GCCP01
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
+#else
+		if (m_subFrame == 6 && m_comboItemState >= 0) {
+#endif
 			endPSlotBit(0x20);
 			CFlat.ResetParticleWork(
 			    (m_comboItemState + 0x1C + reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 5) | 0x400,
@@ -2733,14 +2761,18 @@ void CGPartyObj::checkTargetParticle()
  * PAL Size: 612b
  * EN Address: 0x8013F624
  * EN Size: 448b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8011a7e8
+ * JP Size: 612b
  */
 void CGPartyObj::moveCenterTargetParticle()
 {
 	int step = m_subFrame;
 
+#ifdef VERSION_GCCP01
 	if (step >= 5) {
+#else
+	if (step >= 6) {
+#endif
 		return;
 	}
 
@@ -2768,8 +2800,8 @@ void CGPartyObj::moveCenterTargetParticle()
  * PAL Size: 1348b
  * EN Address: 0x8013F7E4
  * EN Size: 1200b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8011a2a4
+ * JP Size: 1348b
  */
 void CGPartyObj::onStatMagic()
 {
@@ -2816,11 +2848,19 @@ void CGPartyObj::onStatMagic()
 				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->DelCmdListAndItem(PartyData(this).unk6BC, 1);
 			}
 		}
+#ifdef VERSION_GCCP01
 		if (m_subFrame == 8 && m_comboLinkCount != 0) {
+#else
+		if (m_subFrame == 10 && m_comboLinkCount != 0) {
+#endif
 			sendCombiToScript__10CGCharaObjFP10CGCharaObjii(this, reinterpret_cast<CGCharaObj*>(m_comboScriptArg), m_comboScriptMode);
 		}
 		moveCenterTargetParticle();
+#ifdef VERSION_GCCP01
 		if (m_subFrame >= 0x12) {
+#else
+		if (m_subFrame >= 0x16) {
+#endif
 			m_unk63CBits.m_bit80 = 1;
 		}
 		if (isLoopAnim() != 0) {
@@ -2875,10 +2915,10 @@ void CGPartyObj::onStatMagic()
  * --INFO--
  * PAL Address: 0x8011e1b4
  * PAL Size: 376b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8011d514
+ * EN Size: 376b
+ * JP Address: 0x8011a12c
+ * JP Size: 376b
  */
 void CGPartyObj::onStatDie()
 {
@@ -2900,12 +2940,20 @@ void CGPartyObj::onStatDie()
 				putParticleFromItem(0x220, 3, 0, &m_worldPosition);
 				changeSubStat(2);
 			}
+#ifdef VERSION_GCCP01
 		} else if (m_subFrame == 0x19) {
+#else
+		} else if (m_subFrame == 0x1E) {
+#endif
 			changeStat(0x22, 0, 0);
 		}
 		break;
 	case 2:
+#ifdef VERSION_GCCP01
 		if (m_subFrame >= 0xBB) {
+#else
+		if (m_subFrame >= 0xE1) {
+#endif
 			if (System.GetErrorLevel() >= 2U) {
 				System.Printf(const_cast<char*>(lbl_801DCCB0));
 			}
@@ -3125,10 +3173,10 @@ inline void CGPartyObj::statCarry()
  * --INFO--
  * PAL Address: 0x8011d710
  * PAL Size: 884b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8011ca70
+ * EN Size: 884b
+ * JP Address: 0x80119688
+ * JP Size: 884b
  */
 void CGPartyObj::statPut()
 {
@@ -3145,7 +3193,11 @@ void CGPartyObj::statPut()
 			h = chalice->m_worldPosition.y - m_worldPosition.y;
 		}
 
+#ifdef VERSION_GCCP01
 		if (m_stateFrame <= 0x0B) {
+#else
+		if (m_stateFrame <= 0x0E) {
+#endif
 			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
 			m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
 			m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
@@ -4703,8 +4755,8 @@ messageMenu:
  * PAL Size: 2332b
  * EN Address: 0x80143488
  * EN Size: 2532b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x801168fc
+ * JP Size: 2332b
  */
 void CGPartyObj::gpmMove()
 {
@@ -4925,7 +4977,11 @@ void CGPartyObj::gpmMove()
 		CGPartyObj::m_ghostWork.carrySpeed = newSpeed;
 
 		CGPartyObj::m_ghostWork.field08++;
+#ifdef VERSION_GCCP01
 		if (CGPartyObj::m_ghostWork.field08 == 4) {
+#else
+		if (CGPartyObj::m_ghostWork.field08 == 5) {
+#endif
 			CGPartyObj::m_ghostWork.field08 = 0;
 		}
 		return;
@@ -4968,11 +5024,12 @@ void CGPartyObj::gpmMove()
 		}
 	}
 
-	CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
 	{
+		int slot = 0;
+		CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
 		GhostPartyWork& ghostWork = CGPartyObj::m_ghostWork;
 		const int slotSel = CGPartyObj::m_ghostWork.slotSel;
-		for (int slot = 0; slot < 3; slot++) {
+		for (; slot < 3; slot++) {
 			if (slot == slotSel) {
 				ghostWork.counters[slot] = 0;
 			} else {

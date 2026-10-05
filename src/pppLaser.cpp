@@ -43,10 +43,10 @@ STATIC_ASSERT(offsetof(pppLaser, m_workArea) == 0x80);
  * --INFO--
  * PAL Address: 801766ec
  * PAL Size: 336b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80175668
+ * EN Size: 336b
+ * JP Address: 0x801713D8
+ * JP Size: 348b
  */
 void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
 {
@@ -59,16 +59,10 @@ void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
     Vec targetCursorPosB;
 
     work->m_length = 0.0f;
-    work->m_graphValue3 = zero;
-    work->m_graphValue2 = zero;
-    work->m_halfWidth = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_lengthStep = zero;
+    work->m_halfWidth = work->m_graphValue2 = work->m_graphValue3 = zero;
+    work->m_lengthStep = work->m_graphValue0 = work->m_graphValue1 = zero;
     work->m_points = 0;
-    work->m_origin.z = zero;
-    work->m_origin.y = zero;
-    work->m_origin.x = zero;
+    work->m_origin.x = work->m_origin.y = work->m_origin.z = zero;
 
     work->m_shapeReady = 0;
     work->m_hitFrame = 0;
@@ -102,25 +96,19 @@ void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
  * --INFO--
  * PAL Address: 801766a8
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80175624
+ * EN Size: 68b
+ * JP Address: 0x8017138C
+ * JP Size: 76b
  */
 void pppConstruct2Laser(pppLaser *laser, _pppCtrlTable *ctrlTable)
 {
     f32 zero = 0.0f;
     LaserWork* work = reinterpret_cast<LaserWork*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_workOffset);
 
-    work->m_graphValue3 = 0.0f;
-    work->m_graphValue2 = zero;
-    work->m_halfWidth = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_lengthStep = zero;
-    work->m_origin.z = zero;
-    work->m_origin.y = zero;
-    work->m_origin.x = zero;
+    work->m_halfWidth = work->m_graphValue2 = work->m_graphValue3 = zero;
+    work->m_lengthStep = work->m_graphValue0 = work->m_graphValue1 = zero;
+    work->m_origin.x = work->m_origin.y = work->m_origin.z = zero;
     work->m_shapeReady = 0;
 }
 
@@ -129,10 +117,10 @@ void pppConstruct2Laser(pppLaser *laser, _pppCtrlTable *ctrlTable)
  * --INFO--
  * PAL Address: 8017665c
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801755D8
+ * EN Size: 76b
+ * JP Address: 0x80171340
+ * JP Size: 76b
  */
 void pppDestructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
 {
@@ -149,10 +137,10 @@ void pppDestructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
  * --INFO--
  * PAL Address: 801760a0
  * PAL Size: 1468b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8017501C
+ * EN Size: 1468b
+ * JP Address: 0x80170D94
+ * JP Size: 1452b
  */
 extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable *ctrlTable)
 {
@@ -319,10 +307,10 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
  * --INFO--
  * PAL Address: 801754e0
  * PAL Size: 3008b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8017445C
+ * EN Size: 3008b
+ * JP Address: 0x8017017C
+ * JP Size: 3096b
  */
 extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable *ctrlTable)
 {

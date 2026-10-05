@@ -557,6 +557,13 @@ p_minigame.cpp:
 sound.cpp:
 	.text start:0x800C4860 end:0x800C82F0
 	.bss start:0x802F1688 end:0x802F396C
+	.ctors start:0x801D438C end:0x801D4390
+	extab start:0x800084F8 end:0x800086C4
+	extabindex start:0x8000EC5C end:0x8000EEF0
+	.rodata start:0x801D9FC8 end:0x801DA1F6
+	.data start:0x8020F3F0 end:0x8020F40C
+	.sdata start:0x8032D860 end:0x8032D870
+	.sdata2 start:0x8032FC98 end:0x8032FCEC
 
 textureman.cpp:
 	.sbss start:0x8032DCC0 end:0x8032DCC8
@@ -1419,3 +1426,172 @@ gx/GXPerf.c:
 pppMiasma.cpp:
 	.text start:0x80108D40 end:0x8010A4C8
 	.sdata2 start:0x803308D0 end:0x803308F8
+
+pppYmMiasma.cpp:
+	.text start:0x80090160 end:0x80090F38
+	.rodata start:0x801D8C08 end:0x801D8C18
+	.sdata2 start:0x8032F600 end:0x8032F630
+
+RedSound/RedSound.cpp:
+	.text start:0x801CB99C end:0x801CC85C
+	.ctors start:0x801D43B0 end:0x801D43B4
+	extab start:0x8000ABB8 end:0x8000AD70
+	extabindex start:0x800125A4 end:0x80012838
+	.rodata start:0x801E6E98 end:0x801E6FC0
+	.bss start:0x8032D150 end:0x8032D25C
+	.sbss start:0x8032E4A0 end:0x8032E4AC
+	.sdata2 start:0x80332D40 end:0x80332D55
+
+auto_8032D25C_bss:
+	.bss start:0x8032D25C end:0x8032D260 align:1
+
+auto_8032E4AC_sbss:
+	.sbss start:0x8032E4AC end:0x8032E4C0 align:1
+
+auto_80332D55_sdata2:
+	.sdata2 start:0x80332D55 end:0x80332D58 align:1
+
+auto_8020F40C_data:
+	.data start:0x8020F40C end:0x8020F410 align:1
+
+auto_801DA1F6_rodata:
+	.rodata start:0x801DA1F6 end:0x801DA1F8 align:1
+
+auto_8032FCEC_sdata2:
+	.sdata2 start:0x8032FCEC end:0x8032FCF0 align:1
+
+texanim.cpp:
+	.text start:0x80043B64 end:0x80044F6C
+	.rodata start:0x801D6A10 end:0x801D6AC0
+	.data start:0x801E8A98 end:0x801E8B10
+	.sdata start:0x8032D580 end:0x8032D5B8
+	.sdata2 start:0x8032EAF8 end:0x8032EB18
+
+mapanim.cpp:
+	.text start:0x8004A294 end:0x8004AFC4
+	.rodata start:0x801D6BF8 end:0x801D6C58
+	.data start:0x801E9308 end:0x801E9314
+	.sdata start:0x8032D620 end:0x8032D628
+	.sdata2 start:0x8032EC60 end:0x8032EC70
+
+maptexanim.cpp:
+	.text start:0x8004F704 end:0x800501F0
+	.rodata start:0x801D6DD8 end:0x801D6E20
+	.data start:0x801E9818 end:0x801E9830
+	.sdata start:0x8032D668 end:0x8032D678
+	.sdata2 start:0x8032ECF8 end:0x8032ED20
+
+auto_801E9314_data:
+	.data start:0x801E9314 end:0x801E9318
+
+auto_801E8A94_data:
+	.data start:0x801E8A94 end:0x801E8A98
+
+RedSound/RedDriver.cpp:
+	.text start:0x801BBE74 end:0x801BEE9C
+	.ctors start:0x801D43AC end:0x801D43B0
+	extab start:0x8000A2D0 end:0x8000A5A8
+	extabindex start:0x80011848 end:0x80011C8C
+	.rodata start:0x801E6638 end:0x801E6735
+	.bss start:0x8032A840 end:0x8032D14C
+	.sbss start:0x8032E398 end:0x8032E46C
+	.sdata2 start:0x80332CB8 end:0x80332CC5
+
+auto_8032D14C_bss:
+	.bss start:0x8032D14C end:0x8032D150 align:1
+
+auto_8032E46C_sbss:
+	.sbss start:0x8032E46C end:0x8032E470 align:1
+
+auto_80332CC5_sdata2:
+	.sdata2 start:0x80332CC5 end:0x80332CC8 align:1
+
+auto_801E6735_rodata:
+	.rodata start:0x801E6735 end:0x801E6738 align:1
+
+RedSound/RedMemory.cpp:
+	.text start:0x801BEE9C end:0x801BF560
+	extab start:0x8000A5A8 end:0x8000A5E8
+	extabindex start:0x80011C8C end:0x80011CEC
+	.rodata start:0x801E6738 end:0x801E6782
+	.sbss start:0x8032E470 end:0x8032E488
+	.sdata2 start:0x80332CC8 end:0x80332CD5
+
+auto_80332CD5_sdata2:
+	.sdata2 start:0x80332CD5 end:0x80332CD8 align:1
+
+auto_801E6782_rodata:
+	.rodata start:0x801E6782 end:0x801E6788 align:1
+
+RedSound/RedEntry.cpp:
+	.text start:0x801BF560 end:0x801C1F2C
+	extab start:0x8000A5E8 end:0x8000A750
+	extabindex start:0x80011CEC end:0x80011F08
+	.rodata start:0x801E6788 end:0x801E6CC4
+	.sdata2 start:0x80332CD8 end:0x80332CFB
+
+auto_801E6CC4_rodata:
+	.rodata start:0x801E6CC4 end:0x801E6CC8 align:1
+
+auto_80332CFB_sdata2:
+	.sdata2 start:0x80332CFB end:0x80332D00 align:1
+
+RedSound/RedExecute.cpp:
+	.text start:0x801C1F2C end:0x801C63E0
+	extab start:0x8000A750 end:0x8000A870
+	extabindex start:0x80011F08 end:0x800120B8
+	.data start:0x8021C7B0 end:0x8021D18E
+	.sdata start:0x8032DC10 end:0x8032DC14
+	.sbss start:0x8032E488 end:0x8032E49C
+	.sdata2 start:0x80332D00 end:0x80332D10
+
+auto_8021D18E_data:
+	.data start:0x8021D18E end:0x8021D190 align:1
+
+auto_8032DC14_sdata:
+	.sdata start:0x8032DC14 end:0x8032DC18 align:1
+
+auto_8032E49C_sbss:
+	.sbss start:0x8032E49C end:0x8032E4A0 align:1
+
+RedSound/RedCommand.cpp:
+	.text start:0x801C8FA0 end:0x801CA8A4
+	extab start:0x8000AAF0 end:0x8000AB70
+	extabindex start:0x80012478 end:0x80012538
+	.rodata start:0x801E6CC8 end:0x801E6DCB
+	.data start:0x8021DBD0 end:0x8021DCB0
+	.sdata2 start:0x80332D10 end:0x80332D25
+
+auto_801E6DCB_rodata:
+	.rodata start:0x801E6DCB end:0x801E6DD0 align:1
+
+auto_80332D25_sdata2:
+	.sdata2 start:0x80332D25 end:0x80332D28 align:1
+
+RedSound/RedStream.cpp:
+	.text start:0x801CA8A4 end:0x801CB99C
+	extab start:0x8000AB70 end:0x8000ABB8
+	extabindex start:0x80012538 end:0x800125A4
+	.rodata start:0x801E6DD0 end:0x801E6E96
+	.sdata2 start:0x80332D28 end:0x80332D3D
+
+auto_801E6E96_rodata:
+	.rodata start:0x801E6E96 end:0x801E6E98 align:1
+
+auto_80332D3D_sdata2:
+	.sdata2 start:0x80332D3D end:0x80332D40 align:1
+
+RedSound/RedMidiCtrl.cpp:
+	.text start:0x801C63E0 end:0x801C8FA0
+	extab start:0x8000A870 end:0x8000AAF0
+	extabindex start:0x800120B8 end:0x80012478
+	.data start:0x8021D190 end:0x8021DBD0
+
+auto_8021C7AC_data:
+	.data start:0x8021C7AC end:0x8021C7B0 align:1
+
+pppLaser.cpp:
+	.text start:0x8017445C end:0x801757B8
+
+pppScreenBreak.cpp:
+	.text start:0x8012C788 end:0x8012D90C

@@ -669,12 +669,12 @@ success:
 }
 /*
  * --INFO--
- * PAL Address: 0x801c0ec0
+ * PAL Address: 0x801C0EC0
  * PAL Size: 720b
- * EN Address: 0x80202de4
+ * EN Address: 0x801BFE28
  * EN Size: 720b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x801BC138
+ * JP Size: 720b
  */
 int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 {
@@ -723,8 +723,12 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 				return REDSOUND_WAVE_NO_NONE;
 			}
 
-			transferSize = RedWaveHeadGetToneSize(RedWaveHeadFromData(waveData));
-			work = RedWaveHeadGetTableSize(RedWaveHeadFromData(waveData));
+			transferSize = RedWaveHeadFromData(waveData)->m_toneCount;
+			transferSize *= REDSOUND_WAVE_TONE_ENTRY_SIZE;
+			work = RedWaveHeadFromData(waveData)->m_tableCount;
+			work *= REDSOUND_WAVE_TABLE_ENTRY_SIZE;
+			work += REDSOUND_WAVE_TABLE_ALIGN - 1;
+			work &= REDSOUND_WAVE_TABLE_ALIGN_MASK;
 			work += transferSize;
 			work += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			remainingWaveSize = RedWaveHeadFromData(waveData)->m_waveSize;

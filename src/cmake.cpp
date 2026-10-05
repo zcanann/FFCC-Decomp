@@ -2399,12 +2399,12 @@ inline void CMenuPcs::CmakeTribeOpen()
 
 /*
  * --INFO--
- * PAL Address: 0x801708b0
+ * PAL Address: 0x801708B0
  * PAL Size: 1080b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016F838
+ * EN Size: 1080b
+ * JP Address: 0x8016AC20
+ * JP Size: 1192b
  */
 int CMenuPcs::CmakeTribeCtrl()
 {
@@ -2454,14 +2454,15 @@ int CMenuPcs::CmakeTribeCtrl()
                 if (fieldSelect == 0) {
                     CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
                 } else {
-                    unsigned char* base = reinterpret_cast<unsigned char*>(&Game);
                     int slot;
                     for (slot = 0; slot < 8; ++slot) {
-                        if ((*reinterpret_cast<int*>(base + slot * 0xC30 + 0x1794) != 0) &&
-                            (*(base + slot * 0xC30 + 0x1F96) != 1) &&
-                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D0) == CmakeState(this)->m_select) &&
-                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D4) == CmakeState(this)->m_row) &&
-                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D2) == s_CmakeInfo.m_gender)) {
+                        if ((Game.m_caravanWorkArr[slot].m_shopState != 0) &&
+#ifndef VERSION_GCCJGC
+                            (Game.m_caravanWorkArr[slot].m_caravanLocalFlags != 1) &&
+#endif
+                            (Game.m_caravanWorkArr[slot].m_tribeId == CmakeState(this)->m_select) &&
+                            (Game.m_caravanWorkArr[slot].m_appearanceVariant == CmakeState(this)->m_row) &&
+                            (Game.m_caravanWorkArr[slot].m_genderFlag == s_CmakeInfo.m_gender)) {
                             break;
                         }
                     }
@@ -2693,12 +2694,12 @@ inline void CMenuPcs::CmakeJobOpen()
 
 /*
  * --INFO--
- * PAL Address: 0x8016fb38
+ * PAL Address: 0x8016FB38
  * PAL Size: 1156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016EAC0
+ * EN Size: 1156b
+ * JP Address: 0x80169EF4
+ * JP Size: 1108b
  */
 int CMenuPcs::CmakeJobCtrl()
 {
@@ -2721,46 +2722,42 @@ int CMenuPcs::CmakeJobCtrl()
     } else {
         if ((repeat & 0x8) != 0) {
             if ((CmakeState(this)->m_select % 4) != 0) {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 1);
+                CmakeState(this)->m_select -= 1;
             } else {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 3);
+                CmakeState(this)->m_select += 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
             if ((CmakeState(this)->m_select % 4) < 3) {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 1);
+                CmakeState(this)->m_select += 1;
             } else {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 3);
+                CmakeState(this)->m_select -= 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((repeat & 0x3) != 0) {
             if (CmakeState(this)->m_select <= 3) {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 4);
+                CmakeState(this)->m_select += 4;
             } else {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 4);
+                CmakeState(this)->m_select -= 4;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((repeat & 0xF) == 0) {
             if ((down & 0x100) != 0) {
-                unsigned char* group = reinterpret_cast<unsigned char*>(&Game);
-                int slot = 0;
-                for (int groupCount = 2; groupCount != 0; groupCount--) {
-                    for (int inner = 0; inner < 4; ++inner) {
-                        if ((slot != static_cast<int>(CmakeSlot(this))) &&
-                            (*reinterpret_cast<int*>(group + 0x1794) != 0) &&
-                            (*(group + 0x1F96) != 1) &&
-                            (*reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(CmakeState(this)->m_select))) {
-                            goto found;
-                        }
-                        group += 0xC30;
-                        ++slot;
+                int slot;
+                for (slot = 0; slot < 8; ++slot) {
+                    if (slot != CmakeSlot(this) &&
+                        Game.m_caravanWorkArr[slot].m_shopState != 0 &&
+#ifndef VERSION_GCCJGC
+                        Game.m_caravanWorkArr[slot].m_caravanLocalFlags != 1 &&
+#endif
+                        Game.m_caravanWorkArr[slot].m_jobType == CmakeState(this)->m_select) {
+                        break;
                     }
                 }
-            found:
 
                 if (slot < 8) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);

@@ -36,7 +36,11 @@ extern const char sPartPcsManagerClassName[] = "CManager";
 extern const char sPartPcsProcessClassName[] = "CProcess";
 extern const char sMiruraPdtPathFmt[] = "dvd/tina/stage%03d/mirura";
 extern const char sLocationTitlePdtPathFmt[] = "dvd/tina/stage%03d/title";
+#ifdef VERSION_GCCJGC
+extern const char sMenuPdtPathFmt[] = "dvd/menu/%s";
+#else
 extern const char sMenuPdtPathFmt[] = "dvd/%smenu/%s";
+#endif
 extern const char sMonsterPdtPathFmt[] = "dvd/tina/mon/m%03d";
 extern const char sMonsterVariantPdtPathFmt[] = "dvd/tina/mon/m%03d_%c";
 extern const char sFieldPdtPathFmt[] = "dvd/tina/stage%03d/fp%03d";
@@ -1183,10 +1187,10 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
  * --INFO--
  * PAL Address: 0x80052128
  * PAL Size: 392b
- * EN Address: 0x800615ac
- * EN Size: 308b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80051F1C
+ * EN Size: 392b
+ * JP Address: 0x80051998
+ * JP Size: 372b
  */
 int CPartPcs::LoadMenuPdt(char* fileName)
 {
@@ -1195,7 +1199,11 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     CMemory::CStage* stage;
     char path[0x100];
 
+#ifdef VERSION_GCCJGC
+    sprintf(path, sMenuPdtPathFmt, fileName);
+#else
     sprintf(path, sMenuPdtPathFmt, Game.GetLangString(), fileName);
+#endif
 
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = MenuPcs.m_stageF4;

@@ -1,5 +1,6 @@
 #include "global.h"
 
+#if !defined(VERSION_GCCJGC)
 #if defined(VERSION_GCCE01)
 #include "msg_monster_us.inc"
 #else
@@ -1008,4 +1009,5 @@ char *gMonsterNames_Es[] = {
     "Duende pr\xE1" "ct.",
 };
 
+#endif
 #endif

@@ -305,7 +305,9 @@ s32 Artifact_IsOwned(s32 idx)
 void ArtifactScreen_PrintDesc(void)
 {
     struct Window *win;
+#if !defined(VERSION_GCCJGC)
     char buf[68];
+#endif
     s32 n;
     char *str;
 
@@ -314,10 +316,18 @@ void ArtifactScreen_PrintDesc(void)
     win = &gWindows[1];
     n = sArtifactTop + win->cursor;
     if (Artifact_IsOwned(n)) {
+#if defined(VERSION_GCCJGC)
+        str = gItemDescs_Jp[n + 159];
+#else
         Msg_GetItemDesc(n + 159, buf);
         str = buf;
+#endif
     } else {
+#if defined(VERSION_GCCJGC)
+        str = Msg_GetSystem(42);
+#else
         str = Msg_GetSystem(0);
+#endif
     }
     Text_Print(str, TEXT_DRAW);
     HelpWin_CopyText(1, 1);

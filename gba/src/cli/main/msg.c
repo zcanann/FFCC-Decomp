@@ -58,6 +58,7 @@ extern char *gMonsterNames_It[];
 extern char *gMonsterNames_Fr[];
 extern char *gMonsterNames_Es[];
 
+#if !defined(VERSION_GCCJGC)
 #if defined(VERSION_GCCE01)
 #include "msg_desc_us.inc"
 #else
@@ -436,7 +437,6 @@ const s8 gItemDescIds[][2] = {
 const char sPlusText[] = "+";
 const char sTenText[] = "10";
 
-#if !defined(VERSION_GCCJGC)
 /*
  * --INFO--
  * PAL Address: 0x0201A6D4
@@ -683,14 +683,15 @@ char *Msg_GetLetter(s32 idx)
     return tbl[idx];
 }
 
+#if !defined(VERSION_GCCJGC)
 /*
  * --INFO--
  * PAL Address: 0x0201AAAC
  * PAL Size: 104b
  * EN Address: 0x0201A8D0
  * EN Size: 16b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: N/A (table lookup is inlined)
+ * JP Size: 0b
  */
 char *Msg_GetItemName(s32 idx)
 {
@@ -806,3 +807,4 @@ copy:
         }
     }
 }
+#endif

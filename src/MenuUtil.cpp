@@ -611,10 +611,17 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 }
 
+#ifdef VERSION_GCCJGC
+#include "src/MenuUtil_jp.inc"
+#else
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80179F90
+ * PAL Size: 52b
+ * EN Address: 0x80178E30
+ * EN Size: 52b
+ * JP Address: 0x80174F08
+ * JP Size: 2552b
  */
 void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXColor color, int tlut, float margin, float scaleY)
 {
@@ -624,6 +631,8 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
 		DrawHelpMessageUS(msgNo, font, posX, posY, color, tlut, margin, scaleY);
 	}
 }
+
+#endif
 
 /*
  * --INFO--

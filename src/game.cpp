@@ -56,6 +56,11 @@ const char s_townNameTipa[] = "Tipa";
 const char sGameStageName[] = "Game";
 }
 enum {
+#ifdef VERSION_GCCJGC
+	kGameStageSize = 0xE6000,
+#else
+	kGameStageSize = 0x106000,
+#endif
 	kGameWorkDataClearSize =
 	    sizeof(CGame::CGameWork) - offsetof(CGame::CGameWork, m_gameDataStartMarker),
 	kGameScriptSaveDataSize = 0x800,
@@ -105,13 +110,14 @@ inline CGame::CGame()
  * --INFO--
  * PAL Address: 0x8001600C
  * PAL Size: 476b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80015E58
+ * EN Size: 396b
+ * JP Address: 0x80015A54
+ * JP Size: 376b
  */
 void CGame::Init()
 {
+#ifdef VERSION_GCCP01
     int languageId;
 
     switch (static_cast<unsigned char>(OSGetLanguage())) {
@@ -137,6 +143,9 @@ void CGame::Init()
         break;
     }
     Game.m_gameWork.m_languageId = static_cast<unsigned char>(languageId);
+#elif defined(VERSION_GCCE01)
+    Game.m_gameWork.m_languageId = 1;
+#endif
 
     CameraPcs.Init();
     GraphicPcs.Init();
@@ -152,7 +161,7 @@ void CGame::Init()
     McPcs.Init();
     DbgMenuPcs.Init();
 
-    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(sGameStageName), 0);
+    m_mainStage = Memory.CreateStage(kGameStageSize, const_cast<char*>(sGameStageName), 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
         m_debugStage = Memory.CreateStage(0x220000, "GameDebug", 1);
     }
@@ -803,13 +812,21 @@ const char* CGame::GetLangString()
  * --INFO--
  * PAL Address: 0x80014B90
  * PAL Size: 364b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80014A28
+ * EN Size: 288b
+ * JP Address: 0x80014660
+ * JP Size: 268b
  */
 void CGame::loadCfd()
 {
+#ifdef VERSION_GCCJGC
+    static const char* tName[] = {
+        "dvd/cft/param.cfd",
+        "dvd/cft/c_system.cfd",
+        "dvd/cft/mail_tbl.cfd",
+        "dvd/cft/newbattle.cfd",
+    };
+#else
     static const char* tName[] = {
         "dvd/%scft/param.cfd",
         "dvd/%scft/c_system.cfd",
@@ -818,11 +835,16 @@ void CGame::loadCfd()
     };
 
     char path[0xFC];
+#endif
 
     for (int i = 0; i < 4; i++)
     {
+#ifdef VERSION_GCCJGC
+        CFile::CHandle* handle = File.Open(const_cast<char*>(tName[i]), 0, CFile::PRI_LOW);
+#else
         sprintf(path, tName[i], Game.GetLangString());
         CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
+#endif
 
         if (handle != nullptr)
         {

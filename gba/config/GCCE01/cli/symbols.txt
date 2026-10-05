@@ -1051,3 +1051,7 @@ msg_sys_strings = .rodata:0x0201CE24; // type:object size:0x1F1C literal data:by
 msg_item_strings = .rodata:0x0201ED40; // type:object size:0x18F5 literal data:byte
 msg_monster_strings = .rodata:0x0202082C; // type:object size:0x138C literal data:byte
 msg_desc_strings = .rodata:0x02021BB8; // type:object size:0x12C7 literal data:byte
+sTmpArtifactUnused = .bss:0x0300284C; // type:object size:0x1 scope:local data:byte
+sTmpArtifactRow = .bss:0x0300284E; // type:object size:0x1 scope:local data:byte
+sTmpArtifactQuit = .bss:0x0300284D; // type:object size:0x1 scope:local data:byte
+sTmpArtifactUnused2 = .bss:0x0300284F; // type:object size:0x1 scope:local data:byte

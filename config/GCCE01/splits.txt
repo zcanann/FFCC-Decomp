@@ -775,3 +775,12 @@ TRK_MINNOW_DOLPHIN/mem_TRK.c:
 
 mes.cpp:
 	.text start:0x80097B8C end:0x8009AC94
+
+TRK_MINNOW_DOLPHIN/msghndlr.c:
+	.text	start:0x801A90DC end:0x801AA14C
+	.rodata	start:0x801E5718 end:0x801E5900
+	.data	start:0x8021BE50 end:0x8021BE88
+	.bss start:0x803290F8 end:0x803290FC
+
+TRK_MINNOW_DOLPHIN/usr_put.c:
+	.text	start:0x801A8ED8 end:0x801A8F64

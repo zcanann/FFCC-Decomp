@@ -2,3 +2,6 @@
 # a constant offset that lands outside the referenced object.
 # FamilyScreen_PrintRow: relationNames[idx - 1], with row size 0x12 at offset 0xC.
 0x0200F6A4 gSession-0x6
+
+# Text_Print folds widths 1..8 into the eight-word mask table base.
+0x0201CF14 gNibbleMasks-0x4

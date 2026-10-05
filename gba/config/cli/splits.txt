@@ -152,10 +152,10 @@ main/xfer:
 	.rodata     start:0x0201CCF8 end:0x0201CD10
 
 main/link:
-	.rodata     start:0x0201CD10 end:0x0201CF14
+	.rodata     start:0x0201CD10 end:0x0201CF18
 
 main/textmask:
-	.rodata     start:0x0201CF14 end:0x0201CF38
+	.rodata     start:0x0201CF18 end:0x0201CF38
 
 main/artifact:
 	.rodata     start:0x0201CF38 end:0x0201CF3D
@@ -197,7 +197,10 @@ main/sound_data:
 	.rodata     start:0x0202F188 end:0x0202F2D8
 
 main/sound_assets_2:
-	.rodata     start:0x0202F2D8 end:0x0202FA20
+	.rodata     start:0x0202F2D8 end:0x0202F920
+
+regional_data:
+	.rodata     start:0x0202F920 end:0x0202FA20
 
 main/obj:
 	.data       start:0x0202FA20 end:0x0202FA38
@@ -249,7 +252,7 @@ main/text:
 	.bss        start:0x030008D8 end:0x03001164
 
 main/obj:
-	.bss        start:0x03001168 end:0x03002750
+	.bss        start:0x03001168 end:0x0300274A
 
 main/session:
 	.bss        start:0x03002750 end:0x03002771

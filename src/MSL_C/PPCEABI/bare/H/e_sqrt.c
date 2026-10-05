@@ -5,10 +5,10 @@
 
 /*
  * --INFO--
- * PAL Address: 0x801D677C
+ * PAL Address: 0x801BC15C
  * PAL Size: 548b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801BB03C
+ * EN Size: 548b
  * JP Address: TODO
  * JP Size: TODO
  */

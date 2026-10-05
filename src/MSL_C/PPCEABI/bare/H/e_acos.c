@@ -1,4 +1,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
+#if defined(VERSION_GCCJGC)
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
+#endif
 
 #ifndef NAN
 #define NAN (*(float*)__float_nan)

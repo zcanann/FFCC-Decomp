@@ -7,10 +7,11 @@
 gFontTilesLz:
 	.incbin "gFontTilesLz.bin"
 
-	.global lbl_02021B6C
+@ The first 14 palette banks are unused; Text_Init uploads the final two.
+	.global gUnusedFontPalettes
 	.balign 4
-lbl_02021B6C:
-	.incbin "lbl_02021B6C.bin"
+gUnusedFontPalettes:
+	.incbin "gUnusedFontPalettes.bin"
 
 	.global gFontPalette
 	.balign 4

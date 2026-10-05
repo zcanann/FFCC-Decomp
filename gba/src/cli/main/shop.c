@@ -9,6 +9,22 @@
 #include "screen.h"
 #include "lists.h"
 
+#if defined(VERSION_GCCE01)
+#define SHOP_CURRENCY_MSG 5
+#define SHOP_MENU_X 22
+#define SHOP_MENU_WIDTH 7
+#define SHOP_CONFIRM_X 8
+#define SHOP_ITEM_ICON_OFFSET 0
+#define SHOP_USE_ICON_OFFSET 4
+#else
+#define SHOP_CURRENCY_MSG 13
+#define SHOP_MENU_X 20
+#define SHOP_MENU_WIDTH 9
+#define SHOP_CONFIRM_X 6
+#define SHOP_ITEM_ICON_OFFSET 1
+#define SHOP_USE_ICON_OFFSET 5
+#endif
+
 static s8 sShopResult;
 static s8 sInfoItem;
 static s8 sShopRow;
@@ -50,6 +66,15 @@ void InfoWin_ClearRows(s32);
 void InfoWin_PrintNextRow(void);
 s32 InfoWin_IsDrawn(void);
 
+/*
+ * --INFO--
+ * PAL Address: 0x02015E48
+ * PAL Size: 228b
+ * EN Address: 0x02015C9C
+ * EN Size: 228b
+ * JP Address: 0x020151FC
+ * JP Size: 232b
+ */
 void ShopTopScreen_Setup(void)
 {
     s32 i;
@@ -59,10 +84,10 @@ void ShopTopScreen_Setup(void)
     DmaClear32(0, 0, gWindows, sizeof(struct Window) * 5);
     gWindows[0].active = 1;
     gWindows[0].cursor = gShopMenuPos[0];
-    gWindows[0].x = 20;
+    gWindows[0].x = SHOP_MENU_X;
     gWindows[0].y = 1;
     gWindows[0].rows = 3;
-    gWindows[0].width = 9;
+    gWindows[0].width = SHOP_MENU_WIDTH;
     gWindows[0].height = 8;
     gWindows[0].style = 1;
     gWindows[0].variant = 0;
@@ -192,6 +217,15 @@ s32 ShopTopScreen_HandleInput(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02016154
+ * PAL Size: 412b
+ * EN Address: 0x02015FA8
+ * EN Size: 412b
+ * JP Address: 0x0201550C
+ * JP Size: 408b
+ */
 void ShopList_Setup(void)
 {
     s32 i;
@@ -205,10 +239,10 @@ void ShopList_Setup(void)
     ListWin_Setup(1, 16, 0, 2);
     gWindows[2].active = 1;
     gWindows[2].cursor = 0;
-    gWindows[2].x = 6;
+    gWindows[2].x = SHOP_CONFIRM_X;
     gWindows[2].y = 14;
     gWindows[2].rows = 2;
-    gWindows[2].width = 9;
+    gWindows[2].width = SHOP_MENU_WIDTH;
     gWindows[2].height = 4;
     gWindows[2].style = 3;
     gWindows[2].variant = 0;
@@ -536,12 +570,22 @@ s32 ShopSellScreen_Init(void)
     return ShopBuyScreen_Init();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02016B28
+ * PAL Size: 472b
+ * EN Address: 0x0201697C
+ * EN Size: 416b
+ * JP Address: 0x02015EDC
+ * JP Size: 420b
+ */
 s32 ShopSellScreen_Main(void)
 {
     struct Window *win;
     s32 id;
     s32 ret;
 
+#if !defined(VERSION_GCCE01)
     if (!(gDataFlags & DATA_SELL_LIST)) {
         if (gKeysNew & B_BUTTON) {
             sShopResult = -1;
@@ -550,6 +594,7 @@ s32 ShopSellScreen_Main(void)
         }
         return 0;
     }
+#endif
     win = &gWindows[1];
     if (sShopRow < win->rows) {
         id = gSession.items[sShopRow];
@@ -613,6 +658,15 @@ s32 ShopSellScreen_Exit(void)
     return ShopBuyScreen_Exit();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02016D0C
+ * PAL Size: 380b
+ * EN Address: 0x02016B28
+ * EN Size: 368b
+ * JP Address: 0x0201608C
+ * JP Size: 352b
+ */
 void ShopList_DrawIcons(void)
 {
     struct BuyList *list;
@@ -651,7 +705,7 @@ void ShopList_DrawIcons(void)
         }
         t = Item_GetIcon(id);
         pal = Obj_GetPalette(0, t);
-        Obj_Draw(x - 1, y, 0, t, pal, win->bg, 0);
+        Obj_Draw(x - SHOP_ITEM_ICON_OFFSET, y, 0, t, pal, win->bg, 0);
     }
     if (gScreen != 1) {
         x = (win->x + 1) * 8;
@@ -660,7 +714,7 @@ void ShopList_DrawIcons(void)
         pal = Obj_GetPalette(2, t);
         for (i = 0; i < win->rows; i++, y += 16) {
             if (Session_IsItemInUse(i + sShopTop))
-                Obj_Draw(x - 5, y + 4, 2, t, pal, win->bg, 0);
+                Obj_Draw(x - SHOP_USE_ICON_OFFSET, y + 4, 2, t, pal, win->bg, 0);
         }
     }
 }
@@ -972,6 +1026,15 @@ void InfoWin_ClearRows(s32 mode)
     sInfoArrow = 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x020174F4
+ * PAL Size: 1372b
+ * EN Address: 0x02017304
+ * EN Size: 1372b
+ * JP Address: 0x02016848
+ * JP Size: 1404b
+ */
 void InfoWin_PrintNextRow(void)
 {
     char str[32];
@@ -1019,12 +1082,12 @@ void InfoWin_PrintNextRow(void)
         Text_CopyToVram(dst, win->width);
     } else if (sInfoRow == 1) {
         if ((gScreen == 1 && n > 0) || (gScreen == 2 && n > 158)) {
-            n = Text_Print(Msg_GetSystem(13), TEXT_WIDTH) + 72;
+            n = Text_Print(Msg_GetSystem(SHOP_CURRENCY_MSG), TEXT_WIDTH) + 72;
             i = (win->width - 2) * 8 - n;
             Text_SetX(i);
             n = sInfoItem;
             Text_PrintNumber(vals[n], i, 8);
-            Text_Print(Msg_GetSystem(13), TEXT_DRAW);
+            Text_Print(Msg_GetSystem(SHOP_CURRENCY_MSG), TEXT_DRAW);
         } else if (n > 0 && gScreen == 2 && n <= 158) {
             n = Text_Print(Msg_GetSystem(38), TEXT_WIDTH);
             i = (win->width - 2) * 8 - n;
@@ -1091,7 +1154,7 @@ void InfoWin_PrintNextRow(void)
                 Text_SetX(i >> 1);
                 Text_Print(Msg_GetSystem(14), TEXT_DRAW);
             } else if (sInfoRow == 3) {
-                strcpy(str, Msg_GetSystem(13));
+                strcpy(str, Msg_GetSystem(SHOP_CURRENCY_MSG));
                 strcat(str, sSlashText);
                 n = Text_Print(str, TEXT_WIDTH) + 72;
                 i = (win->width - 2) * 8 - n;
@@ -1099,14 +1162,14 @@ void InfoWin_PrintNextRow(void)
                 Text_PrintNumber(gSession.gil, i, 8);
                 Text_Print(str, TEXT_DRAW);
             } else if (sInfoRow == 4) {
-                strcpy(str, Msg_GetSystem(13));
+                strcpy(str, Msg_GetSystem(SHOP_CURRENCY_MSG));
                 strcat(str, sSlashText);
                 n = Text_Print(str, TEXT_WIDTH) + 72;
                 i = (win->width - 2) * 8 - n;
                 Text_SetX(i);
                 n = sInfoItem;
                 Text_PrintNumber(vals[n], i, 8);
-                Text_Print(Msg_GetSystem(13), TEXT_DRAW);
+                Text_Print(Msg_GetSystem(SHOP_CURRENCY_MSG), TEXT_DRAW);
             } else if (sInfoRow == 5) {
                 n = Text_Print(Msg_GetSystem(15), TEXT_WIDTH) + 18;
                 i = (win->width - 3) * 8 - n;
@@ -1268,6 +1331,15 @@ s32 InfoWin_IsDrawn(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02017CE0
+ * PAL Size: 272b
+ * EN Address: 0x02017AF0
+ * EN Size: 272b
+ * JP Address: 0x02017054
+ * JP Size: 272b
+ */
 void InfoWin_PrintTotal(void)
 {
     char buf[32];
@@ -1286,13 +1358,13 @@ void InfoWin_PrintTotal(void)
         p += 2;
     Text_SetFill(1, 2);
     Text_Clear();
-    strcpy(buf, Msg_GetSystem(13));
+    strcpy(buf, Msg_GetSystem(SHOP_CURRENCY_MSG));
     strcat(buf, sSlashText);
     w = Text_Print(buf, TEXT_WIDTH) + 72;
     x = (win->width - 2) * 8 - w;
     Text_SetX(x);
     Text_PrintNumber(((u32 *)p)[sInfoItem] * sShopQuantity, x, 8);
-    Text_Print(Msg_GetSystem(13), TEXT_DRAW);
+    Text_Print(Msg_GetSystem(SHOP_CURRENCY_MSG), TEXT_DRAW);
     Text_CopyToVram(dst, win->width);
     Text_Clear();
     dst += ofs;

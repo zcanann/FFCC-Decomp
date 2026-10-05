@@ -50,9 +50,6 @@ const u8 sShakeAmpTable[] = { 4, 4, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1 };
 const s8 sShakeOffsetTable[] = { 0, 0, 4, -4, 2, 3, -1, -4, 3, -2, 1, 2, -3, -1, 0, 0 };
 const char sMapLoadText[] = "MAP LOAD ";
 const char sPercentText[] = "%";
-extern const u16 gBackdropPalettes[];
-extern const u16 *gBackdropTiles[];
-extern const u16 *gBackdropMaps[];
 
 void AgbMain(void)
 {
@@ -256,98 +253,9 @@ void Header_Init(void)
     Header_Clear();
 }
 
-void Bg_LoadBackdrop(s32 no)
-{
-    u16 buf[40];
-    const u16 *tiles;
-    const u16 *pal;
-    const u16 *map;
-    s32 pal_no;
-    s32 x;
-    s32 y;
-    s32 w;
-    s32 h;
-    u32 size;
-    u32 dst;
-
-    w = 8;
-    h = 8;
-    tiles = gBackdropTiles[no];
-    pal_no = Link_GetPlayerNo();
-    if (gSpMode) {
-        pal_no += 4;
-    }
-    pal = &gBackdropPalettes[pal_no * 16];
-    map = gBackdropMaps[no];
-    DmaCopy16(3, tiles, 0x0600D7E0, 0x800);
-    DmaCopy16(3, pal, 0x05000000, 32);
-    size = 64;
-    for (y = 0; y < h; y++) {
-        for (x = 0; x < 32; x += w) {
-            memcpy(&buf[x], &map[y * w], 16);
-        }
-        for (x = 0; x < 32; x++) {
-            buf[x] += 0x2BF;
-        }
-        for (x = y; x < 32; x += h) {
-            dst = 0x0600F800 + x * size;
-            DmaCopy16(3, buf, dst, size);
-        }
-    }
-}
-
-void Bg_CopyBackdropToRadar(void)
-{
-    u16 buf[40];
-    s32 i;
-    s32 j;
-    s32 size;
-    s32 n;
-    u32 ofs;
-    u32 dst;
-
-    DmaCopy16(0, 0x0600D7E0, 0x06007060, 0x800);
-    size = 24;
-    for (i = 0; i < 16; i++) {
-        DmaCopy16(0, 0x0600F800 + i * 64 + 40, buf, size);
-        n = size / sizeof(u16);
-        for (j = 0; j < n; j++) {
-            buf[j] += 0xC4;
-        }
-        dst = 0x0600E800 + (i * 32 + 20) * 2;
-        DmaCopy16(0, buf, dst, size);
-    }
-    for (i = 16; i < 32; i++) {
-        ofs = i * 64;
-        DmaCopy16(0, 0x0600F800 + ofs, buf, 64);
-        for (j = 0; j < 32; j++) {
-            buf[j] += 0xC4;
-        }
-        dst = 0x0600E800 + ofs;
-        DmaCopy16(0, buf, dst, 64);
-    }
-}
-
-void Bg_ClearMaps(void)
-{
-    if (Link_IsConnected() || gScreen != SCREEN_WAITING) {
-        DmaClear16(0, 0x3FF, 0x0600E000, 0x800);
-        DmaClear16(0, 0x3FF, 0x0600E800, 0x800);
-        DmaClear16(0, 0x2FF, 0x0600F000, 0x800);
-    }
-}
-
-void Bg_LoadPlayerPalette(void)
-{
-    s32 pal = Link_GetPlayerNo();
-    const u16 *src;
-
-    if (gSpMode) {
-        pal += 4;
-    }
-    src = &gBackdropPalettes[pal * 16];
-    DmaCopy16(3, src, 0x05000000, 32);
-}
+#if !defined(VERSION_GCCJGC)
+#include "backdrop.inc"
+#endif
 
 u16 *Bg_GetMapPtr(s32 bg, s32 x, s32 y)
 {
@@ -594,43 +502,157 @@ s16 FixInverse(s16 a)
     return one / a;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02000F00
+ * PAL Size: 72b
+ * EN Address: 0x02000F00
+ * EN Size: 70b
+ * JP Address: 0x02000C98
+ * JP Size: 158b
+ */
 void Str_GetChar(const char *str, s32 n, char *out)
 {
     s32 len;
     s32 i;
     s32 cnt;
+#if defined(VERSION_GCCJGC)
+    s32 state;
+#endif
 
     out[0] = 0;
     len = strlen(str);
     if (len) {
         cnt = 0;
+#if defined(VERSION_GCCJGC)
+        state = 0;
+#endif
         for (i = 0; i < len; i++) {
+#if defined(VERSION_GCCJGC)
+            if ((state == 0 || state == 2) &&
+                ((str[i] >= 0x81 && str[i] <= 0x9F) ||
+                 (str[i] >= 0xE0 && str[i] <= 0xFC))) {
+                state = 1;
+            } else if (state == 1 && str[i] != 0x7F &&
+                       str[i] >= 0x40 && str[i] <= 0xFC) {
+                state = 2;
+            } else {
+                state = 0;
+            }
+            if (cnt == n) {
+                if (state == 0) {
+                    out[0] = str[i];
+                    out[1] = 0;
+                } else {
+                    out[0] = str[i];
+                    out[1] = str[i + 1];
+                    out[2] = 0;
+                }
+                break;
+            }
+            if (state != 1)
+                cnt++;
+#else
             if (cnt == n) {
                 out[0] = str[i];
                 out[1] = 0;
                 break;
             }
             cnt++;
+#endif
         }
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02000F48
+ * PAL Size: 24b
+ * EN Address: 0x02000F48
+ * EN Size: 22b
+ * JP Address: 0x02000D38
+ * JP Size: 134b
+ */
 s32 Str_IsWideChar(const char *str, s32 n)
 {
+#if defined(VERSION_GCCJGC)
+    s32 len;
+    s32 i;
+    s32 cnt;
+    s32 state;
+
+    len = strlen(str);
+    if (len) {
+        cnt = 0;
+        state = 0;
+        for (i = 0; i < len; i++) {
+            if ((state == 0 || state == 2) &&
+                ((str[i] >= 0x81 && str[i] <= 0x9F) ||
+                 (str[i] >= 0xE0 && str[i] <= 0xFC))) {
+                state = 1;
+            } else if (state == 1 && str[i] != 0x7F &&
+                       str[i] >= 0x40 && str[i] <= 0xFC) {
+                state = 2;
+            } else {
+                state = 0;
+            }
+            if (cnt == n)
+                return state ? 1 : 0;
+            if (state != 1)
+                cnt++;
+        }
+    }
+    return -1;
+#else
     if (strlen(str) == 0) {
         return -1;
     }
     return 0;
+#endif
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02000F60
+ * PAL Size: 16b
+ * EN Address: 0x02000F60
+ * EN Size: 16b
+ * JP Address: 0x02000DC0
+ * JP Size: 110b
+ */
 s32 Str_Length(const char *str)
 {
     s32 len = strlen(str);
+#if defined(VERSION_GCCJGC)
+    s32 cnt;
+    s32 state;
+    s32 i;
+#endif
 
     if (len == 0) {
         return 0;
     }
+#if defined(VERSION_GCCJGC)
+    cnt = 0;
+    state = 0;
+    for (i = 0; i < len; i++) {
+        if ((state == 0 || state == 2) &&
+            ((str[i] >= 0x81 && str[i] <= 0x9F) ||
+             (str[i] >= 0xE0 && str[i] <= 0xFC))) {
+            state = 1;
+        } else if (state == 1 && str[i] != 0x7F &&
+                   str[i] >= 0x40 && str[i] <= 0xFC) {
+            state = 2;
+        } else {
+            state = 0;
+        }
+        if (state != 1)
+            cnt++;
+    }
+    return cnt;
+#else
     return len;
+#endif
 }
 
 void Alarm_Update(void)

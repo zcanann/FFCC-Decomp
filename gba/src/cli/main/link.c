@@ -74,7 +74,7 @@ const u16 sCrc16Table[] = {
     0x6E17, 0x7E36, 0x4E55, 0x5E74, 0x2E93, 0x3EB2, 0x0ED1, 0x1EF0,
 };
 
-const char sIdleCode[4] = "RELS";
+const char sIdleCode[] = "RELS";
 static u32 sLinkUnused;
 static u32 sTxQueue[64];
 static s32 sTxCount;
@@ -414,6 +414,15 @@ void Link_RxPush(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02002794
+ * PAL Size: 1912b
+ * EN Address: 0x02002794
+ * EN Size: 1912b
+ * JP Address: 0x020015BC
+ * JP Size: 1900b
+ */
 void Link_ProcessRecv(void)
 {
     vu16 ie;
@@ -640,8 +649,10 @@ restart:
                 Session_OnMemories(sRxBuf[i]);
             } else if (msg[1] == EVT_START_BONUS) {
                 Session_OnStartBonus();
+#if !defined(VERSION_GCCJGC)
             } else if (msg[1] == EVT_LANGUAGE) {
                 Session_OnLanguage(sRxBuf[i]);
+#endif
             }
         } else if ((msg[0] & LINK_CMD_MASK) == LINK_ITEM) {
             Session_OnItemChange(sRxBuf[i]);

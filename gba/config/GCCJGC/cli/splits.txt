@@ -142,8 +142,89 @@ libgcc/_udivsi3:
 libgcc/_umodsi3:
 	.text       start:0x0201C7EC end:0x0201C8AC
 
+main/main:
+	.rodata     start:0x0201C8AC end:0x0201C95C align:4
+
+main/link:
+	.rodata     start:0x0201C95C end:0x0201CB64 align:4
+
+main/xfer:
+	.rodata     start:0x0201CB64 end:0x0201CB7C align:4
+
 regional_data:
-	.rodata     start:0x0201C8AC end:0x0202CA24
+	.rodata     start:0x0201CB7C end:0x0201CB84
+
+main/textmask:
+	.rodata     start:0x0201CB84 end:0x0201CBA4 align:4
+
+regional_data:
+	.rodata     start:0x0201CBA4 end:0x0201D188
+
+main/msg_sys:
+	.rodata     start:0x0201D188 end:0x0201D72C align:4
+
+regional_data:
+	.rodata     start:0x0201D72C end:0x02025AA4
+
+main/obj:
+	.data       start:0x02025AA4 end:0x02025ABC align:4
+
+main/mode:
+	.data       start:0x02025ABC end:0x02025C18 align:4
+
+regional_data:
+	.rodata     start:0x02025C18 end:0x02025DF0
+
+main/msg_sys:
+	.data       start:0x02025DF0 end:0x02025FC8 align:4
+
+regional_data:
+	.rodata     start:0x02025FC8 end:0x0202CA24
+
+main/main:
+	.bss        start:0x03000000 end:0x03000011 align:4
+
+main/link:
+	.bss        start:0x03000018 end:0x03000880 align:8
+
+main/xfer:
+	.bss        start:0x03000880 end:0x030008BC align:8
 
 regional_bss:
-	.bss        start:0x03002990 end:0x030044C1
+	.bss        start:0x030008BC end:0x030008E8
+
+main/text:
+	.bss        start:0x030008E8 end:0x03001174 align:8
+
+main/radarmap:
+	.bss        start:0x03001174 end:0x03001190 align:4
+
+main/obj:
+	.bss        start:0x03001190 end:0x03002772 align:8
+
+regional_bss:
+	.bss        start:0x03002774 end:0x030027C0 align:4
+
+main/gil:
+	.bss        start:0x030027C0 end:0x030027CE align:4
+
+regional_bss:
+	.bss        start:0x030027CE end:0x030029C0 align:1
+
+main/main:
+	.common     start:0x030029C0 end:0x03002AC0 align:16
+
+regional_bss:
+	.bss        start:0x03002AC0 end:0x03002AF0
+
+main/xfer:
+	.common     start:0x03002AF0 end:0x03002AFC align:4
+
+regional_bss:
+	.bss        start:0x03002AFC end:0x030030B0
+
+main/mode:
+	.common     start:0x030030B0 end:0x030032E8 align:16
+
+regional_bss:
+	.bss        start:0x030032E8 end:0x030044C1 align:4

@@ -93,7 +93,7 @@ void PPCMtl2cr(register u32 newL2cr)
  * JP Address: TODO
  * JP Size: TODO
  */
-void PPCMtdec(register u32 newDec)
+__declspec(weak) void PPCMtdec(register u32 newDec)
 {
     asm { mtdec newDec }
 }
@@ -121,7 +121,7 @@ void PPCSync(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void PPCHalt(void)
+__declspec(weak) void PPCHalt(void)
 {
     asm {
         sync

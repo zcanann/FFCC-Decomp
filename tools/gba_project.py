@@ -126,6 +126,16 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
     "GCCP01": COMPLETE,
     "GCCE01": {
         "cli": [
+            "main/backdrop_gfx", "main/backdrop", "main/font_gfx",
+            "main/m4a_tables", "main/sound_data", "main/sound_assets", "main/sound_assets_2",
+            "main/letter",
+            "main/smith",
+            "main/mode",
+            "main/equip", "main/cmdlist", "main/scouter",
+            "main/family", "main/widget",
+            "main/cmake", "main/item", "main/gil",
+            "main/link", "main/obj",
+            "main/menu", "main/radar", "main/favorite",
             "crt0", "m4a/m4a_1", "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet",
             "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
             "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",
@@ -133,8 +143,16 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libc/string/memset", "libc/string/strcat", "libc/string/strchr", "libc/string/strcpy",
             "libc/string/strlen", "libgcc/_call_via_rX", "libgcc/_divsi3", "libgcc/_dvmd_tls",
             "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3", "main/artifact",
+            "main/xfer", "main/radarmap", "main/main", "main/session", "main/textmask", "main/text",
         ],
         "mgr": [
+            "sound_assets",
+            "font_gfx",
+            "obj_gfx",
+            "menu_gfx", "field_gfx",
+            "sintable", "param", "course", "config",
+            "random", "sound_data",
+            "main", "MgJoyBus", "m4a_tables", "libc/arm/libcfunc", "libc/arm/syscalls",
             "crt0", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2", "libagbsyscall/CpuFastSet",
             "libagbsyscall/CpuSet", "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
             "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",
@@ -157,6 +175,8 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
     },
     "GCCJGC": {
         "cli": [
+            "main/main", "main/xfer", "main/radarmap", "main/textmask", "main/obj", "main/link", "main/msg_sys",
+            "main/mode", "main/gil",
             "crt0", "m4a/m4a_1", "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet",
             "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
             "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",
@@ -165,6 +185,14 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
         ],
         "mgr": [
+            "sound_assets",
+            "font_gfx",
+            "obj_gfx",
+            "menu_gfx", "field_gfx",
+            "sintable", "param", "course", "config",
+            "random", "sound_data",
+            "main", "MgJoyBus", "m4a_tables", "libc/arm/libcfunc",
+            "field", "route", "obj",
             "camera", "sound", "text", "libc/reent/impure",
             "libc/arm/syscalls", "libc/reent/sbrkr",
             "crt0", "fixmath", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2",
@@ -526,7 +554,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 n.build(assets, "gba_assets", _path(bins[category]),
                         implicit=split_deps + [_path(tools / "assets.py")]
                         + [_path(config_dir / name) for name in ("symbols.txt", "splits.txt", "constants.txt",
-                                                                 "references.txt") if (config_dir / name).is_file()],
+                                                                 "references.txt", "pointers.txt") if (config_dir / name).is_file()],
                         variables={"config": _path(config_dir), "outdir": _path(out / "assets")})
             bases = {}
             compiled_game_sources = set()
@@ -567,7 +595,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             overrides = " ".join(f"--object {u}={bases[u]}" for u in sorted(complete))
             n.build(asm + [ldscript], "gba_split", _path(bins[category]),
                     implicit=split_deps + [_path(config_dir / "symbols.txt"), _path(config_dir / "splits.txt")]
-                    + [_path(config_dir / name) for name in ("constants.txt", "references.txt")
+                    + [_path(config_dir / name) for name in ("constants.txt", "references.txt", "pointers.txt")
                        if (config_dir / name).is_file()],
                     variables={"bin": _path(bins[category]), "config": _path(config_dir),
                                "asmdir": _path(out / "asm"), "ldscript": ldscript,

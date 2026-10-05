@@ -4,18 +4,7 @@
 
 #include "dolphin/axfx/__axfx.h"
 
-extern const double reverb_hi_4ch_handle_i2fMagic;
-
 extern f32 powf(f32 x, f32 y);
-
-static s32 axfx_reverb_hi_dpl2_lens[10] = {
-    0x000006FD, 0x000007CF, 0x0000091D, 0x000001B1, 0x00000095,
-    0x0000002F, 0x00000049, 0x00000043, 0x00000047, 0x00000000,
-};
-
-extern const f32 reverb_hi_4ch_value100_0;
-extern const f32 reverb_hi_4ch_value0_3;
-extern const f32 reverb_hi_4ch_value0_6;
 
 static inline void DLsetdelayDpl2(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
@@ -51,6 +40,7 @@ static inline void DLdeleteDpl2(AXFX_REVHI_DELAYLINE* dl) {
  * JP Size: TODO
  */
 static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay) {
+    static s32 lens[9] = {1789, 1999, 2333, 433, 149, 47, 73, 67, 71};
     u8 i;
     u8 k;
 
@@ -72,18 +62,18 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     memset(rv, 0, sizeof(AXFX_REVHI_WORK_DPL2));
     for (k = 0; k < 4; k++) {
         for (i = 0; i < 3; i++) {
-            DLcreateDpl2(&rv->C[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i] + 2);
-            DLsetdelayDpl2(&rv->C[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i]);
-            rv->combCoef[i + (k * 3)] = powf(10.0f, (axfx_reverb_hi_dpl2_lens[i] * -3) / (32000.0f * time));
+            DLcreateDpl2(&rv->C[i + (k * 3)], lens[i] + 2);
+            DLsetdelayDpl2(&rv->C[i + (k * 3)], lens[i]);
+            rv->combCoef[i + (k * 3)] = powf(10.0f, (lens[i] * -3) / (32000.0f * time));
         }
 
         for (i = 0; i < 2; i++) {
-            DLcreateDpl2(&rv->AP[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i + 3] + 2);
-            DLsetdelayDpl2(&rv->AP[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i + 3]);
+            DLcreateDpl2(&rv->AP[i + (k * 3)], lens[i + 3] + 2);
+            DLsetdelayDpl2(&rv->AP[i + (k * 3)], lens[i + 3]);
         }
 
-        DLcreateDpl2(&rv->AP[2 + (k * 3)], axfx_reverb_hi_dpl2_lens[k + 5] + 2);
-        DLsetdelayDpl2(&rv->AP[2 + (k * 3)], axfx_reverb_hi_dpl2_lens[k + 5]);
+        DLcreateDpl2(&rv->AP[2 + (k * 3)], lens[k + 5] + 2);
+        DLsetdelayDpl2(&rv->AP[2 + (k * 3)], lens[k + 5]);
         rv->lpLastout[k] = 0.0f;
     }
 
@@ -138,7 +128,7 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
      || (time < 0.01f) || (time > 10.0f)
      || (mix < 0.0f) || (mix > 1.0f)
      || (damping < 0.0f) || (damping > 1.0f)
-     || (preDelay < 0.0f) || (preDelay > reverb_hi_4ch_value100_0)) {
+     || (preDelay < 0.0f) || (preDelay > 100.0f)) {
         return 0;
     }
 
@@ -167,6 +157,9 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     return ReverbHICreateDpl2(rv, coloration, time, mix, damping, preDelay);
 }
 
+static const f32 value0_3 = 0.3f;
+static const f32 value0_6 = 0.6f;
+static const double i2fMagic = 4503601774854144.0;
 
 asm static void HandleReverbDpl2(register s32* sptr, register AXFX_REVHI_WORK_DPL2* rv, register s32 k) {
     nofralloc
@@ -186,12 +179,12 @@ asm static void HandleReverbDpl2(register s32* sptr, register AXFX_REVHI_WORK_DP
 	stfd f25, 0xb8(r1)
 	stw k, 0x50(r1)
 	stw rv, 0x54(r1)
-	lis r31, reverb_hi_4ch_value0_3@ha
-	lfs f6, reverb_hi_4ch_value0_3@l(r31)
-	lis r31, reverb_hi_4ch_value0_6@ha
-	lfs f9, reverb_hi_4ch_value0_6@l(r31)
-	lis r31, reverb_hi_4ch_handle_i2fMagic@ha
-	lfd f5, reverb_hi_4ch_handle_i2fMagic@l(r31)
+	lis r31, value0_3@ha
+	lfs f6, value0_3@l(r31)
+	lis r31, value0_6@ha
+	lfs f9, value0_6@l(r31)
+	lis r31, i2fMagic@ha
+	lfd f5, i2fMagic@l(r31)
 	lfs f2, AXFX_REVHI_WORK_DPL2.allPassCoeff(rv)
 	lfs f15, AXFX_REVHI_WORK_DPL2.damping(rv)
 	lfs f8, AXFX_REVHI_WORK_DPL2.level(rv)
@@ -600,8 +593,3 @@ void AXFXReverbHiCallbackDpl2(AXFX_BUFFERUPDATE_DPL2* bufferUpdate, AXFX_REVERBH
         HandleReverbDpl2(bufferUpdate->Rs, &reverb->rv, 3);
     }
 }
-
-const f32 reverb_hi_4ch_value100_0 = 100.0f;
-const f32 reverb_hi_4ch_value0_3 = 0.3f;
-const f32 reverb_hi_4ch_value0_6 = 0.6f;
-const double reverb_hi_4ch_handle_i2fMagic = 4503601774854144.0;

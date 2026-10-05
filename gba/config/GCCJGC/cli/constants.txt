@@ -1,0 +1,4 @@
+# Fixed multiboot header fields read by Link_Init, not code pointers.
+0x020000C4 main/link
+0x020000C5 main/link
+0x020000C8 main/link

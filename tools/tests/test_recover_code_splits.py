@@ -6,11 +6,13 @@ import sys
 import tempfile
 import unittest
 
-from tools.recover_code_splits import dol_sections, read_symbols, recover
+from tools.recover_code_splits import dol_sections, read_symbols, recover, relocate_code
 
 ROOT = Path(__file__).resolve().parents[2]
 BIN = Path(os.environ.get('PPC_BINUTILS', ROOT / 'build/binutils'))
 AS = BIN / ('powerpc-eabi-as.exe' if sys.platform == 'win32' else 'powerpc-eabi-as')
+LD = BIN / ('powerpc-eabi-ld.exe' if sys.platform == 'win32' else 'powerpc-eabi-ld')
+OBJCOPY = BIN / ('powerpc-eabi-objcopy.exe' if sys.platform == 'win32' else 'powerpc-eabi-objcopy')
 
 
 def dol(body, copies=1, data_only=False):
@@ -28,6 +30,12 @@ class DolTests(unittest.TestCase):
             dol_sections(b'')
         with self.assertRaisesRegex(ValueError, 'bounds'):
             dol_sections(dol(bytes(16))[:-1])
+
+    def test_branch_range_and_alignment(self):
+        for target in (0x84000000, 0x80004002):
+            with self.subTest(target=target), self.assertRaisesRegex(ValueError, 'out of range'):
+                relocate_code(bytes.fromhex('48000001'), 0x80004000,
+                              [dict(offset=0, kind=10, value=target, relative=False)])
 
 
 @unittest.skipUnless(AS.is_file(), 'PowerPC GNU assembler required')
@@ -112,6 +120,81 @@ blr
         ):
             with self.subTest(symbol=line):
                 self.assertEqual(recover('unit.c', obj, dol(body), read_symbols(line))['status'], 'rejected')
+
+
+@unittest.skipUnless(AS.is_file() and LD.is_file() and OBJCOPY.is_file(), 'PowerPC GNU binutils required')
+class RelocationTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.path = Path(self.temp.name)
+
+    def linked_fixture(self, extra='', address=0x80004000):
+        source = self.path / 'relocations.s'
+        source.write_text('''
+.text
+.global Function
+.type Function,@function
+Function:
+bl External+4
+lis 3,Data@ha
+addi 3,3,Data@l
+lis 4,Data@h
+lis 5,(Data+32)@ha
+addi 5,5,(Data+32)@l
+lis 6,Function@ha
+addi 6,6,Function@l
+li 7,41
+blr
+.size Function,.-Function
+''' + extra, encoding='utf-8')
+        obj, linked, binary = [self.path / name for name in ('relocations.o', 'linked.elf', 'linked.bin')]
+        subprocess.run([str(AS), '-mgekko', '-o', str(obj), str(source)], check=True, capture_output=True)
+        subprocess.run([str(LD), '-Ttext', hex(address), '--defsym', 'External=0x80005000',
+                        '--defsym', 'Data=0x8033FFF0', '-e', 'Function', '-o', str(linked), str(obj)],
+                       check=True, capture_output=True)
+        subprocess.run([str(OBJCOPY), '-O', 'binary', '-j', '.text', str(linked), str(binary)],
+                       check=True, capture_output=True)
+        known = read_symbols('External = .text:0x80005000; // type:function size:0x4\n'
+                             'Data = .data:0x8033FFF0; // type:object size:0x40')
+        return obj.read_bytes(), binary.read_bytes(), known
+
+    def test_replays_actual_gnu_linker_output(self):
+        obj, body, known = self.linked_fixture()
+        self.assertEqual(recover('unit.c', obj, dol(body), known)['status'], 'rejected')
+        row = recover('unit.c', obj, dol(body), known, allow_relocations=True)
+        self.assertEqual(row['status'], 'verified', row)
+        self.assertEqual(row['relocation_count'], 8)
+        self.assertEqual(row['verified_bytes'], len(body))
+
+    def test_rejects_corrupt_branch_and_address_relocations(self):
+        obj, body, known = self.linked_fixture()
+        for offset in (3, 7, 11, 15, 19, 23, 27, 31, 35):
+            changed = bytearray(body)
+            changed[offset] ^= 4
+            with self.subTest(offset=offset):
+                row = recover('unit.c', obj, dol(changed), known, True)
+                self.assertEqual(row['status'], 'rejected', row)
+                self.assertNotIn('split_snippet', row)
+
+    def test_rejects_unresolved_or_wrong_external_identity(self):
+        obj, body, known = self.linked_fixture()
+        known.pop('External')
+        self.assertIn('unresolved', recover('unit.c', obj, dol(body), known, True)['reason'])
+        known.update(read_symbols('External = .text:0x80005004; // type:function size:0x4'))
+        self.assertEqual(recover('unit.c', obj, dol(body), known, True)['status'], 'rejected')
+
+    def test_rejects_unsupported_relocation(self):
+        obj, body, known = self.linked_fixture('.long Data\n')
+        row = recover('unit.c', obj, dol(body), known, True)
+        self.assertIn('unsupported PowerPC relocation', row['reason'])
+
+    def test_rejects_two_fully_relocated_placements(self):
+        obj, first, known = self.linked_fixture()
+        _, second, _ = self.linked_fixture(address=0x80004000 + len(first))
+        row = recover('unit.c', obj, dol(first + second), known, True)
+        self.assertEqual(row['status'], 'rejected')
+        self.assertEqual(row['candidates'], [0x80004000, 0x80004000 + len(first)])
 
 
 if __name__ == '__main__':

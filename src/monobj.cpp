@@ -1041,8 +1041,7 @@ void CGMonObj::onFrameStat()
 		if (prgObj->m_stateFrame == 0) {
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
 			object->m_displayFlags |= 1;
-			float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
+			float speedScale = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon;
 			object->moveVectorRot(object->m_rotBaseY, 0.0f, speedScale, 0x14);
 		}
 		if (prgObj->m_stateFrame == 0x10) {

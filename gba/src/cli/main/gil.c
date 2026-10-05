@@ -20,6 +20,15 @@ void GilScreen_HandleInput(void);
 s32 GilScreen_OpenConfirm(void);
 s32 GilScreen_CloseConfirm(void);
 
+/*
+ * --INFO--
+ * PAL Address: 0x02014F4C
+ * PAL Size: 548b
+ * EN Address: 0x02014D90
+ * EN Size: 548b
+ * JP Address: 0x0200FF14
+ * JP Size: 556b
+ */
 void GilScreen_Setup(void)
 {
     s32 i;
@@ -40,8 +49,13 @@ void GilScreen_Setup(void)
     Window_ResetItems(&gWindows[0], 1);
 
     gWindows[1].active = 1;
+#if !defined(VERSION_GCCP01)
+    gWindows[1].width = 7;
+    gWindows[1].x = gWindows[0].x - 7;
+#else
     gWindows[1].width = 9;
     gWindows[1].x = gWindows[0].x - 9;
+#endif
     gWindows[1].y = 10;
     gWindows[1].rows = 2;
     gWindows[1].height = gWindows[1].rows * 2 + 2;

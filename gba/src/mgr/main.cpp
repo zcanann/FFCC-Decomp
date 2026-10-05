@@ -67,9 +67,17 @@ s32 gAssertLine;
 #define GLYPH_TH          13
 #define GLYPH_LAP         14
 #define GLYPH_WRONG_WAY_1 15
+#if defined(VERSION_GCCJGC)
+#define GLYPH_LAP_COUNT_OTHER 16
+#define GLYPH_LAP_COUNT_3 17
+#define GLYPH_FINAL_LAP   18
+#else
 #define GLYPH_WRONG_WAY_2 16
 #define GLYPH_WRONG_WAY_3 17
+#define GLYPH_LAP_COUNT_OTHER 18
+#define GLYPH_LAP_COUNT_3 19
 #define GLYPH_FINAL_LAP   20
+#endif
 
 void AssertFailed(const char *file, s32 line)
 {
@@ -297,6 +305,15 @@ void InitGame(struct Main *main)
     m4aSoundVSyncOn();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x020007F4
+ * PAL Size: 2192b
+ * EN Address: 0x020007F4
+ * EN Size: 2192b
+ * JP Address: 0x020007F4
+ * JP Size: 2128b
+ */
 void UpdateGameState(struct Main *main)
 {
     s32 i;
@@ -311,7 +328,11 @@ void UpdateGameState(struct Main *main)
     case STATE_LOADING:
         if (main->timer == 0) {
             Text_Clear(&gTextLayer, 15);
+#if defined(VERSION_GCCJGC)
+            Text_Printf(&gTextLayer, 8, 9, "L O A D I N G");
+#else
             Text_Printf(&gTextLayer, 10, 9, "LOADING...");
+#endif
             main->textEnabled = 1;
         }
         main->timer++;
@@ -399,7 +420,11 @@ void UpdateGameState(struct Main *main)
             Text_DrawGlyph(&gTextLayer, 13, 4, GLYPH_DIGIT(1), 14);
             m4aSongNumStart(SE_COUNTDOWN);
         } else if (main->timer == 170) {
+#if defined(VERSION_GCCJGC)
+            Text_DrawGlyph(&gTextLayer, 9, 4, GLYPH_GO, 14);
+#else
             Text_DrawGlyph(&gTextLayer, 11, 4, GLYPH_GO, 14);
+#endif
             SetGameState(main, STATE_RACE);
             m4aSongNumStart(SE_GO);
             gEngineSong = SONG_NONE;
@@ -437,9 +462,9 @@ void UpdateGameState(struct Main *main)
                 main->lap = lap;
                 Text_DrawGlyph(&gTextLayer, 21, 0, GLYPH_LAP, 14);
                 if (main->lapCount == 3) {
-                    Text_DrawGlyph(&gTextLayer, 26, 0, 19, 14);
+                    Text_DrawGlyph(&gTextLayer, 26, 0, GLYPH_LAP_COUNT_3, 14);
                 } else {
-                    Text_DrawGlyph(&gTextLayer, 26, 0, 18, 14);
+                    Text_DrawGlyph(&gTextLayer, 26, 0, GLYPH_LAP_COUNT_OTHER, 14);
                 }
                 main->showLap = 1;
                 gShownLap = lap;
@@ -458,15 +483,23 @@ void UpdateGameState(struct Main *main)
             DrawTimerAndRank(main);
             if (Game_IsWrongWay(&gGame, gCamera.player)) {
                 if (main->bannerShown == 0 && main->finalLapTimer == 0 && !gWrongWayShown) {
+#if defined(VERSION_GCCJGC)
+                    Text_DrawGlyph(&gTextLayer, 11, 5, GLYPH_WRONG_WAY_1, 14);
+#else
                     Text_DrawGlyph(&gTextLayer, 9, 5, GLYPH_WRONG_WAY_1, 14);
                     Text_DrawGlyph(&gTextLayer, 15, 5, GLYPH_WRONG_WAY_2, 14);
                     Text_DrawGlyph(&gTextLayer, 21, 5, GLYPH_WRONG_WAY_3, 14);
+#endif
                     gWrongWayShown = 1;
                 }
             } else if (gWrongWayShown) {
+#if defined(VERSION_GCCJGC)
+                Text_EraseGlyph(&gTextLayer, 11, 5, GLYPH_WRONG_WAY_1);
+#else
                 Text_EraseGlyph(&gTextLayer, 9, 5, GLYPH_WRONG_WAY_1);
                 Text_EraseGlyph(&gTextLayer, 15, 5, GLYPH_WRONG_WAY_2);
                 Text_EraseGlyph(&gTextLayer, 21, 5, GLYPH_WRONG_WAY_3);
+#endif
                 gWrongWayShown = 0;
             }
             gChaserPlayer = Game_FindChaser(&gGame, gPlayerNo, 0);

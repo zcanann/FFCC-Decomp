@@ -217,8 +217,11 @@ libgcc/_muldi3:
 libgcc/_negdi2:
 	.text       start:0x0200EC80 end:0x0200EC98
 
-regional_data:
-	.rodata     start:0x0200EC98 end:0x0200EDAC
+main:
+	.rodata     start:0x0200EC98 end:0x0200ED70 align:4
+
+MgJoyBus:
+	.rodata     start:0x0200ED70 end:0x0200EDAC align:4
 
 obj:
 	.rodata     start:0x0200EDAC end:0x0200EDC8 align:4
@@ -226,14 +229,23 @@ obj:
 effect:
 	.rodata     start:0x0200EDC8 end:0x0200EE10 align:4
 
-regional_data:
-	.rodata     start:0x0200EE10 end:0x02010210
+sintable:
+	.rodata     start:0x0200EE10 end:0x02010210 align:4
 
 chunk:
 	.rodata     start:0x02010210 end:0x02010230 align:4
 
-regional_data:
-	.rodata     start:0x02010230 end:0x020139F8
+param:
+	.rodata     start:0x02010230 end:0x02010388 align:4
+
+m4a_tables:
+	.rodata     start:0x02010388 end:0x020104EC align:4
+
+sound_data:
+	.rodata     start:0x020104EC end:0x02010934 align:4
+
+sound_assets:
+	.rodata     start:0x02010934 end:0x020139F8 align:4
 
 libc/reent/impure:
 	.rodata     start:0x020139F8 end:0x020139FC
@@ -250,8 +262,17 @@ libc/locale/locale:
 libc/stdlib/mprec:
 	.rodata     start:0x02013AC8 end:0x02013BEC
 
+libc/arm/syscalls:
+	.rodata     start:0x02013BEC end:0x02013C14 align:4
+
+course:
+	.rodata     start:0x02013C14 end:0x02014684 align:4
+
 regional_data:
-	.rodata     start:0x02013BEC end:0x020158A0
+	.rodata     start:0x02014684 end:0x02014690
+
+sound_data:
+	.data       start:0x02014690 end:0x020158A0 align:4
 
 libc/reent/sbrkr:
 	.common     start:0x020158A0 end:0x020158A4 align:4
@@ -268,8 +289,8 @@ effect:
 text:
 	.data       start:0x020159B8 end:0x02015A4C align:4
 
-regional_data:
-	.rodata     start:0x02015A4C end:0x02015A54
+random:
+	.data       start:0x02015A4C end:0x02015A54 align:4
 
 libc/reent/impure:
 	.data       start:0x02015A54 end:0x02015D44
@@ -280,8 +301,20 @@ libc/locale/locale:
 libc/stdlib/mallocr:
 	.data       start:0x02015D58 end:0x0201619C
 
-regional_data:
-	.rodata     start:0x0201619C end:0x02021F40
+menu_gfx:
+	.rodata     start:0x0201619C end:0x020173DC align:4
+
+obj_gfx:
+	.rodata     start:0x020173DC end:0x0201C2D0 align:4
+
+config:
+	.rodata     start:0x0201C2D0 end:0x0201C2FC align:4
+
+field_gfx:
+	.rodata     start:0x0201C2FC end:0x020204C4 align:4
+
+font_gfx:
+	.rodata     start:0x020204C4 end:0x02021F40 align:4
 
 obj:
 	.ctors      start:0x02021F40 end:0x02021F44 align:1
@@ -292,8 +325,11 @@ camera:
 sound:
 	.ctors      start:0x02021F48 end:0x02021F4C align:1
 
-regional_bss:
-	.bss        start:0x03000000 end:0x03005DF4
+main:
+	.bss        start:0x03000000 end:0x03005C78 align:4
+
+MgJoyBus:
+	.bss        start:0x03005C78 end:0x03005DF4 align:4
 
 obj:
 	.bss        start:0x03005DF4 end:0x030060F8 align:4
@@ -310,8 +346,14 @@ route:
 sound:
 	.bss        start:0x030063F8 end:0x03006400 align:4
 
-regional_bss:
-	.bss        start:0x03006400 end:0x030070F8
+random:
+	.bss        start:0x03006400 end:0x03006DC8 align:4
+
+sound_data:
+	.bss        start:0x03006DC8 end:0x03007048 align:4
+
+libc/arm/syscalls:
+	.bss        start:0x03007048 end:0x030070F8 align:4
 
 libgcc/dp-bit:
 	.bss        start:0x030070F8 end:0x0300710C

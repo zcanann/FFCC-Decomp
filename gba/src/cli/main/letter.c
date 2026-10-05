@@ -88,7 +88,9 @@ struct ScreenFuncs gLetterReadStates[] = {
 
 const char sSpaceText[] = " ";
 const char sQuestionText[] = "?";
+#if !defined(VERSION_GCCE01)
 const char sPeriodText[] = ".";
+#endif
 
 void LetterScreen_Setup(void)
 {
@@ -576,6 +578,15 @@ s32 LetterGift_Init(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02011FBC
+ * PAL Size: 276b
+ * EN Address: 0x02011EB8
+ * EN Size: 268b
+ * JP Address: 0x0200D034
+ * JP Size: 272b
+ */
 s32 LetterGift_Main(void)
 {
     struct Window *win = &gWindows[1];
@@ -593,7 +604,11 @@ s32 LetterGift_Main(void)
         }
         Window_PutText(win, sLetterRow, 0);
         attr = Session_IsItemInUse(sLetterRow) ? 6 : 5;
+#if defined(VERSION_GCCE01)
+        if (attr == 5 && Session_GetItemCategory(sLetterRow) == 1)
+#else
         if (attr == 5 && (Session_GetItemCategory(sLetterRow) == 1 || Session_GetItemCategory(sLetterRow) == 3))
+#endif
             attr = 6;
         Window_DrawRow(1, win->bg, sLetterRow, sLetterRow, attr);
         sLetterRow++;
@@ -1038,6 +1053,15 @@ s32 LetterTake_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02012AF0
+ * PAL Size: 552b
+ * EN Address: 0x020129E4
+ * EN Size: 432b
+ * JP Address: 0x0200DCD0
+ * JP Size: 408b
+ */
 s32 LetterTaken_Init(void)
 {
     char buf[256];
@@ -1053,6 +1077,17 @@ s32 LetterTaken_Init(void)
         memset(win, 0, sizeof(struct Window));
         memset(buf, 0, sizeof(buf));
         entry = &LETTER_ENTRIES[sLetterSel];
+#if defined(VERSION_GCCE01)
+        if (entry->flags & 8) {
+            strcpy(buf, Msg_GetItemName(entry->attachment));
+            strcat(buf, Msg_GetLetter(8));
+        } else {
+            IntToStr(buf, entry->attachment);
+            strcat(buf, sSpaceText);
+            strcat(buf, Msg_GetSystem(5));
+            strcat(buf, Msg_GetLetter(8));
+        }
+#else
         if (!(gLanguage & 15))
             strcat(buf, Msg_GetLetter(8));
         if (entry->flags & 8) {
@@ -1065,8 +1100,13 @@ s32 LetterTaken_Init(void)
         }
         if (!(gLanguage & 15))
             strcat(buf, sPeriodText);
+#endif
         Text_SetFill(1, 1);
         Text_Clear();
+#if defined(VERSION_GCCE01)
+        w2 = Text_Print(Msg_GetLetter(9), TEXT_WIDTH);
+        str = buf;
+#else
         if (gLanguage & 15) {
             w2 = Text_Print(Msg_GetLetter(9), TEXT_WIDTH);
             str = buf;
@@ -1074,6 +1114,7 @@ s32 LetterTaken_Init(void)
             w2 = Text_Print(buf, TEXT_WIDTH);
             str = Msg_GetLetter(9);
         }
+#endif
         Text_Print(str, TEXT_DRAW);
         w = Text_GetX();
         if (w < w2)
@@ -1096,18 +1137,24 @@ s32 LetterTaken_Init(void)
             win->items[i].text = Msg_GetSystem(0);
         }
         Window_PutText(win, 0, 0);
+#if !defined(VERSION_GCCE01)
         if (!(gLanguage & 15)) {
             Text_Clear();
             Text_Print(buf, TEXT_DRAW);
             Window_PutText(win, 1, 0);
         }
+#endif
         sLetterFailed = 0;
         sLetterSubInit = 1;
         m4aSongNumStart(0);
     }
     Text_SetFill(1, 1);
     w = win->anim >> 3;
+#if defined(VERSION_GCCE01)
+    if (w == 1) {
+#else
     if (w == 1 && (gLanguage & 15)) {
+#endif
         Text_Clear();
         Text_Print(Msg_GetLetter(9), TEXT_DRAW);
         Window_PutText(win, 1, 0);
@@ -1154,6 +1201,15 @@ s32 LetterTaken_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02012D90
+ * PAL Size: 700b
+ * EN Address: 0x02012C0C
+ * EN Size: 680b
+ * JP Address: 0x0200DEE0
+ * JP Size: 706b
+ */
 s32 LetterAnswer_Init(void)
 {
     char buf[256];
@@ -1195,9 +1251,11 @@ s32 LetterAnswer_Init(void)
             if (w < len)
                 w = len;
         }
+#if !defined(VERSION_GCCE01)
         len = Text_Print(Msg_GetSystem(4), TEXT_WIDTH);
         if (w < len)
             w = len;
+#endif
         w = (w & 7) ? (w >> 3) + 1 : w >> 3;
         win->active = 1;
         if (sLetterAnswer >= 0) {
@@ -1942,6 +2000,15 @@ void LetterGift_PrintItem(s32 idx, s32 row)
     Window_PutText(win, row, 0);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x020140F4
+ * PAL Size: 608b
+ * EN Address: 0x02013F5C
+ * EN Size: 572b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void Letter_BuildText(char *buf, s32 type)
 {
     s32 *hdr = (s32 *)LIST_BUF;
@@ -1964,7 +2031,11 @@ void Letter_BuildText(char *buf, s32 type)
             strcpy(buf, Msg_GetLetter(5));
             len = strlen(buf);
             memcpy(buf + len, p, 16);
+#if defined(VERSION_GCCE01)
+        } else if (mode == 3) {
+#else
         } else if (mode == 3 || mode == 4) {
+#endif
             strcpy(buf, Msg_GetLetter(5));
             len = strlen(buf);
             memcpy(buf + len, p, 16);
@@ -2012,11 +2083,15 @@ void Letter_BuildText(char *buf, s32 type)
             strcat(buf, sSpaceText);
             strcat(buf, Msg_GetSystem(5));
         } else {
+#if !defined(VERSION_GCCE01)
             if (mode == 1)
                 strcat(buf, Msg_GetLetter(2));
+#endif
             strcat(buf, Msg_GetItemName((u16)sLetterAttachValue));
+#if !defined(VERSION_GCCE01)
             if (mode == 1)
                 strcat(buf, Msg_GetLetter(3));
+#endif
         }
         if (mode == 1)
             strcat(buf, Msg_GetLetter(13));

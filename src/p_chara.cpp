@@ -730,7 +730,7 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
 
-        if (anim->IsBanked() && releaseSize < anim->GetHistory()) {
+        if (anim->IsBanked() > 0 && releaseSize < anim->GetHistory()) {
             releaseSize = anim->GetHistory();
             releaseAnim = loadAnim;
         }

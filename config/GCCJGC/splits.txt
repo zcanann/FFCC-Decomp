@@ -30,3 +30,243 @@ MSL_C/PPCEABI/bare/H/s_modf.c:
 
 MSL_C/PPCEABI/bare/H/wchar_io.c:
 	.text start:0x801B44EC end:0x801B4574
+
+color.cpp:
+	.text start:0x800C2640 end:0x800C268C
+
+maplight.cpp:
+	.text start:0x8004A9E8 end:0x8004AA34
+
+mtx/mtx44vec.c:
+	.text start:0x80181190 end:0x80181208
+
+TRK_MINNOW_DOLPHIN/flush_cache.c:
+	.text start:0x801A7E8C end:0x801A7EC4
+
+amcstubs/AmcExi2Stubs.c:
+	.text start:0x801B76CC end:0x801B76FC
+
+base/PPCArch.c:
+	.text start:0x80175A90 end:0x80175BA4
+
+dolphin/os/__ppc_eabi_init.cpp:
+	.init start:0x80003400 end:0x80003458
+
+TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:
+	.text start:0x801A9C78 end:0x801A9FF0
+
+TRK_MINNOW_DOLPHIN/targcont.c:
+	.text start:0x801AA544 end:0x801AA578
+
+os/OSStopwatch.c:
+	.text start:0x8017ADA4 end:0x8017AF00
+
+os/OSSync.c:
+	.text start:0x8017AF00 end:0x8017AF84
+
+os/OSAudioSystem.c:
+	.text start:0x80177214 end:0x801774A8
+	.data start:0x80232220 end:0x802322A0
+
+chunkfile.cpp:
+	extab start:0x800056E0 end:0x800056F0
+	extabindex start:0x8000ADE0 end:0x8000ADF8
+	.text start:0x80012820 end:0x80012B4C
+
+pppAngle.cpp:
+	.text start:0x8005F0E0 end:0x8005F164
+
+pppBindOnlyPos.cpp:
+	.text start:0x80123A38 end:0x80123A58
+
+pppChangeBGColor.cpp:
+	.text start:0x80129354 end:0x801293B0
+
+pppPObjPoint.cpp:
+	.text start:0x8005FF58 end:0x8005FFEC
+
+MSL_C/PPCEABI/bare/H/ctype.c:
+	.text start:0x801B0768 end:0x801B078C
+	.data start:0x80238CD0 end:0x80238ED0
+
+MSL_C/PPCEABI/bare/H/e_fmod.c:
+	.text start:0x801B4B14 end:0x801B4E50
+	.rodata start:0x801DB890 end:0x801DB8A0
+
+MSL_C/PPCEABI/bare/H/signal.c:
+	.text start:0x801B3EE8 end:0x801B3FA8
+	.bss start:0x80348630 end:0x80348648
+
+MSL_C/PPCEABI/bare/H/abort_exit.c:
+	.text start:0x801AD168 end:0x801AD2F4
+	.bss start:0x803481F8 end:0x803482F8
+	.sbss start:0x8034C140 end:0x8034C150
+
+MSL_C/PPCEABI/bare/H/misc_io.c:
+	.text start:0x801B1E48 end:0x801B1E68
+
+Runtime.PPCEABI.H/ptmf.c:
+	.text start:0x801AB3F4 end:0x801AB44C
+	.rodata start:0x801DB2A8 end:0x801DB2B4
+
+MSL_C/PPCEABI/bare/H/k_cos.c:
+	.text start:0x801B5AA4 end:0x801B5B98
+	.sdata2 start:0x8034FFA8 end:0x8034FFF0
+
+MSL_C/PPCEABI/bare/H/k_sin.c:
+	.text start:0x801B69EC end:0x801B6A8C
+	.sdata2 start:0x80350030 end:0x80350068
+
+MSL_C/PPCEABI/bare/H/s_floor.c:
+	.text start:0x801B6FB4 end:0x801B70FC
+	.sdata2 start:0x803500D0 end:0x803500E0
+
+MSL_C/PPCEABI/bare/H/s_frexp.c:
+	.text start:0x801B70FC end:0x801B7188
+	.sdata2 start:0x803500E0 end:0x803500E8
+
+TRK_MINNOW_DOLPHIN/target_options.c:
+	.text start:0x801AA578 end:0x801AA594
+	.bss start:0x803481E0 end:0x803481E4
+
+MSL_C/PPCEABI/bare/H/rand.c:
+	.text start:0x801B3EC8 end:0x801B3EE8
+	.sdata start:0x8034B9F8 end:0x8034B9FC
+
+MSL_C/PPCEABI/bare/H/e_atan2.c:
+	.text start:0x801B4884 end:0x801B4B14
+	.sdata2 start:0x8034FDE8 end:0x8034FE40
+
+MSL_C/PPCEABI/bare/H/e_rem_pio2.c:
+	.text start:0x801B5704 end:0x801B5AA4
+	.sdata2 start:0x8034FF50 end:0x8034FFA8
+	.rodata start:0x801DB8D0 end:0x801DBA58
+
+MSL_C/PPCEABI/bare/H/k_rem_pio2.c:
+	.text start:0x801B5B98 end:0x801B69EC
+	.sdata2 start:0x8034FFF0 end:0x80350030
+	.rodata start:0x801DBA58 end:0x801DBAA8
+
+MSL_C/PPCEABI/bare/H/k_tan.c:
+	.text start:0x801B6A8C end:0x801B6CA0
+	.sdata2 start:0x80350068 end:0x803500A0
+	.rodata start:0x801DBAA8 end:0x801DBB10
+
+MSL_C/PPCEABI/bare/H/s_atan.c:
+	.text start:0x801B6CA0 end:0x801B6EB8
+	.rodata start:0x801DBB10 end:0x801DBBA8
+	.sdata2 start:0x803500A0 end:0x803500C8
+
+MSL_C/PPCEABI/bare/H/s_ldexp.c:
+	.text start:0x801B7188 end:0x801B734C
+	.sdata2 start:0x803500E8 end:0x80350110
+
+MSL_C/PPCEABI/bare/H/s_cos.c:
+	.text start:0x801B6EE0 end:0x801B6FB4
+	.sdata2 start:0x803500C8 end:0x803500D0
+
+MSL_C/PPCEABI/bare/H/s_sin.c:
+	.text start:0x801B7448 end:0x801B7520
+	.sdata2 start:0x80350110 end:0x80350118
+
+MSL_C/PPCEABI/bare/H/s_tan.c:
+	.text start:0x801B7520 end:0x801B7598
+	.sdata2 start:0x80350118 end:0x80350120
+
+MSL_C/PPCEABI/bare/H/float.c:
+	.sdata start:0x8034BA08 end:0x8034BA10
+
+MSL_C/PPCEABI/bare/H/errno.c:
+	.sbss start:0x8034C158 end:0x8034C15C
+
+MSL_C/PPCEABI/bare/H/e_acos.c:
+	.text start:0x801B4574 end:0x801B4884
+	.sdata2 start:0x8034FD58 end:0x8034FDE8
+
+MSL_C/PPCEABI/bare/H/e_pow.c:
+	.text start:0x801B4E50 end:0x801B5704
+	.rodata start:0x801DB8A0 end:0x801DB8D0
+	.sdata2 start:0x8034FE40 end:0x8034FF50
+
+MSL_C/PPCEABI/bare/H/w_acos.c:
+	.text start:0x801B7598 end:0x801B75B8
+
+MSL_C/PPCEABI/bare/H/w_atan2.c:
+	.text start:0x801B75B8 end:0x801B75D8
+
+MSL_C/PPCEABI/bare/H/w_fmod.c:
+	.text start:0x801B75D8 end:0x801B75F8
+
+MSL_C/PPCEABI/bare/H/w_pow.c:
+	.text start:0x801B75F8 end:0x801B7618
+
+MSL_C/PPCEABI/bare/H/math_ppc.c:
+	.text start:0x801B7618 end:0x801B76CC
+
+MSL_C/PPCEABI/bare/H/mbstring.c:
+	.text start:0x801B18F0 end:0x801B1A08
+	.sdata2 start:0x8034FD48 end:0x8034FD4C
+
+os/OSAlloc.c:
+	.text start:0x80176EE4 end:0x801771F4
+	.sdata start:0x8034B878 end:0x8034B87C
+	.sbss start:0x8034BD48 end:0x8034BD58
+
+db/db.c:
+	.text start:0x80175BA4 end:0x80175C90
+	.data start:0x80232010 end:0x80232028
+	.sbss start:0x8034BCF8 end:0x8034BD00
+
+axfx/axfx.c:
+	.text start:0x80190EEC end:0x80190F48
+	.sdata start:0x8034B948 end:0x8034B950
+
+thp/THPDec.c:
+	.text start:0x801C8B6C end:0x801D00D4
+	.rodata start:0x801DC530 end:0x801DC5C0
+	.data start:0x8023A600 end:0x8023A63C
+	.bss start:0x8034B080 end:0x8034B1B0
+	.sdata start:0x8034BA20 end:0x8034BA24
+	.sbss start:0x8034C2A0 end:0x8034C3B8
+	.sdata2 start:0x803501C0 end:0x803501DC
+
+axfx/chorus.c:
+	.text start:0x80190058 end:0x80190A40
+	.data start:0x80237050 end:0x80237850
+	.sdata2 start:0x8034FBE8 end:0x8034FBF0
+
+axfx/delay.c:
+	.text start:0x80190A40 end:0x80190EEC
+
+axfx/reverb_std.c:
+	.text start:0x8018F45C end:0x80190058
+	.data start:0x80237040 end:0x80237050
+	.sdata2 start:0x8034FBA8 end:0x8034FBE8
+
+axfx/reverb_hi_4ch.c:
+	.text start:0x80190F48 end:0x80191E80
+	.data start:0x80237850 end:0x80237874
+	.sdata2 start:0x8034FBF0 end:0x8034FC30
+
+gx/GXAttr.c:
+	.text start:0x8019B038 end:0x8019C1A8
+	.data start:0x80237D80 end:0x80237EE0
+	.sdata start:0x8034B978 end:0x8034B984
+
+gx/GXGeometry.c:
+	.text start:0x8019C94C end:0x8019CCFC
+
+gx/GXPixel.c:
+	.text start:0x8019FEE4 end:0x801A051C
+	.sdata2 start:0x8034FCE8 end:0x8034FD20
+	.data start:0x802382D0 end:0x802382F0
+
+gx/GXFrameBuf.c:
+	.text start:0x8019CCFC end:0x8019DA18
+	.sdata2 start:0x8034FC60 end:0x8034FC70
+	.data start:0x80237EE0 end:0x8023800C
+
+gx/GXDisplayList.c:
+	.text start:0x801A0520 end:0x801A072C
+	.bss start:0x803435F8 end:0x80343B14
+	.sbss start:0x8034C128 end:0x8034C12C

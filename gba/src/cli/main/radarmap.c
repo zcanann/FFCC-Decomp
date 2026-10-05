@@ -341,3 +341,7 @@ void Radar_ScrollMap(s32 dx, s32 dy)
         }
     }
 }
+
+#if defined(VERSION_GCCJGC)
+#include "backdrop.inc"
+#endif

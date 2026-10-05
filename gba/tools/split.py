@@ -168,12 +168,15 @@ def bootstrap(data: bytes) -> Tuple[List[Symbol], List[Split]]:
 
 
 class Emitter:
-    def __init__(self, a: Analysis, symbols: List[Symbol], splits: List[Split], constants=(), references=None):
+    def __init__(self, a: Analysis, symbols: List[Symbol], splits: List[Split], constants=(), references=None,
+                 data_pointers=()):
         self.a = a
         # Literal values that are plain numbers even though they fall inside the image.
         self.constants = set(constants)
         # Pointer values with a fixed expression, such as a folded negative offset.
         self.references = dict(references or {})
+        # Independently identified pointer fields, including packed/unaligned data.
+        self.data_pointers = set(data_pointers)
         self.symbols = symbols
         self.splits = splits
         self.addresses = [s.address for s in symbols]
@@ -336,6 +339,16 @@ class Emitter:
                 out.append(f".L_{address:08X}:")
 
             remaining = split.end - address
+            if address in self.data_pointers:
+                if is_code or remaining < 4 or any(address + i in self.by_address
+                                                   or address + i in self.data_pointers for i in (1, 2, 3)):
+                    raise ValueError(f"Data pointer at 0x{address:08X} crosses a boundary or lies in code")
+                expr = self.pointer(a.word(address), unit, address)
+                if expr is None:
+                    raise ValueError(f"Data pointer at 0x{address:08X} has no symbolic target")
+                out.append(f"\t.4byte {expr}")
+                address += 4
+                continue
             thumb_code = mode == "thumb"
             if is_code and address in a.calls and remaining >= 4:
                 target, _ = a.calls[address]
@@ -365,7 +378,8 @@ class Emitter:
                     out.append(self.arm_instruction(address, unit))
                     address += 4
                     continue
-            inner = [i for i in (1, 2, 3) if address + i in self.by_address or address + i in labels]
+            inner = [i for i in (1, 2, 3) if address + i in self.by_address or address + i in labels
+                     or address + i in self.data_pointers]
             if address % 4 == 0 and remaining >= 4 and not inner and not self.overlaps_code(address):
                 value = a.word(address)
                 raw = open_symbol is not None and open_symbol[0].raw and address < open_symbol[1] + open_symbol[0].size
@@ -501,7 +515,21 @@ def load_emitter(data: bytes, config: Path) -> "Emitter":
             fields = line.split("#")[0].split()
             if len(fields) == 2:
                 references[int(fields[0], 0)] = fields[1]
-    return Emitter(a, symbols, splits, constants, references)
+    pointers_path = config / "pointers.txt"
+    data_pointers = []
+    if pointers_path.is_file():
+        for line in pointers_path.read_text().splitlines():
+            fields = line.split("#")[0].split()
+            if not fields:
+                continue
+            if len(fields) != 1:
+                raise ValueError(f"Invalid data pointer location: {line}")
+            address = int(fields[0], 0)
+            if not any(s.section in (".rodata", ".data") and s.start <= address
+                       and address + 4 <= s.end for s in splits):
+                raise ValueError(f"Data pointer at 0x{address:08X} is outside initialized data")
+            data_pointers.append(address)
+    return Emitter(a, symbols, splits, constants, references, data_pointers)
 
 
 def main() -> None:

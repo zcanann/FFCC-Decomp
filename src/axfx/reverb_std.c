@@ -5,12 +5,6 @@
 #include "dolphin/axfx/__axfx.h"
 
 extern f32 powf(f32 x, f32 y);
-extern const f32 FLOAT_803337C0;
-extern const f32 axfx_reverb_std_handle_f32_0p3;
-extern const f32 axfx_reverb_std_handle_f32_0p6;
-extern const double axfx_reverb_std_handle_i2f_magic;
-
-s32 sReverbStdDelayLengths[4] = {1789, 1999, 433, 149};
 
 static const f32 axfx_reverb_std_f32_0 = 0.0f;
 static const f32 axfx_reverb_std_f32_0p01 = 0.01f;
@@ -65,6 +59,7 @@ static inline void DLdelete(AXFX_REVSTD_DELAYLINE* dl) {
  * JP Size: TODO
  */
 static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
+    static s32 lens[4] = {1789, 1999, 433, 149};
     u8 i;
     u8 k;
     f32 timeFactor;
@@ -89,14 +84,14 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
 
     for (k = 0; k < 3; k++) {
         for (i = 0; i < 2; i++) {
-            DLcreate(&rv->C[i + (k * 2)], sReverbStdDelayLengths[i] + 2);
-            DLsetdelay(&rv->C[i + (k * 2)], sReverbStdDelayLengths[i]);
-            rv->combCoef[i + (k * 2)] = powf(axfx_reverb_std_f32_10, (sReverbStdDelayLengths[i] * -3) / timeFactor);
+            DLcreate(&rv->C[i + (k * 2)], lens[i] + 2);
+            DLsetdelay(&rv->C[i + (k * 2)], lens[i]);
+            rv->combCoef[i + (k * 2)] = powf(axfx_reverb_std_f32_10, (lens[i] * -3) / timeFactor);
         }
 
         for (i = 0; i < 2; i++) {
-            DLcreate(&rv->AP[i + (k * 2)], sReverbStdDelayLengths[i + 2] + 2);
-            DLsetdelay(&rv->AP[i + (k * 2)], sReverbStdDelayLengths[i + 2]);
+            DLcreate(&rv->AP[i + (k * 2)], lens[i + 2] + 2);
+            DLsetdelay(&rv->AP[i + (k * 2)], lens[i + 2]);
         }
         rv->lpLastout[k] = axfx_reverb_std_f32_0;
     }
@@ -141,12 +136,11 @@ static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
 				  predelay >= axfx_reverb_std_f32_0 && predelay <= axfx_reverb_std_f32_0p1,
 				  "The value of specified parameter is out of range.");
 
-
     if ((coloration < axfx_reverb_std_f32_0) || (coloration > axfx_reverb_std_f32_1)
      || (time < axfx_reverb_std_f32_0p01) || (time > axfx_reverb_std_f32_10)
      || (mix < axfx_reverb_std_f32_0) || (mix > axfx_reverb_std_f32_1)
      || (damping < axfx_reverb_std_f32_0) || (damping > axfx_reverb_std_f32_1)
-     || (predelay < axfx_reverb_std_f32_0) || (predelay > FLOAT_803337C0)) {
+     || (predelay < axfx_reverb_std_f32_0) || (predelay > 100.0f)) {
         return 0;
     }
 
@@ -175,6 +169,10 @@ static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     return ReverbSTDCreate(rv, coloration, time, mix, damping, predelay);
 }
 
+static const f32 value0_3 = 0.3f;
+static const f32 value0_6 = 0.6f;
+static const double i2fMagic = 4503601774854144.0;
+
 asm static void HandleReverb2(register s32* sptr, register AXFX_REVSTD_WORK* rv) {
     nofralloc
 	stwu r1, -144(r1)
@@ -186,12 +184,12 @@ asm static void HandleReverb2(register s32* sptr, register AXFX_REVSTD_WORK* rv)
 	stfd f18, 120(r1)
 	stfd f19, 128(r1)
 	stfd f20, 136(r1)
-	lis r31, axfx_reverb_std_handle_f32_0p3@ha
-	lfs f6, axfx_reverb_std_handle_f32_0p3@l(r31)
-	lis r31, axfx_reverb_std_handle_f32_0p6@ha
-	lfs f9, axfx_reverb_std_handle_f32_0p6@l(r31)
-	lis r31, axfx_reverb_std_handle_i2f_magic@ha
-	lfd f5, axfx_reverb_std_handle_i2f_magic@l(r31)
+	lis r31, value0_3@ha
+	lfs f6, value0_3@l(r31)
+	lis r31, value0_6@ha
+	lfs f9, value0_6@l(r31)
+	lis r31, i2fMagic@ha
+	lfd f5, i2fMagic@l(r31)
 	lfs f2, AXFX_REVSTD_WORK.allPassCoeff(rv)
 	lfs f11, AXFX_REVSTD_WORK.damping(rv)
 	lfs f8, AXFX_REVSTD_WORK.level(rv)
@@ -493,8 +491,3 @@ void AXFXReverbStdCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_REVERBSTD* reve
         ReverbSTDCallback(bufferUpdate->left, bufferUpdate->right, bufferUpdate->surround, &reverb->rv);
     }
 }
-
-const f32 FLOAT_803337C0 = 100.0f;
-const f32 axfx_reverb_std_handle_f32_0p3 = 0.3f;
-const f32 axfx_reverb_std_handle_f32_0p6 = 0.6f;
-const double axfx_reverb_std_handle_i2f_magic = 4503601774854144.0;

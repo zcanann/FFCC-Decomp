@@ -1,16 +1,16 @@
-int __ieee754_sqrt(void);
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
 
 
 /*
  * --INFO--
- * PAL Address: 0x801D6A54
+ * PAL Address: 0x801BC434
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801BB314
+ * EN Size: 32b
  * JP Address: TODO
  * JP Size: TODO
  */
-void sqrt(void)
+double sqrt(double x)
 {
-	__ieee754_sqrt();
+	return __ieee754_sqrt(x);
 }

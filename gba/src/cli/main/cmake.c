@@ -8,6 +8,22 @@
 #include "window.h"
 #include "screen.h"
 
+#if defined(VERSION_GCCE01)
+#define CMAKE_NAME_BUTTON_X 24
+#define CMAKE_NAME_BUTTON_WIDTH 5
+#define CMAKE_NAME_LABEL_TILES 10
+#define CMAKE_NAME_FOOTER_ICONS 3
+#define CMAKE_CONFIRM_WIDTH 24
+#define CMAKE_CONFIRM_TEXT_WIDTH 19
+#else
+#define CMAKE_NAME_BUTTON_X 20
+#define CMAKE_NAME_BUTTON_WIDTH 9
+#define CMAKE_NAME_LABEL_TILES 14
+#define CMAKE_NAME_FOOTER_ICONS 5
+#define CMAKE_CONFIRM_WIDTH 25
+#define CMAKE_CONFIRM_TEXT_WIDTH 23
+#endif
+
 struct CMakeData gCMakeData;
 
 static s8 sCMakeResult;
@@ -77,6 +93,15 @@ void CMakeConfirmScreen_DrawNextRow(void);
 void CMakeConfirmScreen_DrawCursor(void);
 s32 CMakeConfirmScreen_HandleInput(void);
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200A7EC
+ * PAL Size: 732b
+ * EN Address: 0x0200A71C
+ * EN Size: 732b
+ * JP Address: 0x0201080C
+ * JP Size: 708b
+ */
 void CMakeNameScreen_Setup(void)
 {
     struct Window *win;
@@ -99,10 +124,10 @@ void CMakeNameScreen_Setup(void)
     gWindows[0].textX = 0;
 
     gWindows[1].active = 1;
-    gWindows[1].x = 20;
+    gWindows[1].x = CMAKE_NAME_BUTTON_X;
     gWindows[1].y = 15;
     gWindows[1].rows = 3;
-    gWindows[1].width = 9;
+    gWindows[1].width = CMAKE_NAME_BUTTON_WIDTH;
     gWindows[1].height = 3;
     gWindows[1].style = 3;
     gWindows[1].variant = 0;
@@ -144,7 +169,7 @@ void CMakeNameScreen_Setup(void)
     x = (gWindows[1].width * 8 - Text_Print(Msg_GetCMake(0), TEXT_WIDTH)) >> 1;
     Text_SetX(x);
     Text_Print(Msg_GetCMake(0), TEXT_DRAW);
-    Text_CopyToObj(1, 14, 0);
+    Text_CopyToObj(1, CMAKE_NAME_LABEL_TILES, 0);
     HelpWin_Clear(2, 1);
     HelpWin_DrawFrame(2, 1, 9);
 
@@ -216,6 +241,15 @@ s32 CMakeNameScreen_Init(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200AB8C
+ * PAL Size: 312b
+ * EN Address: 0x0200AABC
+ * EN Size: 312b
+ * JP Address: 0x02010B90
+ * JP Size: 312b
+ */
 s32 CMakeNameScreen_Main(void)
 {
     s32 ret = 0;
@@ -258,7 +292,7 @@ s32 CMakeNameScreen_Main(void)
     Obj_DrawBanner(2, 8, 7, 20, 0, 1);
     x = gWindows[1].x * 8;
     y = gWindows[1].y * 8 + 5;
-    for (i = 0; i <= 4; i++, x += 16)
+    for (i = 0; i < CMAKE_NAME_FOOTER_ICONS; i++, x += 16)
         Obj_Draw(x, y, 22, i, 0, 1, 0);
     if (ret)
         HelpWin_Clear(2, 1);
@@ -2024,6 +2058,15 @@ s32 CMakeJobScreen_HandleInput(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200D934
+ * PAL Size: 392b
+ * EN Address: 0x0200D864
+ * EN Size: 392b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CMakeConfirmScreen_Setup(void)
 {
     struct Window *win;
@@ -2036,7 +2079,7 @@ void CMakeConfirmScreen_Setup(void)
     gWindows->x = 2;
     gWindows->y = 4;
     gWindows->rows = 4;
-    gWindows->width = 25;
+    gWindows->width = CMAKE_CONFIRM_WIDTH;
     gWindows->height = 12;
     gWindows->style = 8;
     gWindows->variant = 0;
@@ -2190,6 +2233,15 @@ s32 CMakeConfirmScreen_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200DD44
+ * PAL Size: 316b
+ * EN Address: 0x0200DC74
+ * EN Size: 316b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CMakeConfirmScreen_PrintNextRow(void)
 {
     char buf[64];
@@ -2200,7 +2252,7 @@ void CMakeConfirmScreen_PrintNextRow(void)
     if (sCMakeTextRow <= 3) {
         memcpy(&tmp, gWindows, sizeof(struct Window));
         tmp.bg--;
-        tmp.width = 23;
+        tmp.width = CMAKE_CONFIRM_TEXT_WIDTH;
         Text_SetFill(0, 0);
         Text_Clear();
         memset(buf, 0, sizeof(buf));
@@ -2232,6 +2284,15 @@ void CMakeConfirmScreen_PrintNextRow(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200DE80
+ * PAL Size: 184b
+ * EN Address: 0x0200DDB0
+ * EN Size: 184b
+ * JP Address: 0x020140B8
+ * JP Size: 184b
+ */
 void CMakeConfirmScreen_DrawNextRow(void)
 {
     u16 buf[60];
@@ -2249,8 +2310,8 @@ void CMakeConfirmScreen_DrawNextRow(void)
         for (i = 0; i < ARRAY_COUNT(buf); i++)
             buf[i] = 0x3FF;
         attr = 0x7000;
-        len = 23;
-        tile = sCMakeTileRow * 46 + 128;
+        len = CMAKE_CONFIRM_TEXT_WIDTH;
+        tile = sCMakeTileRow * (CMAKE_CONFIRM_TEXT_WIDTH * 2) + 128;
         for (i = 0; i < len; i++) {
             buf[i] = tile++ | attr;
             buf[i + 30] = tile++ | attr;

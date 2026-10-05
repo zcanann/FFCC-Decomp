@@ -24,6 +24,15 @@ static struct Marker sPartyMarkers[4];
 extern u8 gUnusedBytes[8];
 static s8 sBackdropTribe;
 
+/*
+ * --INFO--
+ * PAL Address: 0x020043FC
+ * PAL Size: 280b
+ * EN Address: 0x020043FC
+ * EN Size: 280b
+ * JP Address: 0x020027B8
+ * JP Size: 276b
+ */
 void Session_Init(void)
 {
     s32 i;
@@ -36,9 +45,15 @@ void Session_Init(void)
     memset(&gScouterHit, 0xFF, sizeof(gScouterHit));
     sBackdropTribe = 0;
     gRadarType = 1;
+#if defined(VERSION_GCCJGC)
+    gRadarMode = 0;
+#else
     gRadarMode = 1;
+#endif
     gScouterDirty = 0;
+#if !defined(VERSION_GCCJGC)
     gLanguage = 0;
+#endif
     for (i = 0; i < 2; i++) {
         sBasePos[i] = 0;
         sPrevBasePos[i] = 0;
@@ -567,9 +582,23 @@ void Radar_OnType(u32 data)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02004F54
+ * PAL Size: 56b
+ * EN Address: 0x02004F54
+ * EN Size: 56b
+ * JP Address: 0x0200330C
+ * JP Size: 36b
+ */
 void Radar_OnMode(u32 data)
 {
     struct JoyArgs *cmd = (struct JoyArgs *)&data;
+#if defined(VERSION_GCCJGC)
+    gRadarMode = cmd->arg;
+    if (gRadarMode == 2)
+        gRadarMode = 1;
+#else
     s8 old = gRadarMode;
 
     gRadarMode = cmd->arg;
@@ -577,6 +606,7 @@ void Radar_OnMode(u32 data)
         Screen_Reset();
         Bg_ClearMaps();
     }
+#endif
 }
 
 void Scouter_OnInfo(u8 *p)
@@ -650,9 +680,20 @@ void Session_OnStartBonus(void)
         gParty[i].hp = 1;
 }
 
+#if !defined(VERSION_GCCJGC)
+/*
+ * --INFO--
+ * PAL Address: 0x020050D4
+ * PAL Size: 20b
+ * EN Address: 0x020050D4
+ * EN Size: 20b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void Session_OnLanguage(u32 data)
 {
     struct JoyArgs *cmd = (struct JoyArgs *)&data;
 
     gLanguage = cmd->arg;
 }
+#endif

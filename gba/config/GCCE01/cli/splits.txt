@@ -145,17 +145,203 @@ libgcc/_udivsi3:
 libgcc/_umodsi3:
 	.text       start:0x0201C954 end:0x0201CA14
 
-regional_data:
-	.rodata     start:0x0201CA14 end:0x0201CD04
+main/main:
+	.rodata     start:0x0201CA14 end:0x0201CAC4 align:4
+
+main/xfer:
+	.rodata     start:0x0201CAC4 end:0x0201CADC align:4
+
+main/link:
+	.rodata     start:0x0201CADC end:0x0201CCE4 align:4
+
+main/textmask:
+	.rodata     start:0x0201CCE4 end:0x0201CD04 align:4
 
 main/artifact:
 	.rodata     start:0x0201CD04 end:0x0201CD0C align:4
 
+main/cmake:
+	.rodata     start:0x0201CD0C end:0x0201CE10 align:4
+
+main/letter:
+	.rodata     start:0x0201CE10 end:0x0201CE18 align:4
+
+main/scouter:
+	.rodata     start:0x0201CE18 end:0x0201CE1C align:4
+
+main/shop:
+	.rodata     start:0x0201CE1C end:0x0201CE20 align:4
+
+main/smith:
+	.rodata     start:0x0201CE20 end:0x0201CE24 align:4
+
 regional_data:
-	.rodata     start:0x0201CD0C end:0x0202E058
+	.rodata     start:0x0201CE24 end:0x02023274
+
+main/backdrop_gfx:
+	.rodata     start:0x02023274 end:0x02025574 align:4
+
+main/m4a_tables:
+	.rodata     start:0x02025574 end:0x020256D8 align:4
+
+main/sound_assets:
+	.rodata     start:0x020256D8 end:0x02028240 align:4
+
+main/sound_data:
+	.rodata     start:0x02028240 end:0x02028390 align:4
+
+main/sound_assets_2:
+	.rodata     start:0x02028390 end:0x020289D8
+
+regional_data:
+	.rodata     start:0x020289D8 end:0x02028AD8 align:4
+
+main/obj:
+	.data       start:0x02028AD8 end:0x02028AF0 align:4
+
+main/mode:
+	.data       start:0x02028AF0 end:0x02028C4C align:4
+
+main/cmake:
+	.data       start:0x02028C4C end:0x02028C88 align:4
+
+main/letter:
+	.data       start:0x02028C88 end:0x02028CF4 align:4
+
+regional_data:
+	.rodata     start:0x02028CF4 end:0x0202B7E0
+
+main/backdrop:
+	.data       start:0x0202B7E0 end:0x0202B800 align:4
+
+main/font_gfx:
+	.data       start:0x0202B800 end:0x0202E058 align:4
+
+main/main:
+	.bss        start:0x03000000 end:0x03000011 align:4
+
+main/xfer:
+	.bss        start:0x03000018 end:0x03000054 align:8
+
+main/radarmap:
+	.bss        start:0x03000054 end:0x03000070 align:4
+
+main/link:
+	.bss        start:0x03000070 end:0x030008D8 align:8
+
+main/text:
+	.bss        start:0x030008D8 end:0x03001164 align:8
+
+main/obj:
+	.bss        start:0x03001168 end:0x0300274A align:8
+
+main/session:
+	.bss        start:0x03002750 end:0x03002771 align:8
 
 main/artifact:
 	.bss        start:0x03002774 end:0x0300277C align:4
 
 regional_bss:
-	.bss        start:0x0300277C end:0x030044C1
+	.bss        start:0x0300277C end:0x03002780
+
+main/cmake:
+	.bss        start:0x03002780 end:0x030027AD align:8
+
+regional_bss:
+	.bss        start:0x030027AD end:0x030027B0 align:1
+
+main/cmdlist:
+	.bss        start:0x030027B0 end:0x030027C0 align:4
+
+main/family:
+	.bss        start:0x030027C0 end:0x030027C2 align:4
+
+regional_bss:
+	.bss        start:0x030027C2 end:0x030027C4 align:1
+
+main/equip:
+	.bss        start:0x030027C4 end:0x030027C9 align:4
+
+regional_bss:
+	.bss        start:0x030027C9 end:0x030027CC align:1
+
+main/item:
+	.bss        start:0x030027CC end:0x030027D6 align:4
+
+regional_bss:
+	.bss        start:0x030027D6 end:0x030027D8 align:1
+
+main/letter:
+	.bss        start:0x030027D8 end:0x030027F4 align:4
+
+main/menu:
+	.bss        start:0x030027F4 end:0x030027F6 align:4
+
+regional_bss:
+	.bss        start:0x030027F6 end:0x030027F8 align:1
+
+main/radar:
+	.bss        start:0x030027F8 end:0x030027F9 align:4
+
+regional_bss:
+	.bss        start:0x030027F9 end:0x030027FC align:1
+
+main/gil:
+	.bss        start:0x030027FC end:0x0300280A align:4
+
+regional_bss:
+	.bss        start:0x0300280A end:0x0300280C align:1
+
+main/scouter:
+	.bss        start:0x0300280C end:0x03002814 align:4
+
+main/shop:
+	.bss        start:0x03002814 end:0x0300281F align:4
+
+regional_bss:
+	.bss        start:0x0300281F end:0x03002820 align:1
+
+main/smith:
+	.bss        start:0x03002820 end:0x03002840 align:8
+
+main/favorite:
+	.bss        start:0x03002840 end:0x0300284A align:8
+
+regional_bss:
+	.bss        start:0x0300284A end:0x03002850 align:1
+
+main/sound_data:
+	.bss        start:0x03002850 end:0x03002990 align:8
+
+regional_bss:
+	.bss        start:0x03002990 end:0x030029C0
+
+main/main:
+	.common     start:0x030029C0 end:0x03002AC0 align:16
+
+regional_bss:
+	.bss        start:0x03002AC0 end:0x03002AF0
+
+main/xfer:
+	.common     start:0x03002AF0 end:0x03002AFC align:4
+
+regional_bss:
+	.bss        start:0x03002AFC end:0x03002CA0
+
+main/session:
+	.common     start:0x03002CA0 end:0x03002DD0 align:16
+
+regional_bss:
+	.bss        start:0x03002DD0 end:0x03002FB0
+
+main/cmake:
+	.common     start:0x03002FB0 end:0x03002FCC align:16
+
+regional_bss:
+	.bss        start:0x03002FCC end:0x030030B0 align:4
+
+main/mode:
+	.common     start:0x030030B0 end:0x030032E8 align:16
+
+regional_bss:
+	.bss        start:0x030032E8 end:0x030044C1 align:4

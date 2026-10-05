@@ -86,7 +86,8 @@ public:
 
     struct WorldMapEffectState
     {
-        unsigned char m_flags;
+        signed char m_paused : 1;
+        unsigned char : 7;
         unsigned char m_pad01;
         short m_duration;
         short m_timer;

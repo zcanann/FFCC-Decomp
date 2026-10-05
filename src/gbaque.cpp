@@ -408,7 +408,7 @@ void GbaQueue::LoadAll()
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 	{
-		unsigned char resetMask = m_resetFlags;
+		char resetMask = m_resetFlags;
 		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
 		}

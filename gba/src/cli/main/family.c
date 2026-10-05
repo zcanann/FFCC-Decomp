@@ -120,6 +120,15 @@ void FamilyScreen_HandleInput(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200F600
+ * PAL Size: 168b
+ * EN Address: 0x0200F524
+ * EN Size: 136b
+ * JP Address: 0x0200C1EC
+ * JP Size: 152b
+ */
 void FamilyScreen_PrintRow(s32 idx)
 {
     struct Window *win = gWindows;
@@ -135,10 +144,14 @@ void FamilyScreen_PrintRow(s32 idx)
         if (lv <= 0)
             return;
         Text_Print(Msg_GetSystem(lv + 53), TEXT_DRAW);
+#if defined(VERSION_GCCE01)
+        Text_SetX(56);
+#else
         if ((gLanguage & 15) == 1)
             Text_SetX(80);
         else
             Text_SetX(56);
+#endif
         Text_Print(gSession.relationNames[idx - 1], TEXT_DRAW);
     }
     Text_CopyToVram(Window_GetTextVram(win, idx, 0), win->width);

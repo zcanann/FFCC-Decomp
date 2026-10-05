@@ -21,6 +21,32 @@
 
 CGraphic Graphic;
 
+#ifdef VERSION_GCCP01
+enum { kGraphicFifoSize = 0x60000 };
+#else
+enum { kGraphicFifoSize = 0x80000 };
+#endif
+
+#ifdef VERSION_GCCJGC
+enum {
+    GraphicFrameBufferLine = 0x62,
+    GraphicSavedBufferLine = 0x64,
+    GraphicFifoLine = 0x67,
+    GraphicInitDrawDoneLine = 0x9A,
+    GraphicFlipDrawDoneLine = 0x240,
+    GraphicTempBufferLine = 0xB26,
+};
+#else
+enum {
+    GraphicFrameBufferLine = 0x86,
+    GraphicSavedBufferLine = 0x88,
+    GraphicFifoLine = 0x8B,
+    GraphicInitDrawDoneLine = 0xBE,
+    GraphicFlipDrawDoneLine = 0x26D,
+    GraphicTempBufferLine = 0xB53,
+};
+#endif
+
 GXRenderModeObj _GXPal528IntDf = {
     VI_TVMODE_PAL_INT,
     640, 448, 528,
@@ -135,11 +161,6 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-#ifdef VERSION_GCCP01
-    enum { kFifoSize = 0x60000 };
-#else
-    enum { kFifoSize = 0x80000 };
-#endif
     char* graphicInitData = const_cast<char*>(sGraphicInitData);
 
     m_graphicStage = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
@@ -187,10 +208,10 @@ void CGraphic::Init()
 #endif
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
 
-    m_frameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x86) u8[xfbBufferSize];
+    m_frameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, GraphicFrameBufferLine) u8[xfbBufferSize];
     memset(m_frameBuffer, 0, 4);
 
-    m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x88) u8[savedBufferSize];
+    m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, GraphicSavedBufferLine) u8[savedBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
 #ifdef VERSION_GCCJGC
@@ -198,13 +219,13 @@ void CGraphic::Init()
 #else
     u32 scratchBufferSize = (((m_renderMode->fbWidth + 0xF) & 0xFFF0) * m_renderMode->efbHeight * 2) + 0x46000;
 #endif
-    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, 0xB53, 0);
+    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, GraphicTempBufferLine, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
-    m_fifoBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x8B) u8[kFifoSize];
+    m_fifoBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, GraphicFifoLine) u8[kGraphicFifoSize];
 
     VIConfigure(m_renderMode);
-    GXInit(m_fifoBuffer, kFifoSize);
+    GXInit(m_fifoBuffer, kGraphicFifoSize);
 
     GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(m_renderMode->fbWidth),
                   static_cast<f32>(m_renderMode->efbHeight), kGraphicZeroF, kGraphicOneF);
@@ -251,7 +272,7 @@ void CGraphic::Init()
     m_blurTextureCount = 0;
     GXCopyDisp(m_frameBuffer, GX_TRUE);
     m_drawDoneFile = graphicInitData + kGraphicInitSource;
-    m_drawDoneLine = 0xBE;
+    m_drawDoneLine = GraphicInitDrawDoneLine;
     m_drawDoneWaiting = 1;
     GXSetDrawDone();
     GXWaitDrawDone();
@@ -655,12 +676,12 @@ int CGraphic::IsFrameRateOver()
 
 /*
  * --INFO--
- * PAL Address: 0x800191d8
+ * PAL Address: 0x800191D8
  * PAL Size: 424b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80018FD4
+ * EN Size: 424b
+ * JP Address: 0x80018BC0
+ * JP Size: 424b
  */
 void CGraphic::Flip()
 {
@@ -685,7 +706,7 @@ void CGraphic::Flip()
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXCopyDisp(m_frameBuffer, GX_TRUE);
         m_drawDoneFile = const_cast<char*>(sGraphicSourceStrings);
-        m_drawDoneLine = 0x26D;
+        m_drawDoneLine = GraphicFlipDrawDoneLine;
         m_drawDoneWaiting = 1;
         GXSetDrawDone();
         GXWaitDrawDone();
@@ -695,8 +716,8 @@ void CGraphic::Flip()
 
         m_fifoIndex = 1 - m_fifoIndex;
 
-        GXInitFifoBase(&m_fifos[m_fifoIndex], m_fifoBuffer, 0x60000);
-        GXInitFifoLimits(&m_fifos[m_fifoIndex], 0x5C000, 0x50000);
+        GXInitFifoBase(&m_fifos[m_fifoIndex], m_fifoBuffer, kGraphicFifoSize);
+        GXInitFifoLimits(&m_fifos[m_fifoIndex], kGraphicFifoSize - 0x4000, kGraphicFifoSize - 0x10000);
         GXSetCPUFifo(&m_fifos[m_fifoIndex]);
         GXSetGPFifo(&m_fifos[m_fifoIndex]);
     }
@@ -1263,12 +1284,12 @@ void CGraphic::CopySaveFrameBuffer()
 
 /*
  * --INFO--
- * PAL Address: 0x80017b30
+ * PAL Address: 0x80017B30
  * PAL Size: 716b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001792C
+ * EN Size: 716b
+ * JP Address: 0x8001755C
+ * JP Size: 716b
  */
 _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int doClear)
 {
@@ -1292,7 +1313,11 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
     }
 
     if ((xEnd < 0) || (yEnd < 0) || (x > static_cast<int>(m_renderMode->fbWidth)) || (yEnd < 0) ||
+#ifdef VERSION_GCCJGC
+        (y > static_cast<int>(m_renderMode->xfbHeight)) || (width <= 0) || (height <= 0)) {
+#else
         (y > static_cast<int>(m_renderMode->efbHeight)) || (width <= 0) || (height <= 0)) {
+#endif
         return 0;
     }
 
@@ -1312,16 +1337,28 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
         y = 0;
     }
 
-    int efbHeight = static_cast<int>(m_renderMode->efbHeight);
-    if (yEnd > efbHeight) {
-        height -= (yEnd - efbHeight);
+#ifdef VERSION_GCCJGC
+    int bufferHeight = static_cast<int>(m_renderMode->xfbHeight);
+#else
+    int bufferHeight = static_cast<int>(m_renderMode->efbHeight);
+#endif
+    if (yEnd > bufferHeight) {
+        height -= (yEnd - bufferHeight);
+#ifdef VERSION_GCCJGC
+        yEnd = static_cast<int>(m_renderMode->xfbHeight);
+#else
         yEnd = static_cast<int>(m_renderMode->efbHeight);
+#endif
     }
 
     if (((xEnd - x) != 0) && ((yEnd - y) != 0)) {
         int texFormat = 6;
         int textureSize = width * height * 4;
+#ifdef VERSION_GCCJGC
+        int maxTextureSize = (u16)((m_renderMode->fbWidth + 0xF) & ~0xF) * m_renderMode->xfbHeight * 2 + 0x46000;
+#else
         int maxTextureSize = (u16)((m_renderMode->fbWidth + 0xF) & ~0xF) * m_renderMode->efbHeight * 2 + 0x46000;
+#endif
         if (maxTextureSize < textureSize) {
             texFormat = 4;
             textureSize /= 2;
@@ -1347,17 +1384,22 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
  * --INFO--
  * PAL Address: 0x80017980
  * PAL Size: 432b
- * EN Address: 0x80020AA8
- * EN Size: 568b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001777C
+ * EN Size: 432b
+ * JP Address: 0x800173AC
+ * JP Size: 432b
  */
 void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int y, int width, int height, int dstOffset,
                                   _GXTexFilter filter, _GXTexFmt format, int doClear)
 {
     int xEnd = x + width;
     int yEnd = y + height;
-    if ((xEnd < 0) || (yEnd < 0) || (x > m_renderMode->fbWidth) || (yEnd < 0) || (y > m_renderMode->efbHeight) ||
+    if ((xEnd < 0) || (yEnd < 0) || (x > m_renderMode->fbWidth) || (yEnd < 0) ||
+#ifdef VERSION_GCCJGC
+        (y > m_renderMode->xfbHeight) ||
+#else
+        (y > m_renderMode->efbHeight) ||
+#endif
         (width <= 0) || (height <= 0)) {
         return;
     }
@@ -1900,17 +1942,25 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80016440
+ * PAL Size: 132b
+ * EN Address: 0x8001623C
+ * EN Size: 132b
+ * JP Address: 0x80015E18
+ * JP Size: 132b
  */
 void CGraphic::CreateTempBuffer()
 {
 	GXRenderModeObj* renderMode = m_renderMode;
-	u16 efbHeight = renderMode->efbHeight;
+#ifdef VERSION_GCCJGC
+	u16 bufferHeight = renderMode->xfbHeight;
+#else
+	u16 bufferHeight = renderMode->efbHeight;
+#endif
 	u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
 	m_scratchTextureBuffer =
-	    Memory._Alloc(alignedWidth * (u32)efbHeight * 2 + 0x46000, m_scratchStage, const_cast<char*>(sGraphicSourceStrings),
-	                  0xB53, 0);
+	    Memory._Alloc(alignedWidth * (u32)bufferHeight * 2 + 0x46000, m_scratchStage, const_cast<char*>(sGraphicSourceStrings),
+	                  GraphicTempBufferLine, 0);
 	memset(m_scratchTextureBuffer, 0, 0x46004);
 }
 

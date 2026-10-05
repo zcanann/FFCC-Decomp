@@ -1034,10 +1034,10 @@ void CMenuPcs::CalcResultOpenAnim()
  * --INFO--
  * PAL Address: 0x8013A8F4
  * PAL Size: 2136b
- * EN Address: 0x801569A8
- * EN Size: 2280b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80139B8C
+ * EN Size: 2136b
+ * JP Address: 0x801367B4
+ * JP Size: 2128b
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
@@ -1186,16 +1186,27 @@ void CMenuPcs::DrawResultOpenAnim()
 					} else {
 						CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 						int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+#ifdef VERSION_GCCJGC
+						strcpy(text, "\x81\x9A");
+						strcat(text, Game.GetBonusName(strIdx));
+#else
 						strcpy(text, Game.GetBonusName(strIdx));
+#endif
 					}
 
 					float x = (float)sprite->x + sprite->motionX;
 					float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
 					if (textIndex < activePartyCount) {
 						y -= 4.0f;
 					}
+#endif
 					font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+					font->SetPosY(y);
+#else
 					font->SetPosY(y - 4.0f);
+#endif
 					font->Draw(text);
 
 					textIndex++;
@@ -1203,8 +1214,12 @@ void CMenuPcs::DrawResultOpenAnim()
 						font = this->m_fonts[1];
 						font->SetMargin(1.0f);
 						font->SetShadow(0);
+#ifdef VERSION_GCCJGC
+						font->SetScale(1.0f);
+#else
 						font->SetScaleX(0.800000011920929f);
 						font->SetScaleY(1.0f);
+#endif
 						font->DrawInit();
 					}
 				}
@@ -1371,10 +1386,10 @@ void CMenuPcs::CalcResultCountAnim()
  * --INFO--
  * PAL Address: 0x80139B14
  * PAL Size: 1816b
- * EN Address: 0x801578B0
- * EN Size: 1460b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80138E30
+ * EN Size: 1740b
+ * JP Address: 0x80135B44
+ * JP Size: 1692b
  */
 void CMenuPcs::DrawResultCountAnim()
 {
@@ -1481,25 +1496,41 @@ void CMenuPcs::DrawResultCountAnim()
 				CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 				int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
 				int __p2 = strIdx;
+#ifdef VERSION_GCCJGC
+				strcpy(text, "\x81\x9A");
+				strcat(text, Game.m_cFlatDataArr[1].TableStrings(7)[__p2]);
+#else
 				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[__p2]);
+#endif
 			}
 
 			float x = (float)sprite->x + sprite->motionX;
 			float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
 			if (textIndex < activePartyCount) {
 				y -= 4.0f;
 			}
+#endif
 			font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+			font->SetPosY(y);
+#else
 			font->SetPosY(y - 4.0f);
+#endif
 			font->Draw(text);
 
 			textIndex++;
 			if (textIndex == activePartyCount) {
 				font = this->m_fonts[1];
 				font->SetMargin(1.0f);
+#ifdef VERSION_GCCJGC
+				font->SetShadow(0);
+				font->SetScale(1.0f);
+#else
 				font->SetScaleX(0.7f);
 				font->SetScaleY(1.0f);
 				font->SetShadow(0);
+#endif
 				font->DrawInit();
 			}
 		}
@@ -1778,10 +1809,10 @@ void CMenuPcs::CalcResultCloseAnim()
  * --INFO--
  * PAL Address: 0x80136F9C
  * PAL Size: 2452b
- * EN Address: 0x80158B34
- * EN Size: 2360b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801362B8
+ * EN Size: 2452b
+ * JP Address: 0x80132E58
+ * JP Size: 2428b
  */
 void CMenuPcs::DrawResultCloseAnim()
 {
@@ -1942,16 +1973,28 @@ void CMenuPcs::DrawResultCloseAnim()
 					strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 				} else {
 					CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
+#ifdef VERSION_GCCJGC
+					int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+					strcpy(text, "\x81\x9A");
+					strcat(text, Game.GetBonusName(strIdx));
+#else
 					strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
+#endif
 				}
 
 				float x = (float)sprite->x + sprite->motionX;
 				float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
 				if (textIndex < activePartyCount) {
 					y -= 4.0f;
 				}
+#endif
 				font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+				font->SetPosY(y);
+#else
 				font->SetPosY(y - 4.0f);
+#endif
 				font->Draw(text);
 
 				textIndex++;
@@ -1960,8 +2003,12 @@ void CMenuPcs::DrawResultCloseAnim()
 					font = font1;
 					font1->SetMargin(1.0f);
 					font1->SetShadow(0);
+#ifdef VERSION_GCCJGC
+					font1->SetScale(1.0f);
+#else
 					font1->SetScaleX(0.800000011920929f);
 					font1->SetScaleY(1.0f);
+#endif
 					font1->DrawInit();
 				}
 			}

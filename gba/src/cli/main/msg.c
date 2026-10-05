@@ -606,8 +606,6 @@ char *Msg_GetTrait(s32 idx)
     return tbl[idx];
 }
 
-#endif
-
 char *Msg_GetLook(s32 idx)
 {
     char **tbl;
@@ -657,6 +655,8 @@ char *Msg_GetCMake(s32 idx)
     }
     return tbl[idx];
 }
+
+#endif
 
 char *Msg_GetLetter(s32 idx)
 {

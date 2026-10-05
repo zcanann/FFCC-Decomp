@@ -167,7 +167,13 @@ main/textmask:
 	.rodata     start:0x0201CB84 end:0x0201CBA4 align:4
 
 regional_data:
-	.rodata     start:0x0201CBA4 end:0x0201D17C
+	.rodata     start:0x0201CBA4 end:0x0201CC78
+
+main/cmake:
+	.rodata     start:0x0201CC78 end:0x0201D160 align:4
+
+regional_data:
+	.rodata     start:0x0201D160 end:0x0201D17C
 
 main/scouter:
 	.rodata     start:0x0201D17C end:0x0201D188 align:4
@@ -200,7 +206,10 @@ main/mode:
 	.data       start:0x02025ABC end:0x02025C18 align:4
 
 regional_data:
-	.rodata     start:0x02025C18 end:0x02025DF0
+	.rodata     start:0x02025C18 end:0x02025CBC
+
+main/cmake:
+	.data       start:0x02025CBC end:0x02025DF0 align:4
 
 main/msg_sys:
 	.data       start:0x02025DF0 end:0x02025FC8 align:4

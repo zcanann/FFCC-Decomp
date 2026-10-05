@@ -1535,3 +1535,57 @@ auto_801E6CC4_rodata:
 
 auto_80332CFB_sdata2:
 	.sdata2 start:0x80332CFB end:0x80332D00 align:1
+
+RedSound/RedExecute.cpp:
+	.text start:0x801C1F2C end:0x801C63E0
+	extab start:0x8000A750 end:0x8000A870
+	extabindex start:0x80011F08 end:0x800120B8
+	.data start:0x8021C7B0 end:0x8021D18E
+	.sdata start:0x8032DC10 end:0x8032DC14
+	.sbss start:0x8032E488 end:0x8032E49C
+	.sdata2 start:0x80332D00 end:0x80332D10
+
+auto_8021D18E_data:
+	.data start:0x8021D18E end:0x8021D190 align:1
+
+auto_8032DC14_sdata:
+	.sdata start:0x8032DC14 end:0x8032DC18 align:1
+
+auto_8032E49C_sbss:
+	.sbss start:0x8032E49C end:0x8032E4A0 align:1
+
+RedSound/RedCommand.cpp:
+	.text start:0x801C8FA0 end:0x801CA8A4
+	extab start:0x8000AAF0 end:0x8000AB70
+	extabindex start:0x80012478 end:0x80012538
+	.rodata start:0x801E6CC8 end:0x801E6DCB
+	.data start:0x8021DBD0 end:0x8021DCB0
+	.sdata2 start:0x80332D10 end:0x80332D25
+
+auto_801E6DCB_rodata:
+	.rodata start:0x801E6DCB end:0x801E6DD0 align:1
+
+auto_80332D25_sdata2:
+	.sdata2 start:0x80332D25 end:0x80332D28 align:1
+
+RedSound/RedStream.cpp:
+	.text start:0x801CA8A4 end:0x801CB99C
+	extab start:0x8000AB70 end:0x8000ABB8
+	extabindex start:0x80012538 end:0x800125A4
+	.rodata start:0x801E6DD0 end:0x801E6E96
+	.sdata2 start:0x80332D28 end:0x80332D3D
+
+auto_801E6E96_rodata:
+	.rodata start:0x801E6E96 end:0x801E6E98 align:1
+
+auto_80332D3D_sdata2:
+	.sdata2 start:0x80332D3D end:0x80332D40 align:1
+
+RedSound/RedMidiCtrl.cpp:
+	.text start:0x801C63E0 end:0x801C8FA0
+	extab start:0x8000A870 end:0x8000AAF0
+	extabindex start:0x800120B8 end:0x80012478
+	.data start:0x8021D190 end:0x8021DBD0
+
+auto_8021C7AC_data:
+	.data start:0x8021C7AC end:0x8021C7B0 align:1

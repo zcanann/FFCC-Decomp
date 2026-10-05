@@ -937,6 +937,12 @@ TRK_MINNOW_DOLPHIN/targsupp.s:
 	.text	start:0x801A9B00 end:0x801A9B20
 
 file.cpp:
+	.data start:0x801DC5C0 end:0x801DC610
+	.sdata start:0x8034B1C0 end:0x8034B1D0
+	.sdata2 start:0x8034C3C0 end:0x8034C3E8
+	extab start:0x800056F0 end:0x80005768
+	extabindex start:0x8000ADF8 end:0x8000AEAC
+	.ctors start:0x801D0624 end:0x801D0628
 	.text start:0x80012B4C end:0x80013D9C
 	.bss start:0x8023A640 end:0x8023A7B0
 

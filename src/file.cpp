@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+#ifndef VERSION_GCCJGC
 static const char s_diskReadErrorJp0[] = {0x83, 0x66, 0x83, 0x42, 0x83, 0x58, 0x83, 0x4E, 0x82, 0xF0, 0x93, 0xC7, 0x82, 0xDF, 0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x82, 0xC5, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42, 0x00};
 static const char s_diskReadErrorJp1[] = {0x82, 0xAD, 0x82, 0xED, 0x82, 0xB5, 0x82, 0xAD, 0x82, 0xCD, 0x81, 0x41, 0x96, 0x7B, 0x91, 0xCC, 0x82, 0xCC, 0x8E, 0xE6, 0x88, 0xB5, 0x90, 0xE0, 0x96, 0xBE, 0x8F, 0x91, 0x82, 0xF0, 0x82, 0xA8, 0x93, 0xC7, 0x82, 0xDD, 0x82, 0xAD, 0x82, 0xBE, 0x82, 0xB3, 0x82, 0xA2, 0x81, 0x42, 0x00};
 static const char s_diskReadErrorEn0[] = "The Game Disc could not be read.";
@@ -132,6 +133,8 @@ static const char* l_tError[4][6][3] = {
     },
 };
 
+#endif
+
 enum {
 #ifdef VERSION_GCCJGC
     FileReadBufferAllocationLine = 0x29,
@@ -143,7 +146,13 @@ enum {
 };
 
 enum {
-#ifdef VERSION_GCCE01
+#ifdef VERSION_GCCJGC
+    FileErrorCopySize = 0x23000,
+    FileErrorDrawBeginLine = 0x2BA,
+    FileErrorCopyLine = 0x311,
+    FileErrorDisplayLine = 0x315,
+    FileErrorDrawEndLine = 0x340
+#elif defined(VERSION_GCCE01)
     FileErrorCopySize = 0x23000,
     FileErrorDrawBeginLine = 0x2C4,
     FileErrorCopyLine = 0x321,
@@ -594,12 +603,13 @@ next:
  * JP Address: 0x80012B58
  * JP Size: 1840b
  */
+#ifdef VERSION_GCCJGC
+#include "src/file_jp.inc"
+#else
 void CFile::DrawError(DVDFileInfo& info, int errorCode)
 {
     _GXTexObj backupTexObj;
-#ifndef VERSION_GCCJGC
     m_isDiskError = 1;
-#endif
 
     while (true)
     {
@@ -619,9 +629,7 @@ retry:
 
         if (font == 0)
         {
-#ifndef VERSION_GCCJGC
             m_isDiskError = 0;
-#endif
             return;
         }
 
@@ -781,10 +789,10 @@ retry:
     }
 
     Sound.PauseDiscError(0);
-#ifndef VERSION_GCCJGC
     m_isDiskError = 0;
-#endif
 }
+
+#endif
 
 /*
  * --INFO--

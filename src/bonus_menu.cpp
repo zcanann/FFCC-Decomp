@@ -2902,37 +2902,34 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 		idx = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = 0x16;
 			spr->startFrame = 8;
 			spr->duration = 8;
-			idx++;
 		}
 		int i1 = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->startFrame = i1;
 			spr->duration = 8;
 			spr->flags = 2;
-			idx++;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = 0x1f;
 			spr->startFrame = i1;
 			spr->duration = i1;
 			spr->flags = 2;
-			idx++;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = -4;
 			spr->startFrame = i1;
 			spr->duration = 8;
 		}
 
 		for (; i1 < activePartyCount; i1++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i1 + 4];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i1 + idx];
 			spr->startFrame = 0;
 			spr->duration = 8;
 			spr->depth = 1.0f;
@@ -2944,40 +2941,39 @@ void CMenuPcs::CalcSelectCloseAnim()
 			spr->targetY = (float)spr->y + spr->motionY;
 		}
 
-		int base;
-		base = activePartyCount + 4;
-		s_PlayerTop = base;
+		idx += activePartyCount;
+		s_PlayerTop = idx;
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			SetupSelectCloseSpriteMotion(spr);
 		}
 
-		base += activePartyCount;
-		s_ArtiTop = base;
+		idx += activePartyCount;
+		s_ArtiTop = idx;
 		for (int i = 0; i < 8; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			spr->startFrame = 0;
 			spr->duration = 8;
 			spr->flags = 0;
 		}
 
-		base += 8;
+		idx += 8;
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			SetupSelectCloseSpriteMotion(spr);
 		}
 
-		base += activePartyCount;
+		idx += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			SetupSelectCloseSpriteMotion(spr);
 		}
 
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
-			int delta = base - 4;
+			int delta = idx - 4;
 			for (int i = 0; i < activePartyCount; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->kind = -1;
 				spr->x = (short)(src->x + 0x50);

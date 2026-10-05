@@ -31,6 +31,9 @@ For experienced reverse-engineers, there are still quite a few harder tasks rema
 
 ### Regional builds
 
+See [regional compiler baselines](docs/compiler_baseline.md) for the game compiler
+choices, comparative evidence, and the Japanese patched-compiler provenance.
+
 Regional progress: [PAL](https://decomp.dev/zcanann/FFCC-Decomp/GCCP01),
 [USA](https://decomp.dev/zcanann/FFCC-Decomp/GCCE01),
 [Japan](https://decomp.dev/zcanann/FFCC-Decomp/GCCJGC).

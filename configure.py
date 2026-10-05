@@ -504,7 +504,8 @@ config.libs = [
     ]),
     {
         "lib": "Game",
-        "mw_version": "GC/2.5",
+        # Japanese compatibility baseline; provenance: docs/compiler_baseline.md.
+        "mw_version": "GC/2.0p1" if config.version == "GCCJGC" else "GC/2.5",
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [

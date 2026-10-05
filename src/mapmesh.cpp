@@ -415,12 +415,8 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             m_vertices = reinterpret_cast<Vec*>(cursor);
             cursor += chunk.m_size;
-            m_bound.m_min.z = kMapMeshInitialMinBound;
-            m_bound.m_min.y = kMapMeshInitialMinBound;
-            m_bound.m_min.x = kMapMeshInitialMinBound;
-            m_bound.m_max.z = kMapMeshInitialMaxBound;
-            m_bound.m_max.y = kMapMeshInitialMaxBound;
-            m_bound.m_max.x = kMapMeshInitialMaxBound;
+            m_bound.m_min.x = m_bound.m_min.y = m_bound.m_min.z = kMapMeshInitialMinBound;
+            m_bound.m_max.x = m_bound.m_max.y = m_bound.m_max.z = kMapMeshInitialMaxBound;
 
             int vertexIndex = 0;
             for (; vertexIndex < static_cast<int>(m_vertexCount); vertexIndex++) {
@@ -680,12 +676,8 @@ void CMapMesh::Destroy()
  */
 CMapMesh::CMapMesh()
 {
-    m_bound.m_min.z = kMapMeshInitialMinBound;
-    m_bound.m_min.y = kMapMeshInitialMinBound;
-    m_bound.m_min.x = kMapMeshInitialMinBound;
-    m_bound.m_max.z = kMapMeshInitialMaxBound;
-    m_bound.m_max.y = kMapMeshInitialMaxBound;
-    m_bound.m_max.x = kMapMeshInitialMaxBound;
+    m_bound.m_min.x = m_bound.m_min.y = m_bound.m_min.z = kMapMeshInitialMinBound;
+    m_bound.m_max.x = m_bound.m_max.y = m_bound.m_max.z = kMapMeshInitialMaxBound;
 
     m_meshData = 0;
     m_displayListData = 0;

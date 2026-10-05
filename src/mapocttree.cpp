@@ -576,9 +576,10 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
 		static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
 		DrawCharaShadowTypeMeshFlag_r(m_nodePool);
 
+		float defaultOffsetZ = kMapOctTreeDefaultOffsetZ;
 		float offsetZ = m_mapObject->m_zBufferOffset;
-		if (kMapOctTreeDefaultOffsetZ != offsetZ) {
-			CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
+		if (defaultOffsetZ != offsetZ) {
+			CameraPcs.SetOffsetZBuff(defaultOffsetZ);
 		}
 	}
 }
@@ -624,9 +625,10 @@ void COctTree::Draw(unsigned char drawType)
 			if (m_mapObject->m_disableZWrite != 0) {
 				GXSetZMode(1, (GXCompare)3, 1);
 			}
+			float defaultOffsetZ = kMapOctTreeDefaultOffsetZ;
 			float offsetZ = m_mapObject->m_zBufferOffset;
-			if (kMapOctTreeDefaultOffsetZ != offsetZ) {
-				CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
+			if (defaultOffsetZ != offsetZ) {
+				CameraPcs.SetOffsetZBuff(defaultOffsetZ);
 			}
 		}
 	}

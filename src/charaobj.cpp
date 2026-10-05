@@ -21,6 +21,14 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+#ifdef VERSION_GCCP01
+static const int kCounterDamageStatusFrames = 25;
+static const int kLateItemParticleFrame = 16;
+#else
+static const int kCounterDamageStatusFrames = 30;
+static const int kLateItemParticleFrame = 20;
+#endif
+
 extern char SoundBuffer[];
 
 
@@ -2111,7 +2119,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					if (sourceObj->m_lastStateId == 6 && srcEntryKind <= 1) {
 						break;
 					}
-					reinterpret_cast<CGCharaObj*>(sourceObj)->setSta(4, 0x19);
+					reinterpret_cast<CGCharaObj*>(sourceObj)->setSta(4, kCounterDamageStatusFrames);
 					sourceObj->changeStat(10, 0, 0);
 					reinterpret_cast<CGCharaObj*>(sourceObj)->addHp(-1, 0);
 				}
@@ -2649,7 +2657,7 @@ checkParticle:
 		case 0x46D:
 		case 0x46E:
 			if (effectArg0 == 2) {
-				if (m_stateFrame >= 0x10) {
+				if (m_stateFrame >= kLateItemParticleFrame) {
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
 					float rand0 = Math.RandFPM(60.0f);
 					float rand1 = Math.RandFPM(60.0f);

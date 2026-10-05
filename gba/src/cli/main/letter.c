@@ -1910,16 +1910,28 @@ void LetterGift_DrawIcons(void)
         if (v > 0) {
             id = Item_GetIcon(v);
             pal = Obj_GetPalette(0, id);
+#if defined(VERSION_GCCJGC)
+            Obj_Draw(x, y, 0, id, pal, win->bg, 0);
+#else
             Obj_Draw(x - 2, y, 0, id, pal, win->bg, 0);
+#endif
         }
     }
     x = (win->x + 1) * 8;
     y = (win->y + 1) * 8;
+#if defined(VERSION_GCCJGC)
+    id = 4;
+#else
     id = ((gLanguage & 15) == 1) ? 24 : 4;
+#endif
     pal = Obj_GetPalette(2, id);
     for (i = 0; i < win->rows; i++, y += 16) {
         if (Session_IsItemInUse(i + sLetterGiftTop))
+#if defined(VERSION_GCCJGC)
+            Obj_Draw(x - 4, y, 2, id, pal, win->bg, 0);
+#else
             Obj_Draw(x - 4, y, 2, id, pal, win->bg - 1, 0);
+#endif
     }
 }
 

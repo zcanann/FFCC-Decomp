@@ -913,7 +913,7 @@ config.libs = [
     DolphinLib(
         "ai",
         [
-            Object(Matching, "ai/ai.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ai/ai.c"),
         ],
     ),
     DolphinLib(

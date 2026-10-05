@@ -660,3 +660,14 @@ MSL_C/PPCEABI/bare/H/mem.c:
 Runtime.PPCEABI.H/runtime.c:
 	.text start:0x801AEE24 end:0x801AF51C
 	.rodata start:0x801E5D48 end:0x801E5D60
+
+Runtime.PPCEABI.H/global_destructor_chain.c:
+	.text start:0x801ae64c end:0x801AE6AC
+	.dtors start:0x801d43c8 end:0x801D43CC
+	.sbss start:0x8032e350 end:0x8032E354
+
+Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
+	.text start:0x801af51c end:0x801AF598
+	.ctors start:0x801d4300 end:0x801D4304
+	.dtors start:0x801d43c0 end:0x801D43C8
+	.sdata start:0x8032dbd0 end:0x8032DBD4

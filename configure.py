@@ -1059,7 +1059,7 @@ config.libs = [
         "cflags": cflags_runtime,
         "progress_category": "sdk",
         "objects": [
-            Object(Matching, "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/__va_arg.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/CPlusLibPPC.cp"),
             Object(
@@ -1075,7 +1075,7 @@ config.libs = [
                 extab_padding=[0x02, 0x55],
             ),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "Runtime.PPCEABI.H/global_destructor_chain.c",
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),

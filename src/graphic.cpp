@@ -34,6 +34,7 @@ enum {
     GraphicFifoLine = 0x67,
     GraphicInitDrawDoneLine = 0x9A,
     GraphicFlipDrawDoneLine = 0x240,
+    GraphicSphereDisplayListLine = 0x3ED,
     GraphicTempBufferLine = 0xB26,
 };
 #else
@@ -43,6 +44,7 @@ enum {
     GraphicFifoLine = 0x8B,
     GraphicInitDrawDoneLine = 0xBE,
     GraphicFlipDrawDoneLine = 0x26D,
+    GraphicSphereDisplayListLine = 0x41A,
     GraphicTempBufferLine = 0xB53,
 };
 #endif
@@ -1084,10 +1086,10 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
  * --INFO--
  * PAL Address: 0x80018300
  * PAL Size: 1124b
- * EN Address: 0x8001FCA8
- * EN Size: 892b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800180FC
+ * EN Size: 1124b
+ * JP Address: 0x80017D2C
+ * JP Size: 1056b
  */
 void CGraphic::makeSphere()
 {
@@ -1121,7 +1123,7 @@ void CGraphic::makeSphere()
     vertices[vertexCount][2] = kGraphicZeroF;
 
     m_sphereDisplayListSize = 0x880;
-    m_sphereDisplayList = new (m_graphicStage, const_cast<char*>(sGraphicSourceStrings), 0x41A) u8[m_sphereDisplayListSize];
+    m_sphereDisplayList = new (m_graphicStage, const_cast<char*>(sGraphicSourceStrings), GraphicSphereDisplayListLine) u8[m_sphereDisplayListSize];
 
     DCInvalidateRange(m_sphereDisplayList, m_sphereDisplayListSize);
     GXBeginDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
@@ -1130,7 +1132,7 @@ void CGraphic::makeSphere()
     int ring = 0;
     for (; ring < 5; ring++) {
         for (int seg = 0; seg < 8; seg++) {
-            int current = ring * 8 + seg + 1;
+            int current = ring * 8 + 1 + seg;
             GXPosition3f32(vertices[current][1], vertices[current][0], vertices[current][2]);
             int next = ring * 8 + 1 + (seg + 1) % 8;
             GXPosition3f32(vertices[next][1], vertices[next][0], vertices[next][2]);

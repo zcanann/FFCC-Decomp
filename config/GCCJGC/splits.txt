@@ -1141,6 +1141,7 @@ p_tina.cpp:
 	.text start:0x800517A8 end:0x80053458
 
 p_dbgmenu.cpp:
+	.bss start:0x80322008 end:0x80324A74
 	.text start:0x801275FC end:0x80129354
 
 p_map.cpp:
@@ -1179,3 +1180,33 @@ pppBreathModel.cpp:
 	.text start:0x800D8434 end:0x800D9D6C
 	.rodata start:0x801D6090 end:0x801D60A8
 	.sdata2 start:0x8034DC88 end:0x8034DCC0
+
+usb.cpp:
+	.text start:0x80021CD8 end:0x80021FB0
+	.ctors start:0x801D0648 end:0x801D064C
+	extab start:0x80005DB0 end:0x80005DC8
+	extabindex start:0x8000B5CC end:0x8000B5F0
+	.rodata start:0x801D1AE8 end:0x801D1BB1
+	.data start:0x801DCB58 end:0x801DCB74
+	.bss start:0x80260EC0 end:0x80260F40
+	.sdata start:0x8034B278 end:0x8034B288
+	.sdata2 start:0x8034C5E0 end:0x8034C5E5
+
+system.cpp:
+	.text start:0x80021788 end:0x80021840
+	.bss start:0x8025FC40 end:0x80260EBC
+
+auto_07_801DCB74_data:
+	.data start:0x801DCB74 end:0x801DCB78 align:4
+
+auto_08_80260EBC_bss:
+	.bss start:0x80260EBC end:0x80260EC0 align:4
+
+auto_08_80324A74_bss:
+	.bss start:0x80324A74 end:0x80324A78 align:4
+
+auto_06_801D1BB1_rodata:
+	.rodata start:0x801D1BB1 end:0x801D1BB8 align:1
+
+auto_11_8034C5E5_sdata2:
+	.sdata2 start:0x8034C5E5 end:0x8034C5E8 align:1

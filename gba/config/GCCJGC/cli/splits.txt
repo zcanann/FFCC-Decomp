@@ -242,7 +242,13 @@ main/favorite:
 	.bss        start:0x03002788 end:0x03002792 align:8
 
 regional_bss:
-	.bss        start:0x03002792 end:0x030027B4 align:1
+	.bss        start:0x03002792 end:0x03002794 align:1
+
+main/family:
+	.bss        start:0x03002794 end:0x03002796 align:4
+
+regional_bss:
+	.bss        start:0x03002796 end:0x030027B4 align:1
 
 main/item:
 	.bss        start:0x030027B4 end:0x030027BE align:4

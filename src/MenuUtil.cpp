@@ -1470,8 +1470,13 @@ void CMenuPcs::DrawOptionMenu()
 		pos.bar.x = 372.0f;
 		pos.bar.y = 196.0f;
 		pos.minLabel.x = 372.0f;
+#ifdef VERSION_GCCJGC
+		pos.minLabel.y = 172.0f;
+		pos.maxLabel.y = 172.0f;
+#else
 		pos.minLabel.y = 168.0f;
 		pos.maxLabel.y = 168.0f;
+#endif
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
 		rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
@@ -1525,11 +1530,20 @@ void CMenuPcs::DrawOptionMenu()
 			}
 		}
 
+#ifdef VERSION_GCCJGC
+		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.minLabel.x),
+		                static_cast<int>(pos.minLabel.y), color, 7,
+		                "\202\215\202\211\202\216", 1.0f);
+		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.maxLabel.x),
+		                static_cast<int>(pos.maxLabel.y), color, 7,
+		                "\202\215\202\201\202\230", 1.0f);
+#else
 		DrawFont(static_cast<int>(pos.minLabel.x), static_cast<int>(pos.minLabel.y), color, 7,
 		         OPT_MES(16), 1.0f, 1.0f);
 		pos.maxLabel.x = 564.0f - font->GetWidth(OPT_MES(17));
 		DrawFont(static_cast<int>(pos.maxLabel.x), static_cast<int>(pos.maxLabel.y), color, 7, OPT_MES(17), 1.0f,
 		         1.0f);
+#endif
 		break;
 	}
 	case 3: {
@@ -1547,8 +1561,13 @@ void CMenuPcs::DrawOptionMenu()
 		pos.bar.x = 372.0f;
 		pos.bar.y = 196.0f;
 		pos.minLabel.x = 372.0f;
+#ifdef VERSION_GCCJGC
+		pos.minLabel.y = 172.0f;
+		pos.maxLabel.y = 172.0f;
+#else
 		pos.minLabel.y = 168.0f;
 		pos.maxLabel.y = 168.0f;
+#endif
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
 		rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
@@ -1602,11 +1621,20 @@ void CMenuPcs::DrawOptionMenu()
 			}
 		}
 
+#ifdef VERSION_GCCJGC
+		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.minLabel.x),
+		                static_cast<int>(pos.minLabel.y), color, 7,
+		                "\202\215\202\211\202\216", 1.0f);
+		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.maxLabel.x),
+		                static_cast<int>(pos.maxLabel.y), color, 7,
+		                "\202\215\202\201\202\230", 1.0f);
+#else
 		DrawFont(static_cast<int>(pos.minLabel.x), static_cast<int>(pos.minLabel.y), color, 7,
 		         OPT_MES(16), 1.0f, 1.0f);
 		pos.maxLabel.x = 564.0f - font->GetWidth(OPT_MES(17));
 		DrawFont(static_cast<int>(pos.maxLabel.x), static_cast<int>(pos.maxLabel.y), color, 7, OPT_MES(17), 1.0f,
 		         1.0f);
+#endif
 		break;
 	}
 	case 4: {

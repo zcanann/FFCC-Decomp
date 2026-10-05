@@ -104,7 +104,13 @@ enum {
 #endif
 	kBonusFrameTexture,
 	kBonusPlayerTexture,
-	kBonusCountTexture
+	kBonusCountTexture,
+#ifdef VERSION_GCCJGC
+	kBonusArtifactFrameTexture = 0x1E,
+#else
+	kBonusArtifactFrameTexture = 0x1F,
+#endif
+	kBonusCursorTexture
 };
 
 static inline void InitBonusEffectSlots(CMenuPcs* menu)
@@ -119,7 +125,11 @@ static inline void InitBonusEffectSlots(CMenuPcs* menu)
 static inline void SetupSelectCloseSpriteMotion(CMenuPcs::Sprt2* sprite)
 {
 	sprite->startFrame = 0;
+#ifdef VERSION_GCCP01
 	sprite->duration = 8;
+#else
+	sprite->duration = 10;
+#endif
 	sprite->x = (short)(int)sprite->targetX;
 	sprite->y = (short)(int)sprite->targetY;
 	sprite->motionX = 240.0f;
@@ -2135,11 +2145,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-#ifdef VERSION_GCCJGC
-			spr->kind = 0x1e;
-#else
-			spr->kind = 0x1f;
-#endif
+			spr->kind = kBonusArtifactFrameTexture;
 			spr->x = 0;
 			spr->y = 0;
 			spr->w = 0x80;
@@ -2585,14 +2591,14 @@ void CMenuPcs::DrawSelectOpenAnim()
 				color.a = (unsigned char)(255.0f * sprite->alpha);
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
-				if (sprite->kind == 0x20) {
+				if (sprite->kind == kBonusCursorTexture) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
 				}
 				MenuPcs.DrawRect(0,
 				    (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 				    (float)sprite->w, (float)sprite->h,
 				    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
-				if (sprite->kind == 0x20) {
+				if (sprite->kind == kBonusCursorTexture) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 				}
 				lastKind = sprite->kind;
@@ -2754,10 +2760,10 @@ void CMenuPcs::DrawSelectOpenAnim()
  * --INFO--
  * PAL Address: 0x8013473C
  * PAL Size: 2844b
- * EN Address: 0x8015B508
- * EN Size: 3004b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80133A5C
+ * EN Size: 2844b
+ * JP Address: 0x801305B4
+ * JP Size: 2848b
  */
 void CMenuPcs::CalcSelectWait()
 {
@@ -2780,7 +2786,7 @@ void CMenuPcs::CalcSelectWait()
 			short count = m_bonusAnim->header.count;
 			CMenuPcs::Sprt2* cursor = &m_bonusAnim->sprites[count];
 			CMenuPcs::Sprt2* partySprite = cursor - activePartyCount * 2;
-			cursor->kind = 0x20;
+			cursor->kind = kBonusCursorTexture;
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
 			cursor->w = 0x40;
@@ -2788,7 +2794,11 @@ void CMenuPcs::CalcSelectWait()
 			cursor->mulX = 0.0f;
 			cursor->mulY = 0.0f;
 			cursor->startFrame = 0;
+#ifdef VERSION_GCCP01
 			cursor->duration = 8;
+#else
+			cursor->duration = 10;
+#endif
 			cursor->depth = 1.0f;
 			cursor->flags = 0;
 			m_bonusAnim->header.count = (short)(count + 1);
@@ -3030,13 +3040,18 @@ inline void CMenuPcs::DrawSelectWait()
  * --INFO--
  * PAL Address: 0x80133AD8
  * PAL Size: 3172b
- * EN Address: 0x8015C0EC
- * EN Size: 3440b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80132DF8
+ * EN Size: 3172b
+ * JP Address: 0x8012F928
+ * JP Size: 3212b
  */
 void CMenuPcs::CalcSelectCloseAnim()
 {
+#ifdef VERSION_GCCP01
+	enum { kFadeFrames = 8 };
+#else
+	enum { kFadeFrames = 10 };
+#endif
 	int activePartyCount = s_Rinfo->m_partyCount;
 	int twice;
 	int i;
@@ -3065,20 +3080,20 @@ void CMenuPcs::CalcSelectCloseAnim()
 		idx = 0;
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x16;
-			spr->startFrame = 8;
-			spr->duration = 8;
+			spr->kind = kBonusBackgroundTexture;
+			spr->startFrame = kFadeFrames;
+			spr->duration = kFadeFrames;
 		}
 		int i1 = 0;
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->startFrame = i1;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->flags = 2;
 		}
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x1f;
+			spr->kind = kBonusArtifactFrameTexture;
 			spr->startFrame = i1;
 			spr->duration = i1;
 			spr->flags = 2;
@@ -3087,13 +3102,13 @@ void CMenuPcs::CalcSelectCloseAnim()
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = -4;
 			spr->startFrame = i1;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 		}
 
 		for (; i1 < activePartyCount; i1++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i1 + idx];
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->x = (short)(int)spr->targetX;
 			spr->y = (short)(int)spr->targetY;
@@ -3115,7 +3130,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		for (int i = 0; i < 8; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->flags = 0;
 		}
 
@@ -3141,7 +3156,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 				spr->x = (short)(src->x + 0x50);
 				spr->y = (short)(src->y + 0x48);
 				spr->startFrame = src->startFrame;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->motionX = 240.0f;
 				spr->motionY = 0.0f;
 				spr->targetX = (float)spr->x + spr->motionX;

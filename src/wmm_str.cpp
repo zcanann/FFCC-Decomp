@@ -2,8 +2,13 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 
+#ifdef VERSION_GCCJGC
+#include "src/wmm_str_status_jp.inc"
+#endif
+
 #include "src/wmm_str_data.inc"
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x8017b3f8
@@ -31,7 +36,6 @@ const char* CMenuPcs::GetMcStr(int index)
         return s_McStr_us[index];
     }
 }
-#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x8017B268

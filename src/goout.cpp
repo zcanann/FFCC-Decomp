@@ -1143,9 +1143,12 @@ inline unsigned char CGoOutMenu::SelectYesNo(int cursorY0, int cursorY1, int cur
     m_cursorListY1 = cursorY1;
     m_cursorMode = cursorMode;
 
+#ifndef VERSION_GCCJGC
     if (MenuPcs.m_menuWindowInfo->state != 1) {
         return 0;
     }
+
+#endif
 
     if ((Pad.GetButtonDown(0) & 3) != 0) {
         m_cursorChoice ^= 1;
@@ -1547,12 +1550,12 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 
 /*
  * --INFO--
- * PAL Address: 0x8016a06c
+ * PAL Address: 0x8016A06C
  * PAL Size: 6248b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80169014
+ * EN Size: 6216b
+ * JP Address: 0x80164700
+ * JP Size: 5708b
  */
 void CGoOutMenu::CalcGoOut()
 {
@@ -2130,12 +2133,12 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
 
 /*
  * --INFO--
- * PAL Address: 0x80168e3c
+ * PAL Address: 0x80168E3C
  * PAL Size: 3548b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80167DE4
+ * EN Size: 3548b
+ * JP Address: 0x80163620
+ * JP Size: 3436b
  */
 void CGoOutMenu::CalcDel()
 {

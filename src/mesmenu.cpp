@@ -752,7 +752,9 @@ void CMesMenu::onDraw()
                         iconEdgeX = (width - 144.0f) - (-10.0f);
                     }
                     unsigned int anchorY = (iconAnchor - 1) & 2;
-                    float iconX = (drawX + 0.0f) + iconEdgeX;
+                    float iconX = 0.0f;
+                    iconX = drawX + iconX;
+                    iconX += iconEdgeX;
                     float iconEdgeY;
                     if (anchorY != 0) {
                         iconEdgeY = (-8.0f) + height;

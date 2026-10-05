@@ -1064,7 +1064,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/__va_arg.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "Runtime.PPCEABI.H/CPlusLibPPC.cp"),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "Runtime.PPCEABI.H/GCN_mem_alloc.c",
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),
@@ -1103,7 +1103,7 @@ config.libs = [
         "objects": [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "MSL_C/PPCEABI/bare/H/abort_exit.c"),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "MSL_C/PPCEABI/bare/H/alloc.c",
                 mw_version="GC/2.7",
             ),

@@ -681,3 +681,13 @@ MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
 exi/EXIUart.c:
 	.text	start:0x8017E020 end:0x8017E5F4
 	.sbss	start:0x8034BDD0 end:0x8034BDE0
+
+MSL_C/PPCEABI/bare/H/alloc.c:
+	.text start:0x801AD2F4 end:0x801AE1CC
+	.rodata start:0x801DB3E0 end:0x801DB3F8
+	.bss start:0x803482F8 end:0x80348330
+	.sbss start:0x8034C150 end:0x8034C158
+
+Runtime.PPCEABI.H/GCN_mem_alloc.c:
+	.text start:0x801ACFF8 end:0x801AD168
+	.rodata start:0x801DB368 end:0x801DB3E0

@@ -726,3 +726,13 @@ ringmenu.cpp:
 exi/EXIUart.c:
 	.text	start:0x80182970 end:0x80182F44
 	.sbss	start:0x8032DFD0 end:0x8032DFE0
+
+MSL_C/PPCEABI/bare/H/alloc.c:
+	.text start:0x801B0CCC end:0x801B1BA4
+	.rodata start:0x801E5E70 end:0x801E5E88
+	.bss start:0x8032A4F0 end:0x8032A528
+	.sbss start:0x8032E368 end:0x8032E370
+
+Runtime.PPCEABI.H/GCN_mem_alloc.c:
+	.text start:0x801B09D0 end:0x801B0B40
+	.rodata start:0x801E5DF8 end:0x801E5E70

@@ -813,3 +813,6 @@ TRK_MINNOW_DOLPHIN/nubinit.c:
 	.text start:0x801A384C end:0x801A39D0
 	.rodata start:0x801DB170 end:0x801DB190
 	.bss start:0x80344048 end:0x8034404C
+
+MenuUtil.cpp:
+	.text start:0x80171534 end:0x80175A90

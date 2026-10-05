@@ -3171,7 +3171,11 @@ void CMenuPcs::DrawMainMenu()
 			char* const text = textList[m_wmWorldState->m_cardChannel];
 			const float* pWt1 = &FLOAT_80331594;
 			const float* pHt1 = &FLOAT_803313e8;
+#ifdef VERSION_GCCJGC
+			const int x = static_cast<int>(CalcCenteringPos(text, 22));
+#else
 			const int x = static_cast<int>(CalcCenteringPos2(text, *pWt1, *pHt1));
+#endif
 			const float* pYt1 = &FLOAT_803317D0;
 			const float* pWt2 = &FLOAT_80331594;
 			const float* pHt2 = &FLOAT_803313e8;
@@ -3722,7 +3726,11 @@ void CMenuPcs::DrawCMakeMenu()
 			char* const text = textList[textIndex];
 			const float* pW1 = &FLOAT_80331594;
 			const float* pH1 = &FLOAT_803313e8;
+#ifdef VERSION_GCCJGC
+			const int x = static_cast<int>(CalcCenteringPos(text, 22));
+#else
 			const int x = static_cast<int>(CalcCenteringPos2(text, *pW1, *pH1));
+#endif
 			const float* pY1 = &FLOAT_803317D0;
 			const float* pW1b = &FLOAT_80331594;
 			const float* pH1b = &FLOAT_803313e8;
@@ -3741,7 +3749,11 @@ void CMenuPcs::DrawCMakeMenu()
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const float* pWc = &FLOAT_80331594;
 					const float* pHc = &FLOAT_803313e8;
+#ifdef VERSION_GCCJGC
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos(text, 22));
+#else
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
+#endif
 					const float* pYc = &FLOAT_803317D0;
 					const float* pWc2 = &FLOAT_80331594;
 					const float* pHc2 = &FLOAT_803313e8;
@@ -3756,7 +3768,11 @@ void CMenuPcs::DrawCMakeMenu()
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const float* pWc = &FLOAT_80331594;
 					const float* pHc = &FLOAT_803313e8;
+#ifdef VERSION_GCCJGC
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos(text, 22));
+#else
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
+#endif
 					const float* pYc = &FLOAT_803317D0;
 					const float* pWc2 = &FLOAT_80331594;
 					const float* pHc2 = &FLOAT_803313e8;
@@ -3775,7 +3791,11 @@ void CMenuPcs::DrawCMakeMenu()
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const float* pWc = &FLOAT_80331594;
 					const float* pHc = &FLOAT_803313e8;
+#ifdef VERSION_GCCJGC
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos(text, 22));
+#else
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
+#endif
 					const float* pYc = &FLOAT_803317D0;
 					const float* pWc2 = &FLOAT_80331594;
 					const float* pHc2 = &FLOAT_803313e8;
@@ -3975,7 +3995,11 @@ void CMenuPcs::DrawLoadMenu()
 		const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
 		char* text = g_strWMMenuMes[languageIndex][8];
 		_GXColor color = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(uAlpha)).color;
+#ifdef VERSION_GCCJGC
+		const int x = static_cast<int>(MenuPcs.CalcCenteringPos(text, 22));
+#else
 		const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+#endif
 		MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), color, 7, text,
 		                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 	}
@@ -9152,7 +9176,11 @@ nextListEntry:
 			char* text2 = const_cast<char*>(GetMcStr(2));
 			const float* pWf1 = &FLOAT_80331594;
 			const float* pHf3 = &FLOAT_803313e8;
+#ifdef VERSION_GCCJGC
+			const int x = static_cast<int>(CalcCenteringPos(text2, 22));
+#else
 			const int x = static_cast<int>(CalcCenteringPos2(text2, *pWf1, *pHf3));
+#endif
 			const float* pWf2 = &FLOAT_80331594;
 			const float* pHf4 = &FLOAT_803313e8;
 			DrawFont2(x, 0x187, color, 7, text, *pWf2, *pHf4, *pHf4);
@@ -9162,7 +9190,11 @@ nextListEntry:
 			char* text2 = const_cast<char*>(GetMcStr(3));
 			const float* pWf3 = &FLOAT_80331594;
 			const float* pHf5 = &FLOAT_803313e8;
+#ifdef VERSION_GCCJGC
+			const int x = static_cast<int>(CalcCenteringPos(text2, 22));
+#else
 			const int x = static_cast<int>(CalcCenteringPos2(text2, *pWf3, *pHf5));
+#endif
 			const float* pWf4 = &FLOAT_80331594;
 			const float* pHf6 = &FLOAT_803313e8;
 			DrawFont2(x, 0x187, color, 7, text, *pWf4, *pHf6, *pHf6);

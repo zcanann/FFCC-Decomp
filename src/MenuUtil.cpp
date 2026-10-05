@@ -221,8 +221,34 @@ inline int CMenuPcs::GetLongHelpString(CFont* font, int firstLine, int lineMax)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 124b
+ * EN Address: UNUSED
+ * EN Size: 152b
+ * JP Address: 0x80175A20
+ * JP Size: 112b
+ */
+#ifdef VERSION_GCCJGC
+float CMenuPcs::CalcCenteringPos(char* text, int fontSize)
+{
+	int length = strlen(text);
+	CFont* font = m_fonts[0];
+	float halfWidth = 0.5f;
+	float offset = 320.0f;
+	font->SetScaleX(1.0f);
+	font->SetScaleY(1.0f);
+	float width = font->GetWidth(text);
+	return offset - width * halfWidth;
+}
+#else
+/*
+ * --INFO--
+ * PAL Address: 0x8017AE70
+ * PAL Size: 164b
+ * EN Address: 0x80179DC0
+ * EN Size: 164b
+ * JP Address: UNUSED
+ * JP Size: TODO
  */
 float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
@@ -239,6 +265,7 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 	width = font->GetWidth(text);
 	return offset - width * halfWidth;
 }
+#endif
 
 /*
  * --INFO--

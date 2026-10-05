@@ -435,8 +435,26 @@ static const int kMcListEntrySize = sizeof(McListInfo);
 static const int kMcListCount = 4;
 #ifdef VERSION_GCCJGC
 static const int kMemoryCardBannerTexture = 30;
+static const int kMcSlotLeftTexture = 35;
+static const int kMcSlotMiddleTexture = 36;
+static const int kMcCharacterFrameTexture = 37;
+static const int kMcCharacterFillTexture = 41;
+static const int kWorldFrameTexture = 29;
+static const int kMcYearTexture = 22;
+static const int kMcYearLabelTexture = 32;
+static const int kMcFaceTexture = 53;
+static const int kMcTimeTexture = 31;
 #else
 static const int kMemoryCardBannerTexture = 31;
+static const int kMcSlotLeftTexture = 36;
+static const int kMcSlotMiddleTexture = 37;
+static const int kMcCharacterFrameTexture = 38;
+static const int kMcCharacterFillTexture = 42;
+static const int kWorldFrameTexture = 30;
+static const int kMcYearTexture = 23;
+static const int kMcYearLabelTexture = 33;
+static const int kMcFaceTexture = 55;
+static const int kMcTimeTexture = 32;
 #endif
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
@@ -6291,12 +6309,12 @@ void CMenuPcs::CalcWMFrame0(int param)
 
 /*
  * --INFO--
- * PAL Address: 0x800f3384
+ * PAL Address: 0x800F3384
  * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F2904
+ * EN Size: 380b
+ * JP Address: 0x800EFB58
+ * JP Size: 380b
  */
 void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 {
@@ -6309,7 +6327,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 	color.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kWorldFrameTexture));
 
 	int i;
 	i = 0;
@@ -8718,7 +8736,7 @@ void CMenuPcs::DrawMCList()
 				GXSetChanMatColor(GX_COLOR0A0, slotColor);
 
 				// Draw slot background
-				MenuPcs.SetTexture((TEX)0x24);
+				MenuPcs.SetTexture((TEX)kMcSlotLeftTexture);
 				const float* pZb1 = &FLOAT_803313dc;
 				const float* pOb1 = &FLOAT_803313e8;
 				const float* pW68a = &FLOAT_80331468;
@@ -8726,7 +8744,7 @@ void CMenuPcs::DrawMCList()
 				MenuPcs.DrawRect(0, yPos, slotY, *pW68a, *pHF8a,
 				         *pZb1, *pZb1,
 				         *pOb1, *pOb1, *pZb1);
-				MenuPcs.SetTexture((TEX)0x25);
+				MenuPcs.SetTexture((TEX)kMcSlotMiddleTexture);
 				const float* pW68b = &FLOAT_80331468;
 				yPos += *pW68b;
 				const float* pZb2 = &FLOAT_803313dc;
@@ -8811,7 +8829,7 @@ nextListEntry:
 		sepBase = *psBa;
 		sepOff = *psOf;
 		for (int slot = 0; slot < kMcListCount; slot++) {
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kWorldFrameTexture));
 			MenuPcs.DrawRect(0, FLOAT_803314D8,
 			         static_cast<float>(static_cast<float>(sepSlope * static_cast<double>(slot) + sepBase) -
 			                            sepOff),
@@ -8832,7 +8850,9 @@ nextListEntry:
 		double mapX;
 		double rowSlopeD;
 		mapX = *pOff2 + static_cast<double>(*p518a);
+#ifndef VERSION_GCCJGC
 		const int language = Game.m_gameWork.GetLanguage();
+#endif
 		const int* digitWidths = s_YearWTbl;
 		const int* playWidths = s_TimeWTbl;
 		rowSlopeD = *pSl2;
@@ -8846,7 +8866,7 @@ nextListEntry:
 				float rowY = *pH40a + slotY;
 				const float* pW68c = &FLOAT_80331468;
 				float capX = *pW68c;
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x26));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcCharacterFrameTexture));
 				const float* pZc1 = &FLOAT_803313dc;
 				const float* pOc1 = &FLOAT_803313e8;
 				const float* pW68d = &FLOAT_80331468;
@@ -8878,7 +8898,7 @@ nextListEntry:
 				MenuPcs.DrawRect(8, capX, rowY, *pD8c3, *pH40c,
 				         *pZc2, *pZc2,
 				         *pOc2, *pOc2, *pZc2);
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcCharacterFillTexture));
 				const float* pZc3 = &FLOAT_803313dc;
 				const float* pOc3 = &FLOAT_803313e8;
 				const float* p51ca = &FLOAT_8033151c;
@@ -8888,11 +8908,15 @@ nextListEntry:
 
 				const float* p520a = &FLOAT_80331520;
 				digitX = *p520a;
+#ifdef VERSION_GCCJGC
+				rowY = FLOAT_803314D8 + slotY;
+#else
 				if (language != 5) {
 					const float* pD8c4 = &FLOAT_803314D8;
 					rowY = *pD8c4 + slotY;
 				}
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
+#endif
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcYearTexture));
 				int digitCount = (static_cast<int>(slotData->m_scriptSysVal0) > 9) + 1;
 				if (static_cast<int>(slotData->m_scriptSysVal0) > 99) {
 					digitCount = 3;
@@ -8917,6 +8941,9 @@ nextListEntry:
 							totalWidth += digitWidths[static_cast<int>(slotData->m_scriptSysVal0) % 10];
 						}
 					}
+#ifdef VERSION_GCCJGC
+					digitX += (float)((32 - totalWidth) / 2);
+#else
 					double digitScaleD;
 					if (language != 5) {
 						const double* pSc530a = &DOUBLE_80331530;
@@ -8934,6 +8961,7 @@ nextListEntry:
 						totalWidth += 0x20;
 					}
 					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
+#endif
 					const float* pZd1 = &FLOAT_803313dc;
 					const double* pCs1 = &DOUBLE_80331490;
 					const double* pRs1 = &DOUBLE_80331540;
@@ -8963,9 +8991,15 @@ nextListEntry:
 						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, *p410b,
 						         static_cast<float>(colSlope * static_cast<float>(digit % 5)),
 						         static_cast<float>(rowSlope * static_cast<float>(digit / 5) + rowBase),
+#ifdef VERSION_GCCJGC
+						         *pOd1, *pOd1, zeroF);
+						digitX += digitWidthF;
+#else
 						         digitScale, *pOd1, zeroF);
 						digitX += digitWidthF * digitScale;
+#endif
 					}
+#ifndef VERSION_GCCJGC
 					float suffixU;
 					float suffixWidth;
 					if (language == 2) {
@@ -9021,10 +9055,14 @@ nextListEntry:
 						MenuPcs.DrawRect(0, digitX, rowY, suffixWidth, *pD8d1,
 						         *pZd3, suffixU, suffixScale, *pOd2, *pZd3);
 					}
+#endif
 				}
 
 				const float* pLx520 = &FLOAT_80331520;
 				float labelX = *pLx520;
+#ifdef VERSION_GCCJGC
+				float dateLabelY = FLOAT_80331554 + slotY;
+#else
 				float dateLabelY;
 				if (language != 5) {
 					const float* pDl554 = &FLOAT_80331554;
@@ -9036,16 +9074,21 @@ nextListEntry:
 				}
 				const float* pLx550 = &FLOAT_80331550;
 				labelX -= *pLx550;
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+#endif
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcYearLabelTexture));
 				const float* pZe1 = &FLOAT_803313dc;
 				const float* pOe1 = &FLOAT_803313e8;
 				const float* pH40e = &FLOAT_80331440;
 				const float* p558a = &FLOAT_80331558;
 				MenuPcs.DrawRect(0, labelX, dateLabelY,
+#ifdef VERSION_GCCJGC
+				         32.0f, *p558a, *pZe1, *pZe1,
+#else
 				         *pH40e, *p558a, *pZe1, *pZe1,
+#endif
 				         *pOe1, *pOe1, *pZe1);
 
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x37));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcFaceTexture));
 				const float* p55Ca = &FLOAT_8033155C;
 				float iconX = *p55Ca;
 				const float* pD8e1 = &FLOAT_803314D8;
@@ -9079,7 +9122,7 @@ nextListEntry:
 				}
 				const float* pW68h = &FLOAT_80331468;
 				rowY = *pW68h + slotY;
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcTimeTexture));
 				const float* pZe3 = &FLOAT_803313dc;
 				const float* pOe3 = &FLOAT_803313e8;
 				const float* p564a = &FLOAT_80331564;

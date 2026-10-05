@@ -790,7 +790,7 @@ config.libs = [
             Object(NonMatching, "THPSimple.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "USBStreamData.cpp"),
-            Object(Matching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "vector.cpp"),
             Object(Matching, "wind.cpp"),
             Object(NonMatching, "wm_menu.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
@@ -966,14 +966,14 @@ config.libs = [
     DolphinLib(
         "mix",
         [
-            Object(Matching, "mix/mix.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mix/mix.c"),
         ],
     ),
     DolphinLib(
         "axart",
         [
-            Object(Matching, "axart/axart.c"),
-            Object(Matching, "axart/axart3d.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axart/axart.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axart/axart3d.c"),
         ],
     ),
     DolphinLib(
@@ -1008,7 +1008,7 @@ config.libs = [
         "gx",
         [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXAttr.c"),
-            Object(Matching, "gx/GXBump.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXBump.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXDisplayList.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXFifo.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXFrameBuf.c"),
@@ -1026,7 +1026,7 @@ config.libs = [
             Object(Matching, "gx/GXSave.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXStubs.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXTev.c"),
-            Object(Matching, "gx/GXTexture.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXTexture.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "gx/GXTransform.c",
@@ -1042,8 +1042,8 @@ config.libs = [
         "gba",
         [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBA.c"),
-            Object(Matching, "gba/GBAGetProcessStatus.c"),
-            Object(Matching, "gba/GBAJoyBoot.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAGetProcessStatus.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAJoyBoot.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBARead.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAWrite.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAXfer.c"),
@@ -1302,7 +1302,7 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "thp/THPDec.c"),
-            Object(Matching, "thp/THPAudio.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "thp/THPAudio.c"),
         ],
     },
 ]

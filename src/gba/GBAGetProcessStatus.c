@@ -4,10 +4,10 @@
  * --INFO--
  * PAL Address: 0x801A76FC
  * PAL Size: 372b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801A65E0
+ * EN Size: 372b
+ * JP Address: 0x801A1C24
+ * JP Size: 372b
  */
 s32 GBAGetProcessStatus(s32 chan, u8* percentp) {
     GBAControl* gba = &__GBA[chan];

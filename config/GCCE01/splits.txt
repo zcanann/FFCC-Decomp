@@ -1106,3 +1106,61 @@ auto_07_8021AEB5_data:
 
 auto_07_8021AFF3_data:
 	.data start:0x8021AFF3 end:0x8021AFF8 align:1
+
+gba/GBAGetProcessStatus.c:
+	.text	start:0x801A65E0 end:0x801A6754
+
+gba/GBAJoyBoot.c:
+	.text	start:0x801A6754 end:0x801A7660
+	.data	start:0x8021BA08 end:0x8021BA35
+
+auto_07_8021BA35_data:
+	.data start:0x8021BA35 end:0x8021BA38 align:1
+
+thp/THPAudio.c:
+	.text	start:0x801D3DC4 end:0x801D42F4
+
+gx/GXBump.c:
+	.text	start:0x801A3A28 end:0x801A40BC
+	.sdata2	start:0x80332878 end:0x80332880
+
+mix/mix.c:
+	.text	start:0x8019683C end:0x8019685C
+	.bss	start:0x80324D20 end:0x80326520
+
+axart/axart.c:
+	.text	start:0x8019685C end:0x801968F0
+	.sbss	start:0x8032E290 end:0x8032E294
+	.sdata2	start:0x803327C8 end:0x803327D0
+
+axart/axart3d.c:
+	.text	start:0x801968F0 end:0x80196900
+	.sbss	start:0x8032E298 end:0x8032E2A0
+
+gx/GXTexture.c:
+	.text	start:0x801A2A5C end:0x801A3A28
+	.data	start:0x8021B5F0 end:0x8021B818
+	.sdata	start:0x8032DB80 end:0x8032DBC0
+	.sdata2	start:0x80332850 end:0x80332878
+
+auto_10_8032E294_sbss:
+	.sbss start:0x8032E294 end:0x8032E298 align:4
+
+math.cpp:
+	.text start:0x8001A024 end:0x8001C0E4
+	.rodata start:0x801D53E0 end:0x801D53F0
+	.data start:0x801E72D0 end:0x801E72F0
+	.sdata start:0x8032D3E0 end:0x8032D3F0
+	.sdata2 start:0x8032E700 end:0x8032E760
+	extab start:0x80005920 end:0x800059B0
+	extabindex start:0x8000B1DC end:0x8000B2B4
+	.bss start:0x8023B498 end:0x8023B848
+
+auto_07_8021B5EC_data:
+	.data start:0x8021B5EC end:0x8021B5F0
+
+auto_09_8032DB7C_sdata:
+	.sdata start:0x8032DB7C end:0x8032DB80
+
+auto_11_8033284C_sdata2:
+	.sdata2 start:0x8033284C end:0x80332850

@@ -1,5 +1,14 @@
-#include <dolphin/thp.h>
+#include <dolphin/thp/THPAudio.h>
 
+/*
+ * --INFO--
+ * PAL Address: 0x801D4E5C
+ * PAL Size: 1124b
+ * EN Address: 0x801D3DC4
+ * EN Size: 1124b
+ * JP Address: 0x801D00D4
+ * JP Size: 1124b
+ */
 u32 THPAudioDecode(s16 *audioBuffer, u8 *audioFrame, s32 flag)
 {
     THPAudioRecordHeader *header;
@@ -145,6 +154,15 @@ u32 THPAudioDecode(s16 *audioBuffer, u8 *audioFrame, s32 flag)
     return header->sampleSize;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801D52C0
+ * PAL Size: 144b
+ * EN Address: 0x801D4228
+ * EN Size: 144b
+ * JP Address: 0x801D0538
+ * JP Size: 144b
+ */
 static s32 __THPAudioGetNewSample(THPAudioDecodeInfo *info)
 {
     s32 sample;
@@ -168,6 +186,15 @@ static s32 __THPAudioGetNewSample(THPAudioDecodeInfo *info)
     return sample;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801D5350
+ * PAL Size: 60b
+ * EN Address: 0x801D42B8
+ * EN Size: 60b
+ * JP Address: 0x801D05C8
+ * JP Size: 60b
+ */
 static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr)
 {
     info->encodeData = ptr;

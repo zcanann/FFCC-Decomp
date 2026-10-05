@@ -824,7 +824,7 @@ config.libs = [
             Object(Matching, "os/OSAlarm.c"),
             Object(Matching, "os/OSAlloc.c"),
             Object(Matching, "os/OSArena.c"),
-            Object(Matching, "os/OSAudioSystem.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSAudioSystem.c"),
             Object(Matching, "os/OSCache.c"),
             Object(Matching, "os/OSContext.c"),
             Object(Matching, "os/OSError.c"),
@@ -1179,7 +1179,7 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             Object(Matching, "TRK_MINNOW_DOLPHIN/__exception.s"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/CircleBuffer.c", mw_version="GC/2.6"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "TRK_MINNOW_DOLPHIN/CircleBuffer.c", mw_version="GC/2.6"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/dispatch.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),

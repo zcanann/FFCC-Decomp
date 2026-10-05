@@ -69,3 +69,10 @@ os/OSStopwatch.c:
 
 os/OSSync.c:
 	.text start:0x8017F854 end:0x8017F8D8
+
+TRK_MINNOW_DOLPHIN/CircleBuffer.c:
+	.text start:0x801ADF28 end:0x801AE190
+
+os/OSAudioSystem.c:
+	.text start:0x8017BB68 end:0x8017BDFC
+	.data start:0x802157E8 end:0x80215868

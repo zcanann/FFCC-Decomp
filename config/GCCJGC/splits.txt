@@ -63,3 +63,7 @@ os/OSStopwatch.c:
 
 os/OSSync.c:
 	.text start:0x8017AF00 end:0x8017AF84
+
+os/OSAudioSystem.c:
+	.text start:0x80177214 end:0x801774A8
+	.data start:0x80232220 end:0x802322A0

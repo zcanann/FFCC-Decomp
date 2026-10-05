@@ -8612,38 +8612,22 @@ void CMenuPcs::DrawMainMenuSub()
 		m_wm.m_worldObjData[i].m_cameraPosition.z = zSub;
 	}
 
-	float* depthPtr = depthValues;
-	unsigned int* orderPtr = drawOrder;
-	for (unsigned int i = 0; static_cast<int>(i) < 5; i++) {
+	for (i = 0; i < 5; i++) {
 		m_wm.m_handles[i]->m_model->GetMatrix(modelMtx);
-		*orderPtr = i;
-		orderPtr++;
-		*depthPtr = modelMtx[2][3];
-		depthPtr++;
+		drawOrder[i] = i;
+		depthValues[i] = modelMtx[2][3];
 	}
 
-	{
-		float* fp = depthValues;
-		unsigned int* op = drawOrder;
-		for (i = 0; i < 5; i++) {
-			int next = i + 1;
-			float* fpInner = depthValues + next;
-			unsigned int* opInner = drawOrder + next;
-			for (j = next; j < 5; j++) {
-				float depth = *fp;
-				if (*fp > *fpInner) {
-					unsigned int idx = *op;
-					unsigned int idxInner = *opInner;
-					*fp = *fpInner;
-					*op = idxInner;
-					*fpInner = depth;
-					*opInner = idx;
-				}
-				fpInner++;
-				opInner++;
+	for (i = 0; i < 5; i++) {
+		for (j = i + 1; j < 5; j++) {
+			if (depthValues[i] > depthValues[j]) {
+				float depth = depthValues[i];
+				unsigned int index = drawOrder[i];
+				depthValues[i] = depthValues[j];
+				drawOrder[i] = drawOrder[j];
+				depthValues[j] = depth;
+				drawOrder[j] = index;
 			}
-			op++;
-			fp++;
 		}
 	}
 

@@ -163,19 +163,30 @@ void Window_Open(struct Window *win)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02005B84
+ * PAL Size: 1216b
+ * EN Address: 0x02005B54
+ * EN Size: 1152b
+ * JP Address: 0x02005D08
+ * JP Size: 1152b
+ */
 void Window_OpenStyle0(struct Window *win, s32 tile, s32 pal, s32 type)
 {
     u16 buf[30];
+    s32 mod;
     s32 x;
     s32 py;
     s32 i;
     s32 y;
     s32 n;
-    s32 mod;
     s32 t;
     s32 row;
     s32 k;
+#if defined(VERSION_GCCP01)
     s32 edge;
+#endif
     s32 attr;
     s32 flags;
     u16 *map;
@@ -234,7 +245,11 @@ void Window_OpenStyle0(struct Window *win, s32 tile, s32 pal, s32 type)
                 k += t;
             } else {
                 k = tile - 4;
+#if !defined(VERSION_GCCP01)
+                row = 0;
+#else
                 row = n / 3;
+#endif
             }
         }
         attr = Window_GetItemPalette(win->items[row].enabled, win->slot);
@@ -248,6 +263,9 @@ void Window_OpenStyle0(struct Window *win, s32 tile, s32 pal, s32 type)
             }
         }
 
+#if !defined(VERSION_GCCP01)
+        if ((row == 0 && !t) || (row == win->rows - 1 && t)) {
+#else
         edge = 0;
         if (win->tallRows) {
             t = 0;
@@ -257,6 +275,7 @@ void Window_OpenStyle0(struct Window *win, s32 tile, s32 pal, s32 type)
                 edge = 1;
         }
         if ((win->tallRows && edge) || (!win->tallRows && ((row == 0 && !t) || (row == win->rows - 1 && t)))) {
+#endif
             buf[0] = (tile + 4) | pal;
             buf[win->width - 1] = (tile + 4) | pal;
             buf[win->width - 1] |= 0x400;
@@ -1355,6 +1374,15 @@ void Window_OpenStyle14(struct Window *win, s32 tile, s32 pal)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02007D9C
+ * PAL Size: 988b
+ * EN Address: 0x02007D2C
+ * EN Size: 986b
+ * JP Address: 0x02007F60
+ * JP Size: 986b
+ */
 void Window_OpenStyleNone(struct Window *win, s32 tile, s32 pal)
 {
     u16 buf[30];
@@ -1416,7 +1444,11 @@ void Window_OpenStyleNone(struct Window *win, s32 tile, s32 pal)
             n--;
             k = !(n & 1);
             j = (n - 1) >> 1;
+#if !defined(VERSION_GCCP01)
+            t = 0x320;
+#else
             t = 0x340;
+#endif
             t += win->width * 2 * j;
             t += k;
             for (i = 1; i < win->width - 1; i++) {
@@ -1642,6 +1674,15 @@ void Window_CloseStyle1(struct Window *win)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02008540
+ * PAL Size: 360b
+ * EN Address: 0x020084D0
+ * EN Size: 330b
+ * JP Address: 0x02008704
+ * JP Size: 330b
+ */
 void Window_CloseStyle3(struct Window *win)
 {
     u16 buf[30];
@@ -1669,11 +1710,13 @@ void Window_CloseStyle3(struct Window *win)
         DmaCopy16(3, buf, map, win->width << 1);
         if ((py >> 3) - 1 <= win->y)
             DmaCopy16(3, buf, map - 32, win->width << 1);
+#if defined(VERSION_GCCP01)
         if (win->bg == 2) {
             tile = 0x3FF;
             for (i = 0; i < ARRAY_COUNT(buf); i++)
                 buf[i] = tile;
         }
+#endif
         map = Bg_GetMapPtr(win->bg - 1, win->x, py >> 3);
         DmaCopy16(3, buf, map, win->width << 1);
         if ((py >> 3) - 1 <= win->y && gMode)
@@ -1693,6 +1736,15 @@ void Window_CloseStyle3(struct Window *win)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x020086A8
+ * PAL Size: 320b
+ * EN Address: 0x0200861C
+ * EN Size: 304b
+ * JP Address: 0x02008850
+ * JP Size: 304b
+ */
 void Window_CloseStyle4(struct Window *win)
 {
     u16 buf[30];
@@ -1719,11 +1771,13 @@ void Window_CloseStyle4(struct Window *win)
         DmaCopy16(3, buf, map, win->width << 1);
         if ((py >> 3) - 1 <= win->y)
             DmaCopy16(3, buf, map - 32, win->width << 1);
+#if defined(VERSION_GCCP01)
         if (win->bg == 2) {
             tile = 0x3FF;
             for (i = 0; i < ARRAY_COUNT(buf); i++)
                 buf[i] = tile;
         }
+#endif
         map = Bg_GetMapPtr(win->bg - 1, win->x, py >> 3);
         DmaCopy16(3, buf, map, win->width << 1);
         if ((py >> 3) - 1 > win->y) {
@@ -1784,6 +1838,15 @@ void Window_CloseStyle5(struct Window *win)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x020088E0
+ * PAL Size: 360b
+ * EN Address: 0x02008844
+ * EN Size: 330b
+ * JP Address: 0x02008A78
+ * JP Size: 330b
+ */
 void Window_CloseStyle6(struct Window *win)
 {
     u16 buf[30];
@@ -1811,11 +1874,13 @@ void Window_CloseStyle6(struct Window *win)
         DmaCopy16(3, buf, map, win->width << 1);
         if ((py >> 3) - 1 <= win->y)
             DmaCopy16(3, buf, map - 32, win->width << 1);
+#if defined(VERSION_GCCP01)
         if (win->bg == 2) {
             tile = 0x3FF;
             for (i = 0; i < ARRAY_COUNT(buf); i++)
                 buf[i] = tile;
         }
+#endif
         map = Bg_GetMapPtr(win->bg - 1, win->x, py >> 3);
         DmaCopy16(3, buf, map, win->width << 1);
         if ((py >> 3) - 1 <= win->y && gMode)
@@ -1835,6 +1900,15 @@ void Window_CloseStyle6(struct Window *win)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02008A48
+ * PAL Size: 324b
+ * EN Address: 0x02008990
+ * EN Size: 300b
+ * JP Address: 0x02008BC4
+ * JP Size: 300b
+ */
 void Window_CloseStyle7(struct Window *win)
 {
     u16 buf[30];
@@ -1858,14 +1932,24 @@ void Window_CloseStyle7(struct Window *win)
             tile = 0x2FF;
         for (i = 0; i < ARRAY_COUNT(buf); i++)
             buf[i] = tile;
+#if defined(VERSION_GCCP01)
         map = Bg_GetMapPtr(win->bg, win->x, py >> 3);
+#else
+        map = Bg_GetMapPtr(win->bg - 1, win->x, py >> 3);
+#endif
         DmaCopy16(3, buf, map, win->width << 1);
+#if defined(VERSION_GCCP01)
         if (win->bg == 2) {
             tile = 0x3FF;
             for (i = 0; i < ARRAY_COUNT(buf); i++)
                 buf[i] = tile;
         }
+#endif
+#if defined(VERSION_GCCP01)
         map = Bg_GetMapPtr(win->bg - 1, win->x, py >> 3);
+#else
+        map = Bg_GetMapPtr(win->bg, win->x, py >> 3);
+#endif
         DmaCopy16(3, buf, map, win->width << 1);
         if ((py >> 3) - 2 <= win->y) {
             for (i = 0; i < 2; i++) {

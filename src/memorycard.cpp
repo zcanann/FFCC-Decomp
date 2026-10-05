@@ -90,6 +90,19 @@ enum {
     kMemoryCardStageSize = 0x16000,
     kMemoryCardSaveBufferSize = 0xA000,
     kMemoryCardSaveLetterOffset = 0x104,
+#if defined(VERSION_GCCJGC)
+    kMemoryCardRegion = 'J',
+    kMemoryCardAllocationLine = 0x2A2,
+    kMemoryCardAllocationErrorLine = 0x2A4,
+    kMemoryCardIconOpenErrorLine = 0x2E4,
+    kMemoryCardIconDataErrorLine = 0x2EC,
+#else
+    kMemoryCardRegion = 'E',
+    kMemoryCardAllocationLine = 0x2AB,
+    kMemoryCardAllocationErrorLine = 0x2AD,
+    kMemoryCardIconOpenErrorLine = 0x2EF,
+    kMemoryCardIconDataErrorLine = 0x2F6,
+#endif
 };
 
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_region) == 0x10);
@@ -498,13 +511,14 @@ int CMemoryCardMan::McOpen(int chan)
  * --INFO--
  * PAL Address: 0x800C48E8
  * PAL Size: 124b
- * EN Address: 0x800D97A0
- * EN Size: 248b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C4170
+ * EN Size: 124b
+ * JP Address: 0x800C2058
+ * JP Size: 72b
  */
 int CMemoryCardMan::McClose()
 {
+#if !defined(VERSION_GCCJGC)
 	int chan = m_fileInfo.chan;
 
 	if (chan < 0 || chan > 1)
@@ -515,6 +529,7 @@ int CMemoryCardMan::McClose()
 
 		return m_result;
 	}
+#endif
 
 	int result = CARDClose(&m_fileInfo);
 
@@ -607,21 +622,21 @@ int CMemoryCardMan::McSetStat(int chan)
  * --INFO--
  * PAL Address: 0x800C4738
  * PAL Size: 164b
- * EN Address: 0x800D9B24
- * EN Size: 228b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C3FC0
+ * EN Size: 164b
+ * JP Address: 0x800C1EA8
+ * JP Size: 164b
  */
 void CMemoryCardMan::CreateMcBuff()
 {
     if (m_saveBuffer == 0)
     {
-        m_saveBuffer = new (m_stage, "memorycard.cpp", 0x2AB)
+        m_saveBuffer = new (m_stage, "memorycard.cpp", kMemoryCardAllocationLine)
             char[kMemoryCardSaveBufferSize];
 
         if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
-            System.Printf("%s(%d): Error: memory allocation error\n", "memorycard.cpp", 0x2AD);
+            System.Printf("%s(%d): Error: memory allocation error\n", "memorycard.cpp", kMemoryCardAllocationErrorLine);
         }
     }
 
@@ -702,10 +717,10 @@ void CMemoryCardMan::McEnd()
  * --INFO--
  * PAL Address: 0x800C4344
  * PAL Size: 776b
- * EN Address: 0x800D9CF4
- * EN Size: 728b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C3BCC
+ * EN Size: 776b
+ * JP Address: 0x800C1AD8
+ * JP Size: 740b
  */
 void CMemoryCardMan::SetMcIconImage()
 {
@@ -714,15 +729,24 @@ void CMemoryCardMan::SetMcIconImage()
         CreateMcBuff();
     }
 
+#if defined(VERSION_GCCJGC)
+    CFile::CHandle* h = File.Open(CardConst::MC_ICONIMG_FNAME, 0, CFile::PRI_LOW);
+#else
     char path[136];
 
     const char* lang = Game.GetLangString();
     sprintf(path, "dvd/%smenu/%s", lang, CardConst::MC_ICONIMG_FNAME);
     CFile::CHandle* h = File.Open(path, 0, CFile::PRI_LOW);
+#endif
 
     if (h == nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
     {
-        System.Printf("%s(%d): Error: %s open error\n", "memorycard.cpp", 0x2EF, path);
+        System.Printf("%s(%d): Error: %s open error\n", "memorycard.cpp", kMemoryCardIconOpenErrorLine,
+#if defined(VERSION_GCCJGC)
+                      CardConst::MC_ICONIMG_FNAME);
+#else
+                      path);
+#endif
     }
 
     File.Read(h);
@@ -732,7 +756,12 @@ void CMemoryCardMan::SetMcIconImage()
 
     if (len != 0x2A00 && static_cast<unsigned int>(System.m_execParam) >= 1)
     {
-        System.Printf("%s(%d): Error: [%s] data error\n", "memorycard.cpp", 0x2F6, path);
+        System.Printf("%s(%d): Error: [%s] data error\n", "memorycard.cpp", kMemoryCardIconDataErrorLine,
+#if defined(VERSION_GCCJGC)
+                      CardConst::MC_ICONIMG_FNAME);
+#else
+                      path);
+#endif
     }
 
     char* saveBuffer = m_saveBuffer;
@@ -1032,10 +1061,10 @@ void CMemoryCardMan::EncodeData()
  * --INFO--
  * PAL Address: 0x800C369C
  * PAL Size: 2576b
- * EN Address: 0x800DA5B8
- * EN Size: 2356b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C2F24
+ * EN Size: 2576b
+ * JP Address: 0x800C0E30
+ * JP Size: 2576b
  */
 void CMemoryCardMan::MakeSaveData()
 {
@@ -1057,7 +1086,7 @@ void CMemoryCardMan::MakeSaveData()
     memcpy(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE));
     memcpy(saveDat->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE));
     memcpy(saveDat->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION));
-    saveDat->m_region = 'E';
+    saveDat->m_region = kMemoryCardRegion;
     saveDat->m_random = Math.Rand(0x7FFFFFFF);
     saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
     saveDat->m_flags = 0;
@@ -1212,10 +1241,10 @@ void CMemoryCardMan::MakeSaveData()
  * --INFO--
  * PAL Address: 0x800C2DBC
  * PAL Size: 2272b
- * EN Address: 0x800DAEEC
- * EN Size: 2292b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C2644
+ * EN Size: 2272b
+ * JP Address: 0x800C05C8
+ * JP Size: 2152b
  */
 void CMemoryCardMan::SetLoadData()
 {
@@ -1253,7 +1282,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (saveDat->m_region != 'E')
+    if (saveDat->m_region != kMemoryCardRegion)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1295,6 +1324,7 @@ void CMemoryCardMan::SetLoadData()
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
         CCaravanWork* caravanWork = &g->m_caravanWorkArr[c];
 
+#if !defined(VERSION_GCCJGC)
         for (i = count = 0; i < 64; i++)
         {
             if (savedCharacter.m_inventoryItems[i] != -1)
@@ -1310,6 +1340,7 @@ void CMemoryCardMan::SetLoadData()
             }
             savedCharacter.m_inventoryItemCount = static_cast<u16>(count);
         }
+#endif
 
         caravanWork->m_id = savedCharacter.m_id;
         caravanWork->m_param1 = savedCharacter.m_param1;
@@ -1395,7 +1426,9 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_shopData0 = savedCharacter.m_originRandom;
         *reinterpret_cast<u64*>(&caravanWork->m_shopData1) = savedCharacter.m_originSerial;
         caravanWork->m_baseDataIndex = savedCharacter.m_baseDataIndex;
+#if !defined(VERSION_GCCJGC)
         caravanWork->m_maxHp = caravanWork->GetArtifactIncludeHpMax();
+#endif
 
     }
 

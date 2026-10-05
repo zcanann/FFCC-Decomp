@@ -4,6 +4,11 @@
 #include <stdarg.h>
 #include <string.h>
 
+#ifdef VERSION_GCCJGC
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
+#endif
+
 CGoOutMenu g_GoOutMenu;
 CGoOutMenu* g_pGoOutMenu;
 int g_freeCaravanIdx;
@@ -18,6 +23,7 @@ static const int kTransferMessageBase = 0;
 static const int kTransferMessageGroup = 2;
 #endif
 
+#ifndef VERSION_GCCJGC
 static const char s_The_Memory_Card_in_Slot_A_contains_801DEE30[] = "The Memory Card in Slot A contains";
 static const char s_no_save_data_for_your_current_game_801DEE54[] = "no save data for your current game,";
 static const char s_or_contains_corrupt_data_Please_801DEE78[] = "or contains corrupt data. Please";
@@ -582,6 +588,8 @@ const char* g_strGooutMes[] = {
     s_Para_transferir_un_personaje_debes_801E2E6C, s_crear_uno_primero_y_guardar_los_datos_801E2E90, s_en_una_Memory_Card_tarjeta_de_memoria_801E2EB8, s_El_personaje_no_puede_ser_801E2EE4, s_eliminado_de_los_datos_actuales_801E2F00,
 };
 
+#endif
+
 struct GoOutMenuState
 {
     unsigned char unk0[0x18];
@@ -614,12 +622,19 @@ static inline GoOutMenuState& MenuGoOutState()
     return *MenuPcs.m_goOutState;
 }
 
+#ifndef VERSION_GCCJGC
 static inline const char* GetGoOutMessageLine(int languageId, int line)
 {
     return g_strGooutMes[(languageId * 0x6E) + line];
 }
 
+#endif
+
+#ifdef VERSION_GCCJGC
+static const char s_gooutCpp[] = "goout.cpp";
+#else
 extern char s_gooutCpp[];
+#endif
 
 static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
 {
@@ -721,12 +736,12 @@ void CGoOutMenu::CalcMemCardProc()
 
 /*
  * --INFO--
- * PAL Address: 0x8016c564
+ * PAL Address: 0x8016C564
  * PAL Size: 1156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016B4EC
+ * EN Size: 1156b
+ * JP Address: 0x801668A8
+ * JP Size: 1108b
  */
 unsigned char CGoOutMenu::SetMemCardError()
 {
@@ -755,6 +770,14 @@ unsigned char CGoOutMenu::SetMemCardError()
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 5,
+                       "\203\130\203\215\203\142\203\147\202\140\202\314\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311\202\315",
+                       "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\252\202\240\202\350\202\334\202\271\202\361\201\102",
+                       "",
+                       "\203\130\203\215\203\142\203\147\202\140\202\311\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\252\223\374\202\301\202\275",
+                       "\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\360\202\263\202\265\202\304\202\255\202\276\202\263\202\242\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 0),
@@ -762,6 +785,7 @@ unsigned char CGoOutMenu::SetMemCardError()
                        GetGoOutMessageLine(languageId, 2),
                        GetGoOutMessageLine(languageId, 3),
                        GetGoOutMessageLine(languageId, 4));
+#endif
             break;
         } else if (m_lastMemCardProc == 3) {
             MenuPcs.m_menuWindowInfo->state = 3;
@@ -856,6 +880,14 @@ unsigned char CGoOutMenu::SetMemCardError()
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 5,
+                       "\203\130\203\215\203\142\203\147\202\140\202\314\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311\202\315",
+                       "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\252\202\240\202\350\202\334\202\271\202\361\201\102",
+                       "",
+                       "\203\130\203\215\203\142\203\147\202\140\202\311\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\252\223\374\202\301\202\275",
+                       "\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\360\202\263\202\265\202\304\202\255\202\276\202\263\202\242\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 0),
@@ -863,6 +895,7 @@ unsigned char CGoOutMenu::SetMemCardError()
                        GetGoOutMessageLine(languageId, 2),
                        GetGoOutMessageLine(languageId, 3),
                        GetGoOutMessageLine(languageId, 4));
+#endif
         }
         break;
     }
@@ -1040,12 +1073,12 @@ inline void CGoOutMenu::CalcLoadMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x8016c1a4
+ * PAL Address: 0x8016C1A4
  * PAL Size: 616b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016B12C
+ * EN Size: 616b
+ * JP Address: 0x8016653C
+ * JP Size: 548b
  */
 void CGoOutMenu::SetMainMode(unsigned char mode)
 {
@@ -1083,12 +1116,20 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
     }
     case 2:
         if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) != 1) {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 4,
+                       "\202\334\202\276\210\352\223\170\202\340\203\132\201\133\203\165\202\263\202\352\202\304\202\242\202\334\202\271\202\361\201\102",
+                       "",
+                       "\203\114\203\203\203\211\203\116\203\136\201\133\202\314\210\332\223\256\202\311\202\315\203\132\201\133\203\165\203\146\201\133\203\136\202\252\225\113\227\166\202\310\202\314\202\305\201\101",
+                       "\220\346\202\311\214\273\215\335\202\314\203\146\201\133\203\136\202\360\203\132\201\133\203\165\202\265\202\304\202\255\202\276\202\263\202\242\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 5),
                        GetGoOutMessageLine(languageId, 6),
                        GetGoOutMessageLine(languageId, 7),
                        GetGoOutMessageLine(languageId, 8));
+#endif
             m_returnGoOutMode = (char)0xff;
             m_goOutMode = 0;
         }
@@ -1096,6 +1137,14 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         do {
             if (Game.m_caravanWorkArr[i].m_shopState != 0 &&
                 static_cast<signed char>(Game.m_caravanWorkArr[i].unk_0xc1e) != 1) {
+#ifdef VERSION_GCCJGC
+                SetMenuStr(0, 5,
+                           "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\311\201\101",
+                           "\202\334\202\276\203\132\201\133\203\165\202\263\202\352\202\304\202\242\202\310\202\242\203\114\203\203\203\211\203\116\203\136\201\133\202\252\202\242\202\334\202\267\201\102",
+                           "",
+                           "\203\114\203\203\203\211\203\116\203\136\201\133\202\314\210\332\223\256\202\311\202\315\203\132\201\133\203\165\203\146\201\133\203\136\202\252\225\113\227\166\202\310\202\314\202\305\201\101",
+                           "\220\346\202\311\214\273\215\335\202\314\203\146\201\133\203\136\202\360\203\132\201\133\203\165\202\265\202\304\202\255\202\276\202\263\202\242\201\102");
+#else
                 int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 5,
                            GetGoOutMessageLine(languageId, 9),
@@ -1103,6 +1152,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
                            GetGoOutMessageLine(languageId, 11),
                            GetGoOutMessageLine(languageId, 12),
                            GetGoOutMessageLine(languageId, 13));
+#endif
                 m_returnGoOutMode = (char)0xff;
                 m_goOutMode = 0;
             }
@@ -1126,6 +1176,27 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
     }
     }
 }
+
+#ifdef VERSION_GCCJGC
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 232b
+ * EN Address: UNUSED
+ * EN Size: 272b
+ * JP Address: UNUSED
+ * JP Size: TODO
+ */
+void dumpOdekake(Mc::SaveDat* saveData)
+{
+    for (int i = 0; i < 8; i++) {
+        const CGoOutSaveCaravan& caravan = GoOutSaveDat(saveData).m_caravan[i];
+        System.Printf("pc=%d  use=%d:  odekake=%d  Guest=%d\n", i,
+                      caravan.m_dataPresent, caravan.m_odekakeOutFlag,
+                      caravan.m_odekakeReturnFlag);
+    }
+}
+#endif
 
 /*
  * --INFO--
@@ -1265,12 +1336,12 @@ inline void CGoOutMenu::Destroy()
 
 /*
  * --INFO--
- * PAL Address: 0x8016b8d4
+ * PAL Address: 0x8016B8D4
  * PAL Size: 2256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016A85C
+ * EN Size: 2256b
+ * JP Address: 0x80165D4C
+ * JP Size: 2032b
  */
 void CGoOutMenu::SetGoOutMode(unsigned char mode)
 {
@@ -1284,6 +1355,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_watchCardDisconnect = 0;
         m_saveLoadMenuOpen = 0;
         {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 7,
+                       "\203\130\203\215\203\142\203\147\202\140\202\311\201\101\214\273\215\335\203\166\203\214\203\103\222\206\202\314",
+                       "\203\146\201\133\203\136\202\252\202\240\202\351\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\360\201\101",
+                       "\203\130\203\215\203\142\203\147\202\141\202\311\201\101\210\332\223\256\202\263\202\271\202\351\203\114\203\203\203\211\203\116\203\136\201\133\202\314",
+                       "\203\146\201\133\203\136\202\252\202\240\202\351\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\360\202\263\202\265\202\304\202\255\202\276\202\263\202\242\201\102",
+                       "",
+                       "\203\114\203\203\203\211\203\116\203\136\201\133\202\314\210\332\223\256\202\360\202\250\202\261\202\310\202\301\202\304\202\242\202\351\212\324\202\315",
+                       "\202\307\202\277\202\347\202\314\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\340\224\262\202\251\202\310\202\242\202\305\202\255\202\276\202\263\202\242\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 7,
                        GetGoOutMessageLine(languageId, 14),
@@ -1293,6 +1374,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 18),
                        GetGoOutMessageLine(languageId, 19),
                        GetGoOutMessageLine(languageId, 20));
+#endif
         }
         break;
 	case 1:
@@ -1371,6 +1453,14 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x10:
         if (m_returnTransfer == 0) {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 5,
+                       "\221\111\202\361\202\276\203\114\203\203\203\211\203\116\203\136\201\133\202\360\201\101",
+                       "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\311",
+                       "\210\332\223\256\202\265\202\304\202\340\202\346\202\353\202\265\202\242\202\305\202\267\202\251\201\110",
+                       "\201\151\214\263\202\311\226\337\202\267\202\334\202\305\216\147\227\160\202\305\202\253\202\334\202\271\202\361\201\152",
+                       "\201\100\202\315\202\242\201\100\201\100\202\242\202\242\202\246");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 21),
@@ -1378,7 +1468,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 23),
                        GetGoOutMessageLine(languageId, 24),
                        GetGoOutMessageLine(languageId, 25));
+#endif
         } else {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 5,
+                       "\221\111\202\361\202\276\203\114\203\203\203\211\203\116\203\136\201\133\202\360\201\101",
+                       "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\311",
+                       "\226\337\202\265\202\304\202\340\202\346\202\353\202\265\202\242\202\305\202\267\202\251\201\110",
+                       "\201\151\201\165\203\121\203\130\203\147\201\166\202\252\202\355\202\314\203\146\201\133\203\136\202\251\202\347\215\355\217\234\202\265\202\334\202\267\201\152",
+                       "\201\100\202\315\202\242\201\100\201\100\202\242\202\242\202\246");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 26),
@@ -1386,6 +1485,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 28),
                        GetGoOutMessageLine(languageId, 29),
                        GetGoOutMessageLine(languageId, 30));
+#endif
         }
         m_cursorChoice = 1;
         break;
@@ -1430,12 +1530,20 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             m_memCardProc = 2;
         }
         {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 4,
+                       "\203\130\203\215\203\142\203\147\202\140\202\314\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311",
+                       "\203\132\201\133\203\165\222\206\202\305\202\267\201\102",
+                       "\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\342\203\160\203\217\201\133\203\173\203\136\203\223\202\311",
+                       "\202\263\202\355\202\347\202\310\202\242\202\305\202\255\202\276\202\263\202\242\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 31),
                        GetGoOutMessageLine(languageId, 32),
                        GetGoOutMessageLine(languageId, 33),
                        GetGoOutMessageLine(languageId, 34));
+#endif
         }
         break;
     }
@@ -1463,12 +1571,20 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             m_memCardProc = 2;
         }
         {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 4,
+                       "\203\130\203\215\203\142\203\147\202\141\202\314\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311",
+                       "\203\132\201\133\203\165\222\206\202\305\202\267\201\102",
+                       "\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\342\203\160\203\217\201\133\203\173\203\136\203\223\202\311",
+                       "\202\263\202\355\202\347\202\310\202\242\202\305\202\255\202\276\202\263\202\242\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 35),
                        GetGoOutMessageLine(languageId, 36),
                        GetGoOutMessageLine(languageId, 37),
                        GetGoOutMessageLine(languageId, 38));
+#endif
         }
         break;
     case 0x14:
@@ -1574,6 +1690,14 @@ void CGoOutMenu::CalcGoOut()
             m_messageTimer = 0;
             m_messageState = 1;
             {
+#ifdef VERSION_GCCJGC
+                SetMenuStr(0, 5,
+                           "\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\252\224\262\202\251\202\352\202\275\202\314\202\305\201\101",
+                           "\203\114\203\203\203\211\203\116\203\136\201\133\202\314\210\332\223\256\202\360\222\206\216\176\202\265\202\334\202\267\201\102",
+                           "",
+                           "\203\114\203\203\203\211\203\116\203\136\201\133\202\314\210\332\223\256\202\360\202\265\202\304\202\242\202\351\212\324\202\315",
+                           "\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\360\224\262\202\251\202\310\202\242\202\305\202\255\202\276\202\263\202\242\201\102");
+#else
                 int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 5,
                            GetGoOutMessageLine(languageId, 39),
@@ -1581,6 +1705,7 @@ void CGoOutMenu::CalcGoOut()
                            GetGoOutMessageLine(languageId, 41),
                            GetGoOutMessageLine(languageId, 42),
                            GetGoOutMessageLine(languageId, 43));
+#endif
             }
             return;
         }
@@ -1640,10 +1765,16 @@ card_connected:;
             return;
         }
         if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(0) == -3) {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 2,
+                       "\203\130\203\215\203\142\203\147\202\140\202\311\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\252",
+                       "\202\263\202\263\202\301\202\304\202\242\202\334\202\271\202\361\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 2,
                        GetGoOutMessageLine(languageId, 44),
                        GetGoOutMessageLine(languageId, 45));
+#endif
             m_returnGoOutMode = -1;
             SetGoOutMode(0);
             return;
@@ -1658,6 +1789,14 @@ card_connected:;
 
             MenuPcs.GetMcAccessPos(&m_accessCardChannel, &m_accessSaveIndex);
             if (m_accessCardChannel == -1) {
+#ifdef VERSION_GCCJGC
+                SetMenuStr(0, 5,
+                           "\203\130\203\215\203\142\203\147\202\140\202\314\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311\202\315",
+                           "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\252\202\240\202\350\202\334\202\271\202\361\201\102",
+                           "",
+                           "\203\130\203\215\203\142\203\147\202\140\202\311\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\252\223\374\202\301\202\275",
+                           "\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\360\202\263\202\265\202\304\202\255\202\276\202\263\202\242\201\102");
+#else
                 int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 5,
                            GetGoOutMessageLine(languageId, 0),
@@ -1665,6 +1804,7 @@ card_connected:;
                            GetGoOutMessageLine(languageId, 2),
                            GetGoOutMessageLine(languageId, 3),
                            GetGoOutMessageLine(languageId, 4));
+#endif
                 m_returnGoOutMode = -1;
                 SetGoOutMode(0);
             } else {
@@ -1686,10 +1826,16 @@ card_connected:;
             return;
         }
         if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(1) == -3) {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 2,
+                       "\203\130\203\215\203\142\203\147\202\141\202\311\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\252",
+                       "\202\263\202\263\202\301\202\304\202\242\202\334\202\271\202\361\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 2,
                        GetGoOutMessageLine(languageId, 46),
                        GetGoOutMessageLine(languageId, 47));
+#endif
             m_returnGoOutMode = -1;
             SetGoOutMode(0);
             return;
@@ -1704,10 +1850,16 @@ card_connected:;
                 MenuPcs.CalcGoOutSelCharInit();
                 if (MenuPcs.CheckSameMcFormatID(MenuPcs.m_goOutTransferSaveData,
                                                 static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)) != 0) {
+#ifdef VERSION_GCCJGC
+                    SetMenuStr(0, 2,
+                               "\202\261\202\314\203\146\201\133\203\136\202\315\201\101\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\251\202\347",
+                               "\203\122\203\163\201\133\202\263\202\352\202\275\202\340\202\314\202\310\202\314\202\305\216\147\227\160\202\305\202\253\202\334\202\271\202\361\201\102");
+#else
                     int languageId = Game.m_gameWork.GetLanguage() - 1;
                     SetMenuStr(0, 2,
                                GetGoOutMessageLine(languageId, 48),
                                GetGoOutMessageLine(languageId, 49));
+#endif
                     m_returnGoOutMode = -1;
                     SetGoOutMode(0);
                     return;
@@ -1726,6 +1878,16 @@ card_connected:;
                 MenuGoOutState().m_resultSelect = 0;
                 MenuPcs.InitSaveLoadMenu();
                 MenuPcs.CalcGoOutSelCharInit();
+#ifdef VERSION_GCCJGC
+                SetMenuStr(0, 7,
+                           "\203\130\203\215\203\142\203\147\202\141\202\314\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311\202\315",
+                           "\203\164\203\100\203\103\203\151\203\213\203\164\203\100\203\223\203\136\203\127\201\133\201\105\203\116\203\212\203\130\203\136\203\213\203\116\203\215\203\152\203\116\203\213\202\314",
+                           "\203\132\201\133\203\165\203\146\201\133\203\136\202\252\202\240\202\350\202\334\202\271\202\361\201\102",
+                           "",
+                           "\203\130\203\215\203\142\203\147\202\141\202\311",
+                           "\203\164\203\100\203\103\203\151\203\213\203\164\203\100\203\223\203\136\203\127\201\133\201\105\203\116\203\212\203\130\203\136\203\213\203\116\203\215\203\152\203\116\203\213\202\314",
+                           "\203\132\201\133\203\165\203\146\201\133\203\136\202\314\202\240\202\351\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\360\202\263\202\265\202\304\202\255\202\276\202\263\202\242\201\102");
+#else
                 int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 7,
                            GetGoOutMessageLine(languageId, 50),
@@ -1735,6 +1897,7 @@ card_connected:;
                            GetGoOutMessageLine(languageId, 54),
                            GetGoOutMessageLine(languageId, 55),
                            GetGoOutMessageLine(languageId, 56));
+#endif
                 m_returnGoOutMode = -1;
                 SetGoOutMode(0);
             }
@@ -1751,10 +1914,16 @@ card_connected:;
         }
         if (m_selectedTransferChara != -1) {
             if (GoOutSaveDat(static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)).m_caravan[m_selectedTransferChara].m_odekakeOutFlag != 0) {
+#ifdef VERSION_GCCJGC
+                SetMenuStr(0, 2,
+                           "\201\165\202\250\202\305\202\251\202\257\222\206\201\166\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\315",
+                           "\210\332\223\256\202\267\202\351\202\261\202\306\202\252\202\305\202\253\202\334\202\271\202\361\201\102");
+#else
                 int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 2,
                            GetGoOutMessageLine(languageId, 57),
                            GetGoOutMessageLine(languageId, 58));
+#endif
                 m_returnGoOutMode = 0xF;
                 SetGoOutMode(0);
             } else {
@@ -1765,11 +1934,18 @@ card_connected:;
                     if (sameChara == -3) {
                         m_returnGoOutMode = 0xF;
                         m_goOutMode = 0;
+#ifdef VERSION_GCCJGC
+                        SetMenuStr(0, 3,
+                                   "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\311\202\315",
+                                   "\202\267\202\305\202\311\223\257\202\266\203\114\203\203\203\211\203\116\203\136\201\133\202\252\202\242\202\351\202\275\202\337\201\101",
+                                   "\202\261\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\315\210\332\223\256\202\305\202\253\202\334\202\271\202\361\201\102");
+#else
                         int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 3,
                                    GetGoOutMessageLine(languageId, 59),
                                    GetGoOutMessageLine(languageId, 60),
                                    GetGoOutMessageLine(languageId, 61));
+#endif
                         break;
                     }
 
@@ -1777,6 +1953,15 @@ card_connected:;
                     if (g_freeCaravanIdx < 0) {
                         m_returnGoOutMode = 0xF;
                         m_goOutMode = 0;
+#ifdef VERSION_GCCJGC
+                        SetMenuStr(0, 6,
+                                   "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\311\202\315",
+                                   "\202\267\202\305\202\311\203\114\203\203\203\211\203\116\203\136\201\133\202\252\202\127\220\154\202\242\202\351\202\275\202\337\201\101",
+                                   "\203\114\203\203\203\211\203\116\203\136\201\133\202\360\210\332\223\256\202\263\202\271\202\351\202\261\202\306\202\252\202\305\202\253\202\334\202\271\202\361\201\102",
+                                   "",
+                                   "\203\114\203\203\203\211\203\116\203\136\201\133\202\314\210\332\223\256\202\360\202\250\202\261\202\310\202\244\217\352\215\207\202\315\201\101",
+                                   "\202\120\220\154\225\252\210\310\217\343\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\314\213\363\202\253\202\252\225\113\227\166\202\305\202\267\201\102");
+#else
                         int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 6,
                                    GetGoOutMessageLine(languageId, 62),
@@ -1785,6 +1970,7 @@ card_connected:;
                                    GetGoOutMessageLine(languageId, 65),
                                    GetGoOutMessageLine(languageId, 66),
                                    GetGoOutMessageLine(languageId, 67));
+#endif
                         break;
                     }
                 } else {
@@ -1794,10 +1980,16 @@ card_connected:;
                         m_goOutMode = 0;
                         m_returnGoOutMode = 0xF;
                         m_goOutMode = 0;
+#ifdef VERSION_GCCJGC
+                        SetMenuStr(0, 2,
+                                   "\201\165\203\121\203\130\203\147\201\166\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\315",
+                                   "\214\263\202\314\203\146\201\133\203\136\210\310\212\117\202\311\202\315\210\332\223\256\202\305\202\253\202\334\202\271\202\361\201\102");
+#else
                         int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 2,
                                    GetGoOutMessageLine(languageId, 68),
                                    GetGoOutMessageLine(languageId, 69));
+#endif
                         break;
                     }
                     m_returnTransfer = 1;
@@ -2002,12 +2194,12 @@ inline void CGoOutMenu::DrawGoOut()
 
 /*
  * --INFO--
- * PAL Address: 0x80169c18
+ * PAL Address: 0x80169C18
  * PAL Size: 1108b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80168BC0
+ * EN Size: 1108b
+ * JP Address: 0x8016438C
+ * JP Size: 884b
  */
 void CGoOutMenu::SetDelMode(unsigned char mode)
 {
@@ -2043,12 +2235,20 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
             }
 
             if (activeMainCharacterCount <= 1) {
+#ifdef VERSION_GCCJGC
+                SetMenuStr(0, 4,
+                           "\202\261\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\315\215\355\217\234\202\305\202\253\202\334\202\271\202\361\201\102",
+                           "",
+                           "\203\146\201\133\203\136\202\311\202\315\201\101\203\121\203\130\203\147\202\305\202\315\202\310\202\242\203\114\203\203\203\211\203\116\203\136\201\133\202\252",
+                           "\217\355\202\311\202\120\220\154\210\310\217\343\202\242\202\310\202\257\202\352\202\316\202\310\202\350\202\334\202\271\202\361\201\102");
+#else
                 int languageId = Game.m_gameWork.GetLanguage() - 1;
                 SetMenuStr(0, 4,
                            GetGoOutMessageLine(languageId, 70),
                            GetGoOutMessageLine(languageId, 71),
                            GetGoOutMessageLine(languageId, 72),
                            GetGoOutMessageLine(languageId, 73));
+#endif
                 m_prevDeleteMode = 2;
                 SetDelMode(0);
                 return;
@@ -2056,27 +2256,60 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         }
 
         {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 2,
+                       "\202\261\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\360\215\355\217\234\202\265\202\334\202\267\202\251\201\110",
+                       "\201\100\202\315\202\242\201\100\201\100\202\242\202\242\202\246");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 2,
                        GetGoOutMessageLine(languageId, 74),
                        GetGoOutMessageLine(languageId, 75));
+#endif
         }
+#ifdef VERSION_GCCJGC
+        m_cursorChoice = 0;
+#else
         m_cursorChoice = 1;
+#endif
         break;
     }
     case 4:
         {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 4,
+                       "\203\114\203\203\203\211\203\116\203\136\201\133\202\360\215\355\217\234\202\267\202\351\202\306",
+                       "\214\263\202\311\226\337\202\267\202\261\202\306\202\315\202\305\202\253\202\334\202\271\202\361\201\102",
+                       "\226\173\223\226\202\311\202\346\202\353\202\265\202\242\202\305\202\267\202\251\201\110",
+                       "\201\100\202\315\202\242\201\100\201\100\202\242\202\242\202\246");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 76),
                        GetGoOutMessageLine(languageId, 77),
                        GetGoOutMessageLine(languageId, 78),
                        GetGoOutMessageLine(languageId, 79));
+#endif
         }
+#ifdef VERSION_GCCJGC
+        m_cursorChoice = 0;
+#else
         m_cursorChoice = 1;
+#endif
         break;
     case 5:
         if (Game.m_caravanWorkArr[m_selectedChara].m_caravanLocalFlags != 0) {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 8,
+                       "\201\165\203\121\203\130\203\147\201\166\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\360\215\355\217\234\202\265\202\334\202\265\202\275\201\102",
+                       "",
+                       "\214\263\202\314\203\146\201\133\203\136\202\314\201\165\202\250\202\305\202\251\202\257\222\206\201\166\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\314",
+                       "\203\146\201\133\203\136\202\360\225\234\212\210\202\263\202\271\202\304\202\250\202\242\202\304\202\255\202\276\202\263\202\242\201\102",
+                       "",
+                       "\201\165\202\250\202\305\202\251\202\257\222\206\201\166\203\114\203\203\203\211\203\116\203\136\201\133\202\314\203\146\201\133\203\136\202\314\225\234\212\210\202\315\201\101",
+                       "\201\165\203\114\203\203\203\211\203\116\203\136\201\133\202\314\215\355\217\234\201\166\202\305\201\101\201\165\202\250\202\305\202\251\202\257\222\206\201\166\202\314",
+                       "\203\114\203\203\203\211\203\116\203\136\201\133\202\360\221\111\202\324\202\306\225\234\212\210\202\267\202\351\202\261\202\306\202\252\202\305\202\253\202\334\202\267\201\102");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 8,
                        GetGoOutMessageLine(languageId, 80),
@@ -2087,15 +2320,33 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 85),
                        GetGoOutMessageLine(languageId, 86),
                        GetGoOutMessageLine(languageId, 87));
+#endif
         } else {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 1, "\203\114\203\203\203\211\203\116\203\136\201\133\202\360\215\355\217\234\202\265\202\334\202\265\202\275\201\102");
+#else
             const char** mes = &g_strGooutMes[(Game.m_gameWork.GetLanguage() - 1) * 0x6E];
             SetMenuStr(0, 1, mes[88]);
+#endif
         }
+#ifdef VERSION_GCCJGC
+        m_cursorChoice = 0;
+#else
         m_cursorChoice = 1;
+#endif
         MenuPcs.SetMenuCharaAnim(m_selectedChara, 5);
         break;
     case 6:
         {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 6,
+                       "\202\261\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\315",
+                       "\201\165\202\250\202\305\202\251\202\257\222\206\201\166\202\314\202\275\202\337\215\355\217\234\202\305\202\253\202\334\202\271\202\361\201\102",
+                       "\202\261\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\360\215\355\217\234\202\267\202\351\202\311\202\315\201\101",
+                       "\203\146\201\133\203\136\202\360\225\234\212\210\202\263\202\271\202\351\225\113\227\166\202\252\202\240\202\350\202\334\202\267\201\102",
+                       "\225\234\212\210\202\263\202\271\202\304\202\346\202\353\202\265\202\242\202\305\202\267\202\251\201\110",
+                       "\201\100\202\315\202\242\201\100\201\100\202\242\202\242\202\246");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 6,
                        GetGoOutMessageLine(languageId, 89),
@@ -2104,11 +2355,24 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 92),
                        GetGoOutMessageLine(languageId, 93),
                        GetGoOutMessageLine(languageId, 94));
+#endif
         }
+#ifdef VERSION_GCCJGC
+        m_cursorChoice = 0;
+#else
         m_cursorChoice = 1;
+#endif
         break;
     case 7:
         {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 5,
+                       "\203\146\201\133\203\136\202\360\225\234\212\210\202\263\202\271\202\351\202\306\201\101",
+                       "\210\332\223\256\220\346\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\314\203\146\201\133\203\136\202\360",
+                       "\202\261\202\261\202\311\226\337\202\267\202\261\202\306\202\252\202\305\202\253\202\310\202\255\202\310\202\350\202\334\202\267\201\102",
+                       "\226\173\223\226\202\311\202\346\202\353\202\265\202\242\202\305\202\267\202\251\201\110",
+                       "\201\100\202\315\202\242\201\100\201\100\202\242\202\242\202\246");
+#else
             int languageId = Game.m_gameWork.GetLanguage() - 1;
             SetMenuStr(0, 5,
                        GetGoOutMessageLine(languageId, 95),
@@ -2116,14 +2380,23 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 97),
                        GetGoOutMessageLine(languageId, 98),
                        GetGoOutMessageLine(languageId, 99));
+#endif
         }
+#ifdef VERSION_GCCJGC
+        m_cursorChoice = 0;
+#else
         m_cursorChoice = 1;
+#endif
         break;
     case 8:
         MenuPcs.SetMenuCharaAnim(m_selectedChara, 3);
         {
+#ifdef VERSION_GCCJGC
+            SetMenuStr(0, 1, "\203\114\203\203\203\211\203\116\203\136\201\133\202\360\225\234\212\210\202\263\202\271\202\334\202\265\202\275\201\102");
+#else
             const char** mes = &g_strGooutMes[(Game.m_gameWork.GetLanguage() - 1) * 0x6E];
             SetMenuStr(0, 1, mes[100]);
+#endif
         }
         break;
     default:
@@ -2289,10 +2562,10 @@ inline void CGoOutMenu::DrawDel()
  * --INFO--
  * PAL Address: 0x80168400
  * PAL Size: 2620b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801673A8
+ * EN Size: 2620b
+ * JP Address: 0x80162C28
+ * JP Size: 2552b
  */
 void CGoOutMenu::Calc()
 {
@@ -2401,6 +2674,16 @@ void CGoOutMenu::Calc()
                     }
 
                     if (characterCount <= 0) {
+#ifdef VERSION_GCCJGC
+                        SetMenuStr(0, 7,
+                                   "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\315",
+                                   "\202\334\202\276\203\114\203\203\203\211\203\116\203\136\201\133\202\252\215\354\220\254\202\263\202\352\202\304\202\242\202\310\202\242\202\275\202\337\201\101",
+                                   "\203\114\203\203\203\211\203\116\203\136\201\133\202\360\210\332\223\256\202\263\202\271\202\351\202\261\202\306\202\252\202\305\202\253\202\334\202\271\202\361\201\102",
+                                   "",
+                                   "\203\114\203\203\203\211\203\116\203\136\201\133\202\314\210\332\223\256\202\360\202\250\202\261\202\310\202\244\221\117\202\311\201\101",
+                                   "\202\120\220\154\210\310\217\343\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\360\215\354\220\254\202\265\201\101",
+                                   "\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311\203\132\201\133\203\165\202\265\202\304\202\255\202\276\202\263\202\242\201\102");
+#else
                         int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 7,
                                    GetGoOutMessageLine(languageId, 101),
@@ -2410,6 +2693,7 @@ void CGoOutMenu::Calc()
                                    GetGoOutMessageLine(languageId, 105),
                                    GetGoOutMessageLine(languageId, 106),
                                    GetGoOutMessageLine(languageId, 107));
+#endif
                         m_nextMainMode = 1;
                         SetMainMode(0);
                     } else {
@@ -2421,6 +2705,15 @@ void CGoOutMenu::Calc()
                         }
 
                         if (transferableCount >= 8) {
+#ifdef VERSION_GCCJGC
+                            SetMenuStr(0, 6,
+                                       "\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\311\202\315",
+                                       "\202\267\202\305\202\311\203\114\203\203\203\211\203\116\203\136\201\133\202\252\202\127\220\154\202\242\202\351\202\275\202\337\201\101",
+                                       "\203\114\203\203\203\211\203\116\203\136\201\133\202\360\210\332\223\256\202\263\202\271\202\351\202\261\202\306\202\252\202\305\202\253\202\334\202\271\202\361\201\102",
+                                       "",
+                                       "\203\114\203\203\203\211\203\116\203\136\201\133\202\314\210\332\223\256\202\360\202\250\202\261\202\310\202\244\217\352\215\207\202\315\201\101",
+                                       "\202\120\220\154\225\252\210\310\217\343\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\314\213\363\202\253\202\252\225\113\227\166\202\305\202\267\201\102");
+#else
                             int languageId = Game.m_gameWork.GetLanguage() - 1;
                             SetMenuStr(0, 6,
                                        GetGoOutMessageLine(languageId, 62),
@@ -2429,6 +2722,7 @@ void CGoOutMenu::Calc()
                                        GetGoOutMessageLine(languageId, 65),
                                        GetGoOutMessageLine(languageId, 66),
                                        GetGoOutMessageLine(languageId, 67));
+#endif
                             m_nextMainMode = 1;
                             SetMainMode(0);
                         } else {
@@ -2459,10 +2753,16 @@ void CGoOutMenu::Calc()
                         m_messageCloseMode = 0;
                         m_pendingMessageTimer = 0;
                     } else {
+#ifdef VERSION_GCCJGC
+                        SetMenuStr(0, 2,
+                                   "\214\273\215\335\202\314\203\146\201\133\203\136\202\251\202\347\202\315",
+                                   "\203\114\203\203\203\211\203\116\203\136\201\133\202\360\215\355\217\234\202\305\202\253\202\334\202\271\202\361\201\102");
+#else
                         int languageId = Game.m_gameWork.GetLanguage() - 1;
                         SetMenuStr(0, 2,
                                    GetGoOutMessageLine(languageId, 108),
                                    GetGoOutMessageLine(languageId, 109));
+#endif
                         m_nextMainMode = 1;
                         SetMainMode(0);
                     }

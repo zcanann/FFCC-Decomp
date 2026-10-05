@@ -541,7 +541,12 @@ config.libs = [
             Object(NonMatching, "gbaque.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "gobject.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "gobjwork.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(Matching, "goout.cpp", extra_cflags=["-inline auto,deferred"]),
+            Object(
+                Matching,
+                "goout.cpp",
+                extra_cflags=["-inline auto,deferred"]
+                + (["-str reuse,readonly"] if config.version == "GCCJGC" else []),
+            ),
             Object(NonMatching, "graphic.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gxfunc.cpp"),
             Object(NonMatching, "itemobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),

@@ -9621,7 +9621,7 @@ lbl_801D9774 = .rodata:0x801D9774; // type:object size:0xD data:string
 lbl_801D9788 = .rodata:0x801D9788; // type:object size:0x1F data:string
 lbl_801D97A8 = .rodata:0x801D97A8; // type:object size:0xF data:string
 lbl_801D97B8 = .rodata:0x801D97B8; // type:object size:0x10 data:string
-lbl_801D97C8 = .rodata:0x801D97C8; // type:object size:0xBA8
+lbl_801D97C8 = .rodata:0x801D97C8; // type:object size:0xBA1
 s_nameEntryRow0 = .rodata:0x801DA370; // type:object size:0x19 scope:local
 s_nameEntryRow1 = .rodata:0x801DA38C; // type:object size:0x19 scope:local
 s_nameEntryRow2 = .rodata:0x801DA3A8; // type:object size:0x19 scope:local
@@ -15725,3 +15725,7 @@ sRedEntryNewline = .sdata2:0x8035015D; // type:object size:0x2 scope:local align
 sRedEntryPrefixedNewlineFmt = .sdata2:0x8035015F; // type:object size:0x4 scope:local align:1
 lbl_801DC234 = .rodata:0x801DC234; // type:object size:0x4 align:1
 lbl_80350163 = .sdata2:0x80350163; // type:object size:0x5 align:1
+
+
+goout_rodata_alignment = .rodata:0x801DA369; // type:object size:0x3 scope:local align:1
+goout_rodata_tail_padding = .rodata:0x801DA36C; // type:object size:0x4 scope:local align:1

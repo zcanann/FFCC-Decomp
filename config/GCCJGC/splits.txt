@@ -1378,6 +1378,8 @@ auto_8034C5AB_sdata2:
 	.sdata2 start:0x8034C5AB end:0x8034C5B0 align:1
 
 goout.cpp:
+	.rodata start:0x801D97C8 end:0x801DA36C
+	.data start:0x80231E30 end:0x80231E78
 	.bss start:0x80327408 end:0x80327458
 	.sbss start:0x8034BCE8 end:0x8034BCF0
 	.text start:0x80162A00 end:0x80166CFC
@@ -1496,3 +1498,6 @@ auto_801DC234_rodata:
 
 auto_80350163_sdata2:
 	.sdata2 start:0x80350163 end:0x80350168 align:1
+
+auto_801DA36C_rodata:
+	.rodata start:0x801DA36C end:0x801DA370 align:1

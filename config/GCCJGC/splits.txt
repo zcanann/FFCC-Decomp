@@ -1607,6 +1607,13 @@ auto_8034D9FF_sdata2:
 
 pppYmMelt.cpp:
 	.text start:0x800A32D0 end:0x800A3EAC
+	.rodata start:0x801D4B70 end:0x801D4B80
+	.sdata2 start:0x8034D828 end:0x8034D858
 
 pppYmTracer.cpp:
 	.text start:0x80092648 end:0x80093228
+	.rodata start:0x801D4840 end:0x801D4850
+	.sdata2 start:0x8034D420 end:0x8034D440
+
+auto_801D4B6C_rodata:
+	.rodata start:0x801D4B6C end:0x801D4B70 align:4

@@ -1468,3 +1468,25 @@ mapanim.cpp:
 
 maptexanim.cpp:
 	.text start:0x8004F704 end:0x800501F0
+
+RedSound/RedDriver.cpp:
+	.text start:0x801BBE74 end:0x801BEE9C
+	.ctors start:0x801D43AC end:0x801D43B0
+	extab start:0x8000A2D0 end:0x8000A5A8
+	extabindex start:0x80011848 end:0x80011C8C
+	.rodata start:0x801E6638 end:0x801E6735
+	.bss start:0x8032A840 end:0x8032D14C
+	.sbss start:0x8032E398 end:0x8032E46C
+	.sdata2 start:0x80332CB8 end:0x80332CC5
+
+auto_8032D14C_bss:
+	.bss start:0x8032D14C end:0x8032D150 align:1
+
+auto_8032E46C_sbss:
+	.sbss start:0x8032E46C end:0x8032E470 align:1
+
+auto_80332CC5_sdata2:
+	.sdata2 start:0x80332CC5 end:0x80332CC8 align:1
+
+auto_801E6735_rodata:
+	.rodata start:0x801E6735 end:0x801E6738 align:1

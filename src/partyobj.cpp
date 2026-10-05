@@ -278,7 +278,11 @@ static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 {
 	if (isGhostPartyTargetMode(self)) {
+#ifdef VERSION_GCCP01
 		return 5;
+#else
+		return 7;
+#endif
 	}
 
 	unsigned short anim;

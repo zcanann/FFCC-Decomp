@@ -1096,3 +1096,8 @@ TRK_MINNOW_DOLPHIN/targimpl.c:
 
 p_chara.cpp:
 	.text start:0x80072F18 end:0x8007AF9C
+
+axfx/reverb_hi.c:
+	.text	start:0x8018E398 end:0x8018F45C
+	.data	start:0x80237020 end:0x80237040
+	.sdata2	start:0x8034FB60 end:0x8034FBA8

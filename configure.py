@@ -945,7 +945,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axfx/axfx.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axfx/chorus.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axfx/delay.c"),
-            Object(Matching, "axfx/reverb_hi.c",
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "axfx/reverb_hi.c",
                 cflags=replace_flag_prefix(
                     replace_flag_prefix(cflags_base, "-fp_contract ", ""),
                     "-fp ", "-fp fmadd"

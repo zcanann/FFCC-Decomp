@@ -3035,13 +3035,18 @@ void CGCharaObj::StaticFrame()
  * --INFO--
  * PAL Address: 0x8010B9B8
  * PAL Size: 1804b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010AD30
+ * EN Size: 1804b
+ * JP Address: 0x80107A30
+ * JP Size: 1788b
  */
 void CGCharaObj::combi2()
 {
+#ifdef VERSION_GCCP01
+	const int kComboWaitFrames = 66;
+#else
+	const int kComboWaitFrames = 80;
+#endif
 	CGPartyObj* candidates[5];
 	int candidateCount = 0;
 	CVector comboCenter;
@@ -3078,7 +3083,7 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(&candidates[i]->m_comboCenter, &other->m_comboCenter) < 20.0f) {
+			if (PSVECDistance(&party->m_comboCenter, &other->m_comboCenter) < 20.0f) {
 				hasNearbyPartner = 1;
 				break;
 			}
@@ -3127,7 +3132,7 @@ void CGCharaObj::combi2()
 	int fallback;
 	int comboIndex = searchCombi(candidateCount, candidates, fallback);
 	if (comboIndex >= 0) {
-	if (fallback != 0 && candidates[0]->m_comboFrame < 0x42) {
+	if (fallback != 0 && candidates[0]->m_comboFrame < kComboWaitFrames) {
 		return;
 	}
 
@@ -3208,7 +3213,7 @@ void CGCharaObj::combi2()
 	return;
 	}
 
-	if (fallback == 0 || candidates[0]->m_comboFrame >= 0x42) {
+	if (fallback == 0 || candidates[0]->m_comboFrame >= kComboWaitFrames) {
 		candidates[0]->m_comboState = 0;
 		candidates[0]->m_comboFrame = 0;
 		candidates[0]->addSubStat();

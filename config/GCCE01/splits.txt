@@ -343,3 +343,15 @@ ai/ai.c:
 	.sbss start:0x8032E140 end:0x8032E180
 	.sdata start:0x8032DB18 end:0x8032DB1C
 	.data start:0x80216A88 end:0x80216ACC
+
+ar/ar.c:
+	.text start:0x8018E5F4 end:0x801900CC
+	.sdata start:0x8032DB20 end:0x8032DB24
+	.sbss start:0x8032E180 end:0x8032E1A0
+	.data start:0x80216AD0 end:0x80216B14
+
+ar/arq.c:
+	.text start:0x801900CC end:0x80190488
+	.sbss start:0x8032E1A0 end:0x8032E1C8
+	.sdata start:0x8032DB28 end:0x8032DB2C
+	.data start:0x80216B18 end:0x80216B60

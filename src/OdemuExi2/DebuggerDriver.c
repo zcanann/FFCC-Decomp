@@ -98,7 +98,6 @@ static BOOL DBGWriteMailbox(u32 p1) {
     return !error;
 }
 
-#pragma dont_inline on
 static BOOL DBGReadMailbox(u32* p1) {
     BOOL error;
     u32 v;
@@ -117,7 +116,6 @@ static BOOL DBGReadMailbox(u32* p1) {
 
     return !error;
 }
-#pragma dont_inline reset
 
 static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
     BOOL error;
@@ -188,7 +186,7 @@ static BOOL DBGWrite(u32 count, void* buffer, s32 param3) {
     return !total;
 }
 
-inline static BOOL _DBGReadStatus(u32* p1) {
+static BOOL DBGReadStatus(u32* p1) {
     BOOL error;
     u32 cmd;
 
@@ -206,11 +204,6 @@ inline static BOOL _DBGReadStatus(u32* p1) {
 
     return !error;
 }
-#pragma dont_inline on
-static BOOL DBGReadStatus(u32* p1) {
-    return _DBGReadStatus(p1);
-}
-#pragma dont_inline reset
 
 static void MWCallback(u32 a, OSContext* b) {
     EXIInputFlag = TRUE;
@@ -295,7 +288,7 @@ int DBWrite(const void* src, u32 size) {
     BOOL interrupts = OSDisableInterrupts();
 
     do {
-        _DBGReadStatus(&busyFlag);
+        DBGReadStatus(&busyFlag);
     } while (busyFlag & 2);
 
     SendCount++;
@@ -305,7 +298,7 @@ int DBWrite(const void* src, u32 size) {
         ;
 
     do {
-        _DBGReadStatus(&busyFlag);
+        DBGReadStatus(&busyFlag);
     } while (busyFlag & 2);
 
     v = SendCount;
@@ -313,7 +306,7 @@ int DBWrite(const void* src, u32 size) {
         ;
 
     do {
-        while (!_DBGReadStatus(&busyFlag))
+        while (!DBGReadStatus(&busyFlag))
             ;
     } while (busyFlag & 2);
 

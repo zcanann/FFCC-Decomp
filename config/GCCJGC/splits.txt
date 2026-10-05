@@ -728,6 +728,8 @@ TRK_MINNOW_DOLPHIN/mem_TRK.c:
 
 mes.cpp:
 	.text start:0x800976FC end:0x80099580
+	.sdata2 start:0x8034D5B0 end:0x8034D5E0
+	.rodata start:0x801D4970 end:0x801D49F8
 
 util.cpp:
 	.text start:0x80024778 end:0x80024790
@@ -738,3 +740,8 @@ TRK_MINNOW_DOLPHIN/usr_put.c:
 
 memorycard.cpp:
 	.text start:0x800BF1C8 end:0x800C2514
+
+OdemuExi2/DebuggerDriver.c:
+	.text start:0x801B7704 end:0x801B8184
+	.sdata start:0x8034BA10 end:0x8034BA18
+	.sbss start:0x8034C168 end:0x8034C180

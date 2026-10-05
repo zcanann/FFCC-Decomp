@@ -32,12 +32,20 @@ struct MenuGbaLinkPool
     char gbaDir[12];
     char gbaClient[16];
     char gbaObjData[12];
+#ifdef VERSION_GCCJGC
+    char gbaIcon[20];
+#else
     char gbaIcon[12];
+#endif
     char gameTitle[24];
 };
 
 static const MenuGbaLinkPool sMenuGbaLinkStrings = {
+#ifdef VERSION_GCCJGC
+    "dvd/gba/", "ffcc_cli.bin", "objdat.spt", "dvd/menu/icon.dat", "\xCC\xA7\xB2\xC5\xD9\xCC\xA7\xDD\xC0\xBC\xDE\xB0\xA5\xB8\xD8\xBD\xC0\xD9\xB8\xDB\xC6\xB8\xD9"
+#else
     "dvd/gba/", "ffcc_cli.bin", "objdat.spt", "icon.dat", "FF Crystal Chronicles"
+#endif
 };
 
 extern const char sCMenuPcsProcessName[] = "CMenuPcs";
@@ -130,6 +138,15 @@ enum
     MenuCommonTextureCount = 21,
 #else
     MenuCommonTextureCount = 22,
+#endif
+#ifdef VERSION_GCCJGC
+    MenuTextureAllocationLine = 0x17C,
+    MenuMessageAllocationLine = 0x485,
+    MenuRingAllocationLine = 0x48C,
+#else
+    MenuTextureAllocationLine = 0x182,
+    MenuMessageAllocationLine = 0x48B,
+    MenuRingAllocationLine = 0x492,
 #endif
     MenuBattleTextureStart = MenuCommonTextureCount,
     MenuFaceTexture = MenuBattleTextureStart + 2
@@ -555,7 +572,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             CMemory::CStage* stage = (m_mode == 1) ? MapMng.m_stage : GetStage(stageSelect);
 
             m_textureSets[i + textureSetStart] =
-                new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
+                new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuTextureAllocationLine) CTextureSet;
 
             m_textureSets[i + textureSetStart]->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
 
@@ -1361,14 +1378,14 @@ void CMenuPcs::createBattle()
     loadTexture(tName, 2, 2, tTmp, MenuBattleTextureStart, 10, 0);
 
     for (int i = 0; i < 12; i++) {
-        CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x48B) CMesMenu;
+        CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuMessageAllocationLine) CMesMenu;
         m_battleMesMenus[i] = menu;
         m_battleMesMenus[i]->SetIndex(i);
         m_battleMesMenus[i]->Create();
     }
 
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x492) CRingMenu;
+        CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuRingAllocationLine) CRingMenu;
         m_battleRingMenus[i] = menu;
         m_battleRingMenus[i]->SetIndex(i);
         m_battleRingMenus[i]->Create();

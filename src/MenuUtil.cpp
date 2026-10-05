@@ -1343,11 +1343,17 @@ void CMenuPcs::DrawOptionMenu()
 		break;
 	}
 	case 1: {
+#ifdef VERSION_GCCJGC
+		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 189.0f }, { 488.0f, 189.0f } };
+#else
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 0.0f }, { 488.0f, 0.0f } };
+#endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
 		rightXi = static_cast<int>(w * 0.5f + row.rightIcon.x - 472.0f);
+#ifndef VERSION_GCCJGC
 		row.leftText.y = 185.0f;
 		row.rightText.y = 185.0f;
+#endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
@@ -1375,6 +1381,23 @@ void CMenuPcs::DrawOptionMenu()
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+#ifdef VERSION_GCCJGC
+		if (m_stereoMode == 0) {
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x - 2.0f),
+			                static_cast<int>(row.leftText.y - 2.0f), color, 0x17,
+			                "\203\130\203\145\203\214\203\111", 1.2f);
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x),
+			                static_cast<int>(row.rightText.y), color, 6,
+			                "\203\202\203\155\203\211\203\213", 1.0f);
+		} else {
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x),
+			                static_cast<int>(row.leftText.y), color, 6,
+			                "\203\130\203\145\203\214\203\111", 1.0f);
+			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x - 2.0f),
+			                static_cast<int>(row.rightText.y - 2.0f), color, 0x17,
+			                "\203\202\203\155\203\211\203\213", 1.2f);
+		}
+#else
 		double stereoScale = 0.8;
 		if (m_stereoMode == 0) {
 			{
@@ -1429,6 +1452,7 @@ void CMenuPcs::DrawOptionMenu()
 				          stereoScale * oneF, 1.0f, 1.0f);
 			}
 		}
+#endif
 		break;
 	}
 	case 2: {

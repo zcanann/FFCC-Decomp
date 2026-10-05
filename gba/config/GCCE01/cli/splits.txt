@@ -194,7 +194,7 @@ main/text:
 	.bss        start:0x030008D8 end:0x03001164 align:8
 
 main/obj:
-	.bss        start:0x03001168 end:0x03002750 align:8
+	.bss        start:0x03001168 end:0x0300274A align:8
 
 main/session:
 	.bss        start:0x03002750 end:0x03002771 align:8

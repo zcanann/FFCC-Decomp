@@ -69,7 +69,7 @@ static s16 sAffineScaleX[32];
 
 static s16 sAffineScaleY[32];
 static s8 sAffineAngle[32];
-static u8 sObjPalUsage[24];
+static u8 sObjPalUsage[18];
 
 void Obj_Init(void)
 {

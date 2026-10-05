@@ -249,7 +249,7 @@ main/text:
 	.bss        start:0x030008D8 end:0x03001164
 
 main/obj:
-	.bss        start:0x03001168 end:0x03002750
+	.bss        start:0x03001168 end:0x0300274A
 
 main/session:
 	.bss        start:0x03002750 end:0x03002771

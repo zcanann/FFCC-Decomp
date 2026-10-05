@@ -1454,3 +1454,17 @@ auto_8035012D_sdata2:
 
 auto_801DBCA5_rodata:
 	.rodata start:0x801DBCA5 end:0x801DBCA8 align:1
+
+RedSound/RedMemory.cpp:
+	.text start:0x801BB1AC end:0x801BB870
+	extab start:0x8000A610 end:0x8000A650
+	extabindex start:0x80011C38 end:0x80011C98
+	.rodata start:0x801DBCA8 end:0x801DBCF2
+	.sbss start:0x8034C258 end:0x8034C270
+	.sdata2 start:0x80350130 end:0x8035013D
+
+auto_8035013D_sdata2:
+	.sdata2 start:0x8035013D end:0x80350140 align:1
+
+auto_801DBCF2_rodata:
+	.rodata start:0x801DBCF2 end:0x801DBCF8 align:1

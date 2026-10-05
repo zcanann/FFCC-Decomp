@@ -681,12 +681,12 @@ inline void GetCharaCnt(char* dst)
 
 /*
  * --INFO--
- * PAL Address: 0x80173ba4
+ * PAL Address: 0x80173BA4
  * PAL Size: 2984b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80172B20
+ * EN Size: 2984b
+ * JP Address: 0x8016E69C
+ * JP Size: 2984b
  */
 void CMenuPcs::CalcSingCMake()
 {
@@ -902,20 +902,16 @@ void CMenuPcs::CalcSingCMake()
                     if ((down & 0x100) != 0) {
                         if (CmakeState(this)->m_select == 0) {
                             CmakeState(this)->m_resultDir = 1;
-                            int chgWork = CmakeSlot(this) * 0x14;
-                            chgWork += MenuS32(this, 0x844);
-                            *reinterpret_cast<int*>(chgWork + 4) = 3;
+                            m_wmCharaAnimState[CmakeSlot(this)].m_nextAnimIndex = 3;
 
                             CCaravanWork* caravanWork;
                             int slot = static_cast<int>(CmakeSlot(this));
                             int modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
                                 static_cast<int>(s_CmakeInfo.m_gender));
-                            int animWork = slot * 0x34;
-                            animWork += MenuS32(this, 0x824);
-                            *reinterpret_cast<int*>(animWork + 8) = modelNo;
+                            m_wm.m_charaModelData[slot].m_modelNo = modelNo;
 
                             caravanWork = &Game.m_caravanWorkArr[slot];
-                            *reinterpret_cast<unsigned char*>(MenuS32(this, 0x828) + 10) = 1;
+                            m_wm.m_charaSelectData->m_confirmed = 1;
                             caravanWork->LoadInit();
                             caravanWork->m_shopState = 1;
                             caravanWork->unk_0x3a8 = 0x101;

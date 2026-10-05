@@ -30,3 +30,18 @@ MSL_C/PPCEABI/bare/H/s_modf.c:
 
 MSL_C/PPCEABI/bare/H/wchar_io.c:
 	.text start:0x801B44EC end:0x801B4574
+
+color.cpp:
+	.text start:0x800C2640 end:0x800C268C
+
+maplight.cpp:
+	.text start:0x8004A9E8 end:0x8004AA34
+
+mtx/mtx44vec.c:
+	.text start:0x80181190 end:0x80181208
+
+TRK_MINNOW_DOLPHIN/flush_cache.c:
+	.text start:0x801A7E8C end:0x801A7EC4
+
+amcstubs/AmcExi2Stubs.c:
+	.text start:0x801B76CC end:0x801B76FC

@@ -633,6 +633,7 @@ extern char s_Ausruesten_801DDA50[], s_Resistance_801DDB64[], s_Defendre_801DDB8
 extern char s_Detruire_801DDBAC[], s_la_reponse_801DDC14[], s_Envoyer_a_801DDC20[], s_Preferences_801DDC50[];
 extern char s_Continuar_801DDCE0[], s_Extraer_801DDCEC[];
 }
+#ifndef VERSION_GCCJGC
 char* CMenuPcs::GetAttrStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
@@ -649,8 +650,6 @@ char* CMenuPcs::GetAttrStr(int index)
             return (char*)gSingMenuAttrTableEn[index];
     }
 }
-
-#ifndef VERSION_GCCJGC
 char* CMenuPcs::GetMenuStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
@@ -668,8 +667,6 @@ char* CMenuPcs::GetMenuStr(int index)
     }
 }
 
-#endif
-
 char* CMenuPcs::GetHairStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
@@ -686,7 +683,6 @@ char* CMenuPcs::GetHairStr(int index)
             return (char*)PTR_s_Cowlick[index];
     }
 }
-
 char* CMenuPcs::GetJobStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
@@ -703,7 +699,6 @@ char* CMenuPcs::GetJobStr(int index)
             return (char*)PTR_s_Blacksmith[index];
     }
 }
-
 char* CMenuPcs::GetTribeStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
@@ -720,6 +715,7 @@ char* CMenuPcs::GetTribeStr(int index)
             return (char*)PTR_s_Clavat_802140f0[index];
     }
 }
+#endif
 
 extern "C" const char* PTR_s_Clavat_802140f0[] = {
     s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,

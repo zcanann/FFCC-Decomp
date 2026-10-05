@@ -15,6 +15,10 @@
 extern "C" const unsigned char gSingMenuItemIconByType[0x1F5];
 #ifdef VERSION_GCCJGC
 extern "C" const char* gSingMenuTextTableJp[56];
+extern "C" const char* gSingMenuTribeTableJp[4];
+extern "C" const char* gSingMenuJobTableJp[8];
+extern "C" const char* gSingMenuHairTableJp[32];
+extern "C" const char* gSingMenuAttrTableJp[20];
 #endif
 
 class CColor;
@@ -606,9 +610,15 @@ public:
     void WMChgMenu();
     void GetOptionData();
     const char* GetSkillStr(int);
+#ifdef VERSION_GCCJGC
+    char* GetTribeStr(int index) { return (char*)gSingMenuTribeTableJp[index]; }
+    char* GetJobStr(int index) { return (char*)gSingMenuJobTableJp[index]; }
+    char* GetHairStr(int index) { return (char*)gSingMenuHairTableJp[index]; }
+#else
     char* GetTribeStr(int);
     char* GetJobStr(int);
     char* GetHairStr(int);
+#endif
     int GetItemType(int, int);
 #ifdef VERSION_GCCJGC
     int GetItemIcon(int index) { return gSingMenuItemIconByType[index]; }
@@ -688,7 +698,11 @@ public:
     unsigned int CmdOpen2();
     unsigned int CmdClose2();
     CFont* GetFontItem() { return m_fonts[4]; }
+#ifdef VERSION_GCCJGC
+    char* GetAttrStr(int index) { return (char*)gSingMenuAttrTableJp[index]; }
+#else
     char* GetAttrStr(int);
+#endif
     void SetParty();
     void SetCMakeEnd(int);
     void ClrCMakeFlg(int);

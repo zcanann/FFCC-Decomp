@@ -3786,7 +3786,11 @@ inline int JoyBus::SendLanguage(ThreadParam* threadParam)
     cmd = 0;
     ((unsigned char*)&cmd)[0] = 0x14;
     ((unsigned char*)&cmd)[1] = 0x16;
+#ifdef VERSION_GCCE01
+    ((unsigned char*)&cmd)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1);
+#else
     ((unsigned char*)&cmd)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1) | JoyBusConst::JOY_CODE_MASK;
+#endif
 
     return SetSendQueue(threadParam, cmd);
 }
@@ -3851,8 +3855,8 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * --INFO--
  * PAL Address: 0x800b1394
  * PAL Size: 2392b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B0C3C
+ * EN Size: 2380b
  * JP Address: 0x800AF030
  * JP Size: 2164b
  */

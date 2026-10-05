@@ -557,6 +557,13 @@ p_minigame.cpp:
 sound.cpp:
 	.text start:0x800C4860 end:0x800C82F0
 	.bss start:0x802F1688 end:0x802F396C
+	.ctors start:0x801D438C end:0x801D4390
+	extab start:0x800084F8 end:0x800086C4
+	extabindex start:0x8000EC5C end:0x8000EEF0
+	.rodata start:0x801D9FC8 end:0x801DA1F6
+	.data start:0x8020F3F0 end:0x8020F40C
+	.sdata start:0x8032D860 end:0x8032D870
+	.sdata2 start:0x8032FC98 end:0x8032FCEC
 
 textureman.cpp:
 	.sbss start:0x8032DCC0 end:0x8032DCC8
@@ -1424,3 +1431,31 @@ pppYmMiasma.cpp:
 	.text start:0x80090160 end:0x80090F38
 	.rodata start:0x801D8C08 end:0x801D8C18
 	.sdata2 start:0x8032F600 end:0x8032F630
+
+RedSound/RedSound.cpp:
+	.text start:0x801CB99C end:0x801CC85C
+	.ctors start:0x801D43B0 end:0x801D43B4
+	extab start:0x8000ABB8 end:0x8000AD70
+	extabindex start:0x800125A4 end:0x80012838
+	.rodata start:0x801E6E98 end:0x801E6FC0
+	.bss start:0x8032D150 end:0x8032D25C
+	.sbss start:0x8032E4A0 end:0x8032E4AC
+	.sdata2 start:0x80332D40 end:0x80332D55
+
+auto_8032D25C_bss:
+	.bss start:0x8032D25C end:0x8032D260 align:1
+
+auto_8032E4AC_sbss:
+	.sbss start:0x8032E4AC end:0x8032E4C0 align:1
+
+auto_80332D55_sdata2:
+	.sdata2 start:0x80332D55 end:0x80332D58 align:1
+
+auto_8020F40C_data:
+	.data start:0x8020F40C end:0x8020F410 align:1
+
+auto_801DA1F6_rodata:
+	.rodata start:0x801DA1F6 end:0x801DA1F8 align:1
+
+auto_8032FCEC_sdata2:
+	.sdata2 start:0x8032FCEC end:0x8032FCF0 align:1

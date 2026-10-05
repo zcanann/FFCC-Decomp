@@ -1404,3 +1404,22 @@ pppYmMiasma.cpp:
 	.text start:0x8008FBA0 end:0x80090994
 	.rodata start:0x801D4808 end:0x801D4818
 	.sdata2 start:0x8034D380 end:0x8034D3B0
+
+RedSound/RedSound.cpp:
+	.text start:0x801C7CAC end:0x801C8B6C
+	.ctors start:0x801D06D0 end:0x801D06D4
+	extab start:0x8000AC20 end:0x8000ADD8
+	extabindex start:0x80012550 end:0x800127E4
+	.rodata start:0x801DC408 end:0x801DC530
+	.bss start:0x8034AF58 end:0x8034B064
+	.sbss start:0x8034C288 end:0x8034C294
+	.sdata2 start:0x803501A8 end:0x803501BD
+
+auto_8034B064_bss:
+	.bss start:0x8034B064 end:0x8034B080 align:1
+
+auto_8034C294_sbss:
+	.sbss start:0x8034C294 end:0x8034C2A0 align:1
+
+auto_803501BD_sdata2:
+	.sdata2 start:0x803501BD end:0x803501C0 align:1

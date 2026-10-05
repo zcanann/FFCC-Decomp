@@ -68,8 +68,6 @@ extern const float kDebugIndicatorFifoRight;
 static const int kDebugBarLineStep = 8;
 static const char s_debug_pad_port_fmt[] = "%dP";
 static const char s_debug_frame_fmt[] = "%d";
-extern const float kDofDefaultNearZ;
-extern const float kDofDefaultFarZ;
 
 static const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
 static const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
@@ -879,34 +877,25 @@ void CGraphicPcs::SetDOFParameter(signed char flagA, signed char flagB, float ne
 
 /*
  * --INFO--
- * PAL Address: 0x800476c0
+ * PAL Address: 0x800476C0
  * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800474B4
+ * EN Size: 172b
+ * JP Address: 0x8004700C
+ * JP Size: 172b
  */
 void CGraphicPcs::create()
 {
-    float dofDefault;
-    float farZ;
-    float nearZ;
-
     _InitGxFunc();
     m_unkB8 = 0;
-    nearZ = kDofDefaultNearZ;
     m_copySaveFlag = 0;
-    farZ = kDofDefaultFarZ;
     m_dofFlag = 0;
-    dofDefault = kGraphicZero;
     m_dofFlagB = 1;
-    m_dofNearZ = nearZ;
-    m_dofFarZ = farZ;
+    m_dofNearZ = 0.6f;
+    m_dofFarZ = 200.0f;
     m_dofFlagA = 0;
     m_dofMode = 0;
-    m_dofTarget.z = dofDefault;
-    m_dofTarget.y = dofDefault;
-    m_dofTarget.x = dofDefault;
+    m_dofTarget.x = m_dofTarget.y = m_dofTarget.z = 0.0f;
     memset(m_screenFade, 0, sizeof(m_screenFade));
     m_blurMode = 0;
     m_blurFadeOutFlag = 0;

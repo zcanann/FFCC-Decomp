@@ -117,9 +117,9 @@ inline void MTXSetCol(Mtx& matrix, int col, Vec in)
     matrix[2][col] = in.z;
 }
 
-void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
-void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
-void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor);
+static void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
+static void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
+static void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor);
 
 /*
  * --INFO--
@@ -250,11 +250,7 @@ extern "C" void pppConstructBreathModel(pppBreathModel* breathModel, _pppCtrlTab
 {
     VBreathModel* state = GetBreathModelWork(breathModel, GetBreathModelDataOffsets(ctrl)->m_workOffset);
     PSMTXIdentity(state->m_matrix);
-    float zero = 0.0f;
-
-    state->m_direction.z = zero;
-    state->m_direction.y = zero;
-    state->m_direction.x = zero;
+    state->m_direction.x = state->m_direction.y = state->m_direction.z = 0.0f;
 
     state->m_particleData = 0;
     state->m_particleWmats = 0;
@@ -620,7 +616,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* s
  * JP Address: TODO
  * JP Size: TODO
  */
-void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor)
+static void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor)
 {
     PBreathModel* params = pBreathModel;
     PARTICLE_DATA* particleData;
@@ -751,7 +747,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
  * JP Address: TODO
  * JP Size: TODO
  */
-void UpdateParticle(
+static void UpdateParticle(
     VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor)
 {
     PBreathModel* params = pBreathModel;
@@ -843,7 +839,7 @@ void UpdateParticle(
  * JP Address: TODO
  * JP Size: TODO
  */
-void BirthParticle(
+static void BirthParticle(
     _pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor,
     PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {

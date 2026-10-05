@@ -178,6 +178,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
     },
     "GCCJGC": {
         "cli": [
+            "main/backdrop_gfx", "main/backdrop", "main/font_gfx_jp",
             "main/sound_assets_jp",
             "main/m4a_tables", "main/sound_data",
             "main/main", "main/xfer", "main/radarmap", "main/textmask", "main/obj", "main/link", "main/msg_sys",

@@ -63,3 +63,9 @@ TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c:
 
 TRK_MINNOW_DOLPHIN/targcont.c:
 	.text start:0x801AD50C end:0x801AD540
+
+os/OSStopwatch.c:
+	.text start:0x8017F6F8 end:0x8017F854
+
+os/OSSync.c:
+	.text start:0x8017F854 end:0x8017F8D8

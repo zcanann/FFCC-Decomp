@@ -57,3 +57,9 @@ TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:
 
 TRK_MINNOW_DOLPHIN/targcont.c:
 	.text start:0x801AA544 end:0x801AA578
+
+os/OSStopwatch.c:
+	.text start:0x8017ADA4 end:0x8017AF00
+
+os/OSSync.c:
+	.text start:0x8017AF00 end:0x8017AF84

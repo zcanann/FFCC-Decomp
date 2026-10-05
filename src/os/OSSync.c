@@ -7,14 +7,16 @@
 void __OSSystemCallVectorStart(void);
 void __OSSystemCallVectorEnd(void);
 
-void OSResetStopwatch(OSStopwatch* sw) {
-    sw->total = 0;
-    sw->hits = 0;
-    sw->min = 0x00000000FFFFFFFF;
-    sw->max = 0;
-}
-
-asm void SystemCallVector(void) {
+/*
+ * --INFO--
+ * PAL Address: 0x80180970
+ * PAL Size: 32b
+ * EN Address: 0x8017F854
+ * EN Size: 32b
+ * JP Address: 0x8017AF00
+ * JP Size: 32b
+ */
+static asm void SystemCallVector(void) {
 entry __OSSystemCallVectorStart
     nofralloc
     mfspr r9, HID0

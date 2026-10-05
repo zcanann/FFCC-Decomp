@@ -41,6 +41,22 @@ OSTime OSCheckStopwatch(OSStopwatch* sw) {
     return currTotal;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80180948
+ * PAL Size: 40b
+ * EN Address: 0x8017F82C
+ * EN Size: 40b
+ * JP Address: 0x8017AED8
+ * JP Size: 40b
+ */
+void OSResetStopwatch(OSStopwatch* sw) {
+    sw->total = 0;
+    sw->hits = 0;
+    sw->min = 0x00000000FFFFFFFF;
+    sw->max = 0;
+}
+
 void OSDumpStopwatch(OSStopwatch* sw) {
     OSReport("Stopwatch [%s]	:\n", sw->name);
     OSReport("\tTotal= %lld us\n",    OSTicksToMicroseconds(sw->total));

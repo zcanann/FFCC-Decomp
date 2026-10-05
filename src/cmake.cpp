@@ -3104,13 +3104,19 @@ void CMenuPcs::CmakeResultDraw()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
+#ifndef VERSION_GCCJGC
     char tribeWithSlash[0x10];
+#endif
+#ifndef VERSION_GCCJGC
     float labelWidths[4];
+#endif
     int labelY = 0x70;
     for (int i = 0; i < 4; i++) {
         const char* label = GetMenuStr(i + 0x2A);
 
+#ifndef VERSION_GCCJGC
         labelWidths[i] = 232.0f + labelFont->GetWidth(label);
+#endif
         labelFont->SetPosX(232.0f);
 #ifdef VERSION_GCCJGC
         labelFont->SetPosY(static_cast<float>(labelY));
@@ -3136,14 +3142,22 @@ void CMenuPcs::CmakeResultDraw()
         } else if (i == 1) {
             value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
+#ifdef VERSION_GCCJGC
+            value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
+#else
             strcpy(tribeWithSlash, GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe)));
             strcat(tribeWithSlash, "/");
             value = tribeWithSlash;
+#endif
         } else {
             value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
         }
 
+#ifdef VERSION_GCCJGC
+        float x = 336.0f;
+#else
         float x = 8.0f + labelWidths[i];
+#endif
         float y = static_cast<float>(0x70 + i * 0x28);
         float valueWidth = valueFont->GetWidth(value);
         valueFont->SetPosX(x);
@@ -3330,12 +3344,18 @@ void CMenuPcs::CmakeResultDraw1()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
+#ifndef VERSION_GCCJGC
     char tribeWithSlash[0x10];
+#endif
+#ifndef VERSION_GCCJGC
     float labelWidths[4];
+#endif
     for (int i = 0; i < 4; i++) {
         const char* txt = GetMenuStr(0x2A + i);
 
+#ifndef VERSION_GCCJGC
         labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
+#endif
         labelFont->SetPosX(232.0f);
 #ifdef VERSION_GCCJGC
         labelFont->SetPosY(0x70 + i * 0x28);
@@ -3362,14 +3382,20 @@ void CMenuPcs::CmakeResultDraw1()
             txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
         } else if (i == 2) {
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
+#ifndef VERSION_GCCJGC
             strcpy(tribeWithSlash, txt);
             strcat(tribeWithSlash, "/");
             txt = tribeWithSlash;
+#endif
         } else {
             txt = GetJobStr(s_CmakeInfo.m_job);
         }
 
+#ifdef VERSION_GCCJGC
+        float x = 336.0f;
+#else
         float x = 8.0f + labelWidths[i];
+#endif
         float y = static_cast<float>(0x70 + i * 0x28);
         float valueWidth = static_cast<float>(valueFont->GetWidth(txt));
         valueFont->SetPosX(x);

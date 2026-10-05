@@ -301,3 +301,17 @@ gba/GBAXfer.c:
 gx/GXFifo.c:
 	.text start:0x8019A7F0 end:0x8019B038
 	.sbss start:0x8034C0F0 end:0x8034C10C
+
+ax/AXAlloc.c:
+	.text start:0x8018BB3C end:0x8018C004
+	.bss start:0x803285E0 end:0x803286E0
+	.sbss start:0x8034BFC8 end:0x8034BFCC
+
+ax/AXProf.c:
+	.text start:0x8018E350 end:0x8018E398
+	.sbss start:0x8034C080 end:0x8034C090
+
+ax/AXSPB.c:
+	.text start:0x8018D2C8 end:0x8018D790
+	.bss start:0x80330200 end:0x80330238
+	.sbss start:0x8034C048 end:0x8034C06C

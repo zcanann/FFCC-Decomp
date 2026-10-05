@@ -368,3 +368,17 @@ gba/GBAXfer.c:
 gx/GXFifo.c:
 	.text start:0x8019F1AC end:0x8019F9F4
 	.sbss start:0x8032E2F0 end:0x8032E30C
+
+ax/AXAlloc.c:
+	.text start:0x801904F8 end:0x801909C0
+	.bss start:0x8030BCC0 end:0x8030BDC0
+	.sbss start:0x8032E1C8 end:0x8032E1CC
+
+ax/AXProf.c:
+	.text start:0x80192D0C end:0x80192D54
+	.sbss start:0x8032E280 end:0x8032E290
+
+ax/AXSPB.c:
+	.text start:0x80191C84 end:0x8019214C
+	.bss start:0x803138E0 end:0x80313918
+	.sbss start:0x8032E248 end:0x8032E26C

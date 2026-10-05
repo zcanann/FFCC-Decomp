@@ -1286,6 +1286,9 @@ s32 LetterAnswer_Init(void)
                 strcat(buf, str);
             }
             strcat(buf, Msg_GetLetter(3));
+#if defined(VERSION_GCCJGC)
+            strcat(buf, Msg_GetLetter(4));
+#endif
             if (i) {
                 len = Text_Print(buf, TEXT_WIDTH);
             } else {
@@ -1295,7 +1298,7 @@ s32 LetterAnswer_Init(void)
             if (w < len)
                 w = len;
         }
-#if !defined(VERSION_GCCE01)
+#if defined(VERSION_GCCP01)
         len = Text_Print(Msg_GetSystem(4), TEXT_WIDTH);
         if (w < len)
             w = len;
@@ -1351,6 +1354,9 @@ s32 LetterAnswer_Init(void)
                 strcat(buf, str);
             }
             strcat(buf, Msg_GetLetter(3));
+#if defined(VERSION_GCCJGC)
+            strcat(buf, Msg_GetLetter(4));
+#endif
             Text_Print(buf, TEXT_DRAW);
         }
         Window_PutText(win, w, 0);

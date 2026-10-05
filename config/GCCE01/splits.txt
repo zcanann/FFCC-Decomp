@@ -474,3 +474,6 @@ os/OSThread.c:
 
 pppRyjMegaBirthModel.cpp:
 	.text start:0x80083B80 end:0x8008788C
+
+partyobj.cpp:
+	.text start:0x801198D4 end:0x80123CC8

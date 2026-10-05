@@ -164,7 +164,10 @@ main/xfer:
 	.bss        start:0x03000880 end:0x030008BC align:8
 
 regional_bss:
-	.bss        start:0x030008BC end:0x03001174
+	.bss        start:0x030008BC end:0x030008E8
+
+main/text:
+	.bss        start:0x030008E8 end:0x03001174 align:8
 
 main/radarmap:
 	.bss        start:0x03001174 end:0x03001190 align:4

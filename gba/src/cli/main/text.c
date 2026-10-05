@@ -5,7 +5,7 @@
 /* 2bpp proportional font; offsets are relative to the start of the font. */
 struct Font {
     u32 magic;      /* "PCD " */
-    u32 version;    /* "0.50" */
+    u32 version;    /* Resource format version. */
     u16 count;      /* glyphs in map */
     u16 split;      /* glyphs from here on use the second bit plane */
     u32 paletteCount;
@@ -14,7 +14,10 @@ struct Font {
     u16 glyphWidth;
     u16 height;
     u32 glyphs;
-    u8 unk20[14];
+    u8 unk20[8];
+    u16 firstHiragana;
+    u16 firstKatakana;
+    u16 firstKanji;
     u16 first;
     char map[4];    /* NUL-terminated list of the characters in glyph order */
 };
@@ -83,8 +86,20 @@ void Text_Clear(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02003464
+ * PAL Size: 836b
+ * EN Address: 0x02003464
+ * EN Size: 834b
+ * JP Address: 0x020035A4
+ * JP Size: 1030b
+ */
 s32 Text_Print(const char *str, s32 mode)
 {
+#if defined(VERSION_GCCJGC)
+    u32 i;
+#endif
     s32 height;
     s32 shift;
     s32 rest;
@@ -94,13 +109,18 @@ s32 Text_Print(const char *str, s32 mode)
     u32 len;
     s32 mapLen;
     u32 *dst3;
+#if defined(VERSION_GCCJGC)
+    const char *p;
+#endif
     char *map;
     u8 *widths;
     u8 *glyphs;
     u8 second;
     struct Font *font;
+#if !defined(VERSION_GCCJGC)
     u32 i;
     const char *p;
+#endif
     u32 index;
     u32 *glyph;
     s32 w;
@@ -111,6 +131,11 @@ s32 Text_Print(const char *str, s32 mode)
     u32 bits;
     s32 v;
     s32 rs;
+#if defined(VERSION_GCCJGC)
+    s32 group;
+    u16 *wideMap;
+    u32 code;
+#endif
 
     if (str == NULL)
         return 0;
@@ -124,6 +149,66 @@ s32 Text_Print(const char *str, s32 mode)
     mapLen = strlen(map);
     total = 0;
     for (i = 0; i < len; i++, p++) {
+#if defined(VERSION_GCCJGC)
+        if ((s8)*p >= 0) {
+            group = 0;
+            index = font->first;
+            m = mapLen - index * 2;
+        } else if (*p == 0x81) {
+            group = 1;
+            index = 0;
+            m = font->firstHiragana;
+        } else if (*p == 0x82) {
+            group = 2;
+            index = font->firstHiragana;
+            m = font->firstKatakana - index;
+        } else if (*p == 0x83) {
+            group = 3;
+            index = font->firstKatakana;
+            m = font->firstKanji ? font->firstKanji : font->first;
+            m -= index;
+        } else {
+            group = 4;
+            index = font->firstKanji;
+            m = font->first - index;
+        }
+        wideMap = (u16 *)(map + index * 2);
+        if (group != 0) {
+            if (*p == 0x81 && p[1] == 0x40) {
+                if (mode == TEXT_WIDTH)
+                    total += 7;
+                else
+                    sTextX += 7;
+                p++;
+                i++;
+                continue;
+            }
+            k = 0;
+            if (k < m) {
+                do {
+                    code = *wideMap;
+                    if ((code & 0xFF) == *p && (code >> 8) == p[1])
+                        break;
+                    k++;
+                    wideMap++;
+                } while (k < m);
+            }
+            index += k;
+            p++;
+            i++;
+        } else {
+            if (*p == ' ') {
+                if (mode == TEXT_WIDTH)
+                    total += 7;
+                else
+                    sTextX += 7;
+                continue;
+            }
+            for (k = 0; k < m && *((char *)wideMap + k) != *p; k++)
+                ;
+            index += k;
+        }
+#else
         index = font->first;
         m = mapLen - index * 2;
         if (*p == ' ') {
@@ -136,6 +221,7 @@ s32 Text_Print(const char *str, s32 mode)
             for (k = 0; k < m && *(map + w + k) != *p; k++)
                 ;
             index += k;
+#endif
             if (mode == TEXT_WIDTH) {
                 total += widths[index];
             } else {
@@ -216,7 +302,9 @@ s32 Text_Print(const char *str, s32 mode)
                 else
                     sTextX += widths[index];
             }
+#if !defined(VERSION_GCCJGC)
         }
+#endif
     }
     if (mode == TEXT_WIDTH)
         return total;

@@ -165,6 +165,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
         ],
         "mgr": [
+            "field", "route", "obj",
             "camera", "sound", "text", "libc/reent/impure",
             "libc/arm/syscalls", "libc/reent/sbrkr",
             "crt0", "fixmath", "m4a/m4a_1", "joy_reset", "libagbsyscall/ArcTan2",

@@ -29,7 +29,7 @@ struct Session {
 
 /* Caravan member in one of the four controller ports */
 struct Member {
-    char *name;
+    const char *name;
     u16 saveSlot;
     s8 maxHp;
     s8 hp;

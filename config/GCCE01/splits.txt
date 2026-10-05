@@ -825,3 +825,16 @@ TRK_MINNOW_DOLPHIN/dispatch.c:
 
 memorycard.cpp:
 	.text start:0x800C1040 end:0x800C4660
+
+TRK_MINNOW_DOLPHIN/support.c:
+	.text start:0x801AA14C end:0x801AA860
+	.rodata start:0x801E5900 end:0x801E59A8
+
+TRK_MINNOW_DOLPHIN/notify.c:
+	.text start:0x801AA878 end:0x801AA910
+
+TRK_MINNOW_DOLPHIN/MWTrace.c:
+	.text start:0x801AE4DC end:0x801AE52C
+
+TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:
+	.text start:0x801AC5B0 end:0x801AC920

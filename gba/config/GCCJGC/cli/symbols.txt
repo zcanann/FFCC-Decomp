@@ -877,3 +877,7 @@ sItemQuit = .bss:0x030027B8; // type:object size:0x1 scope:local data:byte
 sItemRow = .bss:0x030027B9; // type:object size:0x1 scope:local data:byte
 sItemUnused = .bss:0x030027BA; // type:object size:0x1 scope:local data:byte
 sItemUnused2 = .bss:0x030027BC; // type:object size:0x2 scope:local data:byte
+scouter_strings = .rodata:0x0201D17C; // type:object size:0xC literal data:byte
+sScouterRow = .bss:0x03002838; // type:object size:0x1 scope:local data:byte
+sScouterActive = .bss:0x03002839; // type:object size:0x1 scope:local data:byte
+sScouterShown = .bss:0x0300283C; // type:object size:0x4 scope:local data:byte

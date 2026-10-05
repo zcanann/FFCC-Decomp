@@ -8,10 +8,16 @@
 #include "window.h"
 #include "screen.h"
 
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
 #define SCOUTER_UNKNOWN "???"
 #else
 #define SCOUTER_UNKNOWN Msg_GetSystem(41)
+#endif
+
+#if defined(VERSION_GCCJGC)
+#define SCOUTER_NONE "\202\310\202\265"
+#else
+#define SCOUTER_NONE Msg_GetSystem(62)
 #endif
 
 static s8 sScouterRow;
@@ -262,7 +268,7 @@ void ScouterScreen_PrintNextRow(void)
         if (idx < 0)
             Text_Print(SCOUTER_UNKNOWN, TEXT_DRAW);
         else if (idx == 0)
-            Text_Print(Msg_GetSystem(62), TEXT_DRAW);
+            Text_Print(SCOUTER_NONE, TEXT_DRAW);
         else
             Text_Print(Msg_GetItemName(idx), TEXT_DRAW);
     }

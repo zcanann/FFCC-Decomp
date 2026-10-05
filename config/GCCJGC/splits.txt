@@ -1171,6 +1171,10 @@ auto_08_80345FA4_bss:
 
 pppYmBreath.cpp:
 	.text start:0x800BD870 end:0x800BF1C8
+	.rodata start:0x801D54E0 end:0x801D54F0
+	.sdata2 start:0x8034D9A8 end:0x8034D9E0
 
 pppBreathModel.cpp:
 	.text start:0x800D8434 end:0x800D9D6C
+	.rodata start:0x801D6090 end:0x801D60A8
+	.sdata2 start:0x8034DC88 end:0x8034DCC0

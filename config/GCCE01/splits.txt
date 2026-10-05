@@ -1218,6 +1218,10 @@ pppRyjMegaBirth.cpp:
 
 pppYmBreath.cpp:
 	.text start:0x800BF700 end:0x800C1040
+	.rodata start:0x801D98C8 end:0x801D98D8
+	.sdata2 start:0x8032FC38 end:0x8032FC70
 
 pppBreathModel.cpp:
 	.text start:0x800DA860 end:0x800DC16C
+	.rodata start:0x801DA4B8 end:0x801DA4D0
+	.sdata2 start:0x8032FF28 end:0x8032FF60

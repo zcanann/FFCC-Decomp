@@ -178,6 +178,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
     },
     "GCCJGC": {
         "cli": [
+            "main/cmdlist",
             "joy_reset", "libc/string/strchr", "libc/string/strcmp", "libc/string/strlen",
             "main/widget", "main/scouter", "main/family", "main/radar", "main/equip",
             "main/smith",

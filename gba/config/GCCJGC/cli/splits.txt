@@ -250,8 +250,11 @@ main/radarmap:
 main/obj:
 	.bss        start:0x03001190 end:0x03002772 align:8
 
+main/cmdlist:
+	.bss        start:0x03002774 end:0x03002783 align:4
+
 regional_bss:
-	.bss        start:0x03002774 end:0x03002784 align:4
+	.bss        start:0x03002783 end:0x03002784 align:1
 
 main/radar:
 	.bss        start:0x03002784 end:0x03002785 align:4

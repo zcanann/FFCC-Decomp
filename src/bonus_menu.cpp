@@ -2076,13 +2076,18 @@ void CMenuPcs::DrawResultCloseAnim()
  * --INFO--
  * PAL Address: 0x80135D60
  * PAL Size: 4668b
- * EN Address: 0x8015946C
- * EN Size: 5372b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013506C
+ * EN Size: 4684b
+ * JP Address: 0x80131B78
+ * JP Size: 4832b
  */
 void CMenuPcs::CalcSelectOpenAnim()
 {
+#ifdef VERSION_GCCP01
+	enum { kFadeFrames = 8, kArtifactDuration = 33 };
+#else
+	enum { kFadeFrames = 10, kArtifactDuration = 40 };
+#endif
 	int activePartyCount = s_Rinfo->m_partyCount;
 	int frame;
 	int doneCount;
@@ -2103,7 +2108,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		idx = 0;
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x16;
+			spr->kind = kBonusBackgroundTexture;
 			spr->y = 0;
 			spr->x = 0;
 			spr->w = 0x280;
@@ -2125,12 +2130,16 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulY = 0.0f;
 			spr->mulX = 0.0f;
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 		}
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
+#ifdef VERSION_GCCJGC
+			spr->kind = 0x1e;
+#else
 			spr->kind = 0x1f;
+#endif
 			spr->x = 0;
 			spr->y = 0;
 			spr->w = 0x80;
@@ -2138,7 +2147,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulY = 0.0f;
 			spr->mulX = 0.0f;
 			spr->startFrame = 9999;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-8.0f);
 			spr->motionY = (-8.0f);
@@ -2154,7 +2163,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulY = 0.0f;
 			spr->mulX = 0.0f;
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 		}
 
@@ -2168,7 +2177,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 				}
 			}
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->kind = 0x18;
+			spr->kind = kBonusPlayerTexture;
 			spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
 			spr->y = y;
 			spr->w = 0x60;
@@ -2176,7 +2185,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulX = (float)((partySlot & 1) ? spr->w : 0);
 			spr->mulY = (float)((partySlot >> 1) ? spr->h : 0);
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-240.0f);
 			spr->motionY = 0.0f;
@@ -2198,7 +2207,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulX = 0.0f;
 			spr->mulY = 0.0f;
 			spr->startFrame = (spr - activePartyCount)->startFrame;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-240.0f);
 			spr->motionY = 0.0f;
@@ -2221,8 +2230,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
 				spr->startFrame = start;
+#ifdef VERSION_GCCP01
 				spr->startFrame = (int)(0.8333333134651184f * (float)spr->startFrame);
-				spr->duration = 0x21;
+#endif
+				spr->duration = kArtifactDuration;
 				spr->depth = 1.0f;
 				spr->flags = 1;
 				start += 5;
@@ -2250,7 +2261,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->kind = 0x19;
+			spr->kind = kBonusCountTexture;
 			spr->x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			spr->y = y;
 			spr->w = 0x38;
@@ -2258,7 +2269,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulX = (float)(i * spr->w);
 			spr->mulY = 0.0f;
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-240.0f);
 			spr->motionY = 0.0f;
@@ -2281,7 +2292,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulX = 0.0f;
 			spr->mulY = 0.0f;
 			spr->startFrame = prev->startFrame;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-240.0f);
 			spr->motionY = 0.0f;

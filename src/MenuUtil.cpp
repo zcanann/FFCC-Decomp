@@ -1578,16 +1578,17 @@ void CMenuPcs::DrawOptionMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x8017683c
+ * PAL Address: 0x8017683C
  * PAL Size: 336b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801757B8
+ * EN Size: 336b
+ * JP Address: 0x80171534
+ * JP Size: 336b
  */
 void CMenuPcs::BindMcObj(int slotNo)
 {
 	int slot;
+	int iconType;
 	EffectInfo* obj;
 
 	for (slot = 0; slot < 4; slot++) {
@@ -1613,7 +1614,6 @@ void CMenuPcs::BindMcObj(int slotNo)
 
 	for (slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
-			int iconType;
 			EffectEntry* entry = &m_effectEntries[slot];
 			iconType = entry->m_iconType;
 

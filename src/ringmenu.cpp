@@ -21,6 +21,7 @@
 
 #include <math.h>
 
+#ifdef VERSION_GCCP01
 static const char sRingMenuDisplayToggleChangedFmt[] = {
 	0x72, 0x69, 0x6E, 0x67, 0x4D, 0x65, 0x6E, 0x75,
 	(char)0x95, (char)0x8E, (char)0xA6, 0x6F, 0x6E, 0x2F, 0x6F, 0x66,
@@ -29,6 +30,7 @@ static const char sRingMenuDisplayToggleChangedFmt[] = {
 	(char)0xBD, (char)0x81, (char)0x42, 0x25, 0x64, 0x2D, 0x25, 0x64,
 	0x0A, 0x00, 0x00, 0x00
 };
+#endif
 
 static void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, float);
 
@@ -798,10 +800,10 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
  * --INFO--
  * PAL Address: 0x800a4c3c
  * PAL Size: 1392b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800A4510
+ * EN Size: 1348b
+ * JP Address: 0x800A2B98
+ * JP Size: 1364b
  */
 void CRingMenu::onCalc()
 {
@@ -809,7 +811,9 @@ void CRingMenu::onCalc()
 		const unsigned int targetAnimDirection =
 			(CFlatEnabledEventFlags() >> 2) & 1;
 		if (m_displayDirection != static_cast<int>(targetAnimDirection)) {
+#ifdef VERSION_GCCP01
 			System.Printf(const_cast<char*>(sRingMenuDisplayToggleChangedFmt), m_menuIndex, targetAnimDirection);
+#endif
 			m_displayDirection = !m_displayDirection;
 			m_displayCounter = 0x10 - m_displayCounter;
 		}

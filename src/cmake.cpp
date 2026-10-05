@@ -27,6 +27,46 @@ struct CmakeInfo {
     signed char m_job;
 };
 
+enum CmakeTexture {
+#ifdef VERSION_GCCJGC
+    CMAKE_TEX_WORLD40 = 0x30,
+    CMAKE_TEX_WORLD46 = 0x31,
+    CMAKE_TEX_DIARY1 = 0x33,
+    CMAKE_TEX_DIARY2 = 0x34,
+    CMAKE_TEX_CRYSTAL = 0x37,
+    CMAKE_TEX_WORLD27 = 0x38,
+    CMAKE_TEX_WORLD28 = 0x39,
+    CMAKE_TEX_WORLD44 = 0x3B,
+    CMAKE_TEX_WORLD45 = 0x3C,
+    CMAKE_TEX_WORLD48 = 0x3D,
+    CMAKE_TEX_WORLD49 = 0x3E,
+    CMAKE_TEX_VILLAGE_CRYSTAL = 0x5F,
+    CMAKE_TEX_VILLAGE_WORLD27 = 0x60,
+    CMAKE_TEX_VILLAGE_WORLD28 = 0x61,
+    CMAKE_TEX_VILLAGE_WORLD44 = 0x63,
+    CMAKE_TEX_VILLAGE_WORLD45 = 0x64,
+    CMAKE_VILLAGE_TEXTURE_COUNT = 8,
+#else
+    CMAKE_TEX_WORLD40 = 0x31,
+    CMAKE_TEX_WORLD46 = 0x32,
+    CMAKE_TEX_DIARY1 = 0x35,
+    CMAKE_TEX_DIARY2 = 0x36,
+    CMAKE_TEX_CRYSTAL = 0x39,
+    CMAKE_TEX_WORLD27 = 0x3A,
+    CMAKE_TEX_WORLD28 = 0x3B,
+    CMAKE_TEX_WORLD44 = 0x3D,
+    CMAKE_TEX_WORLD45 = 0x3E,
+    CMAKE_TEX_WORLD48 = 0x3F,
+    CMAKE_TEX_WORLD49 = 0x40,
+    CMAKE_TEX_VILLAGE_CRYSTAL = 0x60,
+    CMAKE_TEX_VILLAGE_WORLD27 = 0x61,
+    CMAKE_TEX_VILLAGE_WORLD28 = 0x62,
+    CMAKE_TEX_VILLAGE_WORLD44 = 0x64,
+    CMAKE_TEX_VILLAGE_WORLD45 = 0x65,
+    CMAKE_VILLAGE_TEXTURE_COUNT = 9,
+#endif
+};
+
 enum CmakeFontSlot {
     CMAKE_FONT_VALUE = 0,
     CMAKE_FONT_LABEL = 1,
@@ -179,7 +219,7 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
         menu->m_wm.m_handles[handleIndex]->Draw(5);
         menu->RestoreProjection();
     } else {
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD46));
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXColor col;
         col.r = 0xFF;
@@ -220,7 +260,7 @@ static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gx
         menu->m_wm.m_handles[handleIndex]->Draw(5);
         menu->RestoreProjection();
     } else {
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD46));
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXColor col;
         col.r = 0xFF;
@@ -267,7 +307,7 @@ static inline void DrawCmakeSelectionBackdrop(CMenuPcs* menu)
     col.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, col);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
     MenuPcs.DrawRect(
         0,
         0.0f, 24.0f, 32.0f, 336.0f,
@@ -277,7 +317,7 @@ static inline void DrawCmakeSelectionBackdrop(CMenuPcs* menu)
         608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
     for (int x = 0x20; x < 0x260; x += 0x20) {
         int span = 0x20;
         if ((0x260 - x) < span) {
@@ -306,7 +346,7 @@ static inline void DrawCmakePopupPanel(CMenuPcs* menu, float alpha, float x, flo
     col.b = 0xFF;
     col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(menu) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(menu) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     MenuPcs.DrawRect(
         0, x, y, w, h,
         0.0f, 0.0f, scaleX, scaleY, 0.0f);
@@ -405,7 +445,9 @@ CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
     {8, (char*)s_world45},
     {8, (char*)s_world48},
     {8, (char*)s_world49},
+#ifndef VERSION_GCCJGC
     {8, (char*)s_world51},
+#endif
 };
 
 static CmakeInfo s_CmakeInfo;
@@ -899,10 +941,10 @@ void CMenuPcs::CalcSingCMake()
  * --INFO--
  * PAL Address: 0x80173794
  * PAL Size: 1040b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80172710
+ * EN Size: 1040b
+ * JP Address: 0x8016E294
+ * JP Size: 1032b
  */
 void CMenuPcs::DrawSingCMake()
 {
@@ -914,7 +956,7 @@ void CMenuPcs::DrawSingCMake()
 
         SetCmakeBlendMatColor(alpha);
 
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
         MenuPcs.DrawRect(
             0,
             0.0f, 24.0f, 32.0f, 336.0f,
@@ -924,7 +966,7 @@ void CMenuPcs::DrawSingCMake()
             608.0f, 24.0f, 32.0f, 336.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
         {
             int span;
             for (int x = 0x20; x < 0x260; x += span) {
@@ -1018,12 +1060,12 @@ resetFrame:
 
 /*
  * --INFO--
- * PAL Address: 0x8017352c
+ * PAL Address: 0x8017352C
  * PAL Size: 616b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801724A8
+ * EN Size: 616b
+ * JP Address: 0x8016E034
+ * JP Size: 608b
  */
 void CMenuPcs::DrawDiaryBase(int page, float alpha)
 {
@@ -1039,9 +1081,9 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     const bool widePage = (page == 0);
-    CMenuPcs::TEX baseTex = static_cast<CMenuPcs::TEX>(0x3F);
+    CMenuPcs::TEX baseTex = static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48);
     if (widePage) {
-        baseTex = static_cast<CMenuPcs::TEX>(0x35);
+        baseTex = static_cast<CMenuPcs::TEX>(CMAKE_TEX_DIARY1);
     }
     MenuPcs.SetTexture(baseTex);
 
@@ -1054,7 +1096,7 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
         8, 608.0f, static_cast<float>(y0), 32.0f, static_cast<float>(frameH),
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(widePage ? 0x36 : 0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(widePage ? CMAKE_TEX_DIARY2 : CMAKE_TEX_WORLD49));
     int span;
     for (int x = 0x20; x < 0x260;) {
         span = 0x20;
@@ -1094,7 +1136,7 @@ inline void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     int frameH = (x == 0.0f) ? 0x150 : 0x180;
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((x == 0.0f) ? 0x3F : 0x35));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((x == 0.0f) ? CMAKE_TEX_WORLD48 : CMAKE_TEX_DIARY1));
     MenuPcs.DrawRect(
         0, 0.0f, 24.0f, 32.0f, static_cast<float>(frameH),
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1102,7 +1144,7 @@ inline void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
         8, 608.0f, 24.0f, 32.0f, static_cast<float>(frameH),
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((x == 0.0f) ? 0x40 : 0x36));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((x == 0.0f) ? CMAKE_TEX_WORLD49 : CMAKE_TEX_DIARY2));
     for (int tileX = 0x20; tileX < 0x260; ) {
         int tileW = 0x20;
         if (0x260 - tileX < 0x20) {
@@ -1120,10 +1162,10 @@ inline void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
  * --INFO--
  * PAL Address: 0x80173258
  * PAL Size: 724b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801721D4
+ * EN Size: 724b
+ * JP Address: 0x8016DD48
+ * JP Size: 748b
  */
 void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
@@ -1138,7 +1180,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
     col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x62 : 0x3B));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD28 : CMAKE_TEX_WORLD28));
     MenuPcs.DrawRect(
         0, 214.0f, 32.0f, 112.0f, 56.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1146,7 +1188,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         8, 474.0f, 32.0f, 112.0f, 56.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     int baseX = 0x116;
     double offsCalc = static_cast<double>(40.0f - 40.0f * x) / 2.0 + 32.0;
     int offsU = static_cast<int>(offsCalc);
@@ -1159,7 +1201,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         return;
     }
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x65 : 0x3E));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD45 : CMAKE_TEX_WORLD45));
 
     baseX += 20.0;
     offsU += 8.0;
@@ -1189,7 +1231,7 @@ inline void CMenuPcs::DrawCrystal(int x, int y, float alpha)
     color.a = static_cast<unsigned char>(alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x60 : 0x39));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_CRYSTAL : CMAKE_TEX_CRYSTAL));
     MenuPcs.DrawRect(
         0,
         static_cast<float>(x),
@@ -1230,12 +1272,12 @@ inline void CMenuPcs::DrawCmakePageMark(float alpha)
 
 /*
  * --INFO--
- * PAL Address: 0x80172ef8
+ * PAL Address: 0x80172EF8
  * PAL Size: 864b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80171E74
+ * EN Size: 864b
+ * JP Address: 0x8016D9F0
+ * JP Size: 856b
  */
 void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 {
@@ -1249,7 +1291,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     col.b = 0xFF;
     col.a = static_cast<unsigned char>(alpha255);
     GXSetChanMatColor(GX_COLOR0A0, col);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     MenuPcs.DrawRect(
         0, 480.0f, 368.0f, 48.0f, 32.0f,
         296.0f, 264.0f, 1.0f, 1.0f, 0.0f);
@@ -1259,7 +1301,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 
     if (yesNoSel != 0) {
         SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD44 : CMAKE_TEX_WORLD44));
         MenuPcs.DrawRect(
             0, 516.0f, 360.0f, 48.0f, 48.0f,
             128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1439,7 +1481,7 @@ inline void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
     col.b = 0xFF;
     col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
     MenuPcs.DrawRect(
         0,
         351.0f + static_cast<float>(x),
@@ -1452,12 +1494,12 @@ inline void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
 
 /*
  * --INFO--
- * PAL Address: 0x80172c1c
+ * PAL Address: 0x80172C1C
  * PAL Size: 732b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80171B98
+ * EN Size: 732b
+ * JP Address: 0x8016D714
+ * JP Size: 732b
  */
 void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 {
@@ -1537,11 +1579,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     col.a = static_cast<unsigned char>(alpha255);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
-#ifdef VERSION_GCCJGC
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-#else
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
-#endif
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD27));
     MenuPcs.DrawRect(
         0, 432.0f, 368.0f, 48.0f, 32.0f,
         296.0f, 264.0f, 1.0f, 1.0f, 0.0f);
@@ -1550,11 +1588,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
         296.0f, 264.0f, 1.0f, 1.0f, 0.0f);
 
     if (yesNoSel != 0) {
-#ifdef VERSION_GCCJGC
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3B));
-#else
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
-#endif
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD44));
         MenuPcs.DrawRect(
             0, 464.0f, 360.0f, 128.0f, 48.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -2002,10 +2036,10 @@ inline void CMenuPcs::CmakeNameClose()
  * --INFO--
  * PAL Address: 0x80171340
  * PAL Size: 3168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801702BC
+ * EN Size: 3168b
+ * JP Address: 0x8016B6E8
+ * JP Size: 3528b
  */
 void CMenuPcs::CmakeNameDraw()
 {
@@ -2027,7 +2061,7 @@ void CMenuPcs::CmakeNameDraw()
 
     DrawWMFrame0(1, 1.0f);
     SetCmakeBlendMatColor(1.0f);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
     MenuPcs.DrawRect(
         0, 0.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -2035,7 +2069,7 @@ void CMenuPcs::CmakeNameDraw()
         8, 608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
     for (int x = 0x20; x < 0x260;) {
         int span = 0x20;
         if ((0x260 - x) < span) {
@@ -2048,7 +2082,7 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     SetCmakeBlendMatColor(alpha);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     MenuPcs.DrawRect(
         0, 192.0f, 56.0f, 416.0f, 264.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -2066,7 +2100,7 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     SetCmakeBlendMatColor(alpha);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     float titleW = 280.0f;
     MenuPcs.DrawRect(
         0, static_cast<float>(static_cast<int>(-(titleW / 2.0 - 400.0))), 268.0f, titleW, 64.0f,
@@ -2089,7 +2123,7 @@ void CMenuPcs::CmakeNameDraw()
         cellX = static_cast<int>(
             26.9f * static_cast<float>(sel) + static_cast<float>(cellX));
         SetCmakeBlendMatColor(1.0f);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD44 : CMAKE_TEX_WORLD44));
         MenuPcs.DrawRect(
             0, static_cast<float>(cellX), static_cast<float>(cursorY), 48.0f, 48.0f,
             128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -2221,12 +2255,12 @@ inline void CMenuPcs::CmakeSexClose()
 
 /*
  * --INFO--
- * PAL Address: 0x80170ce8
+ * PAL Address: 0x80170CE8
  * PAL Size: 1624b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016FC70
+ * EN Size: 1612b
+ * JP Address: 0x8016B0C8
+ * JP Size: 1568b
  */
 void CMenuPcs::CmakeSexDraw()
 {
@@ -2248,14 +2282,14 @@ void CMenuPcs::CmakeSexDraw()
     DrawWMFrame0(1, 1.0f);
 
     SetCmakeBlendMatColor(1.0f);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
     MenuPcs.DrawRect(
         0, 0.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(
         8, 608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
     int span;
     for (int x = 0x20; x < 0x260;) {
         span = 0x20;
@@ -2272,7 +2306,7 @@ void CMenuPcs::CmakeSexDraw()
 
     SetCmakeBlendMatColor(alpha);
     a255 = 255.0f * alpha;
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     float sexW = 256.0f;
     float sexH = 162.4615478515625f;
     MenuPcs.DrawRect(
@@ -2461,12 +2495,12 @@ inline void CMenuPcs::CmakeTribeClose()
 
 /*
  * --INFO--
- * PAL Address: 0x8016ffbc
+ * PAL Address: 0x8016FFBC
  * PAL Size: 2292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016EF44
+ * EN Size: 2292b
+ * JP Address: 0x8016A348
+ * JP Size: 2264b
  */
 void CMenuPcs::CmakeTribeDraw()
 {
@@ -2490,7 +2524,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     SetCmakeBlendMatColor(1.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
     MenuPcs.DrawRect(
         0,
         0.0f, 24.0f, 32.0f, 336.0f,
@@ -2500,7 +2534,7 @@ void CMenuPcs::CmakeTribeDraw()
         608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
     {
         int tileW;
         for (int tileX = 0x20; tileX < 0x260; tileX += tileW) {
@@ -2520,7 +2554,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     SetCmakeBlendMatColor(alpha);
     a255 = 255.0f * alpha;
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     float boxW = 416.0f;
     float boxH = 240.0f;
     MenuPcs.DrawRect(
@@ -2534,7 +2568,7 @@ void CMenuPcs::CmakeTribeDraw()
     {
         int tribe = CmakeState(this)->m_select;
         SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
         MenuPcs.DrawRect(
             0,
             351.0f, 96.0f, 184.0f, 184.0f,
@@ -2740,12 +2774,12 @@ inline void CMenuPcs::CmakeJobClose()
 
 /*
  * --INFO--
- * PAL Address: 0x8016f4f8
+ * PAL Address: 0x8016F4F8
  * PAL Size: 1600b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016E480
+ * EN Size: 1600b
+ * JP Address: 0x801698B8
+ * JP Size: 1596b
  */
 void CMenuPcs::CmakeJobDraw()
 {
@@ -2768,7 +2802,7 @@ void CMenuPcs::CmakeJobDraw()
 
     SetCmakeBlendMatColor(1.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
     MenuPcs.DrawRect(
         0,
         0.0f, 24.0f, 32.0f, 336.0f,
@@ -2778,7 +2812,7 @@ void CMenuPcs::CmakeJobDraw()
         608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
     {
         int span;
         for (int x = 0x20; x < 0x260; x += span) {
@@ -2797,7 +2831,7 @@ void CMenuPcs::CmakeJobDraw()
     DrawCmakePreviewCharaAlpha(this, 1.0f);
 
     SetCmakeBlendMatColor(alpha);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     MenuPcs.DrawRect(
         0,
         192.0f, 56.0f, 416.0f, 264.0f,
@@ -2919,12 +2953,12 @@ inline void CMenuPcs::CmakeResultClose()
 
 /*
  * --INFO--
- * PAL Address: 0x8016ea78
+ * PAL Address: 0x8016EA78
  * PAL Size: 2688b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016DA00
+ * EN Size: 2688b
+ * JP Address: 0x80168EB0
+ * JP Size: 2568b
  */
 void CMenuPcs::CmakeResultDraw()
 {
@@ -2947,7 +2981,7 @@ void CMenuPcs::CmakeResultDraw()
 
     SetCmakeBlendMatColor(1.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
     MenuPcs.DrawRect(
         0,
         0.0f, 24.0f, 32.0f, 336.0f,
@@ -2957,7 +2991,7 @@ void CMenuPcs::CmakeResultDraw()
         608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
     for (int tileX = 0x20; tileX < 0x260; ) {
         int tileW = 0x20;
         if (0x260 - tileX < 0x20) {
@@ -2975,13 +3009,13 @@ void CMenuPcs::CmakeResultDraw()
 
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
         SetCmakeBlendMatColor(1.0f);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     } else {
         SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -2996,7 +3030,7 @@ void CMenuPcs::CmakeResultDraw()
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
         SetCmakeBlendMatColor(1.0f);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
         MenuPcs.DrawRect(
             0,
             351.0f, 96.0f, 184.0f, 184.0f,
@@ -3006,7 +3040,7 @@ void CMenuPcs::CmakeResultDraw()
     } else {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
         SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
         MenuPcs.DrawRect(
             0,
             351.0f, 96.0f, 184.0f, 184.0f,
@@ -3156,12 +3190,12 @@ inline void CMenuPcs::CmakeResultClose1()
 
 /*
  * --INFO--
- * PAL Address: 0x8016e0d4
+ * PAL Address: 0x8016E0D4
  * PAL Size: 2468b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016D05C
+ * EN Size: 2468b
+ * JP Address: 0x80168584
+ * JP Size: 2348b
  */
 void CMenuPcs::CmakeResultDraw1()
 {
@@ -3185,7 +3219,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     SetCmakeBlendMatColor(1.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
     MenuPcs.DrawRect(
         0,
         0.0f, 24.0f, 32.0f, 336.0f,
@@ -3195,7 +3229,7 @@ void CMenuPcs::CmakeResultDraw1()
         608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
     for (int tileX = 0x20; tileX < 0x260; ) {
         int tileW = 0x20;
         if (0x260 - tileX < 0x20) {
@@ -3213,13 +3247,13 @@ void CMenuPcs::CmakeResultDraw1()
 
     if (CmakeState(this)->m_mode == 0) {
         SetCmakeBlendMatColor(1.0f);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     } else {
         SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -3232,7 +3266,7 @@ void CMenuPcs::CmakeResultDraw1()
     {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
         SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
         MenuPcs.DrawRect(
             0,
             351.0f, 96.0f, 184.0f, 184.0f,
@@ -3556,12 +3590,12 @@ inline void CMenuPcs::CmakeVillageClose()
 
 /*
  * --INFO--
- * PAL Address: 0x8016d25c
+ * PAL Address: 0x8016D25C
  * PAL Size: 1764b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016C1E4
+ * EN Size: 1764b
+ * JP Address: 0x80167560
+ * JP Size: 2120b
  */
 void CMenuPcs::CmakeVillageDraw()
 {
@@ -3582,7 +3616,7 @@ void CMenuPcs::CmakeVillageDraw()
     }
 
     SetCmakeBlendMatColor(alpha);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     MenuPcs.DrawRect(
         0, 192.0f, 56.0f, 416.0f, 264.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -3590,7 +3624,7 @@ void CMenuPcs::CmakeVillageDraw()
     DrawCmakeTitle(0, 1.0f, alpha);
 
     SetCmakeBlendMatColor(alpha);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     float panelW = 328.0f;
     MenuPcs.DrawRect(
         0, static_cast<float>(static_cast<int>(-(panelW / 2.0 - 400.0))), 288.0f, panelW, 56.0f,
@@ -3613,7 +3647,7 @@ void CMenuPcs::CmakeVillageDraw()
         cursorX = static_cast<int>(
             26.9f * static_cast<float>(sel) + static_cast<float>(cursorX));
         SetCmakeBlendMatColor(1.0f);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 100 : 0x3D));
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD44 : CMAKE_TEX_WORLD44));
         MenuPcs.DrawRect(
             0,
             static_cast<float>(cursorX), static_cast<float>(cursorY), 48.0f, 48.0f,
@@ -3701,12 +3735,12 @@ void CMenuPcs::createVillageMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x8016d19c
+ * PAL Address: 0x8016D19C
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016C124
+ * EN Size: 192b
+ * JP Address: 0x801674A0
+ * JP Size: 192b
  */
 void CMenuPcs::destroyVillageMenu()
 {
@@ -3719,7 +3753,7 @@ void CMenuPcs::destroyVillageMenu()
             }
         }
 
-        freeTexture(8, 1, 0x60, 9);
+        freeTexture(8, 1, CMAKE_TEX_VILLAGE_CRYSTAL, CMAKE_VILLAGE_TEXTURE_COUNT);
 
         void*& villageWork = CmakeVillageWork(this);
         if (villageWork != nullptr) {
@@ -3733,12 +3767,12 @@ void CMenuPcs::destroyVillageMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x8016cf58
+ * PAL Address: 0x8016CF58
  * PAL Size: 580b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016BEE0
+ * EN Size: 580b
+ * JP Address: 0x80167278
+ * JP Size: 552b
  */
 void CMenuPcs::calcVillageMenu()
 {
@@ -3751,7 +3785,7 @@ void CMenuPcs::calcVillageMenu()
                 loadFont(2, path, 4, -1);
             }
 
-            loadTexture(PTR_s_world2, 8, 1, s_cmakeWorldTextureTable, 0x60, 9, 3);
+            loadTexture(PTR_s_world2, 8, 1, s_cmakeWorldTextureTable, CMAKE_TEX_VILLAGE_CRYSTAL, CMAKE_VILLAGE_TEXTURE_COUNT, 3);
 
             CMemory::CStage* stage = MenuPcs.m_menuStage;
             void*& villageWork = CmakeVillageWork(this);
@@ -3775,7 +3809,7 @@ void CMenuPcs::calcVillageMenu()
                     }
                 }
 
-                freeTexture(8, 1, 0x60, 9);
+                freeTexture(8, 1, CMAKE_TEX_VILLAGE_CRYSTAL, CMAKE_VILLAGE_TEXTURE_COUNT);
                 void*& villageWork = CmakeVillageWork(this);
                 if (villageWork != nullptr) {
                     operator delete(villageWork);

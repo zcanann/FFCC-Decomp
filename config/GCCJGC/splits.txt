@@ -517,3 +517,19 @@ p_light.cpp:
 
 menu_letter.cpp:
 	.text start:0x8015E4DC end:0x80162690
+
+mtx/mtx.c:
+	.text start:0x8017FF4C end:0x80180988
+	.sdata start:0x8034B8B0 end:0x8034B8B8
+	.sdata2 start:0x8034FAF0 end:0x8034FB0C
+
+mtx/mtxvec.c:
+	.text start:0x80180988 end:0x80180ABC
+
+mtx/mtx44.c:
+	.text start:0x80180ABC end:0x80181190
+	.sdata2 start:0x8034FB10 end:0x8034FB28
+
+mtx/vec.c:
+	.text start:0x80181208 end:0x801814B8
+	.sdata2 start:0x8034FB28 end:0x8034FB34

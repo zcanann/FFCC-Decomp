@@ -142,6 +142,22 @@ enum {
 #endif
 };
 
+enum {
+#ifdef VERSION_GCCE01
+    FileErrorCopySize = 0x23000,
+    FileErrorDrawBeginLine = 0x2C4,
+    FileErrorCopyLine = 0x321,
+    FileErrorDisplayLine = 0x325,
+    FileErrorDrawEndLine = 0x353
+#else
+    FileErrorCopySize = 0x29400,
+    FileErrorDrawBeginLine = 0x2CC,
+    FileErrorCopyLine = 0x329,
+    FileErrorDisplayLine = 0x32D,
+    FileErrorDrawEndLine = 0x35B
+#endif
+};
+
 CFile File;
 
 /*
@@ -609,7 +625,7 @@ retry:
             return;
         }
 
-        Graphic._WaitDrawDone("file.cpp", 0x2CC);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDrawBeginLine);
 
         int hasScratchTexture = (int)Graphic.m_scratchTextureBuffer;
         hasScratchTexture = hasScratchTexture != 0;
@@ -620,8 +636,8 @@ retry:
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
             gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255).color);
-            memcpy((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), (void*)((char*)Graphic.m_frameBuffer + 0x34800), 0x29400);
-            DCFlushRange((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), 0x29400);
+            memcpy((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), (void*)((char*)Graphic.m_frameBuffer + 0x34800), FileErrorCopySize);
+            DCFlushRange((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), FileErrorCopySize);
         }
         else
         {
@@ -708,10 +724,10 @@ retry:
             GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
         }
 
-        Graphic._WaitDrawDone("file.cpp", 0x329);
+        Graphic._WaitDrawDone("file.cpp", FileErrorCopyLine);
         Graphic.SetStdDispCopySrc();
         Graphic.SetStdDispCopyDst();
-        Graphic._WaitDrawDone("file.cpp", 0x32D);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDisplayLine);
         VIWaitForRetrace();
         Sound.PauseDiscError(1);
         VISetBlack(FALSE);
@@ -732,8 +748,8 @@ retry:
         {
             gUtil.RenderTextureQuad(0.0f, 0.0f, 640.0f, 112.0f, &backupTexObj, 0, 0, 0, GX_BL_SRCALPHA,
                                            GX_BL_INVSRCALPHA);
-            memcpy((void*)((char*)Graphic.m_frameBuffer + 0x34800), (void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), 0x29400);
-            DCFlushRange((void*)((char*)Graphic.m_frameBuffer + 0x34800), 0x29400);
+            memcpy((void*)((char*)Graphic.m_frameBuffer + 0x34800), (void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), FileErrorCopySize);
+            DCFlushRange((void*)((char*)Graphic.m_frameBuffer + 0x34800), FileErrorCopySize);
         }
         else
         {
@@ -741,7 +757,7 @@ retry:
             GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
         }
 
-        Graphic._WaitDrawDone("file.cpp", 0x35B);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDrawEndLine);
         m_fatalDiskErrorFlag = 0;
 
         while (true)

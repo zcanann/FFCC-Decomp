@@ -1655,6 +1655,10 @@ auto_vector_8034DA04_sdata2:
 
 pppChangeTex.cpp:
 	.text start:0x8013AE44 end:0x8013B888
+	.rodata start:0x801D8DA0 end:0x801D8DB8
+	.sdata2 start:0x8034EC88 end:0x8034ECB0
 
 pppYmChangeTex.cpp:
 	.text start:0x800D0C5C end:0x800D1684
+	.rodata start:0x801D5FB0 end:0x801D5FC8
+	.sdata2 start:0x8034DB18 end:0x8034DB38

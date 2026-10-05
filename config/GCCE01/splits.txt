@@ -489,3 +489,12 @@ materialman.cpp:
 
 mapobj.cpp:
 	.text start:0x800285C4 end:0x8002C4F8
+
+p_camera.cpp:
+	.text start:0x80036084 end:0x8003A3F0
+
+gobject.cpp:
+	.text start:0x8007B7F4 end:0x80081C14
+
+chara.cpp:
+	.text start:0x8006E46C end:0x8007345C

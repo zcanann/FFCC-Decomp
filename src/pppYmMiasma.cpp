@@ -138,10 +138,10 @@ static inline void RenderParticleInline(_pppPObject* pppPObject, PYmMiasma* pYmM
  * --INFO--
  * PAL Address: 0x800907c4
  * PAL Size: 736b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80090160
+ * EN Size: 736b
+ * JP Address: 0x8008FBA0
+ * JP Size: 736b
  */
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaRenderStep* step, _pppCtrlTable* ctrl)
 {
@@ -161,10 +161,10 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaRenderStep* step, _pppC
  * --INFO--
  * PAL Address: 0x80090aa4
  * PAL Size: 748b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80090440
+ * EN Size: 748b
+ * JP Address: 0x8008FE80
+ * JP Size: 748b
  */
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtrlTable* ctrl)
 {
@@ -263,10 +263,10 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtr
  * --INFO--
  * PAL Address: 0x80090d90
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009072C
+ * EN Size: 56b
+ * JP Address: 0x8009016C
+ * JP Size: 56b
  */
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
@@ -282,10 +282,10 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x80090dc8
  * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80090764
+ * EN Size: 36b
+ * JP Address: 0x800901A4
+ * JP Size: 44b
  */
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
@@ -301,10 +301,10 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x80090dec
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80090788
+ * EN Size: 80b
+ * JP Address: 0x800901D0
+ * JP Size: 100b
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
@@ -320,9 +320,7 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
     work->m_impulse.x = one;
     work->m_impulse.y = zero;
     work->m_impulse.z = zero;
-    work->m_prevPosition.z = zero;
-    work->m_prevPosition.y = zero;
-    work->m_prevPosition.x = zero;
+    work->m_prevPosition.x = work->m_prevPosition.y = work->m_prevPosition.z = zero;
     work->m_prevPositionChanged = 0;
 }
 
@@ -344,10 +342,10 @@ inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTIC
  * --INFO--
  * PAL Address: 0x80090e3c
  * PAL Size: 1016b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800907D8
+ * EN Size: 1016b
+ * JP Address: 0x80090234
+ * JP Size: 1016b
  */
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
@@ -464,10 +462,10 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
  * --INFO--
  * PAL Address: 0x80091234
  * PAL Size: 872b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80090BD0
+ * EN Size: 872b
+ * JP Address: 0x8009062C
+ * JP Size: 872b
  */
 void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {

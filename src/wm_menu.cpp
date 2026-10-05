@@ -10782,10 +10782,10 @@ int McCtrl::SaveDat()
  * --INFO--
  * PAL Address: 0x800e8300
  * PAL Size: 1080b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E7A30
+ * EN Size: 1068b
+ * JP Address: 0x800E54AC
+ * JP Size: 1052b
  */
 int McCtrl::LoadDat()
 {
@@ -10807,8 +10807,10 @@ int McCtrl::LoadDat()
 		if (MemoryCardMan.AsyncFinished() == 1) {
 			m_lastResult = MemoryCardMan.GetResult();
 			if (m_lastResult < 0) {
+#if defined(VERSION_GCCP01)
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+#endif
 				if (m_lastResult == -6) {
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
@@ -10901,7 +10903,9 @@ int McCtrl::LoadDat()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				if (!(m_userBuffer == 0)) {
 					memcpy(m_userBuffer, MemoryCardMan.GetMcBuffer(), 0x8BD0);
+#if !defined(VERSION_GCCJGC)
 					MemoryCardMan.CalcSaveDatHpMax(reinterpret_cast<Mc::SaveDat*>(m_userBuffer));
+#endif
 				} else {
 					Game.LoadInit();
 					MemoryCardMan.SetLoadData();

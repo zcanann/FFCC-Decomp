@@ -2078,11 +2078,14 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
  * --INFO--
  * PAL Address: 0x800C17B8
  * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C1040
+ * EN Size: 324b
+ * JP Address: UNUSED
+ * JP Size: UNUSED
  */
+#if defined(VERSION_GCCJGC)
+inline
+#endif
 void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
 {
     for (int charSlot = 0; charSlot < 8; charSlot++)

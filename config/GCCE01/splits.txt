@@ -865,6 +865,11 @@ TRK_MINNOW_DOLPHIN/dispatch.c:
 memorycard.cpp:
 	.text start:0x800C1040 end:0x800C4660
 	.bss start:0x802F15E8 end:0x802F1684
+	.ctors start:0x801D4388 end:0x801D438C
+	.rodata start:0x801D98D8 end:0x801D9FC3
+	.data start:0x8020F3D0 end:0x8020F3EC
+	.sdata start:0x8032D830 end:0x8032D85C
+	.sdata2 start:0x8032FC70 end:0x8032FC8F
 
 TRK_MINNOW_DOLPHIN/support.c:
 	.text start:0x801AA14C end:0x801AA860
@@ -1599,3 +1604,15 @@ pppScreenBreak.cpp:
 	.text start:0x8012C788 end:0x8012D90C
 	.sdata2 start:0x80330C60 end:0x80330C98
 	.rodata start:0x801DC398 end:0x801DC3D0
+
+auto_801D9FC3_rodata:
+	.rodata start:0x801D9FC3 end:0x801D9FC8 align:1
+
+auto_8020F3EC_data:
+	.data start:0x8020F3EC end:0x8020F3F0 align:1
+
+auto_8032D85C_sdata:
+	.sdata start:0x8032D85C end:0x8032D860 align:1
+
+auto_8032FC8F_sdata2:
+	.sdata2 start:0x8032FC8F end:0x8032FC90 align:1

@@ -780,6 +780,11 @@ TRK_MINNOW_DOLPHIN/usr_put.c:
 memorycard.cpp:
 	.text start:0x800BF1C8 end:0x800C2514
 	.bss start:0x8030DF18 end:0x8030DFB4
+	.ctors start:0x801D06A8 end:0x801D06AC
+	.rodata start:0x801D54F0 end:0x801D5B93
+	.data start:0x8022D760 end:0x8022D77C
+	.sdata start:0x8034B650 end:0x8034B67C
+	.sdata2 start:0x8034D9E0 end:0x8034D9FF
 
 OdemuExi2/DebuggerDriver.c:
 	.text start:0x801B7704 end:0x801B8184
@@ -1587,3 +1592,15 @@ auto_801D5DC6_rodata:
 
 auto_8034DA54_sdata2:
 	.sdata2 start:0x8034DA54 end:0x8034DA58 align:1
+
+auto_801D5B93_rodata:
+	.rodata start:0x801D5B93 end:0x801D5B98 align:1
+
+auto_8022D77C_data:
+	.data start:0x8022D77C end:0x8022D780 align:1
+
+auto_8034B67C_sdata:
+	.sdata start:0x8034B67C end:0x8034B680 align:1
+
+auto_8034D9FF_sdata2:
+	.sdata2 start:0x8034D9FF end:0x8034DA00 align:1

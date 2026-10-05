@@ -16,7 +16,11 @@ static char* MC_COMMENT = "FF Crystal Chronicles";
 static char* MCDAT_MAKER = "GDS";
 static char* MCDAT_TITLE = "FFCC";
 static char* MCDAT_MACHINE = "GC";
+#ifdef VERSION_GCCJGC
+static char* MCDAT_VERSION = "0.19";
+#else
 static char* MCDAT_VERSION = "1.00";
+#endif
 }
 
 #endif

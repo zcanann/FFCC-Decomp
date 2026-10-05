@@ -439,6 +439,11 @@ cflat_runtime.cpp:
 	.text start:0x80065100 end:0x80068f5c
 
 joybus.cpp:
+	.data start:0x8022CD38 end:0x8022CD54
+	.sdata start:0x8034B630 end:0x8034B63C
+	.sdata2 start:0x8034D858 end:0x8034D860
+	.bss start:0x803063A0 end:0x8030DEF0
+	.sbss start:0x8034BBB0 end:0x8034BBB4
 	.rodata start:0x801D4B80 end:0x801D4EDC
 	.text start:0x800A3F74 end:0x800B049C
 
@@ -483,6 +488,9 @@ mapocttree.cpp:
 
 cmake.cpp:
 	.text start:0x80167050 end:0x8016F384
+	.rodata start:0x801DA598 end:0x801DA5BC
+	.data start:0x80231F70 end:0x80231FD4
+	.sdata2 start:0x8034F770 end:0x8034F7B8
 
 mes.cpp:
 	.text start:0x800978B8 end:0x80097D20
@@ -492,6 +500,8 @@ shopmenu.cpp:
 
 singmenu.cpp:
 	.rodata start:0x801D925C end:0x801D9454
+	.data start:0x802318E8 end:0x802319C8
+	.sdata2 start:0x8034ED70 end:0x8034EE40
 
 cflat_r2system.cpp:
 	.text start:0x800B049C end:0x800B7D34
@@ -507,9 +517,11 @@ gba/GBAWrite.c:
 
 graphic.cpp:
 	.text start:0x80015DD8 end:0x80019964
+	.bss start:0x8024C748 end:0x80257DD8
 
 p_graphic.cpp:
 	.text start:0x80044978 end:0x8004727C
+	.bss start:0x80284790 end:0x80284884
 
 p_light.cpp:
 	.text start:0x80047728 end:0x80049CB8
@@ -517,3 +529,33 @@ p_light.cpp:
 
 menu_letter.cpp:
 	.text start:0x8015E4DC end:0x80162690
+
+mtx/mtx.c:
+	.text start:0x8017FF4C end:0x80180988
+	.sdata start:0x8034B8B0 end:0x8034B8B8
+	.sdata2 start:0x8034FAF0 end:0x8034FB0C
+
+mtx/mtxvec.c:
+	.text start:0x80180988 end:0x80180ABC
+
+mtx/mtx44.c:
+	.text start:0x80180ABC end:0x80181190
+	.sdata2 start:0x8034FB10 end:0x8034FB28
+
+mtx/vec.c:
+	.text start:0x80181208 end:0x801814B8
+	.sdata2 start:0x8034FB28 end:0x8034FB34
+
+bonus_menu.cpp:
+	.text start:0x8012EF38 end:0x8013A1EC
+
+menu_cmd.cpp:
+	.text start:0x80145F34 end:0x8014B634
+	.rodata start:0x801D94C0 end:0x801D9658
+	.data start:0x80231D70 end:0x80231D84
+
+pppYmMana.cpp:
+	.text start:0x800D2088 end:0x800D5B64
+
+pppMana2.cpp:
+	.text start:0x80102220 end:0x801052F8

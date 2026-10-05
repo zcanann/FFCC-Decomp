@@ -507,6 +507,11 @@ cflat_runtime.cpp:
 	.text start:0x80065614 end:0x80069470
 
 joybus.cpp:
+	.data start:0x8020E9A0 end:0x8020E9BC
+	.sdata start:0x8032D810 end:0x8032D81C
+	.sdata2 start:0x8032FAE0 end:0x8032FAE8
+	.bss start:0x802E9A70 end:0x802F15C0
+	.sbss start:0x8032DD98 end:0x8032DD9C
 	.rodata start:0x801D8F70 end:0x801D92C4
 	.text start:0x800A593C end:0x800B218C
 
@@ -583,9 +588,11 @@ menu_letter.cpp:
 
 graphic.cpp:
 	.text start:0x800161FC end:0x80019D7C
+	.bss start:0x8022FE08 end:0x8023B498
 
 p_graphic.cpp:
 	.text start:0x80044F6C end:0x80047724
+	.bss start:0x80267E50 end:0x80267F44
 
 p_light.cpp:
 	.text start:0x80047BF4 end:0x8004A294
@@ -596,3 +603,25 @@ pppYmMana.cpp:
 
 pppMana2.cpp:
 	.text start:0x8010558C end:0x801085E4
+
+mtx/mtx.c:
+	.text start:0x8018489C end:0x801852D8
+	.sdata start:0x8032DAA8 end:0x8032DAB0
+	.sdata2 start:0x80332688 end:0x803326A4
+
+mtx/mtxvec.c:
+	.text start:0x801852D8 end:0x8018540C
+
+mtx/mtx44.c:
+	.text start:0x8018540C end:0x80185AE0
+	.sdata2 start:0x803326A8 end:0x803326C0
+
+mtx/vec.c:
+	.text start:0x80185B58 end:0x80185E08
+	.sdata2 start:0x803326C0 end:0x803326CC
+
+bonus_menu.cpp:
+	.text start:0x80132428 end:0x8013D528
+
+menu_cmd.cpp:
+	.text start:0x80149A34 end:0x8014F4BC

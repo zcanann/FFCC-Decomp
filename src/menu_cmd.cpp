@@ -55,6 +55,16 @@ static const UniteRecipe s_Unite[] = {
     { -1, -1, -1, { -1, -1, -1 } },
 };
 
+#ifdef VERSION_GCCJGC
+static const char* s_SkillStr_jp[] = {
+    "ファイア剣",
+    "ブリザド剣",
+    "サンダー剣",
+    "ホーリー剣",
+    "グラビデ剣",
+};
+
+#else
 static const char* s_SkillStr_us[] = {
     "Flamestrike",
     "Icestrike",
@@ -94,7 +104,22 @@ static const char* s_SkillStr_sp[] = {
     "",
     "",
 };
+#endif
 namespace {
+
+#ifdef VERSION_GCCJGC
+enum {
+    kCmdPanelTexture = 0x2D,
+    kCmdTabTexture = 0x45,
+    kCmdRowTexture = 0x36
+};
+#else
+enum {
+    kCmdPanelTexture = 0x2E,
+    kCmdTabTexture = 0x46,
+    kCmdRowTexture = 0x37
+};
+#endif
 
 STATIC_ASSERT(offsetof(CmdListEntry, u) == 0x08);
 STATIC_ASSERT(offsetof(CmdListEntry, v) == 0x0C);
@@ -157,7 +182,11 @@ static inline s16* GetCmdStateSelections(CmdState* cmd)
 
 static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
 {
+#ifdef VERSION_GCCJGC
+	return 0;
+#else
 	return menu->m_cmdLayoutFlag;
+#endif
 }
 
 static inline s16 GetUniteRecipeCmd(int recipe)
@@ -260,10 +289,10 @@ inline void CMenuPcs::CmdInit0()
  * --INFO--
  * PAL Address: 0x8014ff0c
  * PAL Size: 816b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8014F000
+ * EN Size: 816b
+ * JP Address: 0x8014B168
+ * JP Size: 804b
  */
 void CMenuPcs::CmdInit1()
 {
@@ -272,7 +301,7 @@ void CMenuPcs::CmdInit1()
 	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
-	entry->tex = 0x2e;
+	entry->tex = kCmdPanelTexture;
 	entry->x = 0xb8;
 	entry->y = 0x28;
 	entry->width = 0x78;
@@ -285,7 +314,7 @@ void CMenuPcs::CmdInit1()
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
 	if (GetCmdLayoutFlag(this) == 0) {
-		tex = 0x46;
+		tex = kCmdTabTexture;
 	}
 	entry->tex = tex;
 	entry->x = 0xa0;
@@ -301,7 +330,7 @@ void CMenuPcs::CmdInit1()
 	tex = 0x2f;
 	entry = &GetCmdListStorage(this)->entries[idx++];
 	if (GetCmdLayoutFlag(this) == 0) {
-		tex = 0x46;
+		tex = kCmdTabTexture;
 	}
 	entry->tex = tex;
 	tex = 0;
@@ -317,7 +346,7 @@ void CMenuPcs::CmdInit1()
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
 	entry->flags = 2;
-	entry->tex = 0x2e;
+	entry->tex = kCmdPanelTexture;
 	entry->x = 0xa0;
 	entry->y = 8;
 	entry->width = 0x48;
@@ -331,7 +360,7 @@ void CMenuPcs::CmdInit1()
 	for (s32 i = 0; i < 8; i++) {
 		entry = &GetCmdListStorage(this)->entries[idx++];
 		entry->flags = 2;
-		entry->tex = 0x37;
+		entry->tex = kCmdRowTexture;
 		entry->x = static_cast<s16>(basePanel->x + 0x24);
 		entry->y = static_cast<s16>(basePanel->y + tex);
 		entry->width = 200;
@@ -359,10 +388,10 @@ void CMenuPcs::CmdInit1()
  * --INFO--
  * PAL Address: 0x8014fc50
  * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8014ED44
+ * EN Size: 700b
+ * JP Address: 0x8014AED4
+ * JP Size: 660b
  */
 void CMenuPcs::CmdInit2()
 {
@@ -370,29 +399,29 @@ void CMenuPcs::CmdInit2()
 	CmdListEntry* entry;
 
 	entry = &GetCmdListStorage(this)->entries[i++];
-	entry->tex = 0x2e;
+	entry->tex = kCmdPanelTexture;
 	entry->startFrame = 2;
 	entry->duration = 5;
 
 	entry = &GetCmdListStorage(this)->entries[i++];
-	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? kCmdTabTexture : 0x2f;
 	entry->startFrame = 7;
 	entry->duration = 5;
 	entry = &GetCmdListStorage(this)->entries[i++];
-	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? kCmdTabTexture : 0x2f;
 	entry->startFrame = 7;
 	entry->duration = 5;
 
 	entry = &GetCmdListStorage(this)->entries[i++];
 	entry->flags = 2;
-	entry->tex = 0x2e;
+	entry->tex = kCmdPanelTexture;
 	entry->startFrame = 7;
 	entry->duration = 5;
 
 	for (s32 j = 0; j < 8; j++) {
 		entry = &GetCmdListStorage(this)->entries[i++];
 		entry->flags = 2;
-		entry->tex = 0x37;
+		entry->tex = kCmdRowTexture;
 		entry->startFrame = 0;
 		entry->duration = 5;
 	}
@@ -638,10 +667,10 @@ int CMenuPcs::CmdClose()
  * --INFO--
  * PAL Address: 0x8014dd88
  * PAL Size: 5472b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8014CE7C
+ * EN Size: 5472b
+ * JP Address: 0x80149004
+ * JP Size: 5412b
  */
 void CMenuPcs::CmdDraw()
 {
@@ -820,7 +849,7 @@ void CMenuPcs::CmdDraw()
 				} else {
 					float rowAlpha = row->alpha;
 					s32 rowTex = tex;
-					if (tex == 0x37) {
+					if (tex == kCmdRowTexture) {
 						s32 sel = specialRow + m_cmdState->scrollTop;
 						if ((itemCount >= 8) && (sel >= itemCount)) {
 							sel -= itemCount;
@@ -869,7 +898,7 @@ void CMenuPcs::CmdDraw()
 							}
 						}
 
-						if ((rowTex == 0x37) &&
+						if ((rowTex == kCmdRowTexture) &&
 						    (specialRow == m_cmdState->selected[1])) {
 							t += rowH;
 						}
@@ -902,7 +931,7 @@ void CMenuPcs::CmdDraw()
 		const s32 itemCount = letterBuf[0];
 		CmdListEntry* scan = &m_cmdList->entries[m_cmdList->count];
 		for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
-			if (scan->tex == 0x37) {
+			if (scan->tex == kCmdRowTexture) {
 				break;
 			}
 			scan++;
@@ -1056,7 +1085,7 @@ void CMenuPcs::CmdDraw()
 			CmdListStorage* const list = m_cmdList;
 			for (s32 idx = list->count; idx < list->listEnd; idx++) {
 				cursorEntry = &list->entries[idx];
-				if (cursorEntry->tex == 0x37) {
+				if (cursorEntry->tex == kCmdRowTexture) {
 					break;
 				}
 			}
@@ -2673,13 +2702,16 @@ unsigned int CMenuPcs::CmdClose2()
  * --INFO--
  * PAL Address: 0x8014a940
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
+ * EN Address: 0x80149A34
+ * EN Size: 156b
+ * JP Address: UNUSED
  * JP Size: TODO
  */
 const char* CMenuPcs::GetSkillStr(int index)
 {
+#ifdef VERSION_GCCJGC
+	return s_SkillStr_jp[index];
+#else
 	switch (Game.m_gameWork.GetLanguage()) {
 	case 2:
 		return s_SkillStr_ge[index];
@@ -2693,4 +2725,5 @@ const char* CMenuPcs::GetSkillStr(int index)
 	default:
 		return s_SkillStr_us[index];
 	}
+#endif
 }

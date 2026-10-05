@@ -22,7 +22,7 @@
 
 JoyBus Joybus;
 
-int gJoyBusThreadExitValue = 0;
+static int s_ThreadRtn = 0;
 
 extern const unsigned short JoyBusCrcTable[256] =
 {
@@ -638,7 +638,7 @@ loop_body:
         {
             m_threadRunningMask &= ~(1 << threadParam->m_portIndex);
             m_stageFlags[threadParam->m_portIndex] = 0;
-            OSExitThread(&gJoyBusThreadExitValue);
+            OSExitThread(&s_ThreadRtn);
         }
 
         if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
@@ -3786,7 +3786,11 @@ inline int JoyBus::SendLanguage(ThreadParam* threadParam)
     cmd = 0;
     ((unsigned char*)&cmd)[0] = 0x14;
     ((unsigned char*)&cmd)[1] = 0x16;
+#ifdef VERSION_GCCE01
+    ((unsigned char*)&cmd)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1);
+#else
     ((unsigned char*)&cmd)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1) | JoyBusConst::JOY_CODE_MASK;
+#endif
 
     return SetSendQueue(threadParam, cmd);
 }
@@ -3851,8 +3855,8 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * --INFO--
  * PAL Address: 0x800b1394
  * PAL Size: 2392b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B0C3C
+ * EN Size: 2380b
  * JP Address: 0x800AF030
  * JP Size: 2164b
  */
@@ -4093,8 +4097,12 @@ int JoyBus::SendCancel(ThreadParam* threadParam)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ABD50
+ * PAL Size: 3364b
+ * EN Address: 0x800AB5F8
+ * EN Size: 3364b
+ * JP Address: 0x800A9C30
+ * JP Size: 3344b
  */
 int JoyBus::SendDataFile(ThreadParam* threadParam)
 {
@@ -4330,10 +4338,12 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             {
                 int remaining = totalSize % 0x2FD;
 
+#ifndef VERSION_GCCJGC
                 if (totalSize != 0 && remaining == 0)
                 {
                     remaining = 0x2FD;
                 }
+#endif
 
                 int rows = remaining / 3;
 

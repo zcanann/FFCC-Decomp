@@ -1,5 +1,8 @@
 #include "global.h"
 
+#if defined(VERSION_GCCE01)
+#include "msg_item_us.inc"
+#else
 char *gItemNames_En[] = {
     "DUMMY-UK",
     "Copper Sword",
@@ -2519,6 +2522,8 @@ char *gItemNames_Es[] = {
     "Dise\xF1o 99",
     "Dise\xF1o 100",
 };
+
+#endif
 
 const u8 gItemIcons[] = {
     52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

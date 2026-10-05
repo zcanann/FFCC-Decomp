@@ -76,3 +76,8 @@ TRK_MINNOW_DOLPHIN/CircleBuffer.c:
 os/OSAudioSystem.c:
 	.text start:0x8017BB68 end:0x8017BDFC
 	.data start:0x802157E8 end:0x80215868
+
+chunkfile.cpp:
+	extab start:0x80005600 end:0x80005610
+	extabindex start:0x8000AD80 end:0x8000AD98
+	.text start:0x80012860 end:0x80012B8C

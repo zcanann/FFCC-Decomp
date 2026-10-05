@@ -4,11 +4,11 @@ static GBASecParam SecParams[4];
 GBAControl __GBA[4];
 BOOL __GBAReset = FALSE;
 
-BOOL OnReset4(BOOL final);
+static BOOL OnReset(BOOL final);
 
-static OSResetFunctionInfo ResetFunctionInfo = {OnReset4, 127};
+static OSResetFunctionInfo ResetFunctionInfo = {OnReset, 127};
 
-void ShortCommandProc(s32 chan) {
+static void ShortCommandProc(s32 chan) {
     GBAControl* gba;
     gba = &__GBA[chan];
 
@@ -105,7 +105,7 @@ s32 GBAReset(s32 chan, u8* status) {
  * JP Address: TODO
  * JP Size: TODO
  */
-BOOL OnReset4(BOOL final) {
+static BOOL OnReset(BOOL final) {
     __GBAReset = TRUE;
     return TRUE;
 }

@@ -355,3 +355,12 @@ ar/arq.c:
 	.sbss start:0x8032E1A0 end:0x8032E1C8
 	.sdata start:0x8032DB28 end:0x8032DB2C
 	.data start:0x80216B18 end:0x80216B60
+
+gba/GBA.c:
+	.text start:0x801A62F0 end:0x801A65E0
+	.data start:0x8021B9F8 end:0x8021BA08
+	.bss start:0x80327200 end:0x80327700
+	.sbss start:0x8032E330 end:0x8032E334
+
+gba/GBAXfer.c:
+	.text start:0x801A7948 end:0x801A7C80

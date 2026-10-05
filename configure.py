@@ -1040,12 +1040,12 @@ config.libs = [
     DolphinLib(
         "gba",
         [
-            Object(Matching, "gba/GBA.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBA.c"),
             Object(Matching, "gba/GBAGetProcessStatus.c"),
             Object(Matching, "gba/GBAJoyBoot.c"),
             Object(Matching, "gba/GBARead.c"),
             Object(Matching, "gba/GBAWrite.c"),
-            Object(Matching, "gba/GBAXfer.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAXfer.c"),
                 Object(
                     Matching,
                     "gba/GBAKey.c",

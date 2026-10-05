@@ -979,9 +979,9 @@ config.libs = [
     DolphinLib(
         "dsp",
         [
-            Object(Matching, "dsp/dsp.c"),
-            Object(Matching, "dsp/dsp_debug.c"),
-            Object(Matching, "dsp/dsp_task.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dsp/dsp.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dsp/dsp_debug.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "dsp/dsp_task.c"),
         ],
     ),
     DolphinLib(

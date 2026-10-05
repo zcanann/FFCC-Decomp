@@ -2224,7 +2224,7 @@ axart/axart3d.c:
 
 dsp/dsp.c:
 	.text       start:0x80197A1C end:0x80197CAC
-	.data       start:0x8021BFB8 end:0x8021C038
+	.data       start:0x8021BFB8 end:0x8021C035
 	.sdata      start:0x8032EB68 end:0x8032EB6C
 	.sbss       start:0x8032F2C0 end:0x8032F2C4
 
@@ -2844,3 +2844,6 @@ auto_10_8032EFA4_sbss:
 
 auto_10_8032F0DC_sbss:
 	.sbss start:0x8032F0DC end:0x8032F0E0 align:4
+
+auto_07_8021C035_data:
+	.data start:0x8021C035 end:0x8021C038 align:1

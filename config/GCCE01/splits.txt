@@ -1086,3 +1086,23 @@ util.cpp:
 	.sdata start:0x8032D468 end:0x8032D478
 	.sdata2 start:0x8032E850 end:0x8032E888
 	.sbss start:0x8032DC50 end:0x8032DC58
+
+dsp/dsp.c:
+	.text	start:0x80196900 end:0x80196B90
+	.data	start:0x8021AE38 end:0x8021AEB5
+	.sdata	start:0x8032DB48 end:0x8032DB4C
+	.sbss	start:0x8032E2A0 end:0x8032E2A4
+
+dsp/dsp_debug.c:
+	.text	start:0x80196B90 end:0x80196BE0
+
+dsp/dsp_task.c:
+	.text	start:0x80196BE0 end:0x80197464
+	.data	start:0x8021AEB8 end:0x8021AFF3
+	.sbss	start:0x8032E2A8 end:0x8032E2C0
+
+auto_07_8021AEB5_data:
+	.data start:0x8021AEB5 end:0x8021AEB8 align:1
+
+auto_07_8021AFF3_data:
+	.data start:0x8021AFF3 end:0x8021AFF8 align:1

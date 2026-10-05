@@ -1000,3 +1000,23 @@ TRK_MINNOW_DOLPHIN/serpoll.c:
 TRK_MINNOW_DOLPHIN/msghndlr.c:
 	.text	start:0x801A729C end:0x801A74DC
 	.bss	start:0x80345A20 end:0x80345A24
+
+dsp/dsp.c:
+	.text	start:0x80191F44 end:0x801921D4
+	.data	start:0x80237878 end:0x802378F5
+	.sdata	start:0x8034B950 end:0x8034B954
+	.sbss	start:0x8034C0A0 end:0x8034C0A4
+
+dsp/dsp_debug.c:
+	.text	start:0x801921D4 end:0x80192224
+
+dsp/dsp_task.c:
+	.text	start:0x80192224 end:0x80192AA8
+	.data	start:0x802378F8 end:0x80237A33
+	.sbss	start:0x8034C0A8 end:0x8034C0C0
+
+auto_07_802378F5_data:
+	.data start:0x802378F5 end:0x802378F8 align:1
+
+auto_07_80237A33_data:
+	.data start:0x80237A33 end:0x80237A38 align:1

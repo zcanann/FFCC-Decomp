@@ -93,6 +93,15 @@ void CMakeConfirmScreen_DrawNextRow(void);
 void CMakeConfirmScreen_DrawCursor(void);
 s32 CMakeConfirmScreen_HandleInput(void);
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200A7EC
+ * PAL Size: 732b
+ * EN Address: 0x0200A71C
+ * EN Size: 732b
+ * JP Address: 0x0201080C
+ * JP Size: 708b
+ */
 void CMakeNameScreen_Setup(void)
 {
     struct Window *win;
@@ -232,6 +241,15 @@ s32 CMakeNameScreen_Init(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200AB8C
+ * PAL Size: 312b
+ * EN Address: 0x0200AABC
+ * EN Size: 312b
+ * JP Address: 0x02010B90
+ * JP Size: 312b
+ */
 s32 CMakeNameScreen_Main(void)
 {
     s32 ret = 0;
@@ -2040,6 +2058,15 @@ s32 CMakeJobScreen_HandleInput(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200D934
+ * PAL Size: 392b
+ * EN Address: 0x0200D864
+ * EN Size: 392b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CMakeConfirmScreen_Setup(void)
 {
     struct Window *win;
@@ -2206,6 +2233,15 @@ s32 CMakeConfirmScreen_Exit(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200DD44
+ * PAL Size: 316b
+ * EN Address: 0x0200DC74
+ * EN Size: 316b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CMakeConfirmScreen_PrintNextRow(void)
 {
     char buf[64];
@@ -2248,6 +2284,15 @@ void CMakeConfirmScreen_PrintNextRow(void)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200DE80
+ * PAL Size: 184b
+ * EN Address: 0x0200DDB0
+ * EN Size: 184b
+ * JP Address: 0x020140B8
+ * JP Size: 184b
+ */
 void CMakeConfirmScreen_DrawNextRow(void)
 {
     u16 buf[60];

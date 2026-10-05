@@ -30,6 +30,15 @@ void ItemScreen_DrawCursor(void);
 void ItemScreen_HandleInput(void);
 void ItemScreen_DrawIcons(void);
 
+/*
+ * --INFO--
+ * PAL Address: 0x020105BC
+ * PAL Size: 436b
+ * EN Address: 0x020104B8
+ * EN Size: 436b
+ * JP Address: 0x0200F204
+ * JP Size: 440b
+ */
 void ItemScreen_Setup(void)
 {
     struct Window *win;

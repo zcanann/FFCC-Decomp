@@ -17,6 +17,15 @@ static inline u32 GetBgVram(s32 bg)
     return 0x06000000;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x020091D4
+ * PAL Size: 172b
+ * EN Address: 0x02009104
+ * EN Size: 170b
+ * JP Address: 0x02009324
+ * JP Size: 156b
+ */
 void MsgBox_Layout(void)
 {
     struct Window *win = &gWindows[4];
@@ -24,7 +33,9 @@ void MsgBox_Layout(void)
     s32 n;
     s32 i;
     s32 len;
+#if !defined(VERSION_GCCE01)
     s32 w;
+#endif
 
     win->active = 1;
     win->style = -1;
@@ -48,12 +59,18 @@ void MsgBox_Layout(void)
     }
     if (max & 7)
         max += 8;
+#if !defined(VERSION_GCCE01)
     w = max >> 3;
+#endif
     win->rows = n + 1;
     win->height = (n + 1) * 2 + 2;
     win->y = (20 - win->height) >> 1;
+#if defined(VERSION_GCCE01)
+    win->width = (max >> 3) + 2;
+#else
     max = w << 3;
     win->width = w + 2;
+#endif
     win->x = (30 - win->width) >> 1;
     win->textX = (max - len) / 2;
 }
@@ -127,7 +144,11 @@ u32 Window_GetTextVram(struct Window *win, s32 row, s32 half)
     else if (win->slot == 3)
         addr += 0x5380;
     else
+#if defined(VERSION_GCCE01)
+        addr = 0x06006400;
+#else
         addr = 0x06006800;
+#endif
     n = 1;
     if (half == 0)
         n = 2;

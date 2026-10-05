@@ -20,6 +20,15 @@ void GilScreen_HandleInput(void);
 s32 GilScreen_OpenConfirm(void);
 s32 GilScreen_CloseConfirm(void);
 
+/*
+ * --INFO--
+ * PAL Address: 0x02014F4C
+ * PAL Size: 548b
+ * EN Address: 0x02014D90
+ * EN Size: 548b
+ * JP Address: 0x0200FF14
+ * JP Size: 556b
+ */
 void GilScreen_Setup(void)
 {
     s32 i;

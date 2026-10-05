@@ -209,7 +209,13 @@ main/cmake:
 	.bss        start:0x03002780 end:0x030027AD align:8
 
 regional_bss:
-	.bss        start:0x030027AD end:0x030027CC align:1
+	.bss        start:0x030027AD end:0x030027C0 align:1
+
+main/family:
+	.bss        start:0x030027C0 end:0x030027C2 align:4
+
+regional_bss:
+	.bss        start:0x030027C2 end:0x030027CC align:1
 
 main/item:
 	.bss        start:0x030027CC end:0x030027D6 align:4

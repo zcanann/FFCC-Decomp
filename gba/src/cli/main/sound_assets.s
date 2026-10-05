@@ -1,4 +1,4 @@
-@ m4a sound data (DirectSound samples and songs) linked before the voice group and tables.
+@ m4a samples, song tracks and headers, extracted with symbolic pointers.
 
 	.section .rodata
 
@@ -17,11 +17,12 @@ gWaveSample1:
 gWaveSample2:
 	.incbin "gWaveSample2.bin"
 
-	.include "lbl_0202DC60.inc"
-	.include "lbl_0202DC90.inc"
+	.include "gSong04Track0.inc"
+	.include "gSong04Track1.inc"
 	.include "gSong04.inc"
-	.include "lbl_0202DCC8.inc"
-	.include "lbl_0202DCE4.inc"
+
+	.include "gSong05Track0.inc"
+	.include "gSong05Track1.inc"
 	.include "gSong05.inc"
 
 	.global gWaveSample3

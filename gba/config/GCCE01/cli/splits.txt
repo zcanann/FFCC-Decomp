@@ -181,14 +181,17 @@ regional_data:
 main/m4a_tables:
 	.rodata     start:0x02025574 end:0x020256D8 align:4
 
-regional_data:
-	.rodata     start:0x020256D8 end:0x02028240
+main/sound_assets:
+	.rodata     start:0x020256D8 end:0x02028240 align:4
 
 main/sound_data:
 	.rodata     start:0x02028240 end:0x02028390 align:4
 
+main/sound_assets_2:
+	.rodata     start:0x02028390 end:0x020289D8
+
 regional_data:
-	.rodata     start:0x02028390 end:0x02028AD8
+	.rodata     start:0x020289D8 end:0x02028AD8 align:4
 
 main/obj:
 	.data       start:0x02028AD8 end:0x02028AF0 align:4

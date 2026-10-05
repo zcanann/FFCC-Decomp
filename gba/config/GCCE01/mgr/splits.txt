@@ -301,14 +301,20 @@ libc/locale/locale:
 libc/stdlib/mallocr:
 	.data       start:0x02015D58 end:0x0201619C
 
+menu_gfx:
+	.rodata     start:0x0201619C end:0x020173DC align:4
+
 regional_data:
-	.rodata     start:0x0201619C end:0x0201C2D0
+	.rodata     start:0x020173DC end:0x0201C2D0
 
 config:
 	.rodata     start:0x0201C2D0 end:0x0201C2FC align:4
 
+field_gfx:
+	.rodata     start:0x0201C2FC end:0x020204C4 align:4
+
 regional_data:
-	.rodata     start:0x0201C2FC end:0x02021F40
+	.rodata     start:0x020204C4 end:0x02021F40
 
 obj:
 	.ctors      start:0x02021F40 end:0x02021F44 align:1

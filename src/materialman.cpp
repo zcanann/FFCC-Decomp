@@ -3743,10 +3743,10 @@ unsigned long CMaterialSet::Find(char* name)
  * --INFO--
  * PAL Address: 0x8003C2F0
  * PAL Size: 428b
- * EN Address: 0x8004E8CC
- * EN Size: 276b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8003C0E4
+ * EN Size: 428b
+ * JP Address: 0x8003BAD8
+ * JP Size: 428b
  */
 void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotIndex)
 {
@@ -3765,14 +3765,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             CMaterial* newMaterial =
                 new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xEE4) CMaterial;
 
-            float scale = 1.0f;
-            newMaterial->m_tevBit = 0xFFF531F0;
-            newMaterial->m_bumpLight = 0;
-            newMaterial->m_textureCount = 0;
-            newMaterial->m_scaleV = scale;
-            newMaterial->m_scaleU = scale;
-            newMaterial->m_singleTextureFlag = 0;
-            newMaterial->m_textureCount = 1;
+            newMaterial->Create(1, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
             newMaterial->m_textureIndices[0] = static_cast<short>(textureIndex);
             newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 

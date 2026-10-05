@@ -13,6 +13,9 @@
 #include <dolphin/gx.h>
 
 extern "C" const unsigned char gSingMenuItemIconByType[0x1F5];
+#ifdef VERSION_GCCJGC
+extern "C" const char* gSingMenuTextTableJp[56];
+#endif
 
 class CColor;
 class CFontMan;
@@ -431,7 +434,11 @@ public:
     void DrawHelpMessageUS(int, CFont*, int, int, _GXColor, int, float, float);
     void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
     void DrawEquipMark(int, int, float);
+#ifdef VERSION_GCCJGC
+    char* GetMenuStr(int index) { return (char*)gSingMenuTextTableJp[index]; }
+#else
     char* GetMenuStr(int);
+#endif
 
     void LoadExtraFont(int, char*);
     void SetExtraFontTlut(int, _GXColor);

@@ -1519,10 +1519,10 @@ inline void CMenuPcs::AddNameChara(int c, int slot, int, int)
  * --INFO--
  * PAL Address: 0x801728bc
  * PAL Size: 864b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80171838
+ * EN Size: 864b
+ * JP Address: 0x8016CE08
+ * JP Size: 728b
  */
 void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 {
@@ -1537,7 +1537,11 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     col.a = static_cast<unsigned char>(alpha255);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
+#ifdef VERSION_GCCJGC
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+#else
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
+#endif
     MenuPcs.DrawRect(
         0, 432.0f, 368.0f, 48.0f, 32.0f,
         296.0f, 264.0f, 1.0f, 1.0f, 0.0f);
@@ -1546,7 +1550,11 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
         296.0f, 264.0f, 1.0f, 1.0f, 0.0f);
 
     if (yesNoSel != 0) {
+#ifdef VERSION_GCCJGC
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3B));
+#else
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
+#endif
         MenuPcs.DrawRect(
             0, 464.0f, 360.0f, 128.0f, 48.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1562,19 +1570,33 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
 
     const char* text = GetMenuStr(1);
+#ifdef VERSION_GCCJGC
+    font->GetWidth(text);
+    int yesX = 460;
+    font->SetPosX(static_cast<float>(yesX));
+    font->SetPosY(373.0f);
+#else
     float yesW = static_cast<float>(font->GetWidth(text));
     int yesX = 0x1D0;
     yesX += (48.0f - yesW) / 2.0f;
     font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(369.0f);
+#endif
     font->Draw(text);
 
     text = GetMenuStr(2);
+#ifdef VERSION_GCCJGC
+    font->GetWidth(text);
+    int noX = 532;
+    font->SetPosX(static_cast<float>(noX));
+    font->SetPosY(373.0f);
+#else
     float noW = static_cast<float>(font->GetWidth(text));
     int noX = 0x218;
     noX += (48.0f - noW) / 2.0f;
     font->SetPosX(static_cast<float>(noX));
     font->SetPosY(369.0f);
+#endif
     font->Draw(text);
 
     DrawInit();
@@ -3820,57 +3842,52 @@ void CMenuPcs::drawVillageMenu()
  * --INFO--
  * PAL Address: 0x8016cd3c
  * PAL Size: 400b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016BCC4
+ * EN Size: 400b
+ * JP Address: 0x80167050
+ * JP Size: 412b
  */
 void CMenuPcs::CalcSingleCMakeChara()
 {
     int slot = static_cast<int>(CmakeSlot(this));
-    int workOff = slot * 0x50 + 0xA00;
-    workOff += MenuS32(this, 0x814);
-    unsigned char* modelWork = reinterpret_cast<unsigned char*>(workOff);
+    WmWorldObjInfo* modelWork = m_wm.m_worldObjData + slot + 0x20;
 
     if (GetCmakeCharaHandle(this, slot)->m_model == nullptr ||
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(GetCmakeCharaHandle(this, slot)->m_model) + 0xB0) == 0) {
-        *reinterpret_cast<int*>(modelWork + 0x00) = 0;
+        GetCmakeCharaHandle(this, slot)->m_model->m_texSet == nullptr) {
+        modelWork->m_active = 0;
         return;
     }
 
-    unsigned char* animWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x824) + slot * 0x34);
-    if (animWork[0x0C] == 1) {
-        *reinterpret_cast<float*>(modelWork + 0x2C) = 0.2617994f;
+    WmCharaModelInfo* animWork = m_wm.m_charaModelData + slot;
+    if (animWork->m_modelChanged == 1) {
+        modelWork->m_transform.m_rotation.y = 0.2617994f;
         SetAnim(CmakeSlot(this));
-        animWork[0x0C] = 0;
+        animWork->m_modelChanged = 0;
     }
 
-    *reinterpret_cast<int*>(modelWork + 0x00) = 1;
+    modelWork->m_active = 1;
     if (GetCmakeCharaHandle(this, slot)->m_charaKind != 3) {
         Mtx scaleMtx;
         Mtx rotXMtx;
         Mtx rotYMtx;
-        float posY = -6.0f;
-        float posXZ = 0.0f;
-        float scale = 0.83f;
 
-        *reinterpret_cast<float*>(modelWork + 0x1C) = posXZ;
-        *reinterpret_cast<float*>(modelWork + 0x20) = posY;
-        *reinterpret_cast<float*>(modelWork + 0x24) = posXZ;
-        *reinterpret_cast<float*>(modelWork + 0x34) = scale;
-        *reinterpret_cast<float*>(modelWork + 0x38) = scale;
-        *reinterpret_cast<float*>(modelWork + 0x3C) = scale;
+        modelWork->m_transform.m_position.x = 0.0f;
+        modelWork->m_transform.m_position.y = -6.0f;
+        modelWork->m_transform.m_position.z = 0.0f;
+        modelWork->m_transform.m_scale.x = 0.83f;
+        modelWork->m_transform.m_scale.y = 0.83f;
+        modelWork->m_transform.m_scale.z = 0.83f;
 
         PSMTXScale(scaleMtx,
-            *reinterpret_cast<float*>(modelWork + 0x34),
-            *reinterpret_cast<float*>(modelWork + 0x38),
-            *reinterpret_cast<float*>(modelWork + 0x3C));
-        PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(modelWork + 0x28));
-        PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(modelWork + 0x2C));
+            modelWork->m_transform.m_scale.x,
+            modelWork->m_transform.m_scale.y,
+            modelWork->m_transform.m_scale.z);
+        PSMTXRotRad(rotXMtx, 'x', modelWork->m_transform.m_rotation.x);
+        PSMTXRotRad(rotYMtx, 'y', modelWork->m_transform.m_rotation.y);
         PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
-        rotXMtx[0][3] = *reinterpret_cast<float*>(modelWork + 0x1C);
-        rotXMtx[1][3] = *reinterpret_cast<float*>(modelWork + 0x20);
-        rotXMtx[2][3] = *reinterpret_cast<float*>(modelWork + 0x24);
+        rotXMtx[0][3] = modelWork->m_transform.m_position.x;
+        rotXMtx[1][3] = modelWork->m_transform.m_position.y;
+        rotXMtx[2][3] = modelWork->m_transform.m_position.z;
         PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
         GetCmakeCharaHandle(this, slot)->m_model->SetMatrix(scaleMtx);
         GetCmakeCharaHandle(this, slot)->m_model->CalcMatrix();

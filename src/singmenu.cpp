@@ -16,6 +16,8 @@
 #include "ffcc/linkage.h"
 #include "ffcc/shopmenu.h"
 #include "ffcc/sound.h"
+#include "ffcc/singmenu_jp.inc"
+
 extern "C" {
 const u8 gSingMenuItemIconByType[0x1F5] = {
     0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -648,6 +650,7 @@ char* CMenuPcs::GetAttrStr(int index)
     }
 }
 
+#ifndef VERSION_GCCJGC
 char* CMenuPcs::GetMenuStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
@@ -664,6 +667,8 @@ char* CMenuPcs::GetMenuStr(int index)
             return (char*)gSingMenuTextTableEn[index];
     }
 }
+
+#endif
 
 char* CMenuPcs::GetHairStr(int index)
 {

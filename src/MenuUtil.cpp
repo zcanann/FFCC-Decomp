@@ -1134,27 +1134,9 @@ void CMenuPcs::DrawOptionMenu()
 
 #ifdef VERSION_GCCJGC
 		if (i == m_optionIndex) {
-			CFont* titleFont = m_fonts[0];
-			titleFont->SetMargin(1.0f);
-			titleFont->SetShadow(1);
-			titleFont->SetScale(1.2f);
-			titleFont->DrawInit();
-			titleFont->SetTlut(0x16);
-			titleFont->SetColor(color);
-			titleFont->SetPosX(94.0f);
-			titleFont->SetPosY(static_cast<float>(selectedY));
-			titleFont->Draw(*option);
+			DrawOptionLabel(m_fonts[0], 94, selectedY, color, 0x16, *option, 1.2f);
 		} else {
-			CFont* titleFont = m_fonts[0];
-			titleFont->SetMargin(1.0f);
-			titleFont->SetShadow(1);
-			titleFont->SetScale(1.0f);
-			titleFont->DrawInit();
-			titleFont->SetTlut(6);
-			titleFont->SetColor(color);
-			titleFont->SetPosX(96.0f);
-			titleFont->SetPosY(static_cast<float>(normalY));
-			titleFont->Draw(*option);
+			DrawOptionLabel(m_fonts[0], 96, normalY, color, 6, *option, 1.0f);
 		}
 #else
 		if (i == m_optionIndex) {
@@ -1181,16 +1163,8 @@ void CMenuPcs::DrawOptionMenu()
 		helpFont->SetMargin(1.0f);
 		helpFont->SetScale(1.0f);
 		float width = helpFont->GetWidth(help);
-		helpFont = m_fonts[0];
-		helpFont->SetMargin(1.0f);
-		helpFont->SetShadow(1);
-		helpFont->SetScale(1.0f);
-		helpFont->DrawInit();
-		helpFont->SetTlut(7);
-		helpFont->SetColor(color);
-		helpFont->SetPosX(static_cast<float>(static_cast<int>(320.0f - width * 0.5f)));
-		helpFont->SetPosY(391.0f);
-		helpFont->Draw(help);
+		DrawOptionLabel(m_fonts[0], static_cast<int>(320.0f - width * 0.5f),
+		                391, color, 7, help, 1.0f);
 	}
 #else
 	{

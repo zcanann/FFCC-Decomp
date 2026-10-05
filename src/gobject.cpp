@@ -695,10 +695,10 @@ void CGObject::CancelAnim(int keepFacing)
  * --INFO--
  * PAL Address: 0x8007C950
  * PAL Size: 224b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8007C2FC
+ * EN Size: 216b
+ * JP Address: 0x8007BD28
+ * JP Size: 216b
  */
 int CGObject::IsLoopAnim(int mode)
 {
@@ -729,14 +729,22 @@ int CGObject::IsLoopAnim(int mode)
         }
 
         if (mode == 2) {
+#ifdef VERSION_GCCP01
             frame += 1.2;
+#else
+            frame += 1.0f;
+#endif
         }
 
         if (m_lastBgAttr < 0.0f) {
             return 0.0f >= frame;
         }
 
+#ifdef VERSION_GCCP01
         return span - 1.0f < frame;
+#else
+        return span <= frame;
+#endif
     }
 
     return 1;

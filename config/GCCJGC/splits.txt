@@ -1282,6 +1282,8 @@ pppsintbl.cpp:
 
 pppYmEnv.cpp:
 	.text start:0x800E1A00 end:0x800E3320
+	.rodata start:0x801D6238 end:0x801D62E0
+	.sdata2 start:0x8034DE90 end:0x8034DF00
 
 auto_10_8034BC84_sbss:
 	.sbss start:0x8034BC84 end:0x8034BC88 align:4

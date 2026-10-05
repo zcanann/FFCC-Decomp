@@ -1203,3 +1203,6 @@ p_dbgmenu.cpp:
 
 p_map.cpp:
 	.text start:0x8003477C end:0x80036084
+
+astar.cpp:
+	.text start:0x801406C0 end:0x80142208

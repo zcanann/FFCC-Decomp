@@ -1149,3 +1149,6 @@ TRK_MINNOW_DOLPHIN/notify.c:
 
 TRK_MINNOW_DOLPHIN/support.c:
 	.text start:0x801A7934 end:0x801A7AD8
+
+astar.cpp:
+	.text start:0x8013D2E8 end:0x8013EE34

@@ -1377,6 +1377,8 @@ stopwatch.cpp:
 
 pppCharaBreak.cpp:
 	.text start:0x8013EC64 end:0x80140374
+	.rodata start:0x801DC560 end:0x801DC5D0
+	.sdata2 start:0x80330FD8 end:0x80331010
 
 pad.cpp:
 	.text start:0x80020288 end:0x80020FC8

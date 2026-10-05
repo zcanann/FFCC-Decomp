@@ -1947,11 +1947,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		CVector frontDelta = CVector(sourceObj->m_worldPosition) - CVector(m_worldPosition);
 		float frontMag = PSVECMag(frontDelta);
 		if (frontMag > 0.0f) {
-			CVector scaledVec;
-			PSVECScale(frontDelta, reinterpret_cast<Vec*>(&scaledVec), 1.0f / frontMag);
-			frontDelta.x = scaledVec.x;
-			frontDelta.y = scaledVec.y;
-			frontDelta.z = scaledVec.z;
+			frontDelta = frontDelta * (1.0f / frontMag);
 			CVector facing;
 			facing.x = sinf(m_rotBaseY);
 			facing.y = 0.0f;

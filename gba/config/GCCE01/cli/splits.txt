@@ -176,7 +176,10 @@ main/smith:
 	.rodata     start:0x0201CE20 end:0x0201CE24 align:4
 
 regional_data:
-	.rodata     start:0x0201CE24 end:0x02025574
+	.rodata     start:0x0201CE24 end:0x02023274
+
+main/backdrop_gfx:
+	.rodata     start:0x02023274 end:0x02025574 align:4
 
 main/m4a_tables:
 	.rodata     start:0x02025574 end:0x020256D8 align:4
@@ -206,7 +209,13 @@ main/letter:
 	.data       start:0x02028C88 end:0x02028CF4 align:4
 
 regional_data:
-	.rodata     start:0x02028CF4 end:0x0202E058
+	.rodata     start:0x02028CF4 end:0x0202B7E0
+
+main/backdrop:
+	.data       start:0x0202B7E0 end:0x0202B800 align:4
+
+main/font_gfx:
+	.data       start:0x0202B800 end:0x0202E058 align:4
 
 main/main:
 	.bss        start:0x03000000 end:0x03000011 align:4

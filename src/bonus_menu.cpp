@@ -123,10 +123,10 @@ static inline void SetupSelectCloseSpriteMotion(CMenuPcs::Sprt2* sprite)
  * --INFO--
  * PAL Address: 0x8013E280
  * PAL Size: 20b
- * EN Address: 0x801541E8
- * EN Size: 28b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013D514
+ * EN Size: 20b
+ * JP Address: 0x8013A1D8
+ * JP Size: 20b
  */
 void CMenuPcs::BonusInit()
 {
@@ -139,19 +139,23 @@ void CMenuPcs::BonusInit()
  * --INFO--
  * PAL Address: 0x8013D59C
  * PAL Size: 3300b
- * EN Address: 0x80154204
- * EN Size: 4592b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013C830
+ * EN Size: 3300b
+ * JP Address: 0x80139524
+ * JP Size: 3252b
  */
 void CMenuPcs::createBonus()
 {
+#ifndef VERSION_GCCJGC
 	char fontPath[128];
+#endif
 
 	Pad.SetAnalogDepth(0x28);
 	for (int i = 0; i < 4; i++) {
 		GbaQue.OpenMenu(i, 0, 0);
+#ifndef VERSION_GCCJGC
 		GbaQue.SetRadarMode(i, 0);
+#endif
 	}
 
 	static char* tName[] = {
@@ -187,9 +191,14 @@ void CMenuPcs::createBonus()
 	    {2, "bonus18"},
 	};
 
+#ifdef VERSION_GCCJGC
+	loadTexture(tName, 2, 1, tTmp, 0x15, 0x12, 0);
+	loadFont(0, "dvd/menu/subfont.fnt", 1, -1);
+#else
 	loadTexture(tName, 2, 1, tTmp, 0x16, 0x12, 0);
 	sprintf(fontPath, "dvd/%smenu/subfont.fnt", Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
+#endif
 
 	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xDD) BonusSummaryData;
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
@@ -553,18 +562,20 @@ void CMenuPcs::calcBonus()
  * --INFO--
  * PAL Address: 0x8013D1C8
  * PAL Size: 216b
- * EN Address: 0x80155704
- * EN Size: 232b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013C45C
+ * EN Size: 216b
+ * JP Address: 0x8013917C
+ * JP Size: 172b
  */
 void CMenuPcs::drawBonus()
 {
 	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
 
+#ifndef VERSION_GCCJGC
 	if ((unsigned int)System.m_execParam >= 1) {
 		System.Printf("draw Bonus (%d)\n", (int)this->m_bonusState->m_phase);
 	}
+#endif
 
 	switch (this->m_bonusState->m_phase) {
 	case 0:

@@ -820,7 +820,7 @@ config.libs = [
                 source="os/__ppc_eabi_init.cpp",
                 cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
             ),
-            Object(Matching, "os/OS.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OS.c"),
             Object(Matching, "os/OSAddress.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSAlarm.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSAlloc.c"),

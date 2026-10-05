@@ -952,3 +952,10 @@ os/OSRtc.c:
 
 TRK_MINNOW_DOLPHIN/msg.c:
 	.text	start:0x801A39D0 end:0x801A3BAC
+
+os/OS.c:
+	.text	start:0x80175C90 end:0x8017677C
+	.data	start:0x80232028 end:0x80232220
+	.bss	start:0x80327480 end:0x803274D0
+	.sdata	start:0x8034B868 end:0x8034B878
+	.sbss	start:0x8034BD00 end:0x8034BD40

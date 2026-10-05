@@ -38,6 +38,7 @@ enum CmakeTexture {
     CMAKE_TEX_CRYSTAL = 0x37,
     CMAKE_TEX_WORLD27 = 0x38,
     CMAKE_TEX_WORLD28 = 0x39,
+    CMAKE_TEX_WORLD29 = 0x3A,
     CMAKE_TEX_WORLD44 = 0x3B,
     CMAKE_TEX_WORLD45 = 0x3C,
     CMAKE_TEX_WORLD48 = 0x3D,
@@ -45,6 +46,7 @@ enum CmakeTexture {
     CMAKE_TEX_VILLAGE_CRYSTAL = 0x5F,
     CMAKE_TEX_VILLAGE_WORLD27 = 0x60,
     CMAKE_TEX_VILLAGE_WORLD28 = 0x61,
+    CMAKE_TEX_VILLAGE_WORLD29 = 0x62,
     CMAKE_TEX_VILLAGE_WORLD44 = 0x63,
     CMAKE_TEX_VILLAGE_WORLD45 = 0x64,
     CMAKE_VILLAGE_TEXTURE_COUNT = 8,
@@ -56,6 +58,7 @@ enum CmakeTexture {
     CMAKE_TEX_CRYSTAL = 0x39,
     CMAKE_TEX_WORLD27 = 0x3A,
     CMAKE_TEX_WORLD28 = 0x3B,
+    CMAKE_TEX_WORLD29 = 0x3C,
     CMAKE_TEX_WORLD44 = 0x3D,
     CMAKE_TEX_WORLD45 = 0x3E,
     CMAKE_TEX_WORLD48 = 0x3F,
@@ -63,6 +66,7 @@ enum CmakeTexture {
     CMAKE_TEX_VILLAGE_CRYSTAL = 0x60,
     CMAKE_TEX_VILLAGE_WORLD27 = 0x61,
     CMAKE_TEX_VILLAGE_WORLD28 = 0x62,
+    CMAKE_TEX_VILLAGE_WORLD29 = 0x63,
     CMAKE_TEX_VILLAGE_WORLD44 = 0x64,
     CMAKE_TEX_VILLAGE_WORLD45 = 0x65,
     CMAKE_VILLAGE_TEXTURE_COUNT = 9,
@@ -2325,6 +2329,24 @@ void CMenuPcs::CmakeNameDraw()
         0.0f, 304.0f, 1.0f, 1.0f, 0.0f);
 
     SetCmakeBlendMatColor(alpha);
+#ifdef VERSION_GCCJGC
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
+    MenuPcs.DrawRect(
+        0, 184.0f, 216.0f, 40.0f, 40.0f,
+        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
+    double crestRightX = 576.0;
+    int rightX = static_cast<int>(crestRightX);
+    MenuPcs.DrawRect(
+        0, static_cast<float>(rightX), 216.0f, 40.0f, 40.0f,
+        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD29 : CMAKE_TEX_WORLD29));
+    MenuPcs.DrawRect(
+        0, 192.0f, 224.0f, 24.0f, 24.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(
+        0, static_cast<float>(rightX + 8), 224.0f, 24.0f, 24.0f,
+        24.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+#else
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(
         0, 184.0f, 216.0f, 48.0f, 48.0f,
@@ -2333,6 +2355,7 @@ void CMenuPcs::CmakeNameDraw()
     MenuPcs.DrawRect(
         0, static_cast<float>(static_cast<int>(crestRightX)), 216.0f, 48.0f, 48.0f,
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+#endif
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
         short sel = CmakeState(this)->m_select;
@@ -2361,7 +2384,11 @@ void CMenuPcs::CmakeNameDraw()
     for (i = 0; i < 5; i++) {
         const char* rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);
+#ifdef VERSION_GCCJGC
+        font->SetPosY(static_cast<float>(0x70 + i * 0x20));
+#else
         font->SetPosY(static_cast<float>(0x6C + i * 0x20));
+#endif
         font->Draw(rowText);
     }
 
@@ -2381,8 +2408,12 @@ void CMenuPcs::CmakeNameDraw()
     if (CmakeState(this)->m_row >= 5) {
         nameCursor = 0;
     }
+#ifdef VERSION_GCCJGC
+    if (GetCharaCnt(s_CmakeInfo.m_name) >= 7) {
+#else
     unsigned int nameLen = strlen(s_CmakeInfo.m_name);
     if (static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31)) >= 7) {
+#endif
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, s_CmakeInfo.m_name, alpha);
@@ -3941,6 +3972,24 @@ void CMenuPcs::CmakeVillageDraw()
         0.0f, 368.0f, 1.0f, 1.0f, 0.0f);
 
     SetCmakeBlendMatColor(alpha);
+#ifdef VERSION_GCCJGC
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
+    MenuPcs.DrawRect(
+        0, 184.0f, 216.0f, 40.0f, 40.0f,
+        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
+    double crestRightX = 576.0;
+    int rightX = static_cast<int>(crestRightX);
+    MenuPcs.DrawRect(
+        0, static_cast<float>(rightX), 216.0f, 40.0f, 40.0f,
+        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD29 : CMAKE_TEX_WORLD29));
+    MenuPcs.DrawRect(
+        0, 192.0f, 224.0f, 24.0f, 24.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(
+        0, static_cast<float>(rightX + 8), 224.0f, 24.0f, 24.0f,
+        24.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+#else
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(
         0, 184.0f, 216.0f, 48.0f, 48.0f,
@@ -3949,6 +3998,7 @@ void CMenuPcs::CmakeVillageDraw()
     MenuPcs.DrawRect(
         0, static_cast<float>(static_cast<int>(crestRightX)), 216.0f, 48.0f, 48.0f,
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+#endif
 
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
         short sel = villageWork->m_select;
@@ -3977,7 +4027,11 @@ void CMenuPcs::CmakeVillageDraw()
     int tableBase = table * 5;
     int i;
     int y;
+#ifdef VERSION_GCCJGC
+    for (i = 0, y = 0x70; i < 5; i++, y += 0x20) {
+#else
     for (i = 0, y = 0x6C; i < 5; i++, y += 0x20) {
+#endif
         rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);
         font->SetPosY(static_cast<float>(y));
@@ -4000,8 +4054,12 @@ void CMenuPcs::CmakeVillageDraw()
     if (villageWork->m_row >= 5) {
         showNameCursor = 0;
     }
+#ifdef VERSION_GCCJGC
+    if (GetCharaCnt(s_CmakeInfo.m_name) >= 7) {
+#else
     unsigned int nameLen = strlen(s_CmakeInfo.m_name);
     if (7 <= static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31))) {
+#endif
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);

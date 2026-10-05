@@ -1126,3 +1126,6 @@ pppPart.cpp:
 game.cpp:
 	.bss start:0x8023A7B0 end:0x8024C748
 	.text start:0x80013D9C end:0x80015DD8
+
+p_chara_viewer.cpp:
+	.text start:0x800BB280 end:0x800BD02C

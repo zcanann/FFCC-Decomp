@@ -919,7 +919,7 @@ config.libs = [
     DolphinLib(
         "ar",
         [
-            Object(MatchingFor("GCCP01", "GCCE01"), "ar/ar.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ar/ar.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ar/arq.c"),
         ],
     ),

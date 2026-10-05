@@ -282,3 +282,9 @@ ar/arq.c:
 	.sbss start:0x8034BFA0 end:0x8034BFC8
 	.sdata start:0x8034B930 end:0x8034B934
 	.data start:0x80233550 end:0x80233598
+
+ar/ar.c:
+	.text start:0x80189CA4 end:0x8018B710
+	.data start:0x80233508 end:0x8023354C
+	.sdata start:0x8034B928 end:0x8034B92C
+	.sbss start:0x8034BF80 end:0x8034BFA0

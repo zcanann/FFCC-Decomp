@@ -708,6 +708,7 @@ menu_money.cpp:
 menu_compa.cpp:
 	.text start:0x8015FF58 end:0x801613D0
 	.rodata start:0x801DDDB0 end:0x801DDDE0
+	.sdata2 start:0x80331F98 end:0x80331FD8
 
 menu_favo.cpp:
 	.text start:0x801613D0 end:0x801629BC

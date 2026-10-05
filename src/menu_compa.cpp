@@ -255,8 +255,12 @@ void CMenuPcs::CompaDraw()
 	compaList = this->m_compaList;
 	font->SetMargin(kCompaOne);
 	font->SetShadow(0);
+#ifdef VERSION_GCCP01
 	font->SetScaleX(kCompaNameFontScaleX);
 	font->SetScaleY(kCompaOne);
+#else
+	font->SetScale(kCompaOne);
+#endif
 	font->DrawInit();
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
@@ -284,12 +288,24 @@ void CMenuPcs::CompaDraw()
 		y = static_cast<float>(compaList->entries[0].y + 0x45);
 		y += static_cast<float>(shown * 0x28);
 		font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(y);
+#else
 		font->SetPosY(y - kCompaTextYOffset);
+#endif
 		font->Draw(name);
 
 		value = Game.GetNPCName(caravanWork->m_evtWordArr[19 + drawIndex]);
+#ifdef VERSION_GCCP01
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
+#else
+		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x80));
+#endif
+#ifdef VERSION_GCCJGC
+		font->SetPosY(y);
+#else
 		font->SetPosY(y - kCompaTextYOffset);
+#endif
 		font->Draw(value);
 
 		shown++;
@@ -298,8 +314,13 @@ void CMenuPcs::CompaDraw()
 
 	font = m_fonts[4];
 	font->SetMargin(kCompaOne);
+#ifdef VERSION_GCCJGC
+	font->SetShadow(1);
+	font->SetScale(kCompaOne);
+#else
 	font->SetShadow(0);
 	font->SetScale(kCompaJobFontScale);
+#endif
 	font->DrawInit();
 	compaList = this->m_compaList;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
@@ -308,7 +329,11 @@ void CMenuPcs::CompaDraw()
 	font->GetWidth(job);
 	jobY = static_cast<float>(compaList->entries[0].y + 0x20);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
+#ifdef VERSION_GCCJGC
+	font->SetPosY(jobY);
+#else
 	font->SetPosY(jobY - kCompaTextYOffset - kCompaJobYOffset);
+#endif
 	font->Draw(job);
 
 	DrawInit();

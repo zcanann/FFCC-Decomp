@@ -1053,11 +1053,11 @@ void CGraphic::makeSphere()
         }
     }
 
-    m_sphereDisplayListSize = 0x880;
     vertices[vertexCount][0] = kGraphicOneF;
     vertices[vertexCount][1] = kGraphicZeroF;
     vertices[vertexCount][2] = kGraphicZeroF;
 
+    m_sphereDisplayListSize = 0x880;
     m_sphereDisplayList = new (m_graphicStage, const_cast<char*>(sGraphicSourceStrings), 0x41A) u8[m_sphereDisplayListSize];
 
     DCInvalidateRange(m_sphereDisplayList, m_sphereDisplayListSize);

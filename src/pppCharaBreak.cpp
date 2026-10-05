@@ -9,6 +9,7 @@
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/system.h"
 #include "ffcc/util.h"
 
 #include "dolphin/gx.h"
@@ -102,12 +103,14 @@ static inline void ClearCharaBreakModelCallbacks(CChara::CModel* model)
  */
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* modelData, void* meshData)
 {
-    CharaBreakWork* work = reinterpret_cast<CharaBreakWork*>(modelData);
     CharaBreakStep* stepData = reinterpret_cast<CharaBreakStep*>(meshData);
 
+#if defined(VERSION_GCCP01)
+    CharaBreakWork* work = reinterpret_cast<CharaBreakWork*>(modelData);
     if (work->m_enabled == 0) {
         return reinterpret_cast<int>(model);
     }
+#endif
 
     return (u32)__cntlzw(1 - (u32)stepData->m_worldSpaceMode) >> 5;
 }
@@ -156,7 +159,10 @@ static void CharaBreak_AfterDrawMeshCallback(
     CharaBreakWork* work = reinterpret_cast<CharaBreakWork*>(modelData);
     CChara::CMesh* meshRef = model->GetMesh();
 
-    if (work->m_enabled != 0) {
+#if defined(VERSION_GCCP01)
+    if (work->m_enabled != 0)
+#endif
+    {
         meshRef += meshIndex;
         CharaBreakMeshData* meshData = meshRef->GetRefData();
         CharaBreakDisplayList* materialData = meshData->m_displayLists;
@@ -618,17 +624,14 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float zero = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
     work->m_meshBuffers = 0;
-    work->m_graphValue2 = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_payloadGraphValue2 = zero;
-    work->m_payloadGraphValue1 = zero;
-    work->m_payloadGraphValue0 = zero;
+    work->m_graphValue0 = work->m_graphValue1 = work->m_graphValue2 = kPppCharaBreakZero;
+    work->m_payloadGraphValue0 = work->m_payloadGraphValue1 = work->m_payloadGraphValue2 = kPppCharaBreakZero;
+#if defined(VERSION_GCCP01)
     work->m_enabled = 1;
+#endif
 }
 
 /*
@@ -642,15 +645,10 @@ void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float zero = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
-    work->m_graphValue2 = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_payloadGraphValue2 = zero;
-    work->m_payloadGraphValue1 = zero;
-    work->m_payloadGraphValue0 = zero;
+    work->m_graphValue0 = work->m_graphValue1 = work->m_graphValue2 = kPppCharaBreakZero;
+    work->m_payloadGraphValue0 = work->m_payloadGraphValue1 = work->m_payloadGraphValue2 = kPppCharaBreakZero;
 }
 
 /*
@@ -675,7 +673,11 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     CharaBreakWork* work;
     CharaBreakDisplayListPair** dlEntryBase;
 
+#if defined(VERSION_GCCP01)
     Graphic._WaitDrawDone("pppCharaBreak.cpp", 0x319);
+#else
+    Graphic._WaitDrawDone("pppCharaBreak.cpp", 0x30D);
+#endif
 
     work = GetCharaBreakWork(charaBreak, data);
     model = work->m_model;
@@ -686,14 +688,23 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     perMeshBuffers = meshBufferSlot;
     mesh = model->GetMesh();
 
-    if (perMeshBuffers != NULL) {
+#if defined(VERSION_GCCP01)
+    if (perMeshBuffers != NULL)
+#endif
+    {
         for (meshIndex = 0; meshIndex < model->GetRefData()->m_meshCount; meshIndex++, mesh++) {
             dlEntryBase = *meshBufferSlot;
             meshData = mesh->GetRefData();
-            if (dlEntryBase != NULL) {
+#if defined(VERSION_GCCP01)
+            if (dlEntryBase != NULL)
+#endif
+            {
                 dlEntries = dlEntryBase;
                 for (dlIndex = 0; dlIndex < meshData->m_displayListCount; dlIndex++) {
-                    if (*dlEntries != NULL) {
+#if defined(VERSION_GCCP01)
+                    if (*dlEntries != NULL)
+#endif
+                    {
                         if ((*dlEntries)->m_rewrittenDisplayList != NULL) {
                             pppMemFree((*dlEntries)->m_rewrittenDisplayList);
                             (*dlEntries)->m_rewrittenDisplayList = 0;
@@ -750,9 +761,11 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
 
     work = GetCharaBreakWork(charaBreak, data);
     handle = ppvMng->m_owner;
+#if defined(VERSION_GCCP01)
     if (work->m_enabled == 0) {
         return;
     }
+#endif
 
     CCharaPcs::CHandle* charaHandle = GetCharaHandlePtr(handle, 0);
     model = GetCharaModelPtr(charaHandle);
@@ -783,8 +796,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
         if (zero == step->m_direction.x && zero == step->m_direction.y &&
             zero == step->m_direction.z) {
             step->m_direction.x = kPppCharaBreakOne;
-            step->m_direction.y = zero;
-            step->m_direction.z = zero;
+            step->m_direction.y = kPppCharaBreakZero;
+            step->m_direction.z = kPppCharaBreakZero;
         } else {
             PSVECNormalize(&step->m_direction, &step->m_direction);
         }
@@ -793,18 +806,28 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
     mesh = model->GetMesh();
 
     if (work->m_meshBuffers == NULL) {
+#if !defined(VERSION_GCCP01)
+        u32 totalPolygonCount = 0;
+#endif
         work->m_miscValue = kPppCharaBreakInitialMiscValue;
-        work->m_meshBuffers =
-            static_cast<CharaBreakDisplayListPair***>(
-                pppMemAllocNoReport(model->GetRefData()->m_meshCount << 2,
-                                ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3D0));
+#if defined(VERSION_GCCP01)
+        work->m_meshBuffers = static_cast<CharaBreakDisplayListPair***>(pppMemAllocNoReport(
+            model->GetRefData()->m_meshCount << 2, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3D0));
+#else
+        work->m_meshBuffers = static_cast<CharaBreakDisplayListPair***>(pppMemAlloc(
+            model->GetRefData()->m_meshCount << 2, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3B5));
+#endif
+#if defined(VERSION_GCCP01)
         if (work->m_meshBuffers == NULL) {
             goto fail;
         }
+#endif
 
+#if defined(VERSION_GCCP01)
         for (u32 i = 0; i < model->GetRefData()->m_meshCount; i++) {
             work->m_meshBuffers[i] = 0;
         }
+#endif
 
         for (i = 0; i < model->GetRefData()->m_meshCount; i++, mesh++) {
             {
@@ -817,14 +840,21 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                 }
             }
 
+#if defined(VERSION_GCCP01)
             work->m_meshBuffers[i] = static_cast<CharaBreakDisplayListPair**>(pppMemAllocNoReport(
-                mesh->GetRefData()->m_displayListCount << 2, ppvEnv->m_stagePtr,
-                "pppCharaBreak.cpp", 0x3E9));
+                mesh->GetRefData()->m_displayListCount << 2, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3E9));
+#else
+            work->m_meshBuffers[i] = static_cast<CharaBreakDisplayListPair**>(pppMemAlloc(
+                mesh->GetRefData()->m_displayListCount << 2, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3C4));
+#endif
             CharaBreakDisplayListPair** meshBuffer = work->m_meshBuffers[i];
+#if defined(VERSION_GCCP01)
             if (meshBuffer == 0) {
                 goto fail;
             }
+#endif
 
+#if defined(VERSION_GCCP01)
             {
                 int displayListCount = mesh->GetRefData()->m_displayListCount;
                 CharaBreakDisplayListPair** dlEntries = meshBuffer;
@@ -832,6 +862,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                     dlEntries[dl] = 0;
                 }
             }
+#endif
 
             {
                 int displayListCount = mesh->GetRefData()->m_displayListCount;
@@ -839,33 +870,57 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                 dl = displayListCount - 1;
                 dlEntries = meshBuffer + dl;
                 for (; dl >= 0; dl--, displayList++) {
+#if defined(VERSION_GCCP01)
                     *dlEntries = (CharaBreakDisplayListPair*)pppMemAllocNoReport(
                         0x10, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3FC);
+#else
+                    *dlEntries = (CharaBreakDisplayListPair*)pppMemAlloc(
+                        0x10, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3CE);
+#endif
+#if defined(VERSION_GCCP01)
                     if (*dlEntries == NULL) {
                         goto fail;
                     }
+#endif
 
+#if defined(VERSION_GCCP01)
                     (*dlEntries)->m_rewrittenDisplayList = NULL;
                     (*dlEntries)->m_displayListSize = 0;
                     (*dlEntries)->m_polygonData = 0;
+#endif
                     (*dlEntries)->m_displayListSize = displayList->m_size;
+#if defined(VERSION_GCCP01)
                     (*dlEntries)->m_rewrittenDisplayList = pppMemAllocNoReport(
-                        displayList->m_size, ppvEnv->m_stagePtr,
-                        "pppCharaBreak.cpp", 0x40B);
+                        displayList->m_size, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x40B);
+#else
+                    (*dlEntries)->m_rewrittenDisplayList = pppMemAlloc(
+                        displayList->m_size, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3D0);
+#endif
+#if defined(VERSION_GCCP01)
                     if ((*dlEntries)->m_rewrittenDisplayList == NULL) {
                         goto fail;
                     }
+#endif
 
                     memcpy((*dlEntries)->m_rewrittenDisplayList, displayList->m_data, displayList->m_size);
                     gUtil.ReWriteDisplayList((*dlEntries)->m_rewrittenDisplayList, displayList->m_size, 1);
 
                     u32 polygonCount = gUtil.GetNumPolygonFromDL((*dlEntries)->m_rewrittenDisplayList, displayList->m_size);
+#if !defined(VERSION_GCCP01)
+                    totalPolygonCount += polygonCount;
+#endif
+#if defined(VERSION_GCCP01)
                     (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemAllocNoReport(
-                        polygonCount * 0x34, ppvEnv->m_stagePtr,
-                        "pppCharaBreak.cpp", 0x423);
+                        polygonCount * sizeof(POLYGON_DATA), ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x423);
+#else
+                    (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemAlloc(
+                        polygonCount * sizeof(POLYGON_DATA), ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3DF);
+#endif
+#if defined(VERSION_GCCP01)
                     if ((*dlEntries)->m_polygonData == NULL) {
                         goto fail;
                     }
+#endif
                     (*dlEntries)->m_polygonCount = (u16)polygonCount;
 
                     CreatePolygon((*dlEntries)->m_polygonData, displayList->m_data, displayList->m_size,
@@ -878,6 +933,12 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
             }
 
         }
+#if !defined(VERSION_GCCP01)
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            System.Printf("ポリゴン数: %d ポリゴンデータサイズ: %d メモリサイズ: %d KB\n",
+                totalPolygonCount, sizeof(POLYGON_DATA), totalPolygonCount * sizeof(POLYGON_DATA) >> 10);
+        }
+#endif
     }
 
     if (ppvIsLoopCalc == 0) {
@@ -885,9 +946,11 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
     }
     return;
 
+#if defined(VERSION_GCCP01)
 fail:
     work->m_enabled = 0;
     ClearCharaBreakModelCallbacks(model);
+#endif
 }
 
 /*
@@ -905,7 +968,10 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTab
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
     VColor* colorWork = reinterpret_cast<VColor*>(charaBreak->m_workArea + colorOffset);
 
-    if (work->m_enabled != 0) {
+#if defined(VERSION_GCCP01)
+    if (work->m_enabled != 0)
+#endif
+    {
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         pppInitBlendMode();
         pppSetDrawEnv(

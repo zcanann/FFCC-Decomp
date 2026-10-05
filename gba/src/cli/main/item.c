@@ -51,7 +51,7 @@ void ItemScreen_Setup(void)
     Window_ResetItems(&gWindows[1], 1);
 
     gWindows[2].active = 1;
-#if defined(VERSION_GCCE01)
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
     gWindows[2].width = 7;
     gWindows[2].x = 12;
 #else
@@ -367,7 +367,11 @@ void ItemScreen_DrawIcons(void)
     s32 icon;
     s32 pal;
 
+#if defined(VERSION_GCCJGC)
+    x = (win->x + 2) * 8;
+#else
     x = win->x * 8 + 14;
+#endif
     y = (win->y + 1) * 8;
     n = win->rows;
     for (i = 0; i < n; i++, y += 16) {
@@ -381,10 +385,14 @@ void ItemScreen_DrawIcons(void)
     }
     x = (win->x + 1) * 8;
     y = (win->y + 1) * 8;
+#if defined(VERSION_GCCJGC)
+    icon = 4;
+#else
     if ((gLanguage & 15) == 1)
         icon = 24;
     else
         icon = 4;
+#endif
     pal = Obj_GetPalette(2, icon);
     for (i = 0; i < win->rows; i++, y += 16) {
         WRAP64(idx, sItemTop + i);
@@ -464,11 +472,14 @@ s32 ItemScreen_CloseActions(void)
 
 void ItemScreen_PrintItem(s32 idx, s32 row)
 {
+    s32 item;
+
     Text_SetFill(1, 0);
     Text_Clear();
     Text_SetX(24);
-    if (gSession.items[idx] > 0)
-        Text_Print(Msg_GetItemName(gSession.items[idx]), TEXT_DRAW);
+    item = gSession.items[idx];
+    if (item > 0)
+        Text_Print(Msg_GetItemName(item), TEXT_DRAW);
     Text_CopyToVram(Window_GetTextVram(&gWindows[1], row, 0), gWindows[1].width);
 }
 

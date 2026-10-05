@@ -182,7 +182,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "main/sound_assets_jp",
             "main/m4a_tables", "main/sound_data",
             "main/main", "main/xfer", "main/radarmap", "main/textmask", "main/obj", "main/link", "main/msg_sys",
-            "main/mode", "main/gil", "main/menu", "main/msg_item", "main/favorite", "main/tmpartifact", "main/artifact",
+            "main/mode", "main/gil", "main/menu", "main/msg_item", "main/favorite", "main/tmpartifact", "main/artifact", "main/item",
             "crt0", "m4a/m4a_1", "libagbsyscall/CpuFastSet", "libagbsyscall/CpuSet",
             "libagbsyscall/LZ77UnCompVram", "libagbsyscall/LZ77UnCompWram",
             "libagbsyscall/MidiKey2Freq", "libagbsyscall/MusicPlayerContinue",

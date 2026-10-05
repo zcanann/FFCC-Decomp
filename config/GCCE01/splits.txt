@@ -1119,3 +1119,7 @@ auto_07_8021BA35_data:
 
 thp/THPAudio.c:
 	.text	start:0x801D3DC4 end:0x801D42F4
+
+gx/GXBump.c:
+	.text	start:0x801A3A28 end:0x801A40BC
+	.sdata2	start:0x80332878 end:0x80332880

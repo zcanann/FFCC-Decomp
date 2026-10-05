@@ -1008,7 +1008,7 @@ config.libs = [
         "gx",
         [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXAttr.c"),
-            Object(Matching, "gx/GXBump.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXBump.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXDisplayList.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXFifo.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gx/GXFrameBuf.c"),

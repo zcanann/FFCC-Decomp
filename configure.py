@@ -645,7 +645,7 @@ config.libs = [
             Object(Matching, "pppDrawMng.cpp"),
             Object(Matching, "pppDrawShape.cpp"),
             Object(Matching, "pppDrawShape2.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppEmission.cpp", extra_cflags=["-str reuse,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppEmission.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(Matching, "pppEraseCharaParts.cpp"),
             Object(Matching, "pppFilter.cpp"),
             Object(Matching, "pppFovAdjustMatrix.cpp"),

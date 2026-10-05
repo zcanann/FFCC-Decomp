@@ -257,9 +257,7 @@ void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     }
 
     baseScale = 0.0f;
-    state->m_scaleAccel = 0.0f;
-    state->m_scaleVelocity = baseScale;
-    state->m_scaleValue = baseScale;
+    state->m_scaleValue = state->m_scaleVelocity = state->m_scaleAccel = baseScale;
 }
 
 /*
@@ -274,9 +272,7 @@ void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
 void pppConstruct2Emission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
     EmissionState* state = GetEmissionState(emission, ctrl);
-    state->m_scaleAccel = baseScale;
-    state->m_scaleVelocity = baseScale;
-    state->m_scaleValue = baseScale;
+    state->m_scaleValue = state->m_scaleVelocity = state->m_scaleAccel = baseScale;
 }
 
 /*
@@ -297,9 +293,7 @@ void pppConstructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     state->m_colorG = 0x80;
     state->m_colorB = 0x80;
     state->m_colorA = 0x80;
-    state->m_scaleAccel = baseScale;
-    state->m_scaleVelocity = baseScale;
-    state->m_scaleValue = baseScale;
+    state->m_scaleValue = state->m_scaleVelocity = state->m_scaleAccel = baseScale;
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);

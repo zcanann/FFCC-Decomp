@@ -152,10 +152,10 @@ main/xfer:
 	.rodata     start:0x0201CCF8 end:0x0201CD10
 
 main/link:
-	.rodata     start:0x0201CD10 end:0x0201CF14
+	.rodata     start:0x0201CD10 end:0x0201CF18
 
 main/textmask:
-	.rodata     start:0x0201CF14 end:0x0201CF38
+	.rodata     start:0x0201CF18 end:0x0201CF38
 
 main/artifact:
 	.rodata     start:0x0201CF38 end:0x0201CF3D

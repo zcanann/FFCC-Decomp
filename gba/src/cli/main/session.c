@@ -650,9 +650,20 @@ void Session_OnStartBonus(void)
         gParty[i].hp = 1;
 }
 
+#if !defined(VERSION_GCCJGC)
+/*
+ * --INFO--
+ * PAL Address: 0x020050D4
+ * PAL Size: 20b
+ * EN Address: 0x020050D4
+ * EN Size: 20b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void Session_OnLanguage(u32 data)
 {
     struct JoyArgs *cmd = (struct JoyArgs *)&data;
 
     gLanguage = cmd->arg;
 }
+#endif

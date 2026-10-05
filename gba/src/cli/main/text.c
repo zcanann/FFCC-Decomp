@@ -41,13 +41,9 @@ static u32 sTextX;
 static struct Font *sFont;
 static u8 sTextFill[0x80];
 static s32 sTextFillOn;
-extern u32 gNibbleMasks[];
+extern const u32 gNibbleMasks[];
 
-#if defined(VERSION_GCCJGC)
 #define TEXT_MASK(width) (*(gNibbleMasks + (width) - 1))
-#else
-#define TEXT_MASK(width) gNibbleMasks[width]
-#endif
 
 void Text_Init(void)
 {

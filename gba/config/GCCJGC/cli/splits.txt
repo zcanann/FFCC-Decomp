@@ -145,8 +145,8 @@ libgcc/_umodsi3:
 main/main:
 	.rodata     start:0x0201C8AC end:0x0201C95C align:4
 
-regional_data:
-	.rodata     start:0x0201C95C end:0x0201CB64
+main/link:
+	.rodata     start:0x0201C95C end:0x0201CB64 align:4
 
 main/xfer:
 	.rodata     start:0x0201CB64 end:0x0201CB7C align:4
@@ -169,7 +169,7 @@ regional_data:
 main/main:
 	.bss        start:0x03000000 end:0x03000011 align:4
 
-regional_bss:
+main/link:
 	.bss        start:0x03000018 end:0x03000880 align:8
 
 main/xfer:

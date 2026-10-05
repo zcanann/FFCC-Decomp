@@ -1,0 +1,3 @@
+
+# Text_Print folds widths 1..8 into the eight-word mask table base.
+0x0201CCE0 gNibbleMasks-0x4

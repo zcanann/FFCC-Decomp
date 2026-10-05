@@ -77,11 +77,20 @@ void __TRK_set_MSR(register u32 msr);
 u32 __TRK_get_MSR();
 void TRK_ppc_memcpy(register void* dest, register const void* src, register int n, register u32 param_4, register u32 param_5);
 
-/**
- * @note Address: 0x800BF790
- * @note Size: 0x2A4
+/*
+ * --INFO--
+ * PAL Address: 0x801AD404
+ * PAL Size: 676b
+ * EN Address: 0x801AC2E8
+ * EN Size: 676b
+ * JP Address: 0x801A9844
+ * JP Size: 688b
  */
+#ifdef VERSION_GCCJGC
+DSError TRKValidMemory32(const void* addr, size_t length, u8 readWriteable)
+#else
 DSError TRKValidMemory32(const void* addr, size_t length, ValidMemoryOptions readWriteable)
+#endif
 {
 	DSError err = DS_InvalidMemory; /* assume range is invalid */
 

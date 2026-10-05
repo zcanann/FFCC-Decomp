@@ -2108,8 +2108,8 @@ int CGPartyObj::getReplaceStat(int state)
  * PAL Size: 2560b
  * EN Address: 0x8013D870
  * EN Size: 2412b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8011bef4
+ * JP Size: 2432b
  */
 void CGPartyObj::statCharge()
 {
@@ -2152,7 +2152,11 @@ void CGPartyObj::statCharge()
 			endPSlotBit(8);
 			bonus(0x18, 0, 0);
 		}
+#ifdef VERSION_GCCP01
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
+#else
+		if (m_subFrame == 6 && m_comboItemState >= 0) {
+#endif
 			endPSlotBit(0x20);
 			CFlat.ResetParticleWork(
 			    (m_comboItemState + 0x1C + reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 5) | 0x400,
@@ -2753,14 +2757,18 @@ void CGPartyObj::checkTargetParticle()
  * PAL Size: 612b
  * EN Address: 0x8013F624
  * EN Size: 448b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8011a7e8
+ * JP Size: 612b
  */
 void CGPartyObj::moveCenterTargetParticle()
 {
 	int step = m_subFrame;
 
+#ifdef VERSION_GCCP01
 	if (step >= 5) {
+#else
+	if (step >= 6) {
+#endif
 		return;
 	}
 
@@ -2788,8 +2796,8 @@ void CGPartyObj::moveCenterTargetParticle()
  * PAL Size: 1348b
  * EN Address: 0x8013F7E4
  * EN Size: 1200b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8011a2a4
+ * JP Size: 1348b
  */
 void CGPartyObj::onStatMagic()
 {
@@ -2836,11 +2844,19 @@ void CGPartyObj::onStatMagic()
 				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->DelCmdListAndItem(PartyData(this).unk6BC, 1);
 			}
 		}
+#ifdef VERSION_GCCP01
 		if (m_subFrame == 8 && m_comboLinkCount != 0) {
+#else
+		if (m_subFrame == 10 && m_comboLinkCount != 0) {
+#endif
 			sendCombiToScript__10CGCharaObjFP10CGCharaObjii(this, reinterpret_cast<CGCharaObj*>(m_comboScriptArg), m_comboScriptMode);
 		}
 		moveCenterTargetParticle();
+#ifdef VERSION_GCCP01
 		if (m_subFrame >= 0x12) {
+#else
+		if (m_subFrame >= 0x16) {
+#endif
 			m_unk63CBits.m_bit80 = 1;
 		}
 		if (isLoopAnim() != 0) {
@@ -2895,10 +2911,10 @@ void CGPartyObj::onStatMagic()
  * --INFO--
  * PAL Address: 0x8011e1b4
  * PAL Size: 376b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8011d514
+ * EN Size: 376b
+ * JP Address: 0x8011a12c
+ * JP Size: 376b
  */
 void CGPartyObj::onStatDie()
 {
@@ -2920,12 +2936,20 @@ void CGPartyObj::onStatDie()
 				putParticleFromItem(0x220, 3, 0, &m_worldPosition);
 				changeSubStat(2);
 			}
+#ifdef VERSION_GCCP01
 		} else if (m_subFrame == 0x19) {
+#else
+		} else if (m_subFrame == 0x1E) {
+#endif
 			changeStat(0x22, 0, 0);
 		}
 		break;
 	case 2:
+#ifdef VERSION_GCCP01
 		if (m_subFrame >= 0xBB) {
+#else
+		if (m_subFrame >= 0xE1) {
+#endif
 			if (System.GetErrorLevel() >= 2U) {
 				System.Printf(const_cast<char*>(lbl_801DCCB0));
 			}

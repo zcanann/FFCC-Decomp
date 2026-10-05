@@ -241,8 +241,11 @@ regional_data:
 m4a_tables:
 	.rodata     start:0x02010388 end:0x020104EC align:4
 
+sound_data:
+	.rodata     start:0x020104EC end:0x02010934 align:4
+
 regional_data:
-	.rodata     start:0x020104EC end:0x020139F8
+	.rodata     start:0x02010934 end:0x020139F8
 
 libc/reent/impure:
 	.rodata     start:0x020139F8 end:0x020139FC
@@ -263,7 +266,10 @@ libc/arm/syscalls:
 	.rodata     start:0x02013BEC end:0x02013C14 align:4
 
 regional_data:
-	.rodata     start:0x02013C14 end:0x020158A0
+	.rodata     start:0x02013C14 end:0x02014690
+
+sound_data:
+	.data       start:0x02014690 end:0x020158A0 align:4
 
 libc/reent/sbrkr:
 	.common     start:0x020158A0 end:0x020158A4 align:4
@@ -280,8 +286,8 @@ effect:
 text:
 	.data       start:0x020159B8 end:0x02015A4C align:4
 
-regional_data:
-	.rodata     start:0x02015A4C end:0x02015A54
+random:
+	.data       start:0x02015A4C end:0x02015A54 align:4
 
 libc/reent/impure:
 	.data       start:0x02015A54 end:0x02015D44
@@ -325,8 +331,11 @@ route:
 sound:
 	.bss        start:0x030063F8 end:0x03006400 align:4
 
-regional_bss:
-	.bss        start:0x03006400 end:0x03007048
+random:
+	.bss        start:0x03006400 end:0x03006DC8 align:4
+
+sound_data:
+	.bss        start:0x03006DC8 end:0x03007048 align:4
 
 libc/arm/syscalls:
 	.bss        start:0x03007048 end:0x030070F8 align:4

@@ -1260,8 +1260,15 @@ usb.cpp:
 	.sdata2 start:0x8032E848 end:0x8032E84D
 
 system.cpp:
-	.text start:0x80021CF0 end:0x80021DA8
-	.bss start:0x80243300 end:0x8024457C
+	.text	start:0x800212A8 end:0x80022240
+	.ctors	start:0x801D4324 end:0x801D4328
+	extab	start:0x80005C98 end:0x80005D08
+	extabindex	start:0x8000B530 end:0x8000B5C0
+	.rodata	start:0x801D5CC8 end:0x801D5EC9
+	.data	start:0x801E76F8 end:0x801E7714
+	.bss	start:0x80243300 end:0x8024457C
+	.sdata	start:0x8032D448 end:0x8032D458
+	.sdata2	start:0x8032E830 end:0x8032E844
 
 auto_07_801E7734_data:
 	.data start:0x801E7734 end:0x801E7738 align:4
@@ -1352,3 +1359,12 @@ auto_10_8032DCDC_sbss:
 pppYmDeformationShp.cpp:
 	.text start:0x8008E864 end:0x8008FF78
 	.sdata2 start:0x8032F5B0 end:0x8032F5F8
+
+auto_801D5EC9_rodata:
+	.rodata start:0x801D5EC9 end:0x801D5ED0 align:1
+
+auto_801E7714_data:
+	.data start:0x801E7714 end:0x801E7718 align:1
+
+auto_8032E844_sdata2:
+	.sdata2 start:0x8032E844 end:0x8032E848 align:4

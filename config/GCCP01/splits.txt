@@ -129,7 +129,7 @@ system.cpp:
 	extabindex  start:0x8000B548 end:0x8000B5D8
 	.text       start:0x800214B4 end:0x8002244C
 	.ctors      start:0x801D53C4 end:0x801D53C8
-	.rodata     start:0x801D6D80 end:0x801D6F90
+	.rodata     start:0x801D6D80 end:0x801D6F89
 	.data       start:0x801E8878 end:0x801E8894
 	.bss        start:0x80244340 end:0x802455BC
 	.sdata      start:0x8032E468 end:0x8032E478
@@ -2850,3 +2850,6 @@ auto_07_8021C035_data:
 
 auto_07_8021CB75_data:
 	.data start:0x8021CB75 end:0x8021CB78 align:1
+
+auto_801D6F89_rodata:
+	.rodata start:0x801D6F89 end:0x801D6F90 align:1

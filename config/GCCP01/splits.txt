@@ -1743,6 +1743,7 @@ monobj_table.cpp:
 	.data       start:0x802129B0 end:0x802140F0
 
 singmenu.cpp:
+	.rodata start:0x801DE6AC end:0x801DE8A4
 	extab       start:0x80009C14 end:0x80009D04
 	extabindex  start:0x80010EE8 end:0x80011050
 	.text       start:0x801453F4 end:0x8014A940

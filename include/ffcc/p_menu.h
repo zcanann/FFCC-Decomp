@@ -12,6 +12,8 @@
 
 #include <dolphin/gx.h>
 
+extern "C" const unsigned char gSingMenuItemIconByType[0x1F5];
+
 class CColor;
 class CFontMan;
 class CFont;
@@ -601,7 +603,11 @@ public:
     char* GetJobStr(int);
     char* GetHairStr(int);
     int GetItemType(int, int);
+#ifdef VERSION_GCCJGC
+    int GetItemIcon(int index) { return gSingMenuItemIconByType[index]; }
+#else
     int GetItemIcon(int);
+#endif
     void ArtiInit();
     void ArtiInit1();
     int ArtiOpen();

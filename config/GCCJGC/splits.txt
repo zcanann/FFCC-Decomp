@@ -488,3 +488,6 @@ mes.cpp:
 
 shopmenu.cpp:
 	.text start:0x8014B634 end:0x80153EA0
+
+singmenu.cpp:
+	.rodata start:0x801D925C end:0x801D9454

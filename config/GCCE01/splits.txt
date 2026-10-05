@@ -558,3 +558,6 @@ shopmenu.cpp:
 
 cmake.cpp:
 	.text start:0x8016BCC4 end:0x801736C8
+
+singmenu.cpp:
+	.rodata start:0x801DD684 end:0x801DD87C

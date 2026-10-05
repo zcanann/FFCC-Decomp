@@ -2044,16 +2044,25 @@ unsigned int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
  * --INFO--
  * PAL Address: 0x8009f6ac
  * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009EFC4
+ * EN Size: 132b
+ * JP Address: 0x8009D67C
+ * JP Size: 128b
  */
 const char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
 {
 	int weaponType = GetWeaponAttrib(cmdListIdx);
 	if (weaponType >= 0 && weaponType < 3) {
+#ifdef VERSION_GCCP01
 		return MenuPcs.GetSkillStr(weaponType);
+#else
+#ifdef VERSION_GCCJGC
+		static const char* pMagicCharge[] = { "ファイアけん", "ブリザドけん", "サンダーけん" };
+#else
+		static const char* pMagicCharge[] = { "Flamestrike", "Icestrike", "Thunderstrike" };
+#endif
+		return pMagicCharge[weaponType];
+#endif
 	}
 
 	return Game.GetShortItemName(GetCmdListItem(cmdListIdx));

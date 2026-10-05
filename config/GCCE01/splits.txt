@@ -722,6 +722,9 @@ menu_lst.cpp:
 
 ringmenu.cpp:
 	.text start:0x800A26A8 end:0x800A4C34
+	.rodata start:0x801D8F50 end:0x801D8F5C
+	.data start:0x8020E948 end:0x8020E99C
+	.sdata start:0x8032D7F8 end:0x8032D810
 
 exi/EXIUart.c:
 	.text	start:0x80182970 end:0x80182F44

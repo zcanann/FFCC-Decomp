@@ -537,3 +537,9 @@ mtx/mtx44.c:
 mtx/vec.c:
 	.text start:0x80181208 end:0x801814B8
 	.sdata2 start:0x8034FB28 end:0x8034FB34
+
+bonus_menu.cpp:
+	.text start:0x8012EF38 end:0x8013A1EC
+
+menu_cmd.cpp:
+	.text start:0x80145F34 end:0x8014B634

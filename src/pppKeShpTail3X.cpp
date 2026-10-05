@@ -114,9 +114,7 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
     do {
         s32 rnd = rand();
         work->m_angles[i] = (s16)(rnd - (rnd / 0x168) * 0x168);
-        work->m_posHistory[i].z = zero;
-        work->m_posHistory[i].y = zero;
-        work->m_posHistory[i].x = zero;
+        work->m_posHistory[i].x = work->m_posHistory[i].y = work->m_posHistory[i].z = zero;
         i++;
     } while (i < 0x1c);
 }

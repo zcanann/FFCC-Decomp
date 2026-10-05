@@ -375,14 +375,8 @@ void pppConstructYmTracer2(pppYmTracer2* tracer, _pppCtrlTable* ctrl)
     work->initWork = 0;
     work->visibleCount = 0;
 
-    work->pad0 = zero;
-    work->pos.z = zero;
-    work->pos.y = zero;
-    work->pos.x = zero;
-    work->pad1c = zero;
-    work->targetPos.z = zero;
-    work->targetPos.y = zero;
-    work->targetPos.x = zero;
+    work->pos.x = work->pos.y = work->pos.z = work->pad0 = zero;
+    work->targetPos.x = work->targetPos.y = work->targetPos.z = work->pad1c = zero;
 
     work->pad2e = 0;
     work->alphaStep = 0;

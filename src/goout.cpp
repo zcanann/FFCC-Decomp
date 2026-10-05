@@ -2059,7 +2059,11 @@ card_connected:;
         }
         break;
     case 0x12:
+#ifdef VERSION_GCCJGC
+        if (m_memCardResult != 0) {
+#else
         if (m_messageWindowOpen != 0 && m_memCardResult != 0) {
+#endif
             if (SetMemCardError() != 0) {
                 return;
             }
@@ -2067,7 +2071,11 @@ card_connected:;
         }
         break;
     case 0x13:
+#ifdef VERSION_GCCJGC
+        if (m_memCardResult != 0) {
+#else
         if (m_messageWindowOpen != 0 && m_memCardResult != 0) {
+#endif
             if (SetMemCardError() != 0) {
                 return;
             }
@@ -2112,7 +2120,11 @@ card_connected:;
         }
         break;
     case 5:
+#ifdef VERSION_GCCJGC
+        if (m_memCardResult == 0) {
+#else
         if (m_messageWindowOpen == 0 || m_memCardResult == 0) {
+#endif
             break;
         }
 
@@ -2151,10 +2163,12 @@ card_connected:;
         break;
     case 3: {
         int formatResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->Format(1);
+#ifndef VERSION_GCCJGC
         if (formatResult < 0) {
             MemoryCardMan.m_opDoneFlag = 1;
             MemoryCardMan.m_currentSlot = static_cast<char>(0xff);
         }
+#endif
 
         int result;
         if (formatResult == 0) {

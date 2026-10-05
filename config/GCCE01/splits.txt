@@ -1592,6 +1592,10 @@ auto_8021C7AC_data:
 
 pppLaser.cpp:
 	.text start:0x8017445C end:0x801757B8
+	.rodata start:0x801E1ED8 end:0x801E1EE8
+	.sdata2 start:0x803323C8 end:0x80332400
 
 pppScreenBreak.cpp:
 	.text start:0x8012C788 end:0x8012D90C
+	.sdata2 start:0x80330C60 end:0x80330C98
+	.rodata start:0x801DC398 end:0x801DC3D0

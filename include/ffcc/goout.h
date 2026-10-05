@@ -96,8 +96,8 @@ private:
     unsigned char m_drawCursor;
     unsigned char m_messageCloseMode;
     unsigned char m_cursorMode;
-    short m_cursorListY0;
-    short m_cursorListY1;
+    short m_cursorX;
+    short m_cursorY;
 };
 
 #endif // _GOOUT_H_

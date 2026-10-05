@@ -21,6 +21,9 @@ static const int kConfirmationDefault = 0;
 static const int kTransferSaveMessage = 44;
 static const int kTransferCompleteMessage = 45;
 static const int kTransferCheckMessage = 46;
+static const int kTransferInitializedIds = 16;
+static const int kTransferSaveAllocLine = 0x319;
+static const int kTransferWorkAllocLine = 0x31B;
 #else
 static const int kTransferWindowBase = 34;
 static const int kTransferMessageBase = 0;
@@ -29,6 +32,9 @@ static const int kConfirmationDefault = 1;
 static const int kTransferSaveMessage = 31;
 static const int kTransferCompleteMessage = 32;
 static const int kTransferCheckMessage = 33;
+static const int kTransferInitializedIds = 8;
+static const int kTransferSaveAllocLine = 0x32B;
+static const int kTransferWorkAllocLine = 0x32D;
 #endif
 
 #ifndef VERSION_GCCJGC
@@ -1042,7 +1048,11 @@ inline void CGoOutMenu::DrawMenu()
         MenuPcs.DrawMcWin(-1, 0);
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             const unsigned int message = static_cast<unsigned int>(m_currentMessage);
+#ifdef VERSION_GCCJGC
+            MenuPcs.DrawMcWinMess(message, kTransferMessageGroup);
+#else
             MenuPcs.DrawMcWinMess(message, (m_currentMessage < 0x1E) ? 0 : 2);
+#endif
         }
     }
 }
@@ -1221,11 +1231,11 @@ void dumpOdekake(Mc::SaveDat* saveData)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline unsigned char CGoOutMenu::SelectYesNo(int cursorY0, int cursorY1, int cursorMode)
+inline unsigned char CGoOutMenu::SelectYesNo(int cursorX, int cursorY, int cursorMode)
 {
     m_drawCursor = 1;
-    m_cursorListY0 = cursorY0;
-    m_cursorListY1 = cursorY1;
+    m_cursorX = cursorX;
+    m_cursorY = cursorY;
     m_cursorMode = cursorMode;
 
 #ifndef VERSION_GCCJGC
@@ -1235,11 +1245,11 @@ inline unsigned char CGoOutMenu::SelectYesNo(int cursorY0, int cursorY1, int cur
 
 #endif
 
-    if ((Pad.GetButtonDown(0) & 3) != 0) {
+    if ((Pad.GetButtonDown(0) & (cursorMode ? 0xC : 3)) != 0) {
         m_cursorChoice ^= 1;
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
-        if (m_cursorChoice == 0) {
+        if (cursorMode || m_cursorChoice == 0) {
             Sound.PlaySe(2, 0x40, 0x7f, 0);
         } else if (m_cursorChoice == 1) {
             Sound.PlaySe(3, 0x40, 0x7f, 0);
@@ -2593,20 +2603,21 @@ void CGoOutMenu::Calc()
         m_menuStringSlot = 0;
         SetMainMode(1);
         MenuPcs.m_goOutTransferSaveData =
-            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32B));
-        MenuPcs.m_goOutTransferWork = operator new(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32D);
+            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), kTransferSaveAllocLine));
+        MenuPcs.m_goOutTransferWork = operator new(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), kTransferWorkAllocLine);
         MenuPcs.m_goOutTransferWorkActive = 0;
         MenuPcs.m_goOutUnknown888 = 0;
         MenuPcs.m_goOutSaveLoadMode = 0;
         MenuPcs.m_goOutUnknown88A = 0;
         WinMessEntry* winMessage = MenuPcs.GetWinMess(kTransferWindowBase);
         winMessage->m_lineCount = 0;
-        for (int i = 0; i < 8; i++) {
+        // Japanese retail initializes 16 IDs across adjacent 20-byte descriptors.
+        for (int i = 0; i < kTransferInitializedIds; i++) {
             winMessage->m_messageIds[i] = i + kTransferMessageBase;
         }
         winMessage = MenuPcs.GetWinMess(kTransferWindowBase + 1);
         winMessage->m_lineCount = 0;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < kTransferInitializedIds; i++) {
             winMessage->m_messageIds[i] = i + kTransferMessageBase + 10;
         }
         MenuPcs.m_menuWindowInfo->state = 3;
@@ -2649,31 +2660,7 @@ void CGoOutMenu::Calc()
                     MenuPcs.ChgAllModel();
                     return;
                 }
-                m_drawCursor = 1;
-                m_cursorListY0 = 200;
-                m_cursorListY1 = 0xB0;
-                m_cursorMode = 1;
-
-                if (MenuPcs.m_menuWindowInfo->state != 1) {
-                    nextMode = 0;
-                    goto do_switch_calc;
-                }
-
-                input = Pad.GetButtonDown(0);
-                if ((input & 0xC) != 0) {
-                    m_cursorChoice ^= 1;
-                    Sound.PlaySe(1, 0x40, 0x7f, 0);
-                } else {
-                    input = Pad.GetButtonDown(0);
-                    if ((input & 0x100) != 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                        nextMode = static_cast<unsigned char>(m_cursorChoice + 1);
-                        goto do_switch_calc;
-                    }
-                }
-
-                nextMode = 0;
-            do_switch_calc:
+                nextMode = SelectYesNo(200, 0xB0, 1);
                 switch (nextMode) {
                 case 1: {
                     int characterCount = 0;
@@ -2806,7 +2793,12 @@ void CGoOutMenu::Calc()
 
         m_currentMessage = m_pendingMessage;
         if (m_pendingMessage != -1) {
-            MenuPcs.GetWinSize(static_cast<short>(m_currentMessage), &x, &y, (m_currentMessage < 0x1E) ? 0 : 2);
+            MenuPcs.GetWinSize(static_cast<short>(m_currentMessage), &x, &y,
+#ifdef VERSION_GCCJGC
+                               kTransferMessageGroup);
+#else
+                               (m_currentMessage < 0x1E) ? 0 : 2);
+#endif
             MenuPcs.SetMcWinInfo(x, y);
             MenuPcs.m_menuWindowInfo->state = 0;
             MenuGoOutState().m_animFrame = 0;
@@ -2859,19 +2851,29 @@ void CalcGoOutMenu()
  */
 inline void CGoOutMenu::DrawSelectYesNo()
 {
+#ifdef VERSION_GCCJGC
+    if (m_drawCursor != 0) {
+        if (m_cursorMode != 0) {
+            MenuPcs.DrawCursor(m_cursorX, m_cursorY + m_cursorChoice * 24, 1.0f);
+        } else {
+            MenuPcs.DrawCursor(m_cursorX + m_cursorChoice * 82, m_cursorY, 1.0f);
+        }
+    }
+#else
     if (MenuPcs.m_menuWindowInfo->state == 1 && m_drawCursor != 0) {
         const float cursorY = (float)(MenuPcs.m_menuWindowInfo->y +
             MenuPcs.m_menuWindowInfo->height - 0x3E);
         float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
 
         if (m_cursorMode != 0) {
-            const int localY = m_cursorListY1 + m_cursorChoice * 0x1E;
+            const int localY = m_cursorY + m_cursorChoice * 0x1E;
             MenuPcs.DrawCursor((int)cursorX, localY, 1.0f);
         } else {
             cursorX = (float)MenuPcs.GetYesNoXPos(m_cursorChoice);
             MenuPcs.DrawCursor((int)cursorX, (int)cursorY, 1.0f);
         }
     }
+#endif
 }
 
 /*
@@ -2936,10 +2938,10 @@ inline void CGoOutMenu::EndMemCardProc()
  * --INFO--
  * PAL Address: 0x80168130
  * PAL Size: 676b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016711C
+ * EN Size: 608b
+ * JP Address: 0x80162A00
+ * JP Size: 504b
  */
 void DrawGoOutMenu()
 {

@@ -9,6 +9,16 @@
 #include "screen.h"
 #include "lists.h"
 
+#if defined(VERSION_GCCE01)
+#define SMITH_ACTION_WIDTH 7
+#define SMITH_EQUIP_ACTION_X 6
+#define SMITH_CURRENCY_MSG 5
+#else
+#define SMITH_ACTION_WIDTH 9
+#define SMITH_EQUIP_ACTION_X 4
+#define SMITH_CURRENCY_MSG 13
+#endif
+
 static s8 sSmithTop;
 static s8 sSmithRow;
 static s8 sSmithResult;
@@ -292,6 +302,15 @@ void SmithTopScreen_DrawIcons(void)
     Window_DrawScrollArrows(0, win->bg, flags);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02018570
+ * PAL Size: 404b
+ * EN Address: 0x02018380
+ * EN Size: 404b
+ * JP Address: 0x020178F0
+ * JP Size: 388b
+ */
 void SmithForgeScreen_Setup(void)
 {
     s32 i;
@@ -315,7 +334,7 @@ void SmithForgeScreen_Setup(void)
     gWindows[1].x = 2;
     gWindows[1].y = 13;
     gWindows[1].rows = 2;
-    gWindows[1].width = 9;
+    gWindows[1].width = SMITH_ACTION_WIDTH;
     gWindows[1].height = 4;
     gWindows[1].style = 3;
     gWindows[1].variant = 0;
@@ -567,6 +586,15 @@ s32 SmithForge_HandleInput(void)
     return ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x02018C38
+ * PAL Size: 1144b
+ * EN Address: 0x02018A48
+ * EN Size: 1164b
+ * JP Address: 0x02017FAC
+ * JP Size: 1140b
+ */
 void SmithForgeScreen_PrintNextRow(void)
 {
     char buf[64];
@@ -635,9 +663,17 @@ void SmithForgeScreen_PrintNextRow(void)
         SmithForge_DrawRow(sSmithRow, n);
     } else if (sSmithRow == 1) {
         w = Text_Print(Msg_GetSystem(17), TEXT_WIDTH);
+#if defined(VERSION_GCCE01)
+        x = 88;
+#else
         x = 104;
+#endif
         Text_SetX(x - w);
         Text_Print(Msg_GetSystem(17), TEXT_DRAW);
+#if defined(VERSION_GCCE01)
+        Text_SetX(96);
+        Text_Print(Msg_GetSystem(19), TEXT_DRAW);
+#endif
         Text_SetX(108);
         Item_FormatWearer(&recipe->items[sSmithVariant].flags, buf);
         Text_Print(buf, TEXT_DRAW);
@@ -656,15 +692,15 @@ void SmithForgeScreen_PrintNextRow(void)
         Text_CopyToVram(dst, win->width);
         SmithForge_DrawRow(sSmithRow, 3);
     } else if (sSmithRow == 3) {
-        w = Text_Print(Msg_GetSystem(13), TEXT_WIDTH) + 72;
+        w = Text_Print(Msg_GetSystem(SMITH_CURRENCY_MSG), TEXT_WIDTH) + 72;
         x = 104 - w;
         Text_PrintNumber(recipe->price, x, 8);
-        Text_Print(Msg_GetSystem(13), TEXT_DRAW);
+        Text_Print(Msg_GetSystem(SMITH_CURRENCY_MSG), TEXT_DRAW);
         Text_SetX(112);
         Text_Print(Msg_GetSystem(18), TEXT_DRAW);
         x = (win->width - 2) * 8 - w;
         Text_PrintNumber(gSession.gil, x, 8);
-        Text_Print(Msg_GetSystem(13), TEXT_DRAW);
+        Text_Print(Msg_GetSystem(SMITH_CURRENCY_MSG), TEXT_DRAW);
         Text_CopyToVram(dst, win->width);
         x = recipe->price > gSession.gil ? 5 : 3;
         SmithForge_DrawRow(sSmithRow, x);
@@ -816,6 +852,15 @@ void Smith_SetResultSlot(s8 val)
     sSmithResultSlot = val;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0201931C
+ * PAL Size: 476b
+ * EN Address: 0x02019140
+ * EN Size: 476b
+ * JP Address: 0x0201868C
+ * JP Size: 496b
+ */
 void SmithEquipScreen_Setup(void)
 {
     s32 i;
@@ -839,10 +884,10 @@ void SmithEquipScreen_Setup(void)
 
     gWindows[1].active = 1;
     gWindows[1].cursor = 0;
-    gWindows[1].x = 4;
+    gWindows[1].x = SMITH_EQUIP_ACTION_X;
     gWindows[1].y = 12;
     gWindows[1].rows = 2;
-    gWindows[1].width = 9;
+    gWindows[1].width = SMITH_ACTION_WIDTH;
     gWindows[1].height = 4;
     gWindows[1].style = 3;
     gWindows[1].variant = 0;

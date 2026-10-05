@@ -440,6 +440,7 @@ static const int kMcSlotMiddleTexture = 36;
 static const int kMcCharacterFrameTexture = 37;
 static const int kMcCharacterFillTexture = 41;
 static const int kWorldFrameTexture = 29;
+static const int kWorldWoodTexture = 21;
 static const int kMcYearTexture = 22;
 static const int kMcYearLabelTexture = 32;
 static const int kMcFaceTexture = 53;
@@ -451,6 +452,7 @@ static const int kMcSlotMiddleTexture = 37;
 static const int kMcCharacterFrameTexture = 38;
 static const int kMcCharacterFillTexture = 42;
 static const int kWorldFrameTexture = 30;
+static const int kWorldWoodTexture = 22;
 static const int kMcYearTexture = 23;
 static const int kMcYearLabelTexture = 33;
 static const int kMcFaceTexture = 55;
@@ -6057,12 +6059,12 @@ void CMenuPcs::CalcWMFrame()
 
 /*
  * --INFO--
- * PAL Address: 0x800f36ac
+ * PAL Address: 0x800F36AC
  * PAL Size: 2228b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F2C2C
+ * EN Size: 2228b
+ * JP Address: 0x800EFE88
+ * JP Size: 1540b
  */
 void CMenuPcs::DrawWMFrame()
 {
@@ -6102,7 +6104,7 @@ void CMenuPcs::DrawWMFrame()
 	matColor.b = 0xFF;
 	matColor.a = static_cast<unsigned char>(static_cast<int>(alpha));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kWorldWoodTexture));
 
 	const float baseX = FLOAT_803315B0;
 	const float baseY = FLOAT_803315B4;
@@ -6123,7 +6125,7 @@ void CMenuPcs::DrawWMFrame()
 
 	short mainState = m_wmWorldState->m_mainState;
 	if (mainState != 0 && mainState <= 3) {
-		MenuPcs.SetTexture((TEX)0x17);
+		MenuPcs.SetTexture((TEX)kMcYearTexture);
 		unsigned char gaugeAlpha = static_cast<unsigned char>(static_cast<int>(
 		    DOUBLE_80331508 *
 		    (static_cast<float>(m_wm.m_frameData->m_titleFrame) /
@@ -6146,6 +6148,9 @@ void CMenuPcs::DrawWMFrame()
 			kZeroG);
 
 		if (m_wmWorldState->m_mainState <= 2) {
+#ifdef VERSION_GCCJGC
+			MenuPcs.SetAttrFmt((FMT)0);
+#else
 			const int language = Game.m_gameWork.GetLanguage();
 			MenuPcs.SetAttrFmt((FMT)0);
 				matColor.r = 0xFF;
@@ -6164,7 +6169,8 @@ void CMenuPcs::DrawWMFrame()
 				kZeroYear);
 
 			MenuPcs.SetAttrFmt((FMT)0);
-			MenuPcs.SetTexture((TEX)0x17);
+			MenuPcs.SetTexture((TEX)kMcYearTexture);
+#endif
 
 			unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 			int dispValue =
@@ -6176,7 +6182,11 @@ void CMenuPcs::DrawWMFrame()
 			if (dispValue > 99) {
 				digitCnt = 3;
 			}
+#ifdef VERSION_GCCJGC
+			const int languageYOffset = 0;
+#else
 			const int languageYOffset = language != 5 ? 0 : 0xE;
+#endif
 
 			if (digitCnt == 3) {
 				int alphaInt =
@@ -6208,20 +6218,20 @@ void CMenuPcs::DrawWMFrame()
 					matColor.b = 0xFF;
 					matColor.a = alphaInt;
 					GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-					Sprt* digit = &m_wm.m_frameData->m_yearSprites[i];
 					MenuPcs.DrawRect(0,
-						(float)digit->m_x,
-						(float)(digit->m_y + languageYOffset),
-						(float)digit->m_width,
-						(float)digit->m_height,
-						digit->m_u,
-						digit->m_v,
-						digit->m_scale,
-						digit->m_scale,
+						(float)m_wm.m_frameData->m_yearSprites[i].m_x,
+						(float)(m_wm.m_frameData->m_yearSprites[i].m_y + languageYOffset),
+						(float)m_wm.m_frameData->m_yearSprites[i].m_width,
+						(float)m_wm.m_frameData->m_yearSprites[i].m_height,
+						m_wm.m_frameData->m_yearSprites[i].m_u,
+						m_wm.m_frameData->m_yearSprites[i].m_v,
+						m_wm.m_frameData->m_yearSprites[i].m_scale,
+						m_wm.m_frameData->m_yearSprites[i].m_scale,
 						kZero);
 				}
 			}
 
+#ifndef VERSION_GCCJGC
 			if (digitCnt != 3 && language != 5) {
 				Sprt* digit = &m_wm.m_frameData->m_yearSprites[0];
 				float suffixU = FLOAT_803313dc;
@@ -6264,6 +6274,7 @@ void CMenuPcs::DrawWMFrame()
 				         suffixScale, suffixScale,
 				         FLOAT_803313dc);
 			}
+#endif
 		}
 	}
 }

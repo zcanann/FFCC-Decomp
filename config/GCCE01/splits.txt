@@ -708,3 +708,6 @@ menu_favo.cpp:
 
 menu_lst.cpp:
 	.text start:0x801736C8 end:0x8017445C
+
+ringmenu.cpp:
+	.text start:0x800A26A8 end:0x800A4C34

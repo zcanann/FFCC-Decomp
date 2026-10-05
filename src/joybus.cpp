@@ -22,7 +22,7 @@
 
 JoyBus Joybus;
 
-int gJoyBusThreadExitValue = 0;
+static int s_ThreadRtn = 0;
 
 extern const unsigned short JoyBusCrcTable[256] =
 {
@@ -638,7 +638,7 @@ loop_body:
         {
             m_threadRunningMask &= ~(1 << threadParam->m_portIndex);
             m_stageFlags[threadParam->m_portIndex] = 0;
-            OSExitThread(&gJoyBusThreadExitValue);
+            OSExitThread(&s_ThreadRtn);
         }
 
         if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)

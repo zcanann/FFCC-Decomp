@@ -439,6 +439,8 @@ cflat_runtime.cpp:
 	.text start:0x80065100 end:0x80068f5c
 
 joybus.cpp:
+	.bss start:0x803063A0 end:0x8030DEF0
+	.sbss start:0x8034BBB0 end:0x8034BBB4
 	.rodata start:0x801D4B80 end:0x801D4EDC
 	.text start:0x800A3F74 end:0x800B049C
 

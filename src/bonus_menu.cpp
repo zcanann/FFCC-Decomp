@@ -1233,10 +1233,10 @@ void CMenuPcs::DrawResultOpenAnim()
  * --INFO--
  * PAL Address: 0x8013A22C
  * PAL Size: 1736b
- * EN Address: 0x80157290
- * EN Size: 1568b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801394FC
+ * EN Size: 1680b
+ * JP Address: 0x801361E0
+ * JP Size: 1492b
  */
 void CMenuPcs::CalcResultCountAnim()
 {
@@ -1248,7 +1248,11 @@ void CMenuPcs::CalcResultCountAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int rank = s_Rinfo->m_party[i].m_rank;
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
+#ifdef VERSION_GCCJGC
+			sprite->kind = 0x18;
+#else
 			sprite->kind = 0x19;
+#endif
 			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			sprite->x = stripX;
 			sprite->y = y;
@@ -1258,7 +1262,11 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->mulX = (float)(rank * sprite->w);
 			sprite->mulY = 0.0f;
 			sprite->startFrame = 9999;
+#ifdef VERSION_GCCP01
 			sprite->duration = 4;
+#else
+			sprite->duration = 5;
+#endif
 			sprite->depth = 1.0f;
 			sprite->motionX = 0.0f;
 			sprite->motionY = 0.0f;
@@ -1268,12 +1276,15 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 
 		int newCount = countTop + activePartyCount;
+
+#ifndef VERSION_GCCJGC
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = m_wm.m_handles[i];
 			if (handle != 0) {
 				handle->m_model->m_lightAlpha = 0.0f;
 			}
 		}
+#endif
 
 		m_bonusAnim->header.count = (short)newCount;
 		this->m_bonusState->m_initialized = 1;
@@ -1285,7 +1296,11 @@ void CMenuPcs::CalcResultCountAnim()
 
 	int countTop = (int)m_bonusAnim->header.count - activePartyCount;
 	int frame;
+#ifdef VERSION_GCCP01
 	frame = (int)this->m_bonusState->m_frame - 8;
+#else
+	frame = (int)this->m_bonusState->m_frame - 10;
+#endif
 
 	for (int i = 0; i < activePartyCount; i++) {
 		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
@@ -1368,7 +1383,13 @@ void CMenuPcs::CalcResultCountAnim()
 	}
 
 	if (this->m_bonusState->m_countFinished == 0 && frame >= 0 &&
+#ifdef VERSION_GCCP01
 	    (double)s_Rinfo->m_winnerTotalValue + 8.333333134651184 <= (double)frame) {
+#elif defined(VERSION_GCCE01)
+	    s_Rinfo->m_winnerTotalValue + 10 <= frame) {
+#else
+	    s_Rinfo->m_winnerTotalValue <= frame) {
+#endif
 		this->m_bonusState->m_countFinished = 1;
 		return;
 	}
@@ -1448,10 +1469,14 @@ void CMenuPcs::DrawResultCountAnim()
 					int total = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
 					int value;
 					if (this->m_bonusState->m_countFinished == 0) {
+#ifdef VERSION_GCCP01
 						double frame = (double)this->m_bonusState->m_frame - 8.333333134651184;
-						if (frame <= 0.0) {
+#else
+						int frame = this->m_bonusState->m_frame - 10;
+#endif
+						if (frame <= 0) {
 							value = 0;
-						} else if (frame < (double)total) {
+						} else if (frame < total) {
 							value = (int)frame;
 						} else {
 							value = total;

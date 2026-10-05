@@ -1650,3 +1650,12 @@ pppBlurChara.cpp:
 
 pppEmission.cpp:
 	.text start:0x800E582C end:0x800E6364
+
+vector.cpp:
+	.text	start:0x800C46D8 end:0x800C478C
+	extab	start:0x800084E0 end:0x800084F0
+	extabindex	start:0x8000EC38 end:0x8000EC50
+	.sdata2	start:0x8032FC90 end:0x8032FC94
+
+auto_vector_8032FC94_sdata2:
+	.sdata2 start:0x8032FC94 end:0x8032FC98 align:4

@@ -4,12 +4,16 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C4E50
+ * PAL Size: 76b
+ * EN Address: 0x800C46D8
+ * EN Size: 76b
+ * JP Address: 0x800C258C
+ * JP Size: 76b
  */
 float CVector::GetRotateY()
 {
-    const float zero = 0.0f;
+    float zero = 0.0f;
     if (zero == this->x && zero == this->z)
     {
         return zero;
@@ -20,8 +24,12 @@ float CVector::GetRotateY()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C4E9C
+ * PAL Size: 36b
+ * EN Address: 0x800C4724
+ * EN Size: 36b
+ * JP Address: 0x800C25D8
+ * JP Size: 36b
  */
 void CVector::Normalize()
 {
@@ -30,25 +38,27 @@ void CVector::Normalize()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C4EC0
+ * PAL Size: 20b
+ * EN Address: 0x800C4748
+ * EN Size: 20b
+ * JP Address: 0x800C25FC
+ * JP Size: 20b
  */
 void CVector::Identity()
 {
-	const float zero = 0.0f;
-	this->z = zero;
-	this->y = zero;
-	this->x = zero;
+	float zero = 0.0f;
+	this->x = this->y = this->z = zero;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800D0B3C
+ * PAL Address: 0x800C4ED4
  * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800C475C
+ * EN Size: 28b
+ * JP Address: 0x800C2610
+ * JP Size: 28b
  */
 CVector::CVector(const Vec& vec)
 {
@@ -61,8 +71,12 @@ CVector::CVector(const Vec& vec)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C4EF0
+ * PAL Size: 16b
+ * EN Address: 0x800C4778
+ * EN Size: 16b
+ * JP Address: 0x800C262C
+ * JP Size: 16b
  */
 CVector::CVector(float x, float y, float z)
 {
@@ -73,8 +87,12 @@ CVector::CVector(float x, float y, float z)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C4F00
+ * PAL Size: 4b
+ * EN Address: 0x800C4788
+ * EN Size: 4b
+ * JP Address: 0x800C263C
+ * JP Size: 4b
  */
 CVector::CVector()
 {

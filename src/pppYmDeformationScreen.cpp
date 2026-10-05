@@ -313,12 +313,8 @@ void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable
 	VYmDeformationScreen* work = GetYmDeformationScreenWork(
 		obj, GetYmDeformationScreenDataOffsets(param2)->m_workOffset);
 
-	work->m_values[1] = zero;
-	work->m_values[0] = zero;
-	work->m_scale = zero;
-	work->m_values[4] = zero;
-	work->m_values[3] = zero;
-	work->m_values[2] = zero;
+	work->m_scale = work->m_values[0] = work->m_values[1] = zero;
+	work->m_values[2] = work->m_values[3] = work->m_values[4] = zero;
 }
 
 /*
@@ -340,10 +336,6 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable*
 
 	work->m_angle = angle;
 	work->m_direction = direction;
-	work->m_values[1] = zero;
-	work->m_values[0] = zero;
-	work->m_scale = zero;
-	work->m_values[4] = zero;
-	work->m_values[3] = zero;
-	work->m_values[2] = zero;
+	work->m_scale = work->m_values[0] = work->m_values[1] = zero;
+	work->m_values[2] = work->m_values[3] = work->m_values[4] = zero;
 }

@@ -317,12 +317,8 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _p
     float value = 0.0f;
     YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, ctrl);
 
-    state->m_values[1] = value;
-    state->m_values[0] = value;
-    state->m_scale = value;
-    state->m_values[4] = value;
-    state->m_values[3] = value;
-    state->m_values[2] = value;
+    state->m_scale = state->m_values[0] = state->m_values[1] = value;
+    state->m_values[2] = state->m_values[3] = state->m_values[4] = value;
 }
 
 /*
@@ -341,10 +337,6 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pp
 
     state->m_angle = 0;
     state->m_direction = 1;
-    state->m_values[1] = zero;
-    state->m_values[0] = zero;
-    state->m_scale = zero;
-    state->m_values[4] = zero;
-    state->m_values[3] = zero;
-    state->m_values[2] = zero;
+    state->m_scale = state->m_values[0] = state->m_values[1] = zero;
+    state->m_values[2] = state->m_values[3] = state->m_values[4] = zero;
 }

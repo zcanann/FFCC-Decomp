@@ -1691,9 +1691,8 @@ void Window_CloseStyle3(struct Window *win)
     s32 top;
     s32 last;
     s32 i;
-    u16 tile;
+    s32 tile;
     u16 *map;
-    s32 frame;
 
     px = win->x * 8;
     top = win->y;
@@ -1725,12 +1724,12 @@ void Window_CloseStyle3(struct Window *win)
             py -= 8;
             for (i = 0; i < win->width; i++, px += 8) {
                 if (i == 0)
-                    frame = 6;
+                    tile = 6;
                 else if (i + 1 >= win->width)
-                    frame = 8;
+                    tile = 8;
                 else
-                    frame = 7;
-                Obj_Draw(px, py, 6, frame, win->variant, win->bg - 1, 0);
+                    tile = 7;
+                Obj_Draw(px, py, 6, tile, win->variant, win->bg - 1, 0);
             }
         }
     }
@@ -1855,9 +1854,8 @@ void Window_CloseStyle6(struct Window *win)
     s32 top;
     s32 last;
     s32 i;
-    u16 tile;
+    s32 tile;
     u16 *map;
-    s32 frame;
 
     px = win->x * 8;
     top = win->y;
@@ -1889,12 +1887,12 @@ void Window_CloseStyle6(struct Window *win)
             py -= 8;
             for (i = 0; i < win->width; i++, px += 8) {
                 if (i == 0)
-                    frame = 6;
+                    tile = 6;
                 else if (i + 1 >= win->width)
-                    frame = 8;
+                    tile = 8;
                 else
-                    frame = 7;
-                Obj_Draw(px, py, 9, frame, win->variant, win->bg - 1, 0);
+                    tile = 7;
+                Obj_Draw(px, py, 9, tile, win->variant, win->bg - 1, 0);
             }
         }
     }

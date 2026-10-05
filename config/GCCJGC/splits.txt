@@ -1675,3 +1675,6 @@ pppYmDrawMdlTexAnm.cpp:
 	.text start:0x80089788 end:0x80089FD4
 	.rodata start:0x801D4798 end:0x801D47C8
 	.sdata2 start:0x8034D288 end:0x8034D2A0
+
+vi/vi.c:
+	.text start:0x80185DF8 end:0x8018782C

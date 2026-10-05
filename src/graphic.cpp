@@ -126,15 +126,20 @@ int checkThread(void*)
 
 /*
  * --INFO--
- * PAL Address: 0x80019b54
+ * PAL Address: 0x80019B54
  * PAL Size: 1000b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80019934
+ * EN Size: 1020b
+ * JP Address: 0x80019520
+ * JP Size: 1016b
  */
 void CGraphic::Init()
 {
+#ifdef VERSION_GCCP01
+    enum { kFifoSize = 0x60000 };
+#else
+    enum { kFifoSize = 0x80000 };
+#endif
     char* graphicInitData = const_cast<char*>(sGraphicInitData);
 
     m_graphicStage = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
@@ -159,8 +164,18 @@ void CGraphic::Init()
     OSResumeThread(&m_thread);
 
     VIInit();
+#ifdef VERSION_GCCP01
     m_renderMode = &_GXPal528IntDf;
+#else
+    m_renderMode = &GXNtsc480IntDf;
+#endif
+#ifdef VERSION_GCCE01
+    GXAdjustForOverscan(m_renderMode, m_renderMode, 0, 0x10);
+#endif
     m_displayCopyEnabled = 1;
+#ifdef VERSION_GCCJGC
+    GXAdjustForOverscan(m_renderMode, m_renderMode, 0, 0x10);
+#endif
 
     GXRenderModeObj* renderMode = m_renderMode;
     u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
@@ -179,10 +194,10 @@ void CGraphic::Init()
     m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, 0xB53, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
-    m_fifoBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x8B) u8[0x60000];
+    m_fifoBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x8B) u8[kFifoSize];
 
     VIConfigure(m_renderMode);
-    GXInit(m_fifoBuffer, 0x60000);
+    GXInit(m_fifoBuffer, kFifoSize);
 
     GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(m_renderMode->fbWidth),
                   static_cast<f32>(m_renderMode->efbHeight), kGraphicZeroF, kGraphicOneF);
@@ -285,17 +300,29 @@ int CGraphic::GetProgressive()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800199B4
+ * PAL Size: 156b
+ * EN Address: 0x80019788
+ * EN Size: 168b
+ * JP Address: 0x80019374
+ * JP Size: 168b
  */
 void CGraphic::ChangeProgressive(int mode)
 {
+#ifdef VERSION_GCCP01
     GXRenderModeObj* defaultRenderMode = &_GXPal528IntDf;
+#else
+    GXRenderModeObj* defaultRenderMode = mode ? &GXNtsc480Prog : &GXNtsc480IntDf;
+#endif
     if (m_renderMode != defaultRenderMode) {
         m_renderMode = defaultRenderMode;
         GXAdjustForOverscan(m_renderMode, m_renderMode, 0, 0x10);
         VIConfigure(m_renderMode);
+#ifdef VERSION_GCCP01
         GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, _GXPal528IntDf.vfilter);
+#else
+        GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, GXNtsc480IntDf.vfilter);
+#endif
         VIFlush();
         VIWaitForRetrace();
         VIWaitForRetrace();

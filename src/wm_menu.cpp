@@ -9941,12 +9941,12 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 /*
  * --INFO--
- * PAL Address: 0x800ea014
+ * PAL Address: 0x800EA014
  * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E9718
+ * EN Size: 316b
+ * JP Address: 0x800E7160
+ * JP Size: 296b
  */
 void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 {
@@ -9963,15 +9963,19 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	for (int i = 0; i < winMess->m_lineCount; i++) {
 		const short msgId = winMess->m_messageIds[i];
 		const char* text = msgTable[msgId];
+#ifndef VERSION_GCCJGC
 		if (text != 0) {
 			if (text[0] == '$') {
 				text++;
 			}
+#endif
 			const int textWidth = font->GetWidth(text);
 			if (textWidth > maxWidth) {
 				maxWidth = textWidth;
 			}
+#ifndef VERSION_GCCJGC
 		}
+#endif
 	}
 
 	int cols = maxWidth / 0x16;
@@ -9980,7 +9984,11 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	}
 
 	*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
+#ifdef VERSION_GCCJGC
+	*h = static_cast<short>(winMess->m_lineCount * 0x16 + 0x40);
+#else
 	*h = static_cast<short>(winMess->m_lineCount * 0x1E + 0x40);
+#endif
 }
 
 /*

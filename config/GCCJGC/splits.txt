@@ -1093,3 +1093,6 @@ auto_07_8023894C_data:
 
 TRK_MINNOW_DOLPHIN/targimpl.c:
 	.text start:0x801A8A18 end:0x801A8B44
+
+p_chara.cpp:
+	.text start:0x80072F18 end:0x8007AF9C

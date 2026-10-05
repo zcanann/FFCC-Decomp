@@ -2566,8 +2566,23 @@ int CCharaPcs::CHandle::IsLoadModelASyncCompleted()
     return m_asyncState == 7;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80073D64
+ * PAL Size: 68b
+ * EN Address: 0x800736CC
+ * EN Size: 188b
+ * JP Address: UNUSED
+ * JP Size: UNUSED
+ */
 int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
 {
+#ifdef VERSION_GCCE01
+    if (System.GetErrorLevel() >= 3U) {
+        System.Printf("step=%d model=%x tex=%x\n", m_asyncState, m_model,
+                      m_model != 0 ? m_model->m_texSet : 0);
+    }
+#endif
 	if ((m_asyncState == 0 || m_asyncState == 7)
 		&& m_model != nullptr
 		&& (checkModelField == 0 || m_model->m_texSet != 0))

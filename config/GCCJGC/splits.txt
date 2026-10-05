@@ -422,6 +422,10 @@ memory.cpp:
 	.sdata2 start:0x8034C4F8 end:0x8034C520
 
 materialman.cpp:
+	.rodata start:0x801D2580 end:0x801D2628
+	.data start:0x801DDF30 end:0x801DDF88
+	.sdata start:0x8034B368 end:0x8034B398
+	.sdata2 start:0x8034C848 end:0x8034C884
 	.bss start:0x80284570 end:0x8028478C
 	.text start:0x8003B9A0 end:0x800434FC
 
@@ -1303,3 +1307,6 @@ auto_10_8034BA64_sbss:
 
 auto_06_801D1841_rodata:
 	.rodata start:0x801D1841 end:0x801D1848 align:1
+
+auto_11_8034C884_sdata2:
+	.sdata2 start:0x8034C884 end:0x8034C888 align:1

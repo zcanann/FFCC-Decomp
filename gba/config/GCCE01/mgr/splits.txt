@@ -244,8 +244,8 @@ m4a_tables:
 sound_data:
 	.rodata     start:0x020104EC end:0x02010934 align:4
 
-regional_data:
-	.rodata     start:0x02010934 end:0x020139F8
+sound_assets:
+	.rodata     start:0x02010934 end:0x020139F8 align:4
 
 libc/reent/impure:
 	.rodata     start:0x020139F8 end:0x020139FC

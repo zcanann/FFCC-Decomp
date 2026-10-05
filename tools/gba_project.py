@@ -136,6 +136,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "main/xfer", "main/radarmap", "main/main", "main/session",
         ],
         "mgr": [
+            "sound_assets",
             "font_gfx",
             "obj_gfx",
             "menu_gfx", "field_gfx",
@@ -173,6 +174,7 @@ VERSION_COMPLETE: Dict[str, Dict[str, List[str]]] = {
             "libgcc/_dvmd_tls", "libgcc/_modsi3", "libgcc/_udivsi3", "libgcc/_umodsi3",
         ],
         "mgr": [
+            "sound_assets",
             "font_gfx",
             "obj_gfx",
             "menu_gfx", "field_gfx",
@@ -541,7 +543,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 n.build(assets, "gba_assets", _path(bins[category]),
                         implicit=split_deps + [_path(tools / "assets.py")]
                         + [_path(config_dir / name) for name in ("symbols.txt", "splits.txt", "constants.txt",
-                                                                 "references.txt") if (config_dir / name).is_file()],
+                                                                 "references.txt", "pointers.txt") if (config_dir / name).is_file()],
                         variables={"config": _path(config_dir), "outdir": _path(out / "assets")})
             bases = {}
             compiled_game_sources = set()
@@ -582,7 +584,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             overrides = " ".join(f"--object {u}={bases[u]}" for u in sorted(complete))
             n.build(asm + [ldscript], "gba_split", _path(bins[category]),
                     implicit=split_deps + [_path(config_dir / "symbols.txt"), _path(config_dir / "splits.txt")]
-                    + [_path(config_dir / name) for name in ("constants.txt", "references.txt")
+                    + [_path(config_dir / name) for name in ("constants.txt", "references.txt", "pointers.txt")
                        if (config_dir / name).is_file()],
                     variables={"bin": _path(bins[category]), "config": _path(config_dir),
                                "asmdir": _path(out / "asm"), "ldscript": ldscript,

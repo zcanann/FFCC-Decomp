@@ -114,6 +114,11 @@ the loaded image and that workspace is not counted as a source object.
   For regional work, diff the configured region in objdiff and verify that any
   symbol update applies to its own layout.
 - `splits.txt`: address ranges per unit. Units become objdiff units.
+- `pointers.txt` (optional): one verified ABS32 pointer field address per line,
+  with `#` comments. This identifies packed fields such as m4a song-command
+  operands that need relocations despite lacking word alignment. Both target
+  splitting and `asset:asm` extraction use these locations; targets must resolve
+  to symbols, and fields cannot cross symbol or section boundaries.
 - `tools/split.py`: generates per-unit assembly and the linker script. Instructions are
   emitted with `.inst`, and calls and pointers become relocations against symbols,
   so target objects diff cleanly against compiled code.

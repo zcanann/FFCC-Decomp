@@ -1807,3 +1807,7 @@ pppLocationTitle.cpp:
 	.text start:0x800D83E8 end:0x800D8AC8
 	.rodata start:0x801DA428 end:0x801DA440
 	.sdata2 start:0x8032FE98 end:0x8032FEA8
+
+gba/GBAKey.c:
+	.text start:0x801A7C80 end:0x801A7EE8
+	.data start:0x8021BA38 end:0x8021BDE0

@@ -1054,7 +1054,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAWrite.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gba/GBAXfer.c"),
                 Object(
-                    Matching,
+                    MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                     "gba/GBAKey.c",
                     cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto"),
                 ),

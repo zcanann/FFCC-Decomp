@@ -302,7 +302,8 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 			} else if (systemVal <= -0x190) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const int bit = systemVal + 0xBE7;
-					const int oldValue = reinterpret_cast<CCaravanWork*>(classData)->GetEvtFlag(bit);
+					CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(classData);
+					const int oldValue = caravan->GetEvtFlag(bit);
 
 					stack[-1].m_word = oldValue;
 					int newValue = oldValue;
@@ -319,7 +320,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						break;
 					}
 
-					reinterpret_cast<CCaravanWork*>(classData)->SetEvtFlag(bit, newValue);
+					caravan->SetEvtFlag(bit, newValue);
 				} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
 					StoreS16Idx<0x9A4>(stack, classData, (systemVal + 0x2F3) * 2, setMode);
 				} else {
@@ -360,8 +361,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset);
 					switch (setMode) {
 					case -1:
-						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
-						    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) -
+						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) -=
 						    stack->m_word;
 						break;
 					case 0:
@@ -369,8 +369,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						    stack->m_word;
 						break;
 					case 1:
-						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
-						    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) +
+						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) +=
 						    stack->m_word;
 						break;
 					}

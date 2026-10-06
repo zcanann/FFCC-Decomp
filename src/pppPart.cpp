@@ -1254,8 +1254,8 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	ppvWorldMatrixWood[0][1] = axisY.x;
 	ppvWorldMatrixWood[1][1] = axisY.y;
 	ppvWorldMatrixWood[2][1] = axisY.z;
-	axisX.y = -axisY.x;
 	axisX.x = axisY.y;
+	axisX.y = -axisY.x;
 	axisX.z = 0.0f;
 	pppNormalize(axisX, axisX);
 
@@ -1647,9 +1647,9 @@ static void pppDrawPartStd(_pppMngSt* pppMngSt)
 				pppProg* prog = stageIter->m_prog;
 				if (prog != 0)
 				{
-					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
-					_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 					u32 count;
+					_pppPObjLink* obj = pDataVal->m_pppPObjLink;
+					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
 					if (fn != 0)
 					{
 						count = pDataVal->m_activeCount;

@@ -884,6 +884,7 @@ void CPartMng::render3Dcursor()
     float x = m_editorCursorPosition.x;
     float y = m_editorCursorPosition.y;
     float z = m_editorCursorPosition.z;
+    float len = 100.0f;
 
     Vec start;
     Vec end;
@@ -892,10 +893,10 @@ void CPartMng::render3Dcursor()
     color.g = 0x80;
     color.b = 0x80;
     color.a = 0xff;
-    start.x = x - 100.0f;
+    start.x = x - len;
     start.y = y;
     start.z = z;
-    end.x = x + 100.0f;
+    end.x = x + len;
     end.y = y;
     end.z = z;
     drawLine3D(&start, &end, color);
@@ -905,10 +906,10 @@ void CPartMng::render3Dcursor()
     color.b = 0x80;
     color.a = 0xff;
     start.x = x;
-    start.y = y - 100.0f;
+    start.y = y - len;
     start.z = z;
     end.x = x;
-    end.y = y + 100.0f;
+    end.y = y + len;
     end.z = z;
     drawLine3D(&start, &end, color);
 
@@ -918,10 +919,10 @@ void CPartMng::render3Dcursor()
     color.a = 0xff;
     start.x = x;
     start.y = y;
-    start.z = z - 100.0f;
+    start.z = z - len;
     end.x = x;
     end.y = y;
-    end.z = z + 100.0f;
+    end.z = z + len;
     drawLine3D(&start, &end, color);
 }
 
@@ -1296,6 +1297,7 @@ unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 {
 	char* textureNames[0x100];
+	char** textureNameWrite;
 	char** textureNameIt = textureNames;
 	CChunkFile::CChunk chunk;
 
@@ -1305,7 +1307,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 		switch (chunk.m_id)
 		{
 		case 0x46534850: { // 'FSHP'
-			char** textureNameWrite = textureNameIt;
+			textureNameWrite = textureNameIt;
 			while (chunkFile.GetNextChunk(chunk))
 			{
 				switch (chunk.m_id)
@@ -1314,8 +1316,8 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 					chunkFile.PushChunk();
 					*textureNameWrite = chunkFile.GetString();
 					chunkFile.PopChunk();
-					textureNameIt++;
 					textureNameWrite++;
+					textureNameIt++;
 					break;
 				case 0x444C5354: // 'DLST'
 					shapeSt->m_displayListData =

@@ -243,9 +243,8 @@ int CMenuPcs::EquipCtrlCur()
 
 	if (mode == 0) {
 		if ((hold & 8) != 0) {
-			int sel = m_equipState->selected[mode];
-			if (sel != 0) {
-				m_equipState->selected[mode] = sel - 1;
+			if (m_equipState->selected[mode] != 0) {
+				m_equipState->selected[mode]--;
 			} else {
 				m_equipState->selected[mode] = 3;
 			}
@@ -306,11 +305,10 @@ int CMenuPcs::EquipCtrlCur()
 				}
 			}
 		} else if ((hold & 4) != 0) {
-			s16 selected = m_equipState->selected[mode];
-
-			if (selected < 7) {
-				m_equipState->selected[mode] = selected + 1;
-			} else if (static_cast<int>(m_equipState->scroll) + static_cast<int>(selected) < letterCount - 1) {
+			EquipMenuState* state = m_equipState;
+			if (state->selected[mode] < 7) {
+				state->selected[mode]++;
+			} else if (state->scroll + state->selected[mode] < letterCount - 1) {
 				m_equipState->scroll = m_equipState->scroll + 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			} else {

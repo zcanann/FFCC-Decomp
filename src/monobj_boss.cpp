@@ -1471,12 +1471,13 @@ int CGMonObj::calcBranchFuncTetsukyojin(int)
 void CGMonObj::frameStatFuncTetsukyojin()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	Vec attackVec;
+	CFlatRuntime::CStack stack[3];
 	const int state = prgObj->m_lastStateId;
 
 	switch (state) {
 	case 100:
 		if (prgObj->m_stateFrame == 0) {
-			Vec attackVec;
 			CVector partyPos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
 			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
 			attackVec.x = attackDir.x;
@@ -1495,13 +1496,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			PSVECScale(&attackVec, &attackVec, kMonObjBossAttackRange - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight);
 			*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4) = attackVec;
 
-			CVector objectPos(reinterpret_cast<CGObject*>(prgObj)->m_worldPosition);
-			CVector delta;
-			PSVECSubtract(&attackVec, reinterpret_cast<Vec*>(&objectPos), reinterpret_cast<Vec*>(&delta));
-			attackVec.x = delta.x;
-			attackVec.y = delta.y;
-			attackVec.z = delta.z;
-			float distance = PSVECDistance(&attackVec, &reinterpret_cast<CGObject*>(prgObj)->m_worldPosition);
+			reinterpret_cast<CVector&>(attackVec) = reinterpret_cast<CVector&>(attackVec) - m_worldPosition;
+			float distance = PSVECDistance(&attackVec, &m_worldPosition);
 			float cappedDistance = kMonObjBossMaxChaseDistance;
 			if (distance < kMonObjBossMaxChaseDistance) {
 				cappedDistance = distance;
@@ -1511,7 +1507,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.m_flags = 0x2114;
 			m_moveWork.m_targetPos = attackVec;
 			m_moveWork.m_speed = kMonObjBossTwo;
-			m_moveWork.m_limitFrame = static_cast<int>(cappedDistance * kMonObjBossHalf);
+			m_moveWork.m_limitFrame = static_cast<int>(cappedDistance / kMonObjBossTwo);
 			m_moveWork.m_changeStat = 0x67;
 		}
 		moveFrame();
@@ -1521,11 +1517,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.Clear();
 			m_moveWork.m_flags = 0x2410;
 
-			const CVector& storedVec = CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
-			const CVector& attackDir = CVector(-storedVec.x, -storedVec.y, -storedVec.z);
-			m_moveWork.m_targetPos.x = attackDir.x;
-			m_moveWork.m_targetPos.y = attackDir.y;
-			m_moveWork.m_targetPos.z = attackDir.z;
+			m_moveWork.m_targetPos = -CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
 			m_moveWork.m_speed = kMonObjBossFastMoveSpeed;
 			m_moveWork.m_limitFrame =
 			    static_cast<int>((kMonObjBossTwo * (kMonObjBossAttackRange - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight)) / kMonObjBossFastMoveSpeed);
@@ -1562,8 +1554,6 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	case 0x66:
 		if (CFlatBossState() >= 1) {
 			if ((m_actionBranch == 1) && (prgObj->m_stateFrame == 0)) {
-				CFlatRuntime::CStack stack[3];
-
 				reinterpret_cast<CGObject*>(prgObj)->m_bgColMask &= 0xFFF3FFFD;
 				m_actionBranch = 2;
 				CFlatBossSubState() = 1;

@@ -174,10 +174,10 @@ inline void CMenuPcs::TmpArtiInit()
  */
 void CMenuPcs::TmpArtiDraw()
 {
-	const CCaravanWork* caravanWork;
-	TmpArtiEntry* entry;
-	CFont* font;
 	int i;
+	TmpArtiEntry* entry;
+	const CCaravanWork* caravanWork;
+	CFont* font;
 	GXColor colors[4];
 	float left;
 	float top;
@@ -188,7 +188,7 @@ void CMenuPcs::TmpArtiDraw()
 	caravanWork = Game.m_scriptFoodBase[0];
 	entry = m_tmpArtiList->entries;
 
-	for (i = 0; i < m_tmpArtiList->count; i++) {
+	for (i = 0; i < m_tmpArtiList->count; i++, entry++) {
 		if (entry->tex >= 0) {
 			int tex = entry->tex;
 			left = (float)entry->x;
@@ -216,18 +216,16 @@ void CMenuPcs::TmpArtiDraw()
 			float z = entry->z;
 			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, kTmpArtiZero);
 		}
-		entry++;
 	}
 
 	entry = m_tmpArtiList->entries;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++, entry++) {
 		if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] >= 0) {
 			int posX = (int)static_cast<float>(entry->x + entry->width - 0x10);
 			int posY = (int)(static_cast<float>(entry->y + 6) - kTmpArtiOne);
 			DrawSingleIcon(caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i], posX, posY,
 			               entry->alpha, 0, kTmpArtiOne);
 		}
-		entry++;
 	}
 
 	font = GetFontItem();
@@ -237,7 +235,7 @@ void CMenuPcs::TmpArtiDraw()
 	font->DrawInit();
 
 	entry = m_tmpArtiList->entries;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++, entry++) {
 		if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] >= 0) {
 			float alpha = entry->alpha;
 			font->SetColor(CColor(0xFF, 0xFF, 0xFF, kTmpArtiColorMax * alpha).color);
@@ -255,7 +253,6 @@ void CMenuPcs::TmpArtiDraw()
 #endif
 			font->Draw(text);
 		}
-		entry++;
 	}
 
 	DrawInit();

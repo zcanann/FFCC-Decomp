@@ -1821,12 +1821,13 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
  */
 void CRedEntry::DisplayMMemoryInfo()
 {
-	int seBlockBank;
+	int work;
 	int totalSize;
 	int entryCount;
 	int maxFreeSize;
 	int bufferTop;
 	int nextAddress;
+	int matched;
 	int freeSize;
 	RedMemoryBlock* memoryBank;
 	RedMemoryBlock* bankEntry;
@@ -1853,7 +1854,7 @@ void CRedEntry::DisplayMMemoryInfo()
 
 	do {
 		if (bankEntry->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
-			int matched = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
+			matched = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
 			freeSize = RedMemoryBlockGetEndAddress(bankEntry);
 			freeSize = (RedMemoryBlockGetNext(bankEntry)->m_size > 0)
 			               ? RedMemoryBlockGetNext(bankEntry)->m_address - freeSize
@@ -1874,18 +1875,18 @@ void CRedEntry::DisplayMMemoryInfo()
 			} while (history < RedEntryMusicBankGetEnd(this));
 
 			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
-				seBlockBank = 0;
+				work = 0;
 				do {
-					if ((RedSeBlockDataGet(seBlockBank) != REDSOUND_SE_BLOCK_DATA_NONE) &&
-					    (bankEntry->m_address == RedSeBlockHeadAddress(RedSeBlockDataGet(seBlockBank)))) {
+					if ((RedSeBlockDataGet(work) != REDSOUND_SE_BLOCK_DATA_NONE) &&
+					    (bankEntry->m_address == RedSeBlockHeadAddress(RedSeBlockDataGet(work)))) {
 						OSReport(sRedEntryMMemorySeBlockInfoFmt, sRedEntryLogPrefix, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
 						matched = REDSOUND_ENTRY_SEARCH_FOUND;
 						break;
 					}
-					seBlockBank++;
-				} while (seBlockBank < REDSOUND_SE_BLOCK_BANK_COUNT);
+					work++;
+				} while (work < REDSOUND_SE_BLOCK_BANK_COUNT);
 			}
 
 			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
@@ -1938,9 +1939,9 @@ void CRedEntry::DisplayMMemoryInfo()
 		bankEntry++;
 	} while (bankEntry < RedMemoryBankGetEnd(memoryBank));
 
-    freeSize = (c_RedMemory.GetMainBufferAddress() + c_RedMemory.GetMainBufferSize()) - nextAddress;
-	if (maxFreeSize < freeSize) {
-		maxFreeSize = freeSize;
+    work = (c_RedMemory.GetMainBufferAddress() + c_RedMemory.GetMainBufferSize()) - nextAddress;
+	if (maxFreeSize < work) {
+		maxFreeSize = work;
 	}
 
 	OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);

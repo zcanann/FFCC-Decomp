@@ -1918,9 +1918,10 @@ inline int CChara::CModel::CalcInterpFrame()
 		resolvedBlend = 4;
 
 		int frame = static_cast<int>(m_curFrame);
+		int i;
 		u16* interpTable = reinterpret_cast<u16*>(AnimInterpOffset(currentAnim) + reinterpret_cast<u32>(AnimBank(currentAnim)));
 
-		for (int i = 0; i < static_cast<int>(interpCount); i++) {
+		for (i = 0; i < static_cast<int>(interpCount); i++) {
 			int start = (i == 0) ? 0 : interpTable[i * 2];
 			int end = (i + 1 < static_cast<int>(interpCount)) ? interpTable[i * 2 + 2] : 10000000;
 			if (start <= frame && frame < end) {

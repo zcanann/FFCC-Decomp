@@ -14,7 +14,10 @@ class CMapTexAnim;
 class CMapTexAnimSet : public CRef
 {
 public:
-    CMapTexAnimSet();
+    CMapTexAnimSet()
+    {
+        m_count = 0;
+    }
     ~CMapTexAnimSet();
 
     void Create(CChunkFile&, CMaterialSet*, CTextureSet*);
@@ -90,5 +93,18 @@ private:
     unsigned short* m_frameTable;
     CMapKeyFrame m_keyFrame;
 };
+
+inline CMapTexAnimSet::~CMapTexAnimSet()
+{
+    for (int i = 0; i < m_count; i++) {
+        CMapTexAnim* entry = m_anims[i];
+        if (entry != 0) {
+            if (entry->DecRef() == 0) {
+                delete entry;
+            }
+            m_anims[i] = 0;
+        }
+    }
+}
 
 #endif // _FFCC_MAPTEXANIM_H_

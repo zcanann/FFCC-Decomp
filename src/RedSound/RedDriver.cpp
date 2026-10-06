@@ -140,7 +140,7 @@ struct RedDriverSmallDataPrefixState {
     volatile int m_MusicSkipLine;
     int m_MusicKeySignature;
     int* volatile p_MusicReplayPoint;
-    RedControlRamp* volatile p_MusicTempoControl;
+    RedControlRamp* p_MusicTempoControl;
     RedControlRamp* volatile p_MusicPitchControl;
     int m_MusicPhraseStop;
     RedMusicPlayCommand* volatile p_MusicNextPlay;
@@ -150,7 +150,7 @@ struct RedDriverSmallDataPrefixState {
     RedStreamDATA* volatile p_Stream;
     int m_DMAMode;
     volatile int m_SeSkipStep;
-    RedVoiceDATA* volatile p_VoiceData;
+    RedVoiceDATA* p_VoiceData;
     int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
     RedTrackDATA* p_EditorTrack;
     u8* volatile p_MainThreadStack;
@@ -913,7 +913,7 @@ volatile int m_MusicFastSpeed;
 volatile int m_MusicSkipLine;
 volatile int m_MusicKeySignature;
 int* volatile p_MusicReplayPoint;
-RedControlRamp* volatile p_MusicTempoControl;
+RedControlRamp* p_MusicTempoControl;
 RedControlRamp* volatile p_MusicPitchControl;
 int m_MusicPhraseStop;
 static RedMusicPlayCommand* volatile p_MusicNextPlay;
@@ -931,7 +931,7 @@ static int m_DMAMode;
 #define RedDmaModeGet() (m_DMAMode)
 #define RedDmaModeSet(mode) (m_DMAMode = (mode))
 volatile int m_SeSkipStep;
-RedVoiceDATA* volatile p_VoiceData;
+RedVoiceDATA* p_VoiceData;
 int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 RedTrackDATA* p_EditorTrack;
 static u8* volatile p_MainThreadStack;

@@ -45,9 +45,6 @@ static const _GXColor s_mapDbgAmbientColor = { 0x40, 0x40, 0x40, 0xFF };
 static const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 
-static const char s_mapMidPathFmt[] = "%s.mid";
-static const char s_mapOtmPathFmt[] = "%s.otm";
-extern "C" const char s_map_cpp[] = "map.cpp";
 static const Vec kMapHitLightDir0 = { 1.0f, 1.0f, 1.0f };
 static const Vec kMapHitLightDir1 = { -1.0f, 1.0f, -1.0f };
 static const char s_set_bg_camera_semi_trans_missing_fmt[] =
@@ -93,69 +90,6 @@ static const char s_mapMtxPathFmt[] = "%s_%d.mtx";
 static const char s_mapReadMtxFmt[] = "ReadMtx fn=%s\n";
 static const char s_map_manager_label[] = "CMapMng.mapmng";
 extern const char s_CMapObjAtrName[] = "CMapObjAtr";
-extern const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapTexAnimSet::CMapTexAnimSet()
-{
-    m_count = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800335d0
- * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapTexAnimSet::~CMapTexAnimSet()
-{
-    for (int i = 0; i < m_count; i++) {
-        CMapTexAnim* entry = m_anims[i];
-        if (entry != 0) {
-            if (entry->DecRef() == 0) {
-                delete entry;
-            }
-            m_anims[i] = 0;
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003492c
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapIdGrp::CMapIdGrp()
-{
-    m_mask = -1;
-    m_primaryColor.r = 0x80;
-    m_primaryColor.b = 0;
-    m_primaryColor.g = 0;
-    m_primaryColor.a = 0x80;
-    m_secondaryColor.r = 0;
-    m_secondaryColor.g = 0;
-    m_secondaryColor.b = 0x80;
-    m_secondaryColor.a = 0x80;
-    m_tertiaryColor.r = 0xFF;
-    m_tertiaryColor.g = 0x40;
-    m_tertiaryColor.b = 0x40;
-    m_tertiaryColor.a = 0x80;
-    m_quaternaryColor.r = 0x40;
-    m_quaternaryColor.g = 0x40;
-    m_quaternaryColor.b = 0;
-    m_quaternaryColor.a = 0x80;
-}
 
 /*
  * --INFO--
@@ -168,7 +102,6 @@ CMapIdGrp::CMapIdGrp()
  */
 float CMapKeyFrame::Get()
 {
-    extern const float kMapZero;
     switch (m_mode) {
     case 0:
         return Math.Line1D(static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
@@ -176,7 +109,7 @@ float CMapKeyFrame::Get()
         return Math.Spline1D(
             static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
     default:
-        return kMapZero;
+        return 0.0f;
     }
 }
 
@@ -191,8 +124,6 @@ float CMapKeyFrame::Get()
  */
 int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
 {
-    extern const float kMapZero;
-    extern const float kMapViewScaleZ;
     switch (m_mode) {
     case 0:
         blend = Math.Line1D(
@@ -203,7 +134,7 @@ int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
             static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
         break;
     default:
-        blend = kMapZero;
+        blend = 0.0f;
         {
             unsigned char key = m_junTable[0];
             key1 = key;
@@ -212,11 +143,11 @@ int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
         return 0;
     }
 
-    if (blend <= kMapZero) {
+    if (blend <= 0.0f) {
         unsigned char key = m_junTable[0];
         key1 = key;
         key0 = key;
-        blend = kMapZero;
+        blend = 0.0f;
         return 0;
     }
 
@@ -225,15 +156,15 @@ int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
         unsigned char key = m_junTable[m_junCount - 1];
         key1 = key;
         key0 = key;
-        blend = kMapViewScaleZ;
+        blend = 1.0f;
         return 0;
     }
 
     key0 = static_cast<int>(blend);
-    key1 = static_cast<int>(1.0f + blend);
+    key1 = static_cast<int>(0.9999f + blend);
     blend = blend - static_cast<float>(key0);
     key0 = m_junTable[key0];
-    if (kMapZero == blend) {
+    if (0.0f == blend) {
         key1 = key0;
         return 0;
     }
@@ -283,7 +214,7 @@ int CMapKeyFrame::IsRun()
 void CMapKeyFrame::ReadJun(CChunkFile& chunkFile, int count)
 {
     m_junCount = static_cast<unsigned char>(count);
-    m_junTable = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0xC1) unsigned char[m_junCount];
+    m_junTable = new (MapMng.m_stage, "map.cpp", 0xC1) unsigned char[m_junCount];
 
     for (int i = 0; i < static_cast<int>(m_junCount); i++) {
         m_junTable[i] = chunkFile.Get1();
@@ -317,8 +248,8 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
 {
     m_isRun = 1;
     m_keyCount = static_cast<unsigned char>(count);
-    m_keyFrame = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0xD5) float[m_keyCount];
-    m_keyValue = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0xD6) float[m_keyCount];
+    m_keyFrame = new (MapMng.m_stage, "map.cpp", 0xD5) float[m_keyCount];
+    m_keyValue = new (MapMng.m_stage, "map.cpp", 0xD6) float[m_keyCount];
 
     for (int i = 0; i < static_cast<int>(m_keyCount); i++) {
         m_keyFrame[i] = chunkFile.GetF4();
@@ -326,7 +257,7 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
     }
 
     if (m_mode == 1) {
-        m_splineTable = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0xDE) float[m_keyCount];
+        m_splineTable = new (MapMng.m_stage, "map.cpp", 0xDE) float[m_keyCount];
         Math.MakeSpline1Dtable(static_cast<int>(m_keyCount) - 1, m_keyValue, m_keyFrame, m_splineTable);
     }
 }
@@ -385,7 +316,7 @@ void CMapMng::Create()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyOctTree()
+void CMapMng::DestroyOctTree()
 {
     for (int i = 0; i < m_octTreeCount; i++) {
         m_octTreeArray[i].~COctTree();
@@ -402,7 +333,7 @@ inline void CMapMng::DestroyOctTree()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapHit()
+void CMapMng::DestroyMapHit()
 {
     for (int i = 0; i < m_mapHitCount; i++) {
         m_mapHitArray[i].~CMapHit();
@@ -419,7 +350,7 @@ inline void CMapMng::DestroyMapHit()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapObj()
+void CMapMng::DestroyMapObj()
 {
     for (int i = 0; i < m_mapObjCount; i++) {
         m_mapObjArray[i].~CMapObj();
@@ -436,7 +367,7 @@ inline void CMapMng::DestroyMapObj()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapMesh()
+void CMapMng::DestroyMapMesh()
 {
     for (int i = 0; i < m_mapMeshCount; i++) {
         m_mapMeshArray[i].~CMapMesh();
@@ -453,7 +384,7 @@ inline void CMapMng::DestroyMapMesh()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyTextureSet()
+void CMapMng::DestroyTextureSet()
 {
     if (m_textureSet != 0) {
         delete m_textureSet;
@@ -470,7 +401,7 @@ inline void CMapMng::DestroyTextureSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMaterialSet()
+void CMapMng::DestroyMaterialSet()
 {
     if (m_materialSet != 0) {
         delete m_materialSet;
@@ -487,7 +418,7 @@ inline void CMapMng::DestroyMaterialSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapTexAnimSet()
+void CMapMng::DestroyMapTexAnimSet()
 {
     if (m_mapTexAnimSet != 0) {
         delete m_mapTexAnimSet;
@@ -504,7 +435,7 @@ inline void CMapMng::DestroyMapTexAnimSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyAnimation()
+void CMapMng::DestroyAnimation()
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimArray().GetSize()); i++) {
         if (GetMapAnimArray()[i] != 0) {
@@ -537,7 +468,7 @@ inline void CMapMng::DestroyAnimation()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapShadow()
+void CMapMng::DestroyMapShadow()
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
         if (GetMapShadowArray()[i] != 0) {
@@ -556,7 +487,7 @@ inline void CMapMng::DestroyMapShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapLightHolder()
+void CMapMng::DestroyMapLightHolder()
 {
     unsigned int j;
     for (int i = 0; i < 2; i++) {
@@ -619,7 +550,7 @@ void CMapMng::Destroy()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void* CMapMng::MapFileRead(char* path, unsigned long& size)
+void* CMapMng::MapFileRead(char* path, unsigned long& size)
 {
     void* filePtr;
 
@@ -671,7 +602,7 @@ inline void* CMapMng::MapFileRead(char* path, unsigned long& size)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CMapMng::MapCheckFileRead(char* path)
+int CMapMng::MapCheckFileRead(char* path)
 {
     if (m_asyncLoadState.m_mapReadMode == 1) {
         return 1;
@@ -748,7 +679,7 @@ CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
  * Address:	TODO
  * Size:	TODO
  */
-inline CMapObj* CMapMng::SearchAtribMapObj(CMapObj* mapObj, CMapObjAtr::TYPE type)
+CMapObj* CMapMng::SearchAtribMapObj(CMapObj* mapObj, CMapObjAtr::TYPE type)
 {
     CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
 
@@ -809,7 +740,6 @@ search:
  */
 int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 {
-    extern const float kMapZero;
     CMapObj* mapObj = GetMapObjArray();
 
     goto search;
@@ -826,9 +756,7 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 search:
         mapObj = SearchAtribMapObj(mapObj, CMapObjAtr::PLAY_STA);
         if (mapObj == 0) {
-            vec->z = kMapZero;
-            vec->y = kMapZero;
-            vec->x = kMapZero;
+            vec->x = vec->y = vec->z = 0.0f;
             return 0;
         }
     }
@@ -845,10 +773,6 @@ search:
  */
 void CMapMng::SetLightSource()
 {
-    extern const float kMapZero;
-    extern const float kMapViewScaleZ;
-    extern const float kMapSpotAngleDefault;
-    extern const float kMapDegToRadScale;
     CMapObjAtr* attr;
     const short mapObjCount = m_mapObjCount;
     CMapObj* mapObj = GetMapObjArray();
@@ -868,11 +792,11 @@ void CMapMng::SetLightSource()
                 light.m_position.x = mapObj->m_worldMtx[0][3];
                 light.m_position.y = mapObj->m_worldMtx[1][3];
                 light.m_position.z = mapObj->m_worldMtx[2][3];
-                light.m_direction.x = kMapZero;
-                light.m_direction.y = kMapZero;
-                light.m_direction.z = kMapViewScaleZ;
+                light.m_direction.x = 0.0f;
+                light.m_direction.y = 0.0f;
+                light.m_direction.z = 1.0f;
                 light.m_attenRadius = pointAttr->m_radius;
-                light.m_spotScale = kMapSpotAngleDefault;
+                light.m_spotScale = 0.78539816339744828f;
                 light.m_radius = pointAttr->m_intensity;
                 light.m_targetColor[0] = pointAttr->m_altColor;
                 light.m_targetColor[1] = pointAttr->m_color;
@@ -894,9 +818,9 @@ void CMapMng::SetLightSource()
                     light->m_position.x = mapObj->m_worldMtx[0][3];
                     light->m_position.y = mapObj->m_worldMtx[1][3];
                     light->m_position.z = mapObj->m_worldMtx[2][3];
-                    light->m_direction.x = kMapZero;
-                    light->m_direction.y = kMapZero;
-                    light->m_direction.z = kMapViewScaleZ;
+                    light->m_direction.x = 0.0f;
+                    light->m_direction.y = 0.0f;
+                    light->m_direction.z = 1.0f;
 
                     light->m_targetPosition.x = spotAttr->m_target->m_worldMtx[0][3];
                     light->m_targetPosition.y = spotAttr->m_target->m_worldMtx[1][3];
@@ -912,9 +836,9 @@ void CMapMng::SetLightSource()
                     light.m_position.y = mapObj->m_worldMtx[1][3];
                     light.m_position.z = mapObj->m_worldMtx[2][3];
 
-                    light.m_direction.x = kMapZero;
-                    light.m_direction.y = kMapZero;
-                    light.m_direction.z = kMapViewScaleZ;
+                    light.m_direction.x = 0.0f;
+                    light.m_direction.y = 0.0f;
+                    light.m_direction.z = 1.0f;
 
                     CMapObj* targetObj = spotAttr->m_target;
                     light.m_targetPosition.x = targetObj->m_worldMtx[0][3];
@@ -927,7 +851,7 @@ void CMapMng::SetLightSource()
                     PSVECNormalize(reinterpret_cast<Vec*>(&light.m_direction), reinterpret_cast<Vec*>(&light.m_direction));
 
                     light.m_attenRadius = spotAttr->m_radius;
-                    light.m_spotScale = kMapDegToRadScale * spotAttr->m_nearRange;
+                    light.m_spotScale = 0.017453292519943295f * spotAttr->m_nearRange;
                     light.m_radius = spotAttr->m_farRange;
 
                     light.m_targetColor[0] = spotAttr->m_altColor;
@@ -992,13 +916,12 @@ int CMapMng::ReadMtx(char* mapName)
 
     if (m_asyncLoadState.m_mapReadMode != 2 && m_asyncLoadState.m_mapReadMode != 3) {
         CMemory::CStage* stage = MapMng.m_stage;
-        CTextureSet* textureSet = new (stage, const_cast<char*>(s_map_cpp), 0x3A9) CTextureSet;
+        CTextureSet* textureSet = new (stage, "map.cpp", 0x3A9) CTextureSet;
         m_textureSet = textureSet;
     }
 
     char* strTmp = g_StrTmp;
-    int loadIndex = 0;
-    while (true) {
+    for (int loadIndex = 0;; loadIndex++) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
         if (!MapCheckFileRead(strTmp)) {
@@ -1061,7 +984,6 @@ int CMapMng::ReadMtx(char* mapName)
             }
         }
 
-        loadIndex += 1;
     }
 
     return 1;
@@ -1078,14 +1000,11 @@ int CMapMng::ReadMtx(char* mapName)
  */
 int CMapMng::ReadMpl(char* mapName)
 {
-    CFile::CHandle* handle;
     char* strTmp = g_StrTmp;
-    int loadIndex = 0;
-    int size = 0;
 
     MapMng.SetDraw(1);
 
-    while (true) {
+    for (int loadIndex = 0;; loadIndex++) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
         if (!MapCheckFileRead(strTmp)) {
@@ -1105,42 +1024,8 @@ int CMapMng::ReadMpl(char* mapName)
             System.Printf(const_cast<char*>(s_mapReadMplFmt), strTmp);
         }
 
-        void* filePtr;
-        if (m_asyncLoadState.m_mapReadMode == 1) {
-            size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
-            filePtr = File.m_readBuffer;
-
-            Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, (size + 0x1F) & ~0x1F);
-            m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
-            CheckSum(filePtr, size);
-            m_asyncLoadState.m_asyncReadIndex += 1;
-        } else {
-            handle = File.Open(strTmp, 0, CFile::PRI_LOW);
-            if (handle != 0) {
-                size = File.GetLength(handle);
-                if (m_asyncLoadState.m_mapReadMode == 3) {
-                    File.ReadASync(handle);
-                    filePtr = reinterpret_cast<void*>(1);
-                    m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = handle;
-                    m_asyncLoadState.m_asyncOpenIndex += 1;
-                } else {
-                    File.Read(handle);
-                    File.SyncCompleted(handle);
-                    filePtr = File.m_readBuffer;
-                    File.Close(handle);
-                    if (m_asyncLoadState.m_mapReadMode == 2) {
-                        Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));
-                        m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex] = size;
-                        m_asyncLoadState.m_fileChecksums[m_asyncLoadState.m_asyncReadIndex] = CheckSum(filePtr, size);
-                        m_asyncLoadState.m_asyncReadIndex += 1;
-                        m_asyncLoadState.m_mapLoadCursor =
-                            reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
-                    }
-                }
-            } else {
-                filePtr = 0;
-            }
-        }
+        unsigned long size;
+        void* filePtr = MapFileRead(strTmp, size);
 
         if (filePtr == 0) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
@@ -1204,7 +1089,6 @@ int CMapMng::ReadMpl(char* mapName)
             }
         }
 
-        loadIndex += 1;
     }
 }
 
@@ -1224,7 +1108,7 @@ int CMapMng::ReadOtm(char* mapName)
     MapMng.SetDraw(1);
     char* strTmp = g_StrTmp;
     void* filePtr;
-    sprintf(strTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
+    sprintf(strTmp, "%s.otm", mapName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_otm_fmt), strTmp);
     }
@@ -1279,7 +1163,7 @@ int CMapMng::ReadOtm(char* mapName)
                 switch (chunk.m_id) {
                 case 0x4D534554: {
                     m_materialSet =
-                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
+                        new (MapMng.m_stage, "map.cpp", 0x482) CMaterialSet();
                     CMaterialSet* materialSet = m_materialSet;
                     materialSet->m_materials.SetDefaultSize(0x180);
                     materialSet->m_materials.SetGrow(0);
@@ -1289,7 +1173,7 @@ int CMapMng::ReadOtm(char* mapName)
 
                 case 0x41534554: {
                     m_mapTexAnimSet =
-                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
+                        new (MapMng.m_stage, "map.cpp", 0x49A) CMapTexAnimSet();
                     m_mapTexAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
                     break;
                 }
@@ -1325,7 +1209,7 @@ int CMapMng::ReadOtm(char* mapName)
                 }
 
                 case 0x414E494D: {
-                    CMapAnim* mapAnim = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
+                    CMapAnim* mapAnim = new (MapMng.m_stage, "map.cpp", 0x4BF) CMapAnim();
                     mapAnim->ReadOtmAnim(chunkFile);
                     GetMapAnimArray().Add(mapAnim);
                     break;
@@ -1348,7 +1232,7 @@ int CMapMng::ReadOtm(char* mapName)
 
         lithCase: {
             CMapLightHolder* light = static_cast<CMapLightHolder*>(
-                operator new(0x10, MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
+                operator new(0x10, MapMng.m_stage, "map.cpp", 0x4D3));
             unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
             lightRaw[0] = chunkFile.Get1();
             lightRaw[1] = chunkFile.Get1();
@@ -1462,7 +1346,7 @@ int CMapMng::ReadMid(char* mapName)
     unsigned long size;
     int ok;
     char* strTmp = g_StrTmp;
-    sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
+    sprintf(strTmp, "%s.mid", mapName);
     ok = 1;
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
@@ -1705,24 +1589,20 @@ void CMapMng::DrawMapShadow()
  * Address:	TODO
  * Size:	TODO
  */
-inline void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
+void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
 {
-    extern const float kMapLargeDistance;
-    extern const float kMapFullTurnDegrees;
-    extern const float kMapZero;
-    extern const float kMapTinyEpsilon;
 
     GXLightObj lightObj;
     Vec v;
     Mtx cameraMtx;
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
-    v.x = kMapLargeDistance * -lightDir.x;
+    v.x = 100000.0f * -lightDir.x;
     float dirZ;
     float dirY = lightDir.y;
     dirZ = lightDir.z;
-    v.y = kMapLargeDistance * -dirY;
-    v.z = kMapLargeDistance * -dirZ;
+    v.y = 100000.0f * -dirY;
+    v.z = 100000.0f * -dirZ;
 
     GXInitLightColor(&lightObj, lightColor);
     PSMTXMultVec(cameraMtx, &v, &v);
@@ -1732,8 +1612,8 @@ inline void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
     v.z = dirZ;
     PSMTXMultVecSR(cameraMtx, &v, &v);
     GXInitLightDir(&lightObj, v.x, v.y, v.z);
-    GXInitLightSpot(&lightObj, kMapFullTurnDegrees, GX_SP_SHARP);
-    GXInitLightAttnK(&lightObj, kMapZero, kMapTinyEpsilon, kMapZero);
+    GXInitLightSpot(&lightObj, 360.0f, GX_SP_SHARP);
+    GXInitLightAttnK(&lightObj, 0.0f, 5.0e-6f, 0.0f);
     GXLoadLightObjImm(&lightObj, static_cast<GXLightID>(lightId));
 }
 
@@ -1779,11 +1659,6 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-    extern const float kMapLargeDistance;
-    extern const float kMapFullTurnDegrees;
-    extern const float kMapZero;
-    extern const float kMapTinyEpsilon;
-    extern const float kMapHitWireZOffset;
     if (m_mapReadReady == 0) {
         return;
     }
@@ -2013,7 +1888,7 @@ void CMapMng::Draw()
             MapMng.m_mapObjArray[i].DrawHit();
         }
 
-        CameraPcs.SetOffsetZBuff(kMapZero);
+        CameraPcs.SetOffsetZBuff(0.0f);
     }
 
     if ((g_MapHitDrawMode & 4) != 0) {
@@ -2035,7 +1910,7 @@ void CMapMng::Draw()
         wireColor.a = 0x80;
         GXSetChanMatColor(GX_COLOR0A0, wireColor);
 
-        CameraPcs.SetOffsetZBuff(kMapHitWireZOffset);
+        CameraPcs.SetOffsetZBuff(-0.1f);
 
         for (int i = 0; i < m_mapObjCount; i++) {
             MapMng.m_mapObjArray[i].DrawHitWire();
@@ -2045,7 +1920,7 @@ void CMapMng::Draw()
             MapMng.m_mapObjArray[i].DrawHitNormal();
         }
 
-        CameraPcs.SetOffsetZBuff(kMapZero);
+        CameraPcs.SetOffsetZBuff(0.0f);
     }
 }
 
@@ -2095,9 +1970,7 @@ void CMapMng::DrawAfter()
  */
 int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    extern const float kMapZero;
-    extern const float kMapHitTInitial;
-    if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
+    if ((0.0f == move->x) && (0.0f == move->z) && (0.0f == move->y)) {
         return 0;
     }
 
@@ -2117,7 +1990,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = kMapHitTInitial;
+    g_hit_t_min = 10.0f;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
@@ -2148,9 +2021,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    extern const float kMapZero;
-    extern const float kMapHitTInitial;
-    if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
+    if ((0.0f == move->x) && (0.0f == move->z) && (0.0f == move->y)) {
         return 0;
     }
 
@@ -2170,7 +2041,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = kMapHitTInitial;
+    g_hit_t_min = 10.0f;
     int hit = 0;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
@@ -2204,7 +2075,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
  * JP Address: TODO
  * JP Size: TODO
  */
-inline CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
+CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
 {
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
@@ -2231,7 +2102,7 @@ inline CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline CMapAnimRun* CMapMng::GetAnimRunID(int animId)
+CMapAnimRun* CMapMng::GetAnimRunID(int animId)
 {
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
@@ -2254,19 +2125,11 @@ inline CMapAnimRun* CMapMng::GetAnimRunID(int animId)
  */
 void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
 {
-    extern const float kMapViewScaleY;
-    extern const float kMapViewScaleXPrimary;
-    extern const float kMapViewScaleZ;
-    extern const float kMapViewScaleXSecondary;
-    float* proj = reinterpret_cast<float*>(projMtx);
-
     PSMTXCopy(viewMtx, m_viewMtx);
-    float scaleY = kMapViewScaleY * proj[5];
-    float scaleX = proj[0];
-    PSMTXScaleApply(
-        m_viewMtx, m_scaledViewMtxPrimary, kMapViewScaleXPrimary * scaleX, scaleY, kMapViewScaleZ);
-    PSMTXScaleApply(
-        m_viewMtx, m_scaledViewMtxSecondary, kMapViewScaleXSecondary * scaleX, scaleY, kMapViewScaleZ);
+    float scaleX = projMtx[0][0];
+    float scaleY = projMtx[1][1];
+    PSMTXScaleApply(m_viewMtx, m_scaledViewMtxPrimary, 0.73898232f * scaleX, 0.88677877f * scaleY, 1.0f);
+    PSMTXScaleApply(m_viewMtx, m_scaledViewMtxSecondary, 0.84455127f * scaleX, 0.88677877f * scaleY, 1.0f);
 }
 
 /*
@@ -2322,8 +2185,6 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, float farRange, float minAlpha,
                                           float maxAlpha, float fadeRange)
 {
-    extern const float kMapCameraSemiTransMinSentinel;
-    extern const float kMapCameraSemiTransMaxSentinel;
     int found = 0;
 
     for (int i = 0; i < m_mapObjCount; i++) {
@@ -2335,8 +2196,8 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             mapObj->m_cameraSemiTransMinAlpha = minAlpha;
             mapObj->m_cameraSemiTransMaxAlpha = maxAlpha;
             if (mapObj->m_mapData != 0 && mapObj->m_octTreeIndex != -1) {
-                mapObj->m_cameraSemiTransMinAlpha = kMapCameraSemiTransMinSentinel;
-                mapObj->m_cameraSemiTransMaxAlpha = kMapCameraSemiTransMaxSentinel;
+                mapObj->m_cameraSemiTransMinAlpha = 1.0e15f;
+                mapObj->m_cameraSemiTransMaxAlpha = -1.0f;
                 mapObj->m_drawPriority = 2;
                 mapObj->m_cameraSemiTransActive = 1;
             }
@@ -2746,19 +2607,3 @@ inline CMapMng::~CMapMng()
 {
 }
 
-extern const float kMapCameraSemiTransMinSentinel = 1.0e15f;
-extern const float kMapCameraSemiTransMaxSentinel = -1.0f;
-extern const float kMapViewScaleXPrimary = 0.73898232f;
-extern const float kMapViewScaleY = 0.88677877f;
-extern const float kMapViewScaleZ = 1.0f;
-extern const float kMapViewScaleXSecondary = 0.84455127f;
-extern const float kMapZero = 0.0f;
-extern const float kMapHitMoveEpsilon = 0.0001f;
-extern const float kMapHitMoveNegEpsilon = -0.0001f;
-extern const float kMapHitTInitial = 10.0f;
-extern const float kMapLargeDistance = 100000.0f;
-extern const float kMapFullTurnDegrees = 360.0f;
-extern const float kMapTinyEpsilon = 5.0e-6f;
-extern const float kMapHitWireZOffset = -0.1f;
-extern const float kMapSpotAngleDefault = 0.78539816339744828f;
-extern const float kMapDegToRadScale = 0.017453292519943295f;

@@ -990,7 +990,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
             u = (u + w) - 0.5f;
         } else {
             u1 = (u + w) - 0.5f;
-            u = u + 0.5f;
+            u += 0.5f;
         }
 
         if ((attr & 4) != 0) {
@@ -998,14 +998,14 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
             v = (v1 + h) - 0.5f;
         } else {
             v1 = (v + h) - 0.5f;
-            v = v + 0.5f;
+            v += 0.5f;
         }
 
         scaledW = w * us;
         scaledH = h * vs;
 
-        x0 = ((attr & 1) != 0) ? -(scaledW * 0.5f - x) : x;
-        y0 = ((attr & 2) != 0) ? -(scaledH * 0.5f - y) : y;
+        x0 = ((attr & 1) != 0) ? x - scaledW * 0.5f : x;
+        y0 = ((attr & 2) != 0) ? y - scaledH * 0.5f : y;
 
         x1 = x0 + scaledW;
         y1 = y0 + scaledH;
@@ -1014,19 +1014,19 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
-            x0 -= x;
-            y0 -= y;
-            x1 -= x;
-            y1 -= y;
+            float dx0 = x0 - x;
+            float dy0 = y0 - y;
+            float dx1 = x1 - x;
+            float dy1 = y1 - y;
 
-            float xtl = (x0 * c) + x;
-            float ytl = (x0 * s) + y;
-            float tx0 = y0 * s;
-            float ty0 = y0 * c;
-            float xtr = (x1 * c) + x;
-            float ytr = (x1 * s) + y;
-            float tx1 = y1 * s;
-            float ty1 = y1 * c;
+            float xtl = (dx0 * c) + x;
+            float ytl = (dx0 * s) + y;
+            float tx0 = dy0 * s;
+            float ty0 = dy0 * c;
+            float xtr = (dx1 * c) + x;
+            float ytr = (dx1 * s) + y;
+            float tx1 = dy1 * s;
+            float ty1 = dy1 * c;
 
             GXPosition3f32(xtl - tx0, ytl + ty0, z);
             GXTexCoord2f32(u, v);
@@ -1085,7 +1085,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
             u = (u + w) - 0.5f;
         } else {
             u1 = (u + w) - 0.5f;
-            u = u + 0.5f;
+            u += 0.5f;
         }
 
         if ((attr & 4) != 0) {
@@ -1093,14 +1093,14 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
             v = (v1 + h) - 0.5f;
         } else {
             v1 = (v + h) - 0.5f;
-            v = v + 0.5f;
+            v += 0.5f;
         }
 
         scaledW = w * us;
         scaledH = h * vs;
 
-        x0 = ((attr & 1) != 0) ? -(scaledW * 0.5f - x) : x;
-        y0 = ((attr & 2) != 0) ? -(scaledH * 0.5f - y) : y;
+        x0 = ((attr & 1) != 0) ? x - scaledW * 0.5f : x;
+        y0 = ((attr & 2) != 0) ? y - scaledH * 0.5f : y;
 
         x1 = x0 + scaledW;
         y1 = y0 + scaledH;
@@ -1109,19 +1109,19 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
-            x0 -= x;
-            y0 -= y;
-            x1 -= x;
-            y1 -= y;
+            float dx0 = x0 - x;
+            float dy0 = y0 - y;
+            float dx1 = x1 - x;
+            float dy1 = y1 - y;
 
-            float xtl = (x0 * c) + x;
-            float ytl = (x0 * s) + y;
-            float tx0 = y0 * s;
-            float ty0 = y0 * c;
-            float xtr = (x1 * c) + x;
-            float ytr = (x1 * s) + y;
-            float tx1 = y1 * s;
-            float ty1 = y1 * c;
+            float xtl = (dx0 * c) + x;
+            float ytl = (dx0 * s) + y;
+            float tx0 = dy0 * s;
+            float ty0 = dy0 * c;
+            float xtr = (dx1 * c) + x;
+            float ytr = (dx1 * s) + y;
+            float tx1 = dy1 * s;
+            float ty1 = dy1 * c;
 
             GXPosition3f32(xtl - tx0, ytl + ty0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
@@ -1202,25 +1202,13 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	}
 
 	const float twoCorner = corner * 2.0f;
-	float midW = width - twoCorner;
-	float midH;
-	float overW;
-	float overH;
-	float uOff;
-	float vOff;
+	float midW = (width - twoCorner < 0.0f) ? 0.0f : width - twoCorner;
+	float midH = (height - twoCorner < 0.0f) ? 0.0f : height - twoCorner;
+	float uOff = (twoCorner - width < 0.0f) ? 0.0f : twoCorner - width;
+	uOff *= 0.5f;
+	float vOff = (twoCorner - height < 0.0f) ? 0.0f : twoCorner - height;
+	vOff *= 0.5f;
 	const int tex = static_cast<int>(texBase);
-
-	midW = (midW < 0.0f) ? 0.0f : midW;
-	midH = height - twoCorner;
-	midH = (midH < 0.0f) ? 0.0f : midH;
-
-	overW = twoCorner - width;
-	overW = (overW < 0.0f) ? 0.0f : overW;
-
-	overH = twoCorner - height;
-	uOff = overW * 0.5f;
-	overH = (overH < 0.0f) ? 0.0f : overH;
-	vOff = overH * 0.5f;
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex));
 	const float cornerW = corner - uOff;
@@ -1335,7 +1323,7 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::drawPause()
+void CMenuPcs::drawPause()
 {
     if (((CFlatEventFlags() & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
         return;
@@ -1482,7 +1470,7 @@ inline void CMenuPcs::calcBattle()
     value = current - 1;
     limit = m_battleHud.m_gaugeTarget - current;
     limit = current + limit;
-    m_battleHud.m_gaugeValue = (limit < value) ? value : ((current + 1 < limit) ? current + 1 : limit);
+    m_battleHud.m_gaugeValue = (limit < value) ? value : ((++current < limit) ? current : limit);
 
     u32 counter = m_battleHud.m_fadeCounter - 1;
     m_battleHud.m_fadeCounter = counter & ~((int)counter >> 31);
@@ -1525,10 +1513,10 @@ void CMenuPcs::drawBattle()
         Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
 
         if (0.0f < projected.w) {
-            const int totalWidth = static_cast<int>(static_cast<float>(m_battleHud.m_width) * fade);
-            const int halfWidth = totalWidth / 2;
             float screenX = 320.0f + (320.0f * projected.x) / projected.w;
             float screenY = 224.0f - (224.0f * projected.y) / projected.w;
+            const int totalWidth = static_cast<int>(static_cast<float>(m_battleHud.m_width) * fade);
+            const int halfWidth = totalWidth / 2;
 
             const float markerX = (screenX < static_cast<float>(halfWidth))
                                       ? static_cast<float>(halfWidth)

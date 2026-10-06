@@ -1387,12 +1387,15 @@ void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
 static void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     int draw = 0;
-    CChara::CMesh::CRefData* mesh = model->GetMesh()[partIndex].m_data;
+    CChara::CMesh* meshes = model->GetMesh();
+    meshes += partIndex;
+    CChara::CMesh::CRefData* mesh = meshes->m_data;
     VYmMana* mana = static_cast<VYmMana*>(work);
     pppYmManaStep* stepData = static_cast<pppYmManaStep*>(step);
     int type = stepData->m_type;
     CGObject* object = mana->m_object;
-    CChara::CMesh::CDisplayList* displayList = &mesh->m_displayLists[dlIndex];
+    CChara::CMesh::CDisplayList* displayList = mesh->m_displayLists;
+    displayList += dlIndex;
 
     switch (type) {
     case 0:

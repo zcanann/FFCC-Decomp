@@ -234,10 +234,10 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
  */
 void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable* ctrl)
 {
-	u32 y;
-	CrystalWork* work;
-	u32 yTile;
 	u32 x;
+	u32 y;
+	u32 yTile;
+	CrystalWork* work;
 	HSD_ImageBuffer* textureInfo;
 	u32 textureSize;
 	float magnitude;
@@ -257,7 +257,7 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable
 		return;
 	}
 
-	work = GetCrystalWork(pppCrystal, ctrl);
+	work = (CrystalWork*)(pppCrystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
 	s32 dataValIndex = step->m_dataValIndex;
 	if (dataValIndex == 0xFFFF) {
 		return;

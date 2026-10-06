@@ -64,21 +64,6 @@ STATIC_ASSERT(sizeof(m_obj) == sizeof(CGObject) * kFlatObjectCount);
 STATIC_ASSERT(sizeof(m_objItem) == sizeof(CGItemObj) * kFlatItemObjCount);
 STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 
-static const char sCFlatRuntime2LayerMissingMsg[] =
-	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";
-static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
-static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
-const char sCFlatRuntime2DebugDrawOverflowMsg[] =
-	"CFlatRuntime2.AddDebugDrawCC: "
-	"\x8e\x8b\x90\xfc\x83\x60\x83\x46\x83\x62\x83\x4e\x83\x66\x83\x6f\x83\x62\x83\x4f"
-	"\x95\x8e\xa6\x82\xf0\x82\xb1\x82\xea\x88\xc8\x8f\xe3\x92\xc7\x89\xc1\x82\xc5"
-	"\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-static const char sCFlatRuntime2SaveSceneMsg[] = "SAVE SCENE";
-static const char sCFlatRuntime2FileNameFmt[] = "dvd/cft/%s.cft";
-static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd/cft/%s.cft.dbg";
-static const char sCFlatRuntime2LoadMsg[] =
-	"\x83\x58\x83\x4e\x83\x8a\x83\x76\x83\x67\x93\xc7\x82\xdd\x8d\x9e"
-	"\x82\xdd\x8f\x49\x97\xb9\n";
 
 STATIC_ASSERT(sizeof(CFlatLayerResource) * kFlatLayerResourceCount == 0x60);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_layerResources) == 0x1770);
@@ -773,7 +758,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 int CFlatRuntime2::Load(char* fileName)
 {
 	char path[0x100];
-	sprintf(path, sCFlatRuntime2FileNameFmt, fileName);
+	sprintf(path, "dvd/cft/%s.cft", fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
@@ -789,7 +774,7 @@ int CFlatRuntime2::Load(char* fileName)
 		int debugIndex = 0;
 		int debugChunk = 0;
 		do {
-			sprintf(path, sCFlatRuntime2DebugFileNameFmt, fileName);
+			sprintf(path, "dvd/cft/%s.cft.dbg", fileName);
 			if (debugIndex != 0) {
 				sprintf(path, "%s.%d", path, debugIndex);
 			}
@@ -810,7 +795,7 @@ int CFlatRuntime2::Load(char* fileName)
 
 	resetChangeScript();
 	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-		System.Printf(const_cast<char*>(sCFlatRuntime2LoadMsg));
+		System.Printf("\x83\x58\x83\x4e\x83\x8a\x83\x76\x83\x67\x93\xc7\x82\xdd\x8d\x9e" "\x82\xdd\x8f\x49\x97\xb9\n");
 	}
 	return 1;
 }
@@ -1088,7 +1073,7 @@ void CFlatRuntime2::Calc()
 				layer->m_textureSet = 0;
 			}
 
-			textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
+			textureSet = new (getStage(), "cflat_runtime2.cpp", 0x335) CTextureSet;
 			layer->m_textureSet = textureSet;
 			void* readBuffer = File.m_readBuffer;
 			layer->m_textureSet->Create(
@@ -1108,9 +1093,9 @@ void CFlatRuntime2::Calc()
 	}
 
 	if (m_saveSceneEnabled != 0) {
-		Graphic.Printf(2, 3, const_cast<char*>(sCFlatRuntime2SaveSceneMsg));
+		Graphic.Printf(2, 3, "SAVE SCENE");
 
-		u32* saveData = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F) u32[0x3FF];
+		u32* saveData = new (getStage(), "cflat_runtime2.cpp", 0x36F) u32[0x3FF];
 
 		u32 header[8];
 		reinterpret_cast<float*>(header)[0] = SwapToF32(CameraPcs.m_positionX);
@@ -1277,6 +1262,7 @@ void CFlatRuntime2::Draw()
 		redColor.g = 0x00;
 		redColor.b = 0x00;
 		redColor.a = 0xFF;
+		float z = 0.0f;
 		float ringVerts[24];
 		float* verts = ringVerts;
 
@@ -1327,9 +1313,9 @@ void CFlatRuntime2::Draw()
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
 				if (entry->m_flagBits.m_bit7 != 0) {
-					GXPosition3f32(vtx[0], vtx[1], 0.0f);
+					GXPosition3f32(vtx[0], vtx[1], z);
 				} else {
-					GXPosition3f32(0.0f, 0.0f, 0.0f);
+					GXPosition3f32(z, z, z);
 				}
 				GXPosition3f32(vtx[0], vtx[1], vtx[2]);
 				vtx += 3;
@@ -1379,7 +1365,7 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 
 	static int frame = 0;
 	if (frame != static_cast<int>(System.m_frameCounter)) {
-		printf(sCFlatRuntime2DebugDrawOverflowMsg);
+		printf("CFlatRuntime2.AddDebugDrawCC: " "\x8e\x8b\x90\xfc\x83\x60\x83\x46\x83\x62\x83\x4e\x83\x66\x83\x6f\x83\x62\x83\x4f" "\x95\x8e\xa6\x82\xf0\x82\xb1\x82\xea\x88\xc8\x8f\xe3\x92\xc7\x89\xc1\x82\xc5" "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n");
 		frame = System.m_frameCounter;
 	}
 }
@@ -1484,14 +1470,14 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
+	sprintf(path, "dvd/%s%s.tex", Game.GetLangString(), fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
 		File.Read(fileHandle);
 		File.SyncCompleted(fileHandle);
 
-		textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
+		textureSet = new (getStage(), "cflat_runtime2.cpp", 0x4F4) CTextureSet;
 		m_layerResources[layerNo].m_textureSet = textureSet;
 		void* readBuffer = File.m_readBuffer;
 		m_layerResources[layerNo].m_textureSet->Create(
@@ -1537,7 +1523,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	}
 
 	char path[0xF4];
-	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
+	sprintf(path, "dvd/%s%s.tex", Game.GetLangString(), fileName);
 
 	m_layerResources[layerNo].m_fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (m_layerResources[layerNo].m_fileHandle != 0) {
@@ -1564,6 +1550,7 @@ void CFlatRuntime2::drawLayer(
 		return;
 	}
 
+	int u1;
 	int textureIndex = m_layerResources[layerNo].m_textureSet->Find(textureName);
 	if (textureIndex >= 0) {
 
@@ -1618,7 +1605,7 @@ void CFlatRuntime2::drawLayer(
 
 	scaleX = static_cast<float>(width) * scaleX;
 	scaleY = static_cast<float>(height) * scaleY;
-	int u1 = texU + width;
+	u1 = texU + width;
 	int v1 = texV + height;
 	float fx = static_cast<float>(x);
 	const float x0 = fx - (((flags & 1) != 0) ? 0.5f * scaleX : 0.0f);
@@ -1720,7 +1707,7 @@ void CFlatRuntime2::drawLayer(
 
 	} else {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-			System.Printf(const_cast<char*>(sCFlatRuntime2LayerMissingMsg), textureName);
+			System.Printf("layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n", textureName);
 		}
 	}
 }

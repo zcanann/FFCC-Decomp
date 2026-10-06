@@ -202,7 +202,11 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
  */
 void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, unsigned char blendMode)
 {
-    pppDrawShp(pppShapeFrame(animData, frameIndex), materialSet, blendMode);
+    pppShapeAnimFrame* frame = &pppShapeAnim(animData)->m_frames[frameIndex];
+    short shapeOffset = frame->m_shapeOffset;
+    tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<unsigned char*>(animData) + shapeOffset);
+
+    pppDrawShp(shape, materialSet, blendMode);
 }
 
 /*

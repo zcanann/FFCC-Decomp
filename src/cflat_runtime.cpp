@@ -176,8 +176,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 							int specLen = 0;
 							while (((specChar = *format) != '\0') && ((specLen == 0) || ((specLen != 0) && (specChar != '%')))) {
 								format++;
-								spec[specLen] = specChar;
-								specLen++;
+								spec[specLen++] = specChar;
 							}
 							spec[specLen] = '\0';
 
@@ -506,7 +505,10 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
 	const int prevArgCount = object->m_argCount;
 
 	if (func->m_useCallerArgs != 0) {
-		object->m_argCount = static_cast<s16>(pop(object));
+		CStack popped;
+		object->m_sp--;
+		popped.m_word = *object->m_sp;
+		object->m_argCount = static_cast<s16>(popped.m_int);
 		object->m_localBase = object->m_sp - object->m_argCount;
 		object->m_sp = object->m_localBase + object->m_argCount;
 	} else {
@@ -539,6 +541,49 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
 			clearCount--;
 		}
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFlatRuntime::callCleanup(CFlatRuntime::CObject* object)
+{
+	CStack returnTemp;
+	CStack codePosTemp;
+	CStack returnValue;
+	CStack packedFlags;
+	CStack previousActive;
+	CStack previousCodePos;
+	CStack previousLocalBase;
+
+	object->m_sp--;
+	returnValue.m_word = *object->m_sp;
+	returnTemp.m_int = returnValue.m_int;
+	object->m_sp--;
+	packedFlags.m_word = *object->m_sp;
+	object->m_sp--;
+	previousActive.m_word = *object->m_sp;
+	object->m_sp--;
+	previousCodePos.m_word = *object->m_sp;
+	codePosTemp.m_int = previousCodePos.m_int;
+	object->m_sp--;
+	previousLocalBase.m_word = *object->m_sp;
+
+	object->m_sp = object->m_localBase;
+	*object->m_sp = returnTemp.m_word;
+	object->m_sp++;
+	object->m_localBase = reinterpret_cast<unsigned int*>(previousLocalBase.m_int);
+	object->m_codePos = codePosTemp.m_word;
+	object->m_flagBits.m_callFlag = static_cast<s8>(previousActive.m_int);
+	object->m_waitCounter = packedFlags.m_int >> 16;
+	object->m_requestPending = (packedFlags.m_word >> 15) & 1;
+	object->m_argCount = static_cast<s16>(packedFlags.m_word);
 }
 
 /*
@@ -758,18 +803,22 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		case 2: {
 			const u32 arg = *reinterpret_cast<u32*>(code + 1);
+			u32 classId;
 			const int index = static_cast<int>(arg) >> 8;
-			const u32 classId = object->m_engineObject != 0 ? static_cast<u32>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(object->m_engineObject) + 0x30)) : 1U;
+			if (object->m_engineObject != 0) {
+				classId = reinterpret_cast<CObject*>(object->m_engineObject)->m_particleId;
+			} else {
+				classId = 1;
+			}
 			if ((arg & 1) != 0) {
 				*object->m_sp = ((static_cast<u32>(index) << 13) | (classId & 0xFFF))
 				              | ((arg >> 4 & 1) != 0 ? 0x1000 : 0);
 				object->m_sp++;
 			} else if ((arg & 2) != 0) {
 				CStack offset;
-				const u32 sign = (arg >> 4 & 1) != 0 ? 0x1000 : 0;
 				object->m_sp--;
 				offset.m_word = *object->m_sp;
-				*object->m_sp = sign | ((classId & 0xFFF) | (index + offset.m_int) * 0x2000);
+				*object->m_sp = ((arg >> 4 & 1) != 0 ? 0x1000 : 0) | ((classId & 0xFFF) | (index + offset.m_int) * 0x2000);
 				object->m_sp++;
 			}
 			break;
@@ -1099,7 +1148,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		case 0x39: {
 			--object->m_sp;
-			returnValue = *reinterpret_cast<CStack*>(object->m_sp);
+			returnValue.m_word = *object->m_sp;
 			--object->m_sp;
 			const u32 classWord = *object->m_sp;
 			CObject* target = reinterpret_cast<CObject*>(intToClass(classWord >> 16));
@@ -1108,7 +1157,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			--object->m_sp;
 			object->m_thisBase = reinterpret_cast<unsigned int*>(*object->m_sp);
 			--object->m_sp;
-			*reinterpret_cast<CStack*>(object->m_sp) = returnValue;
+			*reinterpret_cast<int*>(object->m_sp) = returnValue.m_int;
 			object->m_sp++;
 			break;
 		}
@@ -1118,36 +1167,9 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			break;
 		case 0x3C:
 		returnFromCall: {
-			CStack previousLocalBase;
-			CStack previousCodePos;
-			CStack previousActive;
-			CStack packedFlags;
-			CStack codePosTemp;
-			CStack returnTemp;
 			const int oldCallFlag = object->m_flagBits.m_callFlag;
 
-			object->m_sp--;
-			returnValue.m_word = *object->m_sp;
-			returnTemp.m_int = returnValue.m_int;
-			object->m_sp--;
-			packedFlags.m_word = *object->m_sp;
-			object->m_sp--;
-			previousActive.m_word = *object->m_sp;
-			object->m_sp--;
-			previousCodePos.m_word = *object->m_sp;
-			codePosTemp.m_int = previousCodePos.m_int;
-			object->m_sp--;
-			previousLocalBase.m_word = *object->m_sp;
-
-			object->m_sp = object->m_localBase;
-			*object->m_sp = returnTemp.m_word;
-			object->m_sp++;
-			object->m_localBase = reinterpret_cast<unsigned int*>(previousLocalBase.m_int);
-			object->m_codePos = codePosTemp.m_word;
-			object->m_flagBits.m_callFlag = static_cast<s8>(previousActive.m_int);
-			object->m_waitCounter = packedFlags.m_int >> 16;
-			object->m_requestPending = (packedFlags.m_word >> 15) & 1;
-			object->m_argCount = static_cast<s16>(packedFlags.m_word);
+			callCleanup(object);
 
 			if (object->m_flagBits.m_deleteFlag != 0) {
 				return 0;
@@ -1350,7 +1372,11 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 		engineObject->m_0x34 |= 1 << reqFlagIndex;
 	}
 
-	push(engineObject, args, argCount);
+	int i;
+	for (i = 0; i < argCount; i++) {
+		reinterpret_cast<CStack*>(engineObject->m_sp)[i] = args[i];
+	}
+	engineObject->m_sp += i;
 
 	callSetup(engineObject, func, 1);
 
@@ -1386,15 +1412,21 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 		return 0;
 	}
 
-	push(object, args, argCount);
+	int i;
+	for (i = 0; i < argCount; i++) {
+		reinterpret_cast<CStack*>(object->m_sp)[i] = args[i];
+	}
+	object->m_sp += i;
 
 	callSetup(object, func, 1);
 
 	objectFrame(object);
 
-	const int result = pop(object);
+	object->m_sp--;
+	CStack result;
+	result.m_word = *object->m_sp;
 	if (outArg != 0) {
-		outArg->m_word = result;
+		outArg->m_word = result.m_int;
 	}
 	return 1;
 }
@@ -2107,16 +2139,6 @@ CFlatRuntime::CFlatRuntime()
  * Address:	TODO
  * Size:	TODO
  */
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::callCleanup(CFlatRuntime::CObject*)
-{
-	// TODO
-}
 
 /*
  * --INFO--

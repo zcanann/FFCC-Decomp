@@ -306,7 +306,6 @@ inline void CMenuPcs::CmdInit0()
  */
 void CMenuPcs::CmdInit1()
 {
-	s32 tex = 0x2f;
 	CmdListEntry* entry;
 	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
 
@@ -323,10 +322,7 @@ void CMenuPcs::CmdInit1()
 	entry->duration = 5;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
-	if (GetCmdLayoutFlag(this) == 0) {
-		tex = kCmdTabTexture;
-	}
-	entry->tex = tex;
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? kCmdTabTexture : 0x2f;
 	entry->x = 0xa0;
 	entry->y = 0xe;
 	entry->width = 0x30;
@@ -337,13 +333,8 @@ void CMenuPcs::CmdInit1()
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	tex = 0x2f;
 	entry = &GetCmdListStorage(this)->entries[idx++];
-	if (GetCmdLayoutFlag(this) == 0) {
-		tex = kCmdTabTexture;
-	}
-	entry->tex = tex;
-	tex = 0;
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? kCmdTabTexture : 0x2f;
 	entry->width = 0x30;
 	entry->height = 0x30;
 	entry->x = 0xa5;
@@ -351,7 +342,7 @@ void CMenuPcs::CmdInit1()
 	entry->u = 0.0f;
 	entry->v = 0.0f;
 	entry->scale = 0.75f;
-	entry->startFrame = tex;
+	entry->startFrame = 0;
 	entry->duration = 5;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
@@ -363,7 +354,7 @@ void CMenuPcs::CmdInit1()
 	entry->height = 0x140;
 	entry->u = 0.0f;
 	entry->v = 0.0f;
-	entry->startFrame = tex;
+	entry->startFrame = 0;
 	entry->duration = 5;
 
 	CmdListEntry* basePanel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
@@ -372,14 +363,13 @@ void CMenuPcs::CmdInit1()
 		entry->flags = 2;
 		entry->tex = kCmdRowTexture;
 		entry->x = static_cast<s16>(basePanel->x + 0x24);
-		entry->y = static_cast<s16>(basePanel->y + tex);
+		entry->y = static_cast<s16>(basePanel->y + i * 0x20);
 		entry->width = 200;
 		entry->height = 0x28;
 		entry->u = 0.0f;
 		entry->v = 0.0f;
 		entry->startFrame = 7;
 		entry->duration = 5;
-		tex += 0x20;
 	}
 
 	GetCmdListStorage(this)->listEnd = static_cast<s16>(idx);
@@ -2239,6 +2229,10 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
+	int i;
+	CmdListEntry* entry;
+	int j;
+	int idx;
 	int finished;
 	float targetX;
 	double step = 12.8;
@@ -2251,9 +2245,9 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 
 	if (topIdx > 0) {
-		for (int i = 0; i < 3; i++) {
-			CmdListEntry* entry = &GetCmdListStorage(this)->entries[i + s_UniteTop[topIdx]];
-			int idx = i + s_UniteTop[topIdx];
+		for (i = 0; i < 3; i++) {
+			entry = &GetCmdListStorage(this)->entries[i + s_UniteTop[topIdx]];
+			idx = i + s_UniteTop[topIdx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
@@ -2267,11 +2261,10 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		}
 	} else {
 		targetX = 64.0f + baseX;
-		int i;
 		for (i = finished = 0; i < s_ucnt; i++) {
-			for (int j = 0; j < 3; j++) {
-				CmdListEntry* entry = &GetCmdListStorage(this)->entries[j + s_UniteTop[i]];
-				int idx = j + s_UniteTop[i];
+			for (j = 0; j < 3; j++) {
+				entry = &GetCmdListStorage(this)->entries[j + s_UniteTop[i]];
+				idx = j + s_UniteTop[i];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
@@ -2305,6 +2298,10 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
  */
 int CMenuPcs::UniteCloseAnim(int topIdx)
 {
+	CmdListEntry* entry;
+	int i;
+	int j;
+	int idx;
 	int finished;
 
 	if (s_ucnt == 0) {
@@ -2316,9 +2313,9 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 
 	if (topIdx >= 0) {
 		finished = 0;
-		for (int i = 0; i < 3; i++) {
-			int idx = i + s_UniteTop[topIdx];
-			CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
+		for (i = 0; i < 3; i++) {
+			idx = i + s_UniteTop[topIdx];
+			entry = &GetCmdListStorage(this)->entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
@@ -2335,9 +2332,9 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 	} else {
 		int i;
 		for (i = finished = 0; i < s_ucnt; i++) {
-			for (int j = 0; j < 3; j++) {
-				int idx = j + s_UniteTop[i];
-				CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
+			for (j = 0; j < 3; j++) {
+				idx = j + s_UniteTop[i];
+				entry = &GetCmdListStorage(this)->entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
@@ -2619,6 +2616,7 @@ unsigned int CMenuPcs::CmdClose2()
 {
 	CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 	int combo[5][2];
+	s32 i;
 
 	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected[0]);
 	const u32 modeSel = static_cast<s32>(GetCmdStateSelections(GetCmdStateView(this))[GetCmdStateView(this)->mode]);
@@ -2636,14 +2634,13 @@ unsigned int CMenuPcs::CmdClose2()
 		}
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 1) {
-		s32 uniteIdx = 0;
-		for (uniteIdx = 0; uniteIdx < s_ucnt; uniteIdx++) {
-			if (selected == s_UniteTop[uniteIdx]) {
+		for (i = 0; i < s_ucnt; i++) {
+			if (selected == s_UniteTop[i]) {
 				break;
 			}
 		}
 
-		if (UniteCloseAnim(uniteIdx) != 0) {
+		if (UniteCloseAnim(i) != 0) {
 			ChkUnite(selected, combo);
 			int* comboSel = &combo[0][1];
 
@@ -2655,17 +2652,16 @@ unsigned int CMenuPcs::CmdClose2()
 			}
 
 			const s32 closeSel = GetCmdStateView(this)->selected[0];
-			s32 ununiteCount = 0;
-			for (ununiteCount = 0; ununiteCount < 3; ununiteCount++) {
-				if ((ununiteCount != 0) &&
+			for (i = 0; i < 3; i++) {
+				if ((i != 0) &&
 				    (Game.m_scriptFoodBase[0]
-				         ->m_commandListExtra[closeSel + ununiteCount] != -1)) {
+				         ->m_commandListExtra[closeSel + i] != -1)) {
 					break;
 				}
 			}
 
 			Game.m_scriptFoodBase[0]
-			    ->UnuniteComList(closeSel, ununiteCount);
+			    ->UnuniteComList(closeSel, i);
 			const int recipe = combo[comboIdx][0];
 			Game.m_scriptFoodBase[0]->UniteComList(
 			    comboSel[comboIdx * 2], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
@@ -2694,7 +2690,7 @@ unsigned int CMenuPcs::CmdClose2()
 		}
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 3) {
-		for (s32 i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
+		for (i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
 			CmdListEntry* entry = &GetCmdListStorage(this)->entries[i];
 			if (static_cast<f64>(entry->alpha) >= 1.0) {
 				continue;

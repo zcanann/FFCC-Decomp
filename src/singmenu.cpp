@@ -1167,6 +1167,47 @@ inline void CMenuPcs::calcSingleMenu()
     loadTextureAsync(0, 0, 0, 0, 0, 0, 0);
 }
 
+static inline int LoadSingMenuTextureStep(CMenuPcs* menu)
+{
+    int loadIndex = menu->m_singleMenuTextureLoadIndex;
+    if (loadIndex >= 2) {
+        return 1;
+    }
+
+    if (menu->m_singleMenuTextureLoadState == 0) {
+        char path[256];
+        sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
+        gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
+        File.ReadASync(gSingMenuAsyncFileHandle);
+        menu->m_singleMenuTextureLoadState = menu->m_singleMenuTextureLoadState + 1;
+    } else if (menu->m_singleMenuTextureLoadState == 1) {
+        if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
+            return 0;
+        }
+
+        menu->m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
+
+        void* buffer = File.m_readBuffer;
+        menu->m_textureSets[loadIndex + 5]->Create(buffer, Game.m_gameWork.m_menuStageMode != 0 ? menu->m_stageF4 : menu->m_menuStage, 0, 0, 0, 0);
+        File.Close(gSingMenuAsyncFileHandle);
+        gSingMenuAsyncFileHandle = 0;
+        menu->m_singleMenuTextureLoadState = 0;
+        menu->m_singleMenuTextureLoadIndex = menu->m_singleMenuTextureLoadIndex + 1;
+    }
+
+    if (menu->m_singleMenuTextureLoadIndex < 2) {
+        return 0;
+    }
+
+    for (int i = 0; i < 0x33; i++) {
+        int texIdx = menu->m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->Find(s_singleMenuModelTextureTable[i].textureName);
+        CTexture* tex = menu->m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
+        tex->AddRef();
+        menu->m_textures[i + 45] = tex;
+    }
+    return 1;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80149e5c
@@ -1201,50 +1242,8 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     }
 
     if (SingleCaravanWork()->m_shopRequestState == 0) {
-        int loadCompleted;
-        int loadIndex = m_singleMenuTextureLoadIndex;
-        if (loadIndex >= 2) {
-            loadCompleted = 1;
-        } else {
-            if (m_singleMenuTextureLoadState == 0) {
-                char path[256];
-                sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
-                gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
-                File.ReadASync(gSingMenuAsyncFileHandle);
-                m_singleMenuTextureLoadState = m_singleMenuTextureLoadState + 1;
-            } else if (m_singleMenuTextureLoadState == 1) {
-                if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
-                    loadCompleted = 0;
-                    goto store_load_completed;
-                }
-
-                m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
-
-                void* buffer = File.m_readBuffer;
-                m_textureSets[loadIndex + 5]->Create(buffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
-                File.Close(gSingMenuAsyncFileHandle);
-                gSingMenuAsyncFileHandle = 0;
-                m_singleMenuTextureLoadState = 0;
-                m_singleMenuTextureLoadIndex = m_singleMenuTextureLoadIndex + 1;
-            }
-
-            if (m_singleMenuTextureLoadIndex < 2) {
-                loadCompleted = 0;
-            } else {
-                for (int i = 0; i < 0x33; i++) {
-                    int texIdx = m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->Find(s_singleMenuModelTextureTable[i].textureName);
-                    CTexture* tex = m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
-                    tex->AddRef();
-                    m_textures[i + 45] = tex;
-                }
-                loadCompleted = 1;
-            }
-        }
-store_load_completed:
-        gSingMenuAsyncLoadCompleted = loadCompleted;
+        gSingMenuAsyncLoadCompleted = LoadSingMenuTextureStep(this);
     }
-
-post_texture_load:
     if (m_singleFadeState->done != 0) {
         m_singleMenuPhase = m_singleMenuPhase + 1;
         m_singleFadeState->done = 0;
@@ -1338,6 +1337,52 @@ void CMenuPcs::createSingleMenu()
     }
 }
 
+static inline void DrawSingleBack(CMenuPcs* menu, float alpha)
+{
+    menu->DrawInit();
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(255.0f * alpha);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+    MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+    int y;
+    int step = 0x20;
+    for (y = 0x40; y < 0x180; y += step) {
+        if ((0x180 - y) < step) {
+            step = 0x180 - y;
+        }
+        MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y), 640.0f, static_cast<float>(step),
+                         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    }
+}
+
+static inline void DrawSingleFrame(CMenuPcs* menu, float alpha)
+{
+    menu->DrawInit();
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = 0xFF;
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+    MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f), 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
+    MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80149534
@@ -1424,57 +1469,9 @@ void CMenuPcs::drawSingleMenu()
             for (; i < count; i++, entry++) {
                 if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
-                        float alpha = entry->alpha;
-                        DrawInit();
-                        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-                        _GXColor color;
-                        color.r = 0xFF;
-                        color.g = 0xFF;
-                        color.b = 0xFF;
-                        color.a = static_cast<u8>(255.0f * alpha);
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-                        MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f,
-                                                         64.0f, 0.0f, 0.0f,
-                                                         1.0f, 1.0f, 0.0f);
-                        MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f,
-                                                         64.0f, 0.0f, 0.0f,
-                                                         1.0f, 1.0f, 0.0f);
-
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-                        int step = 0x20;
-                        for (int y = 0x40; y < 0x180; y += step) {
-                            if ((0x180 - y) < step) {
-                                step = 0x180 - y;
-                            }
-                            MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y),
-                                                             640.0f, static_cast<float>(step),
-                                                             0.0f, 0.0f, 1.0f,
-                                                             1.0f, 0.0f);
-                        }
+                        DrawSingleBack(this, entry->alpha);
                     } else if (i == 1) {
-                        float alpha = entry->alpha;
-                        DrawInit();
-                        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-                        _GXColor color;
-                        color.r = 0xFF;
-                        color.g = 0xFF;
-                        color.b = 0xFF;
-                        color.a = 0xFF;
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-                        MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f),
-                                                         24.0f, 176.0f, 288.0f,
-                                                         0.0f, 0.0f, alpha, 1.0f,
-                                                         0.0f);
-                        MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f,
-                                                         288.0f, 0.0f, 0.0f, alpha,
-                                                         1.0f, 0.0f);
+                        DrawSingleFrame(this, entry->alpha);
                     } else if (i == 2) {
                         DrawSingleStat(entry->alpha);
                     } else {
@@ -1496,57 +1493,9 @@ void CMenuPcs::drawSingleMenu()
             for (; i < count; i++, entry++) {
                 if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
-                        float alpha = entry->alpha;
-                        DrawInit();
-                        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-                        _GXColor color;
-                        color.r = 0xFF;
-                        color.g = 0xFF;
-                        color.b = 0xFF;
-                        color.a = static_cast<u8>(255.0f * alpha);
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-                        MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f,
-                                                         64.0f, 0.0f, 0.0f,
-                                                         1.0f, 1.0f, 0.0f);
-                        MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f,
-                                                         64.0f, 0.0f, 0.0f,
-                                                         1.0f, 1.0f, 0.0f);
-
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-                        int step = 0x20;
-                        for (int y = 0x40; y < 0x180; y += step) {
-                            if ((0x180 - y) < step) {
-                                step = 0x180 - y;
-                            }
-                            MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y),
-                                                             640.0f, static_cast<float>(step),
-                                                             0.0f, 0.0f, 1.0f,
-                                                             1.0f, 0.0f);
-                        }
+                        DrawSingleBack(this, entry->alpha);
                     } else if (i == 1) {
-                        float alpha = entry->alpha;
-                        DrawInit();
-                        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-                        _GXColor color;
-                        color.r = 0xFF;
-                        color.g = 0xFF;
-                        color.b = 0xFF;
-                        color.a = 0xFF;
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-                        MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f),
-                                                         24.0f, 176.0f, 288.0f,
-                                                         0.0f, 0.0f, alpha, 1.0f,
-                                                         0.0f);
-                        MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f,
-                                                         288.0f, 0.0f, 0.0f, alpha,
-                                                         1.0f, 0.0f);
+                        DrawSingleFrame(this, entry->alpha);
                     } else if (i == 2) {
                         DrawSingleStat(entry->alpha);
                     } else {
@@ -2207,16 +2156,6 @@ void CMenuPcs::SingleCalcCtrl()
     }
 }
 
-static inline _GXColor SingMenuWhite()
-{
-    _GXColor c;
-    c.r = 0xFF;
-    c.g = 0xFF;
-    c.b = 0xFF;
-    c.a = 0xFF;
-    return c;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801478cc
@@ -2228,43 +2167,10 @@ static inline _GXColor SingMenuWhite()
  */
 void CMenuPcs::SingleDrawCtrl()
 {
-    DrawInit();
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    _GXColor white;
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, white);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-    MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f,
-                                     0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f,
-                                     0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-    int step = 0x20;
-    for (int y = 0x40; y < 0x180; y += step) {
-        if ((0x180 - y) < step) {
-            step = 0x180 - y;
-        }
-
-        MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y), 640.0f,
-                                         static_cast<float>(step), 0.0f, 0.0f,
-                                         1.0f, 1.0f, 0.0f);
-    }
+    DrawSingleBack(this, 1.0f);
 
     if (m_singleMenuMode != 8) {
-        DrawInit();
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXSetChanMatColor(GX_COLOR0A0, SingMenuWhite());
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-        MenuPcs.DrawRect(0, 32.0f, 24.0f, 176.0f, 288.0f,
-                                         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f, 288.0f,
-                                         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        DrawSingleFrame(this, 1.0f);
         DrawSingleStat(1.0f);
         DrawSingleHelpWim(1.0f);
     }
@@ -2997,12 +2903,13 @@ int CMenuPcs::SingWinMessHeight()
 bool CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask;
+    CCaravanWork* caravanWork = SingleCaravanWork();
     int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
     int raceBits = flags & 0xF;
     int genderBits = flags & 0x30;
-    unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
+    unsigned int raceMask = 1 << (caravanWork->m_tribeId & 3);
 
-    if (SingleCaravanWork()->m_genderFlag != 0) {
+    if (caravanWork->m_genderFlag != 0) {
         genderMask = 0x20;
     } else {
         genderMask = 0x10;

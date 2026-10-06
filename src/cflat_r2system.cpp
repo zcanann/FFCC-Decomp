@@ -1370,12 +1370,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 unsigned int* slot = &object->m_localBase[i + 3];
                 if (spec[0] == '%') {
                     int fmtIndex = 1;
-                    char* digits = spec + 1;
                     int started = spec[1] == '0';
                     int width = 0;
-                    for (; (*digits >= '0') && (*digits <= '9'); digits++) {
-                        fmtIndex++;
-                        width = (*digits - '0') + width * 10;
+                    for (; (spec[fmtIndex] >= '0') && (spec[fmtIndex] <= '9'); fmtIndex++) {
+                        width = width * 10 + (spec[fmtIndex] - '0');
                     }
 
                     if (spec[fmtIndex] == 'b') {
@@ -1609,11 +1607,12 @@ renderedDone:
                   static_cast<float>(static_cast<int>(object->m_localBase[2]));
 
         if ((mode & 4) != 0) {
+            int pointCount = m_pathPointCount < 3 ? m_pathPointCount : m_pathPointCount;
             int lowBit = modeBits & 1;
             int highBit = modeBits & 2;
-            int segmentCount = m_pathPointCount + 1 - (lowBit + ((modeBits >> 1) & 1));
+            int segmentCount = pointCount + 1 - (lowBit + ((modeBits >> 1) & 1));
             float scaled = t * static_cast<float>(segmentCount);
-            int baseIndex = (lowBit != 0) + static_cast<int>(scaled);
+            int baseIndex = (modeBits & 1 ? 1 : 0) + static_cast<int>(scaled);
             float segmentT = std::fmodf(scaled, 1.0f);
 
             CVector delta = CVector(m_pathPoints[1].m_position) - CVector(m_pathPoints[0].m_position);
@@ -1703,20 +1702,17 @@ renderedDone:
                     CFlatPathPoint* p1 = &m_pathPoints[i];
                     int i2 = (i + 1) < maxIndex ? (i + 1) : maxIndex;
                     CFlatPathPoint* p2 = &m_pathPoints[i2];
-                    int i3 = i + 2;
-                    if (i3 >= maxIndex) {
-                        i3 = maxIndex;
+                    if (i + 2 < maxIndex) {
+                        maxIndex = i + 2;
                     }
-                    CFlatPathPoint* p3 = &m_pathPoints[i3];
-                    float scaleA = p1->m_distance - p0->m_distance;
+                    CFlatPathPoint* p3 = &m_pathPoints[maxIndex];
                     float scaleB = p2->m_distance - p1->m_distance;
-                    float scaleC = p3->m_distance - p2->m_distance;
                     float segmentT =
                         (kCFlatPadStickZero == scaleB) ? kCFlatPadStickZero : (pathDistance - p1->m_distance) / scaleB;
 
                     Vec result;
                     Math.CalcSpline(&result, &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position,
-                                    scaleA, scaleB, scaleC, segmentT, kCFlatOneF);
+                                    p1->m_distance - p0->m_distance, scaleB, p3->m_distance - p2->m_distance, segmentT, kCFlatOneF);
                     *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
                     *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
                     *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
@@ -2278,7 +2274,8 @@ renderedDone:
     }
     case -0x41: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        int mode = *object->m_localBase & 3;
+        int mode = *object->m_localBase;
+        mode &= 3;
         float alpha = static_cast<float>(static_cast<int>(object->m_localBase[1]));
         alpha /= static_cast<float>(static_cast<int>(object->m_localBase[2]));
         Quaternion start;
@@ -2552,7 +2549,7 @@ renderedDone:
         int alpha = static_cast<int>(255.0f * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
         GraphicPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),
             static_cast<unsigned char>(object->m_localBase[2]), static_cast<unsigned char>(alpha),
-            static_cast<unsigned char>(object->m_localBase[4] == 0), static_cast<unsigned char>(object->m_localBase[5] == 0),
+            static_cast<unsigned char>(object->m_localBase[4] ? 0 : 1), static_cast<unsigned char>(object->m_localBase[5] ? 0 : 1),
             static_cast<short>(object->m_localBase[6]));
         this->push(object, 0);
         outResult = 0;
@@ -3064,14 +3061,12 @@ renderedDone:
         outResult = 0;
         break;
     case -0xAF:
-        this->push(
-            object,
-            static_cast<signed char>(Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]]));
+        this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]]);
         outResult = 0;
         break;
     case -0xAE:
         strcpy(
-            reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].m_name),
+            Game.m_caravanWorkArr[*object->m_localBase].m_name,
             this->m_strBlob + this->m_strOffsets[object->m_localBase[1]]);
         this->push(object, 0);
         outResult = 0;

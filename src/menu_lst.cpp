@@ -71,6 +71,8 @@ void CMenuPcs::MLstDraw()
 	float w;
 	float x;
 	float v;
+	float textX;
+	float textY;
 	GXColor colors[4];
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -123,14 +125,14 @@ void CMenuPcs::MLstDraw()
 	font->DrawInit();
 
 	item = this->m_menuLstList->entries;
-	for (i = 0; i < this->m_menuLstList->count; i++, item++) {
+	for (i = 0; i < this->m_menuLstList->count; item++, i++) {
 		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(kMLstColorMax * item->alpha)).color);
 
 		const char* text = GetMenuStr(i + 0x2e);
 		font->GetWidth(text);
 
-		float textX = (float)(item->x + 0x28);
-		float textY = (float)(item->y + 3);
+		textX = (float)(item->x + 0x28);
+		textY = (float)(item->y + 3);
 		if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 			textX += kMLstSelectedOffsetX;
 		}
@@ -147,10 +149,10 @@ void CMenuPcs::MLstDraw()
 	DrawInit();
 	if (menuMode == 1) {
 		MenuLstEntry* curItem = &this->m_menuLstList->entries[this->m_menuLstState->cursor];
-		float cursorYF = (curItem->height - 0x20) / 2.0 + curItem->y;
-		int cursorY = (int)cursorYF;
-		int cursorX = (int)((float)(curItem->x - 0x38) + (float)((int)System.m_frameCounter % 8));
-		DrawCursor(cursorX, cursorY, kMLstOne);
+		float cursorX = (float)(curItem->x - 0x38);
+		float cursorY = (curItem->height - 0x20) / 2.0 + curItem->y;
+		cursorX += (float)((int)System.m_frameCounter % 8);
+		DrawCursor((int)cursorX, (int)cursorY, kMLstOne);
 	}
 
 	DrawInit();

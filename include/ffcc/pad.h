@@ -97,18 +97,7 @@ public:
      */
     int IsGba(long port)
     {
-        bool suppress = false;
-        if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
-            suppress = true;
-        }
-        int result;
-        if (suppress) {
-            result = 0;
-        } else {
-            unsigned int index = (m_debugPadPort == port) ? 0 : static_cast<unsigned int>(port);
-            result = m_padInputs[index].gbaMode;
-        }
-        return result;
+        return (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) ? 0 : m_padInputs[(m_debugPadPort == port) ? 0 : static_cast<unsigned int>(port)].gbaMode;
     }
     /*
      * --INFO--

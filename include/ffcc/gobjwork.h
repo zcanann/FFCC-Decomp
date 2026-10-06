@@ -301,7 +301,7 @@ public:
     const char* GetCmdListItemName(int);
     int GetWeaponAttrib(int);
     int GetCmdListItem(int);
-    void SearchCombiTop(int);
+    int SearchCombiTop(int);
     void DelCmdListAndItem(int, int);
     int GetNumCombi(int);
     int GetNextCmdListIdx(int, int);
@@ -351,7 +351,7 @@ public:
     int m_joybusCaravanId;                      // 0x03B4
     unsigned short m_letterMeta[8];             // 0x03B8
     unsigned short unk_0x3c8;                   // 0x03C8
-    unsigned char m_name[18];                   // 0x03CA
+    char m_name[18];                            // 0x03CA
     unsigned short unk_0x3dc;                   // 0x03DC
     unsigned short m_progressValue;             // 0x03DE
     unsigned short m_tribeId;                   // 0x03E0

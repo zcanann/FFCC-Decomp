@@ -3294,8 +3294,8 @@ void MainControl(int frames)
 
     if (RedCurrentSoundControlGet()->m_activeTrackCount != 0) {
         if ((RedCurrentSoundControlGet()->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0) {
-            mul = ((u32)RedMusicTempoControlGetValue() >> REDSOUND_FIXED_SHIFT) & REDSOUND_TEMPO_SCALE_MASK;
             step = RedCurrentSoundControlGet()->m_tempo >> REDSOUND_FIXED_SHIFT;
+            mul = ((u32)RedMusicTempoControlGetValue() >> REDSOUND_FIXED_SHIFT) & REDSOUND_TEMPO_SCALE_MASK;
             if (mul != 0) {
                 if (RedMusicTempoControlGetValue() < 0) {
                     step *= (int)mul;

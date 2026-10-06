@@ -359,11 +359,12 @@ void CMenuPcs::MoneyDraw()
 	for (i = 0; i < 2; i++) {
 		x = (float)(entry->x + 0x20);
 		y = (float)(entry->y + 0x18) + 32.0f * (float)i;
+		v = 32.0f * (float)i;
 		for (j = 0; j < 8; j++) {
 			signed char digit = s_place[i][j];
 			if (digit >= 0) {
 				MenuPcs.DrawRect(0, x, y, 24.0f, 32.0f,
-				                 24.0f * (float)digit, 32.0f * (float)i,
+				                 24.0f * (float)digit, v,
 				                 1.0f, 1.0f, 0.0f);
 			}
 			x += 18.0f;
@@ -379,7 +380,7 @@ void CMenuPcs::MoneyDraw()
 		GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 		entry = this->m_moneyPanel->anims;
-		MenuPcs.DrawRect(0, (float)(entry->x + ((7 - this->m_moneyState->selections[0]) * 0x12 + 0x24)),
+		MenuPcs.DrawRect(0, (float)(entry->x + 0x24 + (7 - this->m_moneyState->selections[0]) * 0x12),
 		                 (float)(entry->y + 0x5C), 16.0f, 24.0f,
 		                 0.0f, 0.0f, 1.0f,
 		                 1.0f, 0.0f);
@@ -415,8 +416,8 @@ void CMenuPcs::MoneyDraw()
 
 	if ((mode != 0) && (this->m_moneyState->optionState == 1)) {
 		MenuWindowInfo* window = this->m_menuWindowInfo;
-		y = (float)(window->y + 0x20);
 		x = (float)window->x;
+		y = (float)(window->y + 0x20);
 		y += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
 		x += (float)((int)System.m_frameCounter % 8);
 		DrawCursor((int)x, (int)y, 1.0f);
@@ -545,8 +546,8 @@ inline void CMenuPcs::MoneyInit()
 		anim->uvScale = 1.0f;
 	}
 
-	i = 0;
-	anim = &this->m_moneyPanel->anims[i++];
+	int index = 0;
+	anim = &this->m_moneyPanel->anims[index++];
 	anim->tex = kMoneyPanelTexture;
 	anim->y = 0x68;
 	anim->w = 0xf8;
@@ -557,7 +558,7 @@ inline void CMenuPcs::MoneyInit()
 	anim->uvScale = 1.0f;
 	anim->startFrame = 0;
 	anim->duration = 10;
-	this->m_moneyPanel->count = i;
+	this->m_moneyPanel->count = index;
 
 	s_Money = 0;
 	for (i = 0; i < 2; i++) {

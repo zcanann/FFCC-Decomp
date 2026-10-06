@@ -1,3 +1,4 @@
+#define FFCC_PTRARRAY_DTOR_REMOVEALL
 #include "ffcc/ptrarray.h"
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"
@@ -43,11 +44,6 @@ static inline void _GXSetAlphaCompare(int comp0, int ref0, int op, int comp1, in
 }
 
 namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
 struct ShadowCandidate
 {
     CMapShadow* shadow;
@@ -896,11 +892,12 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     static int bTest2;
     static char init2;
 
+    CMaterial* material;
+    int isStd1000 = 0;
     SetStdEnv();
 
-    CMaterial* material = materialSet->m_materials[materialIndex];
+    material = materialSet->m_materials[materialIndex];
     g_drawMaterial = material;
-    int isStd1000 = 0;
 
     if (material->m_bumpLight != 0) {
         if (material->m_materialType == 3) {
@@ -1186,7 +1183,9 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXLoadTexObj(m_underWaterTexture, static_cast<GXTexMapID>(m_bumpTexMapIds[2]));
             return;
         }
-        if ((m_curEnvTevBit & material->m_tevBit & 0x1000) != 0) {
+        unsigned long tevBit = m_curEnvTevBit;
+        tevBit &= material->m_tevBit;
+        if ((tevBit & 0x1000) != 0) {
             isStd1000 = 1;
         } else {
             if (m_vtxDescMode != 1) {
@@ -1430,10 +1429,10 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
         if ((tevBit & 0x8000) != 0) {
             m_activeEnvTevBit = 0xFFFFFFFF;
             GXColor kColor;
+            kColor.r = 0;
             kColor.g = 0;
-            kColor.r = material->m_shadowKColorId;
             kColor.b = 0;
-            kColor.a = 0;
+            kColor.a = material->m_shadowKColorId;
             GXSetTevColor(static_cast<GXTevRegID>(3), kColor);
             GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
             if ((tevBit & 0x20) != 0) {
@@ -1545,7 +1544,6 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXSetNumChans(1);
             GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
             _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
-            m_numTevStage = 0;
             GXColor alpha;
             GXColor alphaInv;
             alpha.r = 0;
@@ -1556,6 +1554,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             alphaInv.g = 0xFF;
             alphaInv.b = 0xFF;
             alphaInv.a = m_reflectionAlpha;
+            m_numTevStage = 0;
             GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
             _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_RED);
             _GXSetTevSwapMode(m_numTevStage, 0, 1);
@@ -2402,6 +2401,11 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
     }
 }
 
+inline int chkbit32(unsigned long* bits, unsigned long index)
+{
+    return bits[index >> 5] & (1 << (index & 0x1F));
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8003E660
@@ -2413,17 +2417,15 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
  */
 void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shadowBit32, float (*viewMtx) [4])
 {
-    unsigned int i = 0;
-    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
-    for (; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* shadow = (*mapShadowArray)[i];
+    for (long i = 0; i < static_cast<unsigned int>(MapMng.GetMapShadowArray().GetSize()); i++) {
+        CMapShadow* shadow = MapMng.GetMapShadowArray()[i];
 
         if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
             continue;
         }
 
-        if ((shadow->m_materialMode == 1) || ((shadowBit32[i >> 5] & (1u << (i & 0x1F))) != 0)) {
-            SetShadow(*shadow, viewMtx, static_cast<int>(i), 0xFFFFFFFF);
+        if ((shadow->m_materialMode == 1) || chkbit32(shadowBit32, i)) {
+            SetShadow(*shadow, viewMtx, i, 0xFFFFFFFF);
         }
     }
 }
@@ -2447,16 +2449,16 @@ void CMaterialMan::SetPosition(
 {
     CBound searchBound(position, rangeXZ, rangeY);
 
+    ShadowCandidate* candidateWrite;
     CPtrArray<CMapShadow*>* mapShadowArray;
     if (target == static_cast<CMapShadow::TARGET>(0)) {
         ShadowCandidate shadowCandidates[128];
-        ShadowCandidate* candidateWrite = shadowCandidates;
+        candidateWrite = shadowCandidates;
         mapShadowArray = &MapMng.GetMapShadowArray();
         int candidateCount = 0;
 
-        int idx;
-        for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-            CMapShadow* shadow = (*mapShadowArray)[idx];
+        for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+            CMapShadow* shadow = (*mapShadowArray)[i];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2506,30 +2508,28 @@ void CMaterialMan::SetPosition(
             }
         }
 
-        float maxDist = 20000000000000.0f;
-        ShadowCandidate* nearest = 0;
-        float nearestDist = 100000000000000000000.0f;
-        float candidateDist;
-        ShadowCandidate* candidateRead = shadowCandidates;
-        for (int i = 0; i < candidateCount; i++) {
-            candidateDist = candidateRead->distance;
-            if (nearestDist > candidateDist) {
-                nearestDist = candidateDist;
-                nearest = candidateRead;
+        for (int n = 0; n < 1; n++) {
+            ShadowCandidate* nearest = 0;
+            float nearestDist = 100000000000000000000.0f;
+            ShadowCandidate* candidateRead = shadowCandidates;
+            for (int i = 0; i < candidateCount; i++) {
+                if (nearestDist > candidateRead->distance) {
+                    nearestDist = candidateRead->distance;
+                    nearest = candidateRead;
+                }
+                candidateRead++;
             }
-            candidateRead++;
-        }
 
-        if (nearest != 0) {
-            nearest->distance = maxDist;
+            if (nearest == 0) {
+                break;
+            }
+            nearest->distance = 20000000000000.0f;
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
-        unsigned int i = 0;
-        int idx;
         mapShadowArray = &MapMng.GetMapShadowArray();
-        for (; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-            CMapShadow* shadow = (*mapShadowArray)[idx];
+        for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+            CMapShadow* shadow = (*mapShadowArray)[i];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2639,28 +2639,25 @@ int CMaterialMan::GetCharaShadow(
         }
     }
 
-    int outputOffset = outputCount * 4;
-
-    ShadowCandidate* candidateRead = shadowCandidates;
-    float maxDist = 20000000000000.0f;
-    ShadowCandidate* nearest = 0;
-    float nearestDist = 100000000000000000000.0f;
-    float candidateDist;
-    for (int i = 0; i < candidateCount; i++) {
-        candidateDist = candidateRead->distance;
-        if (nearestDist > candidateDist) {
-            nearestDist = candidateDist;
-            nearest = candidateRead;
+    for (int n = 0; n < 1; n++) {
+        ShadowCandidate* nearest = 0;
+        float nearestDist = 100000000000000000000.0f;
+        ShadowCandidate* candidateRead = shadowCandidates;
+        for (int i = 0; i < candidateCount; i++) {
+            if (nearestDist > candidateRead->distance) {
+                nearestDist = candidateRead->distance;
+                nearest = candidateRead;
+            }
+            candidateRead++;
         }
-        candidateRead++;
-    }
 
-    if (nearest != 0) {
-        nearest->distance = maxDist;
+        if (nearest == 0) {
+            break;
+        }
+        nearest->distance = 20000000000000.0f;
         if (outputCount < maxShadows) {
-            *reinterpret_cast<CMaterial**>(Ptr(materialsOut, outputOffset)) = MapMng.m_materialSet->m_materials[nearest->shadow->m_materialIndex];
-            outputCount++;
-            *reinterpret_cast<float (**)[4]>(Ptr(shadowMtxOut, outputOffset)) = nearest->shadow->m_shadowMtx;
+            materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearest->shadow->m_materialIndex];
+            shadowMtxOut[outputCount++] = nearest->shadow->m_shadowMtx;
         }
     }
 

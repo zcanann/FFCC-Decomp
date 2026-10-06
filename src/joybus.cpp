@@ -122,6 +122,8 @@ extern const unsigned int CTRL_GBA;
 extern const unsigned int JOY_CODE_MASK;
 }
 
+extern const unsigned int kJoyBusCmdOpMask;
+
 enum {
 	kJoyDataPacketHeaderBytes = 2,
 	kJoyDataPacketPayloadBytes = 0x400,
@@ -3175,7 +3177,7 @@ unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
         *crc = static_cast<unsigned short>((value << 8) ^ JoyBusCrcTable[static_cast<unsigned char>(value >> 8) ^ *data++]);
     }
 
-    return static_cast<unsigned short>(~*crc);
+    return static_cast<unsigned short>(~static_cast<unsigned short>(*crc));
 }
 
 /*
@@ -3251,6 +3253,55 @@ inline void JoyBus::SetRecvBuffer(ThreadParam* threadParam, unsigned int data)
         buf->m_payload[buf->m_length++] = dataBytes[2];
         buf->m_payload[buf->m_length++] = dataBytes[3];
     }
+
+    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 496b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void JoyBus::CleanQueue(ThreadParam* threadParam)
+{
+    int newCount;
+    int i;
+
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
+    newCount = 0;
+    for (i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
+    {
+        unsigned char* cmd = (unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i];
+
+        if ((unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x0A || (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x10 ||
+            (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x14 || (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x1B ||
+            (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x13 || (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x09)
+        {
+            m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
+        }
+    }
+
+    for (i = 0; i < 0x40; ++i)
+    {
+        if (i < newCount)
+        {
+            m_cmdQueueData[threadParam->m_portIndex][i] = m_recvQueueEntriesArr[threadParam->m_portIndex][i];
+        }
+        else
+        {
+            m_cmdQueueData[threadParam->m_portIndex][i] = 0;
+        }
+
+        m_recvQueueEntriesArr[threadParam->m_portIndex][i] = 0;
+    }
+
+    m_secCmdCount[threadParam->m_portIndex] = 0;
+    m_cmdCount[threadParam->m_portIndex] = newCount;
 
     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 }
@@ -3397,9 +3448,9 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             {
                 unsigned short crcAcc = 0xFFFF;
 
-                if (Crc16(m_recvBuffer[threadParam->m_portIndex].m_length,
-                          m_recvBuffer[threadParam->m_portIndex].m_payload, &crcAcc)
-                    == m_recvBuffer[threadParam->m_portIndex].m_crc)
+                unsigned short crc = Crc16(m_recvBuffer[threadParam->m_portIndex].m_length,
+                          m_recvBuffer[threadParam->m_portIndex].m_payload, &crcAcc);
+                if (crc == m_recvBuffer[threadParam->m_portIndex].m_crc)
                 {
                     GbaQue.SetQueue(threadParam->m_portIndex, prevCmd);
                 }
@@ -3420,108 +3471,33 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         threadParam->m_state = 0x02;
         threadParam->m_subState = 0;
         threadParam->m_skipProcessingFlag = 1;
+        return sendResult;
     }
-    else
+
+    if (threadParam->m_skipProcessingFlag != 0)
     {
-        if (threadParam->m_skipProcessingFlag != 0)
-        {
-            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-            extern const unsigned int kJoyBusCmdOpMask;
-            int newCount;
-            int i;
-
-            for (i = newCount = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
-            {
-                unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
-
-                if (op == 0x0A) goto keep_a;
-                if (op == 0x10) goto keep_a;
-                if (op == 0x14) goto keep_a;
-                if (op == 0x1B) goto keep_a;
-                if (op == 0x13) goto keep_a;
-                if (op != 0x09) goto skip_a;
-            keep_a:
-                m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
-            skip_a:;
-            }
-
-            for (i = 0; i < 0x40; ++i)
-            {
-                if (i < newCount)
-                {
-                    m_cmdQueueData[threadParam->m_portIndex][i] = m_recvQueueEntriesArr[threadParam->m_portIndex][i];
-                }
-                else
-                {
-                    m_cmdQueueData[threadParam->m_portIndex][i] = 0;
-                }
-
-                m_recvQueueEntriesArr[threadParam->m_portIndex][i] = 0;
-            }
-
-            m_secCmdCount[threadParam->m_portIndex] = 0;
-            m_cmdCount[threadParam->m_portIndex] = newCount;
-
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
+        CleanQueue(threadParam);
+    }
 
 #ifndef VERSION_GCCJGC
-        const int state = threadParam->m_state;
+    const int state = threadParam->m_state;
 
-        if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
-            m_stateCodeArr[threadParam->m_portIndex] != 0x09 &&
-            state != 0x05 &&
-            state >= 0x21 && state <= 0x28)
-        {
-            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
+        m_stateCodeArr[threadParam->m_portIndex] != 0x09 &&
+        state != 0x05 &&
+        state >= 0x21 && state <= 0x28)
+    {
+        CleanQueue(threadParam);
 
-            extern const unsigned int kJoyBusCmdOpMask;
-            int newCount;
-            int i;
-
-            for (i = newCount = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
-            {
-                unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
-
-                if (op == 0x0A) goto keep_b;
-                if (op == 0x10) goto keep_b;
-                if (op == 0x14) goto keep_b;
-                if (op == 0x1B) goto keep_b;
-                if (op == 0x13) goto keep_b;
-                if (op != 0x09) goto skip_b;
-            keep_b:
-                m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
-            skip_b:;
-            }
-
-            for (i = 0; i < 0x40; ++i)
-            {
-                if (i < newCount)
-                {
-                    m_cmdQueueData[threadParam->m_portIndex][i] = m_recvQueueEntriesArr[threadParam->m_portIndex][i];
-                }
-                else
-                {
-                    m_cmdQueueData[threadParam->m_portIndex][i] = 0;
-                }
-
-                m_recvQueueEntriesArr[threadParam->m_portIndex][i] = 0;
-            }
-
-            m_secCmdCount[threadParam->m_portIndex] = 0;
-            m_cmdCount[threadParam->m_portIndex] = newCount;
-
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-            threadParam->m_state = 0x05;
-            threadParam->m_subState = 0;
-            threadParam->m_skipProcessingFlag = 1;
-        }
-#endif
+        threadParam->m_state = 0x05;
+        threadParam->m_subState = 0;
+        threadParam->m_skipProcessingFlag = 1;
     }
+#endif
 
-    return (recvResult == 2) | (sendResult != 0 ? 2 : 0);
+    int ret = (recvResult == 2) ? 1 : 0;
+    ret |= (sendResult != 0) ? 2 : 0;
+    return ret;
 }
 
 /*
@@ -4650,9 +4626,11 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
     unsigned char* data = reinterpret_cast<unsigned char*>(src);
     unsigned char* packet = reinterpret_cast<unsigned char*>(outBuffer);
     unsigned int crc = 0xFFFF;
-    int remaining = length;
-    unsigned char* cursor = data;
+    int remaining;
+    unsigned char* cursor;
 
+    cursor = data;
+    remaining = length;
     while (--remaining >= 0) {
         crc = (((crc & 0xFFFF) << 8) ^ JoyBusCrcTable[((crc >> 8) & 0xFF) ^ *cursor++]) & 0xFFFF;
     }

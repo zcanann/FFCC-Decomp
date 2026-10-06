@@ -414,7 +414,7 @@ void GbaQueue::LoadAll()
 		}
 		m_resetFlags = 0;
 
-		for (int i = 0; i < 4; i++) {
+		for (i = 0; i < 4; i++) {
 			if (Game.m_scriptFoodBase[i] == 0) {
 				continue;
 			}
@@ -930,14 +930,14 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 	CCaravanWork* caravanWork;
 	unsigned char* valueBytes;
 	unsigned int itemSlot;
-	int smithItem;
-	int recipeIndex;
 	int i;
 	const SItemFlatRow* itemRow;
 	int materialId;
-	int baseItem;
-	int materialCount;
 	int materialIdx;
+	int baseItem;
+	int recipeIndex;
+	int materialCount;
+	int smithItem;
 	int foundSlot;
 
 	foodBaseArr = Game.m_scriptFoodBase;
@@ -1760,10 +1760,10 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	GbaQueueMapEntity localMapItems[16];
 	GbaQueueMapEntity* localEntry;
 	GbaQueueMapEntity* prevEntry;
-	GbaQueueMapEntity* prevWalk;
+	int count;
 	short baseX;
 	short baseZ;
-	int count;
+	GbaQueueMapEntity* prevWalk;
 	int i;
 	unsigned char* outPtr;
 
@@ -2361,27 +2361,25 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
-	CCaravanWork** foodBasePtr = foodBaseArr + channel;
 	int letterIndex = valueBytes[2];
-	unsigned int hasGil = (*foodBasePtr)->m_letters[letterIndex].FlagsBits().m_attachmentIsGil;
+	unsigned int hasGil = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachmentIsGil;
 	int result;
 
-	if ((hasGil == 0) && ((*foodBasePtr)->m_letters[letterIndex].AttachmentValue() != 0)) {
-		int item = (*foodBasePtr)->m_letters[letterIndex].AttachmentValue();
+	if ((hasGil == 0) && (Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue != 0)) {
+		int item = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue;
 		if ((item < 1) || (item > 0x9E)) {
-			if ((*foodBasePtr)->AddItem(item, 0) == 0) {
+			if (Game.m_scriptFoodBase[channel]->AddItem(item, 0) == 0) {
 				result = 1;
 			} else {
 				result = 0;
 			}
 		}
-	} else if ((hasGil != 0) && ((*foodBasePtr)->m_letters[letterIndex].AttachmentValue() != 0)) {
-		int gil = (*foodBasePtr)->m_letters[letterIndex].AttachmentValue() * 100;
-		if ((*foodBasePtr)->CanAddGil(gil) == 0) {
+	} else if ((hasGil != 0) && (Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue != 0)) {
+		int gil = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue * 100;
+		if (Game.m_scriptFoodBase[channel]->CanAddGil(gil) == 0) {
 			result = 1;
 		} else {
-			(*foodBasePtr)->AddGil(gil);
+			Game.m_scriptFoodBase[channel]->AddGil(gil);
 			result = 0;
 		}
 	}
@@ -2395,7 +2393,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		(*foodBasePtr)->m_letters[letterIndex].FlagsBits().m_attachmentClaimed = 1;
+		Game.m_scriptFoodBase[channel]->m_letters[letterIndex].FlagsBits().m_attachmentClaimed = 1;
 	}
 }
 
@@ -2765,7 +2763,7 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 	cmakeInfo[channel].m_active = 1;
 	cmakeInfo[channel].m_charaType = 0xFF;
 	cmakeInfo[channel].m_jobType = 0xFF;
-	cmakeInfo[channel].m_playerSlot = static_cast<unsigned char>(value);
+	cmakeInfo[channel].m_playerSlot = static_cast<signed char>(value);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetMType(channel, 1);
@@ -2878,7 +2876,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		}
 
 		for (i = 0; i < 8; i++) {
-			if ((i != static_cast<signed char>(localInfo.m_playerSlot)) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
+			if ((i != localInfo.m_playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
 			    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0U) &&
 			    (strcmp(reinterpret_cast<char*>(Game.m_caravanWorkArr[i].m_name), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
@@ -2922,7 +2920,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	signed char playerSlot = cmakeInfo[channel].m_playerSlot;
+	int playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (i = 0; i < 4; i++) {
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (cmakeInfo[i].m_charaType == valueBytes[2])) {
@@ -2963,7 +2961,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	OSWaitSemaphore(accessSemaphores + channel);
 	cmakeInfo[channel].m_charaType = valueBytes[2];
 	OSSignalSemaphore(accessSemaphores + channel);
-	MenuPcs.ChgModel(static_cast<int>(playerSlot), valueBytes[2] & 3, (valueBytes[2] >> 2) & 3,
+	MenuPcs.ChgModel(playerSlot, valueBytes[2] & 3, (valueBytes[2] >> 2) & 3,
 	                 static_cast<int>(valueBytes[2] >> 7));
 }
 
@@ -2993,7 +2991,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	signed char playerSlot = cmakeInfo[channel].m_playerSlot;
+	int playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (i = 0; i < 4; i++) {
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (cmakeInfo[i].m_jobType == valueBytes[2])) {
@@ -3137,9 +3135,9 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	unsigned char compatibilityData[0x10];
 	unsigned char* writePtr;
 	int count;
-	int slot;
+	int j;
 	int outSize;
-	int selectedCount;
+	int i;
 	char* src;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3148,8 +3146,8 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[0] = m_playerData[channel].m_jobType;
 	count = 2;
-	for (slot = 3; slot < 8; slot++) {
-		if (compatibilityData[slot] != 0) {
+	for (i = 3; i < 8; i++) {
+		if (compatibilityData[i] != 0) {
 			count++;
 		}
 	}
@@ -3160,27 +3158,28 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[1] = count;
 	writePtr = outCompatibility + 2;
+	i = 0;
+	j = 1;
 	outSize = 2;
-	selectedCount = 0;
-	for (slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
-			writePtr[0] = static_cast<unsigned char>(slot);
-			writePtr[1] = compatibilityData[slot + 8];
+	for (; (i < count) && (j < 8); j++) {
+		if ((i < 2) || ((i >= 2) && (compatibilityData[j] != 0))) {
+			writePtr[0] = static_cast<unsigned char>(j);
+			writePtr[1] = compatibilityData[j + 8];
 			writePtr += 2;
 			outSize += 2;
-			selectedCount++;
+			i++;
 		}
 	}
 
-	selectedCount = 0;
-	for (slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
-			src = Game.GetNPCName(compatibilityData[slot]);
+	i = 0;
+	for (j = 1; (i < count) && (j < 8); j++) {
+		if ((i < 2) || ((i >= 2) && (compatibilityData[j] != 0))) {
+			src = Game.GetNPCName(compatibilityData[j]);
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
 			writePtr += len + 1;
 			outSize += len + 1;
-			selectedCount++;
+			i++;
 		}
 	}
 
@@ -3227,11 +3226,12 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	memcpy(&localPlayerData, &m_playerData[channel], sizeof(localPlayerData));
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	outData[0] = 0;
-	outData[1] = 0;
-	outData[2] = 0;
-	writePtr = outData + 4;
-	outData[3] = 0;
+	writePtr = outData;
+	writePtr[0] = 0;
+	writePtr[1] = 0;
+	writePtr[2] = 0;
+	writePtr[3] = 0;
+	writePtr += 4;
 	size = 4;
 
 	for (i = count = 0; i < 0x40; i++) {
@@ -3305,9 +3305,8 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 	dataSize = indexBytes + 4;
 	outData += indexBytes - 1;
-	indexPtr = equipIndices;
 	for (i = 0; i < equipCount; i++) {
-		int itemId = localPlayerData.m_items[*indexPtr];
+		int itemId = localPlayerData.m_items[equipIndices[i]];
 		SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
 
 		equipData[0] = __lhbrx(&itemBase->m_equipFlags, 0);
@@ -3316,7 +3315,6 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 		memcpy(outData, equipData, sizeof(equipData));
 		outData += 8;
 		dataSize += 8;
-		indexPtr++;
 	}
 
 	return dataSize;
@@ -3408,40 +3406,44 @@ inline void GbaQueue::SmithEnd(int channel)
 int GbaQueue::MakeBuyData(int channel, char* outData)
 {
 	int totalSize;
-	CCaravanWork** foodBasePtr;
-char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD79) char[kGbaQueueScratchTextSize];
-	if (itemNameScratch == 0) {
-		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xD7B);
-		}
-		return -1;
-	}
-	memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
-
-char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD82) char[kGbaQueueScratchTextSize];
-	if (agbStringScratch == 0) {
-		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xD84);
-		}
-		return -1;
-	}
-	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
-
-	foodBasePtr = &Game.m_scriptFoodBase[channel];
-	const int itemCount = static_cast<short>(
-		Game.m_scriptFoodBase[channel]->m_shopListCount);
-
-	totalSize = 4;
+	int itemCount;
 	int work;
 	unsigned int packed;
 	unsigned short itemId;
 	unsigned short swapped;
 	int i;
+	float price;
+	float userRate;
+	char* itemNameScratch;
+	char* agbStringScratch;
+	char* writePtr;
+
+	itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD79) char[kGbaQueueScratchTextSize];
+	if (itemNameScratch == 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xD7B);
+		}
+		return -1;
+	}
+	memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
+
+	agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD82) char[kGbaQueueScratchTextSize];
+	if (agbStringScratch == 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xD84);
+		}
+		return -1;
+	}
+	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
+
+	itemCount = Game.m_scriptFoodBase[channel]->m_shopListCount;
+
+	totalSize = 4;
 	outData[0] = static_cast<char>(itemCount);
-	char* writePtr = outData + 4;
+	writePtr = outData + 4;
 
 	for (i = 0; i < itemCount; i++) {
-		itemId = (*foodBasePtr)->m_shopList[i];
+		itemId = Game.m_scriptFoodBase[channel]->m_shopList[i];
 		swapped = __lhbrx(&itemId, 0);
 		memcpy(writePtr, &swapped, 2);
 		writePtr += 2;
@@ -3453,15 +3455,13 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		totalSize += 2;
 	}
 
-	const float userRate = static_cast<float>(
+	userRate = static_cast<float>(
 		static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
 
 	for (i = 0; i < itemCount; i++) {
-		work = (*foodBasePtr)->m_shopList[i];
-		work = static_cast<int>(
-			static_cast<float>(static_cast<unsigned short>(
-				reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price)) *
-			userRate);
+		work = Game.m_scriptFoodBase[channel]->m_shopList[i];
+		price = static_cast<unsigned short>(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price);
+		work = static_cast<int>(price * userRate);
 		if (work < 1) {
 			work = 1;
 		}
@@ -3476,7 +3476,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		const int nameItem = (*foodBasePtr)->m_shopList[i];
+		const int nameItem = Game.m_scriptFoodBase[channel]->m_shopList[i];
 		strcpy(itemNameScratch, Game.GetHelpName(nameItem));
 #ifdef VERSION_GCCJGC
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch);
@@ -3512,35 +3512,40 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
  */
 int GbaQueue::MakeSellData(int channel, char* outData)
 {
-	CCaravanWork** foodBasePtr;
-char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDD5) char[kGbaQueueScratchTextSize];
+	int totalSize;
+	int work;
+	unsigned int packed;
+	int i;
+	float price;
+	float userRate;
+	char* itemNameScratch;
+	char* agbStringScratch;
+	char* writePtr;
+
+	itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDD5) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xDD7);
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xDD7);
 		}
 		return -1;
 	}
 	memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 
-char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDDE) char[kGbaQueueScratchTextSize];
+	agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDDE) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xDE0);
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xDE0);
 		}
 		return -1;
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	foodBasePtr = &Game.m_scriptFoodBase[channel];
-	int totalSize = 0;
-	int work;
-	unsigned int packed;
-	char* writePtr = outData;
-	int i;
+	totalSize = 0;
+	writePtr = outData;
 
 	for (i = 0; i < 0x40; i++) {
 		unsigned short sellInfo[4];
-		work = (*foodBasePtr)->m_inventoryItems[i];
+		work = Game.m_scriptFoodBase[channel]->m_inventoryItems[i];
 		if ((work < 1) || (work > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
@@ -3554,16 +3559,14 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	totalSize += 0x200;
 
-	float userRate = static_cast<float>(
+	userRate = static_cast<float>(
 		static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
 	userRate *= 0.25f;
 	for (i = 0; i < 0x40; i++) {
-		work = (*foodBasePtr)->m_inventoryItems[i];
+		work = Game.m_scriptFoodBase[channel]->m_inventoryItems[i];
 		if (work > 0) {
-			work = static_cast<int>(
-				static_cast<float>(static_cast<unsigned short>(
-					reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price)) *
-				userRate);
+			price = static_cast<unsigned short>(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price);
+			work = static_cast<int>(price * userRate);
 			if (work < 1) {
 				work = 1;
 			}
@@ -3581,7 +3584,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		work = (*foodBasePtr)->m_inventoryItems[i];
+		work = Game.m_scriptFoodBase[channel]->m_inventoryItems[i];
 		if (work > 0) {
 			strcpy(itemNameScratch, Game.GetHelpName(work));
 #ifdef VERSION_GCCJGC
@@ -4309,8 +4312,8 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					}
 				}
 
-				const unsigned short enemyFlags = enemyData->m_data[CRomWork::EnemyFlagsOffset];
-				if ((enemyFlags & 5) == 5) {
+				const int enemyFlags = enemyData->m_data[CRomWork::EnemyFlagsOffset] & 5;
+				if (enemyFlags == 5) {
 					localScouterInfo[i].m_traits[0] = 0;
 				} else if ((enemyFlags & 4) != 0) {
 					localScouterInfo[i].m_traits[0] = 1;

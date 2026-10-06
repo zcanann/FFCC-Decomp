@@ -2417,17 +2417,15 @@ inline int chkbit32(unsigned long* bits, unsigned long index)
  */
 void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shadowBit32, float (*viewMtx) [4])
 {
-    unsigned int i = 0;
-    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
-    for (; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* shadow = (*mapShadowArray)[i];
+    for (long i = 0; i < static_cast<unsigned int>(MapMng.GetMapShadowArray().GetSize()); i++) {
+        CMapShadow* shadow = MapMng.GetMapShadowArray()[i];
 
         if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
             continue;
         }
 
         if ((shadow->m_materialMode == 1) || chkbit32(shadowBit32, i)) {
-            SetShadow(*shadow, viewMtx, static_cast<int>(i), 0xFFFFFFFF);
+            SetShadow(*shadow, viewMtx, i, 0xFFFFFFFF);
         }
     }
 }

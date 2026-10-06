@@ -1780,8 +1780,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	if ((flags & 2) != 0) {
 		float halfAngle = kMonObjHalf * (kMonObjDegToRad *
 			static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCA)));
-		float sideDist = kMonObjZero;
-		if (kMonObjZero != halfAngle) {
+		float sideDist;
+		if (kMonObjZero == halfAngle) {
+			sideDist = kMonObjZero;
+		} else {
 			sideDist = kMonObjConeSideRadius / static_cast<float>(tan(static_cast<double>(halfAngle)));
 		}
 

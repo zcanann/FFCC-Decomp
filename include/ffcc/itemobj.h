@@ -118,6 +118,7 @@ public:
 	void carry(CGPartyObj*, int, int);
 	void safeDetach(int, float);
 	void onChangePrg(int);
+	void statPot();
 	void onFrameAlways();
 	void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
 	void loadModel();

@@ -389,11 +389,13 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			{
 				*out++ = '\n';
 			}
+#ifndef VERSION_GCCE01
 			else if (out[-1] == '-')
 			{
 				out[-1] = '\0';
 				out--;
 			}
+#endif
 			break;
 		case 4:
 			*out++ = 0x1D;
@@ -568,6 +570,39 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			caseMode = newCaseMode;
 			break;
 		}
+#ifdef VERSION_GCCE01
+		case 0x44:
+		{
+			int newBranchMode = 2;
+			if (Game.m_caravanWorkArr[CMes::m_tempVar[19]].m_genderFlag == 0)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
+			break;
+		}
+		case 0x42:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
+			int newBranchMode = 2;
+			if (CMes::m_tempVar[varIndex] == 1)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
+			break;
+		}
+		case 0x45:
+		{
+			int newBranchMode = 2;
+			if (playerIndex == 0)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
+			break;
+		}
+#else
 		case 0x44:
 		{
 			int newBranchMode = 2;
@@ -600,6 +635,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			branchMode = newBranchMode;
 			break;
 		}
+#endif
 		case 0x46:
 			if (branchMode == 1)
 			{

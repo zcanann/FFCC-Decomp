@@ -1202,7 +1202,7 @@ void CGItemObj::ItemJump(int state, float jump)
 			cylinder.m_radius = kItemObjZero;
 
 			if (MapMng.CheckHitCylinderNear(&cylinder, &move, mapMask) != 0 &&
-			    g_hit_f->m_groupIndex == state) {
+			    g_hit_lpface_min->m_groupIndex == state) {
 				object->m_groundHitOffset.y += jump;
 			}
 		}

@@ -162,10 +162,10 @@ maphit.cpp:
 	extabindex  start:0x8000B734 end:0x8000B7C4
 	.text       start:0x80024E60 end:0x80027774
 	.ctors      start:0x801D53D0 end:0x801D53D4
-	.rodata     start:0x801D7088 end:0x801D70B0
-	.bss        start:0x80245640 end:0x802456F0
-	.sbss       start:0x8032EC78 end:0x8032EC98
-	.sdata2     start:0x8032F8C0 end:0x8032F930
+	.rodata start:0x801D7088 end:0x801D70B0
+	.bss start:0x80245640 end:0x802456F0
+	.sbss start:0x8032EC78 end:0x8032EC94
+	.sdata2 start:0x8032F8C0 end:0x8032F930
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -2859,3 +2859,6 @@ graphic_dbgfont.cpp:
 
 auto_801FD470_data:
 	.data start:0x801FD470 end:0x801FD480 align:1
+
+auto_8032EC94_sbss:
+	.sbss start:0x8032EC94 end:0x8032EC98

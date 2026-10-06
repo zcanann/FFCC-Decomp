@@ -504,6 +504,10 @@ textureman.cpp:
 
 maphit.cpp:
 	.text start:0x800247A8 end:0x80026E94
+	.rodata start:0x801D1BE0 end:0x801D1C08
+	.bss start:0x80260F40 end:0x80260FF0
+	.sbss start:0x8034BA78 end:0x8034BA94
+	.sdata2 start:0x8034C620 end:0x8034C690
 
 mapmesh.cpp:
 	.text	start:0x80026E94 end:0x80027EF0
@@ -1857,3 +1861,6 @@ zlist.cpp:
 
 zlist_rodata_padding_801D2922:
 	.rodata start:0x801D2922 end:0x801D2928 align:1
+
+auto_8034BA94_sbss:
+	.sbss start:0x8034BA94 end:0x8034BA98

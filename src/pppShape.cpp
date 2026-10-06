@@ -74,21 +74,12 @@ void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, 
     memcpy(&maxPos, minSrc + 0x28, 0xc);
 }
 
-static inline void pppShapeSetUseTexture(tagOAN3_SHAPE* shapeData, unsigned char* textureUsed)
+static inline void pppShapeSetUseTexture(tagOAN3_SHAPE* shape, unsigned char* textureUsed)
 {
-    pppShapeAnimData* animData = reinterpret_cast<pppShapeAnimData*>(shapeData);
-    tagOAN3_SHAPE* shape;
-    int frameIndex;
-    int shapeIndex;
-    tagOAN3_SHAPE_ENTRY* entry;
-
-    for (frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
-        shape = pppShapeFrame(animData, frameIndex);
-        for (shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
-            entry = shape->m_entries;
-            entry += shapeIndex;
-            textureUsed[entry->m_textureIndex] = 1;
-        }
+    for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+        tagOAN3_SHAPE_ENTRY* entry = shape->m_entries;
+        entry += shapeIndex;
+        textureUsed[entry->m_textureIndex] = 1;
     }
 }
 
@@ -107,7 +98,12 @@ void pppCacheUnLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     unsigned char textureUsed[0x100];
     memset(textureUsed, 0, sizeof(textureUsed));
 
-    pppShapeSetUseTexture(reinterpret_cast<tagOAN3_SHAPE*>(animData), textureUsed);
+    for (int frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
+        pppShapeAnimFrame* frame = &animData->m_frames[frameIndex];
+        short shapeOffset = frame->m_shapeOffset;
+        tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<unsigned char*>(animData) + shapeOffset);
+        pppShapeSetUseTexture(shape, textureUsed);
+    }
 
     for (unsigned int textureIndex = 0; textureIndex < sizeof(textureUsed); textureIndex++) {
         if (textureUsed[textureIndex] != 0) {
@@ -131,12 +127,28 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     unsigned char textureUsed[0x100];
     memset(textureUsed, 0, sizeof(textureUsed));
 
-    pppShapeSetUseTexture(reinterpret_cast<tagOAN3_SHAPE*>(animData), textureUsed);
+    for (int frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
+        pppShapeAnimFrame* frame = &animData->m_frames[frameIndex];
+        short shapeOffset = frame->m_shapeOffset;
+        tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<unsigned char*>(animData) + shapeOffset);
+        pppShapeSetUseTexture(shape, textureUsed);
+    }
 
     for (unsigned int textureIndex = 0; textureIndex < sizeof(textureUsed); textureIndex++) {
         if (textureUsed[textureIndex] != 0) {
             materialSet->CacheLoadTexture(textureIndex, &ppvAmemCacheSet);
         }
+    }
+}
+
+static inline void pppSetShapeMaterial0(pppShapeSt* shapeSt, tagOAN3_SHAPE* shape, CMaterialSet* materialSet,
+                                        char** textureNames)
+{
+    for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+        tagOAN3_SHAPE_ENTRY* entry = &shape->m_entries[shapeIndex];
+        entry->m_textureIndex = materialSet->FindTexName(textureNames[entry->m_textureIndex], 0);
+        entry->m_displayList = static_cast<unsigned char*>(shapeSt->m_displayListData) +
+            reinterpret_cast<unsigned int>(entry->m_displayList);
     }
 }
 
@@ -153,13 +165,10 @@ void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** 
 {
     pppShapeAnimData* animData = static_cast<pppShapeAnimData*>(shapeSt->m_animData);
     for (int frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
-        tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
-        for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
-            tagOAN3_SHAPE_ENTRY* entry = &shape->m_entries[shapeIndex];
-            entry->m_textureIndex = materialSet->FindTexName(textureNames[entry->m_textureIndex], 0);
-            entry->m_displayList = static_cast<unsigned char*>(shapeSt->m_displayListData) +
-                reinterpret_cast<unsigned int>(entry->m_displayList);
-        }
+        pppShapeAnimFrame* frame = &animData->m_frames[frameIndex];
+        short shapeOffset = frame->m_shapeOffset;
+        tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<unsigned char*>(animData) + shapeOffset);
+        pppSetShapeMaterial0(shapeSt, shape, materialSet, textureNames);
     }
 }
 

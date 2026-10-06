@@ -1,4 +1,3 @@
-#define FFCC_PTRARRAY_DTOR_REMOVEALL
 #include "ffcc/ptrarray.h"
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"

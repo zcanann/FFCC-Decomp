@@ -2415,9 +2415,9 @@ unsigned int CMenuPcs::CmdOpen1()
 		animEntry->scale = static_cast<f32>((chainCount != 0) ? 1.5 : 1.0);
 		animEntry->width = 0xC0;
 		animEntry->height = 0x40;
-		animEntry->y = static_cast<s16>(((-((static_cast<f32>(animEntry->height) * animEntry->scale) -
-		                                    static_cast<f32>(baseEntry->height)) *
-		                                   0.5) +
+		animEntry->y = static_cast<s16>(((static_cast<f32>(baseEntry->height) -
+		                                   static_cast<f32>(animEntry->height) * animEntry->scale) /
+		                                      2.0 +
 		                                  static_cast<f64>(baseEntry->y)) -
 		                                 3.0);
 		animEntry->u = 0.0f;

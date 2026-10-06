@@ -66,6 +66,29 @@ extern "C" const float kMonObjPercentMax = 100.0f;
 extern "C" const float kMonObjOne = 1.0f;
 
 
+static inline int CGMonObj_SearchNoticeParty(CGMonObj* monObj)
+{
+	if (monObj->m_targetDist < ((Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange)) {
+		float hitScale;
+		int colIndex;
+		monObj->checkCol(6, monObj->m_rotBaseY,
+		                 static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(monObj->m_scriptHandle[9]) + 0xC8)),
+		                 &hitScale, &colIndex);
+		if (colIndex >= 0) {
+			return colIndex;
+		}
+	}
+	return -1;
+}
+
+static inline void CGMonObj_PlayNoticeSe(CGMonObj* monObj)
+{
+	void** scriptHandle = monObj->m_scriptHandle;
+	int rand = Math.Rand(3);
+	unsigned short* romWork = reinterpret_cast<unsigned short*>(scriptHandle[9]);
+	monObj->playSe3D(romWork[0xC9] + (romWork[0xC8] * 1000 + rand), 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+}
+
 static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 {
 	SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
@@ -685,13 +708,7 @@ void CGMonObj::onFrameStat()
 	case 3: {
 		SET_DRAW_FLAG();
 		if ((prgObj->m_stateFrame == 0) && (object->CancelAnim(1), m_unk6B8 == 0)) {
-			void** scriptHandle = object->m_scriptHandle;
-			int rand = Math.Rand(3);
-			unsigned char* script9 = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-			prgObj->playSe3D(
-				static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(script9 + 0x192)) +
-				(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(script9 + 0x190)) * 1000 + rand),
-				0x32, 0x96, 0, (Vec*)0);
+			CGMonObj_PlayNoticeSe(this);
 			m_unk6B8 = 1;
 		}
 
@@ -1974,31 +1991,14 @@ void CGMonObj::seKiduki()
 	if (m_unk6BD != 0) {
 		partyIndex = m_targetPartyIndex;
 	} else {
-		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
-
-		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
-			int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
-			unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-			int colIndex;
-			float hitScale;
-
-			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
-			         static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8)),
-			         &hitScale, &colIndex);
-			partyIndex = colIndex;
-			if (partyIndex >= 0) {
-				goto haveNotice;
-			}
-		}
-		partyIndex = -1;
+		partyIndex = CGMonObj_SearchNoticeParty(this);
 	}
 
-haveNotice:
 	if (partyIndex >= 0) {
+		CGObject* object = reinterpret_cast<CGObject*>(this);
 		int action = m_actionBranch;
-		int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
-		unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-		unsigned short noticeFlags = *reinterpret_cast<unsigned short*>(script + 0xFE);
+		unsigned short noticeFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
+		int monClass = reinterpret_cast<int>(object->m_scriptHandle[4]);
 
 		if ((action == 0) && ((noticeFlags & 0x80) != 0)) {
 			notice = true;
@@ -2006,7 +2006,7 @@ haveNotice:
 		} else if ((action == 0) && ((noticeFlags & 0x20) != 0)) {
 			notice = true;
 			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x33;
-		} else if ((action == 0) && (((noticeFlags & 0x40) != 0) || (scriptHandle[4] == 0x39))) {
+		} else if ((action == 0) && (((noticeFlags & 0x40) != 0) || (monClass == 0x39))) {
 			notice = true;
 			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x34;
 		}
@@ -2097,24 +2097,14 @@ void CGMonObj::isValidTarget()
 		m_moveWork.m_targetPos = m_homePosition;
 	}
 
-	if (((*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
-	    ((*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) || !(homeDist < kMonObjHalf * maxDist))) {
+	void** handle = m_scriptHandle;
+	if (((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
+	    ((reinterpret_cast<CMonWork*>(handle)->m_romWork[0x86] == 1) || !(homeDist < kMonObjHalf * maxDist))) {
 		goto check_home;
 	}
 
 	{
-		int partyIndex;
-		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) <
-			(Game.m_gameWork.m_soundOptionFlag != 0 ? kMonObjWideSoundRange : kMonObjNormalSoundRange)) {
-			int colIndex;
-			float hitScale;
-			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
-			         static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)),
-			         &hitScale, &colIndex);
-			partyIndex = colIndex >= 0 ? colIndex : -1;
-		} else {
-			partyIndex = -1;
-		}
+		int partyIndex = CGMonObj_SearchNoticeParty(this);
 
 		if (partyIndex >= 0) {
 			m_targetPartyIndex = partyIndex;
@@ -3021,19 +3011,7 @@ void CGMonObj::statMove(int* targetIndex)
 			object->m_rotTargetY = object->m_homeRotY;
 		}
 
-		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
-
-		int hitPartyIndex;
-		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
-			int colIndex;
-			float hitScale;
-			monObj->checkCol(6, object->m_rotBaseY,
-				static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xC8)),
-				&hitScale, &colIndex);
-			hitPartyIndex = colIndex;
-		} else {
-			hitPartyIndex = -1;
-		}
+		int hitPartyIndex = CGMonObj_SearchNoticeParty(monObj);
 
 		if (hitPartyIndex >= 0) {
 			*targetPartyIdx = hitPartyIndex;
@@ -3041,13 +3019,7 @@ void CGMonObj::statMove(int* targetIndex)
 			*chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 			if (monObj->m_unk6B8 == 0) {
-				void** scriptHandle = object->m_scriptHandle;
-				int randVal = Math.Rand(3);
-				unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-				prgObj->playSe3D(
-					*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal +
-						*reinterpret_cast<unsigned short*>(script + 0x192),
-					0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+				CGMonObj_PlayNoticeSe(monObj);
 				monObj->m_unk6B8 = 1;
 			}
 		} else {

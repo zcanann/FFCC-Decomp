@@ -2239,6 +2239,10 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
+	int i;
+	CmdListEntry* entry;
+	int j;
+	int idx;
 	int finished;
 	float targetX;
 	double step = 12.8;
@@ -2251,9 +2255,9 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 
 	if (topIdx > 0) {
-		for (int i = 0; i < 3; i++) {
-			CmdListEntry* entry = &GetCmdListStorage(this)->entries[i + s_UniteTop[topIdx]];
-			int idx = i + s_UniteTop[topIdx];
+		for (i = 0; i < 3; i++) {
+			entry = &GetCmdListStorage(this)->entries[i + s_UniteTop[topIdx]];
+			idx = i + s_UniteTop[topIdx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
@@ -2267,11 +2271,10 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		}
 	} else {
 		targetX = 64.0f + baseX;
-		int i;
 		for (i = finished = 0; i < s_ucnt; i++) {
-			for (int j = 0; j < 3; j++) {
-				CmdListEntry* entry = &GetCmdListStorage(this)->entries[j + s_UniteTop[i]];
-				int idx = j + s_UniteTop[i];
+			for (j = 0; j < 3; j++) {
+				entry = &GetCmdListStorage(this)->entries[j + s_UniteTop[i]];
+				idx = j + s_UniteTop[i];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
@@ -2305,6 +2308,10 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
  */
 int CMenuPcs::UniteCloseAnim(int topIdx)
 {
+	CmdListEntry* entry;
+	int i;
+	int j;
+	int idx;
 	int finished;
 
 	if (s_ucnt == 0) {
@@ -2316,9 +2323,9 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 
 	if (topIdx >= 0) {
 		finished = 0;
-		for (int i = 0; i < 3; i++) {
-			int idx = i + s_UniteTop[topIdx];
-			CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
+		for (i = 0; i < 3; i++) {
+			idx = i + s_UniteTop[topIdx];
+			entry = &GetCmdListStorage(this)->entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
@@ -2333,11 +2340,10 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 			return 1;
 		}
 	} else {
-		int i;
 		for (i = finished = 0; i < s_ucnt; i++) {
-			for (int j = 0; j < 3; j++) {
-				int idx = j + s_UniteTop[i];
-				CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
+			for (j = 0; j < 3; j++) {
+				idx = j + s_UniteTop[i];
+				entry = &GetCmdListStorage(this)->entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}

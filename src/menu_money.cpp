@@ -545,8 +545,8 @@ inline void CMenuPcs::MoneyInit()
 		anim->uvScale = 1.0f;
 	}
 
-	i = 0;
-	anim = &this->m_moneyPanel->anims[i++];
+	int index = 0;
+	anim = &this->m_moneyPanel->anims[index++];
 	anim->tex = kMoneyPanelTexture;
 	anim->y = 0x68;
 	anim->w = 0xf8;
@@ -557,7 +557,7 @@ inline void CMenuPcs::MoneyInit()
 	anim->uvScale = 1.0f;
 	anim->startFrame = 0;
 	anim->duration = 10;
-	this->m_moneyPanel->count = i;
+	this->m_moneyPanel->count = index;
 
 	s_Money = 0;
 	for (i = 0; i < 2; i++) {

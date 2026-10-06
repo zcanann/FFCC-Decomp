@@ -1205,8 +1205,7 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 		if ((particleId != 0xFFFF) && (param3 == 10)) {
 			particleId += 1;
 		}
-		soundId = *reinterpret_cast<unsigned short*>(
-			reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) + 0x1A6);
+		soundId = reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork[0xD3];
 		break;
 	}
 
@@ -2427,6 +2426,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		? baseScript \
 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
 			(monObj->m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
+#define aiScriptW (monObj->m_aiState == 0 		? reinterpret_cast<unsigned char*>(reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork) 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + 			(monObj->m_aiState + reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork[0x80]) * 0x1D0 + 0x10)
 	int selectedAction = -1;
 	if (monObj->m_funcs->attackCheck != 0) {
 		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
@@ -2445,9 +2445,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		return -1;
 	}
 
-	unsigned int groupTable[8] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+	int groupTable[8] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 	int groupCount[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	int* groupPtr = reinterpret_cast<int*>(groupTable);
 
 	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
 		int actionOffset = actionIndex * 0x10;
@@ -2487,7 +2486,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		if ((actionFlags & 0x40) != 0) {
 			float targetRot = monObj->m_partyAngle[partyIndex];
 			float baseRot =
-				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
+				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x118)) +
 				object->m_rotBaseY;
 			float angleDelta = (float)__fabs(Math.DstRot(targetRot, baseRot));
 			System.Printf("ACT_FLAG_ROT_CHECK 差分=%f度。\n", kMonObjRadToDeg * angleDelta);
@@ -2513,10 +2512,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > kMonObjHalfPi)) {
 				if (((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) &&
 						(monObj->m_forcedAction ==
-							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E)))) ||
-					((*reinterpret_cast<unsigned short*>(
-							reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) +
-							0x10C) != 1) &&
+							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x11E)))) ||
+					((reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork[0x86] != 1) &&
 						(monObj->m_forcedAction == actionIndex))) {
 					forceAction = 1;
 				}
@@ -2537,7 +2534,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
 				groupIndex = (actionFlags >> 2) & 7;
 			} else {
-				groupIndex = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A);
+				groupIndex = *reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x11A);
 			}
 
 			groupTable[actionIndex] = groupIndex;
@@ -2546,43 +2543,36 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	if (selectorType == 1) {
-		int& groupCursor = monObj->m_unk6CC;
 		int count;
 		for (;;) {
-			int cursor = groupCursor;
+			int cursor = monObj->m_unk6CC;
 			count = groupCount[cursor];
 			if (count != 0) {
 				break;
 			}
-			groupCursor = cursor + 1;
-			if (groupCursor >= 8) {
-				groupCursor = 0;
+			monObj->m_unk6CC = cursor + 1;
+			if (monObj->m_unk6CC >= 8) {
+				monObj->m_unk6CC = 0;
 			}
 		}
 
 		int pick = Math.Rand(count);
 		int seen = 0;
-		int i = 0;
-		for (int pass = 0; pass < 2; pass++) {
-			for (int j = 0; j < 4; j++) {
-				int cursor = groupCursor;
-				if (cursor == groupPtr[j]) {
-					if (seen == pick) {
-						selectedAction = i;
-						groupCursor = cursor + 1;
-						goto mlDone;
-					}
-					seen += 1;
+		for (int i = 0; i < 8; i++) {
+			if (monObj->m_unk6CC == groupTable[i]) {
+				if (seen == pick) {
+					selectedAction = i;
+					monObj->m_unk6CC++;
+					break;
 				}
-				i += 1;
+				seen++;
 			}
-			groupPtr += 4;
 		}
 	}
 
-mlDone:
 	return selectedAction;
 #undef aiScript
+#undef aiScriptW
 #undef baseScript
 }
 

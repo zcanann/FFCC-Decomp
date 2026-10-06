@@ -1167,6 +1167,47 @@ inline void CMenuPcs::calcSingleMenu()
     loadTextureAsync(0, 0, 0, 0, 0, 0, 0);
 }
 
+static inline int LoadSingMenuTextureStep(CMenuPcs* menu)
+{
+    int loadIndex = menu->m_singleMenuTextureLoadIndex;
+    if (loadIndex >= 2) {
+        return 1;
+    }
+
+    if (menu->m_singleMenuTextureLoadState == 0) {
+        char path[256];
+        sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
+        gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
+        File.ReadASync(gSingMenuAsyncFileHandle);
+        menu->m_singleMenuTextureLoadState = menu->m_singleMenuTextureLoadState + 1;
+    } else if (menu->m_singleMenuTextureLoadState == 1) {
+        if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
+            return 0;
+        }
+
+        menu->m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
+
+        void* buffer = File.m_readBuffer;
+        menu->m_textureSets[loadIndex + 5]->Create(buffer, Game.m_gameWork.m_menuStageMode != 0 ? menu->m_stageF4 : menu->m_menuStage, 0, 0, 0, 0);
+        File.Close(gSingMenuAsyncFileHandle);
+        gSingMenuAsyncFileHandle = 0;
+        menu->m_singleMenuTextureLoadState = 0;
+        menu->m_singleMenuTextureLoadIndex = menu->m_singleMenuTextureLoadIndex + 1;
+    }
+
+    if (menu->m_singleMenuTextureLoadIndex < 2) {
+        return 0;
+    }
+
+    for (int i = 0; i < 0x33; i++) {
+        int texIdx = menu->m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->Find(s_singleMenuModelTextureTable[i].textureName);
+        CTexture* tex = menu->m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
+        tex->AddRef();
+        menu->m_textures[i + 45] = tex;
+    }
+    return 1;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80149e5c
@@ -1201,50 +1242,8 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     }
 
     if (SingleCaravanWork()->m_shopRequestState == 0) {
-        int loadCompleted;
-        int loadIndex = m_singleMenuTextureLoadIndex;
-        if (loadIndex >= 2) {
-            loadCompleted = 1;
-        } else {
-            if (m_singleMenuTextureLoadState == 0) {
-                char path[256];
-                sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
-                gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
-                File.ReadASync(gSingMenuAsyncFileHandle);
-                m_singleMenuTextureLoadState = m_singleMenuTextureLoadState + 1;
-            } else if (m_singleMenuTextureLoadState == 1) {
-                if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
-                    loadCompleted = 0;
-                    goto store_load_completed;
-                }
-
-                m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
-
-                void* buffer = File.m_readBuffer;
-                m_textureSets[loadIndex + 5]->Create(buffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
-                File.Close(gSingMenuAsyncFileHandle);
-                gSingMenuAsyncFileHandle = 0;
-                m_singleMenuTextureLoadState = 0;
-                m_singleMenuTextureLoadIndex = m_singleMenuTextureLoadIndex + 1;
-            }
-
-            if (m_singleMenuTextureLoadIndex < 2) {
-                loadCompleted = 0;
-            } else {
-                for (int i = 0; i < 0x33; i++) {
-                    int texIdx = m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->Find(s_singleMenuModelTextureTable[i].textureName);
-                    CTexture* tex = m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
-                    tex->AddRef();
-                    m_textures[i + 45] = tex;
-                }
-                loadCompleted = 1;
-            }
-        }
-store_load_completed:
-        gSingMenuAsyncLoadCompleted = loadCompleted;
+        gSingMenuAsyncLoadCompleted = LoadSingMenuTextureStep(this);
     }
-
-post_texture_load:
     if (m_singleFadeState->done != 0) {
         m_singleMenuPhase = m_singleMenuPhase + 1;
         m_singleFadeState->done = 0;
@@ -2904,12 +2903,13 @@ int CMenuPcs::SingWinMessHeight()
 bool CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask;
+    CCaravanWork* caravanWork = SingleCaravanWork();
     int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
     int raceBits = flags & 0xF;
     int genderBits = flags & 0x30;
-    unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
+    unsigned int raceMask = 1 << (caravanWork->m_tribeId & 3);
 
-    if (SingleCaravanWork()->m_genderFlag != 0) {
+    if (caravanWork->m_genderFlag != 0) {
         genderMask = 0x20;
     } else {
         genderMask = 0x10;

@@ -884,9 +884,6 @@ int CCaravanWork::GetFoodRank(int foodIdx)
  */
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
-	int bit0;
-	int bit1;
-	int bit2;
 	int foundCount = 0;
 
 	for (int i = 0; i < maxResults; i++) {
@@ -1313,7 +1310,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedLinkValueConditions:
 
-		int cmpValue = 0;
+		int cmpValue;
 		int sysVal0 = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
 		int sysVal1 = Game.m_gameWork.m_timerA;
 		int sysVal2 = Game.m_gameWork.m_scriptGlobalTime;
@@ -1388,6 +1385,9 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		{
 			for (int i = 0; i < 8; i++) {
+				int bit0;
+				int bit1;
+				int bit2;
 				const unsigned short evtRule = curLetter->m_eventRules[i];
 				const int sourceType = (evtRule >> 11) & 3;
 
@@ -1399,12 +1399,9 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 				switch (sourceType) {
 				case 1:
-					bit0 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[sourceIdx / 8]) &
-							 (1 << (sourceIdx % 8))) != 0);
-					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 1) / 8]) &
-							 (1 << ((sourceIdx + 1) % 8))) != 0);
-					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 2) / 8]) &
-							 (1 << ((sourceIdx + 2) % 8))) != 0);
+					bit0 = Game.GetEvtFlag(sourceIdx);
+					bit1 = Game.GetEvtFlag(sourceIdx + 1);
+					bit2 = Game.GetEvtFlag(sourceIdx + 2);
 					break;
 				case 2:
 					bit0 = GetEvtFlag(sourceIdx);

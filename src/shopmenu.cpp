@@ -1010,23 +1010,6 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void drawGrouadQuad(int x, int y, int width, int height, _GXColor colorA, _GXColor colorB, _GXColor colorC, _GXColor colorD)
-{
-    setOrtho(x, y, FLOAT_80332d78, FLOAT_80332d78, 0.0f);
-    SetupShopMenuShapeDrawColor(0xFF);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetColorUpdate(GX_TRUE);
-
-    Vec minPos = {0.0f, 0.0f, 0.0f};
-    Vec maxPos = {static_cast<float>(width), static_cast<float>(height), 0.0f};
-    Graphic.RenderNoTexQuadGrouad(minPos, maxPos, colorA, colorB, colorC, colorD);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801589d0
  * PAL Size: 292b
  * EN Address: TODO
@@ -1731,6 +1714,41 @@ inline void CShopMenu::SelectSOUBI()
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void CShopMenu::DrawObi(int y)
+{
+    _GXColor colorA;
+    _GXColor colorB;
+    _GXColor colorC;
+    _GXColor colorD;
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0x00;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0x00;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
+    int x = 0x1C;
+    drawShapeSeqGrouad(9, 0, x, y, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
+
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
+    x += 0x20;
+    while (x < 0x25C) {
+        drawShapeSeqGrouad(9, 0, x, y, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
+        x += 0x20;
+    }
+
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0x00;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0x00;
+    drawShapeSeqGrouad(9, 0, x, y, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80155058
  * PAL Size: 848b
  * EN Address: TODO
@@ -1966,7 +1984,13 @@ void CShopMenu::DrawMake()
     labelFont->Draw(moneyLabel);
     MenuPcs.DrawInit();
 
-    DrawObi(0);
+    int obiX = 0x32;
+    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+    do {
+        obiX += 0x20;
+        drawShapeSeq(6, 0, obiX, 0x104, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+    } while (obiX < 0x20E);
+    drawShapeSeq(5, 0, obiX + 0x40, 0x104, 0xFF, 1, 0, FLOAT_80332D9C, 0);
 
     CFont* headerFont = MenuPcs.GetFont22();
     headerFont->SetMargin(FLOAT_80332d28);
@@ -2144,24 +2168,10 @@ void CShopMenu::DrawSoubi()
  * Address:	TODO
  * Size:	TODO
  */
-static inline void DrawShopFade(_GXColor fadeColor)
+inline void drawGrouadQuad(int x, int y, int width, int height, _GXColor colorA, _GXColor colorB, _GXColor colorC,
+                           _GXColor colorD)
 {
-    Graphic.SetDrawDoneDebugData(0x32);
-
-    Mtx screenMtx;
-    Mtx44 projectionMtx;
-    PSMTXIdentity(screenMtx);
-    screenMtx[0][0] = FLOAT_80332d78;
-    screenMtx[1][1] = FLOAT_80332DD0;
-    screenMtx[2][2] = FLOAT_80332d78;
-    screenMtx[0][3] = FLOAT_80332DE4;
-    screenMtx[1][3] = FLOAT_80332DE8;
-    GXLoadPosMtxImm(screenMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(projectionMtx, FLOAT_80332D9C, FLOAT_80332DEC, FLOAT_80332D9C, FLOAT_80332DF0, FLOAT_80332D9C, FLOAT_80332d28);
-    projectionMtx[2][3] += FLOAT_80332D9C;
-    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+    setOrtho(0x140, 0xE0, FLOAT_80332d78, FLOAT_80332DD0, FLOAT_80332D9C);
 
     _GXColor amb = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor mat = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -2183,17 +2193,15 @@ static inline void DrawShopFade(_GXColor fadeColor)
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
-    Vec topLeft;
-    topLeft.x = FLOAT_80332DF4;
-    topLeft.y = FLOAT_80332DF8;
-    topLeft.z = 0.0f;
-    Vec bottomRight;
-    bottomRight.x = FLOAT_80332DFC;
-    bottomRight.y = FLOAT_80332E00;
-    bottomRight.z = 0.0f;
-    Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
-
-    Graphic.SetDrawDoneDebugData(0x33);
+    Vec minPos;
+    minPos.x = static_cast<float>(x);
+    minPos.y = static_cast<float>(y);
+    minPos.z = 0.0f;
+    Vec maxPos;
+    maxPos.x = static_cast<float>(x + width);
+    maxPos.y = static_cast<float>(y + height);
+    maxPos.z = 0.0f;
+    Graphic.RenderNoTexQuadGrouad(minPos, maxPos, colorA, colorB, colorC, colorD);
 }
 
 /*
@@ -2252,7 +2260,9 @@ void CShopMenu::Draw()
         fadeColor.g = 0;
         fadeColor.b = 0;
         fadeColor.a = 0xFF - static_cast<int>(FLOAT_80332DE0 * m_fade);
-        DrawShopFade(fadeColor);
+        Graphic.SetDrawDoneDebugData(0x32);
+        drawGrouadQuad(-0x280, -0x1C0, 0x77F, 0x53F, fadeColor, fadeColor, fadeColor, fadeColor);
+        Graphic.SetDrawDoneDebugData(0x33);
     }
     Graphic.SetDrawDoneDebugData(0x3C);
 }
@@ -2265,6 +2275,16 @@ void CShopMenu::Draw()
 inline void CShopMenu::InitDrawEnvShape()
 {
     pppInitDrawEnv(0);
+
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetColorUpdate(GX_TRUE);
 }
 
 /*
@@ -2282,17 +2302,7 @@ void CShopMenu::DrawShopBase()
     int languageId = static_cast<int>(Game.m_gameWork.GetLanguage()) - 1;
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
     Graphic.SetDrawDoneDebugData(2);
-    pppInitDrawEnv(0);
-
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl(GX_ALPHA0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-    GXSetColorUpdate(GX_TRUE);
+    InitDrawEnvShape();
 
     int panelY;
     if (m_mode <= 2) {
@@ -2304,31 +2314,7 @@ void CShopMenu::DrawShopBase()
     }
 
     Graphic.SetDrawDoneDebugData(3);
-    _GXColor colorA;
-    _GXColor colorB;
-    _GXColor colorC;
-    _GXColor colorD;
-    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0x00;
-    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0x00;
-    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
-    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
-    drawShapeSeqGrouad(9, 0, 0x1C, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
-
-    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
-    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
-    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
-    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
-    int x = 0x3C;
-    while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
-        x += 0x20;
-    }
-
-    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
-    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
-    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0x00;
-    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0x00;
-    drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
+    DrawObi(panelY + 0x22);
     Graphic.SetDrawDoneDebugData(4);
 
     if (m_mode >= 3) {
@@ -2415,46 +2401,12 @@ void CShopMenu::DrawShopBase()
 void CShopMenu::DrawMakeBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
-    pppInitDrawEnv(0);
+    InitDrawEnvShape();
 
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, (GXCompCnt)1, (GXCompType)5, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, (GXCompCnt)1, (GXCompType)4, 0);
-    GXSetNumChans(1);
-    GXSetChanCtrl((GXChannelID)0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl((GXChannelID)2, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-    GXSetColorUpdate(GX_TRUE);
-
-    _GXColor colorA;
-    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0x00;
-    _GXColor colorB;
-    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
-    _GXColor colorC;
-    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0x00;
-    _GXColor colorD;
-    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
-    drawShapeSeqGrouad(9, 0, 0x1C, 0xB8, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
-
-    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
-    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
-    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
-    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
-    int x = 0x3C;
-    while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
-        x += 0x20;
-    }
-
-    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
-    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0x00;
-    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
-    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0x00;
-    drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
+    DrawObi(0xB8);
 
     drawShapeSeq(3, 0, 0xB4, 0x8C, 0xFF, 0, 0, FLOAT_80332D9C, 0);
-    x = 0xB4;
+    int x = 0xB4;
     while (x < 0x1CC) {
         drawShapeSeq(4, 0, x, 0x8C, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         x += 0x20;
@@ -2474,66 +2426,17 @@ void CShopMenu::DrawMakeBase()
 void CShopMenu::DrawSoubiBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
-    pppInitDrawEnv(0);
+    InitDrawEnvShape();
 
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, (GXCompCnt)1, (GXCompType)5, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, (GXCompCnt)1, (GXCompType)4, 0);
-    GXSetNumChans(1);
-    GXSetChanCtrl((GXChannelID)0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl((GXChannelID)2, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-    GXSetColorUpdate(GX_TRUE);
-
-    _GXColor fadeA;
-    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0x00;
-    _GXColor fadeB;
-    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0xFF;
-    _GXColor fadeC;
-    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0x00;
-    _GXColor fadeD;
-    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0xFF;
-    drawShapeSeqGrouad(9, 0, 0x1C, 0x10C, FLOAT_80332d78, FLOAT_80332DC8, fadeA, fadeB, fadeC, fadeD);
-
-    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0xFF;
-    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0xFF;
-    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0xFF;
-    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0xFF;
-    int x = 0x3C;
-    while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332DC8, fadeA, fadeB, fadeC, fadeD);
-        x += 0x20;
-    }
-    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0xFF;
-    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0x00;
-    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0xFF;
-    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0x00;
-    drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332DC8, fadeA, fadeB, fadeC, fadeD);
+    DrawObi(0x10C);
 
     drawShapeSeqScale(3, 0, 0x106, 0xA4, FLOAT_80332d78, FLOAT_80332DCC, 0xFF);
-    x = 0x106;
+    int x = 0x106;
     while (x < 0x17A) {
         drawShapeSeqScale(4, 0, x, 0xA4, FLOAT_80332d78, FLOAT_80332DCC, 0xFF);
         x += 0x20;
     }
     drawShapeSeqScale(3, 0, x, 0xA4, FLOAT_80332DD0, FLOAT_80332DCC, 0xFF);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CShopMenu::DrawObi(int)
-{
-    int x = 0x32;
-    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, FLOAT_80332D9C, 0);
-    do {
-        x += 0x20;
-        drawShapeSeq(6, 0, x, 0x104, 0xFF, 0, 0, FLOAT_80332D9C, 0);
-    } while (x < 0x20E);
-    drawShapeSeq(5, 0, x + 0x40, 0x104, 0xFF, 1, 0, FLOAT_80332D9C, 0);
 }
 
 /*

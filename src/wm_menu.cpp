@@ -1343,17 +1343,18 @@ void CMenuPcs::destroyWorld()
 
 /*
  * --INFO--
- * PAL Address: 0x80100b00
+ * PAL Address: 0x80100B00
  * PAL Size: 1616b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800FFF4C
+ * EN Size: 1480b
+ * JP Address: 0x800FCC34
+ * JP Size: 1496b
  */
 void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
+#ifdef VERSION_GCCP01
 	static bool s_wmMenuLastMountState = false;
 
 	const bool mounted = MemoryCardMan.m_currentSlot != -1;
@@ -1363,6 +1364,8 @@ void CMenuPcs::CalcDiaryMenu()
 		}
 		s_wmMenuLastMountState = mounted;
 	}
+
+#endif
 
 	WMChgMenu();
 	if (static_cast<char>(bytes[0xD]) == 0) {
@@ -1377,7 +1380,8 @@ void CMenuPcs::CalcDiaryMenu()
 		return;
 	}
 
-	switch (m_wmWorldState->m_menuMode) {
+	const int menuMode = m_wmWorldState->m_menuMode;
+	switch (menuMode) {
 	case 0:
 		CalcMainMenu();
 		break;
@@ -1411,7 +1415,13 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-			System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0x4c0);
+#ifdef VERSION_GCCJGC
+			System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0x5F9, menuMode);
+#elif defined(VERSION_GCCE01)
+			System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0x4B8, menuMode);
+#else
+			System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0x4c0, menuMode);
+#endif
 		}
 		break;
 	}

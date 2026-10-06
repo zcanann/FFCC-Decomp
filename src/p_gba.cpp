@@ -5,6 +5,14 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
+namespace {
+#if defined(VERSION_GCCJGC)
+const unsigned long kGbaStageSize = 0x52000;
+#else
+const unsigned long kGbaStageSize = 0x56000;
+#endif
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -83,7 +91,7 @@ int CGbaPcs::GetTable(unsigned long tableIndex)
  */
 void CGbaPcs::create()
 {
-	m_stage = Memory.CreateStage(0x56000, "CGbaPcs", 0);
+	m_stage = Memory.CreateStage(kGbaStageSize, "CGbaPcs", 0);
 	Joybus.CreateInit();
 	int result = Joybus.LoadBin();
 	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {

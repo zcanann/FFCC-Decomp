@@ -121,18 +121,17 @@ public:
     CMapHitFace* m_faces;         // 0x20
 };
 
-extern unsigned char s_bitMask;
-extern unsigned char s_bitMaskDrawFlags;
+extern unsigned char g_MapHitDrawMode;
+extern unsigned char g_MapHitFaceFlag;
 extern int g_hit_edge_idx_min;
 extern float g_hit_t;
 extern float g_hit_t_min;
 extern float g_hit_t_slide_min;
-extern CMapHitFace* g_hit_f;
 extern CMapHitFace* g_hit_lpface;
 extern CMapHitFace* g_hit_lpface_min;
-extern unsigned char g_MapHitFaceFlag;
-#define gMapHitFaceFlag g_MapHitFaceFlag
+extern unsigned char g_hit_f;
+#define gMapHitFaceFlag g_hit_f
 
-#define gMapHitFace g_hit_f
+#define gMapHitFace g_hit_lpface_min
 
 #endif // _FFCC_MAPHIT_H_

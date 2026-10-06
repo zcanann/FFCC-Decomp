@@ -3,6 +3,10 @@
 
 #include "global.h"
 
+#ifdef VERSION_GCCE01
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ctype.h"
+#endif
+
 #include "ffcc/cflat_data.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/gobjwork.h"
@@ -181,7 +185,11 @@ public:
     void UpperItemName(char* name)
     {
         if (name[0] != '\0') {
+#ifdef VERSION_GCCE01
+            name[0] = std::toupper(name[0]);
+#else
             name[0] = toupperLatin1(name[0]);
+#endif
         }
     }
     char* GetLetter(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x10); }

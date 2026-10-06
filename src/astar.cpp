@@ -11,24 +11,17 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_map.h"
-extern "C" {
-extern const char kAStarGroupDebugFormat[] = "A* GROUP=%d";
-extern const char kAStarPortalDebugFormat[] = "addAStar(%.5f, %.5f, %.5f, %d, %d, 0, 0);\n";
-extern const char kAStarCostDebugFormat[0x18] = "\x8d\xc5\x92\x5a\x8c\x6f\x98\x48%d->%d=%.5fm ";
-extern const float kPolyGroupBaseXZ = 0.0f;
-extern const float kPolyGroupBaseY = -100.0f;
-extern const float kPolyGroupTopOffsetY = 5.0f;
-extern const float kAStarEscapeInitialBestDist = -1000000.0f;
-extern const char kAStarGroupDebugLabel[] = "//A*\n";
-extern const float kDrawAStarSphereRadius = 10.0f;
-extern const float kInfiniteCost = 10000000.0f;
-extern const char kAStarStepDebugFormat[4] = "%d ";
-extern const char kAStarNewLine[4] = "\n";
-}
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 
 #include "string.h"
+
+static const float kPolyGroupBaseXZ = 0.0f;
+static const float kPolyGroupBaseY = -100.0f;
+static const float kPolyGroupTopOffsetY = 5.0f;
+static const float kAStarEscapeInitialBestDist = -1000000.0f;
+static const float kDrawAStarSphereRadius = 10.0f;
+static const float kInfiniteCost = 10000000.0f;
 
 struct CABlock
 {
@@ -254,7 +247,7 @@ inline void CAStar::addAstar(Vec& pos, int groupA, int groupB)
  */
 inline void CAStar::dumpAStar()
 {
-	System.Printf(const_cast<char*>(kAStarGroupDebugLabel));
+	System.Printf(const_cast<char*>("//A*\n"));
 
 	for (int i = 0; i < 64; ++i)
 	{
@@ -269,7 +262,7 @@ inline void CAStar::dumpAStar()
 		if (used)
 		{
 			System.Printf(
-				const_cast<char*>(kAStarPortalDebugFormat),
+				const_cast<char*>("addAStar(%.5f, %.5f, %.5f, %d, %d, 0, 0);\n"),
 				static_cast<double>(p.m_position.x),
 				static_cast<double>(p.m_position.y),
 				static_cast<double>(p.m_position.z),
@@ -298,7 +291,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		m_lastSeenGroup   = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
 	}
 
-	Graphic.Printf(10, 10, const_cast<char*>(kAStarGroupDebugFormat), static_cast<int>(gPartyObj->m_aStarGroupId));
+	Graphic.Printf(10, 10, const_cast<char*>("A* GROUP=%d"), static_cast<int>(gPartyObj->m_aStarGroupId));
 
 	bool padBusy = false;
 	int padLock = Pad.m_debugPadLock;
@@ -474,7 +467,7 @@ void CAStar::calcAStar()
 
 			if (m_bestPath.m_cost < kInfiniteCost)
 			{
-				System.Printf(const_cast<char*>(kAStarCostDebugFormat), from, to, m_bestPath.m_cost);
+				System.Printf(const_cast<char*>("\x8d\xc5\x92\x5a\x8c\x6f\x98\x48%d->%d=%.5fm "), from, to, m_bestPath.m_cost);
 
 				int current = from;
 
@@ -495,10 +488,10 @@ void CAStar::calcAStar()
 
 					current = static_cast<unsigned char>(next);
 
-					System.Printf(const_cast<char*>(kAStarStepDebugFormat), current);
+					System.Printf(const_cast<char*>("%d "), current);
 				}
 
-				System.Printf(const_cast<char*>(kAStarNewLine));
+				System.Printf(const_cast<char*>("\n"));
 			}
 		}
 	}

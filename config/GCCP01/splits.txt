@@ -162,10 +162,10 @@ maphit.cpp:
 	extabindex  start:0x8000B734 end:0x8000B7C4
 	.text       start:0x80024E60 end:0x80027774
 	.ctors      start:0x801D53D0 end:0x801D53D4
-	.rodata     start:0x801D7088 end:0x801D70B0
-	.bss        start:0x80245640 end:0x802456F0
-	.sbss       start:0x8032EC78 end:0x8032EC98
-	.sdata2     start:0x8032F8C0 end:0x8032F930
+	.rodata start:0x801D7088 end:0x801D70B0
+	.bss start:0x80245640 end:0x802456F0
+	.sbss start:0x8032EC78 end:0x8032EC94
+	.sdata2 start:0x8032F8C0 end:0x8032F930
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -189,10 +189,10 @@ mapocttree.cpp:
 	extabindex  start:0x8000B9BC end:0x8000BAD0
 	.text       start:0x8002C704 end:0x8002F45C
 	.ctors      start:0x801D53D4 end:0x801D53D8
-	.rodata     start:0x801D7268 end:0x801D7300
-	.bss        start:0x802456F0 end:0x80245754
-	.sbss       start:0x8032ECA0 end:0x8032ECB8
-	.sdata2     start:0x8032F960 end:0x8032F974
+	.rodata start:0x801D7268 end:0x801D7300
+	.bss start:0x802456F0 end:0x80245754
+	.sbss start:0x8032ECA0 end:0x8032ECB4
+	.sdata2 start:0x8032F960 end:0x8032F974
 
 map.cpp:
 	extab       start:0x80006068 end:0x80006304
@@ -1719,9 +1719,9 @@ astar.cpp:
 	extabindex  start:0x80010E34 end:0x80010EC4
 	.text       start:0x80141550 end:0x80143098
 	.ctors      start:0x801D5444 end:0x801D5448
-	.rodata     start:0x801DD6A8 end:0x801DD6F8
+	.rodata start:0x801DD6A8 end:0x801DD6F6
 	.bss        start:0x80309178 end:0x8030B62C
-	.sdata2     start:0x80332088 end:0x803320B8
+	.sdata2 start:0x80332088 end:0x803320B6
 
 pppConstrainCameraDir.cpp:
 	extab       start:0x80009BFC end:0x80009C04
@@ -2859,3 +2859,15 @@ graphic_dbgfont.cpp:
 
 auto_801FD470_data:
 	.data start:0x801FD470 end:0x801FD480 align:1
+
+auto_8032EC94_sbss:
+	.sbss start:0x8032EC94 end:0x8032EC98
+
+auto_8032ECB4_sbss:
+	.sbss start:0x8032ECB4 end:0x8032ECB8
+
+astar_padding_801DD6F6:
+	.rodata start:0x801DD6F6 end:0x801DD6F8 align:1
+
+astar_padding_803320B6:
+	.sdata2 start:0x803320B6 end:0x803320B8 align:1

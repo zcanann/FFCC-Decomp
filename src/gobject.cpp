@@ -2539,7 +2539,7 @@ void CGObject::bgCollision()
 
     if (m_bgColMask & 0x01)
     {
-        s_bitMaskDrawFlags = 1;
+        g_MapHitFaceFlag = 1;
 
         if (Game.m_currentMapId == 0x21)
         {
@@ -2550,7 +2550,7 @@ void CGObject::bgCollision()
             bgNormalCollision();
         }
 
-        s_bitMaskDrawFlags = 0;
+        g_MapHitFaceFlag = 0;
     }
 }
 

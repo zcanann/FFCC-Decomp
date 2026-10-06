@@ -33,7 +33,7 @@ void tolower_name_conflict(char* str)
  * JP Address: TODO
  * JP Size: TODO
  */
-void toupper(char* str)
+void toupper_name_conflict(char* str)
 {
     unsigned char c;
 

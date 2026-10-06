@@ -504,6 +504,10 @@ textureman.cpp:
 
 maphit.cpp:
 	.text start:0x800247A8 end:0x80026E94
+	.rodata start:0x801D1BE0 end:0x801D1C08
+	.bss start:0x80260F40 end:0x80260FF0
+	.sbss start:0x8034BA78 end:0x8034BA94
+	.sdata2 start:0x8034C620 end:0x8034C690
 
 mapmesh.cpp:
 	.text	start:0x80026E94 end:0x80027EF0
@@ -522,6 +526,10 @@ wm_menu.cpp:
 
 mapocttree.cpp:
 	.text start:0x8002BE38 end:0x8002EB80
+	.rodata start:0x801D1DC0 end:0x801D1E58
+	.bss start:0x80260FF0 end:0x80261054
+	.sbss start:0x8034BAA0 end:0x8034BAB4
+	.sdata2 start:0x8034C6C0 end:0x8034C6D4
 
 cmake.cpp:
 	.text start:0x80167050 end:0x8016F384
@@ -1196,7 +1204,10 @@ TRK_MINNOW_DOLPHIN/support.c:
 	.text start:0x801A74DC end:0x801A7D9C
 
 astar.cpp:
+	.bss start:0x80324A78 end:0x80326F2C
+	.rodata start:0x801D8E28 end:0x801D8E76
 	.text start:0x8013D2E8 end:0x8013EE34
+	.sdata2 start:0x8034ECF0 end:0x8034ED1E
 
 pppYmMegaBirthShpTail3.cpp:
 	.text start:0x8008BEB0 end:0x8008E0BC
@@ -1822,9 +1833,16 @@ p_MaterialEditor.cpp:
 
 ME_USB_process.cpp:
 	.text start:0x8004C264 end:0x8004D544
+	.rodata start:0x801D28D0 end:0x801D28FF
+	.data start:0x801DE9E8 end:0x801DEAF8
+	.sdata2 start:0x8034CA58 end:0x8034CA68
 
 FS_USB_Process.cpp:
 	.text start:0x8004E3C8 end:0x8004F18C
+	extab start:0x80006C40 end:0x80006C48
+	extabindex start:0x8000C820 end:0x8000C82C
+	.rodata start:0x801D29D8 end:0x801D29EB
+	.data start:0x801DECE0 end:0x801DED14
 
 gx/GXInit.c:
 	.text start:0x8019946C end:0x8019A7F0
@@ -1848,3 +1866,83 @@ editor_padding_bss_80289024:
 
 editor_padding_sbss_8034BB25:
 	.sbss start:0x8034BB25 end:0x8034BB28 align:1
+
+zlist.cpp:
+	.text	start:0x8004D82C end:0x8004DA6C
+	extab	start:0x80006B8C end:0x80006BA4
+	extabindex	start:0x8000C76C end:0x8000C790
+	.rodata	start:0x801D2918 end:0x801D2922
+
+zlist_rodata_padding_801D2922:
+	.rodata start:0x801D2922 end:0x801D2928 align:1
+
+auto_8034BA94_sbss:
+	.sbss start:0x8034BA94 end:0x8034BA98
+
+p_usb.cpp:
+	.sbss start:0x8034BA68 end:0x8034BA6D
+	.text start:0x8001F7BC end:0x8001FCE8
+	.rodata start:0x801D1848 end:0x801D187B
+	.sdata2 start:0x8034C570 end:0x8034C578
+	.sdata start:0x8034B240 end:0x8034B258
+	.data start:0x801DC950 end:0x801DCB14
+	.bss start:0x8025F928 end:0x8025FA3C
+	.ctors start:0x801D063C end:0x801D0640
+
+usb_padding_rodata_801D187B:
+	.rodata start:0x801D187B end:0x801D1880 align:1
+
+usb_padding_data_801DCB14:
+	.data start:0x801DCB14 end:0x801DCB18 align:1
+
+usb_padding_bss_8025FA3C:
+	.bss start:0x8025FA3C end:0x8025FA40 align:1
+
+usb_polling_padding_8034BA6D:
+	.sbss start:0x8034BA6D end:0x8034BA70 align:1
+
+p_FunnyShape.cpp:
+	.text start:0x8004DA6C end:0x8004E3C8
+	.sdata start:0x8034B460 end:0x8034B488
+	.data start:0x801DEAF8 end:0x801DECE0
+	.rodata start:0x801D2928 end:0x801D29D3
+	.sdata2 start:0x8034CA68 end:0x8034CA88
+	.bss start:0x80289028 end:0x8028F228
+	.sbss start:0x8034BB28 end:0x8034BB35
+	.ctors start:0x801D0680 end:0x801D0684
+
+funny_padding_rodata_801D29D3:
+	.rodata start:0x801D29D3 end:0x801D29D8 align:1
+
+funny_padding_sbss_8034BB35:
+	.sbss start:0x8034BB35 end:0x8034BB38 align:1
+
+fs_usb_padding_rodata_801D29EB:
+	.rodata start:0x801D29EB end:0x801D29F0 align:1
+
+fs_usb_padding_data_801DED14:
+	.data start:0x801DED14 end:0x801DED18 align:1
+
+auto_8034BAB4_sbss:
+	.sbss start:0x8034BAB4 end:0x8034BAB8
+
+auto_8034C6D4_sdata2:
+	.sdata2 start:0x8034C6D4 end:0x8034C6D8
+
+astar_padding_801D8E76:
+	.rodata start:0x801D8E76 end:0x801D8E78 align:1
+
+astar_padding_8034ED1E:
+	.sdata2 start:0x8034ED1E end:0x8034ED20 align:1
+
+ME_AppRequest.cpp:
+	.text	start:0x8004D544 end:0x8004D82C
+	extab	start:0x80006B64 end:0x80006B8C
+	extabindex	start:0x8000C730 end:0x8000C76C
+	.rodata	start:0x801D2900 end:0x801D2912
+
+me_app_padding_801D2912:
+	.rodata start:0x801D2912 end:0x801D2918 align:1
+
+me_usb_padding_801D28FF:
+	.rodata start:0x801D28FF end:0x801D2900 align:1

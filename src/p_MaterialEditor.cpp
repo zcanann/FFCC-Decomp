@@ -57,15 +57,9 @@ void CMaterialEditorPcs::Init()
         m_viewerLightDirs[i].z = minusOne;
     }
 
-    m_viewerSrtPosition.z = zero;
-    m_viewerSrtPosition.y = zero;
-    m_viewerSrtPosition.x = zero;
-    m_viewerSrtRotation.z = zero;
-    m_viewerSrtRotation.y = zero;
-    m_viewerSrtRotation.x = zero;
-    m_viewerSrtScale.z = one;
-    m_viewerSrtScale.y = one;
-    m_viewerSrtScale.x = one;
+    m_viewerSrtPosition.x = m_viewerSrtPosition.y = m_viewerSrtPosition.z = zero;
+    m_viewerSrtRotation.x = m_viewerSrtRotation.y = m_viewerSrtRotation.z = zero;
+    m_viewerSrtScale.x = m_viewerSrtScale.y = m_viewerSrtScale.z = one;
     m_rsdItem = 0;
 
     textureIndex = 0;
@@ -154,10 +148,8 @@ void CMaterialEditorPcs::createViewer()
     memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 
     one = 1.0f;
-    m_usbTransform.m_modelMatrix[3][3] = one;
-    m_usbTransform.m_modelMatrix[2][2] = one;
-    m_usbTransform.m_modelMatrix[1][1] = one;
-    m_usbTransform.m_modelMatrix[0][0] = one;
+    m_usbTransform.m_modelMatrix[0][0] = m_usbTransform.m_modelMatrix[1][1] =
+        m_usbTransform.m_modelMatrix[2][2] = m_usbTransform.m_modelMatrix[3][3] = one;
 
     PSMTXIdentity(m_unkMatrix.value);
     m_usbStream.CreateBuffer();

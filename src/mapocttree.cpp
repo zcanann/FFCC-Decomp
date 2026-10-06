@@ -42,11 +42,11 @@ static const float kMapOctTreeDefaultOffsetZ = 0.0f;
 static CBound s_bound;
 static CMapCylinder s_cyl;
 static Vec s_mvec;
-static unsigned long s_insertLightBitIndex = 0;
-static unsigned long s_insertShadowBitIndex = 0;
-static int s_light_no = 0;
+static unsigned long s_light_no = 0;
 static unsigned long s_shadow_no = 0;
-static unsigned long InsertShadow_level = 0;
+static int InsertShadow_level = 0;
+static unsigned long clear_flag_mask = 0;
+static unsigned long s_bitMask = 0;
 
 static const char sMapOctTreeNodeMeshTypeFmt[] =
     "\n\n===============================================\n\n\t\t\tm_node=%d   m_meshtype=%d\n\n\n"
@@ -112,7 +112,7 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 				s_cyl.m_bound.m_min.z = s_cyl.m_top.z - radiusPad;
 				s_cyl.m_bound.m_max.z = s_cyl.m_bottom.z + radiusPad;
 			}
-			InsertShadow_level = flag;
+			s_bitMask = flag;
 			CheckHitCylinderNear_r(m_nodePool);
 		}
 	}
@@ -139,7 +139,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 			->CheckHitCylinderNear(&s_cyl, &s_mvec,
 								   octNode->m_meshStart,
 								   octNode->m_meshCount,
-								   InsertShadow_level);
+								   s_bitMask);
 	}
 	for (i = 0; i < 8; i++) {
 		if (octNode->m_children[i] == 0) {
@@ -200,7 +200,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 				s_cyl.m_bound.m_min.z = s_cyl.m_top.z - radiusPad;
 				s_cyl.m_bound.m_max.z = s_cyl.m_bottom.z + radiusPad;
 			}
-			InsertShadow_level = flag;
+			s_bitMask = flag;
 			if (CheckHitCylinder_r(m_nodePool) != 0) {
 				return 1;
 			}
@@ -229,7 +229,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 				 ->CheckHitCylinder(&s_cyl, &s_mvec,
 									node->m_meshStart,
 									node->m_meshCount,
-									InsertShadow_level) != 0)) {
+									s_bitMask) != 0)) {
 			return 1;
 		}
 
@@ -257,7 +257,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
  */
 void COctTree::ClearFlag(unsigned long flag)
 {
-	s_shadow_no = ~flag;
+	clear_flag_mask = ~flag;
 	ClearFlag_r(m_nodePool);
 }
 
@@ -275,7 +275,7 @@ static void ClearFlag_r(COctNode* node)
 	int i;
 
 	if (node->m_meshCount != 0) {
-		node->m_drawFlags &= s_shadow_no;
+		node->m_drawFlags &= clear_flag_mask;
 	}
 	for (i = 0; i < 8; i++) {
 		if (node->m_children[i] == 0) {
@@ -300,7 +300,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 	Mtx inverseMtx;
 
 	if (m_type == 0) {
-		s_insertShadowBitIndex = bitIndex;
+		s_shadow_no = bitIndex;
 		PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 
@@ -309,7 +309,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
 		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);
 
-		s_light_no = 0;
+		InsertShadow_level = 0;
 		InsertShadow_r(m_nodePool);
 	}
 }
@@ -330,16 +330,16 @@ static void InsertShadow_r(COctNode* node)
 	if (node->m_bound.CheckCross(s_bound) == 0) {
 		return;
 	}
-	if ((s_light_no >= 3) && (node->m_meshCount != 0)) {
-		setbit32(&node->m_shadowFlags, s_insertShadowBitIndex);
+	if ((InsertShadow_level >= 3) && (node->m_meshCount != 0)) {
+		setbit32(&node->m_shadowFlags, s_shadow_no);
 	}
 	for (i = 0; i < 8; i++) {
 		if (node->m_children[i] == 0) {
 			return;
 		}
-		s_light_no++;
+		InsertShadow_level++;
 		InsertShadow_r(node->m_children[i]);
-		s_light_no--;
+		InsertShadow_level--;
 	}
 }
 
@@ -439,7 +439,7 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 		return;
 	}
 
-	s_insertLightBitIndex = bitIndex;
+	s_light_no = bitIndex;
 	PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 
@@ -470,7 +470,7 @@ static void InsertLight_r(COctNode* node)
 		return;
 	}
 	if (node->m_meshCount != 0) {
-		setbit32(&node->m_lightFlags, s_insertLightBitIndex);
+		setbit32(&node->m_lightFlags, s_light_no);
 	}
 	for (i = 0; i < 8; i++) {
 		if (node->m_children[i] == 0) {

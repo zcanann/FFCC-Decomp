@@ -17,10 +17,10 @@ static inline CMemory::CStage* MaterialEditorStage()
  * --INFO--
  * PAL Address: 0x8004dce8
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004DADC
+ * EN Size: 40b
+ * JP Address: 0x8004D544
+ * JP Size: 40b
  */
 RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
 {
@@ -45,10 +45,10 @@ inline RSDITEM* CMaterialEditorPcs::GetReadRsd()
  * --INFO--
  * PAL Address: 0x8004dd10
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004DB04
+ * EN Size: 96b
+ * JP Address: 0x8004D56C
+ * JP Size: 96b
  */
 int CMaterialEditorPcs::SetRsdIndex()
 {
@@ -69,10 +69,10 @@ int CMaterialEditorPcs::SetRsdIndex()
  * --INFO--
  * PAL Address: 0x8004dd70
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004DB64
+ * EN Size: 80b
+ * JP Address: 0x8004D5CC
+ * JP Size: 80b
  */
 int CMaterialEditorPcs::SetRsdFlag()
 {
@@ -90,10 +90,10 @@ int CMaterialEditorPcs::SetRsdFlag()
  * --INFO--
  * PAL Address: 0x8004ddc0
  * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004DBB4
+ * EN Size: 212b
+ * JP Address: 0x8004D61C
+ * JP Size: 212b
  */
 int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
 {
@@ -204,10 +204,10 @@ inline RSDLISTITEM* CMaterialEditorPcs::GetRsdItemR()
  * --INFO--
  * PAL Address: 0x8004de94
  * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004DC88
+ * EN Size: 316b
+ * JP Address: 0x8004D6F0
+ * JP Size: 316b
  */
 void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {

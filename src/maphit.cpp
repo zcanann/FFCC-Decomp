@@ -6,27 +6,22 @@
 
 #include <math.h>
 
-extern "C" const float kMapHitInitialTMin = 10.0f;
-extern "C" const float kMapHitEdgeBackoff = 0.5f;
-extern "C" const float kMapHitFaceBackoff = 0.30000001192092896f;
-extern "C" const float kMapHitUnitScale = 1.0f;
-extern "C" const float kMapHitZero = 0.0f;
-extern "C" const float kMapHitRadiusSlideScale = 1.0499999523162842f;
-extern "C" const float kMapHitSlideTLimit = -3.0f;
-extern "C" const double kMapHitEdgeMaxT = 1.0;
-extern "C" const float kMapHitEdgeMinT = -0.009999999776482582f;
-extern "C" const float kMapHitBoundsMinInit = 10000000000.0f;
-extern "C" const float kMapHitBoundsMaxInit = -10000000000.0f;
-extern "C" const float kMapHitVertexOffsetScale = 0.10000000149011612f;
-extern "C" const float kMapHitRadiusScale = 4.0f;
-extern "C" const double kMapHitRadiusBase = -1.0;
-extern "C" const double DOUBLE_8032F908 = 0.999999999999;
-extern "C" const double DOUBLE_8032F910 = 0.0;
-extern "C" const double DOUBLE_8032F918 = 0.5;
-extern "C" const double DOUBLE_8032F920 = 3.0;
-extern "C" const double DOUBLE_8032F928 = 2.0;
+static const float kMapHitInitialTMin = 10.0f;
+static const float kMapHitEdgeBackoff = 0.5f;
+static const float kMapHitFaceBackoff = 0.30000001192092896f;
+static const float kMapHitUnitScale = 1.0f;
+static const float kMapHitZero = 0.0f;
+static const float kMapHitRadiusSlideScale = 1.0499999523162842f;
+static const float kMapHitSlideTLimit = -3.0f;
+static const double kMapHitEdgeMaxT = 1.0;
+static const float kMapHitEdgeMinT = -0.009999999776482582f;
+static const float kMapHitBoundsMinInit = 10000000000.0f;
+static const float kMapHitBoundsMaxInit = -10000000000.0f;
+static const float kMapHitVertexOffsetScale = 0.10000000149011612f;
+static const float kMapHitRadiusScale = 4.0f;
+static const double kMapHitRadiusBase = -1.0;
 static const char s_maphit_cpp[] = "maphit.cpp";
-extern "C" const char sOldMidFormat[] = {
+static const char sOldMidFormat[] = {
     (char)0x8C, (char)0xC3, (char)0x82, (char)0xA2, (char)0x20, (char)0x4D, (char)0x49, (char)0x44,
     (char)0x20, (char)0x82, (char)0xCC, (char)0x8C, (char)0x60, (char)0x8E, (char)0xAE, (char)0x82,
     (char)0xC5, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
@@ -43,9 +38,8 @@ int g_hit_edge_idx_min;
 float g_hit_t;
 float g_hit_t_min;
 float g_hit_t_slide_min;
-unsigned char g_MapHitFaceFlag;
+unsigned char g_hit_f;
 CMapHitFace* g_hit_lpface;
-CMapHitFace* g_hit_f;
 CMapHitFace* g_hit_lpface_min;
 
 /*
@@ -540,12 +534,12 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
 commit:
-    if (static_cast<signed char>(s_bitMask) != 0) {
-        g_hit_lpface->m_drawFlags = s_bitMaskDrawFlags;
+    if (static_cast<signed char>(g_MapHitDrawMode) != 0) {
+        g_hit_lpface->m_drawFlags = g_MapHitFaceFlag;
     }
     g_hit_t_slide_min = g_hit_t;
     g_hit_t_min = g_hit_t;
-    g_hit_f = g_hit_lpface;
+    g_hit_lpface_min = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
     g_hit_mvec_min = g_hit_mvec;
     g_hit_hpv_min = g_hit_hpv;
@@ -554,8 +548,8 @@ commit:
     return 1;
 
 edge_loop:
-    if (static_cast<signed char>(s_bitMask) != 0) {
-        g_hit_lpface->m_drawFlags = s_bitMaskDrawFlags;
+    if (static_cast<signed char>(g_MapHitDrawMode) != 0) {
+        g_hit_lpface->m_drawFlags = g_MapHitFaceFlag;
     }
 
     if (g_hit_lpface->m_edgeFlags == 0) {
@@ -843,7 +837,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 radius = cyl.m_radius;
     const f32 radiusSq = radius * radius;
 
-    if (fabs(localDirection.z) >= 1.0f) {
+    if (fabs(localDirection.z) >= 0.999999999999) {
         f32 disc = radiusSq - px * px - py * py;
         if (disc >= 0.0) {
             disc = sqrtf(disc);

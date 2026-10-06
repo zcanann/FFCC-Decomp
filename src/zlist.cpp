@@ -6,8 +6,12 @@ static const char s_zlist_cpp[] = "zlist.cpp";
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004DFD0
+ * PAL Size: 72b
+ * EN Address: 0x8004DDC4
+ * EN Size: 72b
+ * JP Address: 0x8004D82C
+ * JP Size: 72b
  */
 void* ZLIST::GetDataIdx(int index)
 {
@@ -40,8 +44,12 @@ void* ZLIST::GetDataIdx(int index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004E018
+ * PAL Size: 52b
+ * EN Address: 0x8004DE0C
+ * EN Size: 52b
+ * JP Address: 0x8004D874
+ * JP Size: 52b
  */
 void* ZLIST::GetDataNext(_ZLISTITEM** it)
 {
@@ -66,10 +74,10 @@ void* ZLIST::GetDataNext(_ZLISTITEM** it)
  * --INFO--
  * PAL Address: 0x8004E04C
  * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004DE40
+ * EN Size: 188b
+ * JP Address: 0x8004D8A8
+ * JP Size: 188b
  */
 bool ZLIST::AddTail(void* data)
 {
@@ -111,8 +119,12 @@ bool ZLIST::AddTail(void* data)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004E108
+ * PAL Size: 104b
+ * EN Address: 0x8004DEFC
+ * EN Size: 104b
+ * JP Address: 0x8004D964
+ * JP Size: 104b
  */
 void ZLIST::DeleteList()
 {
@@ -135,8 +147,12 @@ void ZLIST::DeleteList()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004E170
+ * PAL Size: 136b
+ * EN Address: 0x8004DF64
+ * EN Size: 136b
+ * JP Address: 0x8004D9CC
+ * JP Size: 136b
  */
 ZLIST::~ZLIST()
 {
@@ -159,8 +175,12 @@ ZLIST::~ZLIST()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004E1F8
+ * PAL Size: 24b
+ * EN Address: 0x8004DFEC
+ * EN Size: 24b
+ * JP Address: 0x8004DA54
+ * JP Size: 24b
  */
 ZLIST::ZLIST()
 {

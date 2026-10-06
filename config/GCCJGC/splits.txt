@@ -1829,3 +1829,6 @@ gx/GXInit.c:
 
 auto_09_8034B974_sdata:
 	.sdata start:0x8034B974 end:0x8034B978
+
+os/OSLink.c:
+	.text start:0x801791A8 end:0x801791C0

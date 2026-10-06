@@ -838,7 +838,7 @@ config.libs = [
             Object(Matching, "os/OSFatal.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSFont.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSInterrupt.c"),
-            Object(Matching, "os/OSLink.c"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSLink.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSMemory.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSMessage.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OSMutex.c"),

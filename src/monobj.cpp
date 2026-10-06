@@ -2737,18 +2737,15 @@ void CGMonObj::statWatch()
 			monObj->m_chaseDirty = 1;
 		} else {
 			void** handle = object->m_scriptHandle;
-			unsigned char* scriptBase = reinterpret_cast<unsigned char*>(handle[9]);
-			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
+			unsigned char* aiData = reinterpret_cast<unsigned char*>(handle[9]);
+			if (*reinterpret_cast<unsigned short*>(aiData + 0x10C) == 1) {
 				if (attackResult >= 100) {
 					actionState = attackResult;
 				} else {
 					short aiState = monObj->m_aiState;
-					unsigned char* aiData;
-					if (aiState == 0) {
-						aiData = scriptBase;
-					} else {
+					if (aiState != 0) {
 						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(aiData + 0x100)) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData + attackResult * 0x10 + 0x110) & 0x20) != 0) {
 						actionState = 0x21;

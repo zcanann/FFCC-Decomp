@@ -48,10 +48,10 @@ static inline unsigned int Swap32(unsigned int x)
  * --INFO--
  * PAL Address: 0x80020370
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80020164
+ * EN Size: 116b
+ * JP Address: 0x8001FBC4
+ * JP Size: 116b
  */
 void CUSBPcs::Init()
 {
@@ -71,10 +71,10 @@ void CUSBPcs::Init()
  * --INFO--
  * PAL Address: 0x80020314
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80020108
+ * EN Size: 92b
+ * JP Address: 0x8001FB68
+ * JP Size: 92b
  */
 void CUSBPcs::Quit()
 {
@@ -91,10 +91,10 @@ void CUSBPcs::Quit()
  * --INFO--
  * PAL Address: 0x80020300
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800200F4
+ * EN Size: 20b
+ * JP Address: 0x8001FB54
+ * JP Size: 20b
  */
 int CUSBPcs::GetTable(unsigned long index)
 {
@@ -105,10 +105,10 @@ int CUSBPcs::GetTable(unsigned long index)
  * --INFO--
  * PAL Address: 0x8002027c
  * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80020070
+ * EN Size: 132b
+ * JP Address: 0x8001FAD0
+ * JP Size: 132b
  */
 void CUSBPcs::IsBigAlloc(int useBigStage)
 {
@@ -124,10 +124,10 @@ void CUSBPcs::IsBigAlloc(int useBigStage)
  * --INFO--
  * PAL Address: 0x80020248
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8002003C
+ * EN Size: 52b
+ * JP Address: 0x8001FA9C
+ * JP Size: 52b
  */
 void CUSBPcs::create()
 {
@@ -138,10 +138,10 @@ void CUSBPcs::create()
  * --INFO--
  * PAL Address: 0x80020218
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8002000C
+ * EN Size: 48b
+ * JP Address: 0x8001FA6C
+ * JP Size: 48b
  */
 void CUSBPcs::destroy()
 {
@@ -152,10 +152,10 @@ void CUSBPcs::destroy()
  * --INFO--
  * PAL Address: 0x800201f0
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001FFE4
+ * EN Size: 40b
+ * JP Address: 0x8001FA44
+ * JP Size: 40b
  */
 void CUSBPcs::func()
 {
@@ -166,10 +166,10 @@ void CUSBPcs::func()
  * --INFO--
  * PAL Address: 0x800201ec
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001FFE0
+ * EN Size: 4b
+ * JP Address: 0x8001FA40
+ * JP Size: 4b
  */
 void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
 {
@@ -180,10 +180,10 @@ void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
  * --INFO--
  * PAL Address: 0x80020180
  * PAL Size: 108b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001FF74
+ * EN Size: 108b
+ * JP Address: 0x8001F9D0
+ * JP Size: 112b
  */
 void CUSBPcs::mccReadData()
 {
@@ -208,10 +208,10 @@ void CUSBPcs::mccReadData()
  * --INFO--
  * PAL Address: 0x8001ff6c
  * PAL Size: 532b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8001FD60
+ * EN Size: 532b
+ * JP Address: 0x8001F7BC
+ * JP Size: 532b
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {

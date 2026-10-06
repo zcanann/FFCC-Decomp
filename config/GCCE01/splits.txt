@@ -145,7 +145,7 @@ p_sample.cpp:
 	extabindex start:0x8000B41C end:0x8000B428
 	.text start:0x8001FC68 end:0x8001FD60
 	.ctors start:0x801D4318 end:0x801D431C
-	.rodata start:0x801D5C10 end:0x801D5C34
+	.rodata start:0x801D5C10 end:0x801D5C31
 	.data start:0x801E7318 end:0x801E750C
 	.sdata start:0x8032D408 end:0x8032D420
 	.sbss start:0x8032DC40 end:0x8032DC44
@@ -1876,3 +1876,27 @@ zlist_rodata_padding_801D6D0A:
 
 auto_8032DC74_sbss:
 	.sbss start:0x8032DC74 end:0x8032DC78
+
+p_usb.cpp:
+	.text start:0x8001FD60 end:0x80020288
+	.rodata start:0x801D5C38 end:0x801D5C6B
+	.sdata2 start:0x8032E7D8 end:0x8032E7E0
+	.sdata start:0x8032D420 end:0x8032D438
+	.data start:0x801E7510 end:0x801E76D4
+	.bss start:0x80242FE8 end:0x802430FC
+	.ctors start:0x801D431C end:0x801D4320
+
+usb_padding_rodata_801D5C6B:
+	.rodata start:0x801D5C6B end:0x801D5C70 align:1
+
+usb_padding_data_801E76D4:
+	.data start:0x801E76D4 end:0x801E76D8 align:1
+
+usb_padding_bss_802430FC:
+	.bss start:0x802430FC end:0x80243100 align:1
+
+usb_preceding_rodata_padding_801D5C31:
+	.rodata start:0x801D5C31 end:0x801D5C38 align:1
+
+usb_preceding_data_padding_801E750C:
+	.data start:0x801E750C end:0x801E7510 align:4

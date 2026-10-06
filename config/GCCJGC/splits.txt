@@ -1812,6 +1812,13 @@ USBStreamData.cpp:
 
 p_MaterialEditor.cpp:
 	.text start:0x8004AA34 end:0x8004BF74
+	.rodata start:0x801D2870 end:0x801D28CC
+	.sdata start:0x8034B448 end:0x8034B460
+	.data start:0x801DE818 end:0x801DE9E8
+	.sdata2 start:0x8034CA00 end:0x8034CA38
+	.ctors start:0x801D067C end:0x801D0680
+	.bss start:0x80288C38 end:0x80289024
+	.sbss start:0x8034BB18 end:0x8034BB25
 
 ME_USB_process.cpp:
 	.text start:0x8004C264 end:0x8004D544
@@ -1832,3 +1839,12 @@ auto_09_8034B974_sdata:
 
 os/OSLink.c:
 	.text start:0x801791A8 end:0x801791C0
+
+editor_padding_rodata_801D28CC:
+	.rodata start:0x801D28CC end:0x801D28D0 align:4
+
+editor_padding_bss_80289024:
+	.bss start:0x80289024 end:0x80289028 align:4
+
+editor_padding_sbss_8034BB25:
+	.sbss start:0x8034BB25 end:0x8034BB28 align:1

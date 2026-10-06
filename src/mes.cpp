@@ -30,8 +30,8 @@ static const char s_MessageSpeedTagUsed[] =
 
 static inline char GetMesNibbleValue(const char* data)
 {
-	signed char val = (signed char)(((unsigned char)data[0] & 0x0F) << 4);
-	val = (signed char)(val | ((unsigned char)data[1] & 0x0F));
+	char val = (char)(((unsigned char)data[0] & 0x0F) << 4);
+	val |= (unsigned char)data[1] & 0x0F;
 	return val;
 }
 
@@ -46,12 +46,8 @@ static inline char GetMesNibbleValue(const char* data)
  */
 inline char CMes::GET_1(char** text)
 {
-	char* p0 = *text;
-	*text = p0 + 1;
-	signed char val = (signed char)((*p0 & 0x0F) << 4);
-	char* p1 = *text;
-	*text = p1 + 1;
-	val = (signed char)(val | (*p1 & 0x0F));
+	char val = (char)(((unsigned char)*(*text)++ & 0x0F) << 4);
+	val |= (unsigned char)*(*text)++ & 0x0F;
 	return val;
 }
 
@@ -66,11 +62,13 @@ inline char CMes::GET_1(char** text)
  */
 inline int CMes::GET_2(char** text)
 {
-	short acc = (short)((*(*text)++ & 0x0F) << 4);
-	acc = (short)(acc | (*(*text)++ & 0x0F));
-	acc = (short)((short)(acc << 4) | (*(*text)++ & 0x0F));
-	acc = (short)((short)(acc << 4) | (*(*text)++ & 0x0F));
-	return (int)acc;
+	short acc = (short)(((unsigned char)*(*text)++ & 0x0F) << 4);
+	acc |= (unsigned char)*(*text)++ & 0x0F;
+	acc <<= 4;
+	acc |= (unsigned char)*(*text)++ & 0x0F;
+	acc <<= 4;
+	acc |= (unsigned char)*(*text)++ & 0x0F;
+	return acc;
 }
 
 #ifdef VERSION_GCCE01
@@ -188,10 +186,10 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 #else
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	int width = 0;
-	bool continueDraw = true;
+	int lineStartX = (int)font->posX;
 	unsigned short ch;
-	float lineStartX = font->posX;
+	int width = 0;
+	int continueDraw = 1;
 
 	while (continueDraw)
 	{
@@ -199,7 +197,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 
 		if (ch == 0)
 		{
-			continueDraw = false;
+			continueDraw = 0;
 		}
 		else if (ch == 0xFF)
 		{
@@ -209,13 +207,13 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 			case 0:
 				if (breakOnLineTag != 0)
 				{
-					font->SetPosX((float)(int)lineStartX);
+					font->SetPosX((float)lineStartX);
 					float lineAdvance = (float)font->m_glyphHeight * font->scaleY;
 					font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
 				}
 				break;
 			case 1:
-				continueDraw = false;
+				continueDraw = 0;
 				break;
 			}
 		}

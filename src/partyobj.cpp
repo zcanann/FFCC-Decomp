@@ -562,75 +562,13 @@ void CGPartyObj::onCancelStat(int state)
 		break;
 	case 0x0B:
 		{
-			if (party.carryObject != 0) {
-				if (CFlatItemCarryMode() == 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(0x0C, 1);
-					} else {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(2, 1);
-					}
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				}
-			} else {
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0, 0);
-						SetAnimSlot(1, 1);
-					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x30, 1);
-					}
-				} else {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
-					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
-					}
-				}
-			}
+			setIdleMotion();
 		}
 		break;
 	case 0x0C:
 	case 0x0D:
 		{
-			if (party.carryObject != 0) {
-				if (CFlatItemCarryMode() == 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(0x0C, 1);
-					} else {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(2, 1);
-					}
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				}
-			} else {
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0, 0);
-						SetAnimSlot(1, 1);
-					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x30, 1);
-					}
-				} else {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
-					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
-					}
-				}
-			}
+			setIdleMotion();
 		}
 		break;
 	case 9:
@@ -645,38 +583,7 @@ void CGPartyObj::onCancelStat(int state)
 		}
 		enableDamageCol(1);
 		{
-			if (party.carryObject != 0) {
-				if (CFlatItemCarryMode() == 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(0x0C, 1);
-					} else {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(2, 1);
-					}
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				}
-			} else {
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0, 0);
-						SetAnimSlot(1, 1);
-					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x30, 1);
-					}
-				} else {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
-					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
-					}
-				}
-			}
+			setIdleMotion();
 		}
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			endPSlotBit(0x10000);
@@ -696,38 +603,7 @@ void CGPartyObj::onCancelStat(int state)
 		}
 		enableDamageCol(1);
 		{
-			if (party.carryObject != 0) {
-				if (CFlatItemCarryMode() == 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(0x0C, 1);
-					} else {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(2, 1);
-					}
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				}
-			} else {
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0, 0);
-						SetAnimSlot(1, 1);
-					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x30, 1);
-					}
-				} else {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
-					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
-					}
-				}
-			}
+			setIdleMotion();
 		}
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			endPSlotBit(0x10000);
@@ -1785,34 +1661,7 @@ void CGPartyObj::onFrameStat()
 			playSe3D(0x22, 0x32, 0x96, 0, 0);
 		}
 		if (isLoopAnim() != 0) {
-			if (party.carryObject != nullptr) {
-				if (CFlatItemCarryMode() == 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(0x0C, 1);
-					} else {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(2, 1);
-					}
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-				if (m_motionMode == 1) {
-					SetAnimSlot(0, 0);
-					SetAnimSlot(1, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x30, 1);
-				}
-			} else if (m_motionMode == 1) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			}
+			setIdleMotion();
 			changeStat(0, 0, 0);
 			m_extraMoveVec.x = FLOAT_80331a78;
 			m_extraMoveVec.z = FLOAT_80331a78;
@@ -1927,34 +1776,7 @@ void CGPartyObj::onFrameStat()
 				party.flags.flag04 = 0;
 			}
 			enableDamageCol(1);
-			if (party.carryObject != nullptr) {
-				if (CFlatItemCarryMode() == 0) {
-					if (m_motionMode == 1) {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(0x0C, 1);
-					} else {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(2, 1);
-					}
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				}
-			} else if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
-				if (m_motionMode == 1) {
-					SetAnimSlot(0, 0);
-					SetAnimSlot(1, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x30, 1);
-				}
-			} else if (m_motionMode == 1) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			}
+			setIdleMotion();
 			if (m_currentAnimSlot == 6) {
 				reqAnim(0x26, 0, 0);
 			} else {
@@ -2547,13 +2369,7 @@ void CGPartyObj::endTargetParticle()
  */
 int CGPartyObj::isDispTarget()
 {
-	unsigned char result = 0;
-	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
-	    (m_comboState != 0)) {
-		result = 1;
-	}
-
-	return result;
+	return (m_lastStateId == 2 || m_lastStateId == 6) && m_comboState != 0;
 }
 
 /*
@@ -2567,11 +2383,7 @@ int CGPartyObj::isDispTarget()
  */
 int CGPartyObj::isRideTarget()
 {
-	unsigned char result = 0;
-	if (isDispTarget() && m_partyData.flags.flag40) {
-		result = 1;
-	}
-	return result;
+	return isDispTarget() && m_partyData.flags.flag40;
 }
 
 /*
@@ -3148,34 +2960,7 @@ void CGPartyObj::statPut()
 
 	if (isLoopAnim() != 0) {
 		PartyObjOverlay& party = m_partyData;
-		if (party.carryObject != 0) {
-			if (static_cast<int>(CFlatCenterState()) == 0) {
-				if (m_motionMode == 1) {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(2, 1);
-				}
-			} else {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(0x0C, 1);
-			}
-		} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-			if (m_motionMode == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
-			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
-			}
-		} else if (m_motionMode == 1) {
-			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x24, 1);
-		} else {
-			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x24, 1);
-		}
+		setIdleMotion();
 		changeStat(0, 0, 0);
 	}
 }
@@ -4004,36 +3789,7 @@ void CGPartyObj::changeMotionMode(int mode)
 	m_motionMode = static_cast<short>(mode);
 	changeStat(0, 0, 0);
 
-	if (party.carryObject != 0) {
-		if (CFlatItemCarryMode() == 0) {
-			if (m_motionMode == 1) {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(0x0C, 1);
-			} else {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(2, 1);
-			}
-		} else {
-			SetAnimSlot(0x0B, 0);
-			SetAnimSlot(0x0C, 1);
-		}
-	} else {
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-			if (m_motionMode == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
-			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
-			}
-		} else if (m_motionMode == 1) {
-			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x24, 1);
-		} else {
-			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x24, 1);
-		}
-	}
+	setIdleMotion();
 
 	CancelAnim(1);
 
@@ -4046,36 +3802,7 @@ void CGPartyObj::changeMotionMode(int mode)
 
 	enableDamageCol(1);
 
-	if (party.carryObject != 0) {
-		if (CFlatItemCarryMode() == 0) {
-			if (m_motionMode == 1) {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(0x0C, 1);
-			} else {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(2, 1);
-			}
-		} else {
-			SetAnimSlot(0x0B, 0);
-			SetAnimSlot(0x0C, 1);
-		}
-	} else {
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-			if (m_motionMode == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
-			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
-			}
-		} else if (m_motionMode == 1) {
-			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x24, 1);
-		} else {
-			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x24, 1);
-		}
-	}
+	setIdleMotion();
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 		endPSlotBit(0x10000);
@@ -4161,34 +3888,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 
 	enableDamageCol(1);
 
-	if (party.carryObject != 0) {
-		if (static_cast<int>(CFlatCenterState()) == 0) {
-			if (m_motionMode == 1) {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(0x0C, 1);
-			} else {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(2, 1);
-			}
-		} else {
-			SetAnimSlot(0x0B, 0);
-			SetAnimSlot(0x0C, 1);
-		}
-	} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-		if (m_motionMode == 1) {
-			SetAnimSlot(0, 0);
-			SetAnimSlot(1, 1);
-		} else {
-			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x30, 1);
-		}
-	} else if (m_motionMode == 1) {
-		SetAnimSlot(0x25, 0);
-		SetAnimSlot(0x24, 1);
-	} else {
-		SetAnimSlot(0x25, 0);
-		SetAnimSlot(0x24, 1);
-	}
+	setIdleMotion();
 
 	if (restoreDamageCol == 0) {
 		if (m_currentAnimSlot == 6) {

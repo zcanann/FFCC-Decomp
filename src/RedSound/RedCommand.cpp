@@ -605,7 +605,7 @@ int SeBlockPlay(int seId, int bank, int sequenceNo, int pan, int volume)
 
 			if (entries[blockSequence] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
 				seInfoAddress = entries[blockSequence] & REDSOUND_SE_BLOCK_ENTRY_MASK;
-				seInfoAddress += RedSeBlockGetSeCount(seBlock) * REDSOUND_SE_BLOCK_ENTRY_SIZE;
+				seInfoAddress = (RedSeBlockGetSeCount(seBlock) << REDSOUND_SE_BLOCK_ENTRY_SHIFT) + seInfoAddress;
 				seInfoAddress = (int)entries + seInfoAddress;
 				playInfo = (RedSeINFO*)seInfoAddress;
 

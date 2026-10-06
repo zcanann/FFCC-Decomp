@@ -13,7 +13,7 @@ struct GbaCMakeInfo
     unsigned char m_resultCode;
     short m_packetCount;
     unsigned short m_crc;
-    unsigned char m_playerSlot;
+    signed char m_playerSlot;
     char m_name[0x11];
     unsigned char m_charaType;
     unsigned char m_birthDate[2]; // month, day

@@ -1760,10 +1760,10 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	GbaQueueMapEntity localMapItems[16];
 	GbaQueueMapEntity* localEntry;
 	GbaQueueMapEntity* prevEntry;
-	GbaQueueMapEntity* prevWalk;
+	int count;
 	short baseX;
 	short baseZ;
-	int count;
+	GbaQueueMapEntity* prevWalk;
 	int i;
 	unsigned char* outPtr;
 
@@ -2763,7 +2763,7 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 	cmakeInfo[channel].m_active = 1;
 	cmakeInfo[channel].m_charaType = 0xFF;
 	cmakeInfo[channel].m_jobType = 0xFF;
-	cmakeInfo[channel].m_playerSlot = static_cast<unsigned char>(value);
+	cmakeInfo[channel].m_playerSlot = static_cast<signed char>(value);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetMType(channel, 1);
@@ -2876,7 +2876,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		}
 
 		for (i = 0; i < 8; i++) {
-			if ((i != static_cast<signed char>(localInfo.m_playerSlot)) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
+			if ((i != localInfo.m_playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
 			    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0U) &&
 			    (strcmp(reinterpret_cast<char*>(Game.m_caravanWorkArr[i].m_name), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
@@ -2920,7 +2920,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	signed char playerSlot = cmakeInfo[channel].m_playerSlot;
+	int playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (i = 0; i < 4; i++) {
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (cmakeInfo[i].m_charaType == valueBytes[2])) {
@@ -2961,7 +2961,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	OSWaitSemaphore(accessSemaphores + channel);
 	cmakeInfo[channel].m_charaType = valueBytes[2];
 	OSSignalSemaphore(accessSemaphores + channel);
-	MenuPcs.ChgModel(static_cast<int>(playerSlot), valueBytes[2] & 3, (valueBytes[2] >> 2) & 3,
+	MenuPcs.ChgModel(playerSlot, valueBytes[2] & 3, (valueBytes[2] >> 2) & 3,
 	                 static_cast<int>(valueBytes[2] >> 7));
 }
 
@@ -2991,7 +2991,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	signed char playerSlot = cmakeInfo[channel].m_playerSlot;
+	int playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (i = 0; i < 4; i++) {
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (cmakeInfo[i].m_jobType == valueBytes[2])) {

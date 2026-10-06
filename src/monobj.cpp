@@ -823,15 +823,8 @@ void CGMonObj::onFrameStat()
 						} else {
 							float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
 								(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9b + 0xD4)) + kMonObjEpsilon);
-							CVector targetVec(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
-							CVector myVec(object->m_worldPosition);
-							CVector diff;
-							PSVECSubtract(static_cast<Vec*>(myVec), static_cast<Vec*>(targetVec), static_cast<Vec*>(diff));
-							Vec delta;
-							delta.x = diff.x;
-							delta.y = diff.y;
-							delta.z = diff.z;
-							object->moveVector(&delta, speedScale, 1);
+							CVector delta = CVector(object->m_worldPosition) - CVector(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
+							object->moveVector(delta, speedScale, 1);
 						}
 					}
 				}
@@ -861,28 +854,29 @@ void CGMonObj::onFrameStat()
 
 	case 0x1D:
 		SET_DRAW_FLAG();
-		if (prgObj->m_subState != 1) {
-			if ((prgObj->m_subState < 1) && (0 <= prgObj->m_subState)) {
-				if (prgObj->m_subFrame == 0) {
-					void** scriptHandle = object->m_scriptHandle;
-					int rand = Math.Rand(0x50);
-					float randF = Math.RandF();
-					float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-						(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
-					object->moveVectorRot(kMonObjTwo * (kMonObjPi * randF), 0.0f, kMonObjQuarter * speedScale, rand + 10);
-				} else {
-					unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
-					if ((object->m_weaponNodeFlagAll.m_bits1.m_bit20 == 0) ||
-						(object->m_stateFlags0Bits.unk1 != 0)) {
-						object->CancelMove(1);
-						prgObj->changeSubStat(1);
-					}
+		switch (prgObj->m_subState) {
+		case 0:
+			if (prgObj->m_subFrame == 0) {
+				void** scriptHandle = object->m_scriptHandle;
+				int rand = Math.Rand(0x50);
+				float angle = kMonObjTwo * (kMonObjPi * Math.RandF());
+				float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
+					(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
+				object->moveVectorRot(angle, 0.0f, kMonObjQuarter * speedScale, rand + 10);
+			} else {
+				unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
+				if ((object->m_weaponNodeFlagAll.m_bits1.m_bit20 == 0) ||
+					(object->m_stateFlags0Bits.unk1 != 0)) {
+					object->CancelMove(1);
+					prgObj->changeSubStat(1);
 				}
 			}
-		} else {
+			break;
+		case 1:
 			if (static_cast<unsigned int>(Math.Rand(100)) == 0) {
 				prgObj->changeSubStat(0);
 			}
+			break;
 		}
 		break;
 
@@ -890,15 +884,7 @@ void CGMonObj::onFrameStat()
 	case 0x1E: {
 		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
 			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
-		CVector targetVec(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
-		CVector myVec(object->m_worldPosition);
-		CVector diff;
-		PSVECSubtract(static_cast<Vec*>(myVec), static_cast<Vec*>(targetVec), static_cast<Vec*>(diff));
-		Vec delta;
-		delta.x = diff.x;
-		delta.y = diff.y;
-		delta.z = diff.z;
-		object->moveVector(&delta, speedScale, 1);
+		object->moveVector(CVector(object->m_worldPosition) - CVector(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition), speedScale, 1);
 
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		float reachDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));

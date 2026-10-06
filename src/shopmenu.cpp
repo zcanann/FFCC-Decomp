@@ -2006,8 +2006,8 @@ void CShopMenu::DrawMake()
     int ownedRightX = 452;
     CMenuPcs::MaterialInfo recipeMaterial;
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
-    float makeMarginScale = FLOAT_80332d28;
-    float makeMarginBase = FLOAT_80332D10;
+    float makeMarginScale = 1.0f;
+    float makeMarginBase = -4.0f;
     for (int i = 0; i < 3; i++, rowY += 0x1E) {
         if (recipeMaterial.m_itemNo[i] <= 0) {
             break;

@@ -2426,8 +2426,8 @@ void CGObject::bgNormalCollision()
     Vec pos = m_worldPosition;
     pos.y += 5.0f + m_capsuleHalfHeight;
 
-    unsigned int retry = 4;
-    do {
+    unsigned int retry;
+    for (retry = 4; retry != 0; retry--) {
         if (MapPcs.CheckHitCylinderNear(&pos, &move, m_capsuleHalfHeight, m_bgHitMask) == 0) {
             break;
         }
@@ -2445,8 +2445,7 @@ void CGObject::bgNormalCollision()
             move.z = 0.0f;
         }
 
-        --retry;
-    } while (retry != 0);
+    }
 
     if (retry == 0) {
         m_groundHitOffset.z = 0.0f;
@@ -2498,7 +2497,8 @@ void CGObject::bgNormalCollision()
     m_groundHitOffset.y = 0.0f;
     m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
-    m_gravityY = m_jumpLandingDampening * -(delta + (clampedY - delta));
+    float rebound = clampedY - delta;
+    m_gravityY = m_jumpLandingDampening * -(rebound + delta);
 
     if (((m_displayFlags & 1) != 0) && (m_weaponNodeFlagBits.m_attached == 0)) {
         Sound.PlaySe3D(

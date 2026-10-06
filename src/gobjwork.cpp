@@ -1973,8 +1973,8 @@ void CCaravanWork::SetIdxCmdList(int cmdListIdx)
  */
 int CCaravanWork::IsUseCmdList(int cmdListIdx)
 {
-	unsigned char isInvalid = 0;
 	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
+	unsigned char isInvalid = 0;
 
 	if ((cmdListIdx >= 2) && (slotRef == -1)) {
 		isInvalid = 1;
@@ -2029,7 +2029,7 @@ unsigned int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 	int groupedCountLocal = GetNumCombi(cmdListIdx);
 
 	if (groupedCountLocal == 1) {
-		return cmdListIdx == m_currentCmdListIndex;
+		return m_currentCmdListIndex == cmdListIdx;
 	} else {
 		for (int n = cmdListIdx; n >= 0; n--) {
 			if (m_commandListExtra[cmdListIdx] != -1) {
@@ -2179,28 +2179,13 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 void CCaravanWork::DelCmdListAndItem(int cmdListIdx, int updateJoybus)
 {
 	int nextCmdIdx = 0;
-	short* slotRef = &m_commandListInventorySlotRef[cmdListIdx];
+	short* slotRef = (short*)m_commandListInventorySlotRef + cmdListIdx;
 	if (m_currentCmdListIndex == cmdListIdx) {
 		nextCmdIdx = GetNextCmdListIdx(cmdListIdx, 1);
 	}
 
-	short inventorySlot = *slotRef;
-#ifdef VERSION_GCCP01
-	if (m_inventoryItems[inventorySlot] != -1) {
-#endif
-		m_inventoryItems[inventorySlot] = 0xFFFF;
-		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
-		if (updateJoybus != 0) {
-			Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(inventorySlot));
-		}
-#ifdef VERSION_GCCP01
-	}
-#endif
-
-	*slotRef = 0xFFFF;
-	if (updateJoybus != 0) {
-		Joybus.SetCmdLst(m_joybusCaravanId, cmdListIdx, -1);
-	}
+	DeleteItemIdx(*slotRef, updateJoybus);
+	DeleteCmdList(cmdListIdx, updateJoybus);
 
 	if (m_currentCmdListIndex == cmdListIdx) {
 		m_currentCmdListIndex = nextCmdIdx;

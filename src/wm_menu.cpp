@@ -651,16 +651,21 @@ CMenuPcs::EffectInfo::EffectInfo()
 
 /*
  * --INFO--
- * PAL Address: 0x8010172c
+ * PAL Address: 0x8010172C
  * PAL Size: 6000b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80100AF0
+ * EN Size: 6000b
+ * JP Address: 0x800FD790
+ * JP Size: 5984b
  */
 void CMenuPcs::loadData()
 {
 	int i;
+#ifdef VERSION_GCCP01
+	const int kInitialAnimWait = 250;
+#else
+	const int kInitialAnimWait = 300;
+#endif
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	m_menuResultCode = 0;
 	GbaQue.SetControllerMode(1);
@@ -708,7 +713,9 @@ void CMenuPcs::loadData()
 		{2, "world40"},
 		{2, "world46"},
 		{2, "world47"},
+#ifndef VERSION_GCCJGC
 		{2, "world50"},
+#endif
 		{2, "diary1"},
 		{2, "diary2"},
 		{2, "face"},
@@ -721,13 +728,21 @@ void CMenuPcs::loadData()
 		{3, "world45"},
 		{3, "world48"},
 		{3, "world49"},
+#ifndef VERSION_GCCJGC
 		{3, "world51"},
+#endif
 		{4, "cc_logo01"},
 		{4, "cc_logo02"},
+#ifndef VERSION_GCCJGC
 		{4, "cc_logo03"},
+#endif
 	};
 
-	loadTexture(tName, 2, 3, tTmp, 0x16, 0x2F, 0);
+#ifdef VERSION_GCCJGC
+	loadTexture(tName, 2, 3, tTmp, 21, 44, 0);
+#else
+	loadTexture(tName, 2, 3, tTmp, 22, 47, 0);
+#endif
 
 	m_wm.m_handles[0x00] = 0;
 	m_wm.m_handles[0x01] = 0;
@@ -959,7 +974,7 @@ void CMenuPcs::loadData()
 				    const_cast<char*>(s_wmCharaAnimAngry), anim++, 1, 0, modelNo, -1, 0);
 				m_wmCharaAnimState[i].m_animIndex = 0;
 				m_wmCharaAnimState[i].m_nextAnimIndex = -1;
-				m_wmCharaAnimState[i].m_timer = rand() % 250;
+				m_wmCharaAnimState[i].m_timer = rand() % kInitialAnimWait;
 				m_wm.m_handles[i + 0x20]->SetAnim(anim - 6, -1, -1, 0, 0);
 				m_wmCharaAnimState[i].m_frame = m_wm.m_handles[i + 0x20]->m_model->GetNowFrame();
 				m_wmCharaAnimState[i].m_endFrame = m_wm.m_handles[i + 0x20]->m_model->GetEndFrame();
@@ -997,9 +1012,13 @@ void CMenuPcs::loadData()
 #undef worldState
 	}
 
+#ifdef VERSION_GCCJGC
+	loadFont(0, "dvd/menu/subfont.fnt", 1, -1);
+#else
 	char fontPath[128];
 	sprintf(fontPath, "dvd/%smenu/subfont.fnt", Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
+#endif
 
 	bytes[0xD] = 0;
 	{
@@ -1022,7 +1041,11 @@ void CMenuPcs::loadData()
 	}
 
 	char optionPath[256];
+#ifdef VERSION_GCCJGC
+	sprintf(optionPath, "dvd/menu/option.tex");
+#else
 	sprintf(optionPath, "dvd/%smenu/option.tex", Game.GetLangString());
+#endif
 	CFile::CHandle* const fileHandle = File.Open(optionPath, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
 		File.Read(fileHandle);

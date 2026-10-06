@@ -1799,3 +1799,10 @@ pppLocationTitle.cpp:
 gba/GBAKey.c:
 	.text start:0x801A32C4 end:0x801A352C
 	.data start:0x80238478 end:0x80238820
+
+monobj_table.cpp:
+	.text start:0x8013F154 end:0x80141190
+	.ctors start:0x801D06C8 end:0x801D06CC
+	extab start:0x80009C6C end:0x80009C74
+	extabindex start:0x80010E7C end:0x80010E88
+	.data start:0x80230178 end:0x802318B8

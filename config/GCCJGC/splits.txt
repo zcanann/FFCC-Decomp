@@ -1205,8 +1205,9 @@ TRK_MINNOW_DOLPHIN/support.c:
 
 astar.cpp:
 	.bss start:0x80324A78 end:0x80326F2C
-	.rodata start:0x801D8E28 end:0x801D8E78
+	.rodata start:0x801D8E28 end:0x801D8E76
 	.text start:0x8013D2E8 end:0x8013EE34
+	.sdata2 start:0x8034ECF0 end:0x8034ED1E
 
 pppYmMegaBirthShpTail3.cpp:
 	.text start:0x8008BEB0 end:0x8008E0BC
@@ -1924,3 +1925,9 @@ auto_8034BAB4_sbss:
 
 auto_8034C6D4_sdata2:
 	.sdata2 start:0x8034C6D4 end:0x8034C6D8
+
+astar_padding_801D8E76:
+	.rodata start:0x801D8E76 end:0x801D8E78 align:1
+
+astar_padding_8034ED1E:
+	.sdata2 start:0x8034ED1E end:0x8034ED20 align:1

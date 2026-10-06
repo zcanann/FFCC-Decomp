@@ -1259,8 +1259,9 @@ p_map.cpp:
 
 astar.cpp:
 	.bss start:0x80308158 end:0x8030A60C
-	.rodata start:0x801DC5D0 end:0x801DC620
+	.rodata start:0x801DC5D0 end:0x801DC61E
 	.text start:0x801406C0 end:0x80142208
+	.sdata2 start:0x80331018 end:0x80331046
 
 pppYmMegaBirthShpTail3.cpp:
 	.text start:0x8008C434 end:0x8008E63C
@@ -1948,3 +1949,9 @@ auto_8032E93C_sdata2:
 
 auto_8032DC7C_sbss:
 	.sbss start:0x8032DC7C end:0x8032DC80
+
+astar_padding_801DC61E:
+	.rodata start:0x801DC61E end:0x801DC620 align:1
+
+astar_padding_80331046:
+	.sdata2 start:0x80331046 end:0x80331048 align:1

@@ -120,6 +120,7 @@ STATIC_ASSERT(sizeof(MoneyMenuAnimList) == 0x1008);
 int CMenuPcs::MoneyCtrlCur()
 {
 	s16 hold;
+	CCaravanWork* caravanWork;
 	s16 press;
 
 	press = Pad.GetButtonDown(0);
@@ -129,7 +130,7 @@ int CMenuPcs::MoneyCtrlCur()
 		return 0;
 	}
 
-	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+	caravanWork = Game.m_scriptFoodBase[0];
 	int maxDigits = 1;
 	int mode = this->m_moneyState->mode;
 	int maxGil = caravanWork->m_gil;
@@ -146,6 +147,7 @@ int CMenuPcs::MoneyCtrlCur()
 	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
+		int gil;
 		s16* sel = &this->m_moneyState->selections[mode];
 		int cursor = *sel;
 		unsigned int placeValue = 1;
@@ -158,7 +160,7 @@ int CMenuPcs::MoneyCtrlCur()
 			if (caravanWork->m_gil == 0) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
-				int gil = s_Money + placeValue;
+				gil = s_Money + placeValue;
 				gil = (gil <= caravanWork->m_gil) ? gil : 0;
 				s_Money = gil;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -167,7 +169,7 @@ int CMenuPcs::MoneyCtrlCur()
 			}
 		} else {
 			if ((hold & 4) != 0) {
-				int gil = caravanWork->m_gil;
+				gil = caravanWork->m_gil;
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {

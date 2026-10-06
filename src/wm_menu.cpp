@@ -994,18 +994,10 @@ void CMenuPcs::loadData()
 	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331838), 7, 0, -1, -1, -1, 0);
 	m_wm.m_handles[1]->SetAnim(0, -1, -1, -1, 0);
 
-	{
-#define worldState (reinterpret_cast<unsigned char*>(m_wmWorldState))
-		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
-		*reinterpret_cast<short*>(worldState + 0x36) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-		*reinterpret_cast<short*>(worldState + 0x3E) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-		*reinterpret_cast<short*>(worldState + 0x38) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-		*reinterpret_cast<short*>(worldState + 0x40) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-		*reinterpret_cast<short*>(worldState + 0x3A) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-		*reinterpret_cast<short*>(worldState + 0x42) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-		*reinterpret_cast<short*>(worldState + 0x3C) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
-		*reinterpret_cast<short*>(worldState + 0x44) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
-#undef worldState
+	m_wmWorldState->m_menuMode = 0;
+	for (i = 0; i < 4; i++) {
+		m_wmWorldState->m_originalBackupParams[i] = Game.m_gameWork.m_wmBackupParams[i];
+		m_wmWorldState->m_backupParams[i] = Game.m_gameWork.m_wmBackupParams[i];
 	}
 
 #ifdef VERSION_GCCJGC
@@ -1017,23 +1009,19 @@ void CMenuPcs::loadData()
 #endif
 
 	bytes[0xD] = 0;
-	{
-		unsigned char* const worldState = reinterpret_cast<unsigned char*>(m_wmWorldState);
-		bytes[0x10] = 0;
-		bytes[0x12] = 0;
-		bytes[0x13] = 0;
-		*reinterpret_cast<short*>(worldState + 0x20) = 0;
-		*reinterpret_cast<short*>(worldState + 0x1E) = 0;
-		*reinterpret_cast<short*>(worldState + 0x18) = 0;
-	}
+	bytes[0x10] = 0;
+	bytes[0x12] = 0;
+	bytes[0x13] = 0;
+	m_wmWorldState->m_changeRequest = 0;
+	m_wmWorldState->m_nextMenuMode = 0;
+	m_wmWorldState->m_delay = 0;
 	lbl_8032EE1C = 1;
 	lbl_8032E8AC = 1;
 
 	for (i = 4; i < 6; i++) {
 		m_battleMesMenus[i] = new (MenuPcs.m_menuStage, "wm_menu.cpp", kMesMenuLine) CMesMenu;
-		CMesMenu* const cur = m_battleMesMenus[i];
-		cur->SetIndex(i);
-		cur->Create();
+		m_battleMesMenus[i]->SetIndex(i);
+		m_battleMesMenus[i]->Create();
 	}
 
 	char optionPath[256];

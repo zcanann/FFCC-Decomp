@@ -26,10 +26,10 @@ CProcessCallbackTable CMaterialEditorPcs::m_table = {
  * --INFO--
  * PAL Address: 0x8004c3c4
  * PAL Size: 452b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C1B8
+ * EN Size: 452b
+ * JP Address: 0x8004BBF8
+ * JP Size: 488b
  */
 void CMaterialEditorPcs::Init()
 {
@@ -86,10 +86,10 @@ void CMaterialEditorPcs::Init()
  * --INFO--
  * PAL Address: 0x8004c314
  * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C108
+ * EN Size: 176b
+ * JP Address: 0x8004BB48
+ * JP Size: 176b
  */
 void CMaterialEditorPcs::Quit()
 {
@@ -116,10 +116,10 @@ void CMaterialEditorPcs::Quit()
  * --INFO--
  * PAL Address: 0x8004C300
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C0F4
+ * EN Size: 20b
+ * JP Address: 0x8004BB34
+ * JP Size: 20b
  */
 int CMaterialEditorPcs::GetTable(unsigned long index)
 {
@@ -129,10 +129,10 @@ int CMaterialEditorPcs::GetTable(unsigned long index)
  * --INFO--
  * PAL Address: 0x8004c234
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C028
+ * EN Size: 204b
+ * JP Address: 0x8004BA68
+ * JP Size: 204b
  */
 void CMaterialEditorPcs::createViewer()
 {
@@ -166,10 +166,10 @@ void CMaterialEditorPcs::createViewer()
  * --INFO--
  * PAL Address: 0x8004c138
  * PAL Size: 252b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004BF2C
+ * EN Size: 252b
+ * JP Address: 0x8004B96C
+ * JP Size: 252b
  */
 void CMaterialEditorPcs::destroyViewer()
 {
@@ -206,10 +206,10 @@ void CMaterialEditorPcs::destroyViewer()
  * --INFO--
  * PAL Address: 0x8004c098
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004BE8C
+ * EN Size: 160b
+ * JP Address: 0x8004B8CC
+ * JP Size: 160b
  */
 void CMaterialEditorPcs::ClearTextureData()
 {
@@ -231,10 +231,10 @@ void CMaterialEditorPcs::ClearTextureData()
  * --INFO--
  * PAL Address: 0x8004BEC8
  * PAL Size: 464b
- * EN Address: 0x80057EDC
- * EN Size: 432b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004BCBC
+ * EN Size: 464b
+ * JP Address: 0x8004B6FC
+ * JP Size: 464b
  */
 void CMaterialEditorPcs::calcViewer()
 {
@@ -295,10 +295,10 @@ void CMaterialEditorPcs::calcViewer()
  * --INFO--
  * PAL Address: 0x8004b2cc
  * PAL Size: 3068b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004B0C0
+ * EN Size: 3068b
+ * JP Address: 0x8004AAE4
+ * JP Size: 3096b
  */
 void CMaterialEditorPcs::drawViewer()
 {
@@ -566,10 +566,10 @@ void CMaterialEditorPcs::drawViewer()
  * --INFO--
  * PAL Address: 0x8004b21c
  * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004B010
+ * EN Size: 176b
+ * JP Address: 0x8004AA34
+ * JP Size: 176b
  */
 void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
 {

@@ -1821,3 +1821,12 @@ monobj_table.cpp:
 
 USBStreamData.cpp:
 	.text start:0x800501F0 end:0x80050310
+
+p_MaterialEditor.cpp:
+	.text start:0x8004B010 end:0x8004C510
+
+ME_USB_process.cpp:
+	.text start:0x8004C7FC end:0x8004DADC
+
+FS_USB_Process.cpp:
+	.text start:0x8004E940 end:0x8004F704

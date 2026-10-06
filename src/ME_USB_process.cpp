@@ -49,10 +49,10 @@ static inline u32 LoadSwap32(u32 value)
  * --INFO--
  * PAL Address: 0x8004CA08
  * PAL Size: 4784b
- * EN Address: 0x80059AC4
- * EN Size: 5368b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C7FC
+ * EN Size: 4784b
+ * JP Address: 0x8004C264
+ * JP Size: 4784b
  */
 void CMaterialEditorPcs::SetUSBData()
 {
@@ -410,10 +410,10 @@ void CMaterialEditorPcs::SetUSBData()
  * --INFO--
  * PAL Address: 0x8004DCB8
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004DAAC
+ * EN Size: 48b
+ * JP Address: 0x8004D514
+ * JP Size: 48b
  */
 void CMaterialEditorPcs::MemFree(void* ptr)
 {

@@ -452,6 +452,9 @@ static const int kWorldFrameTexture = 29;
 static const int kMcWindowTextureBase = 43;
 static const int kAltWindowTextureBase = 35;
 static const int kWorldWoodTexture = 21;
+static const int kWorldTitleWidth = 184;
+static const int kWorldYearDigitY = 63;
+static const int kBubbleTexture = 23;
 static const int kMcYearTexture = 22;
 static const int kMcYearLabelTexture = 32;
 static const int kMcFaceTexture = 53;
@@ -472,6 +475,9 @@ static const int kWorldFrameTexture = 30;
 static const int kMcWindowTextureBase = 44;
 static const int kAltWindowTextureBase = 36;
 static const int kWorldWoodTexture = 22;
+static const int kWorldTitleWidth = 200;
+static const int kWorldYearDigitY = 67;
+static const int kBubbleTexture = 24;
 static const int kMcYearTexture = 23;
 static const int kMcYearLabelTexture = 33;
 static const int kMcFaceTexture = 55;
@@ -645,16 +651,54 @@ CMenuPcs::EffectInfo::EffectInfo()
 
 /*
  * --INFO--
- * PAL Address: 0x8010172c
+ * PAL Address: 0x8010172C
  * PAL Size: 6000b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80100AF0
+ * EN Size: 6000b
+ * JP Address: 0x800FD790
+ * JP Size: 5984b
  */
 void CMenuPcs::loadData()
 {
 	int i;
+#ifdef VERSION_GCCJGC
+	const int kHandleLine = 0x341;
+	const int kWorldObjLine = 0x361;
+	const int kBubbleLine = 0x374;
+	const int kFrameDataLine = 0x378;
+	const int kFrameInfoLine = 0x37E;
+	const int kCharaModelLine = 0x384;
+	const int kCharaSelectLine = 0x390;
+	const int kWorldStateLine = 0x393;
+	const int kCharaStateLine = 0x397;
+	const int kWorldParamsLine = 0x39B;
+	const int kEffectWorkLine = 0x39F;
+	const int kCharaAnimLine = 0x3A7;
+	const int kWindowInfoLine = 0x3AB;
+	const int kMesMenuLine = 0x42F;
+	const int kOptionTextureLine = 0x445;
+#else
+	const int kHandleLine = 0x1F4;
+	const int kWorldObjLine = 0x214;
+	const int kBubbleLine = 0x227;
+	const int kFrameDataLine = 0x22B;
+	const int kFrameInfoLine = 0x231;
+	const int kCharaModelLine = 0x237;
+	const int kCharaSelectLine = 0x243;
+	const int kWorldStateLine = 0x246;
+	const int kCharaStateLine = 0x24A;
+	const int kWorldParamsLine = 0x24E;
+	const int kEffectWorkLine = 0x252;
+	const int kCharaAnimLine = 0x25A;
+	const int kWindowInfoLine = 0x25E;
+	const int kMesMenuLine = 0x2EA;
+	const int kOptionTextureLine = 0x300;
+#endif
+#ifdef VERSION_GCCP01
+	const int kInitialAnimWait = 250;
+#else
+	const int kInitialAnimWait = 300;
+#endif
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	m_menuResultCode = 0;
 	GbaQue.SetControllerMode(1);
@@ -702,7 +746,9 @@ void CMenuPcs::loadData()
 		{2, "world40"},
 		{2, "world46"},
 		{2, "world47"},
+#ifndef VERSION_GCCJGC
 		{2, "world50"},
+#endif
 		{2, "diary1"},
 		{2, "diary2"},
 		{2, "face"},
@@ -715,54 +761,25 @@ void CMenuPcs::loadData()
 		{3, "world45"},
 		{3, "world48"},
 		{3, "world49"},
+#ifndef VERSION_GCCJGC
 		{3, "world51"},
+#endif
 		{4, "cc_logo01"},
 		{4, "cc_logo02"},
+#ifndef VERSION_GCCJGC
 		{4, "cc_logo03"},
+#endif
 	};
 
-	loadTexture(tName, 2, 3, tTmp, 0x16, 0x2F, 0);
+#ifdef VERSION_GCCJGC
+	loadTexture(tName, 2, 3, tTmp, 21, 44, 0);
+#else
+	loadTexture(tName, 2, 3, tTmp, 22, 47, 0);
+#endif
 
-	m_wm.m_handles[0x00] = 0;
-	m_wm.m_handles[0x01] = 0;
-	m_wm.m_handles[0x02] = 0;
-	m_wm.m_handles[0x03] = 0;
-	m_wm.m_handles[0x04] = 0;
-	m_wm.m_handles[0x05] = 0;
-	m_wm.m_handles[0x06] = 0;
-	m_wm.m_handles[0x07] = 0;
-	m_wm.m_handles[0x08] = 0;
-	m_wm.m_handles[0x09] = 0;
-	m_wm.m_handles[0x0A] = 0;
-	m_wm.m_handles[0x0B] = 0;
-	m_wm.m_handles[0x0C] = 0;
-	m_wm.m_handles[0x0D] = 0;
-	m_wm.m_handles[0x0E] = 0;
-	m_wm.m_handles[0x0F] = 0;
-	m_wm.m_handles[0x10] = 0;
-	m_wm.m_handles[0x11] = 0;
-	m_wm.m_handles[0x12] = 0;
-	m_wm.m_handles[0x13] = 0;
-	m_wm.m_handles[0x14] = 0;
-	m_wm.m_handles[0x15] = 0;
-	m_wm.m_handles[0x16] = 0;
-	m_wm.m_handles[0x17] = 0;
-	m_wm.m_handles[0x18] = 0;
-	m_wm.m_handles[0x19] = 0;
-	m_wm.m_handles[0x1A] = 0;
-	m_wm.m_handles[0x1B] = 0;
-	m_wm.m_handles[0x1C] = 0;
-	m_wm.m_handles[0x1D] = 0;
-	m_wm.m_handles[0x1E] = 0;
-	m_wm.m_handles[0x1F] = 0;
-	m_wm.m_handles[0x20] = 0;
-	m_wm.m_handles[0x21] = 0;
-	m_wm.m_handles[0x22] = 0;
-	m_wm.m_handles[0x23] = 0;
-	m_wm.m_handles[0x24] = 0;
-	m_wm.m_handles[0x25] = 0;
-	m_wm.m_handles[0x26] = 0;
-	m_wm.m_handles[0x27] = 0;
+	for (i = 0; i < 40; i++) {
+		m_wm.m_handles[i] = 0;
+	}
 
 	static const short s_objtbl[] = {
 		110, 52, 127, 67, 66, 73, 42, 37,
@@ -774,7 +791,7 @@ void CMenuPcs::loadData()
 	const short* charaNoTable = s_objtbl;
 	const short* const charaNoDefault = charaNoTable + 21;
 	for (i = 0; i < 0x28; i++, charaNoTable++) {
-		m_wm.m_handles[i] = new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x1F4) CCharaPcs::CHandle;
+		m_wm.m_handles[i] = new (MenuPcs.m_menuStage, "wm_menu.cpp", kHandleLine) CCharaPcs::CHandle;
 		m_wm.m_handles[i]->Add();
 
 		int charaKind;
@@ -807,7 +824,7 @@ void CMenuPcs::loadData()
 	CharaPcs.m_charaAllocStage = 0;
 	m_wm.m_handles[6]->m_model->m_lightAlpha = FLOAT_803314B0;
 
-	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x214) WmWorldObjInfo[40];
+	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "wm_menu.cpp", kWorldObjLine) WmWorldObjInfo[40];
 	{
 		const float bigF = FLOAT_80331598;
 		const float zeroF = FLOAT_803313dc;
@@ -830,21 +847,21 @@ void CMenuPcs::loadData()
 	}
 
 	m_wm.m_bubbleData =
-	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x227) WmBubbleInfo;
+	    new (MenuPcs.m_menuStage, "wm_menu.cpp", kBubbleLine) WmBubbleInfo;
 	memset(m_wm.m_bubbleData, 0, sizeof(WmBubbleInfo));
 
 	m_wm.m_frameData =
-	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x22B) WmFrameData;
+	    new (MenuPcs.m_menuStage, "wm_menu.cpp", kFrameDataLine) WmFrameData;
 	memset(m_wm.m_frameData, 0, sizeof(WmFrameData));
 	InitFrameInfo();
 
 	m_wm.m_frameInfo =
-	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x231) WmFrameInfo;
+	    new (MenuPcs.m_menuStage, "wm_menu.cpp", kFrameInfoLine) WmFrameInfo;
 	memset(m_wm.m_frameInfo, 0, sizeof(WmFrameInfo));
 	InitFrame0Info();
 
 	m_wm.m_charaModelData =
-	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x237) WmCharaModelInfo[kWmMenuPlayerCount];
+	    new (MenuPcs.m_menuStage, "wm_menu.cpp", kCharaModelLine) WmCharaModelInfo[kWmMenuPlayerCount];
 	{
 		for (i = 0; i < kWmMenuPlayerCount; i++) {
 			m_wm.m_charaModelData[i].m_unknown00 = 0;
@@ -858,21 +875,21 @@ void CMenuPcs::loadData()
 	InitCharaInfo();
 
 	m_wm.m_charaSelectData =
-	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x243) WmCharaSelectEntry[kWmCharaSelectCount];
+	    new (MenuPcs.m_menuStage, "wm_menu.cpp", kCharaSelectLine) WmCharaSelectEntry[kWmCharaSelectCount];
 
 	m_wmWorldState =
-	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), MenuPcs.m_menuStage, "wm_menu.cpp", 0x246));
+	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), MenuPcs.m_menuStage, "wm_menu.cpp", kWorldStateLine));
 	memset(m_wmWorldState, 0, sizeof(WmWorldState));
 
 	m_wmCharaState =
-	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x24A) McListInfo[kMcListCount];
+	    new (MenuPcs.m_menuStage, "wm_menu.cpp", kCharaStateLine) McListInfo[kMcListCount];
 	ClrMcList();
 
 	m_wmWorldParams =
-	    static_cast<unsigned char*>(operator new(0x10, MenuPcs.m_menuStage, "wm_menu.cpp", 0x24E));
+	    static_cast<unsigned char*>(operator new(0x10, MenuPcs.m_menuStage, "wm_menu.cpp", kWorldParamsLine));
 	memset(m_wmWorldParams, 0, 0x10);
 
-	m_effectWork = new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x252) EffectInfo[0x28];
+	m_effectWork = new (MenuPcs.m_menuStage, "wm_menu.cpp", kEffectWorkLine) EffectInfo[0x28];
 	for (i = 0; i < 0x28; i++) {
 		m_effectWork[i].m_effectNo = -1;
 		m_effectWork[i].m_partNo = -1;
@@ -880,10 +897,10 @@ void CMenuPcs::loadData()
 	}
 
 	m_wmCharaAnimState =
-	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x25A) WmCharaAnimState[8];
+	    new (MenuPcs.m_menuStage, "wm_menu.cpp", kCharaAnimLine) WmCharaAnimState[8];
 	memset(m_wmCharaAnimState, 0, sizeof(WmCharaAnimState) * 8);
 
-	m_menuWindowInfo = new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x25E) MenuWindowInfo;
+	m_menuWindowInfo = new (MenuPcs.m_menuStage, "wm_menu.cpp", kWindowInfoLine) MenuWindowInfo;
 	memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
 	// Re-initialize the effect work entries.
@@ -953,7 +970,7 @@ void CMenuPcs::loadData()
 				    const_cast<char*>(s_wmCharaAnimAngry), anim++, 1, 0, modelNo, -1, 0);
 				m_wmCharaAnimState[i].m_animIndex = 0;
 				m_wmCharaAnimState[i].m_nextAnimIndex = -1;
-				m_wmCharaAnimState[i].m_timer = rand() % 250;
+				m_wmCharaAnimState[i].m_timer = rand() % kInitialAnimWait;
 				m_wm.m_handles[i + 0x20]->SetAnim(anim - 6, -1, -1, 0, 0);
 				m_wmCharaAnimState[i].m_frame = m_wm.m_handles[i + 0x20]->m_model->GetNowFrame();
 				m_wmCharaAnimState[i].m_endFrame = m_wm.m_handles[i + 0x20]->m_model->GetEndFrame();
@@ -977,52 +994,48 @@ void CMenuPcs::loadData()
 	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331838), 7, 0, -1, -1, -1, 0);
 	m_wm.m_handles[1]->SetAnim(0, -1, -1, -1, 0);
 
-	{
-#define worldState (reinterpret_cast<unsigned char*>(m_wmWorldState))
-		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
-		*reinterpret_cast<short*>(worldState + 0x36) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-		*reinterpret_cast<short*>(worldState + 0x3E) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-		*reinterpret_cast<short*>(worldState + 0x38) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-		*reinterpret_cast<short*>(worldState + 0x40) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-		*reinterpret_cast<short*>(worldState + 0x3A) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-		*reinterpret_cast<short*>(worldState + 0x42) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-		*reinterpret_cast<short*>(worldState + 0x3C) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
-		*reinterpret_cast<short*>(worldState + 0x44) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
-#undef worldState
+	m_wmWorldState->m_menuMode = 0;
+	for (i = 0; i < 4; i++) {
+		m_wmWorldState->m_originalBackupParams[i] = Game.m_gameWork.m_wmBackupParams[i];
+		m_wmWorldState->m_backupParams[i] = Game.m_gameWork.m_wmBackupParams[i];
 	}
 
+#ifdef VERSION_GCCJGC
+	loadFont(0, "dvd/menu/subfont.fnt", 1, -1);
+#else
 	char fontPath[128];
 	sprintf(fontPath, "dvd/%smenu/subfont.fnt", Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
+#endif
 
 	bytes[0xD] = 0;
-	{
-		unsigned char* const worldState = reinterpret_cast<unsigned char*>(m_wmWorldState);
-		bytes[0x10] = 0;
-		bytes[0x12] = 0;
-		bytes[0x13] = 0;
-		*reinterpret_cast<short*>(worldState + 0x20) = 0;
-		*reinterpret_cast<short*>(worldState + 0x1E) = 0;
-		*reinterpret_cast<short*>(worldState + 0x18) = 0;
-	}
+	bytes[0x10] = 0;
+	bytes[0x12] = 0;
+	bytes[0x13] = 0;
+	m_wmWorldState->m_changeRequest = 0;
+	m_wmWorldState->m_nextMenuMode = 0;
+	m_wmWorldState->m_delay = 0;
 	lbl_8032EE1C = 1;
 	lbl_8032E8AC = 1;
 
 	for (i = 4; i < 6; i++) {
-		m_battleMesMenus[i] = new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x2EA) CMesMenu;
-		CMesMenu* const cur = m_battleMesMenus[i];
-		cur->SetIndex(i);
-		cur->Create();
+		m_battleMesMenus[i] = new (MenuPcs.m_menuStage, "wm_menu.cpp", kMesMenuLine) CMesMenu;
+		m_battleMesMenus[i]->SetIndex(i);
+		m_battleMesMenus[i]->Create();
 	}
 
 	char optionPath[256];
+#ifdef VERSION_GCCJGC
+	sprintf(optionPath, "dvd/menu/option.tex");
+#else
 	sprintf(optionPath, "dvd/%smenu/option.tex", Game.GetLangString());
+#endif
 	CFile::CHandle* const fileHandle = File.Open(optionPath, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
 		File.Read(fileHandle);
 		File.SyncCompleted(fileHandle);
 		CTextureSet* texSet =
-		    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x300) CTextureSet;
+		    new (MenuPcs.m_menuStage, "wm_menu.cpp", kOptionTextureLine) CTextureSet;
 		m_wmOptionTextureSet = texSet;
 		m_wmOptionTextureSet->Create(File.m_readBuffer, m_menuStage, 0, 0, 0, 0);
 		File.Close(fileHandle);
@@ -5755,7 +5768,7 @@ void CMenuPcs::DrawFukidashi()
 	matColor.b = 0xFF;
 	matColor.a = 0xFF;
 	GXSetChanMatColor(GX_COLOR0A0, matColor);
-	MenuPcs.SetTexture((TEX)0x18);
+	MenuPcs.SetTexture((TEX)kBubbleTexture);
 
 	Sprt* background = &m_wm.m_bubbleData->m_sprites[0];
 	MenuPcs.DrawRect(texMode,
@@ -5977,12 +5990,12 @@ inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFo
 
 /*
  * --INFO--
- * PAL Address: 0x800f3f60
+ * PAL Address: 0x800F3F60
  * PAL Size: 3012b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F34E0
+ * EN Size: 3012b
+ * JP Address: 0x800F048C
+ * JP Size: 3004b
  */
 void CMenuPcs::CalcWMFrame()
 {
@@ -6015,7 +6028,7 @@ void CMenuPcs::CalcWMFrame()
 	m_wm.m_frameData->m_titleSprite.m_x = 0x68;
 	float titleTexU = FLOAT_803313dc;
 	m_wm.m_frameData->m_titleSprite.m_y = 0x14;
-	m_wm.m_frameData->m_titleSprite.m_width = 200;
+	m_wm.m_frameData->m_titleSprite.m_width = kWorldTitleWidth;
 	m_wm.m_frameData->m_titleSprite.m_height = 0x28;
 	m_wm.m_frameData->m_titleSprite.m_u = titleTexU;
 
@@ -6065,7 +6078,7 @@ void CMenuPcs::CalcWMFrame()
 		const float fV1 = FLOAT_80331524;
 		const float fV4 = FLOAT_80331528;
 		m_wm.m_frameData->m_yearSprites[0].m_x = (0x2B - totalWidth) / 2 + 0x2C;
-		m_wm.m_frameData->m_yearSprites[0].m_y = 0x43;
+		m_wm.m_frameData->m_yearSprites[0].m_y = kWorldYearDigitY;
 		m_wm.m_frameData->m_yearSprites[0].m_width = (short)totalWidth;
 		m_wm.m_frameData->m_yearSprites[0].m_height = 0x20;
 		m_wm.m_frameData->m_yearSprites[0].m_u = fV1;
@@ -6090,7 +6103,7 @@ void CMenuPcs::CalcWMFrame()
 				int digit = digits[wmDigitIdx];
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_x = (short)digitX;
 				int digitW = s_YearWTbl[digit];
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_y = 0x43;
+				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_y = kWorldYearDigitY;
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_width = (short)digitW;
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_height = 0x20;
 				int col = digit % 5;

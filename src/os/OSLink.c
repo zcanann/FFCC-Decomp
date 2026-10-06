@@ -113,11 +113,9 @@ const void* __OSStringTable AT_ADDRESS(OS_BASE_CACHED | 0x30D0);
       __prev->link.next = __next;       \
   } while (0)
 
-#pragma dont_inline on
 void OSNotifyLink(OSModuleInfo* module) {}
 
 void OSNotifyUnlink(OSModuleInfo* module) {}
-#pragma dont_inline reset
 
 void OSSetStringTable(void* stringTable) {
     __OSStringTable = stringTable;
@@ -486,6 +484,15 @@ BOOL OSUnlink(OSModuleInfo* oldModule) {
     return TRUE;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8017EBAC
+ * PAL Size: 24b
+ * EN Address: 0x8017DAFC
+ * EN Size: 24b
+ * JP Address: 0x801791A8
+ * JP Size: 24b
+ */
 void __OSModuleInit(void) {
     __OSModuleInfoList.head = __OSModuleInfoList.tail = 0;
     __OSStringTable = 0;

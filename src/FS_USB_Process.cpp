@@ -45,12 +45,12 @@ static inline u16 LoadSwapU16(u16 value) {
 
 /*
  * --INFO--
- * PAL Address: 0x80052bc0
+ * PAL Address: 0x8004EB4C
  * PAL Size: 3524b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004E940
+ * EN Size: 3524b
+ * JP Address: 0x8004E3C8
+ * JP Size: 3524b
  */
 void CFunnyShapePcs::SetUSBData()
 {

@@ -599,12 +599,12 @@ edge_loop:
 
 /*
  * --INFO--
- * PAL Address: 0x800266f0
+ * PAL Address: 0x800266F0
  * PAL Size: 1608b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800264E4
+ * EN Size: 1608b
+ * JP Address: 0x80026024
+ * JP Size: 1572b
  */
 int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 {
@@ -654,10 +654,10 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp), 0x159)
                     CMapHitFace[m_faceCount];
 
-            const float& offsetScale = kMapHitVertexOffsetScale;
-            const float& radiusScale = kMapHitRadiusScale;
-            const float& zero = kMapHitZero;
-            const double& radiusBase = kMapHitRadiusBase;
+            const float offsetScale = kMapHitVertexOffsetScale;
+            const float radiusScale = kMapHitRadiusScale;
+            const float zero = kMapHitZero;
+            const double radiusBase = kMapHitRadiusBase;
 
             for (int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
                 chunkFile.Align(4);
@@ -677,8 +677,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 face.m_drawFlags = 0;
 
                 for (int i = 0; i < face.m_vertexCount; i++) {
-                    face.m_vertexOffsets[i][1] = zero;
-                    face.m_vertexOffsets[i][0] = zero;
+                    face.m_vertexOffsets[i][0] = face.m_vertexOffsets[i][1] = zero;
                 }
 
                 if (chunk.m_version == 0) {

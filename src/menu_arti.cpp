@@ -589,7 +589,6 @@ void CMenuPcs::ArtiInit1()
  */
 void CMenuPcs::ArtiInit()
 {
-	int index;
 	ArtiOpenAnim* entry;
 
 	memset(m_artiList, 0, sizeof(*m_artiList));
@@ -601,7 +600,7 @@ void CMenuPcs::ArtiInit()
 		}
 	}
 
-	index = 0;
+	int index = 0;
 	entry = &m_artiList->entries[index++];
 	entry->tex = kArtiPanelTexture;
 	entry->x = 0x68;

@@ -760,7 +760,6 @@ void CMenuPcs::ItemInit1()
  */
 void CMenuPcs::ItemInit()
 {
-    int index;
     MenuItemOpenAnim* entry;
 
     memset(m_itemList, 0, sizeof(*m_itemList));
@@ -771,7 +770,7 @@ void CMenuPcs::ItemInit()
         }
     }
 
-    index = 0;
+    int index = 0;
     entry = &m_itemList->anims[index++];
     entry->tex = ITEM_TEX_FRAME;
     entry->x = 0x68;

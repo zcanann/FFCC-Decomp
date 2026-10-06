@@ -578,7 +578,7 @@ static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext,
         ScreenBreakPiece* piece = &pieceBase[i];
         ScreenBreakMeshData* meshData = mesh->m_data;
         if (piece->m_active != 0) {
-            MtxPtr nodeMtx = model->m_nodes[ScreenBreakMeshNodeIndex(meshData)].m_localRuntimeMtx;
+            MtxPtr nodeMtx = model->GetNode(meshData->m_nodeIndex)->GetLocalMatrix();
 
             nodeMtx[0][3] = zero;
             nodeMtx[1][3] = zero;

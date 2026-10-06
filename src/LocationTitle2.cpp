@@ -13,11 +13,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
-static inline int GetGraphFrameFromId(s32 graphId)
-{
-    return (int)graphId / 0x1000;
-}
-
 STATIC_ASSERT(sizeof(LocationTitle2Work) == 0x14);
 STATIC_ASSERT(offsetof(LocationTitle2Work, m_particles) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitle2Work, m_count) == 0x04);
@@ -81,8 +76,8 @@ static inline void copyPolygonData(LocationTitle2Particle* dst, LocationTitle2Pa
 extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
     int graphId;
-    LocationTitle2Particle* particle;
     pppShapeSt* shape;
+    LocationTitle2Particle* particle;
     int graphFrame;
     LocationTitle2Work* work;
 
@@ -95,7 +90,7 @@ extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLoc
     particle = work->m_particles;
     graphId = locationTitle->m_graphId;
     shape = ppvEnv->m_shapeTablePtr[unkB->m_dataValIndex];
-    graphFrame = GetGraphFrameFromId(graphId);
+    graphFrame = graphId / 0x1000;
 
     pppSetBlendMode(unkB->m_blendMode);
 

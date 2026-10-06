@@ -5057,12 +5057,12 @@ fn_8004D56C = .text:0x8004D56C; // type:function size:0x60
 fn_8004D5CC = .text:0x8004D5CC; // type:function size:0x50
 fn_8004D61C = .text:0x8004D61C; // type:function size:0xD4
 fn_8004D6F0 = .text:0x8004D6F0; // type:function size:0x13C
-fn_8004D82C = .text:0x8004D82C; // type:function size:0x48
-fn_8004D874 = .text:0x8004D874; // type:function size:0x34
-fn_8004D8A8 = .text:0x8004D8A8; // type:function size:0xBC
-fn_8004D964 = .text:0x8004D964; // type:function size:0x68
-dtor_8004D9CC = .text:0x8004D9CC; // type:function size:0x88
-fn_8004DA54 = .text:0x8004DA54; // type:function size:0x18
+GetDataIdx__5ZLISTFi = .text:0x8004D82C; // type:function size:0x48 scope:global
+GetDataNext__5ZLISTFPP10_ZLISTITEM = .text:0x8004D874; // type:function size:0x34 scope:global
+AddTail__5ZLISTFPv = .text:0x8004D8A8; // type:function size:0xBC scope:global
+DeleteList__5ZLISTFv = .text:0x8004D964; // type:function size:0x68 scope:global
+__dt__5ZLISTFv = .text:0x8004D9CC; // type:function size:0x88 scope:global
+__ct__5ZLISTFv = .text:0x8004DA54; // type:function size:0x18 scope:global
 fn_8004DA6C = .text:0x8004DA6C; // type:function size:0x214
 fn_8004DC80 = .text:0x8004DC80; // type:function size:0x6C
 fn_8004DCEC = .text:0x8004DCEC; // type:function size:0x98
@@ -15812,3 +15812,5 @@ __OSModuleInit = .text:0x801791A8; // type:function size:0x18
 
 
 gap_sbss_8034BB25 = .sbss:0x8034BB25; // type:object size:0x3 scope:local align:1
+
+gap_rodata_801D2922 = .rodata:0x801D2922; // type:object size:0x6 scope:local align:1

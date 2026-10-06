@@ -1848,3 +1848,12 @@ editor_padding_bss_80289024:
 
 editor_padding_sbss_8034BB25:
 	.sbss start:0x8034BB25 end:0x8034BB28 align:1
+
+zlist.cpp:
+	.text	start:0x8004D82C end:0x8004DA6C
+	extab	start:0x80006B8C end:0x80006BA4
+	extabindex	start:0x8000C76C end:0x8000C790
+	.rodata	start:0x801D2918 end:0x801D2922
+
+zlist_rodata_padding_801D2922:
+	.rodata start:0x801D2922 end:0x801D2928 align:1

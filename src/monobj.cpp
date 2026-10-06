@@ -66,6 +66,35 @@ extern "C" const float kMonObjPercentMax = 100.0f;
 extern "C" const float kMonObjOne = 1.0f;
 
 
+static inline unsigned char* CGMonObj_GetAiData(CGMonObj* monObj)
+{
+	if (monObj->m_aiState == 0) {
+		return reinterpret_cast<unsigned char*>(monObj->m_scriptHandle[9]);
+	}
+	return reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+		(monObj->m_aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(monObj->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
+}
+
+static inline void CGMonObj_SetChaseMove(CGMonObj* monObj, CGPartyObj* target, unsigned int flags)
+{
+	if (monObj->m_moveWork.m_mode != 4) {
+		monObj->m_moveWork.Clear();
+		monObj->m_moveWork.m_flags = 0x855;
+		if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(monObj->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
+			monObj->m_moveWork.m_flags |= 0x400;
+		}
+		if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x80) != 0) {
+			monObj->m_moveWork.m_flags |= 0x20000;
+		}
+		monObj->m_moveWork.SetFlags(flags, 0);
+		monObj->m_moveWork.m_mode = 4;
+		monObj->m_moveWork.m_range =
+			static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(monObj->m_scriptHandle[9]) + 0xCE));
+		monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(monObj->m_scriptHandle[9]) + 0x1B6);
+	}
+	monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(target);
+}
+
 static inline int CGMonObj_SearchNoticeParty(CGMonObj* monObj)
 {
 	if (monObj->m_targetDist < ((Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange)) {
@@ -747,14 +776,7 @@ void CGMonObj::onFrameStat()
 			prgObj->reqAnim(-1, 0, 0);
 		}
 
-		short aiState = m_aiState;
-		unsigned char* aiData;
-		if (aiState == 0) {
-			aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-		} else {
-			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
-		}
+		unsigned char* aiData = CGMonObj_GetAiData(this);
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		float range = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
 
@@ -764,40 +786,16 @@ void CGMonObj::onFrameStat()
 				if (prgObj->m_subState == 0) {
 					unsigned int chaseFlag = 0;
 					unsigned char* aiData2;
-					if (aiState == 0) {
+					if (m_aiState == 0) {
 						aiData2 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 					} else {
 						aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
+							(m_aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x10) != 0) {
 						chaseFlag |= 0x8000;
 					}
-					CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
-					if (m_moveWork.m_mode != 4) {
-						m_moveWork.Clear();
-						m_moveWork.m_flags = 0x855;
-						if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
-							m_moveWork.m_flags |= 0x400;
-						}
-						unsigned char* aiData3;
-						if (m_aiState == 0) {
-							aiData3 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-						} else {
-							aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-								(m_aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
-						}
-						if ((*reinterpret_cast<unsigned short*>(aiData3 + 0x102) & 0x80) != 0) {
-							m_moveWork.m_flags |= 0x20000;
-						}
-						m_moveWork.SetFlags(chaseFlag, 0);
-						m_moveWork.m_mode = 4;
-						m_moveWork.m_range =
-							static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));
-						m_moveWork.m_limitFrame =
-							*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B6);
-					}
-					m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(target);
+					CGMonObj_SetChaseMove(this, Game.m_partyObjArr[m_targetPartyIndex], chaseFlag);
 					moveFrame();
 					if (((m_moveWork.m_stateFlags & 1) != 0) ||
 						(object->m_stateFlags0Bits.unk1 != 0)) {
@@ -1742,38 +1740,13 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	CVector startPos;
 	CVector forward;
 	CVector move;
-	{
-		CVector tmp(object->m_worldPosition.x, object->m_worldPosition.y, object->m_worldPosition.z);
-		startPos.x = tmp.x;
-		startPos.y = tmp.y;
-		startPos.z = tmp.z;
-	}
-	{
-		float sinY = static_cast<float>(sin(static_cast<double>(rotY)));
-		float cosY = static_cast<float>(cos(static_cast<double>(rotY)));
-		CVector tmp(sinY, kMonObjZero, cosY);
-		forward.x = tmp.x;
-		forward.y = tmp.y;
-		forward.z = tmp.z;
-	}
-	{
-		CVector scaled;
-		PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), distance);
-		move.x = scaled.x;
-		move.y = scaled.y;
-		move.z = scaled.z;
-	}
+	startPos = CVector(object->m_worldPosition.x, object->m_worldPosition.y, object->m_worldPosition.z);
+	float sinY = static_cast<float>(sin(static_cast<double>(rotY)));
+	float cosY = static_cast<float>(cos(static_cast<double>(rotY)));
+	forward = CVector(sinY, kMonObjZero, cosY);
+	move = forward * distance;
 
-	unsigned char* aiScript;
-	if (m_aiState == 0) {
-		aiScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-	} else {
-		aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-			(static_cast<int>(m_aiState) +
-			 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
-	}
-
-	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
+	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(this) + 0x102);
 	if ((m_bind != 0) &&
 		(((m_chaseState == 4) && ((aiFlags & 8) == 0)) ||
 		 ((m_chaseState != 4) && ((aiFlags & 4) == 0)))) {
@@ -1792,13 +1765,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		PSMTXMultVecSR(bindMtx, CVector(kMonObjDefaultScale, kMonObjZero, kMonObjZero), reinterpret_cast<Vec*>(&forward));
 		forward.y = kMonObjZero;
 		forward.Normalize();
-		{
-			CVector scaled;
-			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), distance);
-			move.x = scaled.x;
-			move.y = scaled.y;
-			move.z = scaled.z;
-		}
+		move = forward * distance;
 	}
 
 	if ((flags & 1) != 0) {
@@ -1833,30 +1800,11 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			sideDist = kMonObjConeSideRadius / static_cast<float>(tan(static_cast<double>(halfAngle)));
 		}
 
-		Vec coneStart;
-		coneStart.x = startPos.x;
-		coneStart.y = startPos.y;
-		coneStart.z = startPos.z;
-		{
-			CVector scaled;
-			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
-			Vec sideOffset;
-			sideOffset.x = scaled.x;
-			sideOffset.y = scaled.y;
-			sideOffset.z = scaled.z;
-			PSVECSubtract(&coneStart, &sideOffset, &coneStart);
-		}
+		CVector coneStart = startPos;
+		PSVECSubtract(coneStart, forward * sideDist, coneStart);
 
 		float coneLength = distance + sideDist;
-		{
-			CVector scaled;
-			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
-			Vec sideOffset;
-			sideOffset.x = scaled.x;
-			sideOffset.y = scaled.y;
-			sideOffset.z = scaled.z;
-			PSVECAdd(reinterpret_cast<Vec*>(&move), &sideOffset, reinterpret_cast<Vec*>(&move));
-		}
+		PSVECAdd(move, forward * sideDist, move);
 
 		int didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
@@ -1886,30 +1834,16 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				continue;
 			}
 
-			Vec partyPos;
-			{
-				CVector partyPosVec(partyObj->m_worldPosition.x,
-					partyObj->m_worldPosition.y + partyObj->unk_0x184, partyObj->m_worldPosition.z);
-				partyPos.x = partyPosVec.x;
-				partyPos.y = partyPosVec.y;
-				partyPos.z = partyPosVec.z;
-			}
-
-			Vec targetDelta;
-			{
-				CVector delta;
-				PSVECSubtract(&partyPos, &coneStart, reinterpret_cast<Vec*>(&delta));
-				targetDelta.x = delta.x;
-				targetDelta.y = delta.y;
-				targetDelta.z = delta.z;
-			}
-			float targetDist = PSVECMag(&targetDelta);
+			CVector partyPos = CVector(partyObj->m_worldPosition.x,
+				partyObj->m_worldPosition.y + partyObj->unk_0x184, partyObj->m_worldPosition.z);
+			CVector targetDelta = partyPos - coneStart;
+			float targetDist = PSVECMag(targetDelta);
 			if (!(kMonObjZero < targetDist)) {
 				continue;
 			}
 
 			CVector targetDir;
-			PSVECNormalize(&targetDelta, reinterpret_cast<Vec*>(&targetDir));
+			PSVECNormalize(targetDelta, targetDir);
 			float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&targetDir));
 			if (!((sideDist - object->m_bodyEllipsoidRadius) <= targetDist) ||
 				((halfAngle != kMonObjZero) &&
@@ -1926,14 +1860,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			didHit = 1;
 			float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
 			unsigned short hitMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
-			Vec cylTop;
-			{
-				CVector delta;
-				PSVECSubtract(&partyPos, reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&delta));
-				cylTop.x = delta.x;
-				cylTop.y = delta.y;
-				cylTop.z = delta.z;
-			}
+			const CVector& cylTop = partyPos - startPos;
 			CMapCylinder hitCylinder;
 			hitCylinder.m_bottom.x = startPos.x;
 			hitCylinder.m_bottom.y = startPos.y;
@@ -1943,15 +1870,12 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			hitCylinder.m_axis.z = cylTop.z;
 			hitCylinder.m_radius = cylRadius;
 
-			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, &cylTop, hitMask);
-			Vec debugDelta;
-			debugDelta.x = targetDelta.x;
-			debugDelta.y = targetDelta.y;
-			debugDelta.z = targetDelta.z;
+			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, const_cast<CVector&>(cylTop), hitMask);
+			CVector debugDelta = targetDelta;
 			if (mapHit != 0) {
-				PSVECScale(&debugDelta, &debugDelta, g_hit_t_slide_min);
+				PSVECScale(debugDelta, debugDelta, g_hit_t_slide_min);
 			}
-			CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), &debugDelta, cylRadius, 1, mapHit == 0);
+			CFlat.AddDebugDrawCC(startPos, debugDelta, cylRadius, 1, mapHit == 0);
 
 			if (mapHit == 0) {
 				if (hitPartyIndex != NULL) {
@@ -1963,7 +1887,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 		if (halfAngle != kMonObjZero) {
 			float debugRadius = coneLength * static_cast<float>(tan(static_cast<double>(halfAngle)));
-			CFlat.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
+			CFlat.AddDebugDrawCC(coneStart, move, debugRadius, 0, didHit);
 		}
 	}
 }
@@ -2219,7 +2143,7 @@ body:
 							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(scriptB + 0x100)) * 0x1D0 + 0x10;
 					}
 					unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
-					if (((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0xFE) & 8) != 0) ||
+					if (((reinterpret_cast<CMonWork*>(handle)->m_romWork[0x7F] & 8) != 0) ||
 						((aiFlags & 0x100) != 0)) {
 						actionState = 0;
 						monObj->m_moveWork.Clear();
@@ -2340,7 +2264,7 @@ body:
 						if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x40) != 0) {
 							monObj->m_moveWork.m_flags |= 0x10000;
 						}
-						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
+						monObj->m_moveWork.SetFlags(0, 0);
 						monObj->m_moveWork.m_mode = 2;
 					}
 					monObj->m_moveWork.m_target = target;
@@ -3077,33 +3001,7 @@ void CGMonObj::statMove(int* targetIndex)
 		{
 			if (*targetPartyIdx >= 0) {
 				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
-				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
-				if (monObj->m_moveWork.m_mode != 4) {
-					monObj->m_moveWork.Clear();
-					monObj->m_moveWork.m_flags = 0x855;
-					if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
-						monObj->m_moveWork.m_flags |= 0x400;
-					}
-					unsigned char* aiData;
-					if (monObj->m_aiState == 0) {
-						aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-					} else {
-						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(monObj->m_aiState +
-							 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) *
-								0x1D0 +
-							0x10;
-					}
-					if ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x80) != 0) {
-						monObj->m_moveWork.m_flags |= 0x20000;
-					}
-					monObj->m_moveWork.SetFlags(0, 0);
-					monObj->m_moveWork.m_mode = 4;
-					monObj->m_moveWork.m_range =
-						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));
-					monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B6);
-				}
-				monObj->m_moveWork.m_target = partyObj;
+				CGMonObj_SetChaseMove(monObj, Game.m_partyObjArr[*targetPartyIdx], 0);
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 					(object->m_stateFlags0Bits.unk1 != 0)) {
 					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;

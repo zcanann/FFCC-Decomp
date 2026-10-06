@@ -1202,25 +1202,13 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	}
 
 	const float twoCorner = corner * 2.0f;
-	float midW = width - twoCorner;
-	float midH;
-	float overW;
-	float overH;
-	float uOff;
-	float vOff;
+	float midW = (width - twoCorner < 0.0f) ? 0.0f : width - twoCorner;
+	float midH = (height - twoCorner < 0.0f) ? 0.0f : height - twoCorner;
+	float uOff = (twoCorner - width < 0.0f) ? 0.0f : twoCorner - width;
+	uOff *= 0.5f;
+	float vOff = (twoCorner - height < 0.0f) ? 0.0f : twoCorner - height;
+	vOff *= 0.5f;
 	const int tex = static_cast<int>(texBase);
-
-	midW = (midW < 0.0f) ? 0.0f : midW;
-	midH = height - twoCorner;
-	midH = (midH < 0.0f) ? 0.0f : midH;
-
-	overW = twoCorner - width;
-	overW = (overW < 0.0f) ? 0.0f : overW;
-
-	overH = twoCorner - height;
-	uOff = overW * 0.5f;
-	overH = (overH < 0.0f) ? 0.0f : overH;
-	vOff = overH * 0.5f;
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex));
 	const float cornerW = corner - uOff;
@@ -1335,7 +1323,7 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::drawPause()
+void CMenuPcs::drawPause()
 {
     if (((CFlatEventFlags() & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
         return;

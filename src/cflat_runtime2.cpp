@@ -1262,6 +1262,7 @@ void CFlatRuntime2::Draw()
 		redColor.g = 0x00;
 		redColor.b = 0x00;
 		redColor.a = 0xFF;
+		float z = 0.0f;
 		float ringVerts[24];
 		float* verts = ringVerts;
 
@@ -1312,9 +1313,9 @@ void CFlatRuntime2::Draw()
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
 				if (entry->m_flagBits.m_bit7 != 0) {
-					GXPosition3f32(vtx[0], vtx[1], 0.0f);
+					GXPosition3f32(vtx[0], vtx[1], z);
 				} else {
-					GXPosition3f32(0.0f, 0.0f, 0.0f);
+					GXPosition3f32(z, z, z);
 				}
 				GXPosition3f32(vtx[0], vtx[1], vtx[2]);
 				vtx += 3;

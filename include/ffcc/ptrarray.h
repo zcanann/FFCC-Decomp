@@ -30,12 +30,16 @@ CPtrArray<T>::CPtrArray()
 template <class T>
 CPtrArray<T>::~CPtrArray()
 {
+#ifdef FFCC_PTRARRAY_DTOR_REMOVEALL
+    RemoveAll();
+#else
     if (m_items != 0) {
         delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
     m_numItems = 0;
+#endif
 }
 
 template <class T>

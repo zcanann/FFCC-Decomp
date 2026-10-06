@@ -3771,9 +3771,9 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 			CAStar::CAPos* escapePos;
 			if ((routeFrom != 0) && (forbiddenGroup != 0) &&
 				((escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev)) != NULL)) {
-				unsigned short nextGroup = escapePos->m_groupA;
+				unsigned short nextGroup = escapePos->m_group[0];
 				if (nextGroup == routeFrom) {
-					nextGroup = escapePos->m_groupB;
+					nextGroup = escapePos->m_group[1];
 				}
 				unsigned char* routeStep = AStar.m_routeTable[routeFrom][static_cast<unsigned char>(nextGroup)];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);

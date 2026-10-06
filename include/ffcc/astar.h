@@ -16,13 +16,49 @@ public:
 	class CAPos
 	{
 	public:
-		float CalcLength(CAPos&);
-		unsigned int GetOthers(int group);
-		int IsExist(int group);
+		int IsUse()
+		{
+			bool result = false;
+
+			if (m_group[0] != 0 && m_group[1] != 0)
+			{
+				result = true;
+			}
+
+			return result;
+		}
+
+		float CalcLength(CAPos& other)
+		{
+			return PSVECDistance(&m_position, &other.m_position);
+		}
+
+		unsigned int GetOthers(int group)
+		{
+			unsigned char others = m_group[0];
+
+			if (others == group)
+			{
+				others = m_group[1];
+			}
+
+			return others;
+		}
+
+		int IsExist(int group)
+		{
+			bool result = false;
+
+			if (m_group[0] == group || m_group[1] == group)
+			{
+				result = true;
+			}
+
+			return result;
+		}
 
 		Vec m_position;         // 0x0
-		unsigned char m_groupA; // 0xc
-		unsigned char m_groupB; // 0xd
+		unsigned char m_group[2]; // 0xc
 		// Unfilled             // 0xe-0xf
 	}; // Size 0x10
 
@@ -30,10 +66,6 @@ public:
 	{
 	public:
 		CATemp() {}
-		CATemp(const CATemp&);
-
-		void operator=(const CATemp& other);
-
 		unsigned char m_visited[64]; // 0x0
 		unsigned char m_path[64];    // 0x40
 		int m_pathLength;            // 0x80

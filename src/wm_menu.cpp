@@ -3366,19 +3366,19 @@ void CMenuPcs::DrawMainMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x800fb440
+ * PAL Address: 0x800FB440
  * PAL Size: 1232b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800FA9E8
+ * EN Size: 1232b
+ * JP Address: 0x800F77C4
+ * JP Size: 1248b
  */
 void CMenuPcs::DrawDiaryMenu()
 {
-	GetWmWorldHandles(this)[1]->m_model->m_lightAlpha = FLOAT_803313e8;
+	m_wm.m_handles[1]->m_model->m_lightAlpha = FLOAT_803313e8;
 	{
 		SetProjection(1);
-		GetWmWorldHandles(this)[1]->Draw(5);
+		m_wm.m_handles[1]->Draw(5);
 		RestoreProjection();
 	}
 
@@ -9801,6 +9801,11 @@ void CMenuPcs::SetLight(int mode)
  */
 inline void CMenuPcs::DrawPageMark()
 {
+#ifdef VERSION_GCCJGC
+	const int kPageMarkTexture = 42;
+#else
+	const int kPageMarkTexture = 43;
+#endif
 	const int phase = abs(static_cast<int>(System.m_frameCounter) % 20 - 10);
 	const float scale = static_cast<float>(0.03 * phase + 0.7);
 	float x = 220.0f;
@@ -9814,7 +9819,7 @@ inline void CMenuPcs::DrawPageMark()
 	color.a = static_cast<unsigned char>(static_cast<int>(
 	    255.0f * static_cast<float>(0.05 * phase + 0.5)));
 	GXSetChanMatColor(GX_COLOR0A0, color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kPageMarkTexture));
 
 	x = static_cast<float>((48.0f - 48.0f * scale) * 0.5 + x);
 	y = static_cast<float>((40.0f - 40.0f * scale) * 0.5 + y);

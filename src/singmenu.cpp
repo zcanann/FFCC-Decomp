@@ -1338,6 +1338,52 @@ void CMenuPcs::createSingleMenu()
     }
 }
 
+static inline void DrawSingleBack(CMenuPcs* menu, float alpha)
+{
+    menu->DrawInit();
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(255.0f * alpha);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+    MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+    int y;
+    int step = 0x20;
+    for (y = 0x40; y < 0x180; y += step) {
+        if ((0x180 - y) < step) {
+            step = 0x180 - y;
+        }
+        MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y), 640.0f, static_cast<float>(step),
+                         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    }
+}
+
+static inline void DrawSingleFrame(CMenuPcs* menu, float alpha)
+{
+    menu->DrawInit();
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = 0xFF;
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+    MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f), 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
+    MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80149534
@@ -1424,57 +1470,9 @@ void CMenuPcs::drawSingleMenu()
             for (; i < count; i++, entry++) {
                 if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
-                        float alpha = entry->alpha;
-                        DrawInit();
-                        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-                        _GXColor color;
-                        color.r = 0xFF;
-                        color.g = 0xFF;
-                        color.b = 0xFF;
-                        color.a = static_cast<u8>(255.0f * alpha);
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-                        MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f,
-                                                         64.0f, 0.0f, 0.0f,
-                                                         1.0f, 1.0f, 0.0f);
-                        MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f,
-                                                         64.0f, 0.0f, 0.0f,
-                                                         1.0f, 1.0f, 0.0f);
-
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-                        int step = 0x20;
-                        for (int y = 0x40; y < 0x180; y += step) {
-                            if ((0x180 - y) < step) {
-                                step = 0x180 - y;
-                            }
-                            MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y),
-                                                             640.0f, static_cast<float>(step),
-                                                             0.0f, 0.0f, 1.0f,
-                                                             1.0f, 0.0f);
-                        }
+                        DrawSingleBack(this, entry->alpha);
                     } else if (i == 1) {
-                        float alpha = entry->alpha;
-                        DrawInit();
-                        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-                        _GXColor color;
-                        color.r = 0xFF;
-                        color.g = 0xFF;
-                        color.b = 0xFF;
-                        color.a = 0xFF;
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-                        MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f),
-                                                         24.0f, 176.0f, 288.0f,
-                                                         0.0f, 0.0f, alpha, 1.0f,
-                                                         0.0f);
-                        MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f,
-                                                         288.0f, 0.0f, 0.0f, alpha,
-                                                         1.0f, 0.0f);
+                        DrawSingleFrame(this, entry->alpha);
                     } else if (i == 2) {
                         DrawSingleStat(entry->alpha);
                     } else {
@@ -1496,57 +1494,9 @@ void CMenuPcs::drawSingleMenu()
             for (; i < count; i++, entry++) {
                 if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
-                        float alpha = entry->alpha;
-                        DrawInit();
-                        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-                        _GXColor color;
-                        color.r = 0xFF;
-                        color.g = 0xFF;
-                        color.b = 0xFF;
-                        color.a = static_cast<u8>(255.0f * alpha);
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-                        MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f,
-                                                         64.0f, 0.0f, 0.0f,
-                                                         1.0f, 1.0f, 0.0f);
-                        MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f,
-                                                         64.0f, 0.0f, 0.0f,
-                                                         1.0f, 1.0f, 0.0f);
-
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-                        int step = 0x20;
-                        for (int y = 0x40; y < 0x180; y += step) {
-                            if ((0x180 - y) < step) {
-                                step = 0x180 - y;
-                            }
-                            MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y),
-                                                             640.0f, static_cast<float>(step),
-                                                             0.0f, 0.0f, 1.0f,
-                                                             1.0f, 0.0f);
-                        }
+                        DrawSingleBack(this, entry->alpha);
                     } else if (i == 1) {
-                        float alpha = entry->alpha;
-                        DrawInit();
-                        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-                        _GXColor color;
-                        color.r = 0xFF;
-                        color.g = 0xFF;
-                        color.b = 0xFF;
-                        color.a = 0xFF;
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-                        MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f),
-                                                         24.0f, 176.0f, 288.0f,
-                                                         0.0f, 0.0f, alpha, 1.0f,
-                                                         0.0f);
-                        MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f,
-                                                         288.0f, 0.0f, 0.0f, alpha,
-                                                         1.0f, 0.0f);
+                        DrawSingleFrame(this, entry->alpha);
                     } else if (i == 2) {
                         DrawSingleStat(entry->alpha);
                     } else {
@@ -2207,16 +2157,6 @@ void CMenuPcs::SingleCalcCtrl()
     }
 }
 
-static inline _GXColor SingMenuWhite()
-{
-    _GXColor c;
-    c.r = 0xFF;
-    c.g = 0xFF;
-    c.b = 0xFF;
-    c.a = 0xFF;
-    return c;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801478cc
@@ -2228,43 +2168,10 @@ static inline _GXColor SingMenuWhite()
  */
 void CMenuPcs::SingleDrawCtrl()
 {
-    DrawInit();
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    _GXColor white;
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, white);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-    MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f,
-                                     0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f,
-                                     0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-    int step = 0x20;
-    for (int y = 0x40; y < 0x180; y += step) {
-        if ((0x180 - y) < step) {
-            step = 0x180 - y;
-        }
-
-        MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y), 640.0f,
-                                         static_cast<float>(step), 0.0f, 0.0f,
-                                         1.0f, 1.0f, 0.0f);
-    }
+    DrawSingleBack(this, 1.0f);
 
     if (m_singleMenuMode != 8) {
-        DrawInit();
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXSetChanMatColor(GX_COLOR0A0, SingMenuWhite());
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-        MenuPcs.DrawRect(0, 32.0f, 24.0f, 176.0f, 288.0f,
-                                         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f, 288.0f,
-                                         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        DrawSingleFrame(this, 1.0f);
         DrawSingleStat(1.0f);
         DrawSingleHelpWim(1.0f);
     }

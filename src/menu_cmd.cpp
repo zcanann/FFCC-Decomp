@@ -2619,6 +2619,7 @@ unsigned int CMenuPcs::CmdClose2()
 {
 	CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 	int combo[5][2];
+	s32 i;
 
 	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected[0]);
 	const u32 modeSel = static_cast<s32>(GetCmdStateSelections(GetCmdStateView(this))[GetCmdStateView(this)->mode]);
@@ -2636,14 +2637,13 @@ unsigned int CMenuPcs::CmdClose2()
 		}
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 1) {
-		s32 uniteIdx = 0;
-		for (uniteIdx = 0; uniteIdx < s_ucnt; uniteIdx++) {
-			if (selected == s_UniteTop[uniteIdx]) {
+		for (i = 0; i < s_ucnt; i++) {
+			if (selected == s_UniteTop[i]) {
 				break;
 			}
 		}
 
-		if (UniteCloseAnim(uniteIdx) != 0) {
+		if (UniteCloseAnim(i) != 0) {
 			ChkUnite(selected, combo);
 			int* comboSel = &combo[0][1];
 
@@ -2655,17 +2655,16 @@ unsigned int CMenuPcs::CmdClose2()
 			}
 
 			const s32 closeSel = GetCmdStateView(this)->selected[0];
-			s32 ununiteCount = 0;
-			for (ununiteCount = 0; ununiteCount < 3; ununiteCount++) {
-				if ((ununiteCount != 0) &&
+			for (i = 0; i < 3; i++) {
+				if ((i != 0) &&
 				    (Game.m_scriptFoodBase[0]
-				         ->m_commandListExtra[closeSel + ununiteCount] != -1)) {
+				         ->m_commandListExtra[closeSel + i] != -1)) {
 					break;
 				}
 			}
 
 			Game.m_scriptFoodBase[0]
-			    ->UnuniteComList(closeSel, ununiteCount);
+			    ->UnuniteComList(closeSel, i);
 			const int recipe = combo[comboIdx][0];
 			Game.m_scriptFoodBase[0]->UniteComList(
 			    comboSel[comboIdx * 2], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
@@ -2694,7 +2693,7 @@ unsigned int CMenuPcs::CmdClose2()
 		}
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 3) {
-		for (s32 i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
+		for (i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
 			CmdListEntry* entry = &GetCmdListStorage(this)->entries[i];
 			if (static_cast<f64>(entry->alpha) >= 1.0) {
 				continue;

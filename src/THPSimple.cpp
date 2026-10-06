@@ -53,7 +53,7 @@ struct THPSimpleControl {
     s32 unk170;
 };
 
-THPSimpleControl SimpleControl;
+static THPSimpleControl SimpleControl;
 static u8 WorkBuffer[0x40] ATTRIBUTE_ALIGN(32);
 static s32 Initialized;
 static s32 SoundBufferIndex;
@@ -79,7 +79,7 @@ static u16 VolumeTable[0x80] = {
     0x638C, 0x6555, 0x6722, 0x68F4, 0x6AC9, 0x6CA2, 0x6E80, 0x7061,
     0x7247, 0x7430, 0x761E, 0x7810, 0x7A06, 0x7C00, 0x7DFE, 0x8000,
 };
-s16 SoundBuffer[0x280] ATTRIBUTE_ALIGN(32);
+static s16 SoundBuffer[0x280] ATTRIBUTE_ALIGN(32);
 
 static const char sTHPMagic[] = "THP";
 

@@ -1777,3 +1777,11 @@ pppCorona.cpp:
 
 THPSimple.cpp:
 	.text start:0x8010348C end:0x80104D8C
+	.data start:0x80210070 end:0x80210170
+	.bss start:0x802FEA40 end:0x802FF120
+	.sbss start:0x8032DE28 end:0x8032DE40
+	.sdata2 start:0x80330810 end:0x80330818
+
+THPDraw.cpp:
+	.text start:0x80104D8C end:0x8010558C
+	.sdata2 start:0x80330818 end:0x80330840

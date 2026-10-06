@@ -786,14 +786,14 @@ config.libs = [
             Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "textureman.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(
-                Matching,
+                MatchingFor("GCCP01", "GCCE01"),
                 "THPDraw.cpp",
                 cflags=[
                     *replace_flag_prefix(cflags_thp, "-Cpp_exceptions ", "-Cpp_exceptions on"),
                     "-use_lmw_stmw on",
                 ],
             ),
-            Object(NonMatching, "THPSimple.cpp", extra_cflags=["-inline auto,deferred"]),
+            Object(MatchingFor("GCCE01"), "THPSimple.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "USBStreamData.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),

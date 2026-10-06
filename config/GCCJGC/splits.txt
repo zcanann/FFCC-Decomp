@@ -1179,6 +1179,10 @@ p_tina.cpp:
 p_dbgmenu.cpp:
 	.bss start:0x80322008 end:0x80324A74
 	.text start:0x801275FC end:0x80129354
+	.rodata start:0x801D8B78 end:0x801D8C00
+	.data start:0x8022FB60 end:0x8022FF68
+	.sdata start:0x8034B828 end:0x8034B848
+	.sdata2 start:0x8034E8A8 end:0x8034E950
 
 p_map.cpp:
 	.text start:0x800340BC end:0x800359D4

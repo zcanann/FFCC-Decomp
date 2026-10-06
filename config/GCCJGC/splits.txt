@@ -1888,3 +1888,19 @@ usb_padding_bss_8025FA3C:
 
 usb_polling_padding_8034BA6D:
 	.sbss start:0x8034BA6D end:0x8034BA70 align:1
+
+p_FunnyShape.cpp:
+	.text start:0x8004DA6C end:0x8004E3C8
+	.sdata start:0x8034B460 end:0x8034B488
+	.data start:0x801DEAF8 end:0x801DECE0
+	.rodata start:0x801D2928 end:0x801D29D3
+	.sdata2 start:0x8034CA68 end:0x8034CA88
+	.bss start:0x80289028 end:0x8028F228
+	.sbss start:0x8034BB28 end:0x8034BB35
+	.ctors start:0x801D0680 end:0x801D0684
+
+funny_padding_rodata_801D29D3:
+	.rodata start:0x801D29D3 end:0x801D29D8 align:1
+
+funny_padding_sbss_8034BB35:
+	.sbss start:0x8034BB35 end:0x8034BB38 align:1

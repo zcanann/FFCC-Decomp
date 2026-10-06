@@ -32,8 +32,8 @@ inline void* operator new(unsigned long, void* ptr)
  * PAL Size: 184b
  * EN Address: 0x8004E3D8
  * EN Size: 184b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8004DE44
+ * JP Size: 212b
  */
 void CFunnyShapePcs::Init()
 {
@@ -63,10 +63,10 @@ void CFunnyShapePcs::Init()
  * --INFO--
  * PAL Address: 0x8004E5E0
  * PAL Size: 4b
- * EN Address: 0x8005B7D0
+ * EN Address: 0x8004E3D4
  * EN Size: 4b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8004DE40
+ * JP Size: 4b
  */
 void CFunnyShapePcs::Quit()
 {
@@ -76,10 +76,10 @@ void CFunnyShapePcs::Quit()
  * --INFO--
  * PAL Address: 0x8004E5CC
  * PAL Size: 20b
- * EN Address: 0x8005B7D4
+ * EN Address: 0x8004E3C0
  * EN Size: 20b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8004DE2C
+ * JP Size: 20b
  */
 int CFunnyShapePcs::GetTable(unsigned long index)
 {
@@ -90,10 +90,10 @@ int CFunnyShapePcs::GetTable(unsigned long index)
  * --INFO--
  * PAL Address: 0x8004E524
  * PAL Size: 168b
- * EN Address: 0x8005B7E8
- * EN Size: 220b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004E318
+ * EN Size: 168b
+ * JP Address: 0x8004DD84
+ * JP Size: 168b
  */
 void CFunnyShapePcs::createViewer()
 {
@@ -116,10 +116,10 @@ void CFunnyShapePcs::createViewer()
  * --INFO--
  * PAL Address: 0x8004E48C
  * PAL Size: 152b
- * EN Address: 0x8005B8C4
- * EN Size: 208b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004E280
+ * EN Size: 152b
+ * JP Address: 0x8004DCEC
+ * JP Size: 152b
  */
 void CFunnyShapePcs::destroyViewer()
 {
@@ -144,10 +144,10 @@ void CFunnyShapePcs::destroyViewer()
  * --INFO--
  * PAL Address: 0x8004E420
  * PAL Size: 108b
- * EN Address: 0x8005B994
- * EN Size: 120b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004E214
+ * EN Size: 108b
+ * JP Address: 0x8004DC80
+ * JP Size: 108b
  */
 void CFunnyShapePcs::calcViewer()
 {
@@ -169,8 +169,8 @@ void CFunnyShapePcs::calcViewer()
  * PAL Size: 528b
  * EN Address: 0x8004E004
  * EN Size: 528b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x8004DA6C
+ * JP Size: 532b
  */
 void CFunnyShapePcs::drawViewer()
 {

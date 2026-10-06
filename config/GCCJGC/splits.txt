@@ -1765,6 +1765,14 @@ pppCorona.cpp:
 
 THPSimple.cpp:
 	.text start:0x80100114 end:0x80101A20
+	.bss start:0x8031B360 end:0x8031BA40
+	.sbss start:0x8034BC30 end:0x8034BC48
+	.data start:0x8022E9B0 end:0x8022EAB0
+	.sdata2 start:0x8034E508 end:0x8034E510
+
+THPDraw.cpp:
+	.text start:0x80101A20 end:0x80102220
+	.sdata2 start:0x8034E510 end:0x8034E538
 
 mtx/quat.c:
 	.text start:0x801814B8 end:0x80181A24

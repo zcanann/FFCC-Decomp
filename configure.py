@@ -513,7 +513,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "baseobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "bonus_menu.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_data.cpp", extra_cflags=["-str reuse,readonly"]),
-            Object(NonMatching, "cflat_r2class.cpp"),
+            Object(MatchingFor("GCCP01"), "cflat_r2class.cpp"),
             Object(
                 NonMatching,
                 "cflat_r2system.cpp",

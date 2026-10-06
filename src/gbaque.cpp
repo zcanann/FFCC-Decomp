@@ -2361,27 +2361,25 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
-	CCaravanWork** foodBasePtr = foodBaseArr + channel;
 	int letterIndex = valueBytes[2];
-	unsigned int hasGil = (*foodBasePtr)->m_letters[letterIndex].FlagsBits().m_attachmentIsGil;
+	unsigned int hasGil = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachmentIsGil;
 	int result;
 
-	if ((hasGil == 0) && ((*foodBasePtr)->m_letters[letterIndex].AttachmentValue() != 0)) {
-		int item = (*foodBasePtr)->m_letters[letterIndex].AttachmentValue();
+	if ((hasGil == 0) && (Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue != 0)) {
+		int item = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue;
 		if ((item < 1) || (item > 0x9E)) {
-			if ((*foodBasePtr)->AddItem(item, 0) == 0) {
+			if (Game.m_scriptFoodBase[channel]->AddItem(item, 0) == 0) {
 				result = 1;
 			} else {
 				result = 0;
 			}
 		}
-	} else if ((hasGil != 0) && ((*foodBasePtr)->m_letters[letterIndex].AttachmentValue() != 0)) {
-		int gil = (*foodBasePtr)->m_letters[letterIndex].AttachmentValue() * 100;
-		if ((*foodBasePtr)->CanAddGil(gil) == 0) {
+	} else if ((hasGil != 0) && (Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue != 0)) {
+		int gil = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue * 100;
+		if (Game.m_scriptFoodBase[channel]->CanAddGil(gil) == 0) {
 			result = 1;
 		} else {
-			(*foodBasePtr)->AddGil(gil);
+			Game.m_scriptFoodBase[channel]->AddGil(gil);
 			result = 0;
 		}
 	}
@@ -2395,7 +2393,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		(*foodBasePtr)->m_letters[letterIndex].FlagsBits().m_attachmentClaimed = 1;
+		Game.m_scriptFoodBase[channel]->m_letters[letterIndex].FlagsBits().m_attachmentClaimed = 1;
 	}
 }
 
@@ -3137,9 +3135,9 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	unsigned char compatibilityData[0x10];
 	unsigned char* writePtr;
 	int count;
-	int slot;
+	int j;
 	int outSize;
-	int selectedCount;
+	int i;
 	char* src;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3148,8 +3146,8 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[0] = m_playerData[channel].m_jobType;
 	count = 2;
-	for (slot = 3; slot < 8; slot++) {
-		if (compatibilityData[slot] != 0) {
+	for (i = 3; i < 8; i++) {
+		if (compatibilityData[i] != 0) {
 			count++;
 		}
 	}
@@ -3160,27 +3158,28 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[1] = count;
 	writePtr = outCompatibility + 2;
+	i = 0;
+	j = 1;
 	outSize = 2;
-	selectedCount = 0;
-	for (slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
-			writePtr[0] = static_cast<unsigned char>(slot);
-			writePtr[1] = compatibilityData[slot + 8];
+	for (; (i < count) && (j < 8); j++) {
+		if ((i < 2) || ((i >= 2) && (compatibilityData[j] != 0))) {
+			writePtr[0] = static_cast<unsigned char>(j);
+			writePtr[1] = compatibilityData[j + 8];
 			writePtr += 2;
 			outSize += 2;
-			selectedCount++;
+			i++;
 		}
 	}
 
-	selectedCount = 0;
-	for (slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
-			src = Game.GetNPCName(compatibilityData[slot]);
+	i = 0;
+	for (j = 1; (i < count) && (j < 8); j++) {
+		if ((i < 2) || ((i >= 2) && (compatibilityData[j] != 0))) {
+			src = Game.GetNPCName(compatibilityData[j]);
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
 			writePtr += len + 1;
 			outSize += len + 1;
-			selectedCount++;
+			i++;
 		}
 	}
 

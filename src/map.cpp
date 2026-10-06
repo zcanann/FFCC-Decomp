@@ -97,68 +97,6 @@ extern const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapTexAnimSet::CMapTexAnimSet()
-{
-    m_count = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800335d0
- * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapTexAnimSet::~CMapTexAnimSet()
-{
-    for (int i = 0; i < m_count; i++) {
-        CMapTexAnim* entry = m_anims[i];
-        if (entry != 0) {
-            if (entry->DecRef() == 0) {
-                delete entry;
-            }
-            m_anims[i] = 0;
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003492c
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapIdGrp::CMapIdGrp()
-{
-    m_mask = -1;
-    m_primaryColor.r = 0x80;
-    m_primaryColor.b = 0;
-    m_primaryColor.g = 0;
-    m_primaryColor.a = 0x80;
-    m_secondaryColor.r = 0;
-    m_secondaryColor.g = 0;
-    m_secondaryColor.b = 0x80;
-    m_secondaryColor.a = 0x80;
-    m_tertiaryColor.r = 0xFF;
-    m_tertiaryColor.g = 0x40;
-    m_tertiaryColor.b = 0x40;
-    m_tertiaryColor.a = 0x80;
-    m_quaternaryColor.r = 0x40;
-    m_quaternaryColor.g = 0x40;
-    m_quaternaryColor.b = 0;
-    m_quaternaryColor.a = 0x80;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80033c48
  * PAL Size: 196b
  * EN Address: TODO
@@ -385,7 +323,7 @@ void CMapMng::Create()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyOctTree()
+void CMapMng::DestroyOctTree()
 {
     for (int i = 0; i < m_octTreeCount; i++) {
         m_octTreeArray[i].~COctTree();
@@ -402,7 +340,7 @@ inline void CMapMng::DestroyOctTree()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapHit()
+void CMapMng::DestroyMapHit()
 {
     for (int i = 0; i < m_mapHitCount; i++) {
         m_mapHitArray[i].~CMapHit();
@@ -419,7 +357,7 @@ inline void CMapMng::DestroyMapHit()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapObj()
+void CMapMng::DestroyMapObj()
 {
     for (int i = 0; i < m_mapObjCount; i++) {
         m_mapObjArray[i].~CMapObj();
@@ -436,7 +374,7 @@ inline void CMapMng::DestroyMapObj()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapMesh()
+void CMapMng::DestroyMapMesh()
 {
     for (int i = 0; i < m_mapMeshCount; i++) {
         m_mapMeshArray[i].~CMapMesh();
@@ -453,7 +391,7 @@ inline void CMapMng::DestroyMapMesh()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyTextureSet()
+void CMapMng::DestroyTextureSet()
 {
     if (m_textureSet != 0) {
         delete m_textureSet;
@@ -470,7 +408,7 @@ inline void CMapMng::DestroyTextureSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMaterialSet()
+void CMapMng::DestroyMaterialSet()
 {
     if (m_materialSet != 0) {
         delete m_materialSet;
@@ -487,7 +425,7 @@ inline void CMapMng::DestroyMaterialSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapTexAnimSet()
+void CMapMng::DestroyMapTexAnimSet()
 {
     if (m_mapTexAnimSet != 0) {
         delete m_mapTexAnimSet;
@@ -504,7 +442,7 @@ inline void CMapMng::DestroyMapTexAnimSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyAnimation()
+void CMapMng::DestroyAnimation()
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimArray().GetSize()); i++) {
         if (GetMapAnimArray()[i] != 0) {
@@ -537,7 +475,7 @@ inline void CMapMng::DestroyAnimation()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapShadow()
+void CMapMng::DestroyMapShadow()
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
         if (GetMapShadowArray()[i] != 0) {
@@ -556,7 +494,7 @@ inline void CMapMng::DestroyMapShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMng::DestroyMapLightHolder()
+void CMapMng::DestroyMapLightHolder()
 {
     unsigned int j;
     for (int i = 0; i < 2; i++) {
@@ -619,7 +557,7 @@ void CMapMng::Destroy()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void* CMapMng::MapFileRead(char* path, unsigned long& size)
+void* CMapMng::MapFileRead(char* path, unsigned long& size)
 {
     void* filePtr;
 
@@ -671,7 +609,7 @@ inline void* CMapMng::MapFileRead(char* path, unsigned long& size)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CMapMng::MapCheckFileRead(char* path)
+int CMapMng::MapCheckFileRead(char* path)
 {
     if (m_asyncLoadState.m_mapReadMode == 1) {
         return 1;
@@ -748,7 +686,7 @@ CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
  * Address:	TODO
  * Size:	TODO
  */
-inline CMapObj* CMapMng::SearchAtribMapObj(CMapObj* mapObj, CMapObjAtr::TYPE type)
+CMapObj* CMapMng::SearchAtribMapObj(CMapObj* mapObj, CMapObjAtr::TYPE type)
 {
     CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
 
@@ -1665,7 +1603,7 @@ void CMapMng::DrawMapShadow()
  * Address:	TODO
  * Size:	TODO
  */
-inline void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
+void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
 {
     extern const float kMapLargeDistance;
     extern const float kMapFullTurnDegrees;
@@ -2164,7 +2102,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
  * JP Address: TODO
  * JP Size: TODO
  */
-inline CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
+CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
 {
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
@@ -2191,7 +2129,7 @@ inline CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline CMapAnimRun* CMapMng::GetAnimRunID(int animId)
+CMapAnimRun* CMapMng::GetAnimRunID(int animId)
 {
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {

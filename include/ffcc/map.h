@@ -46,7 +46,26 @@ public:
     _GXColor m_tertiaryColor;
     _GXColor m_quaternaryColor;
 
-    CMapIdGrp();
+    CMapIdGrp()
+    {
+        m_mask = -1;
+        m_primaryColor.r = 0x80;
+        m_primaryColor.b = 0;
+        m_primaryColor.g = 0;
+        m_primaryColor.a = 0x80;
+        m_secondaryColor.r = 0;
+        m_secondaryColor.g = 0;
+        m_secondaryColor.b = 0x80;
+        m_secondaryColor.a = 0x80;
+        m_tertiaryColor.r = 0xFF;
+        m_tertiaryColor.g = 0x40;
+        m_tertiaryColor.b = 0x40;
+        m_tertiaryColor.a = 0x80;
+        m_quaternaryColor.r = 0x40;
+        m_quaternaryColor.g = 0x40;
+        m_quaternaryColor.b = 0;
+        m_quaternaryColor.a = 0x80;
+    }
 };
 
 struct CMapMngAsyncLoadState

@@ -556,7 +556,7 @@ config.libs = [
             Object(NonMatching, "LocationTitle2.cpp"),
             Object(Matching, "main.cpp"),
             Object(NonMatching, "manager.cpp"),
-            Object(NonMatching, "map.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(NonMatching, "map.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "mapanim.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             Object(NonMatching, "maphit.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "maplight.cpp"),

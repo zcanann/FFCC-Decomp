@@ -10403,17 +10403,16 @@ float CMenuPcs::GetMaxAnimWait()
 
 /*
  * --INFO--
- * PAL Address: 0x800e9c8c
+ * PAL Address: 0x800E9C8C
  * PAL Size: 896b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E9390
+ * EN Size: 896b
+ * JP Address: 0x800E6DE8
+ * JP Size: 880b
  */
 void CMenuPcs::BindMcObj()
 {
 	int i;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	for (i = 0; i < 4; i++) {
 		EffectInfo* const effectA = &m_effectWork[i + 0x11];
@@ -10435,27 +10434,26 @@ void CMenuPcs::BindMcObj()
 
 	for (i = 0; i < 4; i++) {
 		const McListInfo& charaState = m_wmCharaState[i];
-		const int modelNo = charaState.m_timerA;
+		int modelNo = charaState.m_timerA;
 
 		if (modelNo != 0) {
 			BindEffect(i + 0x11, modelNo + 0x16, -1);
 		}
 
 		const unsigned int flags = charaState.m_chaliceElement;
-		int weaponModel;
 		if ((flags & 1) != 0) {
-			weaponModel = 0;
+			modelNo = 0;
 		} else if ((flags & 2) != 0) {
-			weaponModel = 1;
+			modelNo = 1;
 		} else if ((flags & 4) != 0) {
-			weaponModel = 2;
+			modelNo = 2;
 		} else if ((flags & 8) != 0) {
-			weaponModel = 3;
+			modelNo = 3;
 		} else if ((flags & 0x10) != 0) {
-			weaponModel = 4;
+			modelNo = 4;
 		}
 
-		BindEffect(i + 0x11, weaponModel + 0x1A, -1);
+		BindEffect(i + 0x11, modelNo + 0x1A, -1);
 	}
 }
 

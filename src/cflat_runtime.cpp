@@ -1349,7 +1349,11 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 		engineObject->m_0x34 |= 1 << reqFlagIndex;
 	}
 
-	push(engineObject, args, argCount);
+	int i;
+	for (i = 0; i < argCount; i++) {
+		reinterpret_cast<CStack*>(engineObject->m_sp)[i] = args[i];
+	}
+	engineObject->m_sp += i;
 
 	callSetup(engineObject, func, 1);
 
@@ -1385,7 +1389,11 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 		return 0;
 	}
 
-	push(object, args, argCount);
+	int i;
+	for (i = 0; i < argCount; i++) {
+		reinterpret_cast<CStack*>(object->m_sp)[i] = args[i];
+	}
+	object->m_sp += i;
 
 	callSetup(object, func, 1);
 

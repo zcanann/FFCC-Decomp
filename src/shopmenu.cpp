@@ -648,7 +648,7 @@ inline int CShopMenu::getBuyGil(int itemNo)
     if (itemNo <= 0) {
         return 0;
     }
-    return calcGilRatio(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_price);
+    return calcGilRatio(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemNo * 0x48));
 }
 
 /*
@@ -666,7 +666,7 @@ inline int CShopMenu::getSellGil(int itemNo)
         return 0;
     }
     return static_cast<int>(FLOAT_80332d60 * static_cast<float>(calcGilRatio(
-        reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_price)));
+        *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemNo * 0x48))));
 }
 
 /*
@@ -683,7 +683,7 @@ inline int CShopMenu::getMakeGil(int itemNo)
     if (itemNo <= 0) {
         return 0;
     }
-    return calcGilRatio(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_smithPrice);
+    return calcGilRatio(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x24 + itemNo * 0x48));
 }
 
 /*
@@ -821,10 +821,11 @@ inline int CShopMenu::CheckSell(int index)
  */
 inline int CShopMenu::getItemHaveCnt(int itemNo)
 {
-    int count = 0;
-    for (int i = 0; i < 0x40; i++) {
+    int count;
+    int i;
+    for (i = 0, count = 0; i < 0x40; i++) {
         if (m_caravanWork->m_inventoryItems[i] == itemNo) {
-            ++count;
+            count++;
         }
     }
     return count;
@@ -967,8 +968,6 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
 {
     setOrtho(x, y, scaleX, -scaleY, FLOAT_80332D9C);
 
-    _GXColor matColor = {0, 0, 0, 0};
-
     pppShapeAnimData* shapeData = reinterpret_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
     pppShapeAnimFrame* frame = &shapeData->m_frames[groupNo];
     tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<unsigned char*>(shapeData) + frame->m_shapeOffset);
@@ -976,8 +975,8 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     MaterialMan.InitEnv();
     MaterialMan.LockEnv();
 
-    _GXColor drawColor = {0xFF, 0xFF, 0xFF, 0xFF};
-    GXSetChanAmbColor(GX_COLOR0A0, drawColor);
+    _GXColor matColor = {0, 0, 0, 0};
+    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(const_cast<unsigned int*>(&DAT_80332D04)));
     GXSetChanMatColor(GX_COLOR0A0, matColor);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
@@ -1555,7 +1554,6 @@ void CShopMenu::SelectYesNo()
         if (m_listType == 0) {
             Sound.PlaySe(0x50, 0x40, 0x7F, 0);
             int itemId = getItemNo(m_selectedIndex);
-            int costBase = itemId * 0x48;
             int quantity = 0;
             while (quantity < m_quantity) {
                 CCaravanWork* caravanWork = m_caravanWork;
@@ -1569,7 +1567,7 @@ void CShopMenu::SelectYesNo()
                         gilValue = 0;
                     } else {
                         int gil = caravanWork->m_shopParam *
-                                  *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                                  reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
                         gilValue = gil / 100;
                     }
                 } else if (m_listType == 1) {
@@ -1577,7 +1575,7 @@ void CShopMenu::SelectYesNo()
                         gilValue = 0;
                     } else {
                         int gil = caravanWork->m_shopParam *
-                                  *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                                  reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
                         gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                     }
                 } else {
@@ -1595,7 +1593,7 @@ void CShopMenu::SelectYesNo()
                         gilValue2 = 0;
                     } else {
                         int gil = m_caravanWork->m_shopParam *
-                                  *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                                  reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
                         gilValue2 = gil / 100;
                     }
                 } else if (m_listType == 1) {
@@ -1603,7 +1601,7 @@ void CShopMenu::SelectYesNo()
                         gilValue2 = 0;
                     } else {
                         int gil = m_caravanWork->m_shopParam *
-                                  *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                                  reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
                         gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                     }
                 } else {
@@ -1612,77 +1610,26 @@ void CShopMenu::SelectYesNo()
                 m_caravanWork->AddGil(-gilValue2);
                 ++quantity;
             }
-            return;
-        }
-        goto sellBlock;
-    case 1:
-        goto yesBlock;
-    }
-    return;
-
-sellBlock:
-    int canTrade = CheckSell(m_selectedIndex);
-
-    if (canTrade != 0) {
-        Sound.PlaySe(0x50, 0x40, 0x7F, 0);
-        int sellId = getItemNo(m_selectedIndex);
-        int gilValue;
-        if (m_listType == 0) {
-            if (sellId <= 0) {
-                gilValue = 0;
-            } else {
-                int gil = m_caravanWork->m_shopParam *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + sellId * 0x48);
-                gilValue = gil / 100;
-            }
-        } else if (m_listType == 1) {
-            if (sellId <= 0) {
-                gilValue = 0;
-            } else {
-                int gil = m_caravanWork->m_shopParam *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + sellId * 0x48);
-                gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
+        } else if (CheckSell(m_selectedIndex) != 0) {
+            Sound.PlaySe(0x50, 0x40, 0x7F, 0);
+            int itemNo = getItemNo(m_selectedIndex);
+            if (m_caravanWork->CanAddGil(getBuySellGil(itemNo)) != 0) {
+                m_caravanWork->DeleteItemIdx(m_selectedIndex, 0);
+                m_caravanWork->AddGil(getBuySellGil(itemNo));
             }
         } else {
-            gilValue = -1;
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
-
-        if (m_caravanWork->CanAddGil(gilValue) != 0) {
-            m_caravanWork->DeleteItemIdx(m_selectedIndex, 0);
-            int gilValue2;
-            if (m_listType == 0) {
-                if (sellId <= 0) {
-                    gilValue2 = 0;
-                } else {
-                    int gil = m_caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + sellId * 0x48);
-                    gilValue2 = gil / 100;
-                }
-            } else if (m_listType == 1) {
-                if (sellId <= 0) {
-                    gilValue2 = 0;
-                } else {
-                    int gil = m_caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + sellId * 0x48);
-                    gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                }
-            } else {
-                gilValue2 = -1;
-            }
-            m_caravanWork->AddGil(gilValue2);
+        break;
+    case 1:
+        if (m_listType == 0) {
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            m_subMode = 1;
+        } else {
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            m_subMode = 0;
         }
-    } else {
-        Sound.PlaySe(4, 0x40, 0x7F, 0);
-    }
-    return;
-
-yesBlock:
-    if (m_listType == 0) {
-        Sound.PlaySe(3, 0x40, 0x7F, 0);
-        m_subMode = 1;
-    } else {
-        Sound.PlaySe(3, 0x40, 0x7F, 0);
-        m_subMode = 0;
+        break;
     }
 }
 

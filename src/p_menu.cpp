@@ -1513,10 +1513,10 @@ void CMenuPcs::drawBattle()
         Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
 
         if (0.0f < projected.w) {
-            const int totalWidth = static_cast<int>(static_cast<float>(m_battleHud.m_width) * fade);
-            const int halfWidth = totalWidth / 2;
             float screenX = 320.0f + (320.0f * projected.x) / projected.w;
             float screenY = 224.0f - (224.0f * projected.y) / projected.w;
+            const int totalWidth = static_cast<int>(static_cast<float>(m_battleHud.m_width) * fade);
+            const int halfWidth = totalWidth / 2;
 
             const float markerX = (screenX < static_cast<float>(halfWidth))
                                       ? static_cast<float>(halfWidth)

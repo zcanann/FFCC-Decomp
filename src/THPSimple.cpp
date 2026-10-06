@@ -13,6 +13,12 @@
 #include <dolphin/os/OSCache.h>
 #include <string.h>
 
+#ifdef VERSION_GCCP01
+enum { kTHPReadBufferCount = 8 };
+#else
+enum { kTHPReadBufferCount = 10 };
+#endif
+
 struct THPSimpleControl {
     DVDFileInfo fileInfo;          // 0x00
     THPHeader header;              // 0x3C
@@ -36,15 +42,15 @@ struct THPSimpleControl {
     f32 targetVolume;              // 0xC8
     f32 deltaVolume;               // 0xCC
     s32 rampCount;                 // 0xD0
-    THPReadBuffer readBuffer[8];   // 0xD4
-    u32* yImage;                   // 0x134
-    u32* uImage;                   // 0x138
-    u32* vImage;                   // 0x13C
-    s32 curFrame;                  // 0x140
-    THPAudioBuffer audioBuffer[3]; // 0x144
-    s32 audioDecodeIndex;          // 0x168
-    s32 audioPlayIndex;            // 0x16C
-    s32 unk170;                    // 0x170
+    THPReadBuffer readBuffer[kTHPReadBufferCount];   // 0xD4
+    u32* yImage;
+    u32* uImage;
+    u32* vImage;
+    s32 curFrame;
+    THPAudioBuffer audioBuffer[3];
+    s32 audioDecodeIndex;
+    s32 audioPlayIndex;
+    s32 unk170;
 };
 
 THPSimpleControl SimpleControl;
@@ -132,10 +138,10 @@ static inline void _kami_DVDREAD(DVDFileInfo* fileInfo, void* addr, long length,
  * --INFO--
  * PAL Address: 0x8010585c
  * PAL Size: 288b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80104C6C
+ * EN Size: 288b
+ * JP Address: 0x801018FC
+ * JP Size: 292b
  */
 s32 THPSimpleInit(s32 audioMixMode)
 {
@@ -179,10 +185,10 @@ s32 THPSimpleInit(s32 audioMixMode)
  * --INFO--
  * PAL Address: 0x80105808
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80104C18
+ * EN Size: 84b
+ * JP Address: 0x801018A8
+ * JP Size: 84b
  */
 void THPSimpleQuit(void)
 {
@@ -201,10 +207,10 @@ void THPSimpleQuit(void)
  * --INFO--
  * PAL Address: 0x80105284
  * PAL Size: 1412b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80104694
+ * EN Size: 1412b
+ * JP Address: 0x80101324
+ * JP Size: 1412b
  */
 s32 THPSimpleOpen(const char* path)
 {
@@ -291,10 +297,10 @@ s32 THPSimpleOpen(const char* path)
  * --INFO--
  * PAL Address: 0x801051f4
  * PAL Size: 144b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80104604
+ * EN Size: 144b
+ * JP Address: 0x80101294
+ * JP Size: 144b
  */
 s32 THPSimpleClose(void)
 {
@@ -320,17 +326,17 @@ s32 THPSimpleClose(void)
  * --INFO--
  * PAL Address: 0x80105174
  * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80104580
+ * EN Size: 132b
+ * JP Address: 0x80101210
+ * JP Size: 132b
  */
 s32 THPSimpleCalcNeedMemory(void)
 {
     s32 need;
 
     if (SimpleControl.isOpen != 0) {
-        need = ((SimpleControl.header.mBufferSize + 0x1F) & ~0x1F) * 8;
+        need = ((SimpleControl.header.mBufferSize + 0x1F) & ~0x1F) * kTHPReadBufferCount;
         need += (SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize + 0x1F) & ~0x1F;
         need += ((((u32)(SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize)) >> 2) + 0x1F) & ~0x1F;
         need += ((((u32)(SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize)) >> 2) + 0x1F) & ~0x1F;
@@ -349,17 +355,16 @@ s32 THPSimpleCalcNeedMemory(void)
  * --INFO--
  * PAL Address: 0x80104fcc
  * PAL Size: 424b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801043B0
+ * EN Size: 464b
+ * JP Address: 0x80101040
+ * JP Size: 464b
  */
 s32 THPSimpleSetBuffer(u8* buffer)
 {
-    s32 i;
+    u32 i;
     u32 lumaSize;
     u32 chromaSize;
-    u32 frameBufferSize;
     u8* cursor;
 
     if ((SimpleControl.isOpen != 0) && (SimpleControl.isPreLoaded == 0)) {
@@ -383,10 +388,9 @@ s32 THPSimpleSetBuffer(u8* buffer)
         DCInvalidateRange(SimpleControl.vImage, chromaSize);
         cursor += chromaSize;
 
-        frameBufferSize = (SimpleControl.header.mBufferSize + 0x1F) & ~0x1F;
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < kTHPReadBufferCount; i++) {
             SimpleControl.readBuffer[i].mPtr = cursor;
-            cursor += frameBufferSize;
+            cursor += (SimpleControl.header.mBufferSize + 0x1F) & ~0x1F;
             SimpleControl.readBuffer[i].mIsValid = 0;
         }
 
@@ -449,10 +453,10 @@ static inline void ReadFrameAsync()
  * --INFO--
  * PAL Address: 0x80104e50
  * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80104234
+ * EN Size: 380b
+ * JP Address: 0x80100EC4
+ * JP Size: 380b
  */
 static void __THPSimpleDVDCallback(long result, DVDFileInfo* fileInfo)
 {
@@ -465,7 +469,7 @@ static void __THPSimpleDVDCallback(long result, DVDFileInfo* fileInfo)
         SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid = 1;
         SimpleControl.readOffset += SimpleControl.readSize;
         SimpleControl.readSize = *reinterpret_cast<s32*>(SimpleControl.readBuffer[SimpleControl.readIndex].mPtr);
-        SimpleControl.readIndex = (SimpleControl.readIndex + 1 >= 8) ? 0 : SimpleControl.readIndex + 1;
+        SimpleControl.readIndex = (SimpleControl.readIndex + 1 >= kTHPReadBufferCount) ? 0 : SimpleControl.readIndex + 1;
 
         if (SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) {
             ReadFrameAsync();
@@ -477,10 +481,10 @@ static void __THPSimpleDVDCallback(long result, DVDFileInfo* fileInfo)
  * --INFO--
  * PAL Address: 0x80104c30
  * PAL Size: 544b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80104014
+ * EN Size: 544b
+ * JP Address: 0x80100CA4
+ * JP Size: 544b
  */
 s32 THPSimplePreLoad(s32 loop)
 {
@@ -488,8 +492,8 @@ s32 THPSimplePreLoad(s32 loop)
     u32 readCount;
 
     if ((SimpleControl.isOpen != 0) && (SimpleControl.isPreLoaded == 0)) {
-        readCount = 8;
-        if ((loop == 0) && (SimpleControl.header.mNumFrames < 8)) {
+        readCount = kTHPReadBufferCount;
+        if ((loop == 0) && (SimpleControl.header.mNumFrames < kTHPReadBufferCount)) {
             readCount = SimpleControl.header.mNumFrames;
         }
 
@@ -501,7 +505,7 @@ s32 THPSimplePreLoad(s32 loop)
             SimpleControl.readSize = *reinterpret_cast<s32*>(SimpleControl.readBuffer[SimpleControl.readIndex].mPtr);
             SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid = 1;
             SimpleControl.readBuffer[SimpleControl.readIndex].mFrameNumber = SimpleControl.curAudioTrack;
-            SimpleControl.readIndex = (SimpleControl.readIndex + 1 >= 8) ? 0 : SimpleControl.readIndex + 1;
+            SimpleControl.readIndex = (SimpleControl.readIndex + 1 >= kTHPReadBufferCount) ? 0 : SimpleControl.readIndex + 1;
             SimpleControl.curAudioTrack++;
 
             if ((static_cast<u32>(SimpleControl.curAudioTrack) > (SimpleControl.header.mNumFrames - 1)) &&
@@ -524,10 +528,10 @@ s32 THPSimplePreLoad(s32 loop)
  * --INFO--
  * PAL Address: 0x80104c1c
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80104000
+ * EN Size: 20b
+ * JP Address: 0x80100C90
+ * JP Size: 20b
  */
 void THPSimpleAudioStart(void)
 {
@@ -538,10 +542,10 @@ void THPSimpleAudioStart(void)
  * --INFO--
  * PAL Address: 0x80104c08
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80103FEC
+ * EN Size: 20b
+ * JP Address: 0x80100C7C
+ * JP Size: 20b
  */
 void THPSimpleAudioStop(void)
 {
@@ -552,10 +556,10 @@ void THPSimpleAudioStop(void)
  * --INFO--
  * PAL Address: 0x80104b20
  * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80103EE4
+ * EN Size: 264b
+ * JP Address: 0x80100B74
+ * JP Size: 264b
  */
 s32 THPSimpleLoadStop(void)
 {
@@ -567,14 +571,9 @@ s32 THPSimpleLoadStop(void)
                 SimpleControl.isReadFrameAsync = 0;
             }
 
-            SimpleControl.readBuffer[0].mIsValid = 0;
-            SimpleControl.readBuffer[1].mIsValid = 0;
-            SimpleControl.readBuffer[2].mIsValid = 0;
-            SimpleControl.readBuffer[3].mIsValid = 0;
-            SimpleControl.readBuffer[4].mIsValid = 0;
-            SimpleControl.readBuffer[5].mIsValid = 0;
-            SimpleControl.readBuffer[6].mIsValid = 0;
-            SimpleControl.readBuffer[7].mIsValid = 0;
+            for (s32 i = 0; i < kTHPReadBufferCount; i++) {
+                SimpleControl.readBuffer[i].mIsValid = 0;
+            }
             SimpleControl.audioBuffer[0].mValidSample = 0;
             SimpleControl.audioBuffer[1].mValidSample = 0;
             SimpleControl.audioBuffer[2].mValidSample = 0;
@@ -601,10 +600,10 @@ s32 THPSimpleLoadStop(void)
  * --INFO--
  * PAL Address: 0x8010462c
  * PAL Size: 1268b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801039F0
+ * EN Size: 1268b
+ * JP Address: 0x80100680
+ * JP Size: 1268b
  */
 s32 THPSimpleDecode(s32 audioTrack)
 {
@@ -666,7 +665,7 @@ s32 THPSimpleDecode(s32 audioTrack)
         }
 
         SimpleControl.readBuffer[SimpleControl.readFrame].mIsValid = 0;
-        SimpleControl.readFrame = (SimpleControl.readFrame + 1 >= 8) ? 0 : SimpleControl.readFrame + 1;
+        SimpleControl.readFrame = (SimpleControl.readFrame + 1 >= kTHPReadBufferCount) ? 0 : SimpleControl.readFrame + 1;
 
         CheckPrefetch();
         return 0;
@@ -723,10 +722,10 @@ static inline BOOL VideoDecode(u8* compData)
  * --INFO--
  * PAL Address: 0x80104594
  * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80103958
+ * EN Size: 152b
+ * JP Address: 0x801005E8
+ * JP Size: 152b
  */
 s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth, int polyHeight)
 {
@@ -749,10 +748,10 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth,
  * --INFO--
  * PAL Address: 0x80104240
  * PAL Size: 852b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80103604
+ * EN Size: 852b
+ * JP Address: 0x80100294
+ * JP Size: 852b
  */
 static void MixAudio(short* output, short* input, unsigned long samples)
 {
@@ -896,10 +895,10 @@ done_mixing_silence:
  * --INFO--
  * PAL Address: TODO
  * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010348C
+ * EN Size: 376b
+ * JP Address: 0x80100114
+ * JP Size: 384b
  */
 static void THPAudioMixCallback()
 {

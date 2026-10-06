@@ -1773,3 +1773,6 @@ pppLensFlare.cpp:
 pppCorona.cpp:
 	.text start:0x800DEAEC end:0x800DEDE4
 	.sdata2 start:0x80330078 end:0x80330090
+
+THPSimple.cpp:
+	.text start:0x8010348C end:0x80104D8C

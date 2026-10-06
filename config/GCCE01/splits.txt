@@ -612,6 +612,9 @@ cflat_r2system.cpp:
 
 cflat_r2class.cpp:
 	.text start:0x800B9B98 end:0x800BD0E4
+	.rodata start:0x801D9690 end:0x801D9700
+	.data start:0x8020F080 end:0x8020F3B8
+	.sdata2 start:0x8032FB80 end:0x8032FB98
 
 gba/GBARead.c:
 	.text start:0x801A7660 end:0x801A77C0

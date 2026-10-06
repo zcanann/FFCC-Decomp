@@ -5532,16 +5532,27 @@ void CMenuPcs::CalcFukidashi()
 
 	Mtx scaleMtx;
 	char nameBuffer[64];
+#ifndef VERSION_GCCJGC
 	char tempBuf[64];
 	char secondLine[64];
+#endif
 	int fieldVal = (int)(char)bytes[0x07];
 	if (fieldVal == 0x0F) {
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
+#ifdef VERSION_GCCJGC
+		strcat(nameBuffer, "\x82\xCC\x91\xBA");
+#endif
 	} else if (fieldVal == 0x16) {
 		SetPortTownName(nameBuffer, Game.m_gameWork.m_townName);
+#ifdef VERSION_GCCJGC
+	} else if (fieldVal == 5) {
+		strcpy(nameBuffer, Game.GetPlaceName(fieldVal));
+		*strstr(nameBuffer, "\x82\xCC\x8A\xD9") = 0;
+#endif
 	} else {
 		strcpy(nameBuffer, Game.GetPlaceName(fieldVal));
 	}
+#ifndef VERSION_GCCJGC
 	Game.UpperItemName(nameBuffer);
 
 	int textWidth = 0xD8;
@@ -5552,6 +5563,7 @@ void CMenuPcs::CalcFukidashi()
 		SplitPlace(nameBuffer, tempBuf, secondLine);
 		strcpy(nameBuffer, tempBuf);
 	}
+#endif
 	float nameWidthF = fontFC->GetWidth(nameBuffer);
 
 	int textYOffset = 0x4C;
@@ -5572,8 +5584,10 @@ void CMenuPcs::CalcFukidashi()
 	// Set text position
 	m_wm.m_bubbleData->m_sprites[4].m_y =
 	    m_wm.m_bubbleData->m_sprites[0].m_y + textYOffset;
+#ifndef VERSION_GCCJGC
 	m_wm.m_bubbleData->m_sprites[4].m_y =
 	    m_wm.m_bubbleData->m_sprites[4].m_y - 4;
+#endif
 
 	// Setup model viewport slots
 	int viewportX = m_wm.m_bubbleData->m_sprites[0].m_x - 0x28;
@@ -5765,6 +5779,11 @@ void CMenuPcs::CalcFukidashi()
  */
 void CMenuPcs::DrawFukidashi()
 {
+#ifdef VERSION_GCCJGC
+	const int kBubbleIconTextureBase = 24;
+#else
+	const int kBubbleIconTextureBase = 25;
+#endif
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* const fontFC = GetFontWorld();
 	if (static_cast<signed char>(bytes[0x09]) != 1) {
@@ -5810,7 +5829,7 @@ void CMenuPcs::DrawFukidashi()
 			int drawnIcons = 0;
 			while (bitIndex < 4 && drawnIcons < 2) {
 				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << bitIndex)) != 0) {
-					MenuPcs.SetTexture((TEX)(bitIndex + 0x19));
+					MenuPcs.SetTexture((TEX)(bitIndex + kBubbleIconTextureBase));
 					Sprt* icon;
 					if (drawnIcons == 0) {
 						icon = &m_wm.m_bubbleData->m_sprites[2];
@@ -5829,7 +5848,7 @@ void CMenuPcs::DrawFukidashi()
 		} else {
 			for (int idx = 0; idx < 5; idx++) {
 				if ((iconFlags & (0x10 << idx)) != 0) {
-					MenuPcs.SetTexture((TEX)(idx + 0x19));
+					MenuPcs.SetTexture((TEX)(idx + kBubbleIconTextureBase));
 					WmBubbleInfo* bubble = m_wm.m_bubbleData;
 					MenuPcs.DrawRect(0,
 						(float)bubble->m_sprites[2].m_x, (float)bubble->m_sprites[2].m_y,
@@ -5847,12 +5866,23 @@ void CMenuPcs::DrawFukidashi()
 	int fieldVal = (int)(char)bytes[0x07];
 	if (fieldVal == 0x0F) {
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
+#ifdef VERSION_GCCJGC
+		strcat(nameBuffer, "\x82\xCC\x91\xBA");
+#endif
 	} else if (fieldVal == 0x16) {
+#ifndef VERSION_GCCJGC
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
+#endif
 		SetPortTownName(nameBuffer, Game.m_gameWork.m_townName);
+#ifdef VERSION_GCCJGC
+	} else if (fieldVal == 5) {
+		strcpy(nameBuffer, Game.GetPlaceName(fieldVal));
+		*strstr(nameBuffer, "\x82\xCC\x8A\xD9") = 0;
+#endif
 	} else {
 		strcpy(nameBuffer, Game.GetPlaceName(fieldVal));
 	}
+#ifndef VERSION_GCCJGC
 	Game.UpperItemName(nameBuffer);
 
 	int textW = 0xD8;
@@ -5884,6 +5914,7 @@ void CMenuPcs::DrawFukidashi()
 		}
 		strcpy(nameBuffer, tempBuf);
 	}
+#endif
 
 	fontFC->SetMargin(FLOAT_803313e8);
 	fontFC->SetShadow(0);
@@ -5894,6 +5925,16 @@ void CMenuPcs::DrawFukidashi()
 	fontFC->SetPosY((float)m_wm.m_bubbleData->m_sprites[4].m_y);
 	fontFC->Draw(nameBuffer);
 
+#ifdef VERSION_GCCJGC
+	if (bytes[0x07] == 5) {
+		strcpy(nameBuffer, "\x82\xCC\x8A\xD9");
+		float w2 = fontFC->GetWidth(nameBuffer);
+		fontFC->SetPosX((FLOAT_80331704 - w2) * FLOAT_80331434 +
+		                (float)m_wm.m_bubbleData->m_sprites[0].m_x);
+		fontFC->SetPosY((float)(m_wm.m_bubbleData->m_sprites[4].m_y + 0x16));
+		fontFC->Draw(nameBuffer);
+	}
+#else
 	if (twoLines != 0) {
 		strcpy(nameBuffer, "");
 		float w2 = fontFC->GetWidth(secondLine);
@@ -5902,6 +5943,7 @@ void CMenuPcs::DrawFukidashi()
 		fontFC->SetPosY((float)(m_wm.m_bubbleData->m_sprites[4].m_y + 0x16));
 		fontFC->Draw(secondLine);
 	}
+#endif
 
 	DrawInit();
 

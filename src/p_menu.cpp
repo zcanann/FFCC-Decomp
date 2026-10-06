@@ -1482,7 +1482,7 @@ inline void CMenuPcs::calcBattle()
     value = current - 1;
     limit = m_battleHud.m_gaugeTarget - current;
     limit = current + limit;
-    m_battleHud.m_gaugeValue = (limit < value) ? value : ((current + 1 < limit) ? current + 1 : limit);
+    m_battleHud.m_gaugeValue = (limit < value) ? value : ((++current < limit) ? current : limit);
 
     u32 counter = m_battleHud.m_fadeCounter - 1;
     m_battleHud.m_fadeCounter = counter & ~((int)counter >> 31);

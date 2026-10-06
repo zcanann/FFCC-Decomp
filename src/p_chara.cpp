@@ -831,7 +831,6 @@ int CCharaPcs::GetNumTexShadow()
  */
 void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, Vec* worldPositions, float (*shadowMatrices)[3][4])
 {
-    maxCount = startIndex + maxCount;
     CHandle* handle = m_handleList->m_next;
     int shadowIndex = 0;
 
@@ -853,7 +852,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
             }
 
             shadowIndex++;
-            if (maxCount <= shadowIndex) {
+            if (startIndex + maxCount <= shadowIndex) {
                 return;
             }
         }
@@ -922,12 +921,7 @@ void CCharaPcs::drawMakeTexShadow()
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &backBufferTexObj, 0, 0, m_texShadowSize, m_texShadowSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    LightPcs.SetAmbient(CColor(0x00, 0x00, 0x00, 0xFF).color);
-    LightPcs.SetNumDiffuse(0);
-    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+    InitEnv(1);
 
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
     _GXColor savedCopyClearColor = Graphic.GetCopyClearColor();
@@ -970,14 +964,7 @@ void CCharaPcs::drawShadow()
         return;
     }
 
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-
-    const CColor& shadowBlack = CColor(0x00, 0x00, 0x00, 0xFF);
-    LightPcs.SetAmbient(shadowBlack.color);
-    LightPcs.SetNumDiffuse(0);
-    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+    InitEnv(2);
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {

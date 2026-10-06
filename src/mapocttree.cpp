@@ -406,9 +406,11 @@ void COctTree::ClearShadow()
 static void ClearShadow_r(COctNode* node)
 {
 	int i;
+	unsigned long meshCount = node->m_meshCount;
 
-	if (node->m_meshCount != 0) {
-		node->m_shadowFlags = 0;
+	if (meshCount != 0) {
+		unsigned long* flags = &node->m_shadowFlags;
+		*flags = 0;
 	}
 	for (i = 0; i < 8; i++) {
 		if (node->m_children[i] == 0) {
@@ -506,9 +508,11 @@ void COctTree::ClearLight()
 static void ClearLight_r(COctNode* octNode)
 {
 	int i;
+	unsigned long meshCount = octNode->m_meshCount;
 
-	if (octNode->m_meshCount != 0) {
-		octNode->m_lightFlags = 0;
+	if (meshCount != 0) {
+		unsigned long* flags = &octNode->m_lightFlags;
+		*flags = 0;
 	}
 	for (i = 0; i < 8; i++) {
 		if (octNode->m_children[i] == 0) {

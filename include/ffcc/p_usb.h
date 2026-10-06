@@ -45,7 +45,5 @@ public:
 };
 
 extern CUSBPcs USBPcs;
-extern int s_usbReadPollFrameCounter;
-extern char s_usbReadPollInitialized;
 
 #endif

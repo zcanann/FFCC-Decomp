@@ -10361,8 +10361,8 @@ lbl_8034BA4C = .sbss:0x8034BA4C; // type:object size:0x1 data:byte
 lbl_8034BA50 = .sbss:0x8034BA50; // type:object size:0x4 data:4byte
 lbl_8034BA54 = .sbss:0x8034BA54; // type:object size:0x1 data:byte
 lbl_8034BA58 = .sbss:0x8034BA58; // type:object size:0x8 data:4byte
-lbl_8034BA68 = .sbss:0x8034BA68; // type:object size:0x4 data:4byte
-lbl_8034BA6C = .sbss:0x8034BA6C; // type:object size:0x1 data:byte
+lbl_8034BA68 = .sbss:0x8034BA68; // type:object size:0x4 data:4byte scope:local
+lbl_8034BA6C = .sbss:0x8034BA6C; // type:object size:0x1 data:byte scope:local
 gUtil = .sbss:0x8034BA70; // type:object size:0x4 scope:global
 lbl_8034BAA0 = .sbss:0x8034BAA0; // type:object size:0x4 data:4byte
 lbl_8034BAA4 = .sbss:0x8034BAA4; // type:object size:0x4 data:4byte
@@ -15824,3 +15824,5 @@ gap_rodata_801D187B = .rodata:0x801D187B; // type:object size:0x5 scope:local al
 gap_data_801DCB14 = .data:0x801DCB14; // type:object size:0x4 scope:local align:1
 
 gap_bss_8025FA3C = .bss:0x8025FA3C; // type:object size:0x4 scope:local align:1
+
+gap_sbss_8034BA6D = .sbss:0x8034BA6D; // type:object size:0x3 scope:local align:1

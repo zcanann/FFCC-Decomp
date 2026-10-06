@@ -11744,8 +11744,8 @@ lbl_8032DC30 = .sbss:0x8032DC30; // type:object size:0x4 data:4byte
 lbl_8032DC34 = .sbss:0x8032DC34; // type:object size:0x1 data:byte
 lbl_8032DC38 = .sbss:0x8032DC38; // type:object size:0x8 data:4byte
 SamplePcs = .sbss:0x8032DC40; // type:object size:0x4 data:4byte
-lbl_8032DC48 = .sbss:0x8032DC48; // type:object size:0x4 data:4byte
-lbl_8032DC4C = .sbss:0x8032DC4C; // type:object size:0x1 data:byte
+lbl_8032DC48 = .sbss:0x8032DC48; // type:object size:0x4 data:4byte scope:local
+lbl_8032DC4C = .sbss:0x8032DC4C; // type:object size:0x1 data:byte scope:local
 gUtil = .sbss:0x8032DC50; // type:object size:0x4 scope:global
 g_pStage = .sbss:0x8032DC78; // type:object size:0x4 scope:local data:4byte
 lbl_8032DC80 = .sbss:0x8032DC80; // type:object size:0x4 data:4byte
@@ -17536,3 +17536,5 @@ gap_data_801E76D4 = .data:0x801E76D4; // type:object size:0x4 scope:local align:
 gap_bss_802430FC = .bss:0x802430FC; // type:object size:0x4 scope:local align:1
 
 gap_rodata_801D5C31 = .rodata:0x801D5C31; // type:object size:0x7 scope:local align:1
+
+gap_sbss_8032DC4D = .sbss:0x8032DC4D; // type:object size:0x3 scope:local align:1

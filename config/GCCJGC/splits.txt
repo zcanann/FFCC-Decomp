@@ -1866,6 +1866,7 @@ auto_8034BA94_sbss:
 	.sbss start:0x8034BA94 end:0x8034BA98
 
 p_usb.cpp:
+	.sbss start:0x8034BA68 end:0x8034BA6D
 	.text start:0x8001F7BC end:0x8001FCE8
 	.rodata start:0x801D1848 end:0x801D187B
 	.sdata2 start:0x8034C570 end:0x8034C578
@@ -1882,3 +1883,6 @@ usb_padding_data_801DCB14:
 
 usb_padding_bss_8025FA3C:
 	.bss start:0x8025FA3C end:0x8025FA40 align:1
+
+usb_polling_padding_8034BA6D:
+	.sbss start:0x8034BA6D end:0x8034BA70 align:1

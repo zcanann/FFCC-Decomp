@@ -6,9 +6,6 @@
 #include "string.h"
 #include "types.h"
 
-int s_usbReadPollFrameCounter;
-char s_usbReadPollInitialized;
-
 typedef int CUSBDataHeader_size_mismatch[(sizeof(CUSBPcs::CDataHeader) == 0x40) ? 1 : -1];
 typedef int CUSBDataHeader_payload_size_offset_mismatch
     [(((u32)&((CUSBPcs::CDataHeader*)0)->m_payloadSize) == 0x20) ? 1 : -1];
@@ -187,14 +184,11 @@ void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
  */
 void CUSBPcs::mccReadData()
 {
-    if (s_usbReadPollInitialized == '\0') {
-        s_usbReadPollFrameCounter = 0;
-        s_usbReadPollInitialized = '\x01';
-    }
+    static int testloop = 0;
 
-    s_usbReadPollFrameCounter++;
-    if (4 < s_usbReadPollFrameCounter) {
-        s_usbReadPollFrameCounter = 0;
+    testloop++;
+    if (4 < testloop) {
+        testloop = 0;
     } else {
         return;
     }

@@ -821,6 +821,7 @@ TRK_MINNOW_DOLPHIN/mem_TRK.c:
 
 mes.cpp:
 	.text start:0x80097B8C end:0x8009AC94
+	.bss start:0x802E9A20 end:0x802E9A70
 	.sdata2 start:0x8032F838 end:0x8032F878
 	.rodata start:0x801D8D70 end:0x801D8DF0
 

@@ -10069,8 +10069,6 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 2 : kMcWindowTextureBase + 1));
 	const double innerWidthD = static_cast<double>(sw) - DOUBLE_80331428;
 	const float innerX = FLOAT_80331410 + sx;
-	const float* pZw2 = &FLOAT_803313dc;
-	const float uv1 = *pZw2;
 	const float innerWidthF = static_cast<float>(innerWidthD);
 	float y = sy;
 	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
@@ -10079,14 +10077,12 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 			y = bottom;
 			flags |= 4;
 		}
-		MenuPcs.DrawRect(flags, innerX, y, innerWidthF, FLOAT_80331410, uv1, uv1, FLOAT_803313e8, FLOAT_803313e8, uv1);
+		MenuPcs.DrawRect(flags, innerX, y, innerWidthF, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 1 : kMcWindowTextureBase + 2));
 	const double innerHeightD = static_cast<double>(sh) - DOUBLE_80331428;
 	const float innerY = FLOAT_80331410 + sy;
-	const float* pZw3 = &FLOAT_803313dc;
-	const float uv2 = *pZw3;
 	const float innerHeightF = static_cast<float>(innerHeightD);
 	float x = sx;
 	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
@@ -10095,13 +10091,11 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 			x = right;
 			flags |= 8;
 		}
-		MenuPcs.DrawRect(flags, x, innerY, FLOAT_80331410, innerHeightF, uv2, uv2, FLOAT_803313e8, FLOAT_803313e8, uv2);
+		MenuPcs.DrawRect(flags, x, innerY, FLOAT_80331410, innerHeightF, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 3 : kMcWindowTextureBase + 3));
-	const float* pZw4 = &FLOAT_803313dc;
-	const float uv3 = *pZw4;
-	MenuPcs.DrawRect(flags, innerX, innerY, static_cast<float>(innerWidthD), static_cast<float>(innerHeightD), uv3, uv3, FLOAT_803313e8, FLOAT_803313e8, uv3);
+	MenuPcs.DrawRect(flags, innerX, innerY, static_cast<float>(innerWidthD), static_cast<float>(innerHeightD), FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 	if (m_menuWindowInfo->state == 0) {
 		m_menuWindowInfo->frame++;

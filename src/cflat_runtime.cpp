@@ -432,19 +432,17 @@ inline CFlatRuntime::CFunc* CFlatRuntime::searchFunc(int classIndex, int systemK
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline int CFlatRuntime::pop(CFlatRuntime::CObject* object)
+inline CFlatRuntime::CStack CFlatRuntime::pop(CFlatRuntime::CObject* object)
 {
-	union {
-		u32 u;
-		s32 s;
-	} value;
-
 	object->m_sp--;
-	value.u = *object->m_sp;
-	return value.s;
+	return *reinterpret_cast<CStack*>(object->m_sp);
 }
 
 /*
@@ -505,10 +503,7 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
 	const int prevArgCount = object->m_argCount;
 
 	if (func->m_useCallerArgs != 0) {
-		CStack popped;
-		object->m_sp--;
-		popped.m_word = *object->m_sp;
-		object->m_argCount = static_cast<s16>(popped.m_int);
+		object->m_argCount = static_cast<s16>(pop(object).m_int);
 		object->m_localBase = object->m_sp - object->m_argCount;
 		object->m_sp = object->m_localBase + object->m_argCount;
 	} else {
@@ -867,8 +862,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			continue;
 		}
 		case 9: {
-			CStack cond;
-			cond.m_word = pop(object);
+			CStack cond = pop(object);
 			if (cond.m_int != 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
@@ -884,8 +878,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			break;
 		}
 		case 8: {
-			CStack cond;
-			cond.m_word = pop(object);
+			CStack cond = pop(object);
 			if (cond.m_int == 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
@@ -1422,11 +1415,9 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 
 	objectFrame(object);
 
-	object->m_sp--;
-	CStack result;
-	result.m_word = *object->m_sp;
+	CStack result = pop(object);
 	if (outArg != 0) {
-		outArg->m_word = result.m_int;
+		*outArg = result;
 	}
 	return 1;
 }

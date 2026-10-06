@@ -727,20 +727,20 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtrlTable* data)
 {
-    CharaBreakWork* work;
-    CChara::CMesh* mesh;
-    CChara::CModel* model;
-    CGObject* handle;
-    u32 i;
     CharaBreakDisplayList* displayList;
+    CGObject* handle;
+    CharaBreakWork* work;
+    CChara::CModel* model;
+    CChara::CMesh* mesh;
     CharaBreakDisplayListPair** dlEntries;
+    u32 i;
     int dl;
 
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    work = GetCharaBreakWork(charaBreak, data);
+    work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     handle = ppvMng->m_owner;
 #if defined(VERSION_GCCP01)
     if (work->m_enabled == 0) {

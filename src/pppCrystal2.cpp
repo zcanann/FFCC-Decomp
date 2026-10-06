@@ -214,10 +214,10 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
  */
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlTable* ctrl)
 {
-    u32 y;
-    Crystal2Work* work;
-    u32 yTile;
     u32 x;
+    u32 y;
+    u32 yTile;
+    Crystal2Work* work;
     HSD_ImageBuffer* textureInfo;
     u32 textureSize;
     float magnitude;
@@ -231,7 +231,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
         return;
     }
 
-    work = GetCrystal2Work(pppCrystal2, ctrl);
+    work = (Crystal2Work*)(pppCrystal2->m_workArea + ctrl->m_serializedDataOffsets[2]);
     if ((step->m_crystal.m_refractionMode != 0) && (work->m_refractionMap == 0)) {
         work->m_refractionMap = (HSD_ImageBuffer*)pppMemAlloc(
             sizeof(HSD_ImageBuffer), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);

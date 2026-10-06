@@ -1761,3 +1761,15 @@ pppColum.cpp:
 pppLight.cpp:
 	.text start:0x800DA2CC end:0x800DA860
 	.sdata2 start:0x8032FF18 end:0x8032FF28
+
+pppConformBGNormal.cpp:
+	.text start:0x801085E4 end:0x80108C20
+	.sdata2 start:0x803308B0 end:0x803308C8
+
+pppLensFlare.cpp:
+	.text start:0x800DDEE4 end:0x800DE428
+	.sdata2 start:0x80330018 end:0x80330030
+
+pppCorona.cpp:
+	.text start:0x800DEAEC end:0x800DEDE4
+	.sdata2 start:0x80330078 end:0x80330090

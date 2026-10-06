@@ -58,10 +58,10 @@ static inline CoronaVecWork* GetCoronaVecWork(_pppPObject* object, _pppCtrlTable
  * --INFO--
  * PAL Address: 0x800df320
  * PAL Size: 464b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEAEC
+ * EN Size: 464b
+ * JP Address: 0x800DC564
+ * JP Size: 464b
  */
 void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
 {
@@ -127,10 +127,10 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
  * --INFO--
  * PAL Address: 0x800df4f0
  * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DECBC
+ * EN Size: 240b
+ * JP Address: 0x800DC734
+ * JP Size: 240b
  */
 void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
 {
@@ -165,10 +165,10 @@ void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x800df5e0
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEDAC
+ * EN Size: 4b
+ * JP Address: 0x800DC824
+ * JP Size: 4b
  */
 void pppDestructCorona(_pppPObject*, _pppCtrlTable*)
 {
@@ -178,10 +178,10 @@ void pppDestructCorona(_pppPObject*, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x800df5e4
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEDB0
+ * EN Size: 52b
+ * JP Address: 0x800DC828
+ * JP Size: 52b
  */
 void pppConstructCorona(_pppPObject* object, _pppCtrlTable* ctrl)
 {

@@ -1749,3 +1749,15 @@ pppColum.cpp:
 pppLight.cpp:
 	.text start:0x800D7E94 end:0x800D8434
 	.sdata2 start:0x8034DC78 end:0x8034DC88
+
+pppConformBGNormal.cpp:
+	.text start:0x801052F8 end:0x80105934
+	.sdata2 start:0x8034E5A8 end:0x8034E5C0
+
+pppLensFlare.cpp:
+	.text start:0x800DB9F4 end:0x800DBF40
+	.sdata2 start:0x8034DD70 end:0x8034DD88
+
+pppCorona.cpp:
+	.text start:0x800DC564 end:0x800DC85C
+	.sdata2 start:0x8034DDC8 end:0x8034DDE0

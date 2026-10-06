@@ -356,13 +356,12 @@ void CGMonObj::onStatAttack(int state)
 #define prgObj (reinterpret_cast<CGPrgObj*>(this))
 #define object (reinterpret_cast<CGObject*>(this))
 	SCharaItemRow* attackData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
-	unsigned short attackFlags = attackData->m_flags32;
 	int attackType = attackData->m_actionType;
+	unsigned short attackFlags = attackData->m_flags32;
 
 	if (state == 0) {
 		if ((prgObj->m_stateFrame == 0) && (m_targetPartyIndex >= 0)) {
-			CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
-			m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+			m_comboCenter = reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition;
 			if (state == 3) {
 				return;
 			}
@@ -381,7 +380,7 @@ void CGMonObj::onStatAttack(int state)
 				}
 			}
 
-			target = Game.m_partyObjArr[m_targetPartyIndex];
+			CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
 			reinterpret_cast<CGPrgObj*>(target)->bonus(0x17, m_itemId, reinterpret_cast<CGPrgObj*>(target));
 		}
 		return;
@@ -518,9 +517,9 @@ void CGMonObj::onChangeStat(int state)
 	(this->*m_funcs->changeStat)(state);
 
 	switch (state) {
-	case 0:
-	case 1:
-	case 2:
+	case 3:
+	case 4:
+	case 5:
 		break;
 	case -14:
 	case -13:
@@ -1395,8 +1394,7 @@ void CGMonObj::onStatDie()
 
 			int option = *reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
 			if (option < 9 && m_repop.delay == 0) {
-				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
-				CFlatSpawnBits(option) |= 1ULL << shift;
+				CFlat.m_spawnBits[option] |= 1ULL << reinterpret_cast<int>(object->m_scriptHandle[2]);
 			}
 			return;
 		}
@@ -3589,8 +3587,7 @@ void CGMonObj::setRepop(int mode)
 	int option;
 	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
 		u64 bit = 1ULL << spawnIndex;
-		u64 spawnBits = CFlatSpawnBits(option);
-		if ((spawnBits & bit) != 0) {
+		if ((CFlat.m_spawnBits[option] & bit) != 0) {
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
 			object->m_bgColMask = 0;
 			object->m_displayFlags = 0;
@@ -3699,7 +3696,7 @@ void CGMonObj::setRepop(int mode)
 		}
 
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		int particleId = i + particleBase + 0x50;
+		int particleId = i + 0x50 + particleBase;
 		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[16], object, kMonObjDefaultScale, 0);
 	}
 

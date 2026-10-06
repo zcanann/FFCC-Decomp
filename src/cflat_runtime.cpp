@@ -1418,9 +1418,11 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 
 	objectFrame(object);
 
-	const int result = pop(object);
+	object->m_sp--;
+	CStack result;
+	result.m_word = *object->m_sp;
 	if (outArg != 0) {
-		outArg->m_word = result;
+		outArg->m_word = result.m_int;
 	}
 	return 1;
 }

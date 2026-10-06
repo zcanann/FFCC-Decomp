@@ -2572,6 +2572,8 @@ void CGObject::objectCollision()
         Vec capsuleOffset;
     };
 
+    ColInfo* frontObj;
+    ColInfo* hitObj;
     int keepPushTimer = false;
     ColInfo self;
 
@@ -2620,8 +2622,6 @@ void CGObject::objectCollision()
                 && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))
                 && (capsuleDistance < (m_attackColRadius + other->m_attackColRadius))) {
-                ColInfo* frontObj;
-                ColInfo* hitObj;
                 if (thisAttack) {
                     frontObj = &self;
                     hitObj = &info;

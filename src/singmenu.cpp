@@ -2037,7 +2037,7 @@ void CMenuPcs::SingleCalcCtrl()
     case 0: {
         s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
-            CmdOpen();
+            result = CmdOpen();
         } else if (proc == 1) {
             result = CmdCtrl();
         } else {

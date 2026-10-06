@@ -449,7 +449,7 @@ void CMenuPcs::CmdInit2()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CmdOpen()
+int CMenuPcs::CmdOpen()
 {
 	if (m_cmdState->initialized == 0) {
 		CmdInit();
@@ -494,8 +494,9 @@ void CMenuPcs::CmdOpen()
 	}
 
 	if (done) {
-		UniteOpenAnim(-1);
+		done = UniteOpenAnim(-1);
 	}
+	return done;
 }
 
 /*

@@ -2895,7 +2895,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
             if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
                 sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Plus_80332d4c, statValue);
             } else {
-                if ((attr == 9) || (attr == 10) || (attr == 0xC)) {
+                if (!((attr != 9) && (attr != 10) && (attr != 0xC))) {
                     sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Minus_80332d50, statValue);
                     fontColor = 3;
                 } else {

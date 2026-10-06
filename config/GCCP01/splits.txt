@@ -189,10 +189,10 @@ mapocttree.cpp:
 	extabindex  start:0x8000B9BC end:0x8000BAD0
 	.text       start:0x8002C704 end:0x8002F45C
 	.ctors      start:0x801D53D4 end:0x801D53D8
-	.rodata     start:0x801D7268 end:0x801D7300
-	.bss        start:0x802456F0 end:0x80245754
-	.sbss       start:0x8032ECA0 end:0x8032ECB8
-	.sdata2     start:0x8032F960 end:0x8032F974
+	.rodata start:0x801D7268 end:0x801D7300
+	.bss start:0x802456F0 end:0x80245754
+	.sbss start:0x8032ECA0 end:0x8032ECB4
+	.sdata2 start:0x8032F960 end:0x8032F974
 
 map.cpp:
 	extab       start:0x80006068 end:0x80006304
@@ -2862,3 +2862,6 @@ auto_801FD470_data:
 
 auto_8032EC94_sbss:
 	.sbss start:0x8032EC94 end:0x8032EC98
+
+auto_8032ECB4_sbss:
+	.sbss start:0x8032ECB4 end:0x8032ECB8

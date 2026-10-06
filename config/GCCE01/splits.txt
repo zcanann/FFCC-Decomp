@@ -593,6 +593,10 @@ wm_menu.cpp:
 
 mapocttree.cpp:
 	.text start:0x8002C4F8 end:0x8002F250
+	.rodata start:0x801D61A8 end:0x801D6240
+	.bss start:0x802446B0 end:0x80244714
+	.sbss start:0x8032DC80 end:0x8032DC94
+	.sdata2 start:0x8032E928 end:0x8032E93C
 
 shopmenu.cpp:
 	.text start:0x8014F4BC end:0x801586D0
@@ -1935,3 +1939,12 @@ fs_usb_padding_rodata_801D6DD3:
 
 fs_usb_padding_data_801E9814:
 	.data start:0x801E9814 end:0x801E9818 align:1
+
+auto_8032DC94_sbss:
+	.sbss start:0x8032DC94 end:0x8032DC98
+
+auto_8032E93C_sdata2:
+	.sdata2 start:0x8032E93C end:0x8032E940
+
+auto_8032DC7C_sbss:
+	.sbss start:0x8032DC7C end:0x8032DC80

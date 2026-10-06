@@ -235,12 +235,8 @@ void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 
 	float initValue = 0.0f;
 
-	work->m_projectedZ = initValue;
-	work->m_projectedY = initValue;
-	work->m_projectedX = initValue;
-	work->m_viewPosition.z = initValue;
-	work->m_viewPosition.y = initValue;
-	work->m_viewPosition.x = initValue;
+	work->m_projectedX = work->m_projectedY = work->m_projectedZ = initValue;
+	work->m_viewPosition.x = work->m_viewPosition.y = work->m_viewPosition.z = initValue;
 
 	work->m_shapeFrame2 = 0;
 	work->m_shapeFrame1 = 0;

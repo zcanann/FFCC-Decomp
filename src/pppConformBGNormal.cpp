@@ -291,8 +291,6 @@ void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlT
 
     state = (ConformBgNormalState*)(conformBG->m_workArea + GetConformBgNormalDataOffsets(ctrl)->m_stateOffset);
     scale = 0.0f;
-    state->m_normal.z = scale;
-    state->m_normal.y = scale;
-    state->m_normal.x = scale;
+    state->m_normal.x = state->m_normal.y = state->m_normal.z = scale;
     state->m_initialized = 0;
 }

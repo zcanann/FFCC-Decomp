@@ -190,7 +190,5 @@ void pppConstructCorona(_pppPObject* object, _pppCtrlTable* ctrl)
     work->m_shapeFrame2 = 0;
     work->m_shapeFrame1 = 0;
     work->m_shapeFrame0 = 0;
-    work->m_alphaScaleAccel = initValue;
-    work->m_alphaScaleVelocity = initValue;
-    work->m_alphaScale = initValue;
+    work->m_alphaScale = work->m_alphaScaleVelocity = work->m_alphaScaleAccel = initValue;
 }

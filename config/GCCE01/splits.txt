@@ -1796,3 +1796,13 @@ auto_quat_801E54BC_rodata:
 
 auto_quat_803326CC_sdata2:
 	.sdata2 start:0x803326CC end:0x803326D0 align:4
+
+LocationTitle2.cpp:
+	.text start:0x800D9880 end:0x800DA108
+	.rodata start:0x801DA4A0 end:0x801DA4B8
+	.sdata2 start:0x8032FF00 end:0x8032FF18
+
+pppLocationTitle.cpp:
+	.text start:0x800D83E8 end:0x800D8AC8
+	.rodata start:0x801DA428 end:0x801DA440
+	.sdata2 start:0x8032FE98 end:0x8032FEA8

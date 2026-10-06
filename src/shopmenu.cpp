@@ -63,11 +63,6 @@ extern const float FLOAT_80332d90;
 extern const float FLOAT_80332d94;
 extern const float FLOAT_80332d98;
 extern const float FLOAT_80332D9C;
-extern const double DOUBLE_80332DA0;
-extern const double DOUBLE_80332DA8;
-extern const double DOUBLE_80332DB0;
-extern const double DOUBLE_80332DB8;
-extern const double DOUBLE_80332DC0;
 extern const float FLOAT_80332DC8;
 extern const float FLOAT_80332DCC;
 extern const float FLOAT_80332DD0;
@@ -2450,8 +2445,8 @@ void CShopMenu::DrawSoubiBase()
  */
 void CShopMenu::DrawItemList()
 {
-    int itemIndex = m_listTop;
     int y = 0x4C;
+    int itemIndex = m_listTop;
     unsigned int selectableFrame = 10;
     if (m_listType == 2) {
         selectableFrame = 0xF;
@@ -2478,10 +2473,11 @@ void CShopMenu::DrawItemList()
             frameX = 0x198;
             drawShapeSeq(frame, 1, frameX, y - 4, 0xFF, 0, 0, FLOAT_80332D9C, 0);
             MenuPcs.DrawInit();
+            int cursorY = y - 0x14;
             if (m_subMode == 0) {
-                MenuPcs.DrawCursor(0x114 + (static_cast<int>(System.m_frameCounter) % 8), y - 0x14, FLOAT_80332d28);
+                MenuPcs.DrawCursor(0x114 + (static_cast<int>(System.m_frameCounter) % 8), cursorY, FLOAT_80332d28);
             } else if ((System.m_frameCounter & 1) == 0) {
-                MenuPcs.DrawCursor(0x114, y - 0x14, FLOAT_80332d28);
+                MenuPcs.DrawCursor(0x114, cursorY, FLOAT_80332d28);
             }
         } else {
             frameX = 0x1B8;
@@ -2507,8 +2503,8 @@ void CShopMenu::DrawItemList()
     }
 
     int pulse = abs(static_cast<int>(System.m_frameCounter) % 0x14 - 10);
-    unsigned char alpha = static_cast<unsigned char>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
-    float scale = static_cast<float>(DOUBLE_80332DA8 * (DOUBLE_80332DC0 * static_cast<double>(pulse) + DOUBLE_80332DB8));
+    unsigned char alpha = static_cast<unsigned char>(255.0 * (0.05 * static_cast<double>(pulse) + 0.5));
+    float scale = static_cast<float>(0.5 * (0.03 * static_cast<double>(pulse) + 0.7));
 
     if (m_canScrollUp != 0) {
         drawShapeSeqScale(2, 0, 0x24E, 0x6A, scale, -scale, alpha);

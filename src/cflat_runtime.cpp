@@ -176,8 +176,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 							int specLen = 0;
 							while (((specChar = *format) != '\0') && ((specLen == 0) || ((specLen != 0) && (specChar != '%')))) {
 								format++;
-								spec[specLen] = specChar;
-								specLen++;
+								spec[specLen++] = specChar;
 							}
 							spec[specLen] = '\0';
 

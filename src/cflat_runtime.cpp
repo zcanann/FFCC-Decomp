@@ -505,7 +505,10 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
 	const int prevArgCount = object->m_argCount;
 
 	if (func->m_useCallerArgs != 0) {
-		object->m_argCount = static_cast<s16>(pop(object));
+		CStack popped;
+		object->m_sp--;
+		popped.m_word = *object->m_sp;
+		object->m_argCount = static_cast<s16>(popped.m_int);
 		object->m_localBase = object->m_sp - object->m_argCount;
 		object->m_sp = object->m_localBase + object->m_argCount;
 	} else {
@@ -538,6 +541,49 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
 			clearCount--;
 		}
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFlatRuntime::callCleanup(CFlatRuntime::CObject* object)
+{
+	CStack returnTemp;
+	CStack codePosTemp;
+	CStack returnValue;
+	CStack packedFlags;
+	CStack previousActive;
+	CStack previousCodePos;
+	CStack previousLocalBase;
+
+	object->m_sp--;
+	returnValue.m_word = *object->m_sp;
+	returnTemp.m_int = returnValue.m_int;
+	object->m_sp--;
+	packedFlags.m_word = *object->m_sp;
+	object->m_sp--;
+	previousActive.m_word = *object->m_sp;
+	object->m_sp--;
+	previousCodePos.m_word = *object->m_sp;
+	codePosTemp.m_int = previousCodePos.m_int;
+	object->m_sp--;
+	previousLocalBase.m_word = *object->m_sp;
+
+	object->m_sp = object->m_localBase;
+	*object->m_sp = returnTemp.m_word;
+	object->m_sp++;
+	object->m_localBase = reinterpret_cast<unsigned int*>(previousLocalBase.m_int);
+	object->m_codePos = codePosTemp.m_word;
+	object->m_flagBits.m_callFlag = static_cast<s8>(previousActive.m_int);
+	object->m_waitCounter = packedFlags.m_int >> 16;
+	object->m_requestPending = (packedFlags.m_word >> 15) & 1;
+	object->m_argCount = static_cast<s16>(packedFlags.m_word);
 }
 
 /*
@@ -1098,7 +1144,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		case 0x39: {
 			--object->m_sp;
-			returnValue = *reinterpret_cast<CStack*>(object->m_sp);
+			returnValue.m_word = *object->m_sp;
 			--object->m_sp;
 			const u32 classWord = *object->m_sp;
 			CObject* target = reinterpret_cast<CObject*>(intToClass(classWord >> 16));
@@ -1107,7 +1153,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			--object->m_sp;
 			object->m_thisBase = reinterpret_cast<unsigned int*>(*object->m_sp);
 			--object->m_sp;
-			*reinterpret_cast<CStack*>(object->m_sp) = returnValue;
+			*reinterpret_cast<int*>(object->m_sp) = returnValue.m_int;
 			object->m_sp++;
 			break;
 		}
@@ -1117,36 +1163,9 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			break;
 		case 0x3C:
 		returnFromCall: {
-			CStack previousLocalBase;
-			CStack previousCodePos;
-			CStack previousActive;
-			CStack packedFlags;
-			CStack codePosTemp;
-			CStack returnTemp;
 			const int oldCallFlag = object->m_flagBits.m_callFlag;
 
-			object->m_sp--;
-			returnValue.m_word = *object->m_sp;
-			returnTemp.m_int = returnValue.m_int;
-			object->m_sp--;
-			packedFlags.m_word = *object->m_sp;
-			object->m_sp--;
-			previousActive.m_word = *object->m_sp;
-			object->m_sp--;
-			previousCodePos.m_word = *object->m_sp;
-			codePosTemp.m_int = previousCodePos.m_int;
-			object->m_sp--;
-			previousLocalBase.m_word = *object->m_sp;
-
-			object->m_sp = object->m_localBase;
-			*object->m_sp = returnTemp.m_word;
-			object->m_sp++;
-			object->m_localBase = reinterpret_cast<unsigned int*>(previousLocalBase.m_int);
-			object->m_codePos = codePosTemp.m_word;
-			object->m_flagBits.m_callFlag = static_cast<s8>(previousActive.m_int);
-			object->m_waitCounter = packedFlags.m_int >> 16;
-			object->m_requestPending = (packedFlags.m_word >> 15) & 1;
-			object->m_argCount = static_cast<s16>(packedFlags.m_word);
+			callCleanup(object);
 
 			if (object->m_flagBits.m_deleteFlag != 0) {
 				return 0;
@@ -2114,16 +2133,6 @@ CFlatRuntime::CFlatRuntime()
  * Address:	TODO
  * Size:	TODO
  */
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::callCleanup(CFlatRuntime::CObject*)
-{
-	// TODO
-}
 
 /*
  * --INFO--

@@ -301,7 +301,7 @@ public:
     const char* GetCmdListItemName(int);
     int GetWeaponAttrib(int);
     int GetCmdListItem(int);
-    void SearchCombiTop(int);
+    int SearchCombiTop(int);
     void DelCmdListAndItem(int, int);
     int GetNumCombi(int);
     int GetNextCmdListIdx(int, int);

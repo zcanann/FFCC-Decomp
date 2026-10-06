@@ -1608,11 +1608,7 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
  */
 inline void CCaravanWork::ClampStatus(short& cmdSlots, unsigned short& hpMax)
 {
-	short cap = 8;
-	if (cmdSlots < 8) {
-		cap = cmdSlots;
-	}
-	cmdSlots = cap;
+	cmdSlots = (cmdSlots < 8) ? cmdSlots : 8;
 	hpMax = (hpMax < 0x10) ? hpMax : 0x10;
 }
 
@@ -1627,6 +1623,12 @@ inline void CCaravanWork::ClampStatus(short& cmdSlots, unsigned short& hpMax)
  */
 inline void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int& cmdSlots, int& strength, int& magic, int& defense)
 {
+	hp = 0;
+	cmdSlots = 0;
+	defense = 0;
+	magic = 0;
+	strength = 0;
+
 	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
 		if (artifactIndex < kPermanentArtifactCount || includeTemp != 0) {
 			int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex];
@@ -1673,11 +1675,11 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
-	int hp = 0;
-	int totalSlots = 0;
-	int strength = 0;
-	int magic = 0;
-	int defense = 0;
+	int hp;
+	int totalSlots;
+	int strength;
+	int magic;
+	int defense;
 	CalcArtifactStatus(0, 0, hp, totalSlots, strength, magic, defense);
 
 	totalSlots += (short)m_baseCmdListSlots;
@@ -1731,15 +1733,9 @@ void CCaravanWork::CalcStatus()
 
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
-	unsigned short stat = baseData->m_strength;
-	m_strength = stat;
-	m_baseStrength = stat;
-	stat = baseData->m_magic;
-	m_magic = stat;
-	m_baseMagic = stat;
-	stat = baseData->m_defense;
-	m_defense = stat;
-	m_baseDefense = stat;
+	m_baseStrength = m_strength = baseData->m_strength;
+	m_baseMagic = m_magic = baseData->m_magic;
+	m_baseDefense = m_defense = baseData->m_defense;
 	m_maxHp = baseData->m_maxHp;
 
 	m_equipEffectFlags = 0;
@@ -1790,11 +1786,11 @@ void CCaravanWork::CalcStatus()
 		break;
 	}
 
-	int hpBonus = 0;
-	int cmdBonus = 0;
-	int strBonus = 0;
-	int magBonus = 0;
-	int defBonus = 0;
+	int strBonus;
+	int magBonus;
+	int defBonus;
+	int cmdBonus;
+	int hpBonus;
 	CalcArtifactStatus(1, 0, hpBonus, cmdBonus, strBonus, magBonus, defBonus);
 
 	m_strength += strBonus;
@@ -1982,6 +1978,16 @@ int CCaravanWork::IsUseCmdList(int cmdListIdx)
 	return isInvalid ? 0 : 1;
 }
 
+inline int CCaravanWork::SearchCombiTop(int cmdListIdx)
+{
+	for (; cmdListIdx >= 0; cmdListIdx--) {
+		if (m_commandListExtra[cmdListIdx] != -1) {
+			break;
+		}
+	}
+	return cmdListIdx;
+}
+
 inline int CCaravanWork::GetNumCombi(int cmdListIdx)
 {
 	int numGrouped;
@@ -1990,12 +1996,7 @@ inline int CCaravanWork::GetNumCombi(int cmdListIdx)
 	} else if (m_commandListExtra[cmdListIdx] == 0) {
 		numGrouped = 1;
 	} else {
-		int topIdx;
-		for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-			if (m_commandListExtra[topIdx] != -1) {
-				break;
-			}
-		}
+		int topIdx = SearchCombiTop(cmdListIdx);
 
 		numGrouped = 1;
 		int nextIdx = topIdx + 1;
@@ -2031,12 +2032,7 @@ unsigned int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 	if (groupedCountLocal == 1) {
 		return m_currentCmdListIndex == cmdListIdx;
 	} else {
-		for (int n = cmdListIdx; n >= 0; n--) {
-			if (m_commandListExtra[cmdListIdx] != -1) {
-				break;
-			}
-			cmdListIdx--;
-		}
+		cmdListIdx = SearchCombiTop(cmdListIdx);
 
 		unsigned char selected = 0;
 		short currentCmdListIndex = m_currentCmdListIndex;
@@ -2256,16 +2252,13 @@ int CCaravanWork::CanPlayerPutItem()
  */
 void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 {
-	short weaponIdx = m_weaponIdx;
-	if (weaponIdx == 0) {
+	if (m_weaponIdx == 0) {
 		weaponItem = 0;
 		CCaravanWork* ownerWork = reinterpret_cast<CCaravanWork*>(static_cast<CGPartyObj*>(m_ownerObj)->m_scriptHandle);
 		int equippedSlot = ownerWork->m_equipment[0];
-		if (equippedSlot >= 0) {
-			weaponRef = ownerWork->m_inventoryItems[equippedSlot];
-		}
-	} else if (weaponIdx != 1) {
-		weaponItem = weaponIdx;
+		weaponRef = equippedSlot >= 0 ? ownerWork->m_inventoryItems[equippedSlot] : 0;
+	} else if (m_weaponIdx != 1) {
+		weaponItem = m_weaponIdx;
 		CCaravanWork* ownerWork = reinterpret_cast<CCaravanWork*>(static_cast<CGPartyObj*>(m_ownerObj)->m_scriptHandle);
 		weaponRef = ownerWork->GetCmdListItem(m_weaponIdx);
 	}
@@ -2503,11 +2496,7 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
 	int groupedCount = GetNumCombi(cmdListIdx);
 
 	if (groupedCount > 1) {
-		for (; cmdListIdx >= 0; cmdListIdx--) {
-			if (m_commandListExtra[cmdListIdx] != -1) {
-				break;
-			}
-		}
+		cmdListIdx = SearchCombiTop(cmdListIdx);
 
 		short cmdId = m_commandListExtra[cmdListIdx];
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
@@ -2542,11 +2531,11 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
-	int hpMax = 0;
-	int cmdSlots = 0;
-	int strength = 0;
-	int magic = 0;
-	int defense = 0;
+	int hpMax;
+	int cmdSlots;
+	int strength;
+	int magic;
+	int defense;
 
 	CalcArtifactStatus(0, 0, hpMax, cmdSlots, strength, magic, defense);
 

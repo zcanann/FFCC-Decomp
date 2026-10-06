@@ -268,12 +268,20 @@ extern const double DOUBLE_80331490 = 24.0;
 extern const double DOUBLE_80331498 = 88.0;
 extern const float FLOAT_803314A0 = 112.0f;
 extern const float FLOAT_803314A4 = 50.0f;
+#ifdef VERSION_GCCP01
 extern const double DOUBLE_803314A8 = 25.0;
+#else
+extern const double DOUBLE_803314A8 = 30.0;
+#endif
 extern const float FLOAT_803314B0 = 0.6000000238418579f;
 extern const float FLOAT_803314B4 = -1.399999976158142f;
 extern const float FLOAT_803314B8 = 0.1745329201221466f;
 extern const float FLOAT_803314bc = 0.01745329238474369f;
+#ifdef VERSION_GCCP01
 extern const float FLOAT_803314c0 = 25.0f;
+#else
+extern const float FLOAT_803314c0 = 30.0f;
+#endif
 extern const float FLOAT_803314c4 = 3.0f;
 extern const float FLOAT_803314c8 = 2.0f;
 extern const float FLOAT_803314cc = -2.0f;
@@ -9569,12 +9577,12 @@ inline void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
 
 /*
  * --INFO--
- * PAL Address: 0x800eb1d8
+ * PAL Address: 0x800EB1D8
  * PAL Size: 1312b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800EA8DC
+ * EN Size: 1312b
+ * JP Address: 0x800E82B8
+ * JP Size: 1188b
  */
 void CMenuPcs::CalcMcObj()
 {
@@ -9582,35 +9590,27 @@ void CMenuPcs::CalcMcObj()
 
 	const float* pPanelF = &FLOAT_80331480;
 	const float panelStateFloat = *pPanelF;
-
-	const double* pY48 = &DOUBLE_80331488;
-	const double* pY88 = &DOUBLE_80331498;
-	const double* pY24 = &DOUBLE_80331490;
-	const float* pY112 = &FLOAT_803314A0;
-	const float* pZeroP = &FLOAT_803313dc;
-	const float* p50 = &FLOAT_803314A4;
-	const double* p25 = &DOUBLE_803314A8;
-
 	int i;
+	int viewSlot = 17;
 	WmWorldObjInfo* panelState = &worldObj[17];
-	for (i = 0; i < 4; i++, panelState++) {
+	for (i = 0; i < 4; i++, viewSlot++, panelState++) {
 		panelState->m_viewportX = static_cast<short>(panelStateFloat);
 
 		const int y = static_cast<int>(
-		    static_cast<float>(*pY48 + (*pY88 * static_cast<double>(i) + *pY24)) -
-		    *pY112);
+		    static_cast<float>(DOUBLE_80331488 + (DOUBLE_80331498 * static_cast<double>(i) + DOUBLE_80331490)) -
+		    FLOAT_803314A0);
 		panelState->m_viewportY = static_cast<short>(y);
 		panelState->m_viewportWidth = 0x140;
 		panelState->m_viewportHeight = 0xE0;
-		panelState->m_cameraPosition.x = *pZeroP;
-		panelState->m_cameraPosition.y = *pZeroP;
-		panelState->m_cameraPosition.z = *p50;
+		panelState->m_cameraPosition.x = FLOAT_803313dc;
+		panelState->m_cameraPosition.y = FLOAT_803313dc;
+		panelState->m_cameraPosition.z = FLOAT_803314A4;
 
 		const McListInfo* const charaState = &m_wmCharaState[i];
 		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
 		panelState->m_frameCounter++;
 		if (static_cast<float>(static_cast<int>(panelState->m_frameCounter)) >=
-		    *p25 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount - 1].time)) {
+		    DOUBLE_803314A8 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount - 1].time)) {
 			panelState->m_frameCounter = 0;
 		}
 
@@ -9621,21 +9621,15 @@ void CMenuPcs::CalcMcObj()
 			Mtx rotXMtx;
 			Mtx rotYMtx;
 
-			const float* pB0 = &FLOAT_803314B0;
-			const float* pB4 = &FLOAT_803314B4;
-			const float* pZeroB = &FLOAT_803313dc;
-			const float* pHalfB = &FLOAT_80331434;
-			const float* pB8 = &FLOAT_803314B8;
-			const float* pBC = &FLOAT_803314bc;
 			panelState->m_active = 1;
-			panelState->m_transform.m_position.x = *pB0;
-			panelState->m_transform.m_position.y = *pB4;
-			panelState->m_transform.m_position.z = *pZeroB;
-			panelState->m_transform.m_scale.x = *pHalfB;
-			panelState->m_transform.m_scale.y = *pHalfB;
-			panelState->m_transform.m_scale.z = *pHalfB;
-			panelState->m_transform.m_rotation.x = *pB8;
-			panelState->m_transform.m_rotation.y = panelState->m_transform.m_rotation.y + *pBC;
+			panelState->m_transform.m_position.x = FLOAT_803314B0;
+			panelState->m_transform.m_position.y = FLOAT_803314B4;
+			panelState->m_transform.m_position.z = FLOAT_803313dc;
+			panelState->m_transform.m_scale.x = FLOAT_80331434;
+			panelState->m_transform.m_scale.y = FLOAT_80331434;
+			panelState->m_transform.m_scale.z = FLOAT_80331434;
+			panelState->m_transform.m_rotation.x = FLOAT_803314B8;
+			panelState->m_transform.m_rotation.y = panelState->m_transform.m_rotation.y + FLOAT_803314bc;
 
 			panelState->m_transform.m_position.y =
 			    panelState->m_transform.m_position.y +
@@ -9645,8 +9639,8 @@ void CMenuPcs::CalcMcObj()
 			const float rotVal =
 			    static_cast<float>(GetFcvValue(s_WoodRot,
 			                                   static_cast<float>(static_cast<int>(panelState->m_frameCounter))));
-			const float* pBC2 = &FLOAT_803314bc;
-			panelState->m_transform.m_rotation.y = *pBC2 * rotVal;
+
+			panelState->m_transform.m_rotation.y = FLOAT_803314bc * rotVal;
 			PSMTXScale(scaleMtx, panelState->m_transform.m_scale.x, panelState->m_transform.m_scale.y,
 			           panelState->m_transform.m_scale.z);
 			PSMTXRotRad(rotXMtx, 'x', panelState->m_transform.m_rotation.x);
@@ -9657,9 +9651,9 @@ void CMenuPcs::CalcMcObj()
 			rotXMtx[2][3] = panelState->m_transform.m_position.z;
 			PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-			m_wm.m_handles[i + 17]->m_model->SetMatrix(scaleMtx);
-			m_wm.m_handles[i + 17]->m_model->CalcMatrix();
-			m_wm.m_handles[i + 17]->m_model->CalcSkin();
+			m_wm.m_handles[viewSlot]->m_model->SetMatrix(scaleMtx);
+			m_wm.m_handles[viewSlot]->m_model->CalcMatrix();
+			m_wm.m_handles[viewSlot]->m_model->CalcSkin();
 		}
 	}
 }

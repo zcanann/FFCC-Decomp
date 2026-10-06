@@ -452,6 +452,9 @@ static const int kWorldFrameTexture = 29;
 static const int kMcWindowTextureBase = 43;
 static const int kAltWindowTextureBase = 35;
 static const int kWorldWoodTexture = 21;
+static const int kWorldTitleWidth = 184;
+static const int kWorldYearDigitY = 63;
+static const int kBubbleTexture = 23;
 static const int kMcYearTexture = 22;
 static const int kMcYearLabelTexture = 32;
 static const int kMcFaceTexture = 53;
@@ -472,6 +475,9 @@ static const int kWorldFrameTexture = 30;
 static const int kMcWindowTextureBase = 44;
 static const int kAltWindowTextureBase = 36;
 static const int kWorldWoodTexture = 22;
+static const int kWorldTitleWidth = 200;
+static const int kWorldYearDigitY = 67;
+static const int kBubbleTexture = 24;
 static const int kMcYearTexture = 23;
 static const int kMcYearLabelTexture = 33;
 static const int kMcFaceTexture = 55;
@@ -5755,7 +5761,7 @@ void CMenuPcs::DrawFukidashi()
 	matColor.b = 0xFF;
 	matColor.a = 0xFF;
 	GXSetChanMatColor(GX_COLOR0A0, matColor);
-	MenuPcs.SetTexture((TEX)0x18);
+	MenuPcs.SetTexture((TEX)kBubbleTexture);
 
 	Sprt* background = &m_wm.m_bubbleData->m_sprites[0];
 	MenuPcs.DrawRect(texMode,
@@ -5977,12 +5983,12 @@ inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFo
 
 /*
  * --INFO--
- * PAL Address: 0x800f3f60
+ * PAL Address: 0x800F3F60
  * PAL Size: 3012b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F34E0
+ * EN Size: 3012b
+ * JP Address: 0x800F048C
+ * JP Size: 3004b
  */
 void CMenuPcs::CalcWMFrame()
 {
@@ -6015,7 +6021,7 @@ void CMenuPcs::CalcWMFrame()
 	m_wm.m_frameData->m_titleSprite.m_x = 0x68;
 	float titleTexU = FLOAT_803313dc;
 	m_wm.m_frameData->m_titleSprite.m_y = 0x14;
-	m_wm.m_frameData->m_titleSprite.m_width = 200;
+	m_wm.m_frameData->m_titleSprite.m_width = kWorldTitleWidth;
 	m_wm.m_frameData->m_titleSprite.m_height = 0x28;
 	m_wm.m_frameData->m_titleSprite.m_u = titleTexU;
 
@@ -6065,7 +6071,7 @@ void CMenuPcs::CalcWMFrame()
 		const float fV1 = FLOAT_80331524;
 		const float fV4 = FLOAT_80331528;
 		m_wm.m_frameData->m_yearSprites[0].m_x = (0x2B - totalWidth) / 2 + 0x2C;
-		m_wm.m_frameData->m_yearSprites[0].m_y = 0x43;
+		m_wm.m_frameData->m_yearSprites[0].m_y = kWorldYearDigitY;
 		m_wm.m_frameData->m_yearSprites[0].m_width = (short)totalWidth;
 		m_wm.m_frameData->m_yearSprites[0].m_height = 0x20;
 		m_wm.m_frameData->m_yearSprites[0].m_u = fV1;
@@ -6090,7 +6096,7 @@ void CMenuPcs::CalcWMFrame()
 				int digit = digits[wmDigitIdx];
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_x = (short)digitX;
 				int digitW = s_YearWTbl[digit];
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_y = 0x43;
+				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_y = kWorldYearDigitY;
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_width = (short)digitW;
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_height = 0x20;
 				int col = digit % 5;

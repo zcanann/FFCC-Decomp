@@ -930,14 +930,14 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 	CCaravanWork* caravanWork;
 	unsigned char* valueBytes;
 	unsigned int itemSlot;
-	int smithItem;
-	int recipeIndex;
 	int i;
 	const SItemFlatRow* itemRow;
 	int materialId;
-	int baseItem;
-	int materialCount;
 	int materialIdx;
+	int baseItem;
+	int recipeIndex;
+	int materialCount;
+	int smithItem;
 	int foundSlot;
 
 	foodBaseArr = Game.m_scriptFoodBase;
@@ -4312,8 +4312,8 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					}
 				}
 
-				const unsigned short enemyFlags = enemyData->m_data[CRomWork::EnemyFlagsOffset];
-				if ((enemyFlags & 5) == 5) {
+				const int enemyFlags = enemyData->m_data[CRomWork::EnemyFlagsOffset] & 5;
+				if (enemyFlags == 5) {
 					localScouterInfo[i].m_traits[0] = 0;
 				} else if ((enemyFlags & 4) != 0) {
 					localScouterInfo[i].m_traits[0] = 1;

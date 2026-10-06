@@ -1726,6 +1726,8 @@ void CCaravanWork::SafeDeleteTempItem()
  */
 void CCaravanWork::CalcStatus()
 {
+	int itemIdx;
+	int itemType;
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
@@ -1804,8 +1806,8 @@ void CCaravanWork::CalcStatus()
 	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
 		int equipSlot = m_equipment[equipIdx];
 		if (equipSlot >= 0) {
-			int itemIdx = m_inventoryItems[equipSlot];
-			int itemType = GetItemDataPtr(itemIdx)->m_kind;
+			itemIdx = m_inventoryItems[equipSlot];
+			itemType = GetItemDataPtr(itemIdx)->m_kind;
 
 			if (itemType == 1) {
 				int weaponRef;

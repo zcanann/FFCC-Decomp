@@ -1,29 +1,40 @@
-
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ctype.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x801BB378
+ * EN Size: 68b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void strupr(void)
+char* strlwr(char* str)
 {
-	// TODO
+	char* p = str;
+	while (*p != '\0') {
+		*p = _tolower(*p);
+		p++;
+	}
+	return str;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x801BB334
+ * EN Size: 68b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void strlwr(void)
+char* strupr(char* str)
 {
-	// TODO
+	char* p = str;
+	while (*p != '\0') {
+		*p = _toupper(*p);
+		p++;
+	}
+	return str;
 }

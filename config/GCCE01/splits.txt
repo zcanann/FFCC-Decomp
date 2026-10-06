@@ -1997,3 +1997,6 @@ auto_8032E9DC_sdata2:
 
 auto_8026774C_bss:
 	.bss start:0x8026774C end:0x80267750 align:4
+
+MSL_C/PPCEABI/bare/H/extras.c:
+	.text start:0x801BB334 end:0x801BB3BC

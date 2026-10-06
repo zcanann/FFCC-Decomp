@@ -26,6 +26,8 @@ char* strncpy(char* dst, const char* src, size_t n);
 char* strcpy(char* dst, const char* src);
 size_t strlen(const char* str);
 char* strstr(const char* str, const char* pat);
+char* strupr(char* str);
+char* strlwr(char* str);
 
 #ifdef __cplusplus
 };

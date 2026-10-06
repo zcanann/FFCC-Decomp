@@ -803,18 +803,22 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		case 2: {
 			const u32 arg = *reinterpret_cast<u32*>(code + 1);
+			u32 classId;
 			const int index = static_cast<int>(arg) >> 8;
-			const u32 classId = object->m_engineObject != 0 ? static_cast<u32>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(object->m_engineObject) + 0x30)) : 1U;
+			if (object->m_engineObject != 0) {
+				classId = reinterpret_cast<CObject*>(object->m_engineObject)->m_particleId;
+			} else {
+				classId = 1;
+			}
 			if ((arg & 1) != 0) {
 				*object->m_sp = ((static_cast<u32>(index) << 13) | (classId & 0xFFF))
 				              | ((arg >> 4 & 1) != 0 ? 0x1000 : 0);
 				object->m_sp++;
 			} else if ((arg & 2) != 0) {
 				CStack offset;
-				const u32 sign = (arg >> 4 & 1) != 0 ? 0x1000 : 0;
 				object->m_sp--;
 				offset.m_word = *object->m_sp;
-				*object->m_sp = sign | ((classId & 0xFFF) | (index + offset.m_int) * 0x2000);
+				*object->m_sp = ((arg >> 4 & 1) != 0 ? 0x1000 : 0) | ((classId & 0xFFF) | (index + offset.m_int) * 0x2000);
 				object->m_sp++;
 			}
 			break;

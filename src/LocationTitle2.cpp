@@ -385,7 +385,5 @@ extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, ppp
     work = GetLocationTitle2Work(locationTitle, unkC);
     work->m_particles = 0;
     work->m_count = 0;
-    work->m_acc = value;
-    work->m_vel = value;
-    work->m_cur = value;
+    work->m_cur = work->m_vel = work->m_acc = value;
 }

@@ -1200,6 +1200,7 @@ TRK_MINNOW_DOLPHIN/support.c:
 	.text start:0x801A74DC end:0x801A7D9C
 
 astar.cpp:
+	.bss start:0x80324A78 end:0x80326F2C
 	.rodata start:0x801D8E28 end:0x801D8E78
 	.text start:0x8013D2E8 end:0x8013EE34
 

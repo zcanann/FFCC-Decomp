@@ -1254,6 +1254,7 @@ p_map.cpp:
 	.text start:0x8003477C end:0x80036084
 
 astar.cpp:
+	.bss start:0x80308158 end:0x8030A60C
 	.rodata start:0x801DC5D0 end:0x801DC620
 	.text start:0x801406C0 end:0x80142208
 

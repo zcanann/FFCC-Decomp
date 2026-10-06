@@ -11419,8 +11419,6 @@ lbl_802FF120 = .bss:0x802FF120; // type:object size:0xC data:4byte
 lbl_802FF12C = .bss:0x802FF12C; // type:object size:0x8C data:4byte
 lbl_802FF1B8 = .bss:0x802FF1B8; // type:object size:0x90 data:byte
 MiniGamePcs = .bss:0x802FF248; // type:object size:0x64A0 data:4byte
-lbl_80308158 = .bss:0x80308158; // type:object size:0xC
-lbl_80308164 = .bss:0x80308164; // type:object size:0x24AC data:4byte
 lbl_8030A610 = .bss:0x8030A610; // type:object size:0x14 data:4byte
 lbl_8030A624 = .bss:0x8030A624; // type:object size:0x404
 s_UniteTop = .bss:0x8030AA28; // type:object size:0xC scope:local data:4byte
@@ -17538,3 +17536,5 @@ gap_bss_802430FC = .bss:0x802430FC; // type:object size:0x4 scope:local align:1
 gap_rodata_801D5C31 = .rodata:0x801D5C31; // type:object size:0x7 scope:local align:1
 
 gap_sbss_8032DC4D = .sbss:0x8032DC4D; // type:object size:0x3 scope:local align:1
+@469 = .bss:0x80308158; // type:object size:0xC scope:local
+AStar = .bss:0x80308164; // type:object size:0x24A8

@@ -275,10 +275,11 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppAddVector(endPos, endPos, objectPos);
 
         pppUnitMatrix(mtxB);
+        Vec* particleScale = (Vec*)f32_at(particleData, 0x5C);
         PSMTXScaleApply(mtxB.value, pObject->m_drawMatrix.value,
-                        mtxB.value[0][0] * (*f32_at(particleData, 0x5C) * ppvMng->m_scale.x),
-                        mtxB.value[1][1] * (*f32_at(particleData, 0x60) * ppvMng->m_scale.y),
-                        mtxB.value[2][2] * (*f32_at(particleData, 0x64) * ppvMng->m_scale.z));
+                        mtxB.value[0][0] * (particleScale->x * ppvMng->m_scale.x),
+                        mtxB.value[1][1] * (particleScale->y * ppvMng->m_scale.y),
+                        mtxB.value[2][2] * (particleScale->z * ppvMng->m_scale.z));
         PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
 
         pppFMATRIX rot;

@@ -64,10 +64,10 @@ static inline VColor* GetChangeTexColorBlock(pppChangeTex* changeTex, _pppCtrlTa
  * --INFO--
  * PAL Address: 0x8013ef94
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013E228
+ * EN Size: 100b
+ * JP Address: 0x8013AE44
+ * JP Size: 100b
  */
 void pppRenderChangeTex(pppChangeTex*, ChangeTexStep* step, _pppCtrlTable*)
 {
@@ -85,10 +85,10 @@ void pppRenderChangeTex(pppChangeTex*, ChangeTexStep* step, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x8013eff8
  * PAL Size: 1292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013E28C
+ * EN Size: 1292b
+ * JP Address: 0x8013AEA8
+ * JP Size: 1292b
  */
 void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTable* data)
 {
@@ -251,10 +251,10 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
  * --INFO--
  * PAL Address: 0x8013f504
  * PAL Size: 540b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013E798
+ * EN Size: 540b
+ * JP Address: 0x8013B3B4
+ * JP Size: 540b
  */
 void pppDestructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
@@ -352,10 +352,10 @@ freeArrays:
  * --INFO--
  * PAL Address: 0x8013f720
  * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013E9B4
+ * EN Size: 36b
+ * JP Address: 0x8013B5D0
+ * JP Size: 40b
  */
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
@@ -363,18 +363,17 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 	float init = 0.0f;
 
 	work->m_value0 = init;
-	work->m_value2 = init;
-	work->m_value1 = init;
+	work->m_value1 = work->m_value2 = init;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x8013f744
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013E9D8
+ * EN Size: 64b
+ * JP Address: 0x8013B5F8
+ * JP Size: 68b
  */
 void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
@@ -382,8 +381,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
 
 	work->m_value0 = init;
-	work->m_value2 = init;
-	work->m_value1 = init;
+	work->m_value1 = work->m_value2 = init;
 	work->m_charaObj = 0;
 	work->m_context = ppvMng;
 	work->m_texture = 0;
@@ -395,10 +393,10 @@ void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
  * --INFO--
  * PAL Address: 0x8013f784
  * PAL Size: 344b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013EA18
+ * EN Size: 344b
+ * JP Address: 0x8013B63C
+ * JP Size: 344b
  */
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, float (*) [4])
 {
@@ -438,10 +436,10 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* callbac
  * --INFO--
  * PAL Address: 0x8013f8dc
  * PAL Size: 244b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013EB70
+ * EN Size: 244b
+ * JP Address: 0x8013B794
+ * JP Size: 244b
  */
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, int displayListIdx, float (*) [4])
 {

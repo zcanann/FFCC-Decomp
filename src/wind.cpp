@@ -27,9 +27,6 @@ const float kWindDirMaxOffset = 0.25f;
 const float kWindLerpRate = 0.05f;
 const float kWindVerticalBase = -0.5f;
 const float kWindAlphaScale = 255.0f;
-const double kWindSqrtNewtonHalf = 0.5;
-const double kWindSqrtNewtonThree = 3.0;
-const double kWindSqrtMinInput = 0.0;
 const double kWindSignedIntBias = 4503601774854144.0;
 extern "C" {
 const char sWindAddSphereFailedMsg[] = {
@@ -44,54 +41,6 @@ const char sWindAddAmbientFailedMsg[] = {
     0x95, 0x97, 0x82, 0xF0, 0x92, 0xC7, 0x89, 0xC1, 0x82, 0xC5, 0x82, 0xAB, 0x82, 0xDC, 0x82, 0xB9,
     0x82, 0xF1, 0x81, 0x42, 0x28, 0x61, 0x6D, 0x62, 0x69, 0x65, 0x6E, 0x74, 0x29, 0x0A, 0x00
 };
-}
-
-static inline float WindSqrtf(float x)
-{
-    union {
-        float f;
-        unsigned long bits;
-    } bits;
-    int fpclass;
-
-    if (x > kWindZero) {
-        double guess = __frsqrte((double)x);
-        guess = kWindSqrtNewtonHalf * guess * (kWindSqrtNewtonThree - guess * guess * x);
-        guess = kWindSqrtNewtonHalf * guess * (kWindSqrtNewtonThree - guess * guess * x);
-        guess = kWindSqrtNewtonHalf * guess * (kWindSqrtNewtonThree - guess * guess * x);
-        return (float)(x * guess);
-    }
-
-    if ((double)x < kWindSqrtMinInput) {
-        return NAN;
-    }
-
-    bits.f = x;
-    switch (bits.bits & 0x7f800000) {
-    case 0x7f800000:
-        if ((bits.bits & 0x7fffff) != 0) {
-            fpclass = 1;
-        } else {
-            fpclass = 2;
-        }
-        break;
-    case 0:
-        if ((bits.bits & 0x7fffff) != 0) {
-            fpclass = 5;
-        } else {
-            fpclass = 3;
-        }
-        break;
-    default:
-        fpclass = 4;
-        break;
-    }
-
-    if (fpclass == 1) {
-        return NAN;
-    }
-
-    return x;
 }
 
 /*
@@ -212,10 +161,10 @@ inline int CWind::AddGrass(const Vec* pos)
  * --INFO--
  * PAL Address: 0x800d92fc
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D8AC8
+ * EN Size: 192b
+ * JP Address: 0x800D6740
+ * JP Size: 192b
  */
 void CWind::ChangePower(int id, float power)
 {
@@ -233,10 +182,10 @@ void CWind::ChangePower(int id, float power)
  * --INFO--
  * PAL Address: 0x800d93bc
  * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D8B88
+ * EN Size: 380b
+ * JP Address: 0x800D6800
+ * JP Size: 380b
  */
 int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 {
@@ -273,10 +222,10 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
  * --INFO--
  * PAL Address: 0x800d9538
  * PAL Size: 416b
- * EN Address: 0x800F56F8
- * EN Size: 292b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D8D04
+ * EN Size: 416b
+ * JP Address: 0x800D697C
+ * JP Size: 416b
  */
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
@@ -319,10 +268,10 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
  * --INFO--
  * PAL Address: 0x800d96d8
  * PAL Size: 360b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D8EA4
+ * EN Size: 360b
+ * JP Address: 0x800D6B1C
+ * JP Size: 360b
  */
 int CWind::AddAmbient(float dir, float speed)
 {
@@ -355,10 +304,10 @@ int CWind::AddAmbient(float dir, float speed)
  * --INFO--
  * PAL Address: 0x800d9840
  * PAL Size: 748b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D900C
+ * EN Size: 748b
+ * JP Address: 0x800D6C84
+ * JP Size: 620b
  */
 void CWind::Calc(Vec* out, const Vec* pos, int randomize)
 {
@@ -369,9 +318,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     Vec tmp;
     Vec tmp2;
     zero = kWindZero;
-    out->z = kWindZero;
-    out->y = zero;
-    out->x = zero;
+    out->x = out->y = out->z = zero;
 
     if ((MenuPcs.m_mode == 2) || (Game.m_gameWork.m_gamePaused != 0)) {
         return;
@@ -392,14 +339,15 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                 const float deltaZ = pos->z - obj->centerZ;
                 const float deltaX = pos->x - obj->centerX;
                 float distanceSq = deltaX * deltaX + deltaZ * deltaZ;
-                if (distanceSq < kWindMinDistanceSq) {
-                    distanceSq = kWindMinDistanceSq;
+                float minDistanceSq = kWindMinDistanceSq;
+                if (distanceSq < minDistanceSq) {
+                    distanceSq = minDistanceSq;
                 }
 
                 if (obj->type == 2) {
                     if (distanceSq < obj->radiusSq) {
                         const float lifeScale = kWindOne - obj->lifeRatio * obj->lifeRatio;
-                        const float distance = WindSqrtf(distanceSq);
+                        const float distance = sqrtf(distanceSq);
                         const float forceScale = lifeScale / distance;
                         out->x += deltaX * forceScale;
                         out->y += (kWindVerticalBase + Math.RandF()) * lifeScale;
@@ -420,10 +368,10 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
  * --INFO--
  * PAL Address: 0x800d9b2c
  * PAL Size: 564b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D92F8
+ * EN Size: 564b
+ * JP Address: 0x800D6EF0
+ * JP Size: 564b
  */
 void CWind::Draw()
 {
@@ -474,10 +422,10 @@ void CWind::Draw()
  * --INFO--
  * PAL Address: 0x800d9d60
  * PAL Size: 764b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D952C
+ * EN Size: 764b
+ * JP Address: 0x800D7124
+ * JP Size: 764b
  */
 void CWind::Frame()
 {
@@ -556,8 +504,12 @@ void CWind::Frame()
 
 /*
  * --INFO--
- * Address:	800da05c
- * Size:	88
+ * PAL Address: 0x800DA05C
+ * PAL Size: 88b
+ * EN Address: 0x800D9828
+ * EN Size: 88b
+ * JP Address: 0x800D7420
+ * JP Size: 88b
  */
 void CWind::ClearAll()
 {

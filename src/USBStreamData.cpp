@@ -6,10 +6,10 @@
  * --INFO--
  * PAL Address: 0x800503FC
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800501F0
+ * EN Size: 16b
+ * JP Address: 0x8004FC78
+ * JP Size: 16b
  */
 void CUSBStreamData::SetUSBStreamDataDone()
 { 
@@ -21,10 +21,10 @@ void CUSBStreamData::SetUSBStreamDataDone()
  * --INFO--
  * PAL Address: 0x8005040C
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80050200
+ * EN Size: 40b
+ * JP Address: 0x8004FC88
+ * JP Size: 40b
  */
 int CUSBStreamData::IsUSBStreamDataDone()
 { 
@@ -40,10 +40,10 @@ int CUSBStreamData::IsUSBStreamDataDone()
  * --INFO--
  * PAL Address: 0x80050434
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80050228
+ * EN Size: 84b
+ * JP Address: 0x8004FCB0
+ * JP Size: 84b
  */
 void CUSBStreamData::DeleteBuffer()
 { 
@@ -63,10 +63,10 @@ void CUSBStreamData::DeleteBuffer()
  * --INFO--
  * PAL Address: 0x80050488
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8005027C
+ * EN Size: 20b
+ * JP Address: 0x8004FD04
+ * JP Size: 20b
  */
 void CUSBStreamData::CreateBuffer()
 { 
@@ -77,10 +77,10 @@ void CUSBStreamData::CreateBuffer()
  * --INFO--
  * PAL Address: 0x8005049C
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80050290
+ * EN Size: 100b
+ * JP Address: 0x8004FD18
+ * JP Size: 100b
  */
 CUSBStreamData::~CUSBStreamData()
 {                                               
@@ -95,10 +95,10 @@ CUSBStreamData::~CUSBStreamData()
  * --INFO--
  * PAL Address: 0x80050500
  * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800502F4
+ * EN Size: 28b
+ * JP Address: 0x8004FD7C
+ * JP Size: 28b
  */
 CUSBStreamData::CUSBStreamData()
 { 

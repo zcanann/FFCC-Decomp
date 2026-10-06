@@ -70,10 +70,10 @@ inline void S4ToF32(pppFVECTOR4* dest, s16* src)
  * --INFO--
  * PAL Address: 0x8008922c
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80088BC8
+ * EN Size: 4b
+ * JP Address: 0x80088634
+ * JP Size: 4b
  */
 void pppKeShpTail3XDes(_pppPObjLink*, _pppCtrlTable*)
 {
@@ -83,10 +83,10 @@ void pppKeShpTail3XDes(_pppPObjLink*, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x80089230
  * PAL Size: 304b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80088BCC
+ * EN Size: 304b
+ * JP Address: 0x80088638
+ * JP Size: 288b
  */
 void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
 {
@@ -114,9 +114,7 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
     do {
         s32 rnd = rand();
         work->m_angles[i] = (s16)(rnd - (rnd / 0x168) * 0x168);
-        work->m_posHistory[i].z = zero;
-        work->m_posHistory[i].y = zero;
-        work->m_posHistory[i].x = zero;
+        work->m_posHistory[i].x = work->m_posHistory[i].y = work->m_posHistory[i].z = zero;
         i++;
     } while (i < 0x1c);
 }
@@ -125,10 +123,10 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
  * --INFO--
  * PAL Address: 0x80089360
  * PAL Size: 2624b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80088CFC
+ * EN Size: 2624b
+ * JP Address: 0x80088758
+ * JP Size: 2628b
  */
 void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* ctrlTable)
 {
@@ -389,10 +387,10 @@ advance_segment:
  * --INFO--
  * PAL Address: 0x80089da0
  * PAL Size: 1516b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8008973C
+ * EN Size: 1516b
+ * JP Address: 0x8008919C
+ * JP Size: 1516b
  */
 void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* ctrlTable)
 {

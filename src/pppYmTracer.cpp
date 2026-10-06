@@ -49,12 +49,8 @@ static inline void initTracePolygon(PYmTracer* params, TRACE_POLYGON& polygon)
     polygon.life = -1;
     polygon.alpha = params->m_tracer.m_entryAlpha;
     polygon.decay = params->m_tracer.m_entryAlpha / params->m_tracer.m_entryLife;
-    polygon.from.z = 0.0f;
-    polygon.from.y = 0.0f;
-    polygon.from.x = 0.0f;
-    polygon.to.z = 0.0f;
-    polygon.to.y = 0.0f;
-    polygon.to.x = 0.0f;
+    polygon.from.x = polygon.from.y = polygon.from.z = 0.0f;
+    polygon.to.x = polygon.to.y = polygon.to.z = 0.0f;
 }
 
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
@@ -81,10 +77,10 @@ static inline float* GetYmTracerDataValueWork(int dataValueIndex, int offset)
  * --INFO--
  * PAL Address: 8009312c
  * PAL Size: 920b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80092AC8
+ * EN Size: 920b
+ * JP Address: 0x80092648
+ * JP Size: 928b
  */
 void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtrl* ctrl)
 {
@@ -183,10 +179,10 @@ void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCt
  * --INFO--
  * PAL Address: 800934c4
  * PAL Size: 1944b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80092E60
+ * EN Size: 1944b
+ * JP Address: 0x800929E8
+ * JP Size: 1940b
  */
 void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtrl* ctrl)
 {
@@ -322,10 +318,10 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
  * --INFO--
  * PAL Address: 80093c5c
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800935F8
+ * EN Size: 56b
+ * JP Address: 0x8009317C
+ * JP Size: 56b
  */
 void pppDestructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
@@ -339,10 +335,10 @@ void pppDestructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
  * --INFO--
  * PAL Address: 80093c94
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80093630
+ * EN Size: 32b
+ * JP Address: 0x800931B4
+ * JP Size: 32b
  */
 void pppConstruct2YmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
@@ -357,10 +353,10 @@ void pppConstruct2YmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
  * --INFO--
  * PAL Address: 80093cb4
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80093650
+ * EN Size: 80b
+ * JP Address: 0x800931D4
+ * JP Size: 84b
  */
 void pppConstructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
@@ -374,13 +370,7 @@ void pppConstructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
     work->arg3Work = 0;
     work->initWork = 0;
     work->count = 0;
-    work->_pad0 = zero;
-    work->from.z = zero;
-    work->from.y = zero;
-    work->from.x = zero;
-    work->_pad1c = zero;
-    work->to.z = zero;
-    work->to.y = zero;
-    work->to.x = zero;
+    work->from.x = work->from.y = work->from.z = work->_pad0 = zero;
+    work->to.x = work->to.y = work->to.z = work->_pad1c = zero;
     work->_pad2e = 0;
 }

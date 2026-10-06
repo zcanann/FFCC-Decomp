@@ -59,10 +59,10 @@ static inline YmTracer2DataOffsets* GetYmTracer2DataOffsets(_pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x801035dc
  * PAL Size: 984b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801029A0
+ * EN Size: 984b
+ * JP Address: 0x800FF610
+ * JP Size: 1000b
  */
 void pppRenderYmTracer2(pppYmTracer2* tracer, pppYmTracer2Step* step, _pppCtrlTable* ctrl)
 {
@@ -185,10 +185,10 @@ void pppRenderYmTracer2(pppYmTracer2* tracer, pppYmTracer2Step* step, _pppCtrlTa
  * --INFO--
  * PAL Address: 0x801039b4
  * PAL Size: 1112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80102D78
+ * EN Size: 1112b
+ * JP Address: 0x800FF9F8
+ * JP Size: 1116b
  */
 void pppFrameYmTracer2(pppYmTracer2* tracer, pppYmTracer2Step* step, _pppCtrlTable* ctrl)
 {
@@ -325,10 +325,10 @@ void pppFrameYmTracer2(pppYmTracer2* tracer, pppYmTracer2Step* step, _pppCtrlTab
  * --INFO--
  * PAL Address: 0x80103e0c
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801031D0
+ * EN Size: 56b
+ * JP Address: 0x800FFE54
+ * JP Size: 56b
  */
 void pppDestructYmTracer2(pppYmTracer2* tracer, _pppCtrlTable* ctrl)
 {
@@ -342,10 +342,10 @@ void pppDestructYmTracer2(pppYmTracer2* tracer, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x80103e44
  * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80103208
+ * EN Size: 36b
+ * JP Address: 0x800FFE8C
+ * JP Size: 36b
  */
 void pppConstruct2YmTracer2(pppYmTracer2* tracer, _pppCtrlTable* ctrl)
 {
@@ -360,10 +360,10 @@ void pppConstruct2YmTracer2(pppYmTracer2* tracer, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x80103e68
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010322C
+ * EN Size: 88b
+ * JP Address: 0x800FFEB0
+ * JP Size: 92b
  */
 void pppConstructYmTracer2(pppYmTracer2* tracer, _pppCtrlTable* ctrl)
 {
@@ -375,14 +375,8 @@ void pppConstructYmTracer2(pppYmTracer2* tracer, _pppCtrlTable* ctrl)
     work->initWork = 0;
     work->visibleCount = 0;
 
-    work->pad0 = zero;
-    work->pos.z = zero;
-    work->pos.y = zero;
-    work->pos.x = zero;
-    work->pad1c = zero;
-    work->targetPos.z = zero;
-    work->targetPos.y = zero;
-    work->targetPos.x = zero;
+    work->pos.x = work->pos.y = work->pos.z = work->pad0 = zero;
+    work->targetPos.x = work->targetPos.y = work->targetPos.z = work->pad1c = zero;
 
     work->pad2e = 0;
     work->alphaStep = 0;

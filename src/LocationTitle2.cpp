@@ -73,10 +73,10 @@ static inline void copyPolygonData(LocationTitle2Particle* dst, LocationTitle2Pa
  * --INFO--
  * PAL Address: 0x800da0b4
  * PAL Size: 836b
- * EN Address: TODO  
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D9880
+ * EN Size: 836b
+ * JP Address: 0x800D7478
+ * JP Size: 836b
  */
 extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
@@ -192,10 +192,10 @@ static const char s_locationNodeName[] = "loc";
  * --INFO--
  * PAL Address: 0x800da3f8
  * PAL Size: 1216b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D9BC4
+ * EN Size: 1216b
+ * JP Address: 0x800D77BC
+ * JP Size: 1168b
  */
 extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
@@ -352,10 +352,10 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
  * --INFO--
  * PAL Address: 0x800da8b8
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DA084
+ * EN Size: 84b
+ * JP Address: 0x800D7C4C
+ * JP Size: 84b
  */
 extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Offsets* unkC)
 {
@@ -371,10 +371,10 @@ extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppL
  * --INFO--
  * PAL Address: 0x800da90c
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DA0D8
+ * EN Size: 48b
+ * JP Address: 0x800D7CA0
+ * JP Size: 48b
  */
 extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Offsets* unkC)
 {
@@ -385,7 +385,5 @@ extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, ppp
     work = GetLocationTitle2Work(locationTitle, unkC);
     work->m_particles = 0;
     work->m_count = 0;
-    work->m_acc = value;
-    work->m_vel = value;
-    work->m_cur = value;
+    work->m_cur = work->m_vel = work->m_acc = value;
 }

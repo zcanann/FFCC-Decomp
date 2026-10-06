@@ -16,10 +16,10 @@ STATIC_ASSERT(offsetof(CGCharaObj, m_itemId) == 0x560);
  * --INFO--
  * PAL Address: 0x80127AF0
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126E20
+ * EN Size: 100b
+ * JP Address: 0x801239D4
+ * JP Size: 100b
  */
 void CGPrgObj::onCreate()
 {
@@ -36,10 +36,10 @@ void CGPrgObj::onCreate()
  * --INFO--
  * PAL Address: 0x80127AD0
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126E00
+ * EN Size: 32b
+ * JP Address: 0x801239B4
+ * JP Size: 32b
  */
 void CGPrgObj::onDestroy()
 {
@@ -50,10 +50,10 @@ void CGPrgObj::onDestroy()
  * --INFO--
  * PAL Address: 0x801278DC
  * PAL Size: 500b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126C0C
+ * EN Size: 500b
+ * JP Address: 0x801237C0
+ * JP Size: 500b
  */
 void CGPrgObj::onFrame()
 {
@@ -108,10 +108,10 @@ void CGPrgObj::onFrame()
  * --INFO--
  * PAL Address: 0x80127838
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126B68
+ * EN Size: 164b
+ * JP Address: 0x8012371C
+ * JP Size: 164b
  */
 void CGPrgObj::changeStat(int state, int subState, int stateArg)
 {
@@ -133,10 +133,10 @@ void CGPrgObj::changeStat(int state, int subState, int stateArg)
  * --INFO--
  * PAL Address: 0x80127820
  * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126B50
+ * EN Size: 24b
+ * JP Address: 0x80123704
+ * JP Size: 24b
  */
 void CGPrgObj::changeSubStat(int subState)
 {
@@ -149,10 +149,10 @@ void CGPrgObj::changeSubStat(int subState)
  * --INFO--
  * PAL Address: 0x80127800
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126B30
+ * EN Size: 32b
+ * JP Address: 0x801236E4
+ * JP Size: 32b
  */
 void CGPrgObj::addSubStat()
 {
@@ -165,10 +165,10 @@ void CGPrgObj::addSubStat()
  * --INFO--
  * PAL Address: 0x801277C8
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126AF8
+ * EN Size: 56b
+ * JP Address: 0x801236AC
+ * JP Size: 56b
  */
 void CGPrgObj::reqAnim(int animId, int loop, int direct)
 {
@@ -185,10 +185,10 @@ void CGPrgObj::reqAnim(int animId, int loop, int direct)
  * --INFO--
  * PAL Address: 0x8012776C
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126A9C
+ * EN Size: 92b
+ * JP Address: 0x80123650
+ * JP Size: 92b
  */
 int CGPrgObj::isLoopAnim()
 {
@@ -204,10 +204,10 @@ int CGPrgObj::isLoopAnim()
  * --INFO--
  * PAL Address: 0x80127720
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126A50
+ * EN Size: 76b
+ * JP Address: 0x80123604
+ * JP Size: 76b
  */
 int CGPrgObj::isLoopAnimDirect()
 {
@@ -224,10 +224,10 @@ int CGPrgObj::isLoopAnimDirect()
  * --INFO--
  * PAL Address: 0x80127650
  * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126980
+ * EN Size: 208b
+ * JP Address: 0x80123534
+ * JP Size: 208b
  */
 int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 {
@@ -249,10 +249,10 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
  * --INFO--
  * PAL Address: 0x801275AC
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801268DC
+ * EN Size: 164b
+ * JP Address: 0x80123490
+ * JP Size: 164b
  */
 void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
 {
@@ -269,10 +269,10 @@ void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
  * --INFO--
  * PAL Address: 0x80127510
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126840
+ * EN Size: 156b
+ * JP Address: 0x801233F4
+ * JP Size: 156b
  */
 void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, int seNo)
 {
@@ -289,10 +289,10 @@ void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, 
  * --INFO--
  * PAL Address: 0x80127474
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801267A4
+ * EN Size: 156b
+ * JP Address: 0x80123358
+ * JP Size: 156b
  */
 void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
@@ -309,10 +309,10 @@ void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, 
  * --INFO--
  * PAL Address: 0x801273BC
  * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801266EC
+ * EN Size: 184b
+ * JP Address: 0x801232A0
+ * JP Size: 184b
  */
 void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
@@ -330,10 +330,10 @@ void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float sca
  * --INFO--
  * PAL Address: 0x8012732C
  * PAL Size: 144b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012665C
+ * EN Size: 144b
+ * JP Address: 0x80123210
+ * JP Size: 144b
  */
 float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
@@ -356,10 +356,10 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  * --INFO--
  * PAL Address: 0x80127290
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801265C0
+ * EN Size: 156b
+ * JP Address: 0x80123174
+ * JP Size: 156b
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
@@ -370,10 +370,10 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
  * --INFO--
  * PAL Address: 0x801271E0
  * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126510
+ * EN Size: 176b
+ * JP Address: 0x801230C4
+ * JP Size: 176b
  */
 float CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
@@ -384,10 +384,10 @@ float CGPrgObj::dstTargetRot(CGPrgObj* target)
  * --INFO--
  * PAL Address: 0x80127084
  * PAL Size: 348b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801263B4
+ * EN Size: 348b
+ * JP Address: 0x80122F68
+ * JP Size: 348b
  */
 void CGPrgObj::ClassControl(int classControl, int value)
 {
@@ -426,10 +426,10 @@ void CGPrgObj::ClassControl(int classControl, int value)
  * --INFO--
  * PAL Address: 0x80127028
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126358
+ * EN Size: 92b
+ * JP Address: 0x80122F0C
+ * JP Size: 92b
  */
 int CGPrgObj::GetClassControl(int classControl)
 {
@@ -449,10 +449,10 @@ int CGPrgObj::GetClassControl(int classControl)
  * --INFO--
  * PAL Address: 0x80127024
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126354
+ * EN Size: 4b
+ * JP Address: 0x80122F08
+ * JP Size: 4b
  */
 void CGPrgObj::onChangePrg(int)
 {
@@ -462,10 +462,10 @@ void CGPrgObj::onChangePrg(int)
  * --INFO--
  * PAL Address: 0x80127020
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126350
+ * EN Size: 4b
+ * JP Address: 0x80122F04
+ * JP Size: 4b
  */
 void CGPrgObj::onFrameStat()
 {
@@ -475,10 +475,10 @@ void CGPrgObj::onFrameStat()
  * --INFO--
  * PAL Address: 0x8012701C
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8012634C
+ * EN Size: 4b
+ * JP Address: 0x80122F00
+ * JP Size: 4b
  */
 void CGPrgObj::onFramePostCalc()
 {
@@ -488,10 +488,10 @@ void CGPrgObj::onFramePostCalc()
  * --INFO--
  * PAL Address: 0x80127018
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126348
+ * EN Size: 4b
+ * JP Address: 0x80122EFC
+ * JP Size: 4b
  */
 void CGPrgObj::onFramePreCalc()
 {
@@ -501,10 +501,10 @@ void CGPrgObj::onFramePreCalc()
  * --INFO--
  * PAL Address: 0x80127014
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126344
+ * EN Size: 4b
+ * JP Address: 0x80122EF8
+ * JP Size: 4b
  */
 void CGPrgObj::onChangeStat(int)
 {
@@ -514,10 +514,10 @@ void CGPrgObj::onChangeStat(int)
  * --INFO--
  * PAL Address: 0x80127010
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126340
+ * EN Size: 4b
+ * JP Address: 0x80122EF4
+ * JP Size: 4b
  */
 void CGPrgObj::onCancelStat(int)
 {
@@ -527,10 +527,10 @@ void CGPrgObj::onCancelStat(int)
  * --INFO--
  * PAL Address: 0x80127008
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80126338
+ * EN Size: 8b
+ * JP Address: 0x80122EEC
+ * JP Size: 8b
  */
 int CGPrgObj::GetCID()
 {

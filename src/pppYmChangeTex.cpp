@@ -50,8 +50,8 @@ static inline pppYmChangeTexState* GetChangeTexState(pppYmChangeTex* ymChangeTex
 	    ymChangeTex->m_workArea + GetChangeTexDataOffsets(data)->m_workOffset);
 }
 
-void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
+static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 static inline void SetChangeTexModelCallbacks(CChara::CModel* model, pppYmChangeTexState* state, pppYmChangeTexStep* step)
 {
@@ -64,10 +64,10 @@ static inline void SetChangeTexModelCallbacks(CChara::CModel* model, pppYmChange
  * --INFO--
  * PAL Address: 0x800d3854
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D3020
+ * EN Size: 96b
+ * JP Address: 0x800D0C5C
+ * JP Size: 96b
  */
 void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, _pppCtrlTable*)
 {
@@ -85,10 +85,10 @@ void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, _pppCtrlTab
  * --INFO--
  * PAL Address: 0x800d38b4
  * PAL Size: 1264b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D3080
+ * EN Size: 1264b
+ * JP Address: 0x800D0CBC
+ * JP Size: 1264b
  */
 void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, _pppCtrlTable* data)
 {
@@ -235,10 +235,10 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
  * --INFO--
  * PAL Address: 0x800d3da4
  * PAL Size: 500b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D3570
+ * EN Size: 500b
+ * JP Address: 0x800D11AC
+ * JP Size: 500b
  */
 void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 {
@@ -329,10 +329,10 @@ freeArrays:
  * --INFO--
  * PAL Address: 0x800d3f98
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D3764
+ * EN Size: 64b
+ * JP Address: 0x800D13A0
+ * JP Size: 68b
  */
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 {
@@ -340,8 +340,7 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 	pppYmChangeTexState* state = GetChangeTexState(ymChangeTex, data);
 
 	state->m_value0 = init;
-	state->m_value2 = init;
-	state->m_value1 = init;
+	state->m_value1 = state->m_value2 = init;
 	state->m_charaObj = 0;
 	state->m_context = ppvMng;
 	state->m_texture = 0;
@@ -353,12 +352,12 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
  * --INFO--
  * PAL Address: 0x800d3fd8
  * PAL Size: 396b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D37A4
+ * EN Size: 396b
+ * JP Address: 0x800D13E4
+ * JP Size: 396b
  */
-void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, float (*) [4])
+static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, float (*) [4])
 {
 	pppYmChangeTexState* state = (pppYmChangeTexState*)callbackContext;
 	pppYmChangeTexStep* step = (pppYmChangeTexStep*)callbackParam;
@@ -410,12 +409,12 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* callbackContex
  * --INFO--
  * PAL Address: 0x800d4164
  * PAL Size: 276b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D3930
+ * EN Size: 276b
+ * JP Address: 0x800D1570
+ * JP Size: 276b
  */
-void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, int displayListIdx, float (*) [4])
+static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, int displayListIdx, float (*) [4])
 {
 	pppYmChangeTexState* state = (pppYmChangeTexState*)callbackContext;
 	pppYmChangeTexStep* step = (pppYmChangeTexStep*)callbackParam;

@@ -131,10 +131,10 @@ inline void DisableIndWarp()
  * --INFO--
  * PAL Address: 0x800d19f0
  * PAL Size: 1384b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D11BC
+ * EN Size: 1384b
+ * JP Address: 0x800CEDA4
+ * JP Size: 1384b
  */
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* step, _pppCtrlTable* ctrl)
 {
@@ -252,10 +252,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
  * --INFO--
  * PAL Address: 0x800d1f58
  * PAL Size: 308b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D1724
+ * EN Size: 308b
+ * JP Address: 0x800CF30C
+ * JP Size: 308b
  */
 void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* step, _pppCtrlTable* ctrl)
 {
@@ -293,10 +293,10 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
  * --INFO--
  * PAL Address: 0x800d208c
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D1858
+ * EN Size: 4b
+ * JP Address: 0x800CF440
+ * JP Size: 4b
  */
 void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
 {
@@ -307,32 +307,28 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x800d2090
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D185C
+ * EN Size: 48b
+ * JP Address: 0x800CF444
+ * JP Size: 52b
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* ctrl)
 {
     float value = 0.0f;
     YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, ctrl);
 
-    state->m_values[1] = value;
-    state->m_values[0] = value;
-    state->m_scale = value;
-    state->m_values[4] = value;
-    state->m_values[3] = value;
-    state->m_values[2] = value;
+    state->m_scale = state->m_values[0] = state->m_values[1] = value;
+    state->m_values[2] = state->m_values[3] = state->m_values[4] = value;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800d20c0
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800D188C
+ * EN Size: 64b
+ * JP Address: 0x800CF478
+ * JP Size: 68b
  */
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* ctrl)
 {
@@ -341,10 +337,6 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pp
 
     state->m_angle = 0;
     state->m_direction = 1;
-    state->m_values[1] = zero;
-    state->m_values[0] = zero;
-    state->m_scale = zero;
-    state->m_values[4] = zero;
-    state->m_values[3] = zero;
-    state->m_values[2] = zero;
+    state->m_scale = state->m_values[0] = state->m_values[1] = zero;
+    state->m_values[2] = state->m_values[3] = state->m_values[4] = zero;
 }

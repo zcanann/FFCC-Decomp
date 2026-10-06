@@ -76,10 +76,10 @@ static inline PppLightWork* GetPppLightWork(_pppPObject* object, _pppCtrlTable* 
  * --INFO--
  * PAL Address: 0x800dab00
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DA2CC
+ * EN Size: 52b
+ * JP Address: 0x800D7E94
+ * JP Size: 64b
  */
 void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
@@ -99,10 +99,10 @@ void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
  * --INFO--
  * PAL Address: 0x800dab34
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DA300
+ * EN Size: 100b
+ * JP Address: 0x800D7ED4
+ * JP Size: 112b
  */
 void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
@@ -116,28 +116,20 @@ void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 	*(int*)&work->color2R = 0;
 	*(int*)&work->color2B = 0;
 	
-	work->attenFalloffAccel = zero;
-	work->attenFalloffVelocity = zero;
-	work->attenFalloff = zero;
-	work->attenRadiusAccel = zero;
-	work->attenRadiusVelocity = zero;
-	work->attenRadius = zero;
-	work->spotScaleAccel = zero;
-	work->spotScaleVelocity = zero;
-	work->spotScale = zero;
-	work->specularScaleAccel = zero;
-	work->specularScaleVelocity = zero;
-	work->specularScale = zero;
+	work->attenFalloff = work->attenFalloffVelocity = work->attenFalloffAccel = zero;
+	work->attenRadius = work->attenRadiusVelocity = work->attenRadiusAccel = zero;
+	work->spotScale = work->spotScaleVelocity = work->spotScaleAccel = zero;
+	work->specularScale = work->specularScaleVelocity = work->specularScaleAccel = zero;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800dab98
  * PAL Size: 1276b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DA364
+ * EN Size: 1276b
+ * JP Address: 0x800D7F44
+ * JP Size: 1264b
  */
 void pppLight(_pppPObject* object, PppLightStep* step, _pppCtrlTable* ctrlTable)
 {
@@ -230,7 +222,11 @@ void pppLight(_pppPObject* object, PppLightStep* step, _pppCtrlTable* ctrlTable)
 			*(u32*)&light.m_targetColor[0] = 0;
 		}
 
-		if (ppvIsLoopCalc == 0 && ppvIs2ndCalc == 0) {
+		if (ppvIsLoopCalc == 0
+#if !defined(VERSION_GCCJGC)
+			&& ppvIs2ndCalc == 0
+#endif
+		) {
 			if (step->m_type == 0) {
 				light.m_type = 0;
 				light.m_direction.x = 0.0f;

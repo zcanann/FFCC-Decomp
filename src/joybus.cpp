@@ -6429,10 +6429,14 @@ int JoyBus::SetMType(int portIndex, int mtype)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800A6B2C
+ * PAL Size: 100b
+ * EN Address: 0x800A63D4
+ * EN Size: 100b
+ * JP Address: 0x800A4A0C
+ * JP Size: 100b
  */
-unsigned char JoyBus::GetMType(int portIndex)
+int JoyBus::GetMType(int portIndex)
 {
     OSWaitSemaphore(&m_accessSemaphores[portIndex]);
 

@@ -21,6 +21,14 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+#ifdef VERSION_GCCP01
+static const int kCounterDamageStatusFrames = 25;
+static const int kLateItemParticleFrame = 16;
+#else
+static const int kCounterDamageStatusFrames = 30;
+static const int kLateItemParticleFrame = 20;
+#endif
+
 extern char SoundBuffer[];
 
 
@@ -457,9 +465,7 @@ void CGCharaObj::onFramePreCalc()
 			m_partyAngle[i] = reinterpret_cast<CVector*>(&m_partyDelta[i])->GetRotateY();
 		} else {
 			m_partyDistance[i] = 0.0f;
-			m_partyDelta[i].z = 0.0f;
-			m_partyDelta[i].y = 0.0f;
-			m_partyDelta[i].x = 0.0f;
+			m_partyDelta[i].x = m_partyDelta[i].y = m_partyDelta[i].z = 0.0f;
 			m_partyAngle[i] = 0.0f;
 		}
 
@@ -824,7 +830,8 @@ void CGCharaObj::onFrameStat()
 				break;
 			case 3:
 				if (m_subFrame == 0) {
-					reqAnim((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0) ? m_unk558 : m_unk55C, 0, 0);
+					bool isMonster = (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD;
+					reqAnim(isMonster ? m_unk558 : m_unk55C, 0, 0);
 				}
 
 				if (isLoopAnim() != 0) {
@@ -1371,10 +1378,10 @@ void CGCharaObj::setSta(int staIndex, int value)
  * --INFO--
  * PAL Address: 0x8010FD54
  * PAL Size: 2172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010F0B4
+ * EN Size: 2172b
+ * JP Address: 0x8010BD40
+ * JP Size: 2172b
  */
 void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& outValue)
 {
@@ -1395,15 +1402,8 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) != 0xAD ||
 				(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 8) == 0) {
-				CVector sourcePos(sourceObj->m_worldPosition);
-				const CVector& selfPos = CVector(m_worldPosition);
-				CVector deltaVec;
-				PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
-				Vec delta;
-				delta.x = deltaVec.x;
-				delta.y = deltaVec.y;
-				delta.z = deltaVec.z;
-				moveVectorH(&delta, 2.0f, 8);
+				CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
+				moveVectorH(delta, 2.0f, 8);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x19, 0, 0);
 			}
@@ -1879,10 +1879,10 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  * --INFO--
  * PAL Address: 0x8010D700
  * PAL Size: 6984b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010CA60
+ * EN Size: 6984b
+ * JP Address: 0x80109740
+ * JP Size: 6900b
  */
 void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
 {
@@ -1944,26 +1944,15 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	damageClamp = 0;
 	if (m_lastStateId == 8 && m_subState == 1 &&
 	    ((CharaObjItemRow(itemId)->m_flags2C & 8) == 0)) {
-		CVector selfPos(m_worldPosition);
-		const CVector& sourcePos = CVector(sourceObj->m_worldPosition);
-		CVector deltaVec;
-		PSVECSubtract((Vec*)&sourcePos, reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&deltaVec));
-		Vec frontDelta;
-		frontDelta.x = deltaVec.x;
-		frontDelta.y = deltaVec.y;
-		frontDelta.z = deltaVec.z;
-		float frontMag = PSVECMag(&frontDelta);
+		CVector frontDelta = CVector(sourceObj->m_worldPosition) - CVector(m_worldPosition);
+		float frontMag = PSVECMag(frontDelta);
 		if (frontMag > 0.0f) {
-			CVector scaledVec;
-			PSVECScale(&frontDelta, reinterpret_cast<Vec*>(&scaledVec), 1.0f / frontMag);
-			frontDelta.x = scaledVec.x;
-			frontDelta.y = scaledVec.y;
-			frontDelta.z = scaledVec.z;
+			frontDelta = frontDelta * (1.0f / frontMag);
 			CVector facing;
 			facing.x = sinf(m_rotBaseY);
 			facing.y = 0.0f;
 			facing.z = cosf(m_rotBaseY);
-			if (PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing)) > 0.0f) {
+			if (PSVECDotProduct(frontDelta, reinterpret_cast<Vec*>(&facing)) > 0.0f) {
 				playSe3D(0x1D, 0x32, 0x96, 0, 0);
 				putParticle(0x200, 0, hitPos, 0.1f * m_attackColRadius, 0);
 				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {
@@ -1990,15 +1979,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		int currentKind = kindRows1556[m_itemId].m_status & 0xFF;
 		if (currentKind == 2) {
 			if (staType != 0x66 && staType != 0x67 && staType != 7) {
-				CVector sourcePos(sourceObj->m_worldPosition);
-				const CVector& selfPos = CVector(m_worldPosition);
-				CVector deltaVec;
-				PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
-				Vec delta;
-				delta.x = deltaVec.x;
-				delta.y = deltaVec.y;
-				delta.z = deltaVec.z;
-				moveVectorH(&delta, 2.0f, 10);
+				CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
+				moveVectorH(delta, 2.0f, 10);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x1A, 0, 0);
 			}
@@ -2011,15 +1993,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (itemEffect == 0x1F8 &&
 	    sourceObj->m_weaponNodeFlagAll.m_bits1.m_bit20 != 0 &&
 	    ((CharaObjItemRow(m_itemId)->m_status & 0xFF) == 3)) {
-		CVector sourcePos(sourceObj->m_worldPosition);
-		const CVector& selfPos = CVector(m_worldPosition);
-		CVector deltaVec;
-		PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
-		Vec delta;
-		delta.x = deltaVec.x;
-		delta.y = deltaVec.y;
-		delta.z = deltaVec.z;
-		moveVectorH(&delta, 2.0f, 10);
+		CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
+		moveVectorH(delta, 2.0f, 10);
 		m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 		changeStat(0x19, 0, 0);
 	}
@@ -2111,7 +2086,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					if (sourceObj->m_lastStateId == 6 && srcEntryKind <= 1) {
 						break;
 					}
-					reinterpret_cast<CGCharaObj*>(sourceObj)->setSta(4, 0x19);
+					reinterpret_cast<CGCharaObj*>(sourceObj)->setSta(4, kCounterDamageStatusFrames);
 					sourceObj->changeStat(10, 0, 0);
 					reinterpret_cast<CGCharaObj*>(sourceObj)->addHp(-1, 0);
 				}
@@ -2430,10 +2405,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  * --INFO--
  * PAL Address: 0x8010CBC8
  * PAL Size: 2872b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010BF28
+ * EN Size: 2872b
+ * JP Address: 0x80108C18
+ * JP Size: 2856b
  */
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
@@ -2649,18 +2624,9 @@ checkParticle:
 		case 0x46D:
 		case 0x46E:
 			if (effectArg0 == 2) {
-				if (m_stateFrame >= 0x10) {
+				if (m_stateFrame >= kLateItemParticleFrame) {
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
-					float rand0 = Math.RandFPM(60.0f);
-					float rand1 = Math.RandFPM(60.0f);
-					CVector randomOffset(rand1, 0.0f, rand0);
-					const CVector& randomBase = CVector(0.0f, 7.0f, 165.0f);
-					CVector randomResult;
-					PSVECAdd((Vec*)&randomBase, reinterpret_cast<Vec*>(&randomOffset), reinterpret_cast<Vec*>(&randomResult));
-					Vec randomPos;
-					randomPos.x = randomResult.x;
-					randomPos.y = randomResult.y;
-					randomPos.z = randomResult.z;
+					CVector randomPos = CVector(0.0f, 7.0f, 165.0f) + CVector(Math.RandFPM(60.0f), 0.0f, Math.RandFPM(60.0f));
 					CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
@@ -2714,9 +2680,8 @@ checkParticle:
 				for (; i < 2; i++) {
 					PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 					int side = (i == 0) ? 76 : -76;
-					const CVector& sidePos = CVector(static_cast<float>(side), 0.0f, 60.0f);
 					Vec offsetPos;
-					PSMTXMultVec(rotMtx, (Vec*)&sidePos, &offsetPos);
+					PSMTXMultVec(rotMtx, CVector(static_cast<float>(side), 0.0f, 60.0f), &offsetPos);
 					flatStorage.m_particleWorkPos.x = m_worldPosition.x + offsetPos.x;
 					flatStorage.m_particleWorkPos.y = m_worldPosition.y + offsetPos.y;
 					flatStorage.m_particleWorkPos.z = m_worldPosition.z + offsetPos.z;
@@ -2758,10 +2723,10 @@ checkParticle:
  * --INFO--
  * PAL Address: 0x8010CAF0
  * PAL Size: 216b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010BE5C
+ * EN Size: 204b
+ * JP Address: 0x80108B4C
+ * JP Size: 204b
  */
 int la(CGObject* object)
 {
@@ -2788,7 +2753,11 @@ int la(CGObject* object)
 				if (object->m_lastBgAttr < 0.0f) {
 					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frameMod)), 31, 31) & 0xFF;
 				} else {
+#ifdef VERSION_GCCP01
 					bool isPeriod = (period <= frame);
+#else
+					bool isPeriod = (frameMod == 0);
+#endif
 					result = isPeriod;
 				}
 			}
@@ -2804,10 +2773,10 @@ int la(CGObject* object)
  * --INFO--
  * PAL Address: 0x8010C704
  * PAL Size: 1004b
- * EN Address: 0x801310f0
- * EN Size: 880b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010BA7C
+ * EN Size: 992b
+ * JP Address: 0x8010876C
+ * JP Size: 992b
  */
 void CGCharaObj::statAttack()
 {
@@ -2938,8 +2907,8 @@ int CGCharaObj::calcCastTime(int itemId)
 	}
 
 	SCharaItemRow* typeRows = castRows;
-	int itemNo = typeRows[itemId].m_effect;
 	int itemType = typeRows[itemId].m_actionType;
+	int itemNo = typeRows[itemId].m_effect;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCA];
@@ -3056,13 +3025,18 @@ void CGCharaObj::StaticFrame()
  * --INFO--
  * PAL Address: 0x8010B9B8
  * PAL Size: 1804b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010AD30
+ * EN Size: 1804b
+ * JP Address: 0x80107A30
+ * JP Size: 1788b
  */
 void CGCharaObj::combi2()
 {
+#ifdef VERSION_GCCP01
+	const int kComboWaitFrames = 66;
+#else
+	const int kComboWaitFrames = 80;
+#endif
 	CGPartyObj* candidates[5];
 	int candidateCount = 0;
 	CVector comboCenter;
@@ -3099,7 +3073,7 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(&candidates[i]->m_comboCenter, &other->m_comboCenter) < 20.0f) {
+			if (PSVECDistance(&party->m_comboCenter, &other->m_comboCenter) < 20.0f) {
 				hasNearbyPartner = 1;
 				break;
 			}
@@ -3148,7 +3122,7 @@ void CGCharaObj::combi2()
 	int fallback;
 	int comboIndex = searchCombi(candidateCount, candidates, fallback);
 	if (comboIndex >= 0) {
-	if (fallback != 0 && candidates[0]->m_comboFrame < 0x42) {
+	if (fallback != 0 && candidates[0]->m_comboFrame < kComboWaitFrames) {
 		return;
 	}
 
@@ -3229,7 +3203,7 @@ void CGCharaObj::combi2()
 	return;
 	}
 
-	if (fallback == 0 || candidates[0]->m_comboFrame >= 0x42) {
+	if (fallback == 0 || candidates[0]->m_comboFrame >= kComboWaitFrames) {
 		candidates[0]->m_comboState = 0;
 		candidates[0]->m_comboFrame = 0;
 		candidates[0]->addSubStat();
@@ -3314,10 +3288,10 @@ inline int CGCharaObj::scCheckTime(CCombi2Set* set, CGCharaObj* first, CGCharaOb
  * --INFO--
  * PAL Address: 0x8010B690
  * PAL Size: 552b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8010AA08
+ * EN Size: 552b
+ * JP Address: 0x80107708
+ * JP Size: 552b
  */
 int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 {
@@ -3337,7 +3311,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		int reqLast = reqCount - 1;
 		int slot = 0;
 		CCombi2Set* slotCursor = combiCursor->m_sets;
-		for (; slot < reqCount; slot++) {
+		for (; slot < reqCount; slot++, slotCursor++) {
 			CGCharaObj* partyObj = partyList[slot];
 			if (partyObj->m_comboFrame == 0) {
 				CCombi2Set* fallbackCursor = slotCursor;
@@ -3371,7 +3345,6 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			if (slot == reqLast) {
 				found = combiIndex;
 			}
-			slotCursor++;
 		}
 	}
 

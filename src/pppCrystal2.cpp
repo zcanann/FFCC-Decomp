@@ -99,10 +99,10 @@ static inline float Crystal2SqrtPositive(float value)
  * --INFO--
  * PAL Address: 0x8013e694
  * PAL Size: 1212b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013D928
+ * EN Size: 1212b
+ * JP Address: 0x8013A5FC
+ * JP Size: 1212b
  */
 void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlTable* ctrl)
 {
@@ -207,10 +207,10 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
  * --INFO--
  * PAL Address: 0x8013eb50
  * PAL Size: 924b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013DDE4
+ * EN Size: 924b
+ * JP Address: 0x8013AAB8
+ * JP Size: 740b
  */
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlTable* ctrl)
 {
@@ -299,10 +299,10 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
  * --INFO--
  * PAL Address: 0x8013eeec
  * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013E180
+ * EN Size: 136b
+ * JP Address: 0x8013AD9C
+ * JP Size: 136b
  */
 void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
 {
@@ -328,10 +328,10 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
  * --INFO--
  * PAL Address: 0x8013ef74
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013E208
+ * EN Size: 32b
+ * JP Address: 0x8013AE24
+ * JP Size: 32b
  */
 void pppConstructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
 {

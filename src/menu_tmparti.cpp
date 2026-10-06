@@ -242,7 +242,7 @@ void CMenuPcs::TmpArtiDraw()
 			float alpha = entry->alpha;
 			font->SetColor(CColor(0xFF, 0xFF, 0xFF, kTmpArtiColorMax * alpha).color);
 
-			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] * 5 + 4];
+			const char* text = Game.GetShortItemName(caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i]);
 			float width = font->GetWidth(text);
 			float posX = (entry->width - width) / 2.0 + entry->x;
 			top = (float)(entry->y + 11);

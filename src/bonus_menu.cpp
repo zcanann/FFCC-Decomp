@@ -96,6 +96,23 @@ static BonusBaseInfo* s_Base;
 
 namespace {
 
+enum {
+#ifdef VERSION_GCCJGC
+	kBonusBackgroundTexture = 0x15,
+#else
+	kBonusBackgroundTexture = 0x16,
+#endif
+	kBonusFrameTexture,
+	kBonusPlayerTexture,
+	kBonusCountTexture,
+#ifdef VERSION_GCCJGC
+	kBonusArtifactFrameTexture = 0x1E,
+#else
+	kBonusArtifactFrameTexture = 0x1F,
+#endif
+	kBonusCursorTexture
+};
+
 static inline void InitBonusEffectSlots(CMenuPcs* menu)
 {
 	for (int i = 0; i < 40; i++) {
@@ -108,7 +125,11 @@ static inline void InitBonusEffectSlots(CMenuPcs* menu)
 static inline void SetupSelectCloseSpriteMotion(CMenuPcs::Sprt2* sprite)
 {
 	sprite->startFrame = 0;
+#ifdef VERSION_GCCP01
 	sprite->duration = 8;
+#else
+	sprite->duration = 10;
+#endif
 	sprite->x = (short)(int)sprite->targetX;
 	sprite->y = (short)(int)sprite->targetY;
 	sprite->motionX = 240.0f;
@@ -605,13 +626,18 @@ void CMenuPcs::drawBonus()
  * --INFO--
  * PAL Address: 0x8013B14C
  * PAL Size: 8316b
- * EN Address: 0x801557EC
- * EN Size: 4540b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013A3E4
+ * EN Size: 8312b
+ * JP Address: 0x80137004
+ * JP Size: 8568b
  */
 void CMenuPcs::CalcResultOpenAnim()
 {
+#ifdef VERSION_GCCP01
+	enum { kFadeFrames = 8, kBallFadeStart = 24, kBallDuration = 32 };
+#else
+	enum { kFadeFrames = 10, kBallFadeStart = 30, kBallDuration = 40 };
+#endif
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (this->m_bonusState->m_initialized == 0) {
@@ -624,7 +650,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		idx = 0;
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x16;
+			spr->kind = kBonusBackgroundTexture;
 			spr->y = 0;
 			spr->x = 0;
 			spr->w = 0x280;
@@ -632,21 +658,23 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->mulY = 0.0f;
 			spr->mulX = 0.0f;
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
+#ifndef VERSION_GCCJGC
 			spr->alpha = 0.0f;
+#endif
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i + idx];
-			spr->kind = 0x17;
+			spr->kind = kBonusFrameTexture;
 			spr->x = 0x80;
 			spr->y = (short)(i * 0x60 + 0x38);
 			spr->w = 0x1a0;
 			spr->h = 0x40;
 			spr->mulX = 0.0f;
 			spr->mulY = 0.0f;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 		}
 		idx += activePartyCount;
@@ -657,7 +685,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			for (; i < activePartyCount; i++) {
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				int partySlot = s_Rinfo->m_party[i].m_partySlot;
-				spr->kind = 0x18;
+				spr->kind = kBonusPlayerTexture;
 				spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
 				spr->y = (short)y;
 				spr->w = 0x60;
@@ -667,11 +695,11 @@ void CMenuPcs::CalcResultOpenAnim()
 				if (i == 0) {
 					CMenuPcs::Sprt2* src = spr - backOffset;
 					spr->startFrame = src->startFrame + src->duration;
-					spr->startFrame += 0x18;
+					spr->startFrame += kBallFadeStart;
 				} else {
 					spr->startFrame = (spr - 1)->startFrame + 3;
 				}
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				y += 0x60;
 				spr->depth = 1.0f;
 			}
@@ -692,7 +720,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
 				spr->startFrame = src->startFrame + src->duration;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -710,7 +738,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->h = 0;
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -735,7 +763,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				if (i != 0) {
 					spr->startFrame += bump;
 				}
-				spr->duration = 0x20;
+				spr->duration = kBallDuration;
 				bump += 3;
 				spr->depth = 1.0f;
 			}
@@ -777,15 +805,21 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		{
 			CMenuPcs::Sprt2* count = &m_bonusAnim->sprites[idx];
-			count->kind = 0x19;
+			count->kind = kBonusCountTexture;
 			count->y = 0x10;
+#ifdef VERSION_GCCJGC
+			count->w = 0xB0;
+#else
 			count->w = 0x140;
+#endif
 			count->x = (short)((0x280 - count->w) >> 1);
 			count->h = 0x28;
 			count->mulX = 0.0f;
 			count->mulY = 80.0f;
 			count->startFrame = m_bonusAnim->sprites[1].startFrame;
-			count->duration = 8;
+#ifndef VERSION_GCCJGC
+			count->duration = kFadeFrames;
+#endif
 			count->duration = 10;
 			count->depth = 1.0f;
 		}
@@ -796,7 +830,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			for (int i = 0; i < activePartyCount; i++) {
 				int delta = idx;
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[countTop + i];
-				spr->kind = 0x19;
+				spr->kind = kBonusCountTexture;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = 0x200;
 				spr->y = (short)(src->y + 0xC);
@@ -805,7 +839,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 40.0f;
 				spr->startFrame = src->startFrame + src->duration;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -825,7 +859,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
 				spr->startFrame = src->startFrame;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -845,7 +879,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
 				spr->startFrame = src->startFrame + src->duration;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->depth = 1.0f;
 			}
 		}
@@ -896,6 +930,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
+#ifndef VERSION_GCCJGC
 		{
 			for (int i = 0; i < 0x18; i++) {
 				CCharaPcs::CHandle* handle = m_wm.m_handles[i];
@@ -904,6 +939,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				}
 			}
 		}
+
+#endif
 
 		m_bonusAnim->header.count = (short)idx;
 		m_bonusAnim->header.finished = 0;
@@ -928,7 +965,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
 			}
 
-			if (sprite->kind == 0x17) {
+			if (sprite->kind == kBonusFrameTexture) {
 				for (int j = 0; j < s_Rinfo->m_partyCount; j++) {
 					if (sprite->timer - 1 == 0) {
 						Sound.PlaySe(0x49, 0x40, 0x7f, 0);
@@ -962,13 +999,13 @@ void CMenuPcs::CalcResultOpenAnim()
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else if (i >= total2) {
 				float modelScale = 0.5f;
-				if (sprite->timer == 0x18 && m_bonusAlpha == 0) {
+				if (sprite->timer == kBallFadeStart && m_bonusAlpha == 0) {
 					Sound.PlaySe(0x48, 0x40, 0x7f, 0);
 					this->m_bonusAlpha = 1;
 				}
-				if (sprite->timer >= 0x18) {
-					modelScale += 0.5 * ((float)(sprite->timer - 0x18) /
-					                    (float)(sprite->duration - 0x18));
+				if (sprite->timer >= kBallFadeStart) {
+					modelScale += 0.5 * ((float)(sprite->timer - kBallFadeStart) /
+					                    (float)(sprite->duration - kBallFadeStart));
 				}
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
@@ -1011,9 +1048,9 @@ void CMenuPcs::CalcResultOpenAnim()
 			handle->m_model->CalcMatrix();
 			handle->m_model->CalcSkin();
 			if (i >= total2) {
-				if (sprite->timer >= 0x18) {
-					sprite->alpha = (float)(1.0 - (double)((float)(sprite->timer - 0x18) /
-					                 (float)(sprite->duration - 0x18)));
+				if (sprite->timer >= kBallFadeStart) {
+					sprite->alpha = (float)(1.0 - (double)((float)(sprite->timer - kBallFadeStart) /
+					                 (float)(sprite->duration - kBallFadeStart)));
 					if (sprite->alpha < 0.0) {
 						sprite->alpha = 0.0f;
 					}
@@ -1034,10 +1071,10 @@ void CMenuPcs::CalcResultOpenAnim()
  * --INFO--
  * PAL Address: 0x8013A8F4
  * PAL Size: 2136b
- * EN Address: 0x801569A8
- * EN Size: 2280b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80139B8C
+ * EN Size: 2136b
+ * JP Address: 0x801367B4
+ * JP Size: 2128b
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
@@ -1082,14 +1119,14 @@ void CMenuPcs::DrawResultOpenAnim()
 					if (lastKind < 0) {
 						DrawInit();
 					}
-					if (lastKind != 0x17 && sprite->kind == 0x17) {
+					if (lastKind != kBonusFrameTexture && sprite->kind == kBonusFrameTexture) {
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-					} else if (lastKind == 0x17 && sprite->kind != 0x17) {
+					} else if (lastKind == kBonusFrameTexture && sprite->kind != kBonusFrameTexture) {
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 					}
 
 					_GXColor colors[4];
-					if (sprite->kind == 0x17) {
+					if (sprite->kind == kBonusFrameTexture) {
 						colors[0].r = 0xFF;
 						colors[0].g = 0xFF;
 						colors[0].b = 0xFF;
@@ -1108,7 +1145,7 @@ void CMenuPcs::DrawResultOpenAnim()
 						colors[3].a = 0xFF;
 						GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 					}
-					if (sprite->kind != 0x17) {
+					if (sprite->kind != kBonusFrameTexture) {
 						colors[0].r = 0xFF;
 						colors[0].g = 0xFF;
 						colors[0].b = 0xFF;
@@ -1117,7 +1154,7 @@ void CMenuPcs::DrawResultOpenAnim()
 					}
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
-					if (sprite->kind == 0x17) {
+					if (sprite->kind == kBonusFrameTexture) {
 						float x = (float)sprite->x;
 						float y = (float)sprite->y;
 						float fillWidth;
@@ -1186,16 +1223,27 @@ void CMenuPcs::DrawResultOpenAnim()
 					} else {
 						CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 						int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+#ifdef VERSION_GCCJGC
+						strcpy(text, "\x81\x9A");
+						strcat(text, Game.GetBonusName(strIdx));
+#else
 						strcpy(text, Game.GetBonusName(strIdx));
+#endif
 					}
 
 					float x = (float)sprite->x + sprite->motionX;
 					float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
 					if (textIndex < activePartyCount) {
 						y -= 4.0f;
 					}
+#endif
 					font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+					font->SetPosY(y);
+#else
 					font->SetPosY(y - 4.0f);
+#endif
 					font->Draw(text);
 
 					textIndex++;
@@ -1203,8 +1251,12 @@ void CMenuPcs::DrawResultOpenAnim()
 						font = this->m_fonts[1];
 						font->SetMargin(1.0f);
 						font->SetShadow(0);
+#ifdef VERSION_GCCJGC
+						font->SetScale(1.0f);
+#else
 						font->SetScaleX(0.800000011920929f);
 						font->SetScaleY(1.0f);
+#endif
 						font->DrawInit();
 					}
 				}
@@ -1218,10 +1270,10 @@ void CMenuPcs::DrawResultOpenAnim()
  * --INFO--
  * PAL Address: 0x8013A22C
  * PAL Size: 1736b
- * EN Address: 0x80157290
- * EN Size: 1568b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801394FC
+ * EN Size: 1680b
+ * JP Address: 0x801361E0
+ * JP Size: 1492b
  */
 void CMenuPcs::CalcResultCountAnim()
 {
@@ -1233,7 +1285,7 @@ void CMenuPcs::CalcResultCountAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int rank = s_Rinfo->m_party[i].m_rank;
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
-			sprite->kind = 0x19;
+			sprite->kind = kBonusCountTexture;
 			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			sprite->x = stripX;
 			sprite->y = y;
@@ -1243,7 +1295,11 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->mulX = (float)(rank * sprite->w);
 			sprite->mulY = 0.0f;
 			sprite->startFrame = 9999;
+#ifdef VERSION_GCCP01
 			sprite->duration = 4;
+#else
+			sprite->duration = 5;
+#endif
 			sprite->depth = 1.0f;
 			sprite->motionX = 0.0f;
 			sprite->motionY = 0.0f;
@@ -1253,12 +1309,15 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 
 		int newCount = countTop + activePartyCount;
+
+#ifndef VERSION_GCCJGC
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = m_wm.m_handles[i];
 			if (handle != 0) {
 				handle->m_model->m_lightAlpha = 0.0f;
 			}
 		}
+#endif
 
 		m_bonusAnim->header.count = (short)newCount;
 		this->m_bonusState->m_initialized = 1;
@@ -1270,7 +1329,11 @@ void CMenuPcs::CalcResultCountAnim()
 
 	int countTop = (int)m_bonusAnim->header.count - activePartyCount;
 	int frame;
+#ifdef VERSION_GCCP01
 	frame = (int)this->m_bonusState->m_frame - 8;
+#else
+	frame = (int)this->m_bonusState->m_frame - 10;
+#endif
 
 	for (int i = 0; i < activePartyCount; i++) {
 		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
@@ -1353,7 +1416,13 @@ void CMenuPcs::CalcResultCountAnim()
 	}
 
 	if (this->m_bonusState->m_countFinished == 0 && frame >= 0 &&
+#ifdef VERSION_GCCP01
 	    (double)s_Rinfo->m_winnerTotalValue + 8.333333134651184 <= (double)frame) {
+#elif defined(VERSION_GCCE01)
+	    s_Rinfo->m_winnerTotalValue + 10 <= frame) {
+#else
+	    s_Rinfo->m_winnerTotalValue <= frame) {
+#endif
 		this->m_bonusState->m_countFinished = 1;
 		return;
 	}
@@ -1371,10 +1440,10 @@ void CMenuPcs::CalcResultCountAnim()
  * --INFO--
  * PAL Address: 0x80139B14
  * PAL Size: 1816b
- * EN Address: 0x801578B0
- * EN Size: 1460b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80138E30
+ * EN Size: 1740b
+ * JP Address: 0x80135B44
+ * JP Size: 1692b
  */
 void CMenuPcs::DrawResultCountAnim()
 {
@@ -1433,10 +1502,14 @@ void CMenuPcs::DrawResultCountAnim()
 					int total = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
 					int value;
 					if (this->m_bonusState->m_countFinished == 0) {
+#ifdef VERSION_GCCP01
 						double frame = (double)this->m_bonusState->m_frame - 8.333333134651184;
-						if (frame <= 0.0) {
+#else
+						int frame = this->m_bonusState->m_frame - 10;
+#endif
+						if (frame <= 0) {
 							value = 0;
-						} else if (frame < (double)total) {
+						} else if (frame < total) {
 							value = (int)frame;
 						} else {
 							value = total;
@@ -1481,25 +1554,41 @@ void CMenuPcs::DrawResultCountAnim()
 				CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 				int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
 				int __p2 = strIdx;
+#ifdef VERSION_GCCJGC
+				strcpy(text, "\x81\x9A");
+				strcat(text, Game.m_cFlatDataArr[1].TableStrings(7)[__p2]);
+#else
 				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[__p2]);
+#endif
 			}
 
 			float x = (float)sprite->x + sprite->motionX;
 			float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
 			if (textIndex < activePartyCount) {
 				y -= 4.0f;
 			}
+#endif
 			font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+			font->SetPosY(y);
+#else
 			font->SetPosY(y - 4.0f);
+#endif
 			font->Draw(text);
 
 			textIndex++;
 			if (textIndex == activePartyCount) {
 				font = this->m_fonts[1];
 				font->SetMargin(1.0f);
+#ifdef VERSION_GCCJGC
+				font->SetShadow(0);
+				font->SetScale(1.0f);
+#else
 				font->SetScaleX(0.7f);
 				font->SetScaleY(1.0f);
 				font->SetShadow(0);
+#endif
 				font->DrawInit();
 			}
 		}
@@ -1511,13 +1600,18 @@ void CMenuPcs::DrawResultCountAnim()
  * --INFO--
  * PAL Address: 0x80137930
  * PAL Size: 8676b
- * EN Address: 0x80157E64
- * EN Size: 3280b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80136C4C
+ * EN Size: 8676b
+ * JP Address: 0x801337D4
+ * JP Size: 9072b
  */
 void CMenuPcs::CalcResultCloseAnim()
 {
+#ifdef VERSION_GCCP01
+	enum { kFadeFrames = 8, kFrameStart = 16 };
+#else
+	enum { kFadeFrames = 10, kFrameStart = 20 };
+#endif
 	int doneCount;
 	int delta;
 	const int activePartyCount = s_Rinfo->m_partyCount;
@@ -1538,14 +1632,15 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		for (int i = 0; activePartyCount > i; i++) {
 			Sprt2* sprite = &m_bonusAnim->sprites[i + base];
-			sprite->startFrame = 0x10;
+			sprite->startFrame = kFrameStart;
 		}
 
 		base += activePartyCount;
 
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* spr = &m_bonusAnim->sprites[base + i];
-			Sprt2* src = spr - activePartyCount;
+			delta = base - 1;
+			Sprt2* src = spr - delta;
 			spr->startFrame = src->startFrame + src->duration;
 			spr->flags = 1;
 			spr->targetX = (float)spr->x;
@@ -1556,7 +1651,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
-			Sprt2* source = sprite - activePartyCount;
+			delta = base - (activePartyCount + 1);
+			Sprt2* source = sprite - delta;
 			sprite->startFrame = source->startFrame + source->duration;
 			sprite->flags = 1;
 		}
@@ -1599,8 +1695,8 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
-			sprite->startFrame = 8;
-			sprite->duration = 8;
+			sprite->startFrame = kFadeFrames;
+			sprite->duration = kFadeFrames;
 		}
 
 		base += activePartyCount;
@@ -1626,7 +1722,7 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		base += activePartyCount;
 		{
-			int back = activePartyCount;
+			int back = base - (activePartyCount + 1);
 
 			for (int i = 0; i < activePartyCount; i++) {
 				Sprt2* spr = &m_bonusAnim->sprites[base + i];
@@ -1778,10 +1874,10 @@ void CMenuPcs::CalcResultCloseAnim()
  * --INFO--
  * PAL Address: 0x80136F9C
  * PAL Size: 2452b
- * EN Address: 0x80158B34
- * EN Size: 2360b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801362B8
+ * EN Size: 2452b
+ * JP Address: 0x80132E58
+ * JP Size: 2428b
  */
 void CMenuPcs::DrawResultCloseAnim()
 {
@@ -1831,14 +1927,14 @@ void CMenuPcs::DrawResultCloseAnim()
 				if (lastKind < 0) {
 					DrawInit();
 				}
-				if (lastKind != 0x17 && sprite->kind == 0x17) {
+				if (lastKind != kBonusFrameTexture && sprite->kind == kBonusFrameTexture) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-				} else if (lastKind == 0x17 && sprite->kind != 0x17) {
+				} else if (lastKind == kBonusFrameTexture && sprite->kind != kBonusFrameTexture) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
 
 				_GXColor colors[4];
-				if (sprite->kind == 0x17) {
+				if (sprite->kind == kBonusFrameTexture) {
 					colors[0].r = 0xFF;
 					colors[0].g = 0xFF;
 					colors[0].b = 0xFF;
@@ -1857,7 +1953,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					colors[3].a = 0xFF;
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				}
-				if (sprite->kind != 0x17) {
+				if (sprite->kind != kBonusFrameTexture) {
 					colors[0].r = 0xFF;
 					colors[0].g = 0xFF;
 					colors[0].b = 0xFF;
@@ -1866,7 +1962,7 @@ void CMenuPcs::DrawResultCloseAnim()
 				}
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
-				if (sprite->kind == 0x17) {
+				if (sprite->kind == kBonusFrameTexture) {
 					if (sprite->duration <= sprite->timer) {
 						lastKind = sprite->kind;
 						continue;
@@ -1942,16 +2038,28 @@ void CMenuPcs::DrawResultCloseAnim()
 					strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 				} else {
 					CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
+#ifdef VERSION_GCCJGC
+					int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+					strcpy(text, "\x81\x9A");
+					strcat(text, Game.GetBonusName(strIdx));
+#else
 					strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
+#endif
 				}
 
 				float x = (float)sprite->x + sprite->motionX;
 				float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
 				if (textIndex < activePartyCount) {
 					y -= 4.0f;
 				}
+#endif
 				font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+				font->SetPosY(y);
+#else
 				font->SetPosY(y - 4.0f);
+#endif
 				font->Draw(text);
 
 				textIndex++;
@@ -1960,8 +2068,12 @@ void CMenuPcs::DrawResultCloseAnim()
 					font = font1;
 					font1->SetMargin(1.0f);
 					font1->SetShadow(0);
+#ifdef VERSION_GCCJGC
+					font1->SetScale(1.0f);
+#else
 					font1->SetScaleX(0.800000011920929f);
 					font1->SetScaleY(1.0f);
+#endif
 					font1->DrawInit();
 				}
 			}
@@ -1974,13 +2086,18 @@ void CMenuPcs::DrawResultCloseAnim()
  * --INFO--
  * PAL Address: 0x80135D60
  * PAL Size: 4668b
- * EN Address: 0x8015946C
- * EN Size: 5372b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8013506C
+ * EN Size: 4684b
+ * JP Address: 0x80131B78
+ * JP Size: 4832b
  */
 void CMenuPcs::CalcSelectOpenAnim()
 {
+#ifdef VERSION_GCCP01
+	enum { kFadeFrames = 8, kArtifactDuration = 33 };
+#else
+	enum { kFadeFrames = 10, kArtifactDuration = 40 };
+#endif
 	int activePartyCount = s_Rinfo->m_partyCount;
 	int frame;
 	int doneCount;
@@ -2001,7 +2118,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		idx = 0;
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x16;
+			spr->kind = kBonusBackgroundTexture;
 			spr->y = 0;
 			spr->x = 0;
 			spr->w = 0x280;
@@ -2023,12 +2140,12 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulY = 0.0f;
 			spr->mulX = 0.0f;
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 		}
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x1f;
+			spr->kind = kBonusArtifactFrameTexture;
 			spr->x = 0;
 			spr->y = 0;
 			spr->w = 0x80;
@@ -2036,7 +2153,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulY = 0.0f;
 			spr->mulX = 0.0f;
 			spr->startFrame = 9999;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-8.0f);
 			spr->motionY = (-8.0f);
@@ -2052,7 +2169,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulY = 0.0f;
 			spr->mulX = 0.0f;
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 		}
 
@@ -2066,7 +2183,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 				}
 			}
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->kind = 0x18;
+			spr->kind = kBonusPlayerTexture;
 			spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
 			spr->y = y;
 			spr->w = 0x60;
@@ -2074,7 +2191,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulX = (float)((partySlot & 1) ? spr->w : 0);
 			spr->mulY = (float)((partySlot >> 1) ? spr->h : 0);
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-240.0f);
 			spr->motionY = 0.0f;
@@ -2096,7 +2213,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulX = 0.0f;
 			spr->mulY = 0.0f;
 			spr->startFrame = (spr - activePartyCount)->startFrame;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-240.0f);
 			spr->motionY = 0.0f;
@@ -2119,8 +2236,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 				spr->mulX = 0.0f;
 				spr->mulY = 0.0f;
 				spr->startFrame = start;
+#ifdef VERSION_GCCP01
 				spr->startFrame = (int)(0.8333333134651184f * (float)spr->startFrame);
-				spr->duration = 0x21;
+#endif
+				spr->duration = kArtifactDuration;
 				spr->depth = 1.0f;
 				spr->flags = 1;
 				start += 5;
@@ -2148,7 +2267,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->kind = 0x19;
+			spr->kind = kBonusCountTexture;
 			spr->x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			spr->y = y;
 			spr->w = 0x38;
@@ -2156,7 +2275,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulX = (float)(i * spr->w);
 			spr->mulY = 0.0f;
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-240.0f);
 			spr->motionY = 0.0f;
@@ -2179,7 +2298,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->mulX = 0.0f;
 			spr->mulY = 0.0f;
 			spr->startFrame = prev->startFrame;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->motionX = (-240.0f);
 			spr->motionY = 0.0f;
@@ -2382,13 +2501,20 @@ void CMenuPcs::CalcSelectOpenAnim()
  * --INFO--
  * PAL Address: 0x80135258
  * PAL Size: 2824b
- * EN Address: 0x8015A968
- * EN Size: 2976b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80134578
+ * EN Size: 2804b
+ * JP Address: 0x801310D4
+ * JP Size: 2724b
  */
 void CMenuPcs::DrawSelectOpenAnim()
 {
+#ifdef VERSION_GCCJGC
+	enum { kSourceAllocLine = 0x9CD, kSourceErrorLine = 0x9D0,
+	       kConvertedAllocLine = 0x9D6, kConvertedErrorLine = 0x9D9 };
+#else
+	enum { kSourceAllocLine = 0xA9C, kSourceErrorLine = 0xA9F,
+	       kConvertedAllocLine = 0xAA5, kConvertedErrorLine = 0xAA8 };
+#endif
 	if (this->m_bonusState->m_initialized == 0) {
 		return;
 	}
@@ -2465,14 +2591,14 @@ void CMenuPcs::DrawSelectOpenAnim()
 				color.a = (unsigned char)(255.0f * sprite->alpha);
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
-				if (sprite->kind == 0x20) {
+				if (sprite->kind == kBonusCursorTexture) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
 				}
 				MenuPcs.DrawRect(0,
 				    (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 				    (float)sprite->w, (float)sprite->h,
 				    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
-				if (sprite->kind == 0x20) {
+				if (sprite->kind == kBonusCursorTexture) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 				}
 				lastKind = sprite->kind;
@@ -2516,11 +2642,17 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 			float x = (float)sprite->x + sprite->motionX;
 			float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
 			if (textIndex < activePartyCount) {
 				y -= 4.0f;
 			}
+#endif
 			font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+			font->SetPosY(y);
+#else
 			font->SetPosY(y - 4.0f);
+#endif
 			font->Draw(text);
 			textIndex++;
 		}
@@ -2540,28 +2672,36 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font = this->m_fonts[1];
 		font->SetMargin(1.0f);
 		font->SetShadow(0);
+#ifdef VERSION_GCCJGC
+		font->SetScale(0.9f);
+#else
 		font->SetScaleX(0.7200000286102295f);
 		font->SetScaleY(0.8999999761581421f);
+#endif
 		font->DrawInit();
 		CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 		font->SetColor(color.color);
 
 		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
-		char* title = Game.m_cFlatDataArr[1].TableStrings(0)[idx * 5 + 4];
+		char* title = Game.GetShortItemName(idx);
 		float centerX = (float)((double)sprite->x + (double)(float)sprite->w * 0.5);
 		float centerY = (float)((double)sprite->y + (double)(float)sprite->h * 0.5);
 		font->SetPosX((float)-(0.5 * (double)font->GetWidth(title) - (double)centerX));
+#ifdef VERSION_GCCJGC
+		font->SetPosY(centerY - 44.0f);
+#else
 		font->SetPosY(centerY - 44.0f - 4.0f);
+#endif
 		font->Draw(title);
 
-		char* source = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xA9C) char[0x200];
+		char* source = new (MenuPcs.m_menuStage, "bonus_menu.cpp", kSourceAllocLine) char[0x200];
 		if ((source == 0) && ((unsigned int)System.m_execParam >= 1)) {
-			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", 0xA9F);
+			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", kSourceErrorLine);
 		}
 		memset(source, 0, 0x200);
-		char* converted = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xAA5) char[0x200];
+		char* converted = new (MenuPcs.m_menuStage, "bonus_menu.cpp", kConvertedAllocLine) char[0x200];
 		if ((converted == 0) && ((unsigned int)System.m_execParam >= 1)) {
-			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", 0xAA8);
+			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", kConvertedErrorLine);
 		}
 		memset(converted, 0, 0x200);
 		strcpy(source, Game.m_cFlatDataArr[1].TableStrings(6)[idx]);
@@ -2572,14 +2712,22 @@ void CMenuPcs::DrawSelectOpenAnim()
 #endif
 		strlen(converted);
 
+#ifdef VERSION_GCCJGC
+		float lineY = centerY - 11.0f;
+#else
 		float lineY = centerY - 11.0f - 7.0f;
+#endif
 		for (int line = 0;; line++) {
 			char* lineText = (line != 0) ? strtok(0, const_cast<char*>("\n")) : strtok(converted, const_cast<char*>("\n"));
 			if (lineText == 0) {
 				break;
 			}
 			font->SetPosX((float)-(0.5 * (double)font->GetWidth(lineText) - (double)centerX));
+#ifdef VERSION_GCCJGC
+			font->SetPosY(lineY);
+#else
 			font->SetPosY(lineY - 4.0f);
+#endif
 			font->Draw(lineText);
 			lineY += 22.0f;
 		}
@@ -2597,8 +2745,13 @@ void CMenuPcs::DrawSelectOpenAnim()
 	if (this->m_menuWindowInfo->state == 1) {
 		DrawMcWinMess(0x18, 1);
 		DrawInit();
+#ifdef VERSION_GCCJGC
+		float cursorX = (float)(this->m_menuWindowInfo->x + 32) + (float)(this->m_bonusState->m_confirmSelection * 80);
+		float cursorY = (float)(this->m_menuWindowInfo->y + 76);
+#else
 		float cursorY = (float)(this->m_menuWindowInfo->y + this->m_menuWindowInfo->height - 0x3e);
 		float cursorX = (float)GetYesNoXPos((int)this->m_bonusState->m_confirmSelection);
+#endif
 		DrawCursor((int)cursorX, (int)cursorY, 1.0f);
 	}
 }
@@ -2607,10 +2760,10 @@ void CMenuPcs::DrawSelectOpenAnim()
  * --INFO--
  * PAL Address: 0x8013473C
  * PAL Size: 2844b
- * EN Address: 0x8015B508
- * EN Size: 3004b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80133A5C
+ * EN Size: 2844b
+ * JP Address: 0x801305B4
+ * JP Size: 2848b
  */
 void CMenuPcs::CalcSelectWait()
 {
@@ -2633,7 +2786,7 @@ void CMenuPcs::CalcSelectWait()
 			short count = m_bonusAnim->header.count;
 			CMenuPcs::Sprt2* cursor = &m_bonusAnim->sprites[count];
 			CMenuPcs::Sprt2* partySprite = cursor - activePartyCount * 2;
-			cursor->kind = 0x20;
+			cursor->kind = kBonusCursorTexture;
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
 			cursor->w = 0x40;
@@ -2641,7 +2794,11 @@ void CMenuPcs::CalcSelectWait()
 			cursor->mulX = 0.0f;
 			cursor->mulY = 0.0f;
 			cursor->startFrame = 0;
+#ifdef VERSION_GCCP01
 			cursor->duration = 8;
+#else
+			cursor->duration = 10;
+#endif
 			cursor->depth = 1.0f;
 			cursor->flags = 0;
 			m_bonusAnim->header.count = (short)(count + 1);
@@ -2883,13 +3040,18 @@ inline void CMenuPcs::DrawSelectWait()
  * --INFO--
  * PAL Address: 0x80133AD8
  * PAL Size: 3172b
- * EN Address: 0x8015C0EC
- * EN Size: 3440b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80132DF8
+ * EN Size: 3172b
+ * JP Address: 0x8012F928
+ * JP Size: 3212b
  */
 void CMenuPcs::CalcSelectCloseAnim()
 {
+#ifdef VERSION_GCCP01
+	enum { kFadeFrames = 8 };
+#else
+	enum { kFadeFrames = 10 };
+#endif
 	int activePartyCount = s_Rinfo->m_partyCount;
 	int twice;
 	int i;
@@ -2918,20 +3080,20 @@ void CMenuPcs::CalcSelectCloseAnim()
 		idx = 0;
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x16;
-			spr->startFrame = 8;
-			spr->duration = 8;
+			spr->kind = kBonusBackgroundTexture;
+			spr->startFrame = kFadeFrames;
+			spr->duration = kFadeFrames;
 		}
 		int i1 = 0;
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->startFrame = i1;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->flags = 2;
 		}
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = 0x1f;
+			spr->kind = kBonusArtifactFrameTexture;
 			spr->startFrame = i1;
 			spr->duration = i1;
 			spr->flags = 2;
@@ -2940,13 +3102,13 @@ void CMenuPcs::CalcSelectCloseAnim()
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = -4;
 			spr->startFrame = i1;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 		}
 
 		for (; i1 < activePartyCount; i1++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i1 + idx];
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
 			spr->x = (short)(int)spr->targetX;
 			spr->y = (short)(int)spr->targetY;
@@ -2968,7 +3130,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		for (int i = 0; i < 8; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 			spr->startFrame = 0;
-			spr->duration = 8;
+			spr->duration = kFadeFrames;
 			spr->flags = 0;
 		}
 
@@ -2994,7 +3156,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 				spr->x = (short)(src->x + 0x50);
 				spr->y = (short)(src->y + 0x48);
 				spr->startFrame = src->startFrame;
-				spr->duration = 8;
+				spr->duration = kFadeFrames;
 				spr->motionX = 240.0f;
 				spr->motionY = 0.0f;
 				spr->targetX = (float)spr->x + spr->motionX;

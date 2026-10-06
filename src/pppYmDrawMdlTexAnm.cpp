@@ -97,8 +97,8 @@ extern "C" {
  * PAL Size: 632b
  * EN Address: 0x80089D28
  * EN Size: 632b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80089788
+ * JP Size: 632b
  */
 void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
 {
@@ -136,8 +136,8 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
  * PAL Size: 824b
  * EN Address: 0x80089FA0
  * EN Size: 824b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80089A00
+ * JP Size: 836b
  */
 void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
 {
@@ -198,8 +198,8 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
  * PAL Size: 328b
  * EN Address: 0x8008A2D8
  * EN Size: 328b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80089D44
+ * JP Size: 332b
  */
 void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
@@ -232,8 +232,8 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
  * PAL Size: 316b
  * EN Address: 0x8008A420
  * EN Size: 316b
- * JP Address: TODO
- * JP Size: TODO
+ * JP Address: 0x80089E90
+ * JP Size: 324b
  */
 void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {

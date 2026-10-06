@@ -42,12 +42,12 @@ static inline VYmDeformationScreen* GetYmDeformationScreenWork(pppYmDeformationS
 
 /*
  * --INFO--
- * PAL Address: 0x800981a8
- * PAL Size: 1716b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * PAL Address: 0x8009159C
+ * PAL Size: 1604b
+ * EN Address: 0x80090F38
+ * EN Size: 1604b
+ * JP Address: 0x80090994
+ * JP Size: 1728b
  */
 void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationScreenStep* step, _pppCtrlTable* param3)
 {
@@ -208,12 +208,12 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 
 /*
  * --INFO--
- * PAL Address: 0x8009885c
+ * PAL Address: 0x80091BE0
  * PAL Size: 516b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8009157C
+ * EN Size: 516b
+ * JP Address: 0x80091054
+ * JP Size: 516b
  */
 void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationScreenStep* step, _pppCtrlTable* param3)
 {
@@ -286,12 +286,12 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationSc
 
 /*
  * --INFO--
- * PAL Address: 0x80098a60
+ * PAL Address: 0x80091DE4
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80091780
+ * EN Size: 4b
+ * JP Address: 0x80091258
+ * JP Size: 4b
  */
 void pppDestructYmDeformationScreen(pppYmDeformationScreen*, _pppCtrlTable*)
 {
@@ -300,12 +300,12 @@ void pppDestructYmDeformationScreen(pppYmDeformationScreen*, _pppCtrlTable*)
 
 /*
  * --INFO--
- * PAL Address: 0x80098a64
+ * PAL Address: 0x80091DE8
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80091784
+ * EN Size: 48b
+ * JP Address: 0x8009125C
+ * JP Size: 52b
  */
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
@@ -313,22 +313,18 @@ void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable
 	VYmDeformationScreen* work = GetYmDeformationScreenWork(
 		obj, GetYmDeformationScreenDataOffsets(param2)->m_workOffset);
 
-	work->m_values[1] = zero;
-	work->m_values[0] = zero;
-	work->m_scale = zero;
-	work->m_values[4] = zero;
-	work->m_values[3] = zero;
-	work->m_values[2] = zero;
+	work->m_scale = work->m_values[0] = work->m_values[1] = zero;
+	work->m_values[2] = work->m_values[3] = work->m_values[4] = zero;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80098a94
+ * PAL Address: 0x80091E18
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800917B4
+ * EN Size: 64b
+ * JP Address: 0x80091290
+ * JP Size: 68b
  */
 void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
@@ -340,10 +336,6 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable*
 
 	work->m_angle = angle;
 	work->m_direction = direction;
-	work->m_values[1] = zero;
-	work->m_values[0] = zero;
-	work->m_scale = zero;
-	work->m_values[4] = zero;
-	work->m_values[3] = zero;
-	work->m_values[2] = zero;
+	work->m_scale = work->m_values[0] = work->m_values[1] = zero;
+	work->m_values[2] = work->m_values[3] = work->m_values[4] = zero;
 }

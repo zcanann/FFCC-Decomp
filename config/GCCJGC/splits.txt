@@ -517,6 +517,7 @@ os/OSSemaphore.c:
 	.text start:0x8017AC20 end:0x8017ADA4
 
 wm_menu.cpp:
+	.rodata start:0x801D777C end:0x801D787C
 	.text start:0x800E3E28 end:0x800FEFE8
 
 mapocttree.cpp:
@@ -780,6 +781,11 @@ TRK_MINNOW_DOLPHIN/usr_put.c:
 memorycard.cpp:
 	.text start:0x800BF1C8 end:0x800C2514
 	.bss start:0x8030DF18 end:0x8030DFB4
+	.ctors start:0x801D06A8 end:0x801D06AC
+	.rodata start:0x801D54F0 end:0x801D5B93
+	.data start:0x8022D760 end:0x8022D77C
+	.sdata start:0x8034B650 end:0x8034B67C
+	.sdata2 start:0x8034D9E0 end:0x8034D9FF
 
 OdemuExi2/DebuggerDriver.c:
 	.text start:0x801B7704 end:0x801B8184
@@ -1161,6 +1167,7 @@ game.cpp:
 	.text start:0x80013D9C end:0x80015DD8
 
 p_chara_viewer.cpp:
+	.rodata start:0x801D5318 end:0x801D54A0
 	.text start:0x800BB280 end:0x800BD02C
 
 FunnyShape.cpp:
@@ -1168,10 +1175,16 @@ FunnyShape.cpp:
 
 p_tina.cpp:
 	.text start:0x800517A8 end:0x80053458
+	.bss start:0x8028F228 end:0x8028F368
 
 p_dbgmenu.cpp:
+	.ctors start:0x801D06C0 end:0x801D06C4
 	.bss start:0x80322008 end:0x80324A74
 	.text start:0x801275FC end:0x80129354
+	.rodata start:0x801D8B78 end:0x801D8C00
+	.data start:0x8022FB60 end:0x8022FF68
+	.sdata start:0x8034B828 end:0x8034B848
+	.sdata2 start:0x8034E8A8 end:0x8034E950
 
 p_map.cpp:
 	.text start:0x800340BC end:0x800359D4
@@ -1587,3 +1600,212 @@ auto_801D5DC6_rodata:
 
 auto_8034DA54_sdata2:
 	.sdata2 start:0x8034DA54 end:0x8034DA58 align:1
+
+auto_801D5B93_rodata:
+	.rodata start:0x801D5B93 end:0x801D5B98 align:1
+
+auto_8022D77C_data:
+	.data start:0x8022D77C end:0x8022D780 align:1
+
+auto_8034B67C_sdata:
+	.sdata start:0x8034B67C end:0x8034B680 align:1
+
+auto_8034D9FF_sdata2:
+	.sdata2 start:0x8034D9FF end:0x8034DA00 align:1
+
+pppYmMelt.cpp:
+	.text start:0x800A32D0 end:0x800A3EAC
+	.rodata start:0x801D4B70 end:0x801D4B80
+	.sdata2 start:0x8034D828 end:0x8034D858
+	.sbss2 start:0x803501E0 end:0x803501E4
+
+pppYmTracer.cpp:
+	.text start:0x80092648 end:0x80093228
+	.rodata start:0x801D4840 end:0x801D4850
+	.sdata2 start:0x8034D420 end:0x8034D440
+
+auto_801D4B6C_rodata:
+	.rodata start:0x801D4B6C end:0x801D4B70 align:4
+
+pppKeShpTail3X.cpp:
+	.text start:0x80088634 end:0x80089788
+	.sdata2 start:0x8034D260 end:0x8034D288
+
+pppKeShpTail2X.cpp:
+	.text start:0x80087A9C end:0x80088634
+	.sdata2 start:0x8034D240 end:0x8034D260
+
+pppYmTracer2.cpp:
+	.text start:0x800FF610 end:0x800FFF0C
+	.rodata start:0x801D7BF8 end:0x801D7C10
+	.sdata2 start:0x8034E4E0 end:0x8034E508
+	.sbss2 start:0x803501F8 end:0x80350200
+
+pppBlurChara.cpp:
+	.text start:0x800DADD4 end:0x800DB9F4
+	.rodata start:0x801D6110 end:0x801D6128
+	.sdata2 start:0x8034DD40 end:0x8034DD70
+
+pppEmission.cpp:
+	.text start:0x800E3320 end:0x800E3E28
+	.rodata start:0x801D62E0 end:0x801D62F0
+	.sdata2 start:0x8034DF00 end:0x8034DF28
+
+vector.cpp:
+	.text	start:0x800C258C end:0x800C2640
+	extab	start:0x80008568 end:0x80008578
+	extabindex	start:0x8000EC14 end:0x8000EC2C
+	.sdata2	start:0x8034DA00 end:0x8034DA04
+
+auto_vector_8034DA04_sdata2:
+	.sdata2 start:0x8034DA04 end:0x8034DA08 align:4
+
+pppChangeTex.cpp:
+	.text start:0x8013AE44 end:0x8013B888
+	.rodata start:0x801D8DA0 end:0x801D8DB8
+	.sdata2 start:0x8034EC88 end:0x8034ECB0
+
+pppYmChangeTex.cpp:
+	.text start:0x800D0C5C end:0x800D1684
+	.rodata start:0x801D5FB0 end:0x801D5FC8
+	.sdata2 start:0x8034DB18 end:0x8034DB38
+
+pppYmDeformationMdl.cpp:
+	.text start:0x800CEDA4 end:0x800CF4BC
+	.sdata2 start:0x8034DAB8 end:0x8034DAD8
+
+pppYmDeformationScreen.cpp:
+	.text start:0x80090994 end:0x800912D4
+	.sdata2 start:0x8034D3B0 end:0x8034D3E8
+
+pppYmDrawMdlTexAnm.cpp:
+	.text start:0x80089788 end:0x80089FD4
+	.rodata start:0x801D4798 end:0x801D47C8
+	.sdata2 start:0x8034D288 end:0x8034D2A0
+
+vi/vi.c:
+	.text start:0x80185DF8 end:0x8018782C
+	.data start:0x80233098 end:0x80233468
+	.bss start:0x80328448 end:0x80328590
+	.sdata start:0x8034B8F0 end:0x8034B8FC
+	.sbss start:0x8034BEC0 end:0x8034BF18
+
+auto_8034B8FC_sdata:
+	.sdata start:0x8034B8FC end:0x8034B900 align:1
+
+auto_8034BEBC_sbss:
+	.sbss start:0x8034BEBC end:0x8034BEC0 align:1
+
+wind.cpp:
+	.text start:0x800D6740 end:0x800D7478
+	.rodata start:0x801D6018 end:0x801D6078
+	.sdata2 start:0x8034DC10 end:0x8034DC60
+	.bss start:0x80313010 end:0x8031AC98
+
+chara_anim.cpp:
+	.text start:0x800BD02C end:0x800BD870
+	.rodata start:0x801D54A0 end:0x801D54E0
+	.sdata2 start:0x8034D988 end:0x8034D9A8
+	.data start:0x8022D748 end:0x8022D760
+	.sdata start:0x8034B640 end:0x8034B650
+
+auto_chara_anim_8034B63C_sdata:
+	.sdata start:0x8034B63C end:0x8034B640 align:4
+
+prgobj.cpp:
+	.text start:0x80122EEC end:0x80123A38
+	.rodata start:0x801D8780 end:0x801D87C0
+	.sdata2 start:0x8034E860 end:0x8034E880
+	.data start:0x8022F898 end:0x8022F970
+	.sdata start:0x8034B7F0 end:0x8034B810
+
+baseobj.cpp:
+	.text start:0x801071C8 end:0x8010731C
+	.rodata start:0x801D7C30 end:0x801D7C58
+	.data start:0x8022EAB0 end:0x8022EAE8
+	.sdata start:0x8034B700 end:0x8034B710
+
+pppCrystal.cpp:
+	.text start:0x800D9D6C end:0x800DA728
+	.rodata start:0x801D60A8 end:0x801D6100
+	.sdata2 start:0x8034DCC0 end:0x8034DD28
+
+pppCrystal2.cpp:
+	.text start:0x8013A5FC end:0x8013AE44
+	.rodata start:0x801D8D48 end:0x801D8DA0
+	.sdata2 start:0x8034EC40 end:0x8034EC88
+
+graphic_dbgfont.cpp:
+	.data start:0x801F1800 end:0x801F2400 align:32
+
+pppRain.cpp:
+	.text start:0x800DA728 end:0x800DADD4
+	.rodata start:0x801D6100 end:0x801D6110
+	.sdata2 start:0x8034DD28 end:0x8034DD40
+
+pppColum.cpp:
+	.text start:0x800DBF40 end:0x800DC564
+	.rodata start:0x801D6128 end:0x801D6138
+	.sdata2 start:0x8034DD88 end:0x8034DDC8
+
+pppLight.cpp:
+	.text start:0x800D7E94 end:0x800D8434
+	.sdata2 start:0x8034DC78 end:0x8034DC88
+
+pppConformBGNormal.cpp:
+	.text start:0x801052F8 end:0x80105934
+	.sdata2 start:0x8034E5A8 end:0x8034E5C0
+
+pppLensFlare.cpp:
+	.text start:0x800DB9F4 end:0x800DBF40
+	.sdata2 start:0x8034DD70 end:0x8034DD88
+
+pppCorona.cpp:
+	.text start:0x800DC564 end:0x800DC85C
+	.sdata2 start:0x8034DDC8 end:0x8034DDE0
+
+THPSimple.cpp:
+	.text start:0x80100114 end:0x80101A20
+	.bss start:0x8031B360 end:0x8031BA40
+	.sbss start:0x8034BC30 end:0x8034BC48
+	.data start:0x8022E9B0 end:0x8022EAB0
+	.sdata2 start:0x8034E508 end:0x8034E510
+
+THPDraw.cpp:
+	.text start:0x80101A20 end:0x80102220
+	.sdata2 start:0x8034E510 end:0x8034E538
+
+mtx/quat.c:
+	.text start:0x801814B8 end:0x80181A24
+	.rodata start:0x801DB150 end:0x801DB15C
+	.sdata2 start:0x8034FB38 end:0x8034FB60
+
+auto_quat_801DB15C_rodata:
+	.rodata start:0x801DB15C end:0x801DB160 align:4
+
+auto_quat_8034FB34_sdata2:
+	.sdata2 start:0x8034FB34 end:0x8034FB38 align:4
+
+LocationTitle2.cpp:
+	.text start:0x800D7478 end:0x800D7CD0
+	.rodata start:0x801D6078 end:0x801D6090
+	.sdata2 start:0x8034DC60 end:0x8034DC78
+
+pppLocationTitle.cpp:
+	.text start:0x800D6068 end:0x800D6740
+	.rodata start:0x801D6000 end:0x801D6018
+	.sdata2 start:0x8034DC00 end:0x8034DC10
+
+gba/GBAKey.c:
+	.text start:0x801A32C4 end:0x801A352C
+	.data start:0x80238478 end:0x80238820
+
+monobj_table.cpp:
+	.text start:0x8013F154 end:0x80141190
+	.ctors start:0x801D06C8 end:0x801D06CC
+	extab start:0x80009C6C end:0x80009C74
+	extabindex start:0x80010E7C end:0x80010E88
+	.data start:0x80230178 end:0x802318B8
+
+USBStreamData.cpp:
+	.text start:0x8004FC78 end:0x8004FD98

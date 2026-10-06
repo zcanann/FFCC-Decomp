@@ -164,7 +164,7 @@ public:
 	int SetMoney(int portIndex, unsigned int money);
 
 	int SetMType(int portIndex, int mtype);
-    unsigned char GetMType(int portIndex);
+    int GetMType(int portIndex);
     unsigned int GetPadType(int portIndex);
 
     void ExitThread();

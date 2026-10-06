@@ -38,10 +38,10 @@ static inline VColor* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTa
  * --INFO--
  * PAL Address: 0x800de718
  * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DDEE4
+ * EN Size: 428b
+ * JP Address: 0x800DB9F4
+ * JP Size: 428b
  */
 void pppRenderLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTable)
 {
@@ -98,10 +98,10 @@ void pppRenderLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTa
  * --INFO--
  * PAL Address: 0x800de8c4
  * PAL Size: 844b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DE090
+ * EN Size: 844b
+ * JP Address: 0x800DBBA0
+ * JP Size: 844b
  */
 void pppFrameLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTable)
 {
@@ -211,6 +211,10 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTab
  * --INFO--
  * PAL Address: 0x800dec10
  * PAL Size: 4b
+ * EN Address: 0x800DE3DC
+ * EN Size: 4b
+ * JP Address: 0x800DBEEC
+ * JP Size: 4b
  */
 void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
 {
@@ -220,6 +224,10 @@ void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x800dec14
  * PAL Size: 72b
+ * EN Address: 0x800DE3E0
+ * EN Size: 72b
+ * JP Address: 0x800DBEF0
+ * JP Size: 80b
  */
 void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
@@ -227,12 +235,8 @@ void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 
 	float initValue = 0.0f;
 
-	work->m_projectedZ = initValue;
-	work->m_projectedY = initValue;
-	work->m_projectedX = initValue;
-	work->m_viewPosition.z = initValue;
-	work->m_viewPosition.y = initValue;
-	work->m_viewPosition.x = initValue;
+	work->m_projectedX = work->m_projectedY = work->m_projectedZ = initValue;
+	work->m_viewPosition.x = work->m_viewPosition.y = work->m_viewPosition.z = initValue;
 
 	work->m_shapeFrame2 = 0;
 	work->m_shapeFrame1 = 0;

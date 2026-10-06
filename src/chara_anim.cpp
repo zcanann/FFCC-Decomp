@@ -156,10 +156,10 @@ inline void CChara::CAnimNode::mapping(CChara::CAnim*)
  * --INFO--
  * PAL Address: 0x800BFDE0
  * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800BF668
+ * EN Size: 152b
+ * JP Address: 0x800BD7D8
+ * JP Size: 152b
  */
 CChara::CAnim::CAnim()
 {
@@ -182,10 +182,10 @@ CChara::CAnim::CAnim()
  * --INFO--
  * PAL Address: 0x800BFD44
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800BF5CC
+ * EN Size: 156b
+ * JP Address: 0x800BD73C
+ * JP Size: 156b
  */
 CChara::CAnim::~CAnim()
 {
@@ -204,10 +204,10 @@ CChara::CAnim::~CAnim()
  * --INFO--
  * PAL Address: 0x800BF984
  * PAL Size: 960b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800BF20C
+ * EN Size: 960b
+ * JP Address: 0x800BD37C
+ * JP Size: 960b
  */
 void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 {
@@ -294,10 +294,10 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
  * --INFO--
  * PAL Address: 0x800BF910
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800BF198
+ * EN Size: 116b
+ * JP Address: 0x800BD308
+ * JP Size: 116b
  */
 void CChara::CAnim::InitQuantize()
 {
@@ -312,10 +312,10 @@ void CChara::CAnim::InitQuantize()
  * --INFO--
  * PAL Address: 0x800BF8F0
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800BF178
+ * EN Size: 32b
+ * JP Address: 0x800BD2E8
+ * JP Size: 32b
  */
 CChara::CAnimNode::CAnimNode()
 {
@@ -327,10 +327,10 @@ CChara::CAnimNode::CAnimNode()
  * --INFO--
  * PAL Address: 0x800BF8B4
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800BF13C
+ * EN Size: 60b
+ * JP Address: 0x800BD2AC
+ * JP Size: 60b
  */
 CChara::CAnimNode::~CAnimNode()
 {
@@ -340,10 +340,10 @@ CChara::CAnimNode::~CAnimNode()
  * --INFO--
  * PAL Address: 0x800BF620
  * PAL Size: 660b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800BEEBC
+ * EN Size: 640b
+ * JP Address: 0x800BD02C
+ * JP Size: 640b
  */
 void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 {
@@ -370,9 +370,11 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	anim->m_lastFrame = 0;
 
 	float frameFrac = frame - static_cast<float>(frameInt);
+#if defined(VERSION_GCCP01)
 	if (frameInt == anim->m_frameCount - 1) {
 		frameFrac = 0.0f;
 	}
+#endif
 
 	register int flags = static_cast<int>(m_flagsBits.m_channelModes);
 	register unsigned int dataOffset = m_dataOffset;

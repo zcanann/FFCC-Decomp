@@ -2,7 +2,7 @@
 #include "dolphin/gba/GBAPriv.h"
 #include <string.h>
 
-volatile u8 GBAKeyDspTaskIram[] = {
+static volatile u8 GBAKeyDspTaskIram[] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   33,  2,   255, 0,   33,  19,  6,   18,  3,   18,  4,
     19,  5,   0,   146, 0,   255, 0,   136, 255, 255, 0,   137, 255, 255, 0,   138, 255, 255, 0,
@@ -53,26 +53,10 @@ volatile u8 GBAKeyDspTaskIram[] = {
     0,   0,   0,
 };
 
-char s_GBAKey_c[] = "GBAKey.c";
-char s_GBA___unexpected_dsp_call[] = "GBA - unexpected dsp call";
+static char s_GBAKey_c[] = "GBAKey.c";
+static char s_GBA___unexpected_dsp_call[] = "GBA - unexpected dsp call";
 
 static inline s32 F152(DSPTaskInfo* task)
-{
-    s32 chan;
-    GBAControl* gba;
-
-    for (chan = 0; chan < 4; chan++) {
-        gba = &__GBA[chan];
-        if (&gba->task == task) {
-            return chan;
-        }
-    }
-
-    OSPanic(s_GBAKey_c, 169, s_GBA___unexpected_dsp_call);
-    return -1;
-}
-
-static inline s32 F232_FindChan(DSPTaskInfo* task)
 {
     s32 chan;
     GBAControl* gba;
@@ -92,17 +76,17 @@ static inline s32 F232_FindChan(DSPTaskInfo* task)
  * --INFO--
  * PAL Address: 0x801A8D9C
  * PAL Size: 220b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801A7C80
+ * EN Size: 220b
+ * JP Address: 0x801A32C4
+ * JP Size: 220b
  */
-void F232(void* task)
+static void F23(void* task)
 {
     GBAControl* gba;
     s32 chan;
 
-    chan = F232_FindChan(task);
+    chan = F152(task);
     gba = &__GBA[chan];
 
     DSPSendMailToDSP(0xabba0000);
@@ -114,13 +98,31 @@ void F232(void* task)
         ;
 }
 
-void F252(void* task)
+/*
+ * --INFO--
+ * PAL Address: 0x801A8E78
+ * PAL Size: 168b
+ * EN Address: 0x801A7D5C
+ * EN Size: 168b
+ * JP Address: 0x801A33A0
+ * JP Size: 168b
+ */
+static void F25(void* task)
 {
     s32 chan;
 
     __GBAX01((chan = F152(task)), 0);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A8F20
+ * PAL Size: 228b
+ * EN Address: 0x801A7E04
+ * EN Size: 228b
+ * JP Address: 0x801A3448
+ * JP Size: 228b
+ */
 void __GBAX02(s32 chan, u8* readbuf)
 {
     GBAControl* gba = &__GBA[chan];
@@ -144,9 +146,9 @@ void __GBAX02(s32 chan, u8* readbuf)
     task->iram_length = sizeof(GBAKeyDspTaskIram);
     task->iram_addr = 0;
     task->dsp_init_vector = 0x10;
-    task->init_cb = F232;
+    task->init_cb = F23;
     task->res_cb = NULL;
-    task->done_cb = F252;
+    task->done_cb = F25;
     task->req_cb = NULL;
 
     DSPAddTask(task);

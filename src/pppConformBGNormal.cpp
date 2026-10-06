@@ -44,10 +44,10 @@ static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
  * --INFO--
  * PAL Address: 0x801091d4
  * PAL Size: 1552b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801085E4
+ * EN Size: 1552b
+ * JP Address: 0x801052F8
+ * JP Size: 1552b
  */
 void pppFrameConformBGNormal(pppConformBGNormal* conformBG, pppConformBGNormalStep* step, struct _pppCtrlTable* ctrl)
 {
@@ -279,10 +279,10 @@ void pppFrameConformBGNormal(pppConformBGNormal* conformBG, pppConformBGNormalSt
  * --INFO--
  * PAL Address: 0x801097e4
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80108BF4
+ * EN Size: 44b
+ * JP Address: 0x80105908
+ * JP Size: 44b
  */
 void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlTable* ctrl)
 {
@@ -291,8 +291,6 @@ void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlT
 
     state = (ConformBgNormalState*)(conformBG->m_workArea + GetConformBgNormalDataOffsets(ctrl)->m_stateOffset);
     scale = 0.0f;
-    state->m_normal.z = scale;
-    state->m_normal.y = scale;
-    state->m_normal.x = scale;
+    state->m_normal.x = state->m_normal.y = state->m_normal.z = scale;
     state->m_initialized = 0;
 }

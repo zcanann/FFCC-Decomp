@@ -2800,17 +2800,26 @@ void CMenuPcs::CalcLoadMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x800fca2c
+ * PAL Address: 0x800FCA2C
  * PAL Size: 1416b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800FBFD4
+ * EN Size: 1416b
+ * JP Address: 0x800F8D60
+ * JP Size: 1388b
  */
 void CMenuPcs::CalcTitleMenu()
 {
-
+#ifdef VERSION_GCCJGC
+	char* const OPMOVIE_FNAME = "dvd/movie/ffcc_op.thp";
+	const int kMovieBufferLine = 0xBC9;
+#else
 	static char* OPMOVIE_FNAME = "dvd/movie/ffcc_op.thp";
+#ifdef VERSION_GCCE01
+	const int kMovieBufferLine = 0xA98;
+#else
+	const int kMovieBufferLine = 0xABA;
+#endif
+#endif
 
 	int down = Pad.GetButtonDown(0);
 	const unsigned short repeat = GetButtonRepeat(0);
@@ -2849,7 +2858,7 @@ void CMenuPcs::CalcTitleMenu()
 			THPSimpleOpen(OPMOVIE_FNAME);
 			int thpMemory = THPSimpleCalcNeedMemory();
 			m_wmWorkBuffer =
-			    static_cast<unsigned char*>(Memory._Alloc(thpMemory, CharaPcs.GetAnimStage(), "wm_menu.cpp", 0xABA, 0));
+			    static_cast<unsigned char*>(Memory._Alloc(thpMemory, CharaPcs.GetAnimStage(), "wm_menu.cpp", kMovieBufferLine, 0));
 			THPSimpleSetBuffer(m_wmWorkBuffer);
 			THPSimplePreLoad(0);
 			THPSimpleAudioStart();

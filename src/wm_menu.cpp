@@ -4861,12 +4861,12 @@ void CMenuPcs::DrawTitleMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x800f6d70
+ * PAL Address: 0x800F6D70
  * PAL Size: 724b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F6330
+ * EN Size: 696b
+ * JP Address: 0x800F3118
+ * JP Size: 644b
  */
 void CMenuPcs::SetWorldParam(int code, int value)
 {
@@ -4959,8 +4959,13 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0x17: {
 		const char disabled = value == 0;
 		CameraPcs.m_worldMapEffect.m_paused = disabled;
-		CameraPcs.m_worldMapEffect.m_timer = 0x4B;
-		CameraPcs.m_worldMapEffect.m_duration = 0x4B;
+#ifdef VERSION_GCCP01
+		const int effectFrames = 75;
+#else
+		const int effectFrames = 90;
+#endif
+		CameraPcs.m_worldMapEffect.m_timer = effectFrames;
+		CameraPcs.m_worldMapEffect.m_duration = effectFrames;
 		CameraPcs.m_worldMapEffect.m_rotX = FLOAT_80331618;
 		CameraPcs.m_worldMapEffect.m_rotY = FLOAT_80331760;
 		CameraPcs.m_worldMapEffect.m_scale = FLOAT_80331764;
@@ -4972,6 +4977,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0x19:
 		bytes[0x16] = 1;
 		break;
+#ifndef VERSION_GCCJGC
 	case 0x1a: {
 		int i = 0;
 		do {
@@ -4980,12 +4986,21 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		} while (i < 4);
 		break;
 	}
+#endif
+#ifdef VERSION_GCCP01
 	case 0x1b:
 		GbaQue.SetControllerMode(value ? 1 : 0);
 		break;
+#endif
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+#ifdef VERSION_GCCJGC
+			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x14F0, code);
+#elif defined(VERSION_GCCE01)
+			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x145B, code);
+#else
 			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x1482, code);
+#endif
 		}
 		break;
 	}

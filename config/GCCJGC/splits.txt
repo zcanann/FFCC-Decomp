@@ -1196,6 +1196,13 @@ p_dbgmenu.cpp:
 
 p_map.cpp:
 	.text start:0x800340BC end:0x800359D4
+	.ctors start:0x801D065C end:0x801D0660
+	.rodata start:0x801D2238 end:0x801D23B4
+	.data start:0x801DCD38 end:0x801DD3B0
+	.bss start:0x80283EE0 end:0x8028408C
+	.sdata start:0x8034B308 end:0x8034B320
+	.sbss start:0x8034BAC0 end:0x8034BAD4
+	.sdata2 start:0x8034C758 end:0x8034C774
 
 TRK_MINNOW_DOLPHIN/notify.c:
 	.text start:0x801A7DB4 end:0x801A7E8C
@@ -1955,3 +1962,12 @@ cflat_data.cpp:
 
 cflat_data_padding_801D496F:
 	.rodata start:0x801D496F end:0x801D4970 align:1
+
+auto_801D23B4_rodata:
+	.rodata start:0x801D23B4 end:0x801D23B8 align:1
+
+auto_8034C774_sdata2:
+	.sdata2 start:0x8034C774 end:0x8034C778 align:1
+
+auto_8028408C_bss:
+	.bss start:0x8028408C end:0x80284090 align:4

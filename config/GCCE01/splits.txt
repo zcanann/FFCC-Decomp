@@ -1256,6 +1256,13 @@ p_dbgmenu.cpp:
 
 p_map.cpp:
 	.text start:0x8003477C end:0x80036084
+	.ctors start:0x801D433C end:0x801D4340
+	.rodata start:0x801D6620 end:0x801D679C
+	.data start:0x801E7838 end:0x801E7EB0
+	.bss start:0x802675A0 end:0x8026774C
+	.sdata start:0x8032D4E8 end:0x8032D500
+	.sbss start:0x8032DCA0 end:0x8032DCB4
+	.sdata2 start:0x8032E9C0 end:0x8032E9DC
 
 astar.cpp:
 	.bss start:0x80308158 end:0x8030A60C
@@ -1981,3 +1988,12 @@ cflat_data.cpp:
 
 cflat_data_padding_801D8D6F:
 	.rodata start:0x801D8D6F end:0x801D8D70 align:1
+
+auto_801D679C_rodata:
+	.rodata start:0x801D679C end:0x801D67A0 align:1
+
+auto_8032E9DC_sdata2:
+	.sdata2 start:0x8032E9DC end:0x8032E9E0 align:1
+
+auto_8026774C_bss:
+	.bss start:0x8026774C end:0x80267750 align:4

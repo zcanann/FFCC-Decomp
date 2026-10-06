@@ -90,7 +90,7 @@ CRelProfile g_hit_prof ATTRIBUTE_ALIGN(4);
 CRelProfile g_map_calc_prof ATTRIBUTE_ALIGN(4);
 CRelProfile g_map_draw_prof ATTRIBUTE_ALIGN(4);
 
-char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
+static char oldMapFileName[0x100] = "";
 
 /*
  * --INFO--
@@ -506,8 +506,8 @@ void CMapPcs::calc()
         MapMng.ReadOtm(m_mapName);
         MapMng.ReadMid(m_mapName);
         if ((m_viewerMode != 0) &&
-            (strcmp(s_lastLoadedMapPath__7CMapPcs, m_mapName) != 0)) {
-            strcpy(s_lastLoadedMapPath__7CMapPcs, m_mapName);
+            (strcmp(oldMapFileName, m_mapName) != 0)) {
+            strcpy(oldMapFileName, m_mapName);
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
@@ -657,8 +657,8 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     MapMng.ReadMid(mapPath);
 
     if (static_cast<unsigned char>(mode - 1) > 1) {
-        if ((m_viewerMode != 0) && (strcmp(s_lastLoadedMapPath__7CMapPcs, mapPath) != 0)) {
-            strcpy(s_lastLoadedMapPath__7CMapPcs, mapPath);
+        if ((m_viewerMode != 0) && (strcmp(oldMapFileName, mapPath) != 0)) {
+            strcpy(oldMapFileName, mapPath);
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {

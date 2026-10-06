@@ -1634,10 +1634,10 @@ void CChara::CalcMogScore()
  * --INFO--
  * PAL Address: 0x800df618
  * PAL Size: 480b
- * EN Address: 0x80101240
- * EN Size: 728b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEDE4
+ * EN Size: 480b
+ * JP Address: 0x800DC85C
+ * JP Size: 480b
  */
 void CChara::TimeMogFur()
 {
@@ -1667,9 +1667,12 @@ void CChara::TimeMogFur()
 			int r, g, b;
 			int a = (packed >> 12) & 7;
 			int baseLight = 7 - a;
-			r = ((packed >> 8) & 0xF) + 4 + baseLight;
-			g = ((packed >> 4) & 0xF) + 4 + baseLight;
-			b = (packed & 0xF) + 4 + baseLight;
+			r = (packed >> 8) & 0xF;
+			g = (packed >> 4) & 0xF;
+			b = packed & 0xF;
+			r += baseLight + 4;
+			g += baseLight + 4;
+			b += baseLight + 4;
 			r = r < 0xF ? r : 0xF;
 			g = g < 0xF ? g : 0xF;
 			b = b < 0xF ? b : 0xF;

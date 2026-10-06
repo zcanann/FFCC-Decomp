@@ -1227,6 +1227,7 @@ game.cpp:
 	.text start:0x80013D50 end:0x800161FC
 
 p_chara_viewer.cpp:
+	.rodata start:0x801D9700 end:0x801D9888
 	.text start:0x800BD0E4 end:0x800BEEBC
 
 FunnyShape.cpp:

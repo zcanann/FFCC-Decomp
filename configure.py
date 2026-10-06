@@ -731,7 +731,7 @@ config.libs = [
             Object(NonMatching, "pppScreenBreak.cpp"),
             Object(Matching, "pppScreenQuake.cpp"),
             Object(Matching, "pppSDrawMatrix.cpp"),
-            Object(NonMatching, "pppShape.cpp"),
+            Object(Matching, "pppShape.cpp"),
             Object(Matching, "pppSpMatrix.cpp"),
             Object(Matching, "pppSRandCV.cpp"),
             Object(Matching, "pppSRandDownCV.cpp"),

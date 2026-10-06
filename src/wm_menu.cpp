@@ -449,6 +449,8 @@ static const int kMainMenuFrameTexture = 50;
 static const int kCharacterLifeTexture = 38;
 static const int kCharacterAwayTexture = 54;
 static const int kWorldFrameTexture = 29;
+static const int kMcWindowTextureBase = 43;
+static const int kAltWindowTextureBase = 35;
 static const int kWorldWoodTexture = 21;
 static const int kMcYearTexture = 22;
 static const int kMcYearLabelTexture = 32;
@@ -467,6 +469,8 @@ static const int kMainMenuFrameTexture = 51;
 static const int kCharacterLifeTexture = 39;
 static const int kCharacterAwayTexture = 56;
 static const int kWorldFrameTexture = 30;
+static const int kMcWindowTextureBase = 44;
+static const int kAltWindowTextureBase = 36;
 static const int kWorldWoodTexture = 22;
 static const int kMcYearTexture = 23;
 static const int kMcYearLabelTexture = 33;
@@ -499,9 +503,11 @@ static const double kTitleSlideDistance = 49.333333333333336;
 #endif
 
 #ifdef VERSION_GCCP01
+static const int kMcWindowFrames = 6;
 static const int kTitleMovieFrames = 2883;
 static const int kTitleIdleFrames = 2450;
 #else
+static const int kMcWindowFrames = 8;
 static const int kTitleMovieFrames = 3457;
 static const int kTitleIdleFrames = 2940;
 #endif
@@ -9980,12 +9986,12 @@ void CMenuPcs::SetMcWinInfo(int x, int y)
 
 /*
  * --INFO--
- * PAL Address: 0x800ea4f4
+ * PAL Address: 0x800EA4F4
  * PAL Size: 1528b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800E9BF8
+ * EN Size: 1528b
+ * JP Address: 0x800E75D4
+ * JP Size: 1516b
  */
 void CMenuPcs::DrawMcWin(short state, short kind)
 {
@@ -10007,8 +10013,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	float sx;
 	float bottom;
 	if (m_menuWindowInfo->state != 1) {
-		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(m_menuWindowInfo->frame);
-		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(m_menuWindowInfo->frame);
+		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - FLOAT_80331410) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
+		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - FLOAT_80331410) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
 		sx = (centerX - FLOAT_80331410) - xAdd;
 		sy = (centerY - FLOAT_80331410) - yAdd;
 		sw = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + xAdd));
@@ -10036,7 +10042,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	int rectIdx;
 	unsigned long flags;
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x24 : 0x2C));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase : kMcWindowTextureBase));
 	right = (sx + sw) - FLOAT_80331410;
 	bottom = (sy + sh) - FLOAT_80331410;
 	const float* pZw1 = &FLOAT_803313dc;
@@ -10060,7 +10066,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		MenuPcs.DrawRect(flags, x, y, FLOAT_80331410, FLOAT_80331410, uv0, uv0, FLOAT_803313e8, FLOAT_803313e8, uv0);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x26 : 0x2D));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 2 : kMcWindowTextureBase + 1));
 	const double innerWidthD = static_cast<double>(sw) - DOUBLE_80331428;
 	const float innerX = FLOAT_80331410 + sx;
 	const float* pZw2 = &FLOAT_803313dc;
@@ -10076,7 +10082,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		MenuPcs.DrawRect(flags, innerX, y, innerWidthF, FLOAT_80331410, uv1, uv1, FLOAT_803313e8, FLOAT_803313e8, uv1);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x25 : 0x2E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 1 : kMcWindowTextureBase + 2));
 	const double innerHeightD = static_cast<double>(sh) - DOUBLE_80331428;
 	const float innerY = FLOAT_80331410 + sy;
 	const float* pZw3 = &FLOAT_803313dc;
@@ -10092,20 +10098,20 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		MenuPcs.DrawRect(flags, x, innerY, FLOAT_80331410, innerHeightF, uv2, uv2, FLOAT_803313e8, FLOAT_803313e8, uv2);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x27 : 0x2F));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 3 : kMcWindowTextureBase + 3));
 	const float* pZw4 = &FLOAT_803313dc;
 	const float uv3 = *pZw4;
 	MenuPcs.DrawRect(flags, innerX, innerY, static_cast<float>(innerWidthD), static_cast<float>(innerHeightD), uv3, uv3, FLOAT_803313e8, FLOAT_803313e8, uv3);
 
 	if (m_menuWindowInfo->state == 0) {
 		m_menuWindowInfo->frame++;
-		if (m_menuWindowInfo->frame >= 6) {
-			m_menuWindowInfo->frame = 6;
+		if (m_menuWindowInfo->frame >= kMcWindowFrames) {
+			m_menuWindowInfo->frame = kMcWindowFrames;
 			m_menuWindowInfo->state = 1;
 		}
 	} else if (m_menuWindowInfo->state == 1) {
-		if (m_menuWindowInfo->frame != 6) {
-			m_menuWindowInfo->frame = 6;
+		if (m_menuWindowInfo->frame != kMcWindowFrames) {
+			m_menuWindowInfo->frame = kMcWindowFrames;
 		}
 	} else if (m_menuWindowInfo->state == 2) {
 		m_menuWindowInfo->frame--;

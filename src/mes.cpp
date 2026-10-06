@@ -1374,7 +1374,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x0A:
 		{
-			unsigned char idx = (unsigned char)GET_1(text);
+			unsigned char idx = GET_1(text);
 			short value = (short)GET_2(text);
 			mFlagVars[idx] = value;
 			if (branchMode == 0)
@@ -1389,8 +1389,8 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x0B:
 		{
-			unsigned char idx = (unsigned char)GET_1(text);
-			mFlagVars[idx] = mFlagVars[idx] + 1;
+			unsigned char idx = GET_1(text);
+			mFlagVars[idx]++;
 			if (branchMode == 0)
 			{
 				CFlag flag;
@@ -1492,7 +1492,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x36:
 		{
-			signed char idx = (unsigned char)GET_1(text);
+			unsigned char idx = GET_1(text);
 			if (branchMode == 0)
 			{
 				CFlag flag;

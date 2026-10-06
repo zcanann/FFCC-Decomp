@@ -1785,3 +1785,14 @@ THPSimple.cpp:
 THPDraw.cpp:
 	.text start:0x80104D8C end:0x8010558C
 	.sdata2 start:0x80330818 end:0x80330840
+
+mtx/quat.c:
+	.text start:0x80185E08 end:0x80186374
+	.rodata start:0x801E54B0 end:0x801E54BC
+	.sdata2 start:0x803326D0 end:0x803326F8
+
+auto_quat_801E54BC_rodata:
+	.rodata start:0x801E54BC end:0x801E54C0 align:4
+
+auto_quat_803326CC_sdata2:
+	.sdata2 start:0x803326CC end:0x803326D0 align:4

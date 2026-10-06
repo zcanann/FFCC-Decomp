@@ -355,10 +355,10 @@ void C_QUATMakeClosest(const Quaternion* q, const Quaternion* qto, Quaternion* r
  * --INFO--
  * PAL Address: 0x80186FD4
  * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80185EB8
+ * EN Size: 140b
+ * JP Address: 0x80181568
+ * JP Size: 140b
  */
 void C_QUATRotAxisRad(Quaternion *q, const Vec *axis, f32 rad)
 {
@@ -442,10 +442,10 @@ void C_QUATLerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
  * --INFO--
  * PAL Address: 0x8018731C
  * PAL Size: 372b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80186200
+ * EN Size: 372b
+ * JP Address: 0x801818B0
+ * JP Size: 372b
  */
 #pragma fp_contract off
 void C_QUATSlerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)

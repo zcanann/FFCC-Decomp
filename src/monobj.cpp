@@ -3451,7 +3451,7 @@ void CGMonObj::setRepop(int mode)
 	enableDamageCol(1);
 	reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 
-	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
+	int scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
 
 	if ((scriptFlags & 0x80) != 0 || (scriptFlags & 0x20) != 0) {
 		if (mode == 0) {

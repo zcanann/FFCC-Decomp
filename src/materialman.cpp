@@ -892,11 +892,12 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     static int bTest2;
     static char init2;
 
+    CMaterial* material;
+    int isStd1000 = 0;
     SetStdEnv();
 
-    CMaterial* material = materialSet->m_materials[materialIndex];
+    material = materialSet->m_materials[materialIndex];
     g_drawMaterial = material;
-    int isStd1000 = 0;
 
     if (material->m_bumpLight != 0) {
         if (material->m_materialType == 3) {
@@ -1182,7 +1183,9 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXLoadTexObj(m_underWaterTexture, static_cast<GXTexMapID>(m_bumpTexMapIds[2]));
             return;
         }
-        if ((m_curEnvTevBit & material->m_tevBit & 0x1000) != 0) {
+        unsigned long tevBit = m_curEnvTevBit;
+        tevBit &= material->m_tevBit;
+        if ((tevBit & 0x1000) != 0) {
             isStd1000 = 1;
         } else {
             if (m_vtxDescMode != 1) {
@@ -1426,10 +1429,10 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
         if ((tevBit & 0x8000) != 0) {
             m_activeEnvTevBit = 0xFFFFFFFF;
             GXColor kColor;
+            kColor.r = 0;
             kColor.g = 0;
-            kColor.r = material->m_shadowKColorId;
             kColor.b = 0;
-            kColor.a = 0;
+            kColor.a = material->m_shadowKColorId;
             GXSetTevColor(static_cast<GXTevRegID>(3), kColor);
             GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
             if ((tevBit & 0x20) != 0) {
@@ -1541,7 +1544,6 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXSetNumChans(1);
             GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
             _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
-            m_numTevStage = 0;
             GXColor alpha;
             GXColor alphaInv;
             alpha.r = 0;
@@ -1552,6 +1554,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             alphaInv.g = 0xFF;
             alphaInv.b = 0xFF;
             alphaInv.a = m_reflectionAlpha;
+            m_numTevStage = 0;
             GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
             _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_RED);
             _GXSetTevSwapMode(m_numTevStage, 0, 1);

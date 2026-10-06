@@ -820,9 +820,9 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 		waveY += 2.0f;
 	}
 
-	font->SetScale(static_cast<float>(0.800000011920929 - fabs(static_cast<double>(angle)) / 4.0));
+	font->SetScale(static_cast<float>(0.8f - 0.25 * __fabs(angle)));
 	textWidth = static_cast<float>(font->GetWidth(commandLabel));
-	unclampedAlpha = static_cast<float>(-(fabs(static_cast<double>(angle)) / 2.0 - 1.0));
+	unclampedAlpha = static_cast<float>(1.0 - 0.5 * __fabs(angle));
 	textHeight = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 
 	clampedAlpha = (unclampedAlpha < 0.0f) ? 0.0f : ((1.0f < unclampedAlpha) ? 1.0f : unclampedAlpha);

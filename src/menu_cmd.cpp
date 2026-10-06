@@ -2340,6 +2340,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 			return 1;
 		}
 	} else {
+		int i;
 		for (i = finished = 0; i < s_ucnt; i++) {
 			for (j = 0; j < 3; j++) {
 				idx = j + s_UniteTop[i];

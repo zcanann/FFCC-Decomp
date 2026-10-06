@@ -286,7 +286,7 @@ extern int* volatile p_MusicReplayPoint;
 #define RedMusicReplayPointSetBegin(point) (p_MusicReplayPoint = (point))
 #define RedMusicReplayPointGet(index) (p_MusicReplayPoint + (index))
 #define RedMusicReplayPointSet(index, point) (p_MusicReplayPoint[(index)] = (point))
-extern RedControlRamp* volatile p_MusicTempoControl;
+extern RedControlRamp* p_MusicTempoControl;
 #define RedMusicTempoControlGet() (p_MusicTempoControl)
 #define RedMusicTempoControlSet(control) (p_MusicTempoControl = (control))
 #define RedMusicTempoControlGetValue() (RedMusicTempoControlGet()->m_value)
@@ -329,7 +329,7 @@ extern volatile int m_SeSkipStep;
 #define RedSeSkipStepGet() (m_SeSkipStep)
 #define RedSeSkipStepSet(step) (m_SeSkipStep = (step))
 #define RedSeSkipStepIsActive() (RedSeSkipStepGet() != 0)
-extern RedVoiceDATA* volatile p_VoiceData;
+extern RedVoiceDATA* p_VoiceData;
 #define RedVoiceDataGetBegin() (p_VoiceData)
 #define RedVoiceDataSetBegin(voice) (p_VoiceData = (voice))
 #define RedVoiceDataGet(index) (p_VoiceData + (index))

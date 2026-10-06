@@ -23,6 +23,8 @@ char* strncpy(char* dst, const char* src, size_t n);
 char* strcpy(char* dst, const char* src);
 size_t strlen(const char* str);
 char* strtok(char* str, const char* delim);
+char* strupr(char* str);
+char* strlwr(char* str);
 
 #ifdef __cplusplus
 }

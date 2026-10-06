@@ -34,10 +34,10 @@ CProcessCallbackTable CGamePcs::m_table = {
  * --INFO--
  * PAL Address: 80047930
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80047724
+ * EN Size: 40b
+ * JP Address: 0x8004727C
+ * JP Size: 40b
  */
 void CGamePcs::onMapChanged(int a, int b, int c)
 {
@@ -48,10 +48,10 @@ void CGamePcs::onMapChanged(int a, int b, int c)
  * --INFO--
  * PAL Address: 80047958
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004774C
+ * EN Size: 40b
+ * JP Address: 0x800472A4
+ * JP Size: 40b
  */
 void CGamePcs::onMapChanging(int a, int b)
 {
@@ -62,10 +62,10 @@ void CGamePcs::onMapChanging(int a, int b)
  * --INFO--
  * PAL Address: 80047980
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80047774
+ * EN Size: 40b
+ * JP Address: 0x800472CC
+ * JP Size: 40b
  */
 void CGamePcs::onScriptChanged(char* script, int param)
 {
@@ -76,10 +76,10 @@ void CGamePcs::onScriptChanged(char* script, int param)
  * --INFO--
  * PAL Address: 800479a8
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004779C
+ * EN Size: 40b
+ * JP Address: 0x800472F4
+ * JP Size: 40b
  */
 void CGamePcs::onScriptChanging(char* script)
 {
@@ -90,10 +90,10 @@ void CGamePcs::onScriptChanging(char* script)
  * --INFO--
  * PAL Address: 0x800479d0
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800477C4
+ * EN Size: 40b
+ * JP Address: 0x8004731C
+ * JP Size: 40b
  */
 void CGamePcs::draw2()
 {
@@ -104,10 +104,10 @@ void CGamePcs::draw2()
  * --INFO--
  * PAL Address: 0x800479f8
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800477EC
+ * EN Size: 40b
+ * JP Address: 0x80047344
+ * JP Size: 40b
  */
 void CGamePcs::draw1()
 {
@@ -118,10 +118,10 @@ void CGamePcs::draw1()
  * --INFO--
  * PAL Address: 0x80047a20
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80047814
+ * EN Size: 40b
+ * JP Address: 0x8004736C
+ * JP Size: 40b
  */
 void CGamePcs::draw0()
 {
@@ -132,10 +132,10 @@ void CGamePcs::draw0()
  * --INFO--
  * PAL Address: 0x80047a48
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004783C
+ * EN Size: 40b
+ * JP Address: 0x80047394
+ * JP Size: 40b
  */
 void CGamePcs::calc2()
 {
@@ -146,10 +146,10 @@ void CGamePcs::calc2()
  * --INFO--
  * PAL Address: 0x80047a70
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80047864
+ * EN Size: 40b
+ * JP Address: 0x800473BC
+ * JP Size: 40b
  */
 void CGamePcs::calc1()
 {
@@ -160,10 +160,10 @@ void CGamePcs::calc1()
  * --INFO--
  * PAL Address: 0x80047a98
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004788C
+ * EN Size: 40b
+ * JP Address: 0x800473E4
+ * JP Size: 40b
  */
 void CGamePcs::calc0()
 {
@@ -184,10 +184,10 @@ void CGamePcs::calcInit()
  * --INFO--
  * PAL Address: 0x80047ae8
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800478DC
+ * EN Size: 40b
+ * JP Address: 0x80047434
+ * JP Size: 40b
  */
 void CGamePcs::destroy()
 {
@@ -198,10 +198,10 @@ void CGamePcs::destroy()
  * --INFO--
  * PAL Address: 0x80047b10
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80047904
+ * EN Size: 40b
+ * JP Address: 0x8004745C
+ * JP Size: 40b
  */
 void CGamePcs::create()
 {
@@ -212,10 +212,10 @@ void CGamePcs::create()
  * --INFO--
  * PAL Address: 0x80047b38
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004792C
+ * EN Size: 20b
+ * JP Address: 0x80047484
+ * JP Size: 20b
  */
 int CGamePcs::GetTable(unsigned long param)
 {

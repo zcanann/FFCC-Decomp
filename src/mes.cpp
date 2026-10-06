@@ -55,31 +55,53 @@ inline char CMes::GET_1(char** text)
 	return val;
 }
 
-static inline int ReadTagNibble(char** text)
-{
-	char* p = *text;
-	*text = p + 1;
-	return *p & 0x0F;
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: TODO
- * EN Address: 0x800acc38
- * EN Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
 inline int CMes::GET_2(char** text)
 {
-	short acc = (short)(ReadTagNibble(text) << 4);
-	acc = (short)(acc | ReadTagNibble(text));
-	acc = (short)((short)(acc << 4) | ReadTagNibble(text));
-	acc = (short)((short)(acc << 4) | ReadTagNibble(text));
+	short acc = (short)((*(*text)++ & 0x0F) << 4);
+	acc = (short)(acc | (*(*text)++ & 0x0F));
+	acc = (short)((short)(acc << 4) | (*(*text)++ & 0x0F));
+	acc = (short)((short)(acc << 4) | (*(*text)++ & 0x0F));
 	return (int)acc;
 }
 
+#ifdef VERSION_GCCE01
+#define ApplyCaseMode(text, caseMode)                                     \
+	if (caseMode != 0)                                                    \
+	{                                                                     \
+		if (caseMode == 1)                                                \
+		{                                                                 \
+			if ((text)[0] != '\0')                                        \
+			{                                                             \
+				strupr(text);                                            \
+			}                                                             \
+		}                                                                 \
+		else if (caseMode == 2)                                           \
+		{                                                                 \
+			char* caseModePtr = (text);                                   \
+			if (caseModePtr[0] != '\0')                                   \
+			{                                                             \
+				caseModePtr[0] = (char)std::toupper(caseModePtr[0]);        \
+			}                                                             \
+		}                                                                 \
+		else                                                              \
+		{                                                                 \
+			if ((text)[0] != '\0')                                        \
+			{                                                             \
+				strlwr(text);                                            \
+			}                                                             \
+		}                                                                 \
+		caseMode = 0;                                                     \
+	}
+#else
 #define ApplyCaseMode(text, caseMode)                                     \
 	if (caseMode != 0)                                                    \
 	{                                                                     \
@@ -107,6 +129,7 @@ inline int CMes::GET_2(char** text)
 		}                                                                 \
 		caseMode = 0;                                                     \
 	}
+#endif
 
 static inline CColor& MesColorRef(const CColor& color)
 {
@@ -212,10 +235,10 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 
 /*
  * --INFO--
- * PAL Address: 0x8009836c
+ * PAL Address: 0x8009836C
  * PAL Size: 2136b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80097D08
+ * EN Size: 2144b
  * JP Address: 0x800978B8
  * JP Size: 1128b
  */
@@ -366,11 +389,13 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			{
 				*out++ = '\n';
 			}
+#ifndef VERSION_GCCE01
 			else if (out[-1] == '-')
 			{
 				out[-1] = '\0';
 				out--;
 			}
+#endif
 			break;
 		case 4:
 			*out++ = 0x1D;
@@ -545,6 +570,39 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			caseMode = newCaseMode;
 			break;
 		}
+#ifdef VERSION_GCCE01
+		case 0x44:
+		{
+			int newBranchMode = 2;
+			if (Game.m_caravanWorkArr[CMes::m_tempVar[19]].m_genderFlag == 0)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
+			break;
+		}
+		case 0x42:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
+			int newBranchMode = 2;
+			if (CMes::m_tempVar[varIndex] == 1)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
+			break;
+		}
+		case 0x45:
+		{
+			int newBranchMode = 2;
+			if (playerIndex == 0)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
+			break;
+		}
+#else
 		case 0x44:
 		{
 			int newBranchMode = 2;
@@ -577,6 +635,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			branchMode = newBranchMode;
 			break;
 		}
+#endif
 		case 0x46:
 			if (branchMode == 1)
 			{

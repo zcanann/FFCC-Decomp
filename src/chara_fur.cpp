@@ -29,10 +29,14 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include <string.h>
 
+#ifdef VERSION_GCCJGC
+#include <math.h>
+#else
 extern "C" {
 double atan2(double, double);
 double sqrt(double);
 }
+#endif
 
 STATIC_ASSERT(sizeof(CChara::MogFurState) == 0x2054);
 STATIC_ASSERT(offsetof(CChara::MogFurState, m_dirty) == 0x2000);
@@ -1479,10 +1483,10 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
  * --INFO--
  * PAL Address: 0x800df7f8
  * PAL Size: 2224b
- * EN Address: 0x801008F8
- * EN Size: 2204b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEFC4
+ * EN Size: 2224b
+ * JP Address: 0x800DCA3C
+ * JP Size: 2476b
  */
 void CChara::CalcMogScore()
 {
@@ -1630,10 +1634,10 @@ void CChara::CalcMogScore()
  * --INFO--
  * PAL Address: 0x800df618
  * PAL Size: 480b
- * EN Address: 0x80101240
- * EN Size: 728b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEDE4
+ * EN Size: 480b
+ * JP Address: 0x800DC85C
+ * JP Size: 480b
  */
 void CChara::TimeMogFur()
 {
@@ -1663,9 +1667,12 @@ void CChara::TimeMogFur()
 			int r, g, b;
 			int a = (packed >> 12) & 7;
 			int baseLight = 7 - a;
-			r = ((packed >> 8) & 0xF) + 4 + baseLight;
-			g = ((packed >> 4) & 0xF) + 4 + baseLight;
-			b = (packed & 0xF) + 4 + baseLight;
+			r = (packed >> 8) & 0xF;
+			g = (packed >> 4) & 0xF;
+			b = packed & 0xF;
+			r += baseLight + 4;
+			g += baseLight + 4;
+			b += baseLight + 4;
 			r = r < 0xF ? r : 0xF;
 			g = g < 0xF ? g : 0xF;
 			b = b < 0xF ? b : 0xF;

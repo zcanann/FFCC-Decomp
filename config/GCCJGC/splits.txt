@@ -1196,6 +1196,13 @@ p_dbgmenu.cpp:
 
 p_map.cpp:
 	.text start:0x800340BC end:0x800359D4
+	.ctors start:0x801D065C end:0x801D0660
+	.rodata start:0x801D2238 end:0x801D23B4
+	.data start:0x801DCD38 end:0x801DD3B0
+	.bss start:0x80283EE0 end:0x8028408C
+	.sdata start:0x8034B308 end:0x8034B320
+	.sbss start:0x8034BAC0 end:0x8034BAD4
+	.sdata2 start:0x8034C758 end:0x8034C774
 
 TRK_MINNOW_DOLPHIN/notify.c:
 	.text start:0x801A7DB4 end:0x801A7E8C
@@ -1946,3 +1953,48 @@ me_app_padding_801D2912:
 
 me_usb_padding_801D28FF:
 	.rodata start:0x801D28FF end:0x801D2900 align:1
+
+cflat_data.cpp:
+	.text	start:0x80096FD4 end:0x800976FC
+	extab	start:0x80007DA8 end:0x80007DC0
+	extabindex	start:0x8000E0E0 end:0x8000E104
+	.rodata	start:0x801D4960 end:0x801D496F
+
+cflat_data_padding_801D496F:
+	.rodata start:0x801D496F end:0x801D4970 align:1
+
+auto_801D23B4_rodata:
+	.rodata start:0x801D23B4 end:0x801D23B8 align:1
+
+auto_8034C774_sdata2:
+	.sdata2 start:0x8034C774 end:0x8034C778 align:1
+
+auto_8028408C_bss:
+	.bss start:0x8028408C end:0x80284090 align:4
+
+p_game.cpp:
+	.text start:0x8004727C end:0x800475D4
+	.rodata start:0x801D2778 end:0x801D2799
+	.sdata start:0x8034B3F0 end:0x8034B408
+	.data start:0x801DE240 end:0x801DE44C
+	.sbss start:0x8034BB00 end:0x8034BB04
+	extab start:0x80006940 end:0x800069B0
+	extabindex start:0x8000C454 end:0x8000C4FC
+	.ctors start:0x801D0670 end:0x801D0674
+
+p_gba.cpp:
+	.text start:0x80096CEC end:0x80096FD4
+	.rodata start:0x801D4928 end:0x801D4959
+	.sdata2 start:0x8034D5A8 end:0x8034D5B0
+	.sdata start:0x8034B5C0 end:0x8034B5D8
+	.data start:0x8022C7F0 end:0x8022C9C0
+	.sbss start:0x8034BBA8 end:0x8034BBB0
+	extab start:0x80007D68 end:0x80007DA8
+	extabindex start:0x8000E080 end:0x8000E0E0
+	.ctors start:0x801D06A0 end:0x801D06A4
+
+p_game_padding_801D2799:
+	.rodata start:0x801D2799 end:0x801D27A0 align:1
+
+p_gba_padding_801D4959:
+	.rodata start:0x801D4959 end:0x801D4960 align:1

@@ -474,6 +474,38 @@ static const int kMcFaceTexture = 55;
 static const int kMcTimeTexture = 32;
 #endif
 static Vec s_RingOrgPos;
+#ifdef VERSION_GCCJGC
+static const int kTitleDrawLine = 4929;
+static const int kTitleMenuTexture = 64;
+static const int kTitleLogoTexture = 63;
+static const float kTitleSelectionX = 248.0f;
+static const float kTitleSelectionWidth = 144.0f;
+static const float kTitleLabelX = 260.0f;
+static const float kTitleLabelWidth = 120.0f;
+static const double kTitleSlideDistance = 24.0;
+#else
+#ifdef VERSION_GCCE01
+static const int kTitleDrawLine = 4736;
+#else
+static const int kTitleDrawLine = 4770;
+#endif
+static const int kTitleMenuTexture = 67;
+static const int kTitleLogoTexture = 66;
+static const float kTitleSelectionX = 172.0f;
+static const float kTitleSelectionWidth = 296.0f;
+static const float kTitleLabelX = 172.0f;
+static const float kTitleLabelWidth = 296.0f;
+static const double kTitleSlideDistance = 49.333333333333336;
+#endif
+
+#ifdef VERSION_GCCP01
+static const int kTitleMovieFrames = 2883;
+static const int kTitleIdleFrames = 2450;
+#else
+static const int kTitleMovieFrames = 3457;
+static const int kTitleIdleFrames = 2940;
+#endif
+
 static Vec s_MMenuPos[5];
 
 static const int kWmMenuPlayerCount = 8;
@@ -4467,12 +4499,12 @@ void CMenuPcs::DrawLoadMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x800f7044
+ * PAL Address: 0x800F7044
  * PAL Size: 3768b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800F65E8
+ * EN Size: 3768b
+ * JP Address: 0x800F339C
+ * JP Size: 3644b
  */
 void CMenuPcs::DrawTitleMenu()
 {
@@ -4482,10 +4514,10 @@ void CMenuPcs::DrawTitleMenu()
 		if (state == 0 && static_cast<signed char>(m_wmWorldState->m_worldReady) != 0) {
 			if (static_cast<signed char>(m_wmThpActive) != 0) {
 				THPSimpleDrawCurrentFrame(Graphic.GetRenderModeObj(), 0, 0, 0x280, 0x1C0);
-				Graphic._WaitDrawDone("wm_menu.cpp", 0x12A2);
+				Graphic._WaitDrawDone("wm_menu.cpp", kTitleDrawLine);
 			}
 		short sVarE = m_wmWorldState->m_state0E;
-		if (sVarE != 0 || m_wmWorldState->m_frameCounter >= 0xB43) {
+		if (sVarE != 0 || m_wmWorldState->m_frameCounter >= kTitleMovieFrames) {
 			if (sVarE != -1) {
 				THPSimpleAudioStop();
 				THPSimpleLoadStop();
@@ -4562,11 +4594,11 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Menu items
 		MenuPcs.SetAttrFmt((FMT)0);
-		MenuPcs.SetTexture((TEX)0x43);
+		MenuPcs.SetTexture((TEX)kTitleMenuTexture);
 
 		state = m_wmWorldState->m_mainState;
 		if (state >= 2) {
-			float fX = FLOAT_80331778;
+			float fX = kTitleSelectionX;
 			fX -= FLOAT_80331414;
 			float fY = FLOAT_8033177C;
 			if (m_wmWorldState->m_cardChannel != 0) {
@@ -4576,7 +4608,7 @@ void CMenuPcs::DrawTitleMenu()
 			float alpha;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
-				fX = static_cast<float>(-(DOUBLE_80331790 *
+				fX = static_cast<float>(-(kTitleSlideDistance *
 				                           (static_cast<double>(5 - timer) / DOUBLE_80331798) -
 				                           static_cast<double>(fX)));
 				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314E8);
@@ -4589,17 +4621,17 @@ void CMenuPcs::DrawTitleMenu()
 			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
 			GXSetChanMatColor(GX_COLOR0A0, matColor);
 			MenuPcs.DrawRect(0, fX, fYRect,
-			         FLOAT_80331568, FLOAT_80331554,
+			         kTitleSelectionWidth, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 			AlphaAdd();
 			state = m_wmWorldState->m_mainState;
 			float secondAlpha = alpha;
-			fX = FLOAT_80331778;
+			fX = kTitleSelectionX;
 			fX -= FLOAT_80331414;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
-				fX = static_cast<float>(DOUBLE_80331790 *
+				fX = static_cast<float>(kTitleSlideDistance *
 				                         (static_cast<double>(5 - timer) / DOUBLE_80331798) +
 				                         static_cast<double>(fX));
 			} else if ((state == 2 && m_wmWorldState->m_delay == 0) ||
@@ -4616,7 +4648,7 @@ void CMenuPcs::DrawTitleMenu()
 			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * secondAlpha));
 			GXSetChanMatColor(GX_COLOR0A0, matColor);
 			MenuPcs.DrawRect(0, fX, fYRect,
-			         FLOAT_80331568, FLOAT_80331554,
+			         kTitleSelectionWidth, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_80331554,
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 			AlphaNormal();
@@ -4627,7 +4659,11 @@ void CMenuPcs::DrawTitleMenu()
 		const float kColorScale = FLOAT_80331458;
 		const float kZero = FLOAT_803313dc;
 		unsigned int itemYOffset = 0xFFFFFFF8;
+#ifdef VERSION_GCCJGC
+		int itemTexX = 0;
+#else
 		unsigned int itemTexY = 0x70;
+#endif
 		for (int i = 0; i < 2; i++) {
 			float labelAlpha;
 			if (m_wmWorldState->m_mainState == 1) {
@@ -4645,9 +4681,13 @@ void CMenuPcs::DrawTitleMenu()
 			if (i != 0) {
 				yPos = yPos + (float)((int)itemYOffset);
 			}
-			MenuPcs.DrawRect(0, FLOAT_80331778, yPos,
-			         FLOAT_80331568, FLOAT_80331440,
+			MenuPcs.DrawRect(0, kTitleLabelX, yPos,
+			         kTitleLabelWidth, FLOAT_80331440,
+#ifdef VERSION_GCCJGC
+			         static_cast<float>(itemTexX), 56.0f,
+#else
 			         kZero, (float)((int)itemTexY),
+#endif
 			         FLOAT_803313e8, FLOAT_803313e8, kZero);
 
 			// Cursor on selected item
@@ -4664,7 +4704,7 @@ void CMenuPcs::DrawTitleMenu()
 				matColor.b = 0xFF;
 				matColor.a = static_cast<unsigned char>(cursorAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, matColor);
-				float cursorX = static_cast<float>((FLOAT_803313e0 - FLOAT_80331568 * cursorScale) * DOUBLE_803313F8);
+				float cursorX = static_cast<float>((FLOAT_803313e0 - kTitleLabelWidth * cursorScale) * DOUBLE_803313F8);
 				float cursorY = FLOAT_8033177C - (FLOAT_80331440 * cursorScale - FLOAT_80331440);
 				if (i != 0) {
 					cursorY = cursorY + (float)((int)itemYOffset);
@@ -4672,12 +4712,20 @@ void CMenuPcs::DrawTitleMenu()
 				MenuPcs.DrawRect(0,
 				         cursorX,
 				         cursorY,
-				         FLOAT_80331568, FLOAT_80331440,
+				         kTitleLabelWidth, FLOAT_80331440,
+#ifdef VERSION_GCCJGC
+				         static_cast<float>(itemTexX), 56.0f,
+#else
 				         kZero, (float)((int)itemTexY),
+#endif
 				         cursorScale, cursorScale, kZero);
 			}
 			itemYOffset += 0x28;
+#ifdef VERSION_GCCJGC
+			itemTexX += 120;
+#else
 			itemTexY += 0x28;
+#endif
 		}
 
 		// Logo and copyright textures
@@ -4687,10 +4735,11 @@ void CMenuPcs::DrawTitleMenu()
 		matColor.b = 0xFF;
 		matColor.a = 0xFF;
 		GXSetChanMatColor(GX_COLOR0A0, matColor);
-		MenuPcs.SetTexture((TEX)0x42);
+		MenuPcs.SetTexture((TEX)kTitleLogoTexture);
 		MenuPcs.DrawRect(0, FLOAT_803317B8, FLOAT_803317BC, FLOAT_803317C0, FLOAT_803315B4,
 		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
+#ifndef VERSION_GCCJGC
 		MenuPcs.SetTexture((TEX)0x44);
 		float copyrightAlpha;
 		if (m_wmWorldState->m_mainState == 1) {
@@ -4705,6 +4754,8 @@ void CMenuPcs::DrawTitleMenu()
 		GXSetChanMatColor(GX_COLOR0A0, matColor);
 		MenuPcs.DrawRect(0, FLOAT_803317C4, FLOAT_803317C8, FLOAT_803317CC, FLOAT_80331440,
 		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+
+#endif
 
 		// Timer / state transitions
 		state = m_wmWorldState->m_mainState;
@@ -4787,7 +4838,7 @@ void CMenuPcs::DrawTitleMenu()
 					flatArgs3[2].m_word = 0;
 					gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs3, 0);
 				}
-			} else if (m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= 0x992) {
+			} else if (m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= kTitleIdleFrames) {
 				m_wmWorldState->m_state0E = 0;
 				m_wmWorldState->m_mainState++;
 				m_wmWorldState->m_frameCounter = 0;

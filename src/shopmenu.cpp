@@ -1752,11 +1752,8 @@ void CShopMenu::DrawShop0()
         s_shopMenuTopMenuTextInitialized = 1;
     }
 
-    CFont* font;
-    ShopMenuTopMenuEntry* entry2 = s_shopMenuTopMenuEntries;
-    ShopMenuTopMenuEntry* entry = entry2;
-    for (int i = 0; i < 3; i++, entry++) {
-        s_currentShopMenuTopMenuEntry = entry;
+    for (int i = 0; i < 3; i++) {
+        s_currentShopMenuTopMenuEntry = &s_shopMenuTopMenuEntries[i];
         int highlight = (m_topChoice == i) ? 1 : 0;
 
         Graphic.SetDrawDoneDebugData(0x1E);
@@ -1772,7 +1769,7 @@ void CShopMenu::DrawShop0()
         Graphic.SetDrawDoneDebugData(0x20);
     }
 
-    font = MenuPcs.GetFont22();
+    CFont* font = MenuPcs.GetFont22();
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d8c);
@@ -1780,21 +1777,17 @@ void CShopMenu::DrawShop0()
     font->DrawInit();
 
     Graphic.SetDrawDoneDebugData(0x21);
-    char* titleText = ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE);
-    _drawNoShadowFont(font, titleText, FLOAT_80332d54, FLOAT_80332E30, 9, 0x12);
+    _drawNoShadowFont(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE), FLOAT_80332d54, FLOAT_80332E30, 9, 0x12);
 
     Graphic.SetDrawDoneDebugData(0x22);
     font->SetMargin(FLOAT_80332d28);
     font->SetScale(FLOAT_80332d28);
 
-    for (int i = 0; i < 3; i++, entry2++) {
-        s_currentShopMenuTopMenuEntry = entry2;
+    for (int i = 0; i < 3; i++) {
+        s_currentShopMenuTopMenuEntry = &s_shopMenuTopMenuEntries[i];
         Graphic.SetDrawDoneDebugData(0x23);
-        float entryY = static_cast<float>(s_currentShopMenuTopMenuEntry->y - 0x0B);
-        float entryX = static_cast<float>(s_currentShopMenuTopMenuEntry->x - 0x10);
-        char* entryText = s_currentShopMenuTopMenuEntry->text;
-        _drawNoShadowFont(font, entryText,
-            entryX, entryY, 0x18, 0x12);
+        _drawNoShadowFont(font, s_currentShopMenuTopMenuEntry->text, s_currentShopMenuTopMenuEntry->x - 0x10,
+            s_currentShopMenuTopMenuEntry->y - 0x0B, 0x18, 0x12);
         Graphic.SetDrawDoneDebugData(0x24);
     }
 
@@ -2151,6 +2144,63 @@ void CShopMenu::DrawSoubi()
  * Address:	TODO
  * Size:	TODO
  */
+static inline void DrawShopFade(_GXColor fadeColor)
+{
+    Graphic.SetDrawDoneDebugData(0x32);
+
+    Mtx screenMtx;
+    Mtx44 projectionMtx;
+    PSMTXIdentity(screenMtx);
+    screenMtx[0][0] = FLOAT_80332d78;
+    screenMtx[1][1] = FLOAT_80332DD0;
+    screenMtx[2][2] = FLOAT_80332d78;
+    screenMtx[0][3] = FLOAT_80332DE4;
+    screenMtx[1][3] = FLOAT_80332DE8;
+    GXLoadPosMtxImm(screenMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(projectionMtx, FLOAT_80332D9C, FLOAT_80332DEC, FLOAT_80332D9C, FLOAT_80332DF0, FLOAT_80332D9C, FLOAT_80332d28);
+    projectionMtx[2][3] += FLOAT_80332D9C;
+    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+
+    _GXColor amb = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor mat = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXSetChanAmbColor(GX_COLOR0A0, amb);
+    GXSetChanMatColor(GX_COLOR0A0, mat);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+    Vec topLeft;
+    topLeft.x = FLOAT_80332DF4;
+    topLeft.y = FLOAT_80332DF8;
+    topLeft.z = 0.0f;
+    Vec bottomRight;
+    bottomRight.x = FLOAT_80332DFC;
+    bottomRight.y = FLOAT_80332E00;
+    bottomRight.z = 0.0f;
+    Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
+
+    Graphic.SetDrawDoneDebugData(0x33);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CShopMenu::Draw()
 {
     if (reinterpret_cast<int>(m_unk00) == 0) {
@@ -2202,55 +2252,7 @@ void CShopMenu::Draw()
         fadeColor.g = 0;
         fadeColor.b = 0;
         fadeColor.a = 0xFF - static_cast<int>(FLOAT_80332DE0 * m_fade);
-
-        Graphic.SetDrawDoneDebugData(0x32);
-
-        Mtx44 projectionMtx;
-        Mtx screenMtx;
-        PSMTXIdentity(screenMtx);
-        screenMtx[0][0] = FLOAT_80332d78;
-        screenMtx[1][1] = FLOAT_80332DD0;
-        screenMtx[2][2] = FLOAT_80332d78;
-        screenMtx[0][3] = FLOAT_80332DE4;
-        screenMtx[1][3] = FLOAT_80332DE8;
-        GXLoadPosMtxImm(screenMtx, 0);
-        GXSetCurrentMtx(0);
-
-        C_MTXOrtho(projectionMtx, FLOAT_80332D9C, FLOAT_80332DEC, FLOAT_80332D9C, FLOAT_80332DF0, FLOAT_80332D9C, FLOAT_80332d28);
-        projectionMtx[2][3] += FLOAT_80332D9C;
-        GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
-
-        _GXColor amb = {0xFF, 0xFF, 0xFF, 0xFF};
-        _GXColor mat = {0xFF, 0xFF, 0xFF, 0xFF};
-        GXSetChanAmbColor(GX_COLOR0A0, amb);
-        GXSetChanMatColor(GX_COLOR0A0, mat);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-        _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
-        GXSetZCompLoc(GX_TRUE);
-        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-        GXSetCullMode(GX_CULL_NONE);
-        GXSetNumTexGens(0);
-        GXSetNumTevStages(1);
-        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-        GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-        GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-        GXClearVtxDesc();
-        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-        GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-
-        Vec topLeft;
-        topLeft.x = FLOAT_80332DF4;
-        topLeft.y = FLOAT_80332DF8;
-        topLeft.z = FLOAT_80332D9C;
-        Vec bottomRight;
-        bottomRight.x = FLOAT_80332DFC;
-        bottomRight.y = FLOAT_80332E00;
-        bottomRight.z = FLOAT_80332D9C;
-        Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
-
-        Graphic.SetDrawDoneDebugData(0x33);
+        DrawShopFade(fadeColor);
     }
     Graphic.SetDrawDoneDebugData(0x3C);
 }

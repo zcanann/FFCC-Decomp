@@ -15839,3 +15839,7 @@ lbl_801D298C = .rodata:0x801D298C; // type:object size:0x10 scope:local
 gap_rodata_801D29D3 = .rodata:0x801D29D3; // type:object size:0x5 scope:local align:1
 
 gap_sbss_8034BB35 = .sbss:0x8034BB35; // type:object size:0x3 scope:local align:1
+
+gap_rodata_801D29EB = .rodata:0x801D29EB; // type:object size:0x5 scope:local align:1
+
+gap_data_801DED14 = .data:0x801DED14; // type:object size:0x4 scope:local align:1

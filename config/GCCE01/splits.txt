@@ -1843,6 +1843,10 @@ ME_USB_process.cpp:
 
 FS_USB_Process.cpp:
 	.text start:0x8004E940 end:0x8004F704
+	extab start:0x80006BA0 end:0x80006BA8
+	extabindex start:0x8000C820 end:0x8000C82C
+	.rodata start:0x801D6DC0 end:0x801D6DD3
+	.data start:0x801E97E0 end:0x801E9814
 
 gx/GXInit.c:
 	.text start:0x8019DE28 end:0x8019F1AC
@@ -1925,3 +1929,9 @@ funny_padding_rodata_801D6DBB:
 
 funny_padding_sbss_8032DD15:
 	.sbss start:0x8032DD15 end:0x8032DD18 align:1
+
+fs_usb_padding_rodata_801D6DD3:
+	.rodata start:0x801D6DD3 end:0x801D6DD8 align:1
+
+fs_usb_padding_data_801E9814:
+	.data start:0x801E9814 end:0x801E9818 align:1

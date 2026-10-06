@@ -1177,6 +1177,7 @@ p_tina.cpp:
 	.bss start:0x8028F228 end:0x8028F368
 
 p_dbgmenu.cpp:
+	.ctors start:0x801D06C0 end:0x801D06C4
 	.bss start:0x80322008 end:0x80324A74
 	.text start:0x801275FC end:0x80129354
 	.rodata start:0x801D8B78 end:0x801D8C00

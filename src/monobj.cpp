@@ -1496,6 +1496,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		if (targetIndex >= 0) {
 			targetChar = targetIndex + '0';
 		}
+		int saveSlot = (int)object->m_scriptHandle[2];
 		int aiChar;
 		if (aiMasked == 0) {
 			aiChar = '-';
@@ -1503,7 +1504,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 			aiChar = aiMasked + 0x40;
 		}
 
-		sprintf(text, "%d %c %d %c", (int)object->m_scriptHandle[2], aiChar,
+		sprintf(text, "%d %c %d %c", saveSlot, aiChar,
 		        m_chaseState, targetChar);
 		font->SetPos(posX - font->GetWidth(text) * 0.5f, posY, posZ);
 		font->Draw(text);
@@ -3771,11 +3772,8 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 			CAStar::CAPos* escapePos;
 			if ((routeFrom != 0) && (forbiddenGroup != 0) &&
 				((escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev)) != NULL)) {
-				unsigned short nextGroup = escapePos->m_group[0];
-				if (nextGroup == routeFrom) {
-					nextGroup = escapePos->m_group[1];
-				}
-				unsigned char* routeStep = AStar.m_routeTable[routeFrom][static_cast<unsigned char>(nextGroup)];
+				int nextGroup = escapePos->GetOthers(routeFrom);
+				unsigned char* routeStep = AStar.m_routeTable[routeFrom][nextGroup];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routePrev = routeFrom;
@@ -3815,7 +3813,9 @@ void CGMonObj::moveFrame()
 
 	CVector targetPos;
 	CVector moveDirection;
-	float targetDist = 0.0f;
+	float rotY;
+	float distance;
+	float targetDist;
 
 	if ((moveStateFlags & 1) != 0) {
 		return;
@@ -3849,8 +3849,8 @@ void CGMonObj::moveFrame()
 		moveDirection = CVector(-moveDirection.x, -moveDirection.y, -moveDirection.z);
 	}
 
-	float rotY = moveDirection.GetRotateY();
-	float distance = PSVECMag(static_cast<Vec*>(moveDirection));
+	rotY = moveDirection.GetRotateY();
+	distance = PSVECMag(static_cast<Vec*>(moveDirection));
 
 	if ((((moveFlags & 0x20) != 0) && (targetDist < moveRange)) ||
 		(((moveFlags & 0x40) != 0) && (targetDist >= moveRange))) {
@@ -3874,8 +3874,8 @@ void CGMonObj::moveFrame()
 		float turnFactor = m_turnFactor;
 		float baseDelta = dstRot * turnFactor;
 		float rotDelta = dstRot * (1.0f - turnFactor);
-		m_rotBaseY = m_rotBaseY + baseDelta;
 		rotY = rotY - rotDelta;
+		m_rotBaseY = m_rotBaseY + baseDelta;
 		m_rotTargetY = m_rotBaseY;
 
 		float s = sinf(dstRot);
@@ -3919,15 +3919,15 @@ void CGMonObj::moveFrame()
 		m_groundHitOffset.z += moveDelta.z;
 	}
 
-	float stepRemaining = targetDist - stepDist;
+	targetDist -= stepDist;
 	if ((moveFlags & 0x8000) != 0) {
 		m_rotTargetY = 3.1415927f + rotY;
 	} else {
 		m_rotTargetY = rotY;
 	}
 
-	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
-		((moveFlags & 0x40) == 0 || !(stepRemaining >= moveRange))) {
+	if (((moveFlags & 0x20) == 0 || !(targetDist < moveRange)) &&
+		((moveFlags & 0x40) == 0 || !(targetDist >= moveRange))) {
 		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
 			reqAnim(1, 1, 0);
 		}

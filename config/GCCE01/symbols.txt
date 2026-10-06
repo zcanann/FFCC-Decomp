@@ -17561,3 +17561,5 @@ gap_80331046 = .sdata2:0x80331046; // type:object size:0x2 scope:local align:1
 
 
 gap_rodata_801D6CFA = .rodata:0x801D6CFA; // type:object size:0x6 scope:local align:1
+
+gap_rodata_801D6CE7 = .rodata:0x801D6CE7; // type:object size:0x1 scope:local align:1

@@ -1833,6 +1833,9 @@ p_MaterialEditor.cpp:
 
 ME_USB_process.cpp:
 	.text start:0x8004C264 end:0x8004D544
+	.rodata start:0x801D28D0 end:0x801D28FF
+	.data start:0x801DE9E8 end:0x801DEAF8
+	.sdata2 start:0x8034CA58 end:0x8034CA68
 
 FS_USB_Process.cpp:
 	.text start:0x8004E3C8 end:0x8004F18C
@@ -1940,3 +1943,6 @@ ME_AppRequest.cpp:
 
 me_app_padding_801D2912:
 	.rodata start:0x801D2912 end:0x801D2918 align:1
+
+me_usb_padding_801D28FF:
+	.rodata start:0x801D28FF end:0x801D2900 align:1

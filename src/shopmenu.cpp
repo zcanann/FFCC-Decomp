@@ -2747,47 +2747,45 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     char textBuffer[256];
 
     if (label != 0) {
+        strcpy(textBuffer, label);
+        strcat(textBuffer, s_Colon_80332d30);
+        labelX = static_cast<float>(x + 0x40);
+        _drawNoShadowFont(font, textBuffer, labelX, static_cast<float>(y), 0x18, 0x12);
 
-    strcpy(textBuffer, label);
-    strcat(textBuffer, s_Colon_80332d30);
-    labelX = static_cast<float>(x + 0x40);
-    _drawNoShadowFont(font, textBuffer, labelX, static_cast<float>(y), 0x18, 0x12);
+        CFont* font2 = MenuPcs.m_fonts[0];
+        int valueRightX = static_cast<int>(static_cast<float>(x + 0x108));
+        SetupShopMenuValueFont(font2);
 
-    CFont* font2 = MenuPcs.m_fonts[0];
-    int valueRightX = static_cast<int>(static_cast<float>(x + 0x108));
-    SetupShopMenuValueFont(font2);
+        char valueBuffer[64];
+        sprintf(valueBuffer, s_DecimalFormat_80332d14, statValue);
+        float valueWidth = font2->GetWidth(valueBuffer);
+        valueRightX = static_cast<int>(static_cast<float>(valueRightX) - valueWidth);
+        MenuPcs.DrawNoShadowFont(font2, valueBuffer, static_cast<float>(valueRightX), static_cast<float>(y), 0x1A, 0x12);
+        MenuPcs.DrawInit();
 
-    char valueBuffer[64];
-    sprintf(valueBuffer, s_DecimalFormat_80332d14, statValue);
-    float valueWidth = font2->GetWidth(valueBuffer);
-    valueRightX = static_cast<int>(static_cast<float>(valueRightX) - valueWidth);
-    MenuPcs.DrawNoShadowFont(font2, valueBuffer, static_cast<float>(valueRightX), static_cast<float>(y), 0x1A, 0x12);
-    MenuPcs.DrawInit();
+        font->DrawInit();
+        font->SetMargin(FLOAT_80332d28);
+        font->SetScale(FLOAT_80332d28);
 
-    font->DrawInit();
-    font->SetMargin(FLOAT_80332d28);
-    font->SetScale(FLOAT_80332d28);
+        if ((statType == 1) && (attr >= 1)) {
+            font->SetScaleX(FLOAT_80332d2c);
+            font->SetScaleY(FLOAT_80332d28);
+            _drawNoShadowFont(font, MenuPcs.GetAttrStr(attr), labelX, static_cast<float>(attrY), 0x18, 0x12);
 
-    if ((statType == 1) && (attr >= 1)) {
-        font->SetScaleX(FLOAT_80332d2c);
-        font->SetScaleY(FLOAT_80332d28);
-        _drawNoShadowFont(font, MenuPcs.GetAttrStr(attr), labelX, static_cast<float>(attrY), 0x18, 0x12);
-
-        font->SetScaleX(FLOAT_80332d28);
-        font->GetWidth(MenuPcs.GetAttrStr(attr));
-        if ((attr >= 1) && (attr <= 8)) {
-            strcpy(textBuffer, s_PlusOne_80332d38);
-            labelX = static_cast<float>(x) + (FLOAT_80332d3c - font->GetWidth(textBuffer));
-        } else {
-            return;
+            font->SetScaleX(FLOAT_80332d28);
+            font->GetWidth(MenuPcs.GetAttrStr(attr));
+            if ((attr >= 1) && (attr <= 8)) {
+                strcpy(textBuffer, s_PlusOne_80332d38);
+                labelX = static_cast<float>(x) + (FLOAT_80332d3c - font->GetWidth(textBuffer));
+            } else {
+                return;
+            }
+            _drawNoShadowFont(font, textBuffer, labelX, static_cast<float>(attrY), 9, 0x12);
         }
-        _drawNoShadowFont(font, textBuffer, labelX, static_cast<float>(attrY), 9, 0x12);
-    }
     } else {
         font->SetScaleX(FLOAT_80332d2c);
         font->SetScaleY(FLOAT_80332d28);
-        char* attrStr = MenuPcs.GetAttrStr(attr);
-        _drawNoShadowFont(font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
+        _drawNoShadowFont(font, MenuPcs.GetAttrStr(attr), static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
 
         int fontColor = 9;
         if ((attr >= 1) && (attr <= 8)) {

@@ -813,10 +813,11 @@ void CGMonObj::onFrameStat()
 				}
 				if (prgObj->m_subState == 1) {
 					unsigned char* script9b = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-					unsigned int limit = *reinterpret_cast<unsigned short*>(script9b + 0x1B6);
-					if (static_cast<int>(prgObj->m_stateFrame) <= static_cast<int>(limit)) {
+					int frame = prgObj->m_stateFrame;
+					int limit = *reinterpret_cast<unsigned short*>(script9b + 0x1B6);
+					if (frame <= limit) {
 						if ((object->m_stateFlags0Bits.unk1 != 0) ||
-							(prgObj->m_stateFrame == static_cast<int>(limit)) ||
+							(frame == limit) ||
 							(m_partyDistance[m_targetPartyIndex] >= range)) {
 							prgObj->m_subState = 0;
 							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
@@ -972,9 +973,8 @@ void CGMonObj::onFrameStat()
 
 	case 0x33: {
 		if (prgObj->m_stateFrame == 0) {
-			void* classId = object->m_scriptHandle[4];
+			int seId = (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x3C) ? 0x7937 : 0x7936;
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
-			unsigned int clz = __cntlzw(0x3C - reinterpret_cast<int>(classId));
 			object->m_weaponNodeFlagBits.m_unk10 = 1;
 			object->m_groundHitOffset.z = 0.0f;
 			object->m_groundHitOffset.y = 0.0f;
@@ -982,7 +982,7 @@ void CGMonObj::onFrameStat()
 			object->m_bgColMask |= 0x11;
 			object->m_displayFlags |= 1;
 			prgObj->reqAnim(0xD, 0, 0);
-			prgObj->playSe3D((clz >> 5) + 0x7936, 0x32, 0x96, 0, (Vec*)0);
+			prgObj->playSe3D(seId, 0x32, 0x96, 0, (Vec*)0);
 			int dataNo = object->m_charaModelHandle->GetPdtSlot();
 			prgObj->putParticle((dataNo << 8) | 4, 0, object, kMonObjDefaultScale, 0);
 		}
@@ -998,8 +998,8 @@ void CGMonObj::onFrameStat()
 
 	case 0x34: {
 		if (prgObj->m_stateFrame == 0) {
-			unsigned int particleBase;
-			unsigned int soundId;
+			int soundId;
+			int particleBase;
 			if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x39) {
 				particleBase = 4;
 				soundId = 0xC36E;
@@ -1205,8 +1205,7 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 		if ((particleId != 0xFFFF) && (param3 == 10)) {
 			particleId += 1;
 		}
-		soundId = *reinterpret_cast<unsigned short*>(
-			reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) + 0x1A6);
+		soundId = reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork[0xD3];
 		break;
 	}
 
@@ -1781,8 +1780,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	if ((flags & 2) != 0) {
 		float halfAngle = kMonObjHalf * (kMonObjDegToRad *
 			static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCA)));
-		float sideDist = kMonObjZero;
-		if (kMonObjZero != halfAngle) {
+		float sideDist;
+		if (kMonObjZero == halfAngle) {
+			sideDist = kMonObjZero;
+		} else {
 			sideDist = kMonObjConeSideRadius / static_cast<float>(tan(static_cast<double>(halfAngle)));
 		}
 
@@ -2427,6 +2428,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		? baseScript \
 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
 			(monObj->m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
+#define aiScriptW (monObj->m_aiState == 0 		? reinterpret_cast<unsigned char*>(reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork) 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + 			(monObj->m_aiState + reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork[0x80]) * 0x1D0 + 0x10)
 	int selectedAction = -1;
 	if (monObj->m_funcs->attackCheck != 0) {
 		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
@@ -2445,9 +2447,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		return -1;
 	}
 
-	unsigned int groupTable[8] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+	int groupTable[8] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 	int groupCount[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	int* groupPtr = reinterpret_cast<int*>(groupTable);
 
 	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
 		int actionOffset = actionIndex * 0x10;
@@ -2487,7 +2488,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		if ((actionFlags & 0x40) != 0) {
 			float targetRot = monObj->m_partyAngle[partyIndex];
 			float baseRot =
-				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
+				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x118)) +
 				object->m_rotBaseY;
 			float angleDelta = (float)__fabs(Math.DstRot(targetRot, baseRot));
 			System.Printf("ACT_FLAG_ROT_CHECK 差分=%f度。\n", kMonObjRadToDeg * angleDelta);
@@ -2513,10 +2514,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > kMonObjHalfPi)) {
 				if (((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) &&
 						(monObj->m_forcedAction ==
-							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E)))) ||
-					((*reinterpret_cast<unsigned short*>(
-							reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) +
-							0x10C) != 1) &&
+							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x11E)))) ||
+					((reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork[0x86] != 1) &&
 						(monObj->m_forcedAction == actionIndex))) {
 					forceAction = 1;
 				}
@@ -2537,7 +2536,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
 				groupIndex = (actionFlags >> 2) & 7;
 			} else {
-				groupIndex = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A);
+				groupIndex = *reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x11A);
 			}
 
 			groupTable[actionIndex] = groupIndex;
@@ -2546,43 +2545,36 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	if (selectorType == 1) {
-		int& groupCursor = monObj->m_unk6CC;
 		int count;
 		for (;;) {
-			int cursor = groupCursor;
+			int cursor = monObj->m_unk6CC;
 			count = groupCount[cursor];
 			if (count != 0) {
 				break;
 			}
-			groupCursor = cursor + 1;
-			if (groupCursor >= 8) {
-				groupCursor = 0;
+			monObj->m_unk6CC = cursor + 1;
+			if (monObj->m_unk6CC >= 8) {
+				monObj->m_unk6CC = 0;
 			}
 		}
 
 		int pick = Math.Rand(count);
 		int seen = 0;
-		int i = 0;
-		for (int pass = 0; pass < 2; pass++) {
-			for (int j = 0; j < 4; j++) {
-				int cursor = groupCursor;
-				if (cursor == groupPtr[j]) {
-					if (seen == pick) {
-						selectedAction = i;
-						groupCursor = cursor + 1;
-						goto mlDone;
-					}
-					seen += 1;
+		for (int i = 0; i < 8; i++) {
+			if (monObj->m_unk6CC == groupTable[i]) {
+				if (seen == pick) {
+					selectedAction = i;
+					monObj->m_unk6CC++;
+					break;
 				}
-				i += 1;
+				seen++;
 			}
-			groupPtr += 4;
 		}
 	}
 
-mlDone:
 	return selectedAction;
 #undef aiScript
+#undef aiScriptW
 #undef baseScript
 }
 
@@ -2745,18 +2737,15 @@ void CGMonObj::statWatch()
 			monObj->m_chaseDirty = 1;
 		} else {
 			void** handle = object->m_scriptHandle;
-			unsigned char* scriptBase = reinterpret_cast<unsigned char*>(handle[9]);
-			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
+			unsigned char* aiData = reinterpret_cast<unsigned char*>(handle[9]);
+			if (*reinterpret_cast<unsigned short*>(aiData + 0x10C) == 1) {
 				if (attackResult >= 100) {
 					actionState = attackResult;
 				} else {
 					short aiState = monObj->m_aiState;
-					unsigned char* aiData;
-					if (aiState == 0) {
-						aiData = scriptBase;
-					} else {
+					if (aiState != 0) {
 						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(aiData + 0x100)) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData + attackResult * 0x10 + 0x110) & 0x20) != 0) {
 						actionState = 0x21;
@@ -3459,7 +3448,7 @@ void CGMonObj::setRepop(int mode)
 	enableDamageCol(1);
 	reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 
-	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
+	int scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
 
 	if ((scriptFlags & 0x80) != 0 || (scriptFlags & 0x20) != 0) {
 		if (mode == 0) {

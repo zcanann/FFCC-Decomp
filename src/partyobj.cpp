@@ -1531,19 +1531,18 @@ void CGPartyObj::onFrameStat()
 		return;
 	}
 
-	PartyObjOverlay& party = m_partyData;
 
 	switch (m_lastStateId) {
 	case 0:
 		if (m_stateFrame == 0) {
-			if (party.flags.flag02) {
+			if (m_partyData.flags.flag02) {
 				reqAnim(0x27, 0, 0);
-				party.flags.flag02 = 0;
+				m_partyData.flags.flag02 = 0;
 			} else {
 				reqAnim(-1, 0, 0);
 			}
 		}
-		if ((party.flags.commandActive != 0) ||
+		if ((m_partyData.flags.commandActive != 0) ||
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) ||
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) != 0) ||
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) != 0)) {
@@ -1559,7 +1558,7 @@ void CGPartyObj::onFrameStat()
 		     (m_unk63CBits.m_bit80 != 0) &&
 		     (m_weaponNodeFlagAll.m_bits1.m_shield != 0) &&
 		     (m_weaponNodeFlagAll.m_bits1.m_menuReady != 0) &&
-		     (party.flags.commandActive == 0))) {
+		     (m_partyData.flags.commandActive == 0))) {
 			if ((FLOAT_80331a74 * Game.unkFloat_0xca10 < m_targetDist) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
@@ -1584,7 +1583,7 @@ void CGPartyObj::onFrameStat()
 				unsigned short up = Pad.GetButtonUp(m_animStateMisc);
 				if ((up & 0x400) != 0) {
 					if (CGPartyObj::m_ghostWork.holdTimer < 10 &&
-					    party.carryObject != chaliceObj) {
+					    m_partyData.carryObject != chaliceObj) {
 						CGPartyObj::m_ghostWork.flagBits.flag80 = (gbaParty->m_partyData.carryObject != nullptr);
 					}
 				} else if (heldMask != 0) {
@@ -1610,16 +1609,16 @@ void CGPartyObj::onFrameStat()
 		break;
 	case 7:
 		if (m_stateFrame == 0) {
-			party.unk6D0 = 0;
+			m_partyData.unk6D0 = 0;
 		}
 		if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
 			changeStat(1, 0, 0);
 		} else {
-			party.unk6D0++;
+			m_partyData.unk6D0++;
 #ifdef VERSION_GCCP01
-			if (party.unk6D0 >= 6) {
+			if (m_partyData.unk6D0 >= 6) {
 #else
-			if (party.unk6D0 >= 8) {
+			if (m_partyData.unk6D0 >= 8) {
 #endif
 				changeStat(6, 0, 0);
 			} else {
@@ -1630,40 +1629,7 @@ void CGPartyObj::onFrameStat()
 		}
 		break;
 	case 0x0B:
-		if (Game.m_gameWork.m_menuStageMode != 0 &&
-		    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-		    IsKindOf(0x6D) &&
-		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
-			static float d;
-			static float h;
-			CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
-			if (m_stateFrame == 0) {
-				CancelMove(1);
-				d = m_targetDist - FLOAT_80331ac4;
-				h = chalice->m_worldPosition.y - m_worldPosition.y;
-			}
-
-#ifdef VERSION_GCCP01
-			if (m_stateFrame <= 0x0B) {
-#else
-			if (m_stateFrame <= 0x0E) {
-#endif
-				const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
-				m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
-				m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
-				m_extraMoveVec.y = h * phase + FLOAT_80331A98;
-			}
-		}
-		if (m_stateFrame == 0) {
-			reqAnim(0x0D, 0, 0);
-			playSe3D(0x22, 0x32, 0x96, 0, 0);
-		}
-		if (isLoopAnim() != 0) {
-			setIdleMotion();
-			changeStat(0, 0, 0);
-			m_extraMoveVec.x = FLOAT_80331a78;
-			m_extraMoveVec.z = FLOAT_80331a78;
-		}
+		statCarry();
 		break;
 	case 0x0C:
 	case 0x0D:
@@ -1688,7 +1654,7 @@ void CGPartyObj::onFrameStat()
 #else
 		if (m_stateFrame == 5) {
 #endif
-			changeWeapon(party.pendingWeaponIndex, party.pendingWeaponItemId, 1);
+			changeWeapon(m_partyData.pendingWeaponIndex, m_partyData.pendingWeaponItemId, 1);
 		}
 		if (isLoopAnim() != 0) {
 			changeStat(0, 0, 0);
@@ -1767,11 +1733,11 @@ void CGPartyObj::onFrameStat()
 	case 0x22: {
 #define script (reinterpret_cast<unsigned char*>(m_scriptHandle))
 		if (m_stateFrame == 0) {
-			if (party.flags.flag04) {
+			if (m_partyData.flags.flag04) {
 				if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
 					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), static_cast<CGPrgObj*>(0));
 				}
-				party.flags.flag04 = 0;
+				m_partyData.flags.flag04 = 0;
 			}
 			enableDamageCol(1);
 			setIdleMotion();
@@ -1795,7 +1761,7 @@ void CGPartyObj::onFrameStat()
 			}
 		} else if (isLoopAnim() != 0) {
 			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
-				party.flags.flag02 = 1;
+				m_partyData.flags.flag02 = 1;
 			}
 			changeStat(0, 0, 0);
 		}
@@ -2880,22 +2846,41 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
  * Address:	TODO
  * Size:	TODO
  */
-inline void CGPartyObj::statCarry()
+void CGPartyObj::statCarry()
 {
-	if (m_subState == 0 && m_subFrame == 0) {
-		reqAnim(0x1D, 0, 0);
-	}
+	if (Game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    IsKindOf(0x6D) &&
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
+		static float d;
+		static float h;
+		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+		if (m_stateFrame == 0) {
+			CancelMove(1);
+			d = m_targetDist - FLOAT_80331ac4;
+			h = chalice->m_worldPosition.y - m_worldPosition.y;
+		}
 
-	unsigned short trig = Pad.GetButtonDown(m_animStateMisc);
-	if ((trig & 0x200) != 0) {
-		carry(2, (CGObject*)0, 1);
-		changeStat(0, 0, 0);
-		return;
+#ifdef VERSION_GCCP01
+		if (m_stateFrame <= 0x0B) {
+#else
+		if (m_stateFrame <= 0x0E) {
+#endif
+			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
+			m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
+			m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
+			m_extraMoveVec.y = h * phase + FLOAT_80331A98;
+		}
 	}
-
-	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
-		carry(1, (CGObject*)0, 1);
+	if (m_stateFrame == 0) {
+		reqAnim(0x0D, 0, 0);
+		playSe3D(0x22, 0x32, 0x96, 0, 0);
+	}
+	if (isLoopAnim() != 0) {
+		setIdleMotion();
 		changeStat(0, 0, 0);
+		m_extraMoveVec.x = FLOAT_80331a78;
+		m_extraMoveVec.z = FLOAT_80331a78;
 	}
 }
 

@@ -372,6 +372,26 @@ void CGCharaObj::onCancelStat(int)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGCharaObj::decIgnoreHit()
+{
+	for (int i = 0; i < 4; i++) {
+		if (m_ignoreHit[i].m_flagBits.m_flag_80 && m_ignoreHit[i].m_timer != 0) {
+			if (--m_ignoreHit[i].m_timer == 0) {
+				m_ignoreHit[i].m_flagBits.m_flag_80 = 0;
+			}
+		}
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80112618
  * PAL Size: 952b
  * EN Address: 0x8012b190
@@ -423,20 +443,8 @@ void CGCharaObj::onFramePostCalc()
 		m_displayFlags |= 2;
 	}
 
-	m_updateCounter += 1;
-
-	for (int i = 0; i < 4; i++) {
-		if (m_ignoreHit[i].m_flagBits.m_flag_80) {
-			int t = m_ignoreHit[i].m_timer;
-			if (t != 0) {
-				t -= 1;
-				m_ignoreHit[i].m_timer = static_cast<short>(t);
-				if (static_cast<short>(t) == 0) {
-					m_ignoreHit[i].m_flagBits.m_flag_80 = 0;
-				}
-			}
-		}
-	}
+	m_updateCounter++;
+	decIgnoreHit();
 }
 
 /*
@@ -874,29 +882,6 @@ void CGCharaObj::resetIgnoreHit()
 	m_ignoreHit[1].m_flagBits.m_flag_80 = 0;
 	m_ignoreHit[2].m_flagBits.m_flag_80 = 0;
 	m_ignoreHit[3].m_flagBits.m_flag_80 = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80111678
- * PAL Size: 480b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGCharaObj::decIgnoreHit()
-{
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	for (int i = 0; i < 4; i++) {
-		IgnoreHitSlot& slot = m_ignoreHit[i];
-		if ((slot.m_flag & 0x80) != 0 && slot.m_timer != 0) {
-			slot.m_timer = static_cast<unsigned short>(slot.m_timer - 1);
-			if (slot.m_timer == 0) {
-				slot.m_flag &= 0x7F;
-			}
-		}
-	}
 }
 
 /*
@@ -1385,6 +1370,8 @@ void CGCharaObj::setSta(int staIndex, int value)
  */
 void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& outValue)
 {
+	int i;
+
 	switch (staIndex) {
 		case 0x24:
 			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0) {
@@ -1450,7 +1437,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
 				{
-					int i = 0;
+					i = 0;
 					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
 					for (; i < 0x16; i++, slot += 4) {
 						if (((1U << i) & 0x3bU) != 0) {
@@ -1474,7 +1461,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			putHitParticleFromItem(sourceObj, amount);
 			break;
 		case 0x67:
-			for (int i = 0; i < 0x27; i++) {
+			for (i = 0; i < 0x27; i++) {
 				setSta(i, 0);
 			}
 			m_displayFlags |= 2;
@@ -1526,7 +1513,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			Sound.StopSe3DGroup(m_particleId);
 			{
 				unsigned char* slot = reinterpret_cast<unsigned char*>(this);
-				int i = 0;
+				i = 0;
 				for (; i < 0x16; i++, slot += 4) {
 					if (((1U << i) & 0x3bU) != 0) {
 						CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
@@ -1556,7 +1543,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			Sound.StopSe3DGroup(m_particleId);
 			{
 				unsigned char* slot = reinterpret_cast<unsigned char*>(this);
-				int i = 0;
+				i = 0;
 				for (; i < 0x16; i++, slot += 4) {
 					if (((1U << i) & 0x3bU) != 0) {
 						CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
@@ -1566,6 +1553,21 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			changeStat(0, 0, 0);
 			break;
 	}
+}
+
+static inline bool CharaObjIsMultiStage()
+{
+	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF;
+}
+
+static inline bool CharaObjIsMultiCaravan(CGObject* obj)
+{
+	return CharaObjIsMultiStage() && obj->IsKindOf(0x6D);
+}
+
+static inline bool CharaObjIsJoybusCaravan(CGObject* obj)
+{
+	return CharaObjIsMultiCaravan(obj) && reinterpret_cast<CCaravanWork*>(static_cast<CGPrgObj*>(obj)->m_scriptHandle)->m_joybusCaravanId != 0;
 }
 
 /*
@@ -1588,8 +1590,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 	}
 
-	int itemType;
 	unsigned int base = 0;
+	int itemType;
 	switch (staIndex) {
 		case 1:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x0E);
@@ -1641,25 +1643,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	unsigned short powerValue;
 	bool isPrgObj = source->IsKindOf(0x2D);
 	if (isPrgObj) {
-		unsigned char usePartySource = 0;
-		unsigned char usePartyLeader = 0;
-		unsigned char stageModeActive = usePartyLeader;
-
-		if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			stageModeActive = 1;
-		}
-		if (stageModeActive != 0) {
-			bool isPartyObj = source->IsKindOf(0x6D);
-			if (isPartyObj) {
-				usePartySource = 1;
-			}
-		}
-		if (usePartySource != 0 && reinterpret_cast<CCaravanWork*>(static_cast<CGPrgObj*>(source)->m_scriptHandle)->m_joybusCaravanId != 0) {
-			usePartyLeader = 1;
-		}
-
 		CGPrgObj* powerSource;
-		if (usePartyLeader != 0) {
+		if (CharaObjIsJoybusCaravan(source)) {
 			powerSource = Game.m_partyObjArr[0];
 		} else {
 			powerSource = static_cast<CGPrgObj*>(source);
@@ -2730,9 +2715,9 @@ checkParticle:
  */
 int la(CGObject* object)
 {
+	CCharaPcs::CHandle* model = object->m_charaModelHandle;
 	bool hasMotion = false;
 	int result;
-	CCharaPcs::CHandle* model = object->m_charaModelHandle;
 	if (model != 0 && model->m_model != 0) {
 		hasMotion = true;
 	}
@@ -2816,20 +2801,18 @@ void CGCharaObj::statAttack()
 		enableAttackCol(0, 0, 0);
 	}
 
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
-	unsigned short seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3A);
-	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
-		int seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x38);
+	SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	if ((rows[m_itemId].m_seFlag & 0x8000) == 0 && m_stateFrame == rows[m_itemId].m_seFlag) {
+		int seSpec = rows[m_itemId].m_se;
 		if (seSpec != 0) {
 			int seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
 			playSe3D(seNo, 0x32, 0x96, 0, 0);
 		}
 	}
 
-	itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
-	seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3E);
-	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
-		int seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);
+	rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	if ((rows[m_itemId].m_seFlag1 & 0x8000) == 0 && m_stateFrame == rows[m_itemId].m_seFlag1) {
+		int seSpec = rows[m_itemId].m_se1;
 		if (seSpec != 0) {
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 				int seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));

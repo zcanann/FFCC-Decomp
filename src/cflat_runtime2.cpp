@@ -1264,7 +1264,7 @@ void CFlatRuntime2::Draw()
 		redColor.a = 0xFF;
 		float z = 0.0f;
 		float ringVerts[24];
-		float* verts = ringVerts;
+		float* verts;
 
 		CDebugDrawCC* entry = m_debugDrawCCEntries;
 		for (int i = 0; i < m_debugDrawCCCount; i++, entry++) {
@@ -1307,6 +1307,7 @@ void CFlatRuntime2::Draw()
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
 			int j;
 			float* vtx;
+			verts = ringVerts;
 			for (j = 0, vtx = verts; j < 8; j++) {
 				const float angle = 0.7853982f * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);

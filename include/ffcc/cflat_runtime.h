@@ -181,7 +181,7 @@ public:
 	void push(CFlatRuntime::CObject*, int);
 	void push(CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
 	void pushAddress(CFlatRuntime::CObject*, CFlatRuntime::CStack*);
-	int pop(CFlatRuntime::CObject*);
+	CFlatRuntime::CStack pop(CFlatRuntime::CObject*);
 
 	void PrintCodeInfo();
 	void GetCodeInfo(char*);

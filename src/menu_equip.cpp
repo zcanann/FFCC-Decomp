@@ -911,17 +911,14 @@ int CMenuPcs::EquipOpen()
  */
 void CMenuPcs::EquipInit1()
 {
-	EquipOpenAnim* e;
-	EquipOpenAnim* anchor;
 	int n;
-	int i;
 	EquipOpenAnim* listEntry;
 	int k;
 	float zeroAlpha;
 
-	i = (int)m_equipList->count;
+	int i = (int)m_equipList->count;
 
-	e = &m_equipList->entries[i++];
+	EquipOpenAnim* e = &m_equipList->entries[i++];
 	e->tex = EQUIP_TEX_FRAME;
 	e->x = 0xb8;
 	e->y = 0x28;
@@ -969,9 +966,9 @@ void CMenuPcs::EquipInit1()
 	e->startFrame = 0;
 	e->duration = 5;
 
-	anchor = &m_equipList->entries[m_equipList->count];
+	EquipOpenAnim* anchor = &m_equipList->entries[m_equipList->count];
 	for (n = 0; n < 8; n++) {
-		e = &m_equipList->entries[i];
+		e = &m_equipList->entries[i++];
 		e->flags = 2;
 		e->tex = EQUIP_TEX_LIST;
 		e->x = anchor->x + 0x24;
@@ -982,7 +979,6 @@ void CMenuPcs::EquipInit1()
 		e->v = 0.0f;
 		e->startFrame = 7;
 		e->duration = 5;
-		i++;
 	}
 
 	m_equipList->listEnd = i;

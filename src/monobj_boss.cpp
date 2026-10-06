@@ -496,8 +496,10 @@ void CGMonObj::frameStatFuncLastBoss()
 			for (int i = 0; i < 4; i++) {
 				CGItemObj* capsule = reinterpret_cast<LastBossWork*>(m_boss)->m_capsules[i];
 				if (capsule != 0) {
-					if (capsule->m_lastStateId == 0x25) {
+					switch (capsule->m_lastStateId) {
+					case 0x25:
 						capsule->changeStat(0x24, 0, 0);
+						break;
 					}
 				}
 			}

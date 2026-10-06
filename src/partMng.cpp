@@ -1297,6 +1297,7 @@ unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 {
 	char* textureNames[0x100];
+	char** textureNameWrite;
 	char** textureNameIt = textureNames;
 	CChunkFile::CChunk chunk;
 
@@ -1306,7 +1307,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 		switch (chunk.m_id)
 		{
 		case 0x46534850: { // 'FSHP'
-			char** textureNameWrite = textureNameIt;
+			textureNameWrite = textureNameIt;
 			while (chunkFile.GetNextChunk(chunk))
 			{
 				switch (chunk.m_id)
@@ -1315,8 +1316,8 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 					chunkFile.PushChunk();
 					*textureNameWrite = chunkFile.GetString();
 					chunkFile.PopChunk();
-					textureNameIt++;
 					textureNameWrite++;
+					textureNameIt++;
 					break;
 				case 0x444C5354: // 'DLST'
 					shapeSt->m_displayListData =

@@ -29,10 +29,14 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include <string.h>
 
+#ifdef VERSION_GCCJGC
+#include <math.h>
+#else
 extern "C" {
 double atan2(double, double);
 double sqrt(double);
 }
+#endif
 
 STATIC_ASSERT(sizeof(CChara::MogFurState) == 0x2054);
 STATIC_ASSERT(offsetof(CChara::MogFurState, m_dirty) == 0x2000);
@@ -1479,10 +1483,10 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
  * --INFO--
  * PAL Address: 0x800df7f8
  * PAL Size: 2224b
- * EN Address: 0x801008F8
- * EN Size: 2204b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x800DEFC4
+ * EN Size: 2224b
+ * JP Address: 0x800DCA3C
+ * JP Size: 2476b
  */
 void CChara::CalcMogScore()
 {

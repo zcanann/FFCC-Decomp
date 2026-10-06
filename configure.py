@@ -610,7 +610,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "partMng.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppsintbl.cpp"),
-            Object(NonMatching, "partyobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "partyobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "pppAccele.cpp"),
             Object(Matching, "pppAlignmentScale.cpp"),
             Object(Matching, "pppAngAccele.cpp"),

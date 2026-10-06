@@ -1092,35 +1092,36 @@ void CMenuPcs::SingMenuInit()
 
     m_wm.m_worldObjData = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) WmWorldObjInfo[1];
 
-    WmWorldObjInfo* boardEntry = m_wm.m_worldObjData;
-    int screenY = static_cast<int>(80.0f);
-    boardEntry->m_transform.Identity();
-    m_wm.m_worldObjData->m_active = 0;
     float left = 440.0f;
     float top = 88.0f;
     float width = 96.0f;
     left += 28.0f;
+    int scissorX = static_cast<int>(12.0f + left);
+    for (int i = 0; i < 1; i++) {
+        m_wm.m_worldObjData[i].m_transform.Identity();
+        m_wm.m_worldObjData[i].m_active = 0;
+        m_wm.m_worldObjData[i].m_frameCounter = 0;
+        m_wm.m_worldObjData[i].m_viewportX = 0;
+        m_wm.m_worldObjData[i].m_viewportY = 0;
+        m_wm.m_worldObjData[i].m_viewportWidth = 0x280;
+        m_wm.m_worldObjData[i].m_viewportHeight = 0x1C0;
+        m_wm.m_worldObjData[i].m_cameraPosition.x = 0.0f;
+        m_wm.m_worldObjData[i].m_cameraPosition.y = 0.0f;
+        m_wm.m_worldObjData[i].m_cameraPosition.z = 100.0f;
+        m_wm.m_worldObjData[i].m_scissorX = 0;
+        m_wm.m_worldObjData[i].m_scissorY = 0;
+        m_wm.m_worldObjData[i].m_scissorWidth = 0x280;
+        m_wm.m_worldObjData[i].m_scissorHeight = 0x1C0;
+    }
     double half = 0.5;
     float centerX = 4.0 + (width * half + left);
     float centerY = top * half + top;
     centerX -= 320.0;
     centerY -= 224.0;
-    m_wm.m_worldObjData->m_frameCounter = 0;
-    m_wm.m_worldObjData->m_viewportX = 0;
-    m_wm.m_worldObjData->m_viewportY = 0;
-    m_wm.m_worldObjData->m_viewportWidth = 0x280;
-    m_wm.m_worldObjData->m_viewportHeight = 0x1C0;
-    m_wm.m_worldObjData->m_cameraPosition.x = 0.0f;
-    m_wm.m_worldObjData->m_cameraPosition.y = 0.0f;
-    m_wm.m_worldObjData->m_cameraPosition.z = 100.0f;
-    m_wm.m_worldObjData->m_scissorX = 0;
-    m_wm.m_worldObjData->m_scissorY = 0;
-    m_wm.m_worldObjData->m_scissorWidth = 0x280;
-    m_wm.m_worldObjData->m_scissorHeight = 0x1C0;
     m_wm.m_worldObjData->m_viewportX = static_cast<s16>(centerX - 4.0);
     m_wm.m_worldObjData->m_viewportY = static_cast<s16>(static_cast<int>(centerY));
-    m_wm.m_worldObjData->m_scissorX = static_cast<int>(12.0f + left);
-    m_wm.m_worldObjData->m_scissorY = screenY;
+    m_wm.m_worldObjData->m_scissorX = scissorX;
+    m_wm.m_worldObjData->m_scissorY = static_cast<int>(top - 8.0f);
     m_wm.m_worldObjData->m_scissorWidth = 0x48;
     m_wm.m_worldObjData->m_scissorHeight = 0x58;
 

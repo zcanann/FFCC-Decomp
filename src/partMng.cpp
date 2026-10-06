@@ -884,6 +884,7 @@ void CPartMng::render3Dcursor()
     float x = m_editorCursorPosition.x;
     float y = m_editorCursorPosition.y;
     float z = m_editorCursorPosition.z;
+    float len = 100.0f;
 
     Vec start;
     Vec end;
@@ -892,10 +893,10 @@ void CPartMng::render3Dcursor()
     color.g = 0x80;
     color.b = 0x80;
     color.a = 0xff;
-    start.x = x - 100.0f;
+    start.x = x - len;
     start.y = y;
     start.z = z;
-    end.x = x + 100.0f;
+    end.x = x + len;
     end.y = y;
     end.z = z;
     drawLine3D(&start, &end, color);
@@ -905,10 +906,10 @@ void CPartMng::render3Dcursor()
     color.b = 0x80;
     color.a = 0xff;
     start.x = x;
-    start.y = y - 100.0f;
+    start.y = y - len;
     start.z = z;
     end.x = x;
-    end.y = y + 100.0f;
+    end.y = y + len;
     end.z = z;
     drawLine3D(&start, &end, color);
 
@@ -918,10 +919,10 @@ void CPartMng::render3Dcursor()
     color.a = 0xff;
     start.x = x;
     start.y = y;
-    start.z = z - 100.0f;
+    start.z = z - len;
     end.x = x;
     end.y = y;
-    end.z = z + 100.0f;
+    end.z = z + len;
     drawLine3D(&start, &end, color);
 }
 

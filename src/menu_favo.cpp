@@ -36,28 +36,6 @@ STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
 STATIC_ASSERT(sizeof(FoodRank) == 4);
 STATIC_ASSERT(sizeof(s_rank) == 0x20);
 
-static inline void FavoDrawWindow(FavoEntry* entry, float x, float y, float w, float h, float u, float v, GXColor* colors)
-{
-	if (entry->tex == kFavoWindowTexture) {
-		int yStep = static_cast<int>(y);
-		float end = y + h;
-		while (static_cast<float>(yStep) < end) {
-			int tileH;
-			if (end - static_cast<float>(yStep) >= 32.0f) {
-				tileH = 0x20;
-			} else {
-				tileH = static_cast<int>(end - static_cast<float>(yStep));
-			}
-			MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-			                 w, static_cast<float>(tileH), u, v, colors, entry->uvScale, 1.0f, 0.0f);
-			yStep += 0x20;
-		}
-	} else {
-		MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
-		                 entry->uvScale, 1.0f, 0.0f);
-	}
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80162360
@@ -80,6 +58,7 @@ void CMenuPcs::FavoDraw()
 	float v;
 	GXColor colors[4];
 	char textBuf[0x10];
+	int yStep;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -118,7 +97,21 @@ void CMenuPcs::FavoDraw()
 
 				w = entry->alpha * w;
 				if (w > 0.0f) {
-					FavoDrawWindow(entry, x, y, w, h, u, v, colors);
+					if (entry->tex == kFavoWindowTexture) {
+						for (yStep = static_cast<int>(y); static_cast<float>(yStep) < y + h; yStep += 0x20) {
+							int tileH;
+							if (y + h - static_cast<float>(yStep) >= 32.0f) {
+								tileH = 0x20;
+							} else {
+								tileH = static_cast<int>(y + h - static_cast<float>(yStep));
+							}
+							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+							                 w, static_cast<float>(tileH), u, v, colors, entry->uvScale, 1.0f, 0.0f);
+						}
+					} else {
+						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
+						                 entry->uvScale, 1.0f, 0.0f);
+					}
 
 					u += w;
 					x += w * entry->uvScale;
@@ -135,7 +128,21 @@ void CMenuPcs::FavoDraw()
 					colors[3].a = 0;
 					w = 1.0 / entry->duration;
 					w = w * entry->w;
-					FavoDrawWindow(entry, x, y, w, h, u, v, colors);
+					if (entry->tex == kFavoWindowTexture) {
+						for (yStep = static_cast<int>(y); static_cast<float>(yStep) < y + h; yStep += 0x20) {
+							int tileH;
+							if (y + h - static_cast<float>(yStep) >= 32.0f) {
+								tileH = 0x20;
+							} else {
+								tileH = static_cast<int>(y + h - static_cast<float>(yStep));
+							}
+							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+							                 w, static_cast<float>(tileH), u, v, colors, entry->uvScale, 1.0f, 0.0f);
+						}
+					} else {
+						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
+						                 entry->uvScale, 1.0f, 0.0f);
+					}
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

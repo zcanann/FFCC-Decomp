@@ -1127,8 +1127,9 @@ void CGPartyObj::command()
 			primaryAvailable = true;
 			primaryCommand = 0x1B;
 		}
+	}
 
-		if (Joybus.GetCtrlMode(padSlot) != 1) {
+	if (Joybus.GetCtrlMode(padSlot) != 1) {
 		if ((party.commandMode & 2) != 0) {
 			secondaryAvailable = false;
 			primaryAvailable = true;
@@ -1164,7 +1165,6 @@ void CGPartyObj::command()
 			const int charaCommand = Chara.MogFur().m_commandIndex;
 			ringCommand = charaCommand + 0x1E;
 			ringCommandArg = charaCommand;
-		}
 		}
 	}
 

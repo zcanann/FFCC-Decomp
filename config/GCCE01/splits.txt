@@ -2000,3 +2000,30 @@ auto_8026774C_bss:
 
 MSL_C/PPCEABI/bare/H/extras.c:
 	.text start:0x801BB334 end:0x801BB3BC
+
+p_game.cpp:
+	.text start:0x80047724 end:0x80047A90
+	.rodata start:0x801D6B60 end:0x801D6B81
+	.sdata start:0x8032D5D0 end:0x8032D5E8
+	.data start:0x801E8D40 end:0x801E8F4C
+	.sbss start:0x8032DCE0 end:0x8032DCE4
+	extab start:0x80006898 end:0x80006908
+	extabindex start:0x8000C448 end:0x8000C4F0
+	.ctors start:0x801D4350 end:0x801D4354
+
+p_gba.cpp:
+	.text start:0x80097174 end:0x80097464
+	.rodata start:0x801D8D28 end:0x801D8D59
+	.sdata2 start:0x8032F830 end:0x8032F838
+	.sdata start:0x8032D7A0 end:0x8032D7B8
+	.data start:0x8020E178 end:0x8020E348
+	.sbss start:0x8032DD88 end:0x8032DD90
+	extab start:0x80007CD0 end:0x80007D10
+	extabindex start:0x8000E08C end:0x8000E0EC
+	.ctors start:0x801D4380 end:0x801D4384
+
+p_game_padding_801D6B81:
+	.rodata start:0x801D6B81 end:0x801D6B88 align:1
+
+p_gba_padding_801D8D59:
+	.rodata start:0x801D8D59 end:0x801D8D60 align:1

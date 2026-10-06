@@ -87,7 +87,7 @@ inline int CMes::GET_2(char** text)
 		{                                                                 \
 			if ((text)[0] != '\0')                                        \
 			{                                                             \
-				toupper(text);                                            \
+				toupper_name_conflict(text);                              \
 			}                                                             \
 		}                                                                 \
 		else if (caseMode == 2)                                           \

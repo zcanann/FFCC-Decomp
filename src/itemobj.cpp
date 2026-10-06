@@ -785,13 +785,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		if (carryMode == 0) {
 			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
 			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
-			bool useBossAttachName = false;
-
-			if (Game.m_gameWork.m_menuStageMode != 0) {
-				if (ItemIsGbaCaravan(partyObj)) {
-					useBossAttachName = true;
-				}
-			}
+			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(partyObj);
 
 			CGObject* attachSelf = this;
 			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), attachOffsetPtr);

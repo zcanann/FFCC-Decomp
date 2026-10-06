@@ -306,7 +306,6 @@ inline void CMenuPcs::CmdInit0()
  */
 void CMenuPcs::CmdInit1()
 {
-	s32 tex = 0x2f;
 	CmdListEntry* entry;
 	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
 
@@ -323,10 +322,7 @@ void CMenuPcs::CmdInit1()
 	entry->duration = 5;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
-	if (GetCmdLayoutFlag(this) == 0) {
-		tex = kCmdTabTexture;
-	}
-	entry->tex = tex;
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? kCmdTabTexture : 0x2f;
 	entry->x = 0xa0;
 	entry->y = 0xe;
 	entry->width = 0x30;
@@ -337,13 +333,8 @@ void CMenuPcs::CmdInit1()
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	tex = 0x2f;
 	entry = &GetCmdListStorage(this)->entries[idx++];
-	if (GetCmdLayoutFlag(this) == 0) {
-		tex = kCmdTabTexture;
-	}
-	entry->tex = tex;
-	tex = 0;
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? kCmdTabTexture : 0x2f;
 	entry->width = 0x30;
 	entry->height = 0x30;
 	entry->x = 0xa5;
@@ -351,7 +342,7 @@ void CMenuPcs::CmdInit1()
 	entry->u = 0.0f;
 	entry->v = 0.0f;
 	entry->scale = 0.75f;
-	entry->startFrame = tex;
+	entry->startFrame = 0;
 	entry->duration = 5;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
@@ -363,7 +354,7 @@ void CMenuPcs::CmdInit1()
 	entry->height = 0x140;
 	entry->u = 0.0f;
 	entry->v = 0.0f;
-	entry->startFrame = tex;
+	entry->startFrame = 0;
 	entry->duration = 5;
 
 	CmdListEntry* basePanel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
@@ -372,14 +363,13 @@ void CMenuPcs::CmdInit1()
 		entry->flags = 2;
 		entry->tex = kCmdRowTexture;
 		entry->x = static_cast<s16>(basePanel->x + 0x24);
-		entry->y = static_cast<s16>(basePanel->y + tex);
+		entry->y = static_cast<s16>(basePanel->y + i * 0x20);
 		entry->width = 200;
 		entry->height = 0x28;
 		entry->u = 0.0f;
 		entry->v = 0.0f;
 		entry->startFrame = 7;
 		entry->duration = 5;
-		tex += 0x20;
 	}
 
 	GetCmdListStorage(this)->listEnd = static_cast<s16>(idx);

@@ -1946,3 +1946,12 @@ me_app_padding_801D2912:
 
 me_usb_padding_801D28FF:
 	.rodata start:0x801D28FF end:0x801D2900 align:1
+
+cflat_data.cpp:
+	.text	start:0x80096FD4 end:0x800976FC
+	extab	start:0x80007DA8 end:0x80007DC0
+	extabindex	start:0x8000E0E0 end:0x8000E104
+	.rodata	start:0x801D4960 end:0x801D496F
+
+cflat_data_padding_801D496F:
+	.rodata start:0x801D496F end:0x801D4970 align:1

@@ -8,8 +8,12 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097AC8
+ * PAL Size: 288b
+ * EN Address: 0x80097464
+ * EN Size: 288b
+ * JP Address: 0x80096FD4
+ * JP Size: 288b
  */
 void CFlatData::Destroy()
 {
@@ -61,12 +65,12 @@ void CFlatData::Destroy()
 
 /*
  * --INFO--
- * PAL Address: 0x80097be8
+ * PAL Address: 0x80097BE8
  * PAL Size: 1228b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80097584
+ * EN Size: 1228b
+ * JP Address: 0x800970F4
+ * JP Size: 1228b
  */
 void CFlatData::Create(void* filePtr)
 {
@@ -167,12 +171,12 @@ void CFlatData::Create(void* filePtr)
 
 /*
  * --INFO--
- * PAL Address: 0x800980b4
+ * PAL Address: 0x800980B4
  * PAL Size: 292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80097A50
+ * EN Size: 292b
+ * JP Address: 0x800975C0
+ * JP Size: 292b
  */
 CFlatData::~CFlatData()
 {
@@ -181,8 +185,12 @@ CFlatData::~CFlatData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800981D8
+ * PAL Size: 24b
+ * EN Address: 0x80097B74
+ * EN Size: 24b
+ * JP Address: 0x800976E4
+ * JP Size: 24b
  */
 CFlatData::CFlatData()
 {

@@ -5829,10 +5829,10 @@ fn_80096EC8 = .text:0x80096EC8; // type:function size:0x14
 fn_80096EDC = .text:0x80096EDC; // type:function size:0x4
 fn_80096EE0 = .text:0x80096EE0; // type:function size:0x28
 fn_80096F08 = .text:0x80096F08; // type:function size:0xCC
-fn_80096FD4 = .text:0x80096FD4; // type:function size:0x120
-fn_800970F4 = .text:0x800970F4; // type:function size:0x4CC
-dtor_800975C0 = .text:0x800975C0; // type:function size:0x124
-fn_800976E4 = .text:0x800976E4; // type:function size:0x18
+Destroy__9CFlatDataFv = .text:0x80096FD4; // type:function size:0x120 scope:global
+Create__9CFlatDataFPv = .text:0x800970F4; // type:function size:0x4CC scope:global
+__dt__9CFlatDataFv = .text:0x800975C0; // type:function size:0x124 scope:global
+__ct__9CFlatDataFv = .text:0x800976E4; // type:function size:0x18 scope:global
 drawTagString__4CMesFP5CFontPciii = .text:0x800976FC; // type:function size:0x1BC
 MakeAgbString__4CMesFPcPc = .text:0x800978B8; // type:function size:0x468
 useFlag__4CMesFii = .text:0x80097D20; // type:function size:0xC0
@@ -15851,3 +15851,5 @@ gap_8034ED1E = .sdata2:0x8034ED1E; // type:object size:0x2 scope:local align:1
 gap_rodata_801D2912 = .rodata:0x801D2912; // type:object size:0x6 scope:local align:1
 
 gap_rodata_801D28FF = .rodata:0x801D28FF; // type:object size:0x1 scope:local align:1
+
+gap_rodata_801D496F = .rodata:0x801D496F; // type:object size:0x1 scope:local align:1

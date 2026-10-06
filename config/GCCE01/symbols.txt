@@ -5853,10 +5853,10 @@ fn_80097350 = .text:0x80097350; // type:function size:0x14
 fn_80097364 = .text:0x80097364; // type:function size:0x4
 fn_80097368 = .text:0x80097368; // type:function size:0x28
 fn_80097390 = .text:0x80097390; // type:function size:0xD4
-fn_80097464 = .text:0x80097464; // type:function size:0x120
-fn_80097584 = .text:0x80097584; // type:function size:0x4CC
-dtor_80097A50 = .text:0x80097A50; // type:function size:0x124
-fn_80097B74 = .text:0x80097B74; // type:function size:0x18
+Destroy__9CFlatDataFv = .text:0x80097464; // type:function size:0x120 scope:global
+Create__9CFlatDataFPv = .text:0x80097584; // type:function size:0x4CC scope:global
+__dt__9CFlatDataFv = .text:0x80097A50; // type:function size:0x124 scope:global
+__ct__9CFlatDataFv = .text:0x80097B74; // type:function size:0x18 scope:global
 drawTagString__4CMesFP5CFontPciii = .text:0x80097B8C; // type:function size:0x17C
 MakeAgbString__4CMesFPcPcii = .text:0x80097D08; // type:function size:0x860
 useFlag__4CMesFii = .text:0x80098568; // type:function size:0xC0
@@ -17563,3 +17563,5 @@ gap_80331046 = .sdata2:0x80331046; // type:object size:0x2 scope:local align:1
 gap_rodata_801D6CFA = .rodata:0x801D6CFA; // type:object size:0x6 scope:local align:1
 
 gap_rodata_801D6CE7 = .rodata:0x801D6CE7; // type:object size:0x1 scope:local align:1
+
+gap_rodata_801D8D6F = .rodata:0x801D8D6F; // type:object size:0x1 scope:local align:1

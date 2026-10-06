@@ -1955,3 +1955,12 @@ astar_padding_801DC61E:
 
 astar_padding_80331046:
 	.sdata2 start:0x80331046 end:0x80331048 align:1
+
+ME_AppRequest.cpp:
+	.text	start:0x8004DADC end:0x8004DDC4
+	extab	start:0x80006AC4 end:0x80006AEC
+	extabindex	start:0x8000C730 end:0x8000C76C
+	.rodata	start:0x801D6CE8 end:0x801D6CFA
+
+me_app_padding_801D6CFA:
+	.rodata start:0x801D6CFA end:0x801D6D00 align:1

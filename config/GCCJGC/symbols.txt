@@ -5052,11 +5052,11 @@ fn_8004C120 = .text:0x8004C120; // type:function size:0x54
 fn_8004C174 = .text:0x8004C174; // type:function size:0xF0
 SetUSBData__18CMaterialEditorPcsFv = .text:0x8004C264; // type:function size:0x12B0 scope:global
 MemFree__18CMaterialEditorPcsFPv = .text:0x8004D514; // type:function size:0x30 scope:global
-fn_8004D544 = .text:0x8004D544; // type:function size:0x28
-fn_8004D56C = .text:0x8004D56C; // type:function size:0x60
-fn_8004D5CC = .text:0x8004D5CC; // type:function size:0x50
-fn_8004D61C = .text:0x8004D61C; // type:function size:0xD4
-fn_8004D6F0 = .text:0x8004D6F0; // type:function size:0x13C
+GetRsdItem__18CMaterialEditorPcsFv = .text:0x8004D544; // type:function size:0x28 scope:global
+SetRsdIndex__18CMaterialEditorPcsFv = .text:0x8004D56C; // type:function size:0x60 scope:global
+SetRsdFlag__18CMaterialEditorPcsFv = .text:0x8004D5CC; // type:function size:0x50 scope:global
+AddRsdList__18CMaterialEditorPcsFP5ZLIST = .text:0x8004D61C; // type:function size:0xD4 scope:global
+ResetRsdList__18CMaterialEditorPcsFP5ZLIST = .text:0x8004D6F0; // type:function size:0x13C scope:global
 GetDataIdx__5ZLISTFi = .text:0x8004D82C; // type:function size:0x48 scope:global
 GetDataNext__5ZLISTFPP10_ZLISTITEM = .text:0x8004D874; // type:function size:0x34 scope:global
 AddTail__5ZLISTFPv = .text:0x8004D8A8; // type:function size:0xBC scope:global
@@ -15846,3 +15846,6 @@ kAStarEscapeInitialBestDist = .sdata2:0x8034ED04; // type:object size:0x4 scope:
 @874 = .sdata2:0x8034ED18; // type:object size:0x4 scope:local
 @875 = .sdata2:0x8034ED1C; // type:object size:0x2 scope:local
 gap_8034ED1E = .sdata2:0x8034ED1E; // type:object size:0x2 scope:local align:1
+
+
+gap_rodata_801D2912 = .rodata:0x801D2912; // type:object size:0x6 scope:local align:1

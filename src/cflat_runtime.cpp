@@ -454,14 +454,10 @@ inline CFlatRuntime::CStack CFlatRuntime::pop(CFlatRuntime::CObject* object)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CFlatRuntime::push(CFlatRuntime::CObject* object, CFlatRuntime::CStack* args, int argCount)
+inline void CFlatRuntime::push(CFlatRuntime::CObject* object, CFlatRuntime::CStack* value, int)
 {
-	int copiedArgs;
-	for (copiedArgs = 0; copiedArgs < argCount; copiedArgs++) {
-		CStack* dst = &reinterpret_cast<CStack*>(object->m_sp)[copiedArgs];
-		*dst = args[copiedArgs];
-	}
-	object->m_sp += copiedArgs;
+	*reinterpret_cast<CStack*>(object->m_sp) = *value;
+	object->m_sp++;
 }
 
 /*

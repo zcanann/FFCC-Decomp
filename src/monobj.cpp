@@ -813,10 +813,11 @@ void CGMonObj::onFrameStat()
 				}
 				if (prgObj->m_subState == 1) {
 					unsigned char* script9b = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-					unsigned int limit = *reinterpret_cast<unsigned short*>(script9b + 0x1B6);
-					if (static_cast<int>(prgObj->m_stateFrame) <= static_cast<int>(limit)) {
+					int frame = prgObj->m_stateFrame;
+					int limit = *reinterpret_cast<unsigned short*>(script9b + 0x1B6);
+					if (frame <= limit) {
 						if ((object->m_stateFlags0Bits.unk1 != 0) ||
-							(prgObj->m_stateFrame == static_cast<int>(limit)) ||
+							(frame == limit) ||
 							(m_partyDistance[m_targetPartyIndex] >= range)) {
 							prgObj->m_subState = 0;
 							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
@@ -972,9 +973,8 @@ void CGMonObj::onFrameStat()
 
 	case 0x33: {
 		if (prgObj->m_stateFrame == 0) {
-			void* classId = object->m_scriptHandle[4];
+			int seId = (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x3C) ? 0x7937 : 0x7936;
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
-			unsigned int clz = __cntlzw(0x3C - reinterpret_cast<int>(classId));
 			object->m_weaponNodeFlagBits.m_unk10 = 1;
 			object->m_groundHitOffset.z = 0.0f;
 			object->m_groundHitOffset.y = 0.0f;
@@ -982,7 +982,7 @@ void CGMonObj::onFrameStat()
 			object->m_bgColMask |= 0x11;
 			object->m_displayFlags |= 1;
 			prgObj->reqAnim(0xD, 0, 0);
-			prgObj->playSe3D((clz >> 5) + 0x7936, 0x32, 0x96, 0, (Vec*)0);
+			prgObj->playSe3D(seId, 0x32, 0x96, 0, (Vec*)0);
 			int dataNo = object->m_charaModelHandle->GetPdtSlot();
 			prgObj->putParticle((dataNo << 8) | 4, 0, object, kMonObjDefaultScale, 0);
 		}
@@ -998,8 +998,8 @@ void CGMonObj::onFrameStat()
 
 	case 0x34: {
 		if (prgObj->m_stateFrame == 0) {
-			unsigned int particleBase;
-			unsigned int soundId;
+			int soundId;
+			int particleBase;
 			if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x39) {
 				particleBase = 4;
 				soundId = 0xC36E;

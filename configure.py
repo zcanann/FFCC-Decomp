@@ -795,7 +795,7 @@ config.libs = [
             ),
             Object(MatchingFor("GCCE01"), "THPSimple.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
-            Object(Matching, "USBStreamData.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "USBStreamData.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "vector.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01"), "wind.cpp"),

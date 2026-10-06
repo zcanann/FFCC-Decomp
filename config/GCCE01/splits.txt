@@ -1818,3 +1818,6 @@ monobj_table.cpp:
 	extab start:0x80009BFC end:0x80009C04
 	extabindex start:0x80010EC4 end:0x80010ED0
 	.data start:0x80211838 end:0x80212F78
+
+USBStreamData.cpp:
+	.text start:0x800501F0 end:0x80050310

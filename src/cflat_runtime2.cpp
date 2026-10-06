@@ -1549,6 +1549,7 @@ void CFlatRuntime2::drawLayer(
 		return;
 	}
 
+	int u1;
 	int textureIndex = m_layerResources[layerNo].m_textureSet->Find(textureName);
 	if (textureIndex >= 0) {
 
@@ -1603,7 +1604,7 @@ void CFlatRuntime2::drawLayer(
 
 	scaleX = static_cast<float>(width) * scaleX;
 	scaleY = static_cast<float>(height) * scaleY;
-	int u1 = texU + width;
+	u1 = texU + width;
 	int v1 = texV + height;
 	float fx = static_cast<float>(x);
 	const float x0 = fx - (((flags & 1) != 0) ? 0.5f * scaleX : 0.0f);

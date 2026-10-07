@@ -285,8 +285,8 @@ void CMenuPcs::createBonus()
 			    s_Rinfo->m_party[activeCount].m_foodValue + s_Rinfo->m_party[activeCount].m_artifactValue;
 			s_Rinfo->m_party[activeCount].m_selectedItemId = -1;
 			s_Rinfo->m_party[activeCount].m_selectedSlot = -1;
-			int rawTotal = s_Rinfo->m_party[activeCount].m_totalValue;
 			int totalValueClamped;
+			int rawTotal = s_Rinfo->m_party[activeCount].m_totalValue;
 			if (rawTotal < 0) {
 				totalValueClamped = 0;
 			} else {

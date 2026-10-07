@@ -5109,12 +5109,12 @@ inline float CMenuPcs::CalcSpl(CMenuPcs::SPL* prev, CMenuPcs::SPL* next, float t
 	float u = (t - prev->time) / span;
 	float u2 = u * u;
 	float u3 = u2 * u;
-	float threeU2 = FLOAT_803314c4 * u2;
-	float negTerm = -(FLOAT_803314c8 * u2 - u3);
+	float h00 = 2.0f * u3 - 3.0f * u2 + 1.0f;
+	float h01 = -2.0f * u3 + 3.0f * u2;
+	float h10 = u3 - 2.0f * u2 + u;
+	float h11 = u3 - u2;
 
-	return span * (prev->outTangent * (u + negTerm) + next->inTangent * (u3 - u2)) +
-	       (prev->value * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - threeU2)) +
-	           next->value * (FLOAT_803314cc * u3 + threeU2));
+	return prev->value * h00 + next->value * h01 + span * (prev->outTangent * h10 + next->inTangent * h11);
 }
 
 /*

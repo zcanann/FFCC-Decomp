@@ -233,11 +233,17 @@ void CGItemObj::onFrame()
 			PlayAnim(0, 1, 0, -1, -1, 0);
 
 			CCaravanWork* ownerData = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle);
-			int soundEntry = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
+			CCharaPcs::CHandle* bossHandle = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle;
+			int pdtNo;
+			if (bossHandle->m_pdtLoadRef != 0) {
+				pdtNo = bossHandle->m_pdtLoadRef->m_pdtSlot;
+			} else {
+				pdtNo = -1;
+			}
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
-			putParticle((soundEntry << 8) | ownerData->m_joybusCaravanId, m_particleSlot, this, particleScale, 0x12909);
+			putParticle((pdtNo << 8) | ownerData->m_joybusCaravanId, m_particleSlot, this, particleScale, 0x12909);
 
 			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
 			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));

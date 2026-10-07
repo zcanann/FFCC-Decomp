@@ -2461,12 +2461,12 @@ unsigned int CMenuPcs::CmdClose1()
 		CmdListEntry* const animEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
 		animEntry->alpha =
 			static_cast<float>(-(0.2 * static_cast<f64>(GetCmdStateView(this)->transitionTimer) - 1.0));
-		const s32 nextState = (1.0 == static_cast<f64>(animEntry->scale)) ? 2 : 3;
+		int nextState = (1.0 == static_cast<f64>(animEntry->scale)) ? 2 : 3;
 
 		done = (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= 5.0) ? 1 : 0;
 		if ((done != 0) && (GetCmdStateView(this)->commandResult > 0)) {
 			GetCmdStateView(this)->commandResult = 0;
-			const s16 choice = GetCmdStateView(this)->selected[2];
+			s16 choice = GetCmdStateView(this)->selected[2];
 			if (choice == 0) {
 				GetCmdStateView(this)->uniteState = 1;
 				done = 0;

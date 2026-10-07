@@ -1565,7 +1565,7 @@ void CGPartyObj::onFrameStat()
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
 				Vec moveVec;
-				CVector diff = CVector(*reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C)) - CVector(m_worldPosition);
+				CVector diff = CVector(reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition) - CVector(m_worldPosition);
 				moveVec.x = diff.x;
 				moveVec.y = diff.y;
 				moveVec.z = diff.z;

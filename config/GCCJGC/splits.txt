@@ -1183,6 +1183,7 @@ FunnyShape.cpp:
 
 p_tina.cpp:
 	.text start:0x800517A8 end:0x80053458
+	.rodata start:0x801D2A38 end:0x801D2D50
 	.bss start:0x8028F228 end:0x8028F368
 
 p_dbgmenu.cpp:

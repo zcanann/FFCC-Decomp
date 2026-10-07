@@ -115,6 +115,7 @@ namespace {
 
 #ifdef VERSION_GCCJGC
 enum {
+    kCmdSlotTexture = 0x2C,
     kCmdPanelTexture = 0x2D,
     kCmdTabTexture = 0x45,
     kCmdDisabledRowTexture = 0x33,
@@ -126,6 +127,7 @@ enum {
 };
 #else
 enum {
+    kCmdSlotTexture = 0x2D,
     kCmdPanelTexture = 0x2E,
     kCmdTabTexture = 0x46,
     kCmdDisabledRowTexture = 0x34,
@@ -241,7 +243,7 @@ void CMenuPcs::CmdInit()
 	float texV = 8.0f;
 	for (s32 slot = 0; slot < 8; slot++) {
 		if (slot < caravanWork->m_numCmdListSlots) {
-			entry->tex = 0x2D;
+			entry->tex = kCmdSlotTexture;
 		} else {
 			entry->tex = 0xFFFFFFFF;
 		}

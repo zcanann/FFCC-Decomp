@@ -16,6 +16,14 @@
 #include <math.h>
 #include <string.h>
 
+#if defined(VERSION_GCCJGC)
+#define CHARA_LINE(line, usLine, jpLine) (jpLine)
+#elif defined(VERSION_GCCE01)
+#define CHARA_LINE(line, usLine, jpLine) (usLine)
+#else
+#define CHARA_LINE(line, usLine, jpLine) (line)
+#endif
+
 inline int CSystem::GetErrorLevel()
 {
 	return m_execParam;
@@ -2329,7 +2337,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x56455254: {
 			m_data->m_vertexCount = chunkInfo.m_size / 6;
 			S16Vec* verts = static_cast<S16Vec*>(
-			    Memory._Alloc(chunkInfo.m_size, stage, "chara.cpp", 0x7D6, 0));
+			    Memory._Alloc(chunkInfo.m_size, stage, "chara.cpp", CHARA_LINE(0x7D6, 0x7D1, 0x7C8), 0));
 			m_data->m_vertices = verts;
 			memcpy(m_data->m_vertices, chunk.GetAddress(), chunkInfo.m_size);
 			DCFlushRange(m_data->m_vertices, m_data->m_vertexCount * 6);
@@ -2338,7 +2346,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x4E4F524D: {
 			m_data->m_normalCount = chunkInfo.m_size / 6;
 			S16Vec* normals = static_cast<S16Vec*>(
-			    Memory._Alloc(chunkInfo.m_size, stage, "chara.cpp", 0x7DE, 0));
+			    Memory._Alloc(chunkInfo.m_size, stage, "chara.cpp", CHARA_LINE(0x7DE, 0x7D9, 0x7D0), 0));
 			m_data->m_normals = normals;
 			memcpy(m_data->m_normals, chunk.GetAddress(), chunkInfo.m_size);
 			DCFlushRange(m_data->m_normals, m_data->m_normalCount * 6);
@@ -2347,7 +2355,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x434F4C52: {
 			m_data->m_colorCount = chunkInfo.m_size / sizeof(_GXColor);
 			_GXColor* colors = static_cast<_GXColor*>(
-			    Memory._Alloc(chunkInfo.m_size, stage, "chara.cpp", 0x7E6, 0));
+			    Memory._Alloc(chunkInfo.m_size, stage, "chara.cpp", CHARA_LINE(0x7E6, 0x7E1, 0x7D8), 0));
 			m_data->m_colors = colors;
 			memcpy(m_data->m_colors, chunk.GetAddress(), chunkInfo.m_size);
 			DCFlushRange(m_data->m_colors, m_data->m_colorCount * sizeof(_GXColor));
@@ -2356,7 +2364,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x55562020: {
 			m_data->m_uvCount = chunkInfo.m_size / sizeof(S16Vec2d);
 			S16Vec2d* uvs = static_cast<S16Vec2d*>(
-			    Memory._Alloc(chunkInfo.m_size, stage, "chara.cpp", 0x7EE, 0));
+			    Memory._Alloc(chunkInfo.m_size, stage, "chara.cpp", CHARA_LINE(0x7EE, 0x7E9, 0x7E0), 0));
 			m_data->m_uvs = uvs;
 			memcpy(m_data->m_uvs, chunk.GetAddress(), chunkInfo.m_size);
 			DCFlushRange(m_data->m_uvs, m_data->m_uvCount * sizeof(S16Vec2d));
@@ -2365,7 +2373,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x534B494E: {
 			m_data->m_skinCount = chunkInfo.m_arg0;
 			m_data->m_skins =
-			    new (stage, "chara.cpp", 0x7F8) CChara::CSkin[m_data->m_skinCount];
+			    new (stage, "chara.cpp", CHARA_LINE(0x7F8, 0x7F3, 0x7EA)) CChara::CSkin[m_data->m_skinCount];
 
 			chunk.PushChunk();
 			unsigned int skinIndex = 0;
@@ -2375,17 +2383,17 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 				} else if (chunkInfo.m_id == 0x4F4E4520) {
 					m_data->m_oneWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_oneWeightData =
-					    Memory._Alloc(m_data->m_oneWeightCountOrSize, stage, "chara.cpp", 0x808, 0);
+					    Memory._Alloc(m_data->m_oneWeightCountOrSize, stage, "chara.cpp", CHARA_LINE(0x808, 0x803, 0x7FA), 0);
 					memcpy(m_data->m_oneWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				} else if (chunkInfo.m_id == 0x54574F20) {
 					m_data->m_twoWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_twoWeightData =
-					    Memory._Alloc(m_data->m_twoWeightCountOrSize, stage, "chara.cpp", 0x80E, 0);
+					    Memory._Alloc(m_data->m_twoWeightCountOrSize, stage, "chara.cpp", CHARA_LINE(0x80E, 0x809, 0x800), 0);
 					memcpy(m_data->m_twoWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				} else if (chunkInfo.m_id == 0x524D494E) {
 					m_data->m_threeWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_threeWeightData =
-					    Memory._Alloc(m_data->m_threeWeightCountOrSize, stage, "chara.cpp", 0x814, 0);
+					    Memory._Alloc(m_data->m_threeWeightCountOrSize, stage, "chara.cpp", CHARA_LINE(0x814, 0x80F, 0x806), 0);
 					memcpy(m_data->m_threeWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				}
 			}
@@ -2395,7 +2403,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x444C4844: {
 			m_data->m_displayListCount = chunkInfo.m_arg0 & 0xFFFF;
 			m_data->m_displayLists = reinterpret_cast<CCharaDisplayListRaw*>(
-			    new (stage, "chara.cpp", 0x820) CChara::CMesh::CDisplayList[m_data->m_displayListCount]);
+			    new (stage, "chara.cpp", CHARA_LINE(0x820, 0x81B, 0x812)) CChara::CMesh::CDisplayList[m_data->m_displayListCount]);
 
 			CCharaDisplayListRaw* displayList = m_data->m_displayLists;
 			chunk.PushChunk();
@@ -2408,7 +2416,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 					if (static_cast<u32>(displayList->m_size) != 0) {
 						const unsigned int allocSize = (displayList->m_size + 0x1F) & ~0x1FU;
 						displayList->m_data =
-						    Memory._Alloc(allocSize, stage, "chara.cpp", 0x830, 0);
+						    Memory._Alloc(allocSize, stage, "chara.cpp", CHARA_LINE(0x830, 0x82B, 0x822), 0);
 						chunk.Get(displayList->m_data, displayList->m_size);
 						DCFlushRange(displayList->m_data, displayList->m_size);
 					}

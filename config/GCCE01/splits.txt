@@ -54,6 +54,7 @@ base/PPCArch.c:
 
 dolphin/os/__ppc_eabi_init.cpp:
 	.init start:0x80003400 end:0x80003458
+	.text start:0x80180F00 end:0x80180F94
 
 TRK_MINNOW_DOLPHIN/mainloop.c:
 	.text start:0x801A7EE8 end:0x801A7FE0

@@ -819,12 +819,10 @@ config.libs = [
                 "dolphin/os/__start.c",
                 source="os/__start.c",
             ),
-            Object(NonMatching, "os/__ppc_eabi_init.c"),
             Object(
                 MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "dolphin/os/__ppc_eabi_init.cpp",
                 source="os/__ppc_eabi_init.cpp",
-                cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "os/OS.c"),
             Object(Matching, "os/OSAddress.c"),

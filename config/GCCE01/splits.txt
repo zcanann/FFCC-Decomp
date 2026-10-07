@@ -755,6 +755,8 @@ menu_compa.cpp:
 	.sdata2 start:0x80331F98 end:0x80331FD8
 
 menu_favo.cpp:
+	extab start:0x80009F6C end:0x80009F9C
+	extabindex start:0x800113EC end:0x80011434
 	.text start:0x801613D0 end:0x801629BC
 	.bss start:0x8030AA48 end:0x8030AA68
 	.sdata2 start:0x80331FD8 end:0x80332020

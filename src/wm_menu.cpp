@@ -9496,12 +9496,11 @@ void CMenuPcs::CalcMcObj()
 {
 	WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
 
-	const float* pPanelF = &FLOAT_80331480;
-	const float panelStateFloat = *pPanelF;
+	float panelStateFloat = FLOAT_80331480;
 	int i;
 	int viewSlot = 17;
 	WmWorldObjInfo* panelState = &worldObj[17];
-	for (i = 0; i < 4; i++, viewSlot++, panelState++) {
+	for (i = 0; i < 4; i++, panelState++, viewSlot++) {
 		panelState->m_viewportX = static_cast<short>(panelStateFloat);
 
 		const int y = static_cast<int>(
@@ -9537,7 +9536,7 @@ void CMenuPcs::CalcMcObj()
 			panelState->m_transform.m_scale.y = FLOAT_80331434;
 			panelState->m_transform.m_scale.z = FLOAT_80331434;
 			panelState->m_transform.m_rotation.x = FLOAT_803314B8;
-			panelState->m_transform.m_rotation.y = panelState->m_transform.m_rotation.y + FLOAT_803314bc;
+			panelState->m_transform.m_rotation.y += FLOAT_803314bc;
 
 			panelState->m_transform.m_position.y =
 			    panelState->m_transform.m_position.y +
@@ -9958,10 +9957,12 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	float sx;
 	float bottom;
 	if (m_menuWindowInfo->state != 1) {
+		sx = centerX - FLOAT_80331410;
+		sy = centerY - FLOAT_80331410;
 		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - FLOAT_80331410) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
 		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - FLOAT_80331410) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
-		sx = (centerX - FLOAT_80331410) - xAdd;
-		sy = (centerY - FLOAT_80331410) - yAdd;
+		sx -= xAdd;
+		sy -= yAdd;
 		sw = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + xAdd));
 		sh = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + yAdd));
 	} else {

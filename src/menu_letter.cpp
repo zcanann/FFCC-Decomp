@@ -66,6 +66,9 @@ static const char s_fmt_pcts_pcts[] = "%s%s";
 static const char s_fmt_pcts_pcts_pcts[] = "%s%s%s";
 static const char s_fmt_pcts_sp_pcts_dot[] = "%s %s.";
 static const char s_fmt_pcts_sp_pcts_pcts[] = "%s %s%s";
+#ifdef VERSION_GCCE01
+static const char s_fmt_pcts_sp[] = "%s ";
+#endif
 static const char s_fmt_pctd_sp_pcts[] = "%d %s";
 static const char s_fmt_two_spaces[] = "  ";
 static const char s_fmt_pctd_sp_pcts_pcts[] = "%d %s%s";
@@ -1447,16 +1450,21 @@ int CMenuPcs::LetterConfirmOpen()
 			sprintf(lines[lineCount], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
 			break;
 		}
+#ifdef VERSION_GCCE01
+		case 3:
+#endif
 		case 4: {
 			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x26), title, GetMenuStr(0x25));
 			break;
 		}
+#ifndef VERSION_GCCE01
 		case 3: {
 			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_pcts, GetMenuStr(0x26), title);
 			break;
 		}
+#endif
 		case 5: {
 			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_sp_pcts_dot, GetMenuStr(0x26), title);
@@ -1498,10 +1506,14 @@ int CMenuPcs::LetterConfirmOpen()
 			switch (languageId) {
 			case 2:
 				if (s_Attach == 0) {
+#ifdef VERSION_GCCE01
+					sprintf(lines[lineCount], s_fmt_pcts_sp, Game.GetShortItemName(s_AttachItem));
+#else
 					const char* attachName = Game.GetShortItemName(s_AttachItem);
 					sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23),
 					        attachName,
 					        GetMenuStr(0x24));
+#endif
 				} else if (s_Attach == 1) {
 					sprintf(lines[lineCount], s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
 				}

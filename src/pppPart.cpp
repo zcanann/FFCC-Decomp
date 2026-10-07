@@ -1386,6 +1386,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		pppMngSt->m_pppPDataVals = 0;
 	}
 
+	u8 index;
 	_pppProgSetDef* programSetIt = programSet;
 	if (programSet->m_next != 0)
 	{
@@ -1405,7 +1406,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	pppMngSt->m_pppPObjLinkHead.m_next = 0;
 	pppMngSt->m_spawnedCount = 0;
 
-	u8 index = 0;
+	index = 0;
 	_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
 	for (; programSetIt != 0; programSetIt = programSetIt->m_next)
 	{

@@ -10353,8 +10353,9 @@ void CMenuPcs::BindMcObj()
 	}
 
 	for (i = 0; i < 4; i++) {
+		int modelNo;
 		const McListInfo& charaState = m_wmCharaState[i];
-		int modelNo = charaState.m_timerA;
+		modelNo = charaState.m_timerA;
 
 		if (modelNo != 0) {
 			BindEffect(i + 0x11, modelNo + 0x16, -1);

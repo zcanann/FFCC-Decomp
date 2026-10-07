@@ -2521,20 +2521,24 @@ void CMenuPcs::DrawSelectOpenAnim()
 	}
 
 	int idx;
-	int activePartyCount = s_Rinfo->m_partyCount;
 	CMenuPcs::Sprt2* sprite;
-
-	DrawInit();
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
+	int activePartyCount;
 	int doubleCount;
 	int modelIndex;
 	int i;
 	int kind;
+	int lastKind;
+	CMenuPcs::Sprt2* artiSprite;
+
+	activePartyCount = s_Rinfo->m_partyCount;
+
+	DrawInit();
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
 	doubleCount = activePartyCount * 2;
 
-	int lastKind = 0;
-	CMenuPcs::Sprt2* artiSprite = 0;
+	lastKind = 0;
+	artiSprite = 0;
 	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];
 		kind = sprite->kind;

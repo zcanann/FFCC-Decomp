@@ -6931,13 +6931,16 @@ void CMenuPcs::CalcCharaSelect()
 	unsigned short padTrig[4];
 	int requestCancel;
 	int requestFinalize;
+#ifndef VERSION_GCCJGC
+	unsigned int confirmedSlotMask;
+	unsigned int pendingMask;
+#endif
 
 	m_wmHelpTimer = static_cast<short>(m_wmHelpTimer + 1);
 #ifdef VERSION_GCCJGC
 	if (m_wmHelpTimer >= 270) {
 #else
-	const unsigned int modeIsZero = Game.m_gameWork.m_menuStageMode == 0;
-	if (static_cast<int>(m_wmHelpTimer) >= static_cast<int>((modeIsZero + 2) * 0x4B)) {
+	if (m_wmHelpTimer >= (Game.m_gameWork.m_menuStageMode == 0 ? 3 : 2) * 0x4B) {
 #endif
 		m_wmHelpTimer = 0;
 	}
@@ -7011,7 +7014,7 @@ void CMenuPcs::CalcCharaSelect()
 			}
 		}
 #else
-		unsigned int pendingMask = 0;
+		pendingMask = 0;
 		for (i = 0; i < 4; i++) {
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				break;
@@ -7036,25 +7039,22 @@ void CMenuPcs::CalcCharaSelect()
 				}
 
 				const int slot = entry.m_currentSlot;
-				const int hOff = (slot + 0x20) * 4 + 0x774;
 				if (Game.m_caravanWorkArr[slot].m_shopState == 0 &&
-				    (*reinterpret_cast<CCharaPcs::CHandle**>(bytes + hOff))->IsModelLoaded(1) &&
-				    (*reinterpret_cast<CCharaPcs::CHandle**>(bytes + hOff))->m_charaKind != 3 &&
+				    m_wm.m_handles[slot + 0x20]->IsModelLoaded(1) &&
+				    m_wm.m_handles[slot + 0x20]->m_charaKind != 3 &&
 				    entry.m_cmakeReady != 1) {
 					if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 						System.Printf("chan = %d cur = %d\n", i,
 						              static_cast<int>(entry.m_currentSlot));
 					}
-					const int loadSlot = static_cast<int>(entry.m_currentSlot);
-					m_wm.m_charaModelData[loadSlot].m_modelChanged = 0;
-					GetWmCharaHandles(this)[loadSlot]->LoadModelASync(3, 0x43, 0);
+					ChgModel(entry.m_currentSlot, -1, -1, -1);
 				}
 			} else if (entry.m_cmakePending == 0 && static_cast<int>(Joybus.GetMType(i)) == 1) {
 				Joybus.SetMType(i, 4);
 			}
 		}
 
-		unsigned int confirmedSlotMask = 0;
+		confirmedSlotMask = 0;
 		for (i = 0; i < 4; i++) {
 			if (m_wm.m_charaSelectData[i].m_confirmed != 0) {
 				confirmedSlotMask |= 1u << static_cast<unsigned int>(m_wm.m_charaSelectData[i].m_currentSlot);
@@ -7065,10 +7065,9 @@ void CMenuPcs::CalcCharaSelect()
 			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    ((pendingMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    Game.m_caravanWorkArr[slot].m_shopState == 0 &&
-			    GetWmCharaHandles(this)[slot]->IsModelLoaded(1) &&
-			    GetWmCharaHandles(this)[slot]->m_charaKind != 3) {
-				m_wm.m_charaModelData[slot].m_modelChanged = 0;
-				GetWmCharaHandles(this)[slot]->LoadModelASync(3, 0x43, 0);
+			    m_wm.m_handles[slot + 0x20]->IsModelLoaded(1) &&
+			    m_wm.m_handles[slot + 0x20]->m_charaKind != 3) {
+				ChgModel(slot, -1, -1, -1);
 			}
 		}
 
@@ -8169,13 +8168,8 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
 	caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
 	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
-	{
-		int modelNo2 = static_cast<int>(info.m_charaType & 3) * 200 + 100;
-		if ((info.m_charaType >> 7) != 0) {
-			modelNo2 += 100;
-		}
-		caravanWork.m_id = static_cast<unsigned short>(modelNo2 + ((info.m_charaType >> 2) & 3));
-	}
+	caravanWork.m_id = static_cast<unsigned short>(
+	    GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, (info.m_charaType >> 7) != 0));
 	for (int favorite = 0; favorite < 8; favorite++) {
 		unsigned char nibble = info.m_favorite[favorite >> 1];
 		int v;

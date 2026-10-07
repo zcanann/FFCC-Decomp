@@ -2511,14 +2511,20 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
         1.0f, 1.0f, 0.0f);
 }
 
+#ifdef VERSION_GCCP01
+#define SINGWIN_OPEN_FRAMES 6
+#else
+#define SINGWIN_OPEN_FRAMES 8
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x80146adc
  * PAL Size: 1500b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80145C4C
+ * EN Size: 1500b
+ * JP Address: 0x8014220C
+ * JP Size: 1488b
  */
 void CMenuPcs::DrawSingWin(short mode)
 {
@@ -2538,9 +2544,9 @@ void CMenuPcs::DrawSingWin(short mode)
     float height;
 
     if (m_menuWindowInfo->state != 1) {
-        float leftScale = (left - m_menuWindowInfo->x - 32.0f) / 6.0f;
+        float leftScale = (left - m_menuWindowInfo->x - 32.0f) / SINGWIN_OPEN_FRAMES;
         leftScale *= m_menuWindowInfo->frame;
-        float topScale = (top - m_menuWindowInfo->y - 32.0f) / 6.0f;
+        float topScale = (top - m_menuWindowInfo->y - 32.0f) / SINGWIN_OPEN_FRAMES;
         topScale *= m_menuWindowInfo->frame;
         left = (left - 32.0f) - leftScale;
         width = static_cast<float>(2.0 * static_cast<double>(32.0f + leftScale));
@@ -2628,13 +2634,13 @@ void CMenuPcs::DrawSingWin(short mode)
     s16 state = win->state;
     if (state == 0) {
         win->frame = win->frame + 1;
-        if (m_menuWindowInfo->frame >= 6) {
-            m_menuWindowInfo->frame = 6;
+        if (m_menuWindowInfo->frame >= SINGWIN_OPEN_FRAMES) {
+            m_menuWindowInfo->frame = SINGWIN_OPEN_FRAMES;
             m_menuWindowInfo->state = 1;
         }
     } else if (state == 1) {
-        if (win->frame != 6) {
-            win->frame = 6;
+        if (win->frame != SINGWIN_OPEN_FRAMES) {
+            win->frame = SINGWIN_OPEN_FRAMES;
         }
     } else if (state == 2) {
         win->frame = win->frame - 1;

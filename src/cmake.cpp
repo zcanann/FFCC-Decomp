@@ -454,22 +454,25 @@ static void GetChara(char* text, int index, char* dst)
     }
 }
 #else
-inline void GetChara(char* dst, int index, char* table)
+inline void GetChara(char* text, int index, char* dst)
 {
-    if (dst == nullptr) {
-        return;
-    }
-
     dst[0] = '\0';
-    if (table == nullptr || index < 0) {
-        return;
+    int length = strlen(text);
+    if (length != 0) {
+        int position;
+        int character;
+        character = 0;
+        position = 0;
+        for (; length > 0; --length, ++position) {
+            if (character == index) {
+                dst[0] = text[position];
+                dst[1] = '\0';
+                break;
+            }
+            ++character;
+        }
     }
-
-    const int stride = 0x20;
-    memcpy(dst, table + index * stride, stride);
-    dst[stride - 1] = '\0';
 }
-
 #endif
 
 /*
@@ -513,16 +516,14 @@ static inline int GetCharaType(char* text, int index)
     return -1;
 }
 #else
-inline void GetCharaType(char* dst, int type)
+inline int GetCharaType(char* text, int index)
 {
-    if (dst == nullptr) {
-        return;
+    int length = strlen(text);
+    if (length == 0) {
+        return -1;
     }
-
-    dst[0] = static_cast<char>(type);
-    dst[1] = '\0';
+    return 0;
 }
-
 #endif
 
 /*
@@ -563,13 +564,14 @@ static inline int GetCharaCnt(char* text)
     return character;
 }
 #else
-inline void GetCharaCnt(char* dst)
+inline int GetCharaCnt(char* text)
 {
-    if (dst != nullptr) {
-        dst[0] = '\0';
+    int length = strlen(text);
+    if (length != 0) {
+        return length;
     }
+    return 0;
 }
-
 #endif
 
 /*
@@ -1610,20 +1612,42 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
     return 0;
 }
 #else
-inline int CMenuPcs::AddNameChara(int c, int slot, int, int)
+inline int CMenuPcs::AddNameChara(int add, int column, int row, int table)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    int index = slot;
-    if (index < 0) {
-        index = 0;
+    if (add == 0) {
+        char* name = s_CmakeInfo.m_name;
+        int count = GetCharaCnt(name);
+        if (count == 0) {
+            return -1;
+        }
+        int length = strlen(s_CmakeInfo.m_name);
+        if (GetCharaType(name, count - 1) == 0) {
+            s_CmakeInfo.m_name[length - 1] = '\0';
+        } else {
+            s_CmakeInfo.m_name[length - 2] = '\0';
+        }
+    } else {
+        char picked[3];
+        memset(picked, 0, 3);
+        char* text = const_cast<char*>(s_NameEntryStr[row + table * 5]);
+        GetChara(text, column, picked);
+        int count = GetCharaCnt(s_CmakeInfo.m_name);
+        if (count >= 7) {
+            return -1;
+        }
+        GetChara(text, column, picked);
+        if (count == 0) {
+            strcat(s_CmakeInfo.m_name, picked);
+            return 0;
+        }
+        int type = GetCharaType(text, count - 1);
+        if (type == 0 && count >= 7) {
+            return -1;
+        }
+        strcat(s_CmakeInfo.m_name, picked);
     }
-    if (index > 0x14) {
-        index = 0x14;
-    }
-    self[0x85C + index] = static_cast<unsigned char>(c);
     return 0;
 }
-
 #endif
 
 /*
@@ -1872,9 +1896,6 @@ int CMenuPcs::CmakeNameCtrl()
 {
     short repeat;
     short down;
-#ifndef VERSION_GCCJGC
-    const char* name;
-#endif
 
     down = Pad.GetButtonDown(0);
     repeat = Pad.GetButtonRepeat(0);
@@ -1953,19 +1974,9 @@ int CMenuPcs::CmakeNameCtrl()
                 CmakeState(this)->m_row = 5;
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
             } else if ((down & 0x100) != 0) {
-#ifndef VERSION_GCCJGC
-                short curTable;
-                short curSelect;
-                const char* rowText;
-#endif
                 short curRow = CmakeState(this)->m_row;
                 if (curRow >= 5) {
-#ifdef VERSION_GCCJGC
                     if (GetCharaCnt(s_CmakeInfo.m_name) == 0) {
-#else
-                    int emptyLen = strlen(s_CmakeInfo.m_name);
-                    if ((emptyLen & ((-emptyLen | emptyLen) >> 31)) == 0) {
-#endif
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                         return 0;
                     }
@@ -1995,70 +2006,11 @@ int CMenuPcs::CmakeNameCtrl()
                         return 1;
                     }
                 } else {
-#ifdef VERSION_GCCJGC
                     int ret = AddNameChara(1, CmakeState(this)->m_select, curRow, CmakeState(this)->m_table);
-#else
-                    curTable = CmakeState(this)->m_table;
-                    curSelect = CmakeState(this)->m_select;
-                    char picked[12];
-                    memset(picked, 0, 3);
-                    rowText = s_NameEntryStr[curRow + curTable * 5];
-                    picked[0] = '\0';
-                    int rowLen = strlen(rowText);
-                    if (rowLen != 0) {
-                        int i = 0;
-                        int j = i;
-                        for (; 0 < rowLen; rowLen = rowLen - 1) {
-                            if (i == curSelect) {
-                                picked[0] = rowText[j];
-                                picked[1] = '\0';
-                                break;
-                            }
-                            i = i + 1;
-                            j = j + 1;
-                        }
-                    }
-                    unsigned int rawLen = strlen(s_CmakeInfo.m_name);
-                    int nameLen = rawLen & (static_cast<int>(-rawLen | rawLen) >> 31);
-                    int ret;
-                    if (nameLen >= 7) {
-                        ret = -1;
-                    } else {
-                        picked[0] = '\0';
-                        rowLen = strlen(rowText);
-                        if (rowLen != 0) {
-                            int i = 0;
-                            int j = i;
-                            for (; 0 < rowLen; rowLen = rowLen - 1) {
-                                if (i == curSelect) {
-                                    picked[0] = rowText[j];
-                                    picked[1] = '\0';
-                                    break;
-                                }
-                                i = i + 1;
-                                j = j + 1;
-                            }
-                        }
-                        if (nameLen == 0) {
-                            strcat(s_CmakeInfo.m_name, picked);
-                            ret = 0;
-                        } else if (-((__cntlzw(strlen(rowText)) & 0x20) >> 5) == 0 && nameLen >= 7) {
-                            ret = -1;
-                        } else {
-                            strcat(s_CmakeInfo.m_name, picked);
-                            ret = 0;
-                        }
-                    }
-#endif
                     if (ret != 0) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                     } else {
-#ifdef VERSION_GCCJGC
                         if (GetCharaCnt(s_CmakeInfo.m_name) >= 7) {
-#else
-                        unsigned int finalLen = strlen(s_CmakeInfo.m_name);
-                        if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) >= 7) {
-#endif
                             CmakeState(this)->m_select = 0xB;
                             CmakeState(this)->m_row = 5;
                         }
@@ -2066,27 +2018,8 @@ int CMenuPcs::CmakeNameCtrl()
                     }
                 }
             } else if ((down & 0x200) != 0) {
-#ifdef VERSION_GCCJGC
                 if (GetCharaCnt(s_CmakeInfo.m_name) != 0) {
                     int bsRet = AddNameChara(0, CmakeState(this)->m_select, CmakeState(this)->m_row, CmakeState(this)->m_table);
-#else
-                unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);
-                if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) != 0) {
-                    int bsRet;
-                    name = s_CmakeInfo.m_name;
-                    unsigned int bsLen1 = strlen(name);
-                    if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
-                        bsRet = -1;
-                    } else {
-                        int bsPos = strlen(s_CmakeInfo.m_name);
-                        if (-((__cntlzw(strlen(name)) & 0x20) >> 5) == 0) {
-                            s_CmakeInfo.m_name[bsPos - 1] = '\0';
-                        } else {
-                            s_CmakeInfo.m_name[bsPos - 2] = '\0';
-                        }
-                        bsRet = 0;
-                    }
-#endif
                     if (bsRet != 0) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                     } else {
@@ -2256,12 +2189,7 @@ void CMenuPcs::CmakeNameDraw()
     if (CmakeState(this)->m_row >= 5) {
         nameCursor = 0;
     }
-#ifdef VERSION_GCCJGC
     if (GetCharaCnt(s_CmakeInfo.m_name) >= 7) {
-#else
-    unsigned int nameLen = strlen(s_CmakeInfo.m_name);
-    if (static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31)) >= 7) {
-#endif
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, s_CmakeInfo.m_name, alpha);
@@ -3436,10 +3364,6 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short& table = villageWork->m_table;
     short repeat;
     short down;
-#ifndef VERSION_GCCJGC
-    const char* name;
-    char picked[8];
-#endif
 
     down = Pad.GetButtonDown(0);
     repeat = Pad.GetButtonRepeat(0);
@@ -3508,19 +3432,9 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             row = 5;
             Sound.PlaySe(2, 0x40, 0x7f, 0);
         } else if ((down & 0x100) != 0) {
-#ifndef VERSION_GCCJGC
-            short curTable;
-            short curSelect;
-            const char* rowText;
-#endif
             short curRow = row;
             if (curRow >= 5) {
-#ifdef VERSION_GCCJGC
             if (GetCharaCnt(s_CmakeInfo.m_name) == 0) {
-#else
-            unsigned int emptyLen = strlen(s_CmakeInfo.m_name);
-            if ((emptyLen & (static_cast<int>(-emptyLen | emptyLen) >> 31)) == 0) {
-#endif
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
                 return 0;
             }
@@ -3544,69 +3458,11 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             villageWork->m_resultDir = 1;
             return 1;
         } else {
-#ifdef VERSION_GCCJGC
             int ret = AddNameChara(1, select, curRow, table);
-#else
-            curTable = table;
-            curSelect = select;
-            memset(picked, 0, 3);
-            rowText = s_NameEntryStr[curRow + curTable * 5];
-            picked[0] = '\0';
-            int rowLen = strlen(rowText);
-            if (rowLen != 0) {
-                int i = 0;
-                int j = 0;
-                for (; 0 < rowLen; rowLen = rowLen - 1) {
-                    if (i == curSelect) {
-                        picked[0] = rowText[j];
-                        picked[1] = '\0';
-                        break;
-                    }
-                    i = i + 1;
-                    j = j + 1;
-                }
-            }
-            unsigned int rawLen = strlen(s_CmakeInfo.m_name);
-            int nameLen = rawLen & (static_cast<int>(-rawLen | rawLen) >> 31);
-            int ret;
-            if (nameLen >= 7) {
-                ret = -1;
-            } else {
-                picked[0] = '\0';
-                rowLen = strlen(rowText);
-                if (rowLen != 0) {
-                    int i = 0;
-                    int j = 0;
-                    for (; 0 < rowLen; rowLen = rowLen - 1) {
-                        if (i == curSelect) {
-                            picked[0] = rowText[j];
-                            picked[1] = '\0';
-                            break;
-                        }
-                        i = i + 1;
-                        j = j + 1;
-                    }
-                }
-                if (nameLen == 0) {
-                    strcat(s_CmakeInfo.m_name, picked);
-                    ret = 0;
-                } else if (-((__cntlzw(strlen(rowText)) & 0x20) >> 5) == 0 && nameLen >= 7) {
-                    ret = -1;
-                } else {
-                    strcat(s_CmakeInfo.m_name, picked);
-                    ret = 0;
-                }
-            }
-#endif
             if (ret != 0) {
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
             } else {
-#ifdef VERSION_GCCJGC
                 if (GetCharaCnt(s_CmakeInfo.m_name) >= 7) {
-#else
-                unsigned int finalLen = strlen(s_CmakeInfo.m_name);
-                if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) >= 7) {
-#endif
                     select = 0xB;
                     row = 5;
                 }
@@ -3614,27 +3470,8 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             }
             }
         } else if ((down & 0x200) != 0) {
-#ifdef VERSION_GCCJGC
             if (GetCharaCnt(s_CmakeInfo.m_name) != 0) {
                 int bsRet = AddNameChara(0, select, row, table);
-#else
-            unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);
-            if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) != 0) {
-                int bsRet;
-                name = s_CmakeInfo.m_name;
-                unsigned int bsLen1 = strlen(name);
-                if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
-                    bsRet = -1;
-                } else {
-                    int bsPos = strlen(s_CmakeInfo.m_name);
-                    if (-((__cntlzw(strlen(name)) & 0x20) >> 5) == 0) {
-                        s_CmakeInfo.m_name[bsPos - 1] = '\0';
-                    } else {
-                        s_CmakeInfo.m_name[bsPos - 2] = '\0';
-                    }
-                    bsRet = 0;
-                }
-#endif
                 if (bsRet != 0) {
                     Sound.PlaySe(4, 0x40, 0x7f, 0);
                 } else {
@@ -3788,12 +3625,7 @@ void CMenuPcs::CmakeVillageDraw()
     if (villageWork->m_row >= 5) {
         showNameCursor = 0;
     }
-#ifdef VERSION_GCCJGC
     if (GetCharaCnt(s_CmakeInfo.m_name) >= 7) {
-#else
-    unsigned int nameLen = strlen(s_CmakeInfo.m_name);
-    if (7 <= static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31))) {
-#endif
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);

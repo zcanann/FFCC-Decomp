@@ -24,6 +24,112 @@ static const char s_icon_dat_801E307C[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801E3088[] = "FF Crystal Chronicles";
 
 char* g_strMenuUtilMes[] = {
+#ifdef VERSION_GCCE01
+	"Strength",
+	"Defense",
+	"Position Markers",
+	"Sound Mode",
+	"Music",
+	"Sound Effects",
+	"GBA Color Balance",
+	"Show or hide position marker under each character's feet.",
+	"Select stereo or monaural sound.",
+	"Adjust volume of background music.",
+	"Adjust volume of sound effects.",
+	"Adjust color balance of Game Boy Advance.",
+	"On",
+	"Off",
+	"Stereo",
+	"Monaural",
+	"Min",
+	"Max",
+	"Enhanced",
+	"Standard",
+
+	"St\344rke",
+	"Abwehr",
+	"Erkennungskreisel",
+	"Tonausgabe",
+	"Musik",
+	"Ger\344uscheffekte",
+	"Farbeinstellung",
+	"Erkennungskreisel des Charakters AN/AUS schalten.",
+	"Tonausgabe auf Stereo oder Mono schalten.",
+	"Lautst\344rke der Musik \344ndern.",
+	"Lautst\344rke der Ger\344uscheffekte \344ndern.",
+	"Farbeinstellung des GBA \344ndern.",
+	"AN",
+	"AUS",
+	"STEREO",
+	"MONO",
+	"Min",
+	"Max",
+	"Erweitert",
+	"Normal",
+
+	"Forza",
+	"Difesa",
+	"Indicatori di posizione",
+	"Sonoro",
+	"Musica",
+	"Effetti sonori",
+	"Bilanc. colore GBA",
+	"Attiva o disattiva l'indicatore ai piedi dei personaggi.",
+	"Scelta tra sonoro mono o stereo.",
+	"Regola il volume della musica",
+	"Regola il volume degli effetti sonori",
+	"Regola il colore del Game Boy Advance.",
+	"On",
+	"Off",
+	"Stereo",
+	"Mono",
+	"Min",
+	"Max",
+	"Contr.",
+	"Norm.",
+
+	"Force",
+	"R\351sistance",
+	"Sceau de position",
+	"Signal sonore",
+	"Musique",
+	"Effets sonores",
+	"Affichage du GBA",
+	"Affichage du sceau de position aux pieds des personnages",
+	"Choisissez le signal sonore st\351r\351o ou mono",
+	"R\351glez le volume de la musique",
+	"R\351glez le volume des effets sonores",
+	"R\351glez le contraste des couleurs du Game Boy Advance",
+	"Activ\351",
+	"D\351sactiv\351",
+	"St\351r\351o",
+	"Mono",
+	"Min",
+	"Max",
+	"Am\351lior\351",
+	"Standard",
+
+	"Fuerza",
+	"Defensa",
+	"Indicadores de posici\363n",
+	"Se\361al de sonido",
+	"M\372sica",
+	"Efectos de sonido",
+	"Ajuste del color del GBA",
+	"Mostrar o esconder el indicador de posici\363n bajo los pies de cada personaje.",
+	"Seleccionar sonido est\351reo o monoaural.",
+	"Ajustar el volumen de la m\372sica de fondo.",
+	"Ajustar el volumen de los efectos de sonido.",
+	"Ajustar el balance de color del Game Boy Advance.",
+	"Desactivado",
+	"Activado",
+	"Est\351reo",
+	"Monoaural",
+	"Min.",
+	"M\341x.",
+	"Mejorado",
+	"Est\341ndar",
+#else
 	"Strength:",
 	"Defence:",
 	"Position Markers",
@@ -128,6 +234,7 @@ char* g_strMenuUtilMes[] = {
 	"M\341x.",
 	"Mejorado",
 	"Est\341ndar",
+#endif
 };
 
 
@@ -1662,6 +1769,15 @@ void CMenuPcs::DrawOptionMenu()
 		Vec2d pts[5] = { { 326.0f, 128.0f }, { 300.0f, 160.0f },
 		                       { 330.0f, 138.0f }, { 372.0f, 132.0f }, { 492.0f, 132.0f } };
 		int rowAnimFrame;
+#ifdef VERSION_GCCE01
+		if (static_cast<double>(m_optionRowAnim) < 1.0) {
+			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);
+		} else {
+			rowAnimFrame = 0x10;
+		}
+		const float specialRowCos = static_cast<float>(
+			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f))));
+#else
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
 			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.07692308f);
 		} else {
@@ -1669,6 +1785,7 @@ void CMenuPcs::DrawOptionMenu()
 		}
 		const float specialRowCos = static_cast<float>(
 			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 6.923077f))));
+#endif
 
 		int k = 0;
 		int y = k;
@@ -1739,6 +1856,11 @@ void CMenuPcs::DrawOptionMenu()
 				DrawOptionLabel(m_fonts[0], textXi2 + 8,
 				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(y))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
+#elif defined(VERSION_GCCE01)
+				const Vec2d* pp4 = &pts[k + 4];
+				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				DrawFont(textXi2 + 8, static_cast<int>(-4.0f + (4.0f + (pp4->y + static_cast<float>(y)))),
+				         color, 7, OPT_MES(18), 1.0f, 1.0f);
 #else
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(18);
@@ -1759,6 +1881,9 @@ void CMenuPcs::DrawOptionMenu()
 				DrawOptionLabel(m_fonts[0], textXi + 8,
 				                static_cast<int>(4.0f + (pp3->y + static_cast<float>(y))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\145\202\145", 1.0f);
+#elif defined(VERSION_GCCE01)
+				DrawFont(textXi + 8, static_cast<int>(-4.0f + (4.0f + (pp3->y + static_cast<float>(y)))),
+				         color, 7, OPT_MES(19), 1.0f, 1.0f);
 #else
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(19);

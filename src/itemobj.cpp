@@ -294,9 +294,9 @@ void CGItemObj::onFrameStat()
 				if (static_cast<int>(CFlatCenterState()) == 1) {
 					Vec partyCenter;
 
-					partyCenter.x = (Game.m_partyBound.m_min.x + Game.m_partyBound.m_max.x) * kItemObjHalf;
-					partyCenter.y = (Game.m_partyBound.m_min.y + Game.m_partyBound.m_max.y) * kItemObjHalf;
-					partyCenter.z = (Game.m_partyBound.m_min.z + Game.m_partyBound.m_max.z) * kItemObjHalf;
+					partyCenter.x = (Game.m_partyBound.m_min.x + Game.m_partyBound.m_max.x) / 2.0f;
+					partyCenter.y = (Game.m_partyBound.m_min.y + Game.m_partyBound.m_max.y) / 2.0f;
+					partyCenter.z = (Game.m_partyBound.m_min.z + Game.m_partyBound.m_max.z) / 2.0f;
 					distance = PSVECDistance(&m_worldPosition, &partyCenter);
 				}
 			}
@@ -442,9 +442,11 @@ void CGItemObj::onFrameStat()
 			m_groundHitOffset.y = -(kItemObjBounceAccel * m_moveTimer - m_groundHitOffset.y);
 		}
 
-		m_groundHitOffset.y = (m_groundHitOffset.y < kItemObjDouble * -m_moveTimer)
-		                          ? kItemObjDouble * -m_moveTimer
-		                          : ((kItemObjDouble * m_moveTimer < m_groundHitOffset.y) ? kItemObjDouble * m_moveTimer : m_groundHitOffset.y);
+		{
+			float y = m_groundHitOffset.y;
+			float moveTimer = m_moveTimer;
+			m_groundHitOffset.y = (y < kItemObjDouble * -moveTimer) ? kItemObjDouble * -moveTimer : ((kItemObjDouble * moveTimer < y) ? kItemObjDouble * moveTimer : y);
+		}
 
 		m_rotTargetY += kItemObjFineStep;
 		m_groundHitOffset.x =
@@ -493,9 +495,10 @@ void CGItemObj::onFrameStat()
 				System.Printf("\x8Ev\x82\xA2\x8Fo\x83J\x83v\x83Z\x83\x8B\x8E\xB8\x94s idxParty = %d\n", ownerSlot);
 			}
 
+			LastBossWork* bossWork = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss);
 			CFlatRuntime::CStack stack;
 			stack.m_word = 0;
-			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerSlot] = 0;
+			bossWork->m_capsules[ownerSlot] = 0;
 			gCFlatRuntime().SystemCall(
 			    m_owner, 2, 0x16, 1, &stack, 0);
 
@@ -524,7 +527,8 @@ void CGItemObj::onFrameStat()
 				System.Printf("\x8Ev\x82\xA2\x8Fo\x83J\x83v\x83Z\x83\x8B\x90\xAC\x8C\xF7 idxParty = %d\n", ownerSlot);
 			}
 
-			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerSlot] = 0;
+			LastBossWork* bossWork = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss);
+			bossWork->m_capsules[ownerSlot] = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, kItemObjZero, 0);
 			if (newItem != 0) {
 				newItem->unk_0x168 = m_worldPosition.x;
@@ -753,9 +757,9 @@ inline void CGItemObj::safeDetach(int throwItem, float speed)
 			moveSpeed = kItemObjThrowMoveSpeed;
 		}
 
-		float ownerCos = (float)cos((double)m_owner->m_rotTargetY);
+		speed = (float)cos((double)m_owner->m_rotTargetY);
 		float ownerSin = (float)sin((double)m_owner->m_rotTargetY);
-		const CVector& moveVec = CVector(ownerSin, kItemObjMotionStep, ownerCos);
+		const CVector& moveVec = CVector(ownerSin, kItemObjMotionStep, speed);
 		MoveVector(reinterpret_cast<Vec*>(const_cast<CVector*>(&moveVec)), moveSpeed, 1, 0, 1, 0);
 	}
 

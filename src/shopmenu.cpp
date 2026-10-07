@@ -2010,9 +2010,11 @@ void CShopMenu::DrawMake()
 
     int makeGil = getMakeGil(getItemNo(m_selectedIndex));
     DrawDecScale(makeGil, 0x13, 0x100, 180.0f, -4.0f, 1.5f, 1, 1, 0x12);
-    int gilTlut = 2;
+    int gilTlut;
     if (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex))) {
         gilTlut = 0x14;
+    } else {
+        gilTlut = 2;
     }
     DrawDecScale(m_caravanWork->m_gil, gilTlut, 0x1E2, 180.0f, -4.0f, 1.5f, 1, 1, 0x12);
 

@@ -49,6 +49,24 @@ static const char s_scenegraph_step_x0[] = "x0";
 static const char s_scenegraph_step_x1_8[] = "x1/8";
 static const char s_scenegraph_step_x1_4[] = "x1/4";
 static const char s_scenegraph_step_x1_2[] = "x1/2";
+#ifdef VERSION_GCCJGC
+static const float kGraphicZero = 0.0f;
+static const float kGraphicScreenHeight = 448.0f;
+static const float kGraphicScreenWidth = 640.0f;
+static const float kGraphicScreenCenterX = 320.0f;
+static const float kGraphicScreenCenterY = 224.0f;
+static const float kGraphicHalf = 0.5f;
+static const float kDebugBarLeft = 16.0f;
+static const float kDebugBarTop = 440.0f;
+static const float kDebugBarRight = 336.0f;
+static const float kDebugBarBottom = 441.0f;
+static const float kDebugBarMoveBottom = 436.0f;
+static const float kDebugIndicatorTop = 420.0f;
+static const float kDebugIndicatorFrameRight = 32.0f;
+static const float kDebugIndicatorBottom = 424.0f;
+static const float kDebugIndicatorFifoLeft = 40.0f;
+static const float kDebugIndicatorFifoRight = 56.0f;
+#else
 extern const float kGraphicZero;
 extern const float kGraphicScreenHeight;
 extern const float kGraphicScreenWidth;
@@ -65,6 +83,7 @@ extern const float kDebugIndicatorFrameRight;
 extern const float kDebugIndicatorBottom;
 extern const float kDebugIndicatorFifoLeft;
 extern const float kDebugIndicatorFifoRight;
+#endif
 static const int kDebugBarLineStep = 8;
 static const char s_debug_pad_port_fmt[] = "%dP";
 static const char s_debug_frame_fmt[] = "%d";

@@ -1891,8 +1891,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				changeStat(0x1A, 0, 0);
 			}
 		} else if (currentKind == 3) {
-			allowEffect = 0;
 			effectResult = 0;
+			allowEffect = 0;
 		}
 	}
 
@@ -3200,15 +3200,15 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		}
 
 		int reqLast = reqCount - 1;
-		int slot = 0;
 		CCombi2Set* slotCursor = combiCursor->m_sets;
+		CGCharaObj* partyObj;
+		int slot = 0;
 		for (; slot < reqCount; slot++, slotCursor++) {
-			CGCharaObj* partyObj = partyList[slot];
+			partyObj = partyList[slot];
 			if (partyObj->m_comboFrame == 0) {
 				CCombi2Set* fallbackCursor = slotCursor;
-				int lastSlotIn = count - 1;
 				for (; slot < reqCount; slot++, fallbackCursor++) {
-					int itemMatch = scCheckItem(fallbackCursor, partyObj, slot == lastSlotIn);
+					int itemMatch = scCheckItem(fallbackCursor, partyObj, slot == count - 1);
 					if (itemMatch) {
 						int closeOk = scCheckTime(slotCursor, partyList[0], partyObj, 0);
 						if (closeOk) {

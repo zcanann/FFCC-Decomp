@@ -31,7 +31,7 @@ STATIC_ASSERT(offsetof(CGCharaObj, m_partyDistance) == 0x5D0);
 STATIC_ASSERT(offsetof(CGCharaObj, m_partyRank) == 0x620);
 STATIC_ASSERT(offsetof(CCaravanWork, m_joybusCaravanId) == 0x3B4);
 
-u8 CGMonObj::m_aiWork[0xC];
+CGMonObj::AiWork CGMonObj::m_aiWork;
 u8 CGMonObj::m_boss[0x8C];
 
 extern "C" float g_hit_t;
@@ -93,6 +93,22 @@ static inline void CGMonObj_SetChaseMove(CGMonObj* monObj, CGPartyObj* target, u
 		monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(monObj->m_scriptHandle[9]) + 0x1B6);
 	}
 	monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(target);
+}
+
+static inline void CGMonObj_SetAttackMove(CGMonObj* monObj, CGPartyObj* target, float range, int changeStat)
+{
+	if (monObj->m_moveWork.m_mode != 2) {
+		monObj->m_moveWork.Clear();
+		monObj->m_moveWork.m_flags = 0x325;
+		if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x40) != 0) {
+			monObj->m_moveWork.m_flags |= 0x10000;
+		}
+		monObj->m_moveWork.SetFlags(0, 0);
+		monObj->m_moveWork.m_mode = 2;
+	}
+	monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(target);
+	monObj->m_moveWork.m_range = range;
+	monObj->m_moveWork.m_changeStat = changeStat;
 }
 
 static inline int CGMonObj_SearchNoticeParty(CGMonObj* monObj)
@@ -271,12 +287,12 @@ void CGMonObj::onFramePreCalc()
 		(m_unk6B9 == 0) &&
 		(m_unk6C1 == 0)) {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = -1;
+			CGMonObj::m_aiWork.m_state = -1;
 		} else {
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+			CGMonObj::m_aiWork.m_state = 0;
 		}
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
+		CGMonObj::m_aiWork.m_target = m_targetPartyIndex;
+		CGMonObj::m_aiWork.m_priority = -1;
 
 		int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
 		int aiLocal = 0;
@@ -288,11 +304,11 @@ void CGMonObj::onFramePreCalc()
 		}
 
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			if ((*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != -1) && (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId)) {
-				reinterpret_cast<CGPrgObj*>(this)->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
+			if ((CGMonObj::m_aiWork.m_state != -1) && (CGMonObj::m_aiWork.m_state != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId)) {
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(CGMonObj::m_aiWork.m_state, 0, 0);
 			}
-		} else if (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
+		} else if (CGMonObj::m_aiWork.m_state != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(CGMonObj::m_aiWork.m_state, 0, 0);
 		}
 	}
 #undef object
@@ -679,7 +695,7 @@ void CGMonObj::onCancelStat(int state)
 		break;
 
 	case 0x21:
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		CGMonObj::m_aiWork.m_state = 0;
 		m_moveWork.Clear();
 		if ((m_moveWork.m_stateFlags & 2) == 0) {
 			(this->*m_funcs->moveCancel)();
@@ -1923,13 +1939,13 @@ void CGMonObj::seKiduki()
 
 		if ((action == 0) && ((noticeFlags & 0x80) != 0)) {
 			notice = true;
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x32;
+			CGMonObj::m_aiWork.m_state = 0x32;
 		} else if ((action == 0) && ((noticeFlags & 0x20) != 0)) {
 			notice = true;
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x33;
+			CGMonObj::m_aiWork.m_state = 0x33;
 		} else if ((action == 0) && (((noticeFlags & 0x40) != 0) || (monClass == 0x39))) {
 			notice = true;
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x34;
+			CGMonObj::m_aiWork.m_state = 0x34;
 		}
 	}
 
@@ -1937,7 +1953,7 @@ void CGMonObj::seKiduki()
 	switch (classId) {
 	case 0x6A:
 		notice = true;
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x35;
+		CGMonObj::m_aiWork.m_state = 0x35;
 		break;
 	case 0x70:
 	case 0x7B:
@@ -1990,7 +2006,7 @@ void CGMonObj::isValidTarget()
 	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiData + 0x102);
 	if ((m_targetPartyIndex >= 0) &&
 	    ((aiFlags & 0x20) != 0)) {
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		CGMonObj::m_aiWork.m_state = 0;
 		m_moveWork.Clear();
 		m_chaseState = 2;
 		m_chaseTimer = 0;
@@ -2000,7 +2016,7 @@ void CGMonObj::isValidTarget()
 
 	if (((aiFlags & 0x20) != 0) ||
 	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		CGMonObj::m_aiWork.m_state = 0;
 		m_moveWork.Clear();
 		m_chaseState = 0;
 		m_chaseTimer = 0;
@@ -2009,7 +2025,7 @@ void CGMonObj::isValidTarget()
 	}
 
 	if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
+		CGMonObj::m_aiWork.m_state = 0x21;
 		if (m_moveWork.m_mode != 3) {
 			m_moveWork.Clear();
 			m_moveWork.m_flags = 0x806;
@@ -2046,13 +2062,13 @@ check_home:
 	if ((homeDist < kMonObjHomeSnapDistance) ||
 	    (m_chaseTimer == static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x1B8)))) {
 		m_homePosition = *reinterpret_cast<Vec*>(mon + 0x15C);
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		CGMonObj::m_aiWork.m_state = 0;
 		m_moveWork.Clear();
 		m_chaseState = 0;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
 	} else if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) {
-		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1C;
+		CGMonObj::m_aiWork.m_state = 0x1C;
 	}
 #undef script9
 }
@@ -2068,7 +2084,7 @@ check_home:
  */
 void CGMonObj::resetWork()
 {
-	*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+	CGMonObj::m_aiWork.m_state = 0;
 	m_moveWork.Clear();
 }
 
@@ -2087,7 +2103,7 @@ void CGMonObj::statAround()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	int& targetPartyIndex = monObj->m_targetPartyIndex;
-#define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
+#define actionState (CGMonObj::m_aiWork.m_state)
 #define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
 
 	if (targetPartyIndex >= 0) {
@@ -2605,7 +2621,7 @@ void CGMonObj::statWatch()
 	int& targetPartyIndex = monObj->m_targetPartyIndex;
 	int& chaseState = monObj->m_chaseState;
 	int& chaseTimer = monObj->m_chaseTimer;
-#define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
+#define actionState (CGMonObj::m_aiWork.m_state)
 #define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
 
 	if (reinterpret_cast<CGPrgObj*>(monObj)->m_lastStateId == 0) {
@@ -2801,19 +2817,7 @@ void CGMonObj::statWatch()
 					aiData4 += attackResult * 0x10;
 					short changeStat = static_cast<short>(*reinterpret_cast<unsigned short*>(aiData4 + 0x11E));
 					actionState = 0x21;
-					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
-					if (monObj->m_moveWork.m_mode != 2) {
-						monObj->m_moveWork.Clear();
-						monObj->m_moveWork.m_flags = 0x325;
-						if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x40) != 0) {
-							monObj->m_moveWork.m_flags |= 0x10000;
-						}
-						monObj->m_moveWork.SetFlags(0, 0);
-						monObj->m_moveWork.m_mode = 2;
-					}
-					monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
-					monObj->m_moveWork.m_range = range;
-					monObj->m_moveWork.m_changeStat = static_cast<int>(changeStat);
+					CGMonObj_SetAttackMove(monObj, Game.m_partyObjArr[selectedTarget], range, changeStat);
 				}
 			} else {
 				actionState = attackResult - 0xE;
@@ -2877,7 +2881,7 @@ void CGMonObj::statMove(int* targetIndex)
 
 	case 0: {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+			CGMonObj::m_aiWork.m_state = 0;
 			monObj->m_moveWork.Clear();
 		}
 		if (*chaseTimer == 0) {
@@ -2909,15 +2913,15 @@ void CGMonObj::statMove(int* targetIndex)
 			unsigned short alertMode = *reinterpret_cast<unsigned short*>(aiData + 0x104);
 			switch (alertMode) {
 			case 0:
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+				CGMonObj::m_aiWork.m_state = 0;
 				break;
 			case 1:
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x10;
+				CGMonObj::m_aiWork.m_state = 0x10;
 				break;
 			case 2: {
 				double soundLimit2 = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
 				if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit2) {
-					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1D;
+					CGMonObj::m_aiWork.m_state = 0x1D;
 					float repopDist =
 						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
 					float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
@@ -2925,7 +2929,7 @@ void CGMonObj::statMove(int* targetIndex)
 						monObj->isValidTarget();
 					}
 				} else {
-					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+					CGMonObj::m_aiWork.m_state = 0;
 				}
 				break;
 			}
@@ -2949,11 +2953,11 @@ void CGMonObj::statMove(int* targetIndex)
 	case 5: {
 		{
 			if (*targetPartyIdx >= 0) {
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
+				CGMonObj::m_aiWork.m_state = 0x21;
 				CGMonObj_SetChaseMove(monObj, Game.m_partyObjArr[*targetPartyIdx], 0);
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 					(object->m_stateFlags0Bits.unk1 != 0)) {
-					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+					CGMonObj::m_aiWork.m_state = 0;
 					monObj->m_moveWork.Clear();
 					if (*targetPartyIdx >= 0) {
 						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));
@@ -2963,7 +2967,7 @@ void CGMonObj::statMove(int* targetIndex)
 					monObj->m_chaseDirty = 1;
 				}
 			} else {
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+				CGMonObj::m_aiWork.m_state = 0;
 				monObj->m_moveWork.Clear();
 				*chaseState = 0;
 				*chaseTimer = 0;
@@ -3021,8 +3025,8 @@ void CGMonObj::aiAddDefault(int&)
 int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, int chance, int fallbackState)
 {
 	int& aiState = m_unk6C8;
-#define aiPriority (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0))
-#define aiBranch (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
+#define aiPriority (CGMonObj::m_aiWork.m_priority)
+#define aiBranch (CGMonObj::m_aiWork.m_state)
 
 	if (priority <= aiPriority) {
 		return 0;

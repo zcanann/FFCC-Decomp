@@ -1439,7 +1439,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	if ((triggerButtons & 0x200) != 0) {
-		CFlatRuntime::CStack stack[3];
+		CFlatRuntime::CStack stack[4];
 		stack[0].m_word = 2;
 		stack[1].m_word = 0;
 		stack[2].m_word = 0;

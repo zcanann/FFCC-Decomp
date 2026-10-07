@@ -2173,7 +2173,7 @@ card_connected:;
         break;
     case 3: {
         int formatResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->Format(1);
-#ifndef VERSION_GCCJGC
+#if defined(VERSION_GCCP01)
         if (formatResult < 0) {
             MemoryCardMan.m_opDoneFlag = 1;
             MemoryCardMan.m_currentSlot = static_cast<char>(0xff);
@@ -2857,6 +2857,18 @@ inline void CGoOutMenu::DrawSelectYesNo()
             MenuPcs.DrawCursor(m_cursorX, m_cursorY + m_cursorChoice * 24, 1.0f);
         } else {
             MenuPcs.DrawCursor(m_cursorX + m_cursorChoice * 82, m_cursorY, 1.0f);
+        }
+    }
+#elif defined(VERSION_GCCE01)
+    if (MenuPcs.m_menuWindowInfo->state == 1 && m_drawCursor != 0) {
+        const float cursorY = (float)(MenuPcs.m_menuWindowInfo->y +
+            MenuPcs.m_menuWindowInfo->height - 0x3E);
+
+        if (m_cursorMode != 0) {
+            MenuPcs.DrawCursor(m_cursorX, m_cursorY + m_cursorChoice * 0x1E, 1.0f);
+        } else {
+            const int cursorX = MenuPcs.GetYesNoXPos(m_cursorChoice);
+            MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
         }
     }
 #else

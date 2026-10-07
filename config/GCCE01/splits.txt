@@ -2539,3 +2539,90 @@ main.cpp:
 
 odenotstub/odenotstub.c:
 	.text start:0x801BB3EC end:0x801BB3F4
+
+p_system.cpp:
+	extabindex start:0x8000C4F0 end:0x8000C508
+	.text start:0x80047A90 end:0x80047BF4
+
+mapshadow.cpp:
+	.text start:0x8004C510 end:0x8004C7FC
+
+pppRandCV.cpp:
+	.text start:0x800609A4 end:0x80060BC0
+
+pppRandDownCV.cpp:
+	.text start:0x80060CEC end:0x80060EC4
+
+pppRandDownFV.cpp:
+	.text start:0x80060FCC end:0x800610FC
+
+pppRandDownHCV.cpp:
+	.text start:0x800610FC end:0x800612C4
+
+pppRandDownIV.cpp:
+	.text start:0x800613F0 end:0x80061584
+
+pppRandHCV.cpp:
+	.text start:0x800618F0 end:0x80061AFC
+
+pppRandIV.cpp:
+	.text start:0x80061C3C end:0x80061E04
+
+pppRandUpCV.cpp:
+	.text start:0x80062070 end:0x80062248
+
+pppRandUpFV.cpp:
+	.text start:0x80062350 end:0x80062480
+
+pppRandUpHCV.cpp:
+	.text start:0x80062480 end:0x80062648
+
+pppRandUpIV.cpp:
+	.text start:0x80062774 end:0x80062908
+
+pppDrawMng.cpp:
+	.text start:0x8007B570 end:0x8007B7F4
+
+menu.cpp:
+	extab start:0x80007D68 end:0x80007D90
+	extabindex start:0x8000E170 end:0x8000E1AC
+	.text start:0x8009AC94 end:0x8009ADC4
+
+pppYmLaser.cpp:
+	.text start:0x800D1DE0 end:0x800D2FE4
+
+p_sound.cpp:
+	extab start:0x80008B8C end:0x80008BB4
+	extabindex start:0x8000F61C end:0x8000F658
+	.text start:0x800D7EDC end:0x800D8094
+
+quadobj.cpp:
+	.text start:0x8010A61C end:0x8010A9D8
+
+p_mc.cpp:
+	extabindex start:0x800105AC end:0x800105C4
+	.text start:0x80123CC8 end:0x80123EA8
+
+pppConstrainCameraDir.cpp:
+	.text start:0x80142208 end:0x80142450
+
+singmenu.cpp:
+	.text start:0x80144564 end:0x80149A34
+
+pppFovAdjustMatrix.cpp:
+	.text start:0x8016BCB8 end:0x8016BCC4
+
+wmm_str.cpp:
+	.text start:0x80179E64 end:0x8017A3E4
+
+os/__ppc_eabi_init.c:
+	.text start:0x80180F00 end:0x80180F94
+
+exi/EXIBios.c:
+	.text start:0x80180F94 end:0x80182970
+
+dolphin/os/__start.c:
+	.init start:0x80003100 end:0x80003400
+
+TRK_MINNOW_DOLPHIN/__exception.s:
+	.init start:0x800034AC end:0x800053E0

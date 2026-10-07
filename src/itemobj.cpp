@@ -314,18 +314,9 @@ void CGItemObj::onFrameStat()
 	}
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
-			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
-			bool useBossAttachName = false;
-
-			if (Game.m_gameWork.m_menuStageMode != 0) {
-				if (ItemIsGbaCaravan(m_owner)) {
-					useBossAttachName = true;
-				}
-			}
-
-			CGObject* attachOwner = m_owner;
-			CGObject* attachSelf = this;
-			attachSelf->Attach(attachOwner, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset)));
+			Attach(m_owner,
+			       const_cast<char*>((Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(m_owner)) ? s_itemAttachCenterItem3 : s_itemAttachLeftItem),
+			       CVector(kItemObjZero, kItemObjZero, kItemObjZero));
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}

@@ -16,7 +16,7 @@ void CMes::addString(char** text, int branchMode)
     unsigned short ch;
     while (running)
     {
-        if ((ch = *(unsigned char*)(*text)++) == 0)
+        if ((ch = (unsigned char)*(*text)++) == 0)
         {
             running = 0;
             goto updateBounds;
@@ -24,7 +24,8 @@ void CMes::addString(char** text, int branchMode)
 
         if (((ch >= 0x80) && (ch <= 0x9F)) ||
             ((ch >= 0xE0) && (ch <= 0xFF))) {
-            uch = (ch << 8) | *(unsigned char*)(*text)++;
+            uch = ch << 8;
+            uch |= (unsigned char)*(*text)++;
             goto renderGlyph;
         }
         if (ch < 0xA0) {
@@ -186,15 +187,15 @@ void CMes::addString(char** text, int branchMode)
         case 0x30:
         {
             char number[256];
-            char* numberPtr;
-            sprintf(number, "%d", mFlagVars[GET_1(text)]);
-            numberPtr = number;
+            int value = mFlagVars[GET_1(text)];
+            char* numberPtr = number;
+            sprintf(number, "%d", value);
             addString(&numberPtr, branchMode);
             break;
         }
         case 0x0A:
         {
-            unsigned char idx = (unsigned char)GET_1(text);
+            unsigned char idx = GET_1(text);
             short value = (short)GET_2(text);
             mFlagVars[idx] = value;
             if (branchMode == 0)
@@ -209,8 +210,8 @@ void CMes::addString(char** text, int branchMode)
         }
         case 0x0B:
         {
-            unsigned char idx = (unsigned char)GET_1(text);
-            mFlagVars[idx] = mFlagVars[idx] + 1;
+            unsigned char idx = GET_1(text);
+            mFlagVars[idx]++;
             if (branchMode == 0)
             {
                 CFlag flag;
@@ -287,7 +288,7 @@ void CMes::addString(char** text, int branchMode)
             break;
         case 0x36:
         {
-            signed char idx = (unsigned char)GET_1(text);
+            unsigned char idx = GET_1(text);
             if (branchMode == 0)
             {
                 CFlag flag;

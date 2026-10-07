@@ -147,19 +147,20 @@ static inline CColor& MesColorRef(const CColor& color)
 #ifdef VERSION_GCCJGC
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-    int width = 0;
-    bool continueDraw = true;
-    unsigned short ch;
     int lineStartX = (int)font->posX;
+    unsigned short ch;
+    int width = 0;
+    int continueDraw = 1;
     while (continueDraw) {
         unsigned short c = (unsigned char)*text++;
         if (c == 0) {
-            continueDraw = false;
+            continueDraw = 0;
         } else if (((c >= 0x80) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xFF))) {
-            ch = (c << 8) | (unsigned char)*text++;
+            ch = c << 8;
+            ch |= (unsigned char)*text++;
             goto drawChar;
         } else if (c >= 0xA0) {
-            int tag = (c - 0xA0) & 0xFFFF;
+            unsigned short tag = c - 0xA0;
             switch (tag) {
             case 0:
                 if (breakOnLineTag != 0) {
@@ -169,7 +170,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
                 }
                 break;
             case 1:
-                continueDraw = false;
+                continueDraw = 0;
                 break;
             }
         } else {
@@ -962,7 +963,7 @@ void CMes::Draw()
 					font->SetScaleY(glyphScaleY);
 #endif
 					font->renderFlags.snapPosition = 1;
-					font->Draw((unsigned short)glyph->m_char);
+					font->Draw(glyph->m_char);
 					font->renderFlags.snapPosition = 0;
 				}
 			}

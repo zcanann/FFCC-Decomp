@@ -1057,20 +1057,7 @@ void CChara::CModel::InitMogFurTex()
 
 	if ((texture != 0) && (texture->m_format == GX_TF_RGB565)) {
 		texture->m_format = GX_TF_RGB5A3;
-		Graphic._WaitDrawDone("chara_fur.cpp", 0x506);
-
-		textureSet = m_texSet;
-		textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
-		CTexture* textureData = textureSet->GetTexture(textureIdx);
-		if (textureData != 0) {
-			void* dstBuffer = textureData->m_imageData;
-			int texelCountBytes = textureData->m_width * textureData->m_height * 2;
-
-			DCInvalidateRange(dstBuffer, texelCountBytes);
-			memcpy(dstBuffer, Chara.MogFur().m_texels, 0x2000);
-			DCFlushRange(dstBuffer, texelCountBytes);
-			GXInvalidateTexAll();
-		}
+		CopyFurTex(0);
 
 		texture->InitTexObj();
 		m_flagsA0Bits.m_flagA0_40 = 1;
@@ -1147,9 +1134,9 @@ inline void CChara::CModel::CopyFurTex(int loadFromTexture)
 		return;
 	}
 
+	int width = texture->m_width;
+	int height = texture->m_height;
 	void* image = texture->m_imageData;
-	const int width = texture->m_width;
-	const int height = texture->m_height;
 	if (loadFromTexture != 0) {
 		memcpy(Chara.MogFur().m_texels, image, 0x2000);
 	} else {

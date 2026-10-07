@@ -1277,13 +1277,19 @@ void CMenuPcs::DrawResultOpenAnim()
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	const int activePartyCount = s_Rinfo->m_partyCount;
+	int activePartyCount;
+	int frame;
+	int i;
+	int work;
+	int countTop;
+
+	activePartyCount = s_Rinfo->m_partyCount;
 
 	if (this->m_bonusState->m_initialized == 0) {
-		int countTop = m_bonusAnim->header.count;
+		countTop = m_bonusAnim->header.count;
 		short y = 0x28;
-		for (int i = 0; i < activePartyCount; i++) {
-			int rank = s_Rinfo->m_party[i].m_rank;
+		for (i = 0; i < activePartyCount; i++) {
+			work = s_Rinfo->m_party[i].m_rank;
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
 			sprite->kind = kBonusCountTexture;
 			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
@@ -1292,7 +1298,7 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->w = 0x38;
 			y += 0x60;
 			sprite->h = 0x28;
-			sprite->mulX = (float)(rank * sprite->w);
+			sprite->mulX = (float)(work * sprite->w);
 			sprite->mulY = 0.0f;
 			sprite->startFrame = 9999;
 #ifdef VERSION_GCCP01
@@ -1311,7 +1317,7 @@ void CMenuPcs::CalcResultCountAnim()
 		int newCount = countTop + activePartyCount;
 
 #ifndef VERSION_GCCJGC
-		for (int i = 0; i < 0x18; i++) {
+		for (i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = m_wm.m_handles[i];
 			if (handle != 0) {
 				handle->m_model->m_lightAlpha = 0.0f;
@@ -1327,15 +1333,14 @@ void CMenuPcs::CalcResultCountAnim()
 		this->m_bonusState->m_frame++;
 	}
 
-	int countTop = (int)m_bonusAnim->header.count - activePartyCount;
-	int frame;
+	countTop = (int)m_bonusAnim->header.count - activePartyCount;
 #ifdef VERSION_GCCP01
 	frame = (int)this->m_bonusState->m_frame - 8;
 #else
 	frame = (int)this->m_bonusState->m_frame - 10;
 #endif
 
-	for (int i = 0; i < activePartyCount; i++) {
+	for (i = 0; i < activePartyCount; i++) {
 		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
 		if (this->m_bonusState->m_countFinished != 0) {
 			sprite->motionX = 0.0f;
@@ -1351,14 +1356,14 @@ void CMenuPcs::CalcResultCountAnim()
 			if (frame < sprite->startFrame) {
 				sprite->alpha = 0.0f;
 			} else {
-				int elapsed = frame - sprite->startFrame;
+				work = frame - sprite->startFrame;
 				sprite->alpha = 1.0f;
-				if (elapsed < sprite->duration) {
+				if (work < sprite->duration) {
+					float progress = static_cast<float>(work) / static_cast<float>(sprite->duration);
 					float dx = sprite->targetX - static_cast<float>(sprite->x);
 					float dy = sprite->targetY - static_cast<float>(sprite->y);
-					double progress = 1.0 - static_cast<double>(static_cast<float>(elapsed) / static_cast<float>(sprite->duration));
-					sprite->motionX = static_cast<float>(dx * progress);
-					sprite->motionY = static_cast<float>(dy * progress);
+					sprite->motionX = dx * (1.0 - progress);
+					sprite->motionY = dy * (1.0 - progress);
 				} else {
 					sprite->motionX = 0.0f;
 					sprite->motionY = 0.0f;
@@ -1370,18 +1375,17 @@ void CMenuPcs::CalcResultCountAnim()
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
-	int tribeId;
-	for (int i = 0; i < activePartyCount * 2; i++) {
+	for (i = 0; i < activePartyCount * 2; i++) {
 		CCharaPcs::CHandle* handle;
 		if (i < activePartyCount) {
 			handle = s_Rinfo->m_party[i].m_partyHandle;
-			tribeId = s_Rinfo->m_party[i].m_tribeId;
+			work = s_Rinfo->m_party[i].m_tribeId;
 		} else {
 			handle = m_wm.m_handles[i - activePartyCount];
 		}
 
 		if (i < activePartyCount) {
-			float modelScale = s_PCScl[tribeId];
+			float modelScale = s_PCScl[work];
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
 			PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
@@ -1397,7 +1401,7 @@ void CMenuPcs::CalcResultCountAnim()
 		if (i < activePartyCount) {
 			scaleMtx[0][3] = 0.0f;
 			scaleMtx[2][3] = 0.0f;
-			scaleMtx[1][3] = s_PCYpos[tribeId];
+			scaleMtx[1][3] = s_PCYpos[work];
 		} else {
 			scaleMtx[0][3] = 0.0f;
 			scaleMtx[1][3] = 0.0f;
@@ -3524,17 +3528,20 @@ inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
  */
 void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
+	float centerX;
+	float edgeY;
+	float iconH;
+	float iconW;
 	Sprt2* board = a;
 	Sprt2* icon = b;
 
 	s_Base->m_center.x = (float)(board->x + board->w / 2.0);
 	s_Base->m_center.y = (float)(board->y + board->h / 2.0);
 
-	float iconW = (float)icon->w;
-	float iconH = (float)icon->h;
-
-	float centerX = (float)((double)s_Base->m_center.x - (double)iconW / 2.0);
-	float edgeY = (float)board->y;
+	iconW = (float)icon->w;
+	iconH = (float)icon->h;
+	centerX = (float)((double)s_Base->m_center.x - (double)iconW / 2.0);
+	edgeY = (float)board->y;
 	for (int edge = 0; edge < 2; edge++) {
 		if (edge != 0) {
 			edgeY = edgeY + ((float)board->h - iconH);

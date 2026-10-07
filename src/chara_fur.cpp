@@ -1342,20 +1342,24 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 			if (pickResult == 0) {
 				m_mogWork.m_idleTicks++;
-				if (m_mogWork.m_idleTicks == 0x3C && messageId == -1) {
-					messageId = 3;
-				} else if (m_mogWork.m_idleTicks == 0xF0 && messageId == -1) {
-					messageId = 4;
+				if (m_mogWork.m_idleTicks == 0x3C) {
+					if (messageId == -1) {
+						messageId = 3;
+					}
+				} else if (m_mogWork.m_idleTicks == 0xF0) {
+					if (messageId == -1) {
+						messageId = 4;
+					}
 				}
 			} else {
 				m_mogWork.m_idleTicks = 0;
 			}
 
 			if (doPaint != 0) {
-				int particleNo = 0;
-				int seId = 0;
 				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
 				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
+				int particleNo = 0;
+				int seId = 0;
 				CColor particleColorObj(centerBefore);
 				_GXColor& particleColor = particleColorObj.color;
 				switch (Chara.MogFur().m_commandIndex) {
@@ -1436,15 +1440,24 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					m_mogWork.m_eraseTicks++;
 				}
 
-				if (Chara.MogFur().m_commandIndex < 3 && Chara.MogFur().m_commandIndex >= 0 && doPaint != 0
-				    && m_mogWork.m_loopSeHandle == 0) {
-					m_mogWork.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+				switch (Chara.MogFur().m_commandIndex) {
+				case 0:
+				case 1:
+				case 2:
+					if (doPaint != 0 && m_mogWork.m_loopSeHandle == 0) {
+						m_mogWork.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+					}
+					break;
 				}
 			}
 		}
 	} else {
-		if (Chara.MogFur().m_commandIndex < 3 && Chara.MogFur().m_commandIndex >= 0) {
+		switch (Chara.MogFur().m_commandIndex) {
+		case 0:
+		case 1:
+		case 2:
 			StopMogLoopSe(m_mogWork);
+			break;
 		}
 	}
 

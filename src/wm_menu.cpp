@@ -4549,19 +4549,7 @@ void CMenuPcs::DrawTitleMenu()
 				float fadeAlpha = static_cast<float>(-(DOUBLE_80331770 *
 				                                        static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                        DOUBLE_80331420));
-				SetAttrFmt((FMT)2);
-			matColor.r = 0xFF;
-			matColor.g = 0xFF;
-			matColor.b = 0xFF;
-			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha));
-			GXSetChanMatColor(GX_COLOR0A0, matColor);
-			MenuPcs.SetTexture((TEX)0xFFFFFFFF);
-			AlphaNormal();
-			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-			GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
-			GXPosition3f32(FLOAT_803313e0, FLOAT_803313e4, FLOAT_803313dc);
-			GXPosition3f32(FLOAT_803313dc, FLOAT_803313e4, FLOAT_803313dc);
+				DrawFilter(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha)));
 		}
 
 		// Menu items
@@ -4752,19 +4740,7 @@ void CMenuPcs::DrawTitleMenu()
 				                                 DOUBLE_80331420));
 			}
 			if (fadeAlpha2 >= FLOAT_803313e8) fadeAlpha2 = FLOAT_803313e8;
-			SetAttrFmt((FMT)2);
-			matColor.r = 0;
-			matColor.g = 0;
-			matColor.b = 0;
-			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha2));
-			GXSetChanMatColor(GX_COLOR0A0, matColor);
-			MenuPcs.SetTexture((TEX)0xFFFFFFFF);
-			AlphaNormal();
-			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-			GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
-			GXPosition3f32(FLOAT_803313e0, FLOAT_803313e4, FLOAT_803313dc);
-			GXPosition3f32(FLOAT_803313dc, FLOAT_803313e4, FLOAT_803313dc);
+			DrawFilter(0, 0, 0, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha2)));
 		}
 
 		// End state handling
@@ -10452,12 +10428,9 @@ void CMenuPcs::DrawFilter(unsigned char r, unsigned char g, unsigned char b, uns
 	AlphaNormal();
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-	const float* pTall = &FLOAT_803313e4;
-	const float* pWide = &FLOAT_803313e0;
-	const float* pZero = &FLOAT_803313dc;
-	float tall = *pTall;
-	float wide = *pWide;
-	float zero = *pZero;
+	float tall = 448.0f;
+	float wide = 640.0f;
+	float zero = 0.0f;
 	GXPosition3f32(zero, zero, zero);
 	GXPosition3f32(wide, zero, zero);
 	GXPosition3f32(wide, tall, zero);

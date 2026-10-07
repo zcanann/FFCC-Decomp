@@ -459,32 +459,30 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	font->SetPosY(static_cast<float>(detailY));
 
 		if ((item->m_equipFlags & 0x1000) != 0) {
-			if (item->m_attribute >= 1) {
-				if (item->m_attribute > 0x13) {
-					return;
-				} else {
-					strcpy(scratch, GetAttrStr(item->m_attribute));
-					font->SetTlut(4);
-					font->Draw(scratch);
-					x += 2.0f + font->GetWidth(scratch);
-					font->SetPosX(static_cast<float>(x));
-					font->SetTlut(9);
-
-					unsigned int attr = item->m_attribute;
-					if ((attr >= 1) && (attr <= 8)) {
-						sprintf(scratch, "%s", "+1");
-					} else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-						sprintf(scratch, "%c%d", 0x2B, item->m_value);
-					} else if ((static_cast<unsigned short>(attr - 9) <= 1) || (attr == 0xC)) {
-						sprintf(scratch, "%c%d", 0x2D, item->m_value);
-						font->SetTlut(3);
-					} else {
-						return;
-					}
-
-					font->Draw(scratch);
-				}
+			if ((item->m_attribute < 1) || (item->m_attribute > 0x13)) {
+				return;
 			}
+
+			strcpy(scratch, GetAttrStr(item->m_attribute));
+			font->SetTlut(4);
+			font->Draw(scratch);
+			x += 2.0f + font->GetWidth(scratch);
+			font->SetPosX(static_cast<float>(x));
+			font->SetTlut(9);
+
+			unsigned int attr = item->m_attribute;
+			if ((attr >= 1) && (attr <= 8)) {
+				sprintf(scratch, "%s", "+1");
+			} else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+				sprintf(scratch, "%c%d", 0x2B, item->m_value);
+			} else if ((static_cast<unsigned short>(attr - 9) <= 1) || (attr == 0xC)) {
+				sprintf(scratch, "%c%d", 0x2D, item->m_value);
+				font->SetTlut(3);
+			} else {
+				return;
+			}
+
+			font->Draw(scratch);
 		} else {
 			strcat(scratch, " ");
 			font->Draw(scratch);

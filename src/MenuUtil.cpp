@@ -20,10 +20,123 @@
 static const char s_dvd_gba_801E3058[] = "dvd/gba/";
 static const char s_ffcc_cli_bin_801E3060[] = "ffcc_cli.bin";
 static const char s_objdat_spt_801E3070[] = "objdat.spt";
+#ifdef VERSION_GCCJGC
+static const char s_icon_dat_801E307C[] = "dvd/menu/icon.dat";
+static const char s_FF_Crystal_Chronicles_801E3088[] =
+	"\314\247\262\305\331\314\247\335\300\274\336\260\245\270\330\275\300\331\270\333\306\270\331";
+#else
 static const char s_icon_dat_801E307C[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801E3088[] = "FF Crystal Chronicles";
+#endif
 
+#ifndef VERSION_GCCJGC
 char* g_strMenuUtilMes[] = {
+#ifdef VERSION_GCCE01
+	"Strength",
+	"Defense",
+	"Position Markers",
+	"Sound Mode",
+	"Music",
+	"Sound Effects",
+	"GBA Color Balance",
+	"Show or hide position marker under each character's feet.",
+	"Select stereo or monaural sound.",
+	"Adjust volume of background music.",
+	"Adjust volume of sound effects.",
+	"Adjust color balance of Game Boy Advance.",
+	"On",
+	"Off",
+	"Stereo",
+	"Monaural",
+	"Min",
+	"Max",
+	"Enhanced",
+	"Standard",
+
+	"St\344rke",
+	"Abwehr",
+	"Erkennungskreisel",
+	"Tonausgabe",
+	"Musik",
+	"Ger\344uscheffekte",
+	"Farbeinstellung",
+	"Erkennungskreisel des Charakters AN/AUS schalten.",
+	"Tonausgabe auf Stereo oder Mono schalten.",
+	"Lautst\344rke der Musik \344ndern.",
+	"Lautst\344rke der Ger\344uscheffekte \344ndern.",
+	"Farbeinstellung des GBA \344ndern.",
+	"AN",
+	"AUS",
+	"STEREO",
+	"MONO",
+	"Min",
+	"Max",
+	"Erweitert",
+	"Normal",
+
+	"Forza",
+	"Difesa",
+	"Indicatori di posizione",
+	"Sonoro",
+	"Musica",
+	"Effetti sonori",
+	"Bilanc. colore GBA",
+	"Attiva o disattiva l'indicatore ai piedi dei personaggi.",
+	"Scelta tra sonoro mono o stereo.",
+	"Regola il volume della musica",
+	"Regola il volume degli effetti sonori",
+	"Regola il colore del Game Boy Advance.",
+	"On",
+	"Off",
+	"Stereo",
+	"Mono",
+	"Min",
+	"Max",
+	"Contr.",
+	"Norm.",
+
+	"Force",
+	"R\351sistance",
+	"Sceau de position",
+	"Signal sonore",
+	"Musique",
+	"Effets sonores",
+	"Affichage du GBA",
+	"Affichage du sceau de position aux pieds des personnages",
+	"Choisissez le signal sonore st\351r\351o ou mono",
+	"R\351glez le volume de la musique",
+	"R\351glez le volume des effets sonores",
+	"R\351glez le contraste des couleurs du Game Boy Advance",
+	"Activ\351",
+	"D\351sactiv\351",
+	"St\351r\351o",
+	"Mono",
+	"Min",
+	"Max",
+	"Am\351lior\351",
+	"Standard",
+
+	"Fuerza",
+	"Defensa",
+	"Indicadores de posici\363n",
+	"Se\361al de sonido",
+	"M\372sica",
+	"Efectos de sonido",
+	"Ajuste del color del GBA",
+	"Mostrar o esconder el indicador de posici\363n bajo los pies de cada personaje.",
+	"Seleccionar sonido est\351reo o monoaural.",
+	"Ajustar el volumen de la m\372sica de fondo.",
+	"Ajustar el volumen de los efectos de sonido.",
+	"Ajustar el balance de color del Game Boy Advance.",
+	"Desactivado",
+	"Activado",
+	"Est\351reo",
+	"Monoaural",
+	"Min.",
+	"M\341x.",
+	"Mejorado",
+	"Est\341ndar",
+#else
 	"Strength:",
 	"Defence:",
 	"Position Markers",
@@ -128,7 +241,9 @@ char* g_strMenuUtilMes[] = {
 	"M\341x.",
 	"Mejorado",
 	"Est\341ndar",
+#endif
 };
+#endif
 
 
 namespace {
@@ -136,6 +251,15 @@ static inline void SetUv(Vec2d& uv, float u, float v)
 {
 	uv.x = u;
 	uv.y = v;
+}
+
+static inline int GetOptionHelpX(char* text, CFont* font)
+{
+	font->SetShadow(1);
+	font->SetMargin(1.0f);
+	font->SetScaleX(0.8f);
+	font->SetScaleY(1.0f);
+	return static_cast<int>(-(font->GetWidth(text) / 2.0f - 320.0f));
 }
 }
 
@@ -344,6 +468,7 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 	font->Draw(text);
 }
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x80179FC4
@@ -395,8 +520,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			itemName[0] = '\0';
 		} else {
 			Game.MakeArtItemName(itemName, msgNo, 1);
-			if ((strlen(itemName) != 0) && (static_cast<signed char>(itemName[0]) != 0)) {
-				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
+			if (strlen(itemName) != 0) {
+				Game.UpperItemName(itemName);
 			}
 		}
 
@@ -417,6 +542,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	if (rangeKind != 0) {
+		int i;
 		int baseIndex = drawPrefix + 2;
 		u32 baseY = lineBaseY[baseIndex];
 		int y = baseY;
@@ -428,7 +554,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
-		for (int i = 0; i < lineMax; i++) {
+		for (i = 0; i < lineMax; i++) {
 			char* msg = Game.GetHelpName(firstLine + i);
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -458,32 +584,30 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	font->SetPosY(static_cast<float>(detailY));
 
 		if ((item->m_equipFlags & 0x1000) != 0) {
-			if (item->m_attribute >= 1) {
-				if (item->m_attribute > 0x13) {
-					return;
-				} else {
-					strcpy(scratch, GetAttrStr(item->m_attribute));
-					font->SetTlut(4);
-					font->Draw(scratch);
-					x += 2.0f + font->GetWidth(scratch);
-					font->SetPosX(static_cast<float>(x));
-					font->SetTlut(9);
-
-					unsigned int attr = item->m_attribute;
-					if ((attr >= 1) && (attr <= 8)) {
-						sprintf(scratch, "%s", "+1");
-					} else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-						sprintf(scratch, "%c%d", 0x2B, item->m_value);
-					} else if ((static_cast<unsigned short>(attr - 9) <= 1) || (attr == 0xC)) {
-						sprintf(scratch, "%c%d", 0x2D, item->m_value);
-						font->SetTlut(3);
-					} else {
-						return;
-					}
-
-					font->Draw(scratch);
-				}
+			if ((item->m_attribute < 1) || (item->m_attribute > 0x13)) {
+				return;
 			}
+
+			strcpy(scratch, GetAttrStr(item->m_attribute));
+			font->SetTlut(4);
+			font->Draw(scratch);
+			x += 2.0f + font->GetWidth(scratch);
+			font->SetPosX(static_cast<float>(x));
+			font->SetTlut(9);
+
+			unsigned int attr = item->m_attribute;
+			if ((attr >= 1) && (attr <= 8)) {
+				sprintf(scratch, "%s", "+1");
+			} else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+				sprintf(scratch, "%c%d", 0x2B, item->m_value);
+			} else if ((static_cast<unsigned short>(attr - 9) <= 1) || (attr == 0xC)) {
+				sprintf(scratch, "%c%d", 0x2D, item->m_value);
+				font->SetTlut(3);
+			} else {
+				return;
+			}
+
+			font->Draw(scratch);
 		} else {
 			strcat(scratch, " ");
 			font->Draw(scratch);
@@ -492,6 +616,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->SetTlut(1);
 			font->SetPosX(static_cast<float>(x));
 			sprintf(scratch, " %d", item->m_value);
+#ifdef VERSION_GCCE01
+			strcat(scratch, " ");
+#endif
 			font->Draw(scratch);
 
 			if (m_battleStateFlag == 2) {
@@ -529,9 +656,18 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 							}
 
 							int delta = static_cast<int>(item->m_value) - static_cast<int>(currentValue);
-							int deltaX = x;
-							deltaX += 2.0f + font->GetWidth(scratch);
-							font->SetPosX(static_cast<float>(deltaX));
+							x += 2.0f + font->GetWidth(scratch);
+							font->SetPosX(static_cast<float>(x));
+#ifdef VERSION_GCCE01
+							if (delta >= 0) {
+								font->SetTlut(9);
+								sprintf(scratch, " %c%d ", '+', delta);
+							} else {
+								font->SetTlut(3);
+								sprintf(scratch, " %d ", delta);
+							}
+							font->Draw(scratch);
+#else
 							if (delta >= 0) {
 								font->SetTlut(9);
 							} else {
@@ -541,11 +677,33 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 							if (delta != 0) {
 								font->Draw(scratch);
 							}
+#endif
 						}
 					}
 				}
 			}
 
+#ifdef VERSION_GCCE01
+			if ((item->m_equipFlags & 0x1000) == 0) {
+				if ((item->m_attribute >= 1) && (item->m_attribute <= 0x13)) {
+					x += 2.0f + font->GetWidth(scratch);
+					font->SetPosX(static_cast<float>(x));
+					font->SetTlut(4);
+					strcpy(scratch, GetAttrStr(item->m_attribute));
+					font->Draw(scratch);
+					x += 2.0f + font->GetWidth(scratch);
+					font->SetPosX(static_cast<float>(x));
+					font->SetTlut(9);
+					unsigned int attr = item->m_attribute;
+					if ((attr >= 1) && (attr <= 8)) {
+						sprintf(scratch, "%s", "+1");
+					} else {
+						return;
+					}
+					font->Draw(scratch);
+				}
+			}
+#else
 			float attrPosX = font->posX;
 			int attrX = static_cast<int>(attrPosX + font->GetWidth(" "));
 			font->SetPosX(static_cast<float>(attrX));
@@ -565,15 +723,25 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					font->Draw(scratch);
 				}
 			}
+#endif
 		}
 		} else {
-		int lineCount = 3;
+		char* temp;
 		int firstNonEmptyLine = firstLine;
-		char* temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
+		int lineCount = 3;
+#ifdef VERSION_GCCE01
+		temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
+		            "MenuUtil.cpp", 0x231) char[0x200];
+		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+			System.Printf("%s(%d): Error: memory allocation error\n", "MenuUtil.cpp", 0x233);
+		}
+#else
+		temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
 		            "MenuUtil.cpp", 0x23D) char[0x200];
-		if ((temp == nullptr) && (static_cast<int>(System.m_execParam) >= 1)) {
+		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
 			System.Printf("%s(%d): Error: memory allocation error\n", "MenuUtil.cpp", 0x23F);
 		}
+#endif
 		for (int i = 0; i < lineMax; i++) {
 			char* msg = Game.GetHelpName(firstLine + i);
 			memset(temp, 0, 0x200);
@@ -591,7 +759,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 		delete[] temp;
 
-		int idx = lineCount + drawPrefix - 1;
+		int idx = lineCount - 1 + drawPrefix;
 		int y = lineBaseY[idx];
 		if (drawPrefix != 0) {
 			font->SetPosX(56.0f);
@@ -610,6 +778,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 	}
 }
+#endif
 
 #ifdef VERSION_GCCJGC
 #include "src/MenuUtil_jp.inc"
@@ -1062,7 +1231,7 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(h),
 	             static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 	gUtil.RenderTextureQuad(0.0f,
-	                        -(h * 0.5f - 224.0f) - 14.0f,
+	                        -(h / 2.0f - 224.0f) - 14.0f,
 	                        640.0f, h, m_wmOptionTextures[5], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
@@ -1129,7 +1298,7 @@ void CMenuPcs::DrawOptionMenu()
 		uv1.x = (i == m_optionIndex) ? 0.5f : 1.0f;
 		uv1.y = 1.0f;
 		gUtil.RenderTextureQuad(56.0f, static_cast<float>(rowY),
-		                        w * 0.5f, h, m_wmOptionTextures[0], &uv0,
+		                        w / 2.0f, h, m_wmOptionTextures[0], &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 #ifdef VERSION_GCCJGC
@@ -1173,14 +1342,7 @@ void CMenuPcs::DrawOptionMenu()
 #else
 	{
 		float helpTextY = 387.0f;
-		char* help = helpText[m_optionIndex];
-		CFont* fnt = m_fonts[0];
-		fnt->SetShadow(1);
-		fnt->SetMargin(1.0f);
-		fnt->SetScaleX(0.8f);
-		fnt->SetScaleY(1.0f);
-		DrawFont2(static_cast<int>(-(fnt->GetWidth(help) * 0.5f -
-		                            320.0f)),
+		DrawFont2(GetOptionHelpX(helpText[m_optionIndex], m_fonts[0]),
 		          static_cast<int>(helpTextY), color, 7, helpText[m_optionIndex], 0.8f,
 		          1.0f, 1.0f);
 	}
@@ -1210,7 +1372,7 @@ void CMenuPcs::DrawOptionMenu()
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 0.0f }, { 496.0f, 0.0f } };
 #endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
-		rightXi = static_cast<int>(w * 0.5f + row.rightIcon.x - 472.0f);
+		rightXi = static_cast<int>(w / 2.0f + row.rightIcon.x - 472.0f);
 #ifndef VERSION_GCCJGC
 		row.leftText.y = 185.0f;
 		row.rightText.y = 185.0f;
@@ -1221,7 +1383,7 @@ void CMenuPcs::DrawOptionMenu()
 
 		SetUv(uv0, 0.0f, 0.0f);
 		SetUv(uv1, 0.5f, 1.0f);
-		float sideW = static_cast<float>(sideWidth) * 0.5f;
+		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
@@ -1327,7 +1489,7 @@ void CMenuPcs::DrawOptionMenu()
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 0.0f }, { 488.0f, 0.0f } };
 #endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
-		rightXi = static_cast<int>(w * 0.5f + row.rightIcon.x - 472.0f);
+		rightXi = static_cast<int>(w / 2.0f + row.rightIcon.x - 472.0f);
 #ifndef VERSION_GCCJGC
 		row.leftText.y = 185.0f;
 		row.rightText.y = 185.0f;
@@ -1338,7 +1500,7 @@ void CMenuPcs::DrawOptionMenu()
 
 		SetUv(uv0, 0.0f, 0.0f);
 		SetUv(uv1, 0.5f, 1.0f);
-		float sideW = static_cast<float>(sideWidth) * 0.5f;
+		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
@@ -1619,6 +1781,15 @@ void CMenuPcs::DrawOptionMenu()
 		Vec2d pts[5] = { { 326.0f, 128.0f }, { 300.0f, 160.0f },
 		                       { 330.0f, 138.0f }, { 372.0f, 132.0f }, { 492.0f, 132.0f } };
 		int rowAnimFrame;
+#ifdef VERSION_GCCE01
+		if (static_cast<double>(m_optionRowAnim) < 1.0) {
+			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);
+		} else {
+			rowAnimFrame = 0x10;
+		}
+		const float specialRowCos = static_cast<float>(
+			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f))));
+#else
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
 			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.07692308f);
 		} else {
@@ -1626,6 +1797,7 @@ void CMenuPcs::DrawOptionMenu()
 		}
 		const float specialRowCos = static_cast<float>(
 			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 6.923077f))));
+#endif
 
 		int k = 0;
 		int y = k;
@@ -1696,6 +1868,11 @@ void CMenuPcs::DrawOptionMenu()
 				DrawOptionLabel(m_fonts[0], textXi2 + 8,
 				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(y))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
+#elif defined(VERSION_GCCE01)
+				const Vec2d* pp4 = &pts[k + 4];
+				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				DrawFont(textXi2 + 8, static_cast<int>(-4.0f + (4.0f + (pp4->y + static_cast<float>(y)))),
+				         color, 7, OPT_MES(18), 1.0f, 1.0f);
 #else
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(18);
@@ -1716,6 +1893,9 @@ void CMenuPcs::DrawOptionMenu()
 				DrawOptionLabel(m_fonts[0], textXi + 8,
 				                static_cast<int>(4.0f + (pp3->y + static_cast<float>(y))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\145\202\145", 1.0f);
+#elif defined(VERSION_GCCE01)
+				DrawFont(textXi + 8, static_cast<int>(-4.0f + (4.0f + (pp3->y + static_cast<float>(y)))),
+				         color, 7, OPT_MES(19), 1.0f, 1.0f);
 #else
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(19);

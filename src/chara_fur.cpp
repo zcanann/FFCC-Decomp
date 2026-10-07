@@ -68,7 +68,9 @@ static unsigned int m_seed;
 
 static inline int FurTexelIndex(int x, int y, int tileRowStride)
 {
-	return x % 4 + (y % 4) * 4 + ((x / 4) * 0x10 + (y / 4) * tileRowStride);
+	int index = (x / 4) * 0x10 + (y / 4) * tileRowStride;
+	index += x % 4 + (y % 4) * 4;
+	return index;
 }
 
 /*
@@ -291,8 +293,8 @@ void CChara::makeFurTex()
 		GXLoadPosMtxImm(posMtx, GX_PNMTX0);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
-		float layerFactor = static_cast<float>(layer) * layerStep;
-		layerFactor = layerFactor * layerFactor;
+		float layerT = static_cast<float>(layer) * layerStep;
+		float layerFactor = layerT * layerT;
 
 		CColor clearColor = color[0] * (scaleBase2 - layerFactor) + color[1] * layerFactor;
 		clearColor.color.a = 0;
@@ -306,8 +308,7 @@ void CChara::makeFurTex()
 
 			float rootX = myRandFPM(1.0f);
 			float rootZ = myRandFPM(1.0f);
-			CVector rootTmp(rootX, 0.0f, rootZ);
-			CVector root = rootTmp;
+			CVector root = CVector(rootX, 0.0f, rootZ);
 
 			CHairSet& src = hairSet[myRand(0x20)];
 
@@ -337,9 +338,9 @@ void CChara::makeFurTex()
 				float pz = pos.z;
 
 				CColor color = src.m_colors[0] * (scaleBase2 - t2) + src.m_colors[1] * t2;
-				GXWGFifo.f32 = pz;
-				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = px;
+				GXWGFifo.f32 = py;
+				GXWGFifo.f32 = pz;
 				GXWGFifo.u32 = *reinterpret_cast<unsigned int*>(&color.color);
 				t += quarterStep;
 			}
@@ -424,8 +425,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		furDepth = -clipPos.z / clipPos.w;
 	}
 
-	const float lenScale = m_furLenScale;
-	float furLength = lenScale * (1.0f - furDepth) + lenScale;
+	float furLength = m_furLenScale * (1.0f - furDepth) + m_furLenScale;
 	float furStep = m_furStep;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -499,22 +499,16 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			CMaterial* shadowMaterials[2] = {0, 0};
 			MtxPtr shadowMatrices[2] = {0, 0};
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, modelPos, 100.0f, 20.0f, 0);
-			CMaterial** shadowMatP = shadowMaterials;
-			MtxPtr* shadowMtxP = shadowMatrices;
-			int shadowTexMtxBase = 0;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				const int shadowTexMap = shadowIndex + 3;
-				const int shadowTexMtxId = shadowTexMtxBase + 0x21;
-				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), (*shadowMatP)->GetTexture(0));
+				const int shadowTexMtxId = shadowIndex * 3 + 0x21;
+				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), shadowMaterials[shadowIndex]->GetTexture(0));
 
 				Mtx shadowTexMtx;
-				PSMTXConcat(*shadowMtxP, meshMtx, shadowTexMtx);
+				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
 				GXLoadTexMtxImm(shadowTexMtx, shadowTexMtxId, GX_MTX3x4);
 				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowTexMap), GX_TG_MTX3x4, GX_TG_POS,
 				                  shadowTexMtxId, GX_FALSE, GX_PTIDENTITY);
-				shadowTexMtxBase += 3;
-				shadowMatP++;
-				shadowMtxP++;
 			}
 		}
 
@@ -568,7 +562,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
 				int tevStage = 1;
-				for (int shadowStage = 0; shadowStage < shadowCount; shadowStage++, tevStage++) {
+				for (int shadowStage = 0; shadowStage < shadowCount; tevStage++, shadowStage++) {
 					GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
 					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
 					_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_CPREV, GX_CC_TEXC, GX_CC_TEXA, GX_CC_ZERO);
@@ -814,8 +808,6 @@ int CChara::CModel::PickFur(
 	CChara::CMesh* mesh = m_meshes;
 
 	CWork verts[3];
-	CWork incoming;
-	Mtx44 invScreenMtx;
 
 	for (unsigned int meshIndex = 0; meshIndex < m_data->m_meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -881,6 +873,7 @@ int CChara::CModel::PickFur(
 								psq_st posZ, 8(localPosPtr), 1, 0
 							}
 
+							CWork incoming;
 							PSMTXMultVec(modelViewMtx, &localPos, &incoming.m_viewPos);
 
 							if (incoming.m_viewPos.z >= 0.0f) {
@@ -932,6 +925,7 @@ int CChara::CModel::PickFur(
 								}
 
 								hitAny = 1;
+								Mtx44 invScreenMtx;
 								PSMTX44Copy(screenMtx, invScreenMtx);
 								C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
@@ -1057,20 +1051,7 @@ void CChara::CModel::InitMogFurTex()
 
 	if ((texture != 0) && (texture->m_format == GX_TF_RGB565)) {
 		texture->m_format = GX_TF_RGB5A3;
-		Graphic._WaitDrawDone("chara_fur.cpp", 0x506);
-
-		textureSet = m_texSet;
-		textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
-		CTexture* textureData = textureSet->GetTexture(textureIdx);
-		if (textureData != 0) {
-			void* dstBuffer = textureData->m_imageData;
-			int texelCountBytes = textureData->m_width * textureData->m_height * 2;
-
-			DCInvalidateRange(dstBuffer, texelCountBytes);
-			memcpy(dstBuffer, Chara.MogFur().m_texels, 0x2000);
-			DCFlushRange(dstBuffer, texelCountBytes);
-			GXInvalidateTexAll();
-		}
+		CopyFurTex(0);
 
 		texture->InitTexObj();
 		m_flagsA0Bits.m_flagA0_40 = 1;
@@ -1147,9 +1128,9 @@ inline void CChara::CModel::CopyFurTex(int loadFromTexture)
 		return;
 	}
 
+	int width = texture->m_width;
+	int height = texture->m_height;
 	void* image = texture->m_imageData;
-	const int width = texture->m_width;
-	const int height = texture->m_height;
 	if (loadFromTexture != 0) {
 		memcpy(Chara.MogFur().m_texels, image, 0x2000);
 	} else {
@@ -1641,7 +1622,7 @@ void CChara::CalcMogScore()
  */
 void CChara::TimeMogFur()
 {
-	int x, y;
+	int y, x;
 	const int frameCounter = static_cast<int>(System.m_frameCounter);
 
 	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
@@ -1664,12 +1645,12 @@ void CChara::TimeMogFur()
 		for (x = 0; x < 0x40; x++) {
 			int tileIndex = FurTexelIndex(x, y, 0x100);
 			unsigned short packed = texels[tileIndex];
-			int r, g, b;
+			int r, b, g;
 			int a = (packed >> 12) & 7;
 			int baseLight = 7 - a;
 			r = (packed >> 8) & 0xF;
-			g = (packed >> 4) & 0xF;
 			b = packed & 0xF;
+			g = (packed >> 4) & 0xF;
 			r += baseLight + 4;
 			g += baseLight + 4;
 			b += baseLight + 4;

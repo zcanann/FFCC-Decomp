@@ -66,8 +66,16 @@ static const char s_fmt_pcts_pcts[] = "%s%s";
 static const char s_fmt_pcts_pcts_pcts[] = "%s%s%s";
 static const char s_fmt_pcts_sp_pcts_dot[] = "%s %s.";
 static const char s_fmt_pcts_sp_pcts_pcts[] = "%s %s%s";
+#ifdef VERSION_GCCE01
+static const char s_fmt_pcts_sp[] = "%s ";
+#endif
 static const char s_fmt_pctd_sp_pcts[] = "%d %s";
+#ifdef VERSION_GCCJGC
+static const char s_fmt_pctd[] = "%d";
+static const char s_fmt_two_spaces[] = "　";
+#else
 static const char s_fmt_two_spaces[] = "  ";
+#endif
 static const char s_fmt_pctd_sp_pcts_pcts[] = "%d %s%s";
 static const char s_fmt_pcts_pcts_q[] = "%s%s?";
 
@@ -114,6 +122,14 @@ STATIC_ASSERT(offsetof(CCaravanWork, m_letters) == 0x3EC);
 
 enum {
 	kLetterTextScratchSize = 0x400,
+};
+
+enum {
+#ifdef VERSION_GCCJGC
+	kLetterTexBase = 0x3B,
+#else
+	kLetterTexBase = 0x3C,
+#endif
 };
 
 static inline CCaravanWork* GetLetterCaravanWork()
@@ -416,7 +432,9 @@ inline int CMenuPcs::LetterMessClose()
  */
 inline int CMenuPcs::LetterItemWinOpen()
 {
+#ifndef VERSION_GCCJGC
 	int lang = Game.m_gameWork.m_languageId;
+#endif
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	if (m_letterMenuState->dialogInitialized == '\0') {
 		char info[0x80];
@@ -424,6 +442,15 @@ inline int CMenuPcs::LetterItemWinOpen()
 		char right[0x10];
 		s16 winW;
 		s16 winH;
+#ifdef VERSION_GCCJGC
+		if (caravanWork->m_letters[s_SelLetter].m_bits.m_attachmentIsGil) {
+			sprintf(info, s_fmt_pctd, caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue * 100);
+			strcat(info, GetMenuStr(0x15));
+		} else {
+			strcpy(info, Game.GetShortItemName(caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue));
+		}
+		strcat(info, GetMenuStr(0x22));
+#else
 		if (caravanWork->m_letters[s_SelLetter].m_bits.m_attachmentIsGil) {
 			int gil = caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue * 100;
 			if (lang == 2) {
@@ -449,6 +476,7 @@ inline int CMenuPcs::LetterItemWinOpen()
 				sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), Game.GetShortItemName(value));
 			}
 		}
+#endif
 		strcpy(left, s_fmt_two_spaces);
 		strcat(left, GetMenuStr(1));
 		strcpy(right, s_fmt_two_spaces);
@@ -575,10 +603,10 @@ inline int CMenuPcs::LetterConfirmClose()
  * --INFO--
  * PAL Address: 0x8016394C
  * PAL Size: 64b
- * EN Address: 0x8018ACFC
- * EN Size: 88b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801629BC
+ * EN Size: 64b
+ * JP Address: 0x8015E4DC
+ * JP Size: 64b
  */
 void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 {
@@ -597,10 +625,10 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
  * --INFO--
  * PAL Address: 0x8016398C
  * PAL Size: 1616b
- * EN Address: 0x8018A2C4
- * EN Size: 1956b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801629FC
+ * EN Size: 1616b
+ * JP Address: 0x8015E51C
+ * JP Size: 1616b
  */
 void CMenuPcs::LetterLstBaseDraw(float openRatio)
 {
@@ -650,13 +678,13 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		int tex;
 		flip = 0;
 		if (i == 0) {
-			tex = 0x3C;
+			tex = kLetterTexBase;
 		} else if (i == 1) {
-			tex = 0x3C;
+			tex = kLetterTexBase;
 		} else if (i == 2) {
-			tex = 0x4B;
+			tex = kLetterTexBase + 0xF;
 		} else {
-			tex = 0x4D;
+			tex = kLetterTexBase + 0x11;
 		}
 
 		float x;
@@ -686,9 +714,9 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	float innerWf = static_cast<float>(innerW);
 	float y = y0;
 	for (i = 0; i < 2; ++i) {
-		int tex = 0x49;
+		int tex = kLetterTexBase + 0xD;
 		if (i != 0) {
-			tex = 0x4C;
+			tex = kLetterTexBase + 0x10;
 		}
 		if (i != 0) {
 			y = y1;
@@ -699,7 +727,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0xE));
 	float innerY = FLOAT_803330f4 + y0;
 	double innerH = h - DOUBLE_803330d8;
 	float x = x0;
@@ -715,12 +743,12 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x12));
 	MenuPcs.DrawRect(
 	    flip, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH),
 	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x13));
 	float decoX = xw - FLOAT_80333108;
 	double decoY0 = y0 - DOUBLE_80333100;
 	double decoX1 = DOUBLE_80333100 + decoX;
@@ -745,7 +773,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x50));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x14));
 	float barX = x0 - FLOAT_80333110;
 	float barX1 = FLOAT_80333110 + decoX;
 	float barY0 = static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100);
@@ -768,7 +796,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	}
 
 	if (!(openRatio < DOUBLE_803330e8)) {
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x1));
 		MenuPcs.DrawRect(
 		    0, x0 - FLOAT_803330f4, y0 - FLOAT_80333108,
 		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
@@ -782,10 +810,10 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
  * --INFO--
  * PAL Address: 0x80163FDC
  * PAL Size: 3844b
- * EN Address: 0x801892D4
- * EN Size: 4080b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016304C
+ * EN Size: 3844b
+ * JP Address: 0x8015EB6C
+ * JP Size: 3900b
  */
 int CMenuPcs::LetterCtrlCur()
 {
@@ -890,7 +918,12 @@ int CMenuPcs::LetterCtrlCur()
 			} else {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
+#ifdef VERSION_GCCJGC
+		}
+		if ((press & 0x200) != 0) {
+#else
 		} else if ((press & 0x200) != 0) {
+#endif
 			m_letterMenuState->action = -1;
 			m_letterMenuState->step = m_letterMenuState->step + 1;
 			LetterInit0();
@@ -968,8 +1001,13 @@ int CMenuPcs::LetterCtrlCur()
 				m_letterMenuState->action = -1;
 			} else {
 				s_ReplyPos = static_cast<u8>(curReply);
+#ifdef VERSION_GCCJGC
+			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x5C0) char[kLetterTextScratchSize];
+			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x5C2) char[kLetterTextScratchSize];
+#else
 			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x65E) char[kLetterTextScratchSize];
 			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x660) char[kLetterTextScratchSize];
+#endif
 			memset(srcText, 0, kLetterTextScratchSize);
 			memset(workText, 0, kLetterTextScratchSize);
 
@@ -1104,10 +1142,10 @@ int CMenuPcs::LetterCtrlCur()
  * --INFO--
  * PAL Address: 0x80164EE0
  * PAL Size: 1652b
- * EN Address: 0x80188B64
- * EN Size: 1904b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80163F50
+ * EN Size: 1652b
+ * JP Address: 0x8015FAA8
+ * JP Size: 1640b
  */
 void CMenuPcs::LetterMessDraw()
 {
@@ -1148,8 +1186,13 @@ void CMenuPcs::LetterMessDraw()
 
 	SingleFadeState* animState = m_singleFadeState;
 	CFont* font = m_fonts[0];
+#ifdef VERSION_GCCJGC
+	font->SetMargin(FLOAT_8033313c);
+	font->SetShadow(0);
+#else
 	font->SetShadow(0);
 	font->SetMargin(FLOAT_8033313c);
+#endif
 	font->SetScale(FLOAT_80333140);
 	font->DrawInit();
 	font->SetTlut(0x1C);
@@ -1157,8 +1200,13 @@ void CMenuPcs::LetterMessDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * animState->entries[0].alpha)).color);
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
+#ifdef VERSION_GCCJGC
+	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x49B) char[kLetterTextScratchSize];
+	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x49D) char[kLetterTextScratchSize];
+#else
 	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[kLetterTextScratchSize];
 	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
+#endif
 
 	memset(srcText, 0, kLetterTextScratchSize);
 	memset(workText, 0, kLetterTextScratchSize);
@@ -1168,10 +1216,11 @@ void CMenuPcs::LetterMessDraw()
 	strcpy(srcText, Game.GetLetter((msgIndex & 0x7FC) >> 2));
 #ifdef VERSION_GCCJGC
 	CMes::MakeAgbString(workText, srcText);
+	int y = 0x60;
 #else
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
-#endif
 	int y = 0x58;
+#endif
 
 	int i = 0;
 	char* curLine = workText;
@@ -1257,10 +1306,10 @@ void CMenuPcs::LetterMessDraw()
  * --INFO--
  * PAL Address: 0x80165554
  * PAL Size: 1528b
- * EN Address: 0x801885F4
- * EN Size: 1392b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x801645C4
+ * EN Size: 1528b
+ * JP Address: 0x80160110
+ * JP Size: 1528b
  */
 void CMenuPcs::LetterListDraw()
 {
@@ -1364,7 +1413,7 @@ void CMenuPcs::LetterListDraw()
 		markColor.b = 0xFF;
 		markColor.a = static_cast<u8>(alpha);
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x43));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x7));
 
 		const float iconSize = FLOAT_803330b8;
 		const double iconOffset = (iconSize - iconSize * markScale) / 2.0;
@@ -1409,10 +1458,10 @@ void CMenuPcs::LetterListDraw()
  * --INFO--
  * PAL Address: 0x80165B4C
  * PAL Size: 56b
- * EN Address: 0x801885A8
- * EN Size: 76b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80164BBC
+ * EN Size: 56b
+ * JP Address: 0x80160708
+ * JP Size: 56b
  */
 void CMenuPcs::LetterDraw()
 {
@@ -1427,19 +1476,44 @@ void CMenuPcs::LetterDraw()
  * --INFO--
  * PAL Address: 0x80165B84
  * PAL Size: 1552b
- * EN Address: 0x80188204
- * EN Size: 872b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80164BF4
+ * EN Size: 1420b
+ * JP Address: 0x80160740
+ * JP Size: 720b
  */
 int CMenuPcs::LetterConfirmOpen()
 {
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
+#ifndef VERSION_GCCJGC
 	int languageId = Game.m_gameWork.m_languageId;
+#endif
 
 	if (m_letterMenuState->dialogInitialized == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
+#ifdef VERSION_GCCJGC
+		int lineCount = 0;
+		strcpy(lines[lineCount], Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId()));
+		strcat(lines[lineCount], GetMenuStr(0x26));
+		lineCount++;
+
+		strcpy(lines[lineCount], GetMenuStr(0x23));
+		strcat(lines[lineCount], s_ReplyStr);
+		strcat(lines[lineCount], GetMenuStr(0x24));
+		strcat(lines[lineCount], GetMenuStr(0x27));
+		lineCount++;
+
+		if (s_Attach == 0) {
+			strcpy(lines[lineCount], Game.GetShortItemName(s_AttachItem));
+		} else if (s_Attach == 1) {
+			sprintf(lines[lineCount], s_fmt_pctd, s_AttachItem);
+			strcat(lines[lineCount], GetMenuStr(4));
+		}
+		if (s_Attach != 2) {
+			strcat(lines[lineCount], GetMenuStr(0x28));
+			lineCount++;
+		}
+#else
 		int lineCount = 0;
 		switch (languageId) {
 		case 2: {
@@ -1447,16 +1521,21 @@ int CMenuPcs::LetterConfirmOpen()
 			sprintf(lines[lineCount], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
 			break;
 		}
+#ifdef VERSION_GCCE01
+		case 3:
+#endif
 		case 4: {
 			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x26), title, GetMenuStr(0x25));
 			break;
 		}
+#ifndef VERSION_GCCE01
 		case 3: {
 			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_pcts, GetMenuStr(0x26), title);
 			break;
 		}
+#endif
 		case 5: {
 			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_sp_pcts_dot, GetMenuStr(0x26), title);
@@ -1498,10 +1577,14 @@ int CMenuPcs::LetterConfirmOpen()
 			switch (languageId) {
 			case 2:
 				if (s_Attach == 0) {
+#ifdef VERSION_GCCE01
+					sprintf(lines[lineCount], s_fmt_pcts_sp, Game.GetShortItemName(s_AttachItem));
+#else
 					const char* attachName = Game.GetShortItemName(s_AttachItem);
 					sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23),
 					        attachName,
 					        GetMenuStr(0x24));
+#endif
 				} else if (s_Attach == 1) {
 					sprintf(lines[lineCount], s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
 				}
@@ -1521,6 +1604,7 @@ int CMenuPcs::LetterConfirmOpen()
 			}
 			lineCount++;
 		}
+#endif
 
 		strcat(lines[lineCount], GetMenuStr(0x21));
 		strcpy(lines[lineCount + 1], s_fmt_two_spaces);
@@ -1551,23 +1635,30 @@ int CMenuPcs::LetterConfirmOpen()
  * --INFO--
  * PAL Address: 0x80166194
  * PAL Size: 764b
- * EN Address: 0x80187DB8
- * EN Size: 796b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80165180
+ * EN Size: 764b
+ * JP Address: 0x80160A10
+ * JP Size: 680b
  */
 int CMenuPcs::LetterReplyWinOpen()
 {
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	char* srcText;
 	char* workText;
+#ifndef VERSION_GCCJGC
 	int languageId = Game.m_gameWork.m_languageId;
+#endif
 	if (m_letterMenuState->dialogInitialized == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
 
+#ifdef VERSION_GCCJGC
+		srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x30B) char[kLetterTextScratchSize];
+		workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x30D) char[kLetterTextScratchSize];
+#else
 		srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
 		workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
+#endif
 
 		memset(srcText, 0, kLetterTextScratchSize);
 		memset(workText, 0, kLetterTextScratchSize);
@@ -1590,11 +1681,18 @@ int CMenuPcs::LetterReplyWinOpen()
 				*newline = '\0';
 			}
 
+#ifdef VERSION_GCCJGC
+			strcpy(lines[i], GetMenuStr(0x23));
+			strcat(lines[i], curLine);
+			strcat(lines[i], GetMenuStr(0x24));
+			strcat(lines[i], GetMenuStr(0x25));
+#else
 			if (languageId == 2) {
 				sprintf(lines[i], "%s%s%s", GetMenuStr(0x23), curLine, GetMenuStr(0x24));
 			} else {
 				sprintf(lines[i], "%s%s%s", GetMenuStr(0x23), curLine, GetMenuStr(0x24));
 			}
+#endif
 
 			s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 			if (newline == 0) {
@@ -1640,10 +1738,10 @@ int CMenuPcs::LetterReplyWinOpen()
  * --INFO--
  * PAL Address: 0x80166490
  * PAL Size: 488b
- * EN Address: 0x801875E8
- * EN Size: 144b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8016547C
+ * EN Size: 488b
+ * JP Address: 0x80160CB8
+ * JP Size: 512b
  */
 int CMenuPcs::LetterClose()
 {
@@ -1663,10 +1761,10 @@ int CMenuPcs::LetterClose()
  * --INFO--
  * PAL Address: 0x80166678
  * PAL Size: 4556b
- * EN Address: 0x80186F4C
- * EN Size: 1692b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80165664
+ * EN Size: 4556b
+ * JP Address: 0x80160EB8
+ * JP Size: 4564b
  */
 int CMenuPcs::LetterCtrl()
 {
@@ -1847,10 +1945,10 @@ int CMenuPcs::LetterCtrl()
  * --INFO--
  * PAL Address: 0x80167844
  * PAL Size: 1016b
- * EN Address: 0x80186DD0
- * EN Size: 380b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80166830
+ * EN Size: 1016b
+ * JP Address: 0x8016208C
+ * JP Size: 1084b
  */
 int CMenuPcs::LetterOpen()
 {
@@ -1898,8 +1996,8 @@ int CMenuPcs::LetterOpen()
  * --INFO--
  * PAL Address: 0x80167C3C
  * PAL Size: 408b
- * EN Address: 0x801869D8
- * EN Size: 452b
+ * EN Address: 0x80166C28
+ * EN Size: 408b
  * JP Address: 0x801624C8
  * JP Size: 456b
  */
@@ -1916,11 +2014,7 @@ void CMenuPcs::LetterInit1()
 	SingleFadeEntry* p;
 	int n = 0;
 	p = &m_singleFadeState->entries[n++];
-#ifdef VERSION_GCCJGC
-	p->tex = 0x5E;
-#else
-	p->tex = 0x5F;
-#endif
+	p->tex = kLetterTexBase + 0x23;
 	p->width = 0x238;
 	p->height = 0x178;
 	double scale = DOUBLE_803330a8;
@@ -1933,11 +2027,7 @@ void CMenuPcs::LetterInit1()
 	p->duration = 10;
 
 	p = &m_singleFadeState->entries[n++];
-#ifdef VERSION_GCCJGC
-	p->tex = 0x3D;
-#else
-	p->tex = 0x3E;
-#endif
+	p->tex = kLetterTexBase + 0x2;
 	p->width = 0xA8;
 	p->height = 0x60;
 	p->x = 0x20;

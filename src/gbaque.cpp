@@ -1256,7 +1256,6 @@ void GbaQueue::LoadPlayerStat()
 	}
 
 	if (CFlat.IsInitFinished() != 0) {
-		GbaPInfo* entry = localPlayerStat;
 		outOfShoukiMask = 0;
 		for (i = 0; i < 4; i++) {
 			char menuStageMode = m_singleMode;
@@ -1273,71 +1272,68 @@ void GbaQueue::LoadPlayerStat()
 
 			if (caravanWork != 0) {
 				if ((menuStageMode == 0) || ((menuStageMode != 0) && (i == 0))) {
-					entry->m_active = 1;
+					localPlayerStat[i].m_active = 1;
 				} else if ((menuStageMode != 0) && (i == 1) && (Game.m_scriptFoodBase[i] != 0)) {
-					entry->m_active = 1;
+					localPlayerStat[i].m_active = 1;
 				}
 
-				entry->m_maxHp = static_cast<signed char>(caravanWork->m_maxHp);
-				entry->m_hp = static_cast<char>(caravanWork->m_hp);
+				localPlayerStat[i].m_maxHp = static_cast<signed char>(caravanWork->m_maxHp);
+				localPlayerStat[i].m_hp = static_cast<char>(caravanWork->m_hp);
 				{
 					int tribeAppearance = (caravanWork->m_tribeId & 3) |
 					                                      ((caravanWork->m_appearanceVariant & 3) << 2);
 					if (caravanWork->m_genderFlag != 0) {
 						tribeAppearance |= 0x80;
 					}
-					entry->m_appearance = static_cast<unsigned char>(tribeAppearance);
+					localPlayerStat[i].m_appearance = static_cast<unsigned char>(tribeAppearance);
 				}
 
-				entry->m_gil = caravanWork->m_gil;
+				localPlayerStat[i].m_gil = caravanWork->m_gil;
 				{
-					unsigned short progress = 0xFF;
-					if (caravanWork->m_progressValue <= 0xFF) {
-						progress = caravanWork->m_progressValue;
-					}
-					entry->m_progress = progress;
+					unsigned short pv = caravanWork->m_progressValue;
+					localPlayerStat[i].m_progress = (pv > 0xFF) ? 0xFF : pv;
 				}
 
 				for (int j = 0; j < 8; j++) {
-					entry->m_letterMeta[j] = static_cast<unsigned char>(caravanWork->m_letterMeta[j]);
+					localPlayerStat[i].m_letterMeta[j] = static_cast<unsigned char>(caravanWork->m_letterMeta[j]);
 				}
 
 				{
 					const int saveSlot = caravanWork->m_saveSlot;
-					entry->m_saveSlot = static_cast<signed char>(saveSlot);
-					entry->m_compatibility[0] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
-					signed char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
-					signed char l1 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][1];
-					entry->m_compatibility[1] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
+					localPlayerStat[i].m_saveSlot = static_cast<signed char>(saveSlot);
+					localPlayerStat[i].m_compatibility[0] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
+					unsigned char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
+					unsigned char l1 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][1];
+					localPlayerStat[i].m_compatibility[1] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
 					unsigned char l2 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][2];
 					unsigned char l3 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][3];
-					entry->m_compatibility[2] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x14]);
+					localPlayerStat[i].m_compatibility[2] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x14]);
 					unsigned char l4 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][4];
 					unsigned char l5 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][5];
-					entry->m_compatibility[3] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
-					signed char l6 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][6];
+					localPlayerStat[i].m_compatibility[3] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
+					unsigned char l6 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][6];
 					unsigned char l7 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][7];
-					entry->m_compatibility[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
-					entry->m_compatibility[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
-					entry->m_compatibility[6] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x18]);
-					entry->m_compatibility[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x19]);
-					entry->m_compatibility[8] = l0;
-					entry->m_compatibility[9] = l1;
-					entry->m_compatibility[10] = l2;
-					entry->m_compatibility[11] = l3;
-					entry->m_compatibility[12] = l4;
-					entry->m_compatibility[13] = l5;
-					entry->m_compatibility[14] = l6;
-					entry->m_compatibility[15] = l7;
+					localPlayerStat[i].m_compatibility[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
+					localPlayerStat[i].m_compatibility[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
+					localPlayerStat[i].m_compatibility[6] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x18]);
+					localPlayerStat[i].m_compatibility[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x19]);
+					localPlayerStat[i].m_compatibility[8] = l0;
+					localPlayerStat[i].m_compatibility[9] = l1;
+					localPlayerStat[i].m_compatibility[10] = l2;
+					localPlayerStat[i].m_compatibility[11] = l3;
+					localPlayerStat[i].m_compatibility[12] = l4;
+					localPlayerStat[i].m_compatibility[13] = l5;
+					localPlayerStat[i].m_compatibility[14] = l6;
+					localPlayerStat[i].m_compatibility[15] = l7;
 				}
 
-				entry->m_strength[0] = static_cast<unsigned char>(caravanWork->m_strength > 99 ? 99 : caravanWork->m_strength);
-				entry->m_strength[1] = static_cast<unsigned char>(caravanWork->m_defense > 99 ? 99 : caravanWork->m_defense);
-				entry->m_strength[2] = static_cast<unsigned char>(caravanWork->m_magic > 99 ? 99 : caravanWork->m_magic);
-				entry->m_bonusCondition = caravanWork->m_bonusCondition;
-				entry->m_jobType = static_cast<unsigned char>(caravanWork->m_jobType);
+				localPlayerStat[i].m_strength[0] = static_cast<unsigned char>(caravanWork->m_strength > 99 ? 99 : caravanWork->m_strength);
+				localPlayerStat[i].m_strength[1] = static_cast<unsigned char>(caravanWork->m_defense > 99 ? 99 : caravanWork->m_defense);
+				localPlayerStat[i].m_strength[2] = static_cast<unsigned char>(caravanWork->m_magic > 99 ? 99 : caravanWork->m_magic);
+				localPlayerStat[i].m_bonusCondition = caravanWork->m_bonusCondition;
+				localPlayerStat[i].m_jobType = static_cast<unsigned char>(caravanWork->m_jobType);
 
-				memcpy(entry->m_items, caravanWork->m_inventoryItems, sizeof(entry->m_items));
+				memcpy(localPlayerStat[i].m_items, caravanWork->m_inventoryItems, sizeof(localPlayerStat[i].m_items));
 				{
 					unsigned int artifactBit = 1;
 					int artifactSlot;
@@ -1347,49 +1343,48 @@ void GbaQueue::LoadPlayerStat()
 						artifactSlot = 0x40 + artifactIndex;
 						if (caravanWork->m_inventoryItems[artifactSlot] > 0) {
 							artifactWord = artifactIndex >> 5;
-							entry->m_artifacts[artifactWord] |=
+							localPlayerStat[i].m_artifacts[artifactWord] |=
 							    static_cast<unsigned int>(artifactBit << (artifactIndex % 32));
 						}
 					}
 				}
 
 				for (int j = 0; j < 4; j++) {
-					entry->m_tmpArtifacts[j] = caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + j];
+					localPlayerStat[i].m_tmpArtifacts[j] = caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + j];
 				}
 
-				entry->m_commandSlotCount = static_cast<unsigned char>(caravanWork->m_numCmdListSlots);
+				localPlayerStat[i].m_commandSlotCount = static_cast<unsigned char>(caravanWork->m_numCmdListSlots);
 				for (int j = 0; j < 8; j++) {
-					entry->m_commandSlots[j] = caravanWork->m_commandListInventorySlotRef[j];
+					localPlayerStat[i].m_commandSlots[j] = caravanWork->m_commandListInventorySlotRef[j];
 				}
 
 				for (int j = 0; j < 4; j++) {
-					entry->m_equipment[j] = static_cast<unsigned char>(caravanWork->m_equipment[j]);
+					localPlayerStat[i].m_equipment[j] = static_cast<unsigned char>(caravanWork->m_equipment[j]);
 				}
 
-				entry->m_useItem = caravanWork->IsUseItem();
-				entry->m_radarVisible = static_cast<unsigned char>(partyObj->IsDispRader() != 0);
+				localPlayerStat[i].m_useItem = caravanWork->IsUseItem();
+				localPlayerStat[i].m_radarVisible = static_cast<unsigned char>(partyObj->IsDispRader() != 0);
 
-				if ((caravanWork->IsOutOfShouki() != 0) && (entry->m_hp != 0)) {
+				if ((caravanWork->IsOutOfShouki() != 0) && (localPlayerStat[i].m_hp != 0)) {
 					outOfShoukiMask |= (1U << i);
 				}
 
 				if (caravanWork->CanPlayerUseItem() != 0) {
-					entry->m_itemFlags |= GbaQueConst::CAN_REPLY;
+					localPlayerStat[i].m_itemFlags |= GbaQueConst::CAN_REPLY;
 				}
 				if (caravanWork->CanPlayerPutItem() != 0) {
-					entry->m_itemFlags |= GbaQueConst::ITEM_ATTACH;
+					localPlayerStat[i].m_itemFlags |= GbaQueConst::ITEM_ATTACH;
 				}
 			}
 
 			if (Game.m_partyObjArr[i] != 0) {
-				entry->m_hasPartyObj = 1;
+				localPlayerStat[i].m_hasPartyObj = 1;
 				int posX = static_cast<int>(Game.m_partyObjArr[i]->m_worldPosition.x / 3.0f);
 				int posZ = static_cast<int>(Game.m_partyObjArr[i]->m_worldPosition.z / 3.0f);
-				entry->m_mapPosition[0] = static_cast<short>(posX);
-				entry->m_mapPosition[1] = static_cast<short>(posZ);
+				localPlayerStat[i].m_mapPosition[0] = static_cast<short>(posX);
+				localPlayerStat[i].m_mapPosition[1] = static_cast<short>(posZ);
 			}
 
-			entry++;
 		}
 	}
 
@@ -1606,10 +1601,12 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 {
 	GbaPInfo localPlayerData[4];
 	unsigned char packet[0xC];
-	int i;
 	unsigned char nearbyMask;
 	short baseX;
 	short baseZ;
+	const GbaPInfo* player;
+	const GbaPInfo* basePlayer;
+	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memcpy(localPlayerData, m_playerData, sizeof(localPlayerData));
@@ -1625,8 +1622,8 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	packet[4] = 0x51;
 	packet[8] = 0x91;
 
-	const GbaPInfo* player = localPlayerData;
-	const GbaPInfo* basePlayer = &player[channel];
+	player = localPlayerData;
+	basePlayer = &player[channel];
 
 	nearbyMask = 0;
 	for (i = 0; i < 4; i++) {
@@ -2037,9 +2034,20 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 int GbaQueue::MakeLetterList(int channel, char* outData)
 {
 	int entriesSize;
-	int subjectSize;
+	unsigned int* letterEntryBuf;
 	unsigned int* entryWrite;
-	CCaravanWork* const scriptFood = Game.m_scriptFoodBase[channel];
+	char* npcNameBuf;
+	char* subjectNameBuf;
+	int subjectSize;
+	int letterCount;
+	int npcCount;
+	int subjectCount;
+	char* npcWrite;
+	CCaravanWork* scriptFood;
+	char* subjectWrite;
+	char tempName[kGbaQueueLetterTempNameBytes];
+
+	scriptFood = Game.m_scriptFoodBase[channel];
 
 	if (scriptFood == 0) {
 		m_letterDatFlg |= 1 << channel;
@@ -2048,46 +2056,40 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 		return 0;
 	}
 
-char* npcNameBuf =
-	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7A7) char[kGbaQueueLetterNpcNameBytes];
+	npcNameBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7A7) char[kGbaQueueLetterNpcNameBytes];
 	if (npcNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7A9);
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7A9);
 		}
 		return -1;
 	}
 	memset(npcNameBuf, 0, kGbaQueueLetterNpcNameBytes);
 
-char* subjectNameBuf =
-	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7B1) char[kGbaQueueLetterSubjectNameBytes];
+	subjectNameBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7B1) char[kGbaQueueLetterSubjectNameBytes];
 	if (subjectNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7B3);
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7B3);
 		}
 		return -1;
 	}
 	memset(subjectNameBuf, 0, kGbaQueueLetterSubjectNameBytes);
 
-unsigned int* letterEntryBuf =
-	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7BB) unsigned int[kGbaQueueLetterEntryAllocWords];
+	letterEntryBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7BB) unsigned int[kGbaQueueLetterEntryAllocWords];
 	if (letterEntryBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7BD);
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7BD);
 		}
 		return -1;
 	}
 	memset(letterEntryBuf, 0, kGbaQueueLetterEntryBytes);
 
-	int letterCount = scriptFood->m_letterCount;
+	subjectCount = 0;
+	npcCount = 0;
+	letterCount = scriptFood->m_letterCount;
 
-	int npcCount = 0;
-	int subjectCount = 0;
-
-	char* npcWrite = npcNameBuf;
-	char* subjectWrite = subjectNameBuf;
+	npcWrite = npcNameBuf;
+	subjectWrite = subjectNameBuf;
 	entryWrite = letterEntryBuf;
-
-	char tempName[kGbaQueueLetterTempNameBytes];
 
 	for (int i = 0; i < letterCount; i++) {
 		int matchedSubject = -1;
@@ -2113,7 +2115,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedNpc * 2))[5];
 		} else {
 			if (npcCount >= 0x80 && (unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp), 0x7DC);
+			System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp), 0x7DC);
 			}
 
 			memset(tempName, 0, sizeof(tempName));
@@ -2128,7 +2130,7 @@ System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp)
 				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedSubject * 2))[4];
 		} else {
 			if (subjectCount >= 0x100 && (unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp), 0x7F0);
+			System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp), 0x7F0);
 			}
 
 			memset(tempName, 0, sizeof(tempName));
@@ -2156,7 +2158,7 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 			const int value = static_cast<int>(cur->AttachmentValue());
 			if (value >= 0x100 && value <= 0x124) {
 				if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), 0x810, channel, i);
+			System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), 0x810, channel, i);
 				}
 			} else {
 				flags |= GbaQueConst::MOVE_ATTACH;
@@ -2496,7 +2498,8 @@ void GbaQueue::LoadMapObj()
 					mapObjWork.m_entries[count].m_z = static_cast<short>(mapObj->m_z / 3.0f);
 					mapObjWork.m_entries[count].m_radius = static_cast<short>(mapObj->m_radius / 3.0f);
 
-					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | drawMask;
+					unsigned int flags = mapObjWork.m_drawFlags & mask;
+					mapObjWork.m_drawFlags = flags | drawMask;
 					mapObjWork.m_count = static_cast<unsigned char>(mapObjWork.m_count + 1);
 				}
 			}
@@ -3275,7 +3278,6 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	int dataSize;
 	int equipCount;
 	unsigned short equipData[4];
-	char* indexPtr;
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3284,13 +3286,10 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memset(equipIndices, 0xFF, sizeof(equipIndices));
-	indexPtr = equipIndices;
 	for (i = equipCount = 0; i < 0x40; i++) {
 		short itemId = localPlayerData.m_items[i];
 		if ((itemId >= 0) && (itemId <= 0x9E)) {
-			*indexPtr = i;
-			equipCount++;
-			indexPtr++;
+			equipIndices[equipCount++] = i;
 		}
 	}
 
@@ -3438,9 +3437,11 @@ int GbaQueue::MakeBuyData(int channel, char* outData)
 
 	itemCount = Game.m_scriptFoodBase[channel]->m_shopListCount;
 
-	totalSize = 4;
+	writePtr = outData;
+	totalSize = 0;
 	outData[0] = static_cast<char>(itemCount);
-	writePtr = outData + 4;
+	writePtr += 4;
+	totalSize += 4;
 
 	for (i = 0; i < itemCount; i++) {
 		itemId = Game.m_scriptFoodBase[channel]->m_shopList[i];

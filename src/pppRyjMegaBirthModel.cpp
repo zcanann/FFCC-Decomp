@@ -293,8 +293,24 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     }
 }
 
-static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, _PARTICLE_WMAT* worldMatrixBlock)
+static inline s8 alloc_check(VRyjMegaBirthModel* work, PRyjMegaBirthModel* params)
 {
+    if (work->m_particleBlock == NULL) {
+        return 0;
+    }
+    if ((params->m_enableWorldMatrix != 0) && (work->m_worldMatrixBlock == NULL)) {
+        return 0;
+    }
+    if ((params->m_enableParticleColor != 0) && (work->m_colorBlock == NULL)) {
+        return 0;
+    }
+    return 1;
+}
+
+static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, VRyjMegaBirthModel* work)
+{
+    _PARTICLE_WMAT* worldMatrixBlock = work->m_worldMatrixBlock;
+
     pppUnitMatrix(out);
     switch (params->m_spawnMode) {
     default:
@@ -334,19 +350,8 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* params, _ppp
     _PARTICLE_WMAT* particleWorldMatrix = worldMatrixBlock;
     _PARTICLE_COLOR* particleColor = colorBlock;
     s32 numParticles = work->m_numParticles;
-    s8 hasRequiredMemory;
 
-    if (particleBlock == NULL) {
-        hasRequiredMemory = 0;
-    } else if ((params->m_enableWorldMatrix != 0) && (worldMatrixBlock == NULL)) {
-        hasRequiredMemory = 0;
-    } else if ((params->m_enableParticleColor != 0) && (colorBlock == NULL)) {
-        hasRequiredMemory = 0;
-    } else {
-        hasRequiredMemory = 1;
-    }
-
-    if (!hasRequiredMemory) {
+    if (!alloc_check(work, params)) {
         return;
     }
 
@@ -358,7 +363,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* params, _ppp
     pppFMATRIX emitterMatrix;
     pppFMATRIX scratchMatrix;
 
-    init_matrix(obj, emitterMatrix, params, particleWorldMatrix);
+    init_matrix(obj, emitterMatrix, params, work);
 
     int baseRed = baseColor->m_color.rgba[0];
     int baseGreen = baseColor->m_color.rgba[1];

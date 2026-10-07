@@ -3199,7 +3199,7 @@ void CMenuPcs::drawWorld()
 			break;
 		default:
 			if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC59);
+				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC59, menuMode);
 			}
 			break;
 		}
@@ -3269,7 +3269,6 @@ void CMenuPcs::DrawMainMenu()
 
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		const int helpState = m_wmWorldState->m_mainState;
-		double helpColorAlpha;
 		float helpAlpha;
 		if (helpState == 1) {
 			const double* pRmm5 = &DOUBLE_803314E8;
@@ -3284,23 +3283,7 @@ void CMenuPcs::DrawMainMenu()
 		}
 		const double* pFmm1 = &DOUBLE_803314F0;
 		if (static_cast<double>(helpAlpha) > *pFmm1) {
-			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-			const float* p255mm = &FLOAT_80331458;
-			helpColorAlpha = static_cast<double>(*p255mm * helpAlpha);
-			GXColor helpColor;
-			helpColor.r = 0xFF;
-			helpColor.g = 0xFF;
-			helpColor.b = 0xFF;
-			helpColor.a = static_cast<unsigned char>(static_cast<int>(helpColorAlpha));
-			GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMemoryCardBannerTexture));
-			const float* pZmm6 = &FLOAT_803313dc;
-			const float* pOmm9 = &FLOAT_803313e8;
-			const float* pWmm6 = &FLOAT_803313e0;
-			const float* p440mm = &FLOAT_80331440;
-			const double* pBmm1 = &DOUBLE_803314D0;
-			MenuPcs.DrawRect(0, *pZmm6, static_cast<float>(*pBmm1 - static_cast<double>(*p440mm)),
-			                 *pWmm6, *p440mm, *pZmm6, *pZmm6, *pOmm9, *pOmm9, *pZmm6);
+			DrawHelpBase(kMemoryCardBannerTexture, helpAlpha);
 
 #ifdef VERSION_GCCJGC
 			char textList[5][256] = {
@@ -3322,7 +3305,7 @@ void CMenuPcs::DrawMainMenu()
 			if (helpAlpha > FLOAT_803313e8) {
 				textAlpha = 0xFF;
 			} else {
-				textAlpha = static_cast<unsigned int>(static_cast<int>(helpColorAlpha));
+				textAlpha = static_cast<unsigned int>(static_cast<int>(FLOAT_80331458 * helpAlpha));
 			}
 			CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF));
 			char* const text = textList[m_wmWorldState->m_cardChannel];
@@ -3432,25 +3415,7 @@ void CMenuPcs::DrawMCardMenu()
 		}
 		const double* pThresh = &DOUBLE_803314F0;
 		if (alpha > *pThresh) {
-			const float* p255 = &FLOAT_80331458;
-			MenuPcs.SetAttrFmt((FMT)0);
-			_GXColor bgColor;
-			bgColor.r = 0xFF;
-			bgColor.g = 0xFF;
-			bgColor.b = 0xFF;
-			bgColor.a = (unsigned char)(int)(*p255 * alpha);
-			GXSetChanMatColor(GX_COLOR0A0, bgColor);
-			MenuPcs.SetTexture((TEX)kMemoryCardBannerTexture);
-			const float* pZeroBg = &FLOAT_803313dc;
-			const float* pOneBg = &FLOAT_803313e8;
-			const float* pWideBg = &FLOAT_803313e0;
-			const float* p40Bg = &FLOAT_80331440;
-			const double* pBottomBg = &DOUBLE_803314D0;
-			MenuPcs.DrawRect(0, *pZeroBg,
-			         (float)(*pBottomBg - (double)*p40Bg),
-			         *pWideBg, *p40Bg,
-			         *pZeroBg, *pZeroBg,
-			         *pOneBg, *pOneBg, *pZeroBg);
+			DrawHelpBase(kMemoryCardBannerTexture, alpha);
 		}
 	}
 
@@ -3873,22 +3838,7 @@ void CMenuPcs::DrawCMakeMenu()
 			const float* p255 = &FLOAT_80331458;
 			textAlpha = static_cast<int>(*p255 * contentAlpha);
 		}
-		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		GXColor helpColor;
-		helpColor.r = 0xFF;
-		helpColor.g = 0xFF;
-		helpColor.b = 0xFF;
-		const float* p255b = &FLOAT_80331458;
-		helpColor.a = static_cast<unsigned char>(static_cast<int>(*p255b * contentAlpha));
-		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMemoryCardBannerTexture));
-		const float* pZeroR = &FLOAT_803313dc;
-		const float* pOneR = &FLOAT_803313e8;
-		const float* pWideR = &FLOAT_803313e0;
-		const float* pFortyR = &FLOAT_80331440;
-		const double* pBottomR = &DOUBLE_803314D0;
-		MenuPcs.DrawRect(0, *pZeroR, static_cast<float>(*pBottomR - static_cast<double>(*pFortyR)),
-		         *pWideR, *pFortyR, *pZeroR, *pZeroR, *pOneR, *pOneR, *pZeroR);
+		DrawHelpBase(kMemoryCardBannerTexture, contentAlpha);
 		if (m_wmWorldState->m_menuMode == 3) {
 			if (m_wmWorldState->m_menuMode == 3) {
 #ifdef VERSION_GCCJGC
@@ -4056,18 +4006,7 @@ void CMenuPcs::DrawMoveMenu()
 		moveAlpha = FLOAT_803313e8;
 	}
 	if (state > 0 && state < 3) {
-		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		GXColor helpColor;
-		helpColor.r = 0xFF;
-		helpColor.g = 0xFF;
-		helpColor.b = 0xFF;
-		helpColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha));
-		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-		double bannerY = DOUBLE_803314D0;
-		bannerY -= FLOAT_80331440;
-		MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(bannerY),
-		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		DrawHelpBase(0x23, moveAlpha);
 	}
 	DrawWMFrame();
 
@@ -4156,20 +4095,7 @@ void CMenuPcs::DrawLoadMenu()
 			alpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 		}
 		if (static_cast<double>(alpha) > DOUBLE_803314F0) {
-			MenuPcs.SetAttrFmt((FMT)0);
-			_GXColor bgColor;
-			bgColor.r = 0xFF;
-			bgColor.g = 0xFF;
-			bgColor.b = 0xFF;
-			bgColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
-			GXSetChanMatColor(GX_COLOR0A0, bgColor);
-			MenuPcs.SetTexture((TEX)kMemoryCardBannerTexture);
-			double bannerY = DOUBLE_803314D0;
-			bannerY -= FLOAT_80331440;
-			MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(bannerY),
-			         FLOAT_803313e0, FLOAT_80331440,
-			         FLOAT_803313dc, FLOAT_803313dc,
-			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			DrawHelpBase(kMemoryCardBannerTexture, alpha);
 		}
 	}
 	if (alpha < FLOAT_803313dc) alpha = FLOAT_803313dc;
@@ -8198,13 +8124,13 @@ void CMenuPcs::ChgAllModel()
 {
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
+		CCaravanWork* const caravan = &Game.m_caravanWorkArr[i];
 		int tribe;
 		int appearance;
 		int isFemale;
 		int modelId;
 
 		if (Game.m_caravanWorkArr[i].m_shopState != 0) {
-			CCaravanWork* const caravan = &Game.m_caravanWorkArr[i];
 			tribe = caravan->m_tribeId;
 			isFemale = caravan->m_genderFlag;
 			appearance = caravan->m_appearanceVariant;
@@ -8233,8 +8159,8 @@ void CMenuPcs::ChgAllModel()
 void CMenuPcs::ChgAllModel2()
 {
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		const Mc::CharaDat& character = m_cmakeWork->m_characters[i];
 		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
+		const Mc::CharaDat& character = m_cmakeWork->m_characters[i];
 		int tribe;
 		int isFemale;
 		int appearance;
@@ -9595,35 +9521,18 @@ nextListEntry:
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
+inline void CMenuPcs::DrawHelpBase(int texture, float alpha)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	float alpha = baseAlpha;
-
-	if (alpha <= 0.0f) {
-		alpha = 1.0f;
-	}
-
-	if (worldState != 0) {
-		const short state = worldState->m_mainState;
-		if (state == 0) {
-			alpha *= static_cast<float>(worldState->m_frameCounter) * 0.1f;
-		} else if (state >= 3) {
-			alpha *= 1.0f - static_cast<float>(worldState->m_frameCounter) * 0.1f;
-		}
-	}
-	if (alpha < 0.0f) {
-		alpha = 0.0f;
-	} else if (alpha > 1.0f) {
-		alpha = 1.0f;
-	}
-
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
-	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind == 0 ? 0x1F : 0x20));
-	MenuPcs.DrawRect(0xFFFFFFFF, 0.0f, 0x1A8, 0x280, 0x18, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(255.0f * alpha);
+	GXSetChanMatColor(GX_COLOR0A0, color);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(texture));
+	float height = 40.0f;
+	MenuPcs.DrawRect(0, 0.0f, static_cast<float>(424.0 - height), 640.0f, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -9781,20 +9690,22 @@ inline void CMenuPcs::ClrMcList()
 unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
 	PPPCREATEPARAM createParam;
+	CGObject* object;
+	EffectInfo* effect;
 
 	if (cameraSlot < 0) {
 		cameraSlot = slot;
 	}
 
-	EffectInfo* effect = &m_effectWork[slot];
+	effect = &m_effectWork[slot];
 	if (slot == 5 && effectNo < 0x13) {
 		effect++;
 	} else if (slot >= 0x11 && slot <= 0x14 && effectNo > 0x19) {
 		effect += 4;
 	}
 
+	object = &effect->m_object;
 	const bool group = (effect->m_effectNo = effectNo) > 100;
-	CGObject* const object = &effect->m_object;
 	effect->m_slotNo = slot;
 	object->Create();
 	object->m_charaModelHandle = m_wm.m_handles[cameraSlot];
@@ -10379,15 +10290,19 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
  */
 void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 {
-	CFont* const font = GetFont22();
+	CFont* font;
+	const char* const* msgTable;
+	int maxWidth;
+	const WinMessEntry* winMess;
 
+	font = GetFont22();
 	font->SetMargin(FLOAT_803313e8);
 	font->SetShadow(0);
 	font->SetScale(FLOAT_803313e8);
 
-	const char* const* msgTable = GetMcWinMessBuff(messType);
-	int maxWidth = 0;
-	const WinMessEntry* const winMess = GetWinMess(winType);
+	msgTable = GetMcWinMessBuff(messType);
+	maxWidth = 0;
+	winMess = GetWinMess(winType);
 
 	for (int i = 0; i < winMess->m_lineCount; i++) {
 		const short msgId = winMess->m_messageIds[i];

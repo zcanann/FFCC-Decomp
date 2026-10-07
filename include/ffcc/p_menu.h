@@ -688,7 +688,7 @@ public:
     void CmdInit0();
     void CmdInit1();
     void CmdInit2();
-    void CmdOpen();
+    int CmdOpen();
     int CmdCtrl();
     int CmdClose();
     void CmdDraw();

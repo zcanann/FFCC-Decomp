@@ -496,8 +496,10 @@ void CGMonObj::frameStatFuncLastBoss()
 			for (int i = 0; i < 4; i++) {
 				CGItemObj* capsule = reinterpret_cast<LastBossWork*>(m_boss)->m_capsules[i];
 				if (capsule != 0) {
-					if (capsule->m_lastStateId == 0x25) {
+					switch (capsule->m_lastStateId) {
+					case 0x25:
 						capsule->changeStat(0x24, 0, 0);
+						break;
 					}
 				}
 			}
@@ -1496,7 +1498,10 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			PSVECScale(&attackVec, &attackVec, kMonObjBossAttackRange - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight);
 			*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4) = attackVec;
 
-			reinterpret_cast<CVector&>(attackVec) = reinterpret_cast<CVector&>(attackVec) - m_worldPosition;
+			CVector delta = reinterpret_cast<CVector&>(attackVec) - m_worldPosition;
+			attackVec.x = delta.x;
+			attackVec.y = delta.y;
+			attackVec.z = delta.z;
 			float distance = PSVECDistance(&attackVec, &m_worldPosition);
 			float cappedDistance = kMonObjBossMaxChaseDistance;
 			if (distance < kMonObjBossMaxChaseDistance) {

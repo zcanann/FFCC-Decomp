@@ -17,7 +17,14 @@ struct MonAiFuncTable;
 class CGMonObj : public CGCharaObj
 {
 public:
-    static u8 m_aiWork[0xC];
+    struct AiWork
+    {
+        int m_priority; // 0x0
+        int m_state;    // 0x4
+        int m_target;   // 0x8
+    };
+
+    static AiWork m_aiWork;
     static u8 m_boss[0x8C];
 
     CGMonObj();

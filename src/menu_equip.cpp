@@ -360,9 +360,15 @@ int CMenuPcs::EquipCtrlCur()
 void CMenuPcs::EquipDraw()
 {
 	int helpItem;
-	bool helpFound = false;
+	int helpFound = 0;
+	float x;
+	float y;
 	float w;
 	float h;
+	float u;
+	float v;
+	GXColor colors[4];
+	EquipOpenAnim* listStart;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -372,15 +378,15 @@ void CMenuPcs::EquipDraw()
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	EquipOpenAnim* item = m_equipList->entries;
 
-	for (int i = 0; i < m_equipList->count; i++) {
+	for (int i = 0; i < m_equipList->count; i++, item++) {
 		int tex = item->tex;
 		if (tex >= 0) {
-			float x = (float)item->x;
-			float y = (float)item->y;
+			x = (float)item->x;
+			y = (float)item->y;
 			w = (float)item->w;
 			h = (float)item->h;
-			float u = item->u;
-			float v = item->v;
+			u = item->u;
+			v = item->v;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
@@ -388,28 +394,25 @@ void CMenuPcs::EquipDraw()
 				v = v + h;
 			}
 
-			GXColor color;
-			color.r = 0xff;
-			color.g = 0xff;
-			color.b = 0xff;
-			color.a = (u8)(int)(255.0f * item->alpha);
-			GXSetChanMatColor(GX_COLOR0A0, color);
+			colors[0].r = 0xff;
+			colors[0].g = 0xff;
+			colors[0].b = 0xff;
+			colors[0].a = (u8)(int)(255.0f * item->alpha);
+			GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 			float scale = item->scale;
 			MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, 0.0f);
 		}
-		item++;
 	}
 
 	item = m_equipList->entries;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++, item++) {
 		if (caravanWork->m_equipment[i] >= 0) {
 			int iconY = (int)((float)(item->y + 6) - 1.0f);
 			int iconX = (int)(float)(item->x + item->w - 0x10);
 			DrawSingleIcon(caravanWork->m_inventoryItems[caravanWork->m_equipment[i]], iconX, iconY,
 			               item->alpha, 0, 1.0f);
 		}
-		item++;
 	}
 
 	CFont* font = GetFontItem();
@@ -419,14 +422,14 @@ void CMenuPcs::EquipDraw()
 	font->DrawInit();
 
 	item = m_equipList->entries;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++, item++) {
 		if (caravanWork->m_equipment[i] >= 0) {
 			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)).color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			char* str = Game.GetShortItemName(itemIdx);
 			if ((m_equipState->mode == 0) && (i == static_cast<int>(m_equipState->selected[0]))) {
 				helpItem = itemIdx;
-				helpFound = true;
+				helpFound = 1;
 			}
 			float width = font->GetWidth(str);
 			float textY = (float)(item->y + 0xb);
@@ -434,7 +437,6 @@ void CMenuPcs::EquipDraw()
 			font->SetPosY(textY - 4.0f);
 			font->Draw(str);
 		}
-		item++;
 	}
 	DrawInit();
 
@@ -448,17 +450,16 @@ void CMenuPcs::EquipDraw()
 		for (int i = m_equipList->count; i < m_equipList->listEnd; i++) {
 			int tex = listItem->tex;
 			if (tex >= 0) {
-				float x = (float)listItem->x;
-				float u = listItem->u;
-				float y = (float)listItem->y;
-				float v = listItem->v;
+				x = (float)listItem->x;
+				u = listItem->u;
+				y = (float)listItem->y;
+				v = listItem->v;
 				w = (float)listItem->w;
 				h = (float)listItem->h;
 
 				if (i == m_equipList->count) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(listItem->tex));
-					GXColor colors[4];
 					colors[0].r = 0xff;
 					colors[0].g = 0xff;
 					colors[0].b = 0xff;
@@ -491,17 +492,19 @@ void CMenuPcs::EquipDraw()
 						colors[3].g = 0xff;
 						colors[3].b = 0xff;
 						colors[3].a = 0;
-						w = (float)(1.0 / (double)listItem->duration) * (float)listItem->w;
+						w = (float)(1.0 / (double)listItem->duration);
+						w = w * listItem->w;
 						MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, 1.0f, 1.0f, 0.0f);
 					}
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				} else {
 					float alpha = listItem->alpha;
+					int texId = tex;
 					if (tex == EQUIP_TEX_LIST) {
 						int idx = drawIndex + m_equipState->scroll;
 						if ((idx < 1) || (idx >= letterCount)) {
 							if ((idx >= letterCount) || !ChkEquipActive(idx)) {
-								tex = 0x34;
+								texId = 0x34;
 								alpha = (float)(0.5 * (double)listItem->alpha);
 							}
 						} else {
@@ -513,23 +516,22 @@ void CMenuPcs::EquipDraw()
 									int markY = (int)((double)(h - 24.0f) * 0.5 + (double)y);
 									DrawEquipMark(markX, markY, listItem->alpha);
 								}
-								tex = 0x34;
+								texId = 0x34;
 								alpha = (float)(0.5 * (double)listItem->alpha);
 							}
 						}
-						if ((tex == EQUIP_TEX_LIST) && (drawIndex == m_equipState->selected[1])) {
+						if ((texId == EQUIP_TEX_LIST) && (drawIndex == m_equipState->selected[1])) {
 							v += h;
 						}
 						drawIndex++;
 					}
 
-					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-					GXColor color;
-					color.r = 0xff;
-					color.g = 0xff;
-					color.b = 0xff;
-					color.a = (u8)(int)(255.0f * alpha);
-					GXSetChanMatColor(GX_COLOR0A0, color);
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(texId));
+					colors[0].r = 0xff;
+					colors[0].g = 0xff;
+					colors[0].b = 0xff;
+					colors[0].a = (u8)(int)(255.0f * alpha);
+					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 					float scale = listItem->scale;
 					MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, 0.0f);
 				}
@@ -547,10 +549,8 @@ void CMenuPcs::EquipDraw()
 
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int letterCount = letter[0];
-		EquipOpenAnimList* list = m_equipList;
-		EquipOpenAnim* listStart;
-		for (int i = list->count; i < list->listEnd; i++) {
-			listStart = &list->entries[i];
+		for (int i = m_equipList->count; i < m_equipList->listEnd; i++) {
+			listStart = &m_equipList->entries[i];
 			if (listStart->tex == EQUIP_TEX_LIST) {
 				break;
 			}
@@ -577,7 +577,7 @@ void CMenuPcs::EquipDraw()
 				str = Game.GetShortItemName(itemIdx);
 				if (idx == static_cast<int>(m_equipState->selected[1]) + static_cast<int>(m_equipState->scroll)) {
 					helpItem = itemIdx;
-					helpFound = true;
+					helpFound = 1;
 				}
 			}
 
@@ -607,7 +607,7 @@ void CMenuPcs::EquipDraw()
 	}
 
 	if ((mode == 1) && (m_equipState->step == 1)) {
-		EquipOpenAnim* listStart = &m_equipList->entries[m_equipList->count];
+		listStart = &m_equipList->entries[m_equipList->count];
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		float pos = CalcListPos(static_cast<int>(m_equipState->scroll), static_cast<int>(letter[0]), 0);
 		if (pos > 0.0f) {
@@ -620,24 +620,21 @@ void CMenuPcs::EquipDraw()
 		float cy;
 		if (mode == 0) {
 			EquipOpenAnim* cursorItem = &m_equipList->entries[m_equipState->selected[0]];
-			cy = (float)((double)(cursorItem->h - 0x20) * 0.5 + (double)cursorItem->y);
 			cx = (float)(cursorItem->x - 0x14);
+			cy = (float)((cursorItem->h - 0x20) / 2.0 + cursorItem->y);
 		} else {
-			EquipOpenAnimList* list = m_equipList;
-			EquipOpenAnim* found;
-			for (int i = list->count; i < list->listEnd; i++) {
-				found = &list->entries[i];
-				if (found->tex == EQUIP_TEX_LIST) {
+			for (int i = m_equipList->count; i < m_equipList->listEnd; i++) {
+				listStart = &m_equipList->entries[i];
+				if (m_equipList->entries[i].tex == EQUIP_TEX_LIST) {
 					break;
 				}
 			}
-			EquipOpenAnim* cursorItem = &found[m_equipState->selected[1]];
-			cy = (float)((double)(cursorItem->h - 0x20) * 0.5 + (double)cursorItem->y);
-			cx = (float)(cursorItem->x - 0x14);
+			listStart += m_equipState->selected[1];
+			cx = (float)(listStart->x - 0x14);
+			cy = (float)((listStart->h - 0x20) / 2.0 + listStart->y);
 		}
-		int cursorY = (int)cy;
-		int cursorX = (int)(cx + (float)((int)System.m_frameCounter % 8));
-		DrawCursor(cursorX, cursorY, 1.0f);
+		cx += (float)((int)System.m_frameCounter % 8);
+		DrawCursor((int)cx, (int)cy, 1.0f);
 	}
 
 	EquipMenuState* state = m_equipState;
@@ -649,8 +646,8 @@ void CMenuPcs::EquipDraw()
 	} else {
 		helpEntryIndex = 0;
 	}
-	int helpAlpha = (int)(255.0f * m_equipList->entries[helpEntryIndex].alpha);
 	CFont* helpFont = m_fonts[0];
+	int helpAlpha = (int)(255.0f * m_equipList->entries[helpEntryIndex].alpha);
 	if (!helpFound) {
 		helpItem = -1;
 	}
@@ -662,12 +659,13 @@ void CMenuPcs::EquipDraw()
 	}
 
 	float helpY = 352.0f;
-	DrawHelpMessage(helpItem, helpFont, (int)(320.0f - w * 0.5f), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)helpAlpha).color, 10,
+	DrawHelpMessage(helpItem, helpFont, (int)(320.0f - w / 2), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)helpAlpha).color, 10,
 	                1.0f, 3.0f);
 	if (m_equipState->mode == 1) {
-		int listHelpAlpha = (int)(255.0f * m_equipList->entries[m_equipList->count].alpha);
+		listStart = &m_equipList->entries[m_equipList->count];
+		int listHelpAlpha = (int)(255.0f * listStart->alpha);
 		if (listIndex < 1) {
-			DrawHelpMessage(0x265, helpFont, (int)(320.0f - w * 0.5f), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)listHelpAlpha).color, 10,
+			DrawHelpMessage(0x265, helpFont, (int)(320.0f - w / 2), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)listHelpAlpha).color, 10,
 			                1.0f, 3.0f);
 		}
 	}

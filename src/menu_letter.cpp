@@ -124,6 +124,14 @@ enum {
 	kLetterTextScratchSize = 0x400,
 };
 
+enum {
+#ifdef VERSION_GCCJGC
+	kLetterTexBase = 0x3B,
+#else
+	kLetterTexBase = 0x3C,
+#endif
+};
+
 static inline CCaravanWork* GetLetterCaravanWork()
 {
 	return Game.m_scriptFoodBase[0];
@@ -670,13 +678,13 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		int tex;
 		flip = 0;
 		if (i == 0) {
-			tex = 0x3C;
+			tex = kLetterTexBase;
 		} else if (i == 1) {
-			tex = 0x3C;
+			tex = kLetterTexBase;
 		} else if (i == 2) {
-			tex = 0x4B;
+			tex = kLetterTexBase + 0xF;
 		} else {
-			tex = 0x4D;
+			tex = kLetterTexBase + 0x11;
 		}
 
 		float x;
@@ -706,9 +714,9 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	float innerWf = static_cast<float>(innerW);
 	float y = y0;
 	for (i = 0; i < 2; ++i) {
-		int tex = 0x49;
+		int tex = kLetterTexBase + 0xD;
 		if (i != 0) {
-			tex = 0x4C;
+			tex = kLetterTexBase + 0x10;
 		}
 		if (i != 0) {
 			y = y1;
@@ -719,7 +727,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0xE));
 	float innerY = FLOAT_803330f4 + y0;
 	double innerH = h - DOUBLE_803330d8;
 	float x = x0;
@@ -735,12 +743,12 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x12));
 	MenuPcs.DrawRect(
 	    flip, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH),
 	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x13));
 	float decoX = xw - FLOAT_80333108;
 	double decoY0 = y0 - DOUBLE_80333100;
 	double decoX1 = DOUBLE_80333100 + decoX;
@@ -765,7 +773,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x50));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x14));
 	float barX = x0 - FLOAT_80333110;
 	float barX1 = FLOAT_80333110 + decoX;
 	float barY0 = static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100);
@@ -788,7 +796,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	}
 
 	if (!(openRatio < DOUBLE_803330e8)) {
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x1));
 		MenuPcs.DrawRect(
 		    0, x0 - FLOAT_803330f4, y0 - FLOAT_80333108,
 		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
@@ -910,7 +918,12 @@ int CMenuPcs::LetterCtrlCur()
 			} else {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
+#ifdef VERSION_GCCJGC
+		}
+		if ((press & 0x200) != 0) {
+#else
 		} else if ((press & 0x200) != 0) {
+#endif
 			m_letterMenuState->action = -1;
 			m_letterMenuState->step = m_letterMenuState->step + 1;
 			LetterInit0();
@@ -988,8 +1001,13 @@ int CMenuPcs::LetterCtrlCur()
 				m_letterMenuState->action = -1;
 			} else {
 				s_ReplyPos = static_cast<u8>(curReply);
+#ifdef VERSION_GCCJGC
+			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x5C0) char[kLetterTextScratchSize];
+			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x5C2) char[kLetterTextScratchSize];
+#else
 			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x65E) char[kLetterTextScratchSize];
 			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x660) char[kLetterTextScratchSize];
+#endif
 			memset(srcText, 0, kLetterTextScratchSize);
 			memset(workText, 0, kLetterTextScratchSize);
 
@@ -1384,7 +1402,7 @@ void CMenuPcs::LetterListDraw()
 		markColor.b = 0xFF;
 		markColor.a = static_cast<u8>(alpha);
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x43));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x7));
 
 		const float iconSize = FLOAT_803330b8;
 		const double iconOffset = (iconSize - iconSize * markScale) / 2.0;
@@ -1985,11 +2003,7 @@ void CMenuPcs::LetterInit1()
 	SingleFadeEntry* p;
 	int n = 0;
 	p = &m_singleFadeState->entries[n++];
-#ifdef VERSION_GCCJGC
-	p->tex = 0x5E;
-#else
-	p->tex = 0x5F;
-#endif
+	p->tex = kLetterTexBase + 0x23;
 	p->width = 0x238;
 	p->height = 0x178;
 	double scale = DOUBLE_803330a8;
@@ -2002,11 +2016,7 @@ void CMenuPcs::LetterInit1()
 	p->duration = 10;
 
 	p = &m_singleFadeState->entries[n++];
-#ifdef VERSION_GCCJGC
-	p->tex = 0x3D;
-#else
-	p->tex = 0x3E;
-#endif
+	p->tex = kLetterTexBase + 0x2;
 	p->width = 0xA8;
 	p->height = 0x60;
 	p->x = 0x20;

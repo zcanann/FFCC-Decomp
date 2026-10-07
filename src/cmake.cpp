@@ -266,9 +266,9 @@ static inline unsigned char* GetCmakeRosterEntry(CMenuPcs* menu, int slot)
 static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
 {
     if (CmakeResult(menu) != 0) {
-        return menu->m_fonts[CMAKE_FONT_VILLAGE];
+        return menu->GetFontItem();
     }
-    return menu->m_fonts[CMAKE_FONT_LABEL];
+    return menu->GetFont23();
 }
 
 #ifdef VERSION_GCCJGC
@@ -1253,7 +1253,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
             128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    CFont* font = m_fonts[CMAKE_FONT_VALUE];
+    CFont* font = GetFont22();
     font->SetMargin(1.0f);
     font->SetShadow(1);
     font->SetScale(1.0f);
@@ -1314,7 +1314,7 @@ inline void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
 {
     (void)page;
 
-    CFont* labelFont = m_fonts[CMAKE_FONT_LABEL];
+    CFont* labelFont = GetFont23();
     labelFont->SetMargin(1.0f);
     labelFont->SetShadow(0);
     labelFont->SetScale(1.0f);
@@ -1343,7 +1343,7 @@ inline void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
         labelFont->Draw(txt);
     }
 
-    CFont* valueFont = m_fonts[CMAKE_FONT_VALUE];
+    CFont* valueFont = GetFont22();
     valueFont->SetMargin(1.0f);
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
@@ -1462,7 +1462,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 
     int baseY = (x != 0) ? 0x130 : 300;
 
-    CFont* font = m_fonts[CMAKE_FONT_VALUE];
+    CFont* font = GetFont22();
     font->SetShadow(1);
     font->SetScale(1.0f);
     font->DrawInit();
@@ -1652,7 +1652,14 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    CFont* font = m_fonts[CMAKE_FONT_VALUE];
+    CFont* font;
+    float yesW;
+    int yesX;
+    float noW;
+    int noX;
+    const char* text;
+
+    font = GetFont22();
     font->SetMargin(1.0f);
     font->SetShadow(1);
     font->SetScale(1.0f);
@@ -1661,15 +1668,15 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
 
-    const char* text = GetMenuStr(1);
+    text = GetMenuStr(1);
 #ifdef VERSION_GCCJGC
     font->GetWidth(text);
-    int yesX = 460;
+    yesX = 460;
     font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(373.0f);
 #else
-    float yesW = static_cast<float>(font->GetWidth(text));
-    int yesX = 0x1D0;
+    yesW = static_cast<float>(font->GetWidth(text));
+    yesX = 0x1D0;
     yesX += (48.0f - yesW) / 2.0f;
     font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(369.0f);
@@ -1679,12 +1686,12 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     text = GetMenuStr(2);
 #ifdef VERSION_GCCJGC
     font->GetWidth(text);
-    int noX = 532;
+    noX = 532;
     font->SetPosX(static_cast<float>(noX));
     font->SetPosY(373.0f);
 #else
-    float noW = static_cast<float>(font->GetWidth(text));
-    int noX = 0x218;
+    noW = static_cast<float>(font->GetWidth(text));
+    noX = 0x218;
     noX += (48.0f - noW) / 2.0f;
     font->SetPosX(static_cast<float>(noX));
     font->SetPosY(369.0f);
@@ -2307,7 +2314,7 @@ void CMenuPcs::CmakeSexDraw()
         0.0f, 0.0f, 0.6153846383094788f, 0.6153846383094788f, 0.0f);
     DrawCmakeTitle(2, alpha, 1.0f);
 
-    CFont* font = m_fonts[CMAKE_FONT_LABEL];
+    CFont* font = GetFont23();
     font->SetMargin(1.0f);
     font->SetShadow(0);
     font->SetScale(1.0f);
@@ -2554,7 +2561,7 @@ void CMenuPcs::CmakeTribeDraw()
     int y;
     int hairBase;
     const char* txt;
-    font = m_fonts[CMAKE_FONT_LABEL];
+    font = GetFont23();
     font->SetMargin(1.0f);
     font->SetShadow(0);
     font->SetScale(1.0f);
@@ -2573,7 +2580,7 @@ void CMenuPcs::CmakeTribeDraw()
         font->Draw(txt);
     }
 
-    font = m_fonts[CMAKE_FONT_VALUE];
+    font = GetFont22();
     font->SetMargin(1.0f);
     font->SetShadow(1);
     font->SetScale(1.0f);
@@ -2799,7 +2806,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawCmakeTitle(5, alpha, 1.0f);
 
-    CFont* font = m_fonts[CMAKE_FONT_LABEL];
+    CFont* font = GetFont23();
     font->SetMargin(1.0f);
     font->SetShadow(0);
     font->SetScale(1.0f);
@@ -3001,7 +3008,7 @@ void CMenuPcs::CmakeResultDraw()
         alpha = 1.0f;
     }
 
-    CFont* labelFont = m_fonts[CMAKE_FONT_LABEL];
+    CFont* labelFont = GetFont23();
     labelFont->SetMargin(1.0f);
     labelFont->SetShadow(0);
     labelFont->SetScale(1.0f);
@@ -3032,7 +3039,7 @@ void CMenuPcs::CmakeResultDraw()
         labelY += 0x28;
     }
 
-    CFont* valueFont = m_fonts[CMAKE_FONT_VALUE];
+    CFont* valueFont = GetFont22();
     valueFont->SetMargin(1.0f);
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
@@ -3217,7 +3224,7 @@ void CMenuPcs::CmakeResultDraw1()
             1.0f, 1.0f, 0.0f);
     }
 
-    CFont* labelFont = m_fonts[CMAKE_FONT_LABEL];
+    CFont* labelFont = GetFont23();
     labelFont->SetMargin(1.0f);
     labelFont->SetShadow(0);
     labelFont->SetScale(1.0f);
@@ -3246,7 +3253,7 @@ void CMenuPcs::CmakeResultDraw1()
         labelFont->Draw(txt);
     }
 
-    CFont* valueFont = m_fonts[CMAKE_FONT_VALUE];
+    CFont* valueFont = GetFont22();
     valueFont->SetMargin(1.0f);
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
@@ -3308,9 +3315,9 @@ void CMenuPcs::CmakeResultDraw1()
     DrawInit();
 
     if (CmakeState(this)->m_mode == 1) {
-        int cursorX = static_cast<int>(196.0f + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8));
-        int cursorY = static_cast<int>(static_cast<float>(0x70 + CmakeState(this)->m_select * 0x28));
-        DrawCursor(cursorX, cursorY, alpha);
+        float cursorX = 196.0f;
+        cursorX += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+        DrawCursor(static_cast<int>(cursorX), static_cast<int>(static_cast<float>(0x70 + CmakeState(this)->m_select * 0x28)), alpha);
     }
 }
 

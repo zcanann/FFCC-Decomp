@@ -417,6 +417,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	if (rangeKind != 0) {
+		int i;
 		int baseIndex = drawPrefix + 2;
 		u32 baseY = lineBaseY[baseIndex];
 		int y = baseY;
@@ -428,7 +429,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
-		for (int i = 0; i < lineMax; i++) {
+		for (i = 0; i < lineMax; i++) {
 			char* msg = Game.GetHelpName(firstLine + i);
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -529,9 +530,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 							}
 
 							int delta = static_cast<int>(item->m_value) - static_cast<int>(currentValue);
-							int deltaX = x;
-							deltaX += 2.0f + font->GetWidth(scratch);
-							font->SetPosX(static_cast<float>(deltaX));
+							x += 2.0f + font->GetWidth(scratch);
+							font->SetPosX(static_cast<float>(x));
 							if (delta >= 0) {
 								font->SetTlut(9);
 							} else {
@@ -567,11 +567,12 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			}
 		}
 		} else {
-		int lineCount = 3;
+		char* temp;
 		int firstNonEmptyLine = firstLine;
-		char* temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
+		int lineCount = 3;
+		temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
 		            "MenuUtil.cpp", 0x23D) char[0x200];
-		if ((temp == nullptr) && (static_cast<int>(System.m_execParam) >= 1)) {
+		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
 			System.Printf("%s(%d): Error: memory allocation error\n", "MenuUtil.cpp", 0x23F);
 		}
 		for (int i = 0; i < lineMax; i++) {
@@ -591,7 +592,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 		delete[] temp;
 
-		int idx = lineCount + drawPrefix - 1;
+		int idx = lineCount - 1 + drawPrefix;
 		int y = lineBaseY[idx];
 		if (drawPrefix != 0) {
 			font->SetPosX(56.0f);

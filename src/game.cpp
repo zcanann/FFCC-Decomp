@@ -79,6 +79,64 @@ struct GameNameRow
 
 CGame Game;
 
+inline void CFile::CHandle::Read()
+{
+    File.Read(this);
+}
+
+inline void CFile::CHandle::SyncCompleted()
+{
+    File.SyncCompleted(this);
+}
+
+inline void CFile::CHandle::Close()
+{
+    File.Close(this);
+}
+
+inline void* CFile::GetBuffer()
+{
+    return m_readBuffer;
+}
+
+inline int CMapPcs::GetLightHolderSize(CMapLightHolder::TYPE type)
+{
+    return MapMng.GetMapLightHolderArray(type).GetSize();
+}
+
+inline void CMapPcs::GetLightHolder(CMapLightHolder::TYPE type, long index, _GXColor* color, Vec* pos)
+{
+    CPtrArray<CMapLightHolder*>& holders = MapMng.GetMapLightHolderArray(type);
+
+    if (static_cast<unsigned long>(index) < static_cast<unsigned long>(holders.GetSize())) {
+        holders[index]->GetLightHolder(color, pos);
+    }
+}
+
+inline int CMapPcs::GetCharLightHolderSize()
+{
+    return GetLightHolderSize(CMapLightHolder::TYPE_CHARA);
+}
+
+inline void CMapPcs::GetCharLightHolder(long index, _GXColor* color, Vec* pos)
+{
+    GetLightHolder(CMapLightHolder::TYPE_CHARA, index, color, pos);
+}
+
+inline void CCharaPcs::SetAmbient(int index, _GXColor* color)
+{
+    m_viewerAmbientColor[index] = *color;
+}
+
+inline void CCharaPcs::SetDiffuse(int index, unsigned long light, _GXColor* color, Vec* pos)
+{
+    m_viewerDiffuseColor[index][light] = *color;
+
+    if (index == 0) {
+        m_viewerDiffusePos[light] = *pos;
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8001439C
@@ -389,30 +447,11 @@ void CGame::Exec()
  */
 void CGame::Create()
 {
-    int mapId;
-    int mapVariant;
     char scriptName[256];
 
     m_nextScriptFlags = 1;
     clearWork();
-
-#ifdef VERSION_GCCJGC
-    memset(&m_gameWork.m_languageId, 0,
-           sizeof(CGameWork) - offsetof(CGameWork, m_languageId));
-#else
-    memset(&m_gameWork.m_gameDataStartMarker, 0, kGameWorkDataClearSize);
-#endif
-    memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
-
-    m_gameWork.m_scriptSysVal0 = 1;
-    m_gameWork.m_chaliceElement = 1;
-#ifdef VERSION_GCCJGC
-    strcpy(m_gameWork.m_townName, "（はじまり）");
-#else
-    strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
-#endif
-
-    m_gameWork.m_gameInitFlag = 1;
+    m_gameWork.Init();
 
     if (strlen(m_startScriptName) != 0) {
         strcpy(scriptName, m_startScriptName);
@@ -421,23 +460,7 @@ void CGame::Create()
     }
 
     if (m_newGameFlag == 0) {
-        mapVariant = m_currentMapVariantId;
-        mapId = m_currentMapId;
-
-#ifdef VERSION_GCCJGC
-        Graphic._WaitDrawDone("game.cpp", 0x22C);
-#else
-        Graphic._WaitDrawDone("game.cpp", 0x24E);
-#endif
-        System.MapChanging(mapId, mapVariant);
-
-        m_currentMapId = mapId;
-        m_currentMapVariantId = mapVariant;
-
-        MapPcs.LoadMap(mapId, mapVariant, 0, 0, 0);
-        PartPcs.LoadFieldPdt(mapId, mapVariant, 0, 0, 0);
-
-        System.MapChanged(mapId, mapVariant, 1);
+        ChangeMap(m_currentMapId, m_currentMapVariantId, 0, 1);
     }
 }
 
@@ -470,24 +493,7 @@ void CGame::InitNewGame()
     System.Printf("*ニューゲーム初期化します。\n");
     System.Printf(const_cast<char*>(s_gameDebugMarker));
 
-    CGame* game = &Game;
-
-    CGameWork* work = &game->m_gameWork;
-#ifdef VERSION_GCCJGC
-    memset(&work->m_languageId, 0,
-           sizeof(CGameWork) - offsetof(CGameWork, m_languageId));
-#else
-    memset(&work->m_gameDataStartMarker, 0, kGameWorkDataClearSize);
-#endif
-    memset(work->m_wmBackupParams, 0xFF, sizeof(work->m_wmBackupParams));
-
-    game->m_gameWork.m_scriptSysVal0 = 1;
-    game->m_gameWork.m_chaliceElement = 1;
-#ifdef VERSION_GCCJGC
-    strcpy(work->m_townName, "（はじまり）");
-#else
-    strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
-#endif
+    Game.m_gameWork.InitNewGame();
     CFlatRuntime2Storage().ResetNewGame();
     Chara.InitFurTexBuffer();
 }
@@ -514,14 +520,55 @@ void CGame::clearWork()
     unkCFlatData0[0] = 0;
     unkCFlatData0[1] = 0;
     unkCFlatData0[2] = 0;
-    m_partyObjArr[0] = 0;
-    m_scriptFoodBase[0] = 0;
-    m_partyObjArr[1] = 0;
-    m_scriptFoodBase[1] = 0;
-    m_partyObjArr[2] = 0;
-    m_scriptFoodBase[2] = 0;
-    m_partyObjArr[3] = 0;
-    m_scriptFoodBase[3] = 0;
+    clearWorkScript();
+    clearWorkMap();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGame::clearWorkMap()
+{
+    if (MapPcs.GetCharLightHolderSize() != 0) {
+        _GXColor color;
+        Vec pos;
+
+        MapPcs.GetCharLightHolder(0, &color, 0);
+
+        for (int i = 0; i < 2; i++) {
+            CharaPcs.SetAmbient(i, &color);
+
+            for (unsigned long j = 0; j < 3; j++) {
+                MapPcs.GetCharLightHolder(j + 1, &color, &pos);
+                CharaPcs.SetDiffuse(i, j, &color, &pos);
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGame::clearWorkScript()
+{
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        m_partyObjArr[i] = 0;
+        m_scriptFoodBase[i] = 0;
+    }
 
     unk_flat3_0xc7d0 = 0;
 
@@ -530,81 +577,15 @@ void CGame::clearWork()
         m_monWorkRefs[i] = 0;
     }
 
-    m_gameWork.m_soundOptionFlag = '\0';
-    m_gameWork.m_gameOverFlag = '\0';
-
-    MapMng.DestroyMap();
-    CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
-    Sound.StopAndFreeAllSe(0);
-    Wind.ClearAll();
-
-    Sound.SeMaxVolume(0x7F);
-
-    CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(0);
-
-    if (mapLightHolderArr->GetSize() != 0) {
-        _GXColor holderColor;
-        Vec holderVec;
-
-        unsigned int mapLightHolderIndex = 0;
-        if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
-            (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(&holderColor, 0);
-        }
-
-        for (i = 0; i < 2; i++) {
-            CharaPcs.m_viewerAmbientColor[i] = holderColor;
-
-            for (u32 j = 0; j < 3; j++) {
-                if ((j + 1) < static_cast<u32>(mapLightHolderArr->GetSize())) {
-                    (*mapLightHolderArr)[j + 1]->GetLightHolder(&holderColor, &holderVec);
-                }
-
-                CharaPcs.m_viewerDiffuseColor[i][j] = holderColor;
-
-                if (i == 0) {
-                    CharaPcs.m_viewerDiffusePos[j] = holderVec;
-                }
-            }
-        }
-    }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CGame::clearWorkMap()
-{
-    MapMng.DestroyMap();
-    CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
-    Sound.StopAndFreeAllSe(0);
-    Wind.ClearAll();
-
-    Sound.SeMaxVolume(0x7F);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CGame::clearWorkScript()
-{
-    for (int i = 0; i < 4; i++) {
-        m_partyObjArr[i] = 0;
-        m_scriptFoodBase[i] = 0;
-    }
-
-    unk_flat3_0xc7d0 = 0;
-
-    for (int i = 0; i < 64; i++) {
-        m_monObjects[i] = 0;
-        m_monWorkRefs[i] = 0;
-    }
-
     m_gameWork.m_soundOptionFlag = 0;
     m_gameWork.m_gameOverFlag = 0;
+
+    MapMng.DestroyMap();
+    CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
+    Sound.StopAndFreeAllSe(0);
+    Wind.ClearAll();
+
+    Sound.SeMaxVolume(0x7F);
 }
 
 /*
@@ -646,46 +627,14 @@ void CGame::CheckScriptChange()
             }
         }
 
-        if (m_assetsLoadedFlag == 0) {
-            SoundPcs.createLoad();
-            CharaPcs.createLoad();
-            PartPcs.createLoad();
-            m_assetsLoadedFlag = 1;
-
-            if ((u32)System.m_execParam >= 3) {
-                System.Printf("サウンド・キャラ・パーティクルの常駐を読み込みました。\n");
-            }
-        }
+        LoadLogoWaitingData();
     }
 
     int scriptResult = CFlatRuntime2Storage().Load(m_nextScript.m_name);
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
     if ((int)m_nextScriptFlags != 0) {
-        System.Printf(const_cast<char*>(s_gameDebugMarker));
-        System.Printf("*ニューゲーム初期化します。\n");
-        System.Printf(const_cast<char*>(s_gameDebugMarker));
-
-        CGame* game = &Game;
-
-        CGameWork* work = &game->m_gameWork;
-#ifdef VERSION_GCCJGC
-        memset(&work->m_languageId, 0,
-               sizeof(CGameWork) - offsetof(CGameWork, m_languageId));
-#else
-        memset(&work->m_gameDataStartMarker, 0, kGameWorkDataClearSize);
-#endif
-        memset(work->m_wmBackupParams, 0xFF, sizeof(work->m_wmBackupParams));
-
-        game->m_gameWork.m_scriptSysVal0 = 1;
-        game->m_gameWork.m_chaliceElement = 1;
-#ifdef VERSION_GCCJGC
-        strcpy(work->m_townName, "（はじまり）");
-#else
-        strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
-#endif
-        CFlatRuntime2Storage().ResetNewGame();
-        Chara.InitFurTexBuffer();
+        InitNewGame();
         m_nextScriptFlags = 0;
     }
 
@@ -708,7 +657,11 @@ void CGame::CheckScriptChange()
 void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 {
     if (param5 != 0) {
+#ifdef VERSION_GCCJGC
+        Graphic._WaitDrawDone("game.cpp", 0x22C);
+#else
         Graphic._WaitDrawDone("game.cpp", 0x24E);
+#endif
         System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
@@ -822,29 +775,6 @@ void CGame::MapChanged(int, int, int)
 
 /*
  * --INFO--
- * PAL Address: 0x80013E70
- * PAL Size: 80b
- * EN Address: 0x80013D50
- * EN Size: 8b
- * JP Address: UNUSED
- * JP Size: UNUSED
- */
-const char* CGame::GetLangString()
-{
-#ifdef VERSION_GCCE01
-    return "";
-#else
-    const char* localLangDirs[] = {
-        "jp/", "uk/", "gr/",
-        "it/", "fr/", "sp/",
-    };
-
-    return localLangDirs[m_gameWork.m_languageId];
-#endif
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80014B90
  * PAL Size: 364b
  * EN Address: 0x80014A28
@@ -875,30 +805,40 @@ void CGame::loadCfd()
     for (int i = 0; i < 4; i++)
     {
 #ifdef VERSION_GCCJGC
-        CFile::CHandle* handle = File.Open(const_cast<char*>(tName[i]), 0, CFile::PRI_LOW);
+        char* path = const_cast<char*>(tName[i]);
 #else
         sprintf(path, tName[i], Game.GetLangString());
-        CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
 #endif
+        CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
 
         if (handle != nullptr)
         {
-            File.Read(handle);
-            File.SyncCompleted(handle);
-            m_cFlatDataArr[i].Create(File.m_readBuffer);
-            File.Close(handle);
+            handle->Read();
+            handle->SyncCompleted();
+            m_cFlatDataArr[i].Create(File.GetBuffer());
+            handle->Close();
         }
     }
 
-    unkCFlatData0[0] = (unsigned int)m_cFlatDataArr[0].Data(0).m_data;
-    unkCFlatData0[1] = (unsigned int)m_cFlatDataArr[0].Data(1).m_data;
-    unkCFlatData0[2] = (unsigned int)m_cFlatDataArr[0].Data(2).m_data;
-    m_romLetterWorkBase = (unsigned int)m_cFlatDataArr[2].Data(0).m_data;
-    unk_flat3_field_8_0xc7dc = (unsigned int)m_cFlatDataArr[3].Data(0).m_data;
-    m_combiTable = reinterpret_cast<CCombi2*>(m_cFlatDataArr[3].Data(1).m_data);
+    unkCFlatData0[0] = (unsigned int)m_cFlatDataArr[0].GetData(0);
+    ASSERT(unkCFlatData0[0]);
+    unkCFlatData0[1] = (unsigned int)m_cFlatDataArr[0].GetData(1);
+    ASSERT(unkCFlatData0[1]);
+    unkCFlatData0[2] = (unsigned int)m_cFlatDataArr[0].GetData(2);
+    ASSERT(unkCFlatData0[2]);
+    m_romLetterWorkBase = (unsigned int)m_cFlatDataArr[2].GetData(0);
+    ASSERT(m_romLetterWorkBase);
+    unk_flat3_field_8_0xc7dc = (unsigned int)m_cFlatDataArr[3].GetData(0);
+    ASSERT(unk_flat3_field_8_0xc7dc);
+    m_combiTable = reinterpret_cast<CCombi2*>(m_cFlatDataArr[3].GetData(1));
+    ASSERT(m_combiTable);
+    ASSERT((m_cFlatDataArr[3].Data(1).m_size % sizeof(CCombi2)) == 0);
     m_combiCount = m_cFlatDataArr[3].Data(1).m_size / sizeof(CCombi2);
-    unk_flat3_field_30_0xc7e0 = (unsigned int)m_cFlatDataArr[3].Data(2).m_data;
-    m_bossArtifactBase = reinterpret_cast<CBossArtifactStage*>(m_cFlatDataArr[3].Data(3).m_data);
+    ASSERT(m_combiCount);
+    unk_flat3_field_30_0xc7e0 = (unsigned int)m_cFlatDataArr[3].GetData(2);
+    ASSERT(unk_flat3_field_30_0xc7e0);
+    m_bossArtifactBase = reinterpret_cast<CBossArtifactStage*>(m_cFlatDataArr[3].GetData(3));
+    ASSERT(m_bossArtifactBase);
 }
 
 /*
@@ -1497,12 +1437,7 @@ inline void CGame::CGameWork::ClearEvtWork()
  */
 inline void CGame::CGameWork::Init()
 {
-    memset(&m_gameDataStartMarker, 0, kGameWorkDataClearSize);
-    memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
-
-    m_scriptSysVal0 = 1;
-    m_chaliceElement = 1;
-    strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
+    InitNewGame();
     m_gameInitFlag = 1;
 }
 
@@ -1517,31 +1452,20 @@ inline void CGame::CGameWork::Init()
  */
 inline void CGame::CGameWork::InitNewGame()
 {
-    const unsigned short optionValue = m_optionValue;
-    const unsigned char radarType = m_radarType;
-    const unsigned char mogScoreRadarType = m_mogScoreRadarType;
-    const unsigned char mcHasSerial = m_mcHasSerial;
-    const unsigned char unk13D7 = unk_0x13D7;
-    const unsigned int mcRandom = m_mcRandom;
-    const unsigned char mcId = m_mcId;
-    const unsigned char bgmVolume = m_bgmVolume;
-    const unsigned char seVolume = m_seVolume;
-    const unsigned char stereoFlag = m_stereoFlag;
-    const u64 mcSerial = m_mcSerial;
+#ifdef VERSION_GCCJGC
+    memset(&m_languageId, 0, sizeof(CGameWork) - offsetof(CGameWork, m_languageId));
+#else
+    memset(&m_gameDataStartMarker, 0, kGameWorkDataClearSize);
+#endif
+    memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
 
-    Init();
-
-    m_optionValue = optionValue;
-    m_radarType = radarType;
-    m_mogScoreRadarType = mogScoreRadarType;
-    m_mcHasSerial = mcHasSerial;
-    unk_0x13D7 = unk13D7;
-    m_mcRandom = mcRandom;
-    m_mcId = mcId;
-    m_bgmVolume = bgmVolume;
-    m_seVolume = seVolume;
-    m_stereoFlag = stereoFlag;
-    m_mcSerial = mcSerial;
+    m_scriptSysVal0 = 1;
+    m_chaliceElement = 1;
+#ifdef VERSION_GCCJGC
+    strcpy(m_townName, "（はじまり）");
+#else
+    strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
+#endif
 }
 
 /*
@@ -1571,11 +1495,28 @@ inline int CGame::IsPartyExist(int index)
  */
 inline CGame::CGameWork::CGameWork()
 {
-    memset(&m_gameDataStartMarker, 0, kGameWorkDataClearSize);
-    memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
+    Init();
+}
 
-    m_scriptSysVal0 = 1;
-    m_chaliceElement = 1;
-    strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
-    m_gameInitFlag = 1;
+/*
+ * --INFO--
+ * PAL Address: 0x80013E70
+ * PAL Size: 80b
+ * EN Address: 0x80013D50
+ * EN Size: 8b
+ * JP Address: UNUSED
+ * JP Size: UNUSED
+ */
+const char* CGame::GetLangString()
+{
+#ifdef VERSION_GCCE01
+    return "";
+#else
+    const char* localLangDirs[] = {
+        "jp/", "uk/", "gr/",
+        "it/", "fr/", "sp/",
+    };
+
+    return localLangDirs[m_gameWork.m_languageId];
+#endif
 }

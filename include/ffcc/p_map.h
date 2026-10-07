@@ -5,6 +5,7 @@
 #include <dolphin/mtx.h>
 
 #include "ffcc/system.h"
+#include "ffcc/maplight.h"
 
 struct Vec;
 
@@ -41,6 +42,10 @@ public:
     int GetHitGrpNo();
     unsigned long GetHitGrpBit();
     void IsHitDrawMode(char);
+    int GetLightHolderSize(CMapLightHolder::TYPE);
+    void GetLightHolder(CMapLightHolder::TYPE, long, _GXColor*, Vec*);
+    int GetCharLightHolderSize();
+    void GetCharLightHolder(long, _GXColor*, Vec*);
 
 private:
     Mtx m_viewMtx;                       // 0x04

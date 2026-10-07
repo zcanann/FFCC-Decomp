@@ -28,6 +28,7 @@ public:
     char* GetMes(int);
 
     DataEntry& Data(int index) { return m_data[index]; }
+    void* GetData(int index) { return m_data[index].m_data; }
     const DataEntry& Data(int index) const { return m_data[index]; }
     TableEntry& Table(int index) { return m_tabl[index]; }
     const TableEntry& Table(int index) const { return m_tabl[index]; }

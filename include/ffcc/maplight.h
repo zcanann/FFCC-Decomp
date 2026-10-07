@@ -7,6 +7,11 @@
 class CMapLightHolder
 {
 public:
+    enum TYPE
+    {
+        TYPE_CHARA = 0,
+    };
+
     void GetLightHolder(_GXColor*, Vec*);
 
 private:

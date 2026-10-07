@@ -7410,30 +7410,27 @@ void CMenuPcs::DrawCharaName()
 	GXSetChanMatColor(GX_COLOR0A0, shade);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterNamePlateTexture));
 	const float yBase1 = FLOAT_80331478;
+	float plateW = 64.0f;
 	const double xOffsetDefault =
-	    -(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678);
+	    -(DOUBLE_80331418 * static_cast<double>(plateW) - DOUBLE_80331678);
 	const float yExtra1 = FLOAT_80331684;
-	int row = 0;
-	int yCounter = row;
-	int slotBase = row;
-	for (; row < 2; row++) {
-		float y = yBase1 + static_cast<float>(yCounter);
+	for (int row = 0; row < 2; row++) {
+		float y = yBase1 + static_cast<float>(row * 0xB8);
 		y += yExtra1;
 		if (row != 0) {
 			y += FLOAT_80331548;
 		}
-		int xCounter = 0;
-		int slot = slotBase;
 		for (int col = 0; col < 4; col++) {
+			const int slot = row * 4 + col;
 			if ((confirmedMask & (1u << slot)) != 0) {
 				const char* const text = reinterpret_cast<const char*>(
 				    Game.m_caravanWorkArr[slot].m_name);
-				float xBase = FLOAT_80331410 + static_cast<float>(xCounter);
+				float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
 				const float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
-				if (static_cast<double>(width) * DOUBLE_803313F8 > static_cast<double>(FLOAT_80331680)) {
+				if (static_cast<double>(width) * DOUBLE_803313F8 > static_cast<double>(plateW)) {
 					const float widthPlus = static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
-					scale = static_cast<float>(widthPlus * DOUBLE_803313F8 / static_cast<double>(FLOAT_80331680));
+					scale = static_cast<float>(widthPlus * DOUBLE_803313F8 / static_cast<double>(plateW));
 					const double xOffsetW = FLOAT_8033155C - widthPlus;
 					xBase = static_cast<float>(xOffsetW * DOUBLE_803313F8 + xBase);
 				} else {
@@ -7447,11 +7444,7 @@ void CMenuPcs::DrawCharaName()
 				                                FLOAT_80331680, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc,
 				                                scale, FLOAT_803313e8, FLOAT_803313dc);
 			}
-			xCounter += 0x90;
-			slot++;
 		}
-		yCounter += 0xB8;
-		slotBase += 4;
 	}
 
 	DrawInit();
@@ -7468,12 +7461,8 @@ void CMenuPcs::DrawCharaName()
 	const float yExtra2 = FLOAT_80331688;
 	const float ySub2 = FLOAT_80331550;
 	const double k3f8_2 = DOUBLE_803313F8;
-	int row2 = 0;
-	int slotBase2;
-	int yCounter2 = row2;
-	slotBase2 = row2;
-	for (; row2 < 2; row2++) {
-		float y = yBase2 + static_cast<float>(yCounter2);
+	for (int row2 = 0; row2 < 2; row2++) {
+		float y = yBase2 + static_cast<float>(row2 * 0xB8);
 		y += yExtra2;
 		if (row2 != 0) {
 			y += FLOAT_80331548;
@@ -7481,15 +7470,13 @@ void CMenuPcs::DrawCharaName()
 #ifndef VERSION_GCCJGC
 		y = static_cast<float>(y - ySub2);
 #endif
-		int col = 0;
-		int slot = slotBase2;
-		int xCounter2 = col;
-		for (; col < 4; col++) {
+		for (int col = 0; col < 4; col++) {
+			const int slot = row2 * 4 + col;
 			int restoreColor;
 			restoreColor = 0;
 			const char* text;
 
-			float xBase = xBase2 + static_cast<float>(xCounter2);
+			float xBase = xBase2 + static_cast<float>(col * 0x90);
 
 			const int menuMode = this->m_wmWorldState->m_menuMode;
 			bool hasName;
@@ -7547,11 +7534,7 @@ void CMenuPcs::DrawCharaName()
 			if (restoreColor) {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 			}
-			xCounter2 += 0x90;
-			slot++;
 		}
-		slotBase2 += 4;
-		yCounter2 += 0xB8;
 	}
 
 	DrawInit();

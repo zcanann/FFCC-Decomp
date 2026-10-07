@@ -106,6 +106,20 @@ struct SingMenuSoloNameTable
 };
 
 extern char s_singmenu_cpp[];
+
+#ifdef VERSION_GCCJGC
+#define SINGMENU_LINE(line, jpLine) (jpLine)
+#define SINGMENU_TEX_ID(id) ((id) - 1)
+#else
+#define SINGMENU_LINE(line, jpLine) (line)
+#define SINGMENU_TEX_ID(id) (id)
+#endif
+
+static inline CMenuPcs::TEX SingMenuTex(int id)
+{
+    return static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(id));
+}
+
 extern "C" char s_singMenuTexturePathFmt[];
 extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;
@@ -1022,8 +1036,8 @@ void CMenuPcs::destroySingleMenu()
         m_fonts[4] = 0;
     }
 
-    freeTexture(4, 1, 0x20, 0xD);
-    freeTexture(5, 2, 0x2D, 0x33);
+    freeTexture(4, 1, SINGMENU_TEX_ID(0x20), 0xD);
+    freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
 
     m_stageF0 = 0;
     m_singleMenuInitialized = 0;
@@ -1068,14 +1082,14 @@ void CMenuPcs::destroySingleMenu()
  */
 void CMenuPcs::SingMenuInit()
 {
-    Graphic._WaitDrawDone(s_singmenu_cpp, 0x5C2);
+    Graphic._WaitDrawDone(s_singmenu_cpp, SINGMENU_LINE(0x5C2, 0x563));
     Graphic.DestroyTempBuffer();
 
     m_stageF4 = Graphic.GetTempStage();
     memset(&m_singleMenuTextureLoadIndex, 0, 8);
     m_wm.m_handles[0] = 0;
 
-    CCharaPcs::CHandle* handle = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5CD) CCharaPcs::CHandle;
+    CCharaPcs::CHandle* handle = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x5CD, 0x56E)) CCharaPcs::CHandle;
     m_wm.m_handles[0] = handle;
 
     CCharaPcs::CHandle** handlePtr = &m_wm.m_handles[0];
@@ -1090,7 +1104,7 @@ void CMenuPcs::SingMenuInit()
     (*handlePtr)->LoadAnim((char*)s_stand_80332a24, 0, 1, 0, (static_cast<unsigned int>((*handlePtr)->m_charaNo) / 100) * 100, -1, 0);
     (*handlePtr)->SetAnim(0, -1, -1, -1, 0);
 
-    m_wm.m_worldObjData = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) WmWorldObjInfo[1];
+    m_wm.m_worldObjData = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x5DD, 0x57E)) WmWorldObjInfo[1];
 
     float left = 440.0f;
     float top = 88.0f;
@@ -1125,13 +1139,13 @@ void CMenuPcs::SingMenuInit()
     m_wm.m_worldObjData->m_scissorWidth = 0x48;
     m_wm.m_worldObjData->m_scissorHeight = 0x58;
 
-    m_singleFadeState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x605) SingleFadeState;
+    m_singleFadeState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x605, 0x5A6)) SingleFadeState;
     memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-    m_singMenuState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x609) SingMenuState;
+    m_singMenuState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x609, 0x5AA)) SingMenuState;
     memset(m_singMenuState, 0, sizeof(SingMenuState));
 
-    m_menuWindowInfo = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x60D) MenuWindowInfo;
+    m_menuWindowInfo = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x60D, 0x5AE)) MenuWindowInfo;
     memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
     m_singleMenuPhase = 0;
@@ -1186,7 +1200,7 @@ static inline int LoadSingMenuTextureStep(CMenuPcs* menu)
             return 0;
         }
 
-        menu->m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
+        menu->m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x748, 0x6E8)) CTextureSet;
 
         void* buffer = File.m_readBuffer;
         menu->m_textureSets[loadIndex + 5]->Create(buffer, Game.m_gameWork.m_menuStageMode != 0 ? menu->m_stageF4 : menu->m_menuStage, 0, 0, 0, 0);
@@ -1283,15 +1297,6 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 break;
         }
     }
-}
-
-static inline CMenuPcs::TEX SingMenuTex(int id)
-{
-#ifdef VERSION_GCCJGC
-    return static_cast<CMenuPcs::TEX>(id - 1);
-#else
-    return static_cast<CMenuPcs::TEX>(id);
-#endif
 }
 
 /*
@@ -1422,7 +1427,7 @@ void CMenuPcs::drawSingleMenu()
 
         if ((gSingMenuHasScriptFoodBase != 0) && (m_singleFadeState->done != 0)) {
             Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-            Graphic._WaitDrawDone(s_singmenu_cpp, 0x62B);
+            Graphic._WaitDrawDone(s_singmenu_cpp, SINGMENU_LINE(0x62B, 0x5CC));
             m_singleMenuInitialized = 0;
 
             if (gSingMenuAsyncFileHandle != 0) {
@@ -1430,7 +1435,7 @@ void CMenuPcs::drawSingleMenu()
                 gSingMenuAsyncFileHandle = 0;
             }
 
-            freeTexture(5, 2, 0x2D, 0x33);
+            freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
 
             if (m_wm.m_handles[0] != 0) {
                 delete m_wm.m_handles[0];
@@ -1516,7 +1521,7 @@ void CMenuPcs::drawSingleMenu()
 
             if (m_singleFadeState->done != 0) {
                 Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-                Graphic._WaitDrawDone(s_singmenu_cpp, 0x62B);
+                Graphic._WaitDrawDone(s_singmenu_cpp, SINGMENU_LINE(0x62B, 0x5CC));
                 m_singleMenuInitialized = 0;
 
                 if (gSingMenuAsyncFileHandle != 0) {
@@ -1524,7 +1529,7 @@ void CMenuPcs::drawSingleMenu()
                     gSingMenuAsyncFileHandle = 0;
                 }
 
-                freeTexture(5, 2, 0x2D, 0x33);
+                freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
 
                 if (m_wm.m_handles[0] != 0) {
                     delete m_wm.m_handles[0];
@@ -3057,7 +3062,7 @@ int CMenuPcs::GetEquipType(int itemNo)
     } else {
         // BUG (original): equipType is returned uninitialized on this path.
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, 0xD3D, itemNo, flags);
+            System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, SINGMENU_LINE(0xD3D, 0xCAE), itemNo, flags);
         }
     }
 

@@ -6685,6 +6685,21 @@ void CMenuPcs::CalcChara()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: 244b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::GetAnimNo(int slot, int anim)
+{
+	int base = (static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[slot]->m_charaNo) / 100) - 1) * 6;
+	return base + anim;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800f26f4
  * PAL Size: 1036b
  * EN Address: TODO
@@ -6695,17 +6710,22 @@ void CMenuPcs::CalcChara()
 void CMenuPcs::PCAnimCtrl()
 {
 	WmCharaSelectEntry* const charaSelect = m_wm.m_charaSelectData;
-	unsigned int selectedMask = 0;
+	int isSelected;
+	int i;
+	unsigned int selectedMask;
+	WmCharaAnimState* animState;
+	CCharaPcs::CHandle* handle;
 
-	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		if (charaSelect[i].m_connected != 0 && charaSelect[i].m_confirmed != 0) {
-			selectedMask |= 1 << charaSelect[i].m_currentSlot;
+	selectedMask = 0;
+	for (int j = 0; j < kWmMenuControllerCount; j++) {
+		if (charaSelect[j].m_connected != 0 && charaSelect[j].m_confirmed != 0) {
+			selectedMask |= 1 << charaSelect[j].m_currentSlot;
 		}
 	}
 
-	WmCharaAnimState* animState = m_wmCharaAnimState;
-	for (int i = 0; i < kWmMenuPlayerCount; i++, animState++) {
-		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+	animState = m_wmCharaAnimState;
+	for (i = 0; i < kWmMenuPlayerCount; i++, animState++) {
+		handle = GetWmCharaHandles(this)[i];
 		const int blendMode = handle->GetCurrentAnimNumber() < 0 ? 0 : -1;
 
 		CChara::CModel* const model = handle->m_model;
@@ -6718,19 +6738,19 @@ void CMenuPcs::PCAnimCtrl()
 		if (animState->m_nextAnimIndex >= 0) {
 			animState->m_animIndex = animState->m_nextAnimIndex;
 			animState->m_nextAnimIndex = -1;
-			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState->m_animIndex, -1, -1, blendMode, 0);
+			handle->SetAnim(GetAnimNo(i, animState->m_animIndex), -1, -1, blendMode, 0);
 			animState->m_frame = handle->m_model->GetNowFrame();
 			animState->m_endFrame = handle->m_model->GetEndFrame();
 			animState->m_timer = 0;
 			continue;
 		}
 
-		const int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
+		isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
 		if (isSelected == 0 &&
 		    m_wmWorldState->m_menuMode != 8 &&
 		    animState->m_animIndex == 0 && animState->m_timer >= 3000) {
 			animState->m_animIndex = 4;
-			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState->m_animIndex, -1, -1, blendMode, 0);
+			handle->SetAnim(GetAnimNo(i, animState->m_animIndex), -1, -1, blendMode, 0);
 			animState->m_frame = handle->m_model->GetNowFrame();
 			animState->m_endFrame = handle->m_model->GetEndFrame();
 			animState->m_timer = 0;
@@ -6749,7 +6769,7 @@ void CMenuPcs::PCAnimCtrl()
 				goto frameStep;
 			}
 
-			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState->m_animIndex, -1, -1, blendMode, 0);
+			handle->SetAnim(GetAnimNo(i, animState->m_animIndex), -1, -1, blendMode, 0);
 			animState->m_frame = handle->m_model->GetNowFrame();
 			animState->m_endFrame = handle->m_model->GetEndFrame();
 		} else {
@@ -6762,7 +6782,7 @@ void CMenuPcs::PCAnimCtrl()
 			} else {
 				if (animState->m_animIndex == 3 || animState->m_animIndex == 4 || animState->m_animIndex == 5) {
 					animState->m_animIndex = 0;
-					handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState->m_animIndex, -1, -1, blendMode, 0);
+					handle->SetAnim(GetAnimNo(i, animState->m_animIndex), -1, -1, blendMode, 0);
 					animState->m_frame = handle->m_model->GetNowFrame();
 					animState->m_endFrame = handle->m_model->GetEndFrame();
 					if (isSelected != 0) {

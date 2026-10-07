@@ -252,6 +252,15 @@ static inline void SetUv(Vec2d& uv, float u, float v)
 	uv.x = u;
 	uv.y = v;
 }
+
+static inline int GetOptionHelpX(char* text, CFont* font)
+{
+	font->SetShadow(1);
+	font->SetMargin(1.0f);
+	font->SetScaleX(0.8f);
+	font->SetScaleY(1.0f);
+	return static_cast<int>(-(font->GetWidth(text) / 2.0f - 320.0f));
+}
 }
 
 struct MenuOptionChoiceLayout {
@@ -1333,14 +1342,7 @@ void CMenuPcs::DrawOptionMenu()
 #else
 	{
 		float helpTextY = 387.0f;
-		char* help = helpText[m_optionIndex];
-		CFont* fnt = m_fonts[0];
-		fnt->SetShadow(1);
-		fnt->SetMargin(1.0f);
-		fnt->SetScaleX(0.8f);
-		fnt->SetScaleY(1.0f);
-		DrawFont2(static_cast<int>(-(fnt->GetWidth(help) / 2.0f -
-		                            320.0f)),
+		DrawFont2(GetOptionHelpX(helpText[m_optionIndex], m_fonts[0]),
 		          static_cast<int>(helpTextY), color, 7, helpText[m_optionIndex], 0.8f,
 		          1.0f, 1.0f);
 	}

@@ -1,6 +1,7 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1 for Japan.
+The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1g for Japan.
+GC/2.0p1g is derived during the build from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -52,3 +53,36 @@ This establishes a useful regional compatibility choice. It does not establish
 the provenance of the original compiler or explain every remaining mismatch.
 Continue investigating types, layout, source expressions and linkage before
 attributing residual differences to the compiler.
+
+## Japanese game compiler: GC/2.0p1g
+
+Japanese game units build with GC/2.0p1g, the compiler the BFBB decomp derived
+to model the retail CodeWarrior that built BFBB (released October 2003, two
+months after FFCC Japan). `tools/patch_compiler.py` derives GC/2.0p1a and
+`tools/patch_compiler_rw.py` derives GC/2.0p1b through GC/2.0p1g, both imported
+from BFBB. They run as ninja pre-compile steps from the bundled stock GC/2.0p1
+(SHA-1 `74bc177b10d1bbe8a60a21a6c0aa86d2dd9c0668`) and check the SHA-1 of every
+input and output. The derived GC/2.0p1g is
+`99bd18455ff674337d7a6186164df8a1b1ba13a7`, byte-identical to BFBB's.
+
+The patches narrow stock 2.0p1's alias analysis: a `.sdata2` literal is not
+hoisted above stores, a store to a small static kills a cached literal, whole
+static reads are not loop-invariant, and several behaviours present in GC/2.5
+(const-pointer LICM, the large-loop veto, const-pointee aliasing) are grafted
+back. BFBB's `docs/COMPILER_VARIANTS.md` documents each clause and its class.
+
+Rebuilding all Japanese source with each derived compiler, otherwise unchanged:
+
+| compiler | exact code % | exact functions | vs stock 2.0p1 |
+| --- | --- | --- | --- |
+| GC/2.0p1 | 59.00 | 5135 | |
+| GC/2.0p1a | 63.55 | 5221 | +109 / -23 |
+| GC/2.0p1d | 64.92 | 5250 | +116 / -1 |
+| GC/2.0p1g | 65.14 | 5252 | +117 / -0 |
+
+Each BFBB step moves FFCC Japan in the same direction it moved BFBB; the
+GC/2.5-derived clauses in 2.0p1d recover every function 2.0p1a lost. As a
+control, building PAL with GC/2.0p1g instead of GC/2.5 loses 505 exact
+functions, so these behaviours are specific to the 2003 Japanese build. RedSound
+still uses stock GC/2.0p1 in all regions. Japanese source previously tuned
+against stock GC/2.0p1 should be re-audited.

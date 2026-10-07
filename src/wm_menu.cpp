@@ -1493,14 +1493,9 @@ void CMenuPcs::calcWorld()
 			m_wmWorldState->m_frameCounter = 0;
 		} else {
 			if (m_wmWorldState->m_frameCounter >= 10) {
-				CFlatRuntime::CStack stackData[3];
-
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-				stackData[0].m_word = 2;
-				stackData[1].m_word = 0;
-				stackData[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
+				CallWorldParam(2, 0, 0);
 				m_wmWorldState->m_mainState = 2;
 				m_wmWorldState->m_frameCounter = 0;
 			}
@@ -2844,11 +2839,7 @@ void CMenuPcs::CalcTitleMenu()
 				m_wmWorldState->m_titleState = 0;
 				m_wmWorldState->m_state0E = -1;
 				m_wmWorldState->m_state12 = 0;
-				CFlatRuntime::CStack flatArgs[3];
-				flatArgs[0].m_word = 9;
-				flatArgs[1].m_word = 0;
-				flatArgs[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs, 0);
+				CallWorldParam(9, 0, 0);
 				m_wmWorldState->m_cardChannel = 0;
 				lbl_8032EE1C = 0;
 				return;
@@ -4047,22 +4038,14 @@ void CMenuPcs::DrawMoveMenu()
 	} else if (m_wmWorldState->m_mainState == 1 && m_wmWorldState->m_frameCounter >= 10) {
 		m_wmWorldState->m_mainState++;
 		m_wmWorldState->m_frameCounter = 0;
-		CFlatRuntime::CStack stackData[3];
-		stackData[0].m_word = 3;
-		stackData[1].m_word = 0;
-		stackData[2].m_word = 0;
-		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
+		CallWorldParam(3, 0, 0);
 	} else if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_frameCounter >= 10) {
 		m_wmWorldState->m_mainState++;
 		m_wmWorldState->m_frameCounter = 0;
 	} else if (m_wmWorldState->m_mainState == 3 && m_wmWorldState->m_frameCounter >= 10) {
 		m_wmWorldState->m_mainState++;
 		m_wmWorldState->m_frameCounter = 0;
-		CFlatRuntime::CStack stackData[3];
-		stackData[0].m_word = 4;
-		stackData[1].m_word = 0;
-		stackData[2].m_word = 0;
-		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
+		CallWorldParam(4, 0, 0);
 	}
 }
 
@@ -4506,11 +4489,7 @@ void CMenuPcs::DrawTitleMenu()
 			m_wmWorldState->m_titleState = 0;
 			m_wmWorldState->m_state0E = 0;
 			m_wmWorldState->m_state12 = 0;
-			CFlatRuntime::CStack flatArgs[3];
-			flatArgs[0].m_word = 9;
-			flatArgs[1].m_word = 0;
-			flatArgs[2].m_word = 0;
-			gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs, 0);
+			CallWorldParam(9, 0, 0);
 		}
 	} else {
 		// 3D viewport setup
@@ -4750,11 +4729,7 @@ void CMenuPcs::DrawTitleMenu()
 			if (m_wmWorldState->m_state0E != 0) {
 				lbl_8032E8AC = 1;
 				m_wmWorldState->m_changeRequest = 1;
-				CFlatRuntime::CStack flatArgs2[3];
-				flatArgs2[0].m_word = 7;
-				flatArgs2[1].m_word = static_cast<int>(m_wmWorldState->m_cardChannel);
-				flatArgs2[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs2, 0);
+				CallWorldParam(7, m_wmWorldState->m_cardChannel, 0);
 				bytes[0x0D] = 0;
 			} else {
 				lbl_8032E8AC = 0;
@@ -4780,22 +4755,14 @@ void CMenuPcs::DrawTitleMenu()
 					m_wmWorldState->m_mainState++;
 					m_wmWorldState->m_frameCounter = 0;
 					m_wmWorldState->m_titleState = 0;
-					CFlatRuntime::CStack flatArgs3[3];
-					flatArgs3[0].m_word = 9;
-					flatArgs3[1].m_word = 1;
-					flatArgs3[2].m_word = 0;
-					gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs3, 0);
+					CallWorldParam(9, 1, 0);
 				}
 			} else if (m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= kTitleIdleFrames) {
 				m_wmWorldState->m_state0E = 0;
 				m_wmWorldState->m_mainState++;
 				m_wmWorldState->m_frameCounter = 0;
 				m_wmWorldState->m_titleState = 0;
-				CFlatRuntime::CStack flatArgs4[3];
-				flatArgs4[0].m_word = 9;
-				flatArgs4[1].m_word = 1;
-				flatArgs4[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs4, 0);
+				CallWorldParam(9, 1, 0);
 			}
 		}
 	}
@@ -7831,19 +7798,11 @@ void CMenuPcs::WMChgMenu()
 			m_wmWorldState->m_menuMode = 0;
 			bytes[0xD] = 0;
 			m_wmWorldState->m_cardChannel = 0;
-			CFlatRuntime::CStack stackA[3];
-			stackA[0].m_word = 1;
-			stackA[1].m_word = 1;
-			stackA[2].m_word = 0;
-			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackA, 0);
+			CallWorldParam(1, 1, 0);
 		} else if (changeRequest == -1) {
 			lbl_8032EE1C = 1;
 			m_wmWorldState->m_menuMode = 6;
-			CFlatRuntime::CStack stackB[3];
-			stackB[0].m_word = 1;
-			stackB[1].m_word = 0;
-			stackB[2].m_word = 0;
-			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackB, 0);
+			CallWorldParam(1, 0, 0);
 		}
 	} else if (prevMenuMode == 6) {
 		m_wmWorldState->m_menuMode = 0;
@@ -8212,11 +8171,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	                 static_cast<int>(caravanWork.m_appearanceVariant));
 	caravanWork.LoadFinished();
 
-	CFlatRuntime::CStack stackArgs[3];
-	stackArgs[0].m_word = 0;
-	stackArgs[1].m_word = caravanSlot;
-	stackArgs[2].m_word = 0;
-	gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
+	CallWorldParam(0, caravanSlot, 0);
 }
 
 /*

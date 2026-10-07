@@ -7678,9 +7678,9 @@ void CMenuPcs::DrawCMLife()
 		}
 		const float* pYAdj = &FLOAT_8033166C;
 		yTmp = yTmp + *pYAdj;
-		const double* pHalfD = &DOUBLE_803313F8;
-		x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
-		float step = static_cast<float>(static_cast<double>(8 - count) * *pHalfD);
+		double half = 0.5;
+		x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * half + static_cast<double>(xBase));
+		float step = static_cast<float>(static_cast<double>(8 - count) * half);
 
 		const float* pRectSize = &FLOAT_80331558;
 		float kRectSize;
@@ -9919,8 +9919,9 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
  */
 void CMenuPcs::SetMcWinInfo(int x, int y)
 {
-    const short newX = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<float>(0x280 - x) * DOUBLE_803313F8)));
-    const short newY = static_cast<short>(static_cast<int>(static_cast<float>((FLOAT_80331430 - static_cast<float>(y)) * DOUBLE_803313F8)));
+    double half = 0.5;
+    const short newX = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<float>(0x280 - x) * half)));
+    const short newY = static_cast<short>(static_cast<int>(static_cast<float>((FLOAT_80331430 - static_cast<float>(y)) * half)));
     m_menuWindowInfo->x = newX;
     m_menuWindowInfo->y = newY;
     m_menuWindowInfo->width = static_cast<short>(x);

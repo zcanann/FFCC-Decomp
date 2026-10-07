@@ -2493,3 +2493,15 @@ dolphin/os/__start.c:
 
 TRK_MINNOW_DOLPHIN/__exception.s:
 	.init start:0x800034AC end:0x800053E0
+
+singmenu.cpp:
+	.text start:0x80141190 end:0x80145F34
+
+os/__ppc_eabi_init.c:
+	.text start:0x8017C5B0 end:0x8017C644
+
+exi/EXIBios.c:
+	.text start:0x8017C644 end:0x8017E020
+
+main.cpp:
+	.text start:0x80019964 end:0x80019AE8

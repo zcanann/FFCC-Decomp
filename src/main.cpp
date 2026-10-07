@@ -6,23 +6,68 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 static const char kDefaultScriptName[] = "ffcc_0";
+#ifndef VERSION_GCCJGC
 static const char kLanguageArgUs[] = "us";
 static const char kLanguageArgUk[] = "uk";
 static const char kLanguageArgGr[] = "gr";
 static const char kLanguageArgIt[] = "it";
 static const char kLanguageArgFr[] = "fr";
 static const char kLanguageArgSp[] = "sp";
+#endif
 
+#ifdef VERSION_GCCJGC
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void game(int argc, char** argv)
+{
+    int copyScriptName;
+    int i;
+
+    Game.Init();
+    strcpy(Game.m_startScriptName, kDefaultScriptName);
+
+    if (argc != 0) {
+        copyScriptName = 0;
+        for (i = 1; i < argc; i++) {
+            if (copyScriptName) {
+                strcpy(Game.m_startScriptName, argv[i]);
+                copyScriptName = 0;
+            } else {
+                char c = (argv[i])[0];
+                if ((c == '-') || (c == '/')) {
+                    c = (argv[i])[1];
+                    switch (c) {
+                    case 'f':
+                        copyScriptName = 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    Game.Exec();
+    Game.Quit();
+}
+#else
 void game(int argc, char** argv);
+#endif
 
 /*
  * --INFO--
  * PAL Address: 0x80019f88
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80019D7C
+ * EN Size: 204b
+ * JP Address: 0x80019964
+ * JP Size: 388b
  */
 void main(int argc, char** argv)
 {
@@ -50,12 +95,13 @@ void main(int argc, char** argv)
     System.Quit();
 }
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x8001a054
  * PAL Size: 476b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80019E48
+ * EN Size: 476b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -128,3 +174,4 @@ void game(int argc, char** argv)
     Game.Exec();
     Game.Quit();
 }
+#endif

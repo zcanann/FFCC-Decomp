@@ -1099,25 +1099,13 @@ void CGCharaObj::setSta(int staIndex, int value)
 	if (current != 0 && clampedValue == 0) {
 		switch (staIndex) {
 			case 0x1B:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x400U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x400);
 				break;
 			case 1:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x40U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x40);
 				break;
 			case 0:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x4U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x4);
 				if (isIceJ) {
 					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
 					putParticle((modelPdtNo << 8) | 0x16, 0, this, 1.0f, 0);
@@ -1130,11 +1118,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 4:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x80U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x80);
 				break;
 			case 10:
 				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 4) != 0 &&
@@ -1148,11 +1132,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 9: {
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x4000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x4000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xDA]) * 0.01f;
@@ -1165,11 +1145,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				break;
 			}
 			case 8: {
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x2000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x2000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xDA]) * 0.01f;
@@ -1182,37 +1158,21 @@ void CGCharaObj::setSta(int staIndex, int value)
 				break;
 			}
 			case 7: {
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x8000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x8000);
 				int particleNo = isMon ? 0x71 : 0x15;
 				putParticle(particleNo | 0x100, 0, this, 0.1f * m_attackColRadius, 0);
 				break;
 			}
 			case 3:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x40000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x40000);
 				putParticle(0x10E, 0, this, 0.1f * m_attackColRadius, 0);
 				playSe3D(0x3A, 0x32, 0x96, 0, 0);
 				break;
 			case 2:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x80000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x80000);
 				break;
 			case 6:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x100000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x100000);
 				break;
 				break;
 			default:
@@ -1221,19 +1181,11 @@ void CGCharaObj::setSta(int staIndex, int value)
 	} else if (current == 0 && clampedValue != 0) {
 		switch (staIndex) {
 			case 0x1B:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x400U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x400);
 				putParticle(0x11C, m_particleSlots[10], this, 1.0f, 0x1290D);
 				break;
 			case 1:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x40U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x40);
 				if (isIceJ) {
 					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
 					putParticle((modelPdtNo << 8) | 0x14, m_particleSlots[6], this, 1.0f, 0);
@@ -1242,11 +1194,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 0:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x4U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x4);
 				if (isIceJ) {
 					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
 					putParticleBindTrace((modelPdtNo << 8) | 0x15, m_particleSlots[2], this, 1.0f, 0);
@@ -1258,11 +1206,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 4:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x80U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x80);
 				if (isIceJ) {
 					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
 					putParticle((modelPdtNo << 8) | 0x17, m_particleSlots[7], this, 1.0f, 0);
@@ -1281,11 +1225,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 9: {
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x4000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x4000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xDA]) * 0.01f;
@@ -1298,11 +1238,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				break;
 			}
 			case 8: {
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x2000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x2000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xDA]) * 0.01f;
@@ -1315,38 +1251,22 @@ void CGCharaObj::setSta(int staIndex, int value)
 				break;
 			}
 			case 7: {
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x8000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x8000);
 				int particleNo = isMon ? 0x70 : 0x14;
 				putParticle(particleNo | 0x100, m_particleSlots[15], this, 0.1f * m_attackColRadius, 0);
 				break;
 			}
 			case 3:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x40000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x40000);
 				putParticleBindTrace(0x10D, m_particleSlots[18], this, 0.1f * m_attackColRadius, 0);
 				break;
 			case 2:
 				m_stateTick = 0;
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x80000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x80000);
 				putParticleBindTrace(0x10C, m_particleSlots[19], this, 0.1f * m_attackColRadius, 0);
 				break;
 			case 6:
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x100000U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
+				endPSlotBit(0x100000);
 				putParticleBindTrace(0x107, m_particleSlots[20], this, 0.1f * m_attackColRadius, 0);
 				break;
 			case 0x65:
@@ -1356,7 +1276,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[staIndex] = static_cast<unsigned short>(clampedValue);
+	work = reinterpret_cast<CGObjWork*>(m_scriptHandle);
+	work->m_statusTimers[staIndex] = static_cast<unsigned short>(clampedValue);
 }
 
 /*
@@ -2563,6 +2484,7 @@ checkParticle:
 			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
+		Vec sideOffset;
 		emittedCustom = 0;
 		switch (effectId) {
 		case 0x410:
@@ -2660,17 +2582,14 @@ checkParticle:
 		case 0x49F:
 			if (effectArg0 == 2) {
 				Mtx rotMtx;
-				CFlatRuntime2& flatStorage = CFlatRuntime2Storage();
-				int i = 0;
-				for (; i < 2; i++) {
+				for (int i = 0; i < 2; i++) {
 					PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 					int side = (i == 0) ? 76 : -76;
-					Vec offsetPos;
-					PSMTXMultVec(rotMtx, CVector(static_cast<float>(side), 0.0f, 60.0f), &offsetPos);
-					flatStorage.m_particleWorkPos.x = m_worldPosition.x + offsetPos.x;
-					flatStorage.m_particleWorkPos.y = m_worldPosition.y + offsetPos.y;
-					flatStorage.m_particleWorkPos.z = m_worldPosition.z + offsetPos.z;
-					flatStorage.SetParticleWorkVector(m_rotTargetY, 0.0f);
+					PSMTXMultVec(rotMtx, CVector(static_cast<float>(side), 0.0f, 60.0f), &sideOffset);
+					CFlatRuntime2Storage().m_particleWorkPos.x = m_worldPosition.x + sideOffset.x;
+					CFlatRuntime2Storage().m_particleWorkPos.y = m_worldPosition.y + sideOffset.y;
+					CFlatRuntime2Storage().m_particleWorkPos.z = m_worldPosition.z + sideOffset.z;
+					CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
 				emittedCustom = 1;
@@ -3279,12 +3198,10 @@ inline int CGCharaObj::scCheckTime(CCombi2Set* set, CGCharaObj* first, CGCharaOb
 int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 {
 	int found = -1;
-	int combiIndex = 0;
-	int lastSlot = count - 1;
 	outFallback = 0;
 
 	CCombi2* combiCursor = Game.m_combiTable;
-	for (; combiIndex < static_cast<int>(Game.m_combiCount); combiIndex++, combiCursor++) {
+	for (int combiIndex = 0; combiIndex < static_cast<int>(Game.m_combiCount); combiIndex++, combiCursor++) {
 		int reqCount = combiCursor->GetNumSet();
 
 		if (count < reqCount) {
@@ -3315,7 +3232,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 				break;
 			}
 
-			int itemMatch = scCheckItem(slotCursor, partyObj, slot == lastSlot);
+			int itemMatch = scCheckItem(slotCursor, partyObj, slot == count - 1);
 			if (!itemMatch) {
 				break;
 			}

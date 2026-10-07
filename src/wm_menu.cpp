@@ -6497,8 +6497,8 @@ inline void CMenuPcs::DrawMainMenuBase(float alpha)
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMainMenuFrameTexture));
 
-	float x = 32.0f;
 	float y = 40.0f;
+	float x = 32.0f;
 	y -= x;
 	MenuPcs.DrawRect(0, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	x += 288.0f;

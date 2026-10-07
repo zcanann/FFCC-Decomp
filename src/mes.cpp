@@ -813,6 +813,32 @@ inline CFont* CMes::getFont(int fontIndex, int draw)
 	return font;
 }
 
+#ifdef VERSION_GCCE01
+static inline unsigned char GetIconButtonMode()
+{
+	return Game.m_gameWork.m_menuStageMode;
+}
+#else
+static inline int GetIconButtonMode()
+{
+	int mode;
+	bool specialPad = false;
+	if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
+	{
+		specialPad = true;
+	}
+	if (specialPad)
+	{
+		mode = (Joybus.GetPadType(0) != 0x40000);
+	}
+	else
+	{
+		mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
+	}
+	return mode;
+}
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x80098C90
@@ -863,81 +889,17 @@ void CMes::Draw()
 					switch (iconId + 0x48)
 					{
 					case 0x4F:
-					{
-						int mode;
-						bool specialPad = false;
-						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
-						{
-							specialPad = true;
-						}
-						if (specialPad)
-						{
-							mode = (Joybus.GetPadType(0) != 0x40000);
-						}
-						else
-						{
-							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
-						}
-						iconId = (mode != 0) ? 7 : 0x0B;
+						iconId = (GetIconButtonMode() != 0) ? 7 : 0x0B;
 						break;
-					}
 					case 0x50:
-					{
-						int mode;
-						bool specialPad = false;
-						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
-						{
-							specialPad = true;
-						}
-						if (specialPad)
-						{
-							mode = (Joybus.GetPadType(0) != 0x40000);
-						}
-						else
-						{
-							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
-						}
-						iconId = (mode != 0) ? 8 : 0x0C;
+						iconId = (GetIconButtonMode() != 0) ? 8 : 0x0C;
 						break;
-					}
 					case 0x52:
-					{
-						int mode;
-						bool specialPad = false;
-						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
-						{
-							specialPad = true;
-						}
-						if (specialPad)
-						{
-							mode = (Joybus.GetPadType(0) != 0x40000);
-						}
-						else
-						{
-							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
-						}
-						iconId = (mode != 0) ? 9 : 0x0D;
+						iconId = (GetIconButtonMode() != 0) ? 9 : 0x0D;
 						break;
-					}
 					case 0x53:
-					{
-						int mode;
-						bool specialPad = false;
-						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
-						{
-							specialPad = true;
-						}
-						if (specialPad)
-						{
-							mode = (Joybus.GetPadType(0) != 0x40000);
-						}
-						else
-						{
-							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
-						}
-						iconId = (mode != 0) ? 0x0A : 0x0E;
+						iconId = (GetIconButtonMode() != 0) ? 0x0A : 0x0E;
 						break;
-					}
 					}
 
 					MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
@@ -1116,7 +1078,7 @@ void CMes::addString(char** text, int branchMode)
 	unsigned short uch;
 	while (running)
 	{
-		if ((uch = *(unsigned char*)(*text)++) == 0)
+		if ((uch = (unsigned char)*(*text)++) == 0)
 		{
 			running = 0;
 			goto updateBounds;
@@ -1366,9 +1328,9 @@ void CMes::addString(char** text, int branchMode)
 		case 0x30:
 		{
 			char number[256];
-			char* numberPtr;
-			sprintf(number, "%d", mFlagVars[GET_1(text)]);
-			numberPtr = number;
+			int value = mFlagVars[GET_1(text)];
+			char* numberPtr = number;
+			sprintf(number, "%d", value);
 			addString(&numberPtr, branchMode);
 			break;
 		}
@@ -1455,9 +1417,15 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x22:
 		{
+#ifdef VERSION_GCCE01
+			mCurrentX = (float)GET_2(text);
+			mCurrentY = (float)GET_2(text);
+			MenuPcs.m_battleMesMenus[m_playerIndex]->SetPos(mCurrentX, mCurrentY);
+#else
 			float x = (float)GET_2(text);
 			float y = (float)GET_2(text);
 			MenuPcs.m_battleMesMenus[m_playerIndex]->SetPos(x, y);
+#endif
 			break;
 		}
 		case 0x32:

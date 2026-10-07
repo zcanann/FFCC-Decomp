@@ -532,11 +532,9 @@ void CPartMng::pppDumpMngSt()
         if (mng->m_baseTime != -0x1000 && static_cast<unsigned int>(System.m_execParam) >= 1U) {
             kind = static_cast<int>(mng->m_kind);
             int heapGroup = mng - mngBase;
-            int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
-
             System.Printf(
                 const_cast<char*>(sPartMngDumpEntryFmt), mng->m_prioTime,
-                mng->m_prio, heapSize, kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
+                mng->m_prio, ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup)), kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
                 m_pdtSlots[kind].m_name);
         }
 

@@ -2008,12 +2008,7 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		CMenuPcs& menuPcsRef = MenuPcs;
-		s32 barTex = 0x35;
-		if (groupSize == 2) {
-			barTex = 0x36;
-		}
-		menuPcsRef.SetTexture(static_cast<CMenuPcs::TEX>(barTex));
+		MenuPcs.SetTexture((groupSize == 2) ? static_cast<CMenuPcs::TEX>(0x36) : static_cast<CMenuPcs::TEX>(0x35));
 		MenuPcs.DrawRect(0,
 			rectX,
 			drawY - 8.0f,

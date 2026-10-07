@@ -28,6 +28,13 @@
 #include "ffcc/cardconst.h"
 #endif
 extern char s_shopmenu_cpp[];
+#ifdef VERSION_GCCJGC
+#define SHOP_MENU_FILE "shopmenu.cpp"
+#define SHOP_MENU_LINE(pal, jp) (jp)
+#else
+#define SHOP_MENU_FILE s_shopmenu_cpp
+#define SHOP_MENU_LINE(pal, jp) (pal)
+#endif
 extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
 extern const unsigned int gShopMenuAmbientWhite;
@@ -352,6 +359,7 @@ ShopMenuTopMenuEntry s_shopMenuTopMenuEntries[] = {
     {0x1AE, 0x140, SHOP_JP_CANCEL},
 };
 ShopMenuTopMenuEntry* s_currentShopMenuTopMenuEntry;
+static const char s_cannotMakeHere[] = "\x82\xB1\x82\xCC\x82\xA9\x82\xB6\x82\xE2\x82\xC5\x82\xCD\x82\xC2\x82\xAD\x82\xEA\x82\xDC\x82\xB9\x82\xF1";
 #else
 ShopMenuTopMenuEntry s_shopMenuTopMenuEntries[] = {
     {0x1AE, 0x78, 0},
@@ -1034,7 +1042,7 @@ void CMenuPcs::CreateShopMenu()
 {
     m_shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-            s_shopmenu_cpp, 0x2E2));
+            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E2, 0x2DD)));
     m_shopMenu->Init(0);
 }
 
@@ -1051,7 +1059,7 @@ void CMenuPcs::CreateSmithMenu()
 {
     m_shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-            s_shopmenu_cpp, 0x2E9));
+            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E9, 0x2E4)));
     m_shopMenu->Init(9);
 }
 
@@ -1082,7 +1090,7 @@ inline void CShopMenu::Init(int mode)
     CPartMng::PppPdtSlot* slot;
     pppCacheChunk* cacheChunks;
 
-    Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
+    Graphic._WaitDrawDone(SHOP_MENU_FILE, SHOP_MENU_LINE(0x2FE, 0x2F9));
     m_unk00 = nullptr;
     m_caravanWork = Game.m_scriptFoodBase[0];
     SetMode(mode);
@@ -1091,7 +1099,7 @@ inline void CShopMenu::Init(int mode)
     slot = &PartMng.m_pdtSlots[m_pdtSlot];
     cacheChunks = slot->m_pppDataHead->m_cacheChunks;
     cacheChunks->m_pdt = reinterpret_cast<long*>(
-        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
+        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, SHOP_MENU_FILE, SHOP_MENU_LINE(0x32A, 0x325)));
     long* pdt = cacheChunks->m_pdt;
     pppCacheLoadShape(reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(pdt) + pdt[5]),
         slot->m_pppDataHead);
@@ -1772,9 +1780,10 @@ inline void CShopMenu::DrawObi(int y)
 #ifdef VERSION_GCCJGC
 void CShopMenu::DrawShop0()
 {
+    int i;
     DrawShopBase();
 
-    for (int i = 0; i < 3; i++) {
+    for (i = 0; i < 3; i++) {
         s_currentShopMenuTopMenuEntry = &s_shopMenuTopMenuEntries[i];
         int highlight = (m_topChoice == i) ? 1 : 0;
 
@@ -1802,7 +1811,7 @@ void CShopMenu::DrawShop0()
     font->SetMargin(FLOAT_80332d28);
     font->SetScale(FLOAT_80332d28);
 
-    for (int i = 0; i < 3; i++) {
+    for (i = 0; i < 3; i++) {
         s_currentShopMenuTopMenuEntry = &s_shopMenuTopMenuEntries[i];
         Graphic.SetDrawDoneDebugData(0x23);
         _drawNoShadowFont(font, s_currentShopMenuTopMenuEntry->text, s_currentShopMenuTopMenuEntry->x - 0x10,
@@ -3267,7 +3276,7 @@ inline void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     if (CheckSell(index)) {
         text = Game.m_cFlatDataArr[1].TableStrings(6)[itemNo];
     } else {
-        text = "\x82\xB1\x82\xCC\x82\xA9\x82\xB6\x82\xE2\x82\xC5\x82\xCD\x82\xC2\x82\xAD\x82\xEA\x82\xDC\x82\xB9\x82\xF1";
+        text = const_cast<char*>(s_cannotMakeHere);
     }
 
     CFont* font = MenuPcs.GetFont22();
@@ -3276,12 +3285,12 @@ inline void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
-    int x = centerX - static_cast<int>(CMes::GetTagStringWidth(font, text)) / 2;
-    font->SetPosX(static_cast<float>(x + 1));
+    centerX -= static_cast<int>(CMes::GetTagStringWidth(font, text)) / 2;
+    font->SetPosX(static_cast<float>(centerX + 1));
     font->SetPosY(static_cast<float>(y - 3));
     font->SetTlut(0x12);
     CMes::DrawTagString(font, text);
-    font->SetPosX(static_cast<float>(x));
+    font->SetPosX(static_cast<float>(centerX));
     font->SetPosY(static_cast<float>(y - 4));
     font->SetTlut(7);
     CMes::DrawTagString(font, text);

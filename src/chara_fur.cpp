@@ -240,7 +240,7 @@ void CChara::makeFurTex()
 	}
 
 	GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
-	_GXColor savedCopyClear = Graphic.m_defaultCopyClearColor;
+	_GXColor savedCopyClear = Graphic.GetCopyClearColor();
 	GXSetAlphaUpdate(GX_TRUE);
 	GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
 	GXSetScissor(0, 0, 0x80, 0x80);
@@ -691,8 +691,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
  */
 static void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
-	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
-	*centerAfter = defaultColor;
+	*centerAfter = CColor(0x0f, 0x0f, 0x0f, 0);
 	*centerBefore = *centerAfter;
 
 	int texelCountBytes = width * height * 2;
@@ -729,8 +728,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 			a = (packed >> 12) & 0x07;
 
 			if (distance == 0) {
-				_GXColor beforeColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
-				*centerBefore = beforeColor;
+				*centerBefore = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a);
 			}
 
 			if (mode != 0) {
@@ -754,8 +752,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 			pixels[tileIndex] = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);
 
 			if (distance == 0) {
-				_GXColor afterColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
-				*centerAfter = afterColor;
+				*centerAfter = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a);
 			}
 		}
 	}
@@ -849,8 +846,8 @@ int CChara::CModel::PickFur(
 					cursor += 3;
 					const int primitive = command & 0xF8;
 					remaining -= count * 8 + 3;
-					int vertexIndex = 0;
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
+					int vertexIndex = 0;
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
 						for (; count--; vertexIndex++, indices += 4) {
 							register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
@@ -1273,30 +1270,25 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		_GXColor brushColor;
 		switch (Chara.MogFur().m_commandIndex) {
 		case 0: {
-			const _GXColor c = CColor(0xF, 4, 4, 2).color;
-			brushColor = c;
+			brushColor = CColor(0xF, 4, 4, 2);
 			break;
 		}
 		case 1: {
-			const _GXColor c = CColor(4, 8, 0xF, 2).color;
-			brushColor = c;
+			brushColor = CColor(4, 8, 0xF, 2);
 			break;
 		}
 		case 2: {
-			const _GXColor c = CColor(4, 0xF, 4, 2).color;
-			brushColor = c;
+			brushColor = CColor(4, 0xF, 4, 2);
 			break;
 		}
 		case 3: {
-			const _GXColor c = CColor(0xF, 0xF, 0xF, 4).color;
-			brushColor = c;
+			brushColor = CColor(0xF, 0xF, 0xF, 4);
 			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
 			break;
 		}
 		case 4:
 			{
-				const _GXColor c = CColor(0, 0, 0, 2).color;
-				brushColor = c;
+				brushColor = CColor(0, 0, 0, 2);
 			}
 			eraseMode = 1;
 			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
@@ -1307,15 +1299,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		Vec worldPos;
 
 		CopyFurTex(0);
-		const _GXColor initColor = CColor(0xF, 0xF, 0xF, 0).color;
-		centerAfter.r = initColor.r;
-		centerAfter.g = initColor.g;
-		centerAfter.b = initColor.b;
-		centerAfter.a = initColor.a;
-		centerBefore.r = initColor.r;
-		centerBefore.g = initColor.g;
-		centerBefore.b = initColor.b;
-		centerBefore.a = initColor.a;
+		centerAfter = CColor(0xF, 0xF, 0xF, 0);
+		centerBefore = centerAfter;
 		int pickResult = PickFur(cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
 		CopyFurTex(1);
 		Chara.CalcMogScore();

@@ -412,20 +412,6 @@ void CCharaPcs::SetTexShadowColor(_GXColor color)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9220
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CColor::operator _GXColor()
-{
-    return color;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B9228
  * PAL Size: 28b
  * EN Address: TODO

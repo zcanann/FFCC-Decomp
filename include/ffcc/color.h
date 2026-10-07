@@ -63,7 +63,16 @@ public:
 		return out;
 	}
 	operator CColor&() { return *this; }
-	operator _GXColor();
+	/*
+	 * --INFO--
+	 * PAL Address: 0x800B9220
+	 * PAL Size: 8b
+	 * EN Address: TODO
+	 * EN Size: TODO
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	operator _GXColor() { return color; }
 	/*
 	 * --INFO--
 	 * PAL Address: 0x800B9224

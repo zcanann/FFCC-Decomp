@@ -524,11 +524,22 @@ complete:
  */
 int CCharaPcs::correctLoadAnimAmem()
 {
+    int compactedSize;
+    int chunkSize;
+    int maxEnd;
+    unsigned int nextOffset;
+    int i;
+    int loadAnimCount;
+    int validAnimCount;
+    int scanOffset;
+    int chunkLoadCount;
+    unsigned char* tempBuffer;
+
     if (System.GetErrorLevel() >= 3U) {
         System.Printf("amem anim ガベージコレクション開始。\n");
     }
 
-    unsigned char* tempBuffer = reinterpret_cast<unsigned char*>(
+    tempBuffer = reinterpret_cast<unsigned char*>(
         Memory._Alloc(0x80000, m_loadStages[CCharaPcs::LOAD_STAGE_ANIM], "p_chara.cpp", 0x162, 1));
     if (tempBuffer == 0) {
         if (System.GetErrorLevel() >= 2U) {
@@ -537,13 +548,12 @@ int CCharaPcs::correctLoadAnimAmem()
         return -1;
     }
 
-    int i;
-    int loadAnimCount = m_loadAnims.GetSize();
-    int validAnimCount = 0;
-    int maxEnd = 0;
-    int compactedSize = 0;
-    int scanOffset = 0;
-    int chunkSize = 0;
+    loadAnimCount = m_loadAnims.GetSize();
+    validAnimCount = 0;
+    maxEnd = 0;
+    compactedSize = 0;
+    scanOffset = 0;
+    chunkSize = 0;
     for (i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
@@ -559,8 +569,8 @@ int CCharaPcs::correctLoadAnimAmem()
     }
 
     do {
-        int chunkLoadCount = 0;
-        unsigned int nextOffset = 0;
+        chunkLoadCount = 0;
+        nextOffset = 0;
         const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
         for (i = 0; i < loadAnimCount; i++) {

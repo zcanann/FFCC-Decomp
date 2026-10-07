@@ -1083,9 +1083,8 @@ void CMenuPcs::CmdDraw()
 				cursorEntry = &m_cmdList->entries[index];
 			}
 		} else if (cmdMode == 1) {
-			CmdListStorage* const list = m_cmdList;
-			for (s32 idx = list->count; idx < list->listEnd; idx++) {
-				cursorEntry = &list->entries[idx];
+			for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
+				cursorEntry = &m_cmdList->entries[idx];
 				if (cursorEntry->tex == kCmdRowTexture) {
 					break;
 				}

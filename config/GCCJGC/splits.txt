@@ -2525,7 +2525,10 @@ exi/EXIBios.c:
 	.sbss start:0x8034BDC8 end:0x8034BDD0
 
 main.cpp:
+	extab start:0x800059C0 end:0x800059C8
+	extabindex start:0x8000B1DC end:0x8000B1E8
 	.text start:0x80019964 end:0x80019AE8
+	.sdata2 start:0x8034C490 end:0x8034C498
 
 TRK_MINNOW_DOLPHIN/main_TRK.c:
 	.text start:0x801A9FF0 end:0x801AA034

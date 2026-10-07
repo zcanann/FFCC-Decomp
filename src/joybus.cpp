@@ -3233,7 +3233,11 @@ inline void JoyBus::SetRecvBuffer(ThreadParam* threadParam, unsigned int data)
         {
             if (static_cast<unsigned int>(System.m_execParam) >= 2u)
             {
+#ifdef VERSION_GCCJGC
+                System.Printf(const_cast<char*>(s_recv_type_differ_warn_fmt), threadParam->m_portIndex, const_cast<char*>(s_joybus_cpp), 0x1054);
+#else
                 System.Printf(const_cast<char*>(s_recv_type_differ_warn_fmt), threadParam->m_portIndex, const_cast<char*>(s_joybus_cpp), 0x1079);
+#endif
             }
 
             ClrRecvBuffer(threadParam->m_portIndex);

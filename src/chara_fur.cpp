@@ -68,7 +68,9 @@ static unsigned int m_seed;
 
 static inline int FurTexelIndex(int x, int y, int tileRowStride)
 {
-	return x % 4 + (y % 4) * 4 + ((x / 4) * 0x10 + (y / 4) * tileRowStride);
+	int index = (x / 4) * 0x10 + (y / 4) * tileRowStride;
+	index += x % 4 + (y % 4) * 4;
+	return index;
 }
 
 /*
@@ -1628,7 +1630,7 @@ void CChara::CalcMogScore()
  */
 void CChara::TimeMogFur()
 {
-	int x, y;
+	int y, x;
 	const int frameCounter = static_cast<int>(System.m_frameCounter);
 
 	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
@@ -1651,12 +1653,12 @@ void CChara::TimeMogFur()
 		for (x = 0; x < 0x40; x++) {
 			int tileIndex = FurTexelIndex(x, y, 0x100);
 			unsigned short packed = texels[tileIndex];
-			int r, g, b;
+			int r, b, g;
 			int a = (packed >> 12) & 7;
 			int baseLight = 7 - a;
 			r = (packed >> 8) & 0xF;
-			g = (packed >> 4) & 0xF;
 			b = packed & 0xF;
+			g = (packed >> 4) & 0xF;
 			r += baseLight + 4;
 			g += baseLight + 4;
 			b += baseLight + 4;

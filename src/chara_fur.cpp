@@ -709,9 +709,9 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 			int distance;
 			int tileIndex;
 			unsigned short packed;
-			int r;
-			int g;
 			int b;
+			int g;
+			int r;
 			int a;
 
 			if (px < 0 || width <= px || py < 0 || height <= py) {
@@ -733,8 +733,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 
 			if (mode != 0) {
 				int reduce = (targetColor.a * (4 - distance)) / 4;
-				int reducedAlpha = a - reduce;
-				a = reducedAlpha < 0 ? 0 : reducedAlpha;
+				a = (a - reduce < 0) ? 0 : a - reduce;
 			} else {
 				float k = (float)(distance / 4) + (float)(7 - targetColor.a) / 7.0f;
 				k = (k > 1.0f) ? 1.0f : k;

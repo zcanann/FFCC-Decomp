@@ -1628,15 +1628,17 @@ void CMenuPcs::DrawSingleBase(float alpha)
  * --INFO--
  * PAL Address: 0x80148b98
  * PAL Size: 1988b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80147D08
+ * EN Size: 1864b
+ * JP Address: 0x801442BC
+ * JP Size: 1712b
  */
 void CMenuPcs::DrawSingleStat(float alpha)
 {
     CFont* font;
+#ifdef VERSION_GCCP01
     int languageId = Game.m_gameWork.m_languageId;
+#endif
 
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -1766,15 +1768,18 @@ void CMenuPcs::DrawSingleStat(float alpha)
                 break;
         }
 
+#ifdef VERSION_GCCP01
         if ((languageId == 2) && (i == 3)) {
             font->SetScaleX(0.7199999690055847f);
             font->SetScaleY(0.8999999761581421f);
         } else {
             font->SetScaleX(0.8999999761581421f);
         }
+#endif
         font->Draw(label);
 
         font->renderFlags.fixedWidth = 1;
+#ifdef VERSION_GCCP01
         if (languageId == 2) {
             font->SetMargin(-5.0f);
             font->SetScaleX(0.7199999690055847f);
@@ -1783,6 +1788,9 @@ void CMenuPcs::DrawSingleStat(float alpha)
             font->SetMargin(-3.0f);
             font->SetScale(0.8999999761581421f);
         }
+#else
+        font->SetMargin(-3.0f);
+#endif
 
         int stat;
         if (i == 0) {

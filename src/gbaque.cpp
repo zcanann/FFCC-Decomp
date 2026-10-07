@@ -3441,9 +3441,11 @@ int GbaQueue::MakeBuyData(int channel, char* outData)
 
 	itemCount = Game.m_scriptFoodBase[channel]->m_shopListCount;
 
-	totalSize = 4;
+	writePtr = outData;
+	totalSize = 0;
 	outData[0] = static_cast<char>(itemCount);
-	writePtr = outData + 4;
+	writePtr += 4;
+	totalSize += 4;
 
 	for (i = 0; i < itemCount; i++) {
 		itemId = Game.m_scriptFoodBase[channel]->m_shopList[i];

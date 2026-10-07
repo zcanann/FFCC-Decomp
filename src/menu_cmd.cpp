@@ -775,11 +775,15 @@ void CMenuPcs::CmdDraw()
 
 	CmdListEntry* iconEntry = m_cmdList->entries;
 	for (s32 i = 0; i < caravan->m_numCmdListSlots; i++, iconEntry++) {
-		if ((i >= 2) && (caravan->m_commandListInventorySlotRef[i] >= 0)) {
-			y = static_cast<float>(iconEntry->y - 2);
+		if (i >= 2) {
+			const s32 ref = caravan->m_commandListInventorySlotRef[i];
+			if (ref < 0) {
+				continue;
+			}
 			x = static_cast<float>(iconEntry->x + iconEntry->width - 0x10);
+			y = static_cast<float>(iconEntry->y - 2);
 			DrawSingleIcon(
-			    caravan->m_inventoryItems[caravan->m_commandListInventorySlotRef[i]],
+			    caravan->m_inventoryItems[ref],
 			    static_cast<s32>(static_cast<float>(iconEntry->x + iconEntry->width - 0x10)),
 			    static_cast<s32>(y - 1.0f), iconEntry->alpha, 0, 1.0f);
 		}
@@ -787,10 +791,10 @@ void CMenuPcs::CmdDraw()
 
 	if (m_cmdState->prevMode != 0) {
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		s32 specialRow = 0;
 		CmdListEntry* row = &m_cmdList->entries[m_cmdList->count];
 		const s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		const s32 itemCount = letterBuf[0];
-		s32 specialRow = 0;
 		for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++, row++) {
 			const s32 tex = row->tex;
 			if (tex >= 0) {
@@ -861,8 +865,9 @@ void CMenuPcs::CmdDraw()
 							    Game.m_scriptFoodBase[0];
 							const s16* canBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 							const s16* canItems = canBuf + 1;
+							const s32 canCount = canBuf[0];
 							bool canUse;
-							if ((sel < 0) || (sel >= canBuf[0])) {
+							if ((sel < 0) || (sel >= canCount)) {
 								canUse = false;
 							} else if (sel == 0) {
 								canUse = caravan2->m_commandListInventorySlotRef[m_cmdState->selected[0]] >= 0;
@@ -878,17 +883,12 @@ void CMenuPcs::CmdDraw()
 								rowTex = 0x34;
 							}
 						} else {
-							s32 itemIdx = sel - 2;
+							s32 itemIdx = specialRow + m_cmdState->scrollTop - 2;
 							if ((itemCount >= 8) && (itemIdx >= itemCount)) {
 								itemIdx -= itemCount;
 							}
 
-							bool equippable = true;
-							if (itemIdx + 2 < itemCount) {
-								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1]));
-							}
-
-							if (equippable) {
+							if ((itemIdx + 2 >= itemCount) || EquipChk(static_cast<int>(letterBuf[itemIdx + 1]))) {
 								if (itemIdx + 2 < itemCount) {
 									DrawEquipMark(static_cast<s32>(x - 12.0f),
 									    static_cast<s32>(((rowH - 24.0f) * 0.5) + y),
@@ -930,12 +930,12 @@ void CMenuPcs::CmdDraw()
 
 		const s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		const s32 itemCount = letterBuf[0];
-		CmdListEntry* scan = &m_cmdList->entries[m_cmdList->count];
+		CmdListEntry* scan;
 		for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
+			scan = &m_cmdList->entries[idx];
 			if (scan->tex == kCmdRowTexture) {
 				break;
 			}
-			scan++;
 		}
 
 		CmdListEntry* textRow = scan;
@@ -996,8 +996,8 @@ void CMenuPcs::CmdDraw()
 
 			if (displayIdx >= 2) {
 				const s16 slot = letterBuf[displayIdx - 1];
-				y = static_cast<float>(iconRow->y + 6);
 				x = static_cast<float>(iconRow->x + iconRow->width - 0x10);
+				y = static_cast<float>(iconRow->y + 6);
 				DrawSingleIcon(
 				    caravan->m_inventoryItems[slot],
 				    static_cast<s32>(static_cast<float>(iconRow->x + iconRow->width - 0x10)),

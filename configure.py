@@ -582,7 +582,7 @@ config.libs = [
             Object(NonMatching, "menu_lst.cpp"),
             Object(NonMatching, "menu_money.cpp"),
             Object(NonMatching, "menu_tmparti.cpp"),
-            Object(NonMatching, "MenuUtil.cpp", extra_cflags=["-sdata2 8", "-char unsigned", "-str reuse,readonly", "-inline noauto,deferred"]),
+            Object(NonMatching, "MenuUtil.cpp", extra_cflags=["-sdata2 8", "-str reuse,readonly", "-inline noauto,deferred"]),
             Object(NonMatching, "mes.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "mesmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "monobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),

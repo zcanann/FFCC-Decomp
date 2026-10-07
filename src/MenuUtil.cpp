@@ -395,8 +395,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			itemName[0] = '\0';
 		} else {
 			Game.MakeArtItemName(itemName, msgNo, 1);
-			if ((strlen(itemName) != 0) && (static_cast<signed char>(itemName[0]) != 0)) {
-				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
+			if (strlen(itemName) != 0) {
+				Game.UpperItemName(itemName);
 			}
 		}
 
@@ -491,6 +491,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->SetTlut(1);
 			font->SetPosX(static_cast<float>(x));
 			sprintf(scratch, " %d", item->m_value);
+#ifdef VERSION_GCCE01
+			strcat(scratch, " ");
+#endif
 			font->Draw(scratch);
 
 			if (m_battleStateFlag == 2) {
@@ -530,6 +533,16 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 							int delta = static_cast<int>(item->m_value) - static_cast<int>(currentValue);
 							x += 2.0f + font->GetWidth(scratch);
 							font->SetPosX(static_cast<float>(x));
+#ifdef VERSION_GCCE01
+							if (delta >= 0) {
+								font->SetTlut(9);
+								sprintf(scratch, " %c%d ", '+', delta);
+							} else {
+								font->SetTlut(3);
+								sprintf(scratch, " %d ", delta);
+							}
+							font->Draw(scratch);
+#else
 							if (delta >= 0) {
 								font->SetTlut(9);
 							} else {
@@ -539,11 +552,33 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 							if (delta != 0) {
 								font->Draw(scratch);
 							}
+#endif
 						}
 					}
 				}
 			}
 
+#ifdef VERSION_GCCE01
+			if ((item->m_equipFlags & 0x1000) == 0) {
+				if ((item->m_attribute >= 1) && (item->m_attribute <= 0x13)) {
+					x += 2.0f + font->GetWidth(scratch);
+					font->SetPosX(static_cast<float>(x));
+					font->SetTlut(4);
+					strcpy(scratch, GetAttrStr(item->m_attribute));
+					font->Draw(scratch);
+					x += 2.0f + font->GetWidth(scratch);
+					font->SetPosX(static_cast<float>(x));
+					font->SetTlut(9);
+					unsigned int attr = item->m_attribute;
+					if ((attr >= 1) && (attr <= 8)) {
+						sprintf(scratch, "%s", "+1");
+					} else {
+						return;
+					}
+					font->Draw(scratch);
+				}
+			}
+#else
 			float attrPosX = font->posX;
 			int attrX = static_cast<int>(attrPosX + font->GetWidth(" "));
 			font->SetPosX(static_cast<float>(attrX));
@@ -563,16 +598,25 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					font->Draw(scratch);
 				}
 			}
+#endif
 		}
 		} else {
 		char* temp;
 		int firstNonEmptyLine = firstLine;
 		int lineCount = 3;
+#ifdef VERSION_GCCE01
+		temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
+		            "MenuUtil.cpp", 0x231) char[0x200];
+		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+			System.Printf("%s(%d): Error: memory allocation error\n", "MenuUtil.cpp", 0x233);
+		}
+#else
 		temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
 		            "MenuUtil.cpp", 0x23D) char[0x200];
 		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
 			System.Printf("%s(%d): Error: memory allocation error\n", "MenuUtil.cpp", 0x23F);
 		}
+#endif
 		for (int i = 0; i < lineMax; i++) {
 			char* msg = Game.GetHelpName(firstLine + i);
 			memset(temp, 0, 0x200);

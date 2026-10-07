@@ -3187,7 +3187,7 @@ unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
  */
 int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 {
-    if (m_threadRunningMask == 0)
+    if (!IsThreadRunning())
     {
         return 0;
     }
@@ -4098,8 +4098,6 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     unsigned int localWord;
     unsigned char* localBytes = reinterpret_cast<unsigned char*>(&localWord);
-    unsigned int restartWord;
-    unsigned int singleWord;
     unsigned short swapTmp;
     unsigned short crcTmp;
     int result;
@@ -4134,10 +4132,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             ResetQueue(threadParam);
 
-            restartWord = 0;
-            reinterpret_cast<unsigned char*>(&restartWord)[0] = 0x10;
-
-            if (SetSendQueue(threadParam, restartWord) != 0)
+            if (SendCancel(threadParam) != 0)
             {
                 unsigned int typeVal = static_cast<char>(sendType);
                 int respVal = localBytes[1];
@@ -4178,24 +4173,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         {
             if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
             {
-                singleWord = 0;
-
-                if (GbaQue.IsSingleMode(threadParam->m_portIndex))
-                {
-                    result = 0;
-                }
-
-                reinterpret_cast<unsigned char*>(&singleWord)[0] = 0x09;
-                reinterpret_cast<unsigned char*>(&singleWord)[1] = result;
-
-                int res = SetSendQueue(threadParam, singleWord);
-
-                if (res == 0)
-                {
-                    m_ctrlModeArr[threadParam->m_portIndex] = result;
-                }
-
-                if (res != 0)
+                if (SendCtrlMode(threadParam, 0) != 0)
                 {
                     return -1;
                 }
@@ -4724,7 +4702,6 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 player++;
                 lowBits  += 0x10;
             }
-
             memcpy(&body[0x80], classFlags, sizeof(classFlags));
 
             body[0x84] = playerInfo[0].m_maxHp;
@@ -4745,18 +4722,17 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             q += 5;
 
+            int dataSize = 0x97;
             int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, q);
-
             q += compatLen;
-
-            const int byteLen = compatLen + 0x97;
+            dataSize += compatLen;
 
             memcpy(q, playerInfo[threadParam->m_portIndex].m_letterMeta, 8);
 
             unsigned int statWord = __lwbrx(&playerInfo[threadParam->m_portIndex].m_gil, 0);
             memcpy(q + 8, &statWord, sizeof(statWord));
 
-            int wordCount = MakeJoyData((char*)payload, byteLen + 0xC, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
+            int wordCount = MakeJoyData((char*)payload, dataSize + 0xC, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
             if (wordCount < 0)
             {
@@ -5043,22 +5019,19 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 {
     unsigned int cmd = 0;
     unsigned char* cmdBytes = (unsigned char*)&cmd;
-    int modeByte = controlMode;
-    bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    // If single-player, force modeByte = 0
-    if (isSingle)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex))
 	{
-        modeByte = 0;
+        controlMode = 0;
 	}
 
     cmdBytes[0] = 9;
-    cmdBytes[1] = modeByte;
+    cmdBytes[1] = controlMode;
     int result = SetSendQueue(threadParam, cmd);
 
     if (result == 0)
 	{
-        m_ctrlModeArr[threadParam->m_portIndex] = modeByte;
+        m_ctrlModeArr[threadParam->m_portIndex] = controlMode;
 	}
 
 	return result;
@@ -5075,63 +5048,47 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
  */
 int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 {
-    unsigned int flgWord;
-    int result = GBARecvSend(threadParam, &flgWord);
+    unsigned int flg;
 
-    if (result < 0)
+    if (GBARecvSend(threadParam, &flg) < 0)
     {
-        result = -1;
-    }
-    else
-    {
-        GbaQue.GetMapObjDrawFlg(&flgWord);
-
-        unsigned char* data = reinterpret_cast<unsigned char*>(&flgWord);
-        unsigned char crcBytes[4];
-        for (int i = 3; i >= 0; i--)
-        {
-            crcBytes[i] = *data++;
-        }
-        unsigned int crc = 0xFFFF;
-        int crcCount = 4;
-        unsigned char* crcData = crcBytes;
-
-        while (--crcCount >= 0)
-        {
-            crc = (((crc & 0xFFFF) << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[((crc >> 8) & 0xFF) ^ static_cast<unsigned int>(*crcData)])) & 0xFFFF;
-            crcData = crcData + 1;
-        }
-
-        crc = ~(unsigned short)crc;
-
-        unsigned int cmds[2];
-        cmds[0] = 0;
-        cmds[1] = 0;
-        unsigned char* cmdBytes = (unsigned char*)cmds;
-        cmdBytes[1] = (unsigned char)(crc & 0xFF);
-        cmdBytes[0] = 0x16;
-        cmdBytes[2] = (unsigned char)((crc >> 8) & 0xFF);
-        cmdBytes[3] = crcBytes[0];
-        cmdBytes[4] = 0x56;
-        cmdBytes[5] = crcBytes[1];
-        cmdBytes[6] = crcBytes[2];
-        cmdBytes[7] = crcBytes[3];
-
-        unsigned int cmd0 = cmds[0];
-        result = SetSendQueue(threadParam, cmd0);
-
-        switch (result)
-        {
-        case 0:
-        {
-            unsigned int cmd1 = cmds[1];
-            result = SetSendQueue(threadParam, cmd1);
-            break;
-        }
-        }
+        return -1;
     }
 
-    return result;
+    GbaQue.GetMapObjDrawFlg(&flg);
+
+    unsigned char* flgBytes = reinterpret_cast<unsigned char*>(&flg);
+    unsigned char data[4];
+    for (int i = 3; i >= 0; i--)
+    {
+        data[i] = *flgBytes++;
+    }
+
+    unsigned short crcAcc = 0xFFFF;
+    unsigned short crc = Crc16(4, data, &crcAcc);
+
+    unsigned int cmd[2];
+    cmd[0] = 0;
+    cmd[1] = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(cmd);
+    cmdBytes[0] = 0x16;
+    cmdBytes[1] = static_cast<unsigned char>(crc);
+    cmdBytes[2] = static_cast<unsigned char>(crc >> 8);
+    cmdBytes[3] = data[0];
+    cmdBytes[4] = 0x56;
+    cmdBytes[5] = data[1];
+    cmdBytes[6] = data[2];
+    cmdBytes[7] = data[3];
+
+    unsigned int word = cmd[0];
+    int result = SetSendQueue(threadParam, word);
+    if (result != 0)
+    {
+        return result;
+    }
+
+    word = cmd[1];
+    return SetSendQueue(threadParam, word);
 }
 
 /*

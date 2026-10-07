@@ -293,8 +293,8 @@ void CChara::makeFurTex()
 		GXLoadPosMtxImm(posMtx, GX_PNMTX0);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
-		float layerFactor = static_cast<float>(layer) * layerStep;
-		layerFactor = layerFactor * layerFactor;
+		float layerT = static_cast<float>(layer) * layerStep;
+		float layerFactor = layerT * layerT;
 
 		CColor clearColor = color[0] * (scaleBase2 - layerFactor) + color[1] * layerFactor;
 		clearColor.color.a = 0;
@@ -308,8 +308,7 @@ void CChara::makeFurTex()
 
 			float rootX = myRandFPM(1.0f);
 			float rootZ = myRandFPM(1.0f);
-			CVector rootTmp(rootX, 0.0f, rootZ);
-			CVector root = rootTmp;
+			CVector root = CVector(rootX, 0.0f, rootZ);
 
 			CHairSet& src = hairSet[myRand(0x20)];
 
@@ -339,9 +338,9 @@ void CChara::makeFurTex()
 				float pz = pos.z;
 
 				CColor color = src.m_colors[0] * (scaleBase2 - t2) + src.m_colors[1] * t2;
-				GXWGFifo.f32 = pz;
-				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = px;
+				GXWGFifo.f32 = py;
+				GXWGFifo.f32 = pz;
 				GXWGFifo.u32 = *reinterpret_cast<unsigned int*>(&color.color);
 				t += quarterStep;
 			}

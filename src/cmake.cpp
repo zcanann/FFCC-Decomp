@@ -2434,17 +2434,12 @@ void CMenuPcs::CmakeSexDraw()
 
     if (CmakeState(this)->m_mode == 1) {
         int sel = CmakeState(this)->m_select;
-        int wobble = static_cast<int>(System.m_frameCounter) % 8;
-        int cursorX = static_cast<int>(
-            static_cast<double>(static_cast<float>(400.0 - labelWidth / 2.0) +
-                                static_cast<float>(wobble)) -
-            labelWidth / 2.0);
+        float cx = 400.0 - labelWidth / 2.0;
         float cy = 156.0f;
         cy += static_cast<float>(sel * 0x28);
-        int cursorY = static_cast<int>(cy);
-        DrawCursor(cursorX, cursorY, 1.0f);
+        cx += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+        DrawCursor(static_cast<int>(cx - labelWidth / 2.0), static_cast<int>(cy), 1.0f);
     }
-
 }
 
 /*
@@ -2642,50 +2637,54 @@ void CMenuPcs::CmakeTribeDraw()
             1.0f, 1.0f, 0.0f);
     }
 
-    CFont* tribeFont = m_fonts[CMAKE_FONT_LABEL];
-    tribeFont->SetMargin(1.0f);
-    tribeFont->SetShadow(0);
-    tribeFont->SetScale(1.0f);
-    tribeFont->DrawInit();
-    tribeFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
-
-    const char* txt;
-    int y;
     int i;
-    for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
+    CFont* font;
+    int y;
+    int hairBase;
+    const char* txt;
+    font = m_fonts[CMAKE_FONT_LABEL];
+    font->SetMargin(1.0f);
+    font->SetShadow(0);
+    font->SetScale(1.0f);
+    font->DrawInit();
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+
+    y = 0x88;
+    for (i = 0; i < 4; i++, y += 0x1C) {
         txt = GetTribeStr(i);
-        tribeFont->SetPosX(264.0f);
+        font->SetPosX(264.0f);
 #ifdef VERSION_GCCJGC
-        tribeFont->SetPosY(static_cast<float>(y));
+        font->SetPosY(static_cast<float>(y));
 #else
-        tribeFont->SetPosY(static_cast<float>(y) - 4.0f);
+        font->SetPosY(static_cast<float>(y) - 4.0f);
 #endif
-        tribeFont->Draw(txt);
+        font->Draw(txt);
     }
 
-    CFont* hairFont = m_fonts[CMAKE_FONT_VALUE];
-    hairFont->SetMargin(1.0f);
-    hairFont->SetShadow(1);
-    hairFont->SetScale(1.0f);
-    hairFont->DrawInit();
-    hairFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
-    hairFont->SetTlut(6);
+    font = m_fonts[CMAKE_FONT_VALUE];
+    font->SetMargin(1.0f);
+    font->SetShadow(1);
+    font->SetScale(1.0f);
+    font->DrawInit();
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    font->SetTlut(6);
 
-    int hairBase = CmakeState(this)->m_select * 8;
+    hairBase = CmakeState(this)->m_select * 8;
     if (s_CmakeInfo.m_gender != 0) {
         hairBase += 4;
     }
 
-    for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
-        const char* txt = GetHairStr(hairBase + i);
+    y = 0x88;
+    for (i = 0; i < 4; i++, y += 0x1C) {
+        txt = GetHairStr(hairBase + i);
 #ifdef VERSION_GCCJGC
-        hairFont->SetPosX(424.0f);
-        hairFont->SetPosY(static_cast<float>(y));
+        font->SetPosX(424.0f);
+        font->SetPosY(static_cast<float>(y));
 #else
-        hairFont->SetPosX(384.0f);
-        hairFont->SetPosY(static_cast<float>(y) - 4.0f);
+        font->SetPosX(384.0f);
+        font->SetPosY(static_cast<float>(y) - 4.0f);
 #endif
-        hairFont->Draw(txt);
+        font->Draw(txt);
     }
 
     DrawInit();
@@ -2707,8 +2706,9 @@ void CMenuPcs::CmakeTribeDraw()
 #else
             float hairX = 348.0f;
 #endif
+            hairX += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
             DrawCursor(
-                static_cast<int>(hairX + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8)),
+                static_cast<int>(hairX),
                 static_cast<int>(static_cast<float>(0x88 + CmakeState(this)->m_row * 0x1C)), alpha);
         }
     }

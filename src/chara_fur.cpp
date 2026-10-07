@@ -425,8 +425,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		furDepth = -clipPos.z / clipPos.w;
 	}
 
-	const float lenScale = m_furLenScale;
-	float furLength = lenScale * (1.0f - furDepth) + lenScale;
+	float furLength = m_furLenScale * (1.0f - furDepth) + m_furLenScale;
 	float furStep = m_furStep;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -500,22 +499,16 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			CMaterial* shadowMaterials[2] = {0, 0};
 			MtxPtr shadowMatrices[2] = {0, 0};
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, modelPos, 100.0f, 20.0f, 0);
-			CMaterial** shadowMatP = shadowMaterials;
-			MtxPtr* shadowMtxP = shadowMatrices;
-			int shadowTexMtxBase = 0;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				const int shadowTexMap = shadowIndex + 3;
-				const int shadowTexMtxId = shadowTexMtxBase + 0x21;
-				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), (*shadowMatP)->GetTexture(0));
+				const int shadowTexMtxId = shadowIndex * 3 + 0x21;
+				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), shadowMaterials[shadowIndex]->GetTexture(0));
 
 				Mtx shadowTexMtx;
-				PSMTXConcat(*shadowMtxP, meshMtx, shadowTexMtx);
+				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
 				GXLoadTexMtxImm(shadowTexMtx, shadowTexMtxId, GX_MTX3x4);
 				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowTexMap), GX_TG_MTX3x4, GX_TG_POS,
 				                  shadowTexMtxId, GX_FALSE, GX_PTIDENTITY);
-				shadowTexMtxBase += 3;
-				shadowMatP++;
-				shadowMtxP++;
 			}
 		}
 
@@ -569,7 +562,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
 				int tevStage = 1;
-				for (int shadowStage = 0; shadowStage < shadowCount; shadowStage++, tevStage++) {
+				for (int shadowStage = 0; shadowStage < shadowCount; tevStage++, shadowStage++) {
 					GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
 					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
 					_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_CPREV, GX_CC_TEXC, GX_CC_TEXA, GX_CC_ZERO);

@@ -2229,8 +2229,8 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
-	int i;
 	CmdListEntry* entry;
+	int i;
 	int j;
 	int idx;
 	int finished;
@@ -2246,8 +2246,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 	if (topIdx > 0) {
 		for (i = 0; i < 3; i++) {
-			entry = &GetCmdListStorage(this)->entries[i + s_UniteTop[topIdx]];
 			idx = i + s_UniteTop[topIdx];
+			entry = &GetCmdListStorage(this)->entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
@@ -2263,8 +2263,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		targetX = 64.0f + baseX;
 		for (i = finished = 0; i < s_ucnt; i++) {
 			for (j = 0; j < 3; j++) {
-				entry = &GetCmdListStorage(this)->entries[j + s_UniteTop[i]];
 				idx = j + s_UniteTop[i];
+				entry = &GetCmdListStorage(this)->entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}

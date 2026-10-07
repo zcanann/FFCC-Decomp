@@ -8411,7 +8411,7 @@ void CMenuPcs::CalcMainMenuSub()
 			int frame = 0;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
-				modelScale = static_cast<float>(static_cast<double>(modelScale) * DOUBLE_803315D8);
+				modelScale *= DOUBLE_803315D8;
 			}
 
 			panel->m_transform.m_scale.x = modelScale;

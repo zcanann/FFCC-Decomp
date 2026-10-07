@@ -2541,8 +2541,14 @@ odenotstub/odenotstub.c:
 	.text start:0x801BB3EC end:0x801BB3F4
 
 p_system.cpp:
+	extab start:0x80006908 end:0x80006918
 	extabindex start:0x8000C4F0 end:0x8000C508
 	.text start:0x80047A90 end:0x80047BF4
+	.ctors start:0x801D4354 end:0x801D4358
+	.rodata start:0x801D6B88 end:0x801D6BA9
+	.data start:0x801E8F50 end:0x801E9114
+	.sdata start:0x8032D5E8 end:0x8032D600
+	.sbss start:0x8032DCE8 end:0x8032DCEC
 
 mapshadow.cpp:
 	.text start:0x8004C510 end:0x8004C7FC
@@ -2587,6 +2593,9 @@ menu.cpp:
 	extab start:0x80007D68 end:0x80007D90
 	extabindex start:0x8000E170 end:0x8000E1AC
 	.text start:0x8009AC94 end:0x8009ADC4
+	.data start:0x8020E7E8 end:0x8020E818
+	.sdata start:0x8032D7B8 end:0x8032D7C8
+	.sdata2 start:0x8032F878 end:0x8032F888
 
 pppYmLaser.cpp:
 	.text start:0x800D1DE0 end:0x800D2FE4
@@ -2595,13 +2604,25 @@ p_sound.cpp:
 	extab start:0x80008B8C end:0x80008BB4
 	extabindex start:0x8000F61C end:0x8000F658
 	.text start:0x800D7EDC end:0x800D8094
+	.ctors start:0x801D4394 end:0x801D4398
+	.rodata start:0x801DA400 end:0x801DA421
+	.data start:0x8020F410 end:0x8020F5E0
+	.sdata start:0x8032D870 end:0x8032D888
+	.sbss start:0x8032DDC0 end:0x8032DDC4
 
 quadobj.cpp:
 	.text start:0x8010A61C end:0x8010A9D8
 
 p_mc.cpp:
+	extab start:0x800095EC end:0x800095FC
 	extabindex start:0x800105AC end:0x800105C4
 	.text start:0x80123CC8 end:0x80123EA8
+	.ctors start:0x801D4398 end:0x801D439C
+	.rodata start:0x801DBCF0 end:0x801DBD08
+	.data start:0x80210C10 end:0x80210DD4
+	.sdata start:0x8032D9B0 end:0x8032D9C8
+	.sbss start:0x8032DE68 end:0x8032DE6C
+	.sdata2 start:0x80330AB8 end:0x80330AC0
 
 pppConstrainCameraDir.cpp:
 	.text start:0x80142208 end:0x80142450
@@ -2626,3 +2647,8 @@ dolphin/os/__start.c:
 
 TRK_MINNOW_DOLPHIN/__exception.s:
 	.init start:0x800034AC end:0x800053E0
+
+pppfunctbl.cpp:
+	.rodata start:0x801D7470 end:0x801D7E28
+	.data start:0x801E9D18 end:0x801EB86C
+	.sdata2 start:0x8032F0C0 end:0x8032F0D0

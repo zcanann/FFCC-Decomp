@@ -1330,7 +1330,10 @@ pppGetRotMatrixZYX.cpp:
 	extabindex start:0x8000CEF8 end:0x8000CF04
 
 pppShape.cpp:
+	extab start:0x80007290 end:0x800072D0
+	extabindex start:0x8000D198 end:0x8000D1F8
 	.text start:0x80064AB4 end:0x80065100
+	.sdata2 start:0x8034CE60 end:0x8034CE70
 
 pppsintbl.cpp:
 	.data	start:0x801E0D70 end:0x801F0D70

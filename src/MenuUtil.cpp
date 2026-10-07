@@ -1222,7 +1222,7 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(h),
 	             static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 	gUtil.RenderTextureQuad(0.0f,
-	                        -(h * 0.5f - 224.0f) - 14.0f,
+	                        -(h / 2.0f - 224.0f) - 14.0f,
 	                        640.0f, h, m_wmOptionTextures[5], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
@@ -1289,7 +1289,7 @@ void CMenuPcs::DrawOptionMenu()
 		uv1.x = (i == m_optionIndex) ? 0.5f : 1.0f;
 		uv1.y = 1.0f;
 		gUtil.RenderTextureQuad(56.0f, static_cast<float>(rowY),
-		                        w * 0.5f, h, m_wmOptionTextures[0], &uv0,
+		                        w / 2.0f, h, m_wmOptionTextures[0], &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 #ifdef VERSION_GCCJGC
@@ -1339,7 +1339,7 @@ void CMenuPcs::DrawOptionMenu()
 		fnt->SetMargin(1.0f);
 		fnt->SetScaleX(0.8f);
 		fnt->SetScaleY(1.0f);
-		DrawFont2(static_cast<int>(-(fnt->GetWidth(help) * 0.5f -
+		DrawFont2(static_cast<int>(-(fnt->GetWidth(help) / 2.0f -
 		                            320.0f)),
 		          static_cast<int>(helpTextY), color, 7, helpText[m_optionIndex], 0.8f,
 		          1.0f, 1.0f);
@@ -1370,7 +1370,7 @@ void CMenuPcs::DrawOptionMenu()
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 0.0f }, { 496.0f, 0.0f } };
 #endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
-		rightXi = static_cast<int>(w * 0.5f + row.rightIcon.x - 472.0f);
+		rightXi = static_cast<int>(w / 2.0f + row.rightIcon.x - 472.0f);
 #ifndef VERSION_GCCJGC
 		row.leftText.y = 185.0f;
 		row.rightText.y = 185.0f;
@@ -1381,7 +1381,7 @@ void CMenuPcs::DrawOptionMenu()
 
 		SetUv(uv0, 0.0f, 0.0f);
 		SetUv(uv1, 0.5f, 1.0f);
-		float sideW = static_cast<float>(sideWidth) * 0.5f;
+		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
@@ -1487,7 +1487,7 @@ void CMenuPcs::DrawOptionMenu()
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 0.0f }, { 488.0f, 0.0f } };
 #endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
-		rightXi = static_cast<int>(w * 0.5f + row.rightIcon.x - 472.0f);
+		rightXi = static_cast<int>(w / 2.0f + row.rightIcon.x - 472.0f);
 #ifndef VERSION_GCCJGC
 		row.leftText.y = 185.0f;
 		row.rightText.y = 185.0f;
@@ -1498,7 +1498,7 @@ void CMenuPcs::DrawOptionMenu()
 
 		SetUv(uv0, 0.0f, 0.0f);
 		SetUv(uv1, 0.5f, 1.0f);
-		float sideW = static_cast<float>(sideWidth) * 0.5f;
+		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,

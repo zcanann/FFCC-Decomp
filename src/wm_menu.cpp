@@ -7604,9 +7604,10 @@ void CMenuPcs::DrawCMLife()
 		fade = static_cast<float>(-(*pRate * static_cast<double>(worldState->m_frameCounter) -
 		                            *pOne));
 	}
+	int slot;
 	unsigned int readyMask = 0;
-	for (int i = 0; i < 4; i++) {
-		const WmCharaSelectEntry& entry = selectEntries[i];
+	for (slot = 0; slot < 4; slot++) {
+		const WmCharaSelectEntry& entry = selectEntries[slot];
 		if (entry.m_connected != 0 && entry.m_cmakePending == 0 && entry.m_cmakeReady == 0) {
 			readyMask |= 1u << entry.m_currentSlot;
 		}
@@ -7614,7 +7615,7 @@ void CMenuPcs::DrawCMLife()
 	const float* p255A = &FLOAT_80331458;
 	const double alphaF = *p255A * fade;
 
-	for (int slot = 0; slot < 8; slot++) {
+	for (slot = 0; slot < 8; slot++) {
 		int i;
 		int row;
 		int col;

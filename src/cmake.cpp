@@ -224,44 +224,6 @@ static inline void SetCmakeFontColor(CFont* font, float alpha)
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 }
 
-static inline void DrawCmakeSelectionBackdrop(CMenuPcs* menu)
-{
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor col;
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, col);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
-    MenuPcs.DrawRect(
-        0,
-        0.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        8,
-        608.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
-    for (int x = 0x20; x < 0x260; x += 0x20) {
-        int span = 0x20;
-        if ((0x260 - x) < span) {
-            span = 0x260 - x;
-        }
-
-        MenuPcs.DrawRect(
-            0,
-            (float)x, 24.0f, (float)span, 336.0f,
-            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    }
-
-    menu->DrawInit();
-}
-
 static inline void DrawCmakePopupPanel(CMenuPcs* menu, float alpha, float x, float y, float w, float h, float scaleX, float scaleY)
 {
     int a = static_cast<int>(255.0f * alpha);
@@ -997,33 +959,7 @@ void CMenuPcs::DrawSingCMake()
         float alpha = CalcCmakeFadeAlpha(this);
         DrawWMFrame0(1, alpha);
 
-        SetCmakeBlendMatColor(alpha);
-
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
-        MenuPcs.DrawRect(
-            0,
-            0.0f, 24.0f, 32.0f, 336.0f,
-            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        MenuPcs.DrawRect(
-            8,
-            608.0f, 24.0f, 32.0f, 336.0f,
-            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
-        {
-            int span;
-            for (int x = 0x20; x < 0x260; x += span) {
-                span = 0x20;
-                if ((0x260 - x) < span) {
-                    span = 0x260 - x;
-                }
-
-                MenuPcs.DrawRect(
-                    0,
-                    static_cast<float>(x), 24.0f, static_cast<float>(span), 336.0f,
-                    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-            }
-        }
+        DrawCmakeWin(0.0f, 0.0f, alpha);
 
         if (CmakeState(this)->m_resultFlag != 0 && CmakeState(this)->m_mode == 0) {
             CmakeState(this)->m_step = CmakeState(this)->m_step + 1;
@@ -2213,26 +2149,7 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     DrawWMFrame0(1, 1.0f);
-    SetCmakeBlendMatColor(1.0f);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
-    MenuPcs.DrawRect(
-        0, 0.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        8, 608.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
-    for (int x = 0x20; x < 0x260;) {
-        int span = 0x20;
-        if ((0x260 - x) < span) {
-            span = 0x260 - x;
-        }
-        MenuPcs.DrawRect(
-            0, static_cast<float>(x), 24.0f, static_cast<float>(span), 336.0f,
-            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        x += span;
-    }
+    DrawCmakeWin(0.0f, 0.0f, 1.0f);
 
     SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
@@ -2461,26 +2378,7 @@ void CMenuPcs::CmakeSexDraw()
     }
     DrawWMFrame0(1, 1.0f);
 
-    SetCmakeBlendMatColor(1.0f);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
-    MenuPcs.DrawRect(
-        0, 0.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        8, 608.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
-    int span;
-    for (int x = 0x20; x < 0x260;) {
-        span = 0x20;
-        if ((0x260 - x) < span) {
-            span = 0x260 - x;
-        }
-        MenuPcs.DrawRect(
-            0, static_cast<float>(x), 24.0f, static_cast<float>(span), 336.0f,
-            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        x += span;
-    }
+    DrawCmakeWin(0.0f, 0.0f, 1.0f);
 
     DrawSingleCMakeChara(1.0f);
 
@@ -2715,33 +2613,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    SetCmakeBlendMatColor(1.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
-    MenuPcs.DrawRect(
-        0,
-        0.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        8,
-        608.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
-    {
-        int tileW;
-        for (int tileX = 0x20; tileX < 0x260; tileX += tileW) {
-            tileW = 0x20;
-            if (0x260 - tileX < 0x20) {
-                tileW = 0x260 - tileX;
-            }
-
-            MenuPcs.DrawRect(
-                0,
-                static_cast<float>(tileX), 24.0f, static_cast<float>(tileW), 336.0f,
-                0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        }
-    }
+    DrawCmakeWin(0.0f, 0.0f, 1.0f);
 
     DrawSingleCMakeChara(1.0f);
 
@@ -3002,33 +2874,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    SetCmakeBlendMatColor(1.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
-    MenuPcs.DrawRect(
-        0,
-        0.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        8,
-        608.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
-    {
-        int span;
-        for (int x = 0x20; x < 0x260; x += span) {
-            span = 0x20;
-            if ((0x260 - x) < span) {
-                span = 0x260 - x;
-            }
-
-            MenuPcs.DrawRect(
-                0,
-                static_cast<float>(x), 24.0f, static_cast<float>(span), 336.0f,
-                0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        }
-    }
+    DrawCmakeWin(0.0f, 0.0f, 1.0f);
 
     DrawSingleCMakeChara(1.0f);
 
@@ -3185,31 +3031,7 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    SetCmakeBlendMatColor(1.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
-    MenuPcs.DrawRect(
-        0,
-        0.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        8,
-        608.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
-    for (int tileX = 0x20; tileX < 0x260; ) {
-        int tileW = 0x20;
-        if (0x260 - tileX < 0x20) {
-            tileW = 0x260 - tileX;
-        }
-
-        MenuPcs.DrawRect(
-            0,
-            static_cast<float>(tileX), 24.0f, static_cast<float>(tileW), 336.0f,
-            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        tileX += tileW;
-    }
+    DrawCmakeWin(0.0f, 0.0f, 1.0f);
 
     DrawSingleCMakeChara(1.0f);
 
@@ -3449,31 +3271,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawWMFrame0(1, 1.0f);
 
-    SetCmakeBlendMatColor(1.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD48));
-    MenuPcs.DrawRect(
-        0,
-        0.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        8,
-        608.0f, 24.0f, 32.0f, 336.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD49));
-    for (int tileX = 0x20; tileX < 0x260; ) {
-        int tileW = 0x20;
-        if (0x260 - tileX < 0x20) {
-            tileW = 0x260 - tileX;
-        }
-
-        MenuPcs.DrawRect(
-            0,
-            static_cast<float>(tileX), 24.0f, static_cast<float>(tileW), 336.0f,
-            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        tileX += tileW;
-    }
+    DrawCmakeWin(0.0f, 0.0f, 1.0f);
 
     DrawSingleCMakeChara(1.0f);
 

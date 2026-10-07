@@ -808,8 +808,6 @@ int CChara::CModel::PickFur(
 	CChara::CMesh* mesh = m_meshes;
 
 	CWork verts[3];
-	CWork incoming;
-	Mtx44 invScreenMtx;
 
 	for (unsigned int meshIndex = 0; meshIndex < m_data->m_meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -875,6 +873,7 @@ int CChara::CModel::PickFur(
 								psq_st posZ, 8(localPosPtr), 1, 0
 							}
 
+							CWork incoming;
 							PSMTXMultVec(modelViewMtx, &localPos, &incoming.m_viewPos);
 
 							if (incoming.m_viewPos.z >= 0.0f) {
@@ -926,6 +925,7 @@ int CChara::CModel::PickFur(
 								}
 
 								hitAny = 1;
+								Mtx44 invScreenMtx;
 								PSMTX44Copy(screenMtx, invScreenMtx);
 								C_MTX44Inverse(invScreenMtx, invScreenMtx);
 

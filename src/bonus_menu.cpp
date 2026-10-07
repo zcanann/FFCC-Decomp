@@ -1770,7 +1770,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			doneCount++;
 		}
 
-		if ((sprite->flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
 			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
@@ -2359,7 +2359,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			doneCount++;
 		}
 
-		if ((sprite->flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
 			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
@@ -3188,7 +3188,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 			doneCount++;
 		}
 
-		if ((sprite->flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
 			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;

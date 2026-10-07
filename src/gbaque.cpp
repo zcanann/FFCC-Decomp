@@ -2083,10 +2083,9 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 	}
 	memset(letterEntryBuf, 0, kGbaQueueLetterEntryBytes);
 
-	letterCount = scriptFood->m_letterCount;
-
-	npcCount = 0;
 	subjectCount = 0;
+	npcCount = 0;
+	letterCount = scriptFood->m_letterCount;
 
 	npcWrite = npcNameBuf;
 	subjectWrite = subjectNameBuf;
@@ -2499,7 +2498,8 @@ void GbaQueue::LoadMapObj()
 					mapObjWork.m_entries[count].m_z = static_cast<short>(mapObj->m_z / 3.0f);
 					mapObjWork.m_entries[count].m_radius = static_cast<short>(mapObj->m_radius / 3.0f);
 
-					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | drawMask;
+					unsigned int flags = mapObjWork.m_drawFlags & mask;
+					mapObjWork.m_drawFlags = flags | drawMask;
 					mapObjWork.m_count = static_cast<unsigned char>(mapObjWork.m_count + 1);
 				}
 			}
@@ -3278,7 +3278,6 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	int dataSize;
 	int equipCount;
 	unsigned short equipData[4];
-	char* indexPtr;
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3287,13 +3286,10 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memset(equipIndices, 0xFF, sizeof(equipIndices));
-	indexPtr = equipIndices;
 	for (i = equipCount = 0; i < 0x40; i++) {
 		short itemId = localPlayerData.m_items[i];
 		if ((itemId >= 0) && (itemId <= 0x9E)) {
-			*indexPtr = i;
-			equipCount++;
-			indexPtr++;
+			equipIndices[equipCount++] = i;
 		}
 	}
 

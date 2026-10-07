@@ -2193,16 +2193,17 @@ void CShopMenu::DrawMake()
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
     float makeMarginW = FLOAT_80332E10;
-    short makeAmountX = static_cast<int>(FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
-    DrawDecScale(makeGil, 0x13, makeAmountX, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
+    x = FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c;
+    DrawDecScale(makeGil, 0x13, x, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
 
-    int gilAmountX = static_cast<int>(FLOAT_80332E1C - gilUnitWidth - FLOAT_80332d5c);
-    int makeGil2 = getMakeGil(getItemNo(m_selectedIndex));
-    int gilTlut = 2;
-    if (m_caravanWork->m_gil >= makeGil2) {
+    x = FLOAT_80332E1C - gilUnitWidth - FLOAT_80332d5c;
+    int gilTlut;
+    if (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex))) {
         gilTlut = 0x14;
+    } else {
+        gilTlut = 2;
     }
-    DrawDecScale(m_caravanWork->m_gil, gilTlut, gilAmountX, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
+    DrawDecScale(m_caravanWork->m_gil, gilTlut, x, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
 
     font->SetScale(FLOAT_80332d28);
     font->DrawInit();

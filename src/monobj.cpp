@@ -12,6 +12,7 @@
 #include "ffcc/maphit.h"
 #include "ffcc/monobj_table.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/p_map.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/sound.h"
 #include "ffcc/gbaque.h"
@@ -65,6 +66,22 @@ static const char s_monObjTexAnimU0[3] = "u0";
 extern "C" const float kMonObjPercentMax = 100.0f;
 extern "C" const float kMonObjOne = 1.0f;
 
+
+inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+{
+	CMapCylinder cylinder;
+
+	cylinder.m_bottom = *cylinderBottom;
+	cylinder.m_axis = *direction;
+	cylinder.m_radius = radius;
+
+	return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
+}
+
+inline float CMapPcs::GetHitT()
+{
+	return g_hit_t_slide_min;
+}
 
 static inline unsigned char* CGMonObj_GetAiData(CGMonObj* monObj)
 {
@@ -1782,18 +1799,9 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	if ((flags & 1) != 0) {
 		unsigned short cylHitArg = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
 		float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
-		CMapCylinder hitCylinder;
-		hitCylinder.m_bottom.x = startPos.x;
-		hitCylinder.m_bottom.y = startPos.y;
-		hitCylinder.m_bottom.z = startPos.z;
-		hitCylinder.m_axis.x = move.x;
-		hitCylinder.m_axis.y = move.y;
-		hitCylinder.m_axis.z = move.z;
-		hitCylinder.m_radius = cylRadius;
-
-		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), cylHitArg);
+		int hit = MapPcs.CheckHitCylinderNear(startPos, move, cylRadius, cylHitArg);
 		if (hit != 0) {
-			float hitT = g_hit_t_slide_min;
+			float hitT = MapPcs.GetHitT();
 			if (hitScale != NULL) {
 				*hitScale = hitT;
 			}
@@ -1814,10 +1822,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		}
 
 		CVector coneStart = startPos;
-		PSVECSubtract(coneStart, forward * sideDist, coneStart);
+		coneStart -= forward * sideDist;
 
 		float coneLength = distance + sideDist;
-		PSVECAdd(move, forward * sideDist, move);
+		move += forward * sideDist;
 
 		int didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
@@ -1873,20 +1881,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			didHit = 1;
 			float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
 			unsigned short hitMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
-			const CVector& cylTop = partyPos - startPos;
-			CMapCylinder hitCylinder;
-			hitCylinder.m_bottom.x = startPos.x;
-			hitCylinder.m_bottom.y = startPos.y;
-			hitCylinder.m_bottom.z = startPos.z;
-			hitCylinder.m_axis.x = cylTop.x;
-			hitCylinder.m_axis.y = cylTop.y;
-			hitCylinder.m_axis.z = cylTop.z;
-			hitCylinder.m_radius = cylRadius;
-
-			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, const_cast<CVector&>(cylTop), hitMask);
+			int mapHit = MapPcs.CheckHitCylinderNear(startPos, partyPos - startPos, cylRadius, hitMask);
 			CVector debugDelta = targetDelta;
 			if (mapHit != 0) {
-				PSVECScale(debugDelta, debugDelta, g_hit_t_slide_min);
+				PSVECScale(debugDelta, debugDelta, MapPcs.GetHitT());
 			}
 			CFlat.AddDebugDrawCC(startPos, debugDelta, cylRadius, 1, mapHit == 0);
 

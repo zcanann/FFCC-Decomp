@@ -203,10 +203,10 @@ inline void CGMonObj::suikomiSub(CGObject* target, float zOffset)
 
 	if (kMonObjBossZero < dist) {
 		float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
-		float ax = dx * accel;
-		float az = dz * accel;
-		target->m_groundHitOffset.x += ax;
-		target->m_groundHitOffset.z += az;
+		dx *= accel;
+		dz *= accel;
+		target->m_groundHitOffset.x += dx;
+		target->m_groundHitOffset.z += dz;
 	}
 }
 

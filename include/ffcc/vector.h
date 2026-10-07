@@ -79,6 +79,10 @@ public:
 	{
 		PSVECAdd((const Vec*)this, (const Vec*)&other, (Vec*)this);
 	}
+	void operator-=(const CVector& other)
+	{
+		PSVECSubtract((const Vec*)this, (const Vec*)&other, (Vec*)this);
+	}
 	void operator*=(float scale)
 	{
 		PSVECScale((const Vec*)this, (Vec*)this, scale);

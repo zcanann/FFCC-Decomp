@@ -1624,6 +1624,20 @@ void CMenuPcs::DrawSingleBase(float alpha)
     }
 }
 
+enum {
+#ifdef VERSION_GCCJGC
+    kStatTexHeader = 0x25,
+    kStatTexSlice = 0x28,
+    kStatTexPortrait = 0x21,
+    kStatTexEmblem = 0x29,
+#else
+    kStatTexHeader = 0x26,
+    kStatTexSlice = 0x29,
+    kStatTexPortrait = 0x22,
+    kStatTexEmblem = 0x2A,
+#endif
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80148b98
@@ -1651,14 +1665,14 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color.b = 0xFF;
     color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x26));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kStatTexHeader));
     float x = 440.0f;
     MenuPcs.DrawRect(0, x, 0.0f, 152.0f, 40.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 440.0f, 408.0f, 152.0f, 40.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kStatTexSlice));
     float sliceY = 40.0f;
     float sliceHeight = 8.0f;
     for (; sliceY < 408.0f; sliceY += sliceHeight) {
@@ -1674,7 +1688,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color.b = 0xFF;
     color.a = static_cast<u8>(255.0 * (0.5 * alpha));
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kStatTexPortrait));
 
     int charaNo = SingleCaravanWork()->m_tribeId;
     float iconStep = 216.0f;
@@ -1689,7 +1703,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color.b = 0xFF;
     color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kStatTexEmblem));
     x = 440.0f;
     x += 28.0f;
     MenuPcs.DrawRect(0, x, 88.0f, 96.0f, 88.0f,
@@ -1710,7 +1724,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color.b = 0xFF;
     color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kStatTexEmblem));
     x = 440.0f;
     x += 28.0f;
     MenuPcs.DrawRect(0, x, 128.0f, 96.0f, 48.0f,
@@ -1731,12 +1745,20 @@ void CMenuPcs::DrawSingleStat(float alpha)
     float titleX = 152.0f - titleWidth;
     titleX = 440.0f + static_cast<float>(0.5 * titleX);
     font->SetPosX(1.0f + titleX);
+#ifdef VERSION_GCCJGC
+    font->SetPosY(57.0f);
+#else
     font->SetPosY(53.0f);
+#endif
     font->Draw(charaName);
 
     font->SetTlut(0x17);
     font->SetPosX(titleX);
+#ifdef VERSION_GCCJGC
+    font->SetPosY(56.0f);
+#else
     font->SetPosY(52.0f);
+#endif
     font->Draw(charaName);
 
     font->SetTlut(0x15);
@@ -1746,9 +1768,16 @@ void CMenuPcs::DrawSingleStat(float alpha)
     float y = statY0;
     for (int i = 0; i < 4; i++) {
         font->SetPosX(440.0f);
+#ifdef VERSION_GCCJGC
+        font->SetPosY(y);
+#else
         font->SetPosY(y - 5.0f);
+#endif
 
         char* label;
+#ifdef VERSION_GCCJGC
+        label = GetMenuStr(i + 5);
+#else
         switch (Game.m_gameWork.m_languageId) {
             case 2:
                 label = (char*)gSingMenuTextTableDe[i + 5];
@@ -1767,6 +1796,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
                 label = (char*)gSingMenuTextTableEn[i + 5];
                 break;
         }
+#endif
 
 #ifdef VERSION_GCCP01
         if ((languageId == 2) && (i == 3)) {
@@ -2365,12 +2395,20 @@ void CMenuPcs::DrawShadowFont(CFont* font, char* text, float x, float y, int tlu
 {
     font->SetTlut(shadowTlut);
     font->SetPosX(1.0f + x);
+#ifdef VERSION_GCCJGC
+    font->SetPosY(1.0f + y);
+#else
     font->SetPosY((1.0f + y) - 4.0f);
+#endif
     font->Draw(text);
 
     font->SetTlut(tlut);
     font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+    font->SetPosY(y);
+#else
     font->SetPosY(y - 4.0f);
+#endif
     font->Draw(text);
 }
 
@@ -2387,7 +2425,11 @@ void CMenuPcs::DrawNoShadowFont(CFont* font, char* text, float x, float y, int t
 {
     font->SetTlut(tlut);
     font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+    font->SetPosY(y);
+#else
     font->SetPosY(y - 4.0f);
+#endif
     font->Draw(text);
 }
 
@@ -2682,11 +2724,19 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
     for (i = 0; i < lineCount; i++) {
+#ifdef VERSION_GCCJGC
+        if (useDynamic != 0) {
+            text = s_DynamicMessStr + i * 0x80;
+        } else {
+            text = GetMenuStr(s_singleMenuStaticMessages[messageNo].textIds[i]);
+        }
+#else
         if (useDynamic == 0) {
             text = GetSingWinMessage(s_singleMenuStaticMessages[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
         } else {
             text = s_DynamicMessStr + i * 0x80;
         }
+#endif
         int textWidth = font->GetWidth(text);
         if (textWidth > maxWidth) {
             maxWidth = textWidth;
@@ -2707,16 +2757,28 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     for (i = 0; i < lineCount; i++) {
         font->SetTlut((activeMask & (1 << i)) != 0 ? 7 : 8);
 
+#ifdef VERSION_GCCJGC
+        if (useDynamic != 0) {
+            text = s_DynamicMessStr + i * 0x80;
+        } else {
+            text = GetMenuStr(s_singleMenuStaticMessages[messageNo].textIds[i]);
+        }
+#else
         if (useDynamic == 0) {
             text = GetSingWinMessage(s_singleMenuStaticMessages[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
         } else {
             text = s_DynamicMessStr + i * 0x80;
         }
+#endif
         if (static_cast<int>(strlen(text)) != 0) {
             char lineBuffer[128];
             strcpy(lineBuffer, text);
             font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+            font->SetPosY(y);
+#else
             font->SetPosY(y - yOffset);
+#endif
             font->Draw(lineBuffer);
         }
 
@@ -2744,7 +2806,11 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
 
     font = m_fonts[0];
     font->SetMargin(1.0f);
+#ifdef VERSION_GCCJGC
+    font->SetShadow(0);
+#else
     font->SetShadow(1);
+#endif
     font->SetScale(FLOAT_8032ea78);
 
     maxWidth = 0;
@@ -2755,11 +2821,19 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     }
     for (i = 0; i < lineCount; i++) {
         const char* text;
+#ifdef VERSION_GCCJGC
+        if (useDynamic != 0) {
+            text = s_DynamicMessStr + i * 0x80;
+        } else {
+            text = GetMenuStr(s_singleMenuStaticMessages[messageNo].textIds[i]);
+        }
+#else
         if (useDynamic == 0) {
             text = GetSingWinMessage(s_singleMenuStaticMessages[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
         } else {
             text = s_DynamicMessStr + i * 0x80;
         }
+#endif
         int textWidth = font->GetWidth(text);
         if (textWidth > maxWidth) {
             maxWidth = textWidth;
@@ -2782,9 +2856,13 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         widthLines++;
     }
 
+#ifdef VERSION_GCCJGC
+    widthLines += 3;
+#else
     if (useDynamic == 0) {
         widthLines += 3;
     }
+#endif
 
     *outWidth = static_cast<short>(widthLines * lineHeight + 0x40);
     *outHeight = static_cast<short>(lineCount * (lineHeight + 2) + 0x40);
@@ -3044,6 +3122,40 @@ void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInf
  */
 void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 {
+#ifdef VERSION_GCCJGC
+    unsigned short raceBits;
+    int raceType;
+
+    GetItemType(itemNo, 1);
+    raceBits = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
+    int raceLow = raceBits & 0xF;
+    int genderMask = raceBits & 0x30;
+    outText[0] = '\0';
+
+    if (raceLow == 0xF) {
+        strcpy(outText, GetMenuStr(19));
+        return;
+    }
+
+    for (raceType = 0; raceType < 4; raceType++) {
+        if ((raceLow & (1 << raceType)) != 0) {
+            break;
+        }
+    }
+
+    if (raceType < 4) {
+        strcpy(outText, GetTribeStr(raceType));
+    }
+
+    if (raceLow != 0 && genderMask != 0) {
+        strcpy(outText, " ");
+    }
+    if (genderMask == 0) {
+        return;
+    }
+
+    strcat(outText, GetMenuStr(((genderMask >> 5) & 1) + 17));
+#else
     unsigned short raceBits;
     int raceType;
     char* text;
@@ -3137,6 +3249,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         break;
     }
     strcat(outText, suffix);
+#endif
 }
 
 /*

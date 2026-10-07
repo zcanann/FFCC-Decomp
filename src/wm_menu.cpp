@@ -3843,21 +3843,18 @@ void CMenuPcs::DrawCMakeMenu()
 			         CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
 			         7, textList[textIndex], 1.0f, 1.0f);
 #else
+			int mesNo = 5;
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x4B);
+			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 			char* textList[3] = {0};
 			for (int i = 0; i < 3; i++) {
-				textList[i] = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1][i + 5];
+				textList[i] = mes[mesNo++];
 			}
-			const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(textAlpha & 0xFF)).color;
-			char* const text = textList[textIndex];
-			const float* pW1 = &FLOAT_80331594;
-			const float* pH1 = &FLOAT_803313e8;
-			const int x = static_cast<int>(CalcCenteringPos2(text, *pW1, *pH1));
-			const float* pY1 = &FLOAT_803317D0;
-			const float* pW1b = &FLOAT_80331594;
-			const float* pH1b = &FLOAT_803313e8;
-			DrawFont2(x, static_cast<int>(*pY1), textColor, 7, text,
-			          *pW1b, *pH1b, *pH1b);
+			const float* pY = &FLOAT_803317D0;
+			DrawFont2(static_cast<int>(CalcCenteringPos2(textList[textIndex], FLOAT_80331594, FLOAT_803313e8)),
+			          static_cast<int>(*pY),
+			          CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7,
+			          textList[textIndex], FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 			}
 		} else if (m_wmWorldState->m_menuMode == 8) {
@@ -3872,18 +3869,14 @@ void CMenuPcs::DrawCMakeMenu()
 					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
 					                 7, text, 1.0f, 1.0f);
 #else
-					char** const caseText = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
-				unsigned int ci = 8;
-				char* const text = caseText[ci];
-					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
-					const float* pWc = &FLOAT_80331594;
-					const float* pHc = &FLOAT_803313e8;
-					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
-					const float* pYc = &FLOAT_803317D0;
-					const float* pWc2 = &FLOAT_80331594;
-					const float* pHc2 = &FLOAT_803313e8;
-					MenuPcs.DrawFont2(x, static_cast<int>(*pYc), textColor, 7, text,
-					                  *pWc2, *pHc2, *pHc2);
+					int mesNo = 8;
+					const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
+					char* text = g_strWMMenuMes[languageIndex][mesNo++];
+					const float* pY = &FLOAT_803317D0;
+					MenuPcs.DrawFont2(static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8)),
+					                  static_cast<int>(*pY),
+					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 					break;
 				}
@@ -3894,18 +3887,14 @@ void CMenuPcs::DrawCMakeMenu()
 					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
 					                 7, text, 1.0f, 1.0f);
 #else
-					char** const caseText = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
-				unsigned int ci = 9;
-				char* const text = caseText[ci];
-					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
-					const float* pWc = &FLOAT_80331594;
-					const float* pHc = &FLOAT_803313e8;
-					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
-					const float* pYc = &FLOAT_803317D0;
-					const float* pWc2 = &FLOAT_80331594;
-					const float* pHc2 = &FLOAT_803313e8;
-					MenuPcs.DrawFont2(x, static_cast<int>(*pYc), textColor, 7, text,
-					                  *pWc2, *pHc2, *pHc2);
+					int mesNo = 9;
+					const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
+					char* text = g_strWMMenuMes[languageIndex][mesNo++];
+					const float* pY = &FLOAT_803317D0;
+					MenuPcs.DrawFont2(static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8)),
+					                  static_cast<int>(*pY),
+					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 					break;
 				}
@@ -3920,18 +3909,14 @@ void CMenuPcs::DrawCMakeMenu()
 					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
 					                 7, text, 1.0f, 1.0f);
 #else
-					char** const caseText = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
-				unsigned int ci = 10;
-				char* const text = caseText[ci];
-					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
-					const float* pWc = &FLOAT_80331594;
-					const float* pHc = &FLOAT_803313e8;
-					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, *pWc, *pHc));
-					const float* pYc = &FLOAT_803317D0;
-					const float* pWc2 = &FLOAT_80331594;
-					const float* pHc2 = &FLOAT_803313e8;
-					MenuPcs.DrawFont2(x, static_cast<int>(*pYc), textColor, 7, text,
-					                  *pWc2, *pHc2, *pHc2);
+					int mesNo = 10;
+					const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
+					char* text = g_strWMMenuMes[languageIndex][mesNo++];
+					const float* pY = &FLOAT_803317D0;
+					MenuPcs.DrawFont2(static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8)),
+					                  static_cast<int>(*pY),
+					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 					break;
 				}
@@ -4102,13 +4087,18 @@ void CMenuPcs::DrawLoadMenu()
 	}
 	}
 #else
-	if (g_pGoOutMenu->m_goOutMode == 0x0E) {
+	switch (g_pGoOutMenu->m_goOutMode) {
+	case 0x0E: {
+		int mesNo = 8;
 		const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
-		char* text = g_strWMMenuMes[languageIndex][8];
-		_GXColor color = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(uAlpha)).color;
-		const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
-		MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), color, 7, text,
+		char* text = g_strWMMenuMes[languageIndex][mesNo++];
+		const float* pY = &FLOAT_803317D0;
+		MenuPcs.DrawFont2(static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8)),
+		                  static_cast<int>(*pY),
+		                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(uAlpha)).color, 7, text,
 		                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+		break;
+	}
 	}
 #endif
 

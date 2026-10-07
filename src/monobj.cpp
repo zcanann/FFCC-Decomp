@@ -2218,21 +2218,7 @@ body:
 					if ((*reinterpret_cast<unsigned short*>(aiScript + nextAction * 0x10 + 0x110) & 0x20) != 0) {
 						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 						actionState = 0x21;
-						if (monObj->m_moveWork.m_mode != 4) {
-							monObj->m_moveWork.Clear();
-							monObj->m_moveWork.m_flags = 0x855;
-							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
-								monObj->m_moveWork.m_flags |= 0x400;
-							}
-							if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x80) != 0) {
-								monObj->m_moveWork.m_flags |= 0x20000;
-							}
-							monObj->m_moveWork.SetFlags(0, 0);
-							monObj->m_moveWork.m_mode = 4;
-							monObj->m_moveWork.m_range = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
-							monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
-						}
-						monObj->m_moveWork.m_target = target;
+						monObj->moveChase(target);
 						monObj->m_chaseState = 5;
 						monObj->m_chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -2259,18 +2245,7 @@ body:
 					aiScript4 += nextAction * 0x10;
 					int actionParam = static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript4 + 0x11E));
 					actionState = 0x21;
-					if (monObj->m_moveWork.m_mode != 2) {
-						monObj->m_moveWork.Clear();
-						monObj->m_moveWork.m_flags = 0x325;
-						if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x40) != 0) {
-							monObj->m_moveWork.m_flags |= 0x10000;
-						}
-						monObj->m_moveWork.SetFlags(0, 0);
-						monObj->m_moveWork.m_mode = 2;
-					}
-					monObj->m_moveWork.m_target = target;
-					monObj->m_moveWork.m_range = actionRange;
-					monObj->m_moveWork.m_changeStat = actionParam;
+					CGMonObj_SetAttackMove(monObj, target, actionRange, actionParam);
 				}
 			} else {
 				actionState = nextAction - 0xE;
@@ -2280,6 +2255,7 @@ body:
 			monObj->m_chaseDirty = 1;
 			return;
 	}
+#undef CGMonObj_GetAiData
 #undef script
 #undef actionState
 }
@@ -2392,12 +2368,30 @@ inline void CGMonObj::resetWork()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::moveChase(CGCharaObj*)
+inline void CGMonObj::moveChase(CGCharaObj* target)
 {
-	// TODO
+	if (m_moveWork.m_mode != 4) {
+		m_moveWork.Clear();
+		m_moveWork.m_flags = 0x855;
+		if ((reinterpret_cast<CMonWork*>(m_scriptHandle)->m_romWork[0x7F] & 4) != 0) {
+			m_moveWork.m_flags |= 0x400;
+		}
+		if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(this) + 0x102) & 0x80) != 0) {
+			m_moveWork.m_flags |= 0x20000;
+		}
+		m_moveWork.SetFlags(0, 0);
+		m_moveWork.m_mode = 4;
+		m_moveWork.m_range = static_cast<float>(reinterpret_cast<CMonWork*>(m_scriptHandle)->m_romWork[0x6B]);
+		m_moveWork.m_limitFrame = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_romWork[0xDB];
+	}
+	m_moveWork.m_target = target;
 }
 
 /*
@@ -2787,25 +2781,9 @@ void CGMonObj::statWatch()
 							(aiState + *reinterpret_cast<unsigned short*>(aiData + 0x100)) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData + attackResult * 0x10 + 0x110) & 0x20) != 0) {
-						actionState = 0x21;
 						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
-						if (monObj->m_moveWork.m_mode != 4) {
-							monObj->m_moveWork.Clear();
-							monObj->m_moveWork.m_flags = 0x855;
-							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
-								monObj->m_moveWork.m_flags |= 0x400;
-							}
-							if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x80) != 0) {
-								monObj->m_moveWork.m_flags |= 0x20000;
-							}
-							monObj->m_moveWork.SetFlags(0, 0);
-							monObj->m_moveWork.m_mode = 4;
-							monObj->m_moveWork.m_range =
-								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
-							monObj->m_moveWork.m_limitFrame =
-								*reinterpret_cast<unsigned short*>(script + 0x1B6);
-						}
-						monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
+						actionState = 0x21;
+						monObj->moveChase(party);
 						chaseState = 5;
 						chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -2829,8 +2807,9 @@ void CGMonObj::statWatch()
 					}
 					aiData4 += attackResult * 0x10;
 					short changeStat = static_cast<short>(*reinterpret_cast<unsigned short*>(aiData4 + 0x11E));
+					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 					actionState = 0x21;
-					CGMonObj_SetAttackMove(monObj, Game.m_partyObjArr[selectedTarget], range, changeStat);
+					CGMonObj_SetAttackMove(monObj, party, range, changeStat);
 				}
 			} else {
 				actionState = attackResult - 0xE;

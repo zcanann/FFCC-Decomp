@@ -1823,7 +1823,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	SCharaItemRow* itemRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 	staType = itemRows[itemId].m_staType;
-	if (static_cast<int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && CharaObjGameFlagBit5Set()) {
+	if (staType != 0x67 && staType != 0x65 && staType != 0x66 && CharaObjGameFlagBit5Set()) {
 		System.Printf("スクリプトから攻撃ダメージOFF中\n");
 		return;
 	}
@@ -1832,7 +1832,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	int itemEffect = itemRows[itemId].m_effect;
 	int scriptDefense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0];
 	int damageClamp;
-	calcRegist(static_cast<int>(staType), itemId, resistType, allowEffect, effectResult, 0);
+	calcRegist(staType, itemId, resistType, allowEffect, effectResult, 0);
 
 	if (resistType == 3) {
 		if (staType == 4 || staType == 0x1C || static_cast<unsigned int>(staType) <= 2 ||
@@ -1953,7 +1953,12 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 100:
 			case 0x69:
 			case 0x6A: {
-				unsigned int basePower = (itemEffect == 0x1F8) ? CharaObjItemRow(itemId)->m_basePower : 0;
+				unsigned int basePower;
+				if (itemEffect == 0x1F8) {
+					basePower = CharaObjItemRow(itemId)->m_basePower;
+				} else {
+					basePower = 0;
+				}
 				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && itemId == 0x206) {
 					int castCurrent = static_cast<CGCharaObj*>(sourceObj)->m_unk68C;
 					int castEnd = static_cast<CGCharaObj*>(sourceObj)->m_comboFramePrev;
@@ -2004,24 +2009,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 0x1C: {
 				SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 				unsigned int basePower = powerRows[itemId].m_basePower;
-				unsigned char condC = 0;
-				unsigned char condB = 0;
-				unsigned char condA = 0;
-				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					condA = 1;
-				}
-				if (condA != 0) {
-					if (sourceObj->IsKindOf(0x6D) != 0) {
-						condB = 1;
-					}
-				}
-				if (condB != 0) {
-					if (reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_joybusCaravanId != 0) {
-						condC = 1;
-					}
-				}
 				CGPrgObj* powerSource;
-				if (condC != 0) {
+				if (CharaObjIsJoybusCaravan(sourceObj)) {
 					powerSource = Game.m_partyObjArr[0];
 				} else {
 					powerSource = sourceObj;
@@ -2042,18 +2031,20 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				break;
 			}
 			case 10: {
-				int recoilDamage;
 				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && static_cast<CGMonObj*>(this)->m_unk6C2 != 0) {
-					recoilDamage = 1;
+					damageAmount = 1;
 				} else {
 					float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
 					int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp)) * recoilRate);
-					recoilDamage = (raw < 1) ? 1 : raw;
+					damageAmount = 1;
+					if (raw >= 1) {
+						damageAmount = raw;
+					}
 					if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 						static_cast<CGMonObj*>(this)->m_unk6C2 = 1;
 					}
 				}
-				System.Printf("PC->MON GRAダメージ %d\n", recoilDamage);
+				System.Printf("PC->MON GRAダメージ %d\n", damageAmount);
 				int nextSta = calcSta(10, itemId, sourceObj);
 				setSta(10, nextSta);
 				break;
@@ -2133,9 +2124,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 				unsigned int sourcePower = rawSourcePower;
 				unsigned int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
-				float defenseRate = 1.0f;
+				float defenseRate;
 				if (sourceObj->IsKindOf(0xAD) != 0) {
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
+				} else {
+					defenseRate = 1.0f;
 				}
 				int guardValue = static_cast<int>(static_cast<float>(static_cast<int>(defense)) * defenseRate);
 				int computedGuard = static_cast<int>(basePower + sourcePower) - guardValue;
@@ -2147,7 +2140,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				break;
 			}
 			case 0x25:
-				damageAmount = (itemId == 0x4AA) ? 1 : 10;
+				damageAmount = 10;
+				if (itemId == 0x4AA) {
+					damageAmount = 1;
+				}
 				break;
 			default:
 				System.Printf("STA_%d 未対応\n", staType);
@@ -2270,12 +2266,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
 				     static_cast<CGPartyObj*>(sourceObj)->m_partyData.unk6CC == 2) &&
 				    (calcRegist(0x69, itemId, resistType, allowEffect, effectResult, 0), allowEffect != 0)) {
-					int chance;
-					if (IsKindOf(0xAD) != 0) {
-						chance = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCD];
-					} else {
-						chance = 0x32;
-					}
+					int chance = IsKindOf(0xAD) ? reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCD] : 0x32;
 					if (chance != 0 && (DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0) {
 						chance = 100;
 					}

@@ -10075,18 +10075,20 @@ void CMenuPcs::DrawMcWin(short state, short kind)
  */
 void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
-#ifdef VERSION_GCCJGC
+	CFont* font;
+	const char* const* msgTable;
 	int maxWidth;
-	int msgId;
-#else
 	int i;
+	const WinMessEntry* winMess;
+#ifdef VERSION_GCCJGC
+	int msgId;
 #endif
 #ifndef VERSION_GCCJGC
 	static const char* s_SlotStr[] = {"Slot A", "Steckplatz A", "Slot A", "Slot A", "Ranura A"};
 	static const char* s_DataStr[] = {"Data 1", "Datenblock 1", "Salvataggio 1", "sauvegarde 1", "Archivo 1"};
 #endif
 
-	CFont* const font = GetFont22();
+	font = GetFont22();
 
 	const float* pOneM = &FLOAT_803313e8;
 	font->SetMargin(*pOneM);
@@ -10097,25 +10099,21 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 	font->SetTlut(0x23);
 
-	const char* const* msgTable = GetMcWinMessBuff(messType);
+	msgTable = GetMcWinMessBuff(messType);
 #ifndef VERSION_GCCJGC
 	const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
-	const WinMessEntry* const winMess = GetWinMess(winType);
+	winMess = GetWinMess(winType);
 
 	float lineHeight;
 #endif
 	float posX;
 	if (winType != 0) {
 #ifdef VERSION_GCCJGC
-		const WinMessEntry* const winMess = GetWinMess(winType);
+		winMess = GetWinMess(winType);
 #endif
-#ifdef VERSION_GCCJGC
 		maxWidth = 0;
-#else
-		int maxWidth = 0;
-#endif
 #ifdef VERSION_GCCJGC
-		for (int i = 0; i < winMess->m_lineCount; i++) {
+		for (i = 0; i < winMess->m_lineCount; i++) {
 #else
 		for (i = 0; i < winMess->m_lineCount; i++) {
 #endif
@@ -10135,14 +10133,13 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 #endif
 		}
-		const double* pHalfW = &DOUBLE_803313F8;
-		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - maxWidth) * *pHalfW +
+		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - maxWidth) * 0.5 +
 		                          static_cast<double>(static_cast<int>(m_menuWindowInfo->x)));
 	}
 
 	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
 #ifdef VERSION_GCCJGC
-	const WinMessEntry* const winMess = GetWinMess(winType);
+	winMess = GetWinMess(winType);
 #else
 	const float* pLineH = &FLOAT_80331404;
 	lineHeight = *pLineH;
@@ -10150,7 +10147,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 	char textBuf[128];
 #ifdef VERSION_GCCJGC
-	for (int i = 0; i < winMess->m_lineCount; i++) {
+	for (i = 0; i < winMess->m_lineCount; i++) {
 #else
 	for (i = 0; i < winMess->m_lineCount; i++) {
 #endif
@@ -10176,9 +10173,8 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 			if (winType == 0 || isDollar != 0) {
 #endif
-				const double* pHalfW2 = &DOUBLE_803313F8;
 				const int textWidth = font->GetWidth(textBuf);
-				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - textWidth) * *pHalfW2 +
+				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - textWidth) * 0.5 +
 				                          static_cast<double>(static_cast<int>(m_menuWindowInfo->x)));
 			}
 			font->SetPosX(posX);

@@ -4545,7 +4545,7 @@ void CGPartyObj::gpmMove()
 				}
 			}
 			if (moveKind == 1) {
-				float keepDist = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * FLOAT_80331A58;
+				float keepDist = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) / 2.0f;
 				if (followDist < keepDist) {
 					return;
 				}

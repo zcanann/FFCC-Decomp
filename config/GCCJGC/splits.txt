@@ -2329,3 +2329,167 @@ pppColAccele.cpp:
 
 odenotstub/odenotstub.c:
 	.text start:0x801B76FC end:0x801B7704
+
+p_system.cpp:
+	.text start:0x800475D4 end:0x80047728
+
+mapshadow.cpp:
+	.text start:0x8004BF74 end:0x8004C264
+
+pppAccele.cpp:
+	.text start:0x8005EF60 end:0x8005F020
+
+pppMove.cpp:
+	.text start:0x8005FE2C end:0x8005FEEC
+
+pppPoint.cpp:
+	.text start:0x8005FFEC end:0x80060070
+
+pppRandCV.cpp:
+	.text start:0x800604A8 end:0x800606C4
+
+pppRandDownCV.cpp:
+	.text start:0x800607F0 end:0x800609C8
+
+pppRandDownFV.cpp:
+	.text start:0x80060AD0 end:0x80060C00
+
+pppRandDownHCV.cpp:
+	.text start:0x80060C00 end:0x80060DC8
+
+pppRandDownIV.cpp:
+	.text start:0x80060EF4 end:0x80061088
+
+pppRandFV.cpp:
+	.text start:0x800612C0 end:0x800613F4
+
+pppRandHCV.cpp:
+	.text start:0x800613F4 end:0x80061600
+
+pppRandIV.cpp:
+	.text start:0x80061740 end:0x80061908
+
+pppRandUpCV.cpp:
+	.text start:0x80061B74 end:0x80061D4C
+
+pppRandUpFV.cpp:
+	.text start:0x80061E54 end:0x80061F84
+
+pppRandUpHCV.cpp:
+	.text start:0x80061F84 end:0x8006214C
+
+pppRandUpIV.cpp:
+	.text start:0x80062278 end:0x8006240C
+
+pppScale.cpp:
+	.text start:0x80062538 end:0x800625BC
+
+pppSclAccele.cpp:
+	.text start:0x800625BC end:0x8006267C
+
+pppSclMove.cpp:
+	.text start:0x8006267C end:0x8006273C
+
+pppSRandCV.cpp:
+	.text start:0x8006273C end:0x80062A1C
+
+pppSRandDownCV.cpp:
+	.text start:0x80062A1C end:0x80062CAC
+
+pppSRandDownFV.cpp:
+	.text start:0x80062CAC end:0x80062E58
+
+pppSRandDownHCV.cpp:
+	.text start:0x80062E58 end:0x800630E8
+
+pppSRandFV.cpp:
+	.text start:0x800630E8 end:0x800632A0
+
+pppSRandHCV.cpp:
+	.text start:0x800632A0 end:0x80063580
+
+pppSRandUpCV.cpp:
+	.text start:0x80063580 end:0x80063810
+
+pppSRandUpFV.cpp:
+	.text start:0x80063810 end:0x800639BC
+
+pppSRandUpHCV.cpp:
+	.text start:0x800639BC end:0x80063C4C
+
+pppVtMime.cpp:
+	.text start:0x80064470 end:0x8006478C
+
+pppDrawMng.cpp:
+	.text start:0x8007AF9C end:0x8007B220
+
+pppDrawMdlTs.cpp:
+	.text start:0x800872F4 end:0x800874F4
+
+pppKeZCrctShp.cpp:
+	.text start:0x80087620 end:0x80087A9C
+
+pppParHitSph.cpp:
+	.text start:0x80093228 end:0x8009339C
+
+menu.cpp:
+	extab start:0x80007E00 end:0x80007E28
+	extabindex start:0x8000E164 end:0x8000E1A0
+	.text start:0x80099580 end:0x800996B0
+
+pppYmMoveCircle.cpp:
+	.text start:0x800CE9BC end:0x800CED1C
+
+pppYmLaser.cpp:
+	.text start:0x800CF9C0 end:0x800D0C20
+
+pppYmMoveParabola.cpp:
+	.text start:0x800D1684 end:0x800D1A88
+
+pppParMoveMatrix.cpp:
+	.text start:0x800D1A88 end:0x800D1C34
+
+pppYmTraceMove.cpp:
+	.text start:0x800D1C34 end:0x800D2088
+
+p_sound.cpp:
+	.text start:0x800D5B64 end:0x800D5D14
+
+pppYmLookOn.cpp:
+	.text start:0x800D5D14 end:0x800D5F08
+
+pppYmCheckBGHeight.cpp:
+	.text start:0x800D5F08 end:0x800D6068
+
+quadobj.cpp:
+	.text start:0x8010731C end:0x801076D8
+
+p_mc.cpp:
+	.text start:0x80120854 end:0x80120A24
+
+pppScaleLoopAuto.cpp:
+	.text start:0x8012738C end:0x801275FC
+
+pppScreenQuake.cpp:
+	.text start:0x8013A314 end:0x8013A4EC
+
+pppParHitSphMat.cpp:
+	.text start:0x8013D134 end:0x8013D2E8
+
+pppConstrainCameraDir.cpp:
+	.text start:0x8013EE34 end:0x8013F07C
+
+pppFilter.cpp:
+	.text start:0x8013F07C end:0x8013F154
+
+pppConstrainCameraForLoc.cpp:
+	.text start:0x80162690 end:0x80162A00
+
+pppFovAdjustMatrix.cpp:
+	.text start:0x80167044 end:0x80167050
+
+dolphin/os/__start.c:
+	.init start:0x80003100 end:0x80003400
+
+TRK_MINNOW_DOLPHIN/__exception.s:
+	.init start:0x800034AC end:0x800053E0

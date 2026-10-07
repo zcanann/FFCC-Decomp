@@ -117,6 +117,9 @@ namespace {
 enum {
     kCmdPanelTexture = 0x2D,
     kCmdTabTexture = 0x45,
+    kCmdDisabledRowTexture = 0x33,
+    kCmdUniteListTexture = 0x34,
+    kCmdUniteListPairTexture = 0x35,
     kCmdRowTexture = 0x36,
     kCmdUniteRowTexture = 0x37,
     kCmdUnitePanelTexture = 0x38
@@ -125,6 +128,9 @@ enum {
 enum {
     kCmdPanelTexture = 0x2E,
     kCmdTabTexture = 0x46,
+    kCmdDisabledRowTexture = 0x34,
+    kCmdUniteListTexture = 0x35,
+    kCmdUniteListPairTexture = 0x36,
     kCmdRowTexture = 0x37,
     kCmdUniteRowTexture = 0x38,
     kCmdUnitePanelTexture = 0x39
@@ -880,7 +886,7 @@ void CMenuPcs::CmdDraw()
 
 							if (!canUse) {
 								rowAlpha = 0.5 * row->alpha;
-								rowTex = 0x34;
+								rowTex = kCmdDisabledRowTexture;
 							}
 						} else {
 							s32 itemIdx = specialRow + m_cmdState->scrollTop - 2;
@@ -894,7 +900,7 @@ void CMenuPcs::CmdDraw()
 									    static_cast<s32>(((rowH - 24.0f) * 0.5) + y),
 									    row->alpha);
 								}
-								rowTex = 0x34;
+								rowTex = kCmdDisabledRowTexture;
 								rowAlpha = 0.5 * row->alpha;
 							}
 						}
@@ -2008,7 +2014,7 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		MenuPcs.SetTexture((groupSize == 2) ? static_cast<CMenuPcs::TEX>(0x36) : static_cast<CMenuPcs::TEX>(0x35));
+		MenuPcs.SetTexture((groupSize == 2) ? static_cast<CMenuPcs::TEX>(kCmdUniteListPairTexture) : static_cast<CMenuPcs::TEX>(kCmdUniteListTexture));
 		MenuPcs.DrawRect(0,
 			rectX,
 			drawY - 8.0f,
@@ -2202,9 +2208,11 @@ void CMenuPcs::DrawUniteList()
 			int helpId =  (helpSlot + 0);
 			const u8 helpAlpha =
 			    static_cast<u8>(255.0f * GetCmdListStorage(this)->entries[0].alpha);
+#ifndef VERSION_GCCJGC
 			if (helpSlot == 0x207 || helpSlot == 0x20B || helpSlot == 0x20F) {
 				helpId += 2;
 			}
+#endif
 
 			CFont* const helpFont = GetFont22();
 			DrawHelpMessage(

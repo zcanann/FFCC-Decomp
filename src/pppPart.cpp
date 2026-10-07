@@ -1668,9 +1668,7 @@ static void pppDrawPartStd(_pppMngSt* pppMngSt)
 						}
 						while (count != 0);
 
-#ifdef VERSION_GCCP01
 						Graphic.SetDrawDoneDebugDataPartControl(0x7FFF);
-#endif
 					}
 				}
 				else

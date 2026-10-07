@@ -1344,10 +1344,7 @@ void CChara::CModel::calcMatrix()
 				runtimeScale[2] = srt.m_scale.z;
 			} else {
 				float* runtimeScale = NodeRuntimeScale(node);
-				float zero = 0.0f;
-				runtimeScale[2] = zero;
-				runtimeScale[1] = zero;
-				runtimeScale[0] = zero;
+				runtimeScale[0] = runtimeScale[1] = runtimeScale[2] = 0.0f;
 			}
 		} else {
 			if (NodeRuntimeFlag80(node)) {
@@ -2040,10 +2037,8 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 
 		m_animEnd = static_cast<float>(frameEnd);
 	} else {
-		m_curFrame = 0.0f;
-		m_time = 0.0f;
-		m_animEnd = 0.0f;
-		m_animStart = 0.0f;
+		m_time = m_curFrame = 0.0f;
+		m_animStart = m_animEnd = 0.0f;
 	}
 }
 

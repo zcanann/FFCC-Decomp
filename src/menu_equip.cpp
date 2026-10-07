@@ -664,8 +664,8 @@ void CMenuPcs::EquipDraw()
 	DrawHelpMessage(helpItem, helpFont, (int)(320.0f - w / 2), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)helpAlpha).color, 10,
 	                1.0f, 3.0f);
 	if (m_equipState->mode == 1) {
-		listStart = &m_equipList->entries[m_equipList->count];
-		int listHelpAlpha = (int)(255.0f * listStart->alpha);
+		item = &m_equipList->entries[m_equipList->count];
+		int listHelpAlpha = (int)(255.0f * item->alpha);
 		if (listIndex < 1) {
 			DrawHelpMessage(0x265, helpFont, (int)(320.0f - w / 2), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)listHelpAlpha).color, 10,
 			                1.0f, 3.0f);

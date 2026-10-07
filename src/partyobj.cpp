@@ -167,14 +167,9 @@ static inline int getEquipWeaponInventoryItem(CCaravanWork* work)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmediate)
+inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int immediate)
 {
-	bool needsImmediateChange = forceImmediate || !m_weaponNodeFlagBits.m_prg ||
-	    !m_weaponNodeFlagAll.m_bits1.m_shield || m_partyData.carryObject != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0;
-	if (needsImmediateChange) {
+	if (immediate) {
 		if (itemId <= 0) {
 			LoadWeapon(-1, 0);
 		} else {
@@ -892,7 +887,12 @@ void CGPartyObj::onFramePreCalc()
 		if (static_cast<int>(CFlatCenterState()) == 0) {
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponIndex, itemId);
 			if (m_partyData.weaponIndex != weaponIndex || m_partyData.weaponItemId != itemId) {
-				changeWeapon(weaponIndex, itemId, 0);
+				bool needsImmediateChange = !m_weaponNodeFlagBits.m_prg ||
+				    !m_weaponNodeFlagAll.m_bits1.m_shield || m_partyData.carryObject != 0 ||
+				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
+				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
+				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0;
+				changeWeapon(weaponIndex, itemId, needsImmediateChange);
 			}
 		}
 	}

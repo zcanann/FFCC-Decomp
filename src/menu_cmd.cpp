@@ -2587,7 +2587,7 @@ inline unsigned int CMenuPcs::CmdOpen2()
 
 	CmdListEntry* fadeEntry;
 	s32 i;
-	for (i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
+	for (i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++, fadeEntry++) {
 		if ((i < prev) || (i > next)) {
 			fadeEntry = &GetCmdListStorage(this)->entries[i];
 			fadeEntry->alpha = static_cast<float>(

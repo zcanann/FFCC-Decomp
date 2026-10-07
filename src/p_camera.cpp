@@ -634,12 +634,8 @@ void CCameraPcs::drawShadowBegin()
     PSMTXConcat(rotY, rotX, rotXY);
 
     if (Game.m_currentSceneId == 4) {
-        m_shadowRectBound.m_min.z = 10000000000.0f;
-        m_shadowRectBound.m_min.y = 10000000000.0f;
-        m_shadowRectBound.m_min.x = 10000000000.0f;
-        m_shadowRectBound.m_max.z = -10000000000.0f;
-        m_shadowRectBound.m_max.y = -10000000000.0f;
-        m_shadowRectBound.m_max.x = -10000000000.0f;
+        m_shadowRectBound.m_min.x = m_shadowRectBound.m_min.y = m_shadowRectBound.m_min.z = 10000000000.0f;
+        m_shadowRectBound.m_max.x = m_shadowRectBound.m_max.y = m_shadowRectBound.m_max.z = -10000000000.0f;
 
         if (m_shadowAuto == 1 && GetShadowRect(m_shadowRectBound) != 0) {
             float sumX = m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x;
@@ -959,9 +955,7 @@ void CCameraPcs::calcMap()
     PSMTXRotRad(rotYMtx, 'y', m_mapRotY);
     PSMTXConcat(rotYMtx, rotXMtx, rotMtx);
 
-    DirectionVec().z = 0.0f;
-    DirectionVec().y = 0.0f;
-    DirectionVec().x = 0.0f;
+    DirectionVec().x = DirectionVec().y = DirectionVec().z = 0.0f;
     DirectionVec().z = 1.0f;
     PSMTXMultVecSR(rotMtx, &DirectionVec(), &DirectionVec());
 
@@ -1629,12 +1623,8 @@ void CCameraPcs::CalcQuake()
             m_quake.m_startDuration = 0;
             m_quake.m_endTimer = 0;
             m_quake.m_endDuration = 0;
-            m_quake.m_positionAmplitude.z = 0.0f;
-            m_quake.m_positionAmplitude.y = 0.0f;
-            m_quake.m_positionAmplitude.x = 0.0f;
-            m_quake.m_jitterAmplitude.z = 0.0f;
-            m_quake.m_jitterAmplitude.y = 0.0f;
-            m_quake.m_jitterAmplitude.x = 0.0f;
+            m_quake.m_positionAmplitude.x = m_quake.m_positionAmplitude.y = m_quake.m_positionAmplitude.z = 0.0f;
+            m_quake.m_jitterAmplitude.x = m_quake.m_jitterAmplitude.y = m_quake.m_jitterAmplitude.z = 0.0f;
         }
     }
 }

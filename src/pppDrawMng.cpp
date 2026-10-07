@@ -101,8 +101,8 @@ void pppDrawMng::AddPrimOt(unsigned long otIndex, _pppMngSt* pppMngSt)
  * --INFO--
  * PAL Address: 0x8007BCC8
  * PAL Size: 292b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007B6A8
+ * EN Size: 248b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -135,7 +135,9 @@ void pppDrawMng::DrawOt()
 					_pppDrawPart((_pppMngSt*)prim->m_handle);
 					break;
 				case 1:
+#ifdef VERSION_GCCP01
 					Graphic.SetDrawDoneDebugDataPartControl(0x7ffe);
+#endif
 
 					if (lastType != prim->m_type)
 					{
@@ -145,7 +147,9 @@ void pppDrawMng::DrawOt()
 
 					((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);
 
+#ifdef VERSION_GCCP01
 					Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+#endif
 					break;
 				default:
 					break;

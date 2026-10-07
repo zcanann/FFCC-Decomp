@@ -49,6 +49,24 @@ static const char s_scenegraph_step_x0[] = "x0";
 static const char s_scenegraph_step_x1_8[] = "x1/8";
 static const char s_scenegraph_step_x1_4[] = "x1/4";
 static const char s_scenegraph_step_x1_2[] = "x1/2";
+#ifdef VERSION_GCCJGC
+static const float kGraphicZero = 0.0f;
+static const float kGraphicScreenHeight = 448.0f;
+static const float kGraphicScreenWidth = 640.0f;
+static const float kGraphicScreenCenterX = 320.0f;
+static const float kGraphicScreenCenterY = 224.0f;
+static const float kGraphicHalf = 0.5f;
+static const float kDebugBarLeft = 16.0f;
+static const float kDebugBarTop = 440.0f;
+static const float kDebugBarRight = 336.0f;
+static const float kDebugBarBottom = 441.0f;
+static const float kDebugBarMoveBottom = 436.0f;
+static const float kDebugIndicatorTop = 420.0f;
+static const float kDebugIndicatorFrameRight = 32.0f;
+static const float kDebugIndicatorBottom = 424.0f;
+static const float kDebugIndicatorFifoLeft = 40.0f;
+static const float kDebugIndicatorFifoRight = 56.0f;
+#else
 extern const float kGraphicZero;
 extern const float kGraphicScreenHeight;
 extern const float kGraphicScreenWidth;
@@ -65,6 +83,7 @@ extern const float kDebugIndicatorFrameRight;
 extern const float kDebugIndicatorBottom;
 extern const float kDebugIndicatorFifoLeft;
 extern const float kDebugIndicatorFifoRight;
+#endif
 static const int kDebugBarLineStep = 8;
 static const char s_debug_pad_port_fmt[] = "%dP";
 static const char s_debug_frame_fmt[] = "%d";
@@ -96,56 +115,567 @@ STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_stretch) == 0x24);
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 268b
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGraphicPcs::Init()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGraphicPcs::Quit()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004776c
+ * PAL Size: 20b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor color)
+int CGraphicPcs::GetTable(unsigned long index)
 {
-    drawSFRect(x0, y0, x1, y1, color, color);
+    return reinterpret_cast<int>(&m_table + index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800476C0
+ * PAL Size: 172b
+ * EN Address: 0x800474B4
+ * EN Size: 172b
+ * JP Address: 0x8004700C
+ * JP Size: 172b
+ */
+void CGraphicPcs::create()
+{
+    _InitGxFunc();
+    m_unkB8 = 0;
+    m_copySaveFlag = 0;
+    m_dofFlag = 0;
+    m_dofFlagB = 1;
+    m_dofNearZ = 0.6f;
+    m_dofFarZ = 200.0f;
+    m_dofFlagA = 0;
+    m_dofMode = 0;
+    m_dofTarget.x = m_dofTarget.y = m_dofTarget.z = 0.0f;
+    memset(m_screenFade, 0, sizeof(m_screenFade));
+    m_blurMode = 0;
+    m_blurFadeOutFlag = 0;
+    m_blurR = 0;
+    m_blurG = 0;
+    m_blurB = 0;
+    m_blurStep = 0;
+    m_blurA = 1;
+    m_blurMode2 = 0;
+    m_blurScale = 4;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004769c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::SetDOFParameter(signed char flagA, signed char flagB, float nearZ, float farZ, float focus, float blurNear, float blurFar, int mode)
+{
+	m_dofFlagB = flagB;
+	m_dofNearZ = nearZ;
+	m_dofFarZ = farZ;
+	m_dofFlagA = flagA;
+	m_dofMode = mode;
+	m_dofTarget.x = focus;
+	m_dofTarget.y = blurNear;
+	m_dofTarget.z = blurFar;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004767c
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::SetBlurParameter(int mode, unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char mode2, short scale)
+{
+    m_blurMode = mode;
+    m_blurR = r;
+    m_blurG = g;
+    m_blurB = b;
+    m_blurA = a;
+    m_blurMode2 = mode2;
+    m_blurScale = scale;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGraphicPcs::destroy()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800475b0
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::calc()
+{
+    calcScreenFade();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80047588
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::drawBegin()
+{
+	Graphic.BeginFrame();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80047554
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::drawWait()
+{
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_graphic_cpp), 0xDA);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80047528
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::drawFlip()
+{
+	Graphic.Flip();
+	_InitGxFunc();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80047248
+ * PAL Size: 736b
+ * EN Address: 0x80051148
+ * EN Size: 916b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::drawEnd()
+{
+	char debugPadString[256];
+	char debugInputString[256];
+
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x10) != 0) {
+		Graphic.DrawDebugString();
+	}
+
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) != 0) {
+		drawBar();
+	}
+
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x10) != 0) {
+		Graphic.InitDebugString();
+
+		if (System.m_scenegraphStepMode != 0) {
+			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(s_scenegraph_step_labels[System.m_scenegraphStepMode]), 0xC);
+		}
+
+		if (Pad.GetPortEmulation() != -1) {
+			sprintf(debugPadString, s_debug_pad_port_fmt, Pad.GetPortEmulation() + 1);
+			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
+		}
+
+		int x;
+		int port = 0;
+		x = 0x10;
+		for (; port < 4; port++) {
+			const u16 buttons = Pad.GetButton(port);
+
+			const char c = ((buttons & 0x20) != 0) ? 'r' : ' ';
+			const char z = ((buttons & 0x40) != 0) ? 'l' : ' ';
+			const char s = ((buttons & 0x10) != 0) ? 's' : ' ';
+			const char start = ((buttons & 0x1000) != 0) ? 'S' : ' ';
+			const char a = ((buttons & 0x100) != 0) ? 'A' : ' ';
+			const char b = ((buttons & 0x200) != 0) ? 'B' : ' ';
+			const char r = ((buttons & 2) != 0) ? 'R' : ' ';
+			const char l = ((buttons & 1) != 0) ? 'L' : ' ';
+			const char left = ((buttons & 4) != 0) ? 'D' : ' ';
+			const char down = ((buttons & 8) != 0) ? 'U' : ' ';
+
+			sprintf(debugInputString, s_graphic_pad_input_fmt, down, left, l, r, b, a, start, s, z, c);
+			Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
+			x += 0x60;
+		}
+
+		sprintf(debugInputString, s_debug_frame_fmt, System.m_frameCounter);
+		Graphic.DrawDebugStringDirect(port * 0x60 + 0x10, 0x1A8, debugInputString, 8);
+	}
+
+	Memory.Draw();
+	Graphic.EndFrame();
+}
+
+static inline void setBarColor(GXColor& dst, const u32& colorWord)
+{
+    const GXColor* src = (const GXColor*)&colorWord;
+    dst.r = src->r;
+    dst.g = src->g;
+    dst.b = src->b;
+    dst.a = src->a;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004674C
+ * PAL Size: 2812b
+ * EN Address: 0x800514DC
+ * EN Size: 2500b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::drawBar()
+{
+    Mtx44 ortho;
+    Mtx identity;
+    C_MTXOrtho(ortho, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
+    GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+
+    _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
+    GXSetZCompLoc((GXBool)0);
+    _GXSetAlphaCompare((GXCompare)6, 1, (GXAlphaOp)0, (GXCompare)7, 0);
+    GXSetZMode((GXBool)0, GX_LEQUAL, (GXBool)0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTevStages(1);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
+    PSMTXIdentity(identity);
+    GXLoadPosMtxImm(identity, GX_PNMTX0);
+    GXLoadTexMtxImm(identity, GX_TEXMTX0, GX_MTX2x4);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+
+    int drawText = 0;
+    int padState = Pad.IsDebug(0);
+    if ((padState != 0) && (Joybus.GetPadType(0) != 0x40000)) {
+        drawText = 1;
+    }
+    const int textFlag = (u8)drawText;
+
+    float x = kDebugBarLeft;
+    GXColor barColor = {0x80, 0x80, 0x80, 0xFF};
+    drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor, barColor);
+
+    int hue;
+    int y;
+    CSystem::COrder* order = System.GetFirstOrder();
+    const int orderCount = System.GetNumOrder();
+    int i = 0;
+    hue = 0;
+    y = 0x10;
+    for (; i < orderCount; i++) {
+        const int priority = order->m_priority;
+        const float lastTime = order->m_lastTime;
+        setBarColor(barColor, Math.Hsb2Rgb(hue / orderCount, 100, 100));
+        const float width = (kGraphicScreenCenterX * lastTime) / 100.0f;
+
+        if (priority == 0x26) {
+            drawSFRect(x, textFlag ? static_cast<float>(y) : kDebugBarMoveBottom,
+                       1.0f + (x + width), kDebugBarTop, barColor, barColor);
+            x += width;
+        } else if (priority != 0x27) {
+            drawSFRect(x, textFlag ? static_cast<float>(y) : 432.0f,
+                       1.0f + (x + width), kDebugBarMoveBottom, barColor, barColor);
+            x += width;
+        }
+
+        if (i == orderCount - 1) {
+            setBarColor(barColor, Math.Hsb2Rgb(0, 100, 100));
+            const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / 100.0f;
+
+            drawSFRect(x, textFlag ? static_cast<float>(y) : kDebugBarMoveBottom,
+                       1.0f + (x + soundWidth), kDebugBarTop, barColor, barColor);
+        }
+
+        order = System.GetNextOrder(order);
+        hue += 0x168;
+        y += kDebugBarLineStep;
+    }
+
+    setBarColor(barColor, (u32)*reinterpret_cast<u32*>(&((Graphic.IsFrameRateOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color));
+    drawSFRect(kDebugBarLeft, kDebugIndicatorTop, kDebugIndicatorFrameRight, kDebugIndicatorBottom, barColor, barColor);
+
+    setBarColor(barColor, (u32)*reinterpret_cast<u32*>(&((Graphic.IsFifoOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color));
+    drawSFRect(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kDebugIndicatorFifoRight, kDebugIndicatorBottom, barColor, barColor);
+
+    if (textFlag) {
+        Graphic.InitDebugString();
+
+        order = System.GetFirstOrder();
+        x = kDebugBarLeft;
+        int i = 0;
+        y = 0x10;
+        for (; i < orderCount; i++) {
+            const int priority = order->m_priority;
+            const float width = (kGraphicScreenCenterX * order->m_lastTime) / 100.0f;
+
+            if (priority != 0x27) {
+                char debugString[260];
+                sprintf(debugString, const_cast<char*>(s_graphic_order_debug_fmt), order->m_debugName, order->m_insertIndex, order->m_lastTime);
+
+                if (priority == 0x17) {
+                    char extraString[256];
+                    sprintf(extraString, const_cast<char*>(s_graphic_move_debug_fmt),
+                            CFlatMoveTime(), CFlatBgCollisionTime(),
+                            CFlatObjectCollisionTime(), CFlatUpdateTime(),
+                            CFlatHitTime(), CFlatPerformanceTotalTime());
+                    strcat(debugString, extraString);
+                }
+
+                Graphic.DrawDebugStringDirect(static_cast<u32>(1.0f + x), y, debugString, kDebugBarLineStep);
+                x += width;
+            }
+
+            order = System.GetNextOrder(order);
+            y += kDebugBarLineStep;
+        }
+    }
+
+    PSMTX44Copy(CameraPcs.m_screenMatrix, ortho);
+    GXSetProjection(ortho, GX_PERSPECTIVE);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800465bc
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::drawCopy()
+{
+	if (m_copySaveFlag != 0) {
+		Graphic.CopySaveFrameBuffer();
+		m_copySaveFlag = 0;
+	}
+
+	if (m_dofFlag != 0) {
+		Graphic.RenderDOF(m_dofFlagA, m_dofFlagB, m_dofNearZ, m_dofFarZ, m_dofTarget, m_dofMode);
+	}
+
+	int initBlur = 0;
+	if ((m_blurMode == 1) && (Graphic.m_blurActive == 0)) {
+		Graphic.m_blurActive = 1;
+		Graphic.InitBlurParameter();
+		initBlur = 1;
+		m_blurStep = m_blurB / m_blurR;
+		m_blurFadeOutFlag = 0;
+	}
+
+	if ((m_blurMode != 0) || (Graphic.m_blurActive != 0) || (m_blurFadeOutFlag != 0)) {
+		if (m_blurMode != Graphic.m_blurActive) {
+			m_blurFadeOutFlag = 1;
+		}
+
+		Graphic.RenderBlur(initBlur, m_blurMode2, m_blurA, m_blurG, m_blurB, m_blurScale);
+
+		if (m_blurFadeOutFlag != 0) {
+			if (m_blurB - m_blurStep <= 0) {
+				m_blurB = 0;
+				m_blurFadeOutFlag = 0;
+				m_blurMode = 0;
+				Graphic.m_blurActive = 0;
+			} else {
+				m_blurB -= m_blurStep;
+			}
+		}
+	}
+
+	drawScreenFade();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80046594
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::setViewport()
+{
+	Graphic.SetViewport();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80046538
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::preDrawEnvInit()
+{
+    MaterialMan.InitEnv();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004650c
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphicPcs::stdDrawEnvInit()
+{
+	MaterialMan.LockEnv();
 }
 
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 268b
+ * PAL Size: 200b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor topColor, _GXColor bottomColor)
+inline void CGraphicPcs::calcScreenFade()
 {
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(x0, y0, kGraphicZero);
-    GXColor1u32(*(u32*)&topColor);
-    GXTexCoord2u16(0, 0);
-    GXPosition3f32(x1, y0, kGraphicZero);
-    GXColor1u32(*(u32*)&topColor);
-    GXTexCoord2u16(2, 0);
-    GXPosition3f32(x1, y1, kGraphicZero);
-    GXColor1u32(*(u32*)&bottomColor);
-    GXTexCoord2u16(2, 2);
-    GXPosition3f32(x0, y1, kGraphicZero);
-    GXColor1u32(*(u32*)&bottomColor);
-    GXTexCoord2u16(0, 2);
+    for (int i = 0; i < 4; i++) {
+        if (m_screenFade[i].m_timer > 0 && i != 1) {
+            m_screenFade[i].m_timer--;
+            if (m_screenFade[i].m_timer == 0) {
+                m_screenFade[i].m_targetObj = 0;
+            }
+        }
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 268b
+ * PAL Address: 0x800462B8
+ * PAL Size: 596b
+ * EN Address: 0x800460AC
+ * EN Size: 596b
+ * JP Address: 0x80045BB4
+ * JP Size: 588b
+ */
+void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor innerColor, _GXColor outerColor)
+{
+    float ringPoints[32][4];
+    const float step = 0.19634955f;
+
+    for (int i = 0; i < 32; i++) {
+        float s;
+        const float angle = step * (float)i;
+        s = (float)sin(angle);
+        const float c = (float)cos(angle);
+
+        ringPoints[i][0] = s * (float)innerRadius + (float)centerX;
+        ringPoints[i][1] = c * (float)innerRadius + (float)centerY;
+        ringPoints[i][2] = s * (float)outerRadius + (float)centerX;
+        ringPoints[i][3] = c * (float)outerRadius + (float)centerY;
+    }
+
+    GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 0x80);
+    float z = 0.0f;
+    for (int i = 0; i < 32; i++) {
+        const float* cur = ringPoints[i];
+        const float* nxt = ringPoints[(i + 1) % 32];
+
+        GXPosition3f32(cur[0], cur[1], z);
+        GXColor1u32(*(u32*)&innerColor);
+        GXTexCoord2u16(0, 0);
+
+        GXPosition3f32(nxt[0], nxt[1], z);
+        GXColor1u32(*(u32*)&innerColor);
+        GXTexCoord2u16(0, 0);
+
+        GXPosition3f32(nxt[2], nxt[3], z);
+        GXColor1u32(*(u32*)&outerColor);
+        GXTexCoord2u16(0, 0);
+
+        GXPosition3f32(cur[2], cur[3], z);
+        GXColor1u32(*(u32*)&outerColor);
+        GXTexCoord2u16(0, 0);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80046218
+ * PAL Size: 160b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor color)
+unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 {
-    drawSFCircle(innerRadius, outerRadius, centerX, centerY, color, color);
+    unsigned int result = 0;
+
+    for (int i = 0; i < 4; i++) {
+        if ((m_screenFade[i].m_invert != 0) || (m_screenFade[i].m_timer != 0)) {
+            result |= 1U << i;
+        }
+    }
+
+    return result;
 }
 
 /*
@@ -378,567 +908,57 @@ void CGraphicPcs::drawScreenFade()
     PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);
     GXSetProjection(orthoMtx, GX_PERSPECTIVE);
 }
+
 /*
  * --INFO--
- * PAL Address: 0x80046218
- * PAL Size: 160b
+ * PAL Address: UNUSED
+ * PAL Size: 268b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
+inline void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor color)
 {
-    unsigned int result = 0;
-
-    for (int i = 0; i < 4; i++) {
-        if ((m_screenFade[i].m_invert != 0) || (m_screenFade[i].m_timer != 0)) {
-            result |= 1U << i;
-        }
-    }
-
-    return result;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800462B8
- * PAL Size: 596b
- * EN Address: 0x800460AC
- * EN Size: 596b
- * JP Address: 0x80045BB4
- * JP Size: 588b
- */
-void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor innerColor, _GXColor outerColor)
-{
-    float ringPoints[32][4];
-    const float step = 0.19634955f;
-
-    for (int i = 0; i < 32; i++) {
-        float s;
-        const float angle = step * (float)i;
-        s = (float)sin(angle);
-        const float c = (float)cos(angle);
-
-        ringPoints[i][0] = s * (float)innerRadius + (float)centerX;
-        ringPoints[i][1] = c * (float)innerRadius + (float)centerY;
-        ringPoints[i][2] = s * (float)outerRadius + (float)centerX;
-        ringPoints[i][3] = c * (float)outerRadius + (float)centerY;
-    }
-
-    GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 0x80);
-    float z = 0.0f;
-    for (int i = 0; i < 32; i++) {
-        const float* cur = ringPoints[i];
-        const float* nxt = ringPoints[(i + 1) % 32];
-
-        GXPosition3f32(cur[0], cur[1], z);
-        GXColor1u32(*(u32*)&innerColor);
-        GXTexCoord2u16(0, 0);
-
-        GXPosition3f32(nxt[0], nxt[1], z);
-        GXColor1u32(*(u32*)&innerColor);
-        GXTexCoord2u16(0, 0);
-
-        GXPosition3f32(nxt[2], nxt[3], z);
-        GXColor1u32(*(u32*)&outerColor);
-        GXTexCoord2u16(0, 0);
-
-        GXPosition3f32(cur[2], cur[3], z);
-        GXColor1u32(*(u32*)&outerColor);
-        GXTexCoord2u16(0, 0);
-    }
+    drawSFCircle(innerRadius, outerRadius, centerX, centerY, color, color);
 }
 
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 200b
+ * PAL Size: 268b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGraphicPcs::calcScreenFade()
+inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor topColor, _GXColor bottomColor)
 {
-    for (int i = 0; i < 4; i++) {
-        if (m_screenFade[i].m_timer > 0 && i != 1) {
-            m_screenFade[i].m_timer--;
-            if (m_screenFade[i].m_timer == 0) {
-                m_screenFade[i].m_targetObj = 0;
-            }
-        }
-    }
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(x0, y0, kGraphicZero);
+    GXColor1u32(*(u32*)&topColor);
+    GXTexCoord2u16(0, 0);
+    GXPosition3f32(x1, y0, kGraphicZero);
+    GXColor1u32(*(u32*)&topColor);
+    GXTexCoord2u16(2, 0);
+    GXPosition3f32(x1, y1, kGraphicZero);
+    GXColor1u32(*(u32*)&bottomColor);
+    GXTexCoord2u16(2, 2);
+    GXPosition3f32(x0, y1, kGraphicZero);
+    GXColor1u32(*(u32*)&bottomColor);
+    GXTexCoord2u16(0, 2);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8004650c
- * PAL Size: 44b
+ * PAL Address: UNUSED
+ * PAL Size: 268b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphicPcs::stdDrawEnvInit()
+inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor color)
 {
-	MaterialMan.LockEnv();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80046538
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::preDrawEnvInit()
-{
-    MaterialMan.InitEnv();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80046594
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::setViewport()
-{
-	Graphic.SetViewport();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800465bc
- * PAL Size: 400b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::drawCopy()
-{
-	if (m_copySaveFlag != 0) {
-		Graphic.CopySaveFrameBuffer();
-		m_copySaveFlag = 0;
-	}
-
-	if (m_dofFlag != 0) {
-		Graphic.RenderDOF(m_dofFlagA, m_dofFlagB, m_dofNearZ, m_dofFarZ, m_dofTarget, m_dofMode);
-	}
-
-	int initBlur = 0;
-	if ((m_blurMode == 1) && (Graphic.m_blurActive == 0)) {
-		Graphic.m_blurActive = 1;
-		Graphic.InitBlurParameter();
-		initBlur = 1;
-		m_blurStep = m_blurB / m_blurR;
-		m_blurFadeOutFlag = 0;
-	}
-
-	if ((m_blurMode != 0) || (Graphic.m_blurActive != 0) || (m_blurFadeOutFlag != 0)) {
-		if (m_blurMode != Graphic.m_blurActive) {
-			m_blurFadeOutFlag = 1;
-		}
-
-		Graphic.RenderBlur(initBlur, m_blurMode2, m_blurA, m_blurG, m_blurB, m_blurScale);
-
-		if (m_blurFadeOutFlag != 0) {
-			if (m_blurB - m_blurStep <= 0) {
-				m_blurB = 0;
-				m_blurFadeOutFlag = 0;
-				m_blurMode = 0;
-				Graphic.m_blurActive = 0;
-			} else {
-				m_blurB -= m_blurStep;
-			}
-		}
-	}
-
-	drawScreenFade();
-}
-
-static inline void setBarColor(GXColor& dst, const u32& colorWord)
-{
-    const GXColor* src = (const GXColor*)&colorWord;
-    dst.r = src->r;
-    dst.g = src->g;
-    dst.b = src->b;
-    dst.a = src->a;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004674C
- * PAL Size: 2812b
- * EN Address: 0x800514DC
- * EN Size: 2500b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::drawBar()
-{
-    Mtx44 ortho;
-    Mtx identity;
-    C_MTXOrtho(ortho, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
-    GXSetProjection(ortho, GX_ORTHOGRAPHIC);
-
-    _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
-    GXSetZCompLoc((GXBool)0);
-    _GXSetAlphaCompare((GXCompare)6, 1, (GXAlphaOp)0, (GXCompare)7, 0);
-    GXSetZMode((GXBool)0, GX_LEQUAL, (GXBool)0);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTevStages(1);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
-    GXSetChanCtrl(GX_ALPHA0, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
-    PSMTXIdentity(identity);
-    GXLoadPosMtxImm(identity, GX_PNMTX0);
-    GXLoadTexMtxImm(identity, GX_TEXMTX0, GX_MTX2x4);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-
-    int drawText = 0;
-    int padState = Pad.IsDebug(0);
-    if ((padState != 0) && (Joybus.GetPadType(0) != 0x40000)) {
-        drawText = 1;
-    }
-    const int textFlag = (u8)drawText;
-
-    float x = kDebugBarLeft;
-    GXColor barColor = {0x80, 0x80, 0x80, 0xFF};
-    drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor, barColor);
-
-    int hue;
-    int y;
-    CSystem::COrder* order = System.GetFirstOrder();
-    const int orderCount = System.GetNumOrder();
-    int i = 0;
-    hue = 0;
-    y = 0x10;
-    for (; i < orderCount; i++) {
-        const int priority = order->m_priority;
-        const float lastTime = order->m_lastTime;
-        setBarColor(barColor, Math.Hsb2Rgb(hue / orderCount, 100, 100));
-        const float width = (kGraphicScreenCenterX * lastTime) / 100.0f;
-
-        if (priority == 0x26) {
-            drawSFRect(x, textFlag ? static_cast<float>(y) : kDebugBarMoveBottom,
-                       1.0f + (x + width), kDebugBarTop, barColor, barColor);
-            x += width;
-        } else if (priority != 0x27) {
-            drawSFRect(x, textFlag ? static_cast<float>(y) : 432.0f,
-                       1.0f + (x + width), kDebugBarMoveBottom, barColor, barColor);
-            x += width;
-        }
-
-        if (i == orderCount - 1) {
-            setBarColor(barColor, Math.Hsb2Rgb(0, 100, 100));
-            const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / 100.0f;
-
-            drawSFRect(x, textFlag ? static_cast<float>(y) : kDebugBarMoveBottom,
-                       1.0f + (x + soundWidth), kDebugBarTop, barColor, barColor);
-        }
-
-        order = System.GetNextOrder(order);
-        hue += 0x168;
-        y += kDebugBarLineStep;
-    }
-
-    setBarColor(barColor, (u32)*reinterpret_cast<u32*>(&((Graphic.IsFrameRateOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color));
-    drawSFRect(kDebugBarLeft, kDebugIndicatorTop, kDebugIndicatorFrameRight, kDebugIndicatorBottom, barColor, barColor);
-
-    setBarColor(barColor, (u32)*reinterpret_cast<u32*>(&((Graphic.IsFifoOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color));
-    drawSFRect(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kDebugIndicatorFifoRight, kDebugIndicatorBottom, barColor, barColor);
-
-    if (textFlag) {
-        Graphic.InitDebugString();
-
-        order = System.GetFirstOrder();
-        x = kDebugBarLeft;
-        int i = 0;
-        y = 0x10;
-        for (; i < orderCount; i++) {
-            const int priority = order->m_priority;
-            const float width = (kGraphicScreenCenterX * order->m_lastTime) / 100.0f;
-
-            if (priority != 0x27) {
-                char debugString[260];
-                sprintf(debugString, const_cast<char*>(s_graphic_order_debug_fmt), order->m_debugName, order->m_insertIndex, order->m_lastTime);
-
-                if (priority == 0x17) {
-                    char extraString[256];
-                    sprintf(extraString, const_cast<char*>(s_graphic_move_debug_fmt),
-                            CFlatMoveTime(), CFlatBgCollisionTime(),
-                            CFlatObjectCollisionTime(), CFlatUpdateTime(),
-                            CFlatHitTime(), CFlatPerformanceTotalTime());
-                    strcat(debugString, extraString);
-                }
-
-                Graphic.DrawDebugStringDirect(static_cast<u32>(1.0f + x), y, debugString, kDebugBarLineStep);
-                x += width;
-            }
-
-            order = System.GetNextOrder(order);
-            y += kDebugBarLineStep;
-        }
-    }
-
-    PSMTX44Copy(CameraPcs.m_screenMatrix, ortho);
-    GXSetProjection(ortho, GX_PERSPECTIVE);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80047248
- * PAL Size: 736b
- * EN Address: 0x80051148
- * EN Size: 916b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::drawEnd()
-{
-	char debugPadString[256];
-	char debugInputString[256];
-
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x10) != 0) {
-		Graphic.DrawDebugString();
-	}
-
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) != 0) {
-		drawBar();
-	}
-
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x10) != 0) {
-		Graphic.InitDebugString();
-
-		if (System.m_scenegraphStepMode != 0) {
-			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(s_scenegraph_step_labels[System.m_scenegraphStepMode]), 0xC);
-		}
-
-		if (Pad.GetPortEmulation() != -1) {
-			sprintf(debugPadString, s_debug_pad_port_fmt, Pad.GetPortEmulation() + 1);
-			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
-		}
-
-		int x;
-		int port = 0;
-		x = 0x10;
-		for (; port < 4; port++) {
-			const u16 buttons = Pad.GetButton(port);
-
-			const char c = ((buttons & 0x20) != 0) ? 'r' : ' ';
-			const char z = ((buttons & 0x40) != 0) ? 'l' : ' ';
-			const char s = ((buttons & 0x10) != 0) ? 's' : ' ';
-			const char start = ((buttons & 0x1000) != 0) ? 'S' : ' ';
-			const char a = ((buttons & 0x100) != 0) ? 'A' : ' ';
-			const char b = ((buttons & 0x200) != 0) ? 'B' : ' ';
-			const char r = ((buttons & 2) != 0) ? 'R' : ' ';
-			const char l = ((buttons & 1) != 0) ? 'L' : ' ';
-			const char left = ((buttons & 4) != 0) ? 'D' : ' ';
-			const char down = ((buttons & 8) != 0) ? 'U' : ' ';
-
-			sprintf(debugInputString, s_graphic_pad_input_fmt, down, left, l, r, b, a, start, s, z, c);
-			Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
-			x += 0x60;
-		}
-
-		sprintf(debugInputString, s_debug_frame_fmt, System.m_frameCounter);
-		Graphic.DrawDebugStringDirect(port * 0x60 + 0x10, 0x1A8, debugInputString, 8);
-	}
-
-	Memory.Draw();
-	Graphic.EndFrame();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80047528
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::drawFlip()
-{
-	Graphic.Flip();
-	_InitGxFunc();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80047554
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::drawWait()
-{
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_graphic_cpp), 0xDA);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80047588
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::drawBegin()
-{
-	Graphic.BeginFrame();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800475b0
- * PAL Size: 200b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::calc()
-{
-    calcScreenFade();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphicPcs::destroy()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004767c
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::SetBlurParameter(int mode, unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char mode2, short scale)
-{
-    m_blurMode = mode;
-    m_blurR = r;
-    m_blurG = g;
-    m_blurB = b;
-    m_blurA = a;
-    m_blurMode2 = mode2;
-    m_blurScale = scale;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004769c
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::SetDOFParameter(signed char flagA, signed char flagB, float nearZ, float farZ, float focus, float blurNear, float blurFar, int mode)
-{
-	m_dofFlagB = flagB;
-	m_dofNearZ = nearZ;
-	m_dofFarZ = farZ;
-	m_dofFlagA = flagA;
-	m_dofMode = mode;
-	m_dofTarget.x = focus;
-	m_dofTarget.y = blurNear;
-	m_dofTarget.z = blurFar;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800476C0
- * PAL Size: 172b
- * EN Address: 0x800474B4
- * EN Size: 172b
- * JP Address: 0x8004700C
- * JP Size: 172b
- */
-void CGraphicPcs::create()
-{
-    _InitGxFunc();
-    m_unkB8 = 0;
-    m_copySaveFlag = 0;
-    m_dofFlag = 0;
-    m_dofFlagB = 1;
-    m_dofNearZ = 0.6f;
-    m_dofFarZ = 200.0f;
-    m_dofFlagA = 0;
-    m_dofMode = 0;
-    m_dofTarget.x = m_dofTarget.y = m_dofTarget.z = 0.0f;
-    memset(m_screenFade, 0, sizeof(m_screenFade));
-    m_blurMode = 0;
-    m_blurFadeOutFlag = 0;
-    m_blurR = 0;
-    m_blurG = 0;
-    m_blurB = 0;
-    m_blurStep = 0;
-    m_blurA = 1;
-    m_blurMode2 = 0;
-    m_blurScale = 4;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004776c
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGraphicPcs::GetTable(unsigned long index)
-{
-    return reinterpret_cast<int>(&m_table + index);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphicPcs::Quit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphicPcs::Init()
-{
-	// TODO
+    drawSFRect(x0, y0, x1, y1, color, color);
 }

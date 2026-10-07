@@ -2930,11 +2930,17 @@ void CGCharaObj::combi2()
 #else
 	const int kComboWaitFrames = 80;
 #endif
+	int i;
+	int j;
+	int k;
+	int hasNearbyPartner;
+	int playedComboSe;
+	CGPartyObj* leadParty;
 	CGPartyObj* candidates[5];
 	int candidateCount = 0;
 	CVector comboCenter;
 
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party == 0) {
 			continue;
@@ -2949,14 +2955,14 @@ void CGCharaObj::combi2()
 		return;
 	}
 
-	for (int i = 0; i < candidateCount; i++) {
+	for (i = 0; i < candidateCount; i++) {
 		CGPartyObj* party = candidates[i];
 		if (party == 0 || party->m_comboState == 0) {
 			continue;
 		}
 
-		int hasNearbyPartner = 0;
-		for (int j = 0; j < candidateCount; j++) {
+		hasNearbyPartner = 0;
+		for (j = 0; j < candidateCount; j++) {
 			if (i == j) {
 				continue;
 			}
@@ -2986,8 +2992,8 @@ void CGCharaObj::combi2()
 		party->playSe3D(hasNearbyPartner ? 0x3C : 0x3D, 0x32, 0x96, 0, 0);
 	}
 
-	for (int i = 0; i < candidateCount - 1; i++) {
-		for (int j = i + 1; j < candidateCount; j++) {
+	for (i = 0; i < candidateCount - 1; i++) {
+		for (j = i + 1; j < candidateCount; j++) {
 			if (candidates[i]->m_comboFrame < candidates[j]->m_comboFrame) {
 				CGPartyObj* swap = candidates[i];
 				candidates[i] = candidates[j];
@@ -2996,12 +3002,10 @@ void CGCharaObj::combi2()
 		}
 	}
 
-	for (int i = 1; i < candidateCount; i++) {
-		CGPartyObj** slot = &candidates[i];
-		if (20.0f < PSVECDistance(&candidates[0]->m_comboCenter, &(*slot)->m_comboCenter)) {
-			for (int k = i; k < candidateCount - 1; k++) {
-				slot[0] = slot[1];
-				slot++;
+	for (i = 1; i < candidateCount; i++) {
+		if (20.0f < PSVECDistance(&candidates[0]->m_comboCenter, &candidates[i]->m_comboCenter)) {
+			for (k = i; k < candidateCount - 1; k++) {
+				candidates[k] = candidates[k + 1];
 			}
 			candidateCount--;
 			i--;
@@ -3025,7 +3029,7 @@ void CGCharaObj::combi2()
 	const int isShared1F8 = comboData->m_sets[participantCount - 1].m_item == 0x1F8;
 	if (isShared1F8 == 0) {
 		comboCenter.Identity();
-		for (int i = 0; i < participantCount; i++) {
+		for (i = 0; i < participantCount; i++) {
 			CVector candidateCenter(candidates[i]->m_comboCenter);
 			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&candidateCenter), reinterpret_cast<Vec*>(&comboCenter));
 		}
@@ -3034,9 +3038,9 @@ void CGCharaObj::combi2()
 
 	System.Printf("combi: %d: combi%dに決定\n", System.m_frameCounter, comboData->m_command);
 
-	CGPartyObj* leadParty = candidates[participantCount - 1];
-	int playedComboSe = 0;
-	for (int i = 0; i < participantCount; i++) {
+	leadParty = candidates[participantCount - 1];
+	playedComboSe = 0;
+	for (i = 0; i < participantCount; i++) {
 		CGPartyObj* party = candidates[i];
 		unsigned int comboMode = 0xFFFFFFFF;
 
@@ -3083,7 +3087,7 @@ void CGCharaObj::combi2()
 		party->m_comboScriptMode = comboMode;
 		party->m_comboLinkCount = 0;
 
-		for (int j = 0; j < participantCount; j++) {
+		for (j = 0; j < participantCount; j++) {
 			CGPartyObj* other = candidates[j];
 			if (party == other) {
 				continue;

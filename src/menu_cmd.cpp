@@ -2008,12 +2008,7 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		CMenuPcs& menuPcsRef = MenuPcs;
-		s32 barTex = 0x35;
-		if (groupSize == 2) {
-			barTex = 0x36;
-		}
-		menuPcsRef.SetTexture(static_cast<CMenuPcs::TEX>(barTex));
+		MenuPcs.SetTexture((groupSize == 2) ? static_cast<CMenuPcs::TEX>(0x36) : static_cast<CMenuPcs::TEX>(0x35));
 		MenuPcs.DrawRect(0,
 			rectX,
 			drawY - 8.0f,
@@ -2234,8 +2229,8 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
-	int i;
 	CmdListEntry* entry;
+	int i;
 	int j;
 	int idx;
 	int finished;
@@ -2251,8 +2246,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 	if (topIdx > 0) {
 		for (i = 0; i < 3; i++) {
-			entry = &GetCmdListStorage(this)->entries[i + s_UniteTop[topIdx]];
 			idx = i + s_UniteTop[topIdx];
+			entry = &GetCmdListStorage(this)->entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
@@ -2268,8 +2263,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		targetX = 64.0f + baseX;
 		for (i = finished = 0; i < s_ucnt; i++) {
 			for (j = 0; j < 3; j++) {
-				entry = &GetCmdListStorage(this)->entries[j + s_UniteTop[i]];
 				idx = j + s_UniteTop[i];
+				entry = &GetCmdListStorage(this)->entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
@@ -2466,12 +2461,12 @@ unsigned int CMenuPcs::CmdClose1()
 		CmdListEntry* const animEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
 		animEntry->alpha =
 			static_cast<float>(-(0.2 * static_cast<f64>(GetCmdStateView(this)->transitionTimer) - 1.0));
-		const s32 nextState = (1.0 == static_cast<f64>(animEntry->scale)) ? 2 : 3;
+		int nextState = (1.0 == static_cast<f64>(animEntry->scale)) ? 2 : 3;
 
 		done = (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= 5.0) ? 1 : 0;
 		if ((done != 0) && (GetCmdStateView(this)->commandResult > 0)) {
 			GetCmdStateView(this)->commandResult = 0;
-			const s16 choice = GetCmdStateView(this)->selected[2];
+			s16 choice = GetCmdStateView(this)->selected[2];
 			if (choice == 0) {
 				GetCmdStateView(this)->uniteState = 1;
 				done = 0;

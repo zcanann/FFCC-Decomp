@@ -240,7 +240,7 @@ void CChara::makeFurTex()
 	}
 
 	GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
-	_GXColor savedCopyClear = Graphic.m_defaultCopyClearColor;
+	_GXColor savedCopyClear = Graphic.GetCopyClearColor();
 	GXSetAlphaUpdate(GX_TRUE);
 	GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
 	GXSetScissor(0, 0, 0x80, 0x80);
@@ -637,9 +637,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 				while (remaining != 0) {
 					int primitive = cursor[0] & 0xF8;
-					int count = *reinterpret_cast<const unsigned short*>(cursor + 1);
+					unsigned short vertexCount = *reinterpret_cast<const unsigned short*>(cursor + 1);
 					cursor += 3;
-					remaining -= count * 8 + 3;
+					remaining -= vertexCount * 8 + 3;
+					int count = vertexCount;
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
 						GXBegin(static_cast<GXPrimitive>(primitive), GX_VTXFMT0, count);
@@ -690,8 +691,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
  */
 static void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
-	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
-	*centerAfter = defaultColor;
+	*centerAfter = CColor(0x0f, 0x0f, 0x0f, 0);
 	*centerBefore = *centerAfter;
 
 	int texelCountBytes = width * height * 2;
@@ -728,8 +728,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 			a = (packed >> 12) & 0x07;
 
 			if (distance == 0) {
-				_GXColor beforeColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
-				*centerBefore = beforeColor;
+				*centerBefore = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a);
 			}
 
 			if (mode != 0) {
@@ -753,8 +752,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 			pixels[tileIndex] = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);
 
 			if (distance == 0) {
-				_GXColor afterColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
-				*centerAfter = afterColor;
+				*centerAfter = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a);
 			}
 		}
 	}
@@ -797,13 +795,12 @@ int CChara::CModel::PickFur(
 	float hitU = 0.0f;
 	float hitV = 0.0f;
 	float nearestDepth = 10000000.0f;
-	int hitAny = 0;
-	int hitPaintable = 0;
 	CVector hitViewPos;
 	hitViewPos.Identity();
+	int hitAny = 0;
+	int hitPaintable = 0;
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-	const float negCursorY = -(cursorY - 224.0f);
 
 	CChara::CMesh* mesh = m_meshes;
 
@@ -826,12 +823,11 @@ int CChara::CModel::PickFur(
 
 		Mtx modelViewMtx;
 		PSMTXConcat(viewMtx, meshMtx, modelViewMtx);
-		const unsigned int posGqr = m_data->m_posQuant;
-		const int normGqr = m_data->m_normQuant;
-		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7,
-			          normGqr << 0x18 | 0x70000 | normGqr << 8 | 7, 0xc070c07);
-
+		unsigned int posGqr = m_data->m_posQuant;
+		int normGqr = m_data->m_normQuant;
 		CChara::CMesh::CDisplayList* displayList = mesh->m_data->m_displayLists;
+		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
+		              0xC070C07);
 		int displayCount = mesh->m_data->m_displayListCount - 1;
 		for (; displayCount >= 0; displayCount--, displayList++) {
 			CMaterial* material = m_data->m_materialSet->m_materials[displayList->m_material];
@@ -850,8 +846,8 @@ int CChara::CModel::PickFur(
 					cursor += 3;
 					const int primitive = command & 0xF8;
 					remaining -= count * 8 + 3;
-					int vertexIndex = 0;
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
+					int vertexIndex = 0;
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
 						for (; count--; vertexIndex++, indices += 4) {
 							register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
@@ -894,7 +890,7 @@ int CChara::CModel::PickFur(
 								(primitive == GX_TRIANGLESTRIP && vertexIndex >= 2)) {
 								CWork* vp = &verts[0];
 								int passed = 0;
-								float depthAccum = 0.0f;
+								float depth = 0.0f;
 								for (int remainEdges = 3; remainEdges != 0; remainEdges--) {
 									if (vp->m_projValid == 0) {
 										break;
@@ -914,83 +910,75 @@ int CChara::CModel::PickFur(
 											break;
 										}
 									}
-									depthAccum = depthAccum + vp->m_clip.w;
+									depth = depth + vp->m_clip.w;
 									vp++;
 									passed++;
 								}
 
-								float depth;
-								if (passed != 3 || nearestDepth <= (depth = depthAccum / 3.0f)) {
-									continue;
-								}
+								if (passed == 3) {
+									depth /= 3.0f;
+									if (nearestDepth > depth) {
+										hitAny = 1;
+										Mtx44 invScreenMtx;
+										PSMTX44Copy(screenMtx, invScreenMtx);
+										C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
-								hitAny = 1;
-								Mtx44 invScreenMtx;
-								PSMTX44Copy(screenMtx, invScreenMtx);
-								C_MTX44Inverse(invScreenMtx, invScreenMtx);
+										CVector ray[2];
+										ray[0] = CVector(
+											(cursorX - 320.0f) / 320.0f,
+											-(cursorY - 224.0f) / 224.0f, 0.0f);
+										ray[1] = CVector(ray[0].x, ray[0].y, -100.0f);
+										PSMTX44MultVec(invScreenMtx, ray[0], ray[0]);
+										PSMTX44MultVec(invScreenMtx, ray[1], ray[1]);
 
-								CVector rayStart;
-								CVector rayEnd;
-								rayStart = CVector(
-									(cursorX - 320.0f) / 320.0f,
-									negCursorY / 224.0f, 0.0f);
-								rayEnd = CVector(rayStart.x, rayStart.y, -100.0f);
-								PSMTX44MultVec(invScreenMtx, rayStart, rayStart);
-								PSMTX44MultVec(invScreenMtx, rayEnd, rayEnd);
+										CVector rayDir = ray[1] - ray[0];
 
-								CVector ray = rayEnd - rayStart;
+										CVector normal;
+										CVector normalA;
+										CVector normalB;
+										PSVECCrossProduct(&verts[1].m_viewPos, &verts[0].m_viewPos, normalA);
+										PSVECCrossProduct(&verts[2].m_viewPos, &verts[0].m_viewPos, normalB);
+										PSVECCrossProduct(normalA, normalB, normal);
+										if (verts[2].m_edgeFlag != 0) {
+											normal = CVector(-normal.x, -normal.y, -normal.z);
+										}
+										normal.Normalize();
 
-								CVector normal;
-								CVector normalA;
-								CVector normalB;
-								PSVECCrossProduct(&verts[1].m_viewPos, &verts[0].m_viewPos, normalA);
-								PSVECCrossProduct(&verts[2].m_viewPos, &verts[0].m_viewPos, normalB);
-								PSVECCrossProduct(normalA, normalB, normal);
-								if (verts[2].m_edgeFlag != 0) {
-									normal = CVector(-normal.x, -normal.y, -normal.z);
-								}
-								normal.Normalize();
+										CVector planeDelta = CVector(verts[0].m_viewPos) - ray[0];
+										const float rayDot = PSVECDotProduct(normal, rayDir);
+										const float planeDot = PSVECDotProduct(normal, planeDelta);
+										Vec scaledRay;
+										PSVECScale(rayDir, &scaledRay, planeDot / rayDot);
+										PSVECAdd(ray[0], &scaledRay, hitViewPos);
 
-								CVector planeDelta = CVector(verts[0].m_viewPos) - rayStart;
-								const float rayDot = PSVECDotProduct(normal, ray);
-								const float planeDot = PSVECDotProduct(normal, planeDelta);
-								Vec scaledRay;
-								PSVECScale(ray, &scaledRay, planeDot / rayDot);
-								PSVECAdd(rayStart, &scaledRay, hitViewPos);
+										CVector hitTo[3];
+										CVector area[3];
+										hitTo[0] = CVector(verts[0].m_viewPos) - hitViewPos;
+										hitTo[1] = CVector(verts[1].m_viewPos) - hitViewPos;
+										hitTo[2] = CVector(verts[2].m_viewPos) - hitViewPos;
 
-								CVector hitToA;
-								CVector hitToB;
-								CVector hitToC;
-								CVector areaAB;
-								CVector areaBC;
-								CVector areaCA;
-								hitToA = CVector(verts[0].m_viewPos) - hitViewPos;
-								hitToB = CVector(verts[1].m_viewPos) - hitViewPos;
-								hitToC = CVector(verts[2].m_viewPos) - hitViewPos;
+										PSVECCrossProduct(hitTo[0], hitTo[1], area[0]);
+										PSVECCrossProduct(hitTo[1], hitTo[2], area[1]);
+										PSVECCrossProduct(hitTo[2], hitTo[0], area[2]);
+										CVector weights = CVector(PSVECMag(area[1]), PSVECMag(area[2]), PSVECMag(area[0])) * 0.5f;
+										PSVECScale(weights, weights,
+											       1.0f / (weights.x + weights.y + weights.z));
 
-								PSVECCrossProduct(hitToA, hitToB, areaAB);
-								PSVECCrossProduct(hitToB, hitToC, areaBC);
-								PSVECCrossProduct(hitToC, hitToA, areaCA);
-								const float magAB = PSVECMag(areaAB);
-								const float magCA = PSVECMag(areaCA);
-								const float magBC = PSVECMag(areaBC);
-								CVector weights = CVector(magBC, magCA, magAB) * 0.5f;
-								PSVECScale(weights, weights,
-									       1.0f / (weights.x + weights.y + weights.z));
+										hitU =
+											verts[2].m_uv.x * weights.z + (verts[0].m_uv.x * weights.x + verts[1].m_uv.x * weights.y);
+										hitV =
+											verts[2].m_uv.y * weights.z + (verts[0].m_uv.y * weights.x + verts[1].m_uv.y * weights.y);
 
-								hitU =
-									verts[2].m_uv.x * weights.z + (verts[0].m_uv.x * weights.x + verts[1].m_uv.x * weights.y);
-								hitV =
-									verts[2].m_uv.y * weights.z + (verts[0].m_uv.y * weights.x + verts[1].m_uv.y * weights.y);
-
-								if (outWorldPos != 0) {
-									outWorldPos->x = hitViewPos.x;
-									outWorldPos->y = hitViewPos.y;
-									outWorldPos->z = hitViewPos.z;
-								}
-								if (material->IsFurEnabled()) {
-									hitPaintable = paintableMaterial;
-									nearestDepth = depth;
+										if (outWorldPos != 0) {
+											outWorldPos->x = hitViewPos.x;
+											outWorldPos->y = hitViewPos.y;
+											outWorldPos->z = hitViewPos.z;
+										}
+										if (material->IsFurEnabled()) {
+											hitPaintable = paintableMaterial;
+											nearestDepth = depth;
+										}
+									}
 								}
 							}
 						}
@@ -1005,19 +993,21 @@ int CChara::CModel::PickFur(
 
 	if (doPaint != 0 && hitPaintable != 0) {
 		CTexture* texture = FindMogFurTexture(this);
-		if (texture != 0 && texture->m_format == GX_TF_RGB5A3 && nearestDepth != 0.0f) {
+		if (texture != 0) {
 			unsigned short* furTexels = reinterpret_cast<unsigned short*>(texture->m_imageData);
 			int furTexWidth = texture->m_width;
 			int furTexHeight = texture->m_height;
-			_GXColor paintColor = brushColor;
-			_GXColor before;
-			_GXColor after;
-			brush(furTexels, furTexWidth, furTexHeight, hitU, hitV, mode, paintColor, &before, &after);
-			if (centerBefore != 0) {
-				*centerBefore = before;
-			}
-			if (centerAfter != 0) {
-				*centerAfter = after;
+			if (texture->m_format == GX_TF_RGB5A3 && nearestDepth) {
+				_GXColor paintColor = brushColor;
+				_GXColor before;
+				_GXColor after;
+				brush(furTexels, furTexWidth, furTexHeight, hitU, hitV, mode, paintColor, &before, &after);
+				if (centerBefore != 0) {
+					*centerBefore = before;
+				}
+				if (centerAfter != 0) {
+					*centerAfter = after;
+				}
 			}
 		}
 	}
@@ -1280,30 +1270,25 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		_GXColor brushColor;
 		switch (Chara.MogFur().m_commandIndex) {
 		case 0: {
-			const _GXColor c = CColor(0xF, 4, 4, 2).color;
-			brushColor = c;
+			brushColor = CColor(0xF, 4, 4, 2);
 			break;
 		}
 		case 1: {
-			const _GXColor c = CColor(4, 8, 0xF, 2).color;
-			brushColor = c;
+			brushColor = CColor(4, 8, 0xF, 2);
 			break;
 		}
 		case 2: {
-			const _GXColor c = CColor(4, 0xF, 4, 2).color;
-			brushColor = c;
+			brushColor = CColor(4, 0xF, 4, 2);
 			break;
 		}
 		case 3: {
-			const _GXColor c = CColor(0xF, 0xF, 0xF, 4).color;
-			brushColor = c;
+			brushColor = CColor(0xF, 0xF, 0xF, 4);
 			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
 			break;
 		}
 		case 4:
 			{
-				const _GXColor c = CColor(0, 0, 0, 2).color;
-				brushColor = c;
+				brushColor = CColor(0, 0, 0, 2);
 			}
 			eraseMode = 1;
 			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
@@ -1314,15 +1299,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		Vec worldPos;
 
 		CopyFurTex(0);
-		const _GXColor initColor = CColor(0xF, 0xF, 0xF, 0).color;
-		centerAfter.r = initColor.r;
-		centerAfter.g = initColor.g;
-		centerAfter.b = initColor.b;
-		centerAfter.a = initColor.a;
-		centerBefore.r = initColor.r;
-		centerBefore.g = initColor.g;
-		centerBefore.b = initColor.b;
-		centerBefore.a = initColor.a;
+		centerAfter = CColor(0xF, 0xF, 0xF, 0);
+		centerBefore = centerAfter;
 		int pickResult = PickFur(cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
 		CopyFurTex(1);
 		Chara.CalcMogScore();
@@ -1342,20 +1320,24 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 			if (pickResult == 0) {
 				m_mogWork.m_idleTicks++;
-				if (m_mogWork.m_idleTicks == 0x3C && messageId == -1) {
-					messageId = 3;
-				} else if (m_mogWork.m_idleTicks == 0xF0 && messageId == -1) {
-					messageId = 4;
+				if (m_mogWork.m_idleTicks == 0x3C) {
+					if (messageId == -1) {
+						messageId = 3;
+					}
+				} else if (m_mogWork.m_idleTicks == 0xF0) {
+					if (messageId == -1) {
+						messageId = 4;
+					}
 				}
 			} else {
 				m_mogWork.m_idleTicks = 0;
 			}
 
 			if (doPaint != 0) {
-				int particleNo = 0;
-				int seId = 0;
 				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
 				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
+				int particleNo = 0;
+				int seId = 0;
 				CColor particleColorObj(centerBefore);
 				_GXColor& particleColor = particleColorObj.color;
 				switch (Chara.MogFur().m_commandIndex) {
@@ -1436,15 +1418,24 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					m_mogWork.m_eraseTicks++;
 				}
 
-				if (Chara.MogFur().m_commandIndex < 3 && Chara.MogFur().m_commandIndex >= 0 && doPaint != 0
-				    && m_mogWork.m_loopSeHandle == 0) {
-					m_mogWork.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+				switch (Chara.MogFur().m_commandIndex) {
+				case 0:
+				case 1:
+				case 2:
+					if (doPaint != 0 && m_mogWork.m_loopSeHandle == 0) {
+						m_mogWork.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+					}
+					break;
 				}
 			}
 		}
 	} else {
-		if (Chara.MogFur().m_commandIndex < 3 && Chara.MogFur().m_commandIndex >= 0) {
+		switch (Chara.MogFur().m_commandIndex) {
+		case 0:
+		case 1:
+		case 2:
 			StopMogLoopSe(m_mogWork);
+			break;
 		}
 	}
 

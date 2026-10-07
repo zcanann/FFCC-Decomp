@@ -80,14 +80,11 @@ public:
     int GetNumModel() { return 0x100; }
     pppModelSt* Find(char* name, int)
     {
-        pppModelSt* model;
-        unsigned int i = 0;
-        model = m_models;
-        for (; i < GetNumModel(); i++) {
+        for (unsigned int i = 0; i < GetNumModel(); i++) {
+            pppModelSt* model = &m_models[i];
             if (model->m_isUsed != 0 && strcmp(model->m_name, name) == 0) {
                 return model;
             }
-            model++;
         }
         return 0;
     }
@@ -105,14 +102,11 @@ public:
     int GetNumShape() { return 0x100; }
     pppShapeSt* Find(char* name, int)
     {
-        pppShapeSt* shape;
-        unsigned int i = 0;
-        shape = m_shapes;
-        for (; i < GetNumShape(); i++) {
+        for (unsigned int i = 0; i < GetNumShape(); i++) {
+            pppShapeSt* shape = &m_shapes[i];
             if (shape->m_inUse != 0 && strcmp(shape->m_name, name) == 0) {
                 return shape;
             }
-            shape++;
         }
         return 0;
     }

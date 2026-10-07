@@ -1998,3 +1998,510 @@ p_game_padding_801D2799:
 
 p_gba_padding_801D4959:
 	.rodata start:0x801D4959 end:0x801D4960 align:1
+
+pppAlignmentScale.cpp:
+	extab start:0x800091FC end:0x80009204
+	extabindex start:0x8000FED4 end:0x8000FEE0
+	.text start:0x80105934 end:0x80105A5C
+	.sdata2 start:0x8034E5C0 end:0x8034E5C8
+
+pppCallBackDistance.cpp:
+	extab start:0x80009BE4 end:0x80009BF4
+	extabindex start:0x80010DB0 end:0x80010DC8
+	.text start:0x8013CF9C end:0x8013D134
+
+pppCharaZEnvCtrl.cpp:
+	extab start:0x80009B4C end:0x80009B6C
+	extabindex start:0x80010CCC end:0x80010CFC
+	.text start:0x8013A4EC end:0x8013A5FC
+
+pppColor.cpp:
+	extab start:0x800070D8 end:0x800070E0
+	extabindex start:0x8000CF04 end:0x8000CF10
+	.text start:0x8005F3EC end:0x8005F5C0
+	.sdata2 start:0x8034CC28 end:0x8034CC30
+
+pppConstrainCameraDir2.cpp:
+	extab start:0x8000A0DC end:0x8000A0E4
+	extabindex start:0x80011524 end:0x80011530
+	.text start:0x80166D94 end:0x80167044
+	.sdata2 start:0x8034F760 end:0x8034F770
+
+pppDrawMatrixLoc.cpp:
+	extab start:0x8000A0D4 end:0x8000A0DC
+	extabindex start:0x80011518 end:0x80011524
+	.text start:0x80166CFC end:0x80166D94
+	.sdata2 start:0x8034F758 end:0x8034F760
+
+pppDrawMatrixNoRot.cpp:
+	extab start:0x80007B00 end:0x80007B08
+	extabindex start:0x8000DCE4 end:0x8000DCF0
+	.text start:0x8008A044 end:0x8008A0D8
+
+pppDrawMdl.cpp:
+	extab start:0x80007278 end:0x80007280
+	extabindex start:0x8000D174 end:0x8000D180
+	.text start:0x800647C0 end:0x80064868
+
+pppDrawShape.cpp:
+	extab start:0x80007288 end:0x80007290
+	extabindex start:0x8000D18C end:0x8000D198
+	.text start:0x800648F0 end:0x80064AB4
+
+pppDrawShape2.cpp:
+	extab start:0x80008CA4 end:0x80008CAC
+	extabindex start:0x8000F6D0 end:0x8000F6DC
+	.text start:0x800D7CD0 end:0x800D7E94
+
+pppEraseCharaParts.cpp:
+	extab start:0x800090FC end:0x8000911C
+	extabindex start:0x8000FD54 end:0x8000FD84
+	.text start:0x800FFF0C end:0x80100114
+
+pppKeDMat.cpp:
+	extab start:0x80007B78 end:0x80007B80
+	extabindex start:0x8000DD98 end:0x8000DDA4
+	.text start:0x8008E170 end:0x8008E2EC
+
+pppKeShpTail.cpp:
+	extab start:0x80007A90 end:0x80007A98
+	extabindex start:0x8000DC3C end:0x8000DC48
+	.text start:0x800874F4 end:0x80087620
+
+pppLerpPos.cpp:
+	extab start:0x800097CC end:0x800097DC
+	extabindex start:0x8001078C end:0x800107A4
+	.text start:0x80127130 end:0x8012738C
+	.rodata start:0x801D8B68 end:0x801D8B78
+	.sdata2 start:0x8034E888 end:0x8034E898
+
+pppMatrixScl.cpp:
+	extab start:0x800070E8 end:0x800070F0
+	extabindex start:0x8000CF1C end:0x8000CF28
+	.text start:0x8005F620 end:0x8005F6AC
+
+pppMatrixXYZ.cpp:
+	extab start:0x800070F0 end:0x800070F8
+	extabindex start:0x8000CF28 end:0x8000CF34
+	.text start:0x8005F6AC end:0x8005F7EC
+
+pppMatrixXZY.cpp:
+	extab start:0x800070F8 end:0x80007100
+	extabindex start:0x8000CF34 end:0x8000CF40
+	.text start:0x8005F7EC end:0x8005F92C
+
+pppMatrixYXZ.cpp:
+	extab start:0x80007100 end:0x80007108
+	extabindex start:0x8000CF40 end:0x8000CF4C
+	.text start:0x8005F92C end:0x8005FA6C
+
+pppMatrixYZX.cpp:
+	extab start:0x80007108 end:0x80007110
+	extabindex start:0x8000CF4C end:0x8000CF58
+	.text start:0x8005FA6C end:0x8005FBAC
+
+pppMatrixZXY.cpp:
+	extab start:0x80007110 end:0x80007118
+	extabindex start:0x8000CF58 end:0x8000CF64
+	.text start:0x8005FBAC end:0x8005FCEC
+
+pppMatrixZYX.cpp:
+	extab start:0x80007118 end:0x80007120
+	extabindex start:0x8000CF64 end:0x8000CF70
+	.text start:0x8005FCEC end:0x8005FE2C
+
+pppParMatrix.cpp:
+	extab start:0x80007120 end:0x80007128
+	extabindex start:0x8000CF70 end:0x8000CF7C
+	.text start:0x8005FEEC end:0x8005FF58
+
+pppParMoveLine.cpp:
+	extab start:0x80007BA8 end:0x80007BB0
+	extabindex start:0x8000DDE0 end:0x8000DDEC
+	.text start:0x8008FAB8 end:0x8008FBA0
+	.sdata2 start:0x8034D378 end:0x8034D37C
+
+pppPointAp.cpp:
+	extab start:0x80007128 end:0x80007130
+	extabindex start:0x8000CF7C end:0x8000CF88
+	.text start:0x80060070 end:0x8006018C
+
+pppPointApMtx.cpp:
+	extab start:0x80008AFC end:0x80008B04
+	extabindex start:0x8000F454 end:0x8000F460
+	.text start:0x800CF4BC end:0x800CF60C
+
+pppPointRAp.cpp:
+	extab start:0x80007130 end:0x80007138
+	extabindex start:0x8000CF88 end:0x8000CF94
+	.text start:0x8006018C end:0x80060368
+	.sdata2 start:0x8034CC40 end:0x8034CC4C
+
+pppRandChar.cpp:
+	extab start:0x80007138 end:0x80007140
+	extabindex start:0x8000CF94 end:0x8000CFA0
+	.text start:0x80060368 end:0x800604A8
+	.sdata2 start:0x8034CC50 end:0x8034CC60
+
+pppRandDownChar.cpp:
+	extab start:0x80007148 end:0x80007150
+	extabindex start:0x8000CFAC end:0x8000CFB8
+	.text start:0x800606C4 end:0x800607F0
+	.sdata2 start:0x8034CC70 end:0x8034CC80
+
+pppRandDownFloat.cpp:
+	extab start:0x80007158 end:0x80007160
+	extabindex start:0x8000CFC4 end:0x8000CFD0
+	.text start:0x800609C8 end:0x80060AD0
+	.sdata2 start:0x8034CC90 end:0x8034CC94
+
+pppRandDownInt.cpp:
+	extab start:0x80007170 end:0x80007178
+	extabindex start:0x8000CFE8 end:0x8000CFF4
+	.text start:0x80060DC8 end:0x80060EF4
+	.sdata2 start:0x8034CCB0 end:0x8034CCC0
+
+pppRandDownShort.cpp:
+	extab start:0x80007180 end:0x80007188
+	extabindex start:0x8000D000 end:0x8000D00C
+	.text start:0x80061088 end:0x800611B4
+	.sdata2 start:0x8034CCD0 end:0x8034CCE0
+
+pppRandFloat.cpp:
+	extab start:0x80007188 end:0x80007190
+	extabindex start:0x8000D00C end:0x8000D018
+	.text start:0x800611B4 end:0x800612C0
+	.sdata2 start:0x8034CCE0 end:0x8034CCE4
+
+pppRandInt.cpp:
+	extab start:0x800071A0 end:0x800071A8
+	extabindex start:0x8000D030 end:0x8000D03C
+	.text start:0x80061600 end:0x80061740
+	.sdata2 start:0x8034CD00 end:0x8034CD10
+
+pppRandShort.cpp:
+	extab start:0x800071B0 end:0x800071B8
+	extabindex start:0x8000D048 end:0x8000D054
+	.text start:0x80061908 end:0x80061A48
+	.sdata2 start:0x8034CD20 end:0x8034CD30
+
+pppRandUpChar.cpp:
+	extab start:0x800071B8 end:0x800071C0
+	extabindex start:0x8000D054 end:0x8000D060
+	.text start:0x80061A48 end:0x80061B74
+	.sdata2 start:0x8034CD30 end:0x8034CD40
+
+pppRandUpFloat.cpp:
+	extab start:0x800071C8 end:0x800071D0
+	extabindex start:0x8000D06C end:0x8000D078
+	.text start:0x80061D4C end:0x80061E54
+	.sdata2 start:0x8034CD50 end:0x8034CD54
+
+pppRandUpInt.cpp:
+	extab start:0x800071E0 end:0x800071E8
+	extabindex start:0x8000D090 end:0x8000D09C
+	.text start:0x8006214C end:0x80062278
+	.sdata2 start:0x8034CD70 end:0x8034CD80
+
+pppRandUpShort.cpp:
+	extab start:0x800071F0 end:0x800071F8
+	extabindex start:0x8000D0A8 end:0x8000D0B4
+	.text start:0x8006240C end:0x80062538
+	.sdata2 start:0x8034CD90 end:0x8034CDA0
+
+pppScreenBlur.cpp:
+	extab start:0x80009B24 end:0x80009B3C
+	extabindex start:0x80010C90 end:0x80010CB4
+	.text start:0x8013A1EC end:0x8013A314
+
+pppVertexAp.cpp:
+	extab start:0x80007240 end:0x80007248
+	extabindex start:0x8000D120 end:0x8000D12C
+	.text start:0x80063C4C end:0x80063F64
+	.sdata2 start:0x8034CE30 end:0x8034CE38
+
+pppVertexApAt.cpp:
+	extab start:0x80007248 end:0x80007250
+	extabindex start:0x8000D12C end:0x8000D138
+	.text start:0x80063F64 end:0x80064134
+	.sdata2 start:0x8034CE38 end:0x8034CE40
+
+pppVertexApLc.cpp:
+	extab start:0x80007250 end:0x80007258
+	extabindex start:0x8000D138 end:0x8000D144
+	.text start:0x80064134 end:0x800643A8
+	.sdata2 start:0x8034CE40 end:0x8034CE48
+
+pppVertexApMtx.cpp:
+	extab start:0x80008B04 end:0x80008B0C
+	extabindex start:0x8000F460 end:0x8000F46C
+	.text start:0x800CF60C end:0x800CF98C
+	.sdata2 start:0x8034DAD8 end:0x8034DAE0
+
+pppVertexAttend.cpp:
+	extab start:0x80007258 end:0x80007260
+	extabindex start:0x8000D144 end:0x8000D150
+	.text start:0x800643A8 end:0x80064470
+
+pppYmCallBack.cpp:
+	extab start:0x80008070 end:0x80008078
+	extabindex start:0x8000E4D0 end:0x8000E4DC
+	.text start:0x800A3EAC end:0x800A3F74
+
+pppAngAccele.cpp:
+	.text start:0x8005F020 end:0x8005F0E0
+
+pppAngMove.cpp:
+	.text start:0x8005F164 end:0x8005F224
+
+pppColMove.cpp:
+	.text start:0x8005F308 end:0x8005F3EC
+
+pppDrawMatrixFrontLnr.cpp:
+	extab start:0x80008AE4 end:0x80008AEC
+	extabindex start:0x8000F430 end:0x8000F43C
+	.text start:0x800CED1C end:0x800CEDA4
+
+pppWDrawMatrix.cpp:
+	extab start:0x80007B98 end:0x80007BA0
+	extabindex start:0x8000DDC8 end:0x8000DDD4
+	.text start:0x8008F9B8 end:0x8008FA30
+
+pppWDrawMatrixFront.cpp:
+	extab start:0x80007BA0 end:0x80007BA8
+	extabindex start:0x8000DDD4 end:0x8000DDE0
+	.text start:0x8008FA30 end:0x8008FAB8
+
+pppWDrawMatrixFrontLoop.cpp:
+	extab start:0x80008578 end:0x80008580
+	extabindex start:0x8000EC2C end:0x8000EC38
+	.text start:0x800C268C end:0x800C2714
+
+pppWDrawMatrixLoop.cpp:
+	extab start:0x80008560 end:0x80008568
+	extabindex start:0x8000EC08 end:0x8000EC14
+	.text start:0x800C2514 end:0x800C258C
+
+pppDrawMatrix.cpp:
+	extab start:0x80007270 end:0x80007278
+	extabindex start:0x8000D168 end:0x8000D174
+	.text start:0x8006478C end:0x800647C0
+
+pppDrawMatrixFront.cpp:
+	extab start:0x80007280 end:0x80007288
+	extabindex start:0x8000D180 end:0x8000D18C
+	.text start:0x80064868 end:0x800648F0
+
+pppDrawMatrixWood.cpp:
+	extab start:0x80007AF8 end:0x80007B00
+	extabindex start:0x8000DCD8 end:0x8000DCE4
+	.text start:0x80089FD4 end:0x8008A044
+
+pppMatrixLoc.cpp:
+	extab start:0x800070E0 end:0x800070E8
+	extabindex start:0x8000CF10 end:0x8000CF1C
+	.text start:0x8005F5C0 end:0x8005F620
+
+pppSDrawMatrix.cpp:
+	extab start:0x80008B0C end:0x80008B14
+	extabindex start:0x8000F46C end:0x8000F478
+	.text start:0x800CF98C end:0x800CF9C0
+
+pppSpMatrix.cpp:
+	extab start:0x80008B34 end:0x80008B3C
+	extabindex start:0x8000F4A8 end:0x8000F4B4
+	.text start:0x800D0C20 end:0x800D0C5C
+
+KeLns.cpp:
+	extab start:0x80007B70 end:0x80007B78
+	extabindex start:0x8000DD8C end:0x8000DD98
+	.text start:0x8008E138 end:0x8008E170
+	.sdata2 start:0x8034D328 end:0x8034D32C
+
+pppKeLns.cpp:
+	extab start:0x80007B68 end:0x80007B70
+	extabindex start:0x8000DD80 end:0x8000DD8C
+	.text start:0x8008E0BC end:0x8008E138
+	.sdata2 start:0x8034D320 end:0x8034D324
+
+pppColAccele.cpp:
+	.text start:0x8005F224 end:0x8005F308
+
+odenotstub/odenotstub.c:
+	.text start:0x801B76FC end:0x801B7704
+
+p_system.cpp:
+	.text start:0x800475D4 end:0x80047728
+
+mapshadow.cpp:
+	.text start:0x8004BF74 end:0x8004C264
+
+pppAccele.cpp:
+	.text start:0x8005EF60 end:0x8005F020
+
+pppMove.cpp:
+	.text start:0x8005FE2C end:0x8005FEEC
+
+pppPoint.cpp:
+	.text start:0x8005FFEC end:0x80060070
+
+pppRandCV.cpp:
+	.text start:0x800604A8 end:0x800606C4
+
+pppRandDownCV.cpp:
+	.text start:0x800607F0 end:0x800609C8
+
+pppRandDownFV.cpp:
+	.text start:0x80060AD0 end:0x80060C00
+
+pppRandDownHCV.cpp:
+	.text start:0x80060C00 end:0x80060DC8
+
+pppRandDownIV.cpp:
+	.text start:0x80060EF4 end:0x80061088
+
+pppRandFV.cpp:
+	.text start:0x800612C0 end:0x800613F4
+
+pppRandHCV.cpp:
+	.text start:0x800613F4 end:0x80061600
+
+pppRandIV.cpp:
+	.text start:0x80061740 end:0x80061908
+
+pppRandUpCV.cpp:
+	.text start:0x80061B74 end:0x80061D4C
+
+pppRandUpFV.cpp:
+	.text start:0x80061E54 end:0x80061F84
+
+pppRandUpHCV.cpp:
+	.text start:0x80061F84 end:0x8006214C
+
+pppRandUpIV.cpp:
+	.text start:0x80062278 end:0x8006240C
+
+pppScale.cpp:
+	.text start:0x80062538 end:0x800625BC
+
+pppSclAccele.cpp:
+	.text start:0x800625BC end:0x8006267C
+
+pppSclMove.cpp:
+	.text start:0x8006267C end:0x8006273C
+
+pppSRandCV.cpp:
+	.text start:0x8006273C end:0x80062A1C
+
+pppSRandDownCV.cpp:
+	.text start:0x80062A1C end:0x80062CAC
+
+pppSRandDownFV.cpp:
+	.text start:0x80062CAC end:0x80062E58
+
+pppSRandDownHCV.cpp:
+	.text start:0x80062E58 end:0x800630E8
+
+pppSRandFV.cpp:
+	.text start:0x800630E8 end:0x800632A0
+
+pppSRandHCV.cpp:
+	.text start:0x800632A0 end:0x80063580
+
+pppSRandUpCV.cpp:
+	.text start:0x80063580 end:0x80063810
+
+pppSRandUpFV.cpp:
+	.text start:0x80063810 end:0x800639BC
+
+pppSRandUpHCV.cpp:
+	.text start:0x800639BC end:0x80063C4C
+
+pppVtMime.cpp:
+	.text start:0x80064470 end:0x8006478C
+
+pppDrawMng.cpp:
+	.text start:0x8007AF9C end:0x8007B220
+
+pppDrawMdlTs.cpp:
+	.text start:0x800872F4 end:0x800874F4
+
+pppKeZCrctShp.cpp:
+	.text start:0x80087620 end:0x80087A9C
+
+pppParHitSph.cpp:
+	.text start:0x80093228 end:0x8009339C
+
+menu.cpp:
+	extab start:0x80007E00 end:0x80007E28
+	extabindex start:0x8000E164 end:0x8000E1A0
+	.text start:0x80099580 end:0x800996B0
+
+pppYmMoveCircle.cpp:
+	.text start:0x800CE9BC end:0x800CED1C
+
+pppYmLaser.cpp:
+	.text start:0x800CF9C0 end:0x800D0C20
+
+pppYmMoveParabola.cpp:
+	.text start:0x800D1684 end:0x800D1A88
+
+pppParMoveMatrix.cpp:
+	.text start:0x800D1A88 end:0x800D1C34
+
+pppYmTraceMove.cpp:
+	.text start:0x800D1C34 end:0x800D2088
+
+p_sound.cpp:
+	.text start:0x800D5B64 end:0x800D5D14
+
+pppYmLookOn.cpp:
+	.text start:0x800D5D14 end:0x800D5F08
+
+pppYmCheckBGHeight.cpp:
+	.text start:0x800D5F08 end:0x800D6068
+
+quadobj.cpp:
+	.text start:0x8010731C end:0x801076D8
+
+p_mc.cpp:
+	.text start:0x80120854 end:0x80120A24
+
+pppScaleLoopAuto.cpp:
+	.text start:0x8012738C end:0x801275FC
+
+pppScreenQuake.cpp:
+	.text start:0x8013A314 end:0x8013A4EC
+
+pppParHitSphMat.cpp:
+	.text start:0x8013D134 end:0x8013D2E8
+
+pppConstrainCameraDir.cpp:
+	.text start:0x8013EE34 end:0x8013F07C
+
+pppFilter.cpp:
+	.text start:0x8013F07C end:0x8013F154
+
+pppConstrainCameraForLoc.cpp:
+	.text start:0x80162690 end:0x80162A00
+
+pppFovAdjustMatrix.cpp:
+	.text start:0x80167044 end:0x80167050
+
+dolphin/os/__start.c:
+	.init start:0x80003100 end:0x80003400
+
+TRK_MINNOW_DOLPHIN/__exception.s:
+	.init start:0x800034AC end:0x800053E0
+
+singmenu.cpp:
+	.text start:0x80141190 end:0x80145F34
+
+os/__ppc_eabi_init.c:
+	.text start:0x8017C5B0 end:0x8017C644
+
+exi/EXIBios.c:
+	.text start:0x8017C644 end:0x8017E020
+
+main.cpp:
+	.text start:0x80019964 end:0x80019AE8

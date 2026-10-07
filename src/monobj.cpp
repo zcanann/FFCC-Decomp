@@ -12,6 +12,7 @@
 #include "ffcc/maphit.h"
 #include "ffcc/monobj_table.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/p_map.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/sound.h"
 #include "ffcc/gbaque.h"
@@ -65,6 +66,22 @@ static const char s_monObjTexAnimU0[3] = "u0";
 extern "C" const float kMonObjPercentMax = 100.0f;
 extern "C" const float kMonObjOne = 1.0f;
 
+
+inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+{
+	CMapCylinder cylinder;
+
+	cylinder.m_bottom = *cylinderBottom;
+	cylinder.m_axis = *direction;
+	cylinder.m_radius = radius;
+
+	return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
+}
+
+inline float CMapPcs::GetHitT()
+{
+	return g_hit_t_slide_min;
+}
 
 static inline unsigned char* CGMonObj_GetAiData(CGMonObj* monObj)
 {
@@ -695,8 +712,7 @@ void CGMonObj::onCancelStat(int state)
 		break;
 
 	case 0x21:
-		CGMonObj::m_aiWork.m_state = 0;
-		m_moveWork.Clear();
+		moveCancel();
 		if ((m_moveWork.m_stateFlags & 2) == 0) {
 			(this->*m_funcs->moveCancel)();
 		}
@@ -1782,18 +1798,9 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	if ((flags & 1) != 0) {
 		unsigned short cylHitArg = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
 		float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
-		CMapCylinder hitCylinder;
-		hitCylinder.m_bottom.x = startPos.x;
-		hitCylinder.m_bottom.y = startPos.y;
-		hitCylinder.m_bottom.z = startPos.z;
-		hitCylinder.m_axis.x = move.x;
-		hitCylinder.m_axis.y = move.y;
-		hitCylinder.m_axis.z = move.z;
-		hitCylinder.m_radius = cylRadius;
-
-		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), cylHitArg);
+		int hit = MapPcs.CheckHitCylinderNear(startPos, move, cylRadius, cylHitArg);
 		if (hit != 0) {
-			float hitT = g_hit_t_slide_min;
+			float hitT = MapPcs.GetHitT();
 			if (hitScale != NULL) {
 				*hitScale = hitT;
 			}
@@ -1814,10 +1821,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		}
 
 		CVector coneStart = startPos;
-		PSVECSubtract(coneStart, forward * sideDist, coneStart);
+		coneStart -= forward * sideDist;
 
 		float coneLength = distance + sideDist;
-		PSVECAdd(move, forward * sideDist, move);
+		move += forward * sideDist;
 
 		int didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
@@ -1873,20 +1880,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			didHit = 1;
 			float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
 			unsigned short hitMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
-			const CVector& cylTop = partyPos - startPos;
-			CMapCylinder hitCylinder;
-			hitCylinder.m_bottom.x = startPos.x;
-			hitCylinder.m_bottom.y = startPos.y;
-			hitCylinder.m_bottom.z = startPos.z;
-			hitCylinder.m_axis.x = cylTop.x;
-			hitCylinder.m_axis.y = cylTop.y;
-			hitCylinder.m_axis.z = cylTop.z;
-			hitCylinder.m_radius = cylRadius;
-
-			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, const_cast<CVector&>(cylTop), hitMask);
+			int mapHit = MapPcs.CheckHitCylinderNear(startPos, partyPos - startPos, cylRadius, hitMask);
 			CVector debugDelta = targetDelta;
 			if (mapHit != 0) {
-				PSVECScale(debugDelta, debugDelta, g_hit_t_slide_min);
+				PSVECScale(debugDelta, debugDelta, MapPcs.GetHitT());
 			}
 			CFlat.AddDebugDrawCC(startPos, debugDelta, cylRadius, 1, mapHit == 0);
 
@@ -2006,8 +2003,7 @@ void CGMonObj::isValidTarget()
 	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiData + 0x102);
 	if ((m_targetPartyIndex >= 0) &&
 	    ((aiFlags & 0x20) != 0)) {
-		CGMonObj::m_aiWork.m_state = 0;
-		m_moveWork.Clear();
+		moveCancel();
 		m_chaseState = 2;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
@@ -2016,8 +2012,7 @@ void CGMonObj::isValidTarget()
 
 	if (((aiFlags & 0x20) != 0) ||
 	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
-		CGMonObj::m_aiWork.m_state = 0;
-		m_moveWork.Clear();
+		moveCancel();
 		m_chaseState = 0;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
@@ -2062,8 +2057,7 @@ check_home:
 	if ((homeDist < kMonObjHomeSnapDistance) ||
 	    (m_chaseTimer == static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x1B8)))) {
 		m_homePosition = *reinterpret_cast<Vec*>(mon + 0x15C);
-		CGMonObj::m_aiWork.m_state = 0;
-		m_moveWork.Clear();
+		moveCancel();
 		m_chaseState = 0;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
@@ -2077,12 +2071,12 @@ check_home:
  * --INFO--
  * PAL Address: 0x801162B4
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80115614
+ * EN Size: 60b
+ * JP Address: 0x8011228C
+ * JP Size: 60b
  */
-void CGMonObj::resetWork()
+void CGMonObj::moveCancel()
 {
 	CGMonObj::m_aiWork.m_state = 0;
 	m_moveWork.Clear();
@@ -2115,8 +2109,7 @@ void CGMonObj::statAround()
 	}
 
 	targetPartyIndex = -1;
-	actionState = 0;
-	monObj->m_moveWork.Clear();
+	monObj->moveCancel();
 	monObj->m_chaseState = 3;
 	monObj->m_chaseTimer = 0;
 	monObj->m_chaseDirty = 1;
@@ -2136,8 +2129,7 @@ body:
 
 			int nextAction = monObj->mlAttackCheck(targetPartyIndex);
 			if (nextAction == -2) {
-				actionState = 0;
-				monObj->m_moveWork.Clear();
+				monObj->moveCancel();
 				monObj->m_chaseState = 0;
 				monObj->m_chaseTimer = 0;
 				monObj->m_chaseDirty = 1;
@@ -2158,8 +2150,7 @@ body:
 					unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
 					if (((reinterpret_cast<CMonWork*>(handle)->m_romWork[0x7F] & 8) != 0) ||
 						((aiFlags & 0x100) != 0)) {
-						actionState = 0;
-						monObj->m_moveWork.Clear();
+						monObj->moveCancel();
 						monObj->m_chaseState = 2;
 						monObj->m_chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -2187,8 +2178,7 @@ body:
 					if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 						(monObj->m_moveWork.m_frame >=
 						 static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)))) {
-						actionState = 0;
-						monObj->m_moveWork.Clear();
+						monObj->moveCancel();
 						monObj->m_chaseState = 3;
 						monObj->m_chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -2228,21 +2218,7 @@ body:
 					if ((*reinterpret_cast<unsigned short*>(aiScript + nextAction * 0x10 + 0x110) & 0x20) != 0) {
 						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 						actionState = 0x21;
-						if (monObj->m_moveWork.m_mode != 4) {
-							monObj->m_moveWork.Clear();
-							monObj->m_moveWork.m_flags = 0x855;
-							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
-								monObj->m_moveWork.m_flags |= 0x400;
-							}
-							if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x80) != 0) {
-								monObj->m_moveWork.m_flags |= 0x20000;
-							}
-							monObj->m_moveWork.SetFlags(0, 0);
-							monObj->m_moveWork.m_mode = 4;
-							monObj->m_moveWork.m_range = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
-							monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
-						}
-						monObj->m_moveWork.m_target = target;
+						monObj->moveChase(target);
 						monObj->m_chaseState = 5;
 						monObj->m_chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -2269,18 +2245,7 @@ body:
 					aiScript4 += nextAction * 0x10;
 					int actionParam = static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript4 + 0x11E));
 					actionState = 0x21;
-					if (monObj->m_moveWork.m_mode != 2) {
-						monObj->m_moveWork.Clear();
-						monObj->m_moveWork.m_flags = 0x325;
-						if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x40) != 0) {
-							monObj->m_moveWork.m_flags |= 0x10000;
-						}
-						monObj->m_moveWork.SetFlags(0, 0);
-						monObj->m_moveWork.m_mode = 2;
-					}
-					monObj->m_moveWork.m_target = target;
-					monObj->m_moveWork.m_range = actionRange;
-					monObj->m_moveWork.m_changeStat = actionParam;
+					CGMonObj_SetAttackMove(monObj, target, actionRange, actionParam);
 				}
 			} else {
 				actionState = nextAction - 0xE;
@@ -2290,6 +2255,7 @@ body:
 			monObj->m_chaseDirty = 1;
 			return;
 	}
+#undef CGMonObj_GetAiData
 #undef script
 #undef actionState
 }
@@ -2366,22 +2332,66 @@ void CGMonObj::mlEscape()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::moveCancel()
+inline void CGMonObj::resetWork()
 {
-	// TODO
+	m_targetPartyIndex = -1;
+	m_aiState = 0;
+	m_aiStatePrev = 0;
+	m_unk6C8 = 0;
+	m_unk6CC = 0;
+	m_actionBranch = 0;
+	m_unk6B8 = 0;
+	m_unk6B9 = 0;
+	m_unk6BA = 0;
+	m_unk6BC = 0;
+	m_unk6BD = 0;
+	m_unk6BE = 0;
+	m_attackDelay = 0;
+	m_aliveFrames = 0;
+	m_unk6BF = 0;
+	m_unk6C0 = 0;
+	m_unk6C2 = 0;
+	m_unk6C3 = 0;
+	m_chaseState = 0;
+	m_chaseTimer = 0;
+	m_chaseDirty = 0;
+	m_stepSeHandle = 0;
+	m_moveWork.Clear();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::moveChase(CGCharaObj*)
+inline void CGMonObj::moveChase(CGCharaObj* target)
 {
-	// TODO
+	if (m_moveWork.m_mode != 4) {
+		m_moveWork.Clear();
+		m_moveWork.m_flags = 0x855;
+		if ((reinterpret_cast<CMonWork*>(m_scriptHandle)->m_romWork[0x7F] & 4) != 0) {
+			m_moveWork.m_flags |= 0x400;
+		}
+		if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(this) + 0x102) & 0x80) != 0) {
+			m_moveWork.m_flags |= 0x20000;
+		}
+		m_moveWork.SetFlags(0, 0);
+		m_moveWork.m_mode = 4;
+		m_moveWork.m_range = static_cast<float>(reinterpret_cast<CMonWork*>(m_scriptHandle)->m_romWork[0x6B]);
+		m_moveWork.m_limitFrame = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_romWork[0xDB];
+	}
+	m_moveWork.m_target = target;
 }
 
 /*
@@ -2629,8 +2639,7 @@ void CGMonObj::statWatch()
 		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
 		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
 		if (homeRange <= homeDist) {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 3;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
@@ -2750,14 +2759,12 @@ void CGMonObj::statWatch()
 
 		int attackResult = monObj->mlAttackCheck(selectedTarget);
 		if (attackResult == -2) {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 0;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 		} else if (attackResult == -1) {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 2;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
@@ -2774,25 +2781,9 @@ void CGMonObj::statWatch()
 							(aiState + *reinterpret_cast<unsigned short*>(aiData + 0x100)) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData + attackResult * 0x10 + 0x110) & 0x20) != 0) {
-						actionState = 0x21;
 						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
-						if (monObj->m_moveWork.m_mode != 4) {
-							monObj->m_moveWork.Clear();
-							monObj->m_moveWork.m_flags = 0x855;
-							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
-								monObj->m_moveWork.m_flags |= 0x400;
-							}
-							if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x80) != 0) {
-								monObj->m_moveWork.m_flags |= 0x20000;
-							}
-							monObj->m_moveWork.SetFlags(0, 0);
-							monObj->m_moveWork.m_mode = 4;
-							monObj->m_moveWork.m_range =
-								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
-							monObj->m_moveWork.m_limitFrame =
-								*reinterpret_cast<unsigned short*>(script + 0x1B6);
-						}
-						monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
+						actionState = 0x21;
+						monObj->moveChase(party);
 						chaseState = 5;
 						chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -2816,8 +2807,9 @@ void CGMonObj::statWatch()
 					}
 					aiData4 += attackResult * 0x10;
 					short changeStat = static_cast<short>(*reinterpret_cast<unsigned short*>(aiData4 + 0x11E));
+					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 					actionState = 0x21;
-					CGMonObj_SetAttackMove(monObj, Game.m_partyObjArr[selectedTarget], range, changeStat);
+					CGMonObj_SetAttackMove(monObj, party, range, changeStat);
 				}
 			} else {
 				actionState = attackResult - 0xE;
@@ -2827,8 +2819,7 @@ void CGMonObj::statWatch()
 			monObj->m_chaseDirty = 1;
 		}
 		} else {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 3;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
@@ -2841,8 +2832,7 @@ void CGMonObj::statWatch()
 			(((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 			 (monObj->m_moveWork.m_frame >=
 			  static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC))))) {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 3;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
@@ -2869,31 +2859,25 @@ void CGMonObj::statMove(int* targetIndex)
 #define mon (reinterpret_cast<unsigned char*>(this))
 #define object (reinterpret_cast<CGObject*>(this))
 #define prgObj (reinterpret_cast<CGPrgObj*>(this))
-	int* chaseState = &monObj->m_chaseState;
-	int* chaseTimer = &monObj->m_chaseTimer;
-	int* targetPartyIdx = &monObj->m_targetPartyIndex;
-
-	int state = *chaseState;
-	switch (state) {
+	switch (m_chaseState) {
 	case 4:
 		monObj->seKiduki();
 		break;
 
 	case 0: {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			CGMonObj::m_aiWork.m_state = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 		}
-		if (*chaseTimer == 0) {
+		if (m_chaseTimer == 0) {
 			object->m_rotTargetY = object->m_homeRotY;
 		}
 
 		int hitPartyIndex = CGMonObj_SearchNoticeParty(monObj);
 
 		if (hitPartyIndex >= 0) {
-			*targetPartyIdx = hitPartyIndex;
-			*chaseState = 2;
-			*chaseTimer = 0;
+			m_targetPartyIndex = hitPartyIndex;
+			m_chaseState = 2;
+			m_chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 			if (monObj->m_unk6B8 == 0) {
 				CGMonObj_PlayNoticeSe(monObj);
@@ -2952,25 +2936,23 @@ void CGMonObj::statMove(int* targetIndex)
 
 	case 5: {
 		{
-			if (*targetPartyIdx >= 0) {
+			if (m_targetPartyIndex >= 0) {
 				CGMonObj::m_aiWork.m_state = 0x21;
-				CGMonObj_SetChaseMove(monObj, Game.m_partyObjArr[*targetPartyIdx], 0);
+				CGMonObj_SetChaseMove(monObj, Game.m_partyObjArr[m_targetPartyIndex], 0);
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 					(object->m_stateFlags0Bits.unk1 != 0)) {
-					CGMonObj::m_aiWork.m_state = 0;
-					monObj->m_moveWork.Clear();
-					if (*targetPartyIdx >= 0) {
-						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));
+					monObj->moveCancel();
+					if (m_targetPartyIndex >= 0) {
+						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 					}
-					*chaseState = 1;
-					*chaseTimer = 0;
+					m_chaseState = 1;
+					m_chaseTimer = 0;
 					monObj->m_chaseDirty = 1;
 				}
 			} else {
-				CGMonObj::m_aiWork.m_state = 0;
-				monObj->m_moveWork.Clear();
-				*chaseState = 0;
-				*chaseTimer = 0;
+				monObj->moveCancel();
+				m_chaseState = 0;
+				m_chaseTimer = 0;
 				monObj->m_chaseDirty = 1;
 			}
 		}
@@ -2982,7 +2964,7 @@ void CGMonObj::statMove(int* targetIndex)
 	if (monObj->m_chaseDirty != 0) {
 		monObj->m_chaseDirty = 0;
 	} else {
-		*chaseTimer += 1;
+		m_chaseTimer += 1;
 	}
 #undef prgObj
 #undef object
@@ -3433,29 +3415,7 @@ void CGMonObj::setRepop(int mode)
 		void** repopHandle = object->m_scriptHandle;
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1C) =
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1A);
-		m_targetPartyIndex = -1;
-		m_aiState = 0;
-		m_aiStatePrev = 0;
-		m_unk6C8 = 0;
-		m_unk6CC = 0;
-		m_actionBranch = 0;
-		m_unk6B8 = 0;
-		m_unk6B9 = 0;
-		m_unk6BA = 0;
-		m_unk6BC = 0;
-		m_unk6BD = 0;
-		m_unk6BE = 0;
-		m_attackDelay = 0;
-		m_aliveFrames = 0;
-		m_unk6BF = 0;
-		m_unk6C0 = 0;
-		m_unk6C2 = 0;
-		m_unk6C3 = 0;
-		m_chaseState = 0;
-		m_chaseTimer = 0;
-		m_chaseDirty = 0;
-		m_stepSeHandle = 0;
-		m_moveWork.Clear();
+		resetWork();
 	}
 
 	enableAttackCol(0, 0, 0);

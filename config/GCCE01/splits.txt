@@ -620,7 +620,14 @@ gba/GBAWrite.c:
 	.text start:0x801A77C0 end:0x801A7948
 
 goout.cpp:
+	extab start:0x8000A00C end:0x8000A05C
+	extabindex start:0x800114DC end:0x80011554
 	.text start:0x8016711C end:0x8016B970
+	.rodata start:0x801DDE18 end:0x801E1DC0
+	.data start:0x80213E60 end:0x802147E8
+	.bss start:0x8030AAE8 end:0x8030AB38
+	.sbss start:0x8032DEE8 end:0x8032DEF0
+	.sdata2 start:0x80332150 end:0x80332178
 
 menu_letter.cpp:
 	.text start:0x801629BC end:0x80166DC0

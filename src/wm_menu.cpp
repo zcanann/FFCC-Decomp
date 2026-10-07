@@ -3250,8 +3250,7 @@ void CMenuPcs::DrawMainMenu()
 			const double* pUmm2 = &DOUBLE_80331420;
 			tileAlpha = static_cast<float>(-(*pRmm4 * static_cast<double>(m_wmWorldState->m_frameCounter) - *pUmm2));
 		}
-		const double* pHmm1 = &DOUBLE_803313F8;
-		tileAlpha = static_cast<float>(static_cast<double>(tileAlpha) * *pHmm1);
+		tileAlpha *= 0.5;
 		DrawMainMenuBase(tileAlpha);
 	}
 
@@ -3285,11 +3284,11 @@ void CMenuPcs::DrawMainMenu()
 				"\214\273\215\335\202\314\203\166\203\214\203\103\203\146\201\133\203\136\202\360\203\201\203\202\203\212\201\133\203\112\201\133\203\150\202\311\203\132\201\133\203\165\202\265\202\334\202\267",
 			};
 #else
+			int mesNo = 0;
 			char* textList[5] = {0};
-			const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
-			char** const langText = g_strWMMenuMes[languageIndex];
+			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 			for (int i = 0; i < 5; i++) {
-				textList[i] = langText[i];
+				textList[i] = mes[mesNo++];
 			}
 #endif
 			unsigned int textAlpha;
@@ -3298,20 +3297,17 @@ void CMenuPcs::DrawMainMenu()
 			} else {
 				textAlpha = static_cast<unsigned int>(static_cast<int>(FLOAT_80331458 * helpAlpha));
 			}
+#ifdef VERSION_GCCJGC
 			CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF));
 			char* const text = textList[m_wmWorldState->m_cardChannel];
-			const float* pWt1 = &FLOAT_80331594;
-			const float* pHt1 = &FLOAT_803313e8;
-#ifdef VERSION_GCCJGC
 			const int x = static_cast<int>(CalcCenteringPos(text, 22));
 			DrawFont(x, 391, textColor.color, 7, text, 1.0f, 1.0f);
 #else
-			const int x = static_cast<int>(CalcCenteringPos2(text, *pWt1, *pHt1));
-			const float* pYt1 = &FLOAT_803317D0;
-			const float* pWt2 = &FLOAT_80331594;
-			const float* pHt2 = &FLOAT_803313e8;
-			DrawFont2(x, static_cast<int>(*pYt1), textColor.color, 7, text,
-			          *pWt2, *pHt2, *pHt2);
+			const float* pY = &FLOAT_803317D0;
+			DrawFont2(static_cast<int>(CalcCenteringPos2(textList[m_wmWorldState->m_cardChannel], FLOAT_80331594, FLOAT_803313e8)),
+			          static_cast<int>(*pY),
+			          CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7,
+			          textList[m_wmWorldState->m_cardChannel], FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 		}
 	}

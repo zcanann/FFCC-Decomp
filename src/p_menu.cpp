@@ -140,10 +140,12 @@ enum
     MenuCommonTextureCount = 22,
 #endif
 #ifdef VERSION_GCCJGC
+    MenuFontAllocationLine = 0xF4,
     MenuTextureAllocationLine = 0x17C,
     MenuMessageAllocationLine = 0x485,
     MenuRingAllocationLine = 0x48C,
 #else
+    MenuFontAllocationLine = 0xF8,
     MenuTextureAllocationLine = 0x182,
     MenuMessageAllocationLine = 0x48B,
     MenuRingAllocationLine = 0x492,
@@ -317,7 +319,11 @@ void CMenuPcs::create()
 #endif
     };
 
+#ifdef VERSION_GCCJGC
+    unsigned long menuHeapSize = 0xE4000;
+#else
     unsigned long menuHeapSize = 0xC4000;
+#endif
     if (FontMan.m_font != 0) {
         menuHeapSize -= FontMan.GetInternal22Size();
     }
@@ -405,7 +411,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0xF8) CFont;
+        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuFontAllocationLine) CFont;
         m_fonts[slot]->Create(File.m_readBuffer, stage);
 
         File.Close(fileHandle);

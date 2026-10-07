@@ -477,6 +477,7 @@ monobj_boss.cpp:
 
 p_menu.cpp:
 	.text start:0x8009339C end:0x80096CEC
+	.rodata start:0x801D4850 end:0x801D4928
 	.bss start:0x80305AA0 end:0x80306360
 
 p_minigame.cpp:

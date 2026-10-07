@@ -52,9 +52,6 @@ TRK_MINNOW_DOLPHIN/UDP_Stubs.c:
 base/PPCArch.c:
 	.text start:0x8017A3E4 end:0x8017A4F8
 
-dolphin/os/__ppc_eabi_init.cpp:
-	.init start:0x80003400 end:0x80003458
-
 TRK_MINNOW_DOLPHIN/mainloop.c:
 	.text start:0x801A7EE8 end:0x801A7FE0
 
@@ -623,7 +620,14 @@ gba/GBAWrite.c:
 	.text start:0x801A77C0 end:0x801A7948
 
 goout.cpp:
+	extab start:0x8000A00C end:0x8000A05C
+	extabindex start:0x800114DC end:0x80011554
 	.text start:0x8016711C end:0x8016B970
+	.rodata start:0x801DDE18 end:0x801E1DC0
+	.data start:0x80213E60 end:0x802147E8
+	.bss start:0x8030AAE8 end:0x8030AB38
+	.sbss start:0x8032DEE8 end:0x8032DEF0
+	.sdata2 start:0x80332150 end:0x80332178
 
 menu_letter.cpp:
 	.text start:0x801629BC end:0x80166DC0
@@ -758,6 +762,8 @@ menu_compa.cpp:
 	.sdata2 start:0x80331F98 end:0x80331FD8
 
 menu_favo.cpp:
+	extab start:0x80009F6C end:0x80009F9C
+	extabindex start:0x800113EC end:0x80011434
 	.text start:0x801613D0 end:0x801629BC
 	.bss start:0x8030AA48 end:0x8030AA68
 	.sdata2 start:0x80331FD8 end:0x80332020
@@ -2541,11 +2547,20 @@ odenotstub/odenotstub.c:
 	.text start:0x801BB3EC end:0x801BB3F4
 
 p_system.cpp:
+	extab start:0x80006908 end:0x80006918
 	extabindex start:0x8000C4F0 end:0x8000C508
 	.text start:0x80047A90 end:0x80047BF4
+	.ctors start:0x801D4354 end:0x801D4358
+	.rodata start:0x801D6B88 end:0x801D6BA9
+	.data start:0x801E8F50 end:0x801E9114
+	.sdata start:0x8032D5E8 end:0x8032D600
+	.sbss start:0x8032DCE8 end:0x8032DCEC
 
 mapshadow.cpp:
+	extab start:0x80006A9C end:0x80006AB4
+	extabindex start:0x8000C6F4 end:0x8000C718
 	.text start:0x8004C510 end:0x8004C7FC
+	.sdata2 start:0x8032ECA8 end:0x8032ECC8
 
 pppRandCV.cpp:
 	.text start:0x800609A4 end:0x80060BC0
@@ -2587,6 +2602,9 @@ menu.cpp:
 	extab start:0x80007D68 end:0x80007D90
 	extabindex start:0x8000E170 end:0x8000E1AC
 	.text start:0x8009AC94 end:0x8009ADC4
+	.data start:0x8020E7E8 end:0x8020E818
+	.sdata start:0x8032D7B8 end:0x8032D7C8
+	.sdata2 start:0x8032F878 end:0x8032F888
 
 pppYmLaser.cpp:
 	.text start:0x800D1DE0 end:0x800D2FE4
@@ -2595,13 +2613,31 @@ p_sound.cpp:
 	extab start:0x80008B8C end:0x80008BB4
 	extabindex start:0x8000F61C end:0x8000F658
 	.text start:0x800D7EDC end:0x800D8094
+	.ctors start:0x801D4394 end:0x801D4398
+	.rodata start:0x801DA400 end:0x801DA421
+	.data start:0x8020F410 end:0x8020F5E0
+	.sdata start:0x8032D870 end:0x8032D888
+	.sbss start:0x8032DDC0 end:0x8032DDC4
 
 quadobj.cpp:
+	extab start:0x800091D4 end:0x800091DC
+	extabindex start:0x8000FF88 end:0x8000FF94
 	.text start:0x8010A61C end:0x8010A9D8
+	.rodata start:0x801DB400 end:0x801DB430
+	.data start:0x802101A8 end:0x802101F8
+	.sdata start:0x8032D910 end:0x8032D928
+	.sdata2 start:0x803308F8 end:0x80330904
 
 p_mc.cpp:
+	extab start:0x800095EC end:0x800095FC
 	extabindex start:0x800105AC end:0x800105C4
 	.text start:0x80123CC8 end:0x80123EA8
+	.ctors start:0x801D4398 end:0x801D439C
+	.rodata start:0x801DBCF0 end:0x801DBD08
+	.data start:0x80210C10 end:0x80210DD4
+	.sdata start:0x8032D9B0 end:0x8032D9C8
+	.sbss start:0x8032DE68 end:0x8032DE6C
+	.sdata2 start:0x80330AB8 end:0x80330AC0
 
 pppConstrainCameraDir.cpp:
 	.text start:0x80142208 end:0x80142450
@@ -2613,16 +2649,32 @@ pppFovAdjustMatrix.cpp:
 	.text start:0x8016BCB8 end:0x8016BCC4
 
 wmm_str.cpp:
+	extab start:0x8000A1BC end:0x8000A1CC
+	extabindex start:0x80011764 end:0x8001177C
 	.text start:0x80179E64 end:0x8017A3E4
+	.rodata start:0x801E26E8 end:0x801E54B0
+	.data start:0x80214A58 end:0x802155D8
+	.sdata2 start:0x80332628 end:0x80332688
 
-os/__ppc_eabi_init.c:
+dolphin/os/__ppc_eabi_init.cpp:
+	.init start:0x80003400 end:0x80003458
 	.text start:0x80180F00 end:0x80180F94
 
 exi/EXIBios.c:
 	.text start:0x80180F94 end:0x80182970
+	.data start:0x80216030 end:0x80216140
+	.bss start:0x8030B670 end:0x8030B730
+	.sdata start:0x8032DA98 end:0x8032DAA0
+	.sbss start:0x8032DFC8 end:0x8032DFD0
 
 dolphin/os/__start.c:
 	.init start:0x80003100 end:0x80003400
+	.sbss start:0x8032DFC0 end:0x8032DFC8
 
 TRK_MINNOW_DOLPHIN/__exception.s:
 	.init start:0x800034AC end:0x800053E0
+
+pppfunctbl.cpp:
+	.rodata start:0x801D7470 end:0x801D7E28
+	.data start:0x801E9D18 end:0x801EB86C
+	.sdata2 start:0x8032F0C0 end:0x8032F0D0

@@ -1471,7 +1471,11 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
+#ifdef VERSION_GCCJGC
+	sprintf(path, "dvd/%s.tex", fileName);
+#else
 	sprintf(path, "dvd/%s%s.tex", Game.GetLangString(), fileName);
+#endif
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
@@ -1524,7 +1528,11 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	}
 
 	char path[0xF4];
+#ifdef VERSION_GCCJGC
+	sprintf(path, "dvd/%s.tex", fileName);
+#else
 	sprintf(path, "dvd/%s%s.tex", Game.GetLangString(), fileName);
+#endif
 
 	m_layerResources[layerNo].m_fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (m_layerResources[layerNo].m_fileHandle != 0) {
@@ -2160,6 +2168,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		Game.LoadLogoWaitingData();
 		break;
 
+#ifndef VERSION_GCCJGC
 	case 0x19: {
 		for (int i = 0; i < kFlatPartyObjCount; i++) {
 			CGPartyObj* party = Game.m_partyObjArr[i];
@@ -2180,6 +2189,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	case 0x1A:
 		PartMng.pppDumpMngSt();
 		break;
+#endif
 	}
 }
 

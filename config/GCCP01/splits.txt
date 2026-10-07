@@ -1557,7 +1557,7 @@ monobj.cpp:
 	.data       start:0x802115D0 end:0x80211958
 	.bss        start:0x80300140 end:0x803001D8
 	.sdata      start:0x8032E970 end:0x8032E9A0
-	.sdata2     start:0x803319C0 end:0x80331A58
+	.sdata2     start:0x803319C0 end:0x80331A50
 
 partyobj.cpp:
 	extab       start:0x8000944C end:0x800095FC
@@ -1568,7 +1568,7 @@ partyobj.cpp:
 	.bss        start:0x803001D8 end:0x80300268
 	.sdata      start:0x8032E9A0 end:0x8032E9D0
 	.sbss       start:0x8032EE70 end:0x8032EE88
-	.sdata2     start:0x80331A58 end:0x80331B10
+	.sdata2     start:0x80331A50 end:0x80331B10
 
 p_mc.cpp:
 	extab       start:0x800095FC end:0x8000960C
@@ -1839,7 +1839,7 @@ goout.cpp:
 	extab       start:0x8000A01C end:0x8000A06C
 	extabindex  start:0x800114F4 end:0x8001156C
 	.text       start:0x80168130 end:0x8016C9E8
-	.rodata     start:0x801DEE30 end:0x801DF9B0
+	.rodata     start:0x801DEE30 end:0x801E2F30
 	.data       start:0x80214FE0 end:0x80215968
 	.bss        start:0x8030BB08 end:0x8030BB58
 	.sbss       start:0x8032EF08 end:0x8032EF10
@@ -2004,12 +2004,13 @@ os/OSTime.c:
 	.text       start:0x80181BF8 end:0x8018201C
 	.data       start:0x80217150 end:0x802171B0
 
-os/__ppc_eabi_init.c:
-	.text       start:0x8018201C end:0x801820B0
-
 dolphin/os/__start.c:
 	.init       start:0x80003100 end:0x80003400
 	.sbss       start:0x8032EFE0 end:0x8032EFE8
+
+dolphin/os/__ppc_eabi_init.cpp:
+	.init       start:0x80003400 end:0x80003458
+	.text       start:0x8018201C end:0x801820B0
 
 exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
@@ -2439,9 +2440,6 @@ TRK_MINNOW_DOLPHIN/notify.c:
 
 TRK_MINNOW_DOLPHIN/flush_cache.c:
 	.text       start:0x801ABA2C end:0x801ABA64
-
-dolphin/os/__ppc_eabi_init.cpp:
-	.init       start:0x80003400 end:0x80003458
 
 TRK_MINNOW_DOLPHIN/mem_TRK.c:
 	.init       start:0x80003458 end:0x800034AC

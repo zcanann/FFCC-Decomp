@@ -63,8 +63,6 @@ extern "C" const float kMonObjConeSideRadius = 20.0f;
 extern "C" const float kMonObjParticleRadiusScale = 0.1f;
 extern "C" const float kMonObjTwoThirdsPi = 2.0943952f;
 static const char s_monObjTexAnimU0[3] = "u0";
-extern "C" const float kMonObjPercentMax = 100.0f;
-extern "C" const float kMonObjOne = 1.0f;
 
 
 inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)

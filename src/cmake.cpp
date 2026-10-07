@@ -922,12 +922,8 @@ void CMenuPcs::DrawSingCMake()
 {
 
     switch (CmakeState(this)->m_step) {
-    case 0: {
-        float alpha = CalcCmakeFadeAlpha(this);
-        DrawWMFrame0(1, alpha);
-
-        DrawCmakeWin(0.0f, 0.0f, alpha);
-
+    case 0:
+        CmakeDraw();
         if (CmakeState(this)->m_resultFlag != 0 && CmakeState(this)->m_mode == 0) {
             CmakeState(this)->m_step = CmakeState(this)->m_step + 1;
             CmakeState(this)->m_frame = 0;
@@ -937,9 +933,7 @@ void CMenuPcs::DrawSingCMake()
             m_singleCmakeSlot = 999;
             CmakeState(this)->m_resultValue = -1;
         }
-
         break;
-    }
     case 1:
         CmakeNameDraw();
         break;
@@ -1690,122 +1684,64 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 124b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeOpen()
+inline int CMenuPcs::CmakeOpen()
 {
-    CmakeMenuState* state = CmakeState(this);
-    state->m_mode = 0;
-    state->m_step = 0;
-    state->m_frame = 0;
-    state->m_resultDir = 0;
-    state->m_initialized = 0;
-    state->m_selectionInitialized = 0;
-    state->m_resultFlag = 0;
+    CalcWMFrame0(CmakeState(this)->m_frame - 10);
+    if (CmakeState(this)->m_frame >= 10) {
+        CmakeState(this)->m_select = 0;
+        CmakeState(this)->m_row = 0;
+        CmakeState(this)->m_table = 0;
+        CmakeState(this)->m_subSelect = 0;
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 8b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeCtrl()
+inline int CMenuPcs::CmakeCtrl()
 {
-    CmakeMenuState* state = CmakeState(this);
-    short& mode = state->m_mode;
-    short& step = state->m_step;
-    short& frame = state->m_frame;
-    short& resultDir = state->m_resultDir;
-    short& resultFlag = state->m_resultFlag;
-
-    CalcSingCMake();
-
-    if (resultFlag == 0) {
-        return;
-    }
-
-    if (step == 0) {
-        if (mode == 0) {
-            step = 1;
-            frame = 0;
-            resultFlag = 0;
-            state->m_selectionInitialized = 0;
-            CmakeMcState(this) = 3;
-        } else if (mode == 2) {
-            CmakeSlot(this) = 999;
-            state->m_resultValue = -1;
-            resultFlag = 0;
-        }
-        return;
-    }
-
-    if (mode < 2) {
-        mode = static_cast<short>(mode + 1);
-        frame = 0;
-        resultFlag = 0;
-        CmakeMcState(this) = 3;
-        return;
-    }
-
-    s_OldMenu = static_cast<int>(step);
-
-    if (step == 6) {
-        step = static_cast<short>(state->m_select + 1);
-        mode = (step == 0) ? 2 : 0;
-    } else if (resultDir < 0) {
-        if (step == 5) {
-            step = 6;
-        } else {
-            step = static_cast<short>(step - 1);
-        }
-        mode = (step == 0) ? 2 : 0;
-    } else if (step != 5) {
-        step = static_cast<short>(step + 1);
-        mode = (step == 0) ? 2 : 0;
-    } else {
-        step = 0;
-        mode = 2;
-    }
-
-    state->m_selectionInitialized = 0;
-    frame = 0;
-    resultFlag = 0;
-    CmakeMcState(this) = 3;
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeClose()
+inline int CMenuPcs::CmakeClose()
 {
-    CmakeMenuState* state = CmakeState(this);
-    state->m_step = 0;
-    state->m_mode = 2;
-    state->m_frame = 0;
-    state->m_resultDir = -1;
-    state->m_resultFlag = 0;
-    state->m_selectionInitialized = 0;
+    CalcWMFrame0(-CmakeState(this)->m_frame);
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 612b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1813,24 +1749,28 @@ inline void CMenuPcs::CmakeClose()
  */
 inline void CMenuPcs::CmakeDraw()
 {
-    DrawSingCMake();
+    float alpha = CalcCmakeFadeAlpha(this);
+    DrawWMFrame0(1, alpha);
+
+    DrawCmakeWin(0.0f, 0.0f, alpha);
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeNameOpen()
+inline int CMenuPcs::CmakeNameOpen()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_step = 1;
-    cmakeState->m_mode = 0;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -2009,18 +1949,23 @@ int CMenuPcs::CmakeNameCtrl()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 96b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeNameClose()
+inline int CMenuPcs::CmakeNameClose()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_mode = 2;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_frame >= 10) {
+        if (CmakeState(this)->m_resultDir < 0) {
+            ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
+        }
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -2114,77 +2059,80 @@ void CMenuPcs::CmakeNameDraw()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeSexOpen()
+inline int CMenuPcs::CmakeSexOpen()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_step = 2;
-    cmakeState->m_mode = 0;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_selectionInitialized == 0) {
+        CmakeState(this)->m_select = 0;
+        CmakeState(this)->m_selectionInitialized = 1;
+    }
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 472b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeSexCtrl()
+inline int CMenuPcs::CmakeSexCtrl()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short& mode = cmakeState->m_mode;
-    short& frame = cmakeState->m_frame;
-    short& sel = cmakeState->m_select;
-    unsigned short repeat = GetButtonRepeat(0);
-    unsigned short down = GetButtonDown(0);
+    short down = Pad.GetButtonDown(0);
+    short repeat = Pad.GetButtonRepeat(0);
 
-    if (mode == 1) {
-        if ((repeat & 0x3) != 0) {
-            sel = (sel == 0) ? 1 : 0;
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        }
+    if (repeat == 0) {
+        return 0;
+    }
 
-        if (((repeat & 0x3) == 0) && ((down & 0x100) != 0)) {
-            s_CmakeInfo.m_gender = static_cast<signed char>(sel);
-            MenuS16(this, 0x860) = sel;
-            mode = 2;
-            frame = 0;
-            cmakeState->m_resultDir = 1;
+    if ((repeat & 0xC) != 0) {
+        CmakeState(this)->m_select ^= 1;
+        Sound.PlaySe(1, 0x40, 0x7F, 0);
+    }
+    if ((repeat & 0xC) == 0) {
+        if ((down & 0x100) != 0) {
+            s_CmakeInfo.m_gender = static_cast<signed char>(CmakeState(this)->m_select);
+            CmakeState(this)->m_resultDir = 1;
             Sound.PlaySe(2, 0x40, 0x7F, 0);
-        } else if (((repeat & 0x3) == 0) && ((down & 0x200) != 0)) {
-            mode = 2;
-            frame = 0;
-            cmakeState->m_resultDir = -1;
+            return 1;
+        }
+        if ((down & 0x200) != 0) {
+            CmakeState(this)->m_resultDir = -1;
             Sound.PlaySe(3, 0x40, 0x7F, 0);
-        } else if (frame < 30) {
-            frame = frame + 1;
+            return 1;
         }
     }
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeSexClose()
+inline int CMenuPcs::CmakeSexClose()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_mode = 2;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -2281,19 +2229,26 @@ void CMenuPcs::CmakeSexDraw()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeTribeOpen()
+inline int CMenuPcs::CmakeTribeOpen()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_step = 3;
-    cmakeState->m_mode = 0;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_selectionInitialized == 0) {
+        CmakeState(this)->m_select = 0;
+        CmakeState(this)->m_row = 0;
+        CmakeState(this)->m_fieldSelect = 0;
+        CmakeState(this)->m_selectionInitialized = 1;
+    }
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -2402,18 +2357,20 @@ int CMenuPcs::CmakeTribeCtrl()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeTribeClose()
+inline int CMenuPcs::CmakeTribeClose()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_mode = 2;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -2560,19 +2517,24 @@ void CMenuPcs::CmakeTribeDraw()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeJobOpen()
+inline int CMenuPcs::CmakeJobOpen()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_step = 4;
-    cmakeState->m_mode = 0;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_selectionInitialized == 0) {
+        CmakeState(this)->m_select = 0;
+        CmakeState(this)->m_selectionInitialized = 1;
+    }
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -2669,18 +2631,20 @@ int CMenuPcs::CmakeJobCtrl()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeJobClose()
+inline int CMenuPcs::CmakeJobClose()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_mode = 2;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -2768,76 +2732,94 @@ void CMenuPcs::CmakeJobDraw()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeResultOpen()
+inline int CMenuPcs::CmakeResultOpen()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_step = 5;
-    cmakeState->m_mode = 0;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_selectionInitialized == 0) {
+        CmakeState(this)->m_select = 0;
+        CmakeState(this)->m_selectionInitialized = 1;
+    }
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 820b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeResultCtrl()
+inline int CMenuPcs::CmakeResultCtrl()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short& mode = cmakeState->m_mode;
-    short& sel = cmakeState->m_select;
-    short& resultDir = cmakeState->m_resultDir;
-    short& frame = cmakeState->m_frame;
-    unsigned short repeat = GetButtonRepeat(0);
-    unsigned short down = GetButtonDown(0);
+    short down = Pad.GetButtonDown(0);
+    short repeat = Pad.GetButtonRepeat(0);
 
-    if (mode != 1) {
-        if (frame < 10) {
-            frame = frame + 1;
+    if (repeat == 0) {
+        return 0;
+    }
+
+    if ((repeat & 3) != 0) {
+        CmakeState(this)->m_select ^= 1;
+        Sound.PlaySe(1, 0x40, 0x7F, 0);
+    }
+    if ((repeat & 3) == 0) {
+        if ((down & 0x100) != 0) {
+            if (CmakeState(this)->m_select == 0) {
+                CmakeState(this)->m_resultDir = 1;
+                m_wmCharaAnimState[CmakeSlot(this)].m_nextAnimIndex = 3;
+                SetSingMakeChara();
+                {
+                    short animWait = static_cast<short>(static_cast<int>(GetMaxAnimWait()));
+                    CmakeState(this)->m_stepTimer = animWait;
+                }
+            } else {
+                CmakeState(this)->m_resultDir = -1;
+            }
+            Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+            return 1;
         }
-        return;
+        if ((down & 0x200) != 0) {
+            CmakeState(this)->m_resultDir = -1;
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            return 1;
+        }
     }
-
-    if ((repeat & 0x3) != 0) {
-        sel = (sel == 0) ? 1 : 0;
-    }
-
-    if ((down & 0x100) != 0) {
-        mode = 2;
-        frame = 0;
-        resultDir = (sel == 0) ? 1 : -1;
-    } else if ((down & 0x200) != 0) {
-        mode = 2;
-        frame = 0;
-        resultDir = -1;
-    }
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 68b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeResultClose()
+inline int CMenuPcs::CmakeResultClose()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_mode = 2;
-    cmakeState->m_frame = 0;
+    if (static_cast<int>(CmakeState(this)->m_stepTimer) != 0) {
+        CmakeState(this)->m_stepTimer =
+            static_cast<short>(CmakeState(this)->m_stepTimer - 1);
+        return 0;
+    }
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -3020,61 +3002,94 @@ void CMenuPcs::CmakeResultDraw()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeResultOpen1()
+inline int CMenuPcs::CmakeResultOpen1()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_mode = 0;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_selectionInitialized == 0) {
+        CmakeState(this)->m_select = 0;
+        CmakeState(this)->m_selectionInitialized = 1;
+    }
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 572b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeResultCtrl1()
+inline int CMenuPcs::CmakeResultCtrl1()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short& mode = cmakeState->m_mode;
-    short& frame = cmakeState->m_frame;
-    unsigned short down = GetButtonDown(0);
+    short down = Pad.GetButtonDown(0);
+    short repeat = Pad.GetButtonRepeat(0);
 
-    if (frame < 10) {
-        frame = frame + 1;
-        return;
+    if (repeat == 0) {
+        return 0;
     }
 
-    if ((down & 0x300) != 0) {
-        mode = 2;
-        frame = 0;
+    if ((repeat & 0x8) != 0) {
+        if (static_cast<int>(CmakeState(this)->m_select) != 0) {
+            CmakeState(this)->m_select =
+                static_cast<short>(CmakeState(this)->m_select - 1);
+        } else {
+            CmakeState(this)->m_select = 3;
+        }
+        Sound.PlaySe(1, 0x40, 0x7F, 0);
+    } else if ((repeat & 0x4) != 0) {
+        if (CmakeState(this)->m_select < 3) {
+            CmakeState(this)->m_select =
+                static_cast<short>(CmakeState(this)->m_select + 1);
+        } else {
+            CmakeState(this)->m_select = 0;
+        }
+        Sound.PlaySe(1, 0x40, 0x7F, 0);
     }
+
+    if ((repeat & 0xC) == 0) {
+        if ((down & 0x100) != 0) {
+            if (CmakeState(this)->m_select < 3) {
+                ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
+            }
+            CmakeState(this)->m_resultDir = 1;
+            Sound.PlaySe(2, 0x40, 0x7F, 0);
+            return 1;
+        }
+        if ((down & 0x200) != 0) {
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+        }
+    }
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeResultClose1()
+inline int CMenuPcs::CmakeResultClose1()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    cmakeState->m_mode = 2;
-    cmakeState->m_frame = 0;
+    if (CmakeState(this)->m_frame >= 10) {
+        return 1;
+    }
+    CmakeState(this)->m_frame++;
+    return 0;
 }
 
 /*
@@ -3394,8 +3409,8 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -3478,8 +3493,8 @@ void CMenuPcs::CmakeVillageDraw()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 340b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -3487,9 +3502,33 @@ void CMenuPcs::CmakeVillageDraw()
  */
 inline void CMenuPcs::SetSingMakeChara()
 {
+    CCaravanWork* caravanWork;
     int slot = static_cast<int>(CmakeSlot(this));
-    ChgModel(slot, MenuS16(this, 0x860), MenuS16(this, 0x862), MenuS16(this, 0x864));
-    SetAnim(slot);
+    int modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
+        static_cast<int>(s_CmakeInfo.m_gender));
+    m_wm.m_charaModelData[slot].m_modelNo = modelNo;
+
+    caravanWork = &Game.m_caravanWorkArr[slot];
+    m_wm.m_charaSelectData->m_confirmed = 1;
+    caravanWork->LoadInit();
+    caravanWork->m_shopState = 1;
+    caravanWork->unk_0x3a8 = 0x101;
+    caravanWork->m_jobType = static_cast<int>(s_CmakeInfo.m_job);
+    memset(caravanWork->m_name, 0, 0x11);
+    strcpy(reinterpret_cast<char*>(caravanWork->m_name), s_CmakeInfo.m_name);
+    caravanWork->m_tribeId = static_cast<unsigned short>(s_CmakeInfo.m_tribe);
+    caravanWork->m_appearanceVariant = static_cast<unsigned short>(s_CmakeInfo.m_hair);
+    caravanWork->m_genderFlag = static_cast<unsigned short>(s_CmakeInfo.m_gender);
+    caravanWork->m_id = static_cast<unsigned short>(modelNo);
+    int baseDataIndex =
+        static_cast<int>(caravanWork->m_genderFlag) +
+        static_cast<int>(caravanWork->m_tribeId) * 2;
+    caravanWork->Init(
+        baseDataIndex,
+        reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + baseDataIndex * 0x1D0),
+        static_cast<int>(caravanWork->m_appearanceVariant));
+    caravanWork->LoadFinished();
+    CallWorldParam(0, slot, 0);
 }
 
 /*

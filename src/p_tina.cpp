@@ -17,6 +17,14 @@ extern "C" const char sNoNameProfileLabel[];
 extern "C" unsigned char g_IsDrawHeapSize = 1;
 
 
+#ifdef VERSION_GCCJGC
+extern const char sTinaGbaResourceStrings[] =
+    "dvd/gba/\0\0\0\0"
+    "ffcc_cli.bin\0\0\0\0"
+    "objdat.spt\0\0"
+    "dvd/menu/icon.dat\0\0\0"
+    "\xCC\xA7\xB2\xC5\xD9\xCC\xA7\xDD\xC0\xBC\xDE\xB0\xA5\xB8\xD8\xBD\xC0\xD9\xB8\xDB\xC6\xB8\xD9";
+#else
 extern const char sTinaGbaResourceStrings[] = {
     (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x66, (char)0x66, (char)0x63, (char)0x63,
@@ -29,6 +37,7 @@ extern const char sTinaGbaResourceStrings[] = {
     (char)0x68, (char)0x72, (char)0x6F, (char)0x6E, (char)0x69, (char)0x63, (char)0x6C, (char)0x65,
     (char)0x73, (char)0x00, (char)0x00, (char)0x00,
 };
+#endif
 extern const char sPartPcsGameTableName[] = "CPartPcs(GAME)";
 extern const char sPartPcsViewerTableName[] = "CPartPcs(PART_VIEWER)";
 extern const char sPartPcsClassName[] = "CPartPcs";
@@ -86,7 +95,9 @@ extern const char sTinaDeleteNoticeMsg[] = {
     (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
     (char)0x82, (char)0xF0, (char)0x8D, (char)0xED, (char)0x8F, (char)0x9C, (char)0x82, (char)0xB5,
     (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
+#ifndef VERSION_GCCJGC
     (char)0x00, (char)0x00, (char)0x00, (char)0x00,
+#endif
 };
 /*
  * --INFO--

@@ -49,9 +49,6 @@ amcstubs/AmcExi2Stubs.c:
 base/PPCArch.c:
 	.text start:0x80175A90 end:0x80175BA4
 
-dolphin/os/__ppc_eabi_init.cpp:
-	.init start:0x80003400 end:0x80003458
-
 TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:
 	.text start:0x801A9C78 end:0x801A9FF0
 
@@ -480,6 +477,7 @@ monobj_boss.cpp:
 
 p_menu.cpp:
 	.text start:0x8009339C end:0x80096CEC
+	.rodata start:0x801D4850 end:0x801D4928
 	.bss start:0x80305AA0 end:0x80306360
 
 p_minigame.cpp:
@@ -1177,12 +1175,16 @@ game.cpp:
 p_chara_viewer.cpp:
 	.rodata start:0x801D5318 end:0x801D54A0
 	.text start:0x800BB280 end:0x800BD02C
+	.bss start:0x8030DEF0 end:0x8030DF18
+	.sbss start:0x8034BBB8 end:0x8034BBD8
+	.sdata2 start:0x8034D908 end:0x8034D988
 
 FunnyShape.cpp:
 	.text start:0x8004FD98 end:0x800517A8
 
 p_tina.cpp:
 	.text start:0x800517A8 end:0x80053458
+	.rodata start:0x801D2A38 end:0x801D2D50
 	.bss start:0x8028F228 end:0x8028F368
 
 p_dbgmenu.cpp:
@@ -1330,7 +1332,10 @@ pppGetRotMatrixZYX.cpp:
 	extabindex start:0x8000CEF8 end:0x8000CF04
 
 pppShape.cpp:
+	extab start:0x80007290 end:0x800072D0
+	extabindex start:0x8000D198 end:0x8000D1F8
 	.text start:0x80064AB4 end:0x80065100
+	.sdata2 start:0x8034CE60 end:0x8034CE70
 
 pppsintbl.cpp:
 	.data	start:0x801E0D70 end:0x801F0D70
@@ -1347,7 +1352,7 @@ auto_10_8034BC84_sbss:
 	.sbss start:0x8034BC84 end:0x8034BC88 align:4
 
 p_sample.cpp:
-	.text	start:0x8001F6CC end:0x8001F708
+	.text	start:0x8001F6CC end:0x8001F7BC
 	.rodata	start:0x801D1820 end:0x801D1841
 	.data	start:0x801DC758 end:0x801DC94C
 	.sdata	start:0x8034B228 end:0x8034B240
@@ -2334,7 +2339,10 @@ p_system.cpp:
 	.text start:0x800475D4 end:0x80047728
 
 mapshadow.cpp:
+	extab start:0x80006B3C end:0x80006B54
+	extabindex start:0x8000C6F4 end:0x8000C718
 	.text start:0x8004BF74 end:0x8004C264
+	.sdata2 start:0x8034CA38 end:0x8034CA58
 
 pppAccele.cpp:
 	.text start:0x8005EF60 end:0x8005F020
@@ -2436,6 +2444,9 @@ menu.cpp:
 	extab start:0x80007E00 end:0x80007E28
 	extabindex start:0x8000E164 end:0x8000E1A0
 	.text start:0x80099580 end:0x800996B0
+	.data start:0x8022CB80 end:0x8022CBB0
+	.sdata start:0x8034B5D8 end:0x8034B5E8
+	.sdata2 start:0x8034D5E0 end:0x8034D5F0
 
 pppYmMoveCircle.cpp:
 	.text start:0x800CE9BC end:0x800CED1C
@@ -2462,7 +2473,13 @@ pppYmCheckBGHeight.cpp:
 	.text start:0x800D5F08 end:0x800D6068
 
 quadobj.cpp:
+	extab start:0x8000924C end:0x80009254
+	extabindex start:0x8000FF4C end:0x8000FF58
 	.text start:0x8010731C end:0x801076D8
+	.rodata start:0x801D7C58 end:0x801D7C88
+	.data start:0x8022EAE8 end:0x8022EB38
+	.sdata start:0x8034B710 end:0x8034B728
+	.sdata2 start:0x8034E5F0 end:0x8034E5FC
 
 p_mc.cpp:
 	.text start:0x80120854 end:0x80120A24
@@ -2490,6 +2507,7 @@ pppFovAdjustMatrix.cpp:
 
 dolphin/os/__start.c:
 	.init start:0x80003100 end:0x80003400
+	.sbss start:0x8034BDC0 end:0x8034BDC8
 
 TRK_MINNOW_DOLPHIN/__exception.s:
 	.init start:0x800034AC end:0x800053E0
@@ -2497,11 +2515,28 @@ TRK_MINNOW_DOLPHIN/__exception.s:
 singmenu.cpp:
 	.text start:0x80141190 end:0x80145F34
 
-os/__ppc_eabi_init.c:
+dolphin/os/__ppc_eabi_init.cpp:
+	.init start:0x80003400 end:0x80003458
 	.text start:0x8017C5B0 end:0x8017C644
 
 exi/EXIBios.c:
 	.text start:0x8017C644 end:0x8017E020
+	.data start:0x80232A68 end:0x80232B78
+	.bss start:0x80327F90 end:0x80328050
+	.sdata start:0x8034B8A0 end:0x8034B8A8
+	.sbss start:0x8034BDC8 end:0x8034BDD0
 
 main.cpp:
+	extab start:0x800059C0 end:0x800059C8
+	extabindex start:0x8000B1DC end:0x8000B1E8
 	.text start:0x80019964 end:0x80019AE8
+	.sdata2 start:0x8034C490 end:0x8034C498
+
+TRK_MINNOW_DOLPHIN/main_TRK.c:
+	.text start:0x801A9FF0 end:0x801AA034
+	.bss start:0x80345FB0 end:0x80345FB4
+
+pppfunctbl.cpp:
+	.rodata start:0x801D3088 end:0x801D3A40
+	.data start:0x801DF218 end:0x801E0D6C
+	.sdata2 start:0x8034CE50 end:0x8034CE60

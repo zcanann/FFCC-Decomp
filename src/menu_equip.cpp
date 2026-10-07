@@ -14,10 +14,12 @@ enum {
 #ifdef VERSION_GCCJGC
     EQUIP_TEX_FRAME = 0x2D,
     EQUIP_TEX_TAB = 0x2E,
+    EQUIP_TEX_PLATE = 0x33,
     EQUIP_TEX_LIST = 0x36,
 #else
     EQUIP_TEX_FRAME = 0x2E,
     EQUIP_TEX_TAB = 0x2F,
+    EQUIP_TEX_PLATE = 0x34,
     EQUIP_TEX_LIST = 0x37,
 #endif
 };
@@ -508,7 +510,7 @@ void CMenuPcs::EquipDraw()
 						int idx = drawIndex + m_equipState->scroll;
 						if ((idx < 1) || (idx >= letterCount)) {
 							if ((idx >= letterCount) || !ChkEquipActive(idx)) {
-								texId = 0x34;
+								texId = EQUIP_TEX_PLATE;
 								alpha = (float)(0.5 * (double)listItem->alpha);
 							}
 						} else {
@@ -520,7 +522,7 @@ void CMenuPcs::EquipDraw()
 									int markY = (int)((double)(h - 24.0f) * 0.5 + (double)y);
 									DrawEquipMark(markX, markY, listItem->alpha);
 								}
-								texId = 0x34;
+								texId = EQUIP_TEX_PLATE;
 								alpha = (float)(0.5 * (double)listItem->alpha);
 							}
 						}
@@ -833,7 +835,7 @@ int CMenuPcs::EquipOpen()
 		int idx = 0;
 		entry = m_equipList->entries;
 		for (int k = 4; k != 0; k--) {
-			entry->tex = 0x34;
+			entry->tex = EQUIP_TEX_PLATE;
 			entry->w = 200;
 			entry->h = 0x28;
 			entry->x = (s16)(int)-((double)entry->w * half - centerX);

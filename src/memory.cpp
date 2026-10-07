@@ -1295,45 +1295,46 @@ void CMemory::CStage::drawHeapBar(int y)
  */
 void CMemory::CStage::drawHeapTitle(int y)
 {
-    CBlock* node = (stageGetAllocationMode(this) == 2) ?
-        stageBlockAt(stageGetHeapHead(this)) :
-        stageBlockAt(stageGetHeapHead(this))->m_next;
-    unsigned int totalUnuse = 0;
-    unsigned int maxUnuse = 0;
-    CBlock* prev = node->m_prev;
-    unsigned int heapTop = m_heapTop;
-    char line[264];
+    CBlock* block = (m_allocationMode == 2) ? reinterpret_cast<CBlock*>(m_heapHead)
+                                            : reinterpret_cast<CBlock*>(m_heapHead)->m_next;
+    int unuse = 0;
+    int maxUnuse = 0;
+    CBlock* prev = block->m_prev;
+    unsigned long top = m_heapTop;
+    char buf[0x108];
 
-    while ((node->m_flags & 2) == 0) {
-        if ((node->m_flags & kMemoryBlockUsedFlag) == 0) {
-            int blockStart = reinterpret_cast<int>(payloadFromBlock(node)) - heapTop;
-            int blockEnd = reinterpret_cast<int>(node->m_next) - heapTop;
-            int blockSize = blockEnd - blockStart;
-            totalUnuse += blockSize;
-            if (static_cast<int>(maxUnuse) < blockSize) {
-                maxUnuse = blockSize;
+    while ((block->m_flags & 2) == 0) {
+        if ((block->m_flags & kMemoryBlockUsedFlag) == 0) {
+            int start = reinterpret_cast<unsigned long>(block + 1) - top;
+            int end = reinterpret_cast<unsigned long>(block->m_next) - top;
+            int size = end - start;
+            unuse += size;
+            if (maxUnuse < size) {
+                maxUnuse = size;
             }
         }
 
-        if ((node->m_size != reinterpret_cast<unsigned int>(node->m_next) - reinterpret_cast<int>(payloadFromBlock(node))) ||
-            (node->m_prev != prev)) {
+        unsigned long blockSize = reinterpret_cast<unsigned long>(block->m_next) - reinterpret_cast<unsigned long>(block + 1);
+        if ((block->m_size != blockSize) || (block->m_prev != prev)) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
             }
             return;
         }
 
-        prev = node;
-        node = node->m_next;
+        CBlock* next = block->m_next;
+        prev = block;
+        block = next;
     }
 
-    int srcLen = strlen(m_allocationSourceStr);
-    strcpy(line, m_allocationSourceStr + ((srcLen - 12) & ~((srcLen - 12) >> 31)));
-    Graphic.DrawDebugStringDirect(0x10, y, line, 8);
+    int len = strlen(m_allocationSourceStr);
+    strcpy(buf, m_allocationSourceStr + ((len - 12) & ~((len - 12) >> 31)));
+    Graphic.DrawDebugStringDirect(0x10, y, buf, 8);
 
-    sprintf(line, s_drawHeapTitleFmt, m_allocCount,
-            static_cast<int>(totalUnuse) / 1024, static_cast<int>(maxUnuse) / 1024);
-    Graphic.DrawDebugStringDirect(0x208, y, line, 8);
+    int unuseKB = unuse / 1024;
+    int maxUnuseKB = maxUnuse / 1024;
+    sprintf(buf, s_drawHeapTitleFmt, m_allocCount, unuseKB, maxUnuseKB);
+    Graphic.DrawDebugStringDirect(0x208, y, buf, 8);
 }
 
 /*

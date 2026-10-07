@@ -3003,20 +3003,11 @@ void CGObject::onDestroy()
  */
 void CGObject::onCreate()
 {
-    int cFill = -1;
-    m_worldPosition.z = 0.0f;
-    m_worldPosition.y = 0.0f;
-    m_worldPosition.x = 0.0f;
-    m_groundHitOffset.z = 0.0f;
-    m_groundHitOffset.y = 0.0f;
-    m_groundHitOffset.x = 0.0f;
+    m_worldPosition.x = m_worldPosition.y = m_worldPosition.z = 0.0f;
+    m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = 0.0f;
 
-    m_rotBaseZ = 0.0f;
-    m_rotBaseY = 0.0f;
-    m_rotBaseX = 0.0f;
-    m_rotTargetZ = 0.0f;
-    m_rotTargetY = 0.0f;
-    m_rotTargetX = 0.0f;
+    m_rotBaseX = m_rotBaseY = m_rotBaseZ = 0.0f;
+    m_rotTargetX = m_rotTargetY = m_rotTargetZ = 0.0f;
 
     m_bodyOffset.x = 0.0f;
     m_bodyOffset.y = -1.0f;
@@ -3032,12 +3023,12 @@ void CGObject::onCreate()
     m_weaponModelHandle = 0;
     m_shieldModelHandle = 0;
 
-    m_animStateMisc = cFill;
+    m_animStateMisc = -1;
     m_weaponNodeFlagAll.m_bits1.m_shield = 0;
     m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 
     m_moveBaseSpeed = 2.0f;
-    m_currentAnimSlot = cFill;
+    m_currentAnimSlot = -1;
 
     m_bodyEllipsoidRadius = 5.0f;
     m_bodyEllipsoidOffset = 0.0f;
@@ -3060,7 +3051,7 @@ void CGObject::onCreate()
     m_rotationY = 1.0f;
     m_rotationZ = 1.0f;
     m_attrFlags = 0;
-    m_ownerType = cFill;
+    m_ownerType = -1;
     m_classWorkIndex = 0;
     m_scriptHandle = 0;
 
@@ -3069,8 +3060,8 @@ void CGObject::onCreate()
     m_weaponNodeFlagBits.m_attached = 0;
     m_weaponNodeFlagBits.m_unk20 = 1;
     m_weaponNodeFlagBits.m_unk40 = 0;
-    m_bgHitMask = cFill;
-    m_animSlotSel = cFill;
+    m_bgHitMask = -1;
+    m_animSlotSel = -1;
     m_turnSpeed = 0.0f;
     m_pushParamB = 0;
     m_pushParamA = 0;
@@ -3081,17 +3072,13 @@ void CGObject::onCreate()
     m_alphaTarget = 1.0f;
     m_currentAlpha = 1.0f;
     m_shieldNodeFlagBits.m_bit20 = 0;
-    m_animBlend = 1.0f;
-    m_bgAttrValue = 1.0f;
-    m_bounceFactor = 1.0f;
+    m_bounceFactor = m_bgAttrValue = m_animBlend = 1.0f;
     m_gravityY = 0.0f;
     m_jumpLandingDampening = 0.0f;
 
     m_stateFlags0Bits.unk3 = 0;
 
-    m_bgCollisionQtrn.z = 0.0f;
-    m_bgCollisionQtrn.y = 0.0f;
-    m_bgCollisionQtrn.x = 0.0f;
+    m_bgCollisionQtrn.x = m_bgCollisionQtrn.y = m_bgCollisionQtrn.z = 0.0f;
     m_bgCollisionQtrn.w = 1.0f;
 
     m_shieldNodeFlagBits.m_bit10 = 0;
@@ -3108,8 +3095,7 @@ void CGObject::onCreate()
     m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
     m_stateFlags0Bits.unk0 = 0;
-    m_swayTarget.z = 0.0f;
-    m_swayTarget.x = 0.0f;
+    m_swayTarget.x = m_swayTarget.z = 0.0f;
     m_swayTarget.y = 1.0f;
     m_swayDirection.x = m_swayTarget.x;
     m_swayDirection.y = m_swayTarget.y;
@@ -3119,28 +3105,24 @@ void CGObject::onCreate()
     m_alphaStep = 0.033333335f;
     m_moveMode = 0;
     m_moveModePrevious = 4;
-    m_hitFaceNormal.z = 0.0f;
-    m_hitFaceNormal.y = 0.0f;
-    m_hitFaceNormal.x = 0.0f;
+    m_hitFaceNormal.x = m_hitFaceNormal.y = m_hitFaceNormal.z = 0.0f;
     m_worldParam = 0.0f;
 
-    m_lookAtTargetNodeIndex = cFill;
+    m_lookAtTargetNodeIndex = -1;
     m_worldParamA = 0;
     m_lookAtAccumYaw = 0.0f;
     m_lookAtAccumPitch = 0.0f;
-    m_weaponAttachNode = cFill;
-    m_shieldAttachNodeIndex = cFill;
+    m_weaponAttachNode = -1;
+    m_shieldAttachNodeIndex = -1;
     m_motionMode = 0;
     m_weaponNodeFlagBits.m_prg = 0;
-    m_extraMoveVec.z = 0.0f;
-    m_extraMoveVec.y = 0.0f;
-    m_extraMoveVec.x = 0.0f;
+    m_extraMoveVec.x = m_extraMoveVec.y = m_extraMoveVec.z = 0.0f;
     m_shieldNodeFlagBits.m_bit01 = 0;
     m_field_0x56 = 0x7D;
     m_twistTarget = 0.0f;
 
-    for (unsigned int i = 0; i < sizeof(m_animSlots); i++) {
-        m_animSlots[i] = cFill;
+    for (int i = 0; i < 0x40; i++) {
+        m_animSlots[i] = -1;
     }
 
     memset(m_attackColliders, 0, sizeof(m_attackColliders));

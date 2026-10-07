@@ -6,7 +6,11 @@
 #include "src/wmm_str_status_jp.inc"
 #endif
 
+#ifdef VERSION_GCCE01
+#include "src/wmm_str_data_us.inc"
+#else
 #include "src/wmm_str_data.inc"
+#endif
 
 #ifndef VERSION_GCCJGC
 /*

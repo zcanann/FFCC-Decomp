@@ -167,14 +167,9 @@ static inline int getEquipWeaponInventoryItem(CCaravanWork* work)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmediate)
+inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int immediate)
 {
-	bool needsImmediateChange = forceImmediate || !m_weaponNodeFlagBits.m_prg ||
-	    !m_weaponNodeFlagAll.m_bits1.m_shield || m_partyData.carryObject != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0;
-	if (needsImmediateChange) {
+	if (immediate) {
 		if (itemId <= 0) {
 			LoadWeapon(-1, 0);
 		} else {
@@ -892,7 +887,12 @@ void CGPartyObj::onFramePreCalc()
 		if (static_cast<int>(CFlatCenterState()) == 0) {
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponIndex, itemId);
 			if (m_partyData.weaponIndex != weaponIndex || m_partyData.weaponItemId != itemId) {
-				changeWeapon(weaponIndex, itemId, 0);
+				bool needsImmediateChange = !m_weaponNodeFlagBits.m_prg ||
+				    !m_weaponNodeFlagAll.m_bits1.m_shield || m_partyData.carryObject != 0 ||
+				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
+				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
+				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0;
+				changeWeapon(weaponIndex, itemId, needsImmediateChange);
 			}
 		}
 	}
@@ -1565,7 +1565,7 @@ void CGPartyObj::onFrameStat()
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
 				Vec moveVec;
-				CVector diff = CVector(*reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C)) - CVector(m_worldPosition);
+				CVector diff = CVector(reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition) - CVector(m_worldPosition);
 				moveVec.x = diff.x;
 				moveVec.y = diff.y;
 				moveVec.z = diff.z;
@@ -4545,7 +4545,7 @@ void CGPartyObj::gpmMove()
 				}
 			}
 			if (moveKind == 1) {
-				float keepDist = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * FLOAT_80331A58;
+				float keepDist = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) / 2.0f;
 				if (followDist < keepDist) {
 					return;
 				}

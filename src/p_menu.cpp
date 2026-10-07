@@ -140,10 +140,12 @@ enum
     MenuCommonTextureCount = 22,
 #endif
 #ifdef VERSION_GCCJGC
+    MenuFontAllocationLine = 0xF4,
     MenuTextureAllocationLine = 0x17C,
     MenuMessageAllocationLine = 0x485,
     MenuRingAllocationLine = 0x48C,
 #else
+    MenuFontAllocationLine = 0xF8,
     MenuTextureAllocationLine = 0x182,
     MenuMessageAllocationLine = 0x48B,
     MenuRingAllocationLine = 0x492,
@@ -317,7 +319,11 @@ void CMenuPcs::create()
 #endif
     };
 
+#ifdef VERSION_GCCJGC
+    unsigned long menuHeapSize = 0xE4000;
+#else
     unsigned long menuHeapSize = 0xC4000;
+#endif
     if (FontMan.m_font != 0) {
         menuHeapSize -= FontMan.GetInternal22Size();
     }
@@ -381,7 +387,6 @@ void CMenuPcs::destroy()
  */
 #pragma push
 #pragma pool_data off
-#pragma opt_loop_invariants off
 void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
@@ -406,7 +411,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0xF8) CFont;
+        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuFontAllocationLine) CFont;
         m_fonts[slot]->Create(File.m_readBuffer, stage);
 
         File.Close(fileHandle);
@@ -480,9 +485,10 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
             {{0x00, 0x00, 0x00, 0xFF}, {0x00, 0x00, 0x00, 0xFF}},
             {{0x00, 0x00, 0x00, 0xFF}, {0x00, 0x00, 0x00, 0xFF}}
         };
-        MenuFontTlutPalette* palette = &pal[tlutMode * 0x1C];
 
         for (int colorIndex = 0; colorIndex < 0x10; colorIndex++) {
+            MenuFontTlutPalette* palette = &pal[tlutMode * 0x1C];
+
             for (int tlutIndex = 0; tlutIndex < 0x1C; tlutIndex++) {
                 float blend = 0.0f;
                 float blendInv = 0.0f;
@@ -497,7 +503,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
                     tlutColor.g = palette[tlutIndex].highlight.g;
                     tlutColor.b = palette[tlutIndex].highlight.b;
                 } else {
-                    blend = 1.0f - static_cast<float>(colorIndex - 8) * 0.125f;
+                    blend = 1.0f - static_cast<float>(colorIndex - 8) / 8.0f;
                     blendInv = 1.0f - blend;
                     tlutColor.r = static_cast<u8>(static_cast<float>(palette[tlutIndex].highlight.r) * blend +
                                                   static_cast<float>(palette[tlutIndex].shadow.r) * blendInv);
@@ -1014,30 +1020,21 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
-            float dx0 = x0 - x;
-            float dy0 = y0 - y;
-            float dx1 = x1 - x;
-            float dy1 = y1 - y;
+            x0 -= x;
+            y0 -= y;
+            x1 -= x;
+            y1 -= y;
 
-            float xtl = (dx0 * c) + x;
-            float ytl = (dx0 * s) + y;
-            float tx0 = dy0 * s;
-            float ty0 = dy0 * c;
-            float xtr = (dx1 * c) + x;
-            float ytr = (dx1 * s) + y;
-            float tx1 = dy1 * s;
-            float ty1 = dy1 * c;
-
-            GXPosition3f32(xtl - tx0, ytl + ty0, z);
+            GXPosition3f32(x + x0 * c - y0 * s, y + x0 * s + y0 * c, z);
             GXTexCoord2f32(u, v);
 
-            GXPosition3f32(xtr - tx0, ytr + ty0, z);
+            GXPosition3f32(x + x1 * c - y0 * s, y + x1 * s + y0 * c, z);
             GXTexCoord2f32(u1, v);
 
-            GXPosition3f32(xtl - tx1, ytl + ty1, z);
+            GXPosition3f32(x + x0 * c - y1 * s, y + x0 * s + y1 * c, z);
             GXTexCoord2f32(u, v1);
 
-            GXPosition3f32(xtr - tx1, ytr + ty1, z);
+            GXPosition3f32(x + x1 * c - y1 * s, y + x1 * s + y1 * c, z);
             GXTexCoord2f32(u1, v1);
         } else {
             GXPosition3f32(x0, y0, z);
@@ -1109,33 +1106,24 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
-            float dx0 = x0 - x;
-            float dy0 = y0 - y;
-            float dx1 = x1 - x;
-            float dy1 = y1 - y;
+            x0 -= x;
+            y0 -= y;
+            x1 -= x;
+            y1 -= y;
 
-            float xtl = (dx0 * c) + x;
-            float ytl = (dx0 * s) + y;
-            float tx0 = dy0 * s;
-            float ty0 = dy0 * c;
-            float xtr = (dx1 * c) + x;
-            float ytr = (dx1 * s) + y;
-            float tx1 = dy1 * s;
-            float ty1 = dy1 * c;
-
-            GXPosition3f32(xtl - tx0, ytl + ty0, z);
+            GXPosition3f32(x + x0 * c - y0 * s, y + x0 * s + y0 * c, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
             GXTexCoord2f32(u, v);
 
-            GXPosition3f32(xtr - tx0, ytr + ty0, z);
+            GXPosition3f32(x + x1 * c - y0 * s, y + x1 * s + y0 * c, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
             GXTexCoord2f32(u1, v);
 
-            GXPosition3f32(xtl - tx1, ytl + ty1, z);
+            GXPosition3f32(x + x0 * c - y1 * s, y + x0 * s + y1 * c, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
             GXTexCoord2f32(u, v1);
 
-            GXPosition3f32(xtr - tx1, ytr + ty1, z);
+            GXPosition3f32(x + x1 * c - y1 * s, y + x1 * s + y1 * c, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
             GXTexCoord2f32(u1, v1);
         } else {

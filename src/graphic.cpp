@@ -499,6 +499,7 @@ void CGraphic::SetDrawDoneDebugData(signed char drawDoneId)
     GXSetDrawSync(token);
 }
 
+#ifdef VERSION_GCCP01
 /*
  * --INFO--
  * PAL Address: 0x800196b8
@@ -512,6 +513,7 @@ void CGraphic::SetDrawDoneDebugDataPartControl(int partControl)
 {
 	GXSetDrawSync((u16)(partControl | 0x8000));
 }
+#endif
 
 /*
  * --INFO--

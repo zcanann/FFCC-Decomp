@@ -445,7 +445,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
  */
 static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int volume)
 {
-	signed char seFlagsAndSequenceCount;
+	int trackNo;
 	RedWaveHeadWD* waveHead;
 	RedTrackDATA* seTrack;
 	int eraseAttrMask;
@@ -458,9 +458,8 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 	int loopReport;
 
 	RedSoundControlGet(REDSOUND_CONTROL_SE)->m_updateFlags = 0;
-	remainingSequences = ((unsigned int)seInfo->m_waveNoHi << REDSOUND_SE_INFO_U16_HIGH_SHIFT) +
-	                     (unsigned int)seInfo->m_waveNoLo;
-	waveHead = c_RedEntry.SearchWaveBase(remainingSequences);
+	waveHead = c_RedEntry.SearchWaveBase(remainingSequences = ((unsigned int)seInfo->m_waveNoHi << REDSOUND_SE_INFO_U16_HIGH_SHIFT) +
+	                                                          (unsigned int)seInfo->m_waveNoLo);
 	if (waveHead != 0) {
 		c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_USE, waveHead->m_waveNo);
 	} else {
@@ -471,8 +470,7 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 		}
 	}
 
-	seFlagsAndSequenceCount = seInfo->m_flagsAndCount;
-	if (RedSeInfoFlagsHasMulti(seFlagsAndSequenceCount)) {
+	if (RedSeInfoFlagsHasMulti(seInfo->m_flagsAndCount)) {
 		multiLoopReport = 1;
 	} else {
 		multiLoopReport = 0;
@@ -498,7 +496,8 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 		seTrack = SearchSeEmptyTrack((int)tracksToStart, seInfo->m_eraseTrack, eraseAttrMask);
 		eraseAttrMask = 0;
 		if (seTrack != 0) {
-			voice = RedVoiceDataGet(seTrack->m_trackNo);
+			trackNo = seTrack->m_trackNo;
+			voice = RedVoiceDataGet(trackNo);
 			do {
 				seTrack->m_waveBankData = waveHead;
 				seTrack->m_command = sequenceCommandData;

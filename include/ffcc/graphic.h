@@ -48,7 +48,11 @@ public:
     void BeginFrame();
     void EndFrame();
     void SetDrawDoneDebugData(signed char);
+#ifdef VERSION_GCCP01
     void SetDrawDoneDebugDataPartControl(int);
+#else
+    void SetDrawDoneDebugDataPartControl(int) {}
+#endif
     void _WaitDrawDone(char*, int);
     void Thread();
     int IsFifoOver();

@@ -1285,6 +1285,15 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     }
 }
 
+static inline CMenuPcs::TEX SingMenuTex(int id)
+{
+#ifdef VERSION_GCCJGC
+    return static_cast<CMenuPcs::TEX>(id - 1);
+#else
+    return static_cast<CMenuPcs::TEX>(id);
+#endif
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8014a7cc
@@ -1351,11 +1360,11 @@ static inline void DrawSingleBack(CMenuPcs* menu, float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+    MenuPcs.SetTexture(SingMenuTex(0x20));
     MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+    MenuPcs.SetTexture(SingMenuTex(0x28));
     int y;
     int step = 0x20;
     for (y = 0x40; y < 0x180; y += step) {
@@ -1379,7 +1388,7 @@ static inline void DrawSingleFrame(CMenuPcs* menu, float alpha)
     color.b = 0xFF;
     color.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+    MenuPcs.SetTexture(SingMenuTex(0x21));
     MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f), 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
     MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
 }
@@ -1603,13 +1612,13 @@ void CMenuPcs::DrawSingleBase(float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+    MenuPcs.SetTexture(SingMenuTex(0x20));
     MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+    MenuPcs.SetTexture(SingMenuTex(0x28));
     int y;
     int sliceHeight = 32;
     y = 64;
@@ -1867,7 +1876,7 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+    MenuPcs.SetTexture(SingMenuTex(0x21));
     MenuPcs.DrawRect(0,
                                     -(176.0f * scaleX - 208.0f), 24.0f,
                                     176.0f, 288.0f,
@@ -2323,7 +2332,7 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
     color.a = static_cast<u8>(alphaInt);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+    MenuPcs.SetTexture(SingMenuTex(0x23));
     MenuPcs.DrawRect(0, 32.0f, 312.0f, 32.0f, 32.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(8, 576.0f, 312.0f, 32.0f, 32.0f, 0.0f,
@@ -2333,19 +2342,19 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
     MenuPcs.DrawRect(0xC, 576.0f, 384.0f, 32.0f, 32.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
+    MenuPcs.SetTexture(SingMenuTex(0x27));
     MenuPcs.DrawRect(0, 64.0f, 312.0f, 512.0f, 32.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 64.0f, 384.0f, 512.0f, 32.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
+    MenuPcs.SetTexture(SingMenuTex(0x24));
     MenuPcs.DrawRect(0, 32.0f, 344.0f, 32.0f, 40.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(8, 576.0f, 344.0f, 32.0f, 40.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+    MenuPcs.SetTexture(SingMenuTex(0x2B));
     MenuPcs.DrawRect(8, 64.0f, 344.0f, 512.0f, 40.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
 }
@@ -2371,7 +2380,7 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x25));
+    MenuPcs.SetTexture(SingMenuTex(0x25));
     int icon;
     if (rawIcon != 0) {
         icon = iconNo;
@@ -2477,7 +2486,7 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
     color.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2E));
+    MenuPcs.SetTexture(SingMenuTex(0x2E));
     MenuPcs.DrawRect(0, 10.0f + x, y + z, 8.0f, 8.0f, 128.0f,
         280.0f, 1.0f, 1.0f, 0.0f);
 }
@@ -2546,7 +2555,7 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
     color.b = 0xFF;
     color.a = static_cast<u8>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2C));
+    MenuPcs.SetTexture(SingMenuTex(0x2C));
 
     MenuPcs.DrawRect(0, static_cast<float>(x),
         static_cast<float>(y), 24.0f, 24.0f, 0.0f, 0.0f,
@@ -2618,7 +2627,7 @@ void CMenuPcs::DrawSingWin(short mode)
     white.b = 0xFF;
     white.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, white);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(SingMenuTex(0x3F));
     float x1 = x0 + w - 32.0f;
     float y1 = y0 + h - 32.0f;
     unsigned long uvFlag;
@@ -2641,7 +2650,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, x, y, 32.0f, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x41));
+    MenuPcs.SetTexture(SingMenuTex(0x41));
     double innerW = static_cast<double>(w) - 64.0;
     float innerX = 32.0f + x0;
     float yy = y0;
@@ -2655,7 +2664,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, innerX, yy, innerWf, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(SingMenuTex(0x40));
     double innerH = static_cast<double>(h) - 64.0;
     float innerY = 32.0f + y0;
     float xx = x0;
@@ -2669,7 +2678,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, innerHf, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x42));
+    MenuPcs.SetTexture(SingMenuTex(0x42));
     MenuPcs.DrawRect(uvFlag, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH), 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuWindowInfo* win = m_menuWindowInfo;
@@ -3274,7 +3283,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
     color.a = static_cast<unsigned char>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x53));
+    MenuPcs.SetTexture(SingMenuTex(0x53));
     MenuPcs.DrawRect(0, static_cast<float>(x), static_cast<float>(y), 16.0f,
                                     24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
@@ -3282,7 +3291,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
                                     24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x54));
+    MenuPcs.SetTexture(SingMenuTex(0x54));
     MenuPcs.DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(y),
                                     80.0f, 24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);

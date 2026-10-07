@@ -21,7 +21,12 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
+
 #pragma readonly_strings on
+#ifdef VERSION_GCCJGC
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
+#endif
 extern char s_shopmenu_cpp[];
 extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
@@ -336,6 +341,18 @@ struct ShopMenuTopMenuEntry {
     char* text;
 };
 
+#ifdef VERSION_GCCJGC
+#define SHOP_JP_BUY "\x82\xA9\x82\xA4"
+#define SHOP_JP_SELL "\x82\xA4\x82\xE9"
+#define SHOP_JP_CANCEL "\x82\xC6\x82\xE8\x82\xAF\x82\xB5"
+
+ShopMenuTopMenuEntry s_shopMenuTopMenuEntries[] = {
+    {0x1AE, 0x78, SHOP_JP_BUY},
+    {0x186, 0xDC, SHOP_JP_SELL},
+    {0x1AE, 0x140, SHOP_JP_CANCEL},
+};
+ShopMenuTopMenuEntry* s_currentShopMenuTopMenuEntry;
+#else
 ShopMenuTopMenuEntry s_shopMenuTopMenuEntries[] = {
     {0x1AE, 0x78, 0},
     {0x186, 0xDC, 0},
@@ -343,6 +360,7 @@ ShopMenuTopMenuEntry s_shopMenuTopMenuEntries[] = {
 };
 ShopMenuTopMenuEntry* s_currentShopMenuTopMenuEntry;
 s8 s_shopMenuTopMenuTextInitialized;
+#endif
 
 enum ShopMenuTextIndex {
     SHOP_MENU_TEXT_BUY = 0,
@@ -1751,6 +1769,51 @@ inline void CShopMenu::DrawObi(int y)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+void CShopMenu::DrawShop0()
+{
+    DrawShopBase();
+
+    for (int i = 0; i < 3; i++) {
+        s_currentShopMenuTopMenuEntry = &s_shopMenuTopMenuEntries[i];
+        int highlight = (m_topChoice == i) ? 1 : 0;
+
+        Graphic.SetDrawDoneDebugData(0x1E);
+        drawShapeSeq(0, highlight, s_currentShopMenuTopMenuEntry->x, s_currentShopMenuTopMenuEntry->y, 0xFF, 0, 0,
+            FLOAT_80332D9C, 0);
+        Graphic.SetDrawDoneDebugData(0x1F);
+        drawShapeSeq(
+            8, highlight, s_currentShopMenuTopMenuEntry->x - 0x30, s_currentShopMenuTopMenuEntry->y, 0xFF, 0, 0,
+            FLOAT_80332D9C, 0);
+        Graphic.SetDrawDoneDebugData(0x20);
+    }
+
+    CFont* font = MenuPcs.GetFont22();
+    font->SetMargin(2.0f);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d8c);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+
+    Graphic.SetDrawDoneDebugData(0x21);
+    _drawNoShadowFont(font, "\x83\x56\x83\x87\x83\x62\x83\x76", FLOAT_80332d54, FLOAT_80332E30, 9, 0x12);
+
+    Graphic.SetDrawDoneDebugData(0x22);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetScale(FLOAT_80332d28);
+
+    for (int i = 0; i < 3; i++) {
+        s_currentShopMenuTopMenuEntry = &s_shopMenuTopMenuEntries[i];
+        Graphic.SetDrawDoneDebugData(0x23);
+        _drawNoShadowFont(font, s_currentShopMenuTopMenuEntry->text, s_currentShopMenuTopMenuEntry->x - 0x10,
+            s_currentShopMenuTopMenuEntry->y - 0x0B, 0x18, 0x12);
+        Graphic.SetDrawDoneDebugData(0x24);
+    }
+
+    MenuPcs.DrawInit();
+    Graphic.SetDrawDoneDebugData(0x28);
+}
+#else
 void CShopMenu::DrawShop0()
 {
     int textId = SHOP_MENU_TEXT_BUY;
@@ -1807,6 +1870,7 @@ void CShopMenu::DrawShop0()
     MenuPcs.DrawInit();
     Graphic.SetDrawDoneDebugData(0x28);
 }
+#endif
 
 /*
  * --INFO--
@@ -1857,6 +1921,24 @@ void CShopMenu::DrawSell()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+void CShopMenu::DrawSmith0()
+{
+    DrawShopBase();
+    drawShapeSeqScale(0x11, 0, 0, 0x154, FLOAT_80332e48, FLOAT_80332d28, 0xFF);
+    DrawItemList();
+    DrawItemHelp(m_selectedIndex, 0x140, 0x176);
+
+    CFont* font = MenuPcs.GetFont22();
+    font->SetMargin(4.0f);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d8c);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+    _drawNoShadowFont(font, "\x82\xA9\x82\xB6\x82\xE2", FLOAT_80332d54, FLOAT_80332e4c, 9, 0x12);
+    MenuPcs.DrawInit();
+}
+#else
 void CShopMenu::DrawSmith0()
 {
     DrawShopBase();
@@ -1885,12 +1967,134 @@ void CShopMenu::DrawSmith0()
     _drawNoShadowFont(font, const_cast<char*>(title), static_cast<float>(titleX), FLOAT_80332e4c, 9, 0x12);
     MenuPcs.DrawInit();
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifdef VERSION_GCCJGC
+void CShopMenu::DrawMake()
+{
+    DrawMakeBase();
+
+    drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+    MenuPcs.DrawInit();
+    MenuPcs.DrawSingleIcon(m_resultItem, 0x3C, 0x32, FLOAT_80332d28, 0, FLOAT_80332d28);
+
+    CFont* font = MenuPcs.GetFont22();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+
+    _drawShadowFont(font, GetItemName(m_resultItem), FLOAT_80332d58, FLOAT_80332E0C, 0x18, 0x12);
+    _drawNoShadowFont(font, "\x82\xBB\x82\xA4\x82\xD1\x82\xA9\x82\xCC\x82\xA4\x81\x40\x81\x46", FLOAT_80332E18, FLOAT_80332d58, 0x18, 0x12);
+
+    char raceBuffer[128];
+    MenuPcs.GetRaceStr(m_resultItem, raceBuffer);
+    int raceColor = MenuPcs.ChkEquipPossible(m_resultItem) ? 0x18 : 2;
+    _drawNoShadowFont(font, raceBuffer, 350.0f, FLOAT_80332d58, raceColor, 0x12);
+    font->SetMargin(FLOAT_80332d28);
+
+    int makeGil = getMakeGil(getItemNo(m_selectedIndex));
+    DrawDecScale(makeGil, 0x13, 0x100, FLOAT_80332E18, FLOAT_80332D10, FLOAT_80332d8c, 1, 1, 0x12);
+    int gilTlut = 2;
+    if (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex))) {
+        gilTlut = 0x14;
+    }
+    DrawDecScale(m_caravanWork->m_gil, gilTlut, 0x1E2, FLOAT_80332E18, FLOAT_80332D10, FLOAT_80332d8c, 1, 1, 0x12);
+
+    font->SetScale(FLOAT_80332d28);
+    _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 258.0f, 188.0f, 0x19, 0x12);
+    _drawNoShadowFont(font, "/", FLOAT_80332E14, 188.0f, 0x1B, 0x12);
+    _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 484.0f, 188.0f, 0x19, 0x12);
+
+    CMenuPcs* pcs = &MenuPcs;
+    CFont* labelFont = pcs->GetFontItem();
+    labelFont->SetMargin(FLOAT_80332d28);
+    labelFont->SetShadow(0);
+    labelFont->SetScale(FLOAT_80332d28);
+    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    labelFont->DrawInit();
+    labelFont->SetPosX(FLOAT_80332E18);
+    labelFont->SetPosY(FLOAT_80332E24);
+    labelFont->Draw("\x82\xB9\x82\xA2\x82\xB3\x82\xAD\x82\xD0");
+    labelFont->SetPosX(368.0f);
+    labelFont->SetPosY(FLOAT_80332E24);
+    labelFont->Draw("\x82\xB5\x82\xE5\x82\xB6\x82\xAB\x82\xF1");
+    MenuPcs.DrawInit();
+
+    int obiX = 0x32;
+    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+    do {
+        obiX += 0x20;
+        drawShapeSeq(6, 0, obiX, 0x104, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+    } while (obiX < 0x20E);
+    drawShapeSeq(5, 0, obiX + 0x40, 0x104, 0xFF, 1, 0, FLOAT_80332D9C, 0);
+
+    CFont* headerFont = MenuPcs.GetFont22();
+    headerFont->SetMargin(FLOAT_80332d28);
+    headerFont->SetShadow(1);
+    headerFont->SetScale(FLOAT_80332d28);
+    headerFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    headerFont->DrawInit();
+    _drawNoShadowFont(headerFont, "\x82\xD0\x82\xC2\x82\xE6\x82\xA4\x82\xC8\x82\xE0\x82\xCC", 130.0f, FLOAT_80332E34, 4, 0x12);
+    _drawNoShadowFont(headerFont, "\x82\xB5\x82\xE5\x82\xB6\x82\xB7\x82\xA4", 400.0f, FLOAT_80332E34, 9, 0x12);
+
+    int rowY = 300;
+    CMenuPcs::MaterialInfo recipeMaterial;
+    MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
+    for (int i = 0; i < 3; i++, rowY += 0x1E) {
+        if (recipeMaterial.m_itemNo[i] <= 0) {
+            break;
+        }
+
+        headerFont->SetMargin(FLOAT_80332d28);
+        headerFont->SetShadow(1);
+        headerFont->SetScale(FLOAT_80332d28);
+        float nameX = 290.0f - headerFont->GetWidth(GetItemName(recipeMaterial.m_itemNo[i]));
+        _drawNoShadowFont(headerFont, GetItemName(recipeMaterial.m_itemNo[i]), nameX, rowY, 0x1B, 0x12);
+        _drawNoShadowFont(headerFont, "\x81\x7E", 310.0f, rowY, 0x1B, 0x12);
+        _drawNoShadowFont(headerFont, "/", 390.0f, rowY, 0x1B, 0x12);
+
+        int ownedCount = getItemHaveCnt(recipeMaterial.m_itemNo[i]);
+        DrawDec(recipeMaterial.m_count[i], 0x1B, 0x168, rowY, -3.0f, 0, 1, 0x12);
+        int ownedTlut = 2;
+        if (ownedCount >= recipeMaterial.m_count[i]) {
+            ownedTlut = 0x1B;
+        }
+        DrawDec(ownedCount, ownedTlut, 0x1CC, rowY, -3.0f, 1, 1, 0x12);
+    }
+    MenuPcs.DrawInit();
+
+    int barX = 0x1F6;
+    while (barX > 0x32) {
+        drawShapeSeq(0xC, 0, barX, 0x18C, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        barX -= 0x10;
+    }
+    drawShapeSeq(0xB, 0, 0x226, 0x168, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+    drawShapeSeq(1, 1, barX, 0x18C, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+
+    CFont* labelFont2 = pcs->GetFontItem();
+    labelFont2->SetMargin(FLOAT_80332d28);
+    labelFont2->SetShadow(0);
+    labelFont2->SetScale(FLOAT_80332d28);
+    labelFont2->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    labelFont2->DrawInit();
+    labelFont2->SetPosX(FLOAT_80332E1C);
+    labelFont2->SetPosY(FLOAT_80332DDC);
+    labelFont2->Draw("\x82\xC2\x82\xAD\x82\xE9");
+    labelFont2->SetPosX(510.0f);
+    labelFont2->SetPosY(FLOAT_80332E44);
+    labelFont2->Draw(SHOP_JP_CANCEL);
+    MenuPcs.DrawInit();
+
+    MenuPcs.DrawCursor(0x1E2, m_yesNo * 0x18 + 0x14C, FLOAT_80332d28);
+}
+#else
 void CShopMenu::DrawMake()
 {
     DrawMakeBase();
@@ -2092,12 +2296,60 @@ void CShopMenu::DrawMake()
 
     MenuPcs.DrawCursor(x - 0x24, m_yesNo * 0x18 + 0x14C, FLOAT_80332d28);
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifdef VERSION_GCCJGC
+void CShopMenu::DrawSoubi()
+{
+    DrawSoubiBase();
+
+    drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+    MenuPcs.DrawInit();
+    MenuPcs.DrawSingleIcon(m_resultItem, 0x3C, 0x42, FLOAT_80332d28, 0, FLOAT_80332d28);
+
+    CFont* font = MenuPcs.GetFont22();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+
+    _drawShadowFont(font, GetItemName(m_resultItem), 120.0f, FLOAT_80332E04, 0x18, 0x12);
+
+    DrawItemInfo(m_resultItem, 0xD8, 0x7E, 0xD8, 0x9C, 0xD8, 0xBA, 0x138);
+    MenuPcs.DrawInit();
+
+    int barX = 0x1F6;
+    while (barX > 0x42) {
+        drawShapeSeq(0xC, 0, barX, 0x17C, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        barX -= 0x10;
+    }
+    drawShapeSeq(0xB, 0, 0x226, 0x158, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+    drawShapeSeq(1, 1, barX, 0x17C, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+
+    CFont* labelFont = MenuPcs.GetFontItem();
+    labelFont->SetMargin(FLOAT_80332d28);
+    labelFont->SetShadow(0);
+    labelFont->SetScale(FLOAT_80332d28);
+    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    labelFont->DrawInit();
+
+    labelFont->SetPosX(FLOAT_80332E1C);
+    labelFont->SetPosY(FLOAT_80332E08);
+    labelFont->Draw("\x82\xBB\x82\xA4\x82\xD1");
+    labelFont->SetPosX(510.0f);
+    labelFont->SetPosY(FLOAT_80332d88);
+    labelFont->Draw(SHOP_JP_CANCEL);
+    MenuPcs.DrawInit();
+
+    MenuPcs.DrawCursor(0x1E2, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
+}
+#else
 void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
@@ -2157,6 +2409,7 @@ void CShopMenu::DrawSoubi()
 
     MenuPcs.DrawCursor(cancelTextX - 0x24, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
 }
+#endif
 
 /*
  * --INFO--
@@ -2294,7 +2547,9 @@ inline void CShopMenu::InitDrawEnvShape()
 void CShopMenu::DrawShopBase()
 {
     Graphic.SetDrawDoneDebugData(1);
+#ifndef VERSION_GCCJGC
     int languageId = static_cast<int>(Game.m_gameWork.GetLanguage()) - 1;
+#endif
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
     Graphic.SetDrawDoneDebugData(2);
     InitDrawEnvShape();
@@ -2350,6 +2605,25 @@ void CShopMenu::DrawShopBase()
             CFont* font = MenuPcs.GetFontItem();
             font->SetMargin(FLOAT_80332d28);
             font->SetShadow(0);
+#ifdef VERSION_GCCJGC
+            font->SetScale(FLOAT_80332d28);
+            font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+            font->DrawInit();
+
+            font->SetPosX(118.0f);
+            font->SetPosY(FLOAT_80332DD8);
+            Graphic.SetDrawDoneDebugData(0x10);
+            if (m_listType == 0) {
+                font->Draw(SHOP_JP_BUY);
+            } else {
+                font->Draw(SHOP_JP_SELL);
+            }
+            Graphic.SetDrawDoneDebugData(0x11);
+
+            font->SetPosX(86.0f);
+            font->SetPosY(FLOAT_80332DDC);
+            font->Draw(SHOP_JP_CANCEL);
+#else
             font->SetScaleX(FLOAT_80332d2c);
             font->SetScaleY(FLOAT_80332d28);
             font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
@@ -2371,13 +2645,18 @@ void CShopMenu::DrawShopBase()
             font->SetPosX(cancelTextX);
             font->SetPosY(FLOAT_80332DDC);
             font->Draw(cancelText);
+#endif
             Graphic.SetDrawDoneDebugData(0x12);
             MenuPcs.DrawInit();
             Graphic.SetDrawDoneDebugData(0x13);
 
             if (m_subMode == 2) {
                 Graphic.SetDrawDoneDebugData(0x14);
+#ifdef VERSION_GCCJGC
+                MenuPcs.DrawCursor(0x3A, m_yesNo * 0x18 + 0x134, FLOAT_80332d28);
+#else
                 MenuPcs.DrawCursor(0x2C, m_yesNo * 0x18 + 0x134, FLOAT_80332d28);
+#endif
                 Graphic.SetDrawDoneDebugData(0x15);
             }
         }
@@ -2523,6 +2802,36 @@ void CShopMenu::DrawItemList()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+void CShopMenu::DrawBuySellInfo()
+{
+    CFont* font = MenuPcs.GetFont22();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+
+    _drawNoShadowFont(font, "\x82\xCB\x82\xBE\x82\xF1", 184.0f, FLOAT_80332d80, 0x13, 0x12);
+    _drawNoShadowFont(font, "/", FLOAT_80332e4c, FLOAT_80332d80, 0x18, 0x12);
+    _drawNoShadowFont(font, "\x82\xB5\x82\xE5\x82\xB6\x82\xAB\x82\xF1", 272.0f, FLOAT_80332d80, 0x14, 0x12);
+
+    int totalGil;
+    if (CheckSell(m_selectedIndex)) {
+        totalGil = GetTotalGil();
+    } else {
+        totalGil = 0;
+    }
+
+    DrawDecScale(totalGil, 0x13, 0x120, FLOAT_80332d90, FLOAT_80332D10, FLOAT_80332d8c, 1, 1, 0x12);
+    DrawDecScale(m_caravanWork->m_gil, 0x14, 0x212, FLOAT_80332d90, FLOAT_80332D10, FLOAT_80332d8c, 1, 1, 0x12);
+
+    font->SetScale(FLOAT_80332d28);
+    _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 290.0f, FLOAT_80332E2C, 0x19, 0x12);
+    _drawNoShadowFont(font, "/", 349.0f, FLOAT_80332E2C, 0x1B, 0x12);
+    _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 532.0f, FLOAT_80332E2C, 0x19, 0x12);
+}
+#else
 void CShopMenu::DrawBuySellInfo()
 {
     int languageId = static_cast<int>(Game.m_gameWork.GetLanguage()) - 1;
@@ -2584,6 +2893,7 @@ void CShopMenu::DrawBuySellInfo()
 
     _drawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightMoney)), FLOAT_80332d98, 0x19, 0x12);
 }
+#endif
 
 /*
  * --INFO--
@@ -2594,6 +2904,63 @@ void CShopMenu::DrawBuySellInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+void CShopMenu::DrawItemInfo0()
+{
+    if (m_selectedIndex == -1) {
+        return;
+    }
+
+    int itemNo = getItemNo(m_selectedIndex);
+    MenuPcs.DrawInit();
+    if (itemNo > 0) {
+        MenuPcs.DrawSingleIcon(itemNo, 0x46, 100, FLOAT_80332d28, 0, FLOAT_80332d28);
+    }
+
+    CFont* font = MenuPcs.GetFont22();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+
+    if (itemNo > 0) {
+        font->SetMargin(FLOAT_80332d28);
+        _drawShadowFont(font, GetItemName(itemNo), 118.0f, FLOAT_80332d58, 0x18, 0x12);
+        font->SetMargin(FLOAT_80332d28);
+    }
+
+    if (CheckSell(m_selectedIndex)) {
+        font->SetMargin(FLOAT_80332d28);
+        DrawDec(getBuySellGil(itemNo), 0x1B, 0xD2, FLOAT_80332d68, -3.0f, 0, 1, 0x12);
+        font->SetMargin(FLOAT_80332d28);
+        _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 214.0f, FLOAT_80332d68, 0x19, 0x12);
+    } else {
+        font->SetMargin(FLOAT_80332d28);
+        if (m_listType == 0) {
+            _drawNoShadowFont(font, "\x82\xA9\x82\xA6\x82\xDC\x82\xB9\x82\xF1", 150.0f, FLOAT_80332d68, 0x19, 0x12);
+        } else {
+            _drawNoShadowFont(font, "\x82\xA4\x82\xEA\x82\xDC\x82\xB9\x82\xF1", 150.0f, FLOAT_80332d68, 0x19, 0x12);
+        }
+        font->SetMargin(FLOAT_80332d28);
+    }
+
+    if (m_subMode == 0) {
+        DrawItemInfo(itemNo, 0x4E, 0xA8, 0x4E, 0xC6, 0x4E, 0xE4, 0xB2);
+    }
+
+    if ((m_subMode == 1) && (m_listType == 0)) {
+        _drawNoShadowFont(font, "\x82\xA9\x82\xA4\x82\xA9\x82\xB8", 90.0f, FLOAT_80332d6c, 0x18, 0x12);
+        _drawNoShadowFont(font, "\x81\x7E", 182.0f, FLOAT_80332d6c, 0x18, 0x12);
+        DrawDec(m_quantity / 10, 4, 0xDE, FLOAT_80332d6c, -3.0f, 0, 1, 0x12);
+        DrawDec(m_quantity % 10, 4, 0xF2, FLOAT_80332d6c, -3.0f, 0, 1, 0x12);
+
+        if (m_subMode == 1) {
+            drawShapeSeqScale(0x12, 0, 0xEA - m_figureMode * 0x14, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);
+        }
+    }
+}
+#else
 void CShopMenu::DrawItemInfo0()
 {
     if (m_selectedIndex == -1) {
@@ -2684,6 +3051,7 @@ void CShopMenu::DrawItemInfo0()
         }
     }
 }
+#endif
 
 /*
  * --INFO--
@@ -2694,6 +3062,78 @@ void CShopMenu::DrawItemInfo0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifdef VERSION_GCCJGC
+void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int attrX, int attrY, int effectX, int effectY, int colonX)
+{
+    if ((itemNo <= 0) || (itemNo > 0x9E)) {
+        return;
+    }
+
+    CFont* font = MenuPcs.GetFont22();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+
+    char* label = 0;
+    int statType;
+    if (MenuPcs.GetEquipType(itemNo) == 0) {
+        label = "\x82\xB1\x82\xA4\x82\xB0\x82\xAB";
+        statType = 0;
+    } else if (MenuPcs.GetEquipType(itemNo) != 3) {
+        label = "\x82\xDA\x82\xA4\x82\xAC\x82\xE5";
+        statType = 1;
+    } else {
+        statType = 2;
+    }
+
+    SItemFlatRow* item = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
+    unsigned short statValue = item->m_value;
+    int attr = item->m_attribute;
+
+    if (label != 0) {
+        _drawNoShadowFont(font, label, static_cast<float>(x), static_cast<float>(y), 0x18, 0x12);
+        _drawNoShadowFont(font, "\x81\x46", static_cast<float>(colonX), static_cast<float>(y), 0x18, 0x12);
+
+        DrawDec(statValue, 0x1A, x + 0xB8, static_cast<float>(y), -1.0f, 0, 1, 0x12);
+
+        font->SetMargin(4.0f);
+        if ((statType == 1) && (attr >= 1)) {
+            _drawNoShadowFont(font, "\x82\xC6\x82\xAD\x82\xB5\x82\xE3\x82\xB1\x82\xA4\x82\xA9", static_cast<float>(attrX), static_cast<float>(attrY), 0x16, 0x12);
+            _drawNoShadowFont(font, MenuPcs.GetAttrStr(attr), static_cast<float>(effectX), static_cast<float>(effectY), 0x18, 0x12);
+
+            char effectBuffer[256];
+            effectX = static_cast<int>(static_cast<float>(effectX) + font->GetWidth(MenuPcs.GetAttrStr(attr)));
+            if ((attr >= 1) && (attr <= 8)) {
+                sprintf(effectBuffer, "%s", "\x81\x7B\x82\x50");
+            } else {
+                return;
+            }
+            _drawNoShadowFont(font, effectBuffer, static_cast<float>(effectX), static_cast<float>(effectY), 9, 0x12);
+        }
+    } else {
+        _drawNoShadowFont(font, "\x82\xC6\x82\xAD\x82\xB5\x82\xE3\x82\xB1\x82\xA4\x82\xA9", static_cast<float>(x), static_cast<float>(y), 0x16, 0x12);
+        _drawNoShadowFont(font, MenuPcs.GetAttrStr(attr), static_cast<float>(attrX), static_cast<float>(attrY), 0x18, 0x12);
+        font->SetMargin(3.0f);
+
+        char textBuffer[256];
+        int fontColor = 9;
+        attrX = static_cast<int>(static_cast<float>(attrX) + font->GetWidth(MenuPcs.GetAttrStr(attr)));
+        if ((attr >= 1) && (attr <= 8)) {
+            sprintf(textBuffer, "%s", "\x81\x7B\x82\x50");
+        } else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+            sprintf(textBuffer, "%s%d", "\x81\x7B", statValue);
+        } else if (!((attr != 9) && (attr != 10) && (attr != 0xC))) {
+            sprintf(textBuffer, "%s%d", "\x81\x7C", statValue);
+            fontColor = 3;
+        } else {
+            return;
+        }
+        _drawNoShadowFont(font, textBuffer, static_cast<float>(attrX), static_cast<float>(attrY), fontColor, 0x12);
+    }
+}
+#else
 void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, int unused1, int unused2, int unused3)
 {
     (void)unused0;
@@ -2808,12 +3248,45 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         _drawNoShadowFont(font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(y), fontColor, 0x12);
     }
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifdef VERSION_GCCJGC
+inline void CShopMenu::DrawItemHelp(int index, int centerX, int y)
+{
+    int itemNo = getItemNo(index);
+    if (itemNo <= 0) {
+        return;
+    }
+
+    char* text;
+    if (CheckSell(index)) {
+        text = Game.m_cFlatDataArr[1].TableStrings(6)[itemNo];
+    } else {
+        text = "\x82\xB1\x82\xCC\x82\xA9\x82\xB6\x82\xE2\x82\xC5\x82\xCD\x82\xC2\x82\xAD\x82\xEA\x82\xDC\x82\xB9\x82\xF1";
+    }
+
+    CFont* font = MenuPcs.GetFont22();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+    int x = centerX - static_cast<int>(CMes::GetTagStringWidth(font, text)) / 2;
+    font->SetPosX(static_cast<float>(x + 1));
+    font->SetPosY(static_cast<float>(y - 3));
+    font->SetTlut(0x12);
+    CMes::DrawTagString(font, text);
+    font->SetPosX(static_cast<float>(x));
+    font->SetPosY(static_cast<float>(y - 4));
+    font->SetTlut(7);
+    CMes::DrawTagString(font, text);
+}
+#else
 void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 {
     (void)index;
@@ -2839,11 +3312,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
         System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, 0xC01);
     }
     memset(helpText, 0, 0x200);
-#ifdef VERSION_GCCJGC
-    CMes::MakeAgbString(helpText, const_cast<char*>(sourceText));
-#else
     CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);
-#endif
 
     CFont* font = MenuPcs.GetFont22();
     font->SetMargin(FLOAT_80332d28);
@@ -2864,16 +3333,32 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     font->Draw(helpText);
     delete[] helpText;
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-inline void CShopMenu::DrawDec(int shapeNo, int groupNo, int x, float y, float alpha, int flipX, int flipY, int tlut)
+inline void CShopMenu::DrawDec(int value, int tlut, int x, float y, float margin, int zeroPad, int fixed, int flags)
 {
-    drawShapeSeq(shapeNo, groupNo, x, static_cast<int>(y), static_cast<unsigned char>(alpha), static_cast<unsigned char>(flipX),
-        static_cast<unsigned char>(flipY), 0.0f, static_cast<unsigned char>(tlut));
+    CFont* font = MenuPcs.GetFont22();
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+    font->SetFixed(fixed);
+    font->SetMargin(margin);
+
+    char buffer[64];
+    if (zeroPad != 0) {
+        sprintf(buffer, "%02d", value);
+    } else {
+        sprintf(buffer, "%d", value);
+    }
+    x -= font->GetWidth(buffer);
+    MenuPcs.DrawNoShadowFont(font, buffer, static_cast<float>(x), y, tlut, flags);
+    MenuPcs.DrawInit();
 }
 
 /*
@@ -2881,9 +3366,23 @@ inline void CShopMenu::DrawDec(int shapeNo, int groupNo, int x, float y, float a
  * Address:	TODO
  * Size:	TODO
  */
-inline void CShopMenu::DrawDecScale(int shapeNo, int groupNo, int x, float y, float scaleX, float scaleY, int alpha, int, int)
+inline void CShopMenu::DrawDecScale(int value, int tlut, int x, float y, float margin, float scaleY, int shadow, int fixed,
+                                     int flags)
 {
-    drawShapeSeqScale(shapeNo, groupNo, x, static_cast<int>(y), scaleX, scaleY, static_cast<unsigned char>(alpha));
+    CFont* font = MenuPcs.GetFont22();
+    font->SetShadow(shadow);
+    font->SetScaleX(FLOAT_80332d28);
+    font->SetScaleY(scaleY);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+    font->SetFixed(fixed);
+    font->SetMargin(margin);
+
+    char buffer[64];
+    sprintf(buffer, "%d", value);
+    x -= font->GetWidth(buffer);
+    MenuPcs.DrawNoShadowFont(font, buffer, static_cast<float>(x), y, tlut, flags);
+    MenuPcs.DrawInit();
 }
 
 /*

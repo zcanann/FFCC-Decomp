@@ -797,13 +797,12 @@ int CChara::CModel::PickFur(
 	float hitU = 0.0f;
 	float hitV = 0.0f;
 	float nearestDepth = 10000000.0f;
-	int hitAny = 0;
-	int hitPaintable = 0;
 	CVector hitViewPos;
 	hitViewPos.Identity();
+	int hitAny = 0;
+	int hitPaintable = 0;
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-	const float negCursorY = -(cursorY - 224.0f);
 
 	CChara::CMesh* mesh = m_meshes;
 
@@ -826,12 +825,11 @@ int CChara::CModel::PickFur(
 
 		Mtx modelViewMtx;
 		PSMTXConcat(viewMtx, meshMtx, modelViewMtx);
-		const unsigned int posGqr = m_data->m_posQuant;
-		const int normGqr = m_data->m_normQuant;
-		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7,
-			          normGqr << 0x18 | 0x70000 | normGqr << 8 | 7, 0xc070c07);
-
+		unsigned int posGqr = m_data->m_posQuant;
+		int normGqr = m_data->m_normQuant;
 		CChara::CMesh::CDisplayList* displayList = mesh->m_data->m_displayLists;
+		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
+		              0xC070C07);
 		int displayCount = mesh->m_data->m_displayListCount - 1;
 		for (; displayCount >= 0; displayCount--, displayList++) {
 			CMaterial* material = m_data->m_materialSet->m_materials[displayList->m_material];
@@ -894,7 +892,7 @@ int CChara::CModel::PickFur(
 								(primitive == GX_TRIANGLESTRIP && vertexIndex >= 2)) {
 								CWork* vp = &verts[0];
 								int passed = 0;
-								float depthAccum = 0.0f;
+								float depth = 0.0f;
 								for (int remainEdges = 3; remainEdges != 0; remainEdges--) {
 									if (vp->m_projValid == 0) {
 										break;
@@ -914,83 +912,83 @@ int CChara::CModel::PickFur(
 											break;
 										}
 									}
-									depthAccum = depthAccum + vp->m_clip.w;
+									depth = depth + vp->m_clip.w;
 									vp++;
 									passed++;
 								}
 
-								float depth;
-								if (passed != 3 || nearestDepth <= (depth = depthAccum / 3.0f)) {
-									continue;
-								}
+								if (passed == 3) {
+									depth /= 3.0f;
+									if (nearestDepth > depth) {
+										hitAny = 1;
+										Mtx44 invScreenMtx;
+										PSMTX44Copy(screenMtx, invScreenMtx);
+										C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
-								hitAny = 1;
-								Mtx44 invScreenMtx;
-								PSMTX44Copy(screenMtx, invScreenMtx);
-								C_MTX44Inverse(invScreenMtx, invScreenMtx);
+										CVector rayStart;
+										CVector rayEnd;
+										rayStart = CVector(
+											(cursorX - 320.0f) / 320.0f,
+											-(cursorY - 224.0f) / 224.0f, 0.0f);
+										rayEnd = CVector(rayStart.x, rayStart.y, -100.0f);
+										PSMTX44MultVec(invScreenMtx, rayStart, rayStart);
+										PSMTX44MultVec(invScreenMtx, rayEnd, rayEnd);
 
-								CVector rayStart;
-								CVector rayEnd;
-								rayStart = CVector(
-									(cursorX - 320.0f) / 320.0f,
-									negCursorY / 224.0f, 0.0f);
-								rayEnd = CVector(rayStart.x, rayStart.y, -100.0f);
-								PSMTX44MultVec(invScreenMtx, rayStart, rayStart);
-								PSMTX44MultVec(invScreenMtx, rayEnd, rayEnd);
+										CVector ray = rayEnd - rayStart;
 
-								CVector ray = rayEnd - rayStart;
+										CVector normal;
+										CVector normalA;
+										CVector normalB;
+										PSVECCrossProduct(&verts[1].m_viewPos, &verts[0].m_viewPos, normalA);
+										PSVECCrossProduct(&verts[2].m_viewPos, &verts[0].m_viewPos, normalB);
+										PSVECCrossProduct(normalA, normalB, normal);
+										if (verts[2].m_edgeFlag != 0) {
+											normal = CVector(-normal.x, -normal.y, -normal.z);
+										}
+										normal.Normalize();
 
-								CVector normal;
-								CVector normalA;
-								CVector normalB;
-								PSVECCrossProduct(&verts[1].m_viewPos, &verts[0].m_viewPos, normalA);
-								PSVECCrossProduct(&verts[2].m_viewPos, &verts[0].m_viewPos, normalB);
-								PSVECCrossProduct(normalA, normalB, normal);
-								if (verts[2].m_edgeFlag != 0) {
-									normal = CVector(-normal.x, -normal.y, -normal.z);
-								}
-								normal.Normalize();
+										CVector planeDelta = CVector(verts[0].m_viewPos) - rayStart;
+										const float rayDot = PSVECDotProduct(normal, ray);
+										const float planeDot = PSVECDotProduct(normal, planeDelta);
+										Vec scaledRay;
+										PSVECScale(ray, &scaledRay, planeDot / rayDot);
+										PSVECAdd(rayStart, &scaledRay, hitViewPos);
 
-								CVector planeDelta = CVector(verts[0].m_viewPos) - rayStart;
-								const float rayDot = PSVECDotProduct(normal, ray);
-								const float planeDot = PSVECDotProduct(normal, planeDelta);
-								Vec scaledRay;
-								PSVECScale(ray, &scaledRay, planeDot / rayDot);
-								PSVECAdd(rayStart, &scaledRay, hitViewPos);
+										CVector hitToA;
+										CVector hitToB;
+										CVector hitToC;
+										CVector areaAB;
+										CVector areaBC;
+										CVector areaCA;
+										hitToA = CVector(verts[0].m_viewPos) - hitViewPos;
+										hitToB = CVector(verts[1].m_viewPos) - hitViewPos;
+										hitToC = CVector(verts[2].m_viewPos) - hitViewPos;
 
-								CVector hitToA;
-								CVector hitToB;
-								CVector hitToC;
-								CVector areaAB;
-								CVector areaBC;
-								CVector areaCA;
-								hitToA = CVector(verts[0].m_viewPos) - hitViewPos;
-								hitToB = CVector(verts[1].m_viewPos) - hitViewPos;
-								hitToC = CVector(verts[2].m_viewPos) - hitViewPos;
+										PSVECCrossProduct(hitToA, hitToB, areaAB);
+										PSVECCrossProduct(hitToB, hitToC, areaBC);
+										PSVECCrossProduct(hitToC, hitToA, areaCA);
+										const float magAB = PSVECMag(areaAB);
+										const float magCA = PSVECMag(areaCA);
+										const float magBC = PSVECMag(areaBC);
+										CVector weights = CVector(magBC, magCA, magAB) * 0.5f;
+										PSVECScale(weights, weights,
+											       1.0f / (weights.x + weights.y + weights.z));
 
-								PSVECCrossProduct(hitToA, hitToB, areaAB);
-								PSVECCrossProduct(hitToB, hitToC, areaBC);
-								PSVECCrossProduct(hitToC, hitToA, areaCA);
-								const float magAB = PSVECMag(areaAB);
-								const float magCA = PSVECMag(areaCA);
-								const float magBC = PSVECMag(areaBC);
-								CVector weights = CVector(magBC, magCA, magAB) * 0.5f;
-								PSVECScale(weights, weights,
-									       1.0f / (weights.x + weights.y + weights.z));
+										hitU =
+											verts[2].m_uv.x * weights.z + (verts[0].m_uv.x * weights.x + verts[1].m_uv.x * weights.y);
+										hitV =
+											verts[2].m_uv.y * weights.z + (verts[0].m_uv.y * weights.x + verts[1].m_uv.y * weights.y);
 
-								hitU =
-									verts[2].m_uv.x * weights.z + (verts[0].m_uv.x * weights.x + verts[1].m_uv.x * weights.y);
-								hitV =
-									verts[2].m_uv.y * weights.z + (verts[0].m_uv.y * weights.x + verts[1].m_uv.y * weights.y);
-
-								if (outWorldPos != 0) {
-									outWorldPos->x = hitViewPos.x;
-									outWorldPos->y = hitViewPos.y;
-									outWorldPos->z = hitViewPos.z;
-								}
-								if (material->IsFurEnabled()) {
-									hitPaintable = paintableMaterial;
-									nearestDepth = depth;
+										if (outWorldPos != 0) {
+											outWorldPos->x = hitViewPos.x;
+											outWorldPos->y = hitViewPos.y;
+											outWorldPos->z = hitViewPos.z;
+										}
+										if (material->IsFurEnabled()) {
+											hitPaintable = paintableMaterial;
+											nearestDepth = depth;
+										}
+									}
 								}
 							}
 						}
@@ -1005,19 +1003,21 @@ int CChara::CModel::PickFur(
 
 	if (doPaint != 0 && hitPaintable != 0) {
 		CTexture* texture = FindMogFurTexture(this);
-		if (texture != 0 && texture->m_format == GX_TF_RGB5A3 && nearestDepth != 0.0f) {
+		if (texture != 0) {
 			unsigned short* furTexels = reinterpret_cast<unsigned short*>(texture->m_imageData);
 			int furTexWidth = texture->m_width;
 			int furTexHeight = texture->m_height;
-			_GXColor paintColor = brushColor;
-			_GXColor before;
-			_GXColor after;
-			brush(furTexels, furTexWidth, furTexHeight, hitU, hitV, mode, paintColor, &before, &after);
-			if (centerBefore != 0) {
-				*centerBefore = before;
-			}
-			if (centerAfter != 0) {
-				*centerAfter = after;
+			if (texture->m_format == GX_TF_RGB5A3 && nearestDepth != 0.0f) {
+				_GXColor paintColor = brushColor;
+				_GXColor before;
+				_GXColor after;
+				brush(furTexels, furTexWidth, furTexHeight, hitU, hitV, mode, paintColor, &before, &after);
+				if (centerBefore != 0) {
+					*centerBefore = before;
+				}
+				if (centerAfter != 0) {
+					*centerAfter = after;
+				}
 			}
 		}
 	}

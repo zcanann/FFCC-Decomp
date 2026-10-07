@@ -361,6 +361,10 @@ void CMenuPcs::EquipDraw()
 {
 	int helpItem;
 	int helpFound = 0;
+	int mode;
+	int listState;
+	CCaravanWork* caravanWork;
+	EquipOpenAnim* item;
 	float x;
 	float y;
 	float w;
@@ -373,10 +377,10 @@ void CMenuPcs::EquipDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int mode = static_cast<int>(m_equipState->mode);
-	int listState = static_cast<int>(m_equipState->listState);
-	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
-	EquipOpenAnim* item = m_equipList->entries;
+	mode = static_cast<int>(m_equipState->mode);
+	listState = static_cast<int>(m_equipState->listState);
+	caravanWork = Game.m_scriptFoodBase[0];
+	item = m_equipList->entries;
 
 	for (int i = 0; i < m_equipList->count; i++, item++) {
 		int tex = item->tex;
@@ -559,7 +563,7 @@ void CMenuPcs::EquipDraw()
 		float colorMax = 255.0f;
 		EquipOpenAnim* textItem = listStart;
 		int idx;
-		for (int i = 0; (i < 8) && ((idx = i + m_equipState->scroll) < letterCount); i++) {
+		for (int i = 0; (i < 8) && ((idx = i + m_equipState->scroll) < letterCount); textItem++, i++) {
 			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(colorMax * listStart->alpha)).color);
 
 			char* str;
@@ -586,13 +590,12 @@ void CMenuPcs::EquipDraw()
 			font->SetPosX((float)(textItem->x + 0x1c));
 			font->SetPosY(textY - 4.0f);
 			font->Draw(str);
-			textItem++;
 		}
 
 		DrawInit();
 
 		EquipOpenAnim* iconItem = listStart;
-		for (int i = 0; (i < 8) && ((idx = i + m_equipState->scroll) < letterCount); i++) {
+		for (int i = 0; (i < 8) && ((idx = i + m_equipState->scroll) < letterCount); iconItem++, i++) {
 			if (idx >= 1) {
 				int entry = letter[idx];
 				if (entry >= 0) {
@@ -602,7 +605,6 @@ void CMenuPcs::EquipDraw()
 					               listStart->alpha, 0, 1.0f);
 				}
 			}
-			iconItem++;
 		}
 	}
 

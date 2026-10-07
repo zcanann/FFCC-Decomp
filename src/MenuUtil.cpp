@@ -20,9 +20,16 @@
 static const char s_dvd_gba_801E3058[] = "dvd/gba/";
 static const char s_ffcc_cli_bin_801E3060[] = "ffcc_cli.bin";
 static const char s_objdat_spt_801E3070[] = "objdat.spt";
+#ifdef VERSION_GCCJGC
+static const char s_icon_dat_801E307C[] = "dvd/menu/icon.dat";
+static const char s_FF_Crystal_Chronicles_801E3088[] =
+	"\314\247\262\305\331\314\247\335\300\274\336\260\245\270\330\275\300\331\270\333\306\270\331";
+#else
 static const char s_icon_dat_801E307C[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801E3088[] = "FF Crystal Chronicles";
+#endif
 
+#ifndef VERSION_GCCJGC
 char* g_strMenuUtilMes[] = {
 #ifdef VERSION_GCCE01
 	"Strength",
@@ -236,6 +243,7 @@ char* g_strMenuUtilMes[] = {
 	"Est\341ndar",
 #endif
 };
+#endif
 
 
 namespace {
@@ -451,6 +459,7 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 	font->Draw(text);
 }
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x80179FC4
@@ -760,6 +769,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 	}
 }
+#endif
 
 #ifdef VERSION_GCCJGC
 #include "src/MenuUtil_jp.inc"

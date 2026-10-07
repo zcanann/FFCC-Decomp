@@ -468,17 +468,6 @@ static inline float CalcCenteredShopMenuX(CFont* font, const char* text, int cen
     return static_cast<float>(centerX);
 }
 
-static inline void SetupShopMenuAmountFont(CFont* font)
-{
-    font->SetShadow(1);
-    font->SetScaleX(FLOAT_80332d28);
-    font->SetScaleY(FLOAT_80332d8c);
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-    font->DrawInit();
-    font->SetFixed(1);
-    font->SetMargin(FLOAT_80332d64);
-}
-
 static inline void SetupShopMenuMakeFont(CFont* font, float margin)
 {
     font->SetShadow(1);
@@ -508,17 +497,6 @@ static inline void SetupShopMenuGilFont(CFont* font)
     font->SetFixed(1);
     font->SetMargin(FLOAT_80332d64);
 }
-
-#define DrawShopMenuAmountTrunc(font, value, rightEdge, y, tlut)                                                       \
-    do {                                                                                                               \
-        char amountBuffer[64];                                                                                         \
-        sprintf(amountBuffer, s_DecimalFormat_80332d14, (value));                                                      \
-        float amountWidth = (font)->GetWidth(amountBuffer);                                                            \
-        MenuPcs.DrawNoShadowFont((font), amountBuffer,                                                                 \
-            static_cast<float>(static_cast<int>(static_cast<float>(rightEdge) - amountWidth)), (y), (tlut), 0x12);     \
-        MenuPcs.DrawInit();                                                                                            \
-    } while (0)
-
 
 /*
  * --INFO--
@@ -2216,9 +2194,7 @@ void CShopMenu::DrawMake()
 
     float makeMarginW = FLOAT_80332E10;
     short makeAmountX = static_cast<int>(FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
-    CFont* amountFont = MenuPcs.GetFont22();
-    SetupShopMenuAmountFont(amountFont);
-    DrawShopMenuAmountTrunc(amountFont, makeGil, makeAmountX, FLOAT_80332E18, 0x13);
+    DrawDecScale(makeGil, 0x13, makeAmountX, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
 
     int gilAmountX = static_cast<int>(FLOAT_80332E1C - gilUnitWidth - FLOAT_80332d5c);
     int makeGil2 = getMakeGil(getItemNo(m_selectedIndex));
@@ -2226,10 +2202,7 @@ void CShopMenu::DrawMake()
     if (m_caravanWork->m_gil >= makeGil2) {
         gilTlut = 0x14;
     }
-    int caravanGil = m_caravanWork->m_gil;
-    CFont* amountFont2 = MenuPcs.GetFont22();
-    SetupShopMenuAmountFont(amountFont2);
-    DrawShopMenuAmountTrunc(amountFont2, caravanGil, gilAmountX, FLOAT_80332E18, gilTlut);
+    DrawDecScale(m_caravanWork->m_gil, gilTlut, gilAmountX, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
 
     font->SetScale(FLOAT_80332d28);
     font->DrawInit();
@@ -2918,6 +2891,7 @@ void CShopMenu::DrawBuySellInfo()
 {
     int languageId = static_cast<int>(Game.m_gameWork.GetLanguage()) - 1;
     CFont* font = MenuPcs.GetFont22();
+    int x;
 
     font->DrawInit();
     font->SetMargin(FLOAT_80332d28);
@@ -2926,8 +2900,8 @@ void CShopMenu::DrawBuySellInfo()
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
     char* priceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE);
-    int priceX = static_cast<int>(FLOAT_80332d7c - font->GetWidth(priceText));
-    _drawNoShadowFont(font, priceText, static_cast<float>(priceX), FLOAT_80332d80, 0x13, 0x12);
+    x = FLOAT_80332d7c - font->GetWidth(priceText);
+    _drawNoShadowFont(font, priceText, x, FLOAT_80332d80, 0x13, 0x12);
 
     _drawNoShadowFont(font, const_cast<char*>(s_Slash_80332d84), FLOAT_80332d7c, FLOAT_80332d80, 0x18, 0x12);
 
@@ -2952,28 +2926,24 @@ void CShopMenu::DrawBuySellInfo()
     }
 
     float rightPrice = FLOAT_80332d88 - unitWidth;
-    int amountRightPrice = static_cast<int>(rightPrice - FLOAT_80332d5c);
-    CFont* amountFont = MenuPcs.GetFont22();
-    SetupShopMenuAmountFont(amountFont);
-    DrawShopMenuAmountTrunc(amountFont, totalGil, amountRightPrice, FLOAT_80332d90, 0x13);
+    x = rightPrice - FLOAT_80332d5c;
+    DrawDecScale(totalGil, 0x13, x, FLOAT_80332d90, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
 
     float rightMoney = FLOAT_80332d94 - unitWidth;
-    int amountRightMoney = static_cast<int>(rightMoney - FLOAT_80332d5c);
-    int currentMoney = m_caravanWork->m_gil;
-    CFont* amountFont2 = MenuPcs.GetFont22();
-    SetupShopMenuAmountFont(amountFont2);
-    DrawShopMenuAmountTrunc(amountFont2, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
+    x = rightMoney - FLOAT_80332d5c;
+    DrawDecScale(m_caravanWork->m_gil, 0x14, x, FLOAT_80332d90, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
 
     font->DrawInit();
     font->SetScaleX(FLOAT_80332d2c);
     font->SetScaleY(FLOAT_80332d28);
     font->SetMargin(FLOAT_80332d28);
-    int rightPriceInt = static_cast<int>(rightPrice);
-    _drawNoShadowFont(font, unitText, static_cast<float>(rightPriceInt), FLOAT_80332d98, 0x19, 0x12);
+    x = rightPrice;
+    _drawNoShadowFont(font, unitText, x, FLOAT_80332d98, 0x19, 0x12);
 
     _drawNoShadowFont(font, const_cast<char*>(s_Slash_80332d84), FLOAT_80332d7c, FLOAT_80332d98, 0x1B, 0x12);
 
-    _drawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightMoney)), FLOAT_80332d98, 0x19, 0x12);
+    x = rightMoney;
+    _drawNoShadowFont(font, unitText, x, FLOAT_80332d98, 0x19, 0x12);
 }
 #endif
 
@@ -3084,9 +3054,7 @@ void CShopMenu::DrawItemInfo0()
         amountRightX = static_cast<int>(rightX - FLOAT_80332d5c);
         int totalGil = getBuySellGil(itemNo);
 
-        CFont* amountFont = MenuPcs.GetFont22();
-        SetupShopMenuGilFont(amountFont);
-        DrawShopMenuAmountTrunc(amountFont, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
+        DrawDec(totalGil, 0x1B, amountRightX, FLOAT_80332d68, FLOAT_80332d64, 0, 1, 0x12);
 
         font->SetMargin(FLOAT_80332d28);
         _drawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightX)), FLOAT_80332d68, 0x19, 0x12);
@@ -3233,10 +3201,10 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     int langIndex;
     int equipType;
     SItemFlatRow* item;
-    unsigned short statValue;
     int statType;
+    unsigned short statValue;
     int attr;
-    float labelX;
+    float posX;
 
     font = MenuPcs.GetFont22();
     font->SetMargin(FLOAT_80332d28);
@@ -3271,19 +3239,11 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     if (label != 0) {
         strcpy(textBuffer, label);
         strcat(textBuffer, s_Colon_80332d30);
-        labelX = static_cast<float>(x + 0x40);
-        _drawNoShadowFont(font, textBuffer, labelX, static_cast<float>(y), 0x18, 0x12);
+        posX = x + 0x40;
+        _drawNoShadowFont(font, textBuffer, posX, static_cast<float>(y), 0x18, 0x12);
 
-        CFont* font2 = MenuPcs.m_fonts[0];
-        int valueRightX = static_cast<int>(static_cast<float>(x + 0x108));
-        SetupShopMenuValueFont(font2);
-
-        char valueBuffer[64];
-        sprintf(valueBuffer, s_DecimalFormat_80332d14, statValue);
-        float valueWidth = font2->GetWidth(valueBuffer);
-        valueRightX = static_cast<int>(static_cast<float>(valueRightX) - valueWidth);
-        MenuPcs.DrawNoShadowFont(font2, valueBuffer, static_cast<float>(valueRightX), static_cast<float>(y), 0x1A, 0x12);
-        MenuPcs.DrawInit();
+        posX = x + 0x108;
+        DrawDec(statValue, 0x1A, posX, static_cast<float>(y), FLOAT_80332d34, 0, 1, 0x12);
 
         font->DrawInit();
         font->SetMargin(FLOAT_80332d28);
@@ -3292,17 +3252,18 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         if ((statType == 1) && (attr >= 1)) {
             font->SetScaleX(FLOAT_80332d2c);
             font->SetScaleY(FLOAT_80332d28);
-            _drawNoShadowFont(font, MenuPcs.GetAttrStr(attr), labelX, static_cast<float>(attrY), 0x18, 0x12);
+            _drawNoShadowFont(font, MenuPcs.GetAttrStr(attr), static_cast<float>(x + 0x40), static_cast<float>(attrY), 0x18, 0x12);
 
             font->SetScaleX(FLOAT_80332d28);
             font->GetWidth(MenuPcs.GetAttrStr(attr));
             if ((attr >= 1) && (attr <= 8)) {
                 strcpy(textBuffer, s_PlusOne_80332d38);
-                labelX = static_cast<float>(x) + (FLOAT_80332d3c - font->GetWidth(textBuffer));
+                float width = font->GetWidth(textBuffer);
+                posX = x + (FLOAT_80332d3c - width);
             } else {
                 return;
             }
-            _drawNoShadowFont(font, textBuffer, labelX, static_cast<float>(attrY), 9, 0x12);
+            _drawNoShadowFont(font, textBuffer, posX, static_cast<float>(attrY), 9, 0x12);
         }
     } else {
         font->SetScaleX(FLOAT_80332d2c);

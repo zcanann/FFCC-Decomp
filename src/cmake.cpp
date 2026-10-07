@@ -1198,8 +1198,28 @@ inline void CMenuPcs::DrawCrystal(int x, int y, float alpha)
  */
 inline void CMenuPcs::DrawCmakeNameBase(int page, float alpha)
 {
-    DrawCmakeWin(0.0f, 0.0f, alpha);
-    DrawCmakeTitle(page, 0.0f, alpha);
+    float w;
+    float y;
+    float h;
+    float v;
+
+    if (page == 0) {
+        w = 328.0f;
+        y = 288.0f;
+        h = 56.0f;
+        v = 368.0f;
+    } else {
+        w = 280.0f;
+        y = 268.0f;
+        h = 64.0f;
+        v = 304.0f;
+    }
+
+    SetCmakeBlendMatColor(alpha);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
+    MenuPcs.DrawRect(
+        0, static_cast<float>(static_cast<int>(400.0 - w / 2.0)), y, w, h,
+        0.0f, v, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1213,7 +1233,34 @@ inline void CMenuPcs::DrawCmakeNameBase(int page, float alpha)
  */
 inline void CMenuPcs::DrawCmakePageMark(float alpha)
 {
-    (void)alpha;
+    SetCmakeBlendMatColor(alpha);
+#ifdef VERSION_GCCJGC
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
+    MenuPcs.DrawRect(
+        0, 184.0f, 216.0f, 40.0f, 40.0f,
+        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
+    double crestRightX = 576.0;
+    int rightX = static_cast<int>(crestRightX);
+    MenuPcs.DrawRect(
+        0, static_cast<float>(rightX), 216.0f, 40.0f, 40.0f,
+        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD29 : CMAKE_TEX_WORLD29));
+    MenuPcs.DrawRect(
+        0, 192.0f, 224.0f, 24.0f, 24.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(
+        0, static_cast<float>(rightX + 8), 224.0f, 24.0f, 24.0f,
+        24.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+#else
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
+    MenuPcs.DrawRect(
+        0, 184.0f, 216.0f, 48.0f, 48.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    double crestRightX = 568.0;
+    MenuPcs.DrawRect(
+        0, static_cast<float>(static_cast<int>(crestRightX)), 216.0f, 48.0f, 48.0f,
+        48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+#endif
 }
 
 /*
@@ -1294,11 +1341,13 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::DrawCmakeBallCursor(int kind, int frame, float alpha)
+inline void CMenuPcs::DrawCmakeBallCursor(int x, int y, float alpha)
 {
-    (void)kind;
-    (void)frame;
-    (void)alpha;
+    SetCmakeBlendMatColor(alpha);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD44 : CMAKE_TEX_WORLD44));
+    MenuPcs.DrawRect(
+        0, static_cast<float>(x), static_cast<float>(y), 48.0f, 48.0f,
+        128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1310,103 +1359,32 @@ inline void CMenuPcs::DrawCmakeBallCursor(int kind, int frame, float alpha)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
+inline void CMenuPcs::DrawCmakeCharaText(int table, float alpha)
 {
-    (void)page;
+    CFont* font = GetCmakeKeyboardFont(this);
+    font->SetShadow(0);
+    font->SetScale(1.0f);
+    font->DrawInit();
+    font->SetFixed(1);
+    font->SetMargin(4.9f);
+    SetCmakeFontColor(font, alpha);
 
-    CFont* labelFont = GetFont23();
-    labelFont->SetMargin(1.0f);
-    labelFont->SetShadow(0);
-    labelFont->SetScale(1.0f);
-    labelFont->DrawInit();
-
-    int a = static_cast<int>(255.0f * alpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
+    int y;
+    int i;
+    int tableBase = table * 5;
+    const char* rowText;
+#ifdef VERSION_GCCJGC
+    for (i = 0, y = 0x70; i < 5; i++, y += 0x20) {
+#else
+    for (i = 0, y = 0x6C; i < 5; i++, y += 0x20) {
+#endif
+        rowText = s_NameEntryStr[tableBase + i];
+        font->SetPosX(240.0f);
+        font->SetPosY(static_cast<float>(y));
+        font->Draw(rowText);
     }
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    labelFont->SetColor(rgba.color);
-
-    float labelWidths[4];
-    for (int i = 0; i < 4; i++) {
-        const char* txt = GetMenuStr(0x2A + i);
-        if (txt == 0) {
-            txt = "";
-        }
-
-        labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
-        labelFont->SetPosX(232.0f);
-        labelFont->SetPosY(0x70 + i * 0x28 - 4.0f);
-        labelFont->Draw(txt);
-    }
-
-    CFont* valueFont = GetFont22();
-    valueFont->SetMargin(1.0f);
-    valueFont->SetShadow(1);
-    valueFont->SetScale(1.0f);
-    valueFont->DrawInit();
-    valueFont->SetColor(rgba.color);
-    valueFont->SetTlut(6);
-
-    char tribeWithSep[0x40];
-    for (int i = 0; i < 4; i++) {
-        const char* txt = "";
-
-        switch (i) {
-        case 0:
-            txt = s_CmakeInfo.m_name;
-            break;
-        case 1:
-            txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
-            break;
-        case 2:
-            txt = GetTribeStr(s_CmakeInfo.m_tribe);
-            strcpy(tribeWithSep, txt);
-            strcat(tribeWithSep, "/");
-            txt = tribeWithSep;
-            break;
-        default:
-            txt = GetJobStr(s_CmakeInfo.m_job);
-            break;
-        }
-
-        if (txt == 0) {
-            txt = "";
-        }
-
-        valueFont->SetPosX(8.0f + labelWidths[i]);
-        valueFont->SetPosY(0x70 + i * 0x28 - 4.0f);
-        valueFont->Draw(txt);
-
-        if (i == 2) {
-            int hairIndex = s_CmakeInfo.m_tribe * 8;
-            if (s_CmakeInfo.m_gender != 0) {
-                hairIndex += 4;
-            }
-
-            char tribeWithSep[0x40];
-            strcpy(tribeWithSep, txt);
-            size_t tribeLen = strlen(tribeWithSep);
-            if (tribeLen + 1 < sizeof(tribeWithSep)) {
-                tribeWithSep[tribeLen] = '/';
-                tribeWithSep[tribeLen + 1] = '\0';
-            }
-
-            const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
-            if (hairTxt == 0) {
-                hairTxt = "";
-            }
-
-            valueFont->SetPosX(
-                16.0f + (8.0f + labelWidths[i] + static_cast<float>(valueFont->GetWidth(tribeWithSep))));
-            valueFont->SetPosY(0x70 + i * 0x28 - 4.0f);
-            valueFont->Draw(hairTxt);
-        }
-    }
-
+    font->SetFixed(0);
     DrawInit();
 }
 
@@ -2058,8 +2036,9 @@ void CMenuPcs::CmakeNameDraw()
 {
     CmakeMenuState* state = CmakeState(this);
     int frame = static_cast<int>(state->m_frame) - 1;
-    float a255;
     float alpha;
+    int x;
+    int y;
     if (frame < 0) {
         frame = 0;
     }
@@ -2093,90 +2072,29 @@ void CMenuPcs::CmakeNameDraw()
         DrawCmakeTitle(1, alpha, 1.0f);
     }
 
-    SetCmakeBlendMatColor(alpha);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
-    float titleW = 280.0f;
-    MenuPcs.DrawRect(
-        0, static_cast<float>(static_cast<int>(-(titleW / 2.0 - 400.0))), 268.0f, titleW, 64.0f,
-        0.0f, 304.0f, 1.0f, 1.0f, 0.0f);
-
-    SetCmakeBlendMatColor(alpha);
-#ifdef VERSION_GCCJGC
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
-    MenuPcs.DrawRect(
-        0, 184.0f, 216.0f, 40.0f, 40.0f,
-        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
-    double crestRightX = 576.0;
-    int rightX = static_cast<int>(crestRightX);
-    MenuPcs.DrawRect(
-        0, static_cast<float>(rightX), 216.0f, 40.0f, 40.0f,
-        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD29 : CMAKE_TEX_WORLD29));
-    MenuPcs.DrawRect(
-        0, 192.0f, 224.0f, 24.0f, 24.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        0, static_cast<float>(rightX + 8), 224.0f, 24.0f, 24.0f,
-        24.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-#else
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
-    MenuPcs.DrawRect(
-        0, 184.0f, 216.0f, 48.0f, 48.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    double crestRightX = 568.0;
-    MenuPcs.DrawRect(
-        0, static_cast<float>(static_cast<int>(crestRightX)), 216.0f, 48.0f, 48.0f,
-        48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-#endif
+    DrawCmakeNameBase(1, alpha);
+    DrawCmakePageMark(alpha);
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
-        short sel = CmakeState(this)->m_select;
-        int cellX = (CmakeState(this)->m_row < 5) ? 0xE5 : 0xE5;
-        int cursorY = CmakeState(this)->m_row * 0x20 + 0x63;
-        cellX = static_cast<int>(
-            26.9f * static_cast<float>(sel) + static_cast<float>(cellX));
-        SetCmakeBlendMatColor(1.0f);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD44 : CMAKE_TEX_WORLD44));
-        MenuPcs.DrawRect(
-            0, static_cast<float>(cellX), static_cast<float>(cursorY), 48.0f, 48.0f,
-            128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        x = 0xE5;
+        y = 0x63;
+        x += 26.9f * static_cast<float>(CmakeState(this)->m_select);
+        y += CmakeState(this)->m_row * 0x20;
+        DrawCmakeBallCursor(x, y, 1.0f);
     }
 
-    short table = CmakeState(this)->m_table;
-    int i;
-    CFont* font = GetCmakeKeyboardFont(this);
-    font->SetShadow(0);
-    font->SetScale(1.0f);
-    font->DrawInit();
-    font->renderFlags.fixedWidth = 1;
-    font->SetMargin(4.9f);
-    SetCmakeFontColor(font, alpha);
-
-    int tableBase = table * 5;
-    for (i = 0; i < 5; i++) {
-        const char* rowText = s_NameEntryStr[tableBase + i];
-        font->SetPosX(240.0f);
-#ifdef VERSION_GCCJGC
-        font->SetPosY(static_cast<float>(0x70 + i * 0x20));
-#else
-        font->SetPosY(static_cast<float>(0x6C + i * 0x20));
-#endif
-        font->Draw(rowText);
-    }
-
-    font->renderFlags.fixedWidth = 0;
-    DrawInit();
+    DrawCmakeCharaText(CmakeState(this)->m_table, alpha);
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
-        int cursorLeft = (CmakeState(this)->m_select == 0) ? 0xC8 : 0xC8;
-        cursorLeft = static_cast<int>(26.9f * static_cast<float>(CmakeState(this)->m_select) +
-            static_cast<float>(cursorLeft));
-        cursorLeft += static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(cursorLeft, CmakeState(this)->m_row * 0x20 + 0x70, 1.0f);
+        x = 0xC8;
+        y = 0x70;
+        x += 26.9f * static_cast<float>(CmakeState(this)->m_select);
+        y += CmakeState(this)->m_row * 0x20;
+        x += static_cast<int>(System.m_frameCounter) % 8;
+        DrawCursor(x, y, 1.0f);
     }
 
-    int nameCursor = static_cast<int>(
-        static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - CmakeState(this)->m_mode))) >> 5);
+    int nameCursor = (CmakeState(this)->m_mode == 1) ? 1 : 0;
     if (CmakeState(this)->m_row >= 5) {
         nameCursor = 0;
     }
@@ -3503,6 +3421,8 @@ void CMenuPcs::CmakeVillageDraw()
     CmakeMenuState* villageWork = CmakeVillageState(this);
     int frame = static_cast<int>(villageWork->m_frame) - 1;
     float alpha;
+    int x;
+    int y;
 
     if (frame < 0) {
         frame = 0;
@@ -3523,101 +3443,36 @@ void CMenuPcs::CmakeVillageDraw()
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     DrawCmakeTitle(0, 1.0f, alpha);
-
-    SetCmakeBlendMatColor(alpha);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
-    float panelW = 328.0f;
-    MenuPcs.DrawRect(
-        0, static_cast<float>(static_cast<int>(-(panelW / 2.0 - 400.0))), 288.0f, panelW, 56.0f,
-        0.0f, 368.0f, 1.0f, 1.0f, 0.0f);
-
-    SetCmakeBlendMatColor(alpha);
-#ifdef VERSION_GCCJGC
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
-    MenuPcs.DrawRect(
-        0, 184.0f, 216.0f, 40.0f, 40.0f,
-        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
-    double crestRightX = 576.0;
-    int rightX = static_cast<int>(crestRightX);
-    MenuPcs.DrawRect(
-        0, static_cast<float>(rightX), 216.0f, 40.0f, 40.0f,
-        256.0f, 264.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD29 : CMAKE_TEX_WORLD29));
-    MenuPcs.DrawRect(
-        0, 192.0f, 224.0f, 24.0f, 24.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(
-        0, static_cast<float>(rightX + 8), 224.0f, 24.0f, 24.0f,
-        24.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-#else
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
-    MenuPcs.DrawRect(
-        0, 184.0f, 216.0f, 48.0f, 48.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    double crestRightX = 568.0;
-    MenuPcs.DrawRect(
-        0, static_cast<float>(static_cast<int>(crestRightX)), 216.0f, 48.0f, 48.0f,
-        48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-#endif
+    DrawCmakeNameBase(0, alpha);
+    DrawCmakePageMark(alpha);
 
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
-        short sel = villageWork->m_select;
-        int cursorX = (villageWork->m_row < 5) ? 0xE5 : 0xE5;
-        int cursorY = villageWork->m_row * 0x20 + 0x63;
-        cursorX = static_cast<int>(
-            26.9f * static_cast<float>(sel) + static_cast<float>(cursorX));
-        SetCmakeBlendMatColor(1.0f);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? CMAKE_TEX_VILLAGE_WORLD44 : CMAKE_TEX_WORLD44));
-        MenuPcs.DrawRect(
-            0,
-            static_cast<float>(cursorX), static_cast<float>(cursorY), 48.0f, 48.0f,
-            128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        x = 0xE5;
+        y = 0x63;
+        x += 26.9f * static_cast<float>(villageWork->m_select);
+        y += villageWork->m_row * 0x20;
+        DrawCmakeBallCursor(x, y, 1.0f);
     }
 
-    short table = villageWork->m_table;
-    CFont* font = GetCmakeKeyboardFont(this);
-    font->SetShadow(0);
-    font->SetScale(1.0f);
-    font->DrawInit();
-    font->renderFlags.fixedWidth = 1;
-    font->SetMargin(4.9f);
-    SetCmakeFontColor(font, alpha);
+    DrawCmakeCharaText(villageWork->m_table, alpha);
 
-    const char* rowText;
-    int tableBase = table * 5;
-    int i;
-    int y;
-#ifdef VERSION_GCCJGC
-    for (i = 0, y = 0x70; i < 5; i++, y += 0x20) {
-#else
-    for (i = 0, y = 0x6C; i < 5; i++, y += 0x20) {
-#endif
-        rowText = s_NameEntryStr[tableBase + i];
-        font->SetPosX(240.0f);
-        font->SetPosY(static_cast<float>(y));
-        font->Draw(rowText);
-    }
-
-    font->renderFlags.fixedWidth = 0;
-
-    DrawInit();
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
-        int cursorLeft = (villageWork->m_select == 0) ? 0xC8 : 0xC8;
-        cursorLeft = static_cast<int>(26.9f * static_cast<float>(villageWork->m_select) +
-            static_cast<float>(cursorLeft));
-        cursorLeft += static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(cursorLeft, villageWork->m_row * 0x20 + 0x70, 1.0f);
+        x = 0xC8;
+        y = 0x70;
+        x += 26.9f * static_cast<float>(villageWork->m_select);
+        y += villageWork->m_row * 0x20;
+        x += static_cast<int>(System.m_frameCounter) % 8;
+        DrawCursor(x, y, 1.0f);
     }
 
-    int showNameCursor = static_cast<int>(
-        static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - villageWork->m_mode))) >> 5);
+    int nameCursor = (villageWork->m_mode == 1) ? 1 : 0;
     if (villageWork->m_row >= 5) {
-        showNameCursor = 0;
+        nameCursor = 0;
     }
     if (GetCharaCnt(s_CmakeInfo.m_name) >= 7) {
-        showNameCursor = 0;
+        nameCursor = 0;
     }
-    DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
+    DrawCmakeName(1, nameCursor, s_CmakeInfo.m_name, alpha);
     DrawCmakeDecision((villageWork->m_row >= 5) ? 1 : 0, alpha);
 }
 

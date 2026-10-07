@@ -3199,7 +3199,7 @@ void CMenuPcs::drawWorld()
 			break;
 		default:
 			if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC59);
+				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC59, menuMode);
 			}
 			break;
 		}
@@ -8198,13 +8198,13 @@ void CMenuPcs::ChgAllModel()
 {
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
+		CCaravanWork* const caravan = &Game.m_caravanWorkArr[i];
 		int tribe;
 		int appearance;
 		int isFemale;
 		int modelId;
 
 		if (Game.m_caravanWorkArr[i].m_shopState != 0) {
-			CCaravanWork* const caravan = &Game.m_caravanWorkArr[i];
 			tribe = caravan->m_tribeId;
 			isFemale = caravan->m_genderFlag;
 			appearance = caravan->m_appearanceVariant;
@@ -8233,8 +8233,8 @@ void CMenuPcs::ChgAllModel()
 void CMenuPcs::ChgAllModel2()
 {
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		const Mc::CharaDat& character = m_cmakeWork->m_characters[i];
 		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
+		const Mc::CharaDat& character = m_cmakeWork->m_characters[i];
 		int tribe;
 		int isFemale;
 		int appearance;
@@ -9781,20 +9781,22 @@ inline void CMenuPcs::ClrMcList()
 unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
 	PPPCREATEPARAM createParam;
+	CGObject* object;
+	EffectInfo* effect;
 
 	if (cameraSlot < 0) {
 		cameraSlot = slot;
 	}
 
-	EffectInfo* effect = &m_effectWork[slot];
+	effect = &m_effectWork[slot];
 	if (slot == 5 && effectNo < 0x13) {
 		effect++;
 	} else if (slot >= 0x11 && slot <= 0x14 && effectNo > 0x19) {
 		effect += 4;
 	}
 
+	object = &effect->m_object;
 	const bool group = (effect->m_effectNo = effectNo) > 100;
-	CGObject* const object = &effect->m_object;
 	effect->m_slotNo = slot;
 	object->Create();
 	object->m_charaModelHandle = m_wm.m_handles[cameraSlot];
@@ -10379,15 +10381,19 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
  */
 void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 {
-	CFont* const font = GetFont22();
+	CFont* font;
+	const char* const* msgTable;
+	int maxWidth;
+	const WinMessEntry* winMess;
 
+	font = GetFont22();
 	font->SetMargin(FLOAT_803313e8);
 	font->SetShadow(0);
 	font->SetScale(FLOAT_803313e8);
 
-	const char* const* msgTable = GetMcWinMessBuff(messType);
-	int maxWidth = 0;
-	const WinMessEntry* const winMess = GetWinMess(winType);
+	msgTable = GetMcWinMessBuff(messType);
+	maxWidth = 0;
+	winMess = GetWinMess(winType);
 
 	for (int i = 0; i < winMess->m_lineCount; i++) {
 		const short msgId = winMess->m_messageIds[i];

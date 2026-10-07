@@ -2859,12 +2859,7 @@ void CGMonObj::statMove(int* targetIndex)
 #define mon (reinterpret_cast<unsigned char*>(this))
 #define object (reinterpret_cast<CGObject*>(this))
 #define prgObj (reinterpret_cast<CGPrgObj*>(this))
-	int* chaseState = &monObj->m_chaseState;
-	int* chaseTimer = &monObj->m_chaseTimer;
-	int* targetPartyIdx = &monObj->m_targetPartyIndex;
-
-	int state = *chaseState;
-	switch (state) {
+	switch (m_chaseState) {
 	case 4:
 		monObj->seKiduki();
 		break;
@@ -2873,16 +2868,16 @@ void CGMonObj::statMove(int* targetIndex)
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 			monObj->moveCancel();
 		}
-		if (*chaseTimer == 0) {
+		if (m_chaseTimer == 0) {
 			object->m_rotTargetY = object->m_homeRotY;
 		}
 
 		int hitPartyIndex = CGMonObj_SearchNoticeParty(monObj);
 
 		if (hitPartyIndex >= 0) {
-			*targetPartyIdx = hitPartyIndex;
-			*chaseState = 2;
-			*chaseTimer = 0;
+			m_targetPartyIndex = hitPartyIndex;
+			m_chaseState = 2;
+			m_chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 			if (monObj->m_unk6B8 == 0) {
 				CGMonObj_PlayNoticeSe(monObj);
@@ -2941,23 +2936,23 @@ void CGMonObj::statMove(int* targetIndex)
 
 	case 5: {
 		{
-			if (*targetPartyIdx >= 0) {
+			if (m_targetPartyIndex >= 0) {
 				CGMonObj::m_aiWork.m_state = 0x21;
-				CGMonObj_SetChaseMove(monObj, Game.m_partyObjArr[*targetPartyIdx], 0);
+				CGMonObj_SetChaseMove(monObj, Game.m_partyObjArr[m_targetPartyIndex], 0);
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 					(object->m_stateFlags0Bits.unk1 != 0)) {
 					monObj->moveCancel();
-					if (*targetPartyIdx >= 0) {
-						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));
+					if (m_targetPartyIndex >= 0) {
+						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 					}
-					*chaseState = 1;
-					*chaseTimer = 0;
+					m_chaseState = 1;
+					m_chaseTimer = 0;
 					monObj->m_chaseDirty = 1;
 				}
 			} else {
 				monObj->moveCancel();
-				*chaseState = 0;
-				*chaseTimer = 0;
+				m_chaseState = 0;
+				m_chaseTimer = 0;
 				monObj->m_chaseDirty = 1;
 			}
 		}
@@ -2969,7 +2964,7 @@ void CGMonObj::statMove(int* targetIndex)
 	if (monObj->m_chaseDirty != 0) {
 		monObj->m_chaseDirty = 0;
 	} else {
-		*chaseTimer += 1;
+		m_chaseTimer += 1;
 	}
 #undef prgObj
 #undef object

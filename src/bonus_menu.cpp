@@ -1079,11 +1079,11 @@ void CMenuPcs::CalcResultOpenAnim()
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
-	int activePartyCount;
-	CMenuPcs::Sprt2* sprite;
 	int modelIndex;
+	CMenuPcs::Sprt2* sprite;
 	int lastKind;
 	int i;
+	int activePartyCount;
 
 	if (this->m_bonusState->m_initialized != 0) {
 		activePartyCount = s_Rinfo->m_partyCount;
@@ -1452,20 +1452,24 @@ void CMenuPcs::CalcResultCountAnim()
  */
 void CMenuPcs::DrawResultCountAnim()
 {
+	int doubleCount;
+	int i;
+	int lastKind;
+	int modelIndex;
+	int activePartyCount;
+
 	if (this->m_bonusState->m_initialized == 0) {
 		return;
 	}
 
-	int activePartyCount = s_Rinfo->m_partyCount;
+	activePartyCount = s_Rinfo->m_partyCount;
 
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int modelIndex;
-	int lastKind = 0;
-	int i;
+	lastKind = 0;
 
-	int doubleCount = activePartyCount * 2;
+	doubleCount = activePartyCount * 2;
 	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
 
@@ -1875,18 +1879,21 @@ void CMenuPcs::CalcResultCloseAnim()
  */
 void CMenuPcs::DrawResultCloseAnim()
 {
+	int i;
+	int lastKind;
+	int modelIndex;
+	int activePartyCount;
+
 	if (this->m_bonusState->m_initialized == 0) {
 		return;
 	}
 
-	int activePartyCount = s_Rinfo->m_partyCount;
+	activePartyCount = s_Rinfo->m_partyCount;
 
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int modelIndex;
-	int lastKind = 0;
-	int i;
+	lastKind = 0;
 
 	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];

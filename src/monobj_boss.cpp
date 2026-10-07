@@ -13,7 +13,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void CGMonObj_ResetActionState(CGMonObj*);
 static const float kMonObjBossZero = 0.0f;
 extern const double kMonObjBossHalfF64 = 0.5;
 extern const double kMonObjBossThreeF64 = 3.0;
@@ -1600,7 +1599,7 @@ void CGMonObj::cancelStatFuncTetsukyojin()
 		return;
 	case 100:
 	case 0x67:
-		CGMonObj_ResetActionState(this);
+		moveCancel();
 		return;
 	default:
 		return;

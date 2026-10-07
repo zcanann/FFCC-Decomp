@@ -712,8 +712,7 @@ void CGMonObj::onCancelStat(int state)
 		break;
 
 	case 0x21:
-		CGMonObj::m_aiWork.m_state = 0;
-		m_moveWork.Clear();
+		moveCancel();
 		if ((m_moveWork.m_stateFlags & 2) == 0) {
 			(this->*m_funcs->moveCancel)();
 		}
@@ -2004,8 +2003,7 @@ void CGMonObj::isValidTarget()
 	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiData + 0x102);
 	if ((m_targetPartyIndex >= 0) &&
 	    ((aiFlags & 0x20) != 0)) {
-		CGMonObj::m_aiWork.m_state = 0;
-		m_moveWork.Clear();
+		moveCancel();
 		m_chaseState = 2;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
@@ -2014,8 +2012,7 @@ void CGMonObj::isValidTarget()
 
 	if (((aiFlags & 0x20) != 0) ||
 	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
-		CGMonObj::m_aiWork.m_state = 0;
-		m_moveWork.Clear();
+		moveCancel();
 		m_chaseState = 0;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
@@ -2060,8 +2057,7 @@ check_home:
 	if ((homeDist < kMonObjHomeSnapDistance) ||
 	    (m_chaseTimer == static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x1B8)))) {
 		m_homePosition = *reinterpret_cast<Vec*>(mon + 0x15C);
-		CGMonObj::m_aiWork.m_state = 0;
-		m_moveWork.Clear();
+		moveCancel();
 		m_chaseState = 0;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
@@ -2075,12 +2071,12 @@ check_home:
  * --INFO--
  * PAL Address: 0x801162B4
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80115614
+ * EN Size: 60b
+ * JP Address: 0x8011228C
+ * JP Size: 60b
  */
-void CGMonObj::resetWork()
+void CGMonObj::moveCancel()
 {
 	CGMonObj::m_aiWork.m_state = 0;
 	m_moveWork.Clear();
@@ -2113,8 +2109,7 @@ void CGMonObj::statAround()
 	}
 
 	targetPartyIndex = -1;
-	actionState = 0;
-	monObj->m_moveWork.Clear();
+	monObj->moveCancel();
 	monObj->m_chaseState = 3;
 	monObj->m_chaseTimer = 0;
 	monObj->m_chaseDirty = 1;
@@ -2134,8 +2129,7 @@ body:
 
 			int nextAction = monObj->mlAttackCheck(targetPartyIndex);
 			if (nextAction == -2) {
-				actionState = 0;
-				monObj->m_moveWork.Clear();
+				monObj->moveCancel();
 				monObj->m_chaseState = 0;
 				monObj->m_chaseTimer = 0;
 				monObj->m_chaseDirty = 1;
@@ -2156,8 +2150,7 @@ body:
 					unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
 					if (((reinterpret_cast<CMonWork*>(handle)->m_romWork[0x7F] & 8) != 0) ||
 						((aiFlags & 0x100) != 0)) {
-						actionState = 0;
-						monObj->m_moveWork.Clear();
+						monObj->moveCancel();
 						monObj->m_chaseState = 2;
 						monObj->m_chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -2185,8 +2178,7 @@ body:
 					if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 						(monObj->m_moveWork.m_frame >=
 						 static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)))) {
-						actionState = 0;
-						monObj->m_moveWork.Clear();
+						monObj->moveCancel();
 						monObj->m_chaseState = 3;
 						monObj->m_chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -2364,12 +2356,38 @@ void CGMonObj::mlEscape()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::moveCancel()
+inline void CGMonObj::resetWork()
 {
-	// TODO
+	m_targetPartyIndex = -1;
+	m_aiState = 0;
+	m_aiStatePrev = 0;
+	m_unk6C8 = 0;
+	m_unk6CC = 0;
+	m_actionBranch = 0;
+	m_unk6B8 = 0;
+	m_unk6B9 = 0;
+	m_unk6BA = 0;
+	m_unk6BC = 0;
+	m_unk6BD = 0;
+	m_unk6BE = 0;
+	m_attackDelay = 0;
+	m_aliveFrames = 0;
+	m_unk6BF = 0;
+	m_unk6C0 = 0;
+	m_unk6C2 = 0;
+	m_unk6C3 = 0;
+	m_chaseState = 0;
+	m_chaseTimer = 0;
+	m_chaseDirty = 0;
+	m_stepSeHandle = 0;
+	m_moveWork.Clear();
 }
 
 /*
@@ -2627,8 +2645,7 @@ void CGMonObj::statWatch()
 		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
 		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
 		if (homeRange <= homeDist) {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 3;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
@@ -2748,14 +2765,12 @@ void CGMonObj::statWatch()
 
 		int attackResult = monObj->mlAttackCheck(selectedTarget);
 		if (attackResult == -2) {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 0;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 		} else if (attackResult == -1) {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 2;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
@@ -2825,8 +2840,7 @@ void CGMonObj::statWatch()
 			monObj->m_chaseDirty = 1;
 		}
 		} else {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 3;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
@@ -2839,8 +2853,7 @@ void CGMonObj::statWatch()
 			(((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 			 (monObj->m_moveWork.m_frame >=
 			  static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC))))) {
-			actionState = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 			chaseState = 3;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
@@ -2879,8 +2892,7 @@ void CGMonObj::statMove(int* targetIndex)
 
 	case 0: {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			CGMonObj::m_aiWork.m_state = 0;
-			monObj->m_moveWork.Clear();
+			monObj->moveCancel();
 		}
 		if (*chaseTimer == 0) {
 			object->m_rotTargetY = object->m_homeRotY;
@@ -2955,8 +2967,7 @@ void CGMonObj::statMove(int* targetIndex)
 				CGMonObj_SetChaseMove(monObj, Game.m_partyObjArr[*targetPartyIdx], 0);
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 					(object->m_stateFlags0Bits.unk1 != 0)) {
-					CGMonObj::m_aiWork.m_state = 0;
-					monObj->m_moveWork.Clear();
+					monObj->moveCancel();
 					if (*targetPartyIdx >= 0) {
 						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));
 					}
@@ -2965,8 +2976,7 @@ void CGMonObj::statMove(int* targetIndex)
 					monObj->m_chaseDirty = 1;
 				}
 			} else {
-				CGMonObj::m_aiWork.m_state = 0;
-				monObj->m_moveWork.Clear();
+				monObj->moveCancel();
 				*chaseState = 0;
 				*chaseTimer = 0;
 				monObj->m_chaseDirty = 1;
@@ -3431,29 +3441,7 @@ void CGMonObj::setRepop(int mode)
 		void** repopHandle = object->m_scriptHandle;
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1C) =
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1A);
-		m_targetPartyIndex = -1;
-		m_aiState = 0;
-		m_aiStatePrev = 0;
-		m_unk6C8 = 0;
-		m_unk6CC = 0;
-		m_actionBranch = 0;
-		m_unk6B8 = 0;
-		m_unk6B9 = 0;
-		m_unk6BA = 0;
-		m_unk6BC = 0;
-		m_unk6BD = 0;
-		m_unk6BE = 0;
-		m_attackDelay = 0;
-		m_aliveFrames = 0;
-		m_unk6BF = 0;
-		m_unk6C0 = 0;
-		m_unk6C2 = 0;
-		m_unk6C3 = 0;
-		m_chaseState = 0;
-		m_chaseTimer = 0;
-		m_chaseDirty = 0;
-		m_stepSeHandle = 0;
-		m_moveWork.Clear();
+		resetWork();
 	}
 
 	enableAttackCol(0, 0, 0);

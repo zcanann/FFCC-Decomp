@@ -371,41 +371,6 @@ static inline void StoreCmakeVillageName()
     strcpy(Game.m_gameWork.m_townName, s_CmakeInfo.m_name);
 }
 
-static inline int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
-{
-    const char* nm = name;
-    int slot = 0;
-    int found = false;
-    for (; slot < 8; ++slot) {
-        if (slot == CmakeSlot(menu)) {
-            continue;
-        }
-        if (Game.m_caravanWorkArr[slot].m_shopState == 0) {
-            continue;
-        }
-#ifndef VERSION_GCCJGC
-        if (Game.m_caravanWorkArr[slot].m_caravanLocalFlags == 1) {
-            continue;
-        }
-#endif
-        if (strcmp(nm, reinterpret_cast<char*>(Game.m_caravanWorkArr[slot].m_name)) == 0) {
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        for (int i = 0; i < 0x100; ++i) {
-            if (strcmp(Game.m_cFlatDataArr[1].TableStrings(2)[i], name) == 0) {
-                found = true;
-                break;
-            }
-        }
-    }
-
-    return found;
-}
-
 /*
  * --INFO--
  * PAL Address: TODO
@@ -1974,8 +1939,7 @@ int CMenuPcs::CmakeNameCtrl()
                 CmakeState(this)->m_row = 5;
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
             } else if ((down & 0x100) != 0) {
-                short curRow = CmakeState(this)->m_row;
-                if (curRow >= 5) {
+                if (CmakeState(this)->m_row >= 5) {
                     if (GetCharaCnt(s_CmakeInfo.m_name) == 0) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                         return 0;
@@ -1993,7 +1957,27 @@ int CMenuPcs::CmakeNameCtrl()
                         return 0;
                     }
 
-                    if (IsDuplicateCmakeName(this, s_CmakeInfo.m_name)) {
+                    int i;
+                    int found = 0;
+                    for (i = 0; i < 8; i++) {
+                        if (i != CmakeSlot(this) && Game.m_caravanWorkArr[i].m_shopState != 0 &&
+#ifndef VERSION_GCCJGC
+                            Game.m_caravanWorkArr[i].m_caravanLocalFlags != 1 &&
+#endif
+                            strcmp(s_CmakeInfo.m_name, reinterpret_cast<char*>(Game.m_caravanWorkArr[i].m_name)) == 0) {
+                            found = 1;
+                            break;
+                        }
+                    }
+                    if (found == 0) {
+                        for (i = 0; i < 0x100; i++) {
+                            if (strcmp(Game.m_cFlatDataArr[1].TableStrings(2)[i], s_CmakeInfo.m_name) == 0) {
+                                found = 1;
+                                break;
+                            }
+                        }
+                    }
+                    if (found != 0) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                         short winX;
                         short winY;
@@ -2006,7 +1990,7 @@ int CMenuPcs::CmakeNameCtrl()
                         return 1;
                     }
                 } else {
-                    int ret = AddNameChara(1, CmakeState(this)->m_select, curRow, CmakeState(this)->m_table);
+                    int ret = AddNameChara(1, CmakeState(this)->m_select, CmakeState(this)->m_row, CmakeState(this)->m_table);
                     if (ret != 0) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                     } else {

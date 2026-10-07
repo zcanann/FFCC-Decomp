@@ -52,10 +52,6 @@ TRK_MINNOW_DOLPHIN/UDP_Stubs.c:
 base/PPCArch.c:
 	.text start:0x8017A3E4 end:0x8017A4F8
 
-dolphin/os/__ppc_eabi_init.cpp:
-	.init start:0x80003400 end:0x80003458
-	.text start:0x80180F00 end:0x80180F94
-
 TRK_MINNOW_DOLPHIN/mainloop.c:
 	.text start:0x801A7EE8 end:0x801A7FE0
 
@@ -2637,7 +2633,8 @@ pppFovAdjustMatrix.cpp:
 wmm_str.cpp:
 	.text start:0x80179E64 end:0x8017A3E4
 
-os/__ppc_eabi_init.c:
+dolphin/os/__ppc_eabi_init.cpp:
+	.init start:0x80003400 end:0x80003458
 	.text start:0x80180F00 end:0x80180F94
 
 exi/EXIBios.c:

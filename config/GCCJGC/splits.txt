@@ -49,10 +49,6 @@ amcstubs/AmcExi2Stubs.c:
 base/PPCArch.c:
 	.text start:0x80175A90 end:0x80175BA4
 
-dolphin/os/__ppc_eabi_init.cpp:
-	.init start:0x80003400 end:0x80003458
-	.text start:0x8017C5B0 end:0x8017C644
-
 TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:
 	.text start:0x801A9C78 end:0x801A9FF0
 
@@ -2501,7 +2497,8 @@ TRK_MINNOW_DOLPHIN/__exception.s:
 singmenu.cpp:
 	.text start:0x80141190 end:0x80145F34
 
-os/__ppc_eabi_init.c:
+dolphin/os/__ppc_eabi_init.cpp:
+	.init start:0x80003400 end:0x80003458
 	.text start:0x8017C5B0 end:0x8017C644
 
 exi/EXIBios.c:

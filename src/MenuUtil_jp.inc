@@ -86,30 +86,28 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
         font->SetPosX(56.0f);
         font->SetPosY(326.0f);
         if (item->m_equipFlags & 0x1000) {
-            if (item->m_attribute >= 1) {
-                if (item->m_attribute > 0x13) {
-                    return;
-                } else {
-                    strcpy(scratch, GetAttrStr(item->m_attribute));
-                    font->SetTlut(4);
-                    font->Draw(scratch);
-                    x += 10.0f + font->GetWidth(scratch);
-                    font->SetPosX(static_cast<float>(x));
-                    font->SetTlut(9);
-                    unsigned int attr = item->m_attribute;
-                    if (attr >= 1 && attr <= 8) {
-                        sprintf(scratch, "%s", "+1");
-                    } else if (attr == 0xB || attr == 0x11 || attr == 0x12) {
-                        sprintf(scratch, "%c%d", '+', item->m_value);
-                    } else if (static_cast<unsigned short>(attr - 9) <= 1 || attr == 0xC) {
-                        sprintf(scratch, "%c%d", '-', item->m_value);
-                        font->SetTlut(3);
-                    } else {
-                        return;
-                    }
-                    font->Draw(scratch);
-                }
+            if (item->m_attribute < 1 || item->m_attribute > 0x13) {
+                return;
             }
+
+            strcpy(scratch, GetAttrStr(item->m_attribute));
+            font->SetTlut(4);
+            font->Draw(scratch);
+            x += 10.0f + font->GetWidth(scratch);
+            font->SetPosX(static_cast<float>(x));
+            font->SetTlut(9);
+            unsigned int attr = item->m_attribute;
+            if (attr >= 1 && attr <= 8) {
+                sprintf(scratch, "%s", "+1");
+            } else if (attr == 0xB || attr == 0x11 || attr == 0x12) {
+                sprintf(scratch, "%c%d", '+', item->m_value);
+            } else if (static_cast<unsigned short>(attr - 9) <= 1 || attr == 0xC) {
+                sprintf(scratch, "%c%d", '-', item->m_value);
+                font->SetTlut(3);
+            } else {
+                return;
+            }
+            font->Draw(scratch);
         } else {
             font->Draw(scratch);
             x += 10.0f + font->GetWidth(scratch);

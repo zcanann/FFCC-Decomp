@@ -106,6 +106,20 @@ struct SingMenuSoloNameTable
 };
 
 extern char s_singmenu_cpp[];
+
+#ifdef VERSION_GCCJGC
+#define SINGMENU_LINE(line, jpLine) (jpLine)
+#define SINGMENU_TEX_ID(id) ((id) - 1)
+#else
+#define SINGMENU_LINE(line, jpLine) (line)
+#define SINGMENU_TEX_ID(id) (id)
+#endif
+
+static inline CMenuPcs::TEX SingMenuTex(int id)
+{
+    return static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(id));
+}
+
 extern "C" char s_singMenuTexturePathFmt[];
 extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;
@@ -1022,8 +1036,8 @@ void CMenuPcs::destroySingleMenu()
         m_fonts[4] = 0;
     }
 
-    freeTexture(4, 1, 0x20, 0xD);
-    freeTexture(5, 2, 0x2D, 0x33);
+    freeTexture(4, 1, SINGMENU_TEX_ID(0x20), 0xD);
+    freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
 
     m_stageF0 = 0;
     m_singleMenuInitialized = 0;
@@ -1068,14 +1082,14 @@ void CMenuPcs::destroySingleMenu()
  */
 void CMenuPcs::SingMenuInit()
 {
-    Graphic._WaitDrawDone(s_singmenu_cpp, 0x5C2);
+    Graphic._WaitDrawDone(s_singmenu_cpp, SINGMENU_LINE(0x5C2, 0x563));
     Graphic.DestroyTempBuffer();
 
     m_stageF4 = Graphic.GetTempStage();
     memset(&m_singleMenuTextureLoadIndex, 0, 8);
     m_wm.m_handles[0] = 0;
 
-    CCharaPcs::CHandle* handle = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5CD) CCharaPcs::CHandle;
+    CCharaPcs::CHandle* handle = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x5CD, 0x56E)) CCharaPcs::CHandle;
     m_wm.m_handles[0] = handle;
 
     CCharaPcs::CHandle** handlePtr = &m_wm.m_handles[0];
@@ -1090,7 +1104,7 @@ void CMenuPcs::SingMenuInit()
     (*handlePtr)->LoadAnim((char*)s_stand_80332a24, 0, 1, 0, (static_cast<unsigned int>((*handlePtr)->m_charaNo) / 100) * 100, -1, 0);
     (*handlePtr)->SetAnim(0, -1, -1, -1, 0);
 
-    m_wm.m_worldObjData = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) WmWorldObjInfo[1];
+    m_wm.m_worldObjData = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x5DD, 0x57E)) WmWorldObjInfo[1];
 
     float left = 440.0f;
     float top = 88.0f;
@@ -1125,13 +1139,13 @@ void CMenuPcs::SingMenuInit()
     m_wm.m_worldObjData->m_scissorWidth = 0x48;
     m_wm.m_worldObjData->m_scissorHeight = 0x58;
 
-    m_singleFadeState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x605) SingleFadeState;
+    m_singleFadeState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x605, 0x5A6)) SingleFadeState;
     memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-    m_singMenuState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x609) SingMenuState;
+    m_singMenuState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x609, 0x5AA)) SingMenuState;
     memset(m_singMenuState, 0, sizeof(SingMenuState));
 
-    m_menuWindowInfo = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x60D) MenuWindowInfo;
+    m_menuWindowInfo = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x60D, 0x5AE)) MenuWindowInfo;
     memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
     m_singleMenuPhase = 0;
@@ -1186,7 +1200,7 @@ static inline int LoadSingMenuTextureStep(CMenuPcs* menu)
             return 0;
         }
 
-        menu->m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
+        menu->m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, SINGMENU_LINE(0x748, 0x6E8)) CTextureSet;
 
         void* buffer = File.m_readBuffer;
         menu->m_textureSets[loadIndex + 5]->Create(buffer, Game.m_gameWork.m_menuStageMode != 0 ? menu->m_stageF4 : menu->m_menuStage, 0, 0, 0, 0);
@@ -1351,11 +1365,11 @@ static inline void DrawSingleBack(CMenuPcs* menu, float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+    MenuPcs.SetTexture(SingMenuTex(0x20));
     MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+    MenuPcs.SetTexture(SingMenuTex(0x28));
     int y;
     int step = 0x20;
     for (y = 0x40; y < 0x180; y += step) {
@@ -1379,7 +1393,7 @@ static inline void DrawSingleFrame(CMenuPcs* menu, float alpha)
     color.b = 0xFF;
     color.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+    MenuPcs.SetTexture(SingMenuTex(0x21));
     MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f), 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
     MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
 }
@@ -1413,7 +1427,7 @@ void CMenuPcs::drawSingleMenu()
 
         if ((gSingMenuHasScriptFoodBase != 0) && (m_singleFadeState->done != 0)) {
             Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-            Graphic._WaitDrawDone(s_singmenu_cpp, 0x62B);
+            Graphic._WaitDrawDone(s_singmenu_cpp, SINGMENU_LINE(0x62B, 0x5CC));
             m_singleMenuInitialized = 0;
 
             if (gSingMenuAsyncFileHandle != 0) {
@@ -1421,7 +1435,7 @@ void CMenuPcs::drawSingleMenu()
                 gSingMenuAsyncFileHandle = 0;
             }
 
-            freeTexture(5, 2, 0x2D, 0x33);
+            freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
 
             if (m_wm.m_handles[0] != 0) {
                 delete m_wm.m_handles[0];
@@ -1507,7 +1521,7 @@ void CMenuPcs::drawSingleMenu()
 
             if (m_singleFadeState->done != 0) {
                 Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-                Graphic._WaitDrawDone(s_singmenu_cpp, 0x62B);
+                Graphic._WaitDrawDone(s_singmenu_cpp, SINGMENU_LINE(0x62B, 0x5CC));
                 m_singleMenuInitialized = 0;
 
                 if (gSingMenuAsyncFileHandle != 0) {
@@ -1515,7 +1529,7 @@ void CMenuPcs::drawSingleMenu()
                     gSingMenuAsyncFileHandle = 0;
                 }
 
-                freeTexture(5, 2, 0x2D, 0x33);
+                freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
 
                 if (m_wm.m_handles[0] != 0) {
                     delete m_wm.m_handles[0];
@@ -1603,13 +1617,13 @@ void CMenuPcs::DrawSingleBase(float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+    MenuPcs.SetTexture(SingMenuTex(0x20));
     MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+    MenuPcs.SetTexture(SingMenuTex(0x28));
     int y;
     int sliceHeight = 32;
     y = 64;
@@ -1867,7 +1881,7 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+    MenuPcs.SetTexture(SingMenuTex(0x21));
     MenuPcs.DrawRect(0,
                                     -(176.0f * scaleX - 208.0f), 24.0f,
                                     176.0f, 288.0f,
@@ -2323,7 +2337,7 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
     color.a = static_cast<u8>(alphaInt);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+    MenuPcs.SetTexture(SingMenuTex(0x23));
     MenuPcs.DrawRect(0, 32.0f, 312.0f, 32.0f, 32.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(8, 576.0f, 312.0f, 32.0f, 32.0f, 0.0f,
@@ -2333,19 +2347,19 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
     MenuPcs.DrawRect(0xC, 576.0f, 384.0f, 32.0f, 32.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
+    MenuPcs.SetTexture(SingMenuTex(0x27));
     MenuPcs.DrawRect(0, 64.0f, 312.0f, 512.0f, 32.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 64.0f, 384.0f, 512.0f, 32.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
+    MenuPcs.SetTexture(SingMenuTex(0x24));
     MenuPcs.DrawRect(0, 32.0f, 344.0f, 32.0f, 40.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(8, 576.0f, 344.0f, 32.0f, 40.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+    MenuPcs.SetTexture(SingMenuTex(0x2B));
     MenuPcs.DrawRect(8, 64.0f, 344.0f, 512.0f, 40.0f, 0.0f,
                                     0.0f, 1.0f, 1.0f, 0.0f);
 }
@@ -2371,7 +2385,7 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x25));
+    MenuPcs.SetTexture(SingMenuTex(0x25));
     int icon;
     if (rawIcon != 0) {
         icon = iconNo;
@@ -2477,7 +2491,7 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
     color.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2E));
+    MenuPcs.SetTexture(SingMenuTex(0x2E));
     MenuPcs.DrawRect(0, 10.0f + x, y + z, 8.0f, 8.0f, 128.0f,
         280.0f, 1.0f, 1.0f, 0.0f);
 }
@@ -2546,7 +2560,7 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
     color.b = 0xFF;
     color.a = static_cast<u8>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2C));
+    MenuPcs.SetTexture(SingMenuTex(0x2C));
 
     MenuPcs.DrawRect(0, static_cast<float>(x),
         static_cast<float>(y), 24.0f, 24.0f, 0.0f, 0.0f,
@@ -2618,7 +2632,7 @@ void CMenuPcs::DrawSingWin(short mode)
     white.b = 0xFF;
     white.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, white);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
+    MenuPcs.SetTexture(SingMenuTex(0x3F));
     float x1 = x0 + w - 32.0f;
     float y1 = y0 + h - 32.0f;
     unsigned long uvFlag;
@@ -2641,7 +2655,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, x, y, 32.0f, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x41));
+    MenuPcs.SetTexture(SingMenuTex(0x41));
     double innerW = static_cast<double>(w) - 64.0;
     float innerX = 32.0f + x0;
     float yy = y0;
@@ -2655,7 +2669,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, innerX, yy, innerWf, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    MenuPcs.SetTexture(SingMenuTex(0x40));
     double innerH = static_cast<double>(h) - 64.0;
     float innerY = 32.0f + y0;
     float xx = x0;
@@ -2669,7 +2683,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, innerHf, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x42));
+    MenuPcs.SetTexture(SingMenuTex(0x42));
     MenuPcs.DrawRect(uvFlag, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH), 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuWindowInfo* win = m_menuWindowInfo;
@@ -3048,7 +3062,7 @@ int CMenuPcs::GetEquipType(int itemNo)
     } else {
         // BUG (original): equipType is returned uninitialized on this path.
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, 0xD3D, itemNo, flags);
+            System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, SINGMENU_LINE(0xD3D, 0xCAE), itemNo, flags);
         }
     }
 
@@ -3274,7 +3288,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
     color.a = static_cast<unsigned char>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x53));
+    MenuPcs.SetTexture(SingMenuTex(0x53));
     MenuPcs.DrawRect(0, static_cast<float>(x), static_cast<float>(y), 16.0f,
                                     24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
@@ -3282,7 +3296,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
                                     24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x54));
+    MenuPcs.SetTexture(SingMenuTex(0x54));
     MenuPcs.DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(y),
                                     80.0f, 24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);

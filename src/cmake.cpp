@@ -16,10 +16,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 static int s_OldMenu;
-extern "C" char s_menuSubfontPathFmt[];
-#ifndef VERSION_GCCJGC
-static const char s_cmake_cpp[] = "cmake.cpp";
-#endif
 
 struct CmakeInfo {
     char m_name[0x12];
@@ -275,39 +271,25 @@ static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
 #include "ffcc/cmake_jp.inc"
 static const char s_cmakeSubfontPath[] = "dvd/menu/subfont.fnt";
 static const char s_cmake_cpp[] = "cmake.cpp";
+#define CMAKE_SOURCE_NAME s_cmake_cpp
 #else
-extern "C" const char s_ABCDEFGHIJKL_801E2F30[];
-extern "C" const char s_MNOPQRSTUVWX_801E2F40[];
-extern "C" const char lbl_801E2F50[];
-extern "C" const char lbl_801E2F60[];
-extern "C" const char lbl_801E2F70[];
-extern "C" const char s_abcdefghijkl_801E2F80[];
-extern "C" const char s_mnopqrstuvwx_801E2F90[];
-extern "C" const char lbl_801E2FA0[];
-extern "C" const char lbl_801E2FB0[];
-extern "C" const char lbl_801E2FC0[];
-extern "C" const char s_str_0123456789_801E2FD0[];
-extern "C" const char lbl_801E2FE0[];
-extern "C" const char lbl_801E2FF0[];
-extern "C" const char lbl_801E3000[];
-extern "C" const char lbl_801E3010[];
-
+#define CMAKE_SOURCE_NAME "cmake.cpp"
 static const char* s_NameEntryStr[] = {
-    s_ABCDEFGHIJKL_801E2F30,
-    s_MNOPQRSTUVWX_801E2F40,
-    lbl_801E2F50,
-    lbl_801E2F60,
-    lbl_801E2F70,
-    s_abcdefghijkl_801E2F80,
-    s_mnopqrstuvwx_801E2F90,
-    lbl_801E2FA0,
-    lbl_801E2FB0,
-    lbl_801E2FC0,
-    s_str_0123456789_801E2FD0,
-    lbl_801E2FE0,
-    lbl_801E2FF0,
-    lbl_801E3000,
-    lbl_801E3010
+    "ABCDEFGHIJKL",
+    "MNOPQRSTUVWX",
+    "YZ \xC0\xC1\xC2\xC4\x8C\xC7\xC8\xC9\xCA",
+    "\xCB\xCC\xCD\xCE\xCF\xD1\xD2\xD3\xD4\xD6\xD9\xDA",
+    "\xDB\xDC\xDF         ",
+    "abcdefghijkl",
+    "mnopqrstuvwx",
+    "yz \xE0\xE1\xE2\xE4\x9C\xE7\xE8\xE9\xEA",
+    "\xEB\xEC\xED\xEE\xEF\xF1\xF2\xF3\xF4\xF6\xF9\xFA",
+    "\xFB\xFC\xDF         ",
+    "0123456789-#",
+    "!\xA1?\xBF%&\xB0\x22'()@",
+    "*,./:;<=>[]_",
+    "|\xAB\xBB\x82\x84       ",
+    "            "
 };
 
 #endif
@@ -3600,7 +3582,7 @@ void CMenuPcs::calcVillageMenu()
                 loadFont(2, const_cast<char*>(s_cmakeSubfontPath), 4, -1);
 #else
                 char path[128];
-                sprintf(path, s_menuSubfontPathFmt, Game.GetLangString());
+                sprintf(path, "dvd/%smenu/subfont.fnt", Game.GetLangString());
                 loadFont(2, path, 4, -1);
 #endif
             }
@@ -3616,7 +3598,7 @@ void CMenuPcs::calcVillageMenu()
 #else
             const int allocationLine = 0xCB3;
 #endif
-            villageWork = operator new(0x48, stage, const_cast<char*>(s_cmake_cpp), allocationLine);
+            villageWork = operator new(0x48, stage, const_cast<char*>(CMAKE_SOURCE_NAME), allocationLine);
             memset(villageWork, 0, 0x48);
             LoadCmakeVillageName();
             CmakeResult(this) = 1;

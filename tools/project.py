@@ -672,7 +672,21 @@ def generate_build_ninja(
     # MWCC
     mwcc = compiler_path / "mwcceppc.exe"
     mwcc_cmd = f"{wrapper_cmd}{mwcc} $cflags -MMD -c $in -o $basedir"
-    mwcc_implicit: List[Optional[Path]] = [compilers_implicit or mwcc, wrapper_implicit]
+    # Anything a pre-compile step produces (e.g. a derived compiler) is a real
+    # input to compilation: without this, editing it leaves stale objects.
+    pre_compile_outputs: List[Path] = []
+    if config.custom_build_steps:
+        for custom_step in config.custom_build_steps.get("pre-compile", []):
+            step_outputs = custom_step.get("outputs")
+            if isinstance(step_outputs, list):
+                pre_compile_outputs.extend(step_outputs)
+            elif step_outputs is not None:
+                pre_compile_outputs.append(step_outputs)
+    mwcc_implicit: List[Optional[Path]] = [
+        compilers_implicit or mwcc,
+        wrapper_implicit,
+        *pre_compile_outputs,
+    ]
 
     # MWCC with UTF-8 to Shift JIS wrapper
     mwcc_sjis_cmd = f"{wrapper_cmd}{sjiswrap} {mwcc} $cflags -MMD -c $in -o $basedir"

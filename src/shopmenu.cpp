@@ -37,25 +37,81 @@ extern char s_shopmenu_cpp[];
 #endif
 extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
+#ifdef VERSION_GCCJGC
+static const unsigned int gShopMenuAmbientWhite = 0xFFFFFFFF;
+static const unsigned int gShopMenuMaterialWhiteBase = 0xFFFFFFFF;
+static const unsigned int DAT_80332D04 = 0xFFFFFFFF;
+static const unsigned int DAT_80332D08 = 0xFFFFFFFF;
+static const unsigned int DAT_80332D0C = 0xFFFFFFFF;
+static const float FLOAT_80332D10 = -4.0f;
+static const double DOUBLE_80332D20 = 4503601774854144.0;
+static const float FLOAT_80332d28 = 1.0f;
+static const float FLOAT_80332d2c = 0.8f;
+static const float FLOAT_80332d34 = -5.0f;
+static const float FLOAT_80332d3c = 264.0f;
+static const float FLOAT_80332d54 = 100.0f;
+static const float FLOAT_80332d58 = 104.0f;
+static const float FLOAT_80332d5c = 8.0f;
+static const float FLOAT_80332d60 = 0.25f;
+static const float FLOAT_80332d64 = -6.0f;
+static const float FLOAT_80332d68 = 136.0f;
+static const float FLOAT_80332d6c = 172.0f;
+static const float FLOAT_80332d70 = 259.0f;
+static const float FLOAT_80332d74 = 18.0f;
+static const float FLOAT_80332d78 = 0.5f;
+static const float FLOAT_80332d7c = 352.0f;
+static const float FLOAT_80332d80 = 300.0f;
+static const float FLOAT_80332d88 = 340.0f;
+static const float FLOAT_80332d8c = 1.5f;
+static const float FLOAT_80332d90 = 336.0f;
+static const float FLOAT_80332d94 = 558.0f;
+static const float FLOAT_80332d98 = 348.0f;
+static const float FLOAT_80332D9C = 0.0f;
+static const float FLOAT_80332DC8 = 0.7f;
+static const float FLOAT_80332DCC = 0.4f;
+static const float FLOAT_80332DD0 = -0.5f;
+static const float FLOAT_80332DD4 = 88.0f;
+static const float FLOAT_80332DD8 = 308.0f;
+static const float FLOAT_80332DDC = 332.0f;
+static const float FLOAT_80332DE0 = 255.0f;
+static const float FLOAT_80332DE4 = 320.0f;
+static const float FLOAT_80332DE8 = 224.0f;
+static const float FLOAT_80332DEC = 448.0f;
+static const float FLOAT_80332DF0 = 640.0f;
+static const float FLOAT_80332DF4 = -640.0f;
+static const float FLOAT_80332DF8 = -448.0f;
+static const float FLOAT_80332DFC = 1279.0f;
+static const float FLOAT_80332E00 = 895.0f;
+static const float FLOAT_80332E04 = 70.0f;
+static const float FLOAT_80332E08 = 316.0f;
+static const float FLOAT_80332E0C = 54.0f;
+static const float FLOAT_80332E10 = -2.0f;
+static const float FLOAT_80332E14 = 312.0f;
+static const float FLOAT_80332E18 = 180.0f;
+static const float FLOAT_80332E1C = 520.0f;
+static const float FLOAT_80332E20 = 192.0f;
+static const float FLOAT_80332E24 = 144.0f;
+static const float FLOAT_80332E28 = 96.0f;
+static const float FLOAT_80332E2C = 344.0f;
+static const float FLOAT_80332E30 = 200.0f;
+static const float FLOAT_80332E34 = 260.0f;
+static const float FLOAT_80332E38 = 36.0f;
+static const float FLOAT_80332E3C = 384.0f;
+static const float FLOAT_80332E44 = 356.0f;
+static const float FLOAT_80332e48 = 40.0f;
+static const float FLOAT_80332e4c = 250.0f;
+#else
 extern const unsigned int gShopMenuAmbientWhite;
 extern const unsigned int gShopMenuMaterialWhiteBase;
 extern const unsigned int DAT_80332D04;
 extern const unsigned int DAT_80332D08;
 extern const unsigned int DAT_80332D0C;
 extern const float FLOAT_80332D10;
-extern const char s_DecimalFormat_80332d14[];
-extern const char s_TwoDigitFormat_80332d18[];
 extern const double DOUBLE_80332D20;
 extern const float FLOAT_80332d28;
 extern const float FLOAT_80332d2c;
-extern const char s_Colon_80332d30[];
 extern const float FLOAT_80332d34;
-extern const char s_PlusOne_80332d38[];
 extern const float FLOAT_80332d3c;
-extern const char s_StringFormat_80332d40[];
-extern const char s_StringDecimalFormat_80332d44[];
-extern const char s_Plus_80332d4c[];
-extern const char s_Minus_80332d50[];
 extern const float FLOAT_80332d54;
 extern const float FLOAT_80332d58;
 extern const float FLOAT_80332d5c;
@@ -68,7 +124,6 @@ extern const float FLOAT_80332d74;
 extern const float FLOAT_80332d78;
 extern const float FLOAT_80332d7c;
 extern const float FLOAT_80332d80;
-extern const char s_Slash_80332d84[];
 extern const float FLOAT_80332d88;
 extern const float FLOAT_80332d8c;
 extern const float FLOAT_80332d90;
@@ -105,10 +160,20 @@ extern const float FLOAT_80332E30;
 extern const float FLOAT_80332E34;
 extern const float FLOAT_80332E38;
 extern const float FLOAT_80332E3C;
-extern const char lbl_80332E40[];
 extern const float FLOAT_80332E44;
 extern const float FLOAT_80332e48;
 extern const float FLOAT_80332e4c;
+#endif
+extern const char s_DecimalFormat_80332d14[];
+extern const char s_TwoDigitFormat_80332d18[];
+extern const char s_Colon_80332d30[];
+extern const char s_PlusOne_80332d38[];
+extern const char s_StringFormat_80332d40[];
+extern const char s_StringDecimalFormat_80332d44[];
+extern const char s_Plus_80332d4c[];
+extern const char s_Minus_80332d50[];
+extern const char s_Slash_80332d84[];
+extern const char lbl_80332E40[];
 extern const float FLOAT_80332E50;
 extern const char s_shop_80332e54[];
 extern char s_Blacksmith_801DEB38[];
@@ -153,6 +218,7 @@ extern char s_No_puedes_comprar_801DED44[];
 extern char s_No_vendible_801DED58[];
 extern char s_Cantidad_801DED68[];
 extern char lbl_801DED74[];
+#ifndef VERSION_GCCJGC
 const char lbl_80332B40[] = "Buy";
 const char lbl_80332B44[] = "Sell";
 const char lbl_80332B4C[] = "Cancel";
@@ -329,6 +395,7 @@ extern "C" char* g_strShopMenuMes[105] = {
     (char*)lbl_80332B9C,
     lbl_801DED74,
 };
+#endif
 
 STATIC_ASSERT(offsetof(CShopMenu, m_mode) == 0x4);
 STATIC_ASSERT(offsetof(CShopMenu, m_subMode) == 0x10);
@@ -1094,7 +1161,11 @@ inline void CShopMenu::Init(int mode)
     m_unk00 = nullptr;
     m_caravanWork = Game.m_scriptFoodBase[0];
     SetMode(mode);
+#ifdef VERSION_GCCJGC
+    m_pdtSlot = PartPcs.LoadMenuPdt("shop");
+#else
     m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
+#endif
 
     slot = &PartMng.m_pdtSlots[m_pdtSlot];
     cacheChunks = slot->m_pppDataHead->m_cacheChunks;
@@ -3406,6 +3477,7 @@ inline void CShopMenu::setFaceAlpha(int, int alpha)
     m_faceAlpha = alpha;
 }
 
+#ifndef VERSION_GCCJGC
 extern const unsigned int gShopMenuAmbientWhite = 0xFFFFFFFF;
 extern const unsigned int gShopMenuMaterialWhiteBase = 0xFFFFFFFF;
 extern const unsigned int DAT_80332D04 = 0xFFFFFFFF;
@@ -3473,4 +3545,5 @@ extern const float FLOAT_80332E3C = 384.0f;
 extern const float FLOAT_80332E44 = 356.0f;
 extern const float FLOAT_80332e48 = 40.0f;
 extern const float FLOAT_80332e4c = 250.0f;
+#endif
 extern const float FLOAT_80332E50 = 0.125f;

@@ -9761,18 +9761,16 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 		u1 = tx + halfTexel;
 		u0 = (tx + w) - halfTexel;
 	} else {
-		u0 = tx;
-		u0 += halfTexel;
 		u1 = (tx + w) - halfTexel;
+		u0 = tx + halfTexel;
 	}
 
 	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
 		v0 = (v1 + h) - halfTexel;
 	} else {
-		v0 = ty;
-		v0 += halfTexel;
 		v1 = (ty + h) - halfTexel;
+		v0 = ty + halfTexel;
 	}
 
 	float wS = w * scaleX;
@@ -9845,24 +9843,24 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 
 #define halfTexel FLOAT_80331434
 	float u1;
-	float u0;
 	float v1;
+	float u0;
 	float v0;
 
 	if ((flags & 8) != 0) {
 		u1 = tx + halfTexel;
 		u0 = (tx + w) - halfTexel;
 	} else {
-		u0 = tx + halfTexel;
 		u1 = (tx + w) - halfTexel;
+		u0 = tx + halfTexel;
 	}
 
 	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
-		v0 = (ty + h) - halfTexel;
+		v0 = (v1 + h) - halfTexel;
 	} else {
-		v0 = ty + halfTexel;
 		v1 = (ty + h) - halfTexel;
+		v0 = ty + halfTexel;
 	}
 
 	float wS = w * scaleX;

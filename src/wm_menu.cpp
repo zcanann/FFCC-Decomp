@@ -3055,7 +3055,7 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		CalcGoOutCharaSelect(slot);
 	}
 
-	const short menuAnim = m_wmWorldState->m_mainState;
+	short menuAnim = m_wmWorldState->m_mainState;
 	int offset;
 	if (menuAnim == 0) {
 		offset = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
@@ -10479,23 +10479,26 @@ int CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
  */
 inline int CMenuPcs::IsAsyncCharaLoadFinish()
 {
-	int validCount = 0;
+	int i;
+	int loadedCount;
+	int validCount;
+	validCount = 0;
 	if (m_cmakeWorkActive == 1) {
-		for (int ci = 0; ci < kWmMenuPlayerCount; ci++) {
-			if (m_cmakeWork->m_characters[ci].m_exists != 0) {
+		for (i = 0; i < kWmMenuPlayerCount; i++) {
+			if (m_cmakeWork->m_characters[i].m_exists != 0) {
 				validCount++;
 			}
 		}
 	} else {
-		for (int ci = 0; ci < kWmMenuPlayerCount; ci++) {
-			if (Game.m_caravanWorkArr[ci].m_shopState != 0) {
+		for (i = 0; i < kWmMenuPlayerCount; i++) {
+			if (Game.m_caravanWorkArr[i].m_shopState != 0) {
 				validCount++;
 			}
 		}
 	}
 
-	int loadedCount = 0;
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+	loadedCount = 0;
+	for (i = 0; i < kWmMenuPlayerCount; i++) {
 		const int handleIdx = i + 0x20;
 		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
 		if (handle->m_charaKind != 3 && handle->IsLoadModelASyncCompleted() != 0) {

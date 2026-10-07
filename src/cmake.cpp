@@ -3022,21 +3022,19 @@ void CMenuPcs::CmakeResultDraw()
 #ifndef VERSION_GCCJGC
     float labelWidths[4];
 #endif
-    int labelY = 0x70;
     for (int i = 0; i < 4; i++) {
-        const char* label = GetMenuStr(i + 0x2A);
+        const char* txt = GetMenuStr(0x2A + i);
 
 #ifndef VERSION_GCCJGC
-        labelWidths[i] = 232.0f + labelFont->GetWidth(label);
+        labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
 #endif
         labelFont->SetPosX(232.0f);
 #ifdef VERSION_GCCJGC
-        labelFont->SetPosY(static_cast<float>(labelY));
+        labelFont->SetPosY(0x70 + i * 0x28);
 #else
-        labelFont->SetPosY(static_cast<float>(labelY) - 4.0f);
+        labelFont->SetPosY(0x70 + i * 0x28 - 4.0f);
 #endif
-        labelFont->Draw(label);
-        labelY += 0x28;
+        labelFont->Draw(txt);
     }
 
     CFont* valueFont = GetFont22();

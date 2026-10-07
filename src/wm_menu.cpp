@@ -8591,50 +8591,41 @@ void CMenuPcs::DrawMainMenuSub()
 	Mtx modelMtx;
 	Mtx44 screenMtx;
 	GXColor white;
-	float depthValues[5];
 	unsigned int drawOrder[5];
+	float depthValues[5];
 
 	SetProjection(23);
 	CameraPcs.GetProjectionMatrix(screenMtx);
 
-	const float zSub = FLOAT_80331598;
-	const Vec* posPtr = s_MMenuPos;
-	const double scaleX = DOUBLE_803315A0;
-	const double one = DOUBLE_80331420;
-	const double scaleY = DOUBLE_803315A8;
-	const float subX = FLOAT_803315B0;
-	const float subY = FLOAT_803315B4;
-	const float zero = FLOAT_803313dc;
 	for (i = 0; i < 5; i++) {
 		Vec viewPos;
 		Vec4d clipPos;
-		viewPos.x = posPtr->x;
-		viewPos.z = posPtr->z;
-		viewPos.y = posPtr->y;
-		viewPos.z = viewPos.z - zSub;
+		viewPos.x = s_MMenuPos[i].x;
+		viewPos.z = s_MMenuPos[i].z;
+		viewPos.y = s_MMenuPos[i].y;
+		viewPos.z = viewPos.z - FLOAT_80331598;
 		Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
-		posPtr++;
 
 		clipPos.x = clipPos.x / clipPos.w;
 		clipPos.y = clipPos.y / clipPos.w;
 		double negY = -static_cast<double>(clipPos.y);
-		clipPos.x = static_cast<float>(scaleX * (one + static_cast<double>(clipPos.x)));
-		clipPos.y = static_cast<float>(scaleY * (one + negY));
+		clipPos.x = static_cast<float>(DOUBLE_803315A0 * (DOUBLE_80331420 + static_cast<double>(clipPos.x)));
+		clipPos.y = static_cast<float>(DOUBLE_803315A8 * (DOUBLE_80331420 + negY));
 		m_wm.m_worldObjData[i].m_viewportX =
-		    static_cast<short>(static_cast<int>(clipPos.x - subX));
+		    static_cast<short>(static_cast<int>(clipPos.x - FLOAT_803315B0));
 		m_wm.m_worldObjData[i].m_viewportY =
-		    static_cast<short>(static_cast<int>(clipPos.y - subY));
+		    static_cast<short>(static_cast<int>(clipPos.y - FLOAT_803315B4));
 		m_wm.m_worldObjData[i].m_viewportWidth = 0x280;
 		m_wm.m_worldObjData[i].m_viewportHeight = 0x1C0;
-		m_wm.m_worldObjData[i].m_cameraPosition.x = zero;
-		m_wm.m_worldObjData[i].m_cameraPosition.y = zero;
-		m_wm.m_worldObjData[i].m_cameraPosition.z = zSub;
+		m_wm.m_worldObjData[i].m_cameraPosition.x = FLOAT_803313dc;
+		m_wm.m_worldObjData[i].m_cameraPosition.y = FLOAT_803313dc;
+		m_wm.m_worldObjData[i].m_cameraPosition.z = FLOAT_80331598;
 	}
 
 	for (i = 0; i < 5; i++) {
 		m_wm.m_handles[i]->m_model->GetMatrix(modelMtx);
-		drawOrder[i] = i;
 		depthValues[i] = modelMtx[2][3];
+		drawOrder[i] = i;
 	}
 
 	for (i = 0; i < 5; i++) {

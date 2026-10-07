@@ -113,9 +113,22 @@ static inline int CGMonObj_SearchNoticeParty(CGMonObj* monObj)
 static inline void CGMonObj_PlayNoticeSe(CGMonObj* monObj)
 {
 	void** scriptHandle = monObj->m_scriptHandle;
-	int rand = Math.Rand(3);
+	int se = Math.Rand(3);
 	unsigned short* romWork = reinterpret_cast<unsigned short*>(scriptHandle[9]);
-	monObj->playSe3D(romWork[0xC9] + (romWork[0xC8] * 1000 + rand), 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+	se += romWork[0xC8] * 1000 + romWork[0xC9];
+	monObj->playSe3D(se, 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+}
+
+static inline void CGMonObj_MoveToTarget(CGMonObj* monObj, float speedScale)
+{
+	monObj->moveVector(CVector(monObj->m_worldPosition) - CVector(reinterpret_cast<CGObject*>(Game.m_partyObjArr[monObj->m_targetPartyIndex])->m_worldPosition), speedScale, 1);
+}
+
+static inline void CGMonObj_ChaseTarget(CGMonObj* monObj)
+{
+	float speedScale = monObj->m_pushScale *
+		(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(monObj->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
+	CGMonObj_MoveToTarget(monObj, speedScale);
 }
 
 static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
@@ -883,9 +896,7 @@ void CGMonObj::onFrameStat()
 
 
 	case 0x1E: {
-		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
-		object->moveVector(CVector(object->m_worldPosition) - CVector(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition), speedScale, 1);
+		CGMonObj_ChaseTarget(this);
 
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		float reachDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
@@ -1291,13 +1302,11 @@ void CGMonObj::enableDamageCol(int enabled)
  */
 int CGMonObj::getReplaceStat(int state)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
 	switch (state) {
 	case 0:
 	case 3:
 	case 0x1C:
-		if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == state) {
+		if (m_lastStateId == state) {
 			state = -1;
 		}
 		break;
@@ -1312,10 +1321,11 @@ int CGMonObj::getReplaceStat(int state)
 	case -6:
 	case -5:
 		{
-			unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
-			SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
-			unsigned short actionType = rows[action].m_actionType;
-			switch (actionType) {
+			CMonWork* work = reinterpret_cast<CMonWork*>(m_scriptHandle);
+			int index = state + 0xE;
+			int action = work->m_actionItems[index];
+			const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+			switch (items[action].m_actionType) {
 			case 0:
 			case 1:
 				state = 1;

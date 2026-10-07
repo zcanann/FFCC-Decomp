@@ -1174,6 +1174,9 @@ game.cpp:
 p_chara_viewer.cpp:
 	.rodata start:0x801D5318 end:0x801D54A0
 	.text start:0x800BB280 end:0x800BD02C
+	.bss start:0x8030DEF0 end:0x8030DF18
+	.sbss start:0x8034BBB8 end:0x8034BBD8
+	.sdata2 start:0x8034D908 end:0x8034D988
 
 FunnyShape.cpp:
 	.text start:0x8004FD98 end:0x800517A8

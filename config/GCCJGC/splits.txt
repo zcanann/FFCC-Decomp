@@ -2334,7 +2334,10 @@ p_system.cpp:
 	.text start:0x800475D4 end:0x80047728
 
 mapshadow.cpp:
+	extab start:0x80006B3C end:0x80006B54
+	extabindex start:0x8000C6F4 end:0x8000C718
 	.text start:0x8004BF74 end:0x8004C264
+	.sdata2 start:0x8034CA38 end:0x8034CA58
 
 pppAccele.cpp:
 	.text start:0x8005EF60 end:0x8005F020
@@ -2436,6 +2439,9 @@ menu.cpp:
 	extab start:0x80007E00 end:0x80007E28
 	extabindex start:0x8000E164 end:0x8000E1A0
 	.text start:0x80099580 end:0x800996B0
+	.data start:0x8022CB80 end:0x8022CBB0
+	.sdata start:0x8034B5D8 end:0x8034B5E8
+	.sdata2 start:0x8034D5E0 end:0x8034D5F0
 
 pppYmMoveCircle.cpp:
 	.text start:0x800CE9BC end:0x800CED1C
@@ -2462,7 +2468,13 @@ pppYmCheckBGHeight.cpp:
 	.text start:0x800D5F08 end:0x800D6068
 
 quadobj.cpp:
+	extab start:0x8000924C end:0x80009254
+	extabindex start:0x8000FF4C end:0x8000FF58
 	.text start:0x8010731C end:0x801076D8
+	.rodata start:0x801D7C58 end:0x801D7C88
+	.data start:0x8022EAE8 end:0x8022EB38
+	.sdata start:0x8034B710 end:0x8034B728
+	.sdata2 start:0x8034E5F0 end:0x8034E5FC
 
 p_mc.cpp:
 	.text start:0x80120854 end:0x80120A24
@@ -2490,6 +2502,7 @@ pppFovAdjustMatrix.cpp:
 
 dolphin/os/__start.c:
 	.init start:0x80003100 end:0x80003400
+	.sbss start:0x8034BDC0 end:0x8034BDC8
 
 TRK_MINNOW_DOLPHIN/__exception.s:
 	.init start:0x800034AC end:0x800053E0
@@ -2503,6 +2516,10 @@ dolphin/os/__ppc_eabi_init.cpp:
 
 exi/EXIBios.c:
 	.text start:0x8017C644 end:0x8017E020
+	.data start:0x80232A68 end:0x80232B78
+	.bss start:0x80327F90 end:0x80328050
+	.sdata start:0x8034B8A0 end:0x8034B8A8
+	.sbss start:0x8034BDC8 end:0x8034BDD0
 
 main.cpp:
 	.text start:0x80019964 end:0x80019AE8
@@ -2510,3 +2527,8 @@ main.cpp:
 TRK_MINNOW_DOLPHIN/main_TRK.c:
 	.text start:0x801A9FF0 end:0x801AA034
 	.bss start:0x80345FB0 end:0x80345FB4
+
+pppfunctbl.cpp:
+	.rodata start:0x801D3088 end:0x801D3A40
+	.data start:0x801DF218 end:0x801E0D6C
+	.sdata2 start:0x8034CE50 end:0x8034CE60

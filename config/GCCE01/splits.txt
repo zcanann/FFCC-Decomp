@@ -2548,7 +2548,10 @@ p_system.cpp:
 	.sbss start:0x8032DCE8 end:0x8032DCEC
 
 mapshadow.cpp:
+	extab start:0x80006A9C end:0x80006AB4
+	extabindex start:0x8000C6F4 end:0x8000C718
 	.text start:0x8004C510 end:0x8004C7FC
+	.sdata2 start:0x8032ECA8 end:0x8032ECC8
 
 pppRandCV.cpp:
 	.text start:0x800609A4 end:0x80060BC0
@@ -2608,7 +2611,13 @@ p_sound.cpp:
 	.sbss start:0x8032DDC0 end:0x8032DDC4
 
 quadobj.cpp:
+	extab start:0x800091D4 end:0x800091DC
+	extabindex start:0x8000FF88 end:0x8000FF94
 	.text start:0x8010A61C end:0x8010A9D8
+	.rodata start:0x801DB400 end:0x801DB430
+	.data start:0x802101A8 end:0x802101F8
+	.sdata start:0x8032D910 end:0x8032D928
+	.sdata2 start:0x803308F8 end:0x80330904
 
 p_mc.cpp:
 	extab start:0x800095EC end:0x800095FC
@@ -2639,9 +2648,14 @@ dolphin/os/__ppc_eabi_init.cpp:
 
 exi/EXIBios.c:
 	.text start:0x80180F94 end:0x80182970
+	.data start:0x80216030 end:0x80216140
+	.bss start:0x8030B670 end:0x8030B730
+	.sdata start:0x8032DA98 end:0x8032DAA0
+	.sbss start:0x8032DFC8 end:0x8032DFD0
 
 dolphin/os/__start.c:
 	.init start:0x80003100 end:0x80003400
+	.sbss start:0x8032DFC0 end:0x8032DFC8
 
 TRK_MINNOW_DOLPHIN/__exception.s:
 	.init start:0x800034AC end:0x800053E0

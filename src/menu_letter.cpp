@@ -1186,8 +1186,13 @@ void CMenuPcs::LetterMessDraw()
 
 	SingleFadeState* animState = m_singleFadeState;
 	CFont* font = m_fonts[0];
+#ifdef VERSION_GCCJGC
+	font->SetMargin(FLOAT_8033313c);
+	font->SetShadow(0);
+#else
 	font->SetShadow(0);
 	font->SetMargin(FLOAT_8033313c);
+#endif
 	font->SetScale(FLOAT_80333140);
 	font->DrawInit();
 	font->SetTlut(0x1C);
@@ -1195,8 +1200,13 @@ void CMenuPcs::LetterMessDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * animState->entries[0].alpha)).color);
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
+#ifdef VERSION_GCCJGC
+	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x49B) char[kLetterTextScratchSize];
+	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x49D) char[kLetterTextScratchSize];
+#else
 	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[kLetterTextScratchSize];
 	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
+#endif
 
 	memset(srcText, 0, kLetterTextScratchSize);
 	memset(workText, 0, kLetterTextScratchSize);
@@ -1206,10 +1216,11 @@ void CMenuPcs::LetterMessDraw()
 	strcpy(srcText, Game.GetLetter((msgIndex & 0x7FC) >> 2));
 #ifdef VERSION_GCCJGC
 	CMes::MakeAgbString(workText, srcText);
+	int y = 0x60;
 #else
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
-#endif
 	int y = 0x58;
+#endif
 
 	int i = 0;
 	char* curLine = workText;

@@ -11,7 +11,9 @@ static DSError TRK_mainError;
 
 /* 80371B9C-80371BF4 36C4DC 0058+00 0/0 2/2 0/0 .text            TRK_main */
 DSError TRK_main(void) {
+#ifndef VERSION_GCCJGC
     MWTRACE(1, "TRK_Main \n");
+#endif
     TRK_mainError = TRKInitializeNub();
 
     if (TRK_mainError == DS_NoError) {

@@ -2508,3 +2508,7 @@ exi/EXIBios.c:
 
 main.cpp:
 	.text start:0x80019964 end:0x80019AE8
+
+TRK_MINNOW_DOLPHIN/main_TRK.c:
+	.text start:0x801A9FF0 end:0x801AA034
+	.bss start:0x80345FB0 end:0x80345FB4

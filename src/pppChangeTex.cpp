@@ -92,36 +92,36 @@ void pppRenderChangeTex(pppChangeTex*, ChangeTexStep* step, _pppCtrlTable*)
  */
 void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTable* data)
 {
+	int dlIdx;
+	CChara::CModel* model1;
+	CCharaPcs::CHandle* handle1;
+	GXColor** colorArray;
 	ChangeTexWork* work;
 	VColor* colorBlock;
-	CCharaPcs::CHandle* handle0;
-	CChara::CModel* model0;
-	CCharaPcs::CHandle* handle1;
-	CCharaPcs::CHandle* handle2;
-	CChara::CModel* model1;
-	CChara::CModel* model2;
-	CTexture* texture;
-	GXColor** colorArray;
-	unsigned int meshIdx;
 	ChangeTexMeshRef* meshList;
-	ChangeTexMeshData* meshData;
+	CChara::CModel* model0;
 	ChangeTexDisplayList* dlInfo;
-	ChangeTexDisplayListCopy** dlEntry;
-	int dlIdx;
-	ChangeTexDisplayListCopy* dlPair;
-	float currentValue;
-	short splitY;
-	double alphaBase;
-	GXColor* colors;
-	unsigned int vertCount;
 	unsigned int v;
+	CCharaPcs::CHandle* handle2;
+	unsigned int meshIdx;
+	ChangeTexDisplayListCopy* dlPair;
+	unsigned int vertCount;
+	float currentValue;
+	double alphaBase;
+	ChangeTexDisplayListCopy** dlEntry;
+	ChangeTexMeshData* meshData;
+	short splitY;
+	CCharaPcs::CHandle* handle0;
+	CChara::CModel* model2;
+	GXColor* colors;
+	CTexture* texture;
 
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
 
-	work = GetChangeTexWork(changeTex, data);
-	colorBlock = GetChangeTexColorBlock(changeTex, data);
+	work = reinterpret_cast<ChangeTexWork*>(changeTex->m_workArea + data->m_serializedDataOffsets[2]);
+	colorBlock = reinterpret_cast<VColor*>(changeTex->m_workArea + data->m_serializedDataOffsets[1]);
 	handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	model0 = GetCharaModelPtr(handle0);
 

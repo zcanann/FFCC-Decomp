@@ -92,16 +92,21 @@ void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, _pppCtrlTab
  */
 void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, _pppCtrlTable* data)
 {
-	CCharaPcs::CHandle* handle0;
-	CCharaPcs::CHandle* handle1;
-	CCharaPcs::CHandle* handle2;
-	CChara::CModel* model0;
+	int dlIdx;
 	CChara::CModel* model;
-	CTexture* texture;
-	ChangeTexMeshRef* meshList;
-	ChangeTexMeshRef* curMesh;
-	Mtx modelMtx;
+	CCharaPcs::CHandle* handle1;
+	GXColor** meshColorArrays;
 	pppYmChangeTexState* state;
+	ChangeTexMeshRef* meshList;
+	CChara::CModel* model0;
+	ChangeTexDisplayList* dlInfo;
+	CCharaPcs::CHandle* handle2;
+	unsigned int meshIdx;
+	ChangeTexDisplayListCopy* dlPair;
+	ChangeTexDisplayListCopy** dlEntry;
+	CCharaPcs::CHandle* handle0;
+	CTexture* texture;
+	Mtx modelMtx;
 	int cutoffYFixed;
 	short cutoffY;
 	u8 negativeRamp;
@@ -111,7 +116,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		return;
 	}
 
-	state = GetChangeTexState(ymChangeTex, data);
+	state = reinterpret_cast<pppYmChangeTexState*>(ymChangeTex->m_workArea + data->m_serializedDataOffsets[2]);
 	handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	model0 = GetCharaModelPtr(handle0);
 
@@ -157,17 +162,17 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		    model0->GetRefData()->m_meshCount << 2, ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppYmChangeTex_cpp), 0x160);
 
-		GXColor** meshColorArrays = state->m_meshColorArrays;
-		for (unsigned int meshIdx = 0; meshIdx < model0->GetRefData()->m_meshCount; meshIdx++) {
+		meshColorArrays = state->m_meshColorArrays;
+		for (meshIdx = 0; meshIdx < model0->GetRefData()->m_meshCount; meshIdx++, meshList++) {
 			state->m_displayListArrays[meshIdx] = static_cast<ChangeTexDisplayListCopy**>(
 			    pppMemAlloc(meshList->m_data->m_displayListCount * sizeof(ChangeTexDisplayListCopy*),
 			                ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x168));
 
-			int dlIdx = meshList->m_data->m_displayListCount - 1;
-			ChangeTexDisplayList* dlInfo = meshList->m_data->m_displayLists;
-			ChangeTexDisplayListCopy** dlEntry = &state->m_displayListArrays[meshIdx][dlIdx];
+			dlIdx = meshList->m_data->m_displayListCount - 1;
+			dlInfo = meshList->m_data->m_displayLists;
+			dlEntry = &state->m_displayListArrays[meshIdx][dlIdx];
 			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 1) {
-				ChangeTexDisplayListCopy* dlPair = static_cast<ChangeTexDisplayListCopy*>(
+				dlPair = static_cast<ChangeTexDisplayListCopy*>(
 				    pppMemAlloc(sizeof(ChangeTexDisplayListCopy), ppvEnv->m_stagePtr,
 				                const_cast<char*>(s_pppYmChangeTex_cpp), 0x172));
 				*dlEntry = dlPair;
@@ -185,11 +190,10 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			                const_cast<char*>(s_pppYmChangeTex_cpp), 0x17F));
 			memset(*meshColorArrays, 0xFF, meshList->m_data->m_vertexCount * sizeof(GXColor));
 			meshColorArrays = meshColorArrays + 1;
-			meshList++;
 		}
 	}
 
-	curMesh = model0->GetMesh();
+	meshList = model0->GetMesh();
 	cutoffYFixed = (int)(state->m_value0 * (float)(1 << model0->m_data->m_posQuant));
 	cutoffY = (short)cutoffYFixed;
 	model0->GetMatrixT(modelMtx);
@@ -202,10 +206,10 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		negativeRamp = 0;
 	}
 
-	for (unsigned int meshIdx = 0; meshIdx < model0->GetRefData()->m_meshCount; meshIdx++, curMesh++) {
-		GXColor* vertColors = state->m_meshColorArrays[meshIdx];
-		for (unsigned int v = 0; v < curMesh->m_data->m_vertexCount; v++) {
-			int delta = static_cast<int>(cutoffY) - static_cast<int>(curMesh->GetVertex()[v].y);
+	for (unsigned int i = 0; i < model0->GetRefData()->m_meshCount; i++, meshList++) {
+		GXColor* vertColors = state->m_meshColorArrays[i];
+		for (unsigned int v = 0; v < meshList->m_data->m_vertexCount; v++) {
+			int delta = static_cast<int>(cutoffY) - static_cast<int>(meshList->GetVertex()[v].y);
 			if (delta >= 0) {
 				int level = 0;
 				float threshold = kPppYmChangeTexRampStart;

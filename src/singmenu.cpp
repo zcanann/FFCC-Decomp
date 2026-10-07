@@ -3268,38 +3268,12 @@ void CMenuPcs::DrawSingLife()
     }
 
     if (lifeTimer < 10) {
-        float phaseScale = 9.0f;
-        float angleScale = 0.01745329238474369f;
-        int phase;
-        if (lifeTimer < 0) {
-            phase = 0;
-        } else {
-            phase = 10;
-            if (lifeTimer <= 10) {
-                phase = lifeTimer;
-            }
-        }
-        phaseScale *= static_cast<float>(phase);
-        angleScale *= phaseScale;
-        y += 64.0f * sinf(angleScale);
+        y += 64.0f * sinf(0.01745329238474369f * (9.0f * static_cast<float>((lifeTimer < 0) ? 0 : ((lifeTimer > 10) ? 10 : lifeTimer))));
     } else if (lifeTimer < 0x28) {
         y = 32.0f;
     } else {
-        float phaseScale = 9.0f;
-        float angleScale = 0.01745329238474369f;
-        int phase;
         int t = 10 - (lifeTimer - 0x28);
-        if (t < 0) {
-            phase = 0;
-        } else {
-            phase = 10;
-            if (t <= 10) {
-                phase = t;
-            }
-        }
-        phaseScale *= static_cast<float>(phase);
-        angleScale *= phaseScale;
-        y += 64.0f * sinf(angleScale);
+        y += 64.0f * sinf(0.01745329238474369f * (9.0f * static_cast<float>((t < 0) ? 0 : ((t > 10) ? 10 : t))));
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;

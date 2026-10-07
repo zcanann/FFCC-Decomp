@@ -637,9 +637,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 				while (remaining != 0) {
 					int primitive = cursor[0] & 0xF8;
-					int count = *reinterpret_cast<const unsigned short*>(cursor + 1);
+					unsigned short vertexCount = *reinterpret_cast<const unsigned short*>(cursor + 1);
 					cursor += 3;
-					remaining -= count * 8 + 3;
+					remaining -= vertexCount * 8 + 3;
+					int count = vertexCount;
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
 						GXBegin(static_cast<GXPrimitive>(primitive), GX_VTXFMT0, count);
@@ -925,16 +926,15 @@ int CChara::CModel::PickFur(
 										PSMTX44Copy(screenMtx, invScreenMtx);
 										C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
-										CVector rayStart;
-										CVector rayEnd;
-										rayStart = CVector(
+										CVector ray[2];
+										ray[0] = CVector(
 											(cursorX - 320.0f) / 320.0f,
 											-(cursorY - 224.0f) / 224.0f, 0.0f);
-										rayEnd = CVector(rayStart.x, rayStart.y, -100.0f);
-										PSMTX44MultVec(invScreenMtx, rayStart, rayStart);
-										PSMTX44MultVec(invScreenMtx, rayEnd, rayEnd);
+										ray[1] = CVector(ray[0].x, ray[0].y, -100.0f);
+										PSMTX44MultVec(invScreenMtx, ray[0], ray[0]);
+										PSMTX44MultVec(invScreenMtx, ray[1], ray[1]);
 
-										CVector ray = rayEnd - rayStart;
+										CVector rayDir = ray[1] - ray[0];
 
 										CVector normal;
 										CVector normalA;
@@ -947,30 +947,23 @@ int CChara::CModel::PickFur(
 										}
 										normal.Normalize();
 
-										CVector planeDelta = CVector(verts[0].m_viewPos) - rayStart;
-										const float rayDot = PSVECDotProduct(normal, ray);
+										CVector planeDelta = CVector(verts[0].m_viewPos) - ray[0];
+										const float rayDot = PSVECDotProduct(normal, rayDir);
 										const float planeDot = PSVECDotProduct(normal, planeDelta);
 										Vec scaledRay;
-										PSVECScale(ray, &scaledRay, planeDot / rayDot);
-										PSVECAdd(rayStart, &scaledRay, hitViewPos);
+										PSVECScale(rayDir, &scaledRay, planeDot / rayDot);
+										PSVECAdd(ray[0], &scaledRay, hitViewPos);
 
-										CVector hitToA;
-										CVector hitToB;
-										CVector hitToC;
-										CVector areaAB;
-										CVector areaBC;
-										CVector areaCA;
-										hitToA = CVector(verts[0].m_viewPos) - hitViewPos;
-										hitToB = CVector(verts[1].m_viewPos) - hitViewPos;
-										hitToC = CVector(verts[2].m_viewPos) - hitViewPos;
+										CVector hitTo[3];
+										CVector area[3];
+										hitTo[0] = CVector(verts[0].m_viewPos) - hitViewPos;
+										hitTo[1] = CVector(verts[1].m_viewPos) - hitViewPos;
+										hitTo[2] = CVector(verts[2].m_viewPos) - hitViewPos;
 
-										PSVECCrossProduct(hitToA, hitToB, areaAB);
-										PSVECCrossProduct(hitToB, hitToC, areaBC);
-										PSVECCrossProduct(hitToC, hitToA, areaCA);
-										const float magAB = PSVECMag(areaAB);
-										const float magCA = PSVECMag(areaCA);
-										const float magBC = PSVECMag(areaBC);
-										CVector weights = CVector(magBC, magCA, magAB) * 0.5f;
+										PSVECCrossProduct(hitTo[0], hitTo[1], area[0]);
+										PSVECCrossProduct(hitTo[1], hitTo[2], area[1]);
+										PSVECCrossProduct(hitTo[2], hitTo[0], area[2]);
+										CVector weights = CVector(PSVECMag(area[1]), PSVECMag(area[2]), PSVECMag(area[0])) * 0.5f;
 										PSVECScale(weights, weights,
 											       1.0f / (weights.x + weights.y + weights.z));
 
@@ -1007,7 +1000,7 @@ int CChara::CModel::PickFur(
 			unsigned short* furTexels = reinterpret_cast<unsigned short*>(texture->m_imageData);
 			int furTexWidth = texture->m_width;
 			int furTexHeight = texture->m_height;
-			if (texture->m_format == GX_TF_RGB5A3 && nearestDepth != 0.0f) {
+			if (texture->m_format == GX_TF_RGB5A3 && nearestDepth) {
 				_GXColor paintColor = brushColor;
 				_GXColor before;
 				_GXColor after;

@@ -6531,23 +6531,25 @@ void CMenuPcs::DrawCharaBase()
  */
 void CMenuPcs::CalcChara()
 {
+	int i;
+	int player;
 	WmWorldObjInfo* charaWork = &m_wm.m_worldObjData[32];
 	unsigned int selectedMask = 0;
 
-	for (int i = 0; i < kWmMenuControllerCount; i++) {
+	for (i = 0; i < kWmMenuControllerCount; i++) {
 		if (m_wm.m_charaSelectData[i].m_connected == 1) {
 			selectedMask |= 1u << static_cast<unsigned int>(m_wm.m_charaSelectData[i].m_currentSlot);
 		}
 	}
 
-	for (int slot = 0; slot < 8; slot++) {
+	for (i = 0; i < 8; i++) {
 		unsigned int effectMask = 0;
 		int effectCount = 0;
 
-		for (int player = 0; player < 4; player++) {
+		for (player = 0; player < 4; player++) {
 			WmCharaSelectEntry* const entry = &m_wm.m_charaSelectData[player];
 			const int currentSlot = entry->m_currentSlot;
-			if ((entry->m_connected == 1) && (currentSlot >= 0) && (slot == currentSlot)) {
+			if ((entry->m_connected == 1) && (currentSlot >= 0) && (i == currentSlot)) {
 				effectCount++;
 				effectMask |= 1u << player;
 			}
@@ -6565,7 +6567,7 @@ void CMenuPcs::CalcChara()
 				offset = FLOAT_803316A0;
 			}
 
-			for (int player = 0; player < 4; player++) {
+			for (player = 0; player < 4; player++) {
 				if ((effectMask & (1u << player)) != 0) {
 					Vec loc;
 					const int partNo = m_effectWork[player + 32].m_partNo;
@@ -6580,8 +6582,9 @@ void CMenuPcs::CalcChara()
 		}
 	}
 
-	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork++) {
-		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+	int handleIdx = 0x20;
+	for (i = 0; i < kWmMenuPlayerCount; i++, charaWork++, handleIdx++) {
+		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
 		if (!handle->IsModelLoaded(1)) {
 			charaWork->m_active = 0;
 			continue;
@@ -6595,7 +6598,7 @@ void CMenuPcs::CalcChara()
 		}
 
 		charaWork->m_active = 1;
-		CCharaPcs::CHandle* const charaHandle = GetWmCharaHandles(this)[i];
+		CCharaPcs::CHandle* const charaHandle = m_wm.m_handles[handleIdx];
 		if (charaHandle->m_charaKind == 3) {
 			if ((selectedMask & (1u << i)) != 0) {
 				const float zero = FLOAT_803313dc;
@@ -6656,11 +6659,11 @@ void CMenuPcs::CalcChara()
 
 		const int state = ws->m_mainState;
 		if (state == 1) {
-			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = alpha;
+			m_wm.m_handles[handleIdx]->m_model->m_lightAlpha = alpha;
 		} else if (state == 2) {
-			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313e8;
+			m_wm.m_handles[handleIdx]->m_model->m_lightAlpha = FLOAT_803313e8;
 		} else {
-			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = static_cast<float>(DOUBLE_80331420 - alpha);
+			m_wm.m_handles[handleIdx]->m_model->m_lightAlpha = static_cast<float>(DOUBLE_80331420 - alpha);
 		}
 
 		Mtx scaleMtx;
@@ -6675,9 +6678,9 @@ void CMenuPcs::CalcChara()
 		rotXMtx[1][3] = charaWork->m_transform.m_position.y;
 		rotXMtx[2][3] = charaWork->m_transform.m_position.z;
 		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
-		GetWmCharaHandles(this)[i]->m_model->SetMatrix(scaleMtx);
-		GetWmCharaHandles(this)[i]->m_model->CalcMatrix();
-		GetWmCharaHandles(this)[i]->m_model->CalcSkin();
+		m_wm.m_handles[handleIdx]->m_model->SetMatrix(scaleMtx);
+		m_wm.m_handles[handleIdx]->m_model->CalcMatrix();
+		m_wm.m_handles[handleIdx]->m_model->CalcSkin();
 	}
 
 	PCAnimCtrl();

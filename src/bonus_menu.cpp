@@ -3465,14 +3465,15 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	float width = (float)sprite->w;
 	float height = (float)sprite->h;
 
-	int partyIndex = 0;
-	for (; partyIndex < s_Rinfo->m_partyCount; partyIndex++) {
-		if ((int)this->m_bonusState->m_currentRank == s_Rinfo->m_party[partyIndex].m_rank) {
+	int i;
+	for (i = 0; i < s_Rinfo->m_partyCount; i++) {
+		if ((int)this->m_bonusState->m_currentRank == s_Rinfo->m_party[i].m_rank) {
 			break;
 		}
 	}
+	int partyIndex = i;
 
-	for (int i = 0; i < 8; i++) {
+	for (i = 0; i < 8; i++) {
 		if (this->m_bonusState->m_phase == 4) {
 			float gray = 255.0f;
 			int mask = (signed char)s_Rinfo->m_selectedArtifactMask;

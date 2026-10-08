@@ -3070,7 +3070,11 @@ int CMenuPcs::GetEquipType(int itemNo)
     } else {
         // BUG (original): equipType is returned uninitialized on this path.
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+#ifdef VERSION_GCCE01
+            System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, 0xD38, itemNo, flags);
+#else
             System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, SINGMENU_LINE(0xD3D, 0xCAE), itemNo, flags);
+#endif
         }
     }
 

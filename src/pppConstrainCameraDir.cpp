@@ -104,11 +104,8 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, _pppCtrlTable* ctrl)
 {
-    float zero = 0.0f;
     float* value = (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(ctrl)->m_workOffset);
-    value[2] = zero;
-    value[1] = zero;
-    value[0] = zero;
+    value[0] = value[1] = value[2] = 0.0f;
 }
 
 /*
@@ -122,9 +119,6 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, 
  */
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, _pppCtrlTable* ctrl)
 {
-    float zero = 0.0f;
     float* value = (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(ctrl)->m_workOffset);
-    value[2] = zero;
-    value[1] = zero;
-    value[0] = zero;
+    value[0] = value[1] = value[2] = 0.0f;
 }

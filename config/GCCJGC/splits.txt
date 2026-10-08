@@ -2348,12 +2348,15 @@ mapshadow.cpp:
 
 pppAccele.cpp:
 	.text start:0x8005EF60 end:0x8005F020
+	.sdata2 start:0x8034CC20 end:0x8034CC28
 
 pppMove.cpp:
 	.text start:0x8005FE2C end:0x8005FEEC
+	.sdata2 start:0x8034CC30 end:0x8034CC38
 
 pppPoint.cpp:
 	.text start:0x8005FFEC end:0x80060070
+	.sdata2 start:0x8034CC38 end:0x8034CC40
 
 pppRandCV.cpp:
 	.text start:0x800604A8 end:0x800606C4
@@ -2393,12 +2396,15 @@ pppRandUpIV.cpp:
 
 pppScale.cpp:
 	.text start:0x80062538 end:0x800625BC
+	.sdata2 start:0x8034CDA0 end:0x8034CDA8
 
 pppSclAccele.cpp:
 	.text start:0x800625BC end:0x8006267C
+	.sdata2 start:0x8034CDA8 end:0x8034CDB0
 
 pppSclMove.cpp:
 	.text start:0x8006267C end:0x8006273C
+	.sdata2 start:0x8034CDB0 end:0x8034CDB8
 
 pppSRandCV.cpp:
 	.text start:0x8006273C end:0x80062A1C
@@ -2428,13 +2434,20 @@ pppSRandUpHCV.cpp:
 	.text start:0x800639BC end:0x80063C4C
 
 pppVtMime.cpp:
+	extab start:0x80007260 end:0x80007270
+	extabindex start:0x8000D150 end:0x8000D168
 	.text start:0x80064470 end:0x8006478C
+	.sdata2 start:0x8034CE48 end:0x8034CE50
+	.rodata start:0x801D3078 end:0x801D3088
 
 pppDrawMng.cpp:
 	.text start:0x8007AF9C end:0x8007B220
 
 pppDrawMdlTs.cpp:
+	extab start:0x80007A88 end:0x80007A90
+	extabindex start:0x8000DC30 end:0x8000DC3C
 	.text start:0x800872F4 end:0x800874F4
+	.sdata2 start:0x8034D230 end:0x8034D238
 
 pppKeZCrctShp.cpp:
 	extab start:0x80007A98 end:0x80007AA0
@@ -2490,10 +2503,16 @@ p_mc.cpp:
 	.text start:0x80120854 end:0x80120A24
 
 pppScaleLoopAuto.cpp:
+	extab start:0x800097DC end:0x800097E4
+	extabindex start:0x800107A4 end:0x800107B0
 	.text start:0x8012738C end:0x801275FC
+	.sdata2 start:0x8034E898 end:0x8034E8A8
 
 pppScreenQuake.cpp:
+	extab start:0x80009B3C end:0x80009B4C
+	extabindex start:0x80010CB4 end:0x80010CCC
 	.text start:0x8013A314 end:0x8013A4EC
+	.sdata2 start:0x8034EC38 end:0x8034EC40
 
 pppParHitSphMat.cpp:
 	.text start:0x8013D134 end:0x8013D2E8
@@ -2508,7 +2527,10 @@ pppFilter.cpp:
 	.sdata2 start:0x8034ED30 end:0x8034ED3C
 
 pppConstrainCameraForLoc.cpp:
+	extab start:0x8000A06C end:0x8000A084
+	extabindex start:0x8001147C end:0x800114A0
 	.text start:0x80162690 end:0x80162A00
+	.sdata2 start:0x8034F748 end:0x8034F750
 
 pppFovAdjustMatrix.cpp:
 	.text start:0x80167044 end:0x80167050

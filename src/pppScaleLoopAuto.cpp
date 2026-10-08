@@ -43,22 +43,16 @@ static inline pppScaleLoopAutoWork* GetScaleLoopAutoWork(_pppPObject* object, _p
  */
 void pppScaleLoopAutoCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	float zero = 0.0f;
-
 	pppScaleLoopAutoWork* work = GetScaleLoopAutoWork(object, ctrlTable);
 
-	work->m_scale[2] = zero;
-	work->m_scale[1] = zero;
-	work->m_scale[0] = zero;
-	work->m_baseScale[2] = zero;
-	work->m_baseScale[1] = zero;
-	work->m_baseScale[0] = zero;
+	work->m_scale[0] = work->m_scale[1] = work->m_scale[2] = 0.0f;
+	work->m_baseScale[0] = work->m_baseScale[1] = work->m_baseScale[2] = 0.0f;
 	work->m_initialized = 0;
 	work->m_step = 0;
 	work->m_angle = 0;
 	work->m_countB = 0;
 	work->m_countA = 0;
-	work->m_delta = zero;
+	work->m_delta = 0.0f;
 }
 
 /*

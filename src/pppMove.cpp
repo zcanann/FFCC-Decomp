@@ -1,9 +1,6 @@
 #include "global.h"
 #include "ffcc/pppMove.h"
 #include "ffcc/partMng.h"
-extern "C" {
-const float kPppMoveZero = 0.0f;
-}
 
 struct PppMoveObj {
     f32 x;           // 0x0
@@ -32,11 +29,8 @@ void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
 {
     PppMoveOffsets* offsets = GetPppMoveOffsets(ctrlTable);
     PppMoveObj* moveObj = (PppMoveObj*)(basePtr->m_workArea + offsets->m_velocityOffset);
-    
-    f32 zero = kPppMoveZero;
-    moveObj->z = zero;
-    moveObj->y = zero;
-    moveObj->x = zero;
+
+    moveObj->x = moveObj->y = moveObj->z = 0.0f;
 }
 
 /*

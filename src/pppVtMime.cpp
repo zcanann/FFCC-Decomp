@@ -38,7 +38,6 @@ STATIC_ASSERT(sizeof(VtMimeDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(VtMimeDataOffsets, m_stateOffset) == 0x0);
 
 static const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
-static const float kVtMimeZero = 0.0f;
 
 static inline VtMimeDataOffsets* GetVtMimeDataOffsets(_pppCtrlTable* ctrl)
 {
@@ -87,11 +86,8 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = GetVtMimeState(object, ctrl);
-    float zero = kVtMimeZero;
 
-    state->accel = zero;
-    state->velocity = zero;
-    state->value = zero;
+    state->value = state->velocity = state->accel = 0.0f;
 }
 
 /*
@@ -106,11 +102,8 @@ void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = GetVtMimeState(object, ctrl);
-    float zero = kVtMimeZero;
 
-    state->accel = zero;
-    state->velocity = zero;
-    state->value = zero;
+    state->value = state->velocity = state->accel = 0.0f;
     state->vertexBuffer = 0;
 }
 

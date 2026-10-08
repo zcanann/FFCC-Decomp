@@ -2,7 +2,6 @@
 #include "ffcc/pppPoint.h"
 #include "ffcc/partMng.h"
 
-extern "C" const float kPppPointZero = 0.0f;
 
 STATIC_ASSERT(sizeof(PppPointDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(PppPointDataOffsets, m_pointOffset) == 0x0);
@@ -29,11 +28,8 @@ static inline float* GetPppPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTa
 void pppPointCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
 	float* dst = GetPppPointWork(pObject, ctrlTable);
-	float value = kPppPointZero;
 
-	dst[2] = value;
-	dst[1] = value;
-	dst[0] = value;
+	dst[0] = dst[1] = dst[2] = 0.0f;
 }
 
 /*

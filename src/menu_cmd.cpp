@@ -1181,10 +1181,13 @@ void CMenuPcs::CmdDraw()
  */
 unsigned int CMenuPcs::CmdCtrlCur()
 {
-	short press;
+	s32 mode;
+	CCaravanWork* caravanWork;
 	short hold;
-	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-	CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
+	short press;
+	s16* list;
+	list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+	caravanWork = Game.m_scriptFoodBase[0];
 	press = Pad.GetButtonDown(0);
 	hold = Pad.GetButtonRepeat(0);
 
@@ -1192,7 +1195,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		return 0;
 	}
 
-	s32 mode = GetCmdStateView(this)->mode;
+	mode = GetCmdStateView(this)->mode;
 
 	if (mode == 0) {
 		const s32 cmdCount = caravanWork->m_numCmdListSlots;
@@ -1208,13 +1211,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			CmdState* row2 = GetCmdStateView(this);
 			const int cursor = row2->selected[mode];
 			if (caravanWork->m_commandListExtra[cursor] < 0) {
-				const int m1 = cursor - 1;
-				if (caravanWork->m_commandListExtra[m1] >= 0) {
-					row2->selected[mode] = static_cast<s16>(m1);
-				} else {
-					const int m2 = cursor - 2;
-					if (caravanWork->m_commandListExtra[m2] >= 0) {
-						row2->selected[mode] = static_cast<s16>(m2);
+				for (int k = 1; k < 3; k++) {
+					if (caravanWork->m_commandListExtra[cursor - k] >= 0) {
+						row2->selected[mode] = static_cast<s16>(cursor - k);
+						break;
 					}
 				}
 			}
@@ -1231,13 +1231,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				CmdState* row2 = GetCmdStateView(this);
 				const int cursor = row2->selected[mode];
 				if (caravanWork->m_commandListExtra[cursor] < 0) {
-					const int p1 = cursor + 1;
-					if (caravanWork->m_commandListExtra[p1] >= 0) {
-						row2->selected[mode] = static_cast<s16>(p1);
-					} else {
-						const int p2 = cursor + 2;
-						if (caravanWork->m_commandListExtra[p2] >= 0) {
-							row2->selected[mode] = static_cast<s16>(p2);
+					for (int k = 1; k < 3; k++) {
+						if (caravanWork->m_commandListExtra[cursor + k] >= 0) {
+							row2->selected[mode] = static_cast<s16>(cursor + k);
+							break;
 						}
 					}
 					CmdState* row3 = GetCmdStateView(this);
@@ -1389,10 +1386,9 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		}
 	} else if (mode == 2) {
 		CmdListStorage* cmdList = GetCmdListStorage(this);
-		const int animSlot = cmdList->listEnd + 3;
+		CmdListEntry* panel = &cmdList->entries[cmdList->listEnd + 3];
 		int maxPos;
-		if (1.0 ==
-		    static_cast<double>(cmdList->entries[animSlot].scale)) {
+		if (1.0 == static_cast<double>(panel->scale)) {
 			maxPos = 2;
 		} else {
 			maxPos = 3;
@@ -1436,6 +1432,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		}
 	} else {
 		if ((hold & 0xC) != 0) {
+			int cmdCount;
 			CmdState* const sv0 = GetCmdStateView(this);
 			const int selected = sv0->selected[0];
 			int prev = selected - 1;
@@ -1446,7 +1443,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				prev--;
 			}
 
-			const int cmdCount = caravanWork->m_numCmdListSlots;
+			cmdCount = caravanWork->m_numCmdListSlots;
 			int next = selected + 1;
 			while (next < cmdCount) {
 				if (caravanWork->m_commandListExtra[next] >= 0) {

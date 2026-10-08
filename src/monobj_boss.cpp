@@ -1499,7 +1499,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			attackVec.z = delta.z;
 			float distance = PSVECDistance(&attackVec, &m_worldPosition);
 			float cappedDistance = kMonObjBossMaxChaseDistance;
-			if (distance < kMonObjBossMaxChaseDistance) {
+			if (distance < cappedDistance) {
 				cappedDistance = distance;
 			}
 

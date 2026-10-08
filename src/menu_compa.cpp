@@ -202,7 +202,8 @@ void CMenuPcs::CompaDraw()
 			kCompaOne, kCompaZero);
 	}
 
-	shown = drawIndex = 0;
+	drawIndex = 0;
+	shown = 0;
 	for (i = shown; i < 8 && shown < familyCount; i++) {
 		iconX = static_cast<float>(compaList->entries[0].x + 0x128);
 		iconY = static_cast<float>(compaList->entries[0].y + 0x40);

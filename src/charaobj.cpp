@@ -1885,7 +1885,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		SCharaItemRow* kindRows1556 = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 		int currentKind = kindRows1556[m_itemId].m_status & 0xFF;
 		if (currentKind == 2) {
-			if (staType != 0x66 && staType != 0x67 && staType != 7) {
+#ifndef VERSION_GCCJGC
+			if (staType != 0x66 && staType != 0x67 && staType != 7)
+#endif
+			{
 				CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
 				moveVectorH(delta, 2.0f, 10);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));

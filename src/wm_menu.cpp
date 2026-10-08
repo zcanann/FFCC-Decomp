@@ -3293,7 +3293,7 @@ void CMenuPcs::DrawMainMenu()
 			const float* pY = &FLOAT_803317D0;
 			DrawFont2(static_cast<int>(CalcCenteringPos2(textList[m_wmWorldState->m_cardChannel], FLOAT_80331594, FLOAT_803313e8)),
 			          static_cast<int>(*pY),
-			          CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7,
+			          CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha)).color, 7,
 			          textList[m_wmWorldState->m_cardChannel], FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 		}
@@ -3836,7 +3836,7 @@ void CMenuPcs::DrawCMakeMenu()
 			const float* pY = &FLOAT_803317D0;
 			DrawFont2(static_cast<int>(CalcCenteringPos2(textList[textIndex], FLOAT_80331594, FLOAT_803313e8)),
 			          static_cast<int>(*pY),
-			          CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7,
+			          CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha)).color, 7,
 			          textList[textIndex], FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 			}
@@ -3858,7 +3858,7 @@ void CMenuPcs::DrawCMakeMenu()
 					const float* pY = &FLOAT_803317D0;
 					MenuPcs.DrawFont2(static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8)),
 					                  static_cast<int>(*pY),
-					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7, text,
+					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha)).color, 7, text,
 					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 					break;
@@ -3876,7 +3876,7 @@ void CMenuPcs::DrawCMakeMenu()
 					const float* pY = &FLOAT_803317D0;
 					MenuPcs.DrawFont2(static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8)),
 					                  static_cast<int>(*pY),
-					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7, text,
+					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha)).color, 7, text,
 					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 					break;
@@ -3898,7 +3898,7 @@ void CMenuPcs::DrawCMakeMenu()
 					const float* pY = &FLOAT_803317D0;
 					MenuPcs.DrawFont2(static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8)),
 					                  static_cast<int>(*pY),
-					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7, text,
+					                  CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha)).color, 7, text,
 					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 					break;

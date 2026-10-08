@@ -479,7 +479,7 @@ void CRingMenu::onDraw()
 			posY = 96.0f + (((m_menuIndex & 2) != 0) ? posMainY : posLeft);
 		}
 
-		float buttonAlpha = static_cast<float>(m_buttonTimers[group * 3 + 2]) * 0.125f;
+		float buttonAlpha = static_cast<float>(m_buttonTimers[group * 3 + 2]) / 8.0f;
 		if (m_battleButtons[group * 2 + 2] >= 0) {
 			buttonAlpha = 1.0f - buttonAlpha;
 		}
@@ -572,14 +572,8 @@ void CRingMenu::onDraw()
 					}
 				}
 
-				double mag = fabs(static_cast<double>(m_spinAccumulator));
-				double labelAlphaD;
-				if (mag < 0.009999999776482582) {
-					labelAlphaD = 100.0 * mag;
-				} else {
-					labelAlphaD = 1.0;
-				}
-				labelAlpha = static_cast<float>(labelAlphaD);
+				labelAlpha = (fabs(static_cast<double>(m_spinAccumulator)) < 0.009999999776482582)
+				                 ? 100.0 * fabs(static_cast<double>(m_spinAccumulator)) : 1.0;
 
 				int prev1 = (Game.m_gameWork.IsMogStage())
 				                ? (cmdIndex + 4) % 5
@@ -624,6 +618,7 @@ void CRingMenu::onDraw()
 				continue;
 			}
 
+			const int timer = (&m_buttonTimers[group * 3])[button];
 			const char* label;
 			if ((buttonValue & 0x8000) != 0) {
 				label = Game.GetShortItemName(buttonValue & ~0x8000);
@@ -631,7 +626,7 @@ void CRingMenu::onDraw()
 				label = Game.GetRingName(buttonValue);
 			}
 
-			float fade = static_cast<float>((&m_buttonTimers[group * 3])[button]) * 0.125f;
+			float fade = static_cast<float>(timer) / 8.0f;
 			if (button == 0) {
 				fade = 1.0f - fade;
 			}
@@ -719,11 +714,12 @@ void CRingMenu::onDraw()
 							if (selected != 0) {
 								MenuPcs.SetColor(CColor(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha)));
 								blink = static_cast<float>(static_cast<int>((System.m_frameCounter >> 2) & 1));
-							} else if (caravanWork->IsUseCmdList(i)) {
-								MenuPcs.SetColor(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha)));
-								blink = 0.0f;
 							} else {
-								MenuPcs.SetColor(CColor(0x80, 0x80, 0x80, static_cast<unsigned char>(dimAlpha)));
+								if (caravanWork->IsUseCmdList(i)) {
+									MenuPcs.SetColor(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha)));
+								} else {
+									MenuPcs.SetColor(CColor(0x80, 0x80, 0x80, static_cast<unsigned char>(dimAlpha)));
+								}
 								blink = 0.0f;
 							}
 

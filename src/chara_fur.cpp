@@ -1117,8 +1117,8 @@ inline void CChara::CModel::CopyFurTex(int loadFromTexture)
 		return;
 	}
 
-	int width = texture->m_width;
 	int height = texture->m_height;
+	int width = texture->m_width;
 	void* image = texture->m_imageData;
 	if (loadFromTexture != 0) {
 		memcpy(Chara.MogFur().m_texels, image, 0x2000);

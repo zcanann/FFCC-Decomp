@@ -543,7 +543,7 @@ shopmenu.cpp:
 singmenu.cpp:
 	.rodata start:0x801D8E98 end:0x801D9454
 	.data start:0x802318B8 end:0x80231A98
-	.sdata2 start:0x8034ED40 end:0x8034EE90
+	.sdata2 start:0x8034ED40 end:0x8034F1B8
 
 cflat_r2system.cpp:
 	.text start:0x800B049C end:0x800B7D34
@@ -1239,9 +1239,11 @@ pppYmBreath.cpp:
 	.sdata2 start:0x8034D9A8 end:0x8034D9E0
 
 pppBreathModel.cpp:
+	extab start:0x80008CB4 end:0x80008CEC
+	extabindex start:0x8000F6E8 end:0x8000F73C
 	.text start:0x800D8434 end:0x800D9D6C
-	.rodata start:0x801D6090 end:0x801D60A8
 	.sdata2 start:0x8034DC88 end:0x8034DCC0
+	.rodata start:0x801D6090 end:0x801D60A8
 
 usb.cpp:
 	.text start:0x80021CD8 end:0x80021FB0
@@ -1661,9 +1663,11 @@ pppKeShpTail2X.cpp:
 	.sdata2 start:0x8034D240 end:0x8034D260
 
 pppYmTracer2.cpp:
+	extab start:0x800090E4 end:0x800090FC
+	extabindex start:0x8000FD30 end:0x8000FD54
 	.text start:0x800FF610 end:0x800FFF0C
-	.rodata start:0x801D7BF8 end:0x801D7C10
 	.sdata2 start:0x8034E4E0 end:0x8034E508
+	.rodata start:0x801D7BF8 end:0x801D7C10
 	.sbss2 start:0x803501F8 end:0x80350200
 
 pppBlurChara.cpp:
@@ -2476,7 +2480,10 @@ pppYmLaser.cpp:
 	.text start:0x800CF9C0 end:0x800D0C20
 
 pppYmMoveParabola.cpp:
+	extab start:0x80008B64 end:0x80008B74
+	extabindex start:0x8000F4F0 end:0x8000F508
 	.text start:0x800D1684 end:0x800D1A88
+	.sdata2 start:0x8034DB38 end:0x8034DB58
 
 pppParMoveMatrix.cpp:
 	extab start:0x80008B74 end:0x80008B7C
@@ -2491,7 +2498,10 @@ p_sound.cpp:
 	.text start:0x800D5B64 end:0x800D5D14
 
 pppYmLookOn.cpp:
+	extab start:0x80008C2C end:0x80008C34
+	extabindex start:0x8000F61C end:0x8000F628
 	.text start:0x800D5D14 end:0x800D5F08
+	.sdata2 start:0x8034DBE8 end:0x8034DBF0
 
 pppYmCheckBGHeight.cpp:
 	.text start:0x800D5F08 end:0x800D6068

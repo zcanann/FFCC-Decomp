@@ -3,9 +3,6 @@
 #include "ffcc/KeLns.h"
 #include "ffcc/partMng.h"
 #include "dolphin/types.h"
-extern "C" {
-const float kPppKeLnsZero = 0.0f;
-}
 
 STATIC_ASSERT(sizeof(KeLnsDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(KeLnsDataOffsets, m_workOffset) == 0x0);
@@ -70,7 +67,7 @@ void pppKeLnsLpDraw(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTa
 void pppKeLnsLpCon2(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
 	_KeLnsLp* keLnsLp = GetKeLnsLoopWork(object, ctrlTable);
-	f32 zero = kPppKeLnsZero;
+	f32 zero = 0.0f;
 
 	keLnsLp->m_work8C = zero;
 	keLnsLp->m_work98 = zero;
@@ -90,7 +87,7 @@ void pppKeLnsLpCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 	_KeLnsLp* keLnsLp = GetKeLnsLoopWork(object, ctrlTable);
 
 	KeLnsLp_Init(keLnsLp);
-	f32 zero = kPppKeLnsZero;
+	f32 zero = 0.0f;
 	keLnsLp->m_work8C = zero;
 	keLnsLp->m_work98 = zero;
 }

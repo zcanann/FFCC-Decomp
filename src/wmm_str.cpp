@@ -4,7 +4,7 @@
 
 #ifdef VERSION_GCCJGC
 #include "src/wmm_str_status_jp.inc"
-#endif
+#else
 
 #ifdef VERSION_GCCE01
 #include "src/wmm_str_data_us.inc"
@@ -12,7 +12,6 @@
 #include "src/wmm_str_data.inc"
 #endif
 
-#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x8017b3f8
@@ -140,8 +139,6 @@ WinMessEntry* CMenuPcs::GetWinMess(int index)
     }
 }
 
-#endif
-
 /*
  * --INFO--
  * PAL Address: 0x8017B0A0
@@ -250,3 +247,5 @@ int CMenuPcs::GetSlotABXPos(int right)
     }
     return x - 0x1e;
 }
+
+#endif

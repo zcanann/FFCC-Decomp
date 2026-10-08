@@ -1018,9 +1018,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x15:
 			engineObject->m_weaponNodeFlagBits.m_unk10 = static_cast<signed char>(object->m_localBase[0]);
-			engineObject->m_groundHitOffset.z = 0.0f;
-			engineObject->m_groundHitOffset.y = 0.0f;
-			engineObject->m_groundHitOffset.x = 0.0f;
+			engineObject->m_groundHitOffset.x = engineObject->m_groundHitOffset.y = engineObject->m_groundHitOffset.z = 0.0f;
 			push(object, 0);
 			outResult = 0;
 			break;

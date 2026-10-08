@@ -282,7 +282,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         upperNormalZ = 2.0f * upperCos * upperCos;
         ringNormalZ = 2.0f * ringCos * ringCos;
 
-        if (fabs(upperCos) < (double)0.01f || fabs(ringCos) < (double)0.01f) {
+        if (__fabs(upperCos) < 0.01f || __fabs(ringCos) < 0.01f) {
             break;
         }
 

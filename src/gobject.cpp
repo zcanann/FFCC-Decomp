@@ -2454,9 +2454,7 @@ void CGObject::bgNormalCollision()
     }
 
     if (retry == 0) {
-        m_groundHitOffset.z = 0.0f;
-        m_groundHitOffset.y = 0.0f;
-        m_groundHitOffset.x = 0.0f;
+        m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = 0.0f;
         return;
     }
 
@@ -3075,8 +3073,7 @@ void CGObject::onCreate()
     m_shieldNodeFlagBits.m_bit40 = 0;
     m_frontHitAngle = 0.7853982f;
     m_lookAtTarget = 0;
-    m_alphaTarget = 1.0f;
-    m_currentAlpha = 1.0f;
+    m_currentAlpha = m_alphaTarget = 1.0f;
     m_shieldNodeFlagBits.m_bit20 = 0;
     m_bounceFactor = m_bgAttrValue = m_animBlend = 1.0f;
     m_gravityY = 0.0f;

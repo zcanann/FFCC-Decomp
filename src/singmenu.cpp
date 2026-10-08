@@ -127,6 +127,7 @@ extern "C" char* PTR_s_Alle_Rassen_8021430c;
 extern "C" char* PTR_s_Todos_802145ac;
 extern "C" const char* PTR_s_Clavat_80214110[];
 extern "C" {
+#ifndef VERSION_GCCJGC
 const char s_Clavat_803320D8[] = "Clavat";
 const char s_Lilty_803320E0[] = "Lilty";
 const char s_Yuke_803320E8[] = "Yuke";
@@ -338,6 +339,7 @@ const char s_Lobezna_803326F8[] = "Lobezna";
 const char s_Regen_80332700[] = "Regen";
 const char s_Regena_80332708[] = "Regena";
 const char s_Recup_80332710[] = "R\351cup";
+#endif
 const char s_solo2_80332718[] = "solo2";
 const char s_solo1_80332720[] = "solo1";
 const char s_solo4_80332728[] = "solo4";
@@ -402,8 +404,10 @@ const char s_solo61_803328F8[] = "solo61";
 const char s_solo62_80332900[] = "solo62";
 const char s_solo64_80332908[] = "solo64";
 const char s_solo23_80332910[] = "solo23";
+#ifndef VERSION_GCCJGC
 const char s_plural_s_80332958[] = "s";
 const char s_space_8033295c[] = " ";
+#endif
 const char s_stand_80332a24[] = "stand";
 }
 
@@ -731,6 +735,7 @@ char* CMenuPcs::GetTribeStr(int index)
 }
 #endif
 
+#ifndef VERSION_GCCJGC
 extern "C" const char* PTR_s_Clavat_802140f0[] = {
     s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
@@ -931,6 +936,7 @@ extern "C" const char* gSingMenuAttrTableEs[] = {
     s_Durac_hechiz_801DE638, s_Anti_miasma_801DE648, s_Alcance_hechiz_801DE654, s_Alc_superataq_801DE664,
     s_Revitalia_801DE674, s_Superataque_801DE680, s_Danos_magicos_801DE68C, s_No_se_aturde_801DE69C,
 };
+#endif
 extern "C" {
 extern int s_DynamicMess[5];
 }
@@ -1191,7 +1197,11 @@ static inline int LoadSingMenuTextureStep(CMenuPcs* menu)
 
     if (menu->m_singleMenuTextureLoadState == 0) {
         char path[256];
+#ifdef VERSION_GCCJGC
+        sprintf(path, "dvd/menu/%s.tex", PTR_s_solo1.entries[loadIndex]);
+#else
         sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
+#endif
         gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.ReadASync(gSingMenuAsyncFileHandle);
         menu->m_singleMenuTextureLoadState = menu->m_singleMenuTextureLoadState + 1;
@@ -1333,16 +1343,20 @@ void CMenuPcs::createSingleMenu()
             m_singleMenuStageActive = 1;
         }
 
+#ifdef VERSION_GCCJGC
+        loadFont(1, "dvd/menu/subfont.fnt", 4, -1);
+#else
         char path[128];
         sprintf(path, s_singMenuSubfontPathFmt, Game.GetLangString());
         loadFont(1, path, 4, -1);
+#endif
 
         m_singleMenuInitialized = 0;
         gSingMenuForcedSelection = -1;
         gSingMenuAsyncFileHandle = 0;
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
-            loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
+            loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, SINGMENU_TEX_ID(0x20), 0xD, 1);
             m_wm.m_worldObjData = 0;
             m_singleFadeState = 0;
             m_singMenuState = 0;
@@ -3062,7 +3076,11 @@ int CMenuPcs::GetEquipType(int itemNo)
     } else {
         // BUG (original): equipType is returned uninitialized on this path.
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+#ifdef VERSION_GCCE01
+            System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, 0xD38, itemNo, flags);
+#else
             System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, SINGMENU_LINE(0xD3D, 0xCAE), itemNo, flags);
+#endif
         }
     }
 

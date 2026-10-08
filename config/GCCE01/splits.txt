@@ -743,6 +743,8 @@ MSL_C/PPCEABI/bare/H/printf.c:
 	.sdata2 start:0x803328E8 end:0x803328F0
 
 menu_arti.cpp:
+	extab start:0x80009F0C end:0x80009F44
+	extabindex start:0x8001135C end:0x800113B0
 	.text start:0x8015EAA4 end:0x8015FF58
 	.sdata2 start:0x80331F48 end:0x80331F98
 
@@ -2418,6 +2420,7 @@ pppYmLookOn.cpp:
 	extab start:0x80008BB4 end:0x80008BBC
 	extabindex start:0x8000F658 end:0x8000F664
 	.text start:0x800D8094 end:0x800D8288
+	.sdata2 start:0x8032FE80 end:0x8032FE88
 
 pppYmMoveCircle.cpp:
 	extab start:0x80008A5C end:0x80008A6C

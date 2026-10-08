@@ -987,9 +987,7 @@ void CGMonObj::onFrameStat()
 			}
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
 			object->m_weaponNodeFlagBits.m_unk10 = 1;
-			object->m_groundHitOffset.z = 0.0f;
-			object->m_groundHitOffset.y = 0.0f;
-			object->m_groundHitOffset.x = 0.0f;
+			object->m_groundHitOffset.x = object->m_groundHitOffset.y = object->m_groundHitOffset.z = 0.0f;
 			object->m_bgColMask |= 0x11;
 			object->m_displayFlags |= 1;
 			*reinterpret_cast<float*>(mon + 0x6F8) = object->unk_0x168;
@@ -1028,9 +1026,7 @@ void CGMonObj::onFrameStat()
 			int seId = (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x3C) ? 0x7937 : 0x7936;
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
 			object->m_weaponNodeFlagBits.m_unk10 = 1;
-			object->m_groundHitOffset.z = 0.0f;
-			object->m_groundHitOffset.y = 0.0f;
-			object->m_groundHitOffset.x = 0.0f;
+			object->m_groundHitOffset.x = object->m_groundHitOffset.y = object->m_groundHitOffset.z = 0.0f;
 			object->m_bgColMask |= 0x11;
 			object->m_displayFlags |= 1;
 			prgObj->reqAnim(0xD, 0, 0);
@@ -1060,9 +1056,7 @@ void CGMonObj::onFrameStat()
 				soundId = 0xB3D1;
 			}
 			object->m_weaponNodeFlagBits.m_unk10 = 1;
-			object->m_groundHitOffset.z = 0.0f;
-			object->m_groundHitOffset.y = 0.0f;
-			object->m_groundHitOffset.x = 0.0f;
+			object->m_groundHitOffset.x = object->m_groundHitOffset.y = object->m_groundHitOffset.z = 0.0f;
 			object->m_bgColMask |= 0x11;
 			object->m_displayFlags |= 1;
 			prgObj->reqAnim(0xB, 0, 0);
@@ -1094,7 +1088,7 @@ void CGMonObj::onFrameStat()
 			float speedScale = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon;
 			object->moveVectorRot(object->m_rotBaseY, 0.0f, speedScale, 0x14);
 		}
-		if (prgObj->m_stateFrame == 0x10) {
+		if (prgObj->m_stateFrame == MON_FRAMES(0x14, 0x10)) {
 			object->m_bgColMask |= 0xD0002;
 			prgObj->changeStat(0, 0, 0);
 		}
@@ -1123,7 +1117,7 @@ void CGMonObj::onFrameStat()
 				}
 				prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
 			}
-			if (prgObj->m_subFrame == 0x32) {
+			if (prgObj->m_subFrame == MON_FRAMES(0x3C, 0x32)) {
 				prgObj->changeSubStat(1);
 			}
 		} else {
@@ -1954,11 +1948,14 @@ void CGMonObj::seKiduki()
 	}
 
 	if (notice) {
+#ifndef VERSION_GCCJGC
 		if (classId == 0x7B) {
 			m_chaseState = 0;
 			m_chaseTimer = 0;
 			m_chaseDirty = 1;
-		} else if (m_unk6BD != 0) {
+		} else
+#endif
+		if (m_unk6BD != 0) {
 			m_chaseState = 2;
 			m_chaseTimer = 0;
 			m_chaseDirty = 1;

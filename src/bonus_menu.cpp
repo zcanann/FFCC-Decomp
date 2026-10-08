@@ -21,6 +21,12 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
+#ifdef VERSION_GCCJGC
+#define BONUS_LINE(line, jpLine) (jpLine)
+#else
+#define BONUS_LINE(line, jpLine) (line)
+#endif
+
 static const float s_PCYpos[4] = {-11.14f, -7.1f, -11.55f, -11.14f};
 static const float s_PCScl[4] = {0.87f, 0.78f, 0.78f, 0.87f};
 static const float s_AnimX[3] = {9.1f, 13.7f, 27.9f};
@@ -227,23 +233,23 @@ void CMenuPcs::createBonus()
 	loadFont(0, fontPath, 1, -1);
 #endif
 
-	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xDD) BonusSummaryData;
+	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xDD, 0xD4)) BonusSummaryData;
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (i = 0; i < BonusSummaryData::kArtifactCount; i++) {
 		s_Rinfo->m_artifacts[i] = -1;
 	}
 
-	this->m_bonusState = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xE5) BonusMenuState;
-	m_effectWork = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xE6) EffectInfo[0x28];
+	this->m_bonusState = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE5, 0xDC)) BonusMenuState;
+	m_effectWork = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE6, 0xDD)) EffectInfo[0x28];
 
 	InitBonusEffectSlots(this);
 	memset(this->m_bonusState, 0, sizeof(*this->m_bonusState));
-	s_Base = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF1) BonusBaseInfo;
+	s_Base = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF1, 0xE8)) BonusBaseInfo;
 	memset(s_Base, 0, sizeof(*s_Base));
-	m_bonusAnim = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF5) BonusAnimList;
+	m_bonusAnim = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF5, 0xEC)) BonusAnimList;
 	memset(m_bonusAnim, 0, sizeof(BonusAnimList));
-	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF8) WmWorldObjInfo[24];
-	this->m_menuWindowInfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xFA) MenuWindowInfo;
+	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF8, 0xEF)) WmWorldObjInfo[24];
+	this->m_menuWindowInfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xFA, 0xF1)) MenuWindowInfo;
 	memset(this->m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 	const float depth = 100.0f;
 	const float zero = 0.0f;
@@ -398,7 +404,7 @@ void CMenuPcs::createBonus()
 				break;
 			}
 			CCharaPcs::CHandle* handle =
-			    new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0x183) CCharaPcs::CHandle;
+			    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x183, 0x179)) CCharaPcs::CHandle;
 			this->m_wm.m_handles[slotIdx] = handle;
 			this->m_wm.m_handles[slotIdx]->Add();
 			unsigned long modelCode = s_Rinfo->m_party[i % pc].m_partySlot + 0x83;
@@ -416,7 +422,7 @@ void CMenuPcs::createBonus()
 				m_wm.m_handles[i] = 0;
 			} else {
 				CCharaPcs::CHandle* itemHandle =
-				    new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0x19C) CCharaPcs::CHandle;
+				    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x19C, 0x192)) CCharaPcs::CHandle;
 				m_wm.m_handles[i] = itemHandle;
 				m_wm.m_handles[i]->Add();
 				unsigned short itemModelCode =
@@ -660,8 +666,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->x = 0;
 			spr->w = 0x280;
 			spr->h = 0x1c0;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 0;
 			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
@@ -751,9 +756,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		// staggered model sprites
 		idx += activePartyCount;
 		{
-			i = 0;
-			int bump = i;
-			for (; i < activePartyCount; i++) {
+			for (i = 0; i < activePartyCount; i++) {
 				int delta = idx;
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
@@ -766,10 +769,9 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulY = 0.0f;
 				spr->startFrame = src->startFrame + src->duration;
 				if (i != 0) {
-					spr->startFrame += bump;
+					spr->startFrame += i * 3;
 				}
 				spr->duration = kBallDuration;
-				bump += 3;
 				spr->depth = 1.0f;
 			}
 		}
@@ -1516,9 +1518,6 @@ void CMenuPcs::DrawResultCountAnim()
 					if (this->m_bonusState->m_countFinished == 0) {
 #ifdef VERSION_GCCP01
 						double frame = (double)this->m_bonusState->m_frame - 8.333333134651184;
-#else
-						int frame = this->m_bonusState->m_frame - 10;
-#endif
 						if (frame <= 0) {
 							value = 0;
 						} else if (frame < total) {
@@ -1526,6 +1525,14 @@ void CMenuPcs::DrawResultCountAnim()
 						} else {
 							value = total;
 						}
+#else
+						value = this->m_bonusState->m_frame - 10;
+						if (value <= 0) {
+							value = 0;
+						} else if (value >= total) {
+							value = total;
+						}
+#endif
 					} else {
 						value = total;
 					}
@@ -1553,8 +1560,7 @@ void CMenuPcs::DrawResultCountAnim()
 	for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		Sprt2* sprite = &m_bonusAnim->sprites[i];
 		if (sprite->kind == -1) {
-			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
-			font->SetColor(color.color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 			int partyIndex = textIndex % activePartyCount;
 			int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
@@ -1632,8 +1638,7 @@ void CMenuPcs::CalcResultCloseAnim()
 	if (this->m_bonusState->m_initialized == 0) {
 		for (i = 0; i < (int)m_bonusAnim->header.count; i++) {
 			m_bonusAnim->sprites[i].timer = 0;
-			m_bonusAnim->sprites[i].motionX = 0.0f;
-			m_bonusAnim->sprites[i].motionY = 0.0f;
+			m_bonusAnim->sprites[i].motionY = m_bonusAnim->sprites[i].motionX = 0.0f;
 		}
 
 		int base = 0;
@@ -2127,8 +2132,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->x = 0;
 			spr->w = 0x280;
 			spr->h = 0x1c0;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 0;
 			spr->duration = 0;
 			spr->depth = 1.0f;
@@ -2141,8 +2145,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->y = 0x38;
 			spr->w = 0x168;
 			spr->h = 0x148;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 0;
 			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
@@ -2154,8 +2157,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->y = 0;
 			spr->w = 0x80;
 			spr->h = 0x78;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 9999;
 			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
@@ -2170,8 +2172,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->y = 0;
 			spr->w = 0x70;
 			spr->h = 0x68;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 0;
 			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
@@ -2633,8 +2634,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 			if (sprite->kind != -1) {
 				continue;
 			}
-			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha));
-			font->SetColor(color.color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
 
 			for (int j = 0; j < activePartyCount; j++) {
 				if (textIndex == s_Rinfo->m_party[j].m_rank) {
@@ -2687,8 +2687,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font->SetScaleY(0.8999999761581421f);
 #endif
 		font->DrawInit();
-		CColor color(0xFF, 0xFF, 0xFF, 0xFF);
-		font->SetColor(color.color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
 		char* title = Game.GetShortItemName(idx);

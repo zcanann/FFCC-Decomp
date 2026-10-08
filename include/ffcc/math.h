@@ -80,6 +80,13 @@ public:
     unsigned int Hsb2Rgb(int, int, int);
     float DstRot(float, float);
 
+    void MTXRotRadApply(float (*src)[4], float (*dst)[4], char axis, float rad)
+    {
+        Mtx rot;
+        PSMTXRotRad(rot, axis, rad);
+        PSMTXConcat(src, rot, dst);
+    }
+
     MtxPtr GetLocalMtx() { return m_localMtx; }
 
 private:

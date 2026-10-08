@@ -2431,7 +2431,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             charmFlag = 1;
         }
         const unsigned int drawFlags = m_flags;
-        int modelDrawFlags = ((charmFlag != 0) ? 1 : 0) | (((drawFlags & 0x400) != 0) ? 2 : 0) | (((drawFlags & 0x2000) != 0) ? 4 : 0);
+        int modelDrawFlags = (charmFlag != 0) ? 1 : 0;
+        modelDrawFlags |= ((drawFlags & 0x400) != 0) ? 2 : 0;
+        modelDrawFlags |= ((drawFlags & 0x2000) != 0) ? 4 : 0;
         unsigned char effectFlag = 0;
         if (drawPass == 3 && (drawFlags & 0x8000) != 0) {
             effectFlag = 1;

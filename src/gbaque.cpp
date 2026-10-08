@@ -1673,12 +1673,12 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
  */
 void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 {
+    int j;
     GbaQueueMapEntity localEnemyData[64];
     int radarMode;
     int count;
     short baseX;
     unsigned int i;
-    int j;
     short baseZ;
     GbaQueueMapEntity* localEntry;
     GbaQueueMapEntity* prevEntry;
@@ -1705,7 +1705,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
         localEntry->m_posX = localEntry->m_posX - baseX;
         localEntry->m_posZ = localEntry->m_posZ - baseZ;
 
-        if (abs(localEntry->m_posX) >= 0x50 || abs(localEntry->m_posZ) >= 0x40) {
+        if (__abs(localEntry->m_posX) >= 0x50 || __abs(localEntry->m_posZ) >= 0x40) {
             localEntry->m_posX = -1;
             localEntry->m_posZ = -1;
             localEntry->m_visible = 0;
@@ -1739,7 +1739,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     }
 
     *outCount = count;
-    memcpy(prevEntry, localEnemyData, sizeof(localEnemyData));
+    memcpy(m_enemyHistory[channel], localEnemyData, sizeof(localEnemyData));
     OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -1780,7 +1780,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		localEntry->m_posX = static_cast<short>(localEntry->m_posX - baseX);
 		localEntry->m_posZ = static_cast<short>(localEntry->m_posZ - baseZ);
 
-		if (abs(localEntry->m_posX) >= 0x50 || abs(localEntry->m_posZ) >= 0x40) {
+		if (__abs(localEntry->m_posX) >= 0x50 || __abs(localEntry->m_posZ) >= 0x40) {
 			localEntry->m_posX = -1;
 			localEntry->m_posZ = -1;
 			localEntry->m_visible = 0;
@@ -1813,7 +1813,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	}
 
 	*outCount = count;
-	memcpy(prevEntry, localMapItems, sizeof(localMapItems));
+	memcpy(m_mapItemHistory[channel], localMapItems, sizeof(localMapItems));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

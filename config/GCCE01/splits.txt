@@ -505,6 +505,10 @@ materialman.cpp:
 
 mapobj.cpp:
 	.text start:0x800285C4 end:0x8002C4F8
+	.rodata     start:0x801D6000 end:0x801D61A8
+	.data       start:0x801E7758 end:0x801E77E0
+	.sdata      start:0x8032D478 end:0x8032D4AC
+	.sdata2     start:0x8032E900 end:0x8032E924
 
 p_camera.cpp:
 	.bss start:0x80267750 end:0x80267C30
@@ -516,6 +520,11 @@ gobject.cpp:
 chara.cpp:
 	.sbss start:0x8032DD80 end:0x8032DD88
 	.text start:0x8006E46C end:0x8007345C
+	.rodata     start:0x801D7FB8 end:0x801D8068
+	.data       start:0x801FBB50 end:0x801FBBB8
+	.bss        start:0x802E68A0 end:0x802E8918
+	.sdata2     start:0x8032F170 end:0x8032F1F0
+	.sdata      start:0x8032D6B8 end:0x8032D6E8
 
 cflat_runtime2.cpp:
 	.text start:0x80069470 end:0x8006e46c
@@ -542,6 +551,12 @@ gbaque.cpp:
 
 map.cpp:
 	.text start:0x8002f250 end:0x8003477c
+	.rodata     start:0x801D6240 end:0x801D6620
+	.data       start:0x801E77E0 end:0x801E7834
+	.bss        start:0x80244718 end:0x802675A0
+	.sbss       start:0x8032DC98 end:0x8032DCA0
+	.sdata2     start:0x8032E940 end:0x8032E9C0
+	.sdata      start:0x8032D4B0 end:0x8032D4E8
 
 monobj.cpp:
 	.text start:0x801120b4 end:0x801198d4
@@ -552,6 +567,9 @@ monobj_boss.cpp:
 p_menu.cpp:
 	.text start:0x80093814 end:0x80097174
 	.bss start:0x802E9160 end:0x802E9A20
+	.rodata     start:0x801D8C50 end:0x801D8D28
+	.sdata      start:0x8032D780 end:0x8032D7A0
+	.sdata2     start:0x8032F6C8 end:0x8032F830
 
 p_minigame.cpp:
 	.bss start:0x802FF248 end:0x803056E8
@@ -604,12 +622,17 @@ mapocttree.cpp:
 
 shopmenu.cpp:
 	.text start:0x8014F4BC end:0x801586D0
+	.data       start:0x80213C10 end:0x80213E60
+	.sbss       start:0x8032DEB0 end:0x8032DEB9
 
 cmake.cpp:
 	.text start:0x8016BCC4 end:0x801736C8
 
 singmenu.cpp:
 	.rodata start:0x801DD684 end:0x801DD87C
+	.bss        start:0x8030A610 end:0x8030AA28
+	.sdata      start:0x8032DA58 end:0x8032DA60
+	.sbss       start:0x8032DE98 end:0x8032DEA8
 
 cflat_r2system.cpp:
 	.text start:0x800B218C end:0x800B9B98
@@ -648,10 +671,18 @@ menu_letter.cpp:
 graphic.cpp:
 	.text start:0x800161FC end:0x80019D7C
 	.bss start:0x8022FE08 end:0x8023B498
+	.rodata     start:0x801D5278 end:0x801D5290
+	.sdata      start:0x8032D3C8 end:0x8032D3E0
+	.sbss       start:0x8032DC28 end:0x8032DC38
+	.sdata2     start:0x8032E688 end:0x8032E6E0
 
 p_graphic.cpp:
 	.text start:0x80044F6C end:0x80047724
 	.bss start:0x80267E50 end:0x80267F44
+	.rodata     start:0x801D6AC0 end:0x801D6B60
+	.data       start:0x801E8B10 end:0x801E8D40
+	.sdata2     start:0x8032EB18 end:0x8032EBCC
+	.sdata      start:0x8032D5B8 end:0x8032D5D0
 
 p_light.cpp:
 	.text start:0x80047BF4 end:0x8004A294
@@ -705,6 +736,11 @@ menu_cmd.cpp:
 
 chara_fur.cpp:
 	.text start:0x800DEDE4 end:0x800E3EA8
+	.rodata     start:0x801DA5AC end:0x801DA658
+	.bss        start:0x802FE368 end:0x802FE3C4
+	.sbss       start:0x8032DDC8 end:0x8032DDF4
+	.sdata2     start:0x80330090 end:0x80330128
+	.sbss2      start:0x80332D88 end:0x80332D98
 
 pppYmLaser.cpp:
 	.rodata start:0x801DA3C8 end:0x801DA3D8
@@ -1241,6 +1277,10 @@ charaobj.cpp:
 
 p_chara.cpp:
 	.text start:0x8007345C end:0x8007B570
+	.data       start:0x801FBBB8 end:0x801FC1C0
+	.bss        start:0x802E8918 end:0x802E9040
+	.sdata2     start:0x8032F1F0 end:0x8032F2F8
+	.sdata      start:0x8032D6E8 end:0x8032D748
 
 axfx/reverb_hi.c:
 	.text	start:0x80192D54 end:0x80193E18

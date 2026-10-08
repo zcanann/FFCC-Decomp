@@ -5,6 +5,12 @@
 
 #include <string.h>
 
+#ifdef VERSION_GCCP01
+#define MON_FRAMES(ntsc, pal) (pal)
+#else
+#define MON_FRAMES(ntsc, pal) (ntsc)
+#endif
+
 class CFont;
 class CGPrgObj;
 class CGPartyObj;

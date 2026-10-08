@@ -83,7 +83,11 @@ inline float CMapPcs::GetHitT()
 
 struct CMonAiAction {
 	unsigned short m_flags;
-	unsigned short m_pad02[5];
+	unsigned short m_minDist;
+	unsigned short m_maxDist;
+	unsigned short m_chance;
+	unsigned short m_type;
+	unsigned short m_group;
 	unsigned short m_range;
 	unsigned short m_changeStat;
 };

@@ -2498,7 +2498,10 @@ p_sound.cpp:
 	.text start:0x800D5B64 end:0x800D5D14
 
 pppYmLookOn.cpp:
+	extab start:0x80008C2C end:0x80008C34
+	extabindex start:0x8000F61C end:0x8000F628
 	.text start:0x800D5D14 end:0x800D5F08
+	.sdata2 start:0x8034DBE8 end:0x8034DBF0
 
 pppYmCheckBGHeight.cpp:
 	.text start:0x800D5F08 end:0x800D6068

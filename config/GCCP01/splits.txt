@@ -1340,6 +1340,7 @@ pppYmLookOn.cpp:
 	extab       start:0x80008BBC end:0x80008BC4
 	extabindex  start:0x8000F664 end:0x8000F670
 	.text       start:0x800D88C8 end:0x800D8ABC
+	.sdata2     start:0x80330EC8 end:0x80330ED0
 
 pppYmCheckBGHeight.cpp:
 	extab       start:0x80008BC4 end:0x80008BCC

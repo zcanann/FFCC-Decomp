@@ -3,9 +3,6 @@
 
 extern float ppvSinTbl[];
 
-extern float gPppYmLookOnZero;
-extern float gPppYmLookOnOne;
-
 extern float kPppZero;
 extern float kPppOne;
 extern float kPppBreathModelZero;

@@ -3,7 +3,6 @@
 #include "ffcc/gobject.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
 STATIC_ASSERT(sizeof(YmLookOnDataOffsets) == 0x4);
@@ -64,19 +63,20 @@ void pppFrameYmLookOn(pppYmLookOn* lookOn, struct pppYmLookOnStep* step, struct 
     effectPos.z = ppvMng->m_matrix.value[2][3];
     PSVECSubtract(&effectPos, &targetPos, &toEffect);
 
-    if (((gPppYmLookOnZero != toEffect.x) || (gPppYmLookOnZero != toEffect.y)) || (gPppYmLookOnZero != toEffect.z)) {
+    f32 initialZero = 0.0f;
+    if (((initialZero != toEffect.x) || (initialZero != toEffect.y)) || (initialZero != toEffect.z)) {
         PSVECNormalize(&toEffect, &axisZ);
         axisX.x = axisZ.z;
-        axisX.y = gPppYmLookOnZero;
+        axisX.y = 0.0f;
         axisX.z = -axisZ.x;
-        f32 zero = gPppYmLookOnZero;
+        f32 zero = 0.0f;
         if ((zero == axisZ.z) && (zero == axisX.z)) {
-            axisX.x = gPppYmLookOnOne;
-            axisX.y = gPppYmLookOnZero;
-            axisX.z = gPppYmLookOnZero;
-            axisY.x = gPppYmLookOnZero;
-            axisY.y = gPppYmLookOnZero;
-            axisY.z = gPppYmLookOnOne;
+            axisX.x = 1.0f;
+            axisX.y = 0.0f;
+            axisX.z = 0.0f;
+            axisY.x = 0.0f;
+            axisY.y = 0.0f;
+            axisY.z = 1.0f;
         } else {
             PSVECNormalize(&axisX, &axisX);
             PSVECCrossProduct(&axisZ, &axisX, &axisY);

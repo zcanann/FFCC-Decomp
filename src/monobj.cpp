@@ -1539,24 +1539,10 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 			(static_cast<int>(CFlatCenterState()) == 0) &&
 		((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0)) {
 		char text[0x100];
-		unsigned short aiState = m_groupTag;
-		int targetIndex = m_targetPartyIndex;
-		int targetChar = '-';
-		int aiMasked = aiState & 0x7FFF;
-
-		if (targetIndex >= 0) {
-			targetChar = targetIndex + '0';
-		}
-		int saveSlot = (int)object->m_scriptHandle[2];
-		int aiChar;
-		if (aiMasked == 0) {
-			aiChar = '-';
-		} else {
-			aiChar = aiMasked + 0x40;
-		}
-
-		sprintf(text, "%d %c %d %c", saveSlot, aiChar,
-		        m_chaseState, targetChar);
+		int aiMasked = m_groupTag & 0x7FFF;
+		sprintf(text, "%d %c %d %c", reinterpret_cast<CGObjWork*>(object->m_scriptHandle)->m_saveSlot,
+		        aiMasked == 0 ? '-' : aiMasked + 0x40,
+		        m_chaseState, m_targetPartyIndex >= 0 ? m_targetPartyIndex + '0' : '-');
 		font->SetPos(posX - font->GetWidth(text) * 0.5f, posY, posZ);
 		font->Draw(text);
 		posY -= font->GetHeight();

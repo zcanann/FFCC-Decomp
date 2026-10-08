@@ -1597,8 +1597,8 @@ unsigned int CMenuPcs::CmdClose0()
 	unsigned int done = 0;
 	if (entryCount == doneCount) {
 		done = 1;
-		CmdListEntry* e = &GetCmdListStorage(this)->entries[GetCmdStateView(this)->selected[0]];
-		e->x = GetCmdListEntries(this)[0].x;
+		selEntry = &GetCmdListStorage(this)->entries[GetCmdStateView(this)->selected[0]];
+		selEntry->x = GetCmdListEntries(this)[0].x;
 	}
 
 	return done;
@@ -2447,6 +2447,8 @@ unsigned int CMenuPcs::CmdOpen1()
  */
 unsigned int CMenuPcs::CmdClose1()
 {
+	s32 i;
+	s32 selected;
 	CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
@@ -2455,8 +2457,7 @@ unsigned int CMenuPcs::CmdClose1()
 	int combo[5][2];
 
 	if (state == 0) {
-		const s32 selected = GetCmdStateView(this)->selected[0];
-		s32 i;
+		selected = GetCmdStateView(this)->selected[0];
 		for (i = 0; i < 3; i++) {
 			if ((i != 0) && (caravanWork->m_commandListExtra[selected + i] != -1)) {
 				break;
@@ -2486,7 +2487,7 @@ unsigned int CMenuPcs::CmdClose1()
 			GetCmdStateView(this)->commandResult = 0;
 		}
 	} else if (state == 1) {
-		const s32 selected = GetCmdStateView(this)->selected[0];
+		selected = GetCmdStateView(this)->selected[0];
 		s32 uniteIdx = 0;
 		s32 topCount = s_ucnt;
 		for (; uniteIdx < topCount; uniteIdx++) {
@@ -2507,7 +2508,7 @@ unsigned int CMenuPcs::CmdClose1()
 			cw->UnuniteComList(selected, ununiteCount);
 		}
 	} else if (state == 2) {
-		const s16 selected = GetCmdStateView(this)->selected[0];
+		selected = GetCmdStateView(this)->selected[0];
 		const s32 count = ChkUnite(static_cast<int>(selected), combo);
 		if (count == 1) {
 			done = 0;
@@ -2517,7 +2518,7 @@ unsigned int CMenuPcs::CmdClose1()
 			GetCmdStateView(this)->commandResult = 1;
 		}
 	} else if (state == 3) {
-		const s16 selected = GetCmdStateView(this)->selected[0];
+		selected = GetCmdStateView(this)->selected[0];
 		s32 uniteIdx = 0;
 		s32 topCount = s_ucnt;
 		for (; uniteIdx < topCount; uniteIdx++) {

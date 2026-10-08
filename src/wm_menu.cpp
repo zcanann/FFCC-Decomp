@@ -7409,14 +7409,12 @@ void CMenuPcs::DrawCharaName()
 	shade.a = static_cast<unsigned char>(static_cast<int>(alphaF));
 	GXSetChanMatColor(GX_COLOR0A0, shade);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterNamePlateTexture));
-	const float yBase1 = FLOAT_80331478;
 	float plateW = 64.0f;
 	const double xOffsetDefault =
 	    -(DOUBLE_80331418 * static_cast<double>(plateW) - DOUBLE_80331678);
-	const float yExtra1 = FLOAT_80331684;
 	for (int row = 0; row < 2; row++) {
-		float y = yBase1 + static_cast<float>(row * 0xB8);
-		y += yExtra1;
+		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
+		y += FLOAT_80331684;
 		if (row != 0) {
 			y += FLOAT_80331548;
 		}
@@ -7428,13 +7426,12 @@ void CMenuPcs::DrawCharaName()
 				float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
 				const float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
-				if (static_cast<double>(width) * DOUBLE_803313F8 > static_cast<double>(plateW)) {
-					const float widthPlus = static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
-					scale = static_cast<float>(widthPlus * DOUBLE_803313F8 / static_cast<double>(plateW));
-					const double xOffsetW = FLOAT_8033155C - widthPlus;
-					xBase = static_cast<float>(xOffsetW * DOUBLE_803313F8 + xBase);
+				if (width / 2.0 > plateW) {
+					const float widthPlus = static_cast<float>(width + DOUBLE_80331510);
+					scale = static_cast<float>(widthPlus / 2.0 / plateW);
+					xBase = static_cast<float>((FLOAT_8033155C - widthPlus) / 2.0 + xBase);
 				} else {
-					xBase = static_cast<float>(xOffsetDefault * DOUBLE_803313F8 + xBase);
+					xBase = static_cast<float>(xOffsetDefault / 2.0 + xBase);
 				}
 				MenuPcs.DrawRect(
 				    0, xBase, y, FLOAT_80331680, FLOAT_80331410,
@@ -7452,23 +7449,17 @@ void CMenuPcs::DrawCharaName()
 	font->SetShadow(1);
 	font->SetScale(FLOAT_8033158C);
 	font->DrawInit();
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<long>(alphaF)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
 
 	CSystem* const sys = &System;
-	const float xBase2 = FLOAT_80331410;
-	const float xMax2 = FLOAT_8033155C;
-	const float yBase2 = FLOAT_80331478;
-	const float yExtra2 = FLOAT_80331688;
-	const float ySub2 = FLOAT_80331550;
-	const double k3f8_2 = DOUBLE_803313F8;
 	for (int row2 = 0; row2 < 2; row2++) {
-		float y = yBase2 + static_cast<float>(row2 * 0xB8);
-		y += yExtra2;
+		float y = FLOAT_80331478 + static_cast<float>(row2 * 0xB8);
+		y += FLOAT_80331688;
 		if (row2 != 0) {
 			y += FLOAT_80331548;
 		}
 #ifndef VERSION_GCCJGC
-		y = static_cast<float>(y - ySub2);
+		y -= FLOAT_80331550;
 #endif
 		for (int col = 0; col < 4; col++) {
 			const int slot = row2 * 4 + col;
@@ -7476,7 +7467,7 @@ void CMenuPcs::DrawCharaName()
 			restoreColor = 0;
 			const char* text;
 
-			float xBase = xBase2 + static_cast<float>(col * 0x90);
+			float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
 
 			const int menuMode = this->m_wmWorldState->m_menuMode;
 			bool hasName;
@@ -7526,8 +7517,8 @@ void CMenuPcs::DrawCharaName()
 #endif
 			}
 
-			const float widthDiff = xMax2 - font->GetWidth(text);
-			xBase += widthDiff * k3f8_2;
+			const float widthDiff = FLOAT_8033155C - font->GetWidth(text);
+			xBase += widthDiff / 2.0;
 			font->SetPosX(xBase);
 			font->SetPosY(y);
 			font->Draw(text);
@@ -7647,9 +7638,8 @@ void CMenuPcs::DrawCMLife()
 		}
 		const float* pYAdj = &FLOAT_8033166C;
 		yTmp = yTmp + *pYAdj;
-		double half = 0.5;
-		x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * half + static_cast<double>(xBase));
-		float step = static_cast<float>(static_cast<double>(8 - count) * half);
+		x = static_cast<float>((0x90 - count * 0x10) / 2.0 + xBase);
+		float step = static_cast<float>((8 - count) / 2.0);
 
 		const float* pRectSize = &FLOAT_80331558;
 		float kRectSize;
@@ -9879,11 +9869,8 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
  */
 void CMenuPcs::SetMcWinInfo(int x, int y)
 {
-    double half = 0.5;
-    const short newX = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<float>(0x280 - x) * half)));
-    const short newY = static_cast<short>(static_cast<int>(static_cast<float>((FLOAT_80331430 - static_cast<float>(y)) * half)));
-    m_menuWindowInfo->x = newX;
-    m_menuWindowInfo->y = newY;
+    m_menuWindowInfo->x = static_cast<short>(static_cast<float>(static_cast<float>(0x280 - x) / 2.0));
+    m_menuWindowInfo->y = static_cast<short>(static_cast<float>((FLOAT_80331430 - y) / 2.0));
     m_menuWindowInfo->width = static_cast<short>(x);
     m_menuWindowInfo->height = static_cast<short>(y);
     m_menuWindowInfo->frame = 0;
@@ -10093,8 +10080,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 #endif
 		}
-		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - maxWidth) * 0.5 +
-		                          static_cast<double>(static_cast<int>(m_menuWindowInfo->x)));
+		posX = static_cast<float>((m_menuWindowInfo->width - maxWidth) / 2.0 + m_menuWindowInfo->x);
 	}
 
 	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
@@ -10134,8 +10120,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			if (winType == 0 || isDollar != 0) {
 #endif
 				const int textWidth = font->GetWidth(textBuf);
-				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - textWidth) * 0.5 +
-				                          static_cast<double>(static_cast<int>(m_menuWindowInfo->x)));
+				posX = static_cast<float>((m_menuWindowInfo->width - textWidth) / 2.0 + m_menuWindowInfo->x);
 			}
 			font->SetPosX(posX);
 			font->SetPosY(y);

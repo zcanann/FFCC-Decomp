@@ -1282,26 +1282,25 @@ void CMenuPcs::DrawResultOpenAnim()
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	int activePartyCount;
+	CMenuPcs::Sprt2* sprite;
 	int frame;
-	int i;
 	int work;
+	int activePartyCount;
+	int i;
 	int countTop;
 
 	activePartyCount = s_Rinfo->m_partyCount;
 
 	if (this->m_bonusState->m_initialized == 0) {
 		countTop = m_bonusAnim->header.count;
-		short y = 0x28;
 		for (i = 0; i < activePartyCount; i++) {
 			work = s_Rinfo->m_party[i].m_rank;
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
 			sprite->kind = kBonusCountTexture;
 			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			sprite->x = stripX;
-			sprite->y = y;
+			sprite->y = 0x28 + i * 0x60;
 			sprite->w = 0x38;
-			y += 0x60;
 			sprite->h = 0x28;
 			sprite->mulX = (float)(work * sprite->w);
 			sprite->mulY = 0.0f;
@@ -1319,7 +1318,7 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->timer = 0;
 		}
 
-		int newCount = countTop + activePartyCount;
+		countTop += activePartyCount;
 
 #ifndef VERSION_GCCJGC
 		for (i = 0; i < 0x18; i++) {
@@ -1330,7 +1329,7 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 #endif
 
-		m_bonusAnim->header.count = (short)newCount;
+		m_bonusAnim->header.count = (short)countTop;
 		this->m_bonusState->m_initialized = 1;
 	}
 
@@ -1346,7 +1345,7 @@ void CMenuPcs::CalcResultCountAnim()
 #endif
 
 	for (i = 0; i < activePartyCount; i++) {
-		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[countTop + i];
+		sprite = &m_bonusAnim->sprites[countTop + i];
 		if (this->m_bonusState->m_countFinished != 0) {
 			sprite->motionX = 0.0f;
 			sprite->motionY = 0.0f;

@@ -4217,7 +4217,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             type_error:
                 if ((unsigned int)System.m_execParam >= 1)
                 {
-                    System.Printf(const_cast<char*>(s_send_type_error_fmt), threadParam->m_portIndex);
+                    System.Printf(const_cast<char*>(s_send_type_error_fmt), threadParam->m_portIndex, (signed char)sendType);
                 }
                 return -1;
             }
@@ -4435,7 +4435,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         cnt = m_pposWordIndex[threadParam->m_portIndex];
         sent = cnt;
 
-        while (sent < (int)(signed char)m_cmdBuffer[threadParam->m_portIndex])
+        while (sent < m_cmdBuffer[threadParam->m_portIndex])
         {
             result = SetSendQueue(threadParam, posWords[sent]);
 
@@ -4450,7 +4450,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_pposWordIndex[threadParam->m_portIndex] += sent;
 
         // Done with all player-pos words?
-        if ((int)(signed char)m_cmdBuffer[threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
+        if (m_cmdBuffer[threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
         {
             m_cmdBuffer[threadParam->m_portIndex] = 0;
             m_pposWordIndex[threadParam->m_portIndex] = 0;
@@ -4467,9 +4467,9 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         GbaQue.GetEnemyPos(threadParam->m_portIndex, posWords, &cnt);
 
-        m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)cnt;
+        m_cmdBuffer[4 + threadParam->m_portIndex] = cnt;
 
-        if (static_cast<signed char>(m_cmdBuffer[4 + threadParam->m_portIndex]) == 0)
+        if (m_cmdBuffer[4 + threadParam->m_portIndex] == 0)
         {
             state += 2;
             break;
@@ -4484,7 +4484,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         cnt = m_pposWordIndex[threadParam->m_portIndex];
         sent = cnt;
 
-        while (sent < (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
+        while (sent < m_cmdBuffer[4 + threadParam->m_portIndex])
         {
             result = SetSendQueue(threadParam, posWords[sent]);
 
@@ -4498,7 +4498,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         m_pposWordIndex[threadParam->m_portIndex] += sent;
 
-        if ((int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
+        if (m_cmdBuffer[4 + threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
         {
             state += 1;
             m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
@@ -4516,9 +4516,9 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         GbaQue.GetTreasurePos(threadParam->m_portIndex, posWords, &cnt);
 
-        m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)cnt;
+        m_cmdBuffer[4 + threadParam->m_portIndex] = cnt;
 
-        if (static_cast<signed char>(m_cmdBuffer[4 + threadParam->m_portIndex]) == 0)
+        if (m_cmdBuffer[4 + threadParam->m_portIndex] == 0)
         {
             state = 0;
             break;
@@ -4533,7 +4533,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         cnt = m_pposWordIndex[threadParam->m_portIndex];
         sent = cnt;
 
-        while (sent < (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
+        while (sent < m_cmdBuffer[4 + threadParam->m_portIndex])
         {
             result = SetSendQueue(threadParam, posWords[sent]);
 
@@ -4547,7 +4547,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         m_pposWordIndex[threadParam->m_portIndex] += sent;
 
-        if ((int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
+        if (m_cmdBuffer[4 + threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
         {
             state = 0;
             m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
@@ -4561,9 +4561,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     {
         if ((unsigned int)System.m_execParam >= 2u)
         {
-            signed char cnt = (signed char)m_cmdBuffer[threadParam->m_portIndex];
-
-            System.Printf(const_cast<char*>(s_ppos_cnt_error_fmt), threadParam->m_portIndex, (int)cnt);
+            System.Printf(const_cast<char*>(s_ppos_cnt_error_fmt), threadParam->m_portIndex, m_cmdBuffer[threadParam->m_portIndex]);
         }
 
         m_cmdBuffer[threadParam->m_portIndex] = 0;
@@ -4677,7 +4675,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 if (player->m_maxHp != 0)
                 {
                     int idx = (int)player->m_saveSlot >> 1;
-                    signed char v = (cf[idx] & 0x0F) | lowBits;
+                    signed char v = cf[idx] & 0x0F;
+                    v |= lowBits;
 
                     if ((player->m_saveSlot & 1) != 0)
                     {

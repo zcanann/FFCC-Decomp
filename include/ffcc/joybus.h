@@ -226,7 +226,7 @@ public:
 
     unsigned char m_perThreadTemp[4][24];
 
-    unsigned char m_cmdBuffer[8];
+    signed char m_cmdBuffer[8];
 
     uchar m_stageId;
     uchar m_mapId;

@@ -1191,7 +1191,11 @@ static inline int LoadSingMenuTextureStep(CMenuPcs* menu)
 
     if (menu->m_singleMenuTextureLoadState == 0) {
         char path[256];
+#ifdef VERSION_GCCJGC
+        sprintf(path, "dvd/menu/%s.tex", PTR_s_solo1.entries[loadIndex]);
+#else
         sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
+#endif
         gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.ReadASync(gSingMenuAsyncFileHandle);
         menu->m_singleMenuTextureLoadState = menu->m_singleMenuTextureLoadState + 1;
@@ -1333,16 +1337,20 @@ void CMenuPcs::createSingleMenu()
             m_singleMenuStageActive = 1;
         }
 
+#ifdef VERSION_GCCJGC
+        loadFont(1, "dvd/menu/subfont.fnt", 4, -1);
+#else
         char path[128];
         sprintf(path, s_singMenuSubfontPathFmt, Game.GetLangString());
         loadFont(1, path, 4, -1);
+#endif
 
         m_singleMenuInitialized = 0;
         gSingMenuForcedSelection = -1;
         gSingMenuAsyncFileHandle = 0;
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
-            loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
+            loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, SINGMENU_TEX_ID(0x20), 0xD, 1);
             m_wm.m_worldObjData = 0;
             m_singleFadeState = 0;
             m_singMenuState = 0;

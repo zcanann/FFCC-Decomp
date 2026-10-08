@@ -143,17 +143,17 @@ public:
 	virtual void Quit();
 	virtual void Destroy();
 	virtual int Frame(int, int);
-	virtual void onNewObject(CFlatRuntime::CObject*);
-	virtual void onDeleteObject(CFlatRuntime::CObject*);
-	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
-	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
-	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int);
-	virtual void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
-	virtual CFlatRuntime::CObject* getFreeObject(int);
-	virtual void* intToClass(int);
-	virtual void reqFinished(int, CFlatRuntime::CObject*);
+	virtual void onNewObject(CFlatRuntime::CObject*) {}
+	virtual void onDeleteObject(CFlatRuntime::CObject*) {}
+	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&) { return 0; }
+	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&) { return 0; }
+	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int) { return &m_nullVal; }
+	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int) { return &m_nullVal; }
+	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int) {}
+	virtual void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int) {}
+	virtual CFlatRuntime::CObject* getFreeObject(int) { return 0; }
+	virtual void* intToClass(int) { return 0; }
+	virtual void reqFinished(int, CFlatRuntime::CObject*) {}
 	virtual CMemory::CStage* getStage() = 0;
 	virtual CMemory::CStage* getDebugStage() = 0;
 
@@ -229,7 +229,7 @@ public:
         u32 m_previousCodePos;      // 0x0968
         CCodeIndex m_previousCodeIndex;
     };
-    u8 m_pad_096C[4];               // 0x096C
+    CVal m_nullVal;                 // 0x096C
     int m_0x970;                    // 0x0970
     int m_0x974;                    // 0x0974
     CStackBlock m_stackBlocks;        // 0x0978

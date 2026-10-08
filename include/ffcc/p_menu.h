@@ -178,6 +178,14 @@ struct WmCharaAnimState
 };
 STATIC_ASSERT(sizeof(WmCharaAnimState) == 0x14);
 
+struct WmWorldParams
+{
+    int m_unk00;
+    int m_prevAnim;
+    int m_anim;
+    int m_unk0C;
+};
+
 struct WmWorldState
 {
     float m_posX;
@@ -892,7 +900,14 @@ public:
         WmCharaSelectEntry* m_charaSelectData;
     };
 
-    unsigned char m_pad04[0x0F - 0x04];
+    signed char m_wmArea;            // 0x04
+    signed char m_wmPrevArea;        // 0x05
+    unsigned char m_pad06[0x0A - 0x06];
+    signed char m_wmChgFlags;        // 0x0A
+    signed char m_wmPrevYear;        // 0x0B
+    signed char m_wmYear;            // 0x0C
+    unsigned char m_pad0D;
+    signed char m_wmNextAnim;        // 0x0E
     unsigned char m_pageMarkFlags;
     unsigned char m_pad10[0x14 - 0x10];
     unsigned char m_mcRequestLocked;
@@ -977,7 +992,7 @@ public:
         EffectEntry* m_effectEntries;
         McListInfo* m_wmCharaState;
     };
-    unsigned char* m_wmWorldParams;
+    WmWorldParams* m_wmWorldParams;
     EffectInfo* m_effectWork;
     union {
         unsigned char m_pad844[0x848 - 0x844];
@@ -1077,6 +1092,8 @@ STATIC_ASSERT(offsetof(CGObject, m_alphaTarget) == 0x4B4);
 STATIC_ASSERT(offsetof(CGObject, m_alphaStep) == 0x4B8);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
 STATIC_ASSERT(sizeof(CMenuPcs::MaterialInfo) == 0x0C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmChgFlags) == 0x0A);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmNextAnim) == 0x0E);
 STATIC_ASSERT(offsetof(CMenuPcs, m_pageMarkFlags) == 0x0F);
 STATIC_ASSERT(offsetof(CMenuPcs, m_mcCtrl) == 0x20);
 STATIC_ASSERT(offsetof(CMenuPcs, m_manaWaterTimerA) == 0x70);

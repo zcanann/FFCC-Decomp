@@ -543,7 +543,7 @@ shopmenu.cpp:
 singmenu.cpp:
 	.rodata start:0x801D8E98 end:0x801D9454
 	.data start:0x802318B8 end:0x80231A98
-	.sdata2 start:0x8034ED40 end:0x8034EE90
+	.sdata2 start:0x8034ED40 end:0x8034F1B8
 
 cflat_r2system.cpp:
 	.text start:0x800B049C end:0x800B7D34

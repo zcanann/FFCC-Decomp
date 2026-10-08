@@ -52,11 +52,6 @@ static inline s32 Div16Floor(s16 x)
     return x / 16;
 }
 
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
-
 static inline float RotateShapeX(const u8* entry, u32 xOffset, u32 yOffset, float angle)
 {
     float sinA = static_cast<float>(sin(angle));
@@ -492,7 +487,7 @@ void CFunnyShape::RenderTexture()
 
     const s16 width = m_textureHeaders[0]->width;
     const s16 height = m_textureHeaders[0]->height;
-    GXSetViewport(LoadFloat(kFunnyShapeTextureViewportOrigin), LoadFloat(kFunnyShapeTextureViewportOrigin),
+    GXSetViewport(kFunnyShapeTextureViewportOrigin, kFunnyShapeTextureViewportOrigin,
                   static_cast<float>(width), static_cast<float>(height), kFunnyShapeZero, kFunnyShapeOne);
 
     GXClearVtxDesc();

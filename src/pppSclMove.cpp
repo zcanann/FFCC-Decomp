@@ -4,8 +4,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-const float kPppSclMoveZero = 0.0f;
-
 STATIC_ASSERT(offsetof(PppSclMoveOffsets, m_scaleOffset) == 0x0);
 STATIC_ASSERT(offsetof(PppSclMoveOffsets, m_velocityOffset) == 0x4);
 
@@ -27,10 +25,7 @@ void pppSclMoveCon(_pppPObject* param1, _pppCtrlTable* param2)
 {
     PppSclMoveOffsets* offsets = GetSclMoveOffsets(param2);
     float* data1 = (float*)(param1->m_workArea + offsets->m_velocityOffset);
-    float zero = kPppSclMoveZero;
-    data1[2] = zero;
-    data1[1] = zero;
-    data1[0] = zero;
+    data1[0] = data1[1] = data1[2] = 0.0f;
 }
 
 /*

@@ -56,10 +56,8 @@ void CGQuadObj::Reset(float base, float height)
 	m_vertexCount = 0;
 	m_yBase = base;
 	m_yHeight = height;
-	m_bboxMinZ = 10000000.0f;
-	m_bboxMinX = 10000000.0f;
-	m_bboxMaxZ = -10000000.0f;
-	m_bboxMaxX = -10000000.0f;
+	m_bboxMinX = m_bboxMinZ = 10000000.0f;
+	m_bboxMaxX = m_bboxMaxZ = -10000000.0f;
 }
 
 /*

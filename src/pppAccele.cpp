@@ -2,9 +2,6 @@
 #include "ffcc/pppAccele.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
-extern "C" {
-const float kPppAcceleZero = 0.0f;
-}
 
 STATIC_ASSERT(sizeof(PppAcceleDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(PppAcceleDataOffsets, m_valueOffset) == 0x0);
@@ -37,11 +34,8 @@ static inline float* GetPppAcceleAccel(_pppPObject* obj, _pppCtrlTable* ctrl)
 void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
 	float* accel = GetPppAcceleAccel(obj, ctrl);
-	float zero = kPppAcceleZero;
 
-	accel[2] = zero;
-	accel[1] = zero;
-	accel[0] = zero;
+	accel[0] = accel[1] = accel[2] = 0.0f;
 }
 
 /*

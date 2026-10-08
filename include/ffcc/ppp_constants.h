@@ -8,12 +8,8 @@ extern float gPppYmLookOnOne;
 
 extern float kPppZero;
 extern float kPppOne;
-extern const float kPppAcceleZero;
 extern float kPppBreathModelZero;
 extern const float kPppKeLnsZero;
-extern const float kPppMoveZero;
-extern float kPppSclAcceleZero;
-extern float kPppSclMoveZero;
 extern float kPppSRandCVSingleSampleScale;
 extern float kPppSRandDownCVDualSampleScale;
 extern float kPppSRandDownFVDualSampleScale;

@@ -138,10 +138,8 @@ void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppC
 void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    f32 zero = 0.0f;
 
-    texCoords[5] = zero;
-    texCoords[2] = zero;
+    texCoords[2] = texCoords[5] = 0.0f;
 }
 
 /*
@@ -156,12 +154,6 @@ void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
 void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    f32 zero = 0.0f;
 
-    texCoords[5] = zero;
-    texCoords[4] = zero;
-    texCoords[3] = zero;
-    texCoords[2] = zero;
-    texCoords[1] = zero;
-    texCoords[0] = zero;
+    texCoords[0] = texCoords[1] = texCoords[2] = texCoords[3] = texCoords[4] = texCoords[5] = 0.0f;
 }

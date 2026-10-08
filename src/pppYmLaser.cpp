@@ -47,21 +47,14 @@ STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
  */
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	f32 zero = 0.0f;
 	f32 randArg = 6.2831855f;
 	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
 
-	work->m_length = zero;
-	work->m_graphValue3 = zero;
-	work->m_graphValue2 = zero;
-	work->m_halfWidth = zero;
-	work->m_graphValue1 = zero;
-	work->m_graphValue0 = zero;
-	work->m_lengthStep = zero;
+	work->m_length = 0.0f;
+	work->m_halfWidth = work->m_graphValue2 = work->m_graphValue3 = 0.0f;
+	work->m_lengthStep = work->m_graphValue0 = work->m_graphValue1 = 0.0f;
 	work->m_points = 0;
-	work->m_origin.z = zero;
-	work->m_origin.y = zero;
-	work->m_origin.x = zero;
+	work->m_origin.x = work->m_origin.y = work->m_origin.z = 0.0f;
 	work->m_shapeReady = 0;
 	work->m_hitFrame = 0;
 	work->m_unused2E = 0;
@@ -82,18 +75,11 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
  */
 extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	f32 zero = 0.0f;
 	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
 
-	work->m_graphValue3 = zero;
-	work->m_graphValue2 = zero;
-	work->m_halfWidth = zero;
-	work->m_graphValue1 = zero;
-	work->m_graphValue0 = zero;
-	work->m_lengthStep = zero;
-	work->m_origin.z = zero;
-	work->m_origin.y = zero;
-	work->m_origin.x = zero;
+	work->m_halfWidth = work->m_graphValue2 = work->m_graphValue3 = 0.0f;
+	work->m_lengthStep = work->m_graphValue0 = work->m_graphValue1 = 0.0f;
+	work->m_origin.x = work->m_origin.y = work->m_origin.z = 0.0f;
 	work->m_shapeReady = 0;
 }
 

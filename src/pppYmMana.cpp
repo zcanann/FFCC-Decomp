@@ -342,11 +342,8 @@ static void CalculateNormal(VYmMana* mana)
     normals = mana->m_normals;
     indices = mana->m_indices;
 
-    float zero = 0.0f;
     for (i = 0; i < 0x121; i++) {
-        normals[i].z = zero;
-        normals[i].y = zero;
-        normals[i].x = zero;
+        normals[i].x = normals[i].y = normals[i].z = 0.0f;
     }
 
     i = 0;
@@ -1020,11 +1017,8 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
                             pppMemAlloc(meshShape->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
                                         "pppYmMana.cpp", 1000));
                         Vec* reflectionVec = mana->m_meshReflectionVec;
-                        float zero = 0.0f;
                         for (u32 j = 0; j < meshShape->m_vertexCount; j++) {
-                            reflectionVec[j].z = zero;
-                            reflectionVec[j].y = zero;
-                            reflectionVec[j].x = zero;
+                            reflectionVec[j].x = reflectionVec[j].y = reflectionVec[j].z = 0.0f;
                         }
                     }
                     if (mana->m_meshColors == 0) {

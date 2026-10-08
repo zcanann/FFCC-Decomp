@@ -99,11 +99,8 @@ void pppDestructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
                                         _pppCtrlTable* data)
 {
-    float zero = kPppConstrainCameraForLocZero;
     pppConstrainCameraForLocWork* work = GetConstrainCameraWork(constrainCameraForLoc, data);
-    work->m_cameraOffset.z = zero;
-    work->m_cameraOffset.y = zero;
-    work->m_cameraOffset.x = zero;
+    work->m_cameraOffset.x = work->m_cameraOffset.y = work->m_cameraOffset.z = 0.0f;
 }
 
 /*
@@ -117,11 +114,8 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
  */
 void pppConstructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
-    float zero = kPppConstrainCameraForLocZero;
     pppConstrainCameraForLocWork* work = GetConstrainCameraWork(constrainCameraForLoc, data);
-    work->m_cameraOffset.z = zero;
-    work->m_cameraOffset.y = zero;
-    work->m_cameraOffset.x = zero;
+    work->m_cameraOffset.x = work->m_cameraOffset.y = work->m_cameraOffset.z = 0.0f;
     work->m_owner = constrainCameraForLoc;
 }
 

@@ -17,11 +17,11 @@ public:
     void ReleaseAndRemoveAll();
     void DeleteAndRemoveAll();
     void RemoveAt(unsigned long index);
+    T GetAt(unsigned long index);
     T operator[](unsigned long index);
     void SetStage(CMemory::CStage* stage);
     void SetDefaultSize(unsigned long defaultSize);
     void SetGrow(int growCapacity);
-    T GetAt(unsigned long index);
 
 private:
     int setSize(unsigned long newSize);

@@ -214,420 +214,6 @@ T CPtrArray<T>::GetAt(unsigned long index)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 72b
- * EN Address: 0x80050144
- * EN Size: 80b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CTexAnimSeq::CTexAnimSeq()
-{
-    m_keyCount = 0;
-    m_keys = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 396b
- * EN Address: 0x80050214
- * EN Size: 400b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
-{
-    CChunkFile::CChunk chunk;
-
-    chunkFile.PushChunk();
-    while ((int)chunkFile.GetNextChunk(chunk) != 0) {
-        switch (chunk.m_id) {
-        case 'NAME':
-            strcpy(m_name, chunkFile.GetString());
-            continue;
-        case 'INFO': {
-            m_totalFrames = chunkFile.Get4();
-            chunkFile.Get4();
-            m_interp = (char)chunkFile.Get4();
-            m_chin = (char)chunkFile.Get4();
-            m_e1 = strcmp(m_name, "e1") == 0;
-            continue;
-        }
-        case 'KEY ':
-            m_keyCount = chunk.m_size / 0x30;
-            m_keys = static_cast<CTexAnimKey*>(
-                Memory._Alloc(chunk.m_size, stage, "texanim.cpp", 0x1D4, 0));
-            memcpy(m_keys, chunkFile.GetAddress(), chunk.m_size);
-            continue;
-        default:
-            break;
-        }
-    }
-    chunkFile.PopChunk();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 464b
- * EN Address: 0x800503A4
- * EN Size: 620b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CTexAnimSeq::Interp(float frame, Vec& texGen)
-{
-    float currentFrame = (float)fmod((double)frame, (double)(float)m_totalFrames);
-    unsigned int keyCount = m_keyCount;
-    CTexAnimKey* keys = m_keys;
-    unsigned int keyIndex = 0;
-    unsigned int lastKeyIndex = keyCount - 1;
-
-    while (keyIndex < keyCount) {
-        CTexAnimKey* keyData = &keys[keyIndex];
-        float nextFrame = (float)((keyIndex < lastKeyIndex) ? keyData[1].m_frame : m_totalFrames);
-        CTexAnimKey* nextKeyData;
-
-        if (keyIndex < lastKeyIndex) {
-            nextKeyData = &keys[keyIndex + 1];
-        } else {
-            nextKeyData = keys;
-        }
-
-        if (((float)keyData->m_frame <= currentFrame) && (currentFrame < nextFrame)) {
-            float t;
-            float frameSpan = nextFrame - (float)keyData->m_frame;
-            if (frameSpan == 0.0f) {
-                t = 0.0f;
-            } else {
-                t = (currentFrame - (float)keyData->m_frame) / frameSpan;
-            }
-
-            Vec v0;
-            Vec v1;
-            PSVECScale(&keyData->m_texGen, &v0, 1.0f - t);
-            PSVECScale(&nextKeyData->m_texGen, &v1, t);
-            PSVECAdd(&v0, &v1, &texGen);
-
-            if (!m_interp) {
-                texGen.x = keyData->m_texGen.x;
-                texGen.y = keyData->m_texGen.y;
-            }
-            break;
-        }
-
-        keyIndex = keyIndex + 1;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 8b
- * EN Address: 0x800506F0
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline unsigned int CTexAnimSeq::GetTotalFrame()
-{
-    return m_totalFrames;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 8b
- * EN Address: 0x800506F8
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline char* CTexAnimSeq::GetName()
-{
-    return m_name;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 16b
- * EN Address: 0x80050700
- * EN Size: 16b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline int CTexAnimSeq::IsChin()
-{
-    return m_chin;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 80b
- * EN Address: 0x80050058
- * EN Size: 88b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CTexAnim::CRefData::CRefData()
-{
-    m_material = 0;
-    m_texSrtIndex = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 100b
- * EN Address: 0x8004F950
- * EN Size: 112b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CTexAnim::CTexAnim()
-{
-    const float zero = 0.0f;
-    m_refData = 0;
-    m_seqIndex = 0;
-    m_frame = zero;
-    m_mode = -2;
-    m_texGen.x = m_texGen.y = m_texGen.z = zero;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 724b
- * EN Address: 0x8004FA40
- * EN Size: 360b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
-{
-    CChunkFile::CChunk chunk;
-    CRef* ref = m_refData;
-
-    if (ref != 0) {
-        if (ref->DecRef() == 0) {
-            delete ref;
-        }
-        m_refData = 0;
-    }
-    CTexAnim::CRefData* refData = new (stage, "texanim.cpp", 0xD3) CTexAnim::CRefData;
-    m_refData = refData;
-    m_refData->m_texAnimSeqs.SetStage(stage);
-
-    chunkFile.PushChunk();
-    while ((int)chunkFile.GetNextChunk(chunk) != 0) {
-        switch (chunk.m_id) {
-        case 'NAME':
-            m_refData->m_texSrtIndex = chunk.m_arg0;
-            strcpy(m_refData->m_name, chunkFile.GetString());
-            break;
-        case 'SEQ ': {
-            CTexAnimSeq* seq = new (stage, "texanim.cpp", 0xE2) CTexAnimSeq;
-            seq->Create(chunkFile, stage);
-            m_refData->m_texAnimSeqs.Add(seq);
-            break;
-        }
-        default:
-            break;
-        }
-    }
-    chunkFile.PopChunk();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 208b
- * EN Address: 0x8004FBA8
- * EN Size: 168b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
-{
-    CTexAnim* copy = new (stage, "texanim.cpp", 0xF4) CTexAnim;
-
-    copy->m_refData = m_refData;
-    copy->m_refData->AddRef();
-    copy->m_seqIndex = m_seqIndex;
-    copy->m_frame = m_frame;
-    copy->m_mode = m_mode;
-    copy->m_texGen.x = m_texGen.x;
-    copy->m_texGen.y = m_texGen.y;
-    copy->m_texGen.z = m_texGen.z;
-
-    return copy;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 280b
- * EN Address: 0x8004FC50
- * EN Size: 168b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
-{
-    int materialIndex;
-    CMaterial* material = m_refData->m_material;
-
-    if (material != 0) {
-        if (material->DecRef() == 0) {
-            delete material;
-        }
-        m_refData->m_material = 0;
-    }
-
-    if ((materialSet != 0) && ((materialIndex = materialSet->Find(m_refData->m_name)), materialIndex >= 0)) {
-        material = materialSet->m_materials[materialIndex];
-        m_refData->m_material = material;
-        m_refData->m_material->AddRef();
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 732b
- * EN Address: 0x8004FCF8
- * EN Size: 376b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CTexAnim::AddFrame(float frameStep)
-{
-    CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
-
-    if (!seq->m_e1 || !seq->m_e1 ||
-        (1.0f != m_frame) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
-        seq->Interp(m_frame, m_texGen);
-
-        if (m_mode != -3) {
-            m_frame = m_frame + frameStep;
-            if ((float)seq->m_totalFrames <= m_frame) {
-                if (m_mode == -1) {
-                    m_frame = (float)seq->m_totalFrames;
-                } else if (m_mode >= 0) {
-                    m_seqIndex = m_mode;
-                    m_mode = -2;
-                }
-                m_frame = m_frame - (float)seq->m_totalFrames;
-            }
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 144b
- * EN Address: 0x8004FE70
- * EN Size: 136b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline int CTexAnim::Find(char* name)
-{
-    unsigned long idx;
-    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(m_refData->m_texAnimSeqs.GetSize()); i++) {
-        CTexAnimSeq* seq = m_refData->m_texAnimSeqs[idx];
-        if (strcmp(name, seq->m_name) == 0) {
-            return static_cast<int>(i);
-        }
-    }
-
-    return -1;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CTexAnim::Change(int seqIndex, float frame, CTexAnimSet::ANIM_TYPE mode)
-{
-    m_seqIndex = seqIndex;
-    m_frame = frame;
-    m_mode = static_cast<int>(mode);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 136b
- * EN Address: 0x8004FFA8
- * EN Size: 92b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CTexAnim::SetTexGen()
-{
-    const float zero = 0.0f;
-    CMaterial* material = m_refData->m_material;
-
-    if (material != 0) {
-        CTexScroll* texScroll = material->GetTexScroll(m_refData->m_texSrtIndex);
-        texScroll->m_u0 = m_texGen.x;
-        texScroll->m_v0 = m_texGen.y;
-        texScroll->m_u1 = zero;
-        texScroll->m_v1 = zero;
-        if (zero == texScroll->m_u1) {
-            texScroll->m_type0 = 0;
-        } else {
-            texScroll->m_type0 = 1;
-        }
-        if (zero == texScroll->m_v1) {
-            texScroll->m_type1 = 0;
-        } else {
-            texScroll->m_type1 = 1;
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 56b
- * EN Address: 0x80050004
- * EN Size: 76b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline int CTexAnim::IsChin()
-{
-    CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
-    return seq->IsChin();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 8b
- * EN Address: 0x80050050
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline float CTexAnim::GetChin()
-{
-    return m_texGen.z;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80044a9c
  * PAL Size: 76b
  * EN Address: 0x80044890
@@ -829,6 +415,25 @@ void CTexAnimSet::SetTexGen()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: 0x8004F950
+ * EN Size: 112b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CTexAnim::CTexAnim()
+{
+    const float zero = 0.0f;
+    m_refData = 0;
+    m_seqIndex = 0;
+    m_frame = zero;
+    m_mode = -2;
+    m_texGen.x = m_texGen.y = m_texGen.z = zero;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80043ea4
  * PAL Size: 164b
  * EN Address: 0x80043C98
@@ -845,6 +450,250 @@ CTexAnim::~CTexAnim()
         }
         m_refData = 0;
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 724b
+ * EN Address: 0x8004FA40
+ * EN Size: 360b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
+{
+    CChunkFile::CChunk chunk;
+    CRef* ref = m_refData;
+
+    if (ref != 0) {
+        if (ref->DecRef() == 0) {
+            delete ref;
+        }
+        m_refData = 0;
+    }
+    CTexAnim::CRefData* refData = new (stage, "texanim.cpp", 0xD3) CTexAnim::CRefData;
+    m_refData = refData;
+    m_refData->m_texAnimSeqs.SetStage(stage);
+
+    chunkFile.PushChunk();
+    while ((int)chunkFile.GetNextChunk(chunk) != 0) {
+        switch (chunk.m_id) {
+        case 'NAME':
+            m_refData->m_texSrtIndex = chunk.m_arg0;
+            strcpy(m_refData->m_name, chunkFile.GetString());
+            break;
+        case 'SEQ ': {
+            CTexAnimSeq* seq = new (stage, "texanim.cpp", 0xE2) CTexAnimSeq;
+            seq->Create(chunkFile, stage);
+            m_refData->m_texAnimSeqs.Add(seq);
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    chunkFile.PopChunk();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 208b
+ * EN Address: 0x8004FBA8
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
+{
+    CTexAnim* copy = new (stage, "texanim.cpp", 0xF4) CTexAnim;
+
+    copy->m_refData = m_refData;
+    copy->m_refData->AddRef();
+    copy->m_seqIndex = m_seqIndex;
+    copy->m_frame = m_frame;
+    copy->m_mode = m_mode;
+    copy->m_texGen.x = m_texGen.x;
+    copy->m_texGen.y = m_texGen.y;
+    copy->m_texGen.z = m_texGen.z;
+
+    return copy;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 280b
+ * EN Address: 0x8004FC50
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
+{
+    int materialIndex;
+    CMaterial* material = m_refData->m_material;
+
+    if (material != 0) {
+        if (material->DecRef() == 0) {
+            delete material;
+        }
+        m_refData->m_material = 0;
+    }
+
+    if ((materialSet != 0) && ((materialIndex = materialSet->Find(m_refData->m_name)), materialIndex >= 0)) {
+        material = materialSet->m_materials[materialIndex];
+        m_refData->m_material = material;
+        m_refData->m_material->AddRef();
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 732b
+ * EN Address: 0x8004FCF8
+ * EN Size: 376b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexAnim::AddFrame(float frameStep)
+{
+    CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
+
+    if (!seq->m_e1 || !seq->m_e1 ||
+        (1.0f != m_frame) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
+        seq->Interp(m_frame, m_texGen);
+
+        if (m_mode != -3) {
+            m_frame = m_frame + frameStep;
+            if ((float)seq->m_totalFrames <= m_frame) {
+                if (m_mode == -1) {
+                    m_frame = (float)seq->m_totalFrames;
+                } else if (m_mode >= 0) {
+                    m_seqIndex = m_mode;
+                    m_mode = -2;
+                }
+                m_frame = m_frame - (float)seq->m_totalFrames;
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 144b
+ * EN Address: 0x8004FE70
+ * EN Size: 136b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CTexAnim::Find(char* name)
+{
+    unsigned long idx;
+    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(m_refData->m_texAnimSeqs.GetSize()); i++) {
+        CTexAnimSeq* seq = m_refData->m_texAnimSeqs[idx];
+        if (strcmp(name, seq->m_name) == 0) {
+            return static_cast<int>(i);
+        }
+    }
+
+    return -1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexAnim::Change(int seqIndex, float frame, CTexAnimSet::ANIM_TYPE mode)
+{
+    m_seqIndex = seqIndex;
+    m_frame = frame;
+    m_mode = static_cast<int>(mode);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 136b
+ * EN Address: 0x8004FFA8
+ * EN Size: 92b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexAnim::SetTexGen()
+{
+    const float zero = 0.0f;
+    CMaterial* material = m_refData->m_material;
+
+    if (material != 0) {
+        CTexScroll* texScroll = material->GetTexScroll(m_refData->m_texSrtIndex);
+        texScroll->m_u0 = m_texGen.x;
+        texScroll->m_v0 = m_texGen.y;
+        texScroll->m_u1 = zero;
+        texScroll->m_v1 = zero;
+        if (zero == texScroll->m_u1) {
+            texScroll->m_type0 = 0;
+        } else {
+            texScroll->m_type0 = 1;
+        }
+        if (zero == texScroll->m_v1) {
+            texScroll->m_type1 = 0;
+        } else {
+            texScroll->m_type1 = 1;
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: 0x80050004
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CTexAnim::IsChin()
+{
+    CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
+    return seq->IsChin();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: 0x80050050
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+float CTexAnim::GetChin()
+{
+    return m_texGen.z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: 0x80050058
+ * EN Size: 88b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CTexAnim::CRefData::CRefData()
+{
+    m_material = 0;
+    m_texSrtIndex = 0;
 }
 
 /*
@@ -870,6 +719,21 @@ CTexAnim::CRefData::~CRefData()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: 0x80050144
+ * EN Size: 80b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CTexAnimSeq::CTexAnimSeq()
+{
+    m_keyCount = 0;
+    m_keys = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80043d70
  * PAL Size: 124b
  * EN Address: 0x80043B64
@@ -882,5 +746,99 @@ CTexAnimSeq::~CTexAnimSeq()
     if (m_keys != 0) {
         delete[] m_keys;
         m_keys = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 396b
+ * EN Address: 0x80050214
+ * EN Size: 400b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
+{
+    CChunkFile::CChunk chunk;
+
+    chunkFile.PushChunk();
+    while ((int)chunkFile.GetNextChunk(chunk) != 0) {
+        switch (chunk.m_id) {
+        case 'NAME':
+            strcpy(m_name, chunkFile.GetString());
+            continue;
+        case 'INFO': {
+            m_totalFrames = chunkFile.Get4();
+            chunkFile.Get4();
+            m_interp = (char)chunkFile.Get4();
+            m_chin = (char)chunkFile.Get4();
+            m_e1 = strcmp(m_name, "e1") == 0;
+            continue;
+        }
+        case 'KEY ':
+            m_keyCount = chunk.m_size / 0x30;
+            m_keys = static_cast<CTexAnimKey*>(
+                Memory._Alloc(chunk.m_size, stage, "texanim.cpp", 0x1D4, 0));
+            memcpy(m_keys, chunkFile.GetAddress(), chunk.m_size);
+            continue;
+        default:
+            break;
+        }
+    }
+    chunkFile.PopChunk();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 464b
+ * EN Address: 0x800503A4
+ * EN Size: 620b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexAnimSeq::Interp(float frame, Vec& texGen)
+{
+    float currentFrame = (float)fmod((double)frame, (double)(float)m_totalFrames);
+    unsigned int keyCount = m_keyCount;
+    CTexAnimKey* keys = m_keys;
+    unsigned int keyIndex = 0;
+    unsigned int lastKeyIndex = keyCount - 1;
+
+    while (keyIndex < keyCount) {
+        CTexAnimKey* keyData = &keys[keyIndex];
+        float nextFrame = (float)((keyIndex < lastKeyIndex) ? keyData[1].m_frame : m_totalFrames);
+        CTexAnimKey* nextKeyData;
+
+        if (keyIndex < lastKeyIndex) {
+            nextKeyData = &keys[keyIndex + 1];
+        } else {
+            nextKeyData = keys;
+        }
+
+        if (((float)keyData->m_frame <= currentFrame) && (currentFrame < nextFrame)) {
+            float t;
+            float frameSpan = nextFrame - (float)keyData->m_frame;
+            if (frameSpan == 0.0f) {
+                t = 0.0f;
+            } else {
+                t = (currentFrame - (float)keyData->m_frame) / frameSpan;
+            }
+
+            Vec v0;
+            Vec v1;
+            PSVECScale(&keyData->m_texGen, &v0, 1.0f - t);
+            PSVECScale(&nextKeyData->m_texGen, &v1, t);
+            PSVECAdd(&v0, &v1, &texGen);
+
+            if (!m_interp) {
+                texGen.x = keyData->m_texGen.x;
+                texGen.y = keyData->m_texGen.y;
+            }
+            break;
+        }
+
+        keyIndex = keyIndex + 1;
     }
 }

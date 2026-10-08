@@ -233,11 +233,8 @@ static void CalculateNormal(VMana2* mana2)
     normals = mana2->m_normals;
     indices = mana2->m_indices;
 
-    float zero = 0.0f;
     for (i = 0; i < kWaterVertexCount; i++) {
-        normals[i].z = zero;
-        normals[i].y = zero;
-        normals[i].x = zero;
+        normals[i].x = normals[i].y = normals[i].z = 0.0f;
     }
 
     i = 0;
@@ -1089,11 +1086,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                             static_cast<Vec*>(pppMemAlloc(meshData->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
                                                           const_cast<char*>(s_pppMana2_cpp), 0x232));
                         Vec* reflectionVec = mana2Work->m_meshReflectionVec;
-                        float zero = 0.0f;
                         for (u32 j = 0; j < meshData->m_vertexCount; j++) {
-                            reflectionVec[j].z = zero;
-                            reflectionVec[j].y = zero;
-                            reflectionVec[j].x = zero;
+                            reflectionVec[j].x = reflectionVec[j].y = reflectionVec[j].z = 0.0f;
                         }
                     }
 

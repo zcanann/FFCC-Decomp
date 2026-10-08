@@ -230,17 +230,12 @@ void pppFrameYmTracer2(pppYmTracer2* tracer, pppYmTracer2Step* step, _pppCtrlTab
             (u32)step->m_tracer.m_entryCount * sizeof(YmTracer2Polygon), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer2_cpp), 0xAD);
 
-        val = 0.0f;
         entry = work->entries;
         for (j = 0; j < (s32)(u32)step->m_tracer.m_entryCount; j++) {
             entry->active = 0;
             entry->alpha = 0;
-            entry->pos.z = val;
-            entry->pos.y = val;
-            entry->pos.x = val;
-            entry->targetPos.z = val;
-            entry->targetPos.y = val;
-            entry->targetPos.x = val;
+            entry->pos.x = entry->pos.y = entry->pos.z = 0.0f;
+            entry->targetPos.x = entry->targetPos.y = entry->targetPos.z = 0.0f;
             entry++;
         }
     }

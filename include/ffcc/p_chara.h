@@ -6,6 +6,7 @@
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara_viewer.h"
+#include "ffcc/p_usb.h"
 #include "ffcc/ptrarray_decl.h"
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
@@ -80,6 +81,7 @@ public:
         int IsLoadModelASyncCompleted();
         void CancelLoadModelASync();
         int GetPdtSlot() const;
+        float GetLoadAnimTotalFrame(int);
 
         int m_charaKind;                    // 0x000
         int m_charaNo;                      // 0x004
@@ -262,6 +264,7 @@ public:
     int LoadAnim(int, int, char*, int, int, int);
     CMemory::CStage* GetAnimStage() { return m_loadStages[LOAD_STAGE_ANIM]; }
     int GetCharaAllocStage() { return m_charaAllocStage; }
+    void USBDataCallback(CUSBPcs::CDataHeader*);
     void drawViewer();
     void calcViewer();
     void createViewer();
@@ -331,6 +334,11 @@ public:
 inline int CCharaPcs::CHandle::GetPdtSlot() const
 {
     return m_pdtLoadRef != 0 ? m_pdtLoadRef->m_pdtSlot : -1;
+}
+
+inline float CCharaPcs::CHandle::GetLoadAnimTotalFrame(int slot)
+{
+    return m_animSlot[slot]->m_anim->m_frameCount;
 }
 
 extern CCharaPcs CharaPcs;

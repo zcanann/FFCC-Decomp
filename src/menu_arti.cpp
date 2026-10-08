@@ -164,10 +164,11 @@ void CMenuPcs::ArtiDraw()
 	int selectedArtifactId;
 	int hasSelectedArtifact;
 	CFont* listFont;
-	char* text;
+	int menuIndex;
 	int i;
 	int drawIndex;
 	CFont* helpFont;
+	char* text;
 
 	hasSelectedArtifact = 0;
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -287,7 +288,7 @@ void CMenuPcs::ArtiDraw()
 	for (i = 0; i < 8; i++) {
 		float colorMax = kArtiColorMax;
 		u8 alpha = (u8)(colorMax * entry->alpha);
-		int menuIndex = i + m_artiState->scrollOffset;
+		menuIndex = i + m_artiState->scrollOffset;
 		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha).color);
 
 		if (caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + menuIndex] <= 0) {

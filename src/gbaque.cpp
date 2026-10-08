@@ -1673,12 +1673,12 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
  */
 void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 {
+    int j;
     GbaQueueMapEntity localEnemyData[64];
     int radarMode;
     int count;
     short baseX;
     unsigned int i;
-    int j;
     short baseZ;
     GbaQueueMapEntity* localEntry;
     GbaQueueMapEntity* prevEntry;
@@ -1705,7 +1705,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
         localEntry->m_posX = localEntry->m_posX - baseX;
         localEntry->m_posZ = localEntry->m_posZ - baseZ;
 
-        if (abs(localEntry->m_posX) >= 0x50 || abs(localEntry->m_posZ) >= 0x40) {
+        if (__abs(localEntry->m_posX) >= 0x50 || __abs(localEntry->m_posZ) >= 0x40) {
             localEntry->m_posX = -1;
             localEntry->m_posZ = -1;
             localEntry->m_visible = 0;
@@ -1739,7 +1739,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     }
 
     *outCount = count;
-    memcpy(prevEntry, localEnemyData, sizeof(localEnemyData));
+    memcpy(m_enemyHistory[channel], localEnemyData, sizeof(localEnemyData));
     OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -1780,7 +1780,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		localEntry->m_posX = static_cast<short>(localEntry->m_posX - baseX);
 		localEntry->m_posZ = static_cast<short>(localEntry->m_posZ - baseZ);
 
-		if (abs(localEntry->m_posX) >= 0x50 || abs(localEntry->m_posZ) >= 0x40) {
+		if (__abs(localEntry->m_posX) >= 0x50 || __abs(localEntry->m_posZ) >= 0x40) {
 			localEntry->m_posX = -1;
 			localEntry->m_posZ = -1;
 			localEntry->m_visible = 0;
@@ -1813,7 +1813,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	}
 
 	*outCount = count;
-	memcpy(prevEntry, localMapItems, sizeof(localMapItems));
+	memcpy(m_mapItemHistory[channel], localMapItems, sizeof(localMapItems));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -3626,12 +3626,17 @@ int GbaQueue::MakeSellData(int channel, char* outData)
  */
 int GbaQueue::MakeSmithData(int channel, char* outData)
 {
+#ifdef VERSION_GCCJGC
+	const int allocLine = 0xE20;
+#else
+	const int allocLine = 0xE41;
+#endif
 	CCaravanWork** foodBasePtr;
-	unsigned char* smithIndices = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xE41)
+	unsigned char* smithIndices = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), allocLine)
 		unsigned char[0x40];
 	if (smithIndices == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xE43);
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), allocLine + 2);
 		}
 		return -1;
 	}
@@ -3685,7 +3690,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			}
 
 			for (k = 0; k < 4; k++) {
-				SItemFlatRow* recipeRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
+				SItemFlatRow* itemTable = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+				SItemFlatRow* recipeRow = &itemTable[itemId];
 				itemData[8 + k] =
 				    __lhbrx(&recipeRow->m_smithResults[k], 0);
 				work = recipeRow->m_smithResults[k];
@@ -3694,7 +3700,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 					itemData[13 + k * 4] = 0;
 					itemData[14 + k * 4] = 0;
 				} else {
-					SItemFlatRow* materialBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[work];
+					SItemFlatRow* materialBase = &itemTable[work];
 					itemData[12 + k * 4] = __lhbrx(&materialBase->m_equipFlags, 0);
 					itemData[13 + k * 4] = __lhbrx(&materialBase->m_value, 0);
 					itemData[14 + k * 4] = __lhbrx(&materialBase->m_attribute, 0);

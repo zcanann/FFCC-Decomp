@@ -101,18 +101,11 @@ void pppDesScreenQuake(pppScreenQuake*, _pppCtrlTable*)
  */
 void pppCon2ScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
 {
-    float val = 0.0f;
     float *data = GetScreenQuakeWork(quake, param2);
 
-    data[2] = val;
-    data[1] = val;
-    data[0] = val;
-    data[5] = val;
-    data[4] = val;
-    data[3] = val;
-    data[8] = val;
-    data[7] = val;
-    data[6] = val;
+    data[0] = data[1] = data[2] = 0.0f;
+    data[3] = data[4] = data[5] = 0.0f;
+    data[6] = data[7] = data[8] = 0.0f;
 }
 
 /*
@@ -126,16 +119,9 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
  */
 void pppConScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
 {
-    float val = 0.0f;
     float *data = GetScreenQuakeWork(quake, param2);
 
-    data[2] = val;
-    data[1] = val;
-    data[0] = val;
-    data[5] = val;
-    data[4] = val;
-    data[3] = val;
-    data[8] = val;
-    data[7] = val;
-    data[6] = val;
+    data[0] = data[1] = data[2] = 0.0f;
+    data[3] = data[4] = data[5] = 0.0f;
+    data[6] = data[7] = data[8] = 0.0f;
 }

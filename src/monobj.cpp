@@ -81,6 +81,17 @@ inline float CMapPcs::GetHitT()
 	return g_hit_t_slide_min;
 }
 
+struct CMonAiAction {
+	unsigned short m_flags;
+	unsigned short m_minDist;
+	unsigned short m_maxDist;
+	unsigned short m_chance;
+	unsigned short m_type;
+	unsigned short m_group;
+	unsigned short m_range;
+	unsigned short m_changeStat;
+};
+
 static inline unsigned char* CGMonObj_GetAiData(CGMonObj* monObj)
 {
 	if (monObj->m_aiState == 0) {
@@ -1528,24 +1539,10 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 			(static_cast<int>(CFlatCenterState()) == 0) &&
 		((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0)) {
 		char text[0x100];
-		unsigned short aiState = m_groupTag;
-		int targetIndex = m_targetPartyIndex;
-		int targetChar = '-';
-		int aiMasked = aiState & 0x7FFF;
-
-		if (targetIndex >= 0) {
-			targetChar = targetIndex + '0';
-		}
-		int saveSlot = (int)object->m_scriptHandle[2];
-		int aiChar;
-		if (aiMasked == 0) {
-			aiChar = '-';
-		} else {
-			aiChar = aiMasked + 0x40;
-		}
-
-		sprintf(text, "%d %c %d %c", saveSlot, aiChar,
-		        m_chaseState, targetChar);
+		int aiMasked = m_groupTag & 0x7FFF;
+		sprintf(text, "%d %c %d %c", reinterpret_cast<CGObjWork*>(object->m_scriptHandle)->m_saveSlot,
+		        aiMasked == 0 ? '-' : aiMasked + 0x40,
+		        m_chaseState, m_targetPartyIndex >= 0 ? m_targetPartyIndex + '0' : '-');
 		font->SetPos(posX - font->GetWidth(text) * 0.5f, posY, posZ);
 		font->Draw(text);
 		posY -= font->GetHeight();
@@ -2201,19 +2198,8 @@ body:
 				if (nextAction >= 100) {
 					actionState = nextAction;
 				} else {
-#define CGMonObj_GetAiData(monObj) ((monObj->m_aiState == 0) \
-	? script \
-	: (reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
-		(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10))
 					short aiState = monObj->m_aiState;
-					unsigned char* aiScript;
-					if (aiState == 0) {
-						aiScript = scriptC;
-					} else {
-						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(scriptC + 0x100)) * 0x1D0 + 0x10;
-					}
-					if ((*reinterpret_cast<unsigned short*>(aiScript + nextAction * 0x10 + 0x110) & 0x20) != 0) {
+					if ((reinterpret_cast<CMonAiAction*>(CGMonObj_GetAiData(monObj) + 0x110)[nextAction].m_flags & 0x20) != 0) {
 						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 						actionState = 0x21;
 						monObj->moveChase(target);
@@ -2230,8 +2216,7 @@ body:
 						aiScript3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiState + reinterpret_cast<CMonWork*>(handleB)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
-					aiScript3 += nextAction * 0x10;
-					float actionRange = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript3 + 0x11C));
+					float actionRange = static_cast<float>(reinterpret_cast<CMonAiAction*>(aiScript3 + 0x110)[nextAction].m_range);
 					unsigned char* aiScript4;
 					if (aiState == 0) {
 						aiScript4 = reinterpret_cast<unsigned char*>(reinterpret_cast<CMonWork*>(handleB)->m_romWork);
@@ -2239,9 +2224,8 @@ body:
 						aiScript4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiState + reinterpret_cast<CMonWork*>(handleB)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
+					int actionParam = static_cast<short>(reinterpret_cast<CMonAiAction*>(aiScript4 + 0x110)[nextAction].m_changeStat);
 					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-					aiScript4 += nextAction * 0x10;
-					int actionParam = static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript4 + 0x11E));
 					actionState = 0x21;
 					CGMonObj_SetAttackMove(monObj, target, actionRange, actionParam);
 				}
@@ -2253,7 +2237,6 @@ body:
 			monObj->m_chaseDirty = 1;
 			return;
 	}
-#undef CGMonObj_GetAiData
 #undef script
 #undef actionState
 }
@@ -2738,7 +2721,7 @@ void CGMonObj::statWatch()
 		case 1:
 			if (monObj->m_unk6BC == 0) {
 				if (monObj->m_partyDistance[targetPartyIndex] <
-					static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCE))) {
+					static_cast<float>(reinterpret_cast<CMonWork*>(object->m_scriptHandle)->m_romWork[0x67])) {
 					if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {
 						chaseState = 5;
 						chaseTimer = 0;
@@ -2774,11 +2757,7 @@ void CGMonObj::statWatch()
 					actionState = attackResult;
 				} else {
 					short aiState = monObj->m_aiState;
-					if (aiState != 0) {
-						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(aiData + 0x100)) * 0x1D0 + 0x10;
-					}
-					if ((*reinterpret_cast<unsigned short*>(aiData + attackResult * 0x10 + 0x110) & 0x20) != 0) {
+					if ((reinterpret_cast<CMonAiAction*>(CGMonObj_GetAiData(monObj) + 0x110)[attackResult].m_flags & 0x20) != 0) {
 						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 						actionState = 0x21;
 						monObj->moveChase(party);
@@ -2794,8 +2773,7 @@ void CGMonObj::statWatch()
 						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiState + reinterpret_cast<CMonWork*>(handle)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
-					aiData3 += attackResult * 0x10;
-					float range = static_cast<float>(*reinterpret_cast<unsigned short*>(aiData3 + 0x11C));
+					float range = static_cast<float>(reinterpret_cast<CMonAiAction*>(aiData3 + 0x110)[attackResult].m_range);
 					unsigned char* aiData4;
 					if (aiState == 0) {
 						aiData4 = reinterpret_cast<unsigned char*>(reinterpret_cast<CMonWork*>(handle)->m_romWork);
@@ -2803,8 +2781,7 @@ void CGMonObj::statWatch()
 						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiState + reinterpret_cast<CMonWork*>(handle)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
-					aiData4 += attackResult * 0x10;
-					short changeStat = static_cast<short>(*reinterpret_cast<unsigned short*>(aiData4 + 0x11E));
+					int changeStat = static_cast<short>(reinterpret_cast<CMonAiAction*>(aiData4 + 0x110)[attackResult].m_changeStat);
 					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 					actionState = 0x21;
 					CGMonObj_SetAttackMove(monObj, party, range, changeStat);

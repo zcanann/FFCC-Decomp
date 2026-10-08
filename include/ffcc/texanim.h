@@ -53,9 +53,9 @@ public:
 
     void Create(CChunkFile&, CMemory::CStage*);
     void Interp(float, Vec&);
-    unsigned int GetTotalFrame();
-    char* GetName();
-    int IsChin();
+    unsigned int GetTotalFrame() { return m_totalFrames; }
+    char* GetName() { return m_name; }
+    int IsChin() { return m_chin; }
 
 private:
     friend class CTexAnim;

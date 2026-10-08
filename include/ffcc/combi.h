@@ -23,20 +23,13 @@ public:
      */
     int GetNumSet()
     {
-        int count = 0;
-        if (m_sets[0].m_item != 0) {
-            count = 1;
-            if (m_sets[1].m_item != 0) {
-                count = 2;
-                if (m_sets[2].m_item != 0) {
-                    count = 3;
-                    if (m_sets[3].m_item != 0) {
-                        count = 4;
-                    }
-                }
+        int i;
+        for (i = 0; i < 4; i++) {
+            if (m_sets[i].m_item == 0) {
+                break;
             }
         }
-        return count;
+        return i;
     }
 
     CCombi2Set m_sets[4];

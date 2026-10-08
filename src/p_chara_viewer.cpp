@@ -87,16 +87,56 @@ static inline int ViewerModelPosQuant(CChara::CModel* model)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Size: 796b
+ * EN Address: UNUSED
+ * EN Size: 656b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void sendVertex(coord* vertex)
+void CCharaPcs::USBDataCallback(CUSBPcs::CDataHeader* header)
 {
-    GXPosition3f32(vertex->pos.x, vertex->pos.y, vertex->pos.z);
-    GXTexCoord2f32(vertex->s, vertex->t);
+    char* data = reinterpret_cast<char*>(header + 1);
+    int* values = reinterpret_cast<int*>(data);
+
+    switch (header->m_packetCode) {
+    case 0:
+        strcpy(m_viewerModelPath, data);
+        m_viewerLoadModel = 1;
+        break;
+    case 1:
+        strcpy(m_viewerAnimPath, data);
+        m_viewerLoadAnim = 1;
+        break;
+    case 2:
+        strcpy(m_viewerAnimPath, data);
+        m_viewerAnimRequestedCount = header->m_elementCount;
+        m_viewerLoadAnimContinuous = 1;
+        break;
+    case 3:
+        strcpy(m_viewerTexturePath, data);
+        m_viewerLoadTexture = 1;
+        break;
+    case 4:
+        strcpy(m_viewerDynamicsPath, data);
+        m_viewerLoadDynamics = 1;
+        break;
+    case 5:
+        strcpy(m_viewerTexAnimName, data);
+        m_viewerTexAnimFrame = header->m_elementCount;
+        m_viewerTexAnimDirty = 1;
+        break;
+    case 6:
+        for (int i = 0; i < 3; i++) {
+            m_viewerDiffusePos[i].x = 0.001f * (float)values[i * 3 + 0];
+            m_viewerDiffusePos[i].y = 0.001f * (float)values[i * 3 + 1];
+            m_viewerDiffusePos[i].z = 0.001f * (float)values[i * 3 + 2];
+        }
+        break;
+    case 7:
+        m_viewerStepMode = values[0];
+        m_viewerDrawGrid = values[1];
+        break;
+    }
 }
 
 /*
@@ -239,6 +279,21 @@ void CCharaPcs::drawViewer()
             }
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void sendVertex(coord* vertex)
+{
+    GXPosition3f32(vertex->pos.x, vertex->pos.y, vertex->pos.z);
+    GXTexCoord2f32(vertex->s, vertex->t);
 }
 
 /*

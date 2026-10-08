@@ -3,7 +3,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
-const float kPppScaleZero = 0.0f;
 
 STATIC_ASSERT(sizeof(PppScaleDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(PppScaleDataOffsets, m_scaleOffset) == 0x0);
@@ -26,11 +25,8 @@ void pppScaleCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
 	PppScaleDataOffsets* data = GetPppScaleDataOffsets(ctrlTable);
 	float* value = (float*)(obj->m_workArea + data->m_scaleOffset);
-	float zero = kPppScaleZero;
 
-	value[2] = zero;
-	value[1] = zero;
-	value[0] = zero;
+	value[0] = value[1] = value[2] = 0.0f;
 }
 
 /*

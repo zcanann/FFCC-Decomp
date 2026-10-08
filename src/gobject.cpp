@@ -92,6 +92,9 @@ static inline bool HasLoadedModel(CCharaPcs::CHandle* handle)
 
 static inline float GObjSqrtf(float x)
 {
+#ifdef VERSION_GCCJGC
+    return sqrtf(x);
+#else
     union {
         float f;
         unsigned long bits;
@@ -138,6 +141,7 @@ static inline float GObjSqrtf(float x)
     }
 
     return x;
+#endif
 }
 
 static inline float ClampFloat(float value, float minValue, float maxValue)
@@ -1869,9 +1873,8 @@ void CGObject::update()
             Mtx tiltMtx;
             if (m_groundHitOffset.x || m_groundHitOffset.z) {
                 Vec axis;
-                const float slideMagSq =
-                    m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
-                const float slideMag = GObjSqrtf(slideMagSq);
+                const float slideMag = GObjSqrtf(
+                    m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z);
                 PSVECCrossProduct(&m_groundHitOffset, CVector(0.0f, 1.0f, 0.0f), &axis);
                 PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 3.0f);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
@@ -1899,7 +1902,7 @@ void CGObject::update()
 
             const float swayDx = m_swayTarget.z - m_swayDirection.z;
             const float swayDz = m_swayTarget.x - m_swayDirection.x;
-            const float swayMag = GObjSqrtf(swayDz * swayDz + swayDx * swayDx);
+            GObjSqrtf(swayDz * swayDz + swayDx * swayDx);
             m_swayDirection.x += 0.5f * swayDz;
             m_swayDirection.z += 0.5f * swayDx;
 

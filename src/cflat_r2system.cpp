@@ -55,8 +55,6 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
 
 extern const float kCFlatPadStickZero = 0.0f;
 extern const float kCFlatOneF;
-extern const float FLOAT_80330B5C;
-extern const float FLOAT_80330BC0;
 
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
@@ -396,18 +394,7 @@ void CCharaPcs::SetTexShadowRadius(float texShadowRadius)
  */
 void CCharaPcs::SetTexShadowColor(_GXColor color)
 {
-    const unsigned char* colorBytes = reinterpret_cast<const unsigned char*>(&color);
-    unsigned char c1;
-    unsigned char c2;
-
-    c1 = colorBytes[0];
-    c2 = colorBytes[1];
-    m_texShadowColor.r = c1;
-    c1 = colorBytes[2];
-    m_texShadowColor.g = c2;
-    c2 = colorBytes[3];
-    m_texShadowColor.b = c1;
-    m_texShadowColor.a = c2;
+    m_texShadowColor = color;
 }
 
 /*
@@ -1094,13 +1081,13 @@ int CCameraPcs::IsAbsolute()
  */
 void CLine<64>::CalcBound()
 {
-    min.x = FLOAT_80330B5C;
-    min.y = FLOAT_80330B5C;
-    min.z = FLOAT_80330B5C;
-    max.x = FLOAT_80330BC0;
-    max.y = FLOAT_80330BC0;
-    max.z = FLOAT_80330BC0;
-    totalLength = kCFlatPadStickZero;
+    min.x = 10000000.0f;
+    min.y = 10000000.0f;
+    min.z = 10000000.0f;
+    max.x = -10000000.0f;
+    max.y = -10000000.0f;
+    max.z = -10000000.0f;
+    totalLength = 0.0f;
 
     for (u32 i = 0; i < pointCount; i++) {
         if (points[i].x < min.x) {
@@ -1128,7 +1115,7 @@ void CLine<64>::CalcBound()
             segments[i - 1].length = PSVECMag(&segments[i - 1].delta);
             segments[i - 1].startLength = totalLength;
             totalLength += segments[i - 1].length;
-            if (kCFlatPadStickZero != segments[i - 1].length) {
+            if (segments[i - 1].length != 0.0f) {
                 PSVECNormalize(&segments[i - 1].delta, &segments[i - 1].normal);
             }
         }
@@ -3840,6 +3827,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x78:
             FlatLastResult(this) = gameWork.m_gameOverFlag;
             break;
+#ifdef VERSION_GCCJGC
+        case -0x74:
+            break;
+#else
         case -0x7A: {
             unsigned int languageValue = 1;
             switch (Game.m_gameWork.m_languageId) {
@@ -3867,6 +3858,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             FlatLastResult(this) = languageValue;
             break;
         }
+#endif
         default:
             break;
         }

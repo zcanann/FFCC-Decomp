@@ -2923,6 +2923,7 @@ void CGPartyObj::statPut()
 	if (m_stateFrame == 0) {
 		int seNo;
 		int anim;
+		int direct = 0;
 		switch (m_lastStateId) {
 		case 0x0C:
 			anim = 0x0E;
@@ -2934,10 +2935,11 @@ void CGPartyObj::statPut()
 			break;
 		case 0x1B:
 			anim = (m_motionMode == 1) ? 0x28 : 9;
+			direct = 0;
 			seNo = 0x24;
 			break;
 		}
-		reqAnim(anim, 0, 0);
+		reqAnim(anim, 0, direct);
 		playSe3D(seNo, 0x32, 0x96, 0, 0);
 	}
 

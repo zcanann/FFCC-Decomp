@@ -332,71 +332,33 @@ void CMesMenu::onScriptChanging(char*)
  */
 void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
-    (void)z;
-
     CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
-    if (scriptFood == 0) {
-        return;
-    }
-
-    if (0.0f < alpha) {
+    if ((scriptFood != 0) && (0.0f < alpha)) {
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).Ref());
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuHeartTexture));
 
-        int heartOffset = 0x4C;
-        if ((m_menuIndex & 1) != 0) {
-            heartOffset = 0x30;
-        }
-
         float pulseSinScale = 3.1415927f;
-        float heartBaseX = x + (float)heartOffset;
+        float heartBaseX = x + (float)(((m_menuIndex & 1) != 0) ? 0x30 : 0x4C);
         float heartBaseY = 12.0f + y;
-        float heartZero = 0.0f;
-        float pulseBase = 0.8f;
-        float pulseAmp = 0.2f;
-        float pulseOne = 1.0f;
-        float pulseTimerScale = 0.0625f;
+        float heartZero = 0.0f, pulseBase = 0.8f, pulseAmp = 0.2f, pulseOne = 1.0f, pulseTimerScale = 0.0625f;
 
         for (int heartIndex = 0; heartIndex < (int)((unsigned int)scriptFood->m_maxHp >> 1); heartIndex++) {
             int heartValue = m_heartValue - heartIndex * 0xC;
-            float heartTimer = (float)m_heartGrowTimers[heartIndex];
-            float heartPulse = (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne));
+            float heartPulse = (float)sin(pulseSinScale * -((float)m_heartGrowTimers[heartIndex] * pulseTimerScale - pulseOne));
             heartPulse = pulseAmp * heartPulse + pulseOne;
             heartPulse *= pulseBase;
+            int timer = m_heartDropTimers[heartIndex];
+            float shakeX = (float)((timer == 0) ? 0 : (timer >> 2) * s_mesMenuShakePattern[(timer + 1) & 3]);
+            float shakeY = (float)((timer == 0) ? 0 : (timer >> 2) * s_mesMenuShakePattern[timer & 3]);
 
-            int heartSubTimer = m_heartDropTimers[heartIndex];
-            int heartShakeX;
-            if (heartSubTimer == 0) {
-                heartShakeX = 0;
-            } else {
-                heartShakeX = (heartSubTimer >> 2) * s_mesMenuShakePattern[(heartSubTimer + 1) & 3];
-            }
-
-            float shakeX = (float)heartShakeX;
-            int heartShakeY;
-            if (heartSubTimer == 0) {
-                heartShakeY = 0;
-            } else {
-                heartShakeY = (heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
-            }
-
-            float shakeY = (float)heartShakeY;
-
-            MenuPcs.DrawRect(
-                3, heartBaseX + shakeX, heartBaseY + shakeY, 24.0f, 24.0f, heartZero, heartZero,
-                heartPulse, heartPulse, heartZero);
+            MenuPcs.DrawRect(3, heartBaseX + shakeX, heartBaseY + shakeY, 24.0f, 24.0f, heartZero, heartZero,
+                             heartPulse, heartPulse, heartZero);
 
             if (heartValue > 0) {
-                int fillAmount = 0x0B;
-                if (heartValue < 0x0B) {
-                    fillAmount = heartValue;
-                }
-
-                float u = (float)((scriptFood->m_statusTimers[2] != 0) ? 0 : 0x18);
-                float v = (float)((0x0C - fillAmount) * 0x18);
-                MenuPcs.DrawRect(
-                    3, heartBaseX + shakeX, heartBaseY + shakeY, 24.0f, 24.0f, u, v, heartPulse, heartPulse,
-                    0.0f);
+                int fillAmount = (heartValue < 0x0B) ? heartValue : 0x0B;
+                MenuPcs.DrawRect(3, heartBaseX + shakeX, heartBaseY + shakeY, 24.0f, 24.0f,
+                                 (float)((scriptFood->m_statusTimers[2] != 0) ? 0 : 0x18),
+                                 (float)((0x0C - fillAmount) * 0x18), heartPulse, heartPulse, 0.0f);
             }
 
             heartBaseX += ((m_menuIndex & 1) != 0) ? (-20.400002f) : 20.400002f;
@@ -729,74 +691,7 @@ void CMesMenu::onDraw()
         font->Draw(reinterpret_cast<char*>(scriptFood->m_name));
         MenuPcs.DrawInit();
 
-        {
-            CCaravanWork* heartFood =
-                Game.m_scriptFoodBase[m_menuIndex];
-            if ((heartFood != 0) && (0.0f < stageBlend)) {
-                MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * stageBlend)).Ref());
-                MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuHeartTexture));
-
-                int heartOffset = 0x4C;
-                if ((m_menuIndex & 1) != 0) {
-                    heartOffset = 0x30;
-                }
-
-                float pulseSinScale = 3.1415927f;
-                float heartBaseX = frameX + (float)heartOffset;
-                float heartBaseY = 12.0f + frameY;
-                float heartZero = 0.0f;
-                float pulseBase = 0.8f;
-                float pulseAmp = 0.2f;
-                float pulseOne = 1.0f;
-                float pulseTimerScale = 0.0625f;
-
-                for (int heartIndex = 0; heartIndex < (int)((unsigned int)heartFood->m_maxHp >> 1); heartIndex++) {
-                    int heartValue = m_heartValue - heartIndex * 0xC;
-                    float heartTimer = (float)m_heartGrowTimers[heartIndex];
-                    float heartPulse = (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne));
-                    heartPulse = pulseAmp * heartPulse + pulseOne;
-                    heartPulse *= pulseBase;
-
-                    int heartSubTimer = m_heartDropTimers[heartIndex];
-                    int heartShakeX;
-                    if (heartSubTimer == 0) {
-                        heartShakeX = 0;
-                    } else {
-                        heartShakeX = (heartSubTimer >> 2) * s_mesMenuShakePattern[(heartSubTimer + 1) & 3];
-                    }
-
-                    float shakeX = (float)heartShakeX;
-                    int heartShakeY;
-                    if (heartSubTimer == 0) {
-                        heartShakeY = 0;
-                    } else {
-                        heartShakeY = (heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
-                    }
-
-                    float heartX = heartBaseX + shakeX;
-                    float heartY = heartBaseY + (float)heartShakeY;
-
-                    MenuPcs.DrawRect(
-                        3, heartX, heartY, 24.0f, 24.0f, heartZero, heartZero,
-                        heartPulse, heartPulse, heartZero);
-
-                    if (heartValue > 0) {
-                        int fillAmount = 0x0B;
-                        if (heartValue < 0x0B) {
-                            fillAmount = heartValue;
-                        }
-
-                        float u = (float)((heartFood->m_statusTimers[2] != 0) ? 0 : 0x18);
-                        float v = (float)((0x0C - fillAmount) * 0x18);
-                        MenuPcs.DrawRect(
-                            3, heartX, heartY, 24.0f, 24.0f, u, v, heartPulse, heartPulse,
-                            0.0f);
-                    }
-
-                    heartBaseX += ((m_menuIndex & 1) != 0) ? (-20.400002f) : 20.400002f;
-                }
-            }
-        }
+        DrawHeart(frameX, frameY, 1.0f, stageBlend);
 
         int foodTimer = m_foodShakeTimer;
         int foodId = scriptFood->m_id;
@@ -864,7 +759,7 @@ void CMesMenu::onDraw()
                     } else {
                         iconEdgeX = (width - 144.0f) - (-10.0f);
                     }
-                    unsigned int anchorY = (iconAnchor - 1) & 2;
+                    int anchorY = (iconAnchor - 1) & 2;
                     float iconX = 0.0f;
                     iconX = drawX + iconX;
                     iconX += iconEdgeX;

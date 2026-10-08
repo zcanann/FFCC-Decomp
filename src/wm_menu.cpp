@@ -1778,20 +1778,19 @@ void CMenuPcs::CalcMCardMenu()
 				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetSlot());
 			checkMcResult:
 				curSub = m_wmWorldState->m_subState;
-				short expectedResult;
+				int expectedResult;
 				if (curSub == 5) { expectedResult = -1; }
 				else if (curSub == 6) { expectedResult = -3; }
 				else if (curSub == 7) { expectedResult = -4; }
 				else { expectedResult = 0; }
 				if (curSub != 7) {
-					if (expectedResult != m_wmWorldState->m_mcResult && m_wmWorldState->m_mcResult != 1) {
+					if (m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
 				} else {
-					short chk = m_wmWorldState->m_mcResult;
-					if (chk != 0 && chk != expectedResult && chk != 1) {
+					if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
@@ -2306,9 +2305,8 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -2331,8 +2329,8 @@ void CMenuPcs::CalcLoadMenu()
 	case 0x1C: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			playOpenSe = true;
-			int messType = 0;
 			int winType;
+			int messType = 0;
 			if (subState == 5) { winType = 1; }
 			else if (subState == 6) { winType = 2; }
 			else if (subState == 7) { winType = 3; }
@@ -2364,19 +2362,18 @@ void CMenuPcs::CalcLoadMenu()
 				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetSlot());
 			checkLoadResult:
 				short curSub = m_wmWorldState->m_subState;
-				short expectedResult;
+				int expectedResult;
 				if (curSub == 5) { expectedResult = -1; }
 				else if (curSub == 6) { expectedResult = -3; }
 				else if (curSub == 7) { expectedResult = -4; } else { expectedResult = 0; }
 				if (curSub != 7) {
-					if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
+					if (m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
 				} else {
-					short chk = m_wmWorldState->m_mcResult;
-					if (chk != 0 && chk != expectedResult && chk != 1) {
+					if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
@@ -2390,9 +2387,8 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -2423,9 +2419,8 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -2558,81 +2553,81 @@ void CMenuPcs::CalcLoadMenu()
 				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->LoadDat();
 			}
 
-			if (m_wmWorldState->m_mcResult != 0) {
+			if (m_wmWorldState->m_mcResult == 0) {
 #if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 #endif
-				if (m_wmWorldState->m_subState == 0x16) {
-					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
-						s_Serial = m_mcCtrl.GetSerial();
-						gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.GetSlot();
-						gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.GetDno();
-					} else {
-						gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.GetSlot();
-						gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.GetDno();
-					}
-					for (int charaIdx = 0; charaIdx < kWmMenuPlayerCount; charaIdx++) {
-						WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
-						int tribe;
-						int gender;
-						int variant;
-						if (m_wmWorldState->m_menuMode == 8 && m_cmakeWork != 0) {
-							Mc::CharaDat& character = m_cmakeWork->m_characters[charaIdx];
-							if (character.m_exists != 0) {
-								tribe = character.m_tribeId;
-								variant = character.m_appearanceVariant;
-								gender = character.m_genderFlag;
-							} else {
-								modelInfo->m_modelNo = -1;
-								tribe = -1;
-								variant = -1;
-								gender = -1;
-							}
-						} else if (Game.m_caravanWorkArr[charaIdx].m_shopState != 0) {
-							CCaravanWork& work = Game.m_caravanWorkArr[charaIdx];
-							tribe = work.m_tribeId;
-							gender = work.m_genderFlag;
-							variant = work.m_appearanceVariant;
-							modelInfo->m_modelNo = GetModelNo(tribe, variant, gender);
+				break;
+			}
+			if (m_wmWorldState->m_subState == 0x16) {
+				if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
+					s_Serial = m_mcCtrl.GetSerial();
+					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.GetSlot();
+					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.GetDno();
+				} else {
+					gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.GetSlot();
+					gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.GetDno();
+				}
+				for (int charaIdx = 0; charaIdx < kWmMenuPlayerCount; charaIdx++) {
+					WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
+					int tribe;
+					int variant;
+					int gender;
+					if (m_wmWorldState->m_menuMode == 8 && m_cmakeWork != 0) {
+						Mc::CharaDat& character = m_cmakeWork->m_characters[charaIdx];
+						if (character.m_exists != 0) {
+							tribe = character.m_tribeId;
+							variant = character.m_appearanceVariant;
+							gender = character.m_genderFlag;
 						} else {
 							modelInfo->m_modelNo = -1;
 							tribe = -1;
 							variant = -1;
 							gender = -1;
 						}
-						modelInfo = &m_wm.m_charaModelData[charaIdx];
-						int charaId;
-						int loadMode;
-						if (tribe >= 0) {
-							charaId = GetModelNo(tribe, variant, gender);
-							loadMode = 0;
-							modelInfo->m_modelChanged = 1;
-						} else {
-							loadMode = 3;
-							modelInfo->m_modelChanged = 0;
-							charaId = 0x43;
-						}
-						GetWmCharaHandles(this)[charaIdx]->LoadModelASync(loadMode, charaId, 0);
+					} else if (Game.m_caravanWorkArr[charaIdx].m_shopState != 0) {
+						CCaravanWork& work = Game.m_caravanWorkArr[charaIdx];
+						tribe = work.m_tribeId;
+						gender = work.m_genderFlag;
+						variant = work.m_appearanceVariant;
+						modelInfo->m_modelNo = GetModelNo(tribe, variant, gender);
+					} else {
+						modelInfo->m_modelNo = -1;
+						tribe = -1;
+						variant = -1;
+						gender = -1;
 					}
+					modelInfo = &m_wm.m_charaModelData[charaIdx];
+					int charaId;
+					int loadMode;
+					if (tribe >= 0) {
+						charaId = GetModelNo(tribe, variant, gender);
+						loadMode = 0;
+						modelInfo->m_modelChanged = 1;
+					} else {
+						loadMode = 3;
+						modelInfo->m_modelChanged = 0;
+						charaId = 0x43;
+					}
+					GetWmCharaHandles(this)[charaIdx]->LoadModelASync(loadMode, charaId, 0);
+				}
 
-					if (m_wmWorldState->m_menuMode != 8) {
-						for (int i = 0; i < kWmMenuControllerCount; i++) {
-							m_wmWorldState->m_originalBackupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
-							m_wmWorldState->m_backupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
-						}
+				if (m_wmWorldState->m_menuMode != 8) {
+					for (int i = 0; i < kWmMenuControllerCount; i++) {
+						m_wmWorldState->m_originalBackupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
+						m_wmWorldState->m_backupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
 					}
 				}
-				m_wmWorldState->m_state0E = 1;
-				m_wmWorldState->m_counter1A = 10;
 			}
+			m_wmWorldState->m_state0E = 1;
+			m_wmWorldState->m_counter1A = 10;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -2650,76 +2645,74 @@ void CMenuPcs::CalcLoadMenu()
 		    && m_wmWorldState->m_counter1A == 0) {
 			short listRes = (short)GetMcCtrl()->LoadMcList();
 			m_wmWorldState->m_mcResult = listRes;
-			short listResult = m_wmWorldState->m_mcResult;
-			if (listResult == 0) {
-				if (listResult < 0) {
+			if (m_wmWorldState->m_mcResult == 0) {
 #if defined(VERSION_GCCP01)
+				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
+				}
 #endif
-				}
-			} else {
-				int dataCount = 0;
-				if (m_wmWorldState->m_menuMode == 8) {
-					dataCount = ChkMcDataCnt();
-					if (dataCount == 0) {
-						m_wmWorldState->m_mcResult = (short)0xFC19;
-					}
-				}
-				OSCalendarTime saveTimes[kMcListCount];
-				OSCalendarTime* currentTime = saveTimes;
-				subState = 0;
-				do {
-					OSTicksToCalendarTime(m_wmCharaState[subState].m_saveTime,
-					                      &currentTime[subState]);
-					subState++;
-				} while (subState < 4);
-
-				int entryIdx = 0;
-				int bestIdx = -1;
-				for (; entryIdx < 4; entryIdx++) {
-					const McListInfo& entry = m_wmCharaState[entryIdx];
-					if (entry.m_isBroken == 0
-					    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
-						if (bestIdx < 0) {
-							bestIdx = entryIdx;
-						} else if (saveTimes[bestIdx].year <= currentTime->year
-						           && (saveTimes[bestIdx].year < currentTime->year
-						               || (saveTimes[bestIdx].yday <= currentTime->yday
-						                   && (saveTimes[bestIdx].yday < currentTime->yday
-						                       || (saveTimes[bestIdx].hour <= currentTime->hour
-						                           && (saveTimes[bestIdx].hour < currentTime->hour
-						                               || (saveTimes[bestIdx].min <= currentTime->min
-						                                   && (saveTimes[bestIdx].min < currentTime->min
-						                                       || (saveTimes[bestIdx].sec <= currentTime->sec
-						                                           && (saveTimes[bestIdx].sec < currentTime->sec
-						                                               || (saveTimes[bestIdx].msec <= currentTime->msec
-						                                                   && (saveTimes[bestIdx].msec < currentTime->msec
-						                                                       || saveTimes[bestIdx].usec < currentTime->usec)))))))))))) {
-							bestIdx = entryIdx;
-						}
-					}
-					currentTime++;
-				}
-				if (bestIdx < 0) bestIdx = 0;
-
-				m_wmWorldState->m_cardChannel = (short)bestIdx;
-				for (subState = 0; subState < 4; subState++) {
-					const McListInfo& entry = m_wmCharaState[subState];
-					if (entry.m_isBroken != 0) {
-						m_mcCtrl.SetDno(subState);
-						m_wmWorldState->m_cardChannel = (short)subState;
-						break;
-					}
-				}
-				m_wmWorldState->m_state0E = 1;
-				m_wmWorldState->m_counter1A = 10;
+				break;
 			}
+			int dataCount = 0;
+			if (m_wmWorldState->m_menuMode == 8) {
+				dataCount = ChkMcDataCnt();
+				if (dataCount == 0) {
+					m_wmWorldState->m_mcResult = (short)0xFC19;
+				}
+			}
+			OSCalendarTime saveTimes[kMcListCount];
+			OSCalendarTime* currentTime = saveTimes;
+			subState = 0;
+			do {
+				OSTicksToCalendarTime(m_wmCharaState[subState].m_saveTime,
+				                      &currentTime[subState]);
+				subState++;
+			} while (subState < 4);
+
+			int entryIdx = 0;
+			int bestIdx = -1;
+			for (; entryIdx < 4; entryIdx++) {
+				const McListInfo& entry = m_wmCharaState[entryIdx];
+				if (entry.m_isBroken == 0
+				    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
+					if (bestIdx < 0) {
+						bestIdx = entryIdx;
+					} else if (saveTimes[bestIdx].year <= currentTime->year
+					           && (saveTimes[bestIdx].year < currentTime->year
+					               || (saveTimes[bestIdx].yday <= currentTime->yday
+					                   && (saveTimes[bestIdx].yday < currentTime->yday
+					                       || (saveTimes[bestIdx].hour <= currentTime->hour
+					                           && (saveTimes[bestIdx].hour < currentTime->hour
+					                               || (saveTimes[bestIdx].min <= currentTime->min
+					                                   && (saveTimes[bestIdx].min < currentTime->min
+					                                       || (saveTimes[bestIdx].sec <= currentTime->sec
+					                                           && (saveTimes[bestIdx].sec < currentTime->sec
+					                                               || (saveTimes[bestIdx].msec <= currentTime->msec
+					                                                   && (saveTimes[bestIdx].msec < currentTime->msec
+					                                                       || saveTimes[bestIdx].usec < currentTime->usec)))))))))))) {
+						bestIdx = entryIdx;
+					}
+				}
+				currentTime++;
+			}
+			if (bestIdx < 0) bestIdx = 0;
+
+			m_wmWorldState->m_cardChannel = (short)bestIdx;
+			for (subState = 0; subState < 4; subState++) {
+				const McListInfo& entry = m_wmCharaState[subState];
+				if (entry.m_isBroken != 0) {
+					m_mcCtrl.SetDno(subState);
+					m_wmWorldState->m_cardChannel = (short)subState;
+					break;
+				}
+			}
+			m_wmWorldState->m_state0E = 1;
+			m_wmWorldState->m_counter1A = 10;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -9957,6 +9950,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
  */
 void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 {
+	int i;
 	CFont* font;
 	const char* const* msgTable;
 	int maxWidth;
@@ -9971,7 +9965,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	maxWidth = 0;
 	winMess = GetWinMess(winType);
 
-	for (int i = 0; i < winMess->m_lineCount; i++) {
+	for (i = 0; i < winMess->m_lineCount; i++) {
 		const short msgId = winMess->m_messageIds[i];
 		const char* text = msgTable[msgId];
 #ifndef VERSION_GCCJGC

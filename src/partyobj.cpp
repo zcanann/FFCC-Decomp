@@ -54,7 +54,11 @@ extern const float FLOAT_80331a78 = 0.0f;
 extern const float FLOAT_80331A7C = 0.3f;
 extern const float FLOAT_80331A80 = 0.7f;
 extern const float FLOAT_80331A84 = 1.5f;
+#ifdef VERSION_GCCP01
 extern const float FLOAT_80331A88 = 4.0f;
+#else
+extern const float FLOAT_80331A88 = 3.5f;
+#endif
 extern const double DOUBLE_80331A90 = 90.0;
 extern const float FLOAT_80331A98 = 10.0f;
 extern const double DOUBLE_80331AA8 = 300.0;
@@ -62,12 +66,19 @@ extern const float FLOAT_80331AB0 = 3.0f;
 extern const float FLOAT_80331AB4 = 0.15f;
 extern const float FLOAT_80331AB8 = 3.1415927f;
 extern const float FLOAT_80331ABC = 0.25f;
+#ifdef VERSION_GCCP01
 extern const float FLOAT_80331AC0 = 11.0f;
+#else
+extern const float FLOAT_80331AC0 = 14.0f;
+#endif
 extern const float FLOAT_80331ac4 = 6.0f;
 extern const float FLOAT_80331ac8 = 1.5707964f;
 extern const float FLOAT_80331acc = -100.0f;
 extern const float FLOAT_80331ad0 = 5.0f;
 extern const float FLOAT_80331ad4 = 2.0f;
+#ifndef VERSION_GCCP01
+extern const float FLOAT_80330A80 = 4.0f;
+#endif
 extern const float FLOAT_80331ad8 = 0.7853982f;
 extern const float FLOAT_80331ADC = 0.01f;
 extern const float FLOAT_80331AE0 = 0.017453292f;
@@ -75,7 +86,9 @@ extern const double DOUBLE_80331AE8 = 0.5;
 extern const double DOUBLE_80331AF0 = 3.0;
 extern const double DOUBLE_80331AF8 = 0.0;
 extern const float FLOAT_80331b00 = 1.1f;
+#ifdef VERSION_GCCP01
 extern const float FLOAT_80331b04 = 1.2f;
+#endif
 extern const float FLOAT_80331b08 = 1.25f;
 
 GhostPartyWork CGPartyObj::m_ghostWork;
@@ -908,7 +921,11 @@ void CGPartyObj::onFramePreCalc()
 			} else {
 				speedScale = 1.0f;
 			}
+#ifdef VERSION_GCCP01
 			m_moveBaseSpeed = static_cast<float>(static_cast<int>(FLOAT_80331b04 * speedScale));
+#else
+			m_moveBaseSpeed = speedScale;
+#endif
 		} else {
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		}
@@ -2281,7 +2298,11 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		if (isGhostPartyTargetMode(this)) {
 			radius = FLOAT_80331AB0;
 		} else {
+#ifdef VERSION_GCCP01
 			radius = FLOAT_80331A88;
+#else
+			radius = FLOAT_80330A80;
+#endif
 		}
 
 		if (MapPcs.CheckHitCylinderNear(CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), &rayDir, radius, 0x30) != 0) {
@@ -2475,7 +2496,11 @@ void CGPartyObj::checkTargetParticle()
 			if (isGhostPartyTargetMode(this)) {
 				radius = FLOAT_80331AB0;
 			} else {
+#ifdef VERSION_GCCP01
 				radius = FLOAT_80331A88;
+#else
+				radius = FLOAT_80330A80;
+#endif
 			}
 
 			if (MapPcs.CheckHitCylinderNear(CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), move, radius, 0x30) == 0) {

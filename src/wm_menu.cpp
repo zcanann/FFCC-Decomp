@@ -6885,16 +6885,20 @@ void CMenuPcs::CalcCharaSelect()
 	unsigned short padTrig[4];
 	int requestCancel;
 	int requestFinalize;
-#ifndef VERSION_GCCJGC
+#ifdef VERSION_GCCP01
 	unsigned int confirmedSlotMask;
+#endif
+#ifndef VERSION_GCCJGC
 	unsigned int pendingMask;
 #endif
 
 	m_wmHelpTimer = static_cast<short>(m_wmHelpTimer + 1);
 #ifdef VERSION_GCCJGC
 	if (m_wmHelpTimer >= 270) {
-#else
+#elif defined(VERSION_GCCP01)
 	if (m_wmHelpTimer >= (Game.m_gameWork.m_menuStageMode == 0 ? 3 : 2) * 0x4B) {
+#else
+	if (m_wmHelpTimer >= (Game.m_gameWork.m_menuStageMode == 0 ? 3 : 2) * 0x5A) {
 #endif
 		m_wmHelpTimer = 0;
 	}
@@ -6986,11 +6990,17 @@ void CMenuPcs::CalcCharaSelect()
 
 			if (entry.m_connected == 0) {
 				GbaQue.ClrCmakeInfo(i);
+#ifdef VERSION_GCCP01
 				if (entry.m_cmakeReady == 1) {
 					entry.m_cmakeReady = 0;
 				} else if ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0) {
 					continue;
 				}
+#else
+				if ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0) {
+					continue;
+				}
+#endif
 
 				const int slot = entry.m_currentSlot;
 				const int handleIdx = slot + 0x20;
@@ -7009,6 +7019,7 @@ void CMenuPcs::CalcCharaSelect()
 			}
 		}
 
+#ifdef VERSION_GCCP01
 		confirmedSlotMask = 0;
 		for (i = 0; i < 4; i++) {
 			if (m_wm.m_charaSelectData[i].m_confirmed != 0) {
@@ -7026,6 +7037,7 @@ void CMenuPcs::CalcCharaSelect()
 				ChgModel(slot, -1, -1, -1);
 			}
 		}
+#endif
 
 #endif
 
@@ -7264,7 +7276,7 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (GetWmWorldState(this)->m_nextMenuMode != 0) {
-#ifndef VERSION_GCCJGC
+#ifdef VERSION_GCCP01
 			GbaQue.SetControllerMode(1);
 #endif
 			for (i = 0; i < kWmMenuControllerCount; i++) {
@@ -7273,7 +7285,7 @@ void CMenuPcs::CalcCharaSelect()
 					entry.m_confirmed = 0;
 					entry.m_cmakePending = 0;
 					entry.m_cmakeReady = 0;
-#ifdef VERSION_GCCJGC
+#ifndef VERSION_GCCP01
 					int retry;
 					for (retry = 0; retry < 10; retry++) {
 						if (Joybus.SetMType(i, 4) == 0) {

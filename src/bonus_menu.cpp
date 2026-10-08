@@ -2593,12 +2593,12 @@ void CMenuPcs::DrawSelectOpenAnim()
 					DrawInit();
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
-				GXColor color;
-				color.r = 0xFF;
-				color.g = 0xFF;
-				color.b = 0xFF;
-				color.a = (unsigned char)(255.0f * sprite->alpha);
-				GXSetChanMatColor(GX_COLOR0A0, color);
+				GXColor colors[4];
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = (unsigned char)(255.0f * sprite->alpha);
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 				if (sprite->kind == kBonusCursorTexture) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
@@ -2626,7 +2626,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	font->DrawInit();
 
 	int textIndex;
-	char text[268];
+	char text[256];
 	{
 		int i;
 		for (i = textIndex = 0; i < (int)m_bonusAnim->header.count && textIndex < activePartyCount; i++) {

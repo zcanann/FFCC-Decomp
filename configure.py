@@ -505,7 +505,7 @@ config.libs = [
     {
         "lib": "Game",
         # Japanese compatibility baseline; provenance: docs/compiler_baseline.md.
-        "mw_version": "GC/2.0p1g" if config.version == "GCCJGC" else "GC/2.5",
+        "mw_version": "GC/2.0p1h" if config.version == "GCCJGC" else "GC/2.5",
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
@@ -1341,11 +1341,13 @@ config.progress_report_args = [
     # "--config", "functionRelocDiffs=data_value",
 ]
 
-# Japanese game compiler: GC/2.0p1g, derived during the build from the stock
+# Japanese game compiler: GC/2.0p1h, derived during the build from the stock
 # GC/2.0p1 by tools/patch_compiler.py (2.0p1a) and tools/patch_compiler_rw.py
-# (2.0p1b..g), both imported from the BFBB decomp. Every step is guarded by the
-# SHA-1 of its input and output. See docs/compiler_baseline.md.
-JP_GAME_COMPILER = "GC/2.0p1g"
+# (2.0p1b..g), both imported from the BFBB decomp, then by
+# tools/patch_compiler_ffcc.py (2.0p1h). Every step is guarded by the SHA-1 of
+# its input and output. See docs/compiler_baseline.md.
+BFBB_COMPILER = "GC/2.0p1g"
+JP_GAME_COMPILER = "GC/2.0p1h"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
     {
@@ -1357,6 +1359,12 @@ config.custom_build_rules = [
     {
         "name": "patch_compiler_rw",
         "command": "$python tools/patch_compiler_rw.py $out",
+        "description": "PATCH $out",
+        "restat": True,
+    },
+    {
+        "name": "patch_compiler_ffcc",
+        "command": "$python tools/patch_compiler_ffcc.py $out",
         "description": "PATCH $out",
         "restat": True,
     },
@@ -1375,12 +1383,20 @@ config.custom_build_steps = {
             + ([_compilers_dir] if config.compilers_path is None else []),
         },
         {
-            "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
+            "outputs": [_compilers_dir / BFBB_COMPILER / "mwcceppc.exe"],
             "rule": "patch_compiler_rw",
             "implicit": [
                 _compilers_dir / "GC/2.0p1a" / "mwcceppc.exe",
                 Path("tools") / "patch_compiler_rw.py",
                 Path("tools") / "patch_compiler.py",
+            ],
+        },
+        {
+            "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
+            "rule": "patch_compiler_ffcc",
+            "implicit": [
+                _compilers_dir / BFBB_COMPILER / "mwcceppc.exe",
+                Path("tools") / "patch_compiler_ffcc.py",
             ],
         },
     ]

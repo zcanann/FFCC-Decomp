@@ -1,7 +1,7 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1g for Japan.
-GC/2.0p1g is derived during the build from the bundled GC/2.0p1 (see below).
+The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1h for Japan.
+GC/2.0p1h is derived during the build from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -86,3 +86,32 @@ control, building PAL with GC/2.0p1g instead of GC/2.5 loses 505 exact
 functions, so these behaviours are specific to the 2003 Japanese build. RedSound
 still uses stock GC/2.0p1 in all regions. Japanese source previously tuned
 against stock GC/2.0p1 should be re-audited.
+
+## GC/2.0p1h: two further corrections from FFCC Japan
+
+`tools/patch_compiler_ffcc.py` derives GC/2.0p1h from GC/2.0p1g
+(`99bd18455ff674337d7a6186164df8a1b1ba13a7` to
+`6114c0c66bc9b4ded51a1a278402a753ab12792c`) with 13 byte edits, each checked
+against the expected old bytes. The x86 source of the added predicates is kept
+in the script. No stock compiler (1.3.2, 2.0, 2.0p1, 2.5, 2.7, 3.0a) produces
+the retail shapes below, so both are emulation corrections in BFBB's sense, not
+grafts; the deciding alias queries were identified with BFBB's in-process
+may-alias probe.
+
+- `e3ns` corrects BFBB's clause E3n. A store with a subrange alias into a frame
+  object whose address escapes is ordered before a later whole literal-pool
+  load of at most 8 bytes, including struct-copy stores (pcode flag 0x40) and
+  locals of inlined functions or compiler temporaries, which E3n's predicate
+  rejected. Typical case: an inlined `CMapPcs::CheckHitCylinderNear` filling a
+  local `CMapCylinder` before storing the radius literal.
+- `dsl` orders a direct-operand store to a named static before a later
+  register access to an `@`-named static: the `__sinit_*` vtable store before
+  the pointer-to-member constant loads.
+
+Measured over all Japanese game units against GC/2.0p1g: e3ns +13 / -0 exact
+functions, dsl +2 / -0 plus 12 exact exception-table sections, together
++15 / -0 (38 functions improve, 2 partials dip slightly: `__sinit_p_map_cpp`
+and `CGPartyObj::gpmCol`). On a frozen BFBB checkout (built on 2.0p1e, where
+the parts were first developed) e3ns is 0 / -1 on game code, the one loss being
+`xBoxFromCircle`, BFBB's documented E3n counter-witness, and 0 / 0 on
+RenderWare; dsl is 0 / 0 on both. PAL and USA (GC/2.5) are unaffected.

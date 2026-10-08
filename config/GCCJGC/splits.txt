@@ -556,7 +556,12 @@ cflat_r2system.cpp:
 	.text start:0x800B049C end:0x800B7D34
 
 cflat_r2class.cpp:
+	extab start:0x800083C0 end:0x800083D8
+	extabindex start:0x8000E9C8 end:0x8000E9EC
 	.text start:0x800B7D34 end:0x800BB280
+	.rodata start:0x801D52A8 end:0x801D5318
+	.data start:0x8022D410 end:0x8022D744
+	.sdata2 start:0x8034D8F0 end:0x8034D904
 
 gba/GBARead.c:
 	.text start:0x801A2CA4 end:0x801A2E04

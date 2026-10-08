@@ -4008,14 +4008,14 @@ void stageWeather()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void magicReady()
+static inline int magicReady()
 {
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.m_partyObjArr[i];
-		if (party != nullptr && party->m_scriptHandle != nullptr) {
-			party->ChangeCommandMode(2);
-		}
+	if (CGPartyObj::m_ghostWork.counters[0] >= Chara.MogFur().m_radarLevel[0] ||
+	    CGPartyObj::m_ghostWork.counters[1] >= Chara.MogFur().m_radarLevel[1] ||
+	    CGPartyObj::m_ghostWork.counters[2] >= Chara.MogFur().m_radarLevel[2]) {
+		return 1;
 	}
+	return 0;
 }
 
 /*
@@ -4027,14 +4027,27 @@ inline void magicReady()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void chooseMagic()
+static inline int chooseMagic()
 {
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.m_partyObjArr[i];
-		if (party != nullptr && party->m_scriptHandle != nullptr) {
-			party->useItem(-1);
+	int choices = 0;
+	int i;
+	for (i = 0; i < 3; i++) {
+		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
+			choices++;
 		}
 	}
+
+	int pick = Math.Rand(choices);
+	int cursor = 0;
+	for (i = 0; i < 3; i++) {
+		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
+			if (cursor == pick) {
+				return i;
+			}
+			cursor++;
+		}
+	}
+	return 0;
 }
 
 /*
@@ -4046,12 +4059,13 @@ inline void chooseMagic()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void decMagic(int amount)
+static inline void decMagic(int slotSel)
 {
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.m_partyObjArr[i];
-		if (party != nullptr && party->m_scriptHandle != nullptr) {
-			party->bonus(0, -amount, (CGPrgObj*)0);
+	for (int slot = 0; slot < 3; slot++) {
+		if (slot == slotSel) {
+			CGPartyObj::m_ghostWork.counters[slot] = 0;
+		} else {
+			CGPartyObj::m_ghostWork.counters[slot] = CGPartyObj::m_ghostWork.counters[slot] / 2;
 		}
 	}
 }
@@ -4496,41 +4510,11 @@ void CGPartyObj::gpmMove()
 				    leader->m_subState == 1 &&
 				    leader->m_comboState != 0 &&
 				    leader->m_comboFrame == 0) {
-					int anyReady;
-					if (CGPartyObj::m_ghostWork.counters[0] >= Chara.MogFur().m_radarLevel[0] ||
-					    CGPartyObj::m_ghostWork.counters[1] >= Chara.MogFur().m_radarLevel[1] ||
-					    CGPartyObj::m_ghostWork.counters[2] >= Chara.MogFur().m_radarLevel[2]) {
-						anyReady = 1;
-					} else {
-						anyReady = 0;
-					}
-					if (anyReady == 0) {
+					if (magicReady() == 0) {
 						return;
 					}
 
-					int choices = 0;
-					int i;
-					for (i = 0; i < 3; i++) {
-						if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
-							choices++;
-						}
-					}
-
-					int pick = Math.Rand(choices);
-					int cursor = 0;
-					int newSlotSel;
-					for (i = 0; i < 3; i++) {
-						if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
-							if (cursor == pick) {
-								newSlotSel = i;
-								goto slotPicked;
-							}
-							cursor++;
-						}
-					}
-					newSlotSel = 0;
-				slotPicked:
-					CGPartyObj::m_ghostWork.slotSel = newSlotSel;
+					CGPartyObj::m_ghostWork.slotSel = chooseMagic();
 
 					switch (CGPartyObj::m_ghostWork.slotSel) {
 					case 0:
@@ -4651,19 +4635,8 @@ void CGPartyObj::gpmMove()
 		}
 	}
 
-	{
-		int slot = 0;
-		CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
-		GhostPartyWork& ghostWork = CGPartyObj::m_ghostWork;
-		const int slotSel = CGPartyObj::m_ghostWork.slotSel;
-		for (; slot < 3; slot++) {
-			if (slot == slotSel) {
-				ghostWork.counters[slot] = 0;
-			} else {
-				ghostWork.counters[slot] = ghostWork.counters[slot] / 2;
-			}
-		}
-	}
+	CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
+	decMagic(CGPartyObj::m_ghostWork.slotSel);
 	CGPartyObj::m_ghostWork.flagBits.flag10 = 0;
 }
 

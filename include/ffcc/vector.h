@@ -87,6 +87,10 @@ public:
 	{
 		PSVECScale((const Vec*)this, (Vec*)this, scale);
 	}
+	void operator/=(float divisor)
+	{
+		PSVECScale((const Vec*)this, (Vec*)this, 1.0f / divisor);
+	}
 	operator Vec&() { return *reinterpret_cast<Vec*>(this); }
 	operator Vec*() { return reinterpret_cast<Vec*>(this); }
 

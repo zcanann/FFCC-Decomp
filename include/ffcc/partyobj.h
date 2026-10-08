@@ -15,9 +15,6 @@ class CVector;
 struct Vec;
 
 void stageWeather();
-void magicReady();
-void chooseMagic();
-void decMagic(int);
 void calcWeightMax();
 
 struct PartyObjFlags {

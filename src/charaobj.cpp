@@ -3051,7 +3051,7 @@ void CGCharaObj::combi2()
 			CVector candidateCenter(candidates[i]->m_comboCenter);
 			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&candidateCenter), reinterpret_cast<Vec*>(&comboCenter));
 		}
-		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), 1.0f / static_cast<float>(participantCount));
+		comboCenter /= static_cast<float>(participantCount);
 	}
 
 	System.Printf("combi: %d: combi%dに決定\n", System.m_frameCounter, comboData->m_command);

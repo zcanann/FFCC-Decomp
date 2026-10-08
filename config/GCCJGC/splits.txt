@@ -502,6 +502,7 @@ p_menu.cpp:
 	.rodata start:0x801D4850 end:0x801D4928
 	.bss start:0x80305AA0 end:0x80306360
 	.sdata      start:0x8034B5A0 end:0x8034B5C0
+	.data       start:0x8022C2F8 end:0x8022C7EC
 
 p_minigame.cpp:
 	.bss start:0x8031BB68 end:0x80322008
@@ -562,6 +563,7 @@ cmake.cpp:
 
 shopmenu.cpp:
 	.text start:0x8014B634 end:0x80153EA0
+	.data       start:0x80231D88 end:0x80231E30
 
 singmenu.cpp:
 	.rodata start:0x801D8E98 end:0x801D9454
@@ -650,6 +652,7 @@ chara_fur.cpp:
 	.bss        start:0x8031AC98 end:0x8031ACF4
 	.sbss       start:0x8034BBE0 end:0x8034BC0C
 	.sbss2      start:0x803501E8 end:0x803501F8
+	.sdata2     start:0x8034DDE0 end:0x8034DE90
 
 pppYmLaser.cpp:
 	.rodata start:0x801D5FA0 end:0x801D5FB0

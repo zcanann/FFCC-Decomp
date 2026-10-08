@@ -3547,10 +3547,14 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
 	float centerX;
 	float edgeY;
-	float iconH;
 	float iconW;
-	Sprt2* board = a;
-	Sprt2* icon = b;
+	float iconH;
+	float edgeX;
+	float centerY;
+	Sprt2* board;
+	Sprt2* icon;
+	board = a;
+	icon = b;
 
 	s_Base->m_center.x = (float)(board->x + board->w / 2.0);
 	s_Base->m_center.y = (float)(board->y + board->h / 2.0);
@@ -3572,8 +3576,8 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 		}
 	}
 
-	float edgeX = (float)board->x;
-	float centerY = (float)((double)s_Base->m_center.y - (double)iconH / 2.0);
+	edgeX = (float)board->x;
+	centerY = (float)((double)s_Base->m_center.y - (double)iconH / 2.0);
 	for (int edge = 0; edge < 2; edge++) {
 		if (edge != 0) {
 			edgeX = edgeX + ((float)board->w - iconW);

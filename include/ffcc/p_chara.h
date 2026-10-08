@@ -6,6 +6,7 @@
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara_viewer.h"
+#include "ffcc/p_usb.h"
 #include "ffcc/ptrarray_decl.h"
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
@@ -262,6 +263,7 @@ public:
     int LoadAnim(int, int, char*, int, int, int);
     CMemory::CStage* GetAnimStage() { return m_loadStages[LOAD_STAGE_ANIM]; }
     int GetCharaAllocStage() { return m_charaAllocStage; }
+    void USBDataCallback(CUSBPcs::CDataHeader*);
     void drawViewer();
     void calcViewer();
     void createViewer();

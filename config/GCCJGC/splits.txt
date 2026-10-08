@@ -489,6 +489,7 @@ map.cpp:
 	.sbss       start:0x8034BAB8 end:0x8034BAC0
 	.sdata2     start:0x8034C6D8 end:0x8034C758
 	.sdata      start:0x8034B2D0 end:0x8034B308
+	.rodata     start:0x801D1E58 end:0x801D2238
 
 monobj.cpp:
 	.text start:0x8010ed3c end:0x80116524

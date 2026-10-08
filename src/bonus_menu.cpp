@@ -1504,12 +1504,12 @@ void CMenuPcs::DrawResultCountAnim()
 					DrawInit();
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
-				_GXColor color;
-				color.r = 0xFF;
-				color.g = 0xFF;
-				color.b = 0xFF;
-				color.a = (unsigned char)(sprite->alpha * 255.0f);
-				GXSetChanMatColor(GX_COLOR0A0, color);
+				_GXColor colors[4];
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = (unsigned char)(sprite->alpha * 255.0f);
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
 				if (s_CntTop <= i && i < s_CntTop + activePartyCount) {
@@ -3345,15 +3345,13 @@ inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
 		digits[0] = value;
 	}
 
-	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
 	float digitW = (float)sprite->w;
-	int* dp = digits;
+	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
 	for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 		MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
-		    (float)(sprite->w * *dp), sprite->mulY,
+		    (float)(sprite->w * digits[digitIndex]), sprite->mulY,
 		    sprite->depth, sprite->depth, 0.0f);
 		digitX += digitW;
-		dp++;
 	}
 }
 

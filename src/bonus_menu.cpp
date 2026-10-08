@@ -105,12 +105,16 @@ enum {
 	kBonusFrameTexture,
 	kBonusPlayerTexture,
 	kBonusCountTexture,
-#ifdef VERSION_GCCJGC
-	kBonusArtifactFrameTexture = 0x1E,
-#else
-	kBonusArtifactFrameTexture = 0x1F,
-#endif
-	kBonusCursorTexture
+	kBonusArtiBaseTexture,
+	kBonusFrameCornerTexture,
+	kBonusFrameTopTexture,
+	kBonusFrameLeftTexture,
+	kBonusFrameFillTexture,
+	kBonusArtifactFrameTexture,
+	kBonusCursorTexture,
+	kBonusFrameRightTexture,
+	kBonusFrameBottomTexture,
+	kBonusCheckMarkTexture
 };
 
 static inline void InitBonusEffectSlots(CMenuPcs* menu)
@@ -215,10 +219,10 @@ void CMenuPcs::createBonus()
 	};
 
 #ifdef VERSION_GCCJGC
-	loadTexture(tName, 2, 1, tTmp, 0x15, 0x12, 0);
+	loadTexture(tName, 2, 1, tTmp, kBonusBackgroundTexture, 0x12, 0);
 	loadFont(0, "dvd/menu/subfont.fnt", 1, -1);
 #else
-	loadTexture(tName, 2, 1, tTmp, 0x16, 0x12, 0);
+	loadTexture(tName, 2, 1, tTmp, kBonusBackgroundTexture, 0x12, 0);
 	sprintf(fontPath, "dvd/%smenu/subfont.fnt", Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 #endif
@@ -523,7 +527,7 @@ void CMenuPcs::destroyBonus()
 		this->m_menuWindowInfo = 0;
 	}
 
-	freeTexture(2, 1, 0x16, 0x12);
+	freeTexture(2, 1, kBonusBackgroundTexture, 0x12);
 }
 
 /*
@@ -3382,7 +3386,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1B));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameCornerTexture));
 	const float right = (x + w) - corner;
 	const float bottom = (y + h) - corner;
 	for (int i = 0; i < 4; i++) {
@@ -3414,19 +3418,19 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 		MenuPcs.DrawRect(0, drawX, drawY, corner, corner, texU, texV, texScale, texScale, 0.0f);
 	}
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1C));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameTopTexture));
 	float xCorner = corner + x;
 	float innerW = (float)((double)w - 64.0);
 	MenuPcs.DrawRect(0, xCorner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameBottomTexture));
 	MenuPcs.DrawRect(0, xCorner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameLeftTexture));
 	float innerH = (float)((double)h - 64.0);
 	float yCorner = corner + y;
 	MenuPcs.DrawRect(0, x, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameRightTexture));
 	MenuPcs.DrawRect(0, right, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameFillTexture));
 	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - 64.0), (float)((double)h - 64.0), 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
@@ -3455,7 +3459,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	}
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1A));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusArtiBaseTexture));
 
 	CMenuPcs::Sprt2* sprite = sprt;
 	float width = (float)sprite->w;
@@ -3506,7 +3510,7 @@ inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
 		markColor.a = (unsigned char)(255.0f * artiAlpha);
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusCheckMarkTexture));
 
 		unsigned int activeMask = 0;
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {

@@ -21,6 +21,12 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
+#ifdef VERSION_GCCJGC
+#define BONUS_LINE(line, jpLine) (jpLine)
+#else
+#define BONUS_LINE(line, jpLine) (line)
+#endif
+
 static const float s_PCYpos[4] = {-11.14f, -7.1f, -11.55f, -11.14f};
 static const float s_PCScl[4] = {0.87f, 0.78f, 0.78f, 0.87f};
 static const float s_AnimX[3] = {9.1f, 13.7f, 27.9f};
@@ -227,23 +233,23 @@ void CMenuPcs::createBonus()
 	loadFont(0, fontPath, 1, -1);
 #endif
 
-	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xDD) BonusSummaryData;
+	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xDD, 0xD4)) BonusSummaryData;
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (i = 0; i < BonusSummaryData::kArtifactCount; i++) {
 		s_Rinfo->m_artifacts[i] = -1;
 	}
 
-	this->m_bonusState = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xE5) BonusMenuState;
-	m_effectWork = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xE6) EffectInfo[0x28];
+	this->m_bonusState = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE5, 0xDC)) BonusMenuState;
+	m_effectWork = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE6, 0xDD)) EffectInfo[0x28];
 
 	InitBonusEffectSlots(this);
 	memset(this->m_bonusState, 0, sizeof(*this->m_bonusState));
-	s_Base = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF1) BonusBaseInfo;
+	s_Base = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF1, 0xE8)) BonusBaseInfo;
 	memset(s_Base, 0, sizeof(*s_Base));
-	m_bonusAnim = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF5) BonusAnimList;
+	m_bonusAnim = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF5, 0xEC)) BonusAnimList;
 	memset(m_bonusAnim, 0, sizeof(BonusAnimList));
-	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF8) WmWorldObjInfo[24];
-	this->m_menuWindowInfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xFA) MenuWindowInfo;
+	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF8, 0xEF)) WmWorldObjInfo[24];
+	this->m_menuWindowInfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xFA, 0xF1)) MenuWindowInfo;
 	memset(this->m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 	const float depth = 100.0f;
 	const float zero = 0.0f;
@@ -398,7 +404,7 @@ void CMenuPcs::createBonus()
 				break;
 			}
 			CCharaPcs::CHandle* handle =
-			    new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0x183) CCharaPcs::CHandle;
+			    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x183, 0x179)) CCharaPcs::CHandle;
 			this->m_wm.m_handles[slotIdx] = handle;
 			this->m_wm.m_handles[slotIdx]->Add();
 			unsigned long modelCode = s_Rinfo->m_party[i % pc].m_partySlot + 0x83;
@@ -416,7 +422,7 @@ void CMenuPcs::createBonus()
 				m_wm.m_handles[i] = 0;
 			} else {
 				CCharaPcs::CHandle* itemHandle =
-				    new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0x19C) CCharaPcs::CHandle;
+				    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x19C, 0x192)) CCharaPcs::CHandle;
 				m_wm.m_handles[i] = itemHandle;
 				m_wm.m_handles[i]->Add();
 				unsigned short itemModelCode =

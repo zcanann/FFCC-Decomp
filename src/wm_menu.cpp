@@ -8813,8 +8813,6 @@ nextListEntry:
 #ifndef VERSION_GCCJGC
 		const int language = Game.m_gameWork.GetLanguage();
 #endif
-		const int* digitWidths = s_YearWTbl;
-		const int* playWidths = s_TimeWTbl;
 		rowSlopeD = pSl2;
 		rowBaseD = DOUBLE_80331490;
 		for (slot = 0; slot < kMcListCount; slot++) {
@@ -8861,22 +8859,22 @@ nextListEntry:
 				}
 #endif
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcYearTexture));
-				int digitCount = (static_cast<int>(slotData->m_scriptSysVal0) > 9) + 1;
+				int digitCount = (static_cast<int>(slotData->m_scriptSysVal0) > 9) ? 2 : 1;
 				if (static_cast<int>(slotData->m_scriptSysVal0) > 99) {
 					digitCount = 3;
 				}
 				if (digitCount == 3) {
-					const int dw10 = digitWidths[10];
+					const int dw10 = s_YearWTbl[10];
 					MenuPcs.DrawRect(0, FLOAT_80331520, rowY, static_cast<float>(dw10), FLOAT_80331410,
 					         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 				} else {
 					for (int di = 0; di < digitCount; di++) {
 						if (digitCount == 1) {
-							totalWidth = digitWidths[static_cast<int>(slotData->m_scriptSysVal0) % 10];
+							totalWidth = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
 						} else if (di == 0) {
-							totalWidth = digitWidths[static_cast<int>(slotData->m_scriptSysVal0) / 10];
+							totalWidth = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) / 10];
 						} else {
-							totalWidth += digitWidths[static_cast<int>(slotData->m_scriptSysVal0) % 10];
+							totalWidth += s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
 						}
 					}
 #ifdef VERSION_GCCJGC
@@ -8910,7 +8908,6 @@ nextListEntry:
 					colSlope = *pCs1;
 					rowSlope = *pRs1;
 					rowBase = *pRb1;
-					const int* const dw = s_YearWTbl;
 					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
 						if (digitCount == 1) {
@@ -8920,7 +8917,7 @@ nextListEntry:
 						} else {
 							digit = static_cast<int>(slotData->m_scriptSysVal0) % 10;
 						}
-						const int digitWidth = dw[digit];
+						const int digitWidth = s_YearWTbl[digit];
 						const float digitWidthF = static_cast<float>(digitWidth);
 						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, FLOAT_80331410,
 						         static_cast<float>(colSlope * static_cast<float>(digit % 5)),
@@ -9002,9 +8999,8 @@ nextListEntry:
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcFaceTexture));
 				float iconX = FLOAT_8033155C;
 				const float iconY = FLOAT_803314D8 + slotY;
-				const int* memberPtr = slotData->m_characterIds;
-				for (int member = 0; member < 4; member++, memberPtr++) {
-					const int modelNo = *memberPtr;
+				for (int member = 0; member < 4; member++) {
+					const int modelNo = slotData->m_characterIds[member];
 					if (modelNo >= 0) {
 						const int faceNo = modelNo - 100;
 						float texU;
@@ -9038,7 +9034,7 @@ nextListEntry:
 				const int hundreds = playHours / 100;
 				if (hundreds != 0) {
 					playDigits[0] = hundreds;
-					playWidth += static_cast<float>(playWidths[hundreds]);
+					playWidth += static_cast<float>(s_TimeWTbl[hundreds]);
 				} else {
 					playDigits[0] = -1;
 				}
@@ -9046,28 +9042,28 @@ nextListEntry:
 				const int tens = hourRemainder / 10;
 				if (tens != 0 || playDigits[0] > 0) {
 					playDigits[1] = tens;
-					playWidth += static_cast<float>(playWidths[tens]);
+					playWidth += static_cast<float>(s_TimeWTbl[tens]);
 				} else {
 					playDigits[1] = -1;
 				}
 				playDigits[2] = hourRemainder % 10;
 				playDigits[3] = playMinutes / 10;
 				playDigits[4] = playMinutes % 10;
-				playWidth += static_cast<float>(playWidths[playDigits[2]]);
-				playWidth += static_cast<float>(playWidths[10]);
-				playWidth += static_cast<float>(playWidths[playDigits[3]]);
-				playWidth += static_cast<float>(playWidths[playDigits[4]]);
+				playWidth += static_cast<float>(s_TimeWTbl[playDigits[2]]);
+				playWidth += static_cast<float>(s_TimeWTbl[10]);
+				playWidth += static_cast<float>(s_TimeWTbl[playDigits[3]]);
+				playWidth += static_cast<float>(s_TimeWTbl[playDigits[4]]);
 				float playX = FLOAT_80331518 - playWidth;
 				for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
 					if (playDigits[digitIdx] >= 0) {
 						if (digitIdx == 3) {
-							const float colonW = static_cast<float>(playWidths[10]);
+							const float colonW = static_cast<float>(s_TimeWTbl[10]);
 							const float* pOe5 = &FLOAT_803313e8;
 							MenuPcs.DrawRect(0, playX, rowY, colonW, FLOAT_803314D8,
 							         FLOAT_80331568, FLOAT_803313dc, *pOe5, *pOe5, FLOAT_803313dc);
 							playX += colonW;
 						}
-						const float digitW = static_cast<float>(playWidths[playDigits[digitIdx]]);
+						const float digitW = static_cast<float>(s_TimeWTbl[playDigits[digitIdx]]);
 						const float* pOe6 = &FLOAT_803313e8;
 						MenuPcs.DrawRect(0, playX, rowY, digitW, FLOAT_803314D8,
 						         static_cast<float>(DOUBLE_80331490 * static_cast<double>(playDigits[digitIdx]) + DOUBLE_80331570),

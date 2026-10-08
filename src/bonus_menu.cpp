@@ -751,9 +751,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		// staggered model sprites
 		idx += activePartyCount;
 		{
-			i = 0;
-			int bump = i;
-			for (; i < activePartyCount; i++) {
+			for (i = 0; i < activePartyCount; i++) {
 				int delta = idx;
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
@@ -766,10 +764,9 @@ void CMenuPcs::CalcResultOpenAnim()
 				spr->mulY = 0.0f;
 				spr->startFrame = src->startFrame + src->duration;
 				if (i != 0) {
-					spr->startFrame += bump;
+					spr->startFrame += i * 3;
 				}
 				spr->duration = kBallDuration;
-				bump += 3;
 				spr->depth = 1.0f;
 			}
 		}

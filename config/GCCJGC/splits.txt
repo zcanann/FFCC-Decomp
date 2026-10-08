@@ -1446,6 +1446,8 @@ wmm_str.cpp:
 	.data start:0x8022DCB8 end:0x8022DCC8
 
 pppYmMiasma.cpp:
+	extab start:0x80007BB0 end:0x80007BD8
+	extabindex start:0x8000DDEC end:0x8000DE28
 	.text start:0x8008FBA0 end:0x80090994
 	.rodata start:0x801D4808 end:0x801D4818
 	.sdata2 start:0x8034D380 end:0x8034D3B0
@@ -2435,7 +2437,10 @@ pppDrawMdlTs.cpp:
 	.text start:0x800872F4 end:0x800874F4
 
 pppKeZCrctShp.cpp:
+	extab start:0x80007A98 end:0x80007AA0
+	extabindex start:0x8000DC48 end:0x8000DC54
 	.text start:0x80087620 end:0x80087A9C
+	.sdata2 start:0x8034D238 end:0x8034D23C
 
 pppParHitSph.cpp:
 	.text start:0x80093228 end:0x8009339C
@@ -2497,7 +2502,10 @@ pppConstrainCameraDir.cpp:
 	.text start:0x8013EE34 end:0x8013F07C
 
 pppFilter.cpp:
+	extab start:0x80009C64 end:0x80009C6C
+	extabindex start:0x80010E70 end:0x80010E7C
 	.text start:0x8013F07C end:0x8013F154
+	.sdata2 start:0x8034ED30 end:0x8034ED3C
 
 pppConstrainCameraForLoc.cpp:
 	.text start:0x80162690 end:0x80162A00

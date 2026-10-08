@@ -778,7 +778,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01"), "sound.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,nopool,readonly", "-sdata 8"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "stopwatch.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "system.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "textureman.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(
                 MatchingFor("GCCP01", "GCCE01"),

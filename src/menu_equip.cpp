@@ -79,7 +79,7 @@ bool CMenuPcs::ChkEquipActive(int index)
 			active = caravanWork->m_equipment[equipIndex] >= 0;
 		}
 	} else {
-		item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
+		item = caravanWork->m_inventoryItems[*(itemEntries + index - 1)];
 		active = ChkEquipPossible(item);
 
 		if (active) {
@@ -374,7 +374,6 @@ void CMenuPcs::EquipDraw()
 	float u;
 	float v;
 	GXColor colors[4];
-	EquipOpenAnim* listStart;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -449,23 +448,23 @@ void CMenuPcs::EquipDraw()
 	if (m_equipState->prevMode != 0) {
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 		int drawIndex = 0;
-		EquipOpenAnim* listItem = &m_equipList->entries[m_equipList->count];
+		item = &m_equipList->entries[m_equipList->count];
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int letterCount = letter[0];
 
 		for (int i = m_equipList->count; i < m_equipList->listEnd; i++) {
-			int tex = listItem->tex;
+			int tex = item->tex;
 			if (tex >= 0) {
-				x = (float)listItem->x;
-				u = listItem->u;
-				y = (float)listItem->y;
-				v = listItem->v;
-				w = (float)listItem->w;
-				h = (float)listItem->h;
+				x = (float)item->x;
+				u = item->u;
+				y = (float)item->y;
+				v = item->v;
+				w = (float)item->w;
+				h = (float)item->h;
 
 				if (i == m_equipList->count) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(listItem->tex));
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(item->tex));
 					colors[0].r = 0xff;
 					colors[0].g = 0xff;
 					colors[0].b = 0xff;
@@ -483,13 +482,13 @@ void CMenuPcs::EquipDraw()
 					colors[3].b = 0xff;
 					colors[3].a = 0xff;
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-					w = listItem->alpha * w;
+					w = item->alpha * w;
 					if (w > 0.0f) {
 						MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, 1.0f, 1.0f, 0.0f);
 						x = x + w;
 						u = u + w;
 					}
-					if ((w > 0.0f) && (w < (float)listItem->w)) {
+					if ((w > 0.0f) && (w < (float)item->w)) {
 						colors[1].r = 0xff;
 						colors[1].g = 0xff;
 						colors[1].b = 0xff;
@@ -498,20 +497,20 @@ void CMenuPcs::EquipDraw()
 						colors[3].g = 0xff;
 						colors[3].b = 0xff;
 						colors[3].a = 0;
-						w = (float)(1.0 / (double)listItem->duration);
-						w = w * listItem->w;
+						w = (float)(1.0 / (double)item->duration);
+						w = w * item->w;
 						MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, 1.0f, 1.0f, 0.0f);
 					}
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				} else {
-					float alpha = listItem->alpha;
+					float alpha = item->alpha;
 					int texId = tex;
 					if (tex == EQUIP_TEX_LIST) {
 						int idx = drawIndex + m_equipState->scroll;
 						if ((idx < 1) || (idx >= letterCount)) {
 							if ((idx >= letterCount) || !ChkEquipActive(idx)) {
 								texId = EQUIP_TEX_PLATE;
-								alpha = (float)(0.5 * (double)listItem->alpha);
+								alpha = (float)(0.5 * (double)item->alpha);
 							}
 						} else {
 							int chk = idx - 1;
@@ -520,10 +519,10 @@ void CMenuPcs::EquipDraw()
 								if (equipped) {
 									int markX = (int)(x - 12.0f);
 									int markY = (int)((double)(h - 24.0f) * 0.5 + (double)y);
-									DrawEquipMark(markX, markY, listItem->alpha);
+									DrawEquipMark(markX, markY, item->alpha);
 								}
 								texId = EQUIP_TEX_PLATE;
-								alpha = (float)(0.5 * (double)listItem->alpha);
+								alpha = (float)(0.5 * (double)item->alpha);
 							}
 						}
 						if ((texId == EQUIP_TEX_LIST) && (drawIndex == m_equipState->selected[1])) {
@@ -538,11 +537,11 @@ void CMenuPcs::EquipDraw()
 					colors[0].b = 0xff;
 					colors[0].a = (u8)(int)(255.0f * alpha);
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-					float scale = listItem->scale;
+					float scale = item->scale;
 					MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, 0.0f);
 				}
 			}
-			listItem++;
+			item++;
 		}
 	}
 
@@ -556,17 +555,17 @@ void CMenuPcs::EquipDraw()
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int letterCount = letter[0];
 		for (int i = m_equipList->count; i < m_equipList->listEnd; i++) {
-			listStart = &m_equipList->entries[i];
-			if (listStart->tex == EQUIP_TEX_LIST) {
+			item = &m_equipList->entries[i];
+			if (item->tex == EQUIP_TEX_LIST) {
 				break;
 			}
 		}
 
 		float colorMax = 255.0f;
-		EquipOpenAnim* textItem = listStart;
+		EquipOpenAnim* textItem = item;
 		int idx;
 		for (int i = 0; (i < 8) && ((idx = i + m_equipState->scroll) < letterCount); textItem++, i++) {
-			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(colorMax * listStart->alpha)).color);
+			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(colorMax * item->alpha)).color);
 
 			char* str;
 			if (idx == 0) {
@@ -596,7 +595,7 @@ void CMenuPcs::EquipDraw()
 
 		DrawInit();
 
-		EquipOpenAnim* iconItem = listStart;
+		EquipOpenAnim* iconItem = item;
 		for (int i = 0; (i < 8) && ((idx = i + m_equipState->scroll) < letterCount); iconItem++, i++) {
 			if (idx >= 1) {
 				int entry = letter[idx];
@@ -604,18 +603,18 @@ void CMenuPcs::EquipDraw()
 					int iconY = (int)((float)(iconItem->y + 6) - 1.0f);
 					int iconX = (int)(float)(iconItem->x + iconItem->w - 0x10);
 					DrawSingleIcon(caravanWork->m_inventoryItems[entry], iconX, iconY,
-					               listStart->alpha, 0, 1.0f);
+					               item->alpha, 0, 1.0f);
 				}
 			}
 		}
 	}
 
 	if ((mode == 1) && (m_equipState->step == 1)) {
-		listStart = &m_equipList->entries[m_equipList->count];
+		item = &m_equipList->entries[m_equipList->count];
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		float pos = CalcListPos(static_cast<int>(m_equipState->scroll), static_cast<int>(letter[0]), 0);
 		if (pos > 0.0f) {
-			DrawListPosMark((float)listStart->x, (float)listStart->y, pos);
+			DrawListPosMark((float)item->x, (float)item->y, pos);
 		}
 	}
 
@@ -628,14 +627,14 @@ void CMenuPcs::EquipDraw()
 			cy = (float)((cursorItem->h - 0x20) / 2.0 + cursorItem->y);
 		} else {
 			for (int i = m_equipList->count; i < m_equipList->listEnd; i++) {
-				listStart = &m_equipList->entries[i];
+				item = &m_equipList->entries[i];
 				if (m_equipList->entries[i].tex == EQUIP_TEX_LIST) {
 					break;
 				}
 			}
-			listStart += m_equipState->selected[1];
-			cx = (float)(listStart->x - 0x14);
-			cy = (float)((listStart->h - 0x20) / 2.0 + listStart->y);
+			item += m_equipState->selected[1];
+			cx = (float)(item->x - 0x14);
+			cy = (float)((item->h - 0x20) / 2.0 + item->y);
 		}
 		cx += (float)((int)System.m_frameCounter % 8);
 		DrawCursor((int)cx, (int)cy, 1.0f);
@@ -651,7 +650,8 @@ void CMenuPcs::EquipDraw()
 		helpEntryIndex = 0;
 	}
 	CFont* helpFont = m_fonts[0];
-	int helpAlpha = (int)(255.0f * m_equipList->entries[helpEntryIndex].alpha);
+	item = &m_equipList->entries[helpEntryIndex];
+	int helpAlpha = (int)(255.0f * item->alpha);
 	if (!helpFound) {
 		helpItem = -1;
 	}

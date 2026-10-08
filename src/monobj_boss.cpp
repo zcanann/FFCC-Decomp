@@ -699,7 +699,7 @@ void CGMonObj::logicFuncRamoe()
  */
 void CGMonObj::damagedFuncDuct()
 {
-	int slot = reinterpret_cast<int>(m_scriptHandle[4]) - 0x8E;
+	int slot = reinterpret_cast<int>(reinterpret_cast<void**>(m_scriptHandle)[4]) - 0x8E;
 	putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 2, 0, this, kMonObjBossOne, 0);
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
@@ -724,7 +724,7 @@ void CGMonObj::initFinishedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	initFinishedFuncDefault();
-	const int slot = static_cast<int>(reinterpret_cast<long>(object->m_scriptHandle[4])) - 0x8E;
+	const int slot = static_cast<int>(reinterpret_cast<long>(reinterpret_cast<void**>(object->m_scriptHandle)[4])) - 0x8E;
 	reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x38)[slot] = this;
 }
 
@@ -760,7 +760,7 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int scriptState = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	int scriptState = reinterpret_cast<int>(reinterpret_cast<void**>(object->m_scriptHandle)[4]);
 
 	switch (scriptState) {
 	case 0x85:
@@ -798,7 +798,7 @@ void CGMonObj::logicFuncMeteoParasite()
 	if (work->bits.m_meteo3) {
 		nextState = 0x68;
 	} else {
-		switch (reinterpret_cast<int>(object->m_scriptHandle[4])) {
+		switch (reinterpret_cast<int>(reinterpret_cast<void**>(object->m_scriptHandle)[4])) {
 		case 0x87:
 			if (work->m_coreIndex == 2 && m_actionBranch < 2) {
 				if (work->m_objs[3]->m_lastStateId >= 100 || work->bits.m_bit80) {
@@ -828,7 +828,7 @@ void CGMonObj::logicFuncMeteoParasite()
  */
 void CGMonObj::frameStatFuncMeteoParasite()
 {
-	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
+	int scriptKind = reinterpret_cast<int>(reinterpret_cast<void**>(reinterpret_cast<CGObject*>(this)->m_scriptHandle)[4]);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	int state = prgObj->m_lastStateId;
 
@@ -895,7 +895,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 void CGMonObj::alwaysFuncMeteoParasite()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<void**>(object->m_scriptHandle)[4]);
 
 	switch (scriptKind) {
 	case 0x85:
@@ -956,7 +956,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 void CGMonObj::changeStatFuncMeteoParasite(int stat)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	int scriptKind = reinterpret_cast<int>(reinterpret_cast<void**>(object->m_scriptHandle)[4]);
 	switch (scriptKind) {
 	case 0x87:
 		switch (stat) {
@@ -987,7 +987,7 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 {
 	initFinishedFuncDefault();
 
-	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
+	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<void**>(reinterpret_cast<CGObject*>(this)->m_scriptHandle)[4]);
 	switch (scriptKind) {
 	case 0x85: {
 		CGObject* object = reinterpret_cast<CGObject*>(this);
@@ -2527,7 +2527,7 @@ void CGMonObj::frameStatFuncGolem()
 				reinterpret_cast<GolemBossWork*>(m_boss)->m_moveAngle = m_rotTargetY + turnOffset;
 			}
 			unsigned short scriptScale =
-			    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
+			    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(m_scriptHandle)[9]) + 0xD4);
 			float moveSpeed =
 			    m_pushScale *
 			    (kMonObjBossScaleStep * static_cast<float>(scriptScale) + kMonObjBossEpsilon);
@@ -2710,7 +2710,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 			reqAnim(animId, 0, 0);
 			u16 scriptScale =
-			    *(u16*)((u8*)m_scriptHandle[9] + 0xd4);
+			    *(u16*)((u8*)reinterpret_cast<void**>(m_scriptHandle)[9] + 0xd4);
 			float moveMagnitude =
 			    m_pushScale *
 			    (kMonObjBossScaleStep * (float)scriptScale + kMonObjBossEpsilon);
@@ -2725,7 +2725,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 				    (double)(target->m_worldPosition.z - m_worldPosition.z));
 			}
 
-			int action = reinterpret_cast<int>(m_scriptHandle[4]);
+			int action = reinterpret_cast<int>(reinterpret_cast<void**>(m_scriptHandle)[4]);
 			switch (action) {
 			case 0x5b:
 				playSe3D(0x4e2a, 0x32, 0x1c2, 0, 0);

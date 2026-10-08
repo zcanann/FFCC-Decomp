@@ -108,13 +108,14 @@ void pppDrawMng::AddPrimOt(unsigned long otIndex, _pppMngSt* pppMngSt)
  */
 void pppDrawMng::DrawOt()
 {
+	pppDrawPrimitive* first;
 	int count = sizeof(m_primitiveRefs) / sizeof(m_primitiveRefs[0]); // 0x400
 	pppDrawPrimitive** slot = m_primitiveRefs + (count - 1);
 	unsigned char lastType = 3;
 
 	do
 	{
-		pppDrawPrimitive* first = *slot;
+		first = *slot;
 
 		if (first != 0)
 		{

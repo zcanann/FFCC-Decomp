@@ -1778,20 +1778,19 @@ void CMenuPcs::CalcMCardMenu()
 				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetSlot());
 			checkMcResult:
 				curSub = m_wmWorldState->m_subState;
-				short expectedResult;
+				int expectedResult;
 				if (curSub == 5) { expectedResult = -1; }
 				else if (curSub == 6) { expectedResult = -3; }
 				else if (curSub == 7) { expectedResult = -4; }
 				else { expectedResult = 0; }
 				if (curSub != 7) {
-					if (expectedResult != m_wmWorldState->m_mcResult && m_wmWorldState->m_mcResult != 1) {
+					if (m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
 				} else {
-					short chk = m_wmWorldState->m_mcResult;
-					if (chk != 0 && chk != expectedResult && chk != 1) {
+					if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
@@ -2306,9 +2305,8 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -2331,8 +2329,8 @@ void CMenuPcs::CalcLoadMenu()
 	case 0x1C: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			playOpenSe = true;
-			int messType = 0;
 			int winType;
+			int messType = 0;
 			if (subState == 5) { winType = 1; }
 			else if (subState == 6) { winType = 2; }
 			else if (subState == 7) { winType = 3; }
@@ -2364,19 +2362,18 @@ void CMenuPcs::CalcLoadMenu()
 				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetSlot());
 			checkLoadResult:
 				short curSub = m_wmWorldState->m_subState;
-				short expectedResult;
+				int expectedResult;
 				if (curSub == 5) { expectedResult = -1; }
 				else if (curSub == 6) { expectedResult = -3; }
 				else if (curSub == 7) { expectedResult = -4; } else { expectedResult = 0; }
 				if (curSub != 7) {
-					if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
+					if (m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
 				} else {
-					short chk = m_wmWorldState->m_mcResult;
-					if (chk != 0 && chk != expectedResult && chk != 1) {
+					if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult != expectedResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
@@ -2390,9 +2387,8 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -2423,9 +2419,8 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -2558,81 +2553,81 @@ void CMenuPcs::CalcLoadMenu()
 				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->LoadDat();
 			}
 
-			if (m_wmWorldState->m_mcResult != 0) {
+			if (m_wmWorldState->m_mcResult == 0) {
 #if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 #endif
-				if (m_wmWorldState->m_subState == 0x16) {
-					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
-						s_Serial = m_mcCtrl.GetSerial();
-						gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.GetSlot();
-						gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.GetDno();
-					} else {
-						gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.GetSlot();
-						gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.GetDno();
-					}
-					for (int charaIdx = 0; charaIdx < kWmMenuPlayerCount; charaIdx++) {
-						WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
-						int tribe;
-						int gender;
-						int variant;
-						if (m_wmWorldState->m_menuMode == 8 && m_cmakeWork != 0) {
-							Mc::CharaDat& character = m_cmakeWork->m_characters[charaIdx];
-							if (character.m_exists != 0) {
-								tribe = character.m_tribeId;
-								variant = character.m_appearanceVariant;
-								gender = character.m_genderFlag;
-							} else {
-								modelInfo->m_modelNo = -1;
-								tribe = -1;
-								variant = -1;
-								gender = -1;
-							}
-						} else if (Game.m_caravanWorkArr[charaIdx].m_shopState != 0) {
-							CCaravanWork& work = Game.m_caravanWorkArr[charaIdx];
-							tribe = work.m_tribeId;
-							gender = work.m_genderFlag;
-							variant = work.m_appearanceVariant;
-							modelInfo->m_modelNo = GetModelNo(tribe, variant, gender);
+				break;
+			}
+			if (m_wmWorldState->m_subState == 0x16) {
+				if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
+					s_Serial = m_mcCtrl.GetSerial();
+					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.GetSlot();
+					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.GetDno();
+				} else {
+					gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.GetSlot();
+					gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.GetDno();
+				}
+				for (int charaIdx = 0; charaIdx < kWmMenuPlayerCount; charaIdx++) {
+					WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
+					int tribe;
+					int variant;
+					int gender;
+					if (m_wmWorldState->m_menuMode == 8 && m_cmakeWork != 0) {
+						Mc::CharaDat& character = m_cmakeWork->m_characters[charaIdx];
+						if (character.m_exists != 0) {
+							tribe = character.m_tribeId;
+							variant = character.m_appearanceVariant;
+							gender = character.m_genderFlag;
 						} else {
 							modelInfo->m_modelNo = -1;
 							tribe = -1;
 							variant = -1;
 							gender = -1;
 						}
-						modelInfo = &m_wm.m_charaModelData[charaIdx];
-						int charaId;
-						int loadMode;
-						if (tribe >= 0) {
-							charaId = GetModelNo(tribe, variant, gender);
-							loadMode = 0;
-							modelInfo->m_modelChanged = 1;
-						} else {
-							loadMode = 3;
-							modelInfo->m_modelChanged = 0;
-							charaId = 0x43;
-						}
-						GetWmCharaHandles(this)[charaIdx]->LoadModelASync(loadMode, charaId, 0);
+					} else if (Game.m_caravanWorkArr[charaIdx].m_shopState != 0) {
+						CCaravanWork& work = Game.m_caravanWorkArr[charaIdx];
+						tribe = work.m_tribeId;
+						gender = work.m_genderFlag;
+						variant = work.m_appearanceVariant;
+						modelInfo->m_modelNo = GetModelNo(tribe, variant, gender);
+					} else {
+						modelInfo->m_modelNo = -1;
+						tribe = -1;
+						variant = -1;
+						gender = -1;
 					}
+					modelInfo = &m_wm.m_charaModelData[charaIdx];
+					int charaId;
+					int loadMode;
+					if (tribe >= 0) {
+						charaId = GetModelNo(tribe, variant, gender);
+						loadMode = 0;
+						modelInfo->m_modelChanged = 1;
+					} else {
+						loadMode = 3;
+						modelInfo->m_modelChanged = 0;
+						charaId = 0x43;
+					}
+					GetWmCharaHandles(this)[charaIdx]->LoadModelASync(loadMode, charaId, 0);
+				}
 
-					if (m_wmWorldState->m_menuMode != 8) {
-						for (int i = 0; i < kWmMenuControllerCount; i++) {
-							m_wmWorldState->m_originalBackupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
-							m_wmWorldState->m_backupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
-						}
+				if (m_wmWorldState->m_menuMode != 8) {
+					for (int i = 0; i < kWmMenuControllerCount; i++) {
+						m_wmWorldState->m_originalBackupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
+						m_wmWorldState->m_backupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
 					}
 				}
-				m_wmWorldState->m_state0E = 1;
-				m_wmWorldState->m_counter1A = 10;
 			}
+			m_wmWorldState->m_state0E = 1;
+			m_wmWorldState->m_counter1A = 10;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -2650,76 +2645,74 @@ void CMenuPcs::CalcLoadMenu()
 		    && m_wmWorldState->m_counter1A == 0) {
 			short listRes = (short)GetMcCtrl()->LoadMcList();
 			m_wmWorldState->m_mcResult = listRes;
-			short listResult = m_wmWorldState->m_mcResult;
-			if (listResult == 0) {
-				if (listResult < 0) {
+			if (m_wmWorldState->m_mcResult == 0) {
 #if defined(VERSION_GCCP01)
+				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
+				}
 #endif
-				}
-			} else {
-				int dataCount = 0;
-				if (m_wmWorldState->m_menuMode == 8) {
-					dataCount = ChkMcDataCnt();
-					if (dataCount == 0) {
-						m_wmWorldState->m_mcResult = (short)0xFC19;
-					}
-				}
-				OSCalendarTime saveTimes[kMcListCount];
-				OSCalendarTime* currentTime = saveTimes;
-				subState = 0;
-				do {
-					OSTicksToCalendarTime(m_wmCharaState[subState].m_saveTime,
-					                      &currentTime[subState]);
-					subState++;
-				} while (subState < 4);
-
-				int entryIdx = 0;
-				int bestIdx = -1;
-				for (; entryIdx < 4; entryIdx++) {
-					const McListInfo& entry = m_wmCharaState[entryIdx];
-					if (entry.m_isBroken == 0
-					    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
-						if (bestIdx < 0) {
-							bestIdx = entryIdx;
-						} else if (saveTimes[bestIdx].year <= currentTime->year
-						           && (saveTimes[bestIdx].year < currentTime->year
-						               || (saveTimes[bestIdx].yday <= currentTime->yday
-						                   && (saveTimes[bestIdx].yday < currentTime->yday
-						                       || (saveTimes[bestIdx].hour <= currentTime->hour
-						                           && (saveTimes[bestIdx].hour < currentTime->hour
-						                               || (saveTimes[bestIdx].min <= currentTime->min
-						                                   && (saveTimes[bestIdx].min < currentTime->min
-						                                       || (saveTimes[bestIdx].sec <= currentTime->sec
-						                                           && (saveTimes[bestIdx].sec < currentTime->sec
-						                                               || (saveTimes[bestIdx].msec <= currentTime->msec
-						                                                   && (saveTimes[bestIdx].msec < currentTime->msec
-						                                                       || saveTimes[bestIdx].usec < currentTime->usec)))))))))))) {
-							bestIdx = entryIdx;
-						}
-					}
-					currentTime++;
-				}
-				if (bestIdx < 0) bestIdx = 0;
-
-				m_wmWorldState->m_cardChannel = (short)bestIdx;
-				for (subState = 0; subState < 4; subState++) {
-					const McListInfo& entry = m_wmCharaState[subState];
-					if (entry.m_isBroken != 0) {
-						m_mcCtrl.SetDno(subState);
-						m_wmWorldState->m_cardChannel = (short)subState;
-						break;
-					}
-				}
-				m_wmWorldState->m_state0E = 1;
-				m_wmWorldState->m_counter1A = 10;
+				break;
 			}
+			int dataCount = 0;
+			if (m_wmWorldState->m_menuMode == 8) {
+				dataCount = ChkMcDataCnt();
+				if (dataCount == 0) {
+					m_wmWorldState->m_mcResult = (short)0xFC19;
+				}
+			}
+			OSCalendarTime saveTimes[kMcListCount];
+			OSCalendarTime* currentTime = saveTimes;
+			subState = 0;
+			do {
+				OSTicksToCalendarTime(m_wmCharaState[subState].m_saveTime,
+				                      &currentTime[subState]);
+				subState++;
+			} while (subState < 4);
+
+			int entryIdx = 0;
+			int bestIdx = -1;
+			for (; entryIdx < 4; entryIdx++) {
+				const McListInfo& entry = m_wmCharaState[entryIdx];
+				if (entry.m_isBroken == 0
+				    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
+					if (bestIdx < 0) {
+						bestIdx = entryIdx;
+					} else if (saveTimes[bestIdx].year <= currentTime->year
+					           && (saveTimes[bestIdx].year < currentTime->year
+					               || (saveTimes[bestIdx].yday <= currentTime->yday
+					                   && (saveTimes[bestIdx].yday < currentTime->yday
+					                       || (saveTimes[bestIdx].hour <= currentTime->hour
+					                           && (saveTimes[bestIdx].hour < currentTime->hour
+					                               || (saveTimes[bestIdx].min <= currentTime->min
+					                                   && (saveTimes[bestIdx].min < currentTime->min
+					                                       || (saveTimes[bestIdx].sec <= currentTime->sec
+					                                           && (saveTimes[bestIdx].sec < currentTime->sec
+					                                               || (saveTimes[bestIdx].msec <= currentTime->msec
+					                                                   && (saveTimes[bestIdx].msec < currentTime->msec
+					                                                       || saveTimes[bestIdx].usec < currentTime->usec)))))))))))) {
+						bestIdx = entryIdx;
+					}
+				}
+				currentTime++;
+			}
+			if (bestIdx < 0) bestIdx = 0;
+
+			m_wmWorldState->m_cardChannel = (short)bestIdx;
+			for (subState = 0; subState < 4; subState++) {
+				const McListInfo& entry = m_wmCharaState[subState];
+				if (entry.m_isBroken != 0) {
+					m_mcCtrl.SetDno(subState);
+					m_wmWorldState->m_cardChannel = (short)subState;
+					break;
+				}
+			}
+			m_wmWorldState->m_state0E = 1;
+			m_wmWorldState->m_counter1A = 10;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			int cnt1A = m_wmWorldState->m_counter1A;
-			if (cnt1A != 0) {
-				m_wmWorldState->m_counter1A = cnt1A - 1;
+			if (m_wmWorldState->m_counter1A != 0) {
+				m_wmWorldState->m_counter1A--;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -4615,7 +4608,7 @@ void CMenuPcs::DrawTitleMenu()
 				matColor.b = 0xFF;
 				matColor.a = static_cast<unsigned char>(cursorAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, matColor);
-				float cursorX = static_cast<float>((FLOAT_803313e0 - kTitleLabelWidth * cursorScale) * DOUBLE_803313F8);
+				float cursorX = static_cast<float>((FLOAT_803313e0 - kTitleLabelWidth * cursorScale) / 2.0);
 				float cursorY = FLOAT_8033177C - (FLOAT_80331440 * cursorScale - FLOAT_80331440);
 				if (i != 0) {
 					cursorY = cursorY + (float)((int)itemYOffset);
@@ -6033,8 +6026,8 @@ void CMenuPcs::CalcWMFrame()
 				    m_wm.m_frameData->m_yearSprites[i].m_x +
 				    static_cast<int>((DOUBLE_80331420 +
 				                      static_cast<double>(static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) -
-				                                          scaledWidth)) *
-				                     DOUBLE_803313F8));
+				                                          scaledWidth)) /
+				                     2.0));
 			} else if (i != 0) {
 				float scaledWidth = static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) *
 				                    m_wm.m_frameData->m_yearSprites[i].m_scale;
@@ -6144,158 +6137,157 @@ void CMenuPcs::DrawWMFrame()
 	}
 
 	short mainState = m_wmWorldState->m_mainState;
-	if (mainState != 0 && mainState <= 3) {
-		MenuPcs.SetTexture((TEX)kMcYearTexture);
-		unsigned char gaugeAlpha = static_cast<unsigned char>(static_cast<int>(
-		    DOUBLE_80331508 *
-		    (static_cast<float>(m_wm.m_frameData->m_titleFrame) /
-		     DOUBLE_803316E8)));
-		matColor.r = 0xFF;
+	if (mainState == 0 || mainState > 3) {
+		return;
+	}
+	MenuPcs.SetTexture((TEX)kMcYearTexture);
+	unsigned char gaugeAlpha = static_cast<unsigned char>(static_cast<int>(
+	    DOUBLE_80331508 *
+	    (static_cast<float>(m_wm.m_frameData->m_titleFrame) /
+	     DOUBLE_803316E8)));
+	matColor.r = 0xFF;
+	matColor.g = 0xFF;
+	matColor.b = 0xFF;
+	matColor.a = gaugeAlpha;
+	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
+	const float kZeroG = FLOAT_803313dc;
+	MenuPcs.DrawRect(0,
+		(float)m_wm.m_frameData->m_titleSprite.m_x,
+		(float)m_wm.m_frameData->m_titleSprite.m_y,
+		(float)m_wm.m_frameData->m_titleSprite.m_width,
+		(float)m_wm.m_frameData->m_titleSprite.m_height,
+		m_wm.m_frameData->m_titleSprite.m_u,
+		m_wm.m_frameData->m_titleSprite.m_v,
+		FLOAT_803313e8,
+		FLOAT_803313e8,
+		kZeroG);
+
+	if (m_wmWorldState->m_mainState <= 2) {
+#ifdef VERSION_GCCJGC
+		MenuPcs.SetAttrFmt((FMT)0);
+#else
+		const int language = Game.m_gameWork.GetLanguage();
+		MenuPcs.SetAttrFmt((FMT)0);
+			matColor.r = 0xFF;
 		matColor.g = 0xFF;
 		matColor.b = 0xFF;
-		matColor.a = gaugeAlpha;
+		matColor.a = 0xFF;
 		GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-		const float kZeroG = FLOAT_803313dc;
+		MenuPcs.SetTexture((TEX)0x21);
+		const float kZeroYear = FLOAT_803313dc;
+		float yearY = language != 5 ? FLOAT_803316F4 : FLOAT_803316F8;
 		MenuPcs.DrawRect(0,
-			(float)m_wm.m_frameData->m_titleSprite.m_x,
-			(float)m_wm.m_frameData->m_titleSprite.m_y,
-			(float)m_wm.m_frameData->m_titleSprite.m_width,
-			(float)m_wm.m_frameData->m_titleSprite.m_height,
-			m_wm.m_frameData->m_titleSprite.m_u,
-			m_wm.m_frameData->m_titleSprite.m_v,
-			FLOAT_803313e8,
-			FLOAT_803313e8,
-			kZeroG);
+			FLOAT_803316F0, yearY,
+			FLOAT_80331440, FLOAT_80331558,
+			FLOAT_803313dc, FLOAT_803313dc,
+			FLOAT_803313e8, FLOAT_803313e8,
+			kZeroYear);
 
-		if (m_wmWorldState->m_mainState <= 2) {
+		MenuPcs.SetAttrFmt((FMT)0);
+		MenuPcs.SetTexture((TEX)kMcYearTexture);
+#endif
+
+		int dispValue =
+		    m_wmChgFlags & WMDATA_CHG_YEAR
+		        ? static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + m_wmPrevYear
+		        : static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + m_wmYear;
+		int digitCnt = (dispValue > 9) ? 2 : 1;
+		if (dispValue > 99) {
+			digitCnt = 3;
+		}
 #ifdef VERSION_GCCJGC
-			MenuPcs.SetAttrFmt((FMT)0);
+		const int languageYOffset = 0;
 #else
-			const int language = Game.m_gameWork.GetLanguage();
-			MenuPcs.SetAttrFmt((FMT)0);
-				matColor.r = 0xFF;
+		const int languageYOffset = language != 5 ? 0 : 0xE;
+#endif
+
+		if (digitCnt == 3) {
+			int alphaInt =
+			    static_cast<int>(DOUBLE_80331508 * static_cast<double>(m_wm.m_frameData->m_yearSprites[0].m_alpha));
+			matColor.r = 0xFF;
 			matColor.g = 0xFF;
 			matColor.b = 0xFF;
-			matColor.a = 0xFF;
+			matColor.a = alphaInt;
 			GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-			MenuPcs.SetTexture((TEX)0x21);
-			const float kZeroYear = FLOAT_803313dc;
-			float yearY = language != 5 ? FLOAT_803316F4 : FLOAT_803316F8;
+			const float kZero3 = FLOAT_803313dc;
 			MenuPcs.DrawRect(0,
-				FLOAT_803316F0, yearY,
-				FLOAT_80331440, FLOAT_80331558,
-				FLOAT_803313dc, FLOAT_803313dc,
-				FLOAT_803313e8, FLOAT_803313e8,
-				kZeroYear);
-
-			MenuPcs.SetAttrFmt((FMT)0);
-			MenuPcs.SetTexture((TEX)kMcYearTexture);
-#endif
-
-			unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-			int dispValue =
-			    m_wmChgFlags & WMDATA_CHG_YEAR
-			        ? static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + m_wmPrevYear
-			        : static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + m_wmYear;
-			int digitCnt;
-			digitCnt = (dispValue > 9) + 1;
-			if (dispValue > 99) {
-				digitCnt = 3;
-			}
-#ifdef VERSION_GCCJGC
-			const int languageYOffset = 0;
-#else
-			const int languageYOffset = language != 5 ? 0 : 0xE;
-#endif
-
-			if (digitCnt == 3) {
+				(float)m_wm.m_frameData->m_yearSprites[0].m_x,
+				(float)(m_wm.m_frameData->m_yearSprites[0].m_y + languageYOffset),
+				(float)m_wm.m_frameData->m_yearSprites[0].m_width,
+				(float)m_wm.m_frameData->m_yearSprites[0].m_height,
+				m_wm.m_frameData->m_yearSprites[0].m_u,
+				m_wm.m_frameData->m_yearSprites[0].m_v,
+				m_wm.m_frameData->m_yearSprites[0].m_scale,
+				m_wm.m_frameData->m_yearSprites[0].m_scale,
+				kZero3);
+		} else {
+			const double k255 = DOUBLE_80331508;
+			const float kZero = FLOAT_803313dc;
+			for (int i = 0; i < digitCnt; i++) {
 				int alphaInt =
-				    static_cast<int>(DOUBLE_80331508 * static_cast<double>(m_wm.m_frameData->m_yearSprites[0].m_alpha));
-				matColor.r = 0xFF;
+				    static_cast<int>(k255 * static_cast<double>(m_wm.m_frameData->m_yearSprites[i].m_alpha));
+					matColor.r = 0xFF;
 				matColor.g = 0xFF;
 				matColor.b = 0xFF;
 				matColor.a = alphaInt;
 				GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-				const float kZero3 = FLOAT_803313dc;
 				MenuPcs.DrawRect(0,
-					(float)m_wm.m_frameData->m_yearSprites[0].m_x,
-					(float)(m_wm.m_frameData->m_yearSprites[0].m_y + languageYOffset),
-					(float)m_wm.m_frameData->m_yearSprites[0].m_width,
-					(float)m_wm.m_frameData->m_yearSprites[0].m_height,
-					m_wm.m_frameData->m_yearSprites[0].m_u,
-					m_wm.m_frameData->m_yearSprites[0].m_v,
-					m_wm.m_frameData->m_yearSprites[0].m_scale,
-					m_wm.m_frameData->m_yearSprites[0].m_scale,
-					kZero3);
-			} else {
-				const double k255 = DOUBLE_80331508;
-				const float kZero = FLOAT_803313dc;
-				for (int i = 0; i < digitCnt; i++) {
-					int alphaInt =
-					    static_cast<int>(k255 * static_cast<double>(m_wm.m_frameData->m_yearSprites[i].m_alpha));
-						matColor.r = 0xFF;
-					matColor.g = 0xFF;
-					matColor.b = 0xFF;
-					matColor.a = alphaInt;
-					GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-					MenuPcs.DrawRect(0,
-						(float)m_wm.m_frameData->m_yearSprites[i].m_x,
-						(float)(m_wm.m_frameData->m_yearSprites[i].m_y + languageYOffset),
-						(float)m_wm.m_frameData->m_yearSprites[i].m_width,
-						(float)m_wm.m_frameData->m_yearSprites[i].m_height,
-						m_wm.m_frameData->m_yearSprites[i].m_u,
-						m_wm.m_frameData->m_yearSprites[i].m_v,
-						m_wm.m_frameData->m_yearSprites[i].m_scale,
-						m_wm.m_frameData->m_yearSprites[i].m_scale,
-						kZero);
-				}
+					(float)m_wm.m_frameData->m_yearSprites[i].m_x,
+					(float)(m_wm.m_frameData->m_yearSprites[i].m_y + languageYOffset),
+					(float)m_wm.m_frameData->m_yearSprites[i].m_width,
+					(float)m_wm.m_frameData->m_yearSprites[i].m_height,
+					m_wm.m_frameData->m_yearSprites[i].m_u,
+					m_wm.m_frameData->m_yearSprites[i].m_v,
+					m_wm.m_frameData->m_yearSprites[i].m_scale,
+					m_wm.m_frameData->m_yearSprites[i].m_scale,
+					kZero);
 			}
+		}
 
 #ifndef VERSION_GCCJGC
-			if (digitCnt != 3 && language != 5) {
-				Sprt* digit = &m_wm.m_frameData->m_yearSprites[0];
-				float suffixU = FLOAT_803313dc;
-				float suffixX = static_cast<float>(digit->m_width) * digit->m_scale +
-				                static_cast<float>(digit->m_x);
-				float suffixY = static_cast<float>(digit->m_y);
-				float suffixScale = digit->m_scale;
-				if (language == 1) {
-					if (gWmMenuScriptValueCache / 10 == 1) {
-						suffixU = FLOAT_8033151c;
+		if (digitCnt != 3 && language != 5) {
+			Sprt* digit = &m_wm.m_frameData->m_yearSprites[0];
+			float suffixU = FLOAT_803313dc;
+			float suffixX = static_cast<float>(digit->m_width) * digit->m_scale +
+			                static_cast<float>(digit->m_x);
+			float suffixY = static_cast<float>(digit->m_y);
+			float suffixScale = digit->m_scale;
+			if (language == 1) {
+				if (gWmMenuScriptValueCache / 10 == 1) {
+					suffixU = FLOAT_8033151c;
+				} else {
+					int digit = gWmMenuScriptValueCache % 10;
+					if (digit >= 1 && digit <= 3) {
+						suffixU = FLOAT_803314D8 * static_cast<float>(digit - 1);
 					} else {
-						int digit = gWmMenuScriptValueCache % 10;
-						if (digit >= 1 && digit <= 3) {
-							suffixU = FLOAT_803314D8 * static_cast<float>(digit - 1);
-						} else {
-							suffixU = FLOAT_8033151c;
-						}
+						suffixU = FLOAT_8033151c;
 					}
-				} else if (language == 4) {
-					if (gWmMenuScriptValueCache != 1) {
-						suffixU = FLOAT_803314D8;
-					}
-				} else if (language == 2) {
-					suffixY += FLOAT_80331550;
 				}
-				int alphaInt =
-				    static_cast<int>(DOUBLE_80331508 * static_cast<double>(digit->m_alpha));
-				MenuPcs.SetAttrFmt((FMT)0);
-				matColor.r = 0xFF;
-				matColor.g = 0xFF;
-				matColor.b = 0xFF;
-				matColor.a = alphaInt;
-				GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-				MenuPcs.SetTexture((TEX)0x34);
-				MenuPcs.DrawRect(0,
-				         suffixX,
-				         suffixY,
-				         FLOAT_80331410, FLOAT_803314D8,
-				         FLOAT_803313dc, suffixU,
-				         suffixScale, suffixScale,
-				         FLOAT_803313dc);
+			} else if (language == 4) {
+				if (gWmMenuScriptValueCache != 1) {
+					suffixU = FLOAT_803314D8;
+				}
+			} else if (language == 2) {
+				suffixY += FLOAT_80331550;
 			}
-#endif
+			int alphaInt =
+			    static_cast<int>(DOUBLE_80331508 * static_cast<double>(digit->m_alpha));
+			MenuPcs.SetAttrFmt((FMT)0);
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = alphaInt;
+			GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
+			MenuPcs.SetTexture((TEX)0x34);
+			MenuPcs.DrawRect(0,
+			         suffixX,
+			         suffixY,
+			         FLOAT_80331410, FLOAT_803314D8,
+			         FLOAT_803313dc, suffixU,
+			         suffixScale, suffixScale,
+			         FLOAT_803313dc);
 		}
+#endif
 	}
 }
 
@@ -8792,40 +8784,30 @@ nextListEntry:
 	short separatorSub = worldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
-		const float* psZ = &FLOAT_803313dc;
-		double psSl = DOUBLE_80331498;
-		double sepOff;
-		double sepBase;
-		double sepSlope;
-		float sepZero;
-		sepZero = *psZ;
-		sepSlope = psSl;
-		sepBase = DOUBLE_80331490;
-		sepOff = DOUBLE_80331510;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kWorldFrameTexture));
 			MenuPcs.DrawRect(0, FLOAT_803314D8,
-			         static_cast<float>(static_cast<float>(sepSlope * static_cast<double>(slot) + sepBase) -
-			                            sepOff),
+			         static_cast<float>(static_cast<float>(DOUBLE_80331498 * static_cast<double>(slot) + DOUBLE_80331490) -
+			                            DOUBLE_80331510),
 			         FLOAT_803314D8, FLOAT_803314D8,
-			         static_cast<float>(sepBase * static_cast<double>(slot)), FLOAT_803313e0,
-			         FLOAT_803313e8, FLOAT_803313e8, sepZero);
+			         static_cast<float>(DOUBLE_80331490 * static_cast<double>(slot)), FLOAT_803313e0,
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
 
 	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
-		double pSl2 = DOUBLE_80331498;
-		float p518a = FLOAT_80331518;
+		double rowSlope = DOUBLE_80331498;
+		float mapOffsetX = FLOAT_80331518;
 		double rowBaseD;
 		float slotY;
 		double mapX;
 		double rowSlopeD;
-		mapX = DOUBLE_80331510 + static_cast<double>(p518a);
+		mapX = DOUBLE_80331510 + static_cast<double>(mapOffsetX);
 #ifndef VERSION_GCCJGC
 		const int language = Game.m_gameWork.GetLanguage();
 #endif
-		rowSlopeD = pSl2;
+		rowSlopeD = rowSlope;
 		rowBaseD = DOUBLE_80331490;
 		for (slot = 0; slot < kMcListCount; slot++) {
 			const McListInfo* const slotData = &m_wmCharaState[slot];
@@ -8852,10 +8834,8 @@ nextListEntry:
 					totalWidth++;
 				}
 				const int panelWidth = totalWidth * 0x30 + 0x40;
-				const float* pD8c2 = &FLOAT_803314D8;
-				capX += *pD8c2 + static_cast<float>(panelWidth);
-				const float* pD8c3 = &FLOAT_803314D8;
-				MenuPcs.DrawRect(8, capX, rowY, *pD8c3, FLOAT_80331440,
+				capX += FLOAT_803314D8 + static_cast<float>(panelWidth);
+				MenuPcs.DrawRect(8, capX, rowY, FLOAT_803314D8, FLOAT_80331440,
 				         FLOAT_803313dc, FLOAT_803313dc,
 				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcCharacterFillTexture));
@@ -8908,18 +8888,6 @@ nextListEntry:
 					}
 					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
 #endif
-					const float* pZd1 = &FLOAT_803313dc;
-					const double* pCs1 = &DOUBLE_80331490;
-					const double* pRs1 = &DOUBLE_80331540;
-					const double* pRb1 = &DOUBLE_80331538;
-					double rowBase;
-					double rowSlope;
-					double colSlope;
-					float zeroF;
-					zeroF = *pZd1;
-					colSlope = *pCs1;
-					rowSlope = *pRs1;
-					rowBase = *pRb1;
 					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
 						if (digitCount == 1) {
@@ -8932,13 +8900,13 @@ nextListEntry:
 						const int digitWidth = s_YearWTbl[digit];
 						const float digitWidthF = static_cast<float>(digitWidth);
 						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, FLOAT_80331410,
-						         static_cast<float>(colSlope * static_cast<float>(digit % 5)),
-						         static_cast<float>(rowSlope * static_cast<float>(digit / 5) + rowBase),
+						         static_cast<float>(DOUBLE_80331490 * static_cast<float>(digit % 5)),
+						         static_cast<float>(DOUBLE_80331540 * static_cast<float>(digit / 5) + DOUBLE_80331538),
 #ifdef VERSION_GCCJGC
-						         FLOAT_803313e8, FLOAT_803313e8, zeroF);
+						         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 						digitX += digitWidthF;
 #else
-						         digitScale, FLOAT_803313e8, zeroF);
+						         digitScale, FLOAT_803313e8, FLOAT_803313dc);
 						digitX += digitWidthF * digitScale;
 #endif
 					}
@@ -9019,8 +8987,7 @@ nextListEntry:
 						if ((faceNo / 100 & 1) != 0) {
 							texU = FLOAT_80331560;
 						} else {
-							double pHf1 = DOUBLE_803314F0;
-							texU = static_cast<float>(pHf1);
+							texU = static_cast<float>(DOUBLE_803314F0);
 						}
 						const float du = static_cast<float>(faceNo % 100) * FLOAT_80331468;
 						texU += du;
@@ -9097,14 +9064,12 @@ nextListEntry:
 		}
 
 		// Draw text info for each save slot
-		const double tSlope = DOUBLE_80331498;
-		const double tBase = DOUBLE_80331490;
 		for (slot = 0; slot < kMcListCount; slot++) {
 			char locationStr[64];
 			char line1[64];
 			char line2[64];
 			const McListInfo* const slotData = &m_wmCharaState[slot];
-			const float slotY = static_cast<float>(tSlope * static_cast<double>(slot) + tBase);
+			const float slotY = static_cast<float>(DOUBLE_80331498 * static_cast<double>(slot) + DOUBLE_80331490);
 			if (slotData->m_isBroken != 0 || static_cast<int>(slotData->m_scriptSysVal0) <= 0) {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);
@@ -9115,9 +9080,8 @@ nextListEntry:
 				const unsigned int msgId =
 					slotData->m_isBroken == 0;
 				const int width = static_cast<int>(fontF8->GetWidth(const_cast<char*>(GetMcStr(msgId))));
-				double pHd1 = DOUBLE_803313F8;
-				float pD8f1 = FLOAT_803314D8;
-				fontF8->SetPosX(static_cast<float>(static_cast<float>(0x238 - width) * pHd1 + pD8f1));
+				float textOffsetX = FLOAT_803314D8;
+				fontF8->SetPosX(static_cast<float>(static_cast<float>(0x238 - width) / 2.0 + textOffsetX));
 				fontF8->SetPosY(static_cast<float>(DOUBLE_80331580 + static_cast<double>(slotY)));
 				fontF8->Draw(const_cast<char*>(GetMcStr(msgId)));
 			} else {
@@ -9985,6 +9949,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
  */
 void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 {
+	int i;
 	CFont* font;
 	const char* const* msgTable;
 	int maxWidth;
@@ -9999,7 +9964,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	maxWidth = 0;
 	winMess = GetWinMess(winType);
 
-	for (int i = 0; i < winMess->m_lineCount; i++) {
+	for (i = 0; i < winMess->m_lineCount; i++) {
 		const short msgId = winMess->m_messageIds[i];
 		const char* text = msgTable[msgId];
 #ifndef VERSION_GCCJGC

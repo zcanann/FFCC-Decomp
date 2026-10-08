@@ -1771,7 +1771,7 @@ void CGPartyObj::onFrameStat()
 			} else {
 				m_alpha = FLOAT_80331A7C;
 				m_bgColMask &= 0xFFFEFFF1;
-				void* port = m_scriptHandle[0xED];
+				void* port = reinterpret_cast<void**>(m_scriptHandle)[0xED];
 				endPSlotBit(0x10000);
 				putParticle(reinterpret_cast<int>(port) + 3U | 0x100, m_particleSlots[16], this, 1.0f, 0);
 				playSe3D(0x2D, 0x32, 0x96, 0, 0);
@@ -3181,7 +3181,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		break;
 	case 0x17:
 		if (kind == 1 &&
-		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(source->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(source->m_scriptHandle)[9]) + 0xFE) & 4) != 0) {
 			addValue = stageAdd;
 		}
 		break;
@@ -3301,9 +3301,9 @@ int CGPartyObj::useItem(int itemId)
 					if (value >= 1) {
 						heal = value;
 					}
-					m_scriptHandle[0x2F4] =
+					reinterpret_cast<void**>(m_scriptHandle)[0x2F4] =
 					    reinterpret_cast<void*>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x68)));
-					m_scriptHandle[0x2F5] = reinterpret_cast<void*>(itemId);
+					reinterpret_cast<void**>(m_scriptHandle)[0x2F5] = reinterpret_cast<void*>(itemId);
 				} else {
 					heal = 4;
 				}
@@ -3733,10 +3733,10 @@ void CGPartyObj::ChangeCommandMode(int mode)
 	if (party.commandMode != mode) {
 		party.commandMode = static_cast<short>(mode);
 
-		if (MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId) != 0) {
-			MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(0, -1, -1);
-			MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(1, -1, -1);
-			MenuPcs.GetRingMenu(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(2, -1, -1);
+		if (MenuPcs.GetRingMenu(SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_joybusCaravanId) != 0) {
+			MenuPcs.GetRingMenu(SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(0, -1, -1);
+			MenuPcs.GetRingMenu(SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(1, -1, -1);
+			MenuPcs.GetRingMenu(SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_joybusCaravanId)->SetBattleCommand(2, -1, -1);
 		} else {
 			if (System.GetErrorLevel() >= 2U) {
 				System.Printf("\x83\x8A\x83\x93\x83O\x83\x81\x83j\x83\x85\x81[\x82\xAA\x82\xB7\x82\xC5\x82\xC9\x82\xA0\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81" "B\n");
@@ -3918,7 +3918,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 	} else {
 		m_alpha = FLOAT_80331A7C;
 		m_bgColMask &= 0xFFFEFFF1;
-		void* port = m_scriptHandle[0xED];
+		void* port = reinterpret_cast<void**>(m_scriptHandle)[0xED];
 
 		if (restoreDamageCol == 0 || keepTarget != 0) {
 			endPSlotBit(0x10000);
@@ -4008,14 +4008,14 @@ void stageWeather()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void magicReady()
+static inline int magicReady()
 {
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.m_partyObjArr[i];
-		if (party != nullptr && party->m_scriptHandle != nullptr) {
-			party->ChangeCommandMode(2);
-		}
+	if (CGPartyObj::m_ghostWork.counters[0] >= Chara.MogFur().m_radarLevel[0] ||
+	    CGPartyObj::m_ghostWork.counters[1] >= Chara.MogFur().m_radarLevel[1] ||
+	    CGPartyObj::m_ghostWork.counters[2] >= Chara.MogFur().m_radarLevel[2]) {
+		return 1;
 	}
+	return 0;
 }
 
 /*
@@ -4027,14 +4027,27 @@ inline void magicReady()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void chooseMagic()
+static inline int chooseMagic()
 {
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.m_partyObjArr[i];
-		if (party != nullptr && party->m_scriptHandle != nullptr) {
-			party->useItem(-1);
+	int choices = 0;
+	int i;
+	for (i = 0; i < 3; i++) {
+		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
+			choices++;
 		}
 	}
+
+	int pick = Math.Rand(choices);
+	int cursor = 0;
+	for (i = 0; i < 3; i++) {
+		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
+			if (cursor == pick) {
+				return i;
+			}
+			cursor++;
+		}
+	}
+	return 0;
 }
 
 /*
@@ -4046,12 +4059,13 @@ inline void chooseMagic()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void decMagic(int amount)
+static inline void decMagic(int slotSel)
 {
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.m_partyObjArr[i];
-		if (party != nullptr && party->m_scriptHandle != nullptr) {
-			party->bonus(0, -amount, (CGPrgObj*)0);
+	for (int slot = 0; slot < 3; slot++) {
+		if (slot == slotSel) {
+			CGPartyObj::m_ghostWork.counters[slot] = 0;
+		} else {
+			CGPartyObj::m_ghostWork.counters[slot] = CGPartyObj::m_ghostWork.counters[slot] / 2;
 		}
 	}
 }
@@ -4496,41 +4510,11 @@ void CGPartyObj::gpmMove()
 				    leader->m_subState == 1 &&
 				    leader->m_comboState != 0 &&
 				    leader->m_comboFrame == 0) {
-					int anyReady;
-					if (CGPartyObj::m_ghostWork.counters[0] >= Chara.MogFur().m_radarLevel[0] ||
-					    CGPartyObj::m_ghostWork.counters[1] >= Chara.MogFur().m_radarLevel[1] ||
-					    CGPartyObj::m_ghostWork.counters[2] >= Chara.MogFur().m_radarLevel[2]) {
-						anyReady = 1;
-					} else {
-						anyReady = 0;
-					}
-					if (anyReady == 0) {
+					if (magicReady() == 0) {
 						return;
 					}
 
-					int choices = 0;
-					int i;
-					for (i = 0; i < 3; i++) {
-						if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
-							choices++;
-						}
-					}
-
-					int pick = Math.Rand(choices);
-					int cursor = 0;
-					int newSlotSel;
-					for (i = 0; i < 3; i++) {
-						if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
-							if (cursor == pick) {
-								newSlotSel = i;
-								goto slotPicked;
-							}
-							cursor++;
-						}
-					}
-					newSlotSel = 0;
-				slotPicked:
-					CGPartyObj::m_ghostWork.slotSel = newSlotSel;
+					CGPartyObj::m_ghostWork.slotSel = chooseMagic();
 
 					switch (CGPartyObj::m_ghostWork.slotSel) {
 					case 0:
@@ -4651,19 +4635,8 @@ void CGPartyObj::gpmMove()
 		}
 	}
 
-	{
-		int slot = 0;
-		CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
-		GhostPartyWork& ghostWork = CGPartyObj::m_ghostWork;
-		const int slotSel = CGPartyObj::m_ghostWork.slotSel;
-		for (; slot < 3; slot++) {
-			if (slot == slotSel) {
-				ghostWork.counters[slot] = 0;
-			} else {
-				ghostWork.counters[slot] = ghostWork.counters[slot] / 2;
-			}
-		}
-	}
+	CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
+	decMagic(CGPartyObj::m_ghostWork.slotSel);
 	CGPartyObj::m_ghostWork.flagBits.flag10 = 0;
 }
 

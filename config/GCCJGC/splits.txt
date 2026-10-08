@@ -409,9 +409,16 @@ partyobj.cpp:
 	.text start:0x80116524 end:0x80120854
 
 partMng.cpp:
+	extab start:0x80006F08 end:0x800070A8
+	extabindex start:0x8000CC4C end:0x8000CEBC
 	.text start:0x80056BF0 end:0x8005EB34
+	.ctors start:0x801D0688 end:0x801D068C
+	.rodata start:0x801D2D88 end:0x801D3078
+	.data start:0x801DF148 end:0x801DF218
 	.bss start:0x802917E8 end:0x802B5830
+	.sdata start:0x8034B4B8 end:0x8034B4C0
 	.sbss start:0x8034BB90 end:0x8034BB98
+	.sdata2 start:0x8034CB60 end:0x8034CC08
 
 memory.cpp:
 	.bss start:0x80258188 end:0x8025F928
@@ -431,6 +438,10 @@ materialman.cpp:
 
 mapobj.cpp:
 	.text start:0x80027EF0 end:0x8002BE38
+	.rodata     start:0x801D1C18 end:0x801D1DC0
+	.data       start:0x801DCC58 end:0x801DCCE0
+	.sdata      start:0x8034B298 end:0x8034B2CC
+	.sdata2     start:0x8034C698 end:0x8034C6BC
 
 p_camera.cpp:
 	.bss start:0x80284090 end:0x80284570
@@ -442,6 +453,11 @@ gobject.cpp:
 chara.cpp:
 	.sbss start:0x8034BBA0 end:0x8034BBA8
 	.text start:0x8006DE6C end:0x80072F18
+	.rodata     start:0x801D3BD8 end:0x801D3C88
+	.data       start:0x801F1048 end:0x801F10B0
+	.bss        start:0x803031E0 end:0x80305258
+	.sdata2     start:0x8034CEF8 end:0x8034CF78
+	.sdata      start:0x8034B4D8 end:0x8034B508
 
 cflat_runtime2.cpp:
 	.text start:0x80068f5c end:0x8006de6c
@@ -468,6 +484,12 @@ gbaque.cpp:
 
 map.cpp:
 	.text start:0x8002eb80 end:0x800340bc
+	.data       start:0x801DCCE0 end:0x801DCD34
+	.bss        start:0x80261058 end:0x80283EE0
+	.sbss       start:0x8034BAB8 end:0x8034BAC0
+	.sdata2     start:0x8034C6D8 end:0x8034C758
+	.sdata      start:0x8034B2D0 end:0x8034B308
+	.rodata     start:0x801D1E58 end:0x801D2238
 
 monobj.cpp:
 	.text start:0x8010ed3c end:0x80116524
@@ -479,6 +501,8 @@ p_menu.cpp:
 	.text start:0x8009339C end:0x80096CEC
 	.rodata start:0x801D4850 end:0x801D4928
 	.bss start:0x80305AA0 end:0x80306360
+	.sdata      start:0x8034B5A0 end:0x8034B5C0
+	.data       start:0x8022C2F8 end:0x8022C7EC
 
 p_minigame.cpp:
 	.bss start:0x8031BB68 end:0x80322008
@@ -539,6 +563,7 @@ cmake.cpp:
 
 shopmenu.cpp:
 	.text start:0x8014B634 end:0x80153EA0
+	.data       start:0x80231D88 end:0x80231E30
 
 singmenu.cpp:
 	.rodata start:0x801D8E98 end:0x801D9454
@@ -549,7 +574,12 @@ cflat_r2system.cpp:
 	.text start:0x800B049C end:0x800B7D34
 
 cflat_r2class.cpp:
+	extab start:0x800083C0 end:0x800083D8
+	extabindex start:0x8000E9C8 end:0x8000E9EC
 	.text start:0x800B7D34 end:0x800BB280
+	.rodata start:0x801D52A8 end:0x801D5318
+	.data start:0x8022D410 end:0x8022D744
+	.sdata2 start:0x8034D8F0 end:0x8034D904
 
 gba/GBARead.c:
 	.text start:0x801A2CA4 end:0x801A2E04
@@ -560,10 +590,18 @@ gba/GBAWrite.c:
 graphic.cpp:
 	.text start:0x80015DD8 end:0x80019964
 	.bss start:0x8024C748 end:0x80257DD8
+	.rodata     start:0x801D0E88 end:0x801D0EA0
+	.sdata      start:0x8034B1E8 end:0x8034B200
+	.sbss       start:0x8034BA48 end:0x8034BA58
+	.sdata2     start:0x8034C438 end:0x8034C490
 
 p_graphic.cpp:
 	.text start:0x80044978 end:0x8004727C
 	.bss start:0x80284790 end:0x80284884
+	.rodata     start:0x801D26D8 end:0x801D2778
+	.data       start:0x801DE010 end:0x801DE240
+	.sdata2     start:0x8034C8B0 end:0x8034C964
+	.sdata      start:0x8034B3D8 end:0x8034B3F0
 
 p_light.cpp:
 	.text start:0x80047728 end:0x80049CB8
@@ -610,6 +648,11 @@ pppMana2.cpp:
 
 chara_fur.cpp:
 	.text start:0x800DC85C end:0x800E1A00
+	.rodata     start:0x801D618C end:0x801D6238
+	.bss        start:0x8031AC98 end:0x8031ACF4
+	.sbss       start:0x8034BBE0 end:0x8034BC0C
+	.sbss2      start:0x803501E8 end:0x803501F8
+	.sdata2     start:0x8034DDE0 end:0x8034DE90
 
 pppYmLaser.cpp:
 	.rodata start:0x801D5FA0 end:0x801D5FB0
@@ -1143,6 +1186,11 @@ TRK_MINNOW_DOLPHIN/targimpl.c:
 
 p_chara.cpp:
 	.text start:0x80072F18 end:0x8007AF9C
+	.rodata     start:0x801D3C88 end:0x801D46D0
+	.data       start:0x801F10B0 end:0x801F16B8
+	.bss        start:0x80305258 end:0x80305980
+	.sdata2     start:0x8034CF78 end:0x8034D080
+	.sdata      start:0x8034B508 end:0x8034B568
 
 axfx/reverb_hi.c:
 	.text	start:0x8018E398 end:0x8018F45C
@@ -2445,7 +2493,10 @@ pppVtMime.cpp:
 	.rodata start:0x801D3078 end:0x801D3088
 
 pppDrawMng.cpp:
+	extab start:0x800078C0 end:0x800078D8
+	extabindex start:0x8000D984 end:0x8000D9A8
 	.text start:0x8007AF9C end:0x8007B220
+	.sdata2 start:0x8034D080 end:0x8034D088
 
 pppDrawMdlTs.cpp:
 	extab start:0x80007A88 end:0x80007A90

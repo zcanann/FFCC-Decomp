@@ -92,6 +92,9 @@ static inline bool HasLoadedModel(CCharaPcs::CHandle* handle)
 
 static inline float GObjSqrtf(float x)
 {
+#ifdef VERSION_GCCJGC
+    return sqrtf(x);
+#else
     union {
         float f;
         unsigned long bits;
@@ -138,6 +141,7 @@ static inline float GObjSqrtf(float x)
     }
 
     return x;
+#endif
 }
 
 static inline float ClampFloat(float value, float minValue, float maxValue)
@@ -899,12 +903,12 @@ void CGObject::InitWork(int index)
     ownerType = m_ownerType;
     switch (ownerType) {
     case 0: {
-        reinterpret_cast<CGObjWork*>(m_scriptHandle)->Init(
+        m_scriptHandle->Init(
             index, &reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0])[index], 0);
         break;
     }
     case 1: {
-        reinterpret_cast<CGObjWork*>(m_scriptHandle)->Init(
+        m_scriptHandle->Init(
             index, &reinterpret_cast<CRomWork*>(Game.unkCFlatData0[1])[index], 0);
         break;
     }
@@ -978,17 +982,17 @@ void CGObject::SetClassWork(int ownerType, int workIndex)
 
     switch (ownerType) {
     case 0: {
-        m_scriptHandle = reinterpret_cast<void**>(&Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[workIndex]]);
-        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_saveSlot = Game.m_gameWork.m_wmBackupParams[workIndex];
-        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_ownerObj = this;
+        m_scriptHandle = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[workIndex]];
+        m_scriptHandle->m_saveSlot = Game.m_gameWork.m_wmBackupParams[workIndex];
+        m_scriptHandle->m_ownerObj = this;
         Game.m_scriptFoodBase[workIndex] = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
         return;
     }
 
     case 1:
-        m_scriptHandle = reinterpret_cast<void**>(&Game.m_monWorkArr[workIndex]);
-        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_ownerObj = this;
-        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_saveSlot = workIndex;
+        m_scriptHandle = &Game.m_monWorkArr[workIndex];
+        m_scriptHandle->m_ownerObj = this;
+        m_scriptHandle->m_saveSlot = workIndex;
         Game.m_monObjects[workIndex] = this;
         Game.m_monWorkRefs[workIndex] = reinterpret_cast<CMonWork*>(m_scriptHandle);
         return;
@@ -1869,9 +1873,8 @@ void CGObject::update()
             Mtx tiltMtx;
             if (m_groundHitOffset.x || m_groundHitOffset.z) {
                 Vec axis;
-                const float slideMagSq =
-                    m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
-                const float slideMag = GObjSqrtf(slideMagSq);
+                const float slideMag = GObjSqrtf(
+                    m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z);
                 PSVECCrossProduct(&m_groundHitOffset, CVector(0.0f, 1.0f, 0.0f), &axis);
                 PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 3.0f);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
@@ -1899,7 +1902,7 @@ void CGObject::update()
 
             const float swayDx = m_swayTarget.z - m_swayDirection.z;
             const float swayDz = m_swayTarget.x - m_swayDirection.x;
-            const float swayMag = GObjSqrtf(swayDz * swayDz + swayDx * swayDx);
+            GObjSqrtf(swayDz * swayDz + swayDx * swayDx);
             m_swayDirection.x += 0.5f * swayDz;
             m_swayDirection.z += 0.5f * swayDx;
 
@@ -2993,7 +2996,7 @@ void CGObject::onDestroy()
         m_shieldModelHandle = (CCharaPcs::CHandle*)0;
     }
 
-    m_scriptHandle = (void**)0;
+    m_scriptHandle = 0;
 }
 
 /*

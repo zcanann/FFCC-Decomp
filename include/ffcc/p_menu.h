@@ -819,6 +819,7 @@ public:
     void LetterMessDraw();
     int LetterCtrlCur();
     void LetterLstBaseDraw(float);
+    void LetterDrawPageMark(int);
     void DrawSingBar(int, int, int, float);
     void SingLifeResetWait();
     void FavoInit();

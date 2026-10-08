@@ -897,8 +897,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			i = 0;
 			for (; i < activePartyCount; i++) {
 				CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[activePartyCount + i + 1];
-				int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w * 0.5 + (double)sprite->x)) - 320.0);
-				int centerY = (int)(float)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 224.0);
+				int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)sprite->x)) - 320.0);
+				int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)sprite->y) - 224.0);
 				m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 				m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
 				m_wm.m_worldObjData[i].m_scissorX = sprite->x + 0xC;
@@ -931,7 +931,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			for (; i < activePartyCount; i++) {
 				CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i + 1];
 				float centerX = 0.0f;
-				float centerY = (float)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 224.0);
+				float centerY = (float)((double)(float)((double)sprite->h / 2.0 + (double)sprite->y) - 224.0);
 				m_wm.m_worldObjData[total2 + i].m_viewportX = (short)centerX;
 				m_wm.m_worldObjData[total2 + i].m_viewportY = (short)centerY;
 			}
@@ -984,8 +984,6 @@ void CMenuPcs::CalcResultOpenAnim()
 	}
 
 	Mtx scaleMtx;
-	Mtx rotXMtx;
-	Mtx rotYMtx;
 	{
 		i = 0;
 		int total2 = activePartyCount * 2;
@@ -1021,10 +1019,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 
 			if (i / activePartyCount == 1) {
-				PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
-				PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-				PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * this->m_bonusState->m_modelRotation);
-				PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
+				Math.MTXRotRadApply(scaleMtx, scaleMtx, 'x', 0.2617993950843811f);
+				Math.MTXRotRadApply(scaleMtx, scaleMtx, 'y', 0.01745329238474369f * this->m_bonusState->m_modelRotation);
 			}
 
 			if (i < activePartyCount) {
@@ -1379,8 +1375,6 @@ void CMenuPcs::CalcResultCountAnim()
 	}
 
 	Mtx scaleMtx;
-	Mtx rotXMtx;
-	Mtx rotYMtx;
 	for (i = 0; i < activePartyCount * 2; i++) {
 		CCharaPcs::CHandle* handle;
 		if (i < activePartyCount) {
@@ -1398,10 +1392,8 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 
 		if (i / activePartyCount == 1) {
-			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
-			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * this->m_bonusState->m_modelRotation);
-			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
+			Math.MTXRotRadApply(scaleMtx, scaleMtx, 'x', 0.2617993950843811f);
+			Math.MTXRotRadApply(scaleMtx, scaleMtx, 'y', 0.01745329238474369f * this->m_bonusState->m_modelRotation);
 		}
 
 		if (i < activePartyCount) {
@@ -1504,12 +1496,12 @@ void CMenuPcs::DrawResultCountAnim()
 					DrawInit();
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
-				_GXColor color;
-				color.r = 0xFF;
-				color.g = 0xFF;
-				color.b = 0xFF;
-				color.a = (unsigned char)(sprite->alpha * 255.0f);
-				GXSetChanMatColor(GX_COLOR0A0, color);
+				_GXColor colors[4];
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = (unsigned char)(sprite->alpha * 255.0f);
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
 				if (s_CntTop <= i && i < s_CntTop + activePartyCount) {
@@ -1801,8 +1793,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		for (; i < activePartyCount; i++) {
 			delta = activePartyCount + 1;
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[delta + i];
-			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w * 0.5 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
-			int centerY = (int)(float)((double)(float)((double)sprite->h * 0.5 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
+			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
+			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
 			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
@@ -1818,8 +1810,6 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 	}
 	Mtx scaleMtx;
-	Mtx rotXMtx;
-	Mtx rotYMtx;
 	{
 		int total2 = activePartyCount * 2;
 		i = 0;
@@ -1842,10 +1832,8 @@ void CMenuPcs::CalcResultCloseAnim()
 			}
 
 			if (i / activePartyCount == 1) {
-				PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
-				PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-				PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * this->m_bonusState->m_modelRotation);
-				PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
+				Math.MTXRotRadApply(scaleMtx, scaleMtx, 'x', 0.2617993950843811f);
+				Math.MTXRotRadApply(scaleMtx, scaleMtx, 'y', 0.01745329238474369f * this->m_bonusState->m_modelRotation);
 			}
 
 			if (i < activePartyCount) {
@@ -2323,9 +2311,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_transform.Identity();
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_active = 0;
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_frameCounter = 0;
-				int centerX = (int)((double)(float)((double)frameSprite->w * 0.5 + (double)frameSprite->x) - 320.0);
+				int centerX = (int)((double)(float)((double)frameSprite->w / 2.0 + (double)frameSprite->x) - 320.0);
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportX = (short)centerX;
-				int centerY = (int)((double)(float)((double)frameSprite->h * 0.5 + (double)frameSprite->y) - 224.0);
+				int centerY = (int)((double)(float)((double)frameSprite->h / 2.0 + (double)frameSprite->y) - 224.0);
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportY = (short)centerY;
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportWidth = 0x280;
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportHeight = 0x1C0;
@@ -2387,8 +2375,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 		i = 0;
 		for (; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[4 + i];
-			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w * 0.5 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
-			int centerY = (int)(float)((double)(float)((double)sprite->h * 0.5 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
+			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
+			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
 			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
@@ -2406,8 +2394,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 	Mtx scaleMtx;
 	Mtx rotZMtx;
-	Mtx rotYMtx;
-	Mtx rotXMtx;
 	Vec srcVec;
 	Vec dstVec;
 	{
@@ -2472,10 +2458,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 				PSMTXMultVecSR(rotZMtx, &srcVec, &dstVec);
 
 				if ((unsigned int)handle->m_charaNo == 0x44) {
-					PSMTXRotRad(rotYMtx, 'y', 3.1415927410125732f);
-					PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
-					PSMTXRotRad(rotXMtx, 'x', (-1.1693705320358276f));
-					PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
+					Math.MTXRotRadApply(scaleMtx, scaleMtx, 'y', 3.1415927410125732f);
+					Math.MTXRotRadApply(scaleMtx, scaleMtx, 'x', (-1.1693705320358276f));
 				}
 
 				scaleMtx[0][3] = dstVec.x;
@@ -2593,12 +2577,12 @@ void CMenuPcs::DrawSelectOpenAnim()
 					DrawInit();
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
-				GXColor color;
-				color.r = 0xFF;
-				color.g = 0xFF;
-				color.b = 0xFF;
-				color.a = (unsigned char)(255.0f * sprite->alpha);
-				GXSetChanMatColor(GX_COLOR0A0, color);
+				GXColor colors[4];
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = (unsigned char)(255.0f * sprite->alpha);
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 				if (sprite->kind == kBonusCursorTexture) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
@@ -2626,7 +2610,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	font->DrawInit();
 
 	int textIndex;
-	char text[268];
+	char text[256];
 	{
 		int i;
 		for (i = textIndex = 0; i < (int)m_bonusAnim->header.count && textIndex < activePartyCount; i++) {
@@ -2691,9 +2675,9 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
 		char* title = Game.GetShortItemName(idx);
-		float centerX = (float)((double)sprite->x + (double)(float)sprite->w * 0.5);
-		float centerY = (float)((double)sprite->y + (double)(float)sprite->h * 0.5);
-		font->SetPosX((float)-(0.5 * (double)font->GetWidth(title) - (double)centerX));
+		float centerX = (float)((double)sprite->x + (double)(float)sprite->w / 2.0);
+		float centerY = (float)((double)sprite->y + (double)(float)sprite->h / 2.0);
+		font->SetPosX((float)(centerX - font->GetWidth(title) / 2.0));
 #ifdef VERSION_GCCJGC
 		font->SetPosY(centerY - 44.0f);
 #else
@@ -2729,7 +2713,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 			if (lineText == 0) {
 				break;
 			}
-			font->SetPosX((float)-(0.5 * (double)font->GetWidth(lineText) - (double)centerX));
+			font->SetPosX((float)(centerX - font->GetWidth(lineText) / 2.0));
 #ifdef VERSION_GCCJGC
 			font->SetPosY(lineY);
 #else
@@ -2942,8 +2926,6 @@ void CMenuPcs::CalcSelectWait()
 
 	Mtx scaleMtx;
 	Mtx rotMtx;
-	Mtx tempMtx;
-	Mtx tempMtx2;
 	Vec srcVec;
 	Vec dstVec;
 	{
@@ -2979,10 +2961,8 @@ void CMenuPcs::CalcSelectWait()
 				PSMTXMultVecSR(rotMtx, &srcVec, &dstVec);
 
 				if (handle->m_charaNo == 0x44u) {
-					PSMTXRotRad(tempMtx, 'y', 3.1415927410125732f);
-					PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
-					PSMTXRotRad(tempMtx2, 'x', (-1.1693705320358276f));
-					PSMTXConcat(scaleMtx, tempMtx2, scaleMtx);
+					Math.MTXRotRadApply(scaleMtx, scaleMtx, 'y', 3.1415927410125732f);
+					Math.MTXRotRadApply(scaleMtx, scaleMtx, 'x', (-1.1693705320358276f));
 				}
 
 				scaleMtx[0][3] = dstVec.x;
@@ -3218,8 +3198,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 		i = 0;
 		for (; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[4 + i];
-			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w * 0.5 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
-			int centerY = (int)(float)((double)(float)((double)sprite->h * 0.5 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
+			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
+			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
 			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
@@ -3237,8 +3217,6 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 	Mtx scaleMtx;
 	Mtx rotZMtx;
-	Mtx rotYMtx;
-	Mtx rotXMtx;
 	Vec srcVec;
 	Vec dstVec;
 	{
@@ -3273,10 +3251,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 				PSMTXRotRad(rotZMtx, 'z', 0.01745329238474369f * (float)((-45.0) * (double)rotIndex));
 				PSMTXMultVecSR(rotZMtx, &srcVec, &dstVec);
 				if ((unsigned int)handle->m_charaNo == 0x44) {
-					PSMTXRotRad(rotYMtx, 'y', 3.1415927410125732f);
-					PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
-					PSMTXRotRad(rotXMtx, 'x', (-1.1693705320358276f));
-					PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
+					Math.MTXRotRadApply(scaleMtx, scaleMtx, 'y', 3.1415927410125732f);
+					Math.MTXRotRadApply(scaleMtx, scaleMtx, 'x', (-1.1693705320358276f));
 				}
 				scaleMtx[0][3] = dstVec.x;
 				float modelY = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
@@ -3345,15 +3321,13 @@ inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
 		digits[0] = value;
 	}
 
-	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
 	float digitW = (float)sprite->w;
-	int* dp = digits;
+	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
 	for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 		MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
-		    (float)(sprite->w * *dp), sprite->mulY,
+		    (float)(sprite->w * digits[digitIndex]), sprite->mulY,
 		    sprite->depth, sprite->depth, 0.0f);
 		digitX += digitW;
-		dp++;
 	}
 }
 

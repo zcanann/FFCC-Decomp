@@ -1,3 +1,4 @@
+#include "ffcc/math.h"
 #include "ffcc/cmake.h"
 #include "ffcc/chara.h"
 #include "ffcc/color.h"
@@ -3710,7 +3711,6 @@ void CMenuPcs::CalcSingleCMakeChara()
     if (GetCmakeCharaHandle(this, slot)->m_charaKind != 3) {
         Mtx scaleMtx;
         Mtx rotXMtx;
-        Mtx rotYMtx;
 
         modelWork->m_transform.m_position.x = 0.0f;
         modelWork->m_transform.m_position.y = -6.0f;
@@ -3724,8 +3724,7 @@ void CMenuPcs::CalcSingleCMakeChara()
             modelWork->m_transform.m_scale.y,
             modelWork->m_transform.m_scale.z);
         PSMTXRotRad(rotXMtx, 'x', modelWork->m_transform.m_rotation.x);
-        PSMTXRotRad(rotYMtx, 'y', modelWork->m_transform.m_rotation.y);
-        PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
+        Math.MTXRotRadApply(rotXMtx, rotXMtx, 'y', modelWork->m_transform.m_rotation.y);
         rotXMtx[0][3] = modelWork->m_transform.m_position.x;
         rotXMtx[1][3] = modelWork->m_transform.m_position.y;
         rotXMtx[2][3] = modelWork->m_transform.m_position.z;

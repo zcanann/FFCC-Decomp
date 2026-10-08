@@ -1781,7 +1781,11 @@ void CMenuPcs::DrawOptionMenu()
 		Vec2d pts[5] = { { 326.0f, 128.0f }, { 300.0f, 160.0f },
 		                       { 330.0f, 138.0f }, { 372.0f, 132.0f }, { 492.0f, 132.0f } };
 		int rowAnimFrame;
-#ifdef VERSION_GCCE01
+#ifdef VERSION_GCCJGC
+		rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);
+		const float specialRowCos = static_cast<float>(
+			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f))));
+#elif defined(VERSION_GCCE01)
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
 			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);
 		} else {

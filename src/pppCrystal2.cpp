@@ -257,6 +257,9 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
             xCoord = -1.0f;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
+#ifdef VERSION_GCCJGC
+                magnitude = sqrtf(xCoord * xCoord + ySq);
+#else
                 magnitude = xCoord * xCoord + ySq;
 
                 if (magnitude > 0.0f) {
@@ -266,6 +269,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
                 } else if (Crystal2FpClassify(magnitude) == 1) {
                     magnitude = NAN;
                 }
+#endif
 
                 u32 xFine = x & 3;
                 if (magnitude > 1.0f) {

@@ -6,6 +6,80 @@
 
 #include <string.h>
 
+namespace {
+static inline void i2f_5(float* out, register const unsigned short* in)
+{
+	register float value;
+
+	asm {
+		psq_l value, 0(in), 1, 5
+	}
+
+	*out = value;
+}
+
+static inline void i2f2_5(float* out, register const unsigned short* in, float t)
+{
+	register float a;
+	register float b;
+
+	asm {
+		psq_l a, 0(in), 1, 5
+		psq_l b, 2(in), 1, 5
+	}
+
+	*out = (b - a) * t + a;
+}
+
+static inline void i2f_6(float* out, register const unsigned short* in)
+{
+	register float value;
+
+	asm {
+		psq_l value, 0(in), 1, 6
+	}
+
+	*out = value;
+}
+
+static inline void i2f2_6(float* out, register const unsigned short* in, float t)
+{
+	register float a;
+	register float b;
+
+	asm {
+		psq_l a, 0(in), 1, 6
+		psq_l b, 2(in), 1, 6
+	}
+
+	*out = (b - a) * t + a;
+}
+
+static inline void i2f_7(float* out, register const unsigned short* in)
+{
+	register float value;
+
+	asm {
+		psq_l value, 0(in), 1, 7
+	}
+
+	*out = value;
+}
+
+static inline void i2f2_7(float* out, register const unsigned short* in, float t)
+{
+	register float a;
+	register float b;
+
+	asm {
+		psq_l a, 0(in), 1, 7
+		psq_l b, 2(in), 1, 7
+	}
+
+	*out = (b - a) * t + a;
+}
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -295,7 +369,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	int frameInt = static_cast<int>(frame);
 	anim->m_lastFrame = 0;
 
-	register float frameFrac = frame - static_cast<float>(frameInt);
+	float frameFrac = frame - static_cast<float>(frameInt);
 #if defined(VERSION_GCCP01)
 	if (frameInt == anim->m_frameCount - 1) {
 		frameFrac = 0.0f;
@@ -311,23 +385,10 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) != 0) {
 			if ((flags & 3) == 1) {
-				register float value;
-				asm {
-					psq_l value, 0(inData), 1, 5
-					stfs value, 0(outData)
-				}
+				i2f_5(outData, inData);
 				inData++;
 			} else {
-				register unsigned short* key = inData + frameInt;
-				register float a;
-				register float b;
-				asm {
-					psq_l a, 0(key), 1, 5
-					psq_l b, 2(key), 1, 5
-					fsubs b, b, a
-					fmadds b, b, frameFrac, a
-				}
-				*outData = b;
+				i2f2_5(outData, inData + frameInt, frameFrac);
 				inData += anim->m_frameCount + 1;
 			}
 		} else {
@@ -340,23 +401,10 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) != 0) {
 			if ((flags & 3) == 1) {
-				register float value;
-				asm {
-					psq_l value, 0(inData), 1, 6
-					stfs value, 0(outData)
-				}
+				i2f_6(outData, inData);
 				inData++;
 			} else {
-				register unsigned short* key = inData + frameInt;
-				register float a;
-				register float b;
-				asm {
-					psq_l a, 0(key), 1, 6
-					psq_l b, 2(key), 1, 6
-					fsubs b, b, a
-					fmadds b, b, frameFrac, a
-				}
-				*outData = b;
+				i2f2_6(outData, inData + frameInt, frameFrac);
 				inData += anim->m_frameCount + 1;
 			}
 		} else {
@@ -369,23 +417,10 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) != 0) {
 			if ((flags & 3) == 1) {
-				register float value;
-				asm {
-					psq_l value, 0(inData), 1, 7
-					stfs value, 0(outData)
-				}
+				i2f_7(outData, inData);
 				inData++;
 			} else {
-				register unsigned short* key = inData + frameInt;
-				register float a;
-				register float b;
-				asm {
-					psq_l a, 0(key), 1, 7
-					psq_l b, 2(key), 1, 7
-					fsubs b, b, a
-					fmadds b, b, frameFrac, a
-				}
-				*outData = b;
+				i2f2_7(outData, inData + frameInt, frameFrac);
 				inData += anim->m_frameCount + 1;
 			}
 		} else {

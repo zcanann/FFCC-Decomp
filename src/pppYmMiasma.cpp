@@ -4,7 +4,6 @@
 #include "ffcc/game.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 

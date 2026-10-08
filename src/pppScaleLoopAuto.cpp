@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ffcc/pppScaleLoopAuto.h"
 #include "ffcc/partMng.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppsintbl.h"
 #include <dolphin/types.h>
 #include "ffcc/ppp_linkage.h"

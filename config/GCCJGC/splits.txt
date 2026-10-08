@@ -409,9 +409,16 @@ partyobj.cpp:
 	.text start:0x80116524 end:0x80120854
 
 partMng.cpp:
+	extab start:0x80006F08 end:0x800070A8
+	extabindex start:0x8000CC4C end:0x8000CEBC
 	.text start:0x80056BF0 end:0x8005EB34
+	.ctors start:0x801D0688 end:0x801D068C
+	.rodata start:0x801D2D88 end:0x801D3078
+	.data start:0x801DF148 end:0x801DF218
 	.bss start:0x802917E8 end:0x802B5830
+	.sdata start:0x8034B4B8 end:0x8034B4C0
 	.sbss start:0x8034BB90 end:0x8034BB98
+	.sdata2 start:0x8034CB60 end:0x8034CC08
 
 memory.cpp:
 	.bss start:0x80258188 end:0x8025F928

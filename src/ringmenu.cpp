@@ -52,12 +52,6 @@ static const char sRingMenuDisplayToggleChangedFmt[] = {
 
 static void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, float);
 
-static inline int clampDecToZero(int value)
-{
-	int next = value - 1;
-	return next < 0 ? 0 : next;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800a2dd4
@@ -856,13 +850,13 @@ void CRingMenu::onCalc()
 			m_displayCounter = 0x10 - m_displayCounter;
 		}
 
-		m_displayCounter = clampDecToZero(m_displayCounter);
-		m_transitionCounter = clampDecToZero(m_transitionCounter);
+		m_displayCounter = (m_displayCounter - 1 < 0) ? 0 : m_displayCounter - 1;
+		m_transitionCounter = (m_transitionCounter - 1 < 0) ? 0 : m_transitionCounter - 1;
 		m_commonFrameCounter = m_commonFrameCounter + 1;
-		m_timerB = clampDecToZero(m_timerB);
+		m_timerB = (m_timerB - 1 < 0) ? 0 : m_timerB - 1;
 
 		for (int button = 0; button < 9; button++) {
-			m_buttonTimers[button] = clampDecToZero(m_buttonTimers[button]);
+			m_buttonTimers[button] = (m_buttonTimers[button] - 1 < 0) ? 0 : m_buttonTimers[button] - 1;
 		}
 		for (int anim = 0; anim < 9; anim++) {
 			for (int component = 0; component < 3; component++) {
@@ -894,7 +888,7 @@ void CRingMenu::onCalc()
 			m_gbaConnectedFlag = static_cast<int>(gbaConnected);
 			m_gbaAnimCounter = 0x0C - m_gbaAnimCounter;
 		}
-		m_gbaAnimCounter = clampDecToZero(m_gbaAnimCounter);
+		m_gbaAnimCounter = (m_gbaAnimCounter - 1 < 0) ? 0 : m_gbaAnimCounter - 1;
 
 		float scrollDelta = 0.0f;
 		CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];

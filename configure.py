@@ -770,7 +770,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmTracer.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmTracer2.cpp", cflags=cflags_game),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "prgobj.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,pool,readonly"]),
-            Object(MatchingFor("GCCP01", "GCCE01"), "quadobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "quadobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ringmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "shopmenu.cpp", extra_cflags=["-inline noauto,deferred"]),

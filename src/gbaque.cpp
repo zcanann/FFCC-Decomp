@@ -85,11 +85,6 @@ static inline unsigned short SwapU16(unsigned short value)
 	return __lhbrx(&value, 0);
 }
 
-static inline short SwapS16(short value)
-{
-	return __lhbrx(&value, 0);
-}
-
 static inline unsigned int SwapU32(unsigned int value)
 {
 	return __lwbrx(&value, 0);
@@ -613,10 +608,9 @@ inline void GbaQueue::ChgMoneyData(int channel, unsigned int data)
  */
 inline void GbaQueue::ChgEquipPosData(int channel, unsigned int data)
 {
-	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
+	char* dataBytes = reinterpret_cast<char*>(&data);
 
-	Game.m_scriptFoodBase[channel]
-		->ChgEquipPos(static_cast<signed char>(dataBytes[1]), static_cast<signed char>(dataBytes[2]));
+	Game.m_scriptFoodBase[channel]->ChgEquipPos(dataBytes[1], dataBytes[2]);
 }
 
 /*
@@ -627,9 +621,9 @@ inline void GbaQueue::ChgEquipPosData(int channel, unsigned int data)
 inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
 {
 	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
+	short value = *reinterpret_cast<short*>(dataBytes + 2);
 
-	Game.m_scriptFoodBase[channel]
-		->ChgCmdLst(dataBytes[1], SwapS16(*reinterpret_cast<short*>(dataBytes + 2)));
+	Game.m_scriptFoodBase[channel]->ChgCmdLst(dataBytes[1], static_cast<short>(__lhbrx(&value, 0)));
 }
 
 /*
@@ -649,8 +643,9 @@ inline void GbaQueue::SetSellData(int channel, unsigned int value)
 	Game.m_scriptFoodBase[channel]->DeleteItemIdx(bytes[2], 1);
 	const unsigned short baseGil =
 		reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
-	const float shopRate = static_cast<float>(static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
-	int gil = static_cast<int>(shopRate * 0.25f * static_cast<float>(baseGil));
+	float shopRate = static_cast<float>(static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	shopRate *= 0.25f;
+	int gil = static_cast<int>(shopRate * static_cast<float>(baseGil));
 	if (gil < 1) {
 		gil = 1;
 	}

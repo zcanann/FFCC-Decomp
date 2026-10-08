@@ -632,7 +632,11 @@ void CGObject::DrawDebug(CFont* font)
 void CGObject::SetDispItemName(int showName)
 {
     m_shieldNodeFlagBits.m_bit10 = showName;
+#ifdef VERSION_GCCP01
     m_dispItemTimer = 13;
+#else
+    m_dispItemTimer = 16;
+#endif
 }
 
 /*
@@ -2090,7 +2094,9 @@ void CGObject::update()
                      0x4) != 0) {
                     frameDelta = frameDelta < 0.0f ? -1.0f : 1.0f;
                 }
+#ifdef VERSION_GCCP01
                 frameDelta *= 1.2f;
+#endif
                 frameStep = m_turnSpeed + frameDelta;
             }
 

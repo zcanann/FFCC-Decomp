@@ -1697,7 +1697,11 @@ void CCaravanWork::SafeDeleteTempItem()
 
 	for (int i = 0; i < 64; i++) {
 		short item = m_inventoryItems[i];
+#ifdef VERSION_GCCP01
 		if ((item >= 0x100) && (item <= 0x124) && (item != -1)) {
+#else
+		if ((item >= 0x100) && (item <= 0x124)) {
+#endif
 			m_inventoryItems[i] = invalidItem;
 			m_inventoryItemCount--;
 		}

@@ -6999,9 +6999,10 @@ void CMenuPcs::CalcCharaSelect()
 				}
 
 				const int slot = entry.m_currentSlot;
+				const int handleIdx = slot + 0x20;
 				if (Game.m_caravanWorkArr[slot].m_shopState == 0 &&
-				    m_wm.m_handles[slot + 0x20]->IsModelLoaded(1) &&
-				    m_wm.m_handles[slot + 0x20]->m_charaKind != 3 &&
+				    m_wm.m_handles[handleIdx]->IsModelLoaded(1) &&
+				    m_wm.m_handles[handleIdx]->m_charaKind != 3 &&
 				    entry.m_cmakeReady != 1) {
 					if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 						System.Printf("chan = %d cur = %d\n", i,
@@ -7022,11 +7023,12 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		for (int slot = 0; slot < 8; slot++) {
+			const int handleIdx = slot + 0x20;
 			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    ((pendingMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    Game.m_caravanWorkArr[slot].m_shopState == 0 &&
-			    m_wm.m_handles[slot + 0x20]->IsModelLoaded(1) &&
-			    m_wm.m_handles[slot + 0x20]->m_charaKind != 3) {
+			    m_wm.m_handles[handleIdx]->IsModelLoaded(1) &&
+			    m_wm.m_handles[handleIdx]->m_charaKind != 3) {
 				ChgModel(slot, -1, -1, -1);
 			}
 		}
@@ -8071,7 +8073,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	GbaQue.GetCMakeInfo(channel, &info);
 
 	const int caravanSlot = static_cast<int>(static_cast<signed char>(info.m_playerSlot));
-	const int gender = (info.m_charaType >> 7) != 0;
+	const int gender = (info.m_charaType >> 7) ? 1 : 0;
 	int modelNo = GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, gender);
 
 	m_wm.m_charaModelData[caravanSlot].m_modelNo = modelNo;
@@ -8088,7 +8090,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
 	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
 	caravanWork.m_id = static_cast<unsigned short>(
-	    GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, (info.m_charaType >> 7) != 0));
+	    GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, (info.m_charaType >> 7) ? 1 : 0));
 	for (int favorite = 0; favorite < 8; favorite++) {
 		unsigned char nibble = info.m_favorite[favorite >> 1];
 		int v;
@@ -8215,10 +8217,9 @@ void CMenuPcs::CalcMainMenuSub()
 	int i;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	const unsigned short btn = Pad.GetButtonDown(0);
-	const short state = m_wmWorldState->m_mainState;
 
-	if (((state > 0) && (state < 4)) || m_wmWorldState->m_cardChannel == 1) {
-		if (state == 2 && m_wmWorldState->m_delay == 0) {
+	if (((m_wmWorldState->m_mainState > 0) && (m_wmWorldState->m_mainState < 4)) || m_wmWorldState->m_cardChannel == 1) {
+		if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay == 0) {
 			if ((btn & 1) != 0) {
 				float zero = FLOAT_803313dc;
 				m_wmMenuTargetRotation -= FLOAT_8033151c;
@@ -8297,14 +8298,10 @@ void CMenuPcs::CalcMainMenuSub()
 		Mtx baseMtx;
 		Mtx workMtx;
 		Mtx modelMtx;
-		Mtx rotMtx;
-		Mtx scaleMtx;
-		Mtx selScaleMtx;
 		Vec modelPos;
 
 		PSMTXRotRad(baseMtx, 'x', FLOAT_803315d0);
-		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -m_wmMenuRotation);
-		PSMTXConcat(baseMtx, rotMtx, baseMtx);
+		Math.MTXRotRadApply(baseMtx, baseMtx, 'y', FLOAT_803314bc * -m_wmMenuRotation);
 
 		float selectedRotY = GetFcvValue(s_MenuObjYRot,
 		                                 static_cast<float>(m_wmWorldState->m_titleState));
@@ -8333,8 +8330,7 @@ void CMenuPcs::CalcMainMenuSub()
 		const float rotZSel = FLOAT_803314bc * selectedRotZ;
 		const float rotYSel = FLOAT_803314bc * selectedRotY;
 		for (i = 0; i < 5; i++) {
-			const short curState = m_wmWorldState->m_mainState;
-			if (!(((curState > 0) && (curState < 4)) || i == 1)) {
+			if (!(((m_wmWorldState->m_mainState > 0) && (m_wmWorldState->m_mainState < 4)) || i == 1)) {
 				continue;
 			}
 
@@ -8385,8 +8381,7 @@ void CMenuPcs::CalcMainMenuSub()
 
 			if (i == 0) {
 				PSMTXRotRad(modelMtx, 'y', FLOAT_803315E8);
-				PSMTXRotRad(scaleMtx, 'x', FLOAT_803315d0);
-				PSMTXConcat(modelMtx, scaleMtx, modelMtx);
+				Math.MTXRotRadApply(modelMtx, modelMtx, 'x', FLOAT_803315d0);
 			} else if (i == 1) {
 				if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
 				    m_wmWorldState->m_mainState != 2) {
@@ -8404,8 +8399,7 @@ void CMenuPcs::CalcMainMenuSub()
 
 			if (m_wmWorldState->m_cardChannel == i) {
 				PSMTXRotRad(workMtx, 'z', rotZSel);
-				PSMTXRotRad(selScaleMtx, 'y', rotYSel);
-				PSMTXConcat(workMtx, selScaleMtx, workMtx);
+				Math.MTXRotRadApply(workMtx, workMtx, 'y', rotYSel);
 				PSMTXConcat(workMtx, modelMtx, modelMtx);
 			}
 
@@ -8437,8 +8431,8 @@ void CMenuPcs::CalcMainMenuSub()
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == i &&
 			    m_wmWorldState->m_delay != 0) {
-				PSMTXScale(scaleMtx, openScale, openScale, openScale);
-				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
+				PSMTXScale(workMtx, openScale, openScale, openScale);
+				PSMTXConcat(workMtx, modelMtx, modelMtx);
 			}
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
@@ -8446,8 +8440,8 @@ void CMenuPcs::CalcMainMenuSub()
 				float openScale2 = static_cast<float>(
 				    static_cast<float>(DOUBLE_803313F8 * (static_cast<double>(frame) / DOUBLE_80331608)) +
 				    DOUBLE_80331420);
-				PSMTXScale(scaleMtx, openScale2, openScale2, openScale2);
-				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
+				PSMTXScale(workMtx, openScale2, openScale2, openScale2);
+				PSMTXConcat(workMtx, modelMtx, modelMtx);
 			}
 
 			if (m_wmWorldState->m_mainState == 1) {

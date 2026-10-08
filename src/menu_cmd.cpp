@@ -2308,12 +2308,6 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
  */
 int CMenuPcs::UniteCloseAnim(int topIdx)
 {
-	CmdListEntry* entry;
-	int i;
-	int j;
-	int idx;
-	int finished;
-
 	if (s_ucnt == 0) {
 		return 1;
 	}
@@ -2322,6 +2316,10 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 
 	if (topIdx >= 0) {
+		CmdListEntry* entry;
+		int i;
+		int idx;
+		int finished;
 		finished = 0;
 		for (i = 0; i < 3; i++) {
 			idx = i + s_UniteTop[topIdx];
@@ -2341,6 +2339,10 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		}
 	} else {
 		int i;
+		int idx;
+		CmdListEntry* entry;
+		int j;
+		int finished;
 		for (i = finished = 0; i < s_ucnt; i++) {
 			for (j = 0; j < 3; j++) {
 				idx = j + s_UniteTop[i];

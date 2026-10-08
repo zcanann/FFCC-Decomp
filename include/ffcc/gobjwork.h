@@ -455,7 +455,14 @@ STATIC_ASSERT(sizeof(CRomLetterWork) == 0x3E);
 STATIC_ASSERT(offsetof(CCaravanWork, m_targetCursorPosA) == 0x0BAC);
 STATIC_ASSERT(offsetof(CCaravanWork, m_targetCursorPosB) == 0x0BB8);
 
-CMonWork* SAFE_CAST_MON_WORK(CGObjWork*);
-CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork*);
+inline CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
+{
+    return static_cast<CMonWork*>(work);
+}
+
+inline CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
+{
+    return static_cast<CCaravanWork*>(work);
+}
 
 #endif // _FFCC_GOBJWORK_H_

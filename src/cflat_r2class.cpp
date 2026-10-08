@@ -177,42 +177,6 @@ static inline unsigned int LoadU32(u8* base, int offset)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
-{
-	if (work == 0 || work->m_objType != 1) {
-		return 0;
-	}
-	return static_cast<CMonWork*>(work);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
-{
-	if (work == 0 || work->m_objType != 0) {
-		return 0;
-	}
-	return static_cast<CCaravanWork*>(work);
-}
-
-
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
@@ -1438,17 +1402,17 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x55:
-			reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle)->m_hp = static_cast<unsigned short>(object->m_localBase[1]);
+			engineObject->m_scriptHandle->m_hp = static_cast<unsigned short>(object->m_localBase[1]);
 			push(object, 0);
 			outResult = 0;
 			break;
 		case -0x56:
-			reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle)->m_maxHp = static_cast<unsigned short>(object->m_localBase[1]);
+			engineObject->m_scriptHandle->m_maxHp = static_cast<unsigned short>(object->m_localBase[1]);
 			push(object, 0);
 			outResult = 0;
 			break;
 		case -0x5A: {
-			CGObjWork* work = reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle);
+			CGObjWork* work = engineObject->m_scriptHandle;
 			work->m_statusValues[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			push(object, 0);
 			outResult = 0;

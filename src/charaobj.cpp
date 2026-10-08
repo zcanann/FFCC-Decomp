@@ -401,10 +401,10 @@ inline void CGCharaObj::decIgnoreHit()
  */
 void CGCharaObj::onFramePostCalc()
 {
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[2] != 0) {
+	if (m_scriptHandle->m_statusTimers[2] != 0) {
 		if (m_stateTick != 0 &&
 		    (m_stateTick % static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A))) == 0) {
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp > 1 &&
+			if (m_scriptHandle->m_hp > 1 &&
 			    !CharaObjGameFlagBit5Set()) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
 				addHp(-1, 0);
@@ -413,7 +413,7 @@ void CGCharaObj::onFramePostCalc()
 	}
 
 	for (int i = 0; i < 0x27; i++) {
-		int statusValue = static_cast<int>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[i]) - 1;
+		int statusValue = static_cast<int>(m_scriptHandle->m_statusTimers[i]) - 1;
 		if (statusValue != 0 && i == 2) {
 			m_stateTick += 1;
 		}
@@ -434,9 +434,9 @@ void CGCharaObj::onFramePostCalc()
 		setSta(i, statusValue);
 	}
 
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
-	    reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
-	    reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[3] != 0) {
+	if (m_scriptHandle->m_statusTimers[0] != 0 ||
+	    m_scriptHandle->m_statusTimers[9] != 0 ||
+	    m_scriptHandle->m_statusTimers[3] != 0) {
 		m_displayFlags &= ~2;
 		m_unk63CBits.m_bit80 = 0;
 	} else {
@@ -492,13 +492,13 @@ void CGCharaObj::onFramePreCalc()
 	}
 
 	m_pushScale = 1.0f;
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[8] != 0) {
+	if (m_scriptHandle->m_statusTimers[8] != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x34)) * 0.01f) + 1.0e-07f;
 	}
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[7] != 0) {
+	if (m_scriptHandle->m_statusTimers[7] != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x36)) * 0.01f) + 1.0e-07f;
 	}
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[1] != 0) {
+	if (m_scriptHandle->m_statusTimers[1] != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x40)) * 0.01f) + 1.0e-07f;
 	}
 	m_pushScale = (m_pushScale < 1.2f) ? m_pushScale : 1.2f;
@@ -515,7 +515,7 @@ void CGCharaObj::onFramePreCalc()
 			break;
 	}
 
-	CGObjWork* script = reinterpret_cast<CGObjWork*>(m_scriptHandle);
+	CGObjWork* script = m_scriptHandle;
 	if (script->m_statusTimers[0] != 0 ||
 	    script->m_statusTimers[9] != 0 ||
 	    script->m_statusTimers[3] != 0) {
@@ -560,11 +560,11 @@ float CGCharaObj::onAlphaUpdate()
 {
 	float alpha = m_alpha;
 
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp != 0) {
+	if (m_scriptHandle->m_hp != 0) {
 		if (((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-		     reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp == 0) ||
+		     m_scriptHandle->m_hp == 0) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		     (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 1) != 0 &&
+		     (m_scriptHandle->m_romWork[0x7F] & 1) != 0 &&
 		     static_cast<CGMonObj*>(this)->m_unk6BA == 0)) {
 			int createSerial = m_updateCounter;
 			float alphaWave = static_cast<float>(sin(static_cast<double>(0.05f * static_cast<float>(createSerial))));
@@ -793,7 +793,7 @@ void CGCharaObj::onFrameStat()
 					reqAnim(0x1B, 1, 0);
 				}
 
-				if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[4] == 0) {
+				if (m_scriptHandle->m_statusTimers[4] == 0) {
 					changeSubStat(2);
 				}
 				break;
@@ -1087,12 +1087,12 @@ void CGCharaObj::setSta(int staIndex, int value)
 	int isMon = 0;
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 		isMon = 1;
-		if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7E] == 0xB) {
+		if (m_scriptHandle->m_romWork[0x7E] == 0xB) {
 			isIceJ = 1;
 		}
 	}
 
-	CGObjWork* work = reinterpret_cast<CGObjWork*>(m_scriptHandle);
+	CGObjWork* work = m_scriptHandle;
 	int current = work->m_statusTimers[staIndex];
 	clampedValue = value < 0 ? 0 : value;
 
@@ -1121,13 +1121,13 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x80);
 				break;
 			case 10:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 4) != 0 &&
-					reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork[0x7F] & 4) != 0 &&
+					m_scriptHandle->m_hp != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyUp();
 				}
 				break;
 			case 0x1C:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 1) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork[0x7F] & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOn();
 				}
 				break;
@@ -1135,7 +1135,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x4000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					monsterScale = static_cast<float>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xDA]) * 0.01f;
+					monsterScale = static_cast<float>(m_scriptHandle->m_romWork[0xDA]) * 0.01f;
 				} else {
 					monsterScale = 1.0f;
 				}
@@ -1148,7 +1148,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x2000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					monsterScale = static_cast<float>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xDA]) * 0.01f;
+					monsterScale = static_cast<float>(m_scriptHandle->m_romWork[0xDA]) * 0.01f;
 				} else {
 					monsterScale = 1.0f;
 				}
@@ -1215,12 +1215,12 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 10:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 4) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork[0x7F] & 4) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyDown();
 				}
 				break;
 			case 0x1C:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 1) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork[0x7F] & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOff();
 				}
 				break;
@@ -1228,7 +1228,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x4000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					monsterScale = static_cast<float>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xDA]) * 0.01f;
+					monsterScale = static_cast<float>(m_scriptHandle->m_romWork[0xDA]) * 0.01f;
 				} else {
 					monsterScale = 1.0f;
 				}
@@ -1241,7 +1241,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x2000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					monsterScale = static_cast<float>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xDA]) * 0.01f;
+					monsterScale = static_cast<float>(m_scriptHandle->m_romWork[0xDA]) * 0.01f;
 				} else {
 					monsterScale = 1.0f;
 				}
@@ -1276,7 +1276,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	work = reinterpret_cast<CGObjWork*>(m_scriptHandle);
+	work = m_scriptHandle;
 	work->m_statusTimers[staIndex] = static_cast<unsigned short>(clampedValue);
 }
 
@@ -1295,21 +1295,21 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 
 	switch (staIndex) {
 		case 0x24:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0) {
+			if (m_scriptHandle->m_statusTimers[0] != 0) {
 				setSta(0, 0);
 			}
 			break;
 		case 0x64:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0) {
+			if (m_scriptHandle->m_statusTimers[0] != 0) {
 				setSta(0, 0);
 			}
 			break;
 		case 0x25:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0) {
+			if (m_scriptHandle->m_statusTimers[0] != 0) {
 				setSta(0, 0);
 			}
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) != 0xAD ||
-				(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 8) == 0) {
+				(m_scriptHandle->m_romWork[0x7F] & 8) == 0) {
 				CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
 				moveVectorH(delta, 2.0f, 8);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
@@ -1317,18 +1317,18 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			break;
 		case 0x69:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0) {
+			if (m_scriptHandle->m_statusTimers[0] != 0) {
 				setSta(0, 0);
 			}
 			changeStat(4, 0, 0);
 			break;
 		case 0x6B:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[4] != 0) {
+			if (m_scriptHandle->m_statusTimers[4] != 0) {
 				setSta(4, 0);
 			}
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] == 0 &&
-				reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[9] == 0 &&
-				reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[3] == 0) {
+			if (m_scriptHandle->m_statusTimers[0] == 0 &&
+				m_scriptHandle->m_statusTimers[9] == 0 &&
+				m_scriptHandle->m_statusTimers[3] == 0) {
 				changeStat(0x1A, 0, 0);
 			}
 			break;
@@ -1339,7 +1339,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			changeStat(10, 0, 0);
 			break;
 		case 1:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0) {
+			if (m_scriptHandle->m_statusTimers[0] != 0) {
 				setSta(0, 0);
 				setSta(1, 0);
 				outValue = 0;
@@ -1349,7 +1349,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			break;
 		case 0:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[1] != 0) {
+			if (m_scriptHandle->m_statusTimers[1] != 0) {
 				setSta(0, 0);
 				setSta(1, 0);
 				outValue = 0;
@@ -1376,7 +1376,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			changeStat(10, 0, 0);
 			break;
 		case 0x66:
-			addHp(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_maxHp, 0);
+			addHp(m_scriptHandle->m_maxHp, 0);
 			sourceObj->bonus(0x16, amount, this);
 			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
@@ -1391,7 +1391,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 		case 0x65:
 			if (Game.m_gameWork.m_gameOverFlag == 0) {
 				if (amount == 0x225) {
-					addHp(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_maxHp, 0);
+					addHp(m_scriptHandle->m_maxHp, 0);
 				} else {
 					addHp(8, 0);
 				}
@@ -1406,7 +1406,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			setSta(0x1C, calcSta(0x1C, amount, reinterpret_cast<CGObject*>(sourceObj)));
 			break;
 		case 8:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[7] != 0) {
+			if (m_scriptHandle->m_statusTimers[7] != 0) {
 				setSta(7, 0);
 				setSta(8, 0);
 			} else {
@@ -1416,7 +1416,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			outValue = 0;
 			break;
 		case 7:
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[8] != 0) {
+			if (m_scriptHandle->m_statusTimers[8] != 0) {
 				setSta(7, 0);
 				setSta(8, 0);
 			} else {
@@ -1510,7 +1510,7 @@ static inline unsigned short CharaObjGetPower(CGObject* source, int amount)
 		} else {
 			powerSource = static_cast<CGPrgObj*>(source);
 		}
-		return reinterpret_cast<CGObjWork*>(powerSource->m_scriptHandle)->m_romWork[0xCC];
+		return powerSource->m_scriptHandle->m_romWork[0xCC];
 	}
 	SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 	return powerRows[amount].m_power;
@@ -1519,10 +1519,10 @@ static inline unsigned short CharaObjGetPower(CGObject* source, int amount)
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if (staIndex == 0 || staIndex == 4) {
-		CGObjWork* work = reinterpret_cast<CGObjWork*>(m_scriptHandle);
+		CGObjWork* work = m_scriptHandle;
 		if (work->m_statusTimers[staIndex] != 0) {
 			System.Printf("効果時間上書きなし\n");
-			CGObjWork* work2 = reinterpret_cast<CGObjWork*>(m_scriptHandle);
+			CGObjWork* work2 = m_scriptHandle;
 			return work2->m_statusTimers[staIndex];
 		}
 	}
@@ -1626,7 +1626,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		return;
 	}
 
-	int hpValue = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp;
+	int hpValue = m_scriptHandle->m_hp;
 	int next = hpValue;
 
 	if (hpValue != 0 && delta < 0) {
@@ -1637,22 +1637,22 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		}
 
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_baseDataIndex == 0x9A &&
+			if (m_scriptHandle->m_baseDataIndex == 0x9A &&
 			    static_cast<CGMonObj*>(this)->m_actionBranch == 0) {
 				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x24) -= delta;
 				delta = 0;
 			}
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_baseDataIndex == 0x88) {
+			if (m_scriptHandle->m_baseDataIndex == 0x88) {
 				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) -= delta;
 			}
-			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_baseDataIndex == 0x70 &&
+			if (m_scriptHandle->m_baseDataIndex == 0x70 &&
 			    static_cast<int>(hpValue + delta) <= 0) {
 				delta = -(static_cast<int>(hpValue) - 1);
 			}
 		}
 
 		next = hpValue + delta < 0 ? 0 : hpValue + delta;
-		reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp = static_cast<unsigned short>(next);
+		m_scriptHandle->m_hp = static_cast<unsigned short>(next);
 		m_worldParam = 1.0f;
 
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
@@ -1696,12 +1696,12 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	}
 
 	if (delta > 0) {
-		int maxHp = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_maxHp;
+		int maxHp = m_scriptHandle->m_maxHp;
 		int result = maxHp;
 		if (hpValue + delta < maxHp) {
 			result = hpValue + delta;
 		}
-		reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp = static_cast<unsigned short>(result);
+		m_scriptHandle->m_hp = static_cast<unsigned short>(result);
 	}
 }
 /*
@@ -1730,39 +1730,39 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		case 0x6A:
 		case 0x6B:
 		case 100:
-			outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[0];
+			outA = m_scriptHandle->m_elementResistances[0];
 			break;
-		case 1: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[1]; break;
-		case 0: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[2]; break;
-		case 4: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[3]; break;
-		case 8: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[4]; break;
-		case 9: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[5]; break;
-		case 10: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[6]; break;
-		case 0x1C: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[7]; break;
-		case 2: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[8]; break;
-		case 6: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[9]; break;
-		case 3: outA = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_elementResistances[10]; break;
+		case 1: outA = m_scriptHandle->m_elementResistances[1]; break;
+		case 0: outA = m_scriptHandle->m_elementResistances[2]; break;
+		case 4: outA = m_scriptHandle->m_elementResistances[3]; break;
+		case 8: outA = m_scriptHandle->m_elementResistances[4]; break;
+		case 9: outA = m_scriptHandle->m_elementResistances[5]; break;
+		case 10: outA = m_scriptHandle->m_elementResistances[6]; break;
+		case 0x1C: outA = m_scriptHandle->m_elementResistances[7]; break;
+		case 2: outA = m_scriptHandle->m_elementResistances[8]; break;
+		case 6: outA = m_scriptHandle->m_elementResistances[9]; break;
+		case 3: outA = m_scriptHandle->m_elementResistances[10]; break;
 		default:
 			break;
 	}
 
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[28] == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 1) != 0 &&
+	if (m_scriptHandle->m_statusTimers[28] == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
+		(m_scriptHandle->m_romWork[0x7F] & 1) != 0 &&
 		staIndex != 0x1C) {
 		outA = outA < 2 ? 2 : outA;
 	}
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 4) != 0 &&
-		reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[10] == 0) {
+		(m_scriptHandle->m_romWork[0x7F] & 4) != 0 &&
+		m_scriptHandle->m_statusTimers[10] == 0) {
 		outA = outA < 2 ? 2 : outA;
 	}
 
-	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_baseDataIndex == 0x7F &&
+	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && m_scriptHandle->m_baseDataIndex == 0x7F &&
 	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CGMonObj::m_boss[0x10]) << 24 >> 30) << 30 >> 31) != 0) {
 		outA = 3;
 	}
 
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[27] != 0) {
+	if (m_scriptHandle->m_statusTimers[27] != 0) {
 		outA = 3;
 	}
 
@@ -1805,7 +1805,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	int allowEffect;
 	int effectResult;
 
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[5] != 0) {
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && m_scriptHandle->m_statusTimers[5] != 0) {
 		System.Printf("生き返り後の無敵期間でダメージOFF中\n");
 		return;
 	}
@@ -1831,7 +1831,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	int particleLife = itemRows[itemId].m_actionType;
 	int itemEffect = itemRows[itemId].m_effect;
-	int scriptDefense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0];
+	int scriptDefense = m_scriptHandle->m_statusTimers[0];
 	int damageClamp;
 	calcRegist(staType, itemId, resistType, allowEffect, effectResult, 0);
 
@@ -1909,18 +1909,18 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		changeStat(0x19, 0, 0);
 	}
 
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[27] != 0) {
+	if (m_scriptHandle->m_statusTimers[27] != 0) {
 		allowEffect = 0;
 		effectResult = 0;
 	}
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[3] != 0) {
+	if (m_scriptHandle->m_statusTimers[3] != 0) {
 		allowEffect = 0;
 	}
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[9] != 0 && (staType == 8 || staType == 7)) {
+	if (m_scriptHandle->m_statusTimers[9] != 0 && (staType == 8 || staType == 7)) {
 		allowEffect = 0;
 		effectResult = 0;
 	}
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp == 0) {
+	if (m_scriptHandle->m_hp == 0) {
 		if (staType == 0x65) {
 			allowEffect = 1;
 			effectResult = 0;
@@ -1973,10 +1973,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					}
 				}
 
-				unsigned int sourcePower = reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_strength;
+				unsigned int sourcePower = sourceObj->m_scriptHandle->m_strength;
 				int clampedDamage = 1;
 				float multiplier = CharaObjGetStatusMultiplier(0x2C);
-				unsigned int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
+				unsigned int defense = m_scriptHandle->m_defense;
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(static_cast<int>(basePower + sourcePower))) - defense;
 				if (rawDamage >= 1) {
 					clampedDamage = rawDamage;
@@ -1993,9 +1993,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				System.Printf("PC->MON ATTACKダメージ min1((%d + %d) * %f - %d) + %d = %d\n", basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 
 				if (staType != 0x6A && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-				    (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 0x100) != 0 &&
+				    (m_scriptHandle->m_romWork[0x7F] & 0x100) != 0 &&
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
-				    reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_elementResistances[3] == 0) {
+				    sourceObj->m_scriptHandle->m_elementResistances[3] == 0) {
 					unsigned int srcEntryKind =
 						CharaObjItemRow(static_cast<CGCharaObj*>(sourceObj)->m_itemId)->m_status & 0xFF;
 					if (sourceObj->m_lastStateId == 6 && srcEntryKind <= 1) {
@@ -2020,10 +2020,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					powerSource = sourceObj;
 				}
 
-				unsigned int sourcePower = reinterpret_cast<CGObjWork*>(powerSource->m_scriptHandle)->m_magic;
+				unsigned int sourcePower = powerSource->m_scriptHandle->m_magic;
 				int clampedDamage = 1;
 				float multiplier = CharaObjGetStatusMultiplier(0x2E);
-				unsigned int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
+				unsigned int defense = m_scriptHandle->m_defense;
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(static_cast<int>(basePower + sourcePower))) - defense;
 				if (rawDamage >= 1) {
 					clampedDamage = rawDamage;
@@ -2039,7 +2039,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					damageAmount = 1;
 				} else {
 					float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
-					int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp)) * recoilRate);
+					int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(m_scriptHandle->m_hp)) * recoilRate);
 					damageAmount = 1;
 					if (raw >= 1) {
 						damageAmount = raw;
@@ -2064,10 +2064,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 100:
 			case 0x69:
 			case 0x6A: {
-				int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
+				int defense = m_scriptHandle->m_defense;
 				SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 				unsigned int basePower = powerRows[itemId].m_basePower;
-				unsigned int sourcePower = reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_strength;
+				unsigned int sourcePower = sourceObj->m_scriptHandle->m_strength;
 				float multiplier = CharaObjGetStatusMultiplier(0x30);
 				int guardValue = static_cast<int>(defense * multiplier);
 				int computed30 = static_cast<int>(basePower + sourcePower) - guardValue;
@@ -2086,10 +2086,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 2:
 			case 4:
 			case 0x1C: {
-				int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
+				int defense = m_scriptHandle->m_defense;
 				SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 				unsigned int basePower = powerRows[itemId].m_basePower;
-				unsigned int sourcePower = reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_magic;
+				unsigned int sourcePower = sourceObj->m_scriptHandle->m_magic;
 				float multiplier = CharaObjGetStatusMultiplier(0x32);
 				int guardValue = static_cast<int>(defense * multiplier);
 				int computed32 = static_cast<int>(basePower + sourcePower) - guardValue;
@@ -2102,7 +2102,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 			case 10: {
 				float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
-				int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_hp)) * recoilRate);
+				int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(sourceObj->m_scriptHandle->m_hp)) * recoilRate);
 				damageAmount = (raw < 1) ? 1 : raw;
 				System.Printf("MON->PC GRAダメージ %d\n", damageAmount);
 				break;
@@ -2121,13 +2121,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int basePower = powerRows[itemId].m_basePower;
 				unsigned short rawSourcePower;
 				if (sourceObj->IsKindOf(0xAD) != 0) {
-					rawSourcePower = reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_magic;
+					rawSourcePower = sourceObj->m_scriptHandle->m_magic;
 				} else {
 					SCharaItemRow* srcPowerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 					rawSourcePower = srcPowerRows[itemId].m_sourcePower;
 				}
 				unsigned int sourcePower = rawSourcePower;
-				unsigned int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
+				unsigned int defense = m_scriptHandle->m_defense;
 				float defenseRate;
 				if (sourceObj->IsKindOf(0xAD) != 0) {
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
@@ -2156,11 +2156,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if (staType != 4 &&
-		    !((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD && reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_baseDataIndex == 6 && staType == 0x6A) &&
-		    reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[4] != 0) {
+		    !((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD && sourceObj->m_scriptHandle->m_baseDataIndex == 6 && staType == 0x6A) &&
+		    m_scriptHandle->m_statusTimers[4] != 0) {
 			setSta(4, 0);
 		}
-		if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0 && staType != 2 && staType != 0) {
+		if (m_scriptHandle->m_statusTimers[0] != 0 && staType != 2 && staType != 0) {
 			setSta(0, 0);
 		}
 
@@ -2173,12 +2173,12 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		    (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 4) != 0 &&
-		    reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[10] == 0) {
+		    (m_scriptHandle->m_romWork[0x7F] & 4) != 0 &&
+		    m_scriptHandle->m_statusTimers[10] == 0) {
 			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
-		if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[28] == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		    (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 1) != 0 &&
+		if (m_scriptHandle->m_statusTimers[28] == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
+		    (m_scriptHandle->m_romWork[0x7F] & 1) != 0 &&
 		    staType != 0x1C) {
 			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
@@ -2190,7 +2190,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if (damageAmount != 0) {
 			addHp(-damageAmount, sourceObj);
-			int isDead = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp == 0;
+			int isDead = m_scriptHandle->m_hp == 0;
 			if (isDead != 0) {
 				bonus(0, itemId, sourceObj);
 				sourceObj->bonus(1, itemId, this);
@@ -2228,7 +2228,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 			putHitParticleFromItem(sourceObj, itemId);
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
-				CGObjWork* work = reinterpret_cast<CGObjWork*>(m_scriptHandle);
+				CGObjWork* work = m_scriptHandle;
 				int seNo = work->m_romWork[0xC9] +
 					(work->m_romWork[0xC8] * 1000) + 6 +
 					Math.Rand(3);
@@ -2237,7 +2237,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D &&
-		    reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp != 0) {
+		    m_scriptHandle->m_hp != 0) {
 			int counterState = static_cast<CGCharaObj*>(sourceObj)->m_comboItemState;
 			if (counterState >= 0) {
 				switch (counterState) {
@@ -2270,7 +2270,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
 				     static_cast<CGPartyObj*>(sourceObj)->m_partyData.unk6CC == 2) &&
 				    (calcRegist(0x69, itemId, resistType, allowEffect, effectResult, 0), allowEffect != 0)) {
-					int chance = IsKindOf(0xAD) ? reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCD] : 0x32;
+					int chance = IsKindOf(0xAD) ? m_scriptHandle->m_romWork[0xCD] : 0x32;
 					if (chance != 0 && (DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0) {
 						chance = 100;
 					}
@@ -2291,7 +2291,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (itemEffect != 0x1F8 && particleLife == 2 &&
 	    (allowEffect != 0 || damageAmount != 0) &&
 	    staType != 0x66 && staType != 0x67 && staType != 0x65) {
-		int isDead = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp == 0;
+		int isDead = m_scriptHandle->m_hp == 0;
 		bonus(0x14, itemId, sourceObj);
 		sourceObj->bonus(0x10, itemId, this);
 		if (isDead != 0) {
@@ -2696,7 +2696,7 @@ void CGCharaObj::statAttack()
 	unsigned short cid = GetCID();
 
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
-		int animPoint = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_baseDataIndex;
+		int animPoint = m_scriptHandle->m_baseDataIndex;
 		if (animPoint == 0x88 || animPoint == 0x87) {
 			if (la(this)) {
 				m_subState = 1;
@@ -2809,9 +2809,9 @@ int CGCharaObj::calcCastTime(int itemId)
 	unsigned int baseCast = castRows[itemId].m_power;
 	float castScale;
 
-	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[8] != 0) {
+	if (m_scriptHandle->m_statusTimers[8] != 0) {
 		castScale = CharaObjGetStatusMultiplier(0x0);
-	} else if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[7] != 0) {
+	} else if (m_scriptHandle->m_statusTimers[7] != 0) {
 		castScale = CharaObjGetStatusMultiplier(0x2);
 	} else {
 		castScale = 1.0f;
@@ -2822,7 +2822,7 @@ int CGCharaObj::calcCastTime(int itemId)
 	int itemNo = typeRows[itemId].m_effect;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
-		int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCA];
+		int castBonus = m_scriptHandle->m_romWork[0xCA];
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 			int stageLevel;
 			if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
@@ -2853,7 +2853,7 @@ int CGCharaObj::calcCastTime(int itemId)
 		result = static_cast<int>(baseCast);
 		System.Printf("防御キャスト: %d\n", baseCast);
 	} else if (itemNo == 0x1F8) {
-		int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCB];
+		int castBonus = m_scriptHandle->m_romWork[0xCB];
 		unsigned int playerCid = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D;
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectParams[1]) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
@@ -3245,13 +3245,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 				break;
 			}
 
-			int itemMatch = scCheckItem(slotCursor, partyObj, slot == count - 1);
-			if (!itemMatch) {
-				break;
-			}
-
-			int windowOk = scCheckTime(slotCursor, partyList[0], partyObj, 1);
-			if (!windowOk) {
+			if (!scCheckItem(slotCursor, partyObj, slot == count - 1) || !scCheckTime(slotCursor, partyList[0], partyObj, 1)) {
 				break;
 			}
 

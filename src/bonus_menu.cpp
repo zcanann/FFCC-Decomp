@@ -1553,8 +1553,7 @@ void CMenuPcs::DrawResultCountAnim()
 	for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		Sprt2* sprite = &m_bonusAnim->sprites[i];
 		if (sprite->kind == -1) {
-			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
-			font->SetColor(color.color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 			int partyIndex = textIndex % activePartyCount;
 			int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
@@ -2633,8 +2632,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 			if (sprite->kind != -1) {
 				continue;
 			}
-			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha));
-			font->SetColor(color.color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
 
 			for (int j = 0; j < activePartyCount; j++) {
 				if (textIndex == s_Rinfo->m_party[j].m_rank) {
@@ -2687,8 +2685,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font->SetScaleY(0.8999999761581421f);
 #endif
 		font->DrawInit();
-		CColor color(0xFF, 0xFF, 0xFF, 0xFF);
-		font->SetColor(color.color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
 		char* title = Game.GetShortItemName(idx);

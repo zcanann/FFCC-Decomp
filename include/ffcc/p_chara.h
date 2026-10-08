@@ -81,6 +81,7 @@ public:
         int IsLoadModelASyncCompleted();
         void CancelLoadModelASync();
         int GetPdtSlot() const;
+        float GetLoadAnimTotalFrame(int);
 
         int m_charaKind;                    // 0x000
         int m_charaNo;                      // 0x004
@@ -333,6 +334,11 @@ public:
 inline int CCharaPcs::CHandle::GetPdtSlot() const
 {
     return m_pdtLoadRef != 0 ? m_pdtLoadRef->m_pdtSlot : -1;
+}
+
+inline float CCharaPcs::CHandle::GetLoadAnimTotalFrame(int slot)
+{
+    return m_animSlot[slot]->m_anim->m_frameCount;
 }
 
 extern CCharaPcs CharaPcs;

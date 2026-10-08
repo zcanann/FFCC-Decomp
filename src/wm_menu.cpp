@@ -41,6 +41,14 @@
 
 extern "C" char* strstr(const char*, const char*);
 
+#ifdef VERSION_GCCJGC
+#define WM_TEXTURE_START 21
+#define WM_TEXTURE_COUNT 44
+#else
+#define WM_TEXTURE_START 22
+#define WM_TEXTURE_COUNT 47
+#endif
+
 unsigned char lbl_8032E8AC = 1;
 struct WmMenuLightTable
 {
@@ -779,11 +787,7 @@ void CMenuPcs::loadData()
 #endif
 	};
 
-#ifdef VERSION_GCCJGC
-	loadTexture(tName, 2, 3, tTmp, 21, 44, 0);
-#else
-	loadTexture(tName, 2, 3, tTmp, 22, 47, 0);
-#endif
+	loadTexture(tName, 2, 3, tTmp, WM_TEXTURE_START, WM_TEXTURE_COUNT, 0);
 
 	for (i = 0; i < 40; i++) {
 		m_wm.m_handles[i] = 0;
@@ -796,9 +800,7 @@ void CMenuPcs::loadData()
 		20, 21, 22, 23, 24, 25, 26, 100,
 		300, 500, 700, 200, 400, 600, 800, 0,
 	};
-	const short* charaNoTable = s_objtbl;
-	const short* const charaNoDefault = charaNoTable + 21;
-	for (i = 0; i < 0x28; i++, charaNoTable++) {
+	for (i = 0; i < 0x28; i++) {
 		m_wm.m_handles[i] = new (MenuPcs.m_menuStage, "wm_menu.cpp", kHandleLine) CCharaPcs::CHandle;
 		m_wm.m_handles[i]->Add();
 
@@ -807,22 +809,16 @@ void CMenuPcs::loadData()
 		if (i < 0x20) {
 			CharaPcs.m_charaAllocStage = 1;
 			charaKind = 3;
-			charaNo = *charaNoTable;
+			charaNo = s_objtbl[i];
 		} else {
 			CCaravanWork& caravan = Game.m_caravanWorkArr[i - 0x20];
 			CharaPcs.m_charaAllocStage = 0;
 			if (caravan.m_shopState != 0) {
 				charaKind = 0;
-				charaNo = caravan.m_tribeId * 200 + 100;
-				unsigned short variant = caravan.m_appearanceVariant;
-				int gender = caravan.m_genderFlag;
-				if (gender != 0) {
-					charaNo += 100;
-				}
-				charaNo += variant;
+				charaNo = GetModelNo(caravan.m_tribeId, caravan.m_appearanceVariant, caravan.m_genderFlag);
 			} else {
 				charaKind = 3;
-				charaNo = *charaNoDefault;
+				charaNo = s_objtbl[21];
 			}
 		}
 
@@ -948,7 +944,7 @@ void CMenuPcs::loadData()
 
 	s_MaxAnimWait = FLOAT_803317FC;
 	for (i = 0; i < 8; i++) {
-		const int modelNo = (i + 1) * 100;
+		int modelNo = (i + 1) * 100;
 		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimStand), 1, 0, 0);
 		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimWalk), 1, 0, 0);
 		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimRun), 1, 0, 0);
@@ -958,32 +954,32 @@ void CMenuPcs::loadData()
 
 	{
 		for (i = 0; i < 8; i++) {
-			if (m_wm.m_handles[i + 0x20]->m_charaKind != 3) {
+			int slot = i + 0x20;
+			if (m_wm.m_handles[slot]->m_charaKind != 3) {
 				const unsigned int charaBase =
-				    static_cast<unsigned int>(m_wm.m_handles[i + 0x20]->m_charaNo) /
+				    static_cast<unsigned int>(m_wm.m_handles[slot]->m_charaNo) /
 				    100;
 				const int modelNo = charaBase * 100;
 				int anim = (charaBase - 1) * 6;
-				m_wm.m_handles[i + 0x20]->LoadAnim(
+				m_wm.m_handles[slot]->LoadAnim(
 				    const_cast<char*>(s_wmCharaAnimStand), anim++, 1, 0, modelNo, -1, 0);
-				m_wm.m_handles[i + 0x20]->LoadAnim(
+				m_wm.m_handles[slot]->LoadAnim(
 				    const_cast<char*>(s_wmCharaAnimWalk), anim++, 1, 0, modelNo, -1, 0);
-				m_wm.m_handles[i + 0x20]->LoadAnim(
+				m_wm.m_handles[slot]->LoadAnim(
 				    const_cast<char*>(s_wmCharaAnimRun), anim++, 1, 0, modelNo, -1, 0);
-				m_wm.m_handles[i + 0x20]->LoadAnim(
+				m_wm.m_handles[slot]->LoadAnim(
 				    const_cast<char*>(s_wmCharaAnimGlad), anim++, 3, 0, modelNo, -1, 0);
-				m_wm.m_handles[i + 0x20]->LoadAnim(
+				m_wm.m_handles[slot]->LoadAnim(
 				    const_cast<char*>(s_wmCharaAnimSleep), anim++, 1, 0, modelNo, -1, 0);
-				m_wm.m_handles[i + 0x20]->LoadAnim(
+				m_wm.m_handles[slot]->LoadAnim(
 				    const_cast<char*>(s_wmCharaAnimAngry), anim++, 1, 0, modelNo, -1, 0);
 				m_wmCharaAnimState[i].m_animIndex = 0;
 				m_wmCharaAnimState[i].m_nextAnimIndex = -1;
 				m_wmCharaAnimState[i].m_timer = rand() % kInitialAnimWait;
-				m_wm.m_handles[i + 0x20]->SetAnim(anim - 6, -1, -1, 0, 0);
-				m_wmCharaAnimState[i].m_frame = m_wm.m_handles[i + 0x20]->m_model->GetNowFrame();
-				m_wmCharaAnimState[i].m_endFrame = m_wm.m_handles[i + 0x20]->m_model->GetEndFrame();
-				float maxWait = static_cast<float>(
-				    m_wm.m_handles[i + 0x20]->m_animSlot[anim - 1]->m_anim->m_frameCount);
+				m_wm.m_handles[slot]->SetAnim(anim - 6, -1, -1, 0, 0);
+				m_wmCharaAnimState[i].m_frame = m_wm.m_handles[slot]->m_model->GetNowFrame();
+				m_wmCharaAnimState[i].m_endFrame = m_wm.m_handles[slot]->m_model->GetEndFrame();
+				float maxWait = m_wm.m_handles[slot]->GetLoadAnimTotalFrame(anim - 1);
 				if (s_MaxAnimWait < maxWait) {
 					s_MaxAnimWait = maxWait;
 				}
@@ -1284,7 +1280,7 @@ void CMenuPcs::destroyWorld()
 		m_wm.m_frameData = 0;
 	}
 
-	freeTexture(2, 3, 0x16, 0x2F);
+	freeTexture(2, 3, WM_TEXTURE_START, WM_TEXTURE_COUNT);
 
 	if (m_wmOptionTextureSet != 0) {
 		delete m_wmOptionTextureSet;
@@ -4049,6 +4045,7 @@ void CMenuPcs::DrawLoadMenu()
 
 	short state = m_wmWorldState->m_mainState;
 	float cursorXbase;
+	float cursorY0;
 	float alpha;
 	if (state > 0 && state < 4) {
 		if (state == 1) {
@@ -4103,7 +4100,6 @@ void CMenuPcs::DrawLoadMenu()
 	// Cursor / selection rendering
 	state = m_wmWorldState->m_mainState;
 	if (state == 2 && m_wmWorldState->m_subState >= 0x11) {
-		float cursorY0;
 		cursorY0 = FLOAT_803314D8;
 		cursorXbase = cursorY0;
 		cursorY0 = static_cast<float>(static_cast<double>(cursorY0) - DOUBLE_803317D8);
@@ -4498,8 +4494,7 @@ void CMenuPcs::DrawTitleMenu()
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		_GXColor clearGxColor = CColor(0, 0, 0, 0).color;
-		GXSetCopyClear(clearGxColor, 0xFFFFFF);
+		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0xFFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e0, FLOAT_803313e4,
@@ -4527,9 +4522,9 @@ void CMenuPcs::DrawTitleMenu()
 			fX -= FLOAT_80331414;
 			float fY = FLOAT_8033177C;
 			if (m_wmWorldState->m_cardChannel != 0) {
-				fY = FLOAT_8033177C + (float)(m_wmWorldState->m_cardChannel * 0x28 - 8);
+				fY += (float)(m_wmWorldState->m_cardChannel * 0x28 - 8);
 			}
-			float fYRect = fY - FLOAT_80331780;
+			fY -= FLOAT_80331780;
 			float alpha;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
@@ -4545,7 +4540,7 @@ void CMenuPcs::DrawTitleMenu()
 			matColor.b = 0xFF;
 			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
 			GXSetChanMatColor(GX_COLOR0A0, matColor);
-			MenuPcs.DrawRect(0, fX, fYRect,
+			MenuPcs.DrawRect(0, fX, fY,
 			         kTitleSelectionWidth, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -4572,7 +4567,7 @@ void CMenuPcs::DrawTitleMenu()
 			matColor.b = 0xFF;
 			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * secondAlpha));
 			GXSetChanMatColor(GX_COLOR0A0, matColor);
-			MenuPcs.DrawRect(0, fX, fYRect,
+			MenuPcs.DrawRect(0, fX, fY,
 			         kTitleSelectionWidth, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_80331554,
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);

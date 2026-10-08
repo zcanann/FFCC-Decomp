@@ -7524,16 +7524,12 @@ void CMenuPcs::DrawCMLife()
 
 	float fade;
 	if (worldState->m_mainState == 1) {
-		const double* pRate = &DOUBLE_803314E8;
-		fade = static_cast<float>(*pRate * static_cast<double>(worldState->m_frameCounter));
+		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter));
 	} else if (worldState->m_mainState == 2) {
-		const float* pOne = &FLOAT_803313e8;
-		fade = *pOne;
+		fade = FLOAT_803313e8;
 	} else {
-		const double* pRate = &DOUBLE_803314E8;
-		const double* pOne = &DOUBLE_80331420;
-		fade = static_cast<float>(-(*pRate * static_cast<double>(worldState->m_frameCounter) -
-		                            *pOne));
+		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter) -
+		                            FLOAT_803313e8));
 	}
 	int slot;
 	unsigned int readyMask = 0;
@@ -7543,8 +7539,7 @@ void CMenuPcs::DrawCMLife()
 			readyMask |= 1u << entry.m_currentSlot;
 		}
 	}
-	const float* p255A = &FLOAT_80331458;
-	const double alphaF = *p255A * fade;
+	const double alphaF = FLOAT_80331458 * fade;
 
 	for (slot = 0; slot < 8; slot++) {
 		int i;
@@ -7573,42 +7568,36 @@ void CMenuPcs::DrawCMLife()
 		float green;
 		float blue;
 		if ((readyMask & (1u << slot)) != 0) {
-			const float* pOneC = &FLOAT_803313e8;
-			red = *pOneC;
+			red = FLOAT_803313e8;
 			green = red;
 			blue = red;
 		} else {
-			const float* pHalfC = &FLOAT_80331434;
-			const float* pDimC = &FLOAT_80331668;
-			red = *pHalfC;
-			green = *pDimC;
+			red = FLOAT_80331434;
+			green = FLOAT_80331668;
 			blue = green;
 		}
 
-		const float* p255C = &FLOAT_80331458;
 		GXColor color;
-		color.r = static_cast<unsigned char>(static_cast<int>(*p255C * red));
-		color.g = static_cast<unsigned char>(static_cast<int>(*p255C * green));
-		color.b = static_cast<unsigned char>(static_cast<int>(*p255C * blue));
+		color.r = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red));
+		color.g = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green));
+		color.b = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blue));
 		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
 		row = slot / 4;
 		col = slot % 4;
-		const float* pYOrg = &FLOAT_80331478;
-		const float* pXOrg = &FLOAT_80331410;
 		float xBase;
 		float y;
 		float x;
-		xBase = *pXOrg + static_cast<float>(col * 0x90);
-		y = *pYOrg + static_cast<float>(row * 0xB8);
+		xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
+		y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
 		float yTmp = y;
 		if (row != 0) {
-			const float* pRowAdd = &FLOAT_80331548;
-			yTmp = y + *pRowAdd;
+			float rowAdd = FLOAT_80331548;
+			yTmp = y + rowAdd;
 		}
-		const float* pYAdj = &FLOAT_8033166C;
-		yTmp = yTmp + *pYAdj;
+		float yAdjust = FLOAT_8033166C;
+		yTmp = yTmp + yAdjust;
 		x = static_cast<float>((0x90 - count * 0x10) / 2.0 + xBase);
 		float step = static_cast<float>((8 - count) / 2.0);
 
@@ -7622,7 +7611,7 @@ void CMenuPcs::DrawCMLife()
 			MenuPcs.DrawRect(
 			    0, x, yTmp + yAdd, FLOAT_80331558, FLOAT_80331558,
 			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
-			step = static_cast<float>(step + DOUBLE_80331420);
+			step += 1.0;
 			x += kRectSize;
 		}
 
@@ -8525,9 +8514,8 @@ void CMenuPcs::DrawMainMenuSub()
 
 		clipPos.x = clipPos.x / clipPos.w;
 		clipPos.y = clipPos.y / clipPos.w;
-		double negY = -static_cast<double>(clipPos.y);
-		clipPos.x = static_cast<float>(DOUBLE_803315A0 * (DOUBLE_80331420 + static_cast<double>(clipPos.x)));
-		clipPos.y = static_cast<float>(DOUBLE_803315A8 * (DOUBLE_80331420 + negY));
+		clipPos.x = 320.0 * (clipPos.x + 1.0);
+		clipPos.y = 224.0 * (-clipPos.y + 1.0);
 		m_wm.m_worldObjData[i].m_viewportX =
 		    static_cast<short>(static_cast<int>(clipPos.x - FLOAT_803315B0));
 		m_wm.m_worldObjData[i].m_viewportY =
@@ -9848,10 +9836,10 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 	font = GetFont22();
 
-	const float* pOneM = &FLOAT_803313e8;
-	font->SetMargin(*pOneM);
+	float one = FLOAT_803313e8;
+	font->SetMargin(one);
 	font->SetShadow(0);
-	font->SetScale(*pOneM);
+	font->SetScale(one);
 	font->DrawInit();
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
@@ -9898,8 +9886,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 #ifdef VERSION_GCCJGC
 	winMess = GetWinMess(winType);
 #else
-	const float* pLineH = &FLOAT_80331404;
-	lineHeight = *pLineH;
+	lineHeight = FLOAT_80331404;
 #endif
 
 	char textBuf[128];

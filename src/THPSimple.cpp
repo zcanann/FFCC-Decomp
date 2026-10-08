@@ -87,12 +87,6 @@ static void __THPSimpleDVDCallback(long result, DVDFileInfo* fileInfo);
 static inline void CheckPrefetch();
 static inline BOOL VideoDecode(u8* compData);
 static void THPAudioMixCallback();
-extern const float kTHPSimpleDefaultVolume = 127.0f;
-
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
 
 /*
  * --INFO--
@@ -286,8 +280,7 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
     SimpleControl.isOpen = 1;
-    SimpleControl.curVolume = LoadFloat(kTHPSimpleDefaultVolume);
-    SimpleControl.targetVolume = LoadFloat(kTHPSimpleDefaultVolume);
+    SimpleControl.targetVolume = SimpleControl.curVolume = 127.0f;
     SimpleControl.rampCount = 0;
 
     return 1;

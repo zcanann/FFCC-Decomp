@@ -788,7 +788,7 @@ config.libs = [
                     "-use_lmw_stmw on",
                 ],
             ),
-            Object(MatchingFor("GCCE01"), "THPSimple.cpp", extra_cflags=["-inline auto,deferred"]),
+            Object(MatchingFor("GCCE01", "GCCJGC"), "THPSimple.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "USBStreamData.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),

@@ -1500,6 +1500,22 @@ static inline bool CharaObjIsJoybusCaravan(CGObject* obj)
  * JP Address: TODO
  * JP Size: TODO
  */
+static inline unsigned short CharaObjGetPower(CGObject* source, int amount)
+{
+	bool isPrgObj = source->IsKindOf(0x2D);
+	if (isPrgObj) {
+		CGPrgObj* powerSource;
+		if (CharaObjIsJoybusCaravan(source)) {
+			powerSource = Game.m_partyObjArr[0];
+		} else {
+			powerSource = static_cast<CGPrgObj*>(source);
+		}
+		return reinterpret_cast<CGObjWork*>(powerSource->m_scriptHandle)->m_romWork[0xCC];
+	}
+	SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	return powerRows[amount].m_power;
+}
+
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if (staIndex == 0 || staIndex == 4) {
@@ -1561,22 +1577,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		itemType = 1;
 	}
 
-	unsigned short powerValue;
-	bool isPrgObj = source->IsKindOf(0x2D);
-	if (isPrgObj) {
-		CGPrgObj* powerSource;
-		if (CharaObjIsJoybusCaravan(source)) {
-			powerSource = Game.m_partyObjArr[0];
-		} else {
-			powerSource = static_cast<CGPrgObj*>(source);
-		}
-		powerValue = reinterpret_cast<CGObjWork*>(powerSource->m_scriptHandle)->m_romWork[0xCC];
-	} else {
-		SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
-		powerValue = powerRows[amount].m_power;
-	}
-
-	unsigned int power = powerValue;
+	unsigned int power = CharaObjGetPower(source, amount);
 	if ((static_cast<unsigned short>(source->GetCID()) & 0xAD) == 0xAD) {
 		int stageLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
@@ -2637,6 +2638,7 @@ int la(CGObject* object)
 	} else {
 		CChara::CModel* motion = model->m_model;
 		if (motion->m_anim != 0) {
+#ifdef VERSION_GCCP01
 			int frame;
 			int period = static_cast<int>(1.0f + (motion->m_animEnd -
 				motion->m_animStart));
@@ -2648,14 +2650,27 @@ int la(CGObject* object)
 				if (object->m_lastBgAttr < 0.0f) {
 					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frameMod)), 31, 31) & 0xFF;
 				} else {
-#ifdef VERSION_GCCP01
 					bool isPeriod = (period <= frame);
-#else
-					bool isPeriod = (frameMod == 0);
-#endif
 					result = isPeriod;
 				}
 			}
+#else
+			int period = static_cast<int>(1.0f + (motion->m_animEnd -
+				motion->m_animStart));
+			int frame;
+			if (period == 1) {
+				result = 1;
+			} else {
+				frame = static_cast<int>(object->m_turnSpeed);
+				frame %= period;
+				if (object->m_lastBgAttr < 0.0f) {
+					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frame)), 31, 31) & 0xFF;
+				} else {
+					bool isPeriod = (frame == 0);
+					result = isPeriod;
+				}
+			}
+#endif
 		} else {
 			result = 1;
 		}

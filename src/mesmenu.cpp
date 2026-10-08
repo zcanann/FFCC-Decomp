@@ -997,9 +997,9 @@ void CMesMenu::onCalc()
     }
 
     int desiredStageFlag = stageBit != 0;
-    if (desiredStageFlag != m_stageFadeOut) {
+    if (m_stageFadeOut != desiredStageFlag) {
 #ifdef VERSION_GCCP01
-        System.Printf(const_cast<char*>(s_mesMenuOnOffChangedFmt));
+        System.Printf(const_cast<char*>(s_mesMenuOnOffChangedFmt), m_menuIndex, desiredStageFlag);
 #endif
         m_stageFadeOut = !m_stageFadeOut;
         m_stageFadeTimer = 0x10 - m_stageFadeTimer;
@@ -1109,8 +1109,8 @@ void CMesMenu::onCalc()
             int wait = m_mes.GetWait();
             if (wait == 3) {
                 int altCursor = m_mes.mRubyOffset;
-                int cursor = m_mes.mRubyHeight;
                 int cursorMax = m_mes.mRubyLine;
+                int cursor = m_mes.mRubyHeight;
                 if ((repeatMask & 8) != 0) {
                     cursor--;
                     if (cursor < 0) {

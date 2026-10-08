@@ -573,7 +573,7 @@ config.libs = [
             Object(NonMatching, "menu_equip.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_favo.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "menu_item.cpp"),
-            Object(NonMatching, "menu_letter.cpp"),
+            Object(NonMatching, "menu_letter.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "menu_lst.cpp"),
             Object(NonMatching, "menu_money.cpp"),
             Object(NonMatching, "menu_tmparti.cpp"),

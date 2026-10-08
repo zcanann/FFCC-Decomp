@@ -637,7 +637,13 @@ goout.cpp:
 	.sdata2 start:0x80332150 end:0x80332178
 
 menu_letter.cpp:
+	extab start:0x80009F9C end:0x80009FF4
+	extabindex start:0x80011434 end:0x800114B8
 	.text start:0x801629BC end:0x80166DC0
+	.rodata start:0x801DDDE0 end:0x801DDE18
+	.bss start:0x8030AA68 end:0x8030AAE8
+	.sbss start:0x8032DEC8 end:0x8032DEE8
+	.sdata2 start:0x80332020 end:0x80332148
 
 graphic.cpp:
 	.text start:0x800161FC end:0x80019D7C

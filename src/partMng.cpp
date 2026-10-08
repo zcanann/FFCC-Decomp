@@ -171,7 +171,7 @@ enum PppChunkId {
  * JP Address: TODO
  * JP Size: TODO
  */
-pppShapeSt::pppShapeSt()
+inline pppShapeSt::pppShapeSt()
 {
     m_refCount = 0;
     m_inUse = 0;
@@ -795,30 +795,7 @@ void CPartMng::drawCursor()
         return;
     }
 
-    GXSetNumChans(1);
-    GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
-    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
-
-    Mtx identity;
-    Mtx44 orthoProjection;
-    C_MTXOrtho(orthoProjection, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f,
-               -100.0f);
-    GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
-
-    PSMTXIdentity(identity);
-    GXLoadPosMtxImm(identity, 0);
-    GXSetZCompLoc(0);
-    GXSetCurrentMtx(0);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    GXSetZMode(0, GX_ALWAYS, 0);
-    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetCullMode(GX_CULL_NONE);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    GXSetNumTexGens(0);
-    GXSetNumTevStages(1);
+    pppEditSetProjection2D();
     pppSetBlendMode(3);
 
     _GXColor color;
@@ -859,30 +836,7 @@ void CPartMng::drawCursor()
  */
 void CPartMng::render3Dcursor()
 {
-    GXSetNumChans(1);
-    GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
-    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
-
-    Mtx identity;
-    Mtx44 orthoProjection;
-    C_MTXOrtho(orthoProjection, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f,
-               -100.0f);
-    GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
-
-    PSMTXIdentity(identity);
-    GXLoadPosMtxImm(identity, 0);
-    GXSetZCompLoc(0);
-    GXSetCurrentMtx(0);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    GXSetZMode(0, GX_ALWAYS, 0);
-    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetCullMode(GX_CULL_NONE);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    GXSetNumTexGens(0);
-    GXSetNumTevStages(1);
+    pppEditSetProjection2D();
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
     GXLoadPosMtxImm(ppvCameraMatrix, 0);
     pppSetBlendMode(3);
@@ -967,6 +921,8 @@ void CPartMng::pppGet2Dpos()
     u32 zAtPixel;
     Vec worldPos;
     Vec screenPos;
+    Mtx invCamera ATTRIBUTE_ALIGN(8);
+    Vec viewPos;
 
     if (m_cursorRequest != 0) {
         int x = m_editorCursorX + 0x140;
@@ -978,7 +934,12 @@ void CPartMng::pppGet2Dpos()
             screenPos.x = (float)m_editorCursorX / 320.0f;
             screenPos.y = -(float)m_editorCursorY / 224.0f;
             screenPos.z = (float)((int)zAtPixel - 0xFFFFFF) / 16777216.0f;
-            Screen2world(screenPos, worldPos);
+            float viewZ = ppvScreenMatrix0[2][3] / (screenPos.z + ppvScreenMatrix0[2][2]);
+            viewPos.x = viewZ * (screenPos.x / ppvScreenMatrix0[0][0]);
+            viewPos.y = viewZ * (screenPos.y / ppvScreenMatrix0[1][1]);
+            viewPos.z = -viewZ;
+            PSMTXInverse(ppvCameraMatrix0, invCamera);
+            PSMTXMultVec(invCamera, &viewPos, &worldPos);
             USBPcs.SendDataCode(0x60, &worldPos, 1, 0xC);
         }
         m_cursorRequest = 0;
@@ -1941,12 +1902,40 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: 312b
+ * EN Address: 0x80068F5C
+ * EN Size: 312b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppEditSetProjection2D()
 {
-	// TODO
+    Mtx44 orthoProjection;
+    Mtx identity;
+
+    GXSetNumChans(1);
+    GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
+    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
+
+    C_MTXOrtho(orthoProjection, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f,
+               -100.0f);
+    GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
+
+    PSMTXIdentity(identity);
+    GXLoadPosMtxImm(identity, 0);
+    GXSetZCompLoc(0);
+    GXSetCurrentMtx(0);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    GXSetZMode(0, GX_ALWAYS, 0);
+    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
 }
 
 /*
@@ -2504,15 +2493,6 @@ void CPartMng::pppDumpCacheIdx()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartMng::pppRefCnt0Up()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8005A6C0
  * PAL Size: 512b
  * EN Address: 0x80069F30
@@ -2595,6 +2575,15 @@ void CPartMng::pppPartCalc()
             goto runFrame;
         }
     }
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CPartMng::pppRefCnt0Up()
+{
 }
 
 /*
@@ -4061,7 +4050,7 @@ void CPartMng::pppDestroyAll()
  * JP Address: TODO
  * JP Size: TODO
  */
-_pppMngSt::_pppMngSt()
+inline _pppMngSt::_pppMngSt()
 {
     PPPSEST* soundEffectData = &m_soundEffectData;
     PPPIFPARAM* hitParams = &m_hitParams;

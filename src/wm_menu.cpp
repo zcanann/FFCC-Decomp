@@ -3286,10 +3286,9 @@ void CMenuPcs::DrawMainMenu()
 				textAlpha = static_cast<unsigned int>(static_cast<int>(FLOAT_80331458 * helpAlpha));
 			}
 #ifdef VERSION_GCCJGC
-			CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF));
-			char* const text = textList[m_wmWorldState->m_cardChannel];
-			const int x = static_cast<int>(CalcCenteringPos(text, 22));
-			DrawFont(x, 391, textColor.color, 7, text, 1.0f, 1.0f);
+			DrawFont(static_cast<int>(CalcCenteringPos(textList[m_wmWorldState->m_cardChannel], 22)), 391,
+			         CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color, 7,
+			         textList[m_wmWorldState->m_cardChannel], 1.0f, 1.0f);
 #else
 			const float* pY = &FLOAT_803317D0;
 			DrawFont2(static_cast<int>(CalcCenteringPos2(textList[m_wmWorldState->m_cardChannel], FLOAT_80331594, FLOAT_803313e8)),

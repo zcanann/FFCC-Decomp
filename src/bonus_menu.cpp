@@ -660,8 +660,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->x = 0;
 			spr->w = 0x280;
 			spr->h = 0x1c0;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 0;
 			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
@@ -1628,8 +1627,7 @@ void CMenuPcs::CalcResultCloseAnim()
 	if (this->m_bonusState->m_initialized == 0) {
 		for (i = 0; i < (int)m_bonusAnim->header.count; i++) {
 			m_bonusAnim->sprites[i].timer = 0;
-			m_bonusAnim->sprites[i].motionX = 0.0f;
-			m_bonusAnim->sprites[i].motionY = 0.0f;
+			m_bonusAnim->sprites[i].motionY = m_bonusAnim->sprites[i].motionX = 0.0f;
 		}
 
 		int base = 0;
@@ -2123,8 +2121,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->x = 0;
 			spr->w = 0x280;
 			spr->h = 0x1c0;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 0;
 			spr->duration = 0;
 			spr->depth = 1.0f;
@@ -2137,8 +2134,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->y = 0x38;
 			spr->w = 0x168;
 			spr->h = 0x148;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 0;
 			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
@@ -2150,8 +2146,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->y = 0;
 			spr->w = 0x80;
 			spr->h = 0x78;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 9999;
 			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;
@@ -2166,8 +2161,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->y = 0;
 			spr->w = 0x70;
 			spr->h = 0x68;
-			spr->mulY = 0.0f;
-			spr->mulX = 0.0f;
+			spr->mulX = spr->mulY = 0.0f;
 			spr->startFrame = 0;
 			spr->duration = kFadeFrames;
 			spr->depth = 1.0f;

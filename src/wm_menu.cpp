@@ -8539,8 +8539,7 @@ void CMenuPcs::DrawMainMenuSub()
 		    static_cast<short>(static_cast<int>(clipPos.y - FLOAT_803315B4));
 		m_wm.m_worldObjData[i].m_viewportWidth = 0x280;
 		m_wm.m_worldObjData[i].m_viewportHeight = 0x1C0;
-		m_wm.m_worldObjData[i].m_cameraPosition.x = FLOAT_803313dc;
-		m_wm.m_worldObjData[i].m_cameraPosition.y = FLOAT_803313dc;
+		m_wm.m_worldObjData[i].m_cameraPosition.y = m_wm.m_worldObjData[i].m_cameraPosition.x = FLOAT_803313dc;
 		m_wm.m_worldObjData[i].m_cameraPosition.z = FLOAT_80331598;
 	}
 

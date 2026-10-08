@@ -3191,22 +3191,24 @@ int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 
     if (!IsThreadRunning())
     {
-        return 0;
-    }
-
-    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-    if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
-    {
-        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        result = -1;
+        result = 0;
     }
     else
     {
-        m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = command;
-        m_cmdCount[threadParam->m_portIndex]++;
-        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        result = 0;
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
+        if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
+        {
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = -1;
+        }
+        else
+        {
+            m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = command;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
+        }
     }
 
     return result;
@@ -4168,7 +4170,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     localWord = 0;
     localBytes[0] = 0x0B;
 
-    if (static_cast<signed char>(phase) == 0)
+    if ((char)phase == 0)
     {
         if (step == 0)
         {
@@ -4180,15 +4182,14 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 }
             }
 
-            signed char st = sendType;
-            if (st == 0)
+            if ((char)sendType == 0)
             {
                 unsigned char* baseA = reinterpret_cast<unsigned char*>(m_fileBaseA);
                 dataPtr = baseA;
                 dataBase = baseA;
                 totalSize = static_cast<unsigned short>(m_fileBaseA_dup);
             }
-            else if (st == 1)
+            else if ((signed char)sendType == 1)
             {
                 unsigned char* baseB = reinterpret_cast<unsigned char*>(m_fileBaseB);
                 dataPtr = baseB;
@@ -4197,12 +4198,12 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                if (st == 3) goto letter_data;
-                if (st == 2) goto letter_data;
-                if (st == 6) goto letter_data;
-                if (st == 7) goto letter_data;
-                if (st == 8) goto letter_data;
-                if (st != 9) goto type_error;
+                if ((signed char)sendType == 3) goto letter_data;
+                if ((signed char)sendType == 2) goto letter_data;
+                if ((signed char)sendType == 6) goto letter_data;
+                if ((signed char)sendType == 7) goto letter_data;
+                if ((signed char)sendType == 8) goto letter_data;
+                if ((signed char)sendType != 9) goto type_error;
 
             letter_data:
                 {
@@ -4433,18 +4434,16 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     {
         cnt = m_pposWordIndex[threadParam->m_portIndex];
         sent = cnt;
-        posWords += sent;
 
         while (sent < (int)(signed char)m_cmdBuffer[threadParam->m_portIndex])
         {
-            result = SetSendQueue(threadParam, *posWords);
+            result = SetSendQueue(threadParam, posWords[sent]);
 
             if (result != 0)
             {
                 break;
             }
 
-            posWords++;
             sent++;
         }
 
@@ -4484,18 +4483,16 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     {
         cnt = m_pposWordIndex[threadParam->m_portIndex];
         sent = cnt;
-        posWords += sent;
 
         while (sent < (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
-            result = SetSendQueue(threadParam, *posWords);
+            result = SetSendQueue(threadParam, posWords[sent]);
 
             if (result != 0)
             {
                 break;
             }
 
-            posWords++;
             sent++;
         }
 
@@ -4535,18 +4532,16 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     {
         cnt = m_pposWordIndex[threadParam->m_portIndex];
         sent = cnt;
-        posWords += sent;
 
         while (sent < (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
-            result = SetSendQueue(threadParam, *posWords);
+            result = SetSendQueue(threadParam, posWords[sent]);
 
             if (result != 0)
             {
                 break;
             }
 
-            posWords++;
             sent++;
         }
 
@@ -5190,14 +5185,9 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 
     ResetQueue(threadParam);
 
-    unsigned int cmd0 = 0;
-    unsigned char* cmd0Bytes = reinterpret_cast<unsigned char*>(&cmd0);
-    cmd0Bytes[0] = 0x10;
-    unsigned int word0 = cmd0;
-
     int result;
 
-    result = SetSendQueue(threadParam, word0);
+    result = SendCancel(threadParam);
 
     if (result != 0)
 	{

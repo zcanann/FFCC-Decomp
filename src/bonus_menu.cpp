@@ -1512,9 +1512,6 @@ void CMenuPcs::DrawResultCountAnim()
 					if (this->m_bonusState->m_countFinished == 0) {
 #ifdef VERSION_GCCP01
 						double frame = (double)this->m_bonusState->m_frame - 8.333333134651184;
-#else
-						int frame = this->m_bonusState->m_frame - 10;
-#endif
 						if (frame <= 0) {
 							value = 0;
 						} else if (frame < total) {
@@ -1522,6 +1519,14 @@ void CMenuPcs::DrawResultCountAnim()
 						} else {
 							value = total;
 						}
+#else
+						value = this->m_bonusState->m_frame - 10;
+						if (value <= 0) {
+							value = 0;
+						} else if (value >= total) {
+							value = total;
+						}
+#endif
 					} else {
 						value = total;
 					}

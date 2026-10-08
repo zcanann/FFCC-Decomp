@@ -2421,7 +2421,11 @@ renderedDone:
     }
     case -0x51: {
         char path[0x100];
+#if defined(VERSION_GCCJGC)
+        sprintf(path, "dvd/cft/%s.cfd", this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
+#else
         sprintf(path, "dvd/%scft/%s.cfd", Game.GetLangString(), this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
+#endif
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             fileHandle->Read();

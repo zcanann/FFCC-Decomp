@@ -4608,7 +4608,7 @@ void CMenuPcs::DrawTitleMenu()
 				matColor.b = 0xFF;
 				matColor.a = static_cast<unsigned char>(cursorAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, matColor);
-				float cursorX = static_cast<float>((FLOAT_803313e0 - kTitleLabelWidth * cursorScale) * DOUBLE_803313F8);
+				float cursorX = static_cast<float>((FLOAT_803313e0 - kTitleLabelWidth * cursorScale) / 2.0);
 				float cursorY = FLOAT_8033177C - (FLOAT_80331440 * cursorScale - FLOAT_80331440);
 				if (i != 0) {
 					cursorY = cursorY + (float)((int)itemYOffset);
@@ -6026,8 +6026,8 @@ void CMenuPcs::CalcWMFrame()
 				    m_wm.m_frameData->m_yearSprites[i].m_x +
 				    static_cast<int>((DOUBLE_80331420 +
 				                      static_cast<double>(static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) -
-				                                          scaledWidth)) *
-				                     DOUBLE_803313F8));
+				                                          scaledWidth)) /
+				                     2.0));
 			} else if (i != 0) {
 				float scaledWidth = static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) *
 				                    m_wm.m_frameData->m_yearSprites[i].m_scale;
@@ -6137,158 +6137,157 @@ void CMenuPcs::DrawWMFrame()
 	}
 
 	short mainState = m_wmWorldState->m_mainState;
-	if (mainState != 0 && mainState <= 3) {
-		MenuPcs.SetTexture((TEX)kMcYearTexture);
-		unsigned char gaugeAlpha = static_cast<unsigned char>(static_cast<int>(
-		    DOUBLE_80331508 *
-		    (static_cast<float>(m_wm.m_frameData->m_titleFrame) /
-		     DOUBLE_803316E8)));
-		matColor.r = 0xFF;
+	if (mainState == 0 || mainState > 3) {
+		return;
+	}
+	MenuPcs.SetTexture((TEX)kMcYearTexture);
+	unsigned char gaugeAlpha = static_cast<unsigned char>(static_cast<int>(
+	    DOUBLE_80331508 *
+	    (static_cast<float>(m_wm.m_frameData->m_titleFrame) /
+	     DOUBLE_803316E8)));
+	matColor.r = 0xFF;
+	matColor.g = 0xFF;
+	matColor.b = 0xFF;
+	matColor.a = gaugeAlpha;
+	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
+	const float kZeroG = FLOAT_803313dc;
+	MenuPcs.DrawRect(0,
+		(float)m_wm.m_frameData->m_titleSprite.m_x,
+		(float)m_wm.m_frameData->m_titleSprite.m_y,
+		(float)m_wm.m_frameData->m_titleSprite.m_width,
+		(float)m_wm.m_frameData->m_titleSprite.m_height,
+		m_wm.m_frameData->m_titleSprite.m_u,
+		m_wm.m_frameData->m_titleSprite.m_v,
+		FLOAT_803313e8,
+		FLOAT_803313e8,
+		kZeroG);
+
+	if (m_wmWorldState->m_mainState <= 2) {
+#ifdef VERSION_GCCJGC
+		MenuPcs.SetAttrFmt((FMT)0);
+#else
+		const int language = Game.m_gameWork.GetLanguage();
+		MenuPcs.SetAttrFmt((FMT)0);
+			matColor.r = 0xFF;
 		matColor.g = 0xFF;
 		matColor.b = 0xFF;
-		matColor.a = gaugeAlpha;
+		matColor.a = 0xFF;
 		GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-		const float kZeroG = FLOAT_803313dc;
+		MenuPcs.SetTexture((TEX)0x21);
+		const float kZeroYear = FLOAT_803313dc;
+		float yearY = language != 5 ? FLOAT_803316F4 : FLOAT_803316F8;
 		MenuPcs.DrawRect(0,
-			(float)m_wm.m_frameData->m_titleSprite.m_x,
-			(float)m_wm.m_frameData->m_titleSprite.m_y,
-			(float)m_wm.m_frameData->m_titleSprite.m_width,
-			(float)m_wm.m_frameData->m_titleSprite.m_height,
-			m_wm.m_frameData->m_titleSprite.m_u,
-			m_wm.m_frameData->m_titleSprite.m_v,
-			FLOAT_803313e8,
-			FLOAT_803313e8,
-			kZeroG);
+			FLOAT_803316F0, yearY,
+			FLOAT_80331440, FLOAT_80331558,
+			FLOAT_803313dc, FLOAT_803313dc,
+			FLOAT_803313e8, FLOAT_803313e8,
+			kZeroYear);
 
-		if (m_wmWorldState->m_mainState <= 2) {
+		MenuPcs.SetAttrFmt((FMT)0);
+		MenuPcs.SetTexture((TEX)kMcYearTexture);
+#endif
+
+		int dispValue =
+		    m_wmChgFlags & WMDATA_CHG_YEAR
+		        ? static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + m_wmPrevYear
+		        : static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + m_wmYear;
+		int digitCnt = (dispValue > 9) ? 2 : 1;
+		if (dispValue > 99) {
+			digitCnt = 3;
+		}
 #ifdef VERSION_GCCJGC
-			MenuPcs.SetAttrFmt((FMT)0);
+		const int languageYOffset = 0;
 #else
-			const int language = Game.m_gameWork.GetLanguage();
-			MenuPcs.SetAttrFmt((FMT)0);
-				matColor.r = 0xFF;
+		const int languageYOffset = language != 5 ? 0 : 0xE;
+#endif
+
+		if (digitCnt == 3) {
+			int alphaInt =
+			    static_cast<int>(DOUBLE_80331508 * static_cast<double>(m_wm.m_frameData->m_yearSprites[0].m_alpha));
+			matColor.r = 0xFF;
 			matColor.g = 0xFF;
 			matColor.b = 0xFF;
-			matColor.a = 0xFF;
+			matColor.a = alphaInt;
 			GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-			MenuPcs.SetTexture((TEX)0x21);
-			const float kZeroYear = FLOAT_803313dc;
-			float yearY = language != 5 ? FLOAT_803316F4 : FLOAT_803316F8;
+			const float kZero3 = FLOAT_803313dc;
 			MenuPcs.DrawRect(0,
-				FLOAT_803316F0, yearY,
-				FLOAT_80331440, FLOAT_80331558,
-				FLOAT_803313dc, FLOAT_803313dc,
-				FLOAT_803313e8, FLOAT_803313e8,
-				kZeroYear);
-
-			MenuPcs.SetAttrFmt((FMT)0);
-			MenuPcs.SetTexture((TEX)kMcYearTexture);
-#endif
-
-			unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-			int dispValue =
-			    m_wmChgFlags & WMDATA_CHG_YEAR
-			        ? static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + m_wmPrevYear
-			        : static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + m_wmYear;
-			int digitCnt;
-			digitCnt = (dispValue > 9) + 1;
-			if (dispValue > 99) {
-				digitCnt = 3;
-			}
-#ifdef VERSION_GCCJGC
-			const int languageYOffset = 0;
-#else
-			const int languageYOffset = language != 5 ? 0 : 0xE;
-#endif
-
-			if (digitCnt == 3) {
+				(float)m_wm.m_frameData->m_yearSprites[0].m_x,
+				(float)(m_wm.m_frameData->m_yearSprites[0].m_y + languageYOffset),
+				(float)m_wm.m_frameData->m_yearSprites[0].m_width,
+				(float)m_wm.m_frameData->m_yearSprites[0].m_height,
+				m_wm.m_frameData->m_yearSprites[0].m_u,
+				m_wm.m_frameData->m_yearSprites[0].m_v,
+				m_wm.m_frameData->m_yearSprites[0].m_scale,
+				m_wm.m_frameData->m_yearSprites[0].m_scale,
+				kZero3);
+		} else {
+			const double k255 = DOUBLE_80331508;
+			const float kZero = FLOAT_803313dc;
+			for (int i = 0; i < digitCnt; i++) {
 				int alphaInt =
-				    static_cast<int>(DOUBLE_80331508 * static_cast<double>(m_wm.m_frameData->m_yearSprites[0].m_alpha));
-				matColor.r = 0xFF;
+				    static_cast<int>(k255 * static_cast<double>(m_wm.m_frameData->m_yearSprites[i].m_alpha));
+					matColor.r = 0xFF;
 				matColor.g = 0xFF;
 				matColor.b = 0xFF;
 				matColor.a = alphaInt;
 				GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-				const float kZero3 = FLOAT_803313dc;
 				MenuPcs.DrawRect(0,
-					(float)m_wm.m_frameData->m_yearSprites[0].m_x,
-					(float)(m_wm.m_frameData->m_yearSprites[0].m_y + languageYOffset),
-					(float)m_wm.m_frameData->m_yearSprites[0].m_width,
-					(float)m_wm.m_frameData->m_yearSprites[0].m_height,
-					m_wm.m_frameData->m_yearSprites[0].m_u,
-					m_wm.m_frameData->m_yearSprites[0].m_v,
-					m_wm.m_frameData->m_yearSprites[0].m_scale,
-					m_wm.m_frameData->m_yearSprites[0].m_scale,
-					kZero3);
-			} else {
-				const double k255 = DOUBLE_80331508;
-				const float kZero = FLOAT_803313dc;
-				for (int i = 0; i < digitCnt; i++) {
-					int alphaInt =
-					    static_cast<int>(k255 * static_cast<double>(m_wm.m_frameData->m_yearSprites[i].m_alpha));
-						matColor.r = 0xFF;
-					matColor.g = 0xFF;
-					matColor.b = 0xFF;
-					matColor.a = alphaInt;
-					GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-					MenuPcs.DrawRect(0,
-						(float)m_wm.m_frameData->m_yearSprites[i].m_x,
-						(float)(m_wm.m_frameData->m_yearSprites[i].m_y + languageYOffset),
-						(float)m_wm.m_frameData->m_yearSprites[i].m_width,
-						(float)m_wm.m_frameData->m_yearSprites[i].m_height,
-						m_wm.m_frameData->m_yearSprites[i].m_u,
-						m_wm.m_frameData->m_yearSprites[i].m_v,
-						m_wm.m_frameData->m_yearSprites[i].m_scale,
-						m_wm.m_frameData->m_yearSprites[i].m_scale,
-						kZero);
-				}
+					(float)m_wm.m_frameData->m_yearSprites[i].m_x,
+					(float)(m_wm.m_frameData->m_yearSprites[i].m_y + languageYOffset),
+					(float)m_wm.m_frameData->m_yearSprites[i].m_width,
+					(float)m_wm.m_frameData->m_yearSprites[i].m_height,
+					m_wm.m_frameData->m_yearSprites[i].m_u,
+					m_wm.m_frameData->m_yearSprites[i].m_v,
+					m_wm.m_frameData->m_yearSprites[i].m_scale,
+					m_wm.m_frameData->m_yearSprites[i].m_scale,
+					kZero);
 			}
+		}
 
 #ifndef VERSION_GCCJGC
-			if (digitCnt != 3 && language != 5) {
-				Sprt* digit = &m_wm.m_frameData->m_yearSprites[0];
-				float suffixU = FLOAT_803313dc;
-				float suffixX = static_cast<float>(digit->m_width) * digit->m_scale +
-				                static_cast<float>(digit->m_x);
-				float suffixY = static_cast<float>(digit->m_y);
-				float suffixScale = digit->m_scale;
-				if (language == 1) {
-					if (gWmMenuScriptValueCache / 10 == 1) {
-						suffixU = FLOAT_8033151c;
+		if (digitCnt != 3 && language != 5) {
+			Sprt* digit = &m_wm.m_frameData->m_yearSprites[0];
+			float suffixU = FLOAT_803313dc;
+			float suffixX = static_cast<float>(digit->m_width) * digit->m_scale +
+			                static_cast<float>(digit->m_x);
+			float suffixY = static_cast<float>(digit->m_y);
+			float suffixScale = digit->m_scale;
+			if (language == 1) {
+				if (gWmMenuScriptValueCache / 10 == 1) {
+					suffixU = FLOAT_8033151c;
+				} else {
+					int digit = gWmMenuScriptValueCache % 10;
+					if (digit >= 1 && digit <= 3) {
+						suffixU = FLOAT_803314D8 * static_cast<float>(digit - 1);
 					} else {
-						int digit = gWmMenuScriptValueCache % 10;
-						if (digit >= 1 && digit <= 3) {
-							suffixU = FLOAT_803314D8 * static_cast<float>(digit - 1);
-						} else {
-							suffixU = FLOAT_8033151c;
-						}
+						suffixU = FLOAT_8033151c;
 					}
-				} else if (language == 4) {
-					if (gWmMenuScriptValueCache != 1) {
-						suffixU = FLOAT_803314D8;
-					}
-				} else if (language == 2) {
-					suffixY += FLOAT_80331550;
 				}
-				int alphaInt =
-				    static_cast<int>(DOUBLE_80331508 * static_cast<double>(digit->m_alpha));
-				MenuPcs.SetAttrFmt((FMT)0);
-				matColor.r = 0xFF;
-				matColor.g = 0xFF;
-				matColor.b = 0xFF;
-				matColor.a = alphaInt;
-				GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-				MenuPcs.SetTexture((TEX)0x34);
-				MenuPcs.DrawRect(0,
-				         suffixX,
-				         suffixY,
-				         FLOAT_80331410, FLOAT_803314D8,
-				         FLOAT_803313dc, suffixU,
-				         suffixScale, suffixScale,
-				         FLOAT_803313dc);
+			} else if (language == 4) {
+				if (gWmMenuScriptValueCache != 1) {
+					suffixU = FLOAT_803314D8;
+				}
+			} else if (language == 2) {
+				suffixY += FLOAT_80331550;
 			}
-#endif
+			int alphaInt =
+			    static_cast<int>(DOUBLE_80331508 * static_cast<double>(digit->m_alpha));
+			MenuPcs.SetAttrFmt((FMT)0);
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = alphaInt;
+			GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
+			MenuPcs.SetTexture((TEX)0x34);
+			MenuPcs.DrawRect(0,
+			         suffixX,
+			         suffixY,
+			         FLOAT_80331410, FLOAT_803314D8,
+			         FLOAT_803313dc, suffixU,
+			         suffixScale, suffixScale,
+			         FLOAT_803313dc);
 		}
+#endif
 	}
 }
 

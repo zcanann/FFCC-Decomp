@@ -8792,40 +8792,30 @@ nextListEntry:
 	short separatorSub = worldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
-		const float* psZ = &FLOAT_803313dc;
-		double psSl = DOUBLE_80331498;
-		double sepOff;
-		double sepBase;
-		double sepSlope;
-		float sepZero;
-		sepZero = *psZ;
-		sepSlope = psSl;
-		sepBase = DOUBLE_80331490;
-		sepOff = DOUBLE_80331510;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kWorldFrameTexture));
 			MenuPcs.DrawRect(0, FLOAT_803314D8,
-			         static_cast<float>(static_cast<float>(sepSlope * static_cast<double>(slot) + sepBase) -
-			                            sepOff),
+			         static_cast<float>(static_cast<float>(DOUBLE_80331498 * static_cast<double>(slot) + DOUBLE_80331490) -
+			                            DOUBLE_80331510),
 			         FLOAT_803314D8, FLOAT_803314D8,
-			         static_cast<float>(sepBase * static_cast<double>(slot)), FLOAT_803313e0,
-			         FLOAT_803313e8, FLOAT_803313e8, sepZero);
+			         static_cast<float>(DOUBLE_80331490 * static_cast<double>(slot)), FLOAT_803313e0,
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
 
 	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
-		double pSl2 = DOUBLE_80331498;
-		float p518a = FLOAT_80331518;
+		double rowSlope = DOUBLE_80331498;
+		float mapOffsetX = FLOAT_80331518;
 		double rowBaseD;
 		float slotY;
 		double mapX;
 		double rowSlopeD;
-		mapX = DOUBLE_80331510 + static_cast<double>(p518a);
+		mapX = DOUBLE_80331510 + static_cast<double>(mapOffsetX);
 #ifndef VERSION_GCCJGC
 		const int language = Game.m_gameWork.GetLanguage();
 #endif
-		rowSlopeD = pSl2;
+		rowSlopeD = rowSlope;
 		rowBaseD = DOUBLE_80331490;
 		for (slot = 0; slot < kMcListCount; slot++) {
 			const McListInfo* const slotData = &m_wmCharaState[slot];
@@ -8852,10 +8842,8 @@ nextListEntry:
 					totalWidth++;
 				}
 				const int panelWidth = totalWidth * 0x30 + 0x40;
-				const float* pD8c2 = &FLOAT_803314D8;
-				capX += *pD8c2 + static_cast<float>(panelWidth);
-				const float* pD8c3 = &FLOAT_803314D8;
-				MenuPcs.DrawRect(8, capX, rowY, *pD8c3, FLOAT_80331440,
+				capX += FLOAT_803314D8 + static_cast<float>(panelWidth);
+				MenuPcs.DrawRect(8, capX, rowY, FLOAT_803314D8, FLOAT_80331440,
 				         FLOAT_803313dc, FLOAT_803313dc,
 				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcCharacterFillTexture));
@@ -8908,18 +8896,6 @@ nextListEntry:
 					}
 					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
 #endif
-					const float* pZd1 = &FLOAT_803313dc;
-					const double* pCs1 = &DOUBLE_80331490;
-					const double* pRs1 = &DOUBLE_80331540;
-					const double* pRb1 = &DOUBLE_80331538;
-					double rowBase;
-					double rowSlope;
-					double colSlope;
-					float zeroF;
-					zeroF = *pZd1;
-					colSlope = *pCs1;
-					rowSlope = *pRs1;
-					rowBase = *pRb1;
 					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
 						if (digitCount == 1) {
@@ -8932,13 +8908,13 @@ nextListEntry:
 						const int digitWidth = s_YearWTbl[digit];
 						const float digitWidthF = static_cast<float>(digitWidth);
 						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, FLOAT_80331410,
-						         static_cast<float>(colSlope * static_cast<float>(digit % 5)),
-						         static_cast<float>(rowSlope * static_cast<float>(digit / 5) + rowBase),
+						         static_cast<float>(DOUBLE_80331490 * static_cast<float>(digit % 5)),
+						         static_cast<float>(DOUBLE_80331540 * static_cast<float>(digit / 5) + DOUBLE_80331538),
 #ifdef VERSION_GCCJGC
-						         FLOAT_803313e8, FLOAT_803313e8, zeroF);
+						         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 						digitX += digitWidthF;
 #else
-						         digitScale, FLOAT_803313e8, zeroF);
+						         digitScale, FLOAT_803313e8, FLOAT_803313dc);
 						digitX += digitWidthF * digitScale;
 #endif
 					}
@@ -9019,8 +8995,7 @@ nextListEntry:
 						if ((faceNo / 100 & 1) != 0) {
 							texU = FLOAT_80331560;
 						} else {
-							double pHf1 = DOUBLE_803314F0;
-							texU = static_cast<float>(pHf1);
+							texU = static_cast<float>(DOUBLE_803314F0);
 						}
 						const float du = static_cast<float>(faceNo % 100) * FLOAT_80331468;
 						texU += du;
@@ -9097,14 +9072,12 @@ nextListEntry:
 		}
 
 		// Draw text info for each save slot
-		const double tSlope = DOUBLE_80331498;
-		const double tBase = DOUBLE_80331490;
 		for (slot = 0; slot < kMcListCount; slot++) {
 			char locationStr[64];
 			char line1[64];
 			char line2[64];
 			const McListInfo* const slotData = &m_wmCharaState[slot];
-			const float slotY = static_cast<float>(tSlope * static_cast<double>(slot) + tBase);
+			const float slotY = static_cast<float>(DOUBLE_80331498 * static_cast<double>(slot) + DOUBLE_80331490);
 			if (slotData->m_isBroken != 0 || static_cast<int>(slotData->m_scriptSysVal0) <= 0) {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);
@@ -9115,9 +9088,8 @@ nextListEntry:
 				const unsigned int msgId =
 					slotData->m_isBroken == 0;
 				const int width = static_cast<int>(fontF8->GetWidth(const_cast<char*>(GetMcStr(msgId))));
-				double pHd1 = DOUBLE_803313F8;
-				float pD8f1 = FLOAT_803314D8;
-				fontF8->SetPosX(static_cast<float>(static_cast<float>(0x238 - width) * pHd1 + pD8f1));
+				float textOffsetX = FLOAT_803314D8;
+				fontF8->SetPosX(static_cast<float>(static_cast<float>(0x238 - width) / 2.0 + textOffsetX));
 				fontF8->SetPosY(static_cast<float>(DOUBLE_80331580 + static_cast<double>(slotY)));
 				fontF8->Draw(const_cast<char*>(GetMcStr(msgId)));
 			} else {

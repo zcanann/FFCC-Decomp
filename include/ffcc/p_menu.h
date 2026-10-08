@@ -902,7 +902,10 @@ public:
 
     signed char m_wmArea;            // 0x04
     signed char m_wmPrevArea;        // 0x05
-    unsigned char m_pad06[0x0A - 0x06];
+    signed char m_wmIconVariant;     // 0x06
+    signed char m_wmPlaceNo;         // 0x07
+    signed char m_wmBubbleType;      // 0x08
+    signed char m_wmBubbleVisible;   // 0x09
     signed char m_wmChgFlags;        // 0x0A
     signed char m_wmPrevYear;        // 0x0B
     signed char m_wmYear;            // 0x0C
@@ -913,7 +916,10 @@ public:
     unsigned char m_mcRequestLocked;
     unsigned char m_pad15[0x18 - 0x15];
     signed char m_mcRequest;
-    unsigned char m_pad19[0x20 - 0x19];
+    unsigned char m_pad19;
+    short m_wmIconFlags;             // 0x1A
+    short m_wmBubbleX;               // 0x1C
+    short m_wmBubbleY;               // 0x1E
     McCtrl m_mcCtrl;
     BattleHudState m_battleHud;
     int m_manaWaterTimerA;

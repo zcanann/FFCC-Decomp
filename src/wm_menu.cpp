@@ -5284,39 +5284,38 @@ void CMenuPcs::CalcFukidashi()
 {
 	int padIdx;
 	int i;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if ((char)bytes[0x09] != 1) {
+	if (m_wmBubbleVisible != 1) {
 		return;
 	}
 	int bitIdx;
 
-	m_wm.m_bubbleData->m_sprites[0].m_x = *reinterpret_cast<short*>(bytes + 0x1C);
+	m_wm.m_bubbleData->m_sprites[0].m_x = m_wmBubbleX;
 	float bubbleTexV = FLOAT_803313dc;
-	m_wm.m_bubbleData->m_sprites[0].m_y = *reinterpret_cast<short*>(bytes + 0x1E);
+	m_wm.m_bubbleData->m_sprites[0].m_y = m_wmBubbleY;
 	m_wm.m_bubbleData->m_sprites[0].m_width = 0xF0;
 	m_wm.m_bubbleData->m_sprites[0].m_height = 0xC4;
 	m_wm.m_bubbleData->m_sprites[0].m_v = bubbleTexV;
-	if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+	if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 		m_wm.m_bubbleData->m_sprites[0].m_u = FLOAT_803313dc;
 	} else {
 		m_wm.m_bubbleData->m_sprites[0].m_u = FLOAT_80331704;
 	}
 
 	float panelTexU = FLOAT_80331708;
-	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
+	if ((m_wmIconFlags & 0x3F0) != 0) {
 		m_wm.m_bubbleData->m_sprites[1].m_width = 0x50;
 		float panelTexV = FLOAT_803313dc;
 		m_wm.m_bubbleData->m_sprites[1].m_height = 0x48;
 		m_wm.m_bubbleData->m_sprites[1].m_u = panelTexU;
 		m_wm.m_bubbleData->m_sprites[1].m_v = panelTexV;
 		m_wm.m_bubbleData->m_sprites[1].m_y = m_wm.m_bubbleData->m_sprites[0].m_y + 0x1C;
-		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+		if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 			m_wm.m_bubbleData->m_sprites[1].m_y = m_wm.m_bubbleData->m_sprites[1].m_y + 0x10;
 		}
 		m_wm.m_bubbleData->m_sprites[1].m_x = m_wm.m_bubbleData->m_sprites[0].m_x;
-		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
+		if ((m_wmIconFlags & 0xF) != 0) {
 			m_wm.m_bubbleData->m_sprites[1].m_x = m_wm.m_bubbleData->m_sprites[1].m_x + 0x20;
-		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
+		} else if ((m_wmIconFlags & 0x200) != 0) {
 			m_wm.m_bubbleData->m_sprites[1].m_x = m_wm.m_bubbleData->m_sprites[1].m_x + 0x50;
 		} else {
 			m_wm.m_bubbleData->m_sprites[1].m_x = m_wm.m_bubbleData->m_sprites[1].m_x + 0x38;
@@ -5324,7 +5323,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	float iconTexUV = FLOAT_803313dc;
-	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x1FF) != 0) {
+	if ((m_wmIconFlags & 0x1FF) != 0) {
 		m_wm.m_bubbleData->m_sprites[2].m_width = 0x20;
 		m_wm.m_bubbleData->m_sprites[2].m_height = 0x20;
 		m_wm.m_bubbleData->m_sprites[2].m_u = iconTexUV;
@@ -5332,7 +5331,7 @@ void CMenuPcs::CalcFukidashi()
 
 		m_wm.m_bubbleData->m_sprites[3] = m_wm.m_bubbleData->m_sprites[2];
 
-		short flagsF = *reinterpret_cast<short*>(bytes + 0x1A);
+		short flagsF = m_wmIconFlags;
 		int cnt;
 		WmBubbleInfo* bubble = m_wm.m_bubbleData;
 		int panelRight = bubble->m_sprites[1].m_x + bubble->m_sprites[1].m_width;
@@ -5340,7 +5339,7 @@ void CMenuPcs::CalcFukidashi()
 			bubble->m_sprites[3].m_x = panelRight;
 			m_wm.m_bubbleData->m_sprites[2].m_x = panelRight;
 			for (bitIdx = cnt = 0; bitIdx < 4; bitIdx++) {
-				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << bitIdx)) != 0) {
+				if ((m_wmIconFlags & (1 << bitIdx)) != 0) {
 					cnt++;
 				}
 			}
@@ -5378,7 +5377,7 @@ void CMenuPcs::CalcFukidashi()
 	char tempBuf[64];
 	char secondLine[64];
 #endif
-	int fieldVal = (int)(char)bytes[0x07];
+	int fieldVal = m_wmPlaceNo;
 	if (fieldVal == 0x0F) {
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 #ifdef VERSION_GCCJGC
@@ -5397,10 +5396,7 @@ void CMenuPcs::CalcFukidashi()
 #ifndef VERSION_GCCJGC
 	Game.UpperItemName(nameBuffer);
 
-	int textWidth = 0xD8;
-	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
-		textWidth = 0xA2;
-	}
+	int textWidth = m_wmIconFlags != 0 ? 0xA2 : 0xD8;
 	if (ChkPlaceLength(nameBuffer, textWidth)) {
 		SplitPlace(nameBuffer, tempBuf, secondLine);
 		strcpy(nameBuffer, tempBuf);
@@ -5415,11 +5411,11 @@ void CMenuPcs::CalcFukidashi()
 	        static_cast<float>(static_cast<int>(m_wm.m_bubbleData->m_sprites[0].m_x))));
 	float cameraZ = FLOAT_803314A4;
 	float cameraXY = FLOAT_803313dc;
-	unsigned short iconFlags = *reinterpret_cast<short*>(bytes + 0x1A);
+	unsigned short iconFlags = m_wmIconFlags;
 	if ((iconFlags & 0x3F0) != 0) {
 		textYOffset = 0x6C;
 	}
-	if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+	if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 		textYOffset = textYOffset + 0x10;
 	}
 
@@ -5449,11 +5445,11 @@ void CMenuPcs::CalcFukidashi()
 	// Setup tribe/character model slot
 	float modelScale = FLOAT_8033170C;
 	float modelPosZero = FLOAT_803313dc;
-	short sFlags = *reinterpret_cast<short*>(bytes + 0x1A);
+	short sFlags = m_wmIconFlags;
 	if ((sFlags & 0x3F0) != 0) {
 		int modelIdx;
 		if ((sFlags & 0x200) != 0) {
-			if ((char)bytes[0x06] == 1) {
+			if (m_wmIconVariant == 1) {
 				modelIdx = 7;
 			} else {
 				modelIdx = 6;
@@ -5475,14 +5471,14 @@ void CMenuPcs::CalcFukidashi()
 		worldObj->m_transform.m_scale.x = modelScale;
 		worldObj->m_transform.m_scale.y = modelScale;
 		worldObj->m_transform.m_scale.z = modelScale;
-		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+		if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 			worldObj->m_transform.m_position.y = FLOAT_80331710;
 		}
-		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
+		if ((m_wmIconFlags & 0xF) != 0) {
 			worldObj->m_transform.m_position.x = FLOAT_80331714;
 			worldObj->m_transform.m_position.y = static_cast<float>(
 			    static_cast<double>(worldObj->m_transform.m_position.y) + DOUBLE_80331420);
-		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
+		} else if ((m_wmIconFlags & 0x200) != 0) {
 			worldObj->m_transform.m_position.x = FLOAT_803313dc;
 			worldObj->m_transform.m_position.y = static_cast<float>(
 			    static_cast<double>(worldObj->m_transform.m_position.y) + DOUBLE_80331420);
@@ -5529,7 +5525,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Player character model slots
-	unsigned int field1a = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
+	unsigned int field1a = (unsigned int)m_wmIconFlags;
 	if ((field1a & 0x200) != 0 && (field1a & 0xF) != 0) {
 		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
 		int playerCount;
@@ -5539,7 +5535,7 @@ void CMenuPcs::CalcFukidashi()
 
 		int slotIdx = 0;
 		for (padIdx = 0; padIdx < 4; padIdx++) {
-			if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << padIdx)) != 0) {
+			if ((m_wmIconFlags & (1 << padIdx)) != 0) {
 				int slot8 = padIdx + 8;
 				WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[slot8];
 				worldObj->m_active = 1;
@@ -5553,7 +5549,7 @@ void CMenuPcs::CalcFukidashi()
 				} else {
 					worldObj->m_transform.m_position.y = FLOAT_80331710;
 				}
-				if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+				if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 					if (padIdx == 0 && playerCount == 1) {
 						worldObj->m_transform.m_position.y = static_cast<float>(
 						    static_cast<double>(worldObj->m_transform.m_position.y) - DOUBLE_80331730);
@@ -5626,14 +5622,13 @@ void CMenuPcs::DrawFukidashi()
 #else
 	const int kBubbleIconTextureBase = 25;
 #endif
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* const fontFC = GetFontWorld();
-	if (static_cast<signed char>(bytes[0x09]) != 1) {
+	if (m_wmBubbleVisible != 1) {
 		return;
 	}
 
 	int texMode;
-	if (static_cast<signed char>(bytes[0x08]) == 0 || static_cast<signed char>(bytes[0x08]) == 2) {
+	if (m_wmBubbleType == 0 || m_wmBubbleType == 2) {
 		texMode = 0;
 	} else {
 		texMode = 8;
@@ -5655,7 +5650,7 @@ void CMenuPcs::DrawFukidashi()
 		background->m_u, background->m_v,
 		FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
+	if ((m_wmIconFlags & 0x3F0) != 0) {
 		WmBubbleInfo* bubble = m_wm.m_bubbleData;
 		MenuPcs.DrawRect(0,
 			(float)bubble->m_sprites[1].m_x, (float)bubble->m_sprites[1].m_y,
@@ -5664,13 +5659,13 @@ void CMenuPcs::DrawFukidashi()
 			FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
-	unsigned int iconFlags = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
+	unsigned int iconFlags = (unsigned int)m_wmIconFlags;
 	if ((iconFlags & 0x3F0) != 0 && (iconFlags & 0x1FF) != 0) {
 		if ((iconFlags & 0xF) != 0) {
 			int bitIndex = 0;
 			int drawnIcons = 0;
 			while (bitIndex < 4 && drawnIcons < 2) {
-				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << bitIndex)) != 0) {
+				if ((m_wmIconFlags & (1 << bitIndex)) != 0) {
 					MenuPcs.SetTexture((TEX)(bitIndex + kBubbleIconTextureBase));
 					Sprt* icon;
 					if (drawnIcons == 0) {
@@ -5705,7 +5700,7 @@ void CMenuPcs::DrawFukidashi()
 
 	// Name text
 	char nameBuffer[68];
-	int fieldVal = (int)(char)bytes[0x07];
+	int fieldVal = m_wmPlaceNo;
 	if (fieldVal == 0x0F) {
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 #ifdef VERSION_GCCJGC
@@ -5732,7 +5727,7 @@ void CMenuPcs::DrawFukidashi()
 	char secondLine[64];
 	secondLine[0] = 0;
 	CFont* const font = GetFontWorld();
-	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
+	if (m_wmIconFlags != 0) {
 		textW = 0xA2;
 	}
 	font->SetMargin(FLOAT_803313e8);
@@ -5768,7 +5763,7 @@ void CMenuPcs::DrawFukidashi()
 	fontFC->Draw(nameBuffer);
 
 #ifdef VERSION_GCCJGC
-	if (bytes[0x07] == 5) {
+	if (m_wmPlaceNo == 5) {
 		strcpy(nameBuffer, "\x82\xCC\x8A\xD9");
 		float w2 = fontFC->GetWidth(nameBuffer);
 		fontFC->SetPosX((FLOAT_80331704 - w2) * FLOAT_80331434 +
@@ -5791,7 +5786,7 @@ void CMenuPcs::DrawFukidashi()
 
 	// 3D viewport rendering
 	int viewportSetup = 0;
-	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
+	if ((m_wmIconFlags & 0x3F0) != 0) {
 		for (int slot = 6; slot <= 0x10; slot++) {
 			WmWorldObjInfo* view = &m_wm.m_worldObjData[slot];
 			if (view->m_active != 0) {

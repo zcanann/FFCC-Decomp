@@ -2615,7 +2615,10 @@ pppRandUpIV.cpp:
 	.text start:0x80062774 end:0x80062908
 
 pppDrawMng.cpp:
+	extab start:0x80007828 end:0x80007840
+	extabindex start:0x8000D990 end:0x8000D9B4
 	.text start:0x8007B570 end:0x8007B7F4
+	.sdata2 start:0x8032F2F8 end:0x8032F300
 
 menu.cpp:
 	extab start:0x80007D68 end:0x80007D90

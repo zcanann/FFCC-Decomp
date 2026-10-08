@@ -638,7 +638,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppDrawMatrixWood.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppDrawMdl.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppDrawMdlTs.cpp"),
-            Object(Matching, "pppDrawMng.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppDrawMng.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppDrawShape.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppDrawShape2.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppEmission.cpp", extra_cflags=["-str reuse,readonly"]),

@@ -40,8 +40,8 @@ void pppParMoveMatrix(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrl
 		f32 forwardZ = forward.z;
 		if ((zero == forwardZ) && (zero == right.z)) {
 			// Movement is vertical; fall back to a fixed basis.
-			right.y = 0.0f;
 			right.x = 1.0f;
+			right.y = 0.0f;
 			right.z = 0.0f;
 			up.x = 0.0f;
 			up.y = 0.0f;

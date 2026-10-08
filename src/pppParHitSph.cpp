@@ -7,8 +7,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const float kPppParHitSphZero = 0.0f;
-
 static inline Vec* ParHitSphPreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -40,9 +38,9 @@ void pppParHitSph(_pppPObject* pObject, ParHitSphParams* params)
     origin.z = ppvMng->m_matrix.value[2][3];
     radius = pppMngSt->m_hitScale * params->m_radiusScale;
 
-    if (((kPppParHitSphZero == hitVector.x) && (kPppParHitSphZero == hitVector.y)) &&
-        (kPppParHitSphZero == hitVector.z)) {
-        pppHitCylinderSendSystem(pppMngSt, &origin, &hitVector, radius, kPppParHitSphZero);
+    float zero = 0.0f;
+    if (zero == hitVector.x && zero == hitVector.y && zero == hitVector.z) {
+        pppHitCylinderSendSystem(pppMngSt, &origin, &hitVector, radius, zero);
     } else {
         pppHitCylinderSendSystem(pppMngSt, &origin, &hitVector, radius, params->m_cylinderScale);
     }

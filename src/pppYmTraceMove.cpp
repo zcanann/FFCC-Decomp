@@ -3,8 +3,6 @@
 #include "ffcc/gobject.h"
 #include "ffcc/ppp_linkage.h"
 extern "C" {
-extern const float kPppYmTraceMoveZero = 0.0f;
-extern const float kPppYmTraceMoveOne = 1.0f;
 }
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
@@ -39,11 +37,6 @@ static inline f32 GetYmTraceMoveScale(_pppMngSt* pppMngSt)
 static inline Vec* GetYmTraceMoveBasePosition(_pppMngSt* pppMngSt)
 {
 	return &pppMngSt->BasePosition();
-}
-
-static inline float LoadFloat(const float& value)
-{
-	return value;
 }
 
 /*
@@ -94,9 +87,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* ste
 
 		pppCopyVector(work->m_direction, targetDir);
 		pppSubVector(moveDir, pppMngSt->m_position, *GetYmTraceMovePreviousPosition(pppMngSt));
+		float zero = 0.0f;
 
-		if ((moveDir.x == LoadFloat(kPppYmTraceMoveZero)) && (moveDir.y == LoadFloat(kPppYmTraceMoveZero)) &&
-		    (moveDir.z == LoadFloat(kPppYmTraceMoveZero))) {
+		if ((moveDir.x == zero) && (moveDir.y == zero) && (moveDir.z == zero)) {
 			pppCopyVector(moveDir, work->m_previousDirection);
 		}
 
@@ -106,7 +99,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* ste
 	targetQuat.x = targetDir.x;
 	targetQuat.y = targetDir.y;
 	targetQuat.z = targetDir.z;
-	targetQuat.w = LoadFloat(kPppYmTraceMoveOne);
+	targetQuat.w = 1.0f;
 	moveQuat.x = moveDir.x;
 	moveQuat.y = moveDir.y;
 	moveQuat.z = moveDir.z;
@@ -142,12 +135,8 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, _pppCtrlTable* ctrl
 	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_workArea +
 	                                          GetYmTraceMoveDataOffsets(ctrl)->m_workOffset);
 	_pppMngSt* pppMngSt = ppvMng;
-	f32 zero;
 
 	pppSubVector(work->m_previousDirection, pppMngSt->m_paramVec0, *GetYmTraceMoveBasePosition(pppMngSt));
 	pppCopyVector(work->m_direction, work->m_previousDirection);
-	zero = LoadFloat(kPppYmTraceMoveZero);
-	work->m_acceleration = zero;
-	work->m_velocity = zero;
-	work->m_distance = zero;
+	work->m_distance = work->m_velocity = work->m_acceleration = 0.0f;
 }

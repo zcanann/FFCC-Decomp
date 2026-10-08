@@ -733,9 +733,7 @@ static void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmB
                 unitVelocity.y = kYmBreathZero;
                 unitVelocity.z = kYmBreathNegativeOne;
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.z = kYmBreathZero;
-                groupData->position.y = kYmBreathZero;
-                groupData->position.x = kYmBreathZero;
+                groupData->position.x = groupData->position.y = groupData->position.z = kYmBreathZero;
                 PSMTXCopy(ppvMng->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }

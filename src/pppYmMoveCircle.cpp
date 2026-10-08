@@ -155,12 +155,8 @@ extern "C" void pppConstructYmMoveCircle(_pppPObject* basePtr, _pppCtrlTable* of
         work->m_angle = 360.0f - work->m_angle;
     }
 
-    work->m_radiusStepStep = 0.0f;
-    work->m_radiusStep = 0.0f;
-    work->m_radius = 0.0f;
-    work->m_angleStepStepStep = 0.0f;
-    work->m_angleStepStep = 0.0f;
-    work->m_angleStep = 0.0f;
+    work->m_radius = work->m_radiusStep = work->m_radiusStepStep = 0.0f;
+    work->m_angleStep = work->m_angleStepStep = work->m_angleStepStepStep = 0.0f;
     pppCopyVector(work->m_center, *MoveCircleBasePosition(pppMngSt));
     work->m_hasInit = 0;
 }

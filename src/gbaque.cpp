@@ -3626,12 +3626,17 @@ int GbaQueue::MakeSellData(int channel, char* outData)
  */
 int GbaQueue::MakeSmithData(int channel, char* outData)
 {
+#ifdef VERSION_GCCJGC
+	const int allocLine = 0xE20;
+#else
+	const int allocLine = 0xE41;
+#endif
 	CCaravanWork** foodBasePtr;
-	unsigned char* smithIndices = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xE41)
+	unsigned char* smithIndices = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), allocLine)
 		unsigned char[0x40];
 	if (smithIndices == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xE43);
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), allocLine + 2);
 		}
 		return -1;
 	}
@@ -3685,7 +3690,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			}
 
 			for (k = 0; k < 4; k++) {
-				SItemFlatRow* recipeRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
+				SItemFlatRow* itemTable = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+				SItemFlatRow* recipeRow = &itemTable[itemId];
 				itemData[8 + k] =
 				    __lhbrx(&recipeRow->m_smithResults[k], 0);
 				work = recipeRow->m_smithResults[k];
@@ -3694,7 +3700,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 					itemData[13 + k * 4] = 0;
 					itemData[14 + k * 4] = 0;
 				} else {
-					SItemFlatRow* materialBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[work];
+					SItemFlatRow* materialBase = &itemTable[work];
 					itemData[12 + k * 4] = __lhbrx(&materialBase->m_equipFlags, 0);
 					itemData[13 + k * 4] = __lhbrx(&materialBase->m_value, 0);
 					itemData[14 + k * 4] = __lhbrx(&materialBase->m_attribute, 0);

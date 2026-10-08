@@ -119,13 +119,10 @@ extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMovePara
  */
 extern "C" void pppConstructYmMoveParabola(pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr)
 {
-    const f32 zero = 0.0f;
     _pppMngSt* pppMngSt = ppvMng;
     pppYmMoveParabolaWork* work = ParabolaWork(basePtr, dataPtr);
 
-    work->m_acceleration = zero;
-    work->m_velocity = zero;
-    work->m_distance = zero;
+    work->m_distance = work->m_velocity = work->m_acceleration = 0.0f;
     work->m_frame = 1;
 
     if ((s32)Game.m_currentSceneId == 7) {

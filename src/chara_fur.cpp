@@ -21,7 +21,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pad.h"
 #include "ffcc/ptrarray_fwd.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"

@@ -7605,18 +7605,14 @@ void CMenuPcs::DrawCMLife()
 		x = static_cast<float>((0x90 - count * 0x10) / 2.0 + xBase);
 		float step = static_cast<float>((8 - count) / 2.0);
 
-		const float* pRectSize = &FLOAT_80331558;
-		float kRectSize;
-		kRectSize = *pRectSize;
-
 		for (i = 0; i < count; i++) {
 			float yAdd = GetFcvValue(s_LifePos, step);
 
 			MenuPcs.DrawRect(
 			    0, x, yTmp + yAdd, FLOAT_80331558, FLOAT_80331558,
 			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			x += FLOAT_80331558;
 			step += 1.0;
-			x += kRectSize;
 		}
 
 		unsigned char flagA;

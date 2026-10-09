@@ -608,6 +608,7 @@ monobj_boss.cpp:
 	.data       start:0x80211648 end:0x802116A8
 	.sbss       start:0x8032DE80 end:0x8032DE88
 	.sdata2     start:0x80330C98 end:0x80330D80
+	.rodata     start:0x801DC3D0 end:0x801DC3F8
 
 p_menu.cpp:
 	.text start:0x80093814 end:0x80097174

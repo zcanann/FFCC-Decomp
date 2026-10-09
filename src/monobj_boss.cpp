@@ -30,10 +30,6 @@ extern "C" Vec gLichTeleportPoints[] = {
     {132.0f, 0.0f, -38.0f},
 };
 
-static const char sLichTeleportNodeA[] = "to_a_obj";
-static const char sLichTeleportNodeB[] = "to_b_obj";
-static const char sLichTeleportNodeFormat[] = "to%02d_obj";
-
 struct LichBossWork {
     int m_lichTeleportIndex;
     Vec m_lichTeleportVec;
@@ -931,19 +927,19 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 	const int scriptKind = m_scriptHandle->m_baseDataIndex;
 	switch (scriptKind) {
 	case 0x85: {
-		int nodeIndex = m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeA));
+		int nodeIndex = m_charaModelHandle->m_model->SearchNode("to_a_obj");
 		CChara::CNode* node = m_charaModelHandle->m_model->m_nodes + nodeIndex;
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_nodes[0] = node;
 		node->m_flagsBits.m_flag_80 = 0;
 
-		nodeIndex = m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeB));
+		nodeIndex = m_charaModelHandle->m_model->SearchNode("to_b_obj");
 		CChara::CNode** nodes = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_nodes;
 		nodes[1] = m_charaModelHandle->m_model->m_nodes + nodeIndex;
 		nodes[1]->m_flagsBits.m_flag_80 = 0;
 
 		char nodeName[256];
 		for (int i = 0; i < 12; i++) {
-			sprintf(nodeName, sLichTeleportNodeFormat, i + 1);
+			sprintf(nodeName, "to%02d_obj", i + 1);
 			nodeIndex = m_charaModelHandle->m_model->SearchNode(nodeName);
 			nodes[i + 2] = m_charaModelHandle->m_model->m_nodes + nodeIndex;
 			if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 != 0) {

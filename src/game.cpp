@@ -44,17 +44,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-static const char s_numNameFmt[] = "%d %s";
-static const char s_nameSep[] = " ";
-static const char s_nameNoSep[4] = "";
-static const char s_nameJoinFmt[] = "%s%s%s";
-extern "C" {
-const char s_defaultScriptName[] = "ffcc_0";
-const char s_gameDebugMarker[] = "*\n";
-const char s_townNameTepa[] = "Tepa";
-const char s_townNameTipa[] = "Tipa";
-const char sGameStageName[] = "Game";
-}
 enum {
 #ifdef VERSION_GCCJGC
 	kGameStageSize = 0xE6000,
@@ -219,7 +208,7 @@ void CGame::Init()
     McPcs.Init();
     DbgMenuPcs.Init();
 
-    m_mainStage = Memory.CreateStage(kGameStageSize, const_cast<char*>(sGameStageName), 0);
+    m_mainStage = Memory.CreateStage(kGameStageSize, "Game", 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
         m_debugStage = Memory.CreateStage(0x220000, "GameDebug", 1);
     }
@@ -489,9 +478,9 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    System.Printf(const_cast<char*>(s_gameDebugMarker));
+    System.Printf("*\n");
     System.Printf("*ニューゲーム初期化します。\n");
-    System.Printf(const_cast<char*>(s_gameDebugMarker));
+    System.Printf("*\n");
 
     Game.m_gameWork.InitNewGame();
     CFlatRuntime2Storage().ResetNewGame();
@@ -616,7 +605,7 @@ void CGame::CheckScriptChange()
 
     System.ScriptChanging(m_nextScript.m_name);
 
-    if (strcmp(m_nextScript.m_name, s_defaultScriptName) != 0) {
+    if (strcmp(m_nextScript.m_name, "ffcc_0") != 0) {
         if (m_cfdLoadedFlag == 0) {
             CFlatRuntime2Storage().CFlatRuntime2::Destroy();
             loadCfd();
@@ -1219,12 +1208,12 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
             }
         }
 
-        const char* separator = s_nameNoSep;
+        const char* separator = "";
         if (hasSeparator != 0) {
-            separator = s_nameSep;
+            separator = " ";
         }
 
-        sprintf(out, s_nameJoinFmt, prefix, separator, name);
+        sprintf(out, "%s%s%s", prefix, separator, name);
     }
     return out;
 }
@@ -1252,12 +1241,12 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
         }
     }
 
-    const char* separator = s_nameNoSep;
+    const char* separator = "";
     if (hasSeparator != 0) {
-        separator = s_nameSep;
+        separator = " ";
     }
 
-    sprintf(out, s_nameJoinFmt, prefix, separator, itemName);
+    sprintf(out, "%s%s%s", prefix, separator, itemName);
     return out;
 }
 
@@ -1272,7 +1261,7 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
  */
 char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
 {
-    sprintf(out, s_numNameFmt, count, GetItemName(itemIndex, count));
+    sprintf(out, "%d %s", count, GetItemName(itemIndex, count));
     return out;
 }
 
@@ -1302,12 +1291,12 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
             }
         }
 
-        const char* separator = s_nameNoSep;
+        const char* separator = "";
         if (hasSeparator != 0) {
-            separator = s_nameSep;
+            separator = " ";
         }
 
-        sprintf(out, s_nameJoinFmt, prefix, separator, name);
+        sprintf(out, "%s%s%s", prefix, separator, name);
     }
     return out;
 }
@@ -1335,12 +1324,12 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
         }
     }
 
-    const char* separator = s_nameNoSep;
+    const char* separator = "";
     if (hasSeparator != 0) {
-        separator = s_nameSep;
+        separator = " ";
     }
 
-    sprintf(out, s_nameJoinFmt, prefix, separator, monName);
+    sprintf(out, "%s%s%s", prefix, separator, monName);
     return out;
 }
 
@@ -1355,7 +1344,7 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
  */
 char* CGame::MakeNumMonName(char* out, int monIndex, int count)
 {
-    sprintf(out, s_numNameFmt, count, GetMonName(monIndex, count));
+    sprintf(out, "%d %s", count, GetMonName(monIndex, count));
     return out;
 }
 
@@ -1408,7 +1397,7 @@ inline void CGame::CGameWork::InitNewGame()
 #ifdef VERSION_GCCJGC
     strcpy(m_townName, "（はじまり）");
 #else
-    strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
+    strcpy(m_townName, m_languageId == 3 ? "Tepa" : "Tipa");
 #endif
 }
 

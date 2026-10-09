@@ -1600,6 +1600,7 @@ void CMenuPcs::CalcResultCloseAnim()
 	enum { kFadeFrames = 10, kFrameStart = 20 };
 #endif
 	int doneCount;
+	Sprt2* sprite;
 	int delta;
 	int i;
 	const int activePartyCount = s_Rinfo->m_partyCount;
@@ -1612,32 +1613,32 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		int base = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base++];
-			spr->startFrame = 9999;
-			spr->flags = 3;
+			sprite = &m_bonusAnim->sprites[base++];
+			sprite->startFrame = 9999;
+			sprite->flags = 3;
 		}
 
 		for (i = 0; activePartyCount > i; i++) {
-			Sprt2* sprite = &m_bonusAnim->sprites[i + base];
+			sprite = &m_bonusAnim->sprites[i + base];
 			sprite->startFrame = kFrameStart;
 		}
 
 		base += activePartyCount;
 
 		for (i = 0; i < activePartyCount; i++) {
-			Sprt2* spr = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			delta = base - 1;
-			Sprt2* src = spr - delta;
-			spr->startFrame = src->startFrame + src->duration;
-			spr->flags = 1;
-			spr->targetX = (float)spr->x;
-			spr->motionX = 240.0f;
-			spr->x = (short)(int)((float)spr->x - spr->motionX);
+			Sprt2* src = sprite - delta;
+			sprite->startFrame = src->startFrame + src->duration;
+			sprite->flags = 1;
+			sprite->targetX = (float)sprite->x;
+			sprite->motionX = 240.0f;
+			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
 		}
 
 		base += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
-			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			Sprt2* source = sprite - activePartyCount;
 			sprite->startFrame = source->startFrame + source->duration;
 			sprite->flags = 1;
@@ -1645,74 +1646,74 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		base += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
-			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			sprite->startFrame = 0;
 		}
 
 		base += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
-			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			sprite->startFrame = 9999;
 			sprite->flags = 3;
 		}
 
 		base += activePartyCount;
 		for (i = 0; activePartyCount > i; i++) {
-			Sprt2* spr = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			delta = base - (activePartyCount + 1);
-			spr->startFrame = (spr - delta)->startFrame;
-			spr->flags = 1;
-			spr->targetX = (float)spr->x;
-			spr->motionX = 240.0f;
-			spr->x = (unsigned short)(int)((float)spr->x - spr->motionX);
+			sprite->startFrame = (sprite - delta)->startFrame;
+			sprite->flags = 1;
+			sprite->targetX = (float)sprite->x;
+			sprite->motionX = 240.0f;
+			sprite->x = (unsigned short)(int)((float)sprite->x - sprite->motionX);
 		}
 
 		base += activePartyCount;
 		{
-			Sprt2* sprite = &m_bonusAnim->sprites[base];
+			sprite = &m_bonusAnim->sprites[base];
 			sprite->startFrame = m_bonusAnim->sprites[1].startFrame;
 		}
 		base += 1;
 		s_CntTop = base;
 
 		for (i = 0; i < activePartyCount; i++) {
-			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			sprite->startFrame = kFadeFrames;
 			sprite->duration = kFadeFrames;
 		}
 
 		base += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
-			Sprt2* spr = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			delta = base - (activePartyCount + 1);
-			spr->startFrame = (spr - delta)->startFrame;
-			spr->flags = 1;
-			spr->targetX = (float)spr->x;
-			spr->motionX = 240.0f;
-			spr->x = (unsigned short)(int)((float)spr->x - spr->motionX);
+			sprite->startFrame = (sprite - delta)->startFrame;
+			sprite->flags = 1;
+			sprite->targetX = (float)sprite->x;
+			sprite->motionX = 240.0f;
+			sprite->x = (unsigned short)(int)((float)sprite->x - sprite->motionX);
 		}
 
 		base += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
-			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			sprite->startFrame = 0;
 		}
 
 		base += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
-			Sprt2* spr = &m_bonusAnim->sprites[base + i];
+			sprite = &m_bonusAnim->sprites[base + i];
 			delta = base - (activePartyCount + 1);
-			spr->startFrame = (spr - delta)->startFrame;
-			spr->flags = 1;
-			spr->targetX = (float)spr->x;
-			spr->motionX = 240.0f;
-			spr->x = (short)(int)((float)spr->x - spr->motionX);
+			sprite->startFrame = (sprite - delta)->startFrame;
+			sprite->flags = 1;
+			sprite->targetX = (float)sprite->x;
+			sprite->motionX = 240.0f;
+			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
 		}
 
 		{
 			i = 0;
 			for (; i < m_bonusAnim->header.count; i++) {
-				Sprt2* sprite = &m_bonusAnim->sprites[i];
+				sprite = &m_bonusAnim->sprites[i];
 				if (0.0f == sprite->motionX) {
 					sprite->targetX = (float)(int)sprite->x;
 				}
@@ -1732,7 +1733,7 @@ void CMenuPcs::CalcResultCloseAnim()
 	int frame = (int)this->m_bonusState->m_frame;
 
 	for (i = 0; i < m_bonusAnim->header.count; i++) {
-		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
+		sprite = &m_bonusAnim->sprites[i];
 
 		if ((sprite->flags & 1) != 0) {
 			sprite->alpha = 1.0f;
@@ -1769,7 +1770,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		i = 0;
 		for (; i < activePartyCount; i++) {
 			delta = activePartyCount + 1;
-			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[delta + i];
+			sprite = &m_bonusAnim->sprites[delta + i];
 			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
 			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
@@ -1793,7 +1794,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		int spriteIndex = total2 + 1;
 
 		for (; i < total2; i++, spriteIndex++) {
-			CMenuPcs::Sprt2* alphaSprite = &m_bonusAnim->sprites[spriteIndex];
+			sprite = &m_bonusAnim->sprites[spriteIndex];
 			CCharaPcs::CHandle* handle;
 			if (i < activePartyCount) {
 				handle = s_Rinfo->m_party[i].m_partyHandle;
@@ -1830,7 +1831,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			if (i < activePartyCount) {
 				handle->m_model->m_lightAlpha = 1.0f;
 			} else {
-				handle->m_model->m_lightAlpha = alphaSprite->alpha;
+				handle->m_model->m_lightAlpha = sprite->alpha;
 			}
 
 		}

@@ -237,7 +237,7 @@ public:
     void onDrawDebug(CFont*, float, float&, float);
     void onDraw();
 
-    int GetCID();
+    int GetCID() { return 0x6D; }
 
     PartyObjOverlay m_partyData; // 0x6B8
 };

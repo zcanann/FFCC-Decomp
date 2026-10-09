@@ -56,13 +56,13 @@ public:
 	int onHit(int, CGObject*, int, Vec*);
 	void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
 	int getReplaceStat(int);
-	virtual void onStatDie();
+	virtual void onStatDie() {}
 	virtual void onDamage(CGPrgObj*, int, int, int, Vec*);
 	virtual void onStatMagic();
-	virtual void onStatAttack(int);
-	virtual void onStatShield();
-	virtual void enableAttackCol(int, int, int);
-	virtual void enableDamageCol(int);
+	virtual void onStatAttack(int) {}
+	virtual void onStatShield() {}
+	virtual void enableAttackCol(int, int, int) {}
+	virtual void enableDamageCol(int) {}
 	void putHitParticleFromItem(CGPrgObj*, int);
 	void setSta(int, int);
 	void effective(int, int, CGPrgObj*, int&);
@@ -89,7 +89,7 @@ public:
 	static int scCheckItem(CCombi2Set*, CGCharaObj*, int);
 	static int scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int);
 	static int searchCombi(int, CGPartyObj **, int&);
-	int GetCID();
+	int GetCID() { return 0x2D; }
 
 	int m_updateCounter; // 0x54C
 	int m_attackAnimId;

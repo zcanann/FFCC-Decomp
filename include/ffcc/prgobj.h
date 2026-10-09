@@ -14,21 +14,21 @@ public:
     void onCreate();
     void onDestroy();
     void onFrame();
-    virtual int GetCID();
+    virtual int GetCID() { return 13; }
     virtual void ClassControl(int, int);
     virtual int GetClassControl(int);
-    virtual void bonus(int, int, CGPrgObj*);
-    virtual int getReplaceStat(int);
-    virtual void onCancelStat(int);
-    virtual void onChangeStat(int);
-    virtual void onFramePreCalc();
-    virtual void onFramePostCalc();
-    virtual void onFrameStat();
-    virtual void onFrameAlways();
-    virtual void onFrameAlwaysAfter();
-    virtual void onChangePrg(int);
-    virtual void onDamaged(CGPrgObj*);
-    virtual void onAttacked(CGPrgObj*);
+    virtual void bonus(int, int, CGPrgObj*) {}
+    virtual int getReplaceStat(int state) { return state; }
+    virtual void onCancelStat(int) {}
+    virtual void onChangeStat(int) {}
+    virtual void onFramePreCalc() {}
+    virtual void onFramePostCalc() {}
+    virtual void onFrameStat() {}
+    virtual void onFrameAlways() {}
+    virtual void onFrameAlwaysAfter() {}
+    virtual void onChangePrg(int) {}
+    virtual void onDamaged(CGPrgObj*) {}
+    virtual void onAttacked(CGPrgObj*) {}
     void changeStat(int, int, int);
     void changeSubStat(int subState);
     void addSubStat();

@@ -128,7 +128,7 @@ public:
     void sysControl(int);
     void onChangePrg(int);
     void footSe();
-    int GetCID();
+    int GetCID() { return 0xAD; }
 
     void alwaysFuncDefault();
     void alwaysFuncMeteoParasite();

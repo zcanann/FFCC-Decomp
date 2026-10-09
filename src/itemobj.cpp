@@ -1187,30 +1187,3 @@ void CGItemObj::DispAllFieldItem(int show)
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80124b80
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGPrgObj::getReplaceStat(int state)
-{
-	return state;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124b78
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGItemObj::GetCID()
-{
-	return 0x1d;
-}

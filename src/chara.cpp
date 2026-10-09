@@ -961,7 +961,8 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 				u32 currentNode = 0;
 				while (chunkFile.GetNextChunk(chunk)) {
 					if (chunk.m_id == CharaFourCC('N', 'A', 'M', 'E')) {
-						currentNode = SearchNode(chunkFile.GetString());
+						char* name = chunkFile.GetString();
+						currentNode = SearchNode(name);
 					} else if (chunk.m_id == CharaFourCC('D', 'Y', 'N', ' ')) {
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {

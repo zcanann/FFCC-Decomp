@@ -3131,7 +3131,7 @@ void CMenuPcs::CmakeResultDraw1()
  * JP Size: TODO
  */
 #ifndef VERSION_GCCP01
-void CMenuPcs::CmakeVillageOpen()
+inline void CMenuPcs::CmakeVillageOpen()
 {
     MenuU8(this, 0x16) = 1;
     createVillageMenu();
@@ -3410,7 +3410,7 @@ inline void CMenuPcs::SetSingMakeChara()
  * JP Size: TODO
  */
 #ifndef VERSION_GCCP01
-void CMenuPcs::createVillageMenu()
+inline void CMenuPcs::createVillageMenu()
 {
     if (m_menuResultCode == 0) {
         MenuU8(this, 0x16) = 1;

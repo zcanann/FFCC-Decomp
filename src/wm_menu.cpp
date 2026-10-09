@@ -7546,6 +7546,9 @@ void CMenuPcs::DrawCMLife()
 		                            FLOAT_803313e8));
 	}
 	int slot;
+	int row;
+	int col;
+	int i;
 	unsigned int readyMask = 0;
 	for (slot = 0; slot < 4; slot++) {
 		const WmCharaSelectEntry& entry = m_wm.m_charaSelectData[slot];
@@ -7556,9 +7559,6 @@ void CMenuPcs::DrawCMLife()
 	const double alphaF = FLOAT_80331458 * fade;
 
 	for (slot = 0; slot < 8; slot++) {
-		int i;
-		int row;
-		int col;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterLifeTexture));
 
 		int count;

@@ -3289,7 +3289,11 @@ extern const double DOUBLE_80332D20 = 4503601774854144.0;
 extern const float FLOAT_80332d28 = 1.0f;
 extern const float FLOAT_80332d2c = 0.8f;
 extern const float FLOAT_80332d34 = -5.0f;
+#ifdef VERSION_GCCE01
+extern const float FLOAT_80332d3c = 280.0f;
+#else
 extern const float FLOAT_80332d3c = 264.0f;
+#endif
 extern const float FLOAT_80332d54 = 100.0f;
 extern const float FLOAT_80332d58 = 104.0f;
 extern const float FLOAT_80332d5c = 8.0f;
@@ -3297,7 +3301,11 @@ extern const float FLOAT_80332d60 = 0.25f;
 extern const float FLOAT_80332d64 = -6.0f;
 extern const float FLOAT_80332d68 = 136.0f;
 extern const float FLOAT_80332d6c = 172.0f;
+#ifdef VERSION_GCCE01
+extern const float FLOAT_80332d70 = 275.0f;
+#else
 extern const float FLOAT_80332d70 = 259.0f;
+#endif
 extern const float FLOAT_80332d74 = 18.0f;
 extern const float FLOAT_80332d78 = 0.5f;
 extern const float FLOAT_80332d7c = 352.0f;
@@ -3305,7 +3313,11 @@ extern const float FLOAT_80332d80 = 300.0f;
 extern const float FLOAT_80332d88 = 340.0f;
 extern const float FLOAT_80332d8c = 1.5f;
 extern const float FLOAT_80332d90 = 336.0f;
+#ifdef VERSION_GCCE01
+extern const float FLOAT_80332d94 = 554.0f;
+#else
 extern const float FLOAT_80332d94 = 558.0f;
+#endif
 extern const float FLOAT_80332d98 = 348.0f;
 extern const float FLOAT_80332D9C = 0.0f;
 extern const double DOUBLE_80332DA0 = 255.0;
@@ -3334,7 +3346,11 @@ extern const float FLOAT_80332E0C = 54.0f;
 extern const float FLOAT_80332E10 = -2.0f;
 extern const float FLOAT_80332E14 = 312.0f;
 extern const float FLOAT_80332E18 = 180.0f;
+#ifdef VERSION_GCCE01
+extern const float FLOAT_80332E1C = 512.0f;
+#else
 extern const float FLOAT_80332E1C = 520.0f;
+#endif
 extern const float FLOAT_80332E20 = 192.0f;
 extern const float FLOAT_80332E24 = 144.0f;
 extern const float FLOAT_80332E28 = 96.0f;

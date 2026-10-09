@@ -215,12 +215,8 @@ extern CPad Pad;
  */
 inline unsigned short CPad::GetButtonDown(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     unsigned int result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0;
@@ -347,12 +343,8 @@ inline unsigned short CPad::GetDebugButton(long padIndex)
  */
 inline unsigned short CPad::GetButtonRepeat(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     unsigned int result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0;
@@ -375,12 +367,8 @@ inline unsigned short CPad::GetButtonRepeat(long padIndex)
  */
 inline unsigned short CPad::GetButton(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     unsigned int result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0;
@@ -515,12 +503,8 @@ inline float CPad::GetRightStickX(long padIndex)
  */
 inline unsigned short CPad::GetGbaButtonDown(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     unsigned int result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0;
@@ -543,12 +527,8 @@ inline unsigned short CPad::GetGbaButtonDown(long padIndex)
  */
 inline unsigned short CPad::GetButtonUp(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     unsigned int result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0;

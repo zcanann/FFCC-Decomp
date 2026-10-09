@@ -2929,16 +2929,17 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	if (!IsAsyncCharaLoadFinish()) {
 		return;
 	}
-	WmCharaSelectEntry& entry = m_wm.m_charaSelectData[0];
+	int chan = 0;
+	WmCharaSelectEntry& entry = m_wm.m_charaSelectData[chan];
 	if (entry.m_confirmed != 0) {
 		return;
 	}
 
-	entry.m_padType = Joybus.GetPadType(0);
+	entry.m_padType = Joybus.GetPadType(chan);
 	if (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000 || entry.m_padType == -0x78000000) {
 		entry.m_connected = 1;
 	} else if (Game.m_gameWork.m_menuStageMode == 0) {
-		entry.m_connected = Joybus.GetGBAConnect(0);
+		entry.m_connected = Joybus.GetGBAConnect(chan);
 	} else {
 		entry.m_connected = 0;
 	}
@@ -2946,8 +2947,8 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	unsigned short repeat;
 	unsigned short down;
 	if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
-		repeat = Pad.GetButtonRepeat(0);
-		down = Pad.GetButtonDown(0);
+		repeat = Pad.GetButtonRepeat(chan);
+		down = Pad.GetButtonDown(chan);
 	} else {
 		repeat = 0;
 		down = repeat;
@@ -2957,7 +2958,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		return;
 	}
 
-	WmCharaSelectEntry& curEntry = m_wm.m_charaSelectData[0];
+	WmCharaSelectEntry& curEntry = m_wm.m_charaSelectData[chan];
 	int cursor = static_cast<int>(curEntry.m_currentSlot);
 	if ((repeat & 0x0C) != 0) {
 		if (cursor < 4) {

@@ -36,41 +36,6 @@ static const int kItemObjParticleEndFrame = 150;
 static const int kItemObjCapsuleUseFrame = 16;
 #endif
 
-extern const float kItemObjUnitScale = 1.0f;
-extern const float kItemObjHeightOffset = 10.0f;
-extern const float kItemObjZero = 0.0f;
-extern const float kItemObjGroundProbeDown = -2000.0f;
-extern const float kItemObjFontAlphaMax = 255.0f;
-extern const float kItemObjScreenHalfHeight = 224.0f;
-extern const float kItemObjScreenHalfWidth = 320.0f;
-extern const float kItemObjHalf = 0.5f;
-extern const float kItemObjThrowMoveSpeed = 11.0f;
-static const char sStandAnim[] = "stand";
-extern const float kItemObjParticleScaleBase = 1.0e-7f;
-extern const float kItemObjFineStep = 0.01f;
-extern const float kItemObjMotionStep = 0.1f;
-extern const float kItemObjParticleRandomRange = 0.05f;
-extern const double kItemObjU32ToDoubleBias = 4503599627370496.0;
-extern const float kItemObjWobblePhaseScale = 0.125f;
-extern const double kItemObjS32ToDoubleBias = 4503601774854144.0;
-extern const float kItemObjDamageRadius = 15.0f;
-static const char s_itemAttachCenterItem3[] = "c_item3";
-static const char s_itemAttachLeftItem[] = "l_item";
-extern const float kItemObjPi = 3.1415927410125732f;
-extern const float kItemObjSafeMoveDivisor = 3.0f;
-extern const float kItemObjLaunchSpeed = 8.0f;
-extern const float kItemObjLaunchYOffset = 50.0f;
-extern const float kItemObjHalfPi = 1.5707963705062866f;
-extern const double kItemObjExpireDistance = 300.0;
-extern const float kItemObjDouble = 2.0f;
-extern const float kItemObjRotationDamping = 0.75f;
-extern const float kItemObjMoveOffsetXZ = 0.8999999761581421f;
-extern const float kItemObjBounceAccel = 0.20000000298023224f;
-extern const float kItemObjMemoryRadius = 20.0f;
-extern const float kItemObjMemoryTurnStep = 0.25f;
-extern const float kItemObjMemoryChaseAccel = 0.019999999552965164f;
-extern const float kItemObjMemoryChaseScale = 1.5f;
-static const char s_itemDamageBoneHip[] = "hip";
 u32 g_tempFlag;
 extern char SoundBuffer[];
 
@@ -202,7 +167,7 @@ void CGItemObj::onCancelStat(int)
 {
 	if (m_lastStateId == 0x1b) {
 		m_bgColMask |= 2;
-		m_rotationX = m_rotationY = m_rotationZ = kItemObjUnitScale;
+		m_rotationX = m_rotationY = m_rotationZ = 1.0f;
 	}
 }
 
@@ -242,11 +207,11 @@ void CGItemObj::onFrame()
 			}
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
+			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
 			putParticle((pdtNo << 8) | ownerData->m_joybusCaravanId, m_particleSlot, this, particleScale, 0x12909);
 
-			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
-			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));
+			SetDamageCol(0, const_cast<char*>("hip"), 20.0f, 20.0f,
+			             CVector(0.0f, 0.0f, 0.0f));
 			m_damageColliders[0].m_hitMask = 8;
 			addSubStat();
 		}
@@ -267,12 +232,12 @@ void CGItemObj::onFrame()
 void CGItemObj::onFrameStat()
 {
 	int stateId = m_lastStateId;
-	float zero = kItemObjZero;
+	float zero = 0.0f;
 
 	switch (stateId) {
 	case 0x1b:
 		if (m_stateFrame <= kItemObjExpandFrames) {
-			float wobble = kItemObjHalfPi * (float)m_stateFrame;
+			float wobble = 1.5707964f * (float)m_stateFrame;
 			wobble /= kItemObjExpandFrames;
 			wobble = (float)sin((double)wobble);
 
@@ -288,7 +253,7 @@ void CGItemObj::onFrameStat()
 	case 0: {
 		if (m_owner == 0 &&
 		    m_stateFlags0Bits.unk4 != 0) {
-			float distance = kItemObjZero;
+			float distance = 0.0f;
 
 			if (Game.unk_flat3_0xc7d0 != 0) {
 				distance = PSVECDistance(&m_worldPosition, &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition);
@@ -303,9 +268,9 @@ void CGItemObj::onFrameStat()
 				}
 			}
 
-			if (m_lifeTimer <= 0 || distance > kItemObjExpireDistance) {
+			if (m_lifeTimer <= 0 || distance > 300.0) {
 				System.Printf("\x8E\x9E\x8A\xD4\x82\xA9\x8B\x97\x97\xA3\x82\xC5\x83" "A\x83" "C\x83" "e\x83\x80\x82\xAA\x8F\xC1\x82\xA6\x82\xDC\x82\xB7\x81" "B\n");
-				m_alphaStep = kItemObjMotionStep;
+				m_alphaStep = 0.1f;
 				m_alphaTarget = zero;
 				m_bgColMask = 1;
 				ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
@@ -317,10 +282,10 @@ void CGItemObj::onFrameStat()
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
 			Attach(m_owner,
-			       const_cast<char*>((Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(m_owner)) ? s_itemAttachCenterItem3 : s_itemAttachLeftItem),
-			       CVector(kItemObjZero, kItemObjZero, kItemObjZero));
+			       const_cast<char*>((Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(m_owner)) ? "c_item3" : "l_item"),
+			       CVector(0.0f, 0.0f, 0.0f));
 			changeStat(0, 0, 0);
-			m_bodyEllipsoidRadius = kItemObjZero;
+			m_bodyEllipsoidRadius = 0.0f;
 		}
 		break;
 	case 0xC:
@@ -332,22 +297,22 @@ void CGItemObj::onFrameStat()
 			    Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
 			    (static_cast<unsigned short>(m_owner->GetCID()) & 0x6D) == 0x6D &&
 			    reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId != 0) {
-				launchSpeed = kItemObjUnitScale;
+				launchSpeed = 1.0f;
 			} else if (static_cast<int>(CFlatCenterState()) == 1) {
 				int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
 				    2 <= reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_tribeId) {
-					launchSpeed = kItemObjUnitScale;
+					launchSpeed = 1.0f;
 				} else {
-					launchSpeed = kItemObjDouble;
+					launchSpeed = 2.0f;
 				}
 			} else {
-				launchSpeed = kItemObjSafeMoveDivisor;
+				launchSpeed = 3.0f;
 			}
 
 			safeDetach(1, launchSpeed);
 			m_itemJumpCountdown = kItemObjExpandFrames;
-			m_bodyEllipsoidRadius = kItemObjZero;
+			m_bodyEllipsoidRadius = 0.0f;
 		}
 
 		if (m_carryFrame <= m_stateFrame) {
@@ -369,9 +334,9 @@ void CGItemObj::onFrameStat()
 			m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = zero;
 		} else if (m_stateFrame == kItemObjFadeStartFrame) {
 #ifdef VERSION_GCCP01
-			m_alphaStep = kItemObjWobblePhaseScale;
+			m_alphaStep = 0.125f;
 #else
-			m_alphaStep = kItemObjMotionStep;
+			m_alphaStep = 0.1f;
 #endif
 			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
@@ -380,13 +345,13 @@ void CGItemObj::onFrameStat()
 		}
 
 		if (kItemObjHomeStartFrame < m_stateFrame) {
-			m_rotTargetY += kItemObjMotionStep;
-			m_worldPosition.x += kItemObjMotionStep * (m_owner->m_worldPosition.x - m_worldPosition.x);
-			m_worldPosition.y += kItemObjMotionStep * (kItemObjHalf * m_owner->unk_0x188 + m_owner->m_worldPosition.y - m_worldPosition.y);
-			m_worldPosition.z += kItemObjMotionStep * (m_owner->m_worldPosition.z - m_worldPosition.z);
-			m_rotationX *= kItemObjRotationDamping;
-			m_rotationY *= kItemObjRotationDamping;
-			m_rotationZ *= kItemObjRotationDamping;
+			m_rotTargetY += 0.1f;
+			m_worldPosition.x += 0.1f * (m_owner->m_worldPosition.x - m_worldPosition.x);
+			m_worldPosition.y += 0.1f * (0.5f * m_owner->unk_0x188 + m_owner->m_worldPosition.y - m_worldPosition.y);
+			m_worldPosition.z += 0.1f * (m_owner->m_worldPosition.z - m_worldPosition.z);
+			m_rotationX *= 0.75f;
+			m_rotationY *= 0.75f;
+			m_rotationZ *= 0.75f;
 		}
 		break;
 	case 9:
@@ -405,7 +370,7 @@ void CGItemObj::onFrameStat()
 			}
 
 			if (m_subFrame <= kItemObjExpandFrames) {
-				float wobble = kItemObjHalfPi * (float)m_subFrame;
+				float wobble = 1.5707964f * (float)m_subFrame;
 				wobble /= kItemObjExpandFrames;
 				wobble = (float)sin((double)wobble);
 
@@ -421,43 +386,43 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0x24:
-		m_moveOffset.x = kItemObjMoveOffsetXZ;
-		m_moveOffset.y = kItemObjUnitScale;
-		m_moveOffset.z = kItemObjMoveOffsetXZ;
+		m_moveOffset.x = 0.9f;
+		m_moveOffset.y = 1.0f;
+		m_moveOffset.z = 0.9f;
 
-		if (m_worldPosition.y < kItemObjHeightOffset) {
-			m_groundHitOffset.y += kItemObjBounceAccel * m_moveTimer;
-		} else if (m_worldPosition.y > kItemObjMemoryRadius) {
-			m_groundHitOffset.y = -(kItemObjBounceAccel * m_moveTimer - m_groundHitOffset.y);
+		if (m_worldPosition.y < 10.0f) {
+			m_groundHitOffset.y += 0.2f * m_moveTimer;
+		} else if (m_worldPosition.y > 20.0f) {
+			m_groundHitOffset.y = -(0.2f * m_moveTimer - m_groundHitOffset.y);
 		}
 
 		{
 			float y = m_groundHitOffset.y;
 			float moveTimer = m_moveTimer;
-			m_groundHitOffset.y = (y < kItemObjDouble * -moveTimer) ? kItemObjDouble * -moveTimer : ((kItemObjDouble * moveTimer < y) ? kItemObjDouble * moveTimer : y);
+			m_groundHitOffset.y = (y < 2.0f * -moveTimer) ? 2.0f * -moveTimer : ((2.0f * moveTimer < y) ? 2.0f * moveTimer : y);
 		}
 
-		m_rotTargetY += kItemObjFineStep;
+		m_rotTargetY += 0.01f;
 		m_groundHitOffset.x =
-		    kItemObjFineStep * -(m_worldPosition.x - m_owner->m_worldPosition.x);
+		    0.01f * -(m_worldPosition.x - m_owner->m_worldPosition.x);
 		m_groundHitOffset.z =
-		    kItemObjFineStep * -(m_worldPosition.z - m_owner->m_worldPosition.z);
+		    0.01f * -(m_worldPosition.z - m_owner->m_worldPosition.z);
 		break;
 	case 0x25: {
-		m_moveOffset.y = kItemObjMoveOffsetXZ;
-		m_rotTargetY += kItemObjMemoryTurnStep;
+		m_moveOffset.y = 0.9f;
+		m_rotTargetY += 0.25f;
 
 		CVector delta(reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_targetPosition);
 		delta = delta - CVector(m_worldPosition);
 		float distance = PSVECMag(delta);
-		if (distance < kItemObjMemoryRadius) {
+		if (distance < 20.0f) {
 			changeStat(0x27, 0, 0);
 		} else if (distance > zero) {
-			float moveScale = kItemObjMemoryChaseAccel * m_moveTimer;
+			float moveScale = 0.02f * m_moveTimer;
 
-			m_groundHitOffset.x += kItemObjMemoryChaseScale * delta.x * moveScale;
-			m_groundHitOffset.y += kItemObjMemoryChaseScale * delta.y * moveScale;
-			m_groundHitOffset.z += kItemObjMemoryChaseScale * delta.z * moveScale;
+			m_groundHitOffset.x += 1.5f * delta.x * moveScale;
+			m_groundHitOffset.y += 1.5f * delta.y * moveScale;
+			m_groundHitOffset.z += 1.5f * delta.z * moveScale;
 		} else {
 			m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = zero;
 		}
@@ -475,7 +440,7 @@ void CGItemObj::onFrameStat()
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
+			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
 			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
 		} else if (m_stateFrame == kItemObjCapsuleUseFrame) {
 			int ownerSlot = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId;
@@ -507,7 +472,7 @@ void CGItemObj::onFrameStat()
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
+			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
 			putParticle((pdtNo << 8) | 4, m_particleSlot, this, particleScale, 0x12908);
 		} else if (m_stateFrame == kItemObjCapsuleUseFrame) {
 			int ownerSlot = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId;
@@ -518,7 +483,7 @@ void CGItemObj::onFrameStat()
 
 			LastBossWork* bossWork = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss);
 			bossWork->m_capsules[ownerSlot] = 0;
-			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, kItemObjZero, 0);
+			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, 0.0f, 0);
 			if (newItem != 0) {
 				newItem->unk_0x168 = m_worldPosition.x;
 				newItem->unk_0x16C = m_worldPosition.y;
@@ -647,7 +612,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 		if (createMode == 2) {
 			newItem->m_scriptArg = scriptArg;
-			newItem->m_swayTarget.x = kItemObjUnitScale;
+			newItem->m_swayTarget.x = 1.0f;
 		}
 
 		newItem->changeStat(0x1B, 0, 0);
@@ -655,17 +620,17 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		if ((createFlags & 1) != 0) {
 			float safePosDist;
 			Vec safePos;
-			float yRot = owner->m_rotBaseY + Math.RandFPM(kItemObjMotionStep);
+			float yRot = owner->m_rotBaseY + Math.RandFPM(0.1f);
 
-			newItem->m_worldPosition.x = kItemObjHeightOffset * (float)sin((double)yRot) + owner->m_worldPosition.x;
-			newItem->m_worldPosition.y = kItemObjHeightOffset + owner->m_worldPosition.y;
-			newItem->m_worldPosition.z = kItemObjHeightOffset * (float)cos((double)yRot) + owner->m_worldPosition.z;
+			newItem->m_worldPosition.x = 10.0f * (float)sin((double)yRot) + owner->m_worldPosition.x;
+			newItem->m_worldPosition.y = 10.0f + owner->m_worldPosition.y;
+			newItem->m_worldPosition.z = 10.0f * (float)cos((double)yRot) + owner->m_worldPosition.z;
 
 			safePosDist = newItem->CalcSafePos(0x41, owner, &safePos);
-			float zero = kItemObjZero;
+			float zero = 0.0f;
 			if (safePosDist > zero) {
-				owner->moveVectorHRot(kItemObjPi + owner->m_rotBaseY, zero,
-				                       safePosDist / kItemObjSafeMoveDivisor, 3);
+				owner->moveVectorHRot(3.1415927f + owner->m_rotBaseY, zero,
+				                       safePosDist / 3.0f, 3);
 			}
 
 			newItem->m_worldPosition = safePos;
@@ -676,14 +641,14 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition = owner->m_worldPosition;
 			newItem->SetPosBG(&newItem->m_worldPosition, 1);
 
-			const CVector& moveVec = CVector((float)sin((double)launchAngle), kItemObjHeightOffset, (float)cos((double)launchAngle));
-			newItem->MoveVector((Vec*)const_cast<CVector*>(&moveVec), kItemObjLaunchSpeed, 1, 0, 1, 0);
+			const CVector& moveVec = CVector((float)sin((double)launchAngle), 10.0f, (float)cos((double)launchAngle));
+			newItem->MoveVector((Vec*)const_cast<CVector*>(&moveVec), 8.0f, 1, 0, 1, 0);
 		}
 
 		if ((createFlags & 2) != 0) {
 			newItem->changeStat(0x23, 0, 0);
 			newItem->m_worldPosition.x = owner->m_worldPosition.x;
-			newItem->m_worldPosition.y = owner->m_worldPosition.y + kItemObjLaunchYOffset;
+			newItem->m_worldPosition.y = owner->m_worldPosition.y + 50.0f;
 			newItem->m_worldPosition.z = owner->m_worldPosition.z;
 			newItem->m_owner = owner;
 
@@ -729,10 +694,10 @@ inline void CGItemObj::safeDetach(int throwItem, float speed)
 	Vec safePos;
 	float safeDist = CalcSafePos(0x41, m_owner, &safePos);
 
-	float zero = kItemObjZero;
+	float zero = 0.0f;
 	if (safeDist > zero) {
-		m_owner->moveVectorHRot(kItemObjPi + m_owner->m_rotBaseY, zero,
-		                        safeDist / kItemObjSafeMoveDivisor, 3);
+		m_owner->moveVectorHRot(3.1415927f + m_owner->m_rotBaseY, zero,
+		                        safeDist / 3.0f, 3);
 	}
 
 	Detach();
@@ -743,12 +708,12 @@ inline void CGItemObj::safeDetach(int throwItem, float speed)
 		if (m_lastStateId == 0xC) {
 			moveSpeed = speed;
 		} else {
-			moveSpeed = kItemObjThrowMoveSpeed;
+			moveSpeed = 11.0f;
 		}
 
 		speed = (float)cos((double)m_owner->m_rotTargetY);
 		float ownerSin = (float)sin((double)m_owner->m_rotTargetY);
-		const CVector& moveVec = CVector(ownerSin, kItemObjMotionStep, speed);
+		const CVector& moveVec = CVector(ownerSin, 0.1f, speed);
 		MoveVector(reinterpret_cast<Vec*>(const_cast<CVector*>(&moveVec)), moveSpeed, 1, 0, 1, 0);
 	}
 
@@ -776,14 +741,14 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		m_carryFrame = carryMode;
 
 		if (carryMode == 0) {
-			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
+			const CVector& attachOffset = CVector(0.0f, 0.0f, 0.0f);
 			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
 			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(partyObj);
 
 			CGObject* attachSelf = this;
-			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), attachOffsetPtr);
+			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
 			changeStat(0, 0, 0);
-			m_bodyEllipsoidRadius = kItemObjZero;
+			m_bodyEllipsoidRadius = 0.0f;
 		} else {
 			changeStat(0xB, 0, 0);
 		}
@@ -793,10 +758,10 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		m_carryFrame = carryMode;
 
 		if (carryMode == 0) {
-			safeDetach(0, kItemObjZero);
+			safeDetach(0, 0.0f);
 			changeStat(0, 0, 0);
 			m_itemJumpCountdown = kItemObjExpandFrames;
-			m_bodyEllipsoidRadius = kItemObjZero;
+			m_bodyEllipsoidRadius = 0.0f;
 		} else {
 			changeStat(carryState == 1 ? 0xC : 0xD, 0, 0);
 		}
@@ -853,16 +818,16 @@ void CGItemObj::statPot()
 				particleNoB = 0x1D;
 			}
 
-			putParticle(particleNoA | 0x100, 0, &m_worldPosition, kItemObjUnitScale, 0);
-			putParticle(particleNoB | 0x100, m_particleSlot, &m_worldPosition, kItemObjUnitScale, 0);
+			putParticle(particleNoA | 0x100, 0, &m_worldPosition, 1.0f, 0);
+			putParticle(particleNoB | 0x100, m_particleSlot, &m_worldPosition, 1.0f, 0);
 			playSe3D(0x1A, 0x32, 0x96, 0, 0);
 			m_displayFlags &= ~1;
 			m_bgColMask &= 0xFFFFFFF1;
-			m_moveOffset.x = m_moveOffset.z = kItemObjZero;
+			m_moveOffset.x = m_moveOffset.z = 0.0f;
 			m_bgColMask |= 0x80000;
 
-			const CVector& damageOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
-			SetDamageCol(0, "f051_root", kItemObjDamageRadius, kItemObjDamageRadius,
+			const CVector& damageOffset = CVector(0.0f, 0.0f, 0.0f);
+			SetDamageCol(0, "f051_root", 15.0f, 15.0f,
 			             reinterpret_cast<Vec*>(const_cast<CVector*>(&damageOffset)));
 			m_damageColliders[0].m_hitMask = 9;
 		}
@@ -910,7 +875,7 @@ void CGItemObj::onFrameAlways()
 
 		if (canUseTrace && CFlatItemTraceParticleSlot() == 0) {
 			CFlatItemTraceParticleSlot() = ItemCFlatRuntime()->GetFreeParticleSlot();
-			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, kItemObjUnitScale, 0);
+			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, 1.0f, 0);
 		} else if (!canUseTrace && CFlatItemTraceParticleSlot() != 0) {
 			ItemCFlatRuntime()->EndParticleSlot(CFlatItemTraceParticleSlot(), 0);
 			CFlatItemTraceParticleSlot() = 0;
@@ -956,8 +921,8 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 			ItemCFlatRuntime()->ResetParticleWork(particleNo | 0x100, m_particleSlot);
-			ItemCFlatRuntime()->SetParticleWorkPos(m_worldPosition, kItemObjZero);
-			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, kItemObjUnitScale);
+			ItemCFlatRuntime()->SetParticleWorkPos(m_worldPosition, 0.0f);
+			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, 1.0f);
 			ItemCFlatRuntime()->SetParticleWorkParam(classControl, this);
 			ItemCFlatRuntime()->PutParticleWork();
 			m_bgColMask &= 0xFFF7FFFF;
@@ -1002,7 +967,7 @@ void CGItemObj::loadModel()
 	int modelVariant = 0;
 	int modelFlag = 0;
 	unsigned long animFlags = (unsigned long)-1;
-	char* standAnim = const_cast<char*>(sStandAnim);
+	char* standAnim = const_cast<char*>("stand");
 	int useParticleTable = 1;
 	int itemType = m_worldParamA;
 
@@ -1070,10 +1035,7 @@ void CGItemObj::loadModel()
 				int particleNo = itemRow->m_particles[i];
 
 				if (particleNo != 0xFFFF) {
-					const float& particleScaleStep = kItemObjFineStep;
-					const float& particleScaleBase = kItemObjParticleScaleBase;
-					float particleScale =
-					    particleScaleStep * static_cast<float>(itemRow->m_fineValue) + particleScaleBase;
+					float particleScale = 0.01f * static_cast<float>(itemRow->m_fineValue) + 1.0e-7f;
 					putParticle(particleNo | 0x100, m_particleSlot, this, particleScale, 0);
 				}
 			}
@@ -1081,9 +1043,7 @@ void CGItemObj::loadModel()
 	}
 
 	if (m_worldParamA == 0xCB) {
-		const float& randBase = kItemObjMotionStep;
-		const float& randRange = kItemObjParticleRandomRange;
-		m_moveTimer = randBase - Math.RandF(randRange);
+		m_moveTimer = 0.1f - Math.RandF(0.05f);
 		m_weaponNodeFlagBits.m_unk04 = 0;
 	}
 
@@ -1132,11 +1092,10 @@ void CGItemObj::DrawOmoideName(CFont* font)
 
 			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[m_memoryCapsuleNameIndex];
 			float width = font->GetWidth(name);
-			float depthScale = kItemObjUnitScale / (m_screenDepth - kItemObjHeightOffset);
+			float depthScale = 1.0f / (m_screenDepth - 10.0f);
 			float posY = 224.0f - 224.0f * m_projection.z * depthScale;
 			float posZ = m_projection.w * depthScale;
-			float posX =
-			    -(0.5f * width - (320.0f * m_projection.y * depthScale + 320.0f));
+			float posX = 320.0f * m_projection.y * depthScale + 320.0f - 0.5f * width;
 
 			font->SetPosX(posX);
 			font->SetPosY(posY - 11.0f);
@@ -1163,19 +1122,19 @@ void CGItemObj::ItemJump(int state, float jump)
 
 		if ((object->m_objectFlags & 0x10) == 0) {
 			Vec bottom = object->m_worldPosition;
-			bottom.y += kItemObjHeightOffset;
+			bottom.y += 10.0f;
 			Vec move;
 
-			move.x = kItemObjZero;
-			move.z = kItemObjZero;
-			move.y = kItemObjGroundProbeDown;
+			move.x = 0.0f;
+			move.z = 0.0f;
+			move.y = -2000.0f;
 			unsigned int mapMask = object->m_bgHitMask;
 			CMapCylinder cylinder;
 			cylinder.m_bottom = bottom;
-			cylinder.m_axis.x = kItemObjZero;
-			cylinder.m_axis.y = kItemObjGroundProbeDown;
-			cylinder.m_axis.z = kItemObjZero;
-			cylinder.m_radius = kItemObjZero;
+			cylinder.m_axis.x = 0.0f;
+			cylinder.m_axis.y = -2000.0f;
+			cylinder.m_axis.z = 0.0f;
+			cylinder.m_radius = 0.0f;
 
 			if (MapMng.CheckHitCylinderNear(&cylinder, &move, mapMask) != 0 &&
 			    g_hit_lpface_min->m_groupIndex == state) {

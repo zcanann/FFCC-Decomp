@@ -1062,17 +1062,16 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
     saveDat->m_flags = kMemoryCardSaveFlags;
 
-    CGame* g = &Game;
     for (int i = 0; i < 4; i++)
     {
-        int idx = g->m_gameWork.m_wmBackupParams[i];
-        if (g->m_caravanWorkArr[idx].m_shopState == 0)
+        int idx = Game.m_gameWork.m_wmBackupParams[i];
+        if (Game.m_caravanWorkArr[idx].m_shopState == 0)
         {
-            g->m_gameWork.m_wmBackupParams[i] = -1;
+            Game.m_gameWork.m_wmBackupParams[i] = -1;
         }
-        if (g->m_caravanWorkArr[idx].m_shopBusyFlag != 0)
+        if (Game.m_caravanWorkArr[idx].m_shopBusyFlag != 0)
         {
-            g->m_gameWork.m_wmBackupParams[i] = -1;
+            Game.m_gameWork.m_wmBackupParams[i] = -1;
         }
     }
 
@@ -1099,14 +1098,14 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_gameInitFlag = Game.m_gameWork.m_gameInitFlag != 0;
     for (int i = 0; i < 4; i++)
     {
-        saveDat->m_spModeFlags[i] = g->m_gameWork.m_spModeFlags[i] != 0;
+        saveDat->m_spModeFlags[i] = Game.m_gameWork.m_spModeFlags[i] != 0;
     }
 
     for (int c = 0; c < 8; c++)
     {
         int letter;
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
-        CCaravanWork* caravanWork = &g->m_caravanWorkArr[c];
+        CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
         int shopState = caravanWork->m_shopState;
         if (shopState != 0 && static_cast<s8>(caravanWork->unk_0xc1e) == 0)

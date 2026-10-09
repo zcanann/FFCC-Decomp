@@ -3017,6 +3017,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	enum { kFadeFrames = 10 };
 #endif
 	int activePartyCount = s_Rinfo->m_partyCount;
+	CMenuPcs::Sprt2* sprite;
 	int twice;
 	int i;
 	CMenuPcs::Sprt2* alphaSprite;
@@ -3034,118 +3035,118 @@ void CMenuPcs::CalcSelectCloseAnim()
 		{
 			i = 0;
 			for (; i < (int)m_bonusAnim->header.count; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i];
-				spr->alpha = 1.0f;
-				spr->timer = 0;
-				spr->flags = 0;
+				sprite = &m_bonusAnim->sprites[i];
+				sprite->alpha = 1.0f;
+				sprite->timer = 0;
+				sprite->flags = 0;
 			}
 		}
 
 		idx = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = kBonusBackgroundTexture;
-			spr->startFrame = kFadeFrames;
-			spr->duration = kFadeFrames;
+			sprite = &m_bonusAnim->sprites[idx++];
+			sprite->kind = kBonusBackgroundTexture;
+			sprite->startFrame = kFadeFrames;
+			sprite->duration = kFadeFrames;
 		}
 		i = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->startFrame = i;
-			spr->duration = kFadeFrames;
-			spr->flags = 2;
+			sprite = &m_bonusAnim->sprites[idx++];
+			sprite->startFrame = i;
+			sprite->duration = kFadeFrames;
+			sprite->flags = 2;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = kBonusArtifactFrameTexture;
-			spr->startFrame = i;
-			spr->duration = i;
-			spr->flags = 2;
+			sprite = &m_bonusAnim->sprites[idx++];
+			sprite->kind = kBonusArtifactFrameTexture;
+			sprite->startFrame = i;
+			sprite->duration = i;
+			sprite->flags = 2;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = -4;
-			spr->startFrame = i;
-			spr->duration = kFadeFrames;
+			sprite = &m_bonusAnim->sprites[idx++];
+			sprite->kind = -4;
+			sprite->startFrame = i;
+			sprite->duration = kFadeFrames;
 		}
 
 		for (; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i + idx];
-			spr->startFrame = 0;
-			spr->duration = kFadeFrames;
-			spr->depth = 1.0f;
-			spr->x = (short)(int)spr->targetX;
-			spr->y = (short)(int)spr->targetY;
-			spr->motionX = 240.0f;
-			spr->motionY = 0.0f;
-			spr->targetX = (float)spr->x + spr->motionX;
-			spr->targetY = (float)spr->y + spr->motionY;
+			sprite = &m_bonusAnim->sprites[i + idx];
+			sprite->startFrame = 0;
+			sprite->duration = kFadeFrames;
+			sprite->depth = 1.0f;
+			sprite->x = (short)(int)sprite->targetX;
+			sprite->y = (short)(int)sprite->targetY;
+			sprite->motionX = 240.0f;
+			sprite->motionY = 0.0f;
+			sprite->targetX = (float)sprite->x + sprite->motionX;
+			sprite->targetY = (float)sprite->y + sprite->motionY;
 		}
 
 		idx += activePartyCount;
 		s_PlayerTop = idx;
 		for (i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->startFrame = 0;
-			spr->duration = kFadeFrames;
-			spr->x = (short)(int)spr->targetX;
-			spr->y = (short)(int)spr->targetY;
-			spr->motionX = 240.0f;
-			spr->motionY = 0.0f;
-			spr->targetX = (float)spr->x + spr->motionX;
-			spr->targetY = (float)spr->y + spr->motionY;
+			sprite = &m_bonusAnim->sprites[idx + i];
+			sprite->startFrame = 0;
+			sprite->duration = kFadeFrames;
+			sprite->x = (short)(int)sprite->targetX;
+			sprite->y = (short)(int)sprite->targetY;
+			sprite->motionX = 240.0f;
+			sprite->motionY = 0.0f;
+			sprite->targetX = (float)sprite->x + sprite->motionX;
+			sprite->targetY = (float)sprite->y + sprite->motionY;
 		}
 
 		idx += activePartyCount;
 		s_ArtiTop = idx;
 		for (i = 0; i < 8; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->startFrame = 0;
-			spr->duration = kFadeFrames;
-			spr->flags = 0;
+			sprite = &m_bonusAnim->sprites[idx + i];
+			sprite->startFrame = 0;
+			sprite->duration = kFadeFrames;
+			sprite->flags = 0;
 		}
 
 		idx += 8;
 		for (i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->startFrame = 0;
-			spr->duration = kFadeFrames;
-			spr->x = (short)(int)spr->targetX;
-			spr->y = (short)(int)spr->targetY;
-			spr->motionX = 240.0f;
-			spr->motionY = 0.0f;
-			spr->targetX = (float)spr->x + spr->motionX;
-			spr->targetY = (float)spr->y + spr->motionY;
+			sprite = &m_bonusAnim->sprites[idx + i];
+			sprite->startFrame = 0;
+			sprite->duration = kFadeFrames;
+			sprite->x = (short)(int)sprite->targetX;
+			sprite->y = (short)(int)sprite->targetY;
+			sprite->motionX = 240.0f;
+			sprite->motionY = 0.0f;
+			sprite->targetX = (float)sprite->x + sprite->motionX;
+			sprite->targetY = (float)sprite->y + sprite->motionY;
 		}
 
 		idx += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->startFrame = 0;
-			spr->duration = kFadeFrames;
-			spr->x = (short)(int)spr->targetX;
-			spr->y = (short)(int)spr->targetY;
-			spr->motionX = 240.0f;
-			spr->motionY = 0.0f;
-			spr->targetX = (float)spr->x + spr->motionX;
-			spr->targetY = (float)spr->y + spr->motionY;
+			sprite = &m_bonusAnim->sprites[idx + i];
+			sprite->startFrame = 0;
+			sprite->duration = kFadeFrames;
+			sprite->x = (short)(int)sprite->targetX;
+			sprite->y = (short)(int)sprite->targetY;
+			sprite->motionX = 240.0f;
+			sprite->motionY = 0.0f;
+			sprite->targetX = (float)sprite->x + sprite->motionX;
+			sprite->targetY = (float)sprite->y + sprite->motionY;
 		}
 
 		idx += activePartyCount;
 		{
 			int delta = idx - 4;
 			for (i = 0; i < activePartyCount; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-				CMenuPcs::Sprt2* src = spr - delta;
-				spr->kind = -1;
-				spr->x = (short)(src->x + 0x50);
-				spr->y = (short)(src->y + 0x48);
-				spr->startFrame = src->startFrame;
-				spr->duration = kFadeFrames;
-				spr->motionX = 240.0f;
-				spr->motionY = 0.0f;
-				spr->targetX = (float)spr->x + spr->motionX;
-				spr->targetY = (float)spr->y + spr->motionY;
+				sprite = &m_bonusAnim->sprites[idx + i];
+				CMenuPcs::Sprt2* src = sprite - delta;
+				sprite->kind = -1;
+				sprite->x = (short)(src->x + 0x50);
+				sprite->y = (short)(src->y + 0x48);
+				sprite->startFrame = src->startFrame;
+				sprite->duration = kFadeFrames;
+				sprite->motionX = 240.0f;
+				sprite->motionY = 0.0f;
+				sprite->targetX = (float)sprite->x + sprite->motionX;
+				sprite->targetY = (float)sprite->y + sprite->motionY;
 			}
 		}
 
@@ -3160,7 +3161,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	int frame = (int)this->m_bonusState->m_frame;
 
 	for (; i < (int)m_bonusAnim->header.count; i++) {
-		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
+		sprite = &m_bonusAnim->sprites[i];
 
 		if ((sprite->flags & 1) != 0) {
 			sprite->alpha = 1.0f;
@@ -3195,7 +3196,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	{
 		i = 0;
 		for (; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[4 + i];
+			sprite = &m_bonusAnim->sprites[4 + i];
 			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
 			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;

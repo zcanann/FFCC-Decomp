@@ -2557,6 +2557,24 @@ int CCharaPcs::CHandle::IsLoadModelASyncCompleted()
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CCharaPcs::CHandle::CancelLoadModelASync()
+{
+    if (m_asyncFileHandle != 0) {
+        if (System.GetErrorLevel() >= 2U) {
+            System.Printf("モデル非同期読み込み中にキャンセルされました。\n");
+        }
+        File.Close(m_asyncFileHandle);
+        m_asyncFileHandle = 0;
+    }
+
+    m_asyncState = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80073D64
  * PAL Size: 68b
  * EN Address: 0x800736CC
@@ -2580,24 +2598,6 @@ int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
 	}
 
 	return false;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::CancelLoadModelASync()
-{
-    if (m_asyncFileHandle != 0) {
-        if (System.GetErrorLevel() >= 2U) {
-            System.Printf("モデル非同期読み込み中にキャンセルされました。\n");
-        }
-        File.Close(m_asyncFileHandle);
-        m_asyncFileHandle = 0;
-    }
-
-    m_asyncState = 0;
 }
 
 /*

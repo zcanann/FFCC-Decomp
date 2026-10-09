@@ -214,27 +214,27 @@ static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 	unsigned short anim;
 	if (carryType == 0) {
 		if (CFlatItemCarryMode() == 1) {
-			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
 			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
-			anim = rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim2;
+			anim = rows[work->m_genderFlag +
+			            work->m_tribeId * 2].m_carryAnim2;
 		} else {
-			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
 			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
-			anim = rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim0;
+			anim = rows[work->m_genderFlag +
+			            work->m_tribeId * 2].m_carryAnim0;
 		}
 	} else {
 		if (CFlatItemCarryMode() == 1) {
-			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
 			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
-			anim = rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim3;
+			anim = rows[work->m_genderFlag +
+			            work->m_tribeId * 2].m_carryAnim3;
 		} else {
-			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
 			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
-			anim = rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim1;
+			anim = rows[work->m_genderFlag +
+			            work->m_tribeId * 2].m_carryAnim1;
 		}
 	}
 	return anim;
@@ -974,10 +974,10 @@ void CGPartyObj::command()
 				if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
 					secondaryAvailable = true;
 					if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
-					    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x500) == 0x20 &&
-					     caravan->CanAddGil(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558)) != 0) ||
-					    ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x500) != 0x24 &&
-					      *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x500) != 0x20) &&
+					    (party.target->m_worldParamA == 0x20 &&
+					     caravan->CanAddGil(reinterpret_cast<CGItemObj*>(party.target)->m_scriptArg) != 0) ||
+					    ((party.target->m_worldParamA != 0x24 &&
+					      party.target->m_worldParamA != 0x20) &&
 					     SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_inventoryItemCount + 1 <= 0x40)) {
 						secondaryCommand = 0x17;
 					} else {
@@ -1016,7 +1016,7 @@ void CGPartyObj::command()
 		}
 
 		if (party.carryObject != nullptr) {
-			const int carryState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.carryObject) + 0x500);
+			const int carryState = party.carryObject->m_worldParamA;
 			secondaryAvailable = true;
 			if (carryState == 0x0D) {
 				secondaryCommand = 7;
@@ -1226,7 +1226,7 @@ void CGPartyObj::command()
 		*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(party.target) + 0x550) = this;
 		reinterpret_cast<CGPrgObj*>(party.target)->changeStat(0x0E, 0, 0);
 
-		int itemIdx = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504);
+		int itemIdx = party.target->m_worldParamB;
 		int kind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48);
 		int kindClass;
 		switch (kind) {
@@ -1247,25 +1247,25 @@ void CGPartyObj::command()
 			int addedItem;
 			if (itemIdx >= 0x9F && itemIdx <= 0xFF) {
 				caravan->AddTmpArtifact(itemIdx, &addedItem);
-				System.Printf("\x83" "A\x81[\x83" "e\x83" "B\x83t\x83@\x83N\x83g\x92\xC7\x89\xC1 item=%d\n", *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
+				System.Printf("\x83" "A\x81[\x83" "e\x83" "B\x83t\x83@\x83N\x83g\x92\xC7\x89\xC1 item=%d\n", party.target->m_worldParamB);
 			} else {
 				caravan->AddItem(itemIdx, &addedItem);
-				System.Printf("\x83" "A\x83" "C\x83" "e\x83\x80\x92\xC7\x89\xC1 item=%d\n", *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
+				System.Printf("\x83" "A\x83" "C\x83" "e\x83\x80\x92\xC7\x89\xC1 item=%d\n", party.target->m_worldParamB);
 			}
 			if (kindClass == 0 && caravan->CanAddComList(1) != 0) {
 				int addedSlot;
 				caravan->AddComList(addedItem, &addedSlot);
 				System.Printf("\x83R\x83}\x83\x93\x83h\x83\x8A\x83X\x83g\x92\xC7\x89\xC1 itemidx=%d comidx=%d\n", addedItem, addedSlot);
 			}
-			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
-				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
+			if (reinterpret_cast<CGItemObj*>(party.target)->m_createFlags != 1) {
+				bonus(4, party.target->m_worldParamB, 0);
 			}
 		} else if (itemIdx == 0x190) {
 			bonus(5, 0x190, 0);
-			System.Printf("\x83M\x83\x8B = %d\n", *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
-			caravan->AddGil(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
-			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
-				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
+			System.Printf("\x83M\x83\x8B = %d\n", reinterpret_cast<CGItemObj*>(party.target)->m_scriptArg);
+			caravan->AddGil(reinterpret_cast<CGItemObj*>(party.target)->m_scriptArg);
+			if (reinterpret_cast<CGItemObj*>(party.target)->m_createFlags != 1) {
+				bonus(4, party.target->m_worldParamB, 0);
 			}
 		}
 	}
@@ -1630,11 +1630,10 @@ void CGPartyObj::onFrameStat()
 		statKorobi();
 		break;
 	case 0x22: {
-#define script (reinterpret_cast<unsigned char*>(m_scriptHandle))
 		if (m_stateFrame == 0) {
 			if (m_partyData.flags.flag04) {
-				if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
-					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), static_cast<CGPrgObj*>(0));
+				if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp == 0) {
+					addHp(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_maxHp, static_cast<CGPrgObj*>(0));
 				}
 				m_partyData.flags.flag04 = 0;
 			}
@@ -1645,7 +1644,7 @@ void CGPartyObj::onFrameStat()
 			} else {
 				reqAnim(0x27, 0, 0);
 			}
-			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
+			if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp != 0) {
 				endPSlotBit(0x10000);
 				m_alpha = 1.0f;
 				m_bgColMask |= 0x1000E;
@@ -1659,12 +1658,11 @@ void CGPartyObj::onFrameStat()
 				playSe3D(0x2D, 0x32, 0x96, 0, 0);
 			}
 		} else if (isLoopAnim() != 0) {
-			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
+			if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp != 0) {
 				m_partyData.flags.flag02 = 1;
 			}
 			changeStat(0, 0, 0);
 		}
-#undef script
 		break;
 	}
 	default:
@@ -2669,7 +2667,7 @@ void CGPartyObj::onPush(CGBaseObj* other, int pushType)
 void CGPartyObj::onTalk(CGBaseObj* other, int talkType)
 {
 	if (reinterpret_cast<CGObject*>(other)->IsKindOf(5)) {
-		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(other) + 0x500) == 0x23) {
+		if (reinterpret_cast<CGObject*>(other)->m_worldParamA == 0x23) {
 			m_partyData.secondaryTarget = other;
 		} else {
 			float dist = PSVECDistance(&m_worldPosition, &reinterpret_cast<CGObject*>(other)->m_worldPosition);
@@ -3234,7 +3232,7 @@ int CGPartyObj::putItem(int itemId)
 	CGPrgObj* created;
 	if (canPlayerPutItem() != 0 &&
 	    (created = CGItemObj::CreateFromScript(0, 9, itemId, this, 0.0f, (CGItemObj::CCFS*)0)) != nullptr) {
-		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
+		reinterpret_cast<CGItemObj*>(created)->unk_0x562 =
 		    static_cast<short>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId);
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			changeStat(0x1B, 0, 0);
@@ -3261,8 +3259,8 @@ int CGPartyObj::putGil(int amount)
 	CGPrgObj* created;
 	if (canPlayerPutItem() != 0 &&
 	    (created = CGItemObj::CreateFromScript(2, 1, amount, this, 0.0f, (CGItemObj::CCFS*)0)) != nullptr) {
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(created) + 0x560) = 1;
-		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
+		reinterpret_cast<CGItemObj*>(created)->m_createFlags = 1;
+		reinterpret_cast<CGItemObj*>(created)->unk_0x562 =
 		    static_cast<short>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId);
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			changeStat(0x1B, 0, 0);

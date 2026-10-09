@@ -2135,6 +2135,25 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int, int mer
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CCharaPcs::CHandle::FreeModel()
+{
+    Graphic._WaitDrawDone("p_chara.cpp", 0x8C9);
+    PartMng.pppDeleteCHandle(this);
+
+    ReleaseShared(m_model);
+    ReleaseShared(m_textureSet);
+    ReleaseShared(m_modelLoadRef);
+    ReleaseShared(m_texLoadRef);
+    ReleaseShared(m_pdtLoadRef);
+
+    CharaPcs.releaseUnuseLoadModel(0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800754E8
  * PAL Size: 532b
  * EN Address: 0x80088bec
@@ -2160,25 +2179,6 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
     ReleaseSharedNonNull(m_animSlot[animIndex]);
     CharaPcs.releaseUnuseLoadAnim(m_animSlot[animIndex], 0);
     m_animSlot[animIndex] = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::FreeModel()
-{
-    Graphic._WaitDrawDone("p_chara.cpp", 0x8C9);
-    PartMng.pppDeleteCHandle(this);
-
-    ReleaseShared(m_model);
-    ReleaseShared(m_textureSet);
-    ReleaseShared(m_modelLoadRef);
-    ReleaseShared(m_texLoadRef);
-    ReleaseShared(m_pdtLoadRef);
-
-    CharaPcs.releaseUnuseLoadModel(0);
 }
 
 /*

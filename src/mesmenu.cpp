@@ -801,21 +801,18 @@ void CMesMenu::onDraw()
             float alpha255 = 255.0f * windowScale;
             MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * alpha255) * stageBlend)).Ref());
             float fadeScale = 1.0f - pulseScale;
-            float rotation = 0.2f * (2.0f * (time - 0.5f));
             float promptX = (float)(int)(40.0f + drawX);
             float promptY = (float)(int)(32.0f + drawY);
             float driftX = 5.0f * (pulseScale * sinX);
             float driftY = 10.0f * (pulseScale * sinY);
-            float waveX = promptX + driftX;
-            float waveY = promptY - driftY;
             MenuPcs.DrawRect(
-                3, 8.0f + waveX, 8.0f + waveY, 80.0f, 48.0f, 0.0f,
+                3, 8.0f + (promptX + driftX), 8.0f + (promptY - driftY), 80.0f, 48.0f, 0.0f,
                 0.0f, 0.75f * (1.0f + fadeScale), 0.75f * (pulseScale + fadeScale),
-                rotation);
+                0.2f * (2.0f * (time - 0.5f)));
             MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255 * stageBlend)).Ref());
             MenuPcs.DrawRect(
-                3, waveX, waveY, 80.0f, 48.0f, 0.0f, 0.0f,
-                0.75f * pulseScale, 0.75f * pulseScale, rotation);
+                3, promptX + driftX, promptY - driftY, 80.0f, 48.0f, 0.0f, 0.0f,
+                0.75f * pulseScale, 0.75f * pulseScale, 0.2f * (2.0f * (time - 0.5f)));
         }
 
         if (m_state == 1) {

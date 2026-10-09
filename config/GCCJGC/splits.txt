@@ -539,6 +539,7 @@ monobj_boss.cpp:
 	.text start:0x8012a4d8 end:0x8012ef38
 	.data       start:0x8022FF88 end:0x8022FFE8
 	.sbss       start:0x8034BC88 end:0x8034BC90
+	.sdata2     start:0x8034E988 end:0x8034EA64
 
 p_menu.cpp:
 	.text start:0x8009339C end:0x80096CEC
@@ -623,6 +624,8 @@ shopmenu.cpp:
 	.text start:0x8014B634 end:0x80153EA0
 	.data       start:0x80231D88 end:0x80231E30
 	.rodata     start:0x801D9658 end:0x801D9788
+	.sbss       start:0x8034BCB8 end:0x8034BCC0
+	.sdata2     start:0x8034F298 end:0x8034F470
 
 singmenu.cpp:
 	.rodata start:0x801D8E78 end:0x801D9460
@@ -708,9 +711,10 @@ mtx/vec.c:
 bonus_menu.cpp:
 	.text start:0x8012EF38 end:0x8013A1EC
 	.rodata start:0x801D8CB4 end:0x801D8D30
-	.data start:0x8022FFE8 end:0x80230088
+	.data start:0x8022FFE8 end:0x80230178
 	.sdata start:0x8034B848 end:0x8034B858
 	.sbss start:0x8034BC90 end:0x8034BC9C
+	.sdata2     start:0x8034EA68 end:0x8034EC38
 
 menu_cmd.cpp:
 	.text start:0x80145F34 end:0x8014B634

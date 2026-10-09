@@ -1758,7 +1758,9 @@ void CMenuPcs::CalcMCardMenu()
 			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_wmWorldState->m_flag09 = 1;
+#ifndef VERSION_GCCJGC
 			m_wmWorldState->m_counter1A = 0;
+#endif
 			if (playOpenSe) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
@@ -10006,7 +10008,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 
 	*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
 #ifdef VERSION_GCCJGC
-	*h = static_cast<short>(winMess->m_lineCount * 0x16 + 0x40);
+	*h = static_cast<short>(GetWinMess(winType)->m_lineCount * 0x16 + 0x40);
 #else
 	*h = static_cast<short>(winMess->m_lineCount * 0x1E + 0x40);
 #endif

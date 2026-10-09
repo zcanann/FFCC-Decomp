@@ -718,7 +718,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 				continue;
 			}
 
-			distance = abs(dy) + abs(dx);
+			distance = abs(dx) + abs(dy);
 			tileIndex = FurTexelIndex(px, py, rowStride);
 			packed = pixels[tileIndex];
 

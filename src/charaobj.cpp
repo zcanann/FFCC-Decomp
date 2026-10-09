@@ -1092,7 +1092,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	CGObjWork* work = m_scriptHandle;
+	CGObjWork* work = SAFE_CAST_WORK(m_scriptHandle);
 	int current = work->m_statusTimers[staIndex];
 	clampedValue = value < 0 ? 0 : value;
 
@@ -1276,7 +1276,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	work = m_scriptHandle;
+	work = SAFE_CAST_WORK(m_scriptHandle);
 	work->m_statusTimers[staIndex] = static_cast<unsigned short>(clampedValue);
 }
 
@@ -3382,19 +3382,6 @@ void CGCharaObj::onStatDie()
 int CGCharaObj::GetCID()
 {
 	return 0x2D;
-}
-
-/*
- * --INFO--
- * PAL Address: N/A (not in Ghidra export)
- * PAL Size: N/A
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void SAFE_CAST_WORK(CGObjWork*)
-{
 }
 
 /*

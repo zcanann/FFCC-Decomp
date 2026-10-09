@@ -16,7 +16,6 @@ class CFlatRuntime2;
 class CVector;
 
 int la(CGObject*);
-void SAFE_CAST_WORK(CGObjWork*);
 
 class CGCharaObj : public CGPrgObj
 {

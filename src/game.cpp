@@ -720,29 +720,7 @@ void CGame::ScriptChanging(char*)
  */
 void CGame::ScriptChanged(char*, int)
 {
-    int i;
-
-    for (i = 0; i < 4; i++) {
-        m_partyObjArr[i] = 0;
-        m_scriptFoodBase[i] = 0;
-    }
-
-    unk_flat3_0xc7d0 = 0;
-
-    for (int i = 0; i < 64; i++) {
-        m_monObjects[i] = 0;
-        m_monWorkRefs[i] = 0;
-    }
-
-    m_gameWork.m_soundOptionFlag = 0;
-    m_gameWork.m_gameOverFlag = 0;
-
-    MapMng.DestroyMap();
-    CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
-    Sound.StopAndFreeAllSe(0);
-    Wind.ClearAll();
-
-    Sound.SeMaxVolume(0x7F);
+    clearWorkScript();
 }
 
 /*
@@ -1193,13 +1171,11 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
         return 0;
     }
 
-    u16 behaviorFlags = (u16)baseObj->GetCID();
-    if ((behaviorFlags & 0x6D) != 0x6D) {
+    if (!baseObj->IsKindOf(0x6D)) {
         return 0;
     }
 
-    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(reinterpret_cast<CGObject*>(baseObj)->m_scriptHandle);
-    specialInfo = caravanWork->m_joybusCaravanId;
+    specialInfo = SAFE_CAST_CARAVAN_WORK(reinterpret_cast<CGObject*>(baseObj)->m_scriptHandle)->m_joybusCaravanId;
     return 1;
 }
 
@@ -1229,15 +1205,7 @@ CGPartyObj* CGame::GetPartyObj(int index)
 char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 {
     if (count > 1) {
-        char* name;
-
-        if (count > 1) {
-            name = m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 3];
-        } else {
-            name = m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 1];
-        }
-
-        sprintf(out, s_numNameFmt, count, name);
+        MakeNumItemName(out, itemIndex, count);
     } else {
         char** itemTable = m_cFlatDataArr[1].TableStrings(0);
         unsigned char hasSeparator = 0;
@@ -1304,15 +1272,7 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
  */
 char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
 {
-    char* itemName;
-
-    if (count > 1) {
-        itemName = m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 3];
-    } else {
-        itemName = m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 1];
-    }
-
-    sprintf(out, s_numNameFmt, count, itemName);
+    sprintf(out, s_numNameFmt, count, GetItemName(itemIndex, count));
     return out;
 }
 
@@ -1328,15 +1288,7 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
 char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 {
     if (count > 1) {
-        char* name;
-
-        if (count > 1) {
-            name = m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 3];
-        } else {
-            name = m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 1];
-        }
-
-        sprintf(out, s_numNameFmt, count, name);
+        MakeNumMonName(out, monIndex, count);
     } else {
         char** monTable = m_cFlatDataArr[1].TableStrings(1);
         unsigned char hasSeparator = 0;
@@ -1403,15 +1355,7 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
  */
 char* CGame::MakeNumMonName(char* out, int monIndex, int count)
 {
-    char* monName;
-
-    if (count > 1) {
-        monName = m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 3];
-    } else {
-        monName = m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 1];
-    }
-
-    sprintf(out, s_numNameFmt, count, monName);
+    sprintf(out, s_numNameFmt, count, GetMonName(monIndex, count));
     return out;
 }
 

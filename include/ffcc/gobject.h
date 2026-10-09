@@ -64,6 +64,9 @@ public:
     void HitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
     void SetClassWork(int, int);
     void SetTexAnim(char*);
+    int IsHChara();
+    int IsHWeapon();
+    int IsHShield();
     void LookAt(CGObject*, char*);
     void InitWork(int);
     void LoadModel(int, unsigned long, unsigned long, int);

@@ -7,6 +7,8 @@
 
 #include <dolphin/mtx.h>
 
+struct Vec2d;
+
 class CChunkFile;
 class CGObject;
 class CMaterialSet;
@@ -438,6 +440,10 @@ public:
 			m_afterDrawMeshCallback = callback;
 		}
 		CTexAnimSet* GetTexAnimSet() { return m_texAnimSet; }
+		void GetLookAt(Vec2d*);
+		void SetLookAt(Vec2d*);
+		float GetGlobalChest() { return m_twistAngle; }
+		void SetGlobalChest(float chest) { m_twistAngle = chest; }
 		void SetBeforeCalcMatrixCallback(int (*callback)(CChara::CModel*, void*, void*))
 		{
 			m_beforeCalcMatrixCallback = callback;

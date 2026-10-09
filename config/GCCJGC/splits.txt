@@ -654,7 +654,13 @@ p_light.cpp:
 	.sbss       start:0x8034BB10 end:0x8034BB18
 
 menu_letter.cpp:
+	extab       start:0x8000A014 end:0x8000A06C
+	extabindex  start:0x800113F8 end:0x8001147C
 	.text start:0x8015E4DC end:0x80162690
+	.rodata     start:0x801D97B8 end:0x801D97C8
+	.bss        start:0x80327388 end:0x80327408
+	.sbss       start:0x8034BCC8 end:0x8034BCE8
+	.sdata2     start:0x8034F668 end:0x8034F748
 
 mtx/mtx.c:
 	.text start:0x8017FF4C end:0x80180988

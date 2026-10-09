@@ -39,11 +39,13 @@ static int s_BackUpTopPos = 0;
 static char s_ReplyStr[0x80];
 
 extern "C" const char s_menu_letter_cpp[] = "menu_letter.cpp";
+#ifndef VERSION_GCCJGC
 namespace {
 const char s_letterItemInfoFmt[] = "%s%s%s%s";
 }  // namespace
 static const char s_pctspctspctspcts[] = "%s%s%s%s?";
 static const char s_pctspctd_pcts_801DEE20[] = "%s%d %s?";
+#endif
 
 namespace {
 STATIC_ASSERT(offsetof(SingleFadeEntry, x) == 0x00);
@@ -1202,12 +1204,20 @@ void CMenuPcs::LetterListDraw()
 
 		const char* subject = Game.GetLetterSubject((letter->HeaderWord() & 0x7FC) >> 2);
 		font->SetPosX(64.0f);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(yf);
+#else
 		font->SetPosY(yf - 4.0f);
+#endif
 		font->Draw(subject);
 
 		const char* npcName = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 9) & 0x1FF];
 		font->SetPosX(352.0f);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(static_cast<float>(y));
+#else
 		font->SetPosY(static_cast<float>(y) - 4.0f);
+#endif
 		font->Draw(npcName);
 
 		y += 0x20;
@@ -1295,13 +1305,14 @@ void CMenuPcs::LetterMessDraw()
 	SingleFadeState* animState = m_singleFadeState;
 	CFont* font = m_fonts[0];
 #ifdef VERSION_GCCJGC
-	font->SetMargin(3.0f);
+	font->SetMargin(2.0f);
 	font->SetShadow(0);
+	font->SetScale(1.0f);
 #else
 	font->SetShadow(0);
 	font->SetMargin(3.0f);
-#endif
 	font->SetScale(1.2f);
+#endif
 	font->DrawInit();
 	font->SetTlut(0x1C);
 
@@ -1340,8 +1351,13 @@ void CMenuPcs::LetterMessDraw()
 		}
 
 		if (strlen(curLine) != 0) {
+#ifdef VERSION_GCCJGC
+			font->SetPosX(104.0f);
+			font->SetPosY(y0);
+#else
 			font->SetPosX(136.0f);
 			font->SetPosY(y0 - 4.0f);
+#endif
 			font->Draw(curLine);
 		}
 

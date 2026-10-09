@@ -890,7 +890,6 @@ void CCameraPcs::calcMap()
     Mtx rotXMtx;
     Mtx rotMtx;
     Mtx invViewMtx;
-    Vec dir;
     Vec moveDelta;
     Vec sideVec;
     Vec upVec;
@@ -939,17 +938,13 @@ void CCameraPcs::calcMap()
     }
 
     if ((buttons & 0x1) != 0) {
-        sideVec.x = 0.0f;
-        sideVec.z = 0.0f;
-        sideVec.y = 0.0f;
+        sideVec.x = sideVec.y = sideVec.z = 0.0f;
         sideVec.x = 4.0f;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = 0.0f;
         PSVECAdd(&sideVec, &moveDelta, &moveDelta);
     } else if ((buttons & 0x2) != 0) {
-        sideVec.x = 0.0f;
-        sideVec.z = 0.0f;
-        sideVec.y = 0.0f;
+        sideVec.x = sideVec.y = sideVec.z = 0.0f;
         sideVec.x = -4.0f;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = 0.0f;
@@ -990,10 +985,9 @@ void CCameraPcs::calcMap()
     C_MTXLookAt(m_cameraMatrix, &PositionVec(), &upVec, &TargetVec());
     PSMTXInverse(m_cameraMatrix, invViewMtx);
 
-    dir.x = 0.0f;
-    dir.y = 0.0f;
-    dir.z = -1.0f;
-    DirectionVec() = dir;
+    DirectionVec().x = 0.0f;
+    DirectionVec().y = 0.0f;
+    DirectionVec().z = -1.0f;
     PSMTXMultVecSR(invViewMtx, &DirectionVec(), &DirectionVec());
 }
 

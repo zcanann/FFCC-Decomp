@@ -289,10 +289,10 @@ thp/THPDec.c:
 	.text start:0x801CC85C end:0x801D3DC4
 	.rodata start:0x801E6FC0 end:0x801E7050
 	.data start:0x8021DCB0 end:0x8021DCEC
-	.bss start:0x8032D260 end:0x8032D390
-	.sdata start:0x8032DC18 end:0x8032DC1C
-	.sbss start:0x8032E4C0 end:0x8032E5D8
-	.sdata2 start:0x80332D58 end:0x80332D74
+	.bss start:0x8032D260 end:0x8032D390 align:8
+	.sdata start:0x8032DC18 end:0x8032DC1C align:8
+	.sbss start:0x8032E4C0 end:0x8032E5D8 align:32
+	.sdata2 start:0x80332D58 end:0x80332D74 align:4
 
 axfx/chorus.c:
 	.text start:0x80194A14 end:0x801953FC
@@ -315,7 +315,7 @@ axfx/reverb_hi_4ch.c:
 gx/GXAttr.c:
 	.text start:0x8019F9F4 end:0x801A0B64
 	.data start:0x8021B340 end:0x8021B4A0
-	.sdata start:0x8032DB70 end:0x8032DB7C
+	.sdata start:0x8032DB70 end:0x8032DB7C align:8
 
 gx/GXGeometry.c:
 	.text start:0x801A1308 end:0x801A16B8
@@ -356,7 +356,7 @@ ar/arq.c:
 gba/GBA.c:
 	.text start:0x801A62F0 end:0x801A65E0
 	.data start:0x8021B9F8 end:0x8021BA08
-	.bss start:0x80327200 end:0x80327700
+	.bss start:0x80327200 end:0x80327700 align:16
 	.sbss start:0x8032E330 end:0x8032E334
 
 gba/GBAXfer.c:
@@ -377,12 +377,12 @@ ax/AXProf.c:
 
 ax/AXSPB.c:
 	.text start:0x80191C84 end:0x8019214C
-	.bss start:0x803138E0 end:0x80313918
+	.bss start:0x803138E0 end:0x80313918 align:32
 	.sbss start:0x8032E248 end:0x8032E26C
 
 ax/AXVPB.c:
 	.text start:0x8019214C end:0x80192D0C
-	.bss start:0x80313920 end:0x80324D20
+	.bss start:0x80313920 end:0x80324D20 align:16
 	.data start:0x80216BA8 end:0x80216C7C
 	.sbss start:0x8032E270 end:0x8032E27C
 
@@ -457,7 +457,7 @@ os/OSError.c:
 
 os/OSContext.c:
 	.text start:0x8017C448 end:0x8017CCB8
-	.data start:0x80215A98 end:0x80215C70
+	.data start:0x80215A98 end:0x80215C70 align:8
 
 os/OSAlarm.c:
 	.text start:0x8017B0D0 end:0x8017B838
@@ -466,7 +466,7 @@ os/OSAlarm.c:
 os/OSThread.c:
 	.text start:0x8017F8D8 end:0x80180ADC
 	.bss start:0x8030AC78 end:0x8030B670
-	.sdata start:0x8032DA90 end:0x8032DA94
+	.sdata start:0x8032DA90 end:0x8032DA94 align:8
 	.sbss start:0x8032DFB0 end:0x8032DFBC
 
 pppRyjMegaBirthModel.cpp:
@@ -525,12 +525,12 @@ mapobj.cpp:
 	.sdata2     start:0x8032E900 end:0x8032E924
 
 p_camera.cpp:
-	.bss start:0x80267750 end:0x80267C30
+	.bss start:0x80267750 end:0x80267C30 align:8
 	.text start:0x80036084 end:0x8003A3F0
-	.rodata     start:0x801D67A0 end:0x801D68A8
+	.rodata     start:0x801D67A0 end:0x801D68A8 align:8
 	.data       start:0x801E7EB0 end:0x801E89A4
 	.sbss       start:0x8032DCB8 end:0x8032DCB9
-	.sdata2     start:0x8032E9E0 end:0x8032EA98
+	.sdata2     start:0x8032E9E0 end:0x8032EA98 align:8
 	.sdata      start:0x8032D500 end:0x8032D518
 
 gobject.cpp:
@@ -556,7 +556,7 @@ chara.cpp:
 
 cflat_runtime2.cpp:
 	.text start:0x80069470 end:0x8006e46c
-	.bss start:0x80298F00 end:0x802E68A0
+	.bss start:0x80298F00 end:0x802E68A0 align:32
 	.sbss start:0x8032DD78 end:0x8032DD80
 	.rodata     start:0x801D7E50 end:0x801D7FB8
 	.data       start:0x801FBA88 end:0x801FBB50
@@ -580,9 +580,9 @@ joybus.cpp:
 	.text start:0x800A593C end:0x800B218C
 
 gbaque.cpp:
-	.rodata start:0x801DA1F8 end:0x801DA3C7
-	.bss start:0x802F3970 end:0x802F66E0
-	.sdata2 start:0x8032FCF0 end:0x8032FD30
+	.rodata start:0x801DA1F8 end:0x801DA3C7 align:4
+	.bss start:0x802F3970 end:0x802F66E0 align:8
+	.sdata2 start:0x8032FCF0 end:0x8032FD30 align:8
 	.text start:0x800C82F0 end:0x800D0DD8
 	extab       start:0x800086C4 end:0x80008A5C
 
@@ -591,8 +591,8 @@ map.cpp:
 	.rodata     start:0x801D6240 end:0x801D6620
 	.data       start:0x801E77E0 end:0x801E7834
 	.bss        start:0x80244718 end:0x802675A0
-	.sbss       start:0x8032DC98 end:0x8032DCA0
-	.sdata2     start:0x8032E940 end:0x8032E9C0
+	.sbss       start:0x8032DC98 end:0x8032DCA0 align:8
+	.sdata2     start:0x8032E940 end:0x8032E9C0 align:8
 	.sdata      start:0x8032D4B0 end:0x8032D4E8
 
 monobj.cpp:
@@ -606,7 +606,7 @@ monobj.cpp:
 monobj_boss.cpp:
 	.text start:0x8012d90c end:0x80132428
 	.data       start:0x80211648 end:0x802116A8
-	.sbss       start:0x8032DE80 end:0x8032DE88
+	.sbss       start:0x8032DE80 end:0x8032DE88 align:8
 	.sdata2     start:0x80330C98 end:0x80330D80
 	.rodata     start:0x801DC3D0 end:0x801DC3F8
 
@@ -629,13 +629,13 @@ p_minigame.cpp:
 
 sound.cpp:
 	.text start:0x800C4860 end:0x800C82F0
-	.bss start:0x802F1688 end:0x802F396C
+	.bss start:0x802F1688 end:0x802F396C align:8
 	.ctors start:0x801D438C end:0x801D4390
 	extab start:0x800084F8 end:0x800086C4
 	extabindex start:0x8000EC5C end:0x8000EEF0
-	.rodata start:0x801D9FC8 end:0x801DA1F6
-	.data start:0x8020F3F0 end:0x8020F40C
-	.sdata start:0x8032D860 end:0x8032D870
+	.rodata start:0x801D9FC8 end:0x801DA1F6 align:8
+	.data start:0x8020F3F0 end:0x8020F40C align:8
+	.sdata start:0x8032D860 end:0x8032D870 align:8
 	.sdata2 start:0x8032FC98 end:0x8032FCEC
 
 textureman.cpp:
@@ -660,7 +660,7 @@ mapmesh.cpp:
 	extab start:0x80005E50 end:0x80005EB8
 	extabindex start:0x8000B7AC end:0x8000B848
 	.rodata start:0x801D5FF0 end:0x801D5FFC
-	.sbss start:0x8032DC78 end:0x8032DC7C
+	.sbss start:0x8032DC78 end:0x8032DC7C align:8
 	.sdata2 start:0x8032E8F8 end:0x8032E900
 
 os/OSSemaphore.c:
@@ -679,7 +679,7 @@ mapocttree.cpp:
 	.text start:0x8002C4F8 end:0x8002F250
 	.rodata start:0x801D61A8 end:0x801D6240
 	.bss start:0x802446B0 end:0x80244714
-	.sbss start:0x8032DC80 end:0x8032DC94
+	.sbss start:0x8032DC80 end:0x8032DC94 align:8
 	.sdata2 start:0x8032E928 end:0x8032E93C
 
 shopmenu.cpp:
@@ -1072,7 +1072,7 @@ OdemuExi2/DebuggerDriver.c:
 
 card/CARDBios.c:
 	.text       start:0x80197464 end:0x801987CC
-	.data       start:0x8021AFF8 end:0x8021B050
+	.data       start:0x8021AFF8 end:0x8021B050 align:8
 	.bss        start:0x80326520 end:0x80326760
 	.sdata      start:0x8032DB50 end:0x8032DB54
 	.sbss       start:0x8032E2C0 end:0x8032E2C2
@@ -1117,7 +1117,7 @@ card/CARDStat.c:
 
 card/CARDUnlock.c:
 	.text       start:0x801987CC end:0x80199A2C
-	.data       start:0x8021B060 end:0x8021B1C0
+	.data       start:0x8021B060 end:0x8021B1C0 align:32
 	.sdata      start:0x8032DB58 end:0x8032DB5C
 
 card/CARDWrite.c:
@@ -1175,7 +1175,7 @@ ref.cpp:
 	.text start:0x80043B04 end:0x80043B64
 	.data start:0x801E8A88 end:0x801E8A94
 	.sdata start:0x8032D578 end:0x8032D580
-	.sdata2 start:0x8032EAF0 end:0x8032EAF8
+	.sdata2 start:0x8032EAF0 end:0x8032EAF8 align:8
 
 gx/GXTransform.c:
 	.text	start:0x801A50E8 end:0x801A5898
@@ -1287,15 +1287,15 @@ pad/Pad.c:
 	.text	start:0x8018C3C0 end:0x8018DCE8
 	.data	start:0x80216A30 end:0x80216A88
 	.bss	start:0x8030BC70 end:0x8030BCC0
-	.sdata	start:0x8032DAF8 end:0x8032DB18
+	.sdata	start:0x8032DAF8 end:0x8032DB18 align:8
 	.sbss	start:0x8032E118 end:0x8032E140
 
 util.cpp:
 	.text start:0x80022518 end:0x80024C54
-	.rodata start:0x801D5FA0 end:0x801D5FC8
-	.data start:0x801E7738 end:0x801E7758
+	.rodata start:0x801D5FA0 end:0x801D5FC8 align:8
+	.data start:0x801E7738 end:0x801E7758 align:8
 	.sdata start:0x8032D468 end:0x8032D478
-	.sdata2 start:0x8032E850 end:0x8032E888
+	.sdata2 start:0x8032E850 end:0x8032E888 align:4
 	.sbss start:0x8032DC50 end:0x8032DC58
 	extab       start:0x80005D20 end:0x80005DF0
 	extabindex  start:0x8000B5E4 end:0x8000B71C
@@ -1311,7 +1311,7 @@ dsp/dsp_debug.c:
 
 dsp/dsp_task.c:
 	.text	start:0x80196BE0 end:0x80197464
-	.data	start:0x8021AEB8 end:0x8021AFF3
+	.data	start:0x8021AEB8 end:0x8021AFF3 align:4
 	.sbss	start:0x8032E2A8 end:0x8032E2C0
 
 auto_07_8021AEB5_data:
@@ -1348,13 +1348,13 @@ axart/axart.c:
 
 axart/axart3d.c:
 	.text	start:0x801968F0 end:0x80196900
-	.sbss	start:0x8032E298 end:0x8032E2A0
+	.sbss	start:0x8032E298 end:0x8032E2A0 align:8
 
 gx/GXTexture.c:
 	.text	start:0x801A2A5C end:0x801A3A28
-	.data	start:0x8021B5F0 end:0x8021B818
-	.sdata	start:0x8032DB80 end:0x8032DBC0
-	.sdata2	start:0x80332850 end:0x80332878
+	.data	start:0x8021B5F0 end:0x8021B818 align:8
+	.sdata	start:0x8032DB80 end:0x8032DBC0 align:8
+	.sdata2	start:0x80332850 end:0x80332878 align:8
 
 auto_10_8032E294_sbss:
 	.sbss start:0x8032E294 end:0x8032E298 align:4
@@ -1466,7 +1466,7 @@ p_map.cpp:
 	.sdata2 start:0x8032E9C0 end:0x8032E9DC
 
 astar.cpp:
-	.bss start:0x80308158 end:0x8030A60C
+	.bss start:0x80308158 end:0x8030A60C align:8
 	.rodata start:0x801DC5D0 end:0x801DC61E
 	.text start:0x801406C0 end:0x80142208
 	.sdata2 start:0x80331018 end:0x80331046
@@ -1515,20 +1515,20 @@ usb.cpp:
 	.ctors start:0x801D4328 end:0x801D432C
 	extab start:0x80005D08 end:0x80005D20
 	extabindex start:0x8000B5C0 end:0x8000B5E4
-	.rodata start:0x801D5ED0 end:0x801D5F99
-	.data start:0x801E7718 end:0x801E7734
-	.bss start:0x80244580 end:0x80244600
+	.rodata start:0x801D5ED0 end:0x801D5F99 align:8
+	.data start:0x801E7718 end:0x801E7734 align:8
+	.bss start:0x80244580 end:0x80244600 align:8
 	.sdata start:0x8032D458 end:0x8032D468
-	.sdata2 start:0x8032E848 end:0x8032E84D
+	.sdata2 start:0x8032E848 end:0x8032E84D align:8
 
 system.cpp:
 	.text	start:0x800212A8 end:0x80022240
 	.ctors	start:0x801D4324 end:0x801D4328
 	extab	start:0x80005C98 end:0x80005D08
 	extabindex	start:0x8000B530 end:0x8000B5C0
-	.rodata	start:0x801D5CC8 end:0x801D5EC9
-	.data	start:0x801E76F8 end:0x801E7714
-	.bss	start:0x80243300 end:0x8024457C
+	.rodata	start:0x801D5CC8 end:0x801D5EC9 align:4
+	.data	start:0x801E76F8 end:0x801E7714 align:8
+	.bss	start:0x80243300 end:0x8024457C align:8
 	.sdata	start:0x8032D448 end:0x8032D458
 	.sdata2	start:0x8032E830 end:0x8032E844
 
@@ -1640,7 +1640,7 @@ stopwatch.cpp:
 	.text	start:0x80020FC8 end:0x800212A8
 	extab	start:0x80005C34 end:0x80005C98
 	extabindex	start:0x8000B4B8 end:0x8000B530
-	.sdata2	start:0x8032E818 end:0x8032E830
+	.sdata2	start:0x8032E818 end:0x8032E830 align:8
 
 pppCharaBreak.cpp:
 	.text start:0x8013EC64 end:0x80140374
@@ -1698,10 +1698,10 @@ RedSound/RedSound.cpp:
 	.ctors start:0x801D43B0 end:0x801D43B4
 	extab start:0x8000ABB8 end:0x8000AD70
 	extabindex start:0x800125A4 end:0x80012838
-	.rodata start:0x801E6E98 end:0x801E6FC0
-	.bss start:0x8032D150 end:0x8032D25C
-	.sbss start:0x8032E4A0 end:0x8032E4AC
-	.sdata2 start:0x80332D40 end:0x80332D55
+	.rodata start:0x801E6E98 end:0x801E6FC0 align:4
+	.bss start:0x8032D150 end:0x8032D25C align:8
+	.sbss start:0x8032E4A0 end:0x8032E4AC align:8
+	.sdata2 start:0x80332D40 end:0x80332D55 align:4
 
 auto_8032D25C_bss:
 	.bss start:0x8032D25C end:0x8032D260 align:1
@@ -1724,15 +1724,15 @@ auto_8032FCEC_sdata2:
 texanim.cpp:
 	.text start:0x80043B64 end:0x80044F6C
 	.rodata start:0x801D6A10 end:0x801D6AC0
-	.data start:0x801E8A98 end:0x801E8B10
+	.data start:0x801E8A98 end:0x801E8B10 align:8
 	.sdata start:0x8032D580 end:0x8032D5B8
 	.sdata2 start:0x8032EAF8 end:0x8032EB18
 
 mapanim.cpp:
 	.text start:0x8004A294 end:0x8004AFC4
 	.rodata start:0x801D6BF8 end:0x801D6C58
-	.data start:0x801E9308 end:0x801E9314
-	.sdata start:0x8032D620 end:0x8032D628
+	.data start:0x801E9308 end:0x801E9314 align:8
+	.sdata start:0x8032D620 end:0x8032D628 align:8
 	.sdata2 start:0x8032EC60 end:0x8032EC70
 
 maptexanim.cpp:
@@ -1774,9 +1774,9 @@ RedSound/RedMemory.cpp:
 	.text start:0x801BEE9C end:0x801BF560
 	extab start:0x8000A5A8 end:0x8000A5E8
 	extabindex start:0x80011C8C end:0x80011CEC
-	.rodata start:0x801E6738 end:0x801E6782
-	.sbss start:0x8032E470 end:0x8032E488
-	.sdata2 start:0x80332CC8 end:0x80332CD5
+	.rodata start:0x801E6738 end:0x801E6782 align:4
+	.sbss start:0x8032E470 end:0x8032E488 align:8
+	.sdata2 start:0x80332CC8 end:0x80332CD5 align:4
 
 auto_80332CD5_sdata2:
 	.sdata2 start:0x80332CD5 end:0x80332CD8 align:1
@@ -1788,8 +1788,8 @@ RedSound/RedEntry.cpp:
 	.text start:0x801BF560 end:0x801C1F2C
 	extab start:0x8000A5E8 end:0x8000A750
 	extabindex start:0x80011CEC end:0x80011F08
-	.rodata start:0x801E6788 end:0x801E6CC4
-	.sdata2 start:0x80332CD8 end:0x80332CFB
+	.rodata start:0x801E6788 end:0x801E6CC4 align:8
+	.sdata2 start:0x80332CD8 end:0x80332CFB align:4
 
 auto_801E6CC4_rodata:
 	.rodata start:0x801E6CC4 end:0x801E6CC8 align:1
@@ -1801,10 +1801,10 @@ RedSound/RedExecute.cpp:
 	.text start:0x801C1F2C end:0x801C63E0
 	extab start:0x8000A750 end:0x8000A870
 	extabindex start:0x80011F08 end:0x800120B8
-	.data start:0x8021C7B0 end:0x8021D18E
+	.data start:0x8021C7B0 end:0x8021D18E align:8
 	.sdata start:0x8032DC10 end:0x8032DC14
 	.sbss start:0x8032E488 end:0x8032E49C
-	.sdata2 start:0x80332D00 end:0x80332D10
+	.sdata2 start:0x80332D00 end:0x80332D10 align:8
 
 auto_8021D18E_data:
 	.data start:0x8021D18E end:0x8021D190 align:1
@@ -1819,7 +1819,7 @@ RedSound/RedCommand.cpp:
 	.text start:0x801C8FA0 end:0x801CA8A4
 	extab start:0x8000AAF0 end:0x8000AB70
 	extabindex start:0x80012478 end:0x80012538
-	.rodata start:0x801E6CC8 end:0x801E6DCB
+	.rodata start:0x801E6CC8 end:0x801E6DCB align:8
 	.data start:0x8021DBD0 end:0x8021DCB0
 	.sdata2 start:0x80332D10 end:0x80332D25
 
@@ -1833,8 +1833,8 @@ RedSound/RedStream.cpp:
 	.text start:0x801CA8A4 end:0x801CB99C
 	extab start:0x8000AB70 end:0x8000ABB8
 	extabindex start:0x80012538 end:0x800125A4
-	.rodata start:0x801E6DD0 end:0x801E6E96
-	.sdata2 start:0x80332D28 end:0x80332D3D
+	.rodata start:0x801E6DD0 end:0x801E6E96 align:8
+	.sdata2 start:0x80332D28 end:0x80332D3D align:4
 
 auto_801E6E96_rodata:
 	.rodata start:0x801E6E96 end:0x801E6E98 align:1
@@ -1846,7 +1846,7 @@ RedSound/RedMidiCtrl.cpp:
 	.text start:0x801C63E0 end:0x801C8FA0
 	extab start:0x8000A870 end:0x8000AAF0
 	extabindex start:0x800120B8 end:0x80012478
-	.data start:0x8021D190 end:0x8021DBD0
+	.data start:0x8021D190 end:0x8021DBD0 align:4
 
 auto_8021C7AC_data:
 	.data start:0x8021C7AC end:0x8021C7B0 align:1
@@ -1877,7 +1877,7 @@ auto_8032FC8F_sdata2:
 
 pppYmMelt.cpp:
 	.text start:0x800A4C34 end:0x800A5874
-	.rodata start:0x801D8F60 end:0x801D8F70
+	.rodata start:0x801D8F60 end:0x801D8F70 align:8
 	.sdata2 start:0x8032FAB0 end:0x8032FAE0
 	.sbss2 start:0x80332D80 end:0x80332D84
 
@@ -1922,7 +1922,7 @@ vector.cpp:
 	.text	start:0x800C46D8 end:0x800C478C
 	extab	start:0x800084E0 end:0x800084F0
 	extabindex	start:0x8000EC38 end:0x8000EC50
-	.sdata2	start:0x8032FC90 end:0x8032FC94
+	.sdata2	start:0x8032FC90 end:0x8032FC94 align:4
 
 auto_vector_8032FC94_sdata2:
 	.sdata2 start:0x8032FC94 end:0x8032FC98 align:4
@@ -1964,8 +1964,8 @@ vi/vi.c:
 	.text start:0x8018A748 end:0x8018C17C
 	.data start:0x80216660 end:0x80216A30
 	.bss start:0x8030BB28 end:0x8030BC70
-	.sdata start:0x8032DAE8 end:0x8032DAF4
-	.sbss start:0x8032E0C0 end:0x8032E118
+	.sdata start:0x8032DAE8 end:0x8032DAF4 align:8
+	.sbss start:0x8032E0C0 end:0x8032E118 align:8
 
 auto_8032DAF4_sdata:
 	.sdata start:0x8032DAF4 end:0x8032DAF8 align:1
@@ -2052,7 +2052,7 @@ pppCorona.cpp:
 THPSimple.cpp:
 	.text start:0x8010348C end:0x80104D8C
 	.data start:0x80210070 end:0x80210170
-	.bss start:0x802FEA40 end:0x802FF120
+	.bss start:0x802FEA40 end:0x802FF120 align:32
 	.sbss start:0x8032DE28 end:0x8032DE40
 	.sdata2 start:0x80330810 end:0x80330818
 	extab       start:0x800090A4 end:0x80009104
@@ -2091,7 +2091,7 @@ pppLocationTitle.cpp:
 
 gba/GBAKey.c:
 	.text start:0x801A7C80 end:0x801A7EE8
-	.data start:0x8021BA38 end:0x8021BDE0
+	.data start:0x8021BA38 end:0x8021BDE0 align:4
 
 monobj_table.cpp:
 	.text start:0x80142528 end:0x80144564
@@ -2107,7 +2107,7 @@ p_MaterialEditor.cpp:
 	.text start:0x8004B010 end:0x8004C510
 	.rodata start:0x801D6C58 end:0x801D6CB4
 	.sdata start:0x8032D628 end:0x8032D640
-	.data start:0x801E9318 end:0x801E94E8
+	.data start:0x801E9318 end:0x801E94E8 align:8
 	.sdata2 start:0x8032EC70 end:0x8032ECA8
 	.ctors start:0x801D435C end:0x801D4360
 	.bss start:0x8026C2F8 end:0x8026C6E4
@@ -2132,8 +2132,8 @@ gx/GXInit.c:
 	.text start:0x8019DE28 end:0x8019F1AC
 	.data start:0x8021B200 end:0x8021B340
 	.bss start:0x80326760 end:0x80326CD8
-	.sdata start:0x8032DB68 end:0x8032DB6C
-	.sbss start:0x8032E2C8 end:0x8032E2F0
+	.sdata start:0x8032DB68 end:0x8032DB6C align:8
+	.sbss start:0x8032E2C8 end:0x8032E2F0 align:8
 	.sdata2 start:0x803327D0 end:0x803327F8
 
 auto_09_8032DB6C_sdata:
@@ -2273,7 +2273,7 @@ p_game.cpp:
 	.rodata start:0x801D6B60 end:0x801D6B81
 	.sdata start:0x8032D5D0 end:0x8032D5E8
 	.data start:0x801E8D40 end:0x801E8F4C
-	.sbss start:0x8032DCE0 end:0x8032DCE4
+	.sbss start:0x8032DCE0 end:0x8032DCE4 align:8
 	extab start:0x80006898 end:0x80006908
 	extabindex start:0x8000C448 end:0x8000C4F0
 	.ctors start:0x801D4350 end:0x801D4354
@@ -2906,7 +2906,7 @@ p_sound.cpp:
 	.text start:0x800D7EDC end:0x800D8094
 	.ctors start:0x801D4394 end:0x801D4398
 	.rodata start:0x801DA400 end:0x801DA421
-	.data start:0x8020F410 end:0x8020F5E0
+	.data start:0x8020F410 end:0x8020F5E0 align:8
 	.sdata start:0x8032D870 end:0x8032D888
 	.sbss start:0x8032DDC0 end:0x8032DDC4
 

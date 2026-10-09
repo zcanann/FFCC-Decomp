@@ -94,7 +94,7 @@ public:
     void MakeLightMap();
     void SetBumpTexMatirx(float (*)[4], CLightPcs::CBumpLight*, Vec*, unsigned char);
     float (*GetBumpIndTexMtx())[3] { return m_bumpIndTexMtx; }
-    CBumpLight* GetBumpLight(CLightPcs::TARGET target, int index) { return &m_bumpLights[target][index]; }
+    CBumpLight* GetBumpLight(long index, CLightPcs::TARGET target) { return &m_bumpLights[target][index]; }
 
     Mtx m_bumpTexMtx0;               // 0x04
     Mtx m_bumpTexMtx1;               // 0x34

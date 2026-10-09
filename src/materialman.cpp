@@ -50,11 +50,6 @@ struct ShadowCandidate
     int index;
 };
 
-static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
-{
-    return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
-}
-
 static inline void ReleaseRefNonNull(CRef* object)
 {
     if (object->DecRef() == 0) {
@@ -153,7 +148,7 @@ inline void CMaterialMan::SetStdEnv()
 inline void CMaterial::AddTextureIdx(CChunkFile& chunkFile)
 {
     int index = GetNumTexture();
-    m_textureCount = static_cast<unsigned short>(index + 1);
+    IncNumTexture();
     m_textureIndices[index] = static_cast<short>(chunkFile.Get2());
 }
 
@@ -3361,7 +3356,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     material->m_bumpLight = bumpLights;
                     material->m_bumpLightDirect = 1;
                 } else {
-                    material->m_bumpLight = GetMapBumpLight(bumpIndex);
+                    material->m_bumpLight = LightPcs.GetBumpLight(bumpIndex, static_cast<CLightPcs::TARGET>(1));
                     if (bumpLightDirect != 0) {
                         material->m_bumpLightDirect = 1;
                     } else {
@@ -3383,7 +3378,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_scaleV = 1.0f / chunkFile.GetF4();
                 material->m_materialType = 2;
 
-                material->m_bumpLight = GetMapBumpLight(bumpIndex);
+                material->m_bumpLight = LightPcs.GetBumpLight(bumpIndex, static_cast<CLightPcs::TARGET>(1));
                 material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_blendMode = 4;
                 chunkFile.Get4();
@@ -3408,7 +3403,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_scaleV = 1.0f / chunkFile.GetF4();
                 material->m_materialType = 3;
 
-                material->m_bumpLight = GetMapBumpLight(bumpIndex);
+                material->m_bumpLight = LightPcs.GetBumpLight(bumpIndex, static_cast<CLightPcs::TARGET>(1));
                 material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_tevBit |= 0x4000;
                 chunkFile.Get4();
@@ -3820,6 +3815,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
  */
 inline void CMaterial::IncNumTexture()
 {
+    m_textureCount++;
 }
 
 /*

@@ -257,12 +257,12 @@ static CMenuPcs::FCV s_MenuObjYTrs = {5, s_MenuObjYTrsSpl};
 static CMenuPcs::FCV s_MenuObjScl = {7, s_MenuObjSclSpl};
 
 static float s_MaxAnimWait;
-unsigned char lbl_8032EE1C;
-char gWmMenuCursorX[2];
-char gWmMenuCursorY[2];
+static unsigned char s_LoadCancelFlg;
+static char s_McSavePos[2];
+static char s_McOdekakeLoadPos[2];
 static u64 s_Serial;
 #ifndef VERSION_GCCJGC
-unsigned char gWmMenuScriptValueCache;
+static unsigned char s_NowDispYear;
 #endif
 
 extern const char lbl_80331380[4] = {'?','?','?','?'};
@@ -449,16 +449,16 @@ void CMenuPcs::WmInit()
 	bytes[0x13] = 0;
 	bytes[0xD] = 1;
 	bytes[0x16] = 0;
-	gWmMenuCursorX[0] = 0xFF;
-	gWmMenuCursorX[1] = 0xFF;
-	gWmMenuCursorY[0] = 0xFF;
-	gWmMenuCursorY[1] = 0xFF;
+	s_McSavePos[0] = 0xFF;
+	s_McSavePos[1] = 0xFF;
+	s_McOdekakeLoadPos[0] = 0xFF;
+	s_McOdekakeLoadPos[1] = 0xFF;
 	s_Serial = -1;
 #ifndef VERSION_GCCJGC
 	int scriptValue = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
-	gWmMenuScriptValueCache = scriptValue;
+	s_NowDispYear = scriptValue;
 	if (scriptValue > 99) {
-		gWmMenuScriptValueCache = 100;
+		s_NowDispYear = 100;
 	}
 #endif
 }
@@ -843,7 +843,7 @@ void CMenuPcs::loadData()
 	m_wmWorldState->m_changeRequest = 0;
 	m_wmWorldState->m_nextMenuMode = 0;
 	m_wmWorldState->m_delay = 0;
-	lbl_8032EE1C = 1;
+	s_LoadCancelFlg = 1;
 	lbl_8032E8AC = 1;
 
 	for (i = 4; i < 6; i++) {
@@ -1466,13 +1466,13 @@ void CMenuPcs::CalcMCardMenu()
 
 	if ((signed char)m_wmWorldState->m_worldReady == 0) {
 		m_mcCtrl.Init();
-		if (gWmMenuCursorX[0] >= 0 && gWmMenuCursorX[0] < 2) {
-			m_mcCtrl.SetSlot(gWmMenuCursorX[0]);
+		if (s_McSavePos[0] >= 0 && s_McSavePos[0] < 2) {
+			m_mcCtrl.SetSlot(s_McSavePos[0]);
 		} else {
 			m_mcCtrl.SetSlot(0);
 		}
-		if (gWmMenuCursorX[1] >= 0 && gWmMenuCursorX[1] < 4) {
-			m_mcCtrl.SetDno(gWmMenuCursorX[1]);
+		if (s_McSavePos[1] >= 0 && s_McSavePos[1] < 4) {
+			m_mcCtrl.SetDno(s_McSavePos[1]);
 		} else {
 			m_mcCtrl.SetDno(0);
 		}
@@ -1525,8 +1525,8 @@ void CMenuPcs::CalcMCardMenu()
 					if ((buttonsDown & 0x100) != 0) {
 						m_wmWorldState->m_state0E = 1;
 						m_mcCtrl.SetSlot(m_wmWorldState->m_cardChannel);
-						if (m_wmWorldState->m_cardChannel == static_cast<signed char>(gWmMenuCursorX[0])) {
-							m_mcCtrl.SetDno((int)gWmMenuCursorX[1]);
+						if (m_wmWorldState->m_cardChannel == static_cast<signed char>(s_McSavePos[0])) {
+							m_mcCtrl.SetDno((int)s_McSavePos[1]);
 						}
 						m_wmWorldState->m_counter1A = 10;
 						Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -1804,8 +1804,8 @@ void CMenuPcs::CalcMCardMenu()
 			if (m_wmWorldState->m_subState == 0x13) {
 				if (m_wmWorldState->m_menuMode != 8) {
 					s_Serial = m_mcCtrl.GetSerial();
-					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.GetSlot();
-					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.GetDno();
+					s_McSavePos[0] = (unsigned char)m_mcCtrl.GetSlot();
+					s_McSavePos[1] = (unsigned char)m_mcCtrl.GetDno();
 				}
 				m_wmCharaState[m_mcCtrl.GetDno()].m_scriptSysVal0 = Game.m_gameWork.m_scriptSysVal0;
 			}
@@ -1848,7 +1848,7 @@ void CMenuPcs::CalcMCardMenu()
 					m_wmWorldState->m_mcResult = (short)0xFC19;
 				}
 			}
-			if (gWmMenuCursorX[1] < 0 || (int)gWmMenuCursorX[0] != m_mcCtrl.GetSlot() ||
+			if (s_McSavePos[1] < 0 || (int)s_McSavePos[0] != m_mcCtrl.GetSlot() ||
 			    s_Serial != m_mcCtrl.GetSerial()) {
 				int sel;
 				for (sel = 0; sel < kMcListCount; sel++) {
@@ -1863,7 +1863,7 @@ void CMenuPcs::CalcMCardMenu()
 				}
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.GetDno();
 			} else if (s_Serial == m_mcCtrl.GetSerial()) {
-				m_mcCtrl.SetDno((int)gWmMenuCursorX[1]);
+				m_mcCtrl.SetDno((int)s_McSavePos[1]);
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.GetDno();
 			}
 			subState = 0;
@@ -2385,11 +2385,11 @@ void CMenuPcs::CalcLoadMenu()
 			if (m_wmWorldState->m_subState == 0x16) {
 				if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
 					s_Serial = m_mcCtrl.GetSerial();
-					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.GetSlot();
-					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.GetDno();
+					s_McSavePos[0] = (unsigned char)m_mcCtrl.GetSlot();
+					s_McSavePos[1] = (unsigned char)m_mcCtrl.GetDno();
 				} else {
-					gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.GetSlot();
-					gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.GetDno();
+					s_McOdekakeLoadPos[0] = (unsigned char)m_mcCtrl.GetSlot();
+					s_McOdekakeLoadPos[1] = (unsigned char)m_mcCtrl.GetDno();
 				}
 				for (int charaIdx = 0; charaIdx < kWmMenuPlayerCount; charaIdx++) {
 					WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
@@ -2613,7 +2613,7 @@ void CMenuPcs::CalcTitleMenu()
 
 	{
 		if (static_cast<signed char>(m_wmWorldState->m_worldReady) == 0) {
-			if (static_cast<signed char>(lbl_8032EE1C) == 1) {
+			if (static_cast<signed char>(s_LoadCancelFlg) == 1) {
 				PPPCREATEPARAM param;
 				EffectInfo* titleEffect = &m_effectWork[23];
 				titleEffect->m_effectNo = 0x1F;
@@ -2633,7 +2633,7 @@ void CMenuPcs::CalcTitleMenu()
 				m_wmWorldState->m_state12 = 0;
 				CallWorldParam(9, 0, 0);
 				m_wmWorldState->m_cardChannel = 0;
-				lbl_8032EE1C = 0;
+				s_LoadCancelFlg = 0;
 				return;
 			}
 			lbl_8032E8AC = 0;
@@ -2701,8 +2701,8 @@ void CMenuPcs::CalcTitleMenu()
 			} else if ((down & 0x100) != 0) {
 				if (m_wmWorldState->m_cardChannel == 0) {
 					s_Serial = -1;
-					gWmMenuCursorX[0] = -1;
-					gWmMenuCursorX[1] = -1;
+					s_McSavePos[0] = -1;
+					s_McSavePos[1] = -1;
 					Game.InitNewGame();
 				}
 				m_wmWorldState->m_delay = 0x14;
@@ -5782,9 +5782,9 @@ void CMenuPcs::CalcWMFrame()
 		yearValue = Game.m_gameWork.m_scriptSysVal0 + m_wmYear;
 	}
 #ifndef VERSION_GCCJGC
-	gWmMenuScriptValueCache = (unsigned char)yearValue;
+	s_NowDispYear = (unsigned char)yearValue;
 	if ((int)yearValue > 99) {
-		gWmMenuScriptValueCache = 100;
+		s_NowDispYear = 100;
 	}
 #endif
 
@@ -6089,10 +6089,10 @@ void CMenuPcs::DrawWMFrame()
 			float suffixY = static_cast<float>(digit->m_y);
 			float suffixScale = digit->m_scale;
 			if (language == 1) {
-				if (gWmMenuScriptValueCache / 10 == 1) {
+				if (s_NowDispYear / 10 == 1) {
 					suffixU = 72.0f;
 				} else {
-					int digit = gWmMenuScriptValueCache % 10;
+					int digit = s_NowDispYear % 10;
 					if (digit >= 1 && digit <= 3) {
 						suffixU = 24.0f * static_cast<float>(digit - 1);
 					} else {
@@ -6100,7 +6100,7 @@ void CMenuPcs::DrawWMFrame()
 					}
 				}
 			} else if (language == 4) {
-				if (gWmMenuScriptValueCache != 1) {
+				if (s_NowDispYear != 1) {
 					suffixU = 24.0f;
 				}
 			} else if (language == 2) {
@@ -7533,7 +7533,7 @@ void CMenuPcs::WMChgMenu()
 	}
 
 	int prevMenuMode = m_wmWorldState->m_menuMode;
-	lbl_8032EE1C = 1;
+	s_LoadCancelFlg = 1;
 
 	short changeRequest = m_wmWorldState->m_changeRequest;
 
@@ -7544,7 +7544,7 @@ void CMenuPcs::WMChgMenu()
 		} else if (requestKind == 2) {
 			m_wmWorldState->m_menuMode = 5;
 		} else if (requestKind == 3) {
-			lbl_8032EE1C = 1;
+			s_LoadCancelFlg = 1;
 			if (prevMenuMode == 6) {
 				m_wmWorldState->m_changeRequest = 0;
 				return;
@@ -7594,7 +7594,7 @@ void CMenuPcs::WMChgMenu()
 			m_wmWorldState->m_cardChannel = 0;
 			CallWorldParam(1, 1, 0);
 		} else if (changeRequest == -1) {
-			lbl_8032EE1C = 1;
+			s_LoadCancelFlg = 1;
 			m_wmWorldState->m_menuMode = 6;
 			CallWorldParam(1, 0, 0);
 		}
@@ -8476,8 +8476,8 @@ void CMenuPcs::DrawMainMenuSub()
  */
 void CMenuPcs::GetMcAccessPos(int* x, int* y)
 {
-	*x = gWmMenuCursorX[0];
-	*y = gWmMenuCursorX[1];
+	*x = s_McSavePos[0];
+	*y = s_McSavePos[1];
 }
 
 /*
@@ -8491,8 +8491,8 @@ void CMenuPcs::GetMcAccessPos(int* x, int* y)
  */
 void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 {
-	*x = gWmMenuCursorY[0];
-	*y = gWmMenuCursorY[1];
+	*x = s_McOdekakeLoadPos[0];
+	*y = s_McOdekakeLoadPos[1];
 }
 
 /*

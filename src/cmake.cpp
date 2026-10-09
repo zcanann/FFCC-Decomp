@@ -2898,7 +2898,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
 #ifndef VERSION_GCCJGC
-    char tribeWithSlash[0x10];
+    char tribeWithComma[0x10];
 #endif
 #ifndef VERSION_GCCJGC
     float labelWidths[4];
@@ -2936,9 +2936,9 @@ void CMenuPcs::CmakeResultDraw()
 #ifdef VERSION_GCCJGC
             value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
 #else
-            strcpy(tribeWithSlash, GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe)));
-            strcat(tribeWithSlash, "/");
-            value = tribeWithSlash;
+            strcpy(tribeWithComma, GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe)));
+            strcat(tribeWithComma, ",");
+            value = tribeWithComma;
 #endif
         } else {
             value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
@@ -3145,7 +3145,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
 #ifndef VERSION_GCCJGC
-    char tribeWithSlash[0x10];
+    char tribeWithComma[0x10];
 #endif
 #ifndef VERSION_GCCJGC
     float labelWidths[4];
@@ -3183,9 +3183,9 @@ void CMenuPcs::CmakeResultDraw1()
         } else if (i == 2) {
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
 #ifndef VERSION_GCCJGC
-            strcpy(tribeWithSlash, txt);
-            strcat(tribeWithSlash, "/");
-            txt = tribeWithSlash;
+            strcpy(tribeWithComma, txt);
+            strcat(tribeWithComma, ",");
+            txt = tribeWithComma;
 #endif
         } else {
             txt = GetJobStr(s_CmakeInfo.m_job);

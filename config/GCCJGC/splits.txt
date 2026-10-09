@@ -510,13 +510,13 @@ p_minigame.cpp:
 	.text start:0x80123A58 end:0x80127130
 
 sound.cpp:
-	.text start:0x800C2714 end:0x800C60A4
-	.bss start:0x8030DFB8 end:0x8031029C
-	.ctors start:0x801D06AC end:0x801D06B0
 	extab start:0x80008580 end:0x8000874C
 	extabindex start:0x8000EC38 end:0x8000EECC
+	.text start:0x800C2714 end:0x800C60A4
+	.ctors start:0x801D06AC end:0x801D06B0
 	.rodata start:0x801D5B98 end:0x801D5DC6
 	.data start:0x8022D780 end:0x8022D79C
+	.bss start:0x8030DFB8 end:0x8031029C
 	.sdata start:0x8034B680 end:0x8034B690
 	.sdata2 start:0x8034DA08 end:0x8034DA54
 
@@ -1282,6 +1282,8 @@ auto_08_80345FA4_bss:
 	.bss start:0x80345FA4 end:0x80345FA8 align:4
 
 pppYmBreath.cpp:
+	extab start:0x80008448 end:0x80008480
+	extabindex start:0x8000EA64 end:0x8000EAB8
 	.text start:0x800BD870 end:0x800BF1C8
 	.rodata start:0x801D54E0 end:0x801D54F0
 	.sdata2 start:0x8034D9A8 end:0x8034D9E0
@@ -1402,7 +1404,10 @@ auto_10_8034BC84_sbss:
 	.sbss start:0x8034BC84 end:0x8034BC88 align:4
 
 p_sample.cpp:
+	extab start:0x80005C74 end:0x80005C7C
+	extabindex start:0x8000B428 end:0x8000B434
 	.text	start:0x8001F6CC end:0x8001F7BC
+	.ctors start:0x801D0638 end:0x801D063C
 	.rodata	start:0x801D1820 end:0x801D1841
 	.data	start:0x801DC758 end:0x801DC94C
 	.sdata	start:0x8034B228 end:0x8034B240
@@ -1748,6 +1753,8 @@ pppYmChangeTex.cpp:
 	.sdata2 start:0x8034DB18 end:0x8034DB38
 
 pppYmDeformationMdl.cpp:
+	extab start:0x80008AEC end:0x80008AFC
+	extabindex start:0x8000F43C end:0x8000F454
 	.text start:0x800CEDA4 end:0x800CF4BC
 	.sdata2 start:0x8034DAB8 end:0x8034DAD8
 
@@ -2543,10 +2550,20 @@ pppParMoveMatrix.cpp:
 	.sdata2 start:0x8034DB58 end:0x8034DB60
 
 pppYmTraceMove.cpp:
+	extab start:0x80008B7C end:0x80008B8C
+	extabindex start:0x8000F514 end:0x8000F52C
 	.text start:0x800D1C34 end:0x800D2088
+	.sdata2 start:0x8034DB60 end:0x8034DB68
 
 p_sound.cpp:
+	extab start:0x80008C04 end:0x80008C2C
+	extabindex start:0x8000F5E0 end:0x8000F61C
 	.text start:0x800D5B64 end:0x800D5D14
+	.ctors start:0x801D06B4 end:0x801D06B8
+	.rodata start:0x801D5FD8 end:0x801D5FF9
+	.data start:0x8022D7A0 end:0x8022D970
+	.sdata start:0x8034B690 end:0x8034B6A8
+	.sbss start:0x8034BBD8 end:0x8034BBDC
 
 pppYmLookOn.cpp:
 	extab start:0x80008C2C end:0x80008C34

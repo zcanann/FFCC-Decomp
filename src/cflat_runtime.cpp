@@ -7,9 +7,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
-static const char s_cflat_runtime_newline[] = "\n";
-extern const char lbl_8033011C[8] = "no name";
-static const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
 
 /*
  * --INFO--
@@ -52,9 +49,9 @@ CFlatRuntime::~CFlatRuntime()
 void CFlatRuntime::Init()
 {
 	m_permanentVarValues =
-	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2A) unsigned int[0xC00];
+	    new (getStage(), "cflat_runtime.cpp", 0x2A) unsigned int[0xC00];
 	m_stackStorage =
-	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u32[0x5220];
+	    new (getStage(), "cflat_runtime.cpp", 0x2B) u32[0x5220];
 }
 
 /*
@@ -242,7 +239,7 @@ void CFlatRuntime::Create(void* filePtr)
 			case 'VAL ': {
 				m_permanentVarCount = chunk.m_arg0;
 				m_permanentVarDefs =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
+				    new (getStage(), "cflat_runtime.cpp", 0x96)
 				        CVal[m_permanentVarCount];
 
 				createVal(chunkFile, m_permanentVarCount, m_permanentVarDefs);
@@ -253,7 +250,7 @@ void CFlatRuntime::Create(void* filePtr)
 				m_classCount = chunk.m_arg0;
 
 				m_classes =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x9E)
+				    new (getStage(), "cflat_runtime.cpp", 0x9E)
 				        CClass[m_classCount];
 
 				int classIndex = 0;
@@ -298,7 +295,7 @@ void CFlatRuntime::Create(void* filePtr)
 			case 'FUNC': {
 				m_funcCount = chunk.m_arg0;
 				m_funcs =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0xD9)
+				    new (getStage(), "cflat_runtime.cpp", 0xD9)
 				        CFunc[m_funcCount];
 
 				int funcIndex = 0;
@@ -335,7 +332,7 @@ void CFlatRuntime::Create(void* filePtr)
 								funcBase->m_debugCodeSize = 0;
 								if (funcBase->m_codeSize != 0) {
 									funcBase->m_code = reinterpret_cast<u8*>(
-									    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x109)
+									    new (getStage(), "cflat_runtime.cpp", 0x109)
 									        u8[chunk.m_size]);
 									memcpy(funcBase->m_code, chunkFile.GetAddress(), chunk.m_size);
 								} else {
@@ -360,10 +357,10 @@ void CFlatRuntime::Create(void* filePtr)
 			case 'STR ': {
 				m_strCount = chunk.m_arg0;
 				m_strOffsets =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x121)
+				    new (getStage(), "cflat_runtime.cpp", 0x121)
 				        u16[m_strCount];
 				m_strBlob =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x122)
+				    new (getStage(), "cflat_runtime.cpp", 0x122)
 				        char[chunk.m_size];
 
 				memcpy(m_strBlob, chunkFile.GetAddress(), chunk.m_size);
@@ -382,10 +379,10 @@ void CFlatRuntime::Create(void* filePtr)
 			case 'FSTR': {
 				m_fstrCount = chunk.m_arg0;
 				m_fstrOffsets =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x12F)
+				    new (getStage(), "cflat_runtime.cpp", 0x12F)
 				        u16[m_fstrCount];
 				m_fstrBlob =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x130)
+				    new (getStage(), "cflat_runtime.cpp", 0x130)
 				        char[chunk.m_size];
 
 				memcpy(m_fstrBlob, chunkFile.GetAddress(), chunk.m_size);
@@ -404,10 +401,10 @@ void CFlatRuntime::Create(void* filePtr)
 			case 'VSTR': {
 				m_vstrCount = chunk.m_arg0;
 				m_vstrOffsets =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x13D)
+				    new (getStage(), "cflat_runtime.cpp", 0x13D)
 				        u16[m_vstrCount];
 				m_vstrBlob =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x13E)
+				    new (getStage(), "cflat_runtime.cpp", 0x13E)
 				        char[chunk.m_size];
 
 				memcpy(m_vstrBlob, chunkFile.GetAddress(), chunk.m_size);
@@ -479,7 +476,7 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 								if (funcBase->m_codeSize != 0) {
 									funcBase->m_debugCodeSize = chunk.m_size >> 3;
 									funcBase->m_debugCode =
-									    new (getDebugStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x181)
+									    new (getDebugStage(), "cflat_runtime.cpp", 0x181)
 									        u8[funcBase->m_debugCodeSize << 3];
 									memcpy(funcBase->m_debugCode, chunkFile.GetAddress(), chunk.m_size);
 								} else {
@@ -1207,7 +1204,7 @@ void CFlatRuntime::setSystemVal(CFlatRuntime::CObject*, int)
  */
 int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 {
-	CStopWatch watch(const_cast<char*>(lbl_8033011C));
+	CStopWatch watch("no name");
 	watch.Reset();
 	watch.Start();
 
@@ -1824,7 +1821,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 				if (object->m_argCount == 1) {
 					System.Printf(format);
-					System.Printf(const_cast<char*>(s_cflat_runtime_newline));
+					System.Printf("\n");
 				} else {
 					char spec[256];
 					char rendered[256];
@@ -1904,7 +1901,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 					}
 
 					System.Printf(line);
-					System.Printf(const_cast<char*>(s_cflat_runtime_newline));
+					System.Printf("\n");
 				}
 			}
 
@@ -1913,7 +1910,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			result = 0;
 			break;
 		default: {
-			CStopWatch watch(const_cast<char*>(lbl_8033011C));
+			CStopWatch watch("no name");
 			watch.Reset();
 			watch.Start();
 			ret = onSystemFunc(object, systemKind, systemIndex, result);
@@ -2024,7 +2021,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			goto done;
 		}
 
-		CStopWatch watch(const_cast<char*>(lbl_8033011C));
+		CStopWatch watch("no name");
 		watch.Reset();
 		watch.Start();
 		ret = onClassSystemFunc(object, systemKind, systemIndex, result);

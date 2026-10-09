@@ -38,6 +38,14 @@ static int s_BackUpCur[2];
 static int s_BackUpTopPos = 0;
 static char s_ReplyStr[0x80];
 
+#if defined(VERSION_GCCJGC)
+#define MENU_LETTER_LINE(line, usLine, jpLine) (jpLine)
+#elif defined(VERSION_GCCE01)
+#define MENU_LETTER_LINE(line, usLine, jpLine) (usLine)
+#else
+#define MENU_LETTER_LINE(line, usLine, jpLine) (line)
+#endif
+
 extern "C" const char s_menu_letter_cpp[] = "menu_letter.cpp";
 #ifndef VERSION_GCCJGC
 namespace {
@@ -791,13 +799,8 @@ int CMenuPcs::LetterReplyWinOpen()
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
 
-#ifdef VERSION_GCCJGC
-		srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x30B) char[kLetterTextScratchSize];
-		workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x30D) char[kLetterTextScratchSize];
-#else
-		srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
-		workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
-#endif
+		srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x323, 0x323, 0x30B)) char[kLetterTextScratchSize];
+		workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x325, 0x325, 0x30D)) char[kLetterTextScratchSize];
 
 		memset(srcText, 0, kLetterTextScratchSize);
 		memset(workText, 0, kLetterTextScratchSize);
@@ -1319,13 +1322,8 @@ void CMenuPcs::LetterMessDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * animState->entries[0].alpha)).color);
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
-#ifdef VERSION_GCCJGC
-	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x49B) char[kLetterTextScratchSize];
-	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x49D) char[kLetterTextScratchSize];
-#else
-	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[kLetterTextScratchSize];
-	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
-#endif
+	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x535, 0x52F, 0x49B)) char[kLetterTextScratchSize];
+	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x537, 0x531, 0x49D)) char[kLetterTextScratchSize];
 
 	memset(srcText, 0, kLetterTextScratchSize);
 	memset(workText, 0, kLetterTextScratchSize);
@@ -1621,13 +1619,8 @@ int CMenuPcs::LetterCtrlCur()
 				m_letterMenuState->action = -1;
 			} else {
 				s_ReplyPos = static_cast<u8>(curReply);
-#ifdef VERSION_GCCJGC
-			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x5C0) char[kLetterTextScratchSize];
-			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x5C2) char[kLetterTextScratchSize];
-#else
-			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x65E) char[kLetterTextScratchSize];
-			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x660) char[kLetterTextScratchSize];
-#endif
+			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x65E, 0x658, 0x5C0)) char[kLetterTextScratchSize];
+			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x660, 0x65A, 0x5C2)) char[kLetterTextScratchSize];
 			memset(srcText, 0, kLetterTextScratchSize);
 			memset(workText, 0, kLetterTextScratchSize);
 

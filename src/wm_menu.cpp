@@ -76,9 +76,17 @@ char* g_strWMMenuMes[5][11] = {
 	{
 		"Charaktere kreieren und Gruppenmitglieder bestimmen.",
 		"Die niedergeschriebenen Tagebucheintr\344ge lesen.",
+#ifdef VERSION_GCCE01
+		"Charaktere von anderen Speicherkarten einladen.",
+#else
 		"Charaktere von anderen Memory Cards einladen.",
+#endif
 		"Einstellungen zum Spiel vornehmen.",
+#ifdef VERSION_GCCE01
+		"Aktuelle Spielst\344nde speichern.",
+#else
 		"Aktuelle Spielst\344nde auf die Memory Card speichern.",
+#endif
 		"Bitte die Gruppenmitglieder bestimmen.",
 		"\204Frei\" w\344hlen, um einen neuen Charakter zu kreieren.",
 		"START dr\374cken, um auf Reisen zu gehen.",
@@ -89,11 +97,19 @@ char* g_strWMMenuMes[5][11] = {
 	{
 		"Seleziona i membri del gruppo e crea nuovi personaggi.",
 		"Leggi il diario.",
+#ifdef VERSION_GCCE01
+		"Trasferisce un personaggio di un'altra Memory Card (Scheda Memoria).",
+#else
 		"Importa personaggi da un'altra Memory Card (Scheda Memoria).",
+#endif
 		"Modifica le impostazioni di gioco.",
 		"Salva la partita su Memory Card (Scheda Memoria).",
 		"Seleziona i membri del gruppo.",
+#ifdef VERSION_GCCE01
+		"Seleziona Nessuno per creare un nuovo personaggio.",
+#else
 		"Seleziona Vuoto per creare un nuovo personaggio.",
+#endif
 		"Premi START quando hai finito.",
 		"Seleziona i dati da caricare.",
 		"Seleziona il personaggio che vuoi trasferire.",
@@ -115,12 +131,28 @@ char* g_strWMMenuMes[5][11] = {
 	{
 		"Selecciona los miembros del grupo y crea nuevos personajes.",
 		"Ver las anotaciones del diario.",
+#ifdef VERSION_GCCE01
+		"Transferir un personaje de otra Memory Card (tarjeta de memoria) al juego actual.",
+#else
 		"Transferir un personaje de otra Memory Card al juego actual.",
+#endif
 		"Configurar las opciones del juego.",
+#ifdef VERSION_GCCE01
+		"Guardar los datos del juego en la Memory Card (tarjeta de memoria).",
+#else
 		"Guardar los datos del juego en la Memory Card.",
+#endif
 		"Selecciona los miembros del grupo.",
+#ifdef VERSION_GCCE01
+		"Selecciona \"Ninguno\" para crear un nuevo personaje.",
+#else
 		"Selecciona \"Vac\355o\" para crear un nuevo personaje.",
+#endif
+#ifdef VERSION_GCCE01
+		"Presiona START cuando termines.",
+#else
 		"Pulsa START cuando termines.",
+#endif
 		"Seleccionar los datos del juego a cargar.",
 		"Selecciona el personaje a transferir.",
 		"Selecciona el personaje a eliminar.",
@@ -5270,7 +5302,11 @@ static inline void SetPortTownName(char* dst, const char* townName)
 	strcpy(dst, townName);
 	strcat(dst, "\x82\xCC\x8D\x60");
 #else
+#ifdef VERSION_GCCE01
+	static const char* s_port[] = {"Port ", "-Hafen", "Porto ", "Port ", "Puerto de "};
+#else
 	static const char* s_port[] = {"Port ", "-Hafen", "Porto ", "Port ", "Puerto "};
+#endif
 	const int language = Game.m_gameWork.GetLanguage();
 	if (language == 2) {
 		strcpy(dst, townName);

@@ -652,6 +652,7 @@ os/OSSemaphore.c:
 	.text start:0x8017F574 end:0x8017F6F8
 
 wm_menu.cpp:
+	.rodata start:0x801DA710 end:0x801DB3A0
 	.data start:0x8020F6BC end:0x8020F764
 	.text start:0x800E6364 end:0x80102378
 	.bss        start:0x802FE3C8 end:0x802FE410

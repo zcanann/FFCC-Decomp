@@ -481,7 +481,7 @@ int CFile::IsCompleted(CFile::CHandle* fileHandle)
  */
 void CFile::SyncCompleted(CFile::CHandle* fileHandle)
 {
-	while (fileHandle->m_completionStatus != 3)
+	while (!IsCompleted(fileHandle))
 	{
 		kick();
 	}
@@ -510,18 +510,7 @@ void CFile::kick()
         if ((Game.m_gameWork.m_gamePaused == 0 || handle->m_priority == PRI_CRITICAL)
             && (handle->m_completionStatus == 1 || handle->m_completionStatus == 4))
         {
-            u32 readSize;
-
-            handle->m_completionStatus = 2;
-            readSize = (handle->m_chunkSize + 0x1F) & ~0x1F;
-
-            if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
-            {
-                System.Printf("CFile.kick: \203T\203C\203Y\202\252\203o\203b\203t\203@\202\360\211z\202\246\202\334\202\265\202\275\201B%s(%dbyte)\n", handle->m_name, readSize);
-            }
-
-            DVDReadAsyncPrio(&handle->m_dvdFileInfo, m_readBuffer, readSize, handle->m_currentOffset, 0, 2);
-            handle->m_nextOffset = handle->m_currentOffset + readSize;
+            readASync(handle);
             if (handle->m_completionStatus != 3)
             {
                 return;
@@ -533,6 +522,31 @@ void CFile::kick()
 
         handle = handle->m_previous;
     } while (handle != &m_fileHandle);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 216b
+ * EN Address: 0x8001A058
+ * EN Size: 236b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFile::readASync(CFile::CHandle* handle)
+{
+    u32 readSize;
+
+    handle->m_completionStatus = 2;
+    readSize = (handle->m_chunkSize + 0x1F) & ~0x1F;
+
+    if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
+    {
+        System.Printf("CFile.kick: \203T\203C\203Y\202\252\203o\203b\203t\203@\202\360\211z\202\246\202\334\202\265\202\275\201B%s(%dbyte)\n", handle->m_name, readSize);
+    }
+
+    DVDReadAsyncPrio(&handle->m_dvdFileInfo, m_readBuffer, readSize, handle->m_currentOffset, 0, 2);
+    handle->m_nextOffset = handle->m_currentOffset + readSize;
 }
 
 /*
@@ -625,10 +639,10 @@ retry:
         }
 
         int usingFallbackFont = 0;
-        CFont* font = MenuPcs.m_fonts[0];
-        if (MenuPcs.m_fonts[0] == 0)
+        CFont* font = MenuPcs.GetFont22();
+        if (font == 0)
         {
-            font = FontMan.m_font;
+            font = FontMan.GetInternal22();
             usingFallbackFont = 1;
         }
 
@@ -640,8 +654,7 @@ retry:
 
         Graphic._WaitDrawDone("file.cpp", FileErrorDrawBeginLine);
 
-        int hasScratchTexture = (int)Graphic.m_scratchTextureBuffer;
-        hasScratchTexture = hasScratchTexture != 0;
+        int hasScratchTexture = Graphic.IsAvailableTempBuffer();
         int compactLayout = (bool)(hasScratchTexture && usingFallbackFont == 0);
 
         if (compactLayout)
@@ -649,7 +662,7 @@ retry:
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
             gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255).color);
-            memcpy((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), (void*)((char*)Graphic.m_frameBuffer + 0x34800), FileErrorCopySize);
+            memcpy((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), (void*)((char*)Graphic.GetFrameBuffer() + 0x34800), FileErrorCopySize);
             DCFlushRange((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), FileErrorCopySize);
         }
         else
@@ -692,33 +705,23 @@ retry:
             break;
         }
 
-        unsigned int language = Game.m_gameWork.m_languageId;
+        unsigned int language = Game.m_gameWork.GetLanguage();
         const char* const* lines = l_tError[msgIndex][language];
 
         if (strlen(lines[2]) == 0)
         {
-            font->SetPosX(32.0f);
-            font->SetPosY((float)baseY);
-            font->SetPosZ(0.0f);
+            font->SetPos(32.0f, (float)baseY, 0.0f);
             font->Draw((char*)lines[0]);
-            font->SetPosX(32.0f);
-            font->SetPosY((float)(baseY + 0x1C));
-            font->SetPosZ(0.0f);
+            font->SetPos(32.0f, (float)(baseY + 0x1C), 0.0f);
             font->Draw((char*)lines[1]);
         }
         else
         {
-            font->SetPosX(32.0f);
-            font->SetPosY((float)((int)baseY - 14));
-            font->SetPosZ(0.0f);
+            font->SetPos(32.0f, (float)((int)baseY - 14), 0.0f);
             font->Draw((char*)lines[0]);
-            font->SetPosX(32.0f);
-            font->SetPosY((float)(baseY + 14));
-            font->SetPosZ(0.0f);
+            font->SetPos(32.0f, (float)(baseY + 14), 0.0f);
             font->Draw((char*)lines[1]);
-            font->SetPosX(32.0f);
-            font->SetPosY((float)(baseY + 42));
-            font->SetPosZ(0.0f);
+            font->SetPos(32.0f, (float)(baseY + 42), 0.0f);
             font->Draw((char*)lines[2]);
         }
 
@@ -728,13 +731,13 @@ retry:
         {
             GXSetDispCopySrc(0, 0, 0x280, 0x70);
             GXSetDispCopyDst(0x280, 0x70);
-            GXCopyDisp((void*)((char*)Graphic.m_frameBuffer + 0x34800), GX_FALSE);
+            GXCopyDisp((void*)((char*)Graphic.GetFrameBuffer() + 0x34800), GX_FALSE);
         }
         else
         {
             GXSetDispCopySrc(0, 0, 0x280, 0x1C0);
             GXSetDispCopyDst(0x280, 0x1C0);
-            GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
+            GXCopyDisp(Graphic.GetFrameBuffer(), GX_FALSE);
         }
 
         Graphic._WaitDrawDone("file.cpp", FileErrorCopyLine);
@@ -761,13 +764,13 @@ retry:
         {
             gUtil.RenderTextureQuad(0.0f, 0.0f, 640.0f, 112.0f, &backupTexObj, 0, 0, 0, GX_BL_SRCALPHA,
                                            GX_BL_INVSRCALPHA);
-            memcpy((void*)((char*)Graphic.m_frameBuffer + 0x34800), (void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), FileErrorCopySize);
-            DCFlushRange((void*)((char*)Graphic.m_frameBuffer + 0x34800), FileErrorCopySize);
+            memcpy((void*)((char*)Graphic.GetFrameBuffer() + 0x34800), (void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), FileErrorCopySize);
+            DCFlushRange((void*)((char*)Graphic.GetFrameBuffer() + 0x34800), FileErrorCopySize);
         }
         else
         {
             gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
-            GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
+            GXCopyDisp(Graphic.GetFrameBuffer(), GX_FALSE);
         }
 
         Graphic._WaitDrawDone("file.cpp", FileErrorDrawEndLine);

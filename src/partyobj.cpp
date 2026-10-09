@@ -1948,7 +1948,7 @@ void CGPartyObj::statCharge()
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
 						if (static_cast<float>(maxReach) < mag) {
 							dest = CVector(m_worldPosition) +
-							       (CVector(delta) * (mag - static_cast<float>(maxReach))) * (1.0f / mag);
+							       (CVector(delta) * (mag - static_cast<float>(maxReach))) / mag;
 							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
 						} else {
 							mag = FLOAT_80331a78;
@@ -3885,18 +3885,30 @@ void CGPartyObj::onAttacked(CGPrgObj* attacker)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80142834
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
-void stageWeather()
+static inline int stageWeather()
 {
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.m_partyObjArr[i];
-		if (party != nullptr && party->m_scriptHandle != nullptr) {
-			party->canPlayerGoMenu();
-		}
+	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+	default:
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		return 0;
+	case 6:
+	case 10:
+		return 1;
+	case 4:
+	case 8:
+	case 9:
+	case 0x0B:
+	case 0x0C:
+	case 0x0D:
+		return 2;
 	}
 }
 
@@ -3975,19 +3987,29 @@ static inline void decMagic(int slotSel)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 200b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80142A5C
+ * EN Size: 220b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void calcWeightMax()
+static inline int calcWeightMax()
 {
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.m_partyObjArr[i];
-		if (party != nullptr && party->m_scriptHandle != nullptr) {
-			party->checkAndSetWeapon();
-		}
+	int weather = stageWeather();
+	float rate = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
+	float scale;
+	switch (weather) {
+	default:
+		scale = 1.0f;
+		break;
+	case 1:
+		scale = FLOAT_80331A58 * (1.0f - rate) + FLOAT_80331A58;
+		break;
+	case 2:
+		scale = FLOAT_80331A58 * rate + FLOAT_80331A58;
+		break;
 	}
+	int weightMax = FLOAT_80331A5C * scale;
+	return weightMax;
 }
 
 /*
@@ -4114,43 +4136,7 @@ void CGPartyObj::ghostPartyMog()
 	gpmCol();
 	gpmMove();
 
-	int stageMode;
-	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
-	default:
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		stageMode = 0;
-		break;
-	case 6:
-	case 10:
-		stageMode = 1;
-		break;
-	case 4:
-	case 8:
-	case 9:
-	case 0x0B:
-	case 0x0C:
-	case 0x0D:
-		stageMode = 2;
-		break;
-	}
-
-	float ramp = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
-	float scale;
-	switch (stageMode) {
-	default:
-		scale = 1.0f;
-		break;
-	case 1:
-		scale = FLOAT_80331A58 * (1.0f - ramp) + FLOAT_80331A58;
-		break;
-	case 2:
-		scale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
-		break;
-	}
-	distFar = static_cast<unsigned int>(static_cast<int>(FLOAT_80331A5C * scale));
+	distFar = calcWeightMax();
 
 
 	if (static_cast<double>(m_partyDistance[0]) > DOUBLE_80331A90) {
@@ -4212,41 +4198,7 @@ void CGPartyObj::ghostPartyMog()
 			CGPartyObj::m_ghostWork.flagBits.flag08 = 1;
 		} else {
 			if (CGPartyObj::m_ghostWork.flagBits.flag04 == 0) {
-				int innerMode;
-				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
-				default:
-				case 0:
-				case 1:
-				case 2:
-				case 3:
-					innerMode = 0;
-					break;
-				case 6:
-				case 10:
-					innerMode = 1;
-					break;
-				case 4:
-				case 8:
-				case 9:
-				case 0x0B:
-				case 0x0C:
-				case 0x0D:
-					innerMode = 2;
-					break;
-				}
-				float innerScale;
-				switch (innerMode) {
-				default:
-					innerScale = 1.0f;
-					break;
-				case 1:
-					innerScale = FLOAT_80331A58 * (1.0f - ramp) + FLOAT_80331A58;
-					break;
-				case 2:
-					innerScale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
-					break;
-				}
-				if (static_cast<int>(CGPartyObj::m_ghostWork.pressure) >= static_cast<int>(FLOAT_80331A5C * innerScale)) {
+				if (static_cast<int>(CGPartyObj::m_ghostWork.pressure) >= calcWeightMax()) {
 					CGPartyObj::m_ghostWork.state = 3;
 					CGPartyObj::m_ghostWork.flagBits.flag04 = 1;
 					goto messageMenu;
@@ -4319,44 +4271,8 @@ void CGPartyObj::gpmMove()
 	}
 	CGPartyObj::m_ghostWork.carrySpeed *= FLOAT_80331a74;
 
-	int stageMode;
-	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
-	default:
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		stageMode = 0;
-		break;
-	case 6:
-	case 10:
-		stageMode = 1;
-		break;
-	case 4:
-	case 8:
-	case 9:
-	case 0x0B:
-	case 0x0C:
-	case 0x0D:
-		stageMode = 2;
-		break;
-	}
 
-	float frameScale = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
-	float pressureScale;
-	switch (stageMode) {
-	default:
-		pressureScale = 1.0f;
-		break;
-	case 1:
-		pressureScale = FLOAT_80331A58 * (1.0f - frameScale) + FLOAT_80331A58;
-		break;
-	case 2:
-		pressureScale = FLOAT_80331A58 * frameScale + FLOAT_80331A58;
-		break;
-	}
-
-	pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);
+	pressureLimit = calcWeightMax();
 	if (FLOAT_80331A58 < CGPartyObj::m_ghostWork.carrySpeed) {
 		int delta = -2;
 		if (m_partyData.carryObject != nullptr) {
@@ -4579,42 +4495,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		if ((Game.m_gameWork.m_menuStageMode != 0) &&
 		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
 		    IsKindOf(0x6D) && (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
-			unsigned int bossKind;
-			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
-			default:
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				bossKind = 0;
-				break;
-			case 6:
-			case 0x0A:
-				bossKind = 1;
-				break;
-			case 4:
-			case 8:
-			case 9:
-			case 0x0B:
-			case 0x0C:
-			case 0x0D:
-				bossKind = 2;
-				break;
-			}
-
-			float rate = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
-			float angleScale;
-			switch (bossKind) {
-			default:
-				angleScale = 1.0f;
-				break;
-			case 1:
-				angleScale = FLOAT_80331A58 * (1.0f - rate) + FLOAT_80331A58;
-				break;
-			case 2:
-				angleScale = FLOAT_80331A58 * rate + FLOAT_80331A58;
-				break;
-			}
+			int weightMax = calcWeightMax();
 
 			sprintf(text, "%d/%d %d/%d %d/%d", CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
 			        CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
@@ -4630,7 +4511,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			y = y - lineH;
 
 			sprintf(text, "%d/%d a=%d", CGPartyObj::m_ghostWork.pressure,
-			        static_cast<int>(FLOAT_80331A5C * angleScale), Chara.MogFur().m_alphaScore);
+			        weightMax, Chara.MogFur().m_alphaScore);
 
 			float curY2 = y;
 			width = static_cast<float>(font->GetWidth(text));

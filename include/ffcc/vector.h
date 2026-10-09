@@ -75,6 +75,13 @@ public:
 		PSVECScale((const Vec*)this, (Vec*)&out, scale);
 		return out;
 	}
+	CVector operator/(float divisor) const
+	{
+		CVector out;
+
+		PSVECScale((const Vec*)this, (Vec*)&out, 1.0f / divisor);
+		return out;
+	}
 	void operator+=(const CVector& other)
 	{
 		PSVECAdd((const Vec*)this, (const Vec*)&other, (Vec*)this);

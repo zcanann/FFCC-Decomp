@@ -164,6 +164,25 @@ public:
      * --INFO--
      * PAL Address: UNUSED
      * PAL Size: TODO
+     * EN Address: 0x8011FB08
+     * EN Size: 44b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SetWorldZoomCam(int paused, unsigned short frames, float rotX, float rotY, float scale)
+    {
+        m_worldMapEffect.m_paused = paused;
+        m_worldMapEffect.m_timer = frames;
+        m_worldMapEffect.m_duration = frames;
+        m_worldMapEffect.m_rotX = rotX;
+        m_worldMapEffect.m_rotY = rotY;
+        m_worldMapEffect.m_scale = scale;
+    }
+
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
      * EN Address: 0x80022F3C
      * EN Size: 132b
      * JP Address: TODO

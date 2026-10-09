@@ -577,55 +577,6 @@ static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
 static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSelectCount;
 
-static inline CCharaPcs::CHandle** GetWmCharaHandles(CMenuPcs* menu)
-{
-	return menu->m_wm.m_handles + 0x20;
-}
-
-static inline CCharaPcs::CHandle** GetWmWorldHandles(CMenuPcs* menu)
-{
-	return menu->m_wm.m_handles;
-}
-
-static inline WmCharaAnimState* GetWmCharaAnimState(CMenuPcs* menu)
-{
-	return menu->m_wmCharaAnimState;
-}
-
-static inline WmWorldState* GetWmWorldState(CMenuPcs* menu)
-{
-	return menu->m_wmWorldState;
-}
-
-static inline Mc::SaveDat* GetWmCmakeWork(CMenuPcs* menu)
-{
-	return menu->m_cmakeWorkActive == 1 ? menu->m_cmakeWork : 0;
-}
-
-static inline int GetWmMenuFade(short state, short frame)
-{
-	if (state == 1) {
-		return static_cast<int>(FLOAT_80331458 * static_cast<float>(DOUBLE_803314E8 * (static_cast<double>(frame) - DOUBLE_80331408)));
-	}
-	if (state == 2) {
-		return static_cast<int>(FLOAT_80331458);
-	}
-	return static_cast<int>(FLOAT_80331458 * static_cast<float>(-(DOUBLE_803314E8 * (static_cast<double>(frame) - DOUBLE_80331408) - DOUBLE_80331420)));
-}
-
-static inline CFont* GetWmFont(CMenuPcs* menu)
-{
-	return *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menu) + 0xF8);
-}
-
-static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
-{
-	if (slot < 0 || slot >= kWmMenuPlayerCount) {
-		return;
-	}
-	GetWmCharaAnimState(menu)[slot].m_nextAnimIndex = state;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80102ED8
@@ -2645,7 +2596,7 @@ void CMenuPcs::CalcLoadMenu()
 						modelInfo->m_modelChanged = 0;
 						charaId = 0x43;
 					}
-					GetWmCharaHandles(this)[charaIdx]->LoadModelASync(loadMode, charaId, 0);
+					m_wm.m_handles[charaIdx + 0x20]->LoadModelASync(loadMode, charaId, 0);
 				}
 
 				if (m_wmWorldState->m_menuMode != 8) {
@@ -3045,7 +2996,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 			curEntry.m_confirmed = 1;
 			Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 			if (state != 0) {
-				GetWmCharaAnimState(this)[cursor].m_nextAnimIndex = 3;
+				m_wmCharaAnimState[cursor].m_nextAnimIndex = 3;
 			}
 		}
 	} else if ((down & 0x200) != 0) {
@@ -4880,17 +4831,11 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		break;
 	case 0x17: {
 		const char disabled = value == 0;
-		CameraPcs.m_worldMapEffect.m_paused = disabled;
 #ifdef VERSION_GCCP01
-		const int effectFrames = 75;
+		CameraPcs.SetWorldZoomCam(disabled, 75, FLOAT_80331618, FLOAT_80331760, FLOAT_80331764);
 #else
-		const int effectFrames = 90;
+		CameraPcs.SetWorldZoomCam(disabled, 90, FLOAT_80331618, FLOAT_80331760, FLOAT_80331764);
 #endif
-		CameraPcs.m_worldMapEffect.m_timer = effectFrames;
-		CameraPcs.m_worldMapEffect.m_duration = effectFrames;
-		CameraPcs.m_worldMapEffect.m_rotX = FLOAT_80331618;
-		CameraPcs.m_worldMapEffect.m_rotY = FLOAT_80331760;
-		CameraPcs.m_worldMapEffect.m_scale = FLOAT_80331764;
 		break;
 	}
 	case 0x18:
@@ -6713,7 +6658,7 @@ void CMenuPcs::CalcChara()
  */
 inline int CMenuPcs::GetAnimNo(int slot, int anim)
 {
-	int base = (static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[slot]->m_charaNo) / 100) - 1) * 6;
+	int base = (static_cast<int>(static_cast<unsigned int>(m_wm.m_handles[slot + 0x20]->m_charaNo) / 100) - 1) * 6;
 	return base + anim;
 }
 
@@ -6757,7 +6702,7 @@ void CMenuPcs::PCAnimCtrl()
 
 	animState = m_wmCharaAnimState;
 	for (i = 0; i < kWmMenuPlayerCount; i++, animState++) {
-		handle = GetWmCharaHandles(this)[i];
+		handle = m_wm.m_handles[i + 0x20];
 		const int blendMode = handle->GetCurrentAnimNumber() < 0 ? 0 : -1;
 
 		CChara::CModel* const model = handle->m_model;
@@ -6857,14 +6802,14 @@ void CMenuPcs::DrawChara()
 			}
 		}
 
-		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+		CCharaPcs::CHandle* const handle = m_wm.m_handles[i + 0x20];
 		if (handle->m_charaKind != 3 && handle->GetCurrentAnimNumber() < 0) {
 			continue;
 		}
 
 		SetProjection(viewSlot);
 		SetLight(0);
-		if (GetWmCharaHandles(this)[i]->m_charaKind != 3) {
+		if (m_wm.m_handles[i + 0x20]->m_charaKind != 3) {
 			m_wm.m_handles[viewSlot]->Draw(5);
 		} else {
 			DrawInit();
@@ -6877,7 +6822,7 @@ void CMenuPcs::DrawChara()
 				const float* pOneAl = &FLOAT_803313e8;
 				alpha = *pOneAl;
 			} else {
-				alpha = GetWmCharaHandles(this)[i]->m_model->m_lightAlpha;
+				alpha = m_wm.m_handles[i + 0x20]->m_model->m_lightAlpha;
 			}
 			double colorScaleD;
 			if (selectedMask != 0) {
@@ -7012,7 +6957,7 @@ void CMenuPcs::CalcCharaSelect()
 		}
 	}
 
-	if (GetWmWorldState(this)->m_mainState != 2 || GetWmWorldState(this)->m_nextMenuMode != 0) {
+	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {
 		return;
 	}
 
@@ -7026,7 +6971,7 @@ void CMenuPcs::CalcCharaSelect()
 			for (i = 0; i < 4; i++) {
 				WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 				if (entry.m_confirmed != 0) {
-					GetWmCharaAnimState(this)[entry.m_currentSlot].m_nextAnimIndex = 0;
+					m_wmCharaAnimState[entry.m_currentSlot].m_nextAnimIndex = 0;
 				}
 				entry.m_confirmed = 0;
 				entry.m_cmakePending = 0;
@@ -7152,12 +7097,12 @@ void CMenuPcs::CalcCharaSelect()
 				entry.m_cmakeReady = 0;
 				SetMakeChara(i);
 				Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-				GetWmCharaAnimState(this)[entry.m_currentSlot].m_nextAnimIndex = 3;
+				m_wmCharaAnimState[entry.m_currentSlot].m_nextAnimIndex = 3;
 			}
 
 			if (entry.m_connected == 0) {
 				if (entry.m_confirmed != 0) {
-					GetWmCharaAnimState(this)[entry.m_currentSlot].m_nextAnimIndex = 0;
+					m_wmCharaAnimState[entry.m_currentSlot].m_nextAnimIndex = 0;
 				}
 				entry.m_confirmed = 0;
 				entry.m_cmakePending = 0;
@@ -7263,12 +7208,12 @@ void CMenuPcs::CalcCharaSelect()
 									entry.m_confirmed = 1;
 									locallyConfirmedCount++;
 									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-									GetWmCharaAnimState(this)[currentSlot].m_nextAnimIndex = 3;
+									m_wmCharaAnimState[currentSlot].m_nextAnimIndex = 3;
 								}
 							} else {
 								entry.m_confirmed = 1;
 								Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-								GetWmCharaAnimState(this)[currentSlot].m_nextAnimIndex = 3;
+								m_wmCharaAnimState[currentSlot].m_nextAnimIndex = 3;
 							}
 						}
 					}
@@ -7277,7 +7222,7 @@ void CMenuPcs::CalcCharaSelect()
 				} else if ((trig & 0x0200) != 0) {
 					if (entry.m_confirmed != 0) {
 						entry.m_confirmed = 0;
-						GetWmCharaAnimState(this)[currentSlot].m_nextAnimIndex = 0;
+						m_wmCharaAnimState[currentSlot].m_nextAnimIndex = 0;
 						Sound.PlaySe(0x34, 0x40, 0x7F, 0);
 					} else {
 						requestCancel = 1;
@@ -7297,8 +7242,8 @@ void CMenuPcs::CalcCharaSelect()
 				}
 			}
 			if (anySelected == 0) {
-				GetWmWorldState(this)->m_nextMenuMode = -1;
-				GetWmWorldState(this)->m_delay = 10;
+				m_wmWorldState->m_nextMenuMode = -1;
+				m_wmWorldState->m_delay = 10;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			} else {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -7323,8 +7268,8 @@ void CMenuPcs::CalcCharaSelect()
 			}
 			if (activeCount != 0) {
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
-				GetWmWorldState(this)->m_nextMenuMode = 1;
-				GetWmWorldState(this)->m_delay = 10;
+				m_wmWorldState->m_nextMenuMode = 1;
+				m_wmWorldState->m_delay = 10;
 			} else {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
@@ -7337,8 +7282,8 @@ void CMenuPcs::CalcCharaSelect()
 			}
 		}
 		if (Game.m_gameWork.m_menuStageMode != 0 && m_singleCmakeSlot >= 0) {
-			GetWmWorldState(this)->m_nextMenuMode = 1;
-			GetWmWorldState(this)->m_delay = 10;
+			m_wmWorldState->m_nextMenuMode = 1;
+			m_wmWorldState->m_delay = 10;
 		} else {
 			for (i = 0; i < 4; i++) {
 				if (m_wm.m_charaSelectData[i].m_connected == 0 && m_wm.m_charaSelectData[i].m_disconnectTime < 0x1E) {
@@ -7346,12 +7291,12 @@ void CMenuPcs::CalcCharaSelect()
 				}
 			}
 			if (finishedMask != 0 && finishedMask == readyMask) {
-				GetWmWorldState(this)->m_nextMenuMode = 1;
-				GetWmWorldState(this)->m_delay = static_cast<short>(s_MaxAnimWait);
+				m_wmWorldState->m_nextMenuMode = 1;
+				m_wmWorldState->m_delay = static_cast<short>(s_MaxAnimWait);
 			}
 		}
 
-		if (GetWmWorldState(this)->m_nextMenuMode != 0) {
+		if (m_wmWorldState->m_nextMenuMode != 0) {
 #ifdef VERSION_GCCP01
 			GbaQue.SetControllerMode(1);
 #endif
@@ -7401,7 +7346,7 @@ void CMenuPcs::DrawCharaName()
 	static const char* STR_TBL_sp[] = {"Vac\355o", "Creando..."};
 #endif
 
-	CFont* const font = GetWmFont(this);
+	CFont* const font = GetFont22();
 	WmCharaSelectEntry* const selectEntries = m_wm.m_charaSelectData;
 	unsigned char nameBuf[0x20];
 
@@ -7608,22 +7553,20 @@ void CMenuPcs::DrawCMLife()
 		{0.25f, 0.0f, -65.0f, -65.0f},
 	};
 	static FCV s_LifePos = {3, s_LifeY};
-#define worldState GetWmWorldState(this)
-#define selectEntries m_wm.m_charaSelectData
 
 	float fade;
-	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter));
-	} else if (worldState->m_mainState == 2) {
+	if (m_wmWorldState->m_mainState == 1) {
+		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+	} else if (m_wmWorldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter) -
+		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 		                            FLOAT_803313e8));
 	}
 	int slot;
 	unsigned int readyMask = 0;
 	for (slot = 0; slot < 4; slot++) {
-		const WmCharaSelectEntry& entry = selectEntries[slot];
+		const WmCharaSelectEntry& entry = m_wm.m_charaSelectData[slot];
 		if (entry.m_connected != 0 && entry.m_cmakePending == 0 && entry.m_cmakeReady == 0) {
 			readyMask |= 1u << entry.m_currentSlot;
 		}
@@ -7637,7 +7580,7 @@ void CMenuPcs::DrawCMLife()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterLifeTexture));
 
 		int count;
-		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
+		if (m_wmWorldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
 			if (m_cmakeWork->m_characters[slot].m_exists == 0) {
 				continue;
 			}
@@ -7729,8 +7672,6 @@ void CMenuPcs::DrawCMLife()
 			                                FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
-#undef worldState
-#undef selectEntries
 }
 
 /*
@@ -8060,7 +8001,7 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 #endif
 	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[current];
 	modelData->m_modelChanged = 0;
-	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
+	m_wm.m_handles[current + 0x20]->LoadModelASync(3, 0x43, 0);
 }
 
 /*
@@ -8212,7 +8153,7 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 		modelNo = 0x43;
 	}
 
-	GetWmCharaHandles(this)[slot]->LoadModelASync(charaKind, static_cast<unsigned long>(modelNo), 0);
+	m_wm.m_handles[slot + 0x20]->LoadModelASync(charaKind, static_cast<unsigned long>(modelNo), 0);
 }
 
 /*
@@ -8536,24 +8477,24 @@ void CMenuPcs::CalcMainMenuSub()
 			}
 
 			if (m_wmWorldState->m_mainState == 1) {
-				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha =
+				m_wm.m_handles[i]->m_model->m_lightAlpha =
 				    static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 			} else if (m_wmWorldState->m_mainState == 2) {
-				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313e8;
+				m_wm.m_handles[i]->m_model->m_lightAlpha = FLOAT_803313e8;
 			} else if (m_wmWorldState->m_mainState == 3) {
-				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha =
+				m_wm.m_handles[i]->m_model->m_lightAlpha =
 				    static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                         DOUBLE_80331420));
 			} else {
-				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313dc;
+				m_wm.m_handles[i]->m_model->m_lightAlpha = FLOAT_803313dc;
 			}
 			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
 			    i == 1) {
-				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313e8;
+				m_wm.m_handles[i]->m_model->m_lightAlpha = FLOAT_803313e8;
 			}
-			GetWmWorldHandles(this)[i]->m_model->SetMatrix(modelMtx);
-			GetWmWorldHandles(this)[i]->m_model->CalcMatrix();
-			GetWmWorldHandles(this)[i]->m_model->CalcSkin();
+			m_wm.m_handles[i]->m_model->SetMatrix(modelMtx);
+			m_wm.m_handles[i]->m_model->CalcMatrix();
+			m_wm.m_handles[i]->m_model->CalcSkin();
 		}
 	}
 }
@@ -8791,22 +8732,21 @@ void CMenuPcs::DrawMCList()
 	GXColor colors[4];
 	int slot;
 	int slotOff;
-#define worldState GetWmWorldState(this)
-	short state = worldState->m_mainState;
+	short state = m_wmWorldState->m_mainState;
 
-	if ((state == 2 || state == 3) && worldState->m_subState != 0) {
+	if ((state == 2 || state == 3) && m_wmWorldState->m_subState != 0) {
 		slotOff = 0;
 		slot = 0;
 		do {
 			float yPos;
 			float alpha;
-			short sub = worldState->m_subState;
-			if (sub == 1 || worldState->m_mainState == 3) {
+			short sub = m_wmWorldState->m_subState;
+			if (sub == 1 || m_wmWorldState->m_mainState == 3) {
 				int animFrames;
-				if (worldState->m_mainState == 2) {
-					animFrames = (int)worldState->m_frameCounter - slotOff;
+				if (m_wmWorldState->m_mainState == 2) {
+					animFrames = (int)m_wmWorldState->m_frameCounter - slotOff;
 				} else {
-					animFrames = 10 - ((int)worldState->m_frameCounter - (3 - slot) * 3);
+					animFrames = 10 - ((int)m_wmWorldState->m_frameCounter - (3 - slot) * 3);
 				}
 				if (animFrames < 0) {
 					goto nextListEntry;
@@ -8875,13 +8815,13 @@ nextListEntry:
 	}
 
 	float frameAlpha;
-	state = worldState->m_mainState;
+	state = m_wmWorldState->m_mainState;
 	if (state == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)));
+		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)));
 	} else if (state > 0 && state < 4) {
 		frameAlpha = FLOAT_803313e8;
 	} else {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) - DOUBLE_80331420));
 	}
 	DrawWMFrame0(2, frameAlpha);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -8890,9 +8830,9 @@ nextListEntry:
 	colors[0].b = 0xFF;
 	colors[0].a = 0xFF;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), colors[0]);
-	short separatorSub = worldState->m_subState;
+	short separatorSub = m_wmWorldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
-	    worldState->m_mainState == 2) {
+	    m_wmWorldState->m_mainState == 2) {
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kWorldFrameTexture));
 			MenuPcs.DrawRect(0, FLOAT_803314D8,
@@ -8904,8 +8844,8 @@ nextListEntry:
 		}
 	}
 
-	if (worldState->m_subState >= 0x11 &&
-	    worldState->m_mainState < 3) {
+	if (m_wmWorldState->m_subState >= 0x11 &&
+	    m_wmWorldState->m_mainState < 3) {
 		double rowSlope = DOUBLE_80331498;
 		float mapOffsetX = FLOAT_80331518;
 		double rowBaseD;
@@ -9268,8 +9208,8 @@ nextListEntry:
 #ifndef VERSION_GCCJGC
 	}
 #endif
-	if (worldState->m_subState == 0x11) {
-		short mode = worldState->m_menuMode;
+	if (m_wmWorldState->m_subState == 0x11) {
+		short mode = m_wmWorldState->m_menuMode;
 		if (mode == 5) {
 #ifdef VERSION_GCCJGC
 			char text[256] = "\x83\x8D\x81\x5B\x83\x68\x82\xB7\x82\xE9\x83\x66\x81\x5B\x83\x5E\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
@@ -9297,7 +9237,6 @@ nextListEntry:
 #ifndef VERSION_GCCJGC
 	DrawInit();
 #endif
-#undef worldState
 }
 
 /*
@@ -9587,38 +9526,36 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 		return;
 	}
 
-#define halfTexel FLOAT_80331434
 	float u0;
 	float v0;
 	float u1;
 	float v1;
 
 	if ((flags & 8) != 0) {
-		u1 = tx + halfTexel;
-		u0 = (tx + w) - halfTexel;
+		u1 = tx + FLOAT_80331434;
+		u0 = (tx + w) - FLOAT_80331434;
 	} else {
-		u1 = (tx + w) - halfTexel;
-		u0 = tx + halfTexel;
+		u1 = (tx + w) - FLOAT_80331434;
+		u0 = tx + FLOAT_80331434;
 	}
 
 	if ((flags & 4) != 0) {
-		v1 = ty + halfTexel;
-		v0 = (v1 + h) - halfTexel;
+		v1 = ty + FLOAT_80331434;
+		v0 = (v1 + h) - FLOAT_80331434;
 	} else {
-		v1 = (ty + h) - halfTexel;
-		v0 = ty + halfTexel;
+		v1 = (ty + h) - FLOAT_80331434;
+		v0 = ty + FLOAT_80331434;
 	}
 
 	float wS = w * scaleX;
 	float hS = h * scaleY;
 
 	if ((flags & 1) != 0) {
-		x = x - halfTexel * wS;
+		x = x - FLOAT_80331434 * wS;
 	}
 	if ((flags & 2) != 0) {
-		y = y - halfTexel * hS;
+		y = y - FLOAT_80331434 * hS;
 	}
-#undef halfTexel
 
 	Vec in[4];
 	Vec out[4];
@@ -9677,37 +9614,35 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		return;
 	}
 
-#define halfTexel FLOAT_80331434
 	float u1;
 	float v1;
 	float u0;
 	float v0;
 
 	if ((flags & 8) != 0) {
-		u1 = tx + halfTexel;
-		u0 = (tx + w) - halfTexel;
+		u1 = tx + FLOAT_80331434;
+		u0 = (tx + w) - FLOAT_80331434;
 	} else {
-		u1 = (tx + w) - halfTexel;
-		u0 = tx + halfTexel;
+		u1 = (tx + w) - FLOAT_80331434;
+		u0 = tx + FLOAT_80331434;
 	}
 
 	if ((flags & 4) != 0) {
-		v1 = ty + halfTexel;
-		v0 = (v1 + h) - halfTexel;
+		v1 = ty + FLOAT_80331434;
+		v0 = (v1 + h) - FLOAT_80331434;
 	} else {
-		v1 = (ty + h) - halfTexel;
-		v0 = ty + halfTexel;
+		v1 = (ty + h) - FLOAT_80331434;
+		v0 = ty + FLOAT_80331434;
 	}
 
 	float wS = w * scaleX;
 	h = h * scaleY;
 	if ((flags & 1) != 0) {
-		x = x - halfTexel * wS;
+		x = x - FLOAT_80331434 * wS;
 	}
 	if ((flags & 2) != 0) {
-		y = y - halfTexel * h;
+		y = y - FLOAT_80331434 * h;
 	}
-#undef halfTexel
 
 	Vec out[4];
 

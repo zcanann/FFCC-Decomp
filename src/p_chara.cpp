@@ -2099,7 +2099,7 @@ int CCharaPcs::CHandle::LoadAnim(
 
     m_animSlot[animIndex]->m_playbackFlags = static_cast<unsigned int>(animFlags);
     m_animSlot[animIndex]->m_anim->SetInterp(animFlags & 1);
-    m_animSlot[animIndex]->m_anim->SetLastFrame((animFlags & 2) != 0);
+    m_animSlot[animIndex]->m_anim->SetLastFrame(animFlags & 2);
 
     return 1;
 }

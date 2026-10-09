@@ -422,7 +422,7 @@ void CGCharaObj::onFramePostCalc()
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
 			unsigned short padMask = Pad.GetButtonDown(m_animStateMisc);
-			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
+			if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
 				padMask |= Pad.GetButtonDownAnalog(m_animStateMisc);
 			}
 			if ((padMask & 0xF) != 0) {
@@ -1622,7 +1622,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
  */
 void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 {
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlagsRaw() & 4) != 0) {
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlag() & 4) != 0) {
 		return;
 	}
 
@@ -1809,7 +1809,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		System.Printf("生き返り後の無敵期間でダメージOFF中\n");
 		return;
 	}
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlagsRaw() & 4) != 0) {
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlag() & 4) != 0) {
 		System.Printf("デバッグ無敵でダメージOFF中\n");
 		return;
 	}
@@ -2271,11 +2271,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					}
 				}
 			} else {
-				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
+				if (((DbgMenuPcs.GetDbgFlag() & 0x20) != 0 ||
 				     static_cast<CGPartyObj*>(sourceObj)->m_partyData.unk6CC == 2) &&
 				    (calcRegist(0x69, itemId, resistType, allowEffect, effectResult, 0), allowEffect != 0)) {
 					int chance = IsKindOf(0xAD) ? m_scriptHandle->m_romWork[0xCD] : 0x32;
-					if (chance != 0 && (DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0) {
+					if (chance != 0 && (DbgMenuPcs.GetDbgFlag() & 0x20) != 0) {
 						chance = 100;
 					}
 					if (chance != 0 && static_cast<unsigned int>(Math.Rand(100)) <= static_cast<unsigned int>(chance)) {
@@ -2881,7 +2881,7 @@ int CGCharaObj::calcCastTime(int itemId)
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
 	if ((m_weaponNodeFlagBits.m_prg && (static_cast<int>(CFlatCenterState()) == 0)) &&
-	    ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0)) {
+	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[0x100];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		double posYDouble;

@@ -1245,7 +1245,7 @@ void CFlatRuntime2::Draw()
 	}
 
 	if ((((m_debugFlags & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0)
-			|| ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0))
+			|| ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0))
 		&& m_debugDrawCCCount != 0) {
 		GXColor greenColor;
 		greenColor.r = 0x80;

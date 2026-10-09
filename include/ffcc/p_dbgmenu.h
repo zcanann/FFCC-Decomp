@@ -80,8 +80,7 @@ public:
     int searchID(int, CDM&);
     void Add();
     void Add(int, int, CDMParam&);
-    int GetDbgFlag();
-    inline u32 GetDbgFlagsRaw() const { return m_dbgFlags; }
+    u32 GetDbgFlag() { return m_dbgFlags; }
 
 private:
     u32 m_dbgFlags;                             // 0x04

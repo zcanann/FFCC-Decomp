@@ -702,11 +702,11 @@ traceJoin:
 		CFlat.m_partyTraceParticleSlot[port] = 0;
 	}
 
-	if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0 && (DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0) {
+	if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0 && (DbgMenuPcs.GetDbgFlag() & 0x400) != 0) {
 		AStar.addRealTime(this);
 	}
 
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x2000) != 0) {
+	if ((DbgMenuPcs.GetDbgFlag() & 0x2000) != 0) {
 		int itemId;
 		do {
 			itemId = Math.Rand(0x155) + 0x9F;
@@ -1451,7 +1451,7 @@ void CGPartyObj::onFrameStat()
 			m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 			m_unk63CBits.m_bit80 = 1;
 		}
-		if (((DbgMenuPcs.GetDbgFlagsRaw() & 8) != 0) ||
+		if (((DbgMenuPcs.GetDbgFlag() & 8) != 0) ||
 		    ((Game.unk_flat3_0xc7d0 != 0) &&
 		     (Joybus.GetCtrlMode(m_animStateMisc) == 1) &&
 		     (m_unk63CBits.m_bit80 != 0) &&
@@ -2273,7 +2273,7 @@ void CGPartyObj::checkTargetParticle()
 	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
 	    !IsKindOf(0x6D) ||
 	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0)) {
-		if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
+		if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
 			input.x -= Pad.GetLeftStickX(m_animStateMisc);
 			input.z += Pad.GetLeftStickY(m_animStateMisc);
 		}
@@ -4423,7 +4423,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 
 	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<int>(CFlatCenterState()) == 0) &&
-	    ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0)) {
+	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[256];
 		if ((Game.m_gameWork.m_menuStageMode != 0) &&
 		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&

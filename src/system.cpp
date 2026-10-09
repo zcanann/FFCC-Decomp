@@ -245,7 +245,7 @@ void CSystem::Quit()
  */
 void CSystem::Printf(char* fmt, ...)
 {
-    if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x1000) == 0)
+    if ((DbgMenuPcs.GetDbgFlag() & 0x1000) == 0)
 	{
         return;
 	}
@@ -326,7 +326,7 @@ void CSystem::ExecScenegraph()
             }
         }
 
-        if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x40) != 0) && (Game.m_gameWork.m_gamePaused == 0))
+        if (((DbgMenuPcs.GetDbgFlag() & 0x40) != 0) && (Game.m_gameWork.m_gamePaused == 0))
         {
             for (int port = 0; port < 4; port++)
             {

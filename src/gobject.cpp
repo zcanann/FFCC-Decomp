@@ -1798,7 +1798,7 @@ inline void CChara::CModel::SetLookAt(Vec2d* lookAt)
  */
 void CGObject::update()
 {
-    const unsigned int dbgFlags = DbgMenuPcs.GetDbgFlagsRaw();
+    const unsigned int dbgFlags = DbgMenuPcs.GetDbgFlag();
     const int miniGameModelPass = !(dbgFlags & 0x8000);
 
     m_dispItemTimer = (m_dispItemTimer - 1 < 0) ? 0 : m_dispItemTimer - 1;
@@ -2823,7 +2823,7 @@ void CGObject::move()
         moveVec.y = 0.0f;
         moveVec.x = 0.0f;
 
-        u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
+        u32 miniGameFlags = DbgMenuPcs.GetDbgFlag();
         if ((miniGameFlags & 0x100) != 0 && moveVec.x == 0.0f && moveVec.x == 0.0f) {
             moveVec.x -= Pad.GetLeftStickX(m_animStateMisc);
             moveVec.z += Pad.GetLeftStickY(m_animStateMisc);
@@ -2888,7 +2888,7 @@ void CGObject::move()
 
         if (!movingWithScript) {
             float speed = m_moveBaseSpeed;
-            if (hasStickInput && ((DbgMenuPcs.GetDbgFlagsRaw() & 0x200) != 0)) {
+            if (hasStickInput && ((DbgMenuPcs.GetDbgFlag() & 0x200) != 0)) {
                 const float mag = PSVECMag(&moveVec);
                 speed *= 4.0f * mag;
             }
@@ -2898,7 +2898,7 @@ void CGObject::move()
             if (m_weaponNodeFlagAll.m_bits1.m_shield
                 && m_weaponNodeFlagAll.m_bits1.m_menuReady
                 && (m_ownerType == 0)) {
-                if ((DbgMenuPcs.GetDbgFlagsRaw() & 2) != 0) {
+                if ((DbgMenuPcs.GetDbgFlag() & 2) != 0) {
                     speed *= 4.0f;
                 }
 

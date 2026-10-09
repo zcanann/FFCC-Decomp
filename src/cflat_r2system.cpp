@@ -874,20 +874,6 @@ void CGame::SetNextScript(CGame::CNextScript* nextScript)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9BB0
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CDbgMenuPcs::GetDbgFlag()
-{
-    return m_dbgFlags;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B9B44
  * PAL Size: 36b
  * EN Address: TODO

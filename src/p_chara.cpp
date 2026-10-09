@@ -875,7 +875,7 @@ void CCharaPcs::draw()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
         handle = handle->m_next;
@@ -894,7 +894,7 @@ void CCharaPcs::drawBefore()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(3, 1);
         }
         handle = handle->m_next;
@@ -942,7 +942,7 @@ void CCharaPcs::drawMakeTexShadow()
 
     handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(2, 1);
         }
         handle = handle->m_next;
@@ -971,7 +971,7 @@ void CCharaPcs::drawShadow()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(1, 1);
         }
         handle = handle->m_next;
@@ -1650,7 +1650,7 @@ void CCharaPcs::drawOverlap()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
         handle = handle->m_next;
@@ -2241,7 +2241,7 @@ void CCharaPcs::CHandle::Calc()
  */
 void CCharaPcs::CHandle::Draw(int drawPass)
 {
-	unsigned int dbgMenuFlags = DbgMenuPcs.GetDbgFlagsRaw();
+	unsigned int dbgMenuFlags = DbgMenuPcs.GetDbgFlag();
 	if ((dbgMenuFlags & 0x8000) != 0) {
 		if ((drawPass == 4) && ((m_flags & 0x10000) != 0)) {
 			draw(3, 0);

@@ -302,15 +302,15 @@ void CGraphicPcs::drawEnd()
 	char debugPadString[256];
 	char debugInputString[256];
 
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x10) != 0) {
+	if ((DbgMenuPcs.GetDbgFlag() & 0x10) != 0) {
 		Graphic.DrawDebugString();
 	}
 
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) != 0) {
+	if ((DbgMenuPcs.GetDbgFlag() & 1) != 0) {
 		drawBar();
 	}
 
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x10) != 0) {
+	if ((DbgMenuPcs.GetDbgFlag() & 0x10) != 0) {
 		Graphic.InitDebugString();
 
 		if (System.m_scenegraphStepMode != 0) {

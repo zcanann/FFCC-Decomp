@@ -679,11 +679,12 @@ cmake.cpp:
 	.sdata2     start:0x80332190 end:0x80332370
 
 singmenu.cpp:
-	.rodata start:0x801DD684 end:0x801DD87C
+	.rodata start:0x801DC620 end:0x801DD888
 	.bss        start:0x8030A610 end:0x8030AA28
 	.sdata      start:0x8032DA58 end:0x8032DA60
 	.sbss       start:0x8032DE98 end:0x8032DEA8
 	.data       start:0x80212F78 end:0x80213BA8
+	.sdata2     start:0x80331068 end:0x803319F0
 
 cflat_r2system.cpp:
 	.text start:0x800B218C end:0x800B9B98

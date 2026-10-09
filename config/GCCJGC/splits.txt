@@ -632,7 +632,7 @@ shopmenu.cpp:
 	.sdata2     start:0x8034F298 end:0x8034F470
 
 singmenu.cpp:
-	.rodata start:0x801D8E78 end:0x801D94C0
+	.rodata start:0x801D8E78 end:0x801D94C0 align:4
 	.data start:0x802318B8 end:0x80231D6C
 	.sdata2 start:0x8034ED40 end:0x8034F1B8
 	.bss        start:0x80326F30 end:0x80327348
@@ -919,7 +919,7 @@ TRK_MINNOW_DOLPHIN/mem_TRK.c:
 mes.cpp:
 	.text start:0x800976FC end:0x80099580
 	.sdata2 start:0x8034D5B0 end:0x8034D5E0
-	.rodata start:0x801D4970 end:0x801D49F8
+	.rodata start:0x801D4970 end:0x801D49F8 align:4
 	extab       start:0x80007DC0 end:0x80007E00
 	.data       start:0x8022C9C0 end:0x8022CB80
 
@@ -929,7 +929,7 @@ util.cpp:
 	.data start:0x801DCB78 end:0x801DCC58 align:8
 	.sdata start:0x8034B288 end:0x8034B298
 	.sdata2 start:0x8034C5E8 end:0x8034C620 align:4
-	.sbss start:0x8034BA70 end:0x8034BA78
+	.sbss start:0x8034BA70 end:0x8034BA78 align:4
 	extab       start:0x80005DC8 end:0x80005E98
 	extabindex  start:0x8000B5F0 end:0x8000B728
 
@@ -1370,7 +1370,7 @@ p_tina.cpp:
 	.bss start:0x8028F228 end:0x8028F368
 	.data       start:0x801DED30 end:0x801DF148
 	.sdata      start:0x8034B498 end:0x8034B4B4
-	.sbss       start:0x8034BB38 end:0x8034BB50
+	.sbss       start:0x8034BB38 end:0x8034BB50 align:4
 	.sdata2     start:0x8034CB08 end:0x8034CB30
 
 p_dbgmenu.cpp:
@@ -1619,9 +1619,9 @@ pad.cpp:
 	.ctors start:0x801D0640 end:0x801D0644
 	extab start:0x80005CC4 end:0x80005CDC
 	extabindex start:0x8000B4A0 end:0x8000B4C4
-	.rodata start:0x801D1880 end:0x801D18D5
-	.data start:0x801DCB18 end:0x801DCB34
-	.bss start:0x8025FA40 end:0x8025FC3C
+	.rodata start:0x801D1880 end:0x801D18D5 align:8
+	.data start:0x801DCB18 end:0x801DCB34 align:8
+	.bss start:0x8025FA40 end:0x8025FC3C align:8
 	.sdata start:0x8034B258 end:0x8034B268
 	.sdata2 start:0x8034C578 end:0x8034C5AB
 
@@ -1705,8 +1705,8 @@ mapanim.cpp:
 
 maptexanim.cpp:
 	.text start:0x8004F18C end:0x8004FC78
-	.rodata start:0x801D29F0 end:0x801D2A38
-	.data start:0x801DED18 end:0x801DED30
+	.rodata start:0x801D29F0 end:0x801D2A38 align:8
+	.data start:0x801DED18 end:0x801DED30 align:8
 	.sdata start:0x8034B488 end:0x8034B498
 	.sdata2 start:0x8034CA88 end:0x8034CAB0
 
@@ -2102,7 +2102,7 @@ p_MaterialEditor.cpp:
 
 ME_USB_process.cpp:
 	.text start:0x8004C264 end:0x8004D544
-	.rodata start:0x801D28D0 end:0x801D28FF
+	.rodata start:0x801D28D0 end:0x801D28FF align:8
 	.data start:0x801DE9E8 end:0x801DEAF8
 	.sdata2 start:0x8034CA58 end:0x8034CA68
 	extab       start:0x80006B54 end:0x80006B64
@@ -2112,7 +2112,7 @@ FS_USB_Process.cpp:
 	.text start:0x8004E3C8 end:0x8004F18C
 	extab start:0x80006C40 end:0x80006C48
 	extabindex start:0x8000C820 end:0x8000C82C
-	.rodata start:0x801D29D8 end:0x801D29EB
+	.rodata start:0x801D29D8 end:0x801D29EB align:8
 	.data start:0x801DECE0 end:0x801DED14
 
 gx/GXInit.c:
@@ -2129,23 +2129,11 @@ auto_09_8034B974_sdata:
 os/OSLink.c:
 	.text start:0x801791A8 end:0x801791C0
 
-editor_padding_rodata_801D28CC:
-	.rodata start:0x801D28CC end:0x801D28D0 align:4
-
-editor_padding_bss_80289024:
-	.bss start:0x80289024 end:0x80289028 align:4
-
-editor_padding_sbss_8034BB25:
-	.sbss start:0x8034BB25 end:0x8034BB28 align:1
-
 zlist.cpp:
 	.text	start:0x8004D82C end:0x8004DA6C
 	extab	start:0x80006B8C end:0x80006BA4
 	extabindex	start:0x8000C76C end:0x8000C790
-	.rodata	start:0x801D2918 end:0x801D2922
-
-zlist_rodata_padding_801D2922:
-	.rodata start:0x801D2922 end:0x801D2928 align:1
+	.rodata	start:0x801D2918 end:0x801D2922 align:8
 
 auto_8034BA94_sbss:
 	.sbss start:0x8034BA94 end:0x8034BA98
@@ -2162,41 +2150,17 @@ p_usb.cpp:
 	extab       start:0x80005C7C end:0x80005CC4
 	extabindex  start:0x8000B434 end:0x8000B4A0
 
-usb_padding_rodata_801D187B:
-	.rodata start:0x801D187B end:0x801D1880 align:1
-
-usb_padding_data_801DCB14:
-	.data start:0x801DCB14 end:0x801DCB18 align:1
-
-usb_padding_bss_8025FA3C:
-	.bss start:0x8025FA3C end:0x8025FA40 align:1
-
-usb_polling_padding_8034BA6D:
-	.sbss start:0x8034BA6D end:0x8034BA70 align:1
-
 p_FunnyShape.cpp:
 	.text start:0x8004DA6C end:0x8004E3C8
 	.sdata start:0x8034B460 end:0x8034B488
 	.data start:0x801DEAF8 end:0x801DECE0
-	.rodata start:0x801D2928 end:0x801D29D3
+	.rodata start:0x801D2928 end:0x801D29D3 align:8
 	.sdata2 start:0x8034CA68 end:0x8034CA88
-	.bss start:0x80289028 end:0x8028F228
-	.sbss start:0x8034BB28 end:0x8034BB35
+	.bss start:0x80289028 end:0x8028F228 align:8
+	.sbss start:0x8034BB28 end:0x8034BB35 align:4
 	.ctors start:0x801D0680 end:0x801D0684
 	extab       start:0x80006BA4 end:0x80006C40
 	extabindex  start:0x8000C790 end:0x8000C820
-
-funny_padding_rodata_801D29D3:
-	.rodata start:0x801D29D3 end:0x801D29D8 align:1
-
-funny_padding_sbss_8034BB35:
-	.sbss start:0x8034BB35 end:0x8034BB38 align:1
-
-fs_usb_padding_rodata_801D29EB:
-	.rodata start:0x801D29EB end:0x801D29F0 align:1
-
-fs_usb_padding_data_801DED14:
-	.data start:0x801DED14 end:0x801DED18 align:1
 
 auto_8034BAB4_sbss:
 	.sbss start:0x8034BAB4 end:0x8034BAB8
@@ -2204,32 +2168,17 @@ auto_8034BAB4_sbss:
 auto_8034C6D4_sdata2:
 	.sdata2 start:0x8034C6D4 end:0x8034C6D8
 
-astar_padding_801D8E76:
-	.rodata start:0x801D8E76 end:0x801D8E78 align:1
-
-astar_padding_8034ED1E:
-	.sdata2 start:0x8034ED1E end:0x8034ED20 align:1
-
 ME_AppRequest.cpp:
 	.text	start:0x8004D544 end:0x8004D82C
 	extab	start:0x80006B64 end:0x80006B8C
 	extabindex	start:0x8000C730 end:0x8000C76C
-	.rodata	start:0x801D2900 end:0x801D2912
-
-me_app_padding_801D2912:
-	.rodata start:0x801D2912 end:0x801D2918 align:1
-
-me_usb_padding_801D28FF:
-	.rodata start:0x801D28FF end:0x801D2900 align:1
+	.rodata	start:0x801D2900 end:0x801D2912 align:4
 
 cflat_data.cpp:
 	.text	start:0x80096FD4 end:0x800976FC
 	extab	start:0x80007DA8 end:0x80007DC0
 	extabindex	start:0x8000E0E0 end:0x8000E104
-	.rodata	start:0x801D4960 end:0x801D496F
-
-cflat_data_padding_801D496F:
-	.rodata start:0x801D496F end:0x801D4970 align:1
+	.rodata	start:0x801D4960 end:0x801D496F align:8
 
 auto_801D23B4_rodata:
 	.rodata start:0x801D23B4 end:0x801D23B8 align:1
@@ -2260,12 +2209,6 @@ p_gba.cpp:
 	extab start:0x80007D68 end:0x80007DA8
 	extabindex start:0x8000E080 end:0x8000E0E0
 	.ctors start:0x801D06A0 end:0x801D06A4
-
-p_game_padding_801D2799:
-	.rodata start:0x801D2799 end:0x801D27A0 align:1
-
-p_gba_padding_801D4959:
-	.rodata start:0x801D4959 end:0x801D4960 align:1
 
 pppAlignmentScale.cpp:
 	extab start:0x800091FC end:0x80009204
@@ -2600,7 +2543,7 @@ odenotstub/odenotstub.c:
 
 p_system.cpp:
 	.text start:0x800475D4 end:0x80047728
-	.rodata     start:0x801D27A0 end:0x801D27C1
+	.rodata     start:0x801D27A0 end:0x801D27C1 align:8
 	.data       start:0x801DE450 end:0x801DE614
 	.sdata      start:0x8034B408 end:0x8034B420
 	.sbss       start:0x8034BB08 end:0x8034BB0C
@@ -2883,7 +2826,7 @@ pppConstrainCameraDir.cpp:
 	.text start:0x8013EE34 end:0x8013F07C
 	extab       start:0x80009C5C end:0x80009C64
 	extabindex  start:0x80010E64 end:0x80010E70
-	.sdata2     start:0x8034ED20 end:0x8034ED30
+	.sdata2     start:0x8034ED20 end:0x8034ED30 align:4
 
 pppFilter.cpp:
 	extab start:0x80009C64 end:0x80009C6C

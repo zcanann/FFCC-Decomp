@@ -1713,12 +1713,11 @@ void CMenuPcs::CalcResultCloseAnim()
 		{
 			i = 0;
 			for (; i < m_bonusAnim->header.count; i++) {
-				sprite = &m_bonusAnim->sprites[i];
-				if (0.0f == sprite->motionX) {
-					sprite->targetX = (float)(int)sprite->x;
+				if (0.0f == m_bonusAnim->sprites[i].motionX) {
+					m_bonusAnim->sprites[i].targetX = (float)(int)m_bonusAnim->sprites[i].x;
 				}
-				if (0.0f == sprite->motionY) {
-					sprite->targetY = (float)(int)sprite->y;
+				if (0.0f == m_bonusAnim->sprites[i].motionY) {
+					m_bonusAnim->sprites[i].targetY = (float)(int)m_bonusAnim->sprites[i].y;
 				}
 
 			}

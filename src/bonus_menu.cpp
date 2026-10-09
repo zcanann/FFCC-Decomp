@@ -1854,6 +1854,7 @@ void CMenuPcs::CalcResultCloseAnim()
 void CMenuPcs::DrawResultCloseAnim()
 {
 	int i;
+	CMenuPcs::Sprt2* sprite;
 	int lastKind;
 	int modelIndex;
 	int activePartyCount;
@@ -2002,7 +2003,7 @@ void CMenuPcs::DrawResultCloseAnim()
 	char text[128];
 	{
 		for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
-			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
+			sprite = &m_bonusAnim->sprites[i];
 			if (sprite->kind == -1) {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
 

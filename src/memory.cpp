@@ -224,6 +224,28 @@ static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage)
 
 /*
  * --INFO--
+ * PAL Address: 0x8001FDCC
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CheckSum(void* data, int size)
+{
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(data);
+    unsigned int checksum = 0x12345678;
+    int i;
+
+    for (i = size; i != 0; i--) {
+        checksum += *bytes++;
+    }
+
+    return checksum;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8001FD8C
  * PAL Size: 64b
  * EN Address: TODO
@@ -276,28 +298,6 @@ void operator delete(void* ptr)
 void operator delete[](void* ptr)
 {
     freeStageBlock(ptr);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001FDCC
- * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CheckSum(void* data, int size)
-{
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(data);
-    unsigned int checksum = 0x12345678;
-    int i;
-
-    for (i = size; i != 0; i--) {
-        checksum += *bytes++;
-    }
-
-    return checksum;
 }
 
 /*

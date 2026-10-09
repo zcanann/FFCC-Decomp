@@ -553,20 +553,6 @@ void pppMemFree(void* allocation)
 
 /*
  * --INFO--
- * PAL Address: 80056c74
- * PAL Size: 44b
- * EN Address: 0x80062AEC
- * EN Size: 52b
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppHeapCheckLeak(CMemory::CStage* stage)
-{
-	stage->heapWalker(2, 0, 0xFFFFFFFF);
-}
-
-/*
- * --INFO--
  * PAL Address: 80056ca0
  * PAL Size: 76b
  * EN Address: 0x80062A94
@@ -589,6 +575,20 @@ unsigned long pppHeapUseRate(CMemory::CStage* stage)
 	}
 
 	return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80056c74
+ * PAL Size: 44b
+ * EN Address: 0x80062AEC
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppHeapCheckLeak(CMemory::CStage* stage)
+{
+	stage->heapWalker(2, 0, 0xFFFFFFFF);
 }
 
 /*

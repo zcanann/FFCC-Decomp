@@ -131,10 +131,11 @@ jobs:
     # Build the project
     - name: Build
       run: |
-        # Derive the Japanese game compiler (GC/2.0p1h) from the bundled GC/2.0p1.
+        # Derive the Japanese game compiler (GC/2.0p1i) from the bundled GC/2.0p1.
         python tools/patch_compiler.py /compilers
         python tools/patch_compiler_rw.py /compilers --p1g
         python tools/patch_compiler_ffcc.py /compilers
+        python tools/patch_compiler_ffcc2.py /compilers
         python configure.py --map --version ${{ matrix.version }} \
             --binutils /binutils --compilers /compilers --gba-binutils /usr/bin \
             --gba-compilers build/tools/gba-agbcc

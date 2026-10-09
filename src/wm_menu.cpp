@@ -8501,7 +8501,11 @@ void CMenuPcs::DrawMainMenuSub()
 	int orderIndex;
 	int j;
 	int i;
+#ifdef VERSION_GCCJGC
+	static const float s_sprt_w[] = {176.0f, 104.0f, 208.0f, 136.0f, 208.0f};
+#else
 	static const float s_sprt_w[] = {264.0f, 264.0f, 264.0f, 264.0f, 264.0f};
+#endif
 	Mtx modelMtx;
 	Mtx44 screenMtx;
 	GXColor white;

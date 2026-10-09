@@ -2016,7 +2016,11 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     int maxWidth;
     CFont* font;
     font = m_fonts[0];
+    #ifdef VERSION_GCCJGC
+    font->SetMargin(4.0f);
+#else
     font->SetMargin(1.0f);
+#endif
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
     font->DrawInit();
@@ -2111,7 +2115,11 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     int lineCount;
 
     font = m_fonts[0];
+    #ifdef VERSION_GCCJGC
+    font->SetMargin(4.0f);
+#else
     font->SetMargin(1.0f);
+#endif
 #ifdef VERSION_GCCJGC
     font->SetShadow(0);
 #else

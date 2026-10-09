@@ -2095,8 +2095,7 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const s16 slotType = caravan->m_commandListExtra[i];
-		const int slotCheck = slotType;
-		if (slotCheck == 0) {
+		if (slotType == 0) {
 			continue;
 		}
 
@@ -2221,7 +2220,7 @@ void CMenuPcs::DrawUniteList()
 		if (helpMode == 0) {
 		const s16 helpSlot = caravan->m_commandListExtra[helpSelected];
 		if (helpSlot != 0) {
-			int helpId =  (helpSlot + 0);
+			int helpId = helpSlot;
 			const u8 helpAlpha =
 			    static_cast<u8>(255.0f * GetCmdListStorage(this)->entries[0].alpha);
 #ifndef VERSION_GCCJGC

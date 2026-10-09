@@ -609,7 +609,7 @@ shopmenu.cpp:
 
 singmenu.cpp:
 	.rodata start:0x801D8E78 end:0x801D9460
-	.data start:0x802318B8 end:0x80231A98
+	.data start:0x802318B8 end:0x80231D1C
 	.sdata2 start:0x8034ED40 end:0x8034F1B8
 	.bss        start:0x80326F30 end:0x80327348
 	.sdata      start:0x8034B858 end:0x8034B860

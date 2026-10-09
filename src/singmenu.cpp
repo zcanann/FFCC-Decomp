@@ -2462,7 +2462,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     }
 
     if (raceLow != 0 && genderMask != 0) {
-        strcpy(outText, " ");
+        strcpy(outText, "\x81\x40");
     }
     if (genderMask == 0) {
         return;

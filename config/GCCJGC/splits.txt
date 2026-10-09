@@ -1331,8 +1331,10 @@ pppPart.cpp:
 game.cpp:
 	.bss start:0x8023A7B0 end:0x8024C748
 	.text start:0x80013D9C end:0x80015DD8
+	.rodata     start:0x801D0B10 end:0x801D0DE0
 	.data       start:0x801DC620 end:0x801DC6C0
 	.sdata      start:0x8034B1D0 end:0x8034B1E8
+	.sdata2     start:0x8034C3E8 end:0x8034C438
 	.sbss       start:0x8034BA40 end:0x8034BA45
 
 p_chara_viewer.cpp:

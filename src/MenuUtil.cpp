@@ -1342,7 +1342,7 @@ void CMenuPcs::DrawOptionMenu()
 		helpFont->SetMargin(1.0f);
 		helpFont->SetScale(1.0f);
 		float width = helpFont->GetWidth(help);
-		DrawOptionLabel(m_fonts[0], static_cast<int>(320.0f - width * 0.5f),
+		DrawOptionLabel(m_fonts[0], static_cast<int>(320.0f - width / 2.0f),
 		                391, color, 7, help, 1.0f);
 	}
 #else

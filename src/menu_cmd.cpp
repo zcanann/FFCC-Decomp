@@ -771,7 +771,7 @@ void CMenuPcs::CmdDraw()
 			}
 
 			const float textW = static_cast<float>(nameFont->GetWidth(text));
-			x = static_cast<double>(nameEntry->x) + ((static_cast<float>(nameEntry->width) - textW) * 0.5);
+			x = static_cast<double>(nameEntry->x) + ((static_cast<float>(nameEntry->width) - textW) / 2.0);
 			y = static_cast<float>(nameEntry->y + 3);
 			nameFont->SetPosX(x);
 #ifdef VERSION_GCCJGC
@@ -903,7 +903,7 @@ void CMenuPcs::CmdDraw()
 							if ((itemIdx + 2 >= itemCount) || EquipChk(static_cast<int>(letterBuf[itemIdx + 1]))) {
 								if (itemIdx + 2 < itemCount) {
 									DrawEquipMark(static_cast<s32>(x - 12.0f),
-									    static_cast<s32>(((rowH - 24.0f) * 0.5) + y),
+									    static_cast<s32>(((rowH - 24.0f) / 2.0) + y),
 									    entry->alpha);
 								}
 								rowTex = kCmdDisabledRowTexture;
@@ -1069,7 +1069,7 @@ void CMenuPcs::CmdDraw()
 			    ((static_cast<float>(entry->height) * entry->scale) - 16.0) /
 			    choices);
 			y = ((pitch * static_cast<float>(choice)) + static_cast<float>(entry->y + 8)) +
-			    ((pitch - 19.8) * 0.5);
+			    ((pitch - 19.8) / 2.0);
 			x = static_cast<float>(entry->x + 0x18);
 			choiceFont->SetPosX(static_cast<float>(entry->x + 0x18));
 #ifdef VERSION_GCCJGC
@@ -1115,7 +1115,7 @@ void CMenuPcs::CmdDraw()
 			    ((static_cast<float>(entry->height) * entry->scale) - 16.0) /
 			    static_cast<double>(choices));
 			x = static_cast<float>(entry->x - 0x14);
-			y = ((pitch - 19.8) * 0.5) +
+			y = ((pitch - 19.8) / 2.0) +
 			    ((pitch * static_cast<float>(m_cmdState->selected[2])) + static_cast<float>(entry->y + 8));
 		}
 
@@ -1127,7 +1127,7 @@ void CMenuPcs::CmdDraw()
 					y += 8.0f;
 				}
 			} else {
-				y = (entry->height - 0x20) * 0.5 + entry->y;
+				y = (entry->height - 0x20) / 2.0 + entry->y;
 				x = static_cast<float>(entry->x - 0x14);
 			}
 		}
@@ -1174,7 +1174,7 @@ void CMenuPcs::CmdDraw()
 		helpAlpha = static_cast<int>(255.0f * m_cmdList->entries[0].alpha);
 	}
 
-	float helpX = static_cast<float>(-(w * 0.5f - 320.0f));
+	float helpX = static_cast<float>(-(w / 2.0f - 320.0f));
 	float helpY = 352.0f;
 	DrawHelpMessage(
 	    helpId, helpFont, static_cast<int>(helpX), static_cast<int>(helpY),
@@ -2064,10 +2064,10 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const float width = static_cast<float>(font->GetWidth(text));
-		float x = static_cast<float>((static_cast<float>(entry->width) - width) * 0.5 +
+		float x = static_cast<float>((static_cast<float>(entry->width) - width) / 2.0 +
 		                             static_cast<double>(entry->x));
 		if (topX != entry->x) {
-			const float t = static_cast<float>(fabs(static_cast<double>(topX - entry->x)) * 0.015625);
+			const float t = static_cast<float>(fabs(static_cast<double>(topX - entry->x)) / 64.0);
 			const float target = static_cast<float>(entry->x + entry->width - 0x18) - width;
 			x = (target - x) * t + x;
 		}
@@ -2141,7 +2141,7 @@ void CMenuPcs::DrawUniteList()
 			panelAlpha = startEntry->alpha;
 		} else {
 			panelAlpha = static_cast<float>(
-			    fabs(static_cast<double>(panelX - static_cast<float>(topX))) * 0.015625);
+			    fabs(static_cast<double>(panelX - static_cast<float>(topX))) / 64.0);
 		}
 
 		GXColor color;
@@ -2201,9 +2201,9 @@ void CMenuPcs::DrawUniteList()
 		}
 		const float width = static_cast<float>(font->GetWidth(text));
 		drawY = static_cast<float>(
-		    (static_cast<double>(unitePanels->height) - 19.8) * 0.5 +
+		    (static_cast<double>(unitePanels->height) - 19.8) / 2.0 +
 		    static_cast<double>(unitePanels->y) - 2.0);
-		font->SetPosX(static_cast<float>((static_cast<float>(unitePanels->width) - width) * 0.5 +
+		font->SetPosX(static_cast<float>((static_cast<float>(unitePanels->width) - width) / 2.0 +
 		                                 static_cast<double>(unitePanels->x)));
 #ifdef VERSION_GCCJGC
 		font->SetPosY(drawY);
@@ -2233,7 +2233,7 @@ void CMenuPcs::DrawUniteList()
 			CFont* const helpFont = GetFont22();
 			DrawHelpMessage(
 				helpId, helpFont,
-				static_cast<int>(-(drawW * 0.5f - 320.0f)),
+				static_cast<int>(-(drawW / 2.0f - 320.0f)),
 				static_cast<int>(drawY),
 				CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10,
 				1.0f, 3.0f);

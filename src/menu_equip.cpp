@@ -517,7 +517,7 @@ void CMenuPcs::EquipDraw()
 							if (((chk + 1) >= letterCount) || equipped || !ChkEquipActive(chk + 1)) {
 								if (equipped) {
 									int markX = (int)(x - 12.0f);
-									int markY = (int)((double)(h - 24.0f) * 0.5 + (double)y);
+									int markY = (int)((double)(h - 24.0f) / 2.0 + (double)y);
 									DrawEquipMark(markX, markY, item->alpha);
 								}
 								texId = EQUIP_TEX_PLATE;

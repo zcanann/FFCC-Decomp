@@ -2876,7 +2876,9 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 		for (i = 0; i < 8; i++) {
 			if ((i != localInfo.m_playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
+#ifndef VERSION_GCCJGC
 			    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0U) &&
+#endif
 			    (strcmp(reinterpret_cast<char*>(Game.m_caravanWorkArr[i].m_name), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
@@ -3010,7 +3012,9 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 
 	for (i = 0; i < 8; i++) {
 		if ((i != playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
+#ifndef VERSION_GCCJGC
 		    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0) &&
+#endif
 		    (static_cast<unsigned char>(Game.m_caravanWorkArr[i].m_jobType) == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			return;

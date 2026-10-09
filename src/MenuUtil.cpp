@@ -1367,8 +1367,10 @@ void CMenuPcs::DrawOptionMenu()
 	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionRowAnim));
 	int rowAnimStep = static_cast<int>(m_optionRowAnim / OPTION_ROW_STEP);
 	float rowAngle = static_cast<float>(rowAnimStep) * OPTION_ROW_ANGLE_STEP;
-	float rowSin = static_cast<float>(sin(0.017453292f * (2.0f * rowAngle)));
-	float rowCos = static_cast<float>(cos(0.017453292f * rowAngle));
+	float rowRad = 0.017453292f * rowAngle;
+	rowAngle = 2.0f * rowAngle;
+	float rowSin = static_cast<float>(sin(0.017453292f * rowAngle));
+	float rowCos = static_cast<float>(cos(rowRad));
 
 	switch (m_optionIndex) {
 	case 0: {

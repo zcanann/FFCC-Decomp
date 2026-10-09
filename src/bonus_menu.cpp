@@ -1154,6 +1154,7 @@ void CMenuPcs::DrawResultOpenAnim()
 							MenuPcs.DrawRect(0, x, y, fillWidth, (float)sprite->h,
 							    mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 							x += fillWidth;
+							mulX = fillWidth;
 						}
 						if (fillWidth > 0.0f && fillWidth < (float)sprite->w) {
 							colors[1].r = 0xFF;
@@ -1165,7 +1166,7 @@ void CMenuPcs::DrawResultOpenAnim()
 							colors[3].b = 0xFF;
 							colors[3].a = 0;
 							MenuPcs.DrawRect(0, x, y, (float)sprite->w * (float)(1.0 / (double)sprite->duration), (float)sprite->h,
-							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
+							    mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 						}
 					} else {
 						if (s_CntTop <= i && i < s_CntTop + activePartyCount) {

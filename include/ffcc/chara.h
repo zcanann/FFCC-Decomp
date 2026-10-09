@@ -437,6 +437,7 @@ public:
 		{
 			m_afterDrawMeshCallback = callback;
 		}
+		CTexAnimSet* GetTexAnimSet() { return m_texAnimSet; }
 		void SetBeforeCalcMatrixCallback(int (*callback)(CChara::CModel*, void*, void*))
 		{
 			m_beforeCalcMatrixCallback = callback;

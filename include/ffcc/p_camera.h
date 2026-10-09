@@ -276,6 +276,7 @@ public:
     void SetRefPosition(Vec*);
     int IsAbsolute();
     void addWorldMap();
+    float GetRotate() { return m_yaw; }
     void SetIsAbsolute(int);
     void SetWorldMapMatrix(float (*)[4]);
     void GetWorldMapMatrix(float (*)[4]);

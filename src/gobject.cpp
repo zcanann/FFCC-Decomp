@@ -967,7 +967,7 @@ void CGObject::SetTexAnim(char* name)
     }
 
     if (hasModel) {
-        texAnimSet = handle->m_model->m_texAnimSet;
+        texAnimSet = handle->m_model->GetTexAnimSet();
         if (texAnimSet != (CTexAnimSet*)0) {
             texAnimSet->Change(name, 0.0f, (CTexAnimSet::ANIM_TYPE)-2);
         }
@@ -2539,6 +2539,20 @@ stepMiss:
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800931FC
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapPcs::IsHitFaceFlag(char flag)
+{
+    g_MapHitFaceFlag = flag;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -2554,7 +2568,7 @@ void CGObject::bgCollision()
 
     if (m_bgColMask & 0x01)
     {
-        g_MapHitFaceFlag = 1;
+        MapPcs.IsHitFaceFlag(1);
 
         if (Game.m_currentMapId == 0x21)
         {
@@ -2565,7 +2579,7 @@ void CGObject::bgCollision()
             bgNormalCollision();
         }
 
-        g_MapHitFaceFlag = 0;
+        MapPcs.IsHitFaceFlag(0);
     }
 }
 
@@ -2778,10 +2792,7 @@ void CGObject::move()
 
         if ((!m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd != 0))
             || (m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd == 2))) {
-            m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
-            CFlatRuntime::CStack stack;
-            stack.m_word = (scriptMoveEnd == 2) ? 1 : 0;
-            gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);
+            CancelMove((scriptMoveEnd == 2) ? 1 : 0);
         }
 
         movingWithScript = 1;
@@ -2855,7 +2866,7 @@ void CGObject::move()
         if (movingWithScript) {
             cameraYaw = 0.0f;
         } else {
-            cameraYaw = CameraPcs.m_yaw;
+            cameraYaw = CameraPcs.GetRotate();
         }
 
         const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));

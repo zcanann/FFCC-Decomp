@@ -37,6 +37,7 @@ public:
     void CalcHitPosition(Vec*);
     int CheckHitCylinderNear(Vec*, Vec*, float, unsigned long);
     float GetHitT();
+    void IsHitFaceFlag(char flag);
     void GetHitFaceNormal(Vec*);
     int CalcHitSlide(Vec*, float);
     int GetHitGrpNo();

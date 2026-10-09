@@ -268,7 +268,9 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_partySlot = i;
 			s_Rinfo->m_party[activeCount].m_partyHandle =
 			    Game.m_partyObjArr[i]->m_charaModelHandle;
+#ifndef VERSION_GCCJGC
 			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = 0.0f;
+#endif
 			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)Game.m_scriptFoodBase[i]->m_bonusCondition;
 			s_Rinfo->m_party[activeCount].m_foodValue = Game.m_scriptFoodBase[i]->GetTotalBonus();
 			s_Rinfo->m_party[activeCount].m_artifactValue = Game.m_scriptFoodBase[i]->GetTotalBonus2();

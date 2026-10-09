@@ -223,7 +223,6 @@ static CMenuPcs::FCV s_MenuObjYRot = {4, s_MenuObjYRotSpl};
 static CMenuPcs::FCV s_MenuObjZRot = {4, s_MenuObjZRotSpl};
 static CMenuPcs::FCV s_MenuObjYTrs = {5, s_MenuObjYTrsSpl};
 static CMenuPcs::FCV s_MenuObjScl = {7, s_MenuObjSclSpl};
-extern char cRam8032ee21;
 
 inline CGBaseObj::CGBaseObj()
 {
@@ -445,10 +444,6 @@ extern const char lbl_80331828[7] = "last_r";
 extern const char lbl_80331830[8] = "w_close";
 extern const char lbl_80331838[7] = "w_idle";
 
-extern float FLOAT_80331490;
-extern float FLOAT_80331498;
-extern float FLOAT_803314e8;
-extern float FLOAT_803314f0;
 
 static const int kMcListEntrySize = sizeof(McListInfo);
 static const int kMcListCount = 4;
@@ -7830,7 +7825,10 @@ void CMenuPcs::WMChgMenu()
 				worldObj->m_transform.m_rotation.y = initialRotY;
 				WmCharaSelectEntry* const selectData = &m_wm.m_charaSelectData[slot];
 				selectData->m_displaySlot = selectData->m_currentSlot;
-				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1)) {
+#ifndef VERSION_GCCJGC
+				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1))
+#endif
+				{
 					Mtx mtx;
 					PSMTXIdentity(mtx);
 					m_wm.m_handles[handleIdx]->m_model->SetMatrix(mtx);
@@ -7841,9 +7839,11 @@ void CMenuPcs::WMChgMenu()
 				worldObj++;
 			} while (slot < 8);
 
+#ifndef VERSION_GCCJGC
 			for (int channel = 0; channel < 4; channel++) {
 				GbaQue.ClrCmakeInfo(channel);
 			}
+#endif
 		break;
 	}
 	case 4:

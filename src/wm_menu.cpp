@@ -454,7 +454,11 @@ extern const float FLOAT_80331764 = -0.10000000149011612f;
 extern const float FLOAT_80331768 = 200.0f;
 extern const double DOUBLE_80331770 = 0.025;
 extern const float FLOAT_80331778 = 172.0f;
+#ifdef VERSION_GCCJGC
+extern const float FLOAT_8033177C = 325.0f;
+#else
 extern const float FLOAT_8033177C = 321.0f;
+#endif
 extern const float FLOAT_80331780 = 14.0f;
 extern const double DOUBLE_80331788 = 0.18;
 extern const double DOUBLE_80331790 = 49.333333333333336;

@@ -534,8 +534,8 @@ p_camera.cpp:
 
 gobject.cpp:
 	.text start:0x8007B7F4 end:0x80081C14
-	.rodata     start:0x801D8B30 end:0x801D8B3C
-	.data       start:0x801FC1E0 end:0x801FC224
+	.rodata     start:0x801D8AD0 end:0x801D8B60
+	.data       start:0x801FC1C0 end:0x801FC224
 	.sdata      start:0x8032D748 end:0x8032D760
 	extab       start:0x80007840 end:0x80007978
 	extabindex  start:0x8000D9B4 end:0x8000DB88

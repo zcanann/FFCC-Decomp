@@ -817,13 +817,13 @@ void CMenuPcs::CalcResultOpenAnim()
 			count->duration = 10;
 			count->depth = 1.0f;
 		}
-		int countTop = idx + 1;
-		s_CntTop = countTop;
+		idx++;
+		s_CntTop = idx;
 
 		{
 			for (i = 0; i < activePartyCount; i++) {
-				int delta = idx;
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[countTop + i];
+				int delta = idx - 1;
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = kBonusCountTexture;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = 0x200;
@@ -839,7 +839,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// name sprites
-		idx = countTop + activePartyCount;
+		idx += activePartyCount;
 		{
 			for (i = 0; i < activePartyCount; i++) {
 				int delta = idx - (activePartyCount + 1);
@@ -914,13 +914,12 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		{
 			i = 0;
-			int total2 = activePartyCount * 2;
 			for (; i < activePartyCount; i++) {
 				CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i + 1];
 				float centerX = 0.0f;
 				float centerY = (float)((double)(float)((double)sprite->h / 2.0 + (double)sprite->y) - 224.0);
-				m_wm.m_worldObjData[total2 + i].m_viewportX = (short)centerX;
-				m_wm.m_worldObjData[total2 + i].m_viewportY = (short)centerY;
+				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportX = (short)centerX;
+				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportY = (short)centerY;
 			}
 		}
 
@@ -1025,7 +1024,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				scaleMtx[1][3] = ty;
 				scaleMtx[2][3] = 0.0f;
 				if (1 <= itemIndex && itemIndex <= 2) {
-					scaleMtx[1][3] = (float)((double)(float)ty - 1.8);
+					scaleMtx[1][3] -= 1.8;
 				}
 			} else {
 				scaleMtx[0][3] = 0.0f;

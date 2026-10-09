@@ -182,6 +182,7 @@ public:
     char* GetNPCName(int npcIndex) { return m_cFlatDataArr[1].TableStrings(2)[npcIndex]; }
     char* GetLetterSubject(int subjectIndex) { return m_cFlatDataArr[1].TableStrings(5)[subjectIndex]; }
     char* GetPlaceName(int placeIndex) { return m_cFlatDataArr[1].TableStrings(3)[placeIndex]; }
+    void UPPERItemName(char* name);
     void UpperItemName(char* name)
     {
         if (name[0] != '\0') {
@@ -192,6 +193,10 @@ public:
 #endif
         }
     }
+    void LowerItemName(char* name);
+    void UPPERMonName(char* name);
+    void UpperMonName(char* name);
+    void LowerMonName(char* name);
     char* GetLetter(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x10); }
     char* GetLetterReply(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x11); }
     char* GetMonName(int);

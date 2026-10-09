@@ -690,13 +690,14 @@ int CMenuPcs::EquipClose()
 {
 	EquipOpenAnim* item;
 	int doneCount = 0;
+	int i;
 
 	m_equipState->frame = m_equipState->frame + 1;
 	int itemCount = static_cast<int>(m_equipList->count);
 	int timer = static_cast<int>(m_equipState->frame);
 	item = m_equipList->entries;
 
-	for (int i = 0; i < itemCount; i++) {
+	for (i = 0; i < itemCount; i++) {
 		if (item->startFrame <= timer) {
 			if (item->startFrame + item->duration <= timer) {
 				doneCount++;
@@ -716,11 +717,10 @@ int CMenuPcs::EquipClose()
 	int result = 0;
 	if (m_equipList->count == doneCount) {
 		item = m_equipList->entries;
-		for (int k = itemCount; k > 0; k--) {
+		for (i = 0; i < itemCount; i++, item++) {
 			item->startFrame = 0;
 			item->duration = 1;
 			item->alpha = 0.0f;
-			item++;
 		}
 		result = 1;
 	}

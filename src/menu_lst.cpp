@@ -166,11 +166,11 @@ void CMenuPcs::MLstDraw()
  */
 int CMenuPcs::MLstClose()
 {
+	int i;
 	MenuLstEntry* entry;
 	int completedItems;
 	int itemCount;
 	int currentFrame;
-	int count;
 	int result;
 
 	completedItems = 0;
@@ -178,7 +178,7 @@ int CMenuPcs::MLstClose()
 	itemCount = this->m_menuLstList->count;
 	entry = this->m_menuLstList->entries;
 	currentFrame = (int)this->m_menuLstState->frame;
-	for (int remaining = itemCount; remaining > 0; remaining--) {
+	for (i = 0; i < itemCount; i++) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
@@ -197,11 +197,10 @@ int CMenuPcs::MLstClose()
 	result = 0;
 	if (this->m_menuLstList->count == completedItems) {
 		entry = this->m_menuLstList->entries;
-		for (count = itemCount; count > 0; count--) {
+		for (i = 0; i < itemCount; i++, entry++) {
 			entry->startFrame = 0;
 			entry->duration = 1;
 			entry->alpha = 0.0f;
-			entry++;
 		}
 		result = 1;
 	}
@@ -368,11 +367,11 @@ inline void CMenuPcs::MLstInit()
  */
 int CMenuPcs::MLstOpen()
 {
+	int i;
 	MenuLstEntry* entry;
 	int completedItems;
 	int itemCount;
 	int currentFrame;
-	int count;
 
 	if (this->m_menuLstState->initialized == '\0') {
 		MLstInit();
@@ -383,7 +382,7 @@ int CMenuPcs::MLstOpen()
 	itemCount = this->m_menuLstList->count;
 	entry = this->m_menuLstList->entries;
 	currentFrame = (int)this->m_menuLstState->frame;
-	for (int remaining = itemCount; remaining > 0; remaining--) {
+	for (i = 0; i < itemCount; i++) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
@@ -400,11 +399,10 @@ int CMenuPcs::MLstOpen()
 	int result = 0;
 	if (this->m_menuLstList->count == completedItems) {
 		entry = this->m_menuLstList->entries;
-		for (count = itemCount; count > 0; count--) {
+		for (i = 0; i < itemCount; i++, entry++) {
 			entry->startFrame = 0;
 			entry->duration = 1;
 			entry->alpha = 1.0f;
-			entry++;
 		}
 		result = 1;
 	}

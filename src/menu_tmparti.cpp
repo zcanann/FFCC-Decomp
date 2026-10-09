@@ -257,11 +257,11 @@ void CMenuPcs::TmpArtiDraw()
  */
 unsigned int CMenuPcs::TmpArtiClose()
 {
+	int i;
 	TmpArtiEntry* entry;
 	int completedItems;
 	int itemCount;
 	int currentFrame;
-	int count;
 	unsigned int result;
 
 	completedItems = 0;
@@ -269,7 +269,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 	itemCount = this->m_tmpArtiList->count;
 	entry = this->m_tmpArtiList->entries;
 	currentFrame = this->m_tmpArtiState->frame;
-	for (int remaining = itemCount; remaining > 0; remaining--) {
+	for (i = 0; i < itemCount; i++) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
@@ -289,11 +289,10 @@ unsigned int CMenuPcs::TmpArtiClose()
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
 		entry = this->m_tmpArtiList->entries;
-		for (count = itemCount; count > 0; count--) {
+		for (i = 0; i < itemCount; i++, entry++) {
 			entry->startFrame = 0;
 			entry->duration = 1;
 			entry->alpha = 0.0f;
-			entry++;
 		}
 		result = 1;
 	}
@@ -335,6 +334,7 @@ int CMenuPcs::TmpArtiCtrl()
  */
 unsigned int CMenuPcs::TmpArtiOpen()
 {
+	int i;
 	TmpArtiEntry* entry;
 	int completedItems;
 	int itemCount;
@@ -350,7 +350,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	itemCount = this->m_tmpArtiList->count;
 	entry = this->m_tmpArtiList->entries;
 	currentFrame = this->m_tmpArtiState->frame;
-	for (int remaining = itemCount; remaining > 0; remaining--) {
+	for (i = 0; i < itemCount; i++) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
@@ -366,11 +366,10 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
 		entry = this->m_tmpArtiList->entries;
-		for (int count = itemCount; count > 0; count--) {
+		for (i = 0; i < itemCount; i++, entry++) {
 			entry->startFrame = 0;
 			entry->duration = 1;
 			entry->alpha = 1.0f;
-			entry++;
 		}
 		result = 1;
 	}

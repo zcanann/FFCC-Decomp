@@ -464,6 +464,7 @@ int CMenuPcs::CmdOpen()
 	}
 
 	CmdListEntry* entry;
+	s32 i;
 	s32 finishedCount = 0;
 	m_cmdState->transitionTimer = static_cast<s16>(m_cmdState->transitionTimer + 1);
 
@@ -472,7 +473,7 @@ int CMenuPcs::CmdOpen()
 	entry = list->entries;
 	const s32 timer = static_cast<s32>(m_cmdState->transitionTimer);
 
-	for (s32 i = 0; i < entryCount; i++) {
+	for (i = 0; i < entryCount; i++) {
 		if (entry->startFrame <= timer) {
 			if ((entry->startFrame + entry->duration) <= timer) {
 				finishedCount += 1;
@@ -490,13 +491,11 @@ int CMenuPcs::CmdOpen()
 	int done = 0;
 	CmdListStorage* const list2 = m_cmdList;
 	if (list2->count == finishedCount) {
-		float anim = 1.0f;
 		entry = list2->entries;
-		for (s32 k = entryCount; k > 0; k--) {
+		for (i = 0; i < entryCount; i++, entry++) {
 			entry->startFrame = 0;
 			entry->duration = 1;
-			entry->alpha = anim;
-			entry++;
+			entry->alpha = 1.0f;
 		}
 		done = 1;
 	}

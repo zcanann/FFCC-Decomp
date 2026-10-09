@@ -723,7 +723,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppSclAccele.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppSclMove.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppScreenBlur.cpp"),
-            Object(NonMatching, "pppScreenBreak.cpp"),
+            Object(NonMatching, "pppScreenBreak.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppScreenQuake.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppSDrawMatrix.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppShape.cpp"),

@@ -7362,11 +7362,13 @@ void CMenuPcs::DrawCharaName()
 	} else {
 		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
+	int i;
+	int j;
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
 	const WmCharaSelectEntry* entry = selectEntries;
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		if (entry->m_connected != 0) {
 			const unsigned int bit = 1u << entry->m_currentSlot;
 			activeMask |= bit;
@@ -7397,20 +7399,18 @@ void CMenuPcs::DrawCharaName()
 	float plateW = 64.0f;
 	const double xOffsetDefault =
 	    -(DOUBLE_80331418 * static_cast<double>(plateW) - DOUBLE_80331678);
-	int row;
-	int col;
-	for (row = 0; row < 2; row++) {
-		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
+	for (i = 0; i < 2; i++) {
+		float y = FLOAT_80331478 + static_cast<float>(i * 0xB8);
 		y += FLOAT_80331684;
-		if (row != 0) {
+		if (i != 0) {
 			y += FLOAT_80331548;
 		}
-		for (col = 0; col < 4; col++) {
-			const int slot = row * 4 + col;
+		for (j = 0; j < 4; j++) {
+			const int slot = i * 4 + j;
 			if ((confirmedMask & (1u << slot)) != 0) {
 				const char* const text = reinterpret_cast<const char*>(
 				    Game.m_caravanWorkArr[slot].m_name);
-				float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
+				float xBase = FLOAT_80331410 + static_cast<float>(j * 0x90);
 				const float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
 				if (width / 2.0 > plateW) {
@@ -7439,22 +7439,22 @@ void CMenuPcs::DrawCharaName()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
 
 	CSystem* const sys = &System;
-	for (row = 0; row < 2; row++) {
-		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
+	for (i = 0; i < 2; i++) {
+		float y = FLOAT_80331478 + static_cast<float>(i * 0xB8);
 		y += FLOAT_80331688;
-		if (row != 0) {
+		if (i != 0) {
 			y += FLOAT_80331548;
 		}
 #ifndef VERSION_GCCJGC
 		y -= FLOAT_80331550;
 #endif
-		for (col = 0; col < 4; col++) {
-			const int slot = row * 4 + col;
+		for (j = 0; j < 4; j++) {
+			const int slot = i * 4 + j;
 			int restoreColor;
 			restoreColor = 0;
 			const char* text;
 
-			float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
+			float xBase = FLOAT_80331410 + static_cast<float>(j * 0x90);
 
 			const int menuMode = this->m_wmWorldState->m_menuMode;
 			bool hasName;
@@ -7490,7 +7490,7 @@ void CMenuPcs::DrawCharaName()
 					fade = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(absPhase) - DOUBLE_80331420));
 					restoreColor = 1;
 				}
-				font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<int>(FLOAT_80331458 * fade)).color);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF, FLOAT_80331458 * fade).color);
 			} else {
 				if ((activeMask & (1u << slot)) != 0) {
 					font->SetTlut(7);
@@ -9123,8 +9123,7 @@ nextListEntry:
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x19);
-				const unsigned int msgId =
-					slotData->m_isBroken == 0;
+				const int msgId = slotData->m_isBroken ? 0 : 1;
 				const int width = static_cast<int>(fontF8->GetWidth(const_cast<char*>(GetMcStr(msgId))));
 				float textOffsetX = FLOAT_803314D8;
 				fontF8->SetPosX(static_cast<float>(static_cast<float>(0x238 - width) / 2.0 + textOffsetX));

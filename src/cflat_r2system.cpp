@@ -54,7 +54,6 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
 }
 
 extern const float kCFlatPadStickZero = 0.0f;
-extern const float kCFlatOneF;
 
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
@@ -1624,7 +1623,7 @@ renderedDone:
 
                     Vec result;
                     Math.CalcSpline(&result, &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position,
-                                    p1->m_distance - p0->m_distance, scaleB, p3->m_distance - p2->m_distance, segmentT, kCFlatOneF);
+                                    p1->m_distance - p0->m_distance, scaleB, p3->m_distance - p2->m_distance, segmentT, 1.0f);
                     *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
                     *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
                     *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;

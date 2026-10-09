@@ -23,7 +23,7 @@ extern const Vec sMap21TangentAxis;
 class CGObject : public CGBaseObj
 {
 public:
-    CGObject();
+    CGObject() {}
 
     virtual int GetCID() { return 5; }     // vtable entry 0x10
 	virtual void onCreate();  // vtable entry 0x1c

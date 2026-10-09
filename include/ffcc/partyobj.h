@@ -133,7 +133,7 @@ STATIC_ASSERT(sizeof(GhostPartyWork) == 0x90);
 class CGPartyObj : public CGCharaObj
 {
 public:
-    CGPartyObj();
+    CGPartyObj() {}
 
 	static GhostPartyWork m_ghostWork;
 

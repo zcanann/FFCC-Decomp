@@ -93,7 +93,7 @@ STATIC_ASSERT(offsetof(SCharaItemRow, m_attackEndFrame) == 0x22);
 class CGItemObj : public CGPrgObj
 {
 public:
-	CGItemObj();
+	CGItemObj() {}
 
 	struct CCFS
 	{

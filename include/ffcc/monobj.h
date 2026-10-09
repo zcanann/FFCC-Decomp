@@ -33,7 +33,7 @@ public:
     static AiWork m_aiWork;
     static u8 m_boss[0x8C];
 
-    CGMonObj();
+    CGMonObj() {}
 
     class CMoveWork
     {

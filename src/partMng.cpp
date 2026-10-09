@@ -110,14 +110,6 @@ extern Vec ppvZeroVector;
 }
 extern char g_StrTmp[0x400];
 
-inline CGBaseObj::CGBaseObj()
-{
-}
-
-inline CGObject::CGObject()
-{
-}
-
 extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;

@@ -9,7 +9,7 @@ class CGObject;
 class CGPrgObj : public CGObject
 {
 public:
-    CGPrgObj();
+    CGPrgObj() {}
 
     void onCreate();
     void onDestroy();

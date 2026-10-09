@@ -256,14 +256,6 @@ static CMenuPcs::FCV s_MenuObjZRot = {4, s_MenuObjZRotSpl};
 static CMenuPcs::FCV s_MenuObjYTrs = {5, s_MenuObjYTrsSpl};
 static CMenuPcs::FCV s_MenuObjScl = {7, s_MenuObjSclSpl};
 
-inline CGBaseObj::CGBaseObj()
-{
-}
-
-inline CGObject::CGObject()
-{
-}
-
 static float s_MaxAnimWait;
 unsigned char lbl_8032EE1C;
 char gWmMenuCursorX[2];

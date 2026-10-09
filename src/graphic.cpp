@@ -69,6 +69,17 @@ OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
 }
 
+#ifdef VERSION_GCCJGC
+enum GraphicCppStringOffset {
+    kGraphicInitCGraphic = 0xA8,
+    kGraphicInitSource = 0xC0,
+    kGraphicInitCGraphic2 = 0x200,
+    kGraphicCppPartControlDoneFmt = 0xF4,
+    kGraphicCppPartCharaDoneFmt = 0x138,
+    kGraphicCppPartDoneFmt = 0x178,
+    kGraphicCppDrawDoneFmt = 0x1B4,
+};
+#else
 enum GraphicCppStringOffset {
     kGraphicInitCGraphic = 0xA0,
     kGraphicInitSource = 0xB8,
@@ -78,6 +89,7 @@ enum GraphicCppStringOffset {
     kGraphicCppPartDoneFmt = 0x170,
     kGraphicCppDrawDoneFmt = 0x1AC,
 };
+#endif
 
 extern const char sGraphicUnknownOrderName[4] = "---";
 

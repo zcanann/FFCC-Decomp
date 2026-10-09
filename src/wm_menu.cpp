@@ -7044,14 +7044,14 @@ void CMenuPcs::CalcCharaSelect()
 			}
 		}
 
-		for (int slot = 0; slot < 8; slot++) {
-			const int handleIdx = slot + 0x20;
-			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
-			    ((pendingMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
-			    Game.m_caravanWorkArr[slot].m_shopState == 0 &&
+		for (i = 0; i < 8; i++) {
+			const int handleIdx = i + 0x20;
+			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(i))) == 0) &&
+			    ((pendingMask & (1u << static_cast<unsigned int>(i))) == 0) &&
+			    Game.m_caravanWorkArr[i].m_shopState == 0 &&
 			    m_wm.m_handles[handleIdx]->IsModelLoaded(1) &&
 			    m_wm.m_handles[handleIdx]->m_charaKind != 3) {
-				ChgModel(slot, -1, -1, -1);
+				ChgModel(i, -1, -1, -1);
 			}
 		}
 #endif

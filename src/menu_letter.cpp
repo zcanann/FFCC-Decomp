@@ -1343,17 +1343,21 @@ void CMenuPcs::LetterMessDraw()
 	char* curLine = workText;
 	for (; i < 7; ++i) {
 		char* newline = strchr(curLine, '\n');
+#ifdef VERSION_GCCJGC
+		x0 = 104.0f;
+#else
+		x0 = 136.0f;
+#endif
 		y0 = static_cast<float>(y);
 		if (newline != 0) {
 			*newline = '\0';
 		}
 
 		if (strlen(curLine) != 0) {
+			font->SetPosX(x0);
 #ifdef VERSION_GCCJGC
-			font->SetPosX(104.0f);
 			font->SetPosY(y0);
 #else
-			font->SetPosX(136.0f);
 			font->SetPosY(y0 - 4.0f);
 #endif
 			font->Draw(curLine);

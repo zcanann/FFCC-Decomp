@@ -13,7 +13,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" const char sNoNameProfileLabel[];
 extern "C" unsigned char g_IsDrawHeapSize = 1;
 
 
@@ -183,8 +182,8 @@ struct _pppFieldPdtData
     _pppFieldParticleData m_particles[1];
 };
 
-CProfile g_par_calc_prof(const_cast<char*>(sNoNameProfileLabel));
-CProfile g_par_draw_prof(const_cast<char*>(sNoNameProfileLabel));
+CProfile g_par_calc_prof("no name");
+CProfile g_par_draw_prof("no name");
 
 /*
  * --INFO--
@@ -989,10 +988,6 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 
 	PartMng.m_pppMng[index].m_useOwnerScaleSign = 1;
 	PartMng.m_pppMng[index].m_nodeScaleInitialized = 1;
-}
-
-extern "C" {
-const char sNoNameProfileLabel[] = "no name";
 }
 
 /*

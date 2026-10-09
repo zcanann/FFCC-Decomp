@@ -1092,9 +1092,9 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
+	clampedValue = value < 0 ? 0 : value;
 	CGObjWork* work = SAFE_CAST_WORK(m_scriptHandle);
 	int current = work->m_statusTimers[staIndex];
-	clampedValue = value < 0 ? 0 : value;
 
 	if (current != 0 && clampedValue == 0) {
 		switch (staIndex) {

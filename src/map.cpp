@@ -885,6 +885,22 @@ void CMapMng::SetLightSource()
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8003E224
+ * EN Size: 28b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void COctTree::SetOctTreeMapObj(int index)
+{
+    if (m_mapObject != 0) {
+        m_mapObject->m_octTreeIndex = index;
+    }
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -895,12 +911,19 @@ void CMapMng::SetBumpLightSource()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: 0x8003A424
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::InitMapShadow()
 {
-	// TODO
+    int shadowIdx;
+    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        GetMapShadowArray()[shadowIdx]->Init();
+    }
 }
 
 /*
@@ -1168,9 +1191,7 @@ int CMapMng::ReadOtm(char* mapName)
                 case 0x4D534554: {
                     m_materialSet =
                         new (MapMng.m_stage, "map.cpp", 0x482) CMaterialSet();
-                    CMaterialSet* materialSet = m_materialSet;
-                    materialSet->m_materials.SetDefaultSize(0x180);
-                    materialSet->m_materials.SetGrow(0);
+                    m_materialSet->SetDefaultSize(0x180, 0);
                     m_materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                     break;
                 }
@@ -1255,15 +1276,10 @@ int CMapMng::ReadOtm(char* mapName)
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        if (m_octTreeArray[i].GetMapObject() != 0) {
-            m_octTreeArray[i].GetMapObject()->m_octTreeIndex = static_cast<signed char>(i);
-        }
+        m_octTreeArray[i].SetOctTreeMapObj(i);
     }
 
-    int shadowIdx;
-    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
-        GetMapShadowArray()[shadowIdx]->Init();
-    }
+    InitMapShadow();
 
     m_rootMapObj = SearchChildMapObj(GetMapObjArray(), 0);
     if (m_rootMapObj == 0) {
@@ -1491,9 +1507,7 @@ int CMapMng::ReadMid(char* mapName)
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        if (m_octTreeArray[i].GetMapObject() != 0) {
-            m_octTreeArray[i].GetMapObject()->m_octTreeIndex = static_cast<signed char>(i);
-        }
+        m_octTreeArray[i].SetOctTreeMapObj(i);
     }
 
     return 1;

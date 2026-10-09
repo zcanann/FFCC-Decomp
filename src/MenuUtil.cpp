@@ -443,6 +443,7 @@ inline float CMenuPcs::GetFontWidth(char* text, float scale, float margin)
 	return font->GetWidth(text);
 }
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x8017ac40
@@ -468,7 +469,6 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 	font->Draw(text);
 }
 
-#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x80179FC4
@@ -1243,7 +1243,7 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(h),
 	             static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 	gUtil.RenderTextureQuad(0.0f,
-	                        -(h / 2.0f - 224.0f) - 14.0f,
+	                        224.0f - h / 2.0f - 14.0f,
 	                        640.0f, h, m_wmOptionTextures[5], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
@@ -1252,25 +1252,23 @@ void CMenuPcs::DrawOptionMenu()
 	h = static_cast<float>(panel->m_height);
 	gUtil.RenderTextureQuad(336.0f, 88.0f, w, h, panel, 0, 0, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-	float panelBottom = 88.0f + h;
 	uv0.x = 0.0f;
 	uv0.y = 1.0f;
 	uv1.x = 1.0f;
 	uv1.y = 0.0f;
-	gUtil.RenderTextureQuad(336.0f, panelBottom, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	gUtil.RenderTextureQuad(336.0f, 88.0f + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-	float panelRight = 336.0f + w;
 	uv0.x = 1.0f;
 	uv0.y = 0.0f;
 	uv1.x = 0.0f;
 	uv1.y = 1.0f;
-	gUtil.RenderTextureQuad(panelRight, 88.0f, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	gUtil.RenderTextureQuad(336.0f + w, 88.0f, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = 1.0f;
 	uv0.y = 1.0f;
 	uv1.x = 0.0f;
 	uv1.y = 0.0f;
-	gUtil.RenderTextureQuad(panelRight, panelBottom, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	gUtil.RenderTextureQuad(336.0f + w, 88.0f + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	CTexture* cursor = m_textures[0];
@@ -1297,11 +1295,7 @@ void CMenuPcs::DrawOptionMenu()
 	font->SetScaleX(0.8f);
 	char** option = optionText;
 #endif
-	int i = 0;
-	int rowY = 0x70;
-	int selectedY = 0x73;
-	int normalY = 0x75;
-	for (; i < 5; i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28, option++) {
+	for (int i = 0; i < 5; i++) {
 		CTexture* row = m_wmOptionTextures[0];
 		w = static_cast<float>(row->m_width);
 		h = static_cast<float>(row->m_height);
@@ -1309,23 +1303,23 @@ void CMenuPcs::DrawOptionMenu()
 		uv0.y = 0.0f;
 		uv1.x = (i == m_optionIndex) ? 0.5f : 1.0f;
 		uv1.y = 1.0f;
-		gUtil.RenderTextureQuad(56.0f, static_cast<float>(rowY),
+		gUtil.RenderTextureQuad(56.0f, static_cast<float>(i * 0x28 + 0x70),
 		                        w / 2.0f, h, m_wmOptionTextures[0], &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 #ifdef VERSION_GCCJGC
 		if (i == m_optionIndex) {
-			DrawOptionLabel(m_fonts[0], 94, selectedY, color, 0x16, *option, 1.2f);
+			DrawOptionLabel(m_fonts[0], 94, i * 0x28 + 0x73, color, 0x16, option[i], 1.2f);
 		} else {
-			DrawOptionLabel(m_fonts[0], 96, normalY, color, 6, *option, 1.0f);
+			DrawOptionLabel(m_fonts[0], 96, i * 0x28 + 0x75, color, 6, option[i], 1.0f);
 		}
 #else
 		if (i == m_optionIndex) {
-			DrawFont(0x5E, static_cast<int>(-4.0f + static_cast<float>(selectedY)), color, 0x16,
-			         *option, 1.0f, 1.0f);
+			DrawFont(0x5E, static_cast<int>(-4.0f + static_cast<float>(i * 0x28 + 0x73)), color, 0x16,
+			         option[i], 1.0f, 1.0f);
 		} else {
-			DrawFont(0x60, static_cast<int>(-4.0f + static_cast<float>(normalY)), color, 6,
-			         *option, 1.0f, 1.0f);
+			DrawFont(0x60, static_cast<int>(-4.0f + static_cast<float>(i * 0x28 + 0x75)), color, 6,
+			         option[i], 1.0f, 1.0f);
 		}
 #endif
 	}
@@ -1815,11 +1809,11 @@ void CMenuPcs::DrawOptionMenu()
 			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 6.923077f))));
 #endif
 
-		int k = 0;
-		int y = k;
-		int uvY =  (k | 0);
-		int uvY2 = 0x18;
 		int modeU = 0x280;
+		int y = 0;
+		int uvY2 = 0x18;
+		int k = 0;
+		int uvY = 0;
 		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, uvY2 += 0x20, modeU += 0x40, k = 0) {
 			CTexture* cursorPanel = m_wmOptionTextureSet->GetTexture(4);
 			float cursorWidth = static_cast<float>(cursorPanel->m_width);

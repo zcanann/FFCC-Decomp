@@ -3861,7 +3861,11 @@ void CMenuPcs::DrawCMakeMenu()
 			         7, textList[textIndex], 1.0f, 1.0f);
 #else
 			int mesNo = 5;
+#ifdef VERSION_GCCP01
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x4B);
+#else
+			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x5A);
+#endif
 			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 			char* textList[3] = {0};
 			for (int i = 0; i < 3; i++) {

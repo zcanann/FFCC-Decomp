@@ -439,7 +439,11 @@ void CMenuPcs::EquipDraw()
 			float width = font->GetWidth(str);
 			float textY = (float)(item->y + 0xb);
 			font->SetPosX((float)((((float)item->w - width) / 2.0) + (double)item->x));
+#ifdef VERSION_GCCJGC
+			font->SetPosY(textY);
+#else
 			font->SetPosY(textY - 4.0f);
+#endif
 			font->Draw(str);
 		}
 	}
@@ -589,7 +593,11 @@ void CMenuPcs::EquipDraw()
 			font->GetWidth(str);
 			float textY = (float)(textItem->y + 0xb);
 			font->SetPosX((float)(textItem->x + 0x1c));
+#ifdef VERSION_GCCJGC
+			font->SetPosY(textY);
+#else
 			font->SetPosY(textY - 4.0f);
+#endif
 			font->Draw(str);
 		}
 

@@ -778,12 +778,11 @@ void CGMonObj::onFrameStat()
 		}
 
 		unsigned char* aiData = CGMonObj_GetAiData(this);
-		unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork);
-		float range = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
+		float range = static_cast<float>(m_scriptHandle->m_romWork[0x67]);
 
 		int aiActionKind = *reinterpret_cast<unsigned short*>(aiData + 0x10A);
 		if (aiActionKind == 2) {
-			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
+			if (m_scriptHandle->m_romWork[0x86] == 1) {
 				if (m_subState == 0) {
 					unsigned int chaseFlag = 0;
 					unsigned char* aiData2;
@@ -813,9 +812,8 @@ void CGMonObj::onFrameStat()
 					m_subState = 1;
 				}
 				if (m_subState == 1) {
-					unsigned char* script9b = reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork);
 					int frame = m_stateFrame;
-					int limit = *reinterpret_cast<unsigned short*>(script9b + 0x1B6);
+					int limit = m_scriptHandle->m_romWork[0xDB];
 					if (frame <= limit) {
 						if ((m_stateFlags0Bits.unk1 != 0) ||
 							(frame == limit) ||
@@ -824,7 +822,7 @@ void CGMonObj::onFrameStat()
 							m_rotTargetY = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 						} else {
 							float speedScale = m_pushScale *
-								(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9b + 0xD4)) + 0.0000001f);
+								(0.01f * static_cast<float>(m_scriptHandle->m_romWork[0x6A]) + 0.0000001f);
 							CVector delta = CVector(m_worldPosition) - CVector(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
 							moveVector(delta, speedScale, 1);
 						}
@@ -854,9 +852,8 @@ void CGMonObj::onFrameStat()
 	case 0x1E: {
 		CGMonObj_ChaseTarget(this);
 
-		unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork);
-		float reachDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
-		if ((static_cast<int>(m_stateFrame) == *reinterpret_cast<unsigned short*>(script9 + 0x1B6)) ||
+		float reachDist = static_cast<float>(m_scriptHandle->m_romWork[0x67]);
+		if ((static_cast<int>(m_stateFrame) == m_scriptHandle->m_romWork[0xDB]) ||
 			(reachDist <= m_partyDistance[m_targetPartyIndex]) ||
 			(m_stateFlags0Bits.unk1 != 0)) {
 			changeStat(0, 0, 0);
@@ -1841,17 +1838,16 @@ void CGMonObj::mlHide()
  */
 void CGMonObj::mlEscape()
 {
-#define script9 (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork))
-	float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCC));
+	float maxDist = static_cast<float>(m_scriptHandle->m_romWork[0x66]);
 	float homeDist = PSVECDistance(&m_homePosition, &m_worldPosition);
 	unsigned char* aiData;
 
 	short aiState = m_aiState;
 	if (aiState == 0) {
-		aiData = script9;
+		aiData = (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork));
 	} else {
 		aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-		         (aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) *
+		         (aiState + m_scriptHandle->m_romWork[0x80]) *
 		             0x1D0 +
 		         0x10;
 	}
@@ -1865,13 +1861,13 @@ void CGMonObj::mlEscape()
 	}
 
 	if (((aiFlags & 0x20) != 0) ||
-	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
+	    ((m_scriptHandle->m_romWork[0x7F] & 8) != 0)) {
 		moveCancel();
 		mlSet(0);
 		return;
 	}
 
-	if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
+	if (m_scriptHandle->m_romWork[0x86] == 1) {
 		CGMonObj::m_aiWork.m_state = 0x21;
 		if (m_moveWork.m_mode != 3) {
 			m_moveWork.Clear();
@@ -1892,7 +1888,7 @@ void CGMonObj::mlEscape()
 
 		if (partyIndex >= 0) {
 			m_targetPartyIndex = partyIndex;
-			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
+			if (m_scriptHandle->m_romWork[0x86] == 1) {
 				mlSet(2);
 			} else {
 				mlSet(1);
@@ -1903,14 +1899,13 @@ void CGMonObj::mlEscape()
 
 check_home:
 	if ((homeDist < 10.0f) ||
-	    (m_chaseTimer == static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x1B8)))) {
+	    (m_chaseTimer == static_cast<int>(m_scriptHandle->m_romWork[0xDC]))) {
 		m_homePosition = *&m_worldPosition;
 		moveCancel();
 		mlSet(0);
-	} else if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) {
+	} else if (m_scriptHandle->m_romWork[0x86] != 1) {
 		CGMonObj::m_aiWork.m_state = 0x1C;
 	}
-#undef script9
 }
 
 /*
@@ -1941,10 +1936,9 @@ void CGMonObj::mlMove()
 {
 	int& targetPartyIndex = m_targetPartyIndex;
 #define actionState (CGMonObj::m_aiWork.m_state)
-#define script (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork))
 
 	if (targetPartyIndex >= 0) {
-		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
+		float homeRange = static_cast<float>(m_scriptHandle->m_romWork[0x66]);
 		float homeDist = PSVECDistance(&m_homePosition, &m_worldPosition);
 		if (!(homeRange <= homeDist)) {
 			goto body;
@@ -1959,7 +1953,7 @@ void CGMonObj::mlMove()
 body:
 	{
 			if (m_unk6BD != 0) {
-				float reacquireRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8));
+				float reacquireRange = static_cast<float>(m_scriptHandle->m_romWork[0x64]);
 				int hitPartyIndex;
 				checkCol(6, m_rotBaseY, reacquireRange, (float*)NULL, &hitPartyIndex);
 				if (hitPartyIndex >= 0) {
@@ -2001,10 +1995,10 @@ body:
 						m_moveWork.m_flags = 0x205;
 						short aiState2 = m_aiState;
 						if (aiState2 == 0) {
-							aiScript = script;
+							aiScript = (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork));
 						} else {
 							aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-								(static_cast<int>(aiState2) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+								(static_cast<int>(aiState2) + m_scriptHandle->m_romWork[0x80]) * 0x1D0 + 0x10;
 						}
 						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
 							m_moveWork.m_flags |= 0x10000;
@@ -2014,7 +2008,7 @@ body:
 					m_moveWork.m_target = target;
 					if (((m_moveWork.m_stateFlags & 1) != 0) ||
 						(m_moveWork.m_frame >=
-						 static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)))) {
+						 static_cast<int>(m_scriptHandle->m_romWork[0xDD]))) {
 						moveCancel();
 						mlSet(3);
 					}
@@ -2022,7 +2016,7 @@ body:
 				}
 
 				if (m_chaseTimer >=
-					static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA))) {
+					static_cast<int>(m_scriptHandle->m_romWork[0xDD])) {
 					mlSet(3);
 					return;
 				}
@@ -2071,7 +2065,6 @@ body:
 			mlSet(1);
 			return;
 	}
-#undef script
 #undef actionState
 }
 
@@ -2328,7 +2321,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 #define aiScript (m_aiState == 0 \
 		? baseScript \
 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
-			(m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
+			(m_aiState + m_scriptHandle->m_romWork[0x80]) * 0x1D0 + 0x10)
 #define aiScriptW (m_aiState == 0 		? reinterpret_cast<unsigned char*>(SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork) 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + 			(m_aiState + SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork[0x80]) * 0x1D0 + 0x10)
 	int selectedAction = -1;
 	if (m_funcs->attackCheck != 0) {
@@ -2362,7 +2355,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		int actionType;
-		if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
+		if (m_scriptHandle->m_romWork[0x86] == 1) {
 			actionType = actionFlags & 3;
 		} else {
 			actionType = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118);
@@ -2413,7 +2406,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
 			if (((partyState == 1) || (partyState == 7)) &&
 				((float)__fabs(Math.DstRot(m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > 1.5707964f)) {
-				if (((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) &&
+				if (((m_scriptHandle->m_romWork[0x86] == 1) &&
 						(m_forcedAction ==
 							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x11E)))) ||
 					((SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork[0x86] != 1) &&
@@ -2424,7 +2417,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 
 			if (forceAction || (Math.Rand(100) <= chance)) {
 				selectedAction = actionIndex;
-				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
+				if (m_scriptHandle->m_romWork[0x86] == 1) {
 					break;
 				}
 				if (forceAction) {
@@ -2434,7 +2427,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			}
 		} else {
 			unsigned int groupIndex;
-			if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
+			if (m_scriptHandle->m_romWork[0x86] == 1) {
 				groupIndex = (actionFlags >> 2) & 7;
 			} else {
 				groupIndex = *reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x11A);
@@ -2494,11 +2487,10 @@ void CGMonObj::mlAttack()
 	int& chaseState = m_chaseState;
 	int& chaseTimer = m_chaseTimer;
 #define actionState (CGMonObj::m_aiWork.m_state)
-#define script (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork))
 
 	if (m_lastStateId == 0) {
 		m_unk6BD = 0;
-		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
+		float homeRange = static_cast<float>(m_scriptHandle->m_romWork[0x66]);
 		float homeDist = PSVECDistance(&m_homePosition, &m_worldPosition);
 		if (homeRange <= homeDist) {
 			moveCancel();
@@ -2542,7 +2534,7 @@ void CGMonObj::mlAttack()
 			int minHp = 10000000;
 			int validIndex = 0;
 			float homeRange2 = static_cast<float>(
-				*reinterpret_cast<unsigned short*>(script + 0xCC));
+				m_scriptHandle->m_romWork[0x66]);
 
 			for (slot = 0; slot < 4; slot++) {
 				int partyIndex = m_partyRank[slot];
@@ -2602,7 +2594,7 @@ void CGMonObj::mlAttack()
 			if (m_unk6BC == 0) {
 				if (m_partyDistance[targetPartyIndex] <
 					static_cast<float>(SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork[0x67])) {
-					if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {
+					if (m_scriptHandle->m_romWork[0x86] == 1) {
 						chaseState = 5;
 						chaseTimer = 0;
 						m_chaseDirty = 1;
@@ -2683,17 +2675,16 @@ void CGMonObj::mlAttack()
 	}
 
 	if (m_lastStateId == 0x21) {
-		if ((*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) &&
+		if ((m_scriptHandle->m_romWork[0x86] == 1) &&
 			(((m_moveWork.m_stateFlags & 1) != 0) ||
 			 (m_moveWork.m_frame >=
-			  static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC))))) {
+			  static_cast<int>(m_scriptHandle->m_romWork[0xDE])))) {
 			moveCancel();
 			chaseState = 3;
 			chaseTimer = 0;
 			m_chaseDirty = 1;
 		}
 	}
-#undef script
 #undef actionState
 }
 

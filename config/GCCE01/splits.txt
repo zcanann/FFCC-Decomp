@@ -818,6 +818,7 @@ chara_fur.cpp:
 pppYmLaser.cpp:
 	.rodata start:0x801DA3C8 end:0x801DA3D8
 	extab       start:0x80008A9C end:0x80008ABC
+	.sdata2     start:0x8032FD78 end:0x8032FDB0
 
 gobjwork.cpp:
 	.text start:0x8009DAE4 end:0x800A26A8
@@ -2820,11 +2821,13 @@ pppRandDownFV.cpp:
 	.text start:0x80060FCC end:0x800610FC
 	extab       start:0x800070C0 end:0x800070C8
 	extabindex  start:0x8000CFD0 end:0x8000CFDC
+	.sdata2     start:0x8032EF08 end:0x8032EF10
 
 pppRandDownHCV.cpp:
 	.text start:0x800610FC end:0x800612C4
 	extab       start:0x800070C8 end:0x800070D0
 	extabindex  start:0x8000CFDC end:0x8000CFE8
+	.sdata2     start:0x8032EF10 end:0x8032EF20
 
 pppRandDownIV.cpp:
 	.text start:0x800613F0 end:0x80061584
@@ -2836,6 +2839,7 @@ pppRandHCV.cpp:
 	.text start:0x800618F0 end:0x80061AFC
 	extab       start:0x800070F8 end:0x80007100
 	extabindex  start:0x8000D024 end:0x8000D030
+	.sdata2     start:0x8032EF60 end:0x8032EF70
 
 pppRandIV.cpp:
 	.text start:0x80061C3C end:0x80061E04
@@ -2853,11 +2857,13 @@ pppRandUpFV.cpp:
 	.text start:0x80062350 end:0x80062480
 	extab       start:0x80007130 end:0x80007138
 	extabindex  start:0x8000D078 end:0x8000D084
+	.sdata2     start:0x8032EFC8 end:0x8032EFD0
 
 pppRandUpHCV.cpp:
 	.text start:0x80062480 end:0x80062648
 	extab       start:0x80007138 end:0x80007140
 	extabindex  start:0x8000D084 end:0x8000D090
+	.sdata2     start:0x8032EFD0 end:0x8032EFE0
 
 pppRandUpIV.cpp:
 	.text start:0x80062774 end:0x80062908

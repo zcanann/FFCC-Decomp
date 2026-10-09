@@ -673,6 +673,7 @@ p_light.cpp:
 	.data       start:0x801DE618 end:0x801DE804
 	.sdata      start:0x8034B420 end:0x8034B43C
 	.sbss       start:0x8034BB10 end:0x8034BB18
+	.sdata2     start:0x8034C968 end:0x8034C9F0
 
 menu_letter.cpp:
 	extab       start:0x8000A014 end:0x8000A06C
@@ -734,6 +735,7 @@ chara_fur.cpp:
 pppYmLaser.cpp:
 	.rodata start:0x801D5FA0 end:0x801D5FB0
 	extab       start:0x80008B14 end:0x80008B34
+	.sdata2     start:0x8034DAE0 end:0x8034DB18
 
 MSL_C/PPCEABI/bare/H/string.c:
 	.text start:0x801B3FA8 end:0x801B4428
@@ -2614,11 +2616,13 @@ pppRandDownFV.cpp:
 	.text start:0x80060AD0 end:0x80060C00
 	extab       start:0x80007160 end:0x80007168
 	extabindex  start:0x8000CFD0 end:0x8000CFDC
+	.sdata2     start:0x8034CC98 end:0x8034CCA0
 
 pppRandDownHCV.cpp:
 	.text start:0x80060C00 end:0x80060DC8
 	extab       start:0x80007168 end:0x80007170
 	extabindex  start:0x8000CFDC end:0x8000CFE8
+	.sdata2     start:0x8034CCA0 end:0x8034CCB0
 
 pppRandDownIV.cpp:
 	.text start:0x80060EF4 end:0x80061088
@@ -2630,11 +2634,13 @@ pppRandFV.cpp:
 	.text start:0x800612C0 end:0x800613F4
 	extab       start:0x80007190 end:0x80007198
 	extabindex  start:0x8000D018 end:0x8000D024
+	.sdata2     start:0x8034CCE8 end:0x8034CCF0
 
 pppRandHCV.cpp:
 	.text start:0x800613F4 end:0x80061600
 	extab       start:0x80007198 end:0x800071A0
 	extabindex  start:0x8000D024 end:0x8000D030
+	.sdata2     start:0x8034CCF0 end:0x8034CD00
 
 pppRandIV.cpp:
 	.text start:0x80061740 end:0x80061908
@@ -2652,11 +2658,13 @@ pppRandUpFV.cpp:
 	.text start:0x80061E54 end:0x80061F84
 	extab       start:0x800071D0 end:0x800071D8
 	extabindex  start:0x8000D078 end:0x8000D084
+	.sdata2     start:0x8034CD58 end:0x8034CD60
 
 pppRandUpHCV.cpp:
 	.text start:0x80061F84 end:0x8006214C
 	extab       start:0x800071D8 end:0x800071E0
 	extabindex  start:0x8000D084 end:0x8000D090
+	.sdata2     start:0x8034CD60 end:0x8034CD70
 
 pppRandUpIV.cpp:
 	.text start:0x80062278 end:0x8006240C
@@ -2771,6 +2779,7 @@ menu.cpp:
 
 pppYmMoveCircle.cpp:
 	.text start:0x800CE9BC end:0x800CED1C
+	.sdata2     start:0x8034DA98 end:0x8034DAB8
 
 pppYmLaser.cpp:
 	.text start:0x800CF9C0 end:0x800D0C20

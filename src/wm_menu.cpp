@@ -1163,9 +1163,9 @@ void CMenuPcs::InitCharaInfo()
 		baseY = baseY + 0xB8;
 	}
 
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		CCaravanWork& caravan = Game.m_caravanWorkArr[i];
-		WmCharaModelInfo* entry = &m_wm.m_charaModelData[i];
+	for (slot = 0; slot < kWmMenuPlayerCount; slot++) {
+		CCaravanWork& caravan = Game.m_caravanWorkArr[slot];
+		WmCharaModelInfo* entry = &m_wm.m_charaModelData[slot];
 		if (caravan.m_shopState != 0) {
 			entry->m_modelNo = GetModelNo(caravan.m_tribeId, caravan.m_appearanceVariant,
 			                            caravan.m_genderFlag);

@@ -601,6 +601,7 @@ cmake.cpp:
 	.sdata2 start:0x8034F770 end:0x8034F7B8
 	.sdata start:0x8034B860 end:0x8034B868
 	.bss        start:0x80327458 end:0x80327480
+	.sbss start:0x8034BCF0 end:0x8034BCF4
 
 
 shopmenu.cpp:

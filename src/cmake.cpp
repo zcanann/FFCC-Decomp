@@ -370,8 +370,7 @@ static void GetChara(char* text, int index, char* dst)
         int position;
         int state;
         int character;
-        character = 0;
-        state = 0;
+        state = character = 0;
         position = 0;
         for (; length > 0; --length, ++position) {
             if ((state == 0 || state == 2) &&
@@ -440,8 +439,7 @@ static inline int GetCharaType(char* text, int index)
     int position;
     int state;
     int character;
-    character = 0;
-    state = 0;
+    state = character = 0;
     position = 0;
     for (; length > 0; --length, ++position) {
         if ((state == 0 || state == 2) &&
@@ -491,8 +489,7 @@ static inline int GetCharaCnt(char* text)
     int position;
     int state;
     int character;
-    character = 0;
-    state = 0;
+    state = character = 0;
     position = 0;
     for (; length > 0; --length, ++position) {
         if ((state == 0 || state == 2) &&
@@ -2181,7 +2178,7 @@ void CMenuPcs::CmakeSexDraw()
 #endif
     int y;
     int i;
-    for (i = 0, y = 0x9C; i < 2; ++i) {
+    for (i = 0, y = 0x9C; i < 2; ++i, y += 0x28) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
 #ifdef VERSION_GCCP01
@@ -2199,7 +2196,6 @@ void CMenuPcs::CmakeSexDraw()
         font->SetPosY(static_cast<float>(y) - 4.0f);
 #endif
         font->Draw(txt);
-        y += 0x28;
     }
     DrawInit();
 

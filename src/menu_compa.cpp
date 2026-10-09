@@ -542,9 +542,8 @@ void CMenuPcs::CompaInit()
 	memset(this->m_compaList, 0, sizeof(*this->m_compaList));
 
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	float one = 1.0f;
 	for (int count = 64; count != 0; count--) {
-		entry->uvScale = one;
+		entry->uvScale = 1.0f;
 		entry++;
 	}
 

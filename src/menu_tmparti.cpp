@@ -257,7 +257,6 @@ void CMenuPcs::TmpArtiDraw()
  */
 unsigned int CMenuPcs::TmpArtiClose()
 {
-	float zero;
 	TmpArtiEntry* entry;
 	int completedItems;
 	int itemCount;
@@ -289,12 +288,11 @@ unsigned int CMenuPcs::TmpArtiClose()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		zero = 0.0f;
 		entry = this->m_tmpArtiList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
 			entry->duration = 1;
-			entry->alpha = zero;
+			entry->alpha = 0.0f;
 			entry++;
 		}
 		result = 1;
@@ -367,12 +365,11 @@ unsigned int CMenuPcs::TmpArtiOpen()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		float one = 1.0f;
 		entry = this->m_tmpArtiList->entries;
 		for (int count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
 			entry->duration = 1;
-			entry->alpha = one;
+			entry->alpha = 1.0f;
 			entry++;
 		}
 		result = 1;

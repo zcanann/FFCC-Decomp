@@ -70,8 +70,7 @@ void CMenuPcs::MLstDraw()
 		int tex = item->tex;
 		if (tex >= 0) {
 			x = (float)item->x;
-			float zero = 0.0f;
-			v = zero;
+			v = 0.0f;
 			y = (float)item->y;
 			w = (float)item->width;
 			h = (float)item->height;
@@ -89,17 +88,17 @@ void CMenuPcs::MLstDraw()
 				v += (float)item->height;
 			}
 
-			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);
+			MenuPcs.DrawRect(0, x, y, w, h, 0.0f, v, item->z, item->z, 0.0f);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMLstCursorTexture));
 			w = 40.0f;
 			float iconX = item->x - w / 2.0;
 			float iconY = (float)(item->y - 6);
-			v = zero;
+			v = 0.0f;
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 				v += (float)item->height;
 			}
-			MenuPcs.DrawRect(0, iconX, iconY, w, w, zero, v, item->z, item->z, zero);
+			MenuPcs.DrawRect(0, iconX, iconY, w, w, 0.0f, v, item->z, item->z, 0.0f);
 		}
 	}
 
@@ -167,7 +166,6 @@ void CMenuPcs::MLstDraw()
  */
 int CMenuPcs::MLstClose()
 {
-	float zero;
 	MenuLstEntry* entry;
 	int completedItems;
 	int itemCount;
@@ -198,12 +196,11 @@ int CMenuPcs::MLstClose()
 	}
 	result = 0;
 	if (this->m_menuLstList->count == completedItems) {
-		zero = 0.0f;
 		entry = this->m_menuLstList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
 			entry->duration = 1;
-			entry->alpha = zero;
+			entry->alpha = 0.0f;
 			entry++;
 		}
 		result = 1;
@@ -223,17 +220,15 @@ int CMenuPcs::MLstClose()
  */
 inline void CMenuPcs::MLstInit1()
 {
-	float one;
 	int i;
 	MenuLstEntry* entry;
 	int startFrame;
 	int duration;
 
-	one = 1.0f;
 	entry = this->m_menuLstList->entries;
 	for (i = 0; i < this->m_menuLstList->count; i++) {
-		entry->alpha = one;
-		entry->z = one;
+		entry->alpha = 1.0f;
+		entry->z = 1.0f;
 		entry++;
 	}
 
@@ -373,7 +368,6 @@ inline void CMenuPcs::MLstInit()
  */
 int CMenuPcs::MLstOpen()
 {
-	float one;
 	MenuLstEntry* entry;
 	int completedItems;
 	int itemCount;
@@ -405,12 +399,11 @@ int CMenuPcs::MLstOpen()
 
 	int result = 0;
 	if (this->m_menuLstList->count == completedItems) {
-		one = 1.0f;
 		entry = this->m_menuLstList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
 			entry->duration = 1;
-			entry->alpha = one;
+			entry->alpha = 1.0f;
 			entry++;
 		}
 		result = 1;

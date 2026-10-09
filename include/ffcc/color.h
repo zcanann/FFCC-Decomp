@@ -3,6 +3,8 @@
 
 #include <dolphin/gx.h>
 
+class CColor3;
+
 class CColor
 {
 public:
@@ -63,6 +65,7 @@ public:
 		return out;
 	}
 	operator CColor&() { return *this; }
+	operator CColor3&() { return *reinterpret_cast<CColor3*>(this); }
 	/*
 	 * --INFO--
 	 * PAL Address: 0x800B9220
@@ -108,7 +111,7 @@ public:
 	}
 	CColor3(CColor3& other);
 	CColor3(_GXColor& other);
-	CColor3 operator*(const CColor& other) const
+	CColor3 operator*(const CColor3& other) const
 	{
 		CColor3 result;
 		result.color.r = static_cast<unsigned char>((static_cast<int>(color.r) * other.color.r) / 255);

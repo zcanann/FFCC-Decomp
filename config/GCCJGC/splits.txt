@@ -801,6 +801,7 @@ ringmenu.cpp:
 	.rodata start:0x801D4B60 end:0x801D4B6C
 	.data start:0x8022CCE0 end:0x8022CD34
 	.sdata start:0x8034B618 end:0x8034B630
+	.sdata2 start:0x8034D6E0 end:0x8034D828
 
 MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text start:0x801AE1CC end:0x801AE4DC

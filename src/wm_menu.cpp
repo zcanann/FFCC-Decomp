@@ -1990,12 +1990,7 @@ void CMenuPcs::CalcMCardMenu()
 		} else if (m_menuWindowInfo->state == 1
 		           && m_wmWorldState->m_counter1A == 0) {
 			if (subState == 0xD) {
-#if defined(VERSION_GCCP01)
-				GetMcCtrl()->Format(1);
-				m_wmWorldState->m_mcResult = (short)m_mcCtrl.m_lastResult;
-#else
 				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->Format(1);
-#endif
 #if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
@@ -5455,8 +5450,7 @@ void CMenuPcs::CalcFukidashi()
 #ifndef VERSION_GCCJGC
 	Game.UpperItemName(nameBuffer);
 
-	int textWidth = m_wmIconFlags != 0 ? 0xA2 : 0xD8;
-	if (ChkPlaceLength(nameBuffer, textWidth)) {
+	if (ChkPlaceLength(nameBuffer)) {
 		SplitPlace(nameBuffer, tempBuf, secondLine);
 		strcpy(nameBuffer, tempBuf);
 	}
@@ -5881,9 +5875,13 @@ void CMenuPcs::DrawFukidashi()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CMenuPcs::ChkPlaceLength(char* text, int width)
+inline int CMenuPcs::ChkPlaceLength(char* text)
 {
 	CFont* font = GetFontWorld();
+	int width = 0xD8;
+	if (m_wmIconFlags != 0) {
+		width = 0xA2;
+	}
 	font->SetMargin(1.0f);
 	font->SetShadow(0);
 	font->SetScale(1.0f);

@@ -17,6 +17,29 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: UNUSED
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void MTXConcatVec(Mtx src, Vec* trans, Mtx dst)
+{
+    static Mtx m = {
+        {1.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f, 0.0f},
+    };
+
+    m[0][3] = trans->x;
+    m[1][3] = trans->y;
+    m[2][3] = trans->z;
+    MTXConcat(src, m, dst);
+}
+
 class CRelProfile
 {
 public:

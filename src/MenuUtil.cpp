@@ -357,12 +357,10 @@ float CMenuPcs::CalcCenteringPos(char* text, int fontSize)
 {
 	int length = strlen(text);
 	CFont* font = m_fonts[0];
-	float halfWidth = 0.5f;
-	float offset = 320.0f;
 	font->SetMargin(1.0f);
 	font->SetScale(1.0f);
 	float width = font->GetWidth(text);
-	return offset - width * halfWidth;
+	return 320.0f - width / 2.0f;
 }
 #else
 /*
@@ -378,16 +376,13 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
 	CFont* font = m_fonts[0];
 	float width;
-	float scaleY = 1.0f;
-	float halfWidth = 0.5f;
-	float offset = 320.0f;
 
 	font->SetShadow(1);
 	font->SetMargin(margin);
 	font->SetScaleX(scale);
-	font->SetScaleY(scaleY);
+	font->SetScaleY(1.0f);
 	width = font->GetWidth(text);
-	return offset - width * halfWidth;
+	return 320.0f - width / 2.0f;
 }
 #endif
 
@@ -398,10 +393,8 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
  */
 float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
 {
-    float halfWidth = 0.5f;
-    float offset = 320.0f;
     float width = font->GetWidth(text);
-    return offset - width * halfWidth;
+    return 320.0f - width / 2.0f;
 }
 
 /*
@@ -1198,6 +1191,7 @@ void CMenuPcs::DrawOptionMenu()
 	Vec2d uv1;
 
 #ifndef VERSION_GCCJGC
+	float baseScale = 1.0f;
 	font->SetScale(0.88f);
 	font->SetMargin(0.0f);
 #endif
@@ -1438,8 +1432,7 @@ void CMenuPcs::DrawOptionMenu()
 				char* txt = OPT_MES(12);
 				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				float oneF = 1.0f;
-				float firstScale = oneF * scale;
+				float firstScale = baseScale * scale;
 				fnt->SetScale(firstScale);
 				float tw = fnt->GetWidth(txt);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
@@ -1477,8 +1470,7 @@ void CMenuPcs::DrawOptionMenu()
 				char* txt = OPT_MES(13);
 				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				float oneF = 1.0f;
-				scale = oneF * scale;
+				scale = baseScale * scale;
 				fnt->SetScale(scale);
 				float tw = fnt->GetWidth(txt);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
@@ -1553,13 +1545,12 @@ void CMenuPcs::DrawOptionMenu()
 				char* txt = OPT_MES(14);
 				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				float oneF = 1.0f;
-				fnt->SetScale(stereoScale * oneF);
+				fnt->SetScale(stereoScale * baseScale);
 				float tw = fnt->GetWidth(txt);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
 				                           0.5 + 360.0)),
 				          static_cast<int>(row.leftText.y - 2.0f), color, 0x17, txt,
-				          stereoScale * oneF, 1.0f, 1.0f);
+				          stereoScale * baseScale, 1.0f, 1.0f);
 			}
 			{
 				CFont* fnt = m_fonts[0];
@@ -1591,13 +1582,12 @@ void CMenuPcs::DrawOptionMenu()
 				char* txt = OPT_MES(15);
 				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				float oneF = 1.0f;
-				fnt->SetScale(stereoScale * oneF);
+				fnt->SetScale(stereoScale * baseScale);
 				float tw = fnt->GetWidth(txt);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
 				                           0.5 + 472.0)),
 				          static_cast<int>(row.rightText.y - 2.0f), color, 0x17, txt,
-				          stereoScale * oneF, 1.0f, 1.0f);
+				          stereoScale * baseScale, 1.0f, 1.0f);
 			}
 		}
 #endif

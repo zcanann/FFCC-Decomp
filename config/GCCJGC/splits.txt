@@ -2912,7 +2912,7 @@ singmenu.cpp:
 
 dolphin/os/__ppc_eabi_init.cpp:
 	.init start:0x80003400 end:0x80003458
-	.text start:0x8017C5B0 end:0x8017C644
+	.text start:0x8017C5AC end:0x8017C644
 
 exi/EXIBios.c:
 	.text start:0x8017C644 end:0x8017E020

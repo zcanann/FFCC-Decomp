@@ -66,6 +66,19 @@ lbl_80003438:
 
 static void __init_cpp(void);
 
+#ifdef VERSION_GCCJGC
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: 0x8017C5AC
+ * JP Size: 4b
+ */
+__declspec(weak) void InitMetroTRK_BBA(void) {}
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x8018201C

@@ -9,6 +9,8 @@
  */
 void CMesMenu::onDraw()
 {
+    static int tCut[4] = {1, 6, 7, 6};
+
     if ((m_menuIndex == 0) &&
         (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 30) >> 31) != 0)) {
         int iconFrame = 0;
@@ -30,9 +32,9 @@ void CMesMenu::onDraw()
             unsigned int buttons = Pad.GetButton(0);
 
             if ((buttons & 0x100) != 0) {
-                iconFrame = s_mesMenuIconFrames[(System.m_frameCounter & 6) >> 1];
+                iconFrame = tCut[(System.m_frameCounter & 6) >> 1];
             } else {
-                iconFrame = s_mesMenuIconFrames[0];
+                iconFrame = tCut[0];
             }
             break;
         }
@@ -231,14 +233,14 @@ void CMesMenu::onDraw()
         if (foodTimer == 0) {
             foodShakeX = 0;
         } else {
-            foodShakeX = (foodTimer >> 2) * s_mesMenuShakePattern[3 - ((foodTimer + 1) & 3)];
+            foodShakeX = (foodTimer >> 2) * tXY[3 - ((foodTimer + 1) & 3)];
         }
         float shakeX = (float)foodShakeX;
         int foodShakeY;
         if (foodTimer == 0) {
             foodShakeY = 0;
         } else {
-            foodShakeY = (foodTimer >> 2) * s_mesMenuShakePattern[3 - (foodTimer & 3)];
+            foodShakeY = (foodTimer >> 2) * tXY[3 - (foodTimer & 3)];
         }
         float shakeY = (float)foodShakeY;
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());

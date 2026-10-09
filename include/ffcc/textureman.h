@@ -57,6 +57,7 @@ public:
      * JP Address: TODO
      * JP Size: TODO
      */
+    unsigned int GetFormat() { return m_format; }
     int GetNumTlut()
     {
         if (m_format == GX_TF_C8) {

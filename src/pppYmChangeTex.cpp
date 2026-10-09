@@ -15,10 +15,6 @@
 #include "ffcc/ppp_linkage.h"
 
 static const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
-static const float kPppYmChangeTexRampStart = 2.0f;
-static const float kPppYmChangeTexRampScale = 0.5f;
-static const float kPppYmChangeTexRampStep = 0.25f;
-static const float kPppYmChangeTexInitZero = 0.0f;
 
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
@@ -212,9 +208,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			int delta = static_cast<int>(cutoffY) - static_cast<int>(meshList->GetVertex()[v].y);
 			if (delta >= 0) {
 				int level = 0;
-				float threshold = kPppYmChangeTexRampStart;
+				float threshold = 2.0f;
 				for (int tries = 7; tries != 0; tries--) {
-					if ((float)delta > threshold * kPppYmChangeTexRampScale) {
+					if ((float)delta > threshold * 0.5f) {
 						if (negativeRamp == 0xFF) {
 							vertColors->a = negativeRamp - (level << 4);
 						} else {
@@ -222,7 +218,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 						}
 						break;
 					}
-					threshold = threshold - kPppYmChangeTexRampStep;
+					threshold = threshold - 0.25f;
 					level = level + 1;
 				}
 			} else {
@@ -340,7 +336,7 @@ freeArrays:
  */
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 {
-	float init = kPppYmChangeTexInitZero;
+	float init = 0.0f;
 	pppYmChangeTexState* state = GetChangeTexState(ymChangeTex, data);
 
 	state->m_value0 = init;

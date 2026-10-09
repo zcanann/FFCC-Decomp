@@ -58,6 +58,7 @@ public:
         bool IsBattleStage() { return m_bossArtifactStageIndex < 0xF; }
         bool IsMogStage() { return m_bossArtifactStageIndex == 0x19; }
         bool IsBonusStage() { return m_bossArtifactStageIndex < 0xE; }
+        int IsStreamStage() { return m_bossArtifactStageIndex == 0x17; }
         unsigned char GetLanguage() { return m_languageId; }
 
         unsigned char m_menuStageMode;                   // 0x00
@@ -182,6 +183,7 @@ public:
     char* GetNPCName(int npcIndex) { return m_cFlatDataArr[1].TableStrings(2)[npcIndex]; }
     char* GetLetterSubject(int subjectIndex) { return m_cFlatDataArr[1].TableStrings(5)[subjectIndex]; }
     char* GetPlaceName(int placeIndex) { return m_cFlatDataArr[1].TableStrings(3)[placeIndex]; }
+    void UPPERItemName(char* name);
     void UpperItemName(char* name)
     {
         if (name[0] != '\0') {
@@ -192,6 +194,10 @@ public:
 #endif
         }
     }
+    void LowerItemName(char* name);
+    void UPPERMonName(char* name);
+    void UpperMonName(char* name);
+    void LowerMonName(char* name);
     char* GetLetter(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x10); }
     char* GetLetterReply(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x11); }
     char* GetMonName(int);
@@ -199,7 +205,8 @@ public:
     char* GetMonNames(int);
     char* GetMonArts(int);
     char* GetMonName(int, int);
-    char* GetSysMes(int);
+    int GetNumBonus() { return m_gameWork.m_radarType != 0 ? 4 : 0x10; }
+    char* GetSysMes(int index) { return m_cFlatDataArr[1].GetMes(index); }
     int GetEvtFlag(int);
     void SetEvtFlag(int, int);
 

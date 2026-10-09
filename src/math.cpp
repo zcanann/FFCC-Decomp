@@ -544,10 +544,7 @@ int CBound::CheckFrustum0(float farPlane)
  */
 int CBound::CheckFrustum(Vec& viewPos, float (*viewMatrix)[4], float farPlane)
 {
-    s_f_vpos.x = viewPos.x;
-    s_f_vpos.y = viewPos.y;
-    s_f_vpos.z = viewPos.z;
-    PSMTXCopy(viewMatrix, s_f_lvmtx);
+    SetFrustum(viewPos, viewMatrix);
     return CheckFrustum0(farPlane);
 }
 

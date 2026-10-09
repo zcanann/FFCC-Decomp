@@ -44,12 +44,6 @@ static inline _pppEnvSt* DeformationMdlEnv()
     return ppvEnv;
 }
 
-static const float kYmDeformationMdlScreenWidth = 320.0f;
-static const float kYmDeformationMdlScreenHeight = 224.0f;
-static const float kYmDeformationMdlTexOffset = -0.5f;
-static const float kYmDeformationMdlTexDepth = -1.0f;
-static const float kYmDeformationMdlDegToRad = 0.017453292f;
-
 static inline Mtx& CameraMatrix()
 {
     return CameraPcs.m_cameraMatrix;
@@ -88,7 +82,7 @@ inline void SetUpIndWarp(VYmDeformationMdl* work)
         work->m_angle = 1;
     }
 
-    PSMTXRotRad(rotMtx, 'z', kYmDeformationMdlDegToRad * (float)work->m_angle);
+    PSMTXRotRad(rotMtx, 'z', 0.017453292f * (float)work->m_angle);
     indMtx[0][0] = rotMtx[0][0] * work->m_scale;
     indMtx[0][1] = rotMtx[0][1] * work->m_scale;
     indMtx[0][2] = DeformationMdlZero();
@@ -225,11 +219,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         texMtx[0][2] = screenMtx[0][2];
         texMtx[1][2] = screenMtx[1][2];
         texMtx[2][2] = screenMtx[2][2];
-        texMtx[0][0] = texMtx[0][0] * (kYmDeformationMdlScreenWidth / (float)width);
-        texMtx[1][1] = texMtx[1][1] * -(kYmDeformationMdlScreenHeight / (float)height);
-        texMtx[0][2] = kYmDeformationMdlTexOffset;
-        texMtx[1][2] = kYmDeformationMdlTexOffset;
-        texMtx[2][2] = kYmDeformationMdlTexDepth;
+        texMtx[0][0] = texMtx[0][0] * (320.0f / (float)width);
+        texMtx[1][1] = texMtx[1][1] * -(224.0f / (float)height);
+        texMtx[0][2] = -0.5f;
+        texMtx[1][2] = -0.5f;
+        texMtx[2][2] = -1.0f;
         PSMTXConcat(texMtx, pppYmDeformationMdl->m_drawMatrix.value, texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);

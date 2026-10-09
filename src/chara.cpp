@@ -345,11 +345,6 @@ static inline s16& ModelChest1Index(CChara::CModel* model)
 	return model->m_data->m_chest1NodeIndex;
 }
 
-static inline float TexAnimSetChin(CTexAnimSet* texAnimSet)
-{
-	return texAnimSet->GetChin();
-}
-
 static inline Quaternion& NodePreviousQuat(CChara::CNode* node)
 {
 	return node->m_previousQuat;
@@ -1336,7 +1331,7 @@ void CChara::CModel::calcMatrix()
 					}
 					srt.m_rotation.z += m_chestAmp * tiltScale;
 				} else if (nodeIndex == ModelChest1Index(this) && ModelTexAnimSet(this) != 0) {
-					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
+					srt.m_rotation.z += m_texAnimSet->GetChin();
 				}
 				if (NodeAnimNode0(node)->IsScale()) {
 					Math.SRTToMatrix(animMtx, &srt);
@@ -1725,7 +1720,7 @@ int CChara::CModel::SearchNodeSk(char* name)
  */
 void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 {
-	if (ModelLightAlpha(this) == 0.0f) {
+	if (m_lightAlpha == 0.0f) {
 		return;
 	}
 
@@ -1739,14 +1734,14 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		beforeDrawModel(this, m_callbackContext, m_callbackParam, view, cullFlag);
 	}
 
-	ModelMaterialSet(this)->SetTextureSet(m_texSet);
-	CTexAnimSet* texAnimSet = ModelTexAnimSet(this);
+	m_data->m_materialSet->SetTextureSet(m_texSet);
+	CTexAnimSet* texAnimSet = m_texAnimSet;
 	if (texAnimSet != 0) {
 		texAnimSet->SetTexGen();
 	}
 
-	const int posQuant = ModelPosQuant(this);
-	const int normQuant = ModelNormQuant(this);
+	const int posQuant = m_data->m_posQuant;
+	const int normQuant = m_data->m_normQuant;
 	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, posQuant, (_GXCompType)3, normQuant, (_GXCompType)3, 0xC);
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);
@@ -1757,17 +1752,17 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		cullMode = 2;
 	}
 	GXSetCullMode(static_cast<GXCullMode>(cullMode));
-	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
+	LightPcs.SetAmbientAlpha(m_lightAlpha);
 
-	CCharaMeshRaw* mesh = ModelMeshes(this);
+	CCharaMeshRaw* mesh = m_meshes;
 	int lastLightEnable = 0;
 	int lastZWrite = 0;
 
-	for (int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
+	for (int meshIndex = 0; meshIndex < m_data->m_meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}
-		if (meshIndex < 0x20 && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
+		if (meshIndex < 0x20 && ((m_meshVisibleMask >> meshIndex) & 1) == 0) {
 			continue;
 		}
 
@@ -1775,9 +1770,9 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount != 0) {
-			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+			PSMTXCopy(m_drawMtx, meshMtx);
 		} else {
-			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
+			PSMTXConcat(m_drawMtx, m_nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		if (((cullFlag == 0) && shadowDisabled) || ((cullFlag != 0) && (shadowCullEnabled != 0))) {
@@ -1786,20 +1781,20 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		if (skipShadowPosition) {
 			Vec position;
-			position.x = ModelDrawMtx(this)[0][3];
-			position.y = ModelDrawMtx(this)[1][3];
-			position.z = ModelDrawMtx(this)[2][3];
+			position.x = m_drawMtx[0][3];
+			position.y = m_drawMtx[1][3];
+			position.z = m_drawMtx[2][3];
 			MaterialMan.SetPosition(static_cast<CMapShadow::TARGET>(0), &position, 100.0f, 10.0f, meshMtx,
 			                        m_flagsA0Bits.m_flagA0_80);
 		}
 
-		const int lightEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0xC0) << 24) >> 31;
+		const int lightEnable = mesh->m_data->m_flagsBits.m_flag_80;
 		if (lastLightEnable != lightEnable) {
 			lastLightEnable = lightEnable;
 			LightPcs.EnableLight(lightEnable == 0, 0);
 		}
 
-		const int zWriteEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0x60) << 25) >> 31;
+		const int zWriteEnable = mesh->m_data->m_flagsBits.m_flag_40;
 		if (lastZWrite != zWriteEnable) {
 			lastZWrite = zWriteEnable;
 			GXSetZMode((u8)1, (GXCompare)3, (zWriteEnable == 0) ? GX_TRUE : GX_FALSE);
@@ -1825,7 +1820,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			if (m_drawMeshDLCallback != 0) {
 				m_drawMeshDLCallback(this, m_callbackContext, m_callbackParam, meshIndex, displayListIndex, meshMtx);
 			} else {
-				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, materialAlpha, (_GXTevScale)0);
+				MaterialMan.SetMaterial(m_data->m_materialSet, displayList->m_material, materialAlpha, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
 			}
 		}

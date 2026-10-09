@@ -27,20 +27,6 @@ enum {
 
 typedef unsigned char u8;
 
-static const float kArtiZero = 0.0f;
-static const float kArtiOne = 1.0f;
-static const double kArtiOneDouble = 1.0;
-static const double kArtiHalfDouble = 0.5;
-static const float kArtiColorMax = 255.0f;
-static const float kArtiListFontScale = 0.9f;
-static const float kArtiTextYOffset = 4.0f;
-static const float kArtiHelpY = 352.0f;
-static const float kArtiHelpScale = 3.0f;
-static const float kArtiHelpCenterX = 320.0f;
-static const float kArtiInitX = 128.0f;
-static const float kArtiInitYOffset = 8.0f;
-static const float kArtiInitScale = 0.75f;
-
 namespace {
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiList) == 0x850);
@@ -219,13 +205,13 @@ void CMenuPcs::ArtiDraw()
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				w = entry->alpha * w;
-				if (w > kArtiZero) {
-					MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, kArtiOne, kArtiOne, kArtiZero);
+				if (w > 0.0f) {
+					MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, 1.0f, 1.0f, 0.0f);
 					x += w;
 					u += w;
 				}
 
-				if (w > kArtiZero && w < (float)entry->w) {
+				if (w > 0.0f && w < (float)entry->w) {
 					colors[1].r = 0xFF;
 					colors[1].g = 0xFF;
 					colors[1].b = 0xFF;
@@ -234,9 +220,9 @@ void CMenuPcs::ArtiDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					w = (float)(kArtiOneDouble / (double)entry->duration);
+					w = (float)(1.0 / (double)entry->duration);
 					w = w * entry->w;
-					MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, kArtiOne, kArtiOne, kArtiZero);
+					MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, 1.0f, 1.0f, 0.0f);
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -249,7 +235,7 @@ void CMenuPcs::ArtiDraw()
 					if (itemCount > 0) {
 					} else {
 						texId = kArtiEmptyRowTexture;
-						double half = kArtiHalfDouble;
+						double half = 0.5;
 						itemAlpha = (float)(half * (double)animAlpha);
 					}
 
@@ -263,19 +249,19 @@ void CMenuPcs::ArtiDraw()
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
-				float colorMax = kArtiColorMax;
+				float colorMax = 255.0f;
 				colors[0].a = (u8)(colorMax * itemAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				float uvScale = entry->scale;
-				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, kArtiZero);
+				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 			}
 		}
 	}
 
 	listFont = GetFontItem();
-	listFont->SetMargin(kArtiOne);
+	listFont->SetMargin(1.0f);
 	listFont->SetShadow(0);
-	listFont->SetScale(kArtiListFontScale);
+	listFont->SetScale(0.9f);
 	listFont->DrawInit();
 
 	for (i = 0; i < m_artiList->count; i++) {
@@ -286,7 +272,7 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	for (i = 0; i < 8; i++) {
-		float colorMax = kArtiColorMax;
+		float colorMax = 255.0f;
 		u8 alpha = (u8)(colorMax * entry->alpha);
 		menuIndex = i + m_artiState->scrollOffset;
 		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha).color);
@@ -309,7 +295,7 @@ void CMenuPcs::ArtiDraw()
 #ifdef VERSION_GCCJGC
 		listFont->SetPosY(y);
 #else
-		listFont->SetPosY(y - kArtiTextYOffset);
+		listFont->SetPosY(y - 4.0f);
 #endif
 		listFont->Draw(text);
 	}
@@ -318,17 +304,17 @@ void CMenuPcs::ArtiDraw()
 
 	for (i = 0; i < 8; i++) {
 		if (caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + (i + m_artiState->scrollOffset)] > 0) {
-			int iconY = (int)((float)(entry[i].y + 6) - kArtiOne);
+			int iconY = (int)((float)(entry[i].y + 6) - 1.0f);
 			int iconX = (int)((float)(entry[i].x + entry[i].w - 0x10));
 			DrawSingleIcon(caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + (i + m_artiState->scrollOffset)],
-			               iconX, iconY, entry->alpha, 0, kArtiOne);
+			               iconX, iconY, entry->alpha, 0, 1.0f);
 		}
 	}
 
 	if (artiState == 1) {
 		entry = m_artiList->entries;
 		float mark = static_cast<float>(CalcListPos(m_artiState->scrollOffset, 0x49, 0));
-		if (mark > kArtiZero) {
+		if (mark > 0.0f) {
 			DrawListPosMark((float)entry->x, (float)entry->y, mark);
 		}
 	}
@@ -345,25 +331,25 @@ void CMenuPcs::ArtiDraw()
 		x = (float)(entry->x - 0x14);
 		y = (float)((entry->h - 0x20) / 2.0 + entry->y);
 		x += (float)((int)System.m_frameCounter % 8);
-		DrawCursor((int)x, (int)y, kArtiOne);
+		DrawCursor((int)x, (int)y, 1.0f);
 	}
 
 	helpFont = GetFont22();
-	s8 helpAlpha = (s8)(kArtiColorMax * m_artiList->entries[0].alpha);
+	s8 helpAlpha = (s8)(255.0f * m_artiList->entries[0].alpha);
 	if (!hasSelectedArtifact) {
 		selectedArtifactId = -1;
 	}
 
 	if (selectedArtifactId == -1) {
 		text = GetMenuStr(0x14);
-		float helpY = kArtiHelpY;
+		float helpY = 352.0f;
 		DrawFont((int)CalcCenteringPos(text, helpFont), (int)helpY,
-		         CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, text, kArtiOne, kArtiHelpScale);
+		         CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, text, 1.0f, 3.0f);
 	} else {
-		float helpY = kArtiHelpY;
-		DrawHelpMessage(selectedArtifactId, helpFont, (int)(kArtiHelpCenterX - w / 2),
-		                (int)helpY, CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, kArtiOne,
-		                kArtiHelpScale);
+		float helpY = 352.0f;
+		DrawHelpMessage(selectedArtifactId, helpFont, (int)(320.0f - w / 2),
+		                (int)helpY, CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, 1.0f,
+		                3.0f);
 	}
 }
 
@@ -393,7 +379,7 @@ int CMenuPcs::ArtiClose()
 	for (int i = 0; i < count; i++, anim++) {
 		if (frame >= anim->startFrame) {
 			if (anim->startFrame + anim->duration <= frame) {
-				float zeroF = kArtiZero;
+				float zeroF = 0.0f;
 				finished++;
 				anim->alpha = zeroF;
 				anim->dx = zeroF;
@@ -471,9 +457,9 @@ int CMenuPcs::ArtiOpen()
 	for (int i = 0; i < count; i++, entry++) {
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
-				float zero = kArtiZero;
+				float zero = 0.0f;
 				finished++;
-				entry->alpha = kArtiOne;
+				entry->alpha = 1.0f;
 				entry->dx = zero;
 				entry->dy = zero;
 			} else {
@@ -548,7 +534,7 @@ void CMenuPcs::ArtiInit1()
 	entry = &m_artiList->entries[index++];
 	entry->flags = 2;
 	entry->tex = kArtiRowTexture;
-	alpha = kArtiOne;
+	alpha = 1.0f;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = &m_artiList->entries[index++];
@@ -594,7 +580,7 @@ void CMenuPcs::ArtiInit()
 
 	memset(m_artiList, 0, sizeof(*m_artiList));
 	{
-		float one = kArtiOne;
+		float one = 1.0f;
 		ArtiOpenAnim* p = m_artiList->entries;
 		for (int i = 0; i < 64; i++, p++) {
 			p->scale = one;
@@ -608,10 +594,10 @@ void CMenuPcs::ArtiInit()
 	entry->y = 0x28;
 	entry->w = 0x78;
 	entry->h = 0x108;
-	float titleAlpha = kArtiInitX;
-	float titleScale = kArtiInitYOffset;
-	float one = kArtiOne;
-	float zero = kArtiZero;
+	float titleAlpha = 128.0f;
+	float titleScale = 8.0f;
+	float one = 1.0f;
+	float zero = 0.0f;
 	entry->u = titleAlpha;
 	entry->v = titleScale;
 	entry->scale = one;
@@ -636,7 +622,7 @@ void CMenuPcs::ArtiInit()
 	entry->w = 0x30;
 	entry->h = 0x30;
 	entry->y = 0x150 - entry->h;
-	float rightScale = kArtiInitScale;
+	float rightScale = 0.75f;
 	entry->u = zero;
 	entry->v = zero;
 	entry->scale = rightScale;

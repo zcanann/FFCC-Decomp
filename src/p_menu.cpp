@@ -85,6 +85,8 @@ static const char sMenuGc22FontPathFmt[] = "dvd/menu/gc22.fnt";
 #else
 static const char sMenuGc22FontPathFmt[] = "dvd/%smenu/gc22.fnt";
 #endif
+static const char sMenuCommonName[] = "common";
+static const char sMenuWinName[] = "win";
 static const char sMenuTexKasoru[] = "kasoru";
 static const char sMenuTexPause[] = "pause";
 static const char sMenuTexWin1_0[] = "win1_0";
@@ -142,21 +144,19 @@ enum
 #ifdef VERSION_GCCJGC
     MenuFontAllocationLine = 0xF4,
     MenuTextureAllocationLine = 0x17C,
+    MenuDrawDoneLine = 0x1AA,
     MenuMessageAllocationLine = 0x485,
     MenuRingAllocationLine = 0x48C,
 #else
     MenuFontAllocationLine = 0xF8,
     MenuTextureAllocationLine = 0x182,
+    MenuDrawDoneLine = 0x1B0,
     MenuMessageAllocationLine = 0x48B,
     MenuRingAllocationLine = 0x492,
 #endif
     MenuBattleTextureStart = MenuCommonTextureCount,
     MenuFaceTexture = MenuBattleTextureStart + 2
 };
-
-static const char sMenuCommonName[] = "common";
-static const char sMenuWinName[] = "win";
-
 
 static inline void ReleaseRefObject(void* object)
 {
@@ -651,7 +651,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
     int i;
 
     if (m_mode != static_cast<int>(mode)) {
-        Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), 0x1B0);
+        Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), MenuDrawDoneLine);
         currentMode = m_mode;
         switch (currentMode) {
         case -1:
@@ -1529,7 +1529,11 @@ void CMenuPcs::drawBattle()
             int fillWidth = ((totalWidth - 16) * m_battleHud.m_gaugeValue) / m_battleHud.m_gaugeMax;
             const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * fade));
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
+#ifdef VERSION_GCCJGC
+            MenuPcs.DrawBar(left, markerY, static_cast<float>(totalWidth), static_cast<CMenuPcs::TEX>(0x19), 8.0f);
+#else
             MenuPcs.DrawBar(left, markerY, static_cast<float>(totalWidth), static_cast<CMenuPcs::TEX>(0x1A), 8.0f);
+#endif
 
             const CColor fillTop(0xFF, (m_battleHud.m_gaugeCounter * 0xFF) / 16, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(255.0f * fade));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);

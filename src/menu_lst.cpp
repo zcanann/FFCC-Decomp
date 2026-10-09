@@ -20,21 +20,6 @@ enum {
 };
 #endif
 
-static const float kMLstZero = 0.0f;
-static const float kMLstColorMax = 255.0f;
-static const double kMLstSelectedOffsetX = 20.0;
-static const float kMLstRowHeight = 40.0f;
-static const double kMLstHalfDouble = 0.5;
-static const float kMLstOne = 1.0f;
-static const float kMLstTextYOffset = 4.0f;
-static const float kMLstHelpCenterX = 320.0f;
-static const float kMLstHalf = 0.5f;
-static const float kMLstHelpY = 352.0f;
-static const float kMLstHelpScale = 3.0f;
-static const double kMLstOneDouble = 1.0;
-static const double kMLstZeroDouble = 0.0;
-static const double kMLstWindowCenterX = 216.0;
-
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
@@ -85,7 +70,7 @@ void CMenuPcs::MLstDraw()
 		int tex = item->tex;
 		if (tex >= 0) {
 			x = (float)item->x;
-			float zero = kMLstZero;
+			float zero = 0.0f;
 			v = zero;
 			y = (float)item->y;
 			w = (float)item->width;
@@ -96,18 +81,18 @@ void CMenuPcs::MLstDraw()
 			colors[0].r = 0xff;
 			colors[0].g = 0xff;
 			colors[0].b = 0xff;
-			colors[0].a = (unsigned char)(kMLstColorMax * alpha);
+			colors[0].a = (unsigned char)(255.0f * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
-				x += kMLstSelectedOffsetX;
+				x += 20.0;
 				v += (float)item->height;
 			}
 
 			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMLstCursorTexture));
-			w = kMLstRowHeight;
+			w = 40.0f;
 			float iconX = item->x - w / 2.0;
 			float iconY = (float)(item->y - 6);
 			v = zero;
@@ -119,14 +104,14 @@ void CMenuPcs::MLstDraw()
 	}
 
 	font = GetFontItem();
-	font->SetMargin(kMLstOne);
+	font->SetMargin(1.0f);
 	font->SetShadow(0);
-	font->SetScale(kMLstOne);
+	font->SetScale(1.0f);
 	font->DrawInit();
 
 	item = this->m_menuLstList->entries;
 	for (i = 0; i < this->m_menuLstList->count; item++, i++) {
-		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(kMLstColorMax * item->alpha)).color);
+		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha)).color);
 
 		const char* text = GetMenuStr(i + 0x2e);
 		font->GetWidth(text);
@@ -134,14 +119,14 @@ void CMenuPcs::MLstDraw()
 		textX = (float)(item->x + 0x28);
 		textY = (float)(item->y + 3);
 		if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
-			textX += kMLstSelectedOffsetX;
+			textX += 20.0;
 		}
 
 		font->SetPosX(textX);
 #ifdef VERSION_GCCJGC
 		font->SetPosY(textY);
 #else
-		font->SetPosY(textY - kMLstTextYOffset);
+		font->SetPosY(textY - 4.0f);
 #endif
 		font->Draw(text);
 	}
@@ -152,23 +137,23 @@ void CMenuPcs::MLstDraw()
 		float cursorX = (float)(curItem->x - 0x38);
 		float cursorY = (curItem->height - 0x20) / 2.0 + curItem->y;
 		cursorX += (float)((int)System.m_frameCounter % 8);
-		DrawCursor((int)cursorX, (int)cursorY, kMLstOne);
+		DrawCursor((int)cursorX, (int)cursorY, 1.0f);
 	}
 
 	DrawInit();
 	int helpMessageId = this->m_menuLstState->cursor + 0x25c;
 	CFont* helpFont = this->m_fonts[0];
-	float helpX = kMLstHelpCenterX - w / 2;
-	float helpY = kMLstHelpY;
+	float helpX = 320.0f - w / 2;
+	float helpY = 352.0f;
 	DrawHelpMessage(
 		helpMessageId,
 		helpFont,
 		(int)helpX,
 		(int)helpY,
-		CColor(0xff, 0xff, 0xff, (signed char)(kMLstColorMax * this->m_menuLstList->entries[0].alpha)).color,
+		CColor(0xff, 0xff, 0xff, (signed char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
 		0x0a,
-		kMLstOne,
-		kMLstHelpScale);
+		1.0f,
+		3.0f);
 }
 
 /*
@@ -199,13 +184,13 @@ int CMenuPcs::MLstClose()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = kMLstZero;
+				entry->alpha = 0.0f;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = kMLstOneDouble / (double)entry->duration;
-				entry->alpha = (float)(kMLstOneDouble - ratio * (double)entry->timer);
-				if ((double)entry->alpha < kMLstZeroDouble) {
-					entry->alpha = kMLstZero;
+				double ratio = 1.0 / (double)entry->duration;
+				entry->alpha = (float)(1.0 - ratio * (double)entry->timer);
+				if ((double)entry->alpha < 0.0) {
+					entry->alpha = 0.0f;
 				}
 			}
 		}
@@ -213,7 +198,7 @@ int CMenuPcs::MLstClose()
 	}
 	result = 0;
 	if (this->m_menuLstList->count == completedItems) {
-		zero = kMLstZero;
+		zero = 0.0f;
 		entry = this->m_menuLstList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
@@ -244,7 +229,7 @@ inline void CMenuPcs::MLstInit1()
 	int startFrame;
 	int duration;
 
-	one = kMLstOne;
+	one = 1.0f;
 	entry = this->m_menuLstList->entries;
 	for (i = 0; i < this->m_menuLstList->count; i++) {
 		entry->alpha = one;
@@ -356,15 +341,15 @@ inline void CMenuPcs::MLstInit()
 	MenuLstEntry* entry;
 
 	memset(this->m_menuLstList, 0, sizeof(MenuLstList));
-	one = kMLstOne;
+	one = 1.0f;
 	entry = this->m_menuLstList->entries;
 	for (i = 0; i < 64; i++, entry++) {
 		entry->z = one;
 	}
 
-	xOrigin = kMLstWindowCenterX;
-	itemCenter = kMLstHalfDouble;
-	zero = kMLstZero;
+	xOrigin = 216.0;
+	itemCenter = 0.5;
+	zero = 0.0f;
 	initializedCount = 0;
 	yPos = 0x18;
 	for (i = 0; i < 9; i++) {
@@ -416,10 +401,10 @@ int CMenuPcs::MLstOpen()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = kMLstOne;
+				entry->alpha = 1.0f;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = kMLstOneDouble / (double)entry->duration;
+				double ratio = 1.0 / (double)entry->duration;
 				entry->alpha = (float)(ratio * (double)entry->timer);
 			}
 		}
@@ -428,7 +413,7 @@ int CMenuPcs::MLstOpen()
 
 	int result = 0;
 	if (this->m_menuLstList->count == completedItems) {
-		one = kMLstOne;
+		one = 1.0f;
 		entry = this->m_menuLstList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;

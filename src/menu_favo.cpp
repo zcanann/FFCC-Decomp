@@ -28,9 +28,6 @@ enum {
 
 static FoodRank s_rank[8];
 
-static const float kFavoWideTextureWidth = 384.0f;
-static const float kFavoIconUvScale = 0.75f;
-
 STATIC_ASSERT(sizeof(FavoEntry) == 0x40);
 STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
 STATIC_ASSERT(sizeof(FoodRank) == 4);
@@ -498,7 +495,7 @@ void CMenuPcs::FavoInit()
 	entry->h = 0x20;
 	entry->u = 0.0f;
 	entry->v = 0.0f;
-	entry->uvScale = kFavoWideTextureWidth / entry->w;
+	entry->uvScale = 384.0f / entry->w;
 	entry->startFrame = 5;
 	entry->duration = 5;
 
@@ -510,7 +507,7 @@ void CMenuPcs::FavoInit()
 	entry->h = 200;
 	entry->u = 0.0f;
 	entry->v = 0.0f;
-	entry->uvScale = kFavoWideTextureWidth / entry->w;
+	entry->uvScale = 384.0f / entry->w;
 	entry->startFrame = 5;
 	entry->duration = 5;
 
@@ -522,7 +519,7 @@ void CMenuPcs::FavoInit()
 	entry->h = 0x20;
 	entry->u = 0.0f;
 	entry->v = 0.0f;
-	entry->uvScale = kFavoWideTextureWidth / entry->w;
+	entry->uvScale = 384.0f / entry->w;
 	entry->startFrame = 5;
 	entry->duration = 5;
 
@@ -546,7 +543,7 @@ void CMenuPcs::FavoInit()
 	entry->y = 0x150 - entry->h;
 	entry->u = 0.0f;
 	entry->v = 0.0f;
-	entry->uvScale = kFavoIconUvScale;
+	entry->uvScale = 0.75f;
 	entry->startFrame = 0;
 	entry->duration = 5;
 

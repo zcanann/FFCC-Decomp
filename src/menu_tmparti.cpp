@@ -21,16 +21,6 @@ enum {
 };
 #endif
 
-static const double kTmpArtiHalfDouble = 0.5;
-static const float kTmpArtiColorMax = 255.0f;
-static const float kTmpArtiZero = 0.0f;
-static const float kTmpArtiOne = 1.0f;
-static const float kTmpArtiFontScale = 0.9f;
-static const float kTmpArtiTextYOffset = 4.0f;
-static const double kTmpArtiOneDouble = 1.0;
-static const double kTmpArtiZeroDouble = 0.0;
-static const double kTmpArtiCenterX = 216.0;
-
 STATIC_ASSERT(offsetof(TmpArtiState, initialized) == 0xB);
 STATIC_ASSERT(offsetof(TmpArtiState, closeRequested) == 0xD);
 STATIC_ASSERT(offsetof(TmpArtiState, moveDirection) == 0x1E);
@@ -105,7 +95,7 @@ inline void CMenuPcs::TmpArtiInit0()
     int itemCount;
     const CCaravanWork* caravanWork;
 
-    alpha = kTmpArtiOne;
+    alpha = 1.0f;
     caravanWork = Game.m_scriptFoodBase[0];
     entry = this->m_tmpArtiList->entries;
     for (i = 0; i < this->m_tmpArtiList->count; i++) {
@@ -136,15 +126,15 @@ inline void CMenuPcs::TmpArtiInit()
 {
     memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
 
-    float one = kTmpArtiOne;
+    float one = 1.0f;
     TmpArtiEntry* entry = m_tmpArtiList->entries;
     for (int i = 0; i < 64; i++, entry++) {
         entry->z = one;
     }
 
-    double center = kTmpArtiCenterX;
-    double half = kTmpArtiHalfDouble;
-    float zero = kTmpArtiZero;
+    double center = 216.0;
+    double half = 0.5;
+    float zero = 0.0f;
     entry = m_tmpArtiList->entries;
     for (int row = 0; row < 4; row++, entry++) {
         entry->tex = kTmpArtiRowTexture;
@@ -202,7 +192,7 @@ void CMenuPcs::TmpArtiDraw()
 
 			if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] < 0) {
 				tex = kTmpArtiEmptyRowTexture;
-				alpha = (float)(kTmpArtiHalfDouble * (double)rawAlpha);
+				alpha = (float)(0.5 * (double)rawAlpha);
 			}
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -210,11 +200,11 @@ void CMenuPcs::TmpArtiDraw()
 			colors[0].r = 0xFF;
 			colors[0].g = 0xFF;
 			colors[0].b = 0xFF;
-			colors[0].a = (unsigned char)(int)(kTmpArtiColorMax * alpha);
+			colors[0].a = (unsigned char)(int)(255.0f * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 			float z = entry->z;
-			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, kTmpArtiZero);
+			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, 0.0f);
 		}
 	}
 
@@ -222,23 +212,23 @@ void CMenuPcs::TmpArtiDraw()
 	for (i = 0; i < 4; i++, entry++) {
 		if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] >= 0) {
 			int posX = (int)static_cast<float>(entry->x + entry->width - 0x10);
-			int posY = (int)(static_cast<float>(entry->y + 6) - kTmpArtiOne);
+			int posY = (int)(static_cast<float>(entry->y + 6) - 1.0f);
 			DrawSingleIcon(caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i], posX, posY,
-			               entry->alpha, 0, kTmpArtiOne);
+			               entry->alpha, 0, 1.0f);
 		}
 	}
 
 	font = GetFontItem();
-	font->SetMargin(kTmpArtiOne);
+	font->SetMargin(1.0f);
 	font->SetShadow(0);
-	font->SetScale(kTmpArtiFontScale);
+	font->SetScale(0.9f);
 	font->DrawInit();
 
 	entry = m_tmpArtiList->entries;
 	for (i = 0; i < 4; i++, entry++) {
 		if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] >= 0) {
 			float alpha = entry->alpha;
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, kTmpArtiColorMax * alpha).color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * alpha).color);
 
 			const char* text = Game.GetShortItemName(caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i]);
 			float width = font->GetWidth(text);
@@ -249,7 +239,7 @@ void CMenuPcs::TmpArtiDraw()
 #ifdef VERSION_GCCJGC
 			font->SetPosY(top);
 #else
-			font->SetPosY(top - kTmpArtiTextYOffset);
+			font->SetPosY(top - 4.0f);
 #endif
 			font->Draw(text);
 		}
@@ -286,13 +276,13 @@ unsigned int CMenuPcs::TmpArtiClose()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = kTmpArtiZero;
+				entry->alpha = 0.0f;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = kTmpArtiOneDouble / (double)entry->duration;
-				entry->alpha = (float)(kTmpArtiOneDouble - ratio * (double)entry->timer);
-				if ((double)entry->alpha < kTmpArtiZeroDouble) {
-					entry->alpha = kTmpArtiZero;
+				double ratio = 1.0 / (double)entry->duration;
+				entry->alpha = (float)(1.0 - ratio * (double)entry->timer);
+				if ((double)entry->alpha < 0.0) {
+					entry->alpha = 0.0f;
 				}
 			}
 		}
@@ -301,7 +291,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		zero = kTmpArtiZero;
+		zero = 0.0f;
 		entry = this->m_tmpArtiList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
@@ -357,16 +347,16 @@ unsigned int CMenuPcs::TmpArtiOpen()
 
 	if (this->m_tmpArtiState->initialized == '\0') {
 		memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
-		float one = kTmpArtiOne;
+		float one = 1.0f;
 		entry = m_tmpArtiList->entries;
 		for (int k = 64; k != 0; k--) {
 			entry->z = one;
 			entry++;
 		}
 
-		double half = kTmpArtiHalfDouble;
-		double center = kTmpArtiCenterX;
-		float zero = kTmpArtiZero;
+		double half = 0.5;
+		double center = 216.0;
+		float zero = 0.0f;
 		int row = 0;
 		entry = m_tmpArtiList->entries;
 		for (int k = 4; k != 0; k--) {
@@ -397,7 +387,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = kTmpArtiOne;
+				entry->alpha = 1.0f;
 			} else {
 				entry->timer = entry->timer + 1;
 				entry->alpha = (1.0 / entry->duration) * entry->timer;
@@ -408,7 +398,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		float one = kTmpArtiOne;
+		float one = 1.0f;
 		entry = this->m_tmpArtiList->entries;
 		for (int count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;

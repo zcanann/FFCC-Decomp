@@ -54,6 +54,8 @@ public:
     void SetDrawDoneDebugDataPartControl(int) {}
 #endif
     void _WaitDrawDone(char*, int);
+    void* GetFrameBuffer() { return m_frameBuffer; }
+    int IsAvailableTempBuffer() { return m_scratchTextureBuffer != 0; }
     void Thread();
     int IsFifoOver();
     int IsFrameRateOver();

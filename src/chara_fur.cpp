@@ -73,6 +73,18 @@ static inline int FurTexelIndex(int x, int y, int tileRowStride)
 	return index;
 }
 
+namespace std {
+inline double sqrt(int x)
+{
+	return ::sqrt(static_cast<double>(x));
+}
+
+inline double atan2(int y, int x)
+{
+	return ::atan2(static_cast<double>(y), static_cast<double>(x));
+}
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -177,27 +189,6 @@ static inline void StopMogLoopSe(MogWorkState& work)
 		Sound.StopSe(work.m_loopSeHandle);
 		work.m_loopSeHandle = 0;
 	}
-}
-
-static inline CTexture* FindMogFurTexture(CChara::CModel* model)
-{
-	CTextureSet* textureSet = model->m_texSet;
-
-	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
-	return textureSet->m_textureArray[textureIdx];
-}
-
-static inline void OpenMogHintMessage(int messageId)
-{
-	if (messageId < 0) {
-		return;
-	}
-
-	if (MenuPcs.m_battleMesMenus[5]->IsActiveMessage()) {
-		return;
-	}
-
-	MenuPcs.m_battleMesMenus[5]->Open(Game.m_cFlatDataArr[1].Message(messageId + 8), 0x160, 0x20, 0x220, 0, -1, -1);
 }
 
 } // namespace
@@ -396,7 +387,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		return;
 	}
 
-	const int materialCount = m_data->m_materialSet->m_materials.GetSize();
+	const int materialCount = m_data->m_materialSet->GetNumMaterial();
 
 	int hasFurMaterial = 0;
 	for (int i = 0; i < materialCount; i++) {
@@ -718,7 +709,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 				continue;
 			}
 
-			distance = abs(dy) + abs(dx);
+			distance = abs(dx) + abs(dy);
 			tileIndex = FurTexelIndex(px, py, rowStride);
 			packed = pixels[tileIndex];
 
@@ -991,7 +982,9 @@ int CChara::CModel::PickFur(
 	}
 
 	if (doPaint != 0 && hitPaintable != 0) {
-		CTexture* texture = FindMogFurTexture(this);
+		CTextureSet* textureSet = GetTextureSet();
+		unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
+		CTexture* texture = textureSet->m_textureArray[textureIdx];
 		if (texture != 0) {
 			unsigned short* furTexels = reinterpret_cast<unsigned short*>(texture->m_imageData);
 			int furTexWidth = texture->m_width;
@@ -1034,12 +1027,12 @@ int CChara::CModel::PickFur(
  */
 void CChara::CModel::InitMogFurTex()
 {
-	CTextureSet* textureSet = m_texSet;
+	CTextureSet* textureSet = GetTextureSet();
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
 	CTexture* texture = textureSet->GetTexture(textureIdx);
 
 	if ((texture != 0) && (texture->m_format == GX_TF_RGB565)) {
-		texture->m_format = GX_TF_RGB5A3;
+		texture->SetFormat(GX_TF_RGB5A3);
 		CopyFurTex(0);
 
 		texture->InitTexObj();
@@ -1112,7 +1105,9 @@ void CChara::InitFurTexBuffer()
 inline void CChara::CModel::CopyFurTex(int loadFromTexture)
 {
 	Graphic._WaitDrawDone("chara_fur.cpp", 0x506);
-	CTexture* texture = FindMogFurTexture(this);
+	CTextureSet* textureSet = GetTextureSet();
+	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
+	CTexture* texture = textureSet->m_textureArray[textureIdx];
 	if (texture == 0) {
 		return;
 	}
@@ -1446,7 +1441,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 	}
 
-	OpenMogHintMessage(messageId);
+	if (messageId >= 0 && !MenuPcs.GetMesMenu(5)->IsUse()) {
+		MenuPcs.GetMesMenu(5)->Open(Game.GetSysMes(messageId + 8), 0x160, 0x20, 0x220, 0, -1, -1);
+	}
 	m_mogWork.m_frameCount++;
 }
 
@@ -1473,7 +1470,7 @@ void CChara::CalcMogScore()
 		for (int x = 0; x < 0x40; x++) {
 			const int dx = x - 0x20;
 			const int dy = y - 0x20;
-			const int dist = static_cast<int>(sqrt(static_cast<double>(static_cast<int>(dx * dx + dy * dy))));
+			const int dist = static_cast<int>(std::sqrt(dx * dx + dy * dy));
 
 			if (dist >= 0x40) {
 				continue;
@@ -1496,7 +1493,7 @@ void CChara::CalcMogScore()
 			m_sharedState.m_mogFur.m_alphaScore += a;
 
 			const int ring = dist % 12;
-			int angle = static_cast<int>(MTXRadToDeg(atan2(static_cast<double>(dx), static_cast<double>(dy)))) + 0x168;
+			int angle = static_cast<int>(MTXRadToDeg(std::atan2(dx, dy))) + 0x168;
 			angle %= 0x2D;
 
 			for (int i = 0; i < 3; i++) {

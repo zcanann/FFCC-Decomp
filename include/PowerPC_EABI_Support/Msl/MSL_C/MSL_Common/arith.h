@@ -10,10 +10,9 @@ typedef struct {
 	int rem;  /* remainder */
 } div_t;
 
-#ifdef __MWERKS__
-inline int abs(int value) { return __abs(value); }
-#else
 int abs(int value);
+#ifdef __MWERKS__
+#define abs(n) __abs(n)
 #endif
 div_t div(int numerator, int denominator);
 

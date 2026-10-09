@@ -414,6 +414,11 @@ public:
     }
 
     CPtrArray<CMaterial*> m_materials;        // 0x008
+    void SetDefaultSize(int defaultSize, int grow)
+    {
+        m_materials.SetDefaultSize(defaultSize);
+        m_materials.SetGrow(grow);
+    }
     int GetNumMaterial()
     {
         return m_materials.GetSize();

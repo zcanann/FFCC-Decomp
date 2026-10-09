@@ -7,8 +7,6 @@
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 
-static const float kPppConstrainCameraForLocZero = 0.0f;
-
 struct pppConstrainCameraForLocWork {
     Vec m_cameraOffset;
     float m_fieldC;
@@ -181,7 +179,7 @@ static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* context, voi
     PSVECAdd(&resultPos, &localOffset0, &resultPos);
     PSVECAdd(&resultPos, &localOffset1, &resultPos);
 
-    zero = kPppConstrainCameraForLocZero;
+    zero = 0.0f;
     model->m_worldBaseMtx[0][3] = zero;
     model->m_worldBaseMtx[1][3] = zero;
     model->m_worldBaseMtx[2][3] = zero;

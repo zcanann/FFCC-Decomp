@@ -116,11 +116,6 @@ STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
 
 namespace {
-static inline void* StageBase(CMemory::CStage* stage)
-{
-    return reinterpret_cast<void*>(stage->m_heapTop);
-}
-
 template <typename T>
 static inline void ReleaseSharedNonNull(T* ptr)
 {
@@ -592,7 +587,7 @@ int CCharaPcs::correctLoadAnimAmem()
 
             Memory.CopyFromAMemorySync(
                 tempBuffer + chunkSize,
-                reinterpret_cast<void*>(static_cast<int>(animOffset) + m_amemStage->m_heapTop),
+                reinterpret_cast<void*>(animOffset + reinterpret_cast<unsigned int>(m_amemStage->GetTop())),
                 static_cast<unsigned long>(animSize));
 
             loadAnim->m_anim->SetAmemAddress(compactedSize + chunkSize);
@@ -600,7 +595,7 @@ int CCharaPcs::correctLoadAnimAmem()
         }
 
         if (chunkLoadCount != 0) {
-            const int writeBase = compactedSize + m_amemStage->m_heapTop;
+            const int writeBase = compactedSize + reinterpret_cast<int>(m_amemStage->GetTop());
             Memory.CopyToAMemorySync(
                 tempBuffer, reinterpret_cast<void*>(writeBase),
                 static_cast<unsigned long>(chunkSize));
@@ -1526,7 +1521,7 @@ CCharaPcs::CLoadModel* CCharaPcs::loadModel(void* data, int keyTag, int keyId, i
         loadModel->m_streamSize = size;
         loadModel->m_streamMode = 1;
         Memory.CopyToAMemorySync(
-            data, reinterpret_cast<void*>(m_loadStreamCursor + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
+            data, reinterpret_cast<void*>(m_loadStreamCursor + reinterpret_cast<unsigned int>(m_amemWorkStage->GetTop())),
             static_cast<unsigned long>(size));
         m_loadStreamCursor += static_cast<unsigned int>(size);
     }
@@ -1556,7 +1551,7 @@ CCharaPcs::CLoadTexture* CCharaPcs::loadTexture(void* data, int keyTag, int keyI
         loadTexture->m_streamSize = size;
         loadTexture->m_streamMode = 1;
         Memory.CopyToAMemorySync(
-            data, reinterpret_cast<void*>(m_loadStreamCursor + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
+            data, reinterpret_cast<void*>(m_loadStreamCursor + reinterpret_cast<unsigned int>(m_amemWorkStage->GetTop())),
             static_cast<unsigned long>(size));
         m_loadStreamCursor += static_cast<unsigned int>(size);
     }
@@ -1888,7 +1883,7 @@ foundTexture:
                 File.GetBuffer(),
                 reinterpret_cast<void*>(
                     loadTexture->m_streamOffset +
-                    reinterpret_cast<unsigned int>(StageBase(CharaPcs.m_amemWorkStage))),
+                    reinterpret_cast<unsigned int>(CharaPcs.m_amemWorkStage->GetTop())),
                 static_cast<unsigned long>(loadTexture->m_streamSize));
             loadTexture->m_textureSet = CharaPcs.createTextureSet(File.GetBuffer(), charaKind == 4);
             File.UnlockBuffer();
@@ -1988,7 +1983,7 @@ int CCharaPcs::CHandle::LoadModel(
                     File.GetBuffer(),
                     reinterpret_cast<void*>(
                         loadModel->m_streamOffset +
-                        reinterpret_cast<unsigned int>(StageBase(CharaPcs.m_amemWorkStage))),
+                        reinterpret_cast<unsigned int>(CharaPcs.m_amemWorkStage->GetTop())),
                     static_cast<unsigned long>(loadModel->m_streamSize));
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, "p_chara.cpp", 0x7C7) CChara::CModel;
@@ -2104,7 +2099,7 @@ int CCharaPcs::CHandle::LoadAnim(
 
     m_animSlot[animIndex]->m_playbackFlags = static_cast<unsigned int>(animFlags);
     m_animSlot[animIndex]->m_anim->SetInterp(animFlags & 1);
-    m_animSlot[animIndex]->m_anim->SetLastFrame((animFlags & 2) != 0);
+    m_animSlot[animIndex]->m_anim->SetLastFrame(animFlags & 2);
 
     return 1;
 }

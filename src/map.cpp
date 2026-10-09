@@ -885,6 +885,22 @@ void CMapMng::SetLightSource()
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8003E224
+ * EN Size: 28b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void COctTree::SetOctTreeMapObj(int index)
+{
+    if (m_mapObject != 0) {
+        m_mapObject->m_octTreeIndex = index;
+    }
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -895,12 +911,19 @@ void CMapMng::SetBumpLightSource()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: 0x8003A424
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::InitMapShadow()
 {
-	// TODO
+    int shadowIdx;
+    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        GetMapShadowArray()[shadowIdx]->Init();
+    }
 }
 
 /*
@@ -1168,9 +1191,7 @@ int CMapMng::ReadOtm(char* mapName)
                 case 0x4D534554: {
                     m_materialSet =
                         new (MapMng.m_stage, "map.cpp", 0x482) CMaterialSet();
-                    CMaterialSet* materialSet = m_materialSet;
-                    materialSet->m_materials.SetDefaultSize(0x180);
-                    materialSet->m_materials.SetGrow(0);
+                    m_materialSet->SetDefaultSize(0x180, 0);
                     m_materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                     break;
                 }
@@ -1255,15 +1276,10 @@ int CMapMng::ReadOtm(char* mapName)
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        if (m_octTreeArray[i].GetMapObject() != 0) {
-            m_octTreeArray[i].GetMapObject()->m_octTreeIndex = static_cast<signed char>(i);
-        }
+        m_octTreeArray[i].SetOctTreeMapObj(i);
     }
 
-    int shadowIdx;
-    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
-        GetMapShadowArray()[shadowIdx]->Init();
-    }
+    InitMapShadow();
 
     m_rootMapObj = SearchChildMapObj(GetMapObjArray(), 0);
     if (m_rootMapObj == 0) {
@@ -1491,9 +1507,7 @@ int CMapMng::ReadMid(char* mapName)
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        if (m_octTreeArray[i].GetMapObject() != 0) {
-            m_octTreeArray[i].GetMapObject()->m_octTreeIndex = static_cast<signed char>(i);
-        }
+        m_octTreeArray[i].SetOctTreeMapObj(i);
     }
 
     return 1;
@@ -1747,7 +1761,7 @@ void CMapMng::Draw()
                 GXSetZMode(1, GX_LEQUAL, 0);
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
                 GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-                GXSetChanMatColor(GX_COLOR0A0, CharaPcs.m_texShadowColor);
+                GXSetChanMatColor(GX_COLOR0A0, CharaPcs.GetTexShadowColor());
                 _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
                 _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
                 GXSetNumTevStages(1);
@@ -1765,9 +1779,9 @@ void CMapMng::Draw()
                     for (int i = 0; i < batchCount; i++) {
                         GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX3x4);
                         GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));
-                        GXSetTexCoordGen2(
+                        GXSetTexCoordGen(
                             static_cast<GXTexCoordID>(i), GX_TG_MTX3x4, GX_TG_POS,
-                            static_cast<GXTexMtx>(texMtx), 0, GX_PTIDENTITY);
+                            static_cast<GXTexMtx>(texMtx));
                         GXSetTevDirect(static_cast<GXTevStageID>(stage));
                         _GXSetTevOrder(
                             static_cast<GXTevStageID>(stage), static_cast<GXTexCoordID>(i),
@@ -1883,7 +1897,7 @@ void CMapMng::Draw()
         }
 
         GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, 0, GX_PTIDENTITY);
+        GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
         GXSetNumTevStages(1);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -2244,12 +2258,8 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
     for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* mapObj = &m_mapObjArray[i];
         if (mapObj->m_meshId == id) {
-            mapObj->m_cameraSemiTransTargetAlpha = static_cast<short>(alpha << 7);
+            mapObj->SetCameraSemiTransAlpha(alpha, frameCount);
             found = 1;
-            mapObj->m_cameraSemiTransStep = static_cast<short>(
-                (static_cast<int>(mapObj->m_cameraSemiTransTargetAlpha) -
-                 static_cast<int>(mapObj->m_cameraSemiTransAlpha)) /
-                frameCount);
         }
     }
 
@@ -2490,83 +2500,11 @@ void CMapMng::ShowMapMeshID(int id, int show)
     }
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8002f45c
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMng::SetDrawRangeMapObj(float drawRange)
-{
-    m_octTreeFrustumRange = -drawRange;
-}
 
-/*
- * --INFO--
- * PAL Address: 0x8002f46c
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMng::SetDrawRangeOctTree(float drawRange)
-{
-    m_octTreeDrawMinDepth = -drawRange;
-}
 
-/*
- * --INFO--
- * PAL Address: 0x8002f47c
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
-{
-    int objIndex = GetMapObjIdx(static_cast<unsigned short>(id));
 
-    const Vec spotPosition = position;
-    const _GXColor spotColor = color;
-    CMapObj* mapObj = m_mapObjArray + objIndex;
-    CMapObjAtr* attr = mapObj->m_attribute;
 
-    switch (attr->m_type) {
-    case CMapObjAtr::SPOT_LIGHT:
-    {
-        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-        spotAttr->m_color = spotColor;
-        mapObj->m_localRotation.x = spotPosition.x;
-        mapObj->m_localRotation.y = spotPosition.y;
-        mapObj->m_localRotation.z = spotPosition.z;
-        mapObj->m_localMtxDirty = 1;
-        mapObj->m_calcMtxPending = 1;
-        break;
-    }
-    }
-}
 
-/*
- * --INFO--
- * PAL Address: 0x8002f548
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
-{
-    CMapObj& mapObj = m_mapObjArray[mapObjIndex];
-    mapObj.m_transRateX = x;
-    mapObj.m_transRateY = y;
-    mapObj.m_transRateZ = z;
-}
 
 /*
  * --INFO--
@@ -2590,12 +2528,91 @@ void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f548
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapObjWorldMapLightIdx(int, _GXColor, Vec)
+void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
 {
-	// TODO
+    CMapObj& mapObj = m_mapObjArray[mapObjIndex];
+    mapObj.m_transRateX = x;
+    mapObj.m_transRateY = y;
+    mapObj.m_transRateZ = z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::SetMapObjWorldMapLightIdx(int objIndex, _GXColor color, Vec position)
+{
+    CMapObj* mapObj = m_mapObjArray + objIndex;
+    CMapObjAtr* attr = mapObj->m_attribute;
+
+    switch (attr->m_type) {
+    case CMapObjAtr::SPOT_LIGHT:
+    {
+        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
+        spotAttr->m_color = color;
+        mapObj->m_localRotation.x = position.x;
+        mapObj->m_localRotation.y = position.y;
+        mapObj->m_localRotation.z = position.z;
+        mapObj->m_localMtxDirty = 1;
+        mapObj->m_calcMtxPending = 1;
+        break;
+    }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002f47c
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
+{
+    int objIndex = GetMapObjIdx(static_cast<unsigned short>(id));
+    SetMapObjWorldMapLightIdx(objIndex, color, position);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002f46c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::SetDrawRangeOctTree(float drawRange)
+{
+    m_octTreeDrawMinDepth = -drawRange;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002f45c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::SetDrawRangeMapObj(float drawRange)
+{
+    m_octTreeFrustumRange = -drawRange;
 }
 
 /*

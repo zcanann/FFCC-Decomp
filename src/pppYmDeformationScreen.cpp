@@ -20,16 +20,6 @@
 STATIC_ASSERT(sizeof(YmDeformationScreenDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(YmDeformationScreenDataOffsets, m_workOffset) == 0x8);
 
-static const float kYmDeformationScreenZero = 0.0f;
-static const float kYmDeformationScreenOrthoScaleX = 0.003125f;
-static const float kYmDeformationScreenOrthoScaleY = -0.004464f;
-static const float kYmDeformationScreenOne = 1.0f;
-static const float kYmDeformationScreenOrthoOffsetX = -1.0f;
-static const float kYmDeformationScreenAngleToRad = 0.017453292f;
-static const float kYmDeformationScreenQuadRight = 640.0f;
-static const float kYmDeformationScreenQuadMiddleY = 224.0f;
-static const float kYmDeformationScreenQuadBottom = 448.0f;
-
 static inline YmDeformationScreenDataOffsets* GetYmDeformationScreenDataOffsets(_pppCtrlTable* ctrl)
 {
 	return reinterpret_cast<YmDeformationScreenDataOffsets*>(ctrl->m_serializedDataOffsets);
@@ -83,7 +73,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 	color.rgba[2] = 0x40;
 	color.rgba[3] = 0x40;
 	pppSetBlendMode(0);
-	pppSetDrawEnv(&color, (pppFMATRIX*)0, kYmDeformationScreenZero, (u8)0, (u8)0, (u8)0, (u8)0, (u8)1, (u8)1, (u8)0);
+	pppSetDrawEnv(&color, (pppFMATRIX*)0, 0.0f, (u8)0, (u8)0, (u8)0, (u8)0, (u8)1, (u8)1, (u8)0);
 	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	GXSetNumTexGens(2);
 	GXSetNumChans(1);
@@ -110,12 +100,12 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 		GXSetCurrentMtx(0);
 
 		PSMTX44Identity(orthoMtx);
-		orthoMtx[0][0] = kYmDeformationScreenOrthoScaleX;
-		orthoMtx[1][1] = kYmDeformationScreenOrthoScaleY;
-		orthoMtx[2][2] = kYmDeformationScreenOne;
-		orthoMtx[0][3] = kYmDeformationScreenOrthoOffsetX;
+		orthoMtx[0][0] = 0.003125f;
+		orthoMtx[1][1] = -0.004464f;
+		orthoMtx[2][2] = 1.0f;
+		orthoMtx[0][3] = -1.0f;
 		orthoMtx[1][3] = orthoMtx[2][2];
-		orthoMtx[2][3] = kYmDeformationScreenZero;
+		orthoMtx[2][3] = 0.0f;
 		GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -133,7 +123,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 			work->m_angle = 1;
 		}
 
-		PSMTXRotRad(rot, 'z', kYmDeformationScreenAngleToRad * (float)work->m_angle);
+		PSMTXRotRad(rot, 'z', 0.017453292f * (float)work->m_angle);
 		indMtx[0][0] = rot[0][0] * work->m_scale;
 		indMtx[0][1] = rot[0][1] * work->m_scale;
 		indMtx[0][2] = 0.0f;
@@ -150,10 +140,10 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 	GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	zero = kYmDeformationScreenZero;
-	quadRight = kYmDeformationScreenQuadRight;
-	one = kYmDeformationScreenOne;
-	quadMiddleY = kYmDeformationScreenQuadMiddleY;
+	zero = 0.0f;
+	quadRight = 640.0f;
+	one = 1.0f;
+	quadMiddleY = 224.0f;
 	GXPosition3f32(zero, zero, depth);
 	GXColor1u32(*(u32*)color.rgba);
 	GXTexCoord2f32(zero, zero);
@@ -176,11 +166,11 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 	depth = work->m_depth;
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	{
-		float bottomQuadBottom = kYmDeformationScreenQuadBottom;
-		float bottomOne = kYmDeformationScreenOne;
-		float bottomRight = kYmDeformationScreenQuadRight;
-		float bottomMiddleY = kYmDeformationScreenQuadMiddleY;
-		float bottomZero = kYmDeformationScreenZero;
+		float bottomQuadBottom = 448.0f;
+		float bottomOne = 1.0f;
+		float bottomRight = 640.0f;
+		float bottomMiddleY = 224.0f;
+		float bottomZero = 0.0f;
 
 		GXPosition3f32(bottomZero, bottomMiddleY, depth);
 		GXColor1u32(*(u32*)color.rgba);
@@ -252,13 +242,13 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationSc
 
 			if (param1->m_graphId == 0) {
 				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-				inVec.x = kYmDeformationScreenZero;
-				inVec.y = kYmDeformationScreenZero;
+				inVec.x = 0.0f;
+				inVec.y = 0.0f;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
-				inVec.w = kYmDeformationScreenOne;
+				inVec.w = 1.0f;
 				Math.MTX44MultVec4(screenMtx, &inVec, &outVec);
 				{
-					float zero = kYmDeformationScreenZero;
+					float zero = 0.0f;
 					float outW = outVec.w;
 					if (outW != zero) {
 						outVec.z /= outW;
@@ -309,7 +299,7 @@ void pppDestructYmDeformationScreen(pppYmDeformationScreen*, _pppCtrlTable*)
  */
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
-	float zero = kYmDeformationScreenZero;
+	float zero = 0.0f;
 	VYmDeformationScreen* work = GetYmDeformationScreenWork(
 		obj, GetYmDeformationScreenDataOffsets(param2)->m_workOffset);
 
@@ -330,7 +320,7 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable*
 {
 	short angle = 0;
 	char direction = 1;
-	float zero = kYmDeformationScreenZero;
+	float zero = 0.0f;
 	VYmDeformationScreen* work = GetYmDeformationScreenWork(
 		obj, GetYmDeformationScreenDataOffsets(param2)->m_workOffset);
 

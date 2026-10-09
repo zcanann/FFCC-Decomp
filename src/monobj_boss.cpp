@@ -13,52 +13,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-static const float kMonObjBossZero = 0.0f;
-extern const double kMonObjBossHalfF64 = 0.5;
-extern const double kMonObjBossThreeF64 = 3.0;
-extern const double kMonObjBossZeroF64 = 0.0;
-extern const float kMonObjBossOne = 1.0f;
-extern const float kMonObjBossQuarter = 0.25f;
-extern const float kMonObjBossLargeBodyRadius = 37.5f;
-extern const float kMonObjBossHalfPi = 1.5707963705062866f;
-extern const float kMonObjBossOneEighth = 0.125f;
-extern const float kMonObjBossPi = 3.1415927410125732f;
-extern const float kMonObjBossHalf = 0.5f;
-extern const double kMonObjBossSignedIntBias = 4503601774854144.0;
-extern const float kMonObjBossRightAngleDeg = 90.0f;
-extern const float kMonObjBossLichTeleportHeight = 25.0f;
-extern const double kMonObjBossQuarterPiF64 = 0.7853981852531433;
 static const char sCrystalItemNodeName[] = "c_item";
-extern const float kMonObjBossTwo = 2.0f;
-extern const float kMonObjBossTwelve = 12.0f;
-extern const float kMonObjBossScaleStep = 0.009999999776482582f;
 static const char sMeteoParasiteScriptName[] = "meteo_3";
-extern const float kMeteoParasiteAttackOffsetX = -172.0f;
-extern const float kMeteoParasiteAttackOffsetY = 3.4100000858306885f;
-extern const float kMeteoParasiteAttackOffsetZ = -73.0f;
-extern const float kMonObjBossFastMoveSpeed = 2.5f;
-extern const float kMonObjBossMinAttackDistance = 0.0010000000474974513f;
-extern const float kMonObjBossNegativeOne = -1.0f;
-extern const float kMonObjBossAttackRange = 130.0f;
-extern const float kMonObjBossMaxChaseDistance = 300.0f;
-extern const float kMonObjBossSuctionPower = 190.0f;
-extern const float kMonObjBossLeftTargetX = -100.0f;
-extern const float kMonObjBossLeftTargetZ = -110.0f;
-extern const float kMonObjBossSideTargetRange = 200.0f;
-extern const float kMonObjBossRightTargetXZ = 110.0f;
-extern const float kMonObjBossShortMoveRange = 1.5f;
-extern const float kMonObjBossTurnAroundDeg = 180.0f;
-extern const float kMonObjBossFrameThreshold = 30.0f;
-extern const float kMonObjBossWaveXRadius = 80.0f;
-extern const float kMonObjBossWavePhaseAccel = 0.0005000000237487257f;
-extern const float kMonObjBossWavePhaseStep = 0.02500000037252903f;
-extern const float kMonObjBossEpsilon = 0.00000010000000116860974f;
-extern const double kMonObjBossUnsignedIntBias = 4503599627370496.0;
-extern const float kMonObjBossDuctOffsetPositive = 40.0f;
-extern const float kMonObjBossDuctOffsetNegative = -40.0f;
-extern const float kMonObjBossDuctOffsetLow = -50.0f;
-extern const float kMonObjBossOneSixteenth = 0.0625f;
-extern const float kMonObjBossThreeHalfPi = 4.71238899230957f;
 extern char SoundBuffer[];
 extern "C" Vec gGoblinKingTeleportPoints[] = {
     {-1.5f, -5.989999771118164f, -44.279998779296875f},
@@ -200,8 +156,8 @@ inline void CGMonObj::suikomiSub(CGObject* target, float zOffset)
 	float distSq = dx * dx + dz * dz;
 	float dist = sqrtf(distSq);
 
-	if (kMonObjBossZero < dist) {
-		float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
+	if (0.0f < dist) {
+		float accel = 1.0f / dist * (0.25f * (dist / MON_FRAMES(45.0f, 37.5f)));
 		dx *= accel;
 		dz *= accel;
 		target->m_groundHitOffset.x += dx;
@@ -278,20 +234,20 @@ void CGMonObj::teleport(
 		int pdtNo;
 		m_bgColMask &= 0xFFF3FFFC;
 		m_weaponNodeFlagBits.m_unk10 = 0;
-		m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = kMonObjBossZero;
+		m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = 0.0f;
 
 		reqAnim(animId, 0, 0);
 		playSe3D(seStart, 0x32, 0x1C2, 0, 0);
 
 			pdtNo = m_charaModelHandle->GetPdtSlot();
-		putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, kMonObjBossOne, 0);
+		putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, 1.0f, 0);
 
 		if (mode == 0) {
 			pdtNo = m_charaModelHandle->GetPdtSlot();
-			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, kMonObjBossOne, 0);
+			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, 1.0f, 0);
 		} else {
 			pdtNo = m_charaModelHandle->GetPdtSlot();
-			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, kMonObjBossOne, 0);
+			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, 1.0f, 0);
 		}
 	}
 
@@ -299,11 +255,11 @@ void CGMonObj::teleport(
 
 	if (stateFrame <= blendStartFrame) {
 		if (startFrame <= stateFrame) {
-			const float angle = kMonObjBossHalfPi * (static_cast<float>(stateFrame - startFrame) / static_cast<float>(MON_FRAMES(10, 8)));
+			const float angle = 1.5707964f * (static_cast<float>(stateFrame - startFrame) / static_cast<float>(MON_FRAMES(10, 8)));
 			const float wave = static_cast<float>(cos(angle));
 			m_rotationZ = wave;
 			m_rotationX = wave;
-			m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
+			m_rotationY = 1.0f + static_cast<float>(sin(angle));
 		}
 	} else {
 		if (stateFrame <= blendEndFrame) {
@@ -322,38 +278,38 @@ void CGMonObj::teleport(
 			}
 
 			const float ratio = static_cast<float>(stateFrame - blendStartFrame) / static_cast<float>(blendFrameCount);
-			float blend = static_cast<float>(cos(kMonObjBossPi * ratio));
-			blend = kMonObjBossHalf * (kMonObjBossOne + blend);
+			float blend = static_cast<float>(cos(3.1415927f * ratio));
+			blend = 0.5f * (1.0f + blend);
 			m_worldPosition = CVector(m_worldPosition) * blend +
-				CVector(teleportPoints[teleportIndex]) * (kMonObjBossOne - blend);
+				CVector(teleportPoints[teleportIndex]) * (1.0f - blend);
 
 			if (mode == 1 && stateFrame == blendEndFrame - MON_FRAMES(0x32, 0x2A)) {
 				int pdtNo = m_charaModelHandle->GetPdtSlot();
-				putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &teleportPoints[teleportIndex], kMonObjBossOne, 0);
+				putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &teleportPoints[teleportIndex], 1.0f, 0);
 				playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
 			}
 		} else if (stateFrame <= blendEndPlusFrame) {
 			if (stateFrame == blendEndFrame + 1) {
 				if (mode == 0) {
 					int pdtNo = m_charaModelHandle->GetPdtSlot();
-					putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, kMonObjBossOne, 0);
+					putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, 1.0f, 0);
 					playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
 				}
 
 				m_bgColMask |= 3;
 				m_weaponNodeFlagBits.m_unk10 = 1;
-				m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = kMonObjBossZero;
+				m_groundHitOffset.x = m_groundHitOffset.y = m_groundHitOffset.z = 0.0f;
 
 				if (mode == 1) {
 					m_displayFlags |= 1;
 				}
 			}
 
-			const float angle = kMonObjBossHalfPi * (kMonObjBossOne - static_cast<float>(stateFrame - blendEndFrame) / static_cast<float>(MON_FRAMES(10, 8)));
+			const float angle = 1.5707964f * (1.0f - static_cast<float>(stateFrame - blendEndFrame) / static_cast<float>(MON_FRAMES(10, 8)));
 			const float wave = static_cast<float>(cos(angle));
 			m_rotationZ = wave;
 			m_rotationX = wave;
-			m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
+			m_rotationY = 1.0f + static_cast<float>(sin(angle));
 
 			if (stateFrame == blendEndPlusFrame) {
 				m_bgColMask |= 0xC0000;
@@ -441,10 +397,10 @@ void CGMonObj::frameStatFuncLastBoss()
 			m_bgColMask &= 0xFFF7FFFF;
 			reqAnim(0x18, 0, 0);
 
-			putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, this, kMonObjBossOne, 0);
+			putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, this, 1.0f, 0);
 			playSe3D(0x12912, 0x32, 0x96, 0, 0);
 		} else if (m_stateFrame == MON_FRAMES(0x96, 0x7D)) {
-			m_bodyEllipsoidRadius = kMonObjBossRightAngleDeg;
+			m_bodyEllipsoidRadius = 90.0f;
 		} else if (isLoopAnim() != 0) {
 			m_bgColMask |= 0x80000;
 			SetAnimSlot(0x12, 0);
@@ -459,11 +415,11 @@ void CGMonObj::frameStatFuncLastBoss()
 			m_bgColMask &= 0xFFF7FFFF;
 			reqAnim(0x19, 0, 0);
 
-			putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, this, kMonObjBossOne, 0);
-			putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, this, kMonObjBossOne, 0);
+			putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, this, 1.0f, 0);
+			putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, this, 1.0f, 0);
 			playSe3D(0x12913, 0x32, 0x96, 0, 0);
 		} else if (m_stateFrame == MON_FRAMES(0x32, 0x29)) {
-			m_bodyEllipsoidRadius = kMonObjBossLichTeleportHeight;
+			m_bodyEllipsoidRadius = 25.0f;
 		} else if (isLoopAnim() != 0) {
 			m_bgColMask |= 0x80000;
 			changeStat(0, 0, 0);
@@ -475,13 +431,13 @@ void CGMonObj::frameStatFuncLastBoss()
 		return;
 	case 0x66:
 		if (m_stateFrame == 0) {
-			putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 5, m_particleSlots[10], this, kMonObjBossOne, 0x12902);
+			putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 5, m_particleSlots[10], this, 1.0f, 0x12902);
 		} else if (m_stateFrame == MON_FRAMES(0x5A, 0x4B)) {
 			for (int i = 0; i < 4; i++) {
 				if (reinterpret_cast<LastBossWork*>(m_boss)->m_capsules[i] != 0) {
 					CGItemObj* capsule = reinterpret_cast<LastBossWork*>(m_boss)->m_capsules[i];
 					if (capsule->m_lastStateId == 0x24) {
-						if (fabs(getTargetRot(capsule)) < kMonObjBossQuarterPiF64) {
+						if (fabs(getTargetRot(capsule)) < 0.7853982f) {
 							reinterpret_cast<LastBossWork*>(m_boss)->m_capsules[i]->changeStat(0x25, 0, 0);
 						}
 					}
@@ -699,10 +655,10 @@ void CGMonObj::logicFuncRamoe()
  */
 void CGMonObj::damagedFuncDuct()
 {
-	int slot = reinterpret_cast<int>(reinterpret_cast<void**>(m_scriptHandle)[4]) - 0x8E;
-	putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 2, 0, this, kMonObjBossOne, 0);
+	int slot = m_scriptHandle->m_baseDataIndex - 0x8E;
+	putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 2, 0, this, 1.0f, 0);
 
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+	if (m_scriptHandle->m_hp == 0) {
 		CGObject* bossObj = *reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x68);
 		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
 		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
@@ -724,7 +680,7 @@ void CGMonObj::initFinishedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	initFinishedFuncDefault();
-	const int slot = static_cast<int>(reinterpret_cast<long>(reinterpret_cast<void**>(object->m_scriptHandle)[4])) - 0x8E;
+	const int slot = object->m_scriptHandle->m_baseDataIndex - 0x8E;
 	reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x38)[slot] = this;
 }
 
@@ -760,7 +716,7 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int scriptState = reinterpret_cast<int>(reinterpret_cast<void**>(object->m_scriptHandle)[4]);
+	int scriptState = object->m_scriptHandle->m_baseDataIndex;
 
 	switch (scriptState) {
 	case 0x85:
@@ -798,7 +754,7 @@ void CGMonObj::logicFuncMeteoParasite()
 	if (work->bits.m_meteo3) {
 		nextState = 0x68;
 	} else {
-		switch (reinterpret_cast<int>(reinterpret_cast<void**>(object->m_scriptHandle)[4])) {
+		switch (object->m_scriptHandle->m_baseDataIndex) {
 		case 0x87:
 			if (work->m_coreIndex == 2 && m_actionBranch < 2) {
 				if (work->m_objs[3]->m_lastStateId >= 100 || work->bits.m_bit80) {
@@ -828,7 +784,7 @@ void CGMonObj::logicFuncMeteoParasite()
  */
 void CGMonObj::frameStatFuncMeteoParasite()
 {
-	int scriptKind = reinterpret_cast<int>(reinterpret_cast<void**>(reinterpret_cast<CGObject*>(this)->m_scriptHandle)[4]);
+	int scriptKind = m_scriptHandle->m_baseDataIndex;
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	int state = prgObj->m_lastStateId;
 
@@ -895,12 +851,12 @@ void CGMonObj::frameStatFuncMeteoParasite()
 void CGMonObj::alwaysFuncMeteoParasite()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<void**>(object->m_scriptHandle)[4]);
+	const int scriptKind = object->m_scriptHandle->m_baseDataIndex;
 
 	switch (scriptKind) {
 	case 0x85:
 		if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
-			static float aaa = kMonObjBossZero;
+			static float aaa = 0.0f;
 
 			PSMTXRotRad(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_nodes[0]->m_localRuntimeMtx, 'x',
 			            aaa);
@@ -909,11 +865,11 @@ void CGMonObj::alwaysFuncMeteoParasite()
 
 			MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 			for (int i = 0; i < 12; i++) {
-				float angle = kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve;
+				float angle = 2.0f * (3.1415927f * static_cast<float>(i + 3)) / 12.0f;
 				work->m_rotObjects[i]->m_rotTargetY = angle + aaa;
 			}
 
-			aaa += kMonObjBossScaleStep;
+			aaa += 0.01f;
 		}
 		break;
 	}
@@ -956,7 +912,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 void CGMonObj::changeStatFuncMeteoParasite(int stat)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	int scriptKind = reinterpret_cast<int>(reinterpret_cast<void**>(object->m_scriptHandle)[4]);
+	int scriptKind = object->m_scriptHandle->m_baseDataIndex;
 	switch (scriptKind) {
 	case 0x87:
 		switch (stat) {
@@ -987,7 +943,7 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 {
 	initFinishedFuncDefault();
 
-	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<void**>(reinterpret_cast<CGObject*>(this)->m_scriptHandle)[4]);
+	const int scriptKind = m_scriptHandle->m_baseDataIndex;
 	switch (scriptKind) {
 	case 0x85: {
 		CGObject* object = reinterpret_cast<CGObject*>(this);
@@ -1199,11 +1155,11 @@ void CGMonObj::damagedFuncMeteoParasiteC()
 
 	if (work->bits.m_meteo3 == 0) {
 		if (((work->m_coreIndex == 0) &&
-		     (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1C / 2] <
-		      ((reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1A / 2] * 2) / 3))) ||
+		     (object->m_scriptHandle->m_hp <
+		      ((object->m_scriptHandle->m_maxHp * 2) / 3))) ||
 		    ((work->m_coreIndex == 1) &&
-		     (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1C / 2] <
-		      (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1A / 2] / 3)))) {
+		     (object->m_scriptHandle->m_hp <
+		      (object->m_scriptHandle->m_maxHp / 3)))) {
 			*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) = 0;
 			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
 			object->m_bgColMask &= 0xFFF7FFFF;
@@ -1258,7 +1214,7 @@ void CGMonObj::frameStatFuncMolbol()
 
 	switch (state) {
 	case 100:
-		suikomi(MON_FRAMES(100, 0x53), kMonObjBossZero);
+		suikomi(MON_FRAMES(100, 0x53), 0.0f);
 		break;
 	case 0x65:
 		if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == MON_FRAMES(7, 5) || prgObj->m_stateFrame == MON_FRAMES(12, 10)) {
@@ -1323,8 +1279,8 @@ void CGMonObj::changeStatFuncMolbol(int stat)
 void CGMonObj::damagedFuncWifeLamia()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	if (script[14] <= 1) {
+	CGObjWork* script = object->m_scriptHandle;
+	if (script->m_hp <= 1) {
 		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
 		object->m_bgColMask &= 0xFFF7FFFF;
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
@@ -1353,11 +1309,11 @@ void CGMonObj::frameStatFuncWifeLamia()
 				m_moveWork.m_flags = 0x10022;
 
 				const CVector& attackOffset =
-				    CVector(kMeteoParasiteAttackOffsetX, kMeteoParasiteAttackOffsetY, kMeteoParasiteAttackOffsetZ);
+				    CVector(-172.0f, 3.41f, -73.0f);
 				m_moveWork.m_targetPos.x = attackOffset.x;
 				m_moveWork.m_targetPos.y = attackOffset.y;
 				m_moveWork.m_targetPos.z = attackOffset.z;
-				m_moveWork.m_speed = kMonObjBossFastMoveSpeed;
+				m_moveWork.m_speed = 2.5f;
 				m_moveWork.m_range = reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius;
 			}
 			moveFrame();
@@ -1480,17 +1436,17 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			attackVec.x = attackDir.x;
 			attackVec.y = attackDir.y;
 			attackVec.z = attackDir.z;
-			attackVec.y = kMonObjBossZero;
+			attackVec.y = 0.0f;
 
-			if (PSVECMag(&attackVec) < kMonObjBossMinAttackDistance) {
-				CVector fallback(kMonObjBossZero, kMonObjBossZero, kMonObjBossNegativeOne);
+			if (PSVECMag(&attackVec) < 0.001f) {
+				CVector fallback(0.0f, 0.0f, -1.0f);
 				attackVec.x = fallback.x;
 				attackVec.y = fallback.y;
 				attackVec.z = fallback.z;
 			}
 
 			PSVECNormalize(&attackVec, &attackVec);
-			PSVECScale(&attackVec, &attackVec, kMonObjBossAttackRange - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight);
+			PSVECScale(&attackVec, &attackVec, 130.0f - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight);
 			*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4) = attackVec;
 
 			CVector delta = reinterpret_cast<CVector&>(attackVec) - m_worldPosition;
@@ -1498,7 +1454,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			attackVec.y = delta.y;
 			attackVec.z = delta.z;
 			float distance = PSVECDistance(&attackVec, &m_worldPosition);
-			float cappedDistance = kMonObjBossMaxChaseDistance;
+			float cappedDistance = 300.0f;
 			if (distance < cappedDistance) {
 				cappedDistance = distance;
 			}
@@ -1506,8 +1462,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.Clear();
 			m_moveWork.m_flags = 0x2114;
 			m_moveWork.m_targetPos = attackVec;
-			m_moveWork.m_speed = kMonObjBossTwo;
-			m_moveWork.m_limitFrame = static_cast<int>(cappedDistance / kMonObjBossTwo);
+			m_moveWork.m_speed = 2.0f;
+			m_moveWork.m_limitFrame = static_cast<int>(cappedDistance / 2.0f);
 			m_moveWork.m_changeStat = 0x67;
 		}
 		moveFrame();
@@ -1518,9 +1474,9 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.m_flags = 0x2410;
 
 			m_moveWork.m_targetPos = -CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
-			m_moveWork.m_speed = kMonObjBossFastMoveSpeed;
+			m_moveWork.m_speed = 2.5f;
 			m_moveWork.m_limitFrame =
-			    static_cast<int>((kMonObjBossTwo * (kMonObjBossAttackRange - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight)) / kMonObjBossFastMoveSpeed);
+			    static_cast<int>((2.0f * (130.0f - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight)) / 2.5f);
 		}
 		if (prgObj->m_stateFrame >= MON_FRAMES(0x14, 0x10)) {
 			moveFrame();
@@ -1537,7 +1493,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 					reinterpret_cast<CGObject*>(prgObj)->DispCharaParts(1);
 
 					int pdtNo = reinterpret_cast<CGObject*>(prgObj)->m_charaModelHandle->GetPdtSlot();
-					prgObj->putParticle((pdtNo << 8) | 0x2D, 0, reinterpret_cast<CGObject*>(prgObj), kMonObjBossOne, 0x101E4);
+					prgObj->putParticle((pdtNo << 8) | 0x2D, 0, reinterpret_cast<CGObject*>(prgObj), 1.0f, 0x101E4);
 
 					if (m_actionBranch == 0) {
 						CFlatBossState() = CFlatBossState() - 1;
@@ -1674,7 +1630,7 @@ void CGMonObj::frameStatFuncLich()
 		if (reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0) {
 			int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
 			prgObj->putParticle((pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x590),
-			                    reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
+			                    reinterpret_cast<CGObject*>(this), 1.0f, 0);
 		}
 		reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 0;
 	}
@@ -1756,7 +1712,7 @@ void CGMonObj::frameStatFuncCaveWorm()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	switch (prgObj->m_lastStateId) {
 	case 100:
-		suikomi(MON_FRAMES(0x82, 0x6C), kMonObjBossSuctionPower);
+		suikomi(MON_FRAMES(0x82, 0x6C), 190.0f);
 		break;
 	}
 }
@@ -1911,8 +1867,8 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 
 	if (work->m_stunTimer == 0) {
 		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
-			const CVector& left = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
-			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&left)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
+			const CVector& left = CVector(-100.0f, 0.0f, -110.0f);
+			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&left)), &object->m_worldPosition) < 200.0f &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
 				reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown = 300;
 				work->bits.m_bit40 = 1;
@@ -1921,8 +1877,8 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 			}
 		}
 		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
-			const CVector& right = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
-			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&right)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
+			const CVector& right = CVector(110.0f, 0.0f, 110.0f);
+			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&right)), &object->m_worldPosition) < 200.0f &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_rightCooldown == 0) {
 				work->bits.m_bit20 = 1;
 				m_actionBranch = 1;
@@ -1962,14 +1918,14 @@ void CGMonObj::frameStatFuncLKShooter()
 
 			const CVector* targetPos;
 			if (m_actionBranch == 1) {
-				targetPos = &CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+				targetPos = &CVector(110.0f, 0.0f, 110.0f);
 			} else {
-				targetPos = &CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+				targetPos = &CVector(-100.0f, 0.0f, -110.0f);
 			}
 			m_moveWork.m_targetPos.x = targetPos->x;
 			m_moveWork.m_targetPos.y = targetPos->y;
 			m_moveWork.m_targetPos.z = targetPos->z;
-			m_moveWork.m_range = kMonObjBossShortMoveRange;
+			m_moveWork.m_range = 1.5f;
 			m_moveWork.m_changeStat = 0x65;
 		}
 
@@ -1984,10 +1940,10 @@ void CGMonObj::frameStatFuncLKShooter()
 	case 0x65:
 		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
-			rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
+			rotTarget(m_targetPartyIndex, 180.0f);
 		}
 		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-		    (m_partyDistance[m_partyRank[0]] < kMonObjBossFrameThreshold)) {
+		    (m_partyDistance[m_partyRank[0]] < 30.0f)) {
 			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 		}
 		return;
@@ -2035,12 +1991,12 @@ void CGMonObj::attackedFuncSaw()
  */
 void CGMonObj::moveFrameFuncSaw()
 {
-	const float wave = kMonObjBossQuarter * (kMonObjBossOne + sinf(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4))) + kMonObjBossHalf;
-	m_moveWork.m_targetPos.x = wave * (kMonObjBossWaveXRadius * sinf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
-	m_moveWork.m_targetPos.z = wave * (kMonObjBossAttackRange * cosf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
+	const float wave = 0.25f * (1.0f + sinf(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4))) + 0.5f;
+	m_moveWork.m_targetPos.x = wave * (80.0f * sinf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
+	m_moveWork.m_targetPos.z = wave * (130.0f * cosf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
 	*reinterpret_cast<float*>(CGMonObj::m_boss) +=
-	    kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep;
-	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) += kMonObjBossWavePhaseStep;
+	    0.0005f * (0.5f - (wave - 0.5f)) + 0.01f;
+	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) += 0.025f;
 }
 
 /*
@@ -2099,7 +2055,7 @@ void CGMonObj::frameStatFuncSaw()
 
 				int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
 
-				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0x1C52C);
+				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), reinterpret_cast<CGObject*>(this), 1.0f, 0x1C52C);
 				prgObj->playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
 				m_moveWork.Clear();
 				m_moveWork.m_flags = 0x1402;
@@ -2237,9 +2193,9 @@ void CGMonObj::cancelStatFuncGoblinKing()
 int CGMonObj::calcBranchFuncOrcKing(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	CGObjWork* script = object->m_scriptHandle;
 	int branch = 0;
-	if (script[0x1C / 2] < (script[0x1A / 2] / 5)) {
+	if (script->m_hp < (script->m_maxHp / 5)) {
 		branch = 2;
 	} else {
 		branch = calcBranchFuncDefault(1);
@@ -2295,13 +2251,11 @@ void CGMonObj::alwaysFuncOrcKing()
 		int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
 		reinterpret_cast<CGPrgObj*>(this)->putParticle(
 			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590),
-			reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
+			reinterpret_cast<CGObject*>(this), 1.0f, 0);
 	} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
 		CGMonObj* monObj = CFlat.FindGMonObjFirst();
 		while (monObj != 0) {
-			u8* monBytes = reinterpret_cast<u8*>(monObj);
-			u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
-			reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
+			reinterpret_cast<CGCharaObj*>(monObj)->addHp(-reinterpret_cast<CGObject*>(monObj)->m_scriptHandle->m_maxHp, 0);
 			monObj = CFlat.FindGMonObjNext(monObj);
 		}
 		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
@@ -2333,22 +2287,22 @@ void CGMonObj::frameStatFuncOrcKing()
 		if (m_actionBranch == 0) {
 			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, kMonObjBossOne, 0x8CC0);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, 1.0f, 0x8CC0);
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(0xF, 0, 0);
 			object->SetAnimSlot(0x10, 0);
 			object->SetAnimSlot(0x15, 4);
 		} else if (m_actionBranch == 0x96) {
 			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC1);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, 1.0f, 0x8CC1);
 		} else if (m_actionBranch == 300) {
 			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC2);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, 1.0f, 0x8CC2);
 		} else if (m_actionBranch == 0x1C2) {
 			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC3);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, 1.0f, 0x8CC3);
 		} else if (m_actionBranch == 600) {
 			reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
 			object->m_bgColMask &= 0xFFF7FFFF;
@@ -2358,9 +2312,7 @@ void CGMonObj::frameStatFuncOrcKing()
 			CGMonObj* monObj = CFlat.FindGMonObjFirst();
 			while (monObj != 0) {
 				if (monObj != this) {
-					u8* monBytes = reinterpret_cast<u8*>(monObj);
-					u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
-					reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
+					reinterpret_cast<CGCharaObj*>(monObj)->addHp(-reinterpret_cast<CGObject*>(monObj)->m_scriptHandle->m_maxHp, 0);
 				}
 				monObj = CFlat.FindGMonObjNext(monObj);
 			}
@@ -2508,7 +2460,7 @@ void CGMonObj::frameStatFuncGolem()
 		    (m_stateFlags0Bits.unk1 != 0) ||
 		    ((state == 0x66) &&
 		     (m_partyDistance[m_targetPartyIndex] <
-		      kMonObjBossTwo * m_bodyEllipsoidRadius))) {
+		      2.0f * m_bodyEllipsoidRadius))) {
 			m_rotTargetY = getTargetRot(Game.m_partyObjArr[m_targetPartyIndex]);
 			setAttackAfter(m_itemId);
 		} else {
@@ -2516,10 +2468,10 @@ void CGMonObj::frameStatFuncGolem()
 				float turnOffset;
 				switch (state) {
 				case 0x66:
-					turnOffset = kMonObjBossZero;
+					turnOffset = 0.0f;
 					break;
 				case 0x68:
-					turnOffset = kMonObjBossPi;
+					turnOffset = 3.1415927f;
 					break;
 				}
 				reqAnim(1, 1, 0);
@@ -2527,11 +2479,11 @@ void CGMonObj::frameStatFuncGolem()
 				reinterpret_cast<GolemBossWork*>(m_boss)->m_moveAngle = m_rotTargetY + turnOffset;
 			}
 			unsigned short scriptScale =
-			    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(m_scriptHandle)[9]) + 0xD4);
+			    m_scriptHandle->m_romWork[0x6A];
 			float moveSpeed =
 			    m_pushScale *
-			    (kMonObjBossScaleStep * static_cast<float>(scriptScale) + kMonObjBossEpsilon);
-			moveVectorHRot(reinterpret_cast<GolemBossWork*>(m_boss)->m_moveAngle, kMonObjBossZero,
+			    (0.01f * static_cast<float>(scriptScale) + 1.0e-7f);
+			moveVectorHRot(reinterpret_cast<GolemBossWork*>(m_boss)->m_moveAngle, 0.0f,
 			               moveSpeed, 1);
 		}
 		break;
@@ -2556,9 +2508,9 @@ int CGMonObj::calcBranchFuncGolem(int)
 		return 2;
 	}
 
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	CGObjWork* script = object->m_scriptHandle;
 	return static_cast<unsigned int>(
-	           __cntlzw(script[0x1C / 2] >= static_cast<int>(static_cast<unsigned int>(script[0x1A / 2]) >> 1))) >>
+	           __cntlzw(script->m_hp >= static_cast<int>(static_cast<unsigned int>(script->m_maxHp) >> 1))) >>
 	       5;
 }
 #pragma bool on
@@ -2596,8 +2548,8 @@ void CGMonObj::changeStatFuncGolem(int stat)
 void CGMonObj::damagedFuncGolem()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	if (script[0x1C / 2] == 0) {
+	CGObjWork* script = object->m_scriptHandle;
+	if (script->m_hp == 0) {
 		object->DispCharaParts(7);
 	}
 }
@@ -2621,24 +2573,24 @@ void CGMonObj::frameStatFuncGiantCrab()
 			int soundStep = reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_step;
 			switch (soundStep) {
 			case 0:
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.x = kMonObjBossDuctOffsetPositive;
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.y = kMonObjBossZero;
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.z = kMonObjBossDuctOffsetNegative;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.x = 40.0f;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.y = 0.0f;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.z = -40.0f;
 				break;
 			case 1:
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.x = kMonObjBossDuctOffsetPositive;
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.y = kMonObjBossZero;
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.z = kMonObjBossDuctOffsetPositive;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.x = 40.0f;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.y = 0.0f;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.z = 40.0f;
 				break;
 			case 2:
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.x = kMonObjBossDuctOffsetLow;
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.y = kMonObjBossZero;
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.z = kMonObjBossDuctOffsetNegative;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.x = -50.0f;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.y = 0.0f;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.z = -40.0f;
 				break;
 			case 3:
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.x = kMonObjBossDuctOffsetLow;
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.y = kMonObjBossZero;
-				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.z = kMonObjBossDuctOffsetPositive;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.x = -50.0f;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.y = 0.0f;
+				reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget.z = 40.0f;
 				break;
 			}
 
@@ -2647,10 +2599,10 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 			putParticle(
 				(m_charaModelHandle->GetPdtSlot() << 8) | 6, 0,
-				this, kMonObjBossOne, 0);
+				this, 1.0f, 0);
 			putParticle(
 				(m_charaModelHandle->GetPdtSlot() << 8) | 7, 0,
-				this, kMonObjBossOne, 0);
+				this, 1.0f, 0);
 		}
 
 		int frame = m_stateFrame;
@@ -2664,7 +2616,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			m_bgColMask &= 0xfff7fffd;
 			Vec* moveDir = &reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget;
 			float moveScale = PSVECDistance(moveDir, &m_worldPosition);
-			moveScale *= kMonObjBossOneSixteenth;
+			moveScale /= MON_FRAMES(20.0f, 16.0f);
 			Move(moveDir, moveScale, MON_FRAMES(0x14, 0x10), 1, 0, 0, 0);
 
 			int targetIdx = m_targetPartyIndex;
@@ -2691,31 +2643,31 @@ void CGMonObj::frameStatFuncGiantCrab()
 			int animId;
 			switch (state) {
 			case 0x65:
-				turnOffset = kMonObjBossZero;
+				turnOffset = 0.0f;
 				animId = 1;
 				break;
 			case 0x66:
-				turnOffset = kMonObjBossPi;
+				turnOffset = 3.1415927f;
 				animId = 1;
 				break;
 			case 0x67:
-				turnOffset = kMonObjBossHalfPi;
+				turnOffset = 1.5707964f;
 				animId = 0x12;
 				break;
 			case 0x68:
-				turnOffset = kMonObjBossThreeHalfPi;
+				turnOffset = 4.712389f;
 				animId = 0x13;
 				break;
 			}
 
 			reqAnim(animId, 0, 0);
 			u16 scriptScale =
-			    *(u16*)((u8*)reinterpret_cast<void**>(m_scriptHandle)[9] + 0xd4);
+			    m_scriptHandle->m_romWork[0x6A];
 			float moveMagnitude =
 			    m_pushScale *
-			    (kMonObjBossScaleStep * (float)scriptScale + kMonObjBossEpsilon);
+			    (0.01f * (float)scriptScale + 1.0e-7f);
 			moveVectorHRot(
-				m_rotTargetY + turnOffset, kMonObjBossZero, moveMagnitude, 0x1e);
+				m_rotTargetY + turnOffset, 0.0f, moveMagnitude, 0x1e);
 
 			int targetIdx = m_targetPartyIndex;
 			if (targetIdx >= 0) {
@@ -2725,7 +2677,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 				    (double)(target->m_worldPosition.z - m_worldPosition.z));
 			}
 
-			int action = reinterpret_cast<int>(reinterpret_cast<void**>(m_scriptHandle)[4]);
+			int action = m_scriptHandle->m_baseDataIndex;
 			switch (action) {
 			case 0x5b:
 				playSe3D(0x4e2a, 0x32, 0x1c2, 0, 0);
@@ -2807,22 +2759,22 @@ void CGMonObj::damagedFuncGiantCrab()
 
 	switch (m_actionBranch) {
 	case 0: {
-		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-		if (script[0x1C / 2] < ((script[0x1A / 2] * 2) / 3)) {
+		CGObjWork* script = object->m_scriptHandle;
+		if (script->m_hp < ((script->m_maxHp * 2) / 3)) {
 			object->DispCharaParts(3);
 			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0C, 0, object, kMonObjBossOne, 0);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0C, 0, object, 1.0f, 0);
 			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E36, 0x32, 500, 0, 0);
 			break;
 		}
 		return;
 	}
 	case 1: {
-		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-		if (script[0x1C / 2] < (script[0x1A / 2] / 3)) {
+		CGObjWork* script = object->m_scriptHandle;
+		if (script->m_hp < (script->m_maxHp / 3)) {
 			object->DispCharaParts(1);
 			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0D, 0, object, kMonObjBossOne, 0);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0D, 0, object, 1.0f, 0);
 			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E37, 0x32, 500, 0, 0);
 			break;
 		}

@@ -387,11 +387,10 @@ inline void CSound::create(int minMemoryMode)
 
     SetStereo(IsStereo());
 
-    m_redSound.MusicMasterVolume(m_bgmMasterVolume);
-    m_redSound.SeMasterVolume(m_seMasterVolume);
+    SetBgmMasterVolume(m_bgmMasterVolume);
+    SetSeMasterVolume(m_seMasterVolume);
 
-    m_redSound.SetReverb(1, 4);
-    m_redSound.SetReverbDepth(1, 0x40, 0xF);
+    SetReverb(4, 0x40);
 
     m_waveFile = 0;
     m_streamFile = 0;
@@ -525,20 +524,12 @@ void CSound::Frame()
                     }
 
                     if (static_cast<signed char>(se->m_pan) != pan) {
-                        if (se->m_playId < 0) {
-                            System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
-                        } else {
-                            m_redSound.SePan(se->m_playId, pan, 0x1E);
-                        }
+                        ChangeSePan(se->m_playId, pan, 0x1E);
                         se->m_pan = static_cast<unsigned char>(pan);
                     }
 
                     if (static_cast<signed char>(se->m_volume) != volume) {
-                        if (se->m_playId < 0) {
-                            System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
-                        } else {
-                            m_redSound.SeVolume(se->m_playId, volume, 0x1E);
-                        }
+                        ChangeSeVolume(se->m_playId, volume, 0x1E);
                         se->m_volume = static_cast<unsigned char>(volume);
                     }
                 }
@@ -653,8 +644,7 @@ void CSound::loadWaveFrame()
         } else if (waveState == 1 && File.IsCompleted(waveFile)) {
             m_redSound.SetWaveData(waveID, File.m_readBuffer, waveFile->GetReadSize());
 
-            while (Sound.m_redSound.ReportStandby(0) != 0) {
-            }
+            Sound.WaitASync();
 
             waveState = 0;
             if (waveRemain == 0) {
@@ -729,15 +719,7 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
     if (waveNo < 0) {
         System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else if (m_redSound.ReentryWaveData(waveNo) == -1) {
-        if (m_waveFile != 0) {
-            File.Close(m_waveFile);
-            m_waveFile = 0;
-            System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
-                "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
-                "\x81\x42\n");
-        }
-
-        m_redSound.SetWaveData(-1, nullptr, 0);
+        CancelLoadWaveASync();
 
         char wavePath[256];
         sprintf(wavePath, "dvd/sound/wave/wave%04d.wd", waveNo);
@@ -1929,5 +1911,6 @@ void CSound::AddNoFreeWave(int wave)
  */
 inline void CSound::WaitASync()
 {
-	// TODO
+    while (m_redSound.ReportStandby(0) != 0) {
+    }
 }

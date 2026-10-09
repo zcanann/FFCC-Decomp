@@ -6,10 +6,6 @@
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
-static const float kRandomAngleRange = 32768.0f;
-static const float kRandomAngleBias = 16384.0f;
-static const float kSpinScale = 2.0f;
-
 STATIC_ASSERT(offsetof(pppPointRApOffsets, m_srcOffset) == 0x0);
 STATIC_ASSERT(offsetof(pppPointRApOffsets, m_stateOffset) == 0x4);
 
@@ -54,14 +50,14 @@ void pppPointRAp(_pppPObject* pObject, pppPointRApStep* step, _pppCtrlTable* ctr
             obj->m_link.m_previous = &pObject->m_link;
         }
 
-        s32 angleA = (s32)(kRandomAngleRange * Math.RandF() - kRandomAngleBias);
+        s32 angleA = (s32)(32768.0f * Math.RandF() - 16384.0f);
         float scaleA = step->m_radius;
         float yOff;
         float planarOff = scaleA * pppCosFromTable(angleA);
         yOff = scaleA * pppSinFromTable(angleA);
         float spinRand = Math.RandF();
-        float spinAngle = kRandomAngleRange * spinRand;
-        s32 angleB = (s32)(kSpinScale * spinAngle);
+        float spinAngle = 32768.0f * spinRand;
+        s32 angleB = (s32)(2.0f * spinAngle);
         u32 childPosOffset = step->m_childPosOffset;
         u32 childVelocityOffset = step->m_childVelocityOffset;
         float xOff = planarOff * pppSinFromTable(angleB);

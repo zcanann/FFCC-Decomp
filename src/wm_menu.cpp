@@ -76,9 +76,17 @@ char* g_strWMMenuMes[5][11] = {
 	{
 		"Charaktere kreieren und Gruppenmitglieder bestimmen.",
 		"Die niedergeschriebenen Tagebucheintr\344ge lesen.",
+#ifdef VERSION_GCCE01
+		"Charaktere von anderen Speicherkarten einladen.",
+#else
 		"Charaktere von anderen Memory Cards einladen.",
+#endif
 		"Einstellungen zum Spiel vornehmen.",
+#ifdef VERSION_GCCE01
+		"Aktuelle Spielst\344nde speichern.",
+#else
 		"Aktuelle Spielst\344nde auf die Memory Card speichern.",
+#endif
 		"Bitte die Gruppenmitglieder bestimmen.",
 		"\204Frei\" w\344hlen, um einen neuen Charakter zu kreieren.",
 		"START dr\374cken, um auf Reisen zu gehen.",
@@ -89,11 +97,19 @@ char* g_strWMMenuMes[5][11] = {
 	{
 		"Seleziona i membri del gruppo e crea nuovi personaggi.",
 		"Leggi il diario.",
+#ifdef VERSION_GCCE01
+		"Trasferisce un personaggio di un'altra Memory Card (Scheda Memoria).",
+#else
 		"Importa personaggi da un'altra Memory Card (Scheda Memoria).",
+#endif
 		"Modifica le impostazioni di gioco.",
 		"Salva la partita su Memory Card (Scheda Memoria).",
 		"Seleziona i membri del gruppo.",
+#ifdef VERSION_GCCE01
+		"Seleziona Nessuno per creare un nuovo personaggio.",
+#else
 		"Seleziona Vuoto per creare un nuovo personaggio.",
+#endif
 		"Premi START quando hai finito.",
 		"Seleziona i dati da caricare.",
 		"Seleziona il personaggio che vuoi trasferire.",
@@ -115,12 +131,28 @@ char* g_strWMMenuMes[5][11] = {
 	{
 		"Selecciona los miembros del grupo y crea nuevos personajes.",
 		"Ver las anotaciones del diario.",
+#ifdef VERSION_GCCE01
+		"Transferir un personaje de otra Memory Card (tarjeta de memoria) al juego actual.",
+#else
 		"Transferir un personaje de otra Memory Card al juego actual.",
+#endif
 		"Configurar las opciones del juego.",
+#ifdef VERSION_GCCE01
+		"Guardar los datos del juego en la Memory Card (tarjeta de memoria).",
+#else
 		"Guardar los datos del juego en la Memory Card.",
+#endif
 		"Selecciona los miembros del grupo.",
+#ifdef VERSION_GCCE01
+		"Selecciona \"Ninguno\" para crear un nuevo personaje.",
+#else
 		"Selecciona \"Vac\355o\" para crear un nuevo personaje.",
+#endif
+#ifdef VERSION_GCCE01
+		"Presiona START cuando termines.",
+#else
 		"Pulsa START cuando termines.",
+#endif
 		"Seleccionar los datos del juego a cargar.",
 		"Selecciona el personaje a transferir.",
 		"Selecciona el personaje a eliminar.",
@@ -223,7 +255,6 @@ static CMenuPcs::FCV s_MenuObjYRot = {4, s_MenuObjYRotSpl};
 static CMenuPcs::FCV s_MenuObjZRot = {4, s_MenuObjZRotSpl};
 static CMenuPcs::FCV s_MenuObjYTrs = {5, s_MenuObjYTrsSpl};
 static CMenuPcs::FCV s_MenuObjScl = {7, s_MenuObjSclSpl};
-extern char cRam8032ee21;
 
 inline CGBaseObj::CGBaseObj()
 {
@@ -238,7 +269,9 @@ unsigned char lbl_8032EE1C;
 char gWmMenuCursorX[2];
 char gWmMenuCursorY[2];
 static u64 s_Serial;
+#ifndef VERSION_GCCJGC
 unsigned char gWmMenuScriptValueCache;
+#endif
 
 extern const char lbl_80331380[4] = {'?','?','?','?'};
 extern const float FLOAT_803313dc = 0.0f;
@@ -266,10 +299,10 @@ extern const float FLOAT_80331458 = 255.0f;
 extern const double DOUBLE_80331460 = 0.05;
 extern const float FLOAT_80331468 = 48.0f;
 extern const float FLOAT_8033146C = 248.0f;
-extern const float FLOAT_80331470;
-extern const float FLOAT_80331474;
-extern const float FLOAT_80331478;
-extern const float FLOAT_8033147c;
+extern const float FLOAT_80331470 = 20.0f;
+extern const float FLOAT_80331474 = 1.3333334f;
+extern const float FLOAT_80331478 = 10.0f;
+extern const float FLOAT_8033147c = 10000.0f;
 extern const float FLOAT_80331480 = -96.0f;
 extern const double DOUBLE_80331488 = 48.0;
 extern const double DOUBLE_80331490 = 24.0;
@@ -373,6 +406,11 @@ extern const float FLOAT_8033168C = 3.5f;
 extern const float FLOAT_80331690 = 0.0546875f;
 extern const float FLOAT_80331694 = -50.0f;
 extern const float FLOAT_80331698 = 1.2000000476837158f;
+#ifdef VERSION_GCCP01
+#define WM_MODEL_FRAME_STEP FLOAT_80331698
+#else
+#define WM_MODEL_FRAME_STEP 1.0f
+#endif
 extern const float FLOAT_8033169C = 2.200000047683716f;
 extern const float FLOAT_803316A0 = 3.3000001907348633f;
 extern const float FLOAT_803316A4 = -0.4399999976158142f;
@@ -445,10 +483,6 @@ extern const char lbl_80331828[7] = "last_r";
 extern const char lbl_80331830[8] = "w_close";
 extern const char lbl_80331838[7] = "w_idle";
 
-extern float FLOAT_80331490;
-extern float FLOAT_80331498;
-extern float FLOAT_803314e8;
-extern float FLOAT_803314f0;
 
 static const int kMcListEntrySize = sizeof(McListInfo);
 static const int kMcListCount = 4;
@@ -475,6 +509,7 @@ static const int kMcYearTexture = 22;
 static const int kMcYearLabelTexture = 32;
 static const int kMcFaceTexture = 53;
 static const int kMcTimeTexture = 31;
+static const int kMoveHelpTexture = 34;
 #else
 static const int kMemoryCardBannerTexture = 31;
 static const int kMcSlotLeftTexture = 36;
@@ -498,6 +533,7 @@ static const int kMcYearTexture = 23;
 static const int kMcYearLabelTexture = 33;
 static const int kMcFaceTexture = 55;
 static const int kMcTimeTexture = 32;
+static const int kMoveHelpTexture = 35;
 #endif
 static Vec s_RingOrgPos;
 #ifdef VERSION_GCCJGC
@@ -1479,7 +1515,7 @@ void CMenuPcs::calcWorld()
 
 	if (animState == 1) {
 		if (animTime < animEnd) {
-			m_wm.m_handles[1]->m_model->AddFrame(FLOAT_80331698);
+			m_wm.m_handles[1]->m_model->AddFrame(WM_MODEL_FRAME_STEP);
 			m_wmWorldState->m_frameCounter = 0;
 		} else {
 			if (m_wmWorldState->m_frameCounter >= 10) {
@@ -1525,7 +1561,7 @@ void CMenuPcs::calcWorld()
 			m_wmNextAnim = 0;
 		} else {
 			if (animTime < animEnd) {
-				m_wm.m_handles[1]->m_model->AddFrame(FLOAT_80331698);
+				m_wm.m_handles[1]->m_model->AddFrame(WM_MODEL_FRAME_STEP);
 			} else {
 				m_wm.m_handles[1]->SetAnim(1, -1, -1, -1, 0);
 				m_wmWorldParams->m_anim = 1;
@@ -1533,7 +1569,7 @@ void CMenuPcs::calcWorld()
 		}
 	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
 		if (animTime < animEnd) {
-			m_wm.m_handles[1]->m_model->AddFrame(FLOAT_80331698);
+			m_wm.m_handles[1]->m_model->AddFrame(WM_MODEL_FRAME_STEP);
 		} else {
 			m_wm.m_handles[1]->SetAnim(0, -1, -1, -1, 0);
 			m_wmWorldParams->m_anim = 0;
@@ -1763,7 +1799,9 @@ void CMenuPcs::CalcMCardMenu()
 			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_wmWorldState->m_flag09 = 1;
+#ifndef VERSION_GCCJGC
 			m_wmWorldState->m_counter1A = 0;
+#endif
 			if (playOpenSe) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
@@ -2073,7 +2111,7 @@ void CMenuPcs::CalcMCardMenu()
 		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetSlot());
 		if (m_wmWorldState->m_mcResult == 0 && buttonsRepeat != 0) {
 			if ((buttonsRepeat & 8) != 0) {
-				if (m_wmWorldState->m_cardChannel < 1) {
+				if (m_wmWorldState->m_cardChannel <= 0) {
 					m_wmWorldState->m_cardChannel = 3;
 				} else {
 					m_wmWorldState->m_cardChannel--;
@@ -2774,6 +2812,10 @@ void CMenuPcs::CalcLoadMenu()
 	}
 }
 
+#ifdef VERSION_GCCJGC
+#define OPMOVIE_FNAME "dvd/movie/ffcc_op.thp"
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x800FCA2C
@@ -2786,7 +2828,6 @@ void CMenuPcs::CalcLoadMenu()
 void CMenuPcs::CalcTitleMenu()
 {
 #ifdef VERSION_GCCJGC
-	char* const OPMOVIE_FNAME = "dvd/movie/ffcc_op.thp";
 	const int kMovieBufferLine = 0xBC9;
 #else
 	static char* OPMOVIE_FNAME = "dvd/movie/ffcc_op.thp";
@@ -2929,16 +2970,17 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	if (!IsAsyncCharaLoadFinish()) {
 		return;
 	}
-	WmCharaSelectEntry& entry = m_wm.m_charaSelectData[0];
+	int chan = 0;
+	WmCharaSelectEntry& entry = m_wm.m_charaSelectData[chan];
 	if (entry.m_confirmed != 0) {
 		return;
 	}
 
-	entry.m_padType = Joybus.GetPadType(0);
+	entry.m_padType = Joybus.GetPadType(chan);
 	if (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000 || entry.m_padType == -0x78000000) {
 		entry.m_connected = 1;
 	} else if (Game.m_gameWork.m_menuStageMode == 0) {
-		entry.m_connected = Joybus.GetGBAConnect(0);
+		entry.m_connected = Joybus.GetGBAConnect(chan);
 	} else {
 		entry.m_connected = 0;
 	}
@@ -2946,8 +2988,8 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	unsigned short repeat;
 	unsigned short down;
 	if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
-		repeat = Pad.GetButtonRepeat(0);
-		down = Pad.GetButtonDown(0);
+		repeat = Pad.GetButtonRepeat(chan);
+		down = Pad.GetButtonDown(chan);
 	} else {
 		repeat = 0;
 		down = repeat;
@@ -2957,7 +2999,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		return;
 	}
 
-	WmCharaSelectEntry& curEntry = m_wm.m_charaSelectData[0];
+	WmCharaSelectEntry& curEntry = m_wm.m_charaSelectData[chan];
 	int cursor = static_cast<int>(curEntry.m_currentSlot);
 	if ((repeat & 0x0C) != 0) {
 		if (cursor < 4) {
@@ -3171,7 +3213,13 @@ void CMenuPcs::drawWorld()
 			break;
 		default:
 			if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+#if defined(VERSION_GCCJGC)
+				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xD68, menuMode);
+#elif defined(VERSION_GCCE01)
+				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC37, menuMode);
+#else
 				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC59, menuMode);
+#endif
 			}
 			break;
 		}
@@ -3820,7 +3868,11 @@ void CMenuPcs::DrawCMakeMenu()
 			         7, textList[textIndex], 1.0f, 1.0f);
 #else
 			int mesNo = 5;
+#ifdef VERSION_GCCP01
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x4B);
+#else
+			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x5A);
+#endif
 			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 			char* textList[3] = {0};
 			for (int i = 0; i < 3; i++) {
@@ -3958,7 +4010,7 @@ void CMenuPcs::DrawMoveMenu()
 		moveAlpha = FLOAT_803313e8;
 	}
 	if (state > 0 && state < 3) {
-		DrawHelpBase(0x23, moveAlpha);
+		DrawHelpBase(kMoveHelpTexture, moveAlpha);
 	}
 	DrawWMFrame();
 
@@ -4512,10 +4564,10 @@ void CMenuPcs::DrawTitleMenu()
 			float alpha;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
+				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314E8);
 				fX = static_cast<float>(-(kTitleSlideDistance *
 				                           (static_cast<double>(5 - timer) / DOUBLE_80331798) -
 				                           static_cast<double>(fX)));
-				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314E8);
 			} else {
 				alpha = FLOAT_803313e8;
 			}
@@ -4598,8 +4650,8 @@ void CMenuPcs::DrawTitleMenu()
 			if (m_wmWorldState->m_flag09 == 0 &&
 			    i == m_wmWorldState->m_cardChannel) {
 				int timer = (int)m_wmWorldState->m_titleState;
-				float cursorScale = static_cast<float>(DOUBLE_803317A8 * static_cast<double>(timer) +
-				                                        static_cast<double>(FLOAT_803313e8));
+				float cursorScale = FLOAT_803313e8;
+				cursorScale += DOUBLE_803317A8 * static_cast<double>(timer);
 				int cursorAlpha = static_cast<int>(kColorScale *
 				                                   static_cast<float>(-(DOUBLE_803317B0 * static_cast<double>(timer) -
 				                                                        DOUBLE_80331420)));
@@ -4693,8 +4745,9 @@ void CMenuPcs::DrawTitleMenu()
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
 			if (m_wmWorldState->m_state0E != 0) {
 				lbl_8032E8AC = 1;
+				const int channel = m_wmWorldState->m_cardChannel;
 				m_wmWorldState->m_changeRequest = 1;
-				CallWorldParam(7, m_wmWorldState->m_cardChannel, 0);
+				CallWorldParam(7, channel, 0);
 				bytes[0x0D] = 0;
 			} else {
 				lbl_8032E8AC = 0;
@@ -4703,7 +4756,7 @@ void CMenuPcs::DrawTitleMenu()
 			m_wmWorldState->m_frameCounter = 0;
 			m_wmWorldState->m_worldReady = 0;
 		} else if (state != 2) {
-			unsigned int threshold = 10;
+			int threshold = 10;
 			m_wmWorldState->m_frameCounter++;
 			if (m_wmWorldState->m_mainState == 1) {
 				threshold = 0x28;
@@ -4722,7 +4775,7 @@ void CMenuPcs::DrawTitleMenu()
 					m_wmWorldState->m_titleState = 0;
 					CallWorldParam(9, 1, 0);
 				}
-			} else if (m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= kTitleIdleFrames) {
+			} else if (state == 2 && m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= kTitleIdleFrames) {
 				m_wmWorldState->m_state0E = 0;
 				m_wmWorldState->m_mainState++;
 				m_wmWorldState->m_frameCounter = 0;
@@ -4995,11 +5048,21 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 	case 0x17:
 	case 0x18:
 	case 0x19:
+#ifndef VERSION_GCCJGC
 	case 0x1a:
+#endif
+#ifdef VERSION_GCCP01
 	case 0x1b:
+#endif
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+#if defined(VERSION_GCCJGC)
+			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x158D, code);
+#elif defined(VERSION_GCCE01)
+			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x14F9, code);
+#else
 			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x1521, code);
+#endif
 		}
 		break;
 	}
@@ -5251,7 +5314,11 @@ static inline void SetPortTownName(char* dst, const char* townName)
 	strcpy(dst, townName);
 	strcat(dst, "\x82\xCC\x8D\x60");
 #else
+#ifdef VERSION_GCCE01
+	static const char* s_port[] = {"Port ", "-Hafen", "Porto ", "Port ", "Puerto de "};
+#else
 	static const char* s_port[] = {"Port ", "-Hafen", "Porto ", "Port ", "Puerto "};
+#endif
 	const int language = Game.m_gameWork.GetLanguage();
 	if (language == 2) {
 		strcpy(dst, townName);
@@ -5887,6 +5954,7 @@ inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFo
  */
 void CMenuPcs::CalcWMFrame()
 {
+	int i;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	short mainState = m_wmWorldState->m_mainState;
 	if (mainState == 0) {
@@ -5946,10 +6014,12 @@ void CMenuPcs::CalcWMFrame()
 	} else {
 		yearValue = Game.m_gameWork.m_scriptSysVal0 + m_wmYear;
 	}
+#ifndef VERSION_GCCJGC
 	gWmMenuScriptValueCache = (unsigned char)yearValue;
 	if ((int)yearValue > 99) {
 		gWmMenuScriptValueCache = 100;
 	}
+#endif
 
 	int digitCount = ((int)yearValue > 9) ? 2 : 1;
 	if ((int)yearValue > 99) {
@@ -5985,25 +6055,24 @@ void CMenuPcs::CalcWMFrame()
 		const double dV10 = DOUBLE_80331490;
 		const double dV12 = DOUBLE_80331540;
 		const double dV11 = DOUBLE_80331538;
-		int wmDigitIdx;
-		for (wmDigitIdx = topDigitIdx; wmDigitIdx >= 0; wmDigitIdx--) {
-				int digit = digits[wmDigitIdx];
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_x = (short)digitX;
+		for (i = topDigitIdx; i >= 0; i--) {
+				int digit = digits[i];
+				m_wm.m_frameData->m_yearSprites[i].m_x = (short)digitX;
 				int digitW = s_YearWTbl[digit];
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_y = kWorldYearDigitY;
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_width = (short)digitW;
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_height = 0x20;
+				m_wm.m_frameData->m_yearSprites[i].m_y = kWorldYearDigitY;
+				m_wm.m_frameData->m_yearSprites[i].m_width = (short)digitW;
+				m_wm.m_frameData->m_yearSprites[i].m_height = 0x20;
 				int col = digit % 5;
 				int row = digit / 5;
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_u = (float)(dV10 * (double)(float)col);
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_v = (float)(dV12 * (double)(float)row + dV11);
+				m_wm.m_frameData->m_yearSprites[i].m_u = (float)(dV10 * (double)(float)col);
+				m_wm.m_frameData->m_yearSprites[i].m_v = (float)(dV12 * (double)(float)row + dV11);
 				digitX = digitX + digitW;
 		}
 	}
 
 	if ((m_wmChgFlags & WMDATA_CHG_YEAR) != 0 ||
 	    (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0)) {
-		for (int i = 0; i < digitCount; i++) {
+		for (i = 0; i < digitCount; i++) {
 			if (i != 0 && digitCount != 2) {
 				break;
 			}
@@ -6530,7 +6599,11 @@ void CMenuPcs::CalcChara()
 	int handleIdx = 0x20;
 	for (i = 0; i < kWmMenuPlayerCount; i++, charaWork++, handleIdx++) {
 		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
+#ifdef VERSION_GCCJGC
+		if (handle->m_model == 0 || handle->m_model->m_texSet == 0) {
+#else
 		if (!handle->IsModelLoaded(1)) {
+#endif
 			charaWork->m_active = 0;
 			continue;
 		}
@@ -6657,6 +6730,19 @@ inline int CMenuPcs::GetAnimNo(int slot, int anim)
  */
 void CMenuPcs::PCAnimCtrl()
 {
+#ifdef VERSION_GCCP01
+	const int kIdleTime = 3000;
+	const int kRestTime = 6000;
+	const int kSleepTime = 9000;
+	const int kWakeTime = 12000;
+	const int kResumeTime = 2100;
+#else
+	const int kIdleTime = 3600;
+	const int kRestTime = 7200;
+	const int kSleepTime = 10800;
+	const int kWakeTime = 14400;
+	const int kResumeTime = 2700;
+#endif
 	WmCharaSelectEntry* const charaSelect = m_wm.m_charaSelectData;
 	int isSelected;
 	int i;
@@ -6696,7 +6782,7 @@ void CMenuPcs::PCAnimCtrl()
 		isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
 		if (isSelected == 0 &&
 		    m_wmWorldState->m_menuMode != 8 &&
-		    animState->m_animIndex == 0 && animState->m_timer >= 3000) {
+		    animState->m_animIndex == 0 && animState->m_timer >= kIdleTime) {
 			animState->m_animIndex = 4;
 			handle->SetAnim(GetAnimNo(i, animState->m_animIndex), -1, -1, blendMode, 0);
 			animState->m_frame = handle->m_model->GetNowFrame();
@@ -6704,14 +6790,14 @@ void CMenuPcs::PCAnimCtrl()
 			animState->m_timer = 0;
 		} else if (isSelected != 0 &&
 		           m_wmWorldState->m_menuMode != 8) {
-			if (animState->m_animIndex == 1 && animState->m_timer >= 12000) {
+			if (animState->m_animIndex == 1 && animState->m_timer >= kWakeTime) {
 				animState->m_animIndex = 0;
 				animState->m_timer = 0;
-			} else if (animState->m_animIndex == 2 && animState->m_timer >= 9000) {
+			} else if (animState->m_animIndex == 2 && animState->m_timer >= kSleepTime) {
 				animState->m_animIndex = 1;
-			} else if (animState->m_animIndex == 1 && animState->m_timer >= 6000 && animState->m_timer < 9000) {
+			} else if (animState->m_animIndex == 1 && animState->m_timer >= kRestTime && animState->m_timer < kSleepTime) {
 				animState->m_animIndex = 2;
-			} else if (animState->m_animIndex == 0 && animState->m_timer >= 3000) {
+			} else if (animState->m_animIndex == 0 && animState->m_timer >= kIdleTime) {
 				animState->m_animIndex = 1;
 			} else {
 				goto frameStep;
@@ -6725,7 +6811,7 @@ void CMenuPcs::PCAnimCtrl()
 			const float frame = animState->m_frame;
 			const float frameEnd = animState->m_endFrame;
 			if (frame < frameEnd) {
-				handle->m_model->AddFrame(FLOAT_80331698);
+				handle->m_model->AddFrame(WM_MODEL_FRAME_STEP);
 				animState->m_timer++;
 			} else {
 				if (animState->m_animIndex == 3 || animState->m_animIndex == 4 || animState->m_animIndex == 5) {
@@ -6734,7 +6820,7 @@ void CMenuPcs::PCAnimCtrl()
 					animState->m_frame = handle->m_model->GetNowFrame();
 					animState->m_endFrame = handle->m_model->GetEndFrame();
 					if (isSelected != 0) {
-						animState->m_timer = 0x834;
+						animState->m_timer = kResumeTime;
 					} else {
 						animState->m_timer = 0;
 					}
@@ -7386,13 +7472,15 @@ void CMenuPcs::DrawCharaName()
 	float plateW = 64.0f;
 	const double xOffsetDefault =
 	    -(DOUBLE_80331418 * static_cast<double>(plateW) - DOUBLE_80331678);
-	for (int row = 0; row < 2; row++) {
+	int row;
+	int col;
+	for (row = 0; row < 2; row++) {
 		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
 		y += FLOAT_80331684;
 		if (row != 0) {
 			y += FLOAT_80331548;
 		}
-		for (int col = 0; col < 4; col++) {
+		for (col = 0; col < 4; col++) {
 			const int slot = row * 4 + col;
 			if ((confirmedMask & (1u << slot)) != 0) {
 				const char* const text = reinterpret_cast<const char*>(
@@ -7426,17 +7514,17 @@ void CMenuPcs::DrawCharaName()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
 
 	CSystem* const sys = &System;
-	for (int row2 = 0; row2 < 2; row2++) {
-		float y = FLOAT_80331478 + static_cast<float>(row2 * 0xB8);
+	for (row = 0; row < 2; row++) {
+		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
 		y += FLOAT_80331688;
-		if (row2 != 0) {
+		if (row != 0) {
 			y += FLOAT_80331548;
 		}
 #ifndef VERSION_GCCJGC
 		y -= FLOAT_80331550;
 #endif
-		for (int col = 0; col < 4; col++) {
-			const int slot = row2 * 4 + col;
+		for (col = 0; col < 4; col++) {
+			const int slot = row * 4 + col;
 			int restoreColor;
 			restoreColor = 0;
 			const char* text;
@@ -7604,18 +7692,14 @@ void CMenuPcs::DrawCMLife()
 		x = static_cast<float>((0x90 - count * 0x10) / 2.0 + xBase);
 		float step = static_cast<float>((8 - count) / 2.0);
 
-		const float* pRectSize = &FLOAT_80331558;
-		float kRectSize;
-		kRectSize = *pRectSize;
-
 		for (i = 0; i < count; i++) {
 			float yAdd = GetFcvValue(s_LifePos, step);
 
 			MenuPcs.DrawRect(
 			    0, x, yTmp + yAdd, FLOAT_80331558, FLOAT_80331558,
 			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			x += FLOAT_80331558;
 			step += 1.0;
-			x += kRectSize;
 		}
 
 		unsigned char flagA;
@@ -7833,7 +7917,10 @@ void CMenuPcs::WMChgMenu()
 				worldObj->m_transform.m_rotation.y = initialRotY;
 				WmCharaSelectEntry* const selectData = &m_wm.m_charaSelectData[slot];
 				selectData->m_displaySlot = selectData->m_currentSlot;
-				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1)) {
+#ifndef VERSION_GCCJGC
+				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1))
+#endif
+				{
 					Mtx mtx;
 					PSMTXIdentity(mtx);
 					m_wm.m_handles[handleIdx]->m_model->SetMatrix(mtx);
@@ -7844,9 +7931,11 @@ void CMenuPcs::WMChgMenu()
 				worldObj++;
 			} while (slot < 8);
 
+#ifndef VERSION_GCCJGC
 			for (int channel = 0; channel < 4; channel++) {
 				GbaQue.ClrCmakeInfo(channel);
 			}
+#endif
 		break;
 	}
 	case 4:
@@ -8158,7 +8247,11 @@ void CMenuPcs::SetAnim(int anim)
 
 	m_wmCharaAnimState[anim].m_animIndex = 0;
 	m_wmCharaAnimState[anim].m_nextAnimIndex = -1;
+#ifdef VERSION_GCCP01
 	m_wmCharaAnimState[anim].m_timer = rand() % 250;
+#else
+	m_wmCharaAnimState[anim].m_timer = rand() % 300;
+#endif
 
 	m_wm.m_handles[handleIdx]->SetAnim(animBase - 5, -1, -1,
 	    m_wm.m_handles[handleIdx]->GetCurrentAnimNumber() < 0 ? 0 : -1, 1);
@@ -8201,6 +8294,11 @@ void CMenuPcs::DrawCursor(int x, int y, float scale)
  */
 void CMenuPcs::CalcMainMenuSub()
 {
+#ifdef VERSION_GCCP01
+	const int kRotateFrames = 14;
+#else
+	const int kRotateFrames = 17;
+#endif
 	int i;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	const unsigned short btn = Pad.GetButtonDown(0);
@@ -8215,7 +8313,7 @@ void CMenuPcs::CalcMainMenuSub()
 					m_wmMenuTargetRotation += wrap;
 					m_wmMenuRotation += wrap;
 				}
-				m_wmWorldState->m_frameCounter = 0xE;
+				m_wmWorldState->m_frameCounter = kRotateFrames;
 				if (m_wmWorldState->m_cardChannel >= 4) {
 					m_wmWorldState->m_cardChannel = 0;
 				} else {
@@ -8229,7 +8327,7 @@ void CMenuPcs::CalcMainMenuSub()
 					m_wmMenuTargetRotation -= wrap2;
 					m_wmMenuRotation -= wrap2;
 				}
-				m_wmWorldState->m_frameCounter = 0xE;
+				m_wmWorldState->m_frameCounter = kRotateFrames;
 				if (m_wmWorldState->m_cardChannel <= 0) {
 					m_wmWorldState->m_cardChannel = 4;
 				} else {
@@ -8307,7 +8405,11 @@ void CMenuPcs::CalcMainMenuSub()
 
 		if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay == 0) {
 			m_wmWorldState->m_titleState++;
+#ifdef VERSION_GCCP01
 			if (m_wmWorldState->m_titleState >= 100) {
+#else
+			if (m_wmWorldState->m_titleState >= 120) {
+#endif
 				m_wmWorldState->m_titleState = 0;
 			}
 		} else {
@@ -8323,7 +8425,7 @@ void CMenuPcs::CalcMainMenuSub()
 
 			WmWorldObjInfo* const panel = &worldObj[i];
 			panel->m_active = 1;
-			int frame = 0;
+			int frame;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
 				modelScale *= DOUBLE_803315D8;
@@ -8337,8 +8439,8 @@ void CMenuPcs::CalcMainMenuSub()
 			panel->m_transform.m_position.y = zero;
 			panel->m_transform.m_position.z = FLOAT_803315E0;
 			panel->m_transform.m_rotation.x = zero;
-			panel->m_transform.m_rotation.y = FLOAT_803315E4 * static_cast<float>(i);
 			panel->m_transform.m_rotation.z = zero;
+			panel->m_transform.m_rotation.y = FLOAT_803315E4 * static_cast<float>(i);
 
 			PSMTXRotRad(workMtx, 'y', FLOAT_803314bc * panel->m_transform.m_rotation.y);
 			PSMTXMultVecSR(workMtx, &panel->m_transform.m_position, &modelPos);
@@ -8356,10 +8458,14 @@ void CMenuPcs::CalcMainMenuSub()
 				const int ms = m_wmWorldState->m_mainState;
 				if (ms != 2) {
 					if (ms < 2) {
+#ifdef VERSION_GCCJGC
+						frame = 0x14 - (ms * 10 + m_wmWorldState->m_frameCounter);
+#else
 						frame = 0x13 - (ms * 10 + m_wmWorldState->m_frameCounter);
 						if (static_cast<int>(frame) < 0) {
 							frame = 0;
 						}
+#endif
 					} else {
 						frame = m_wmWorldState->m_frameCounter + (ms - 3) * 10;
 					}
@@ -8496,7 +8602,11 @@ void CMenuPcs::DrawMainMenuSub()
 	int orderIndex;
 	int j;
 	int i;
+#ifdef VERSION_GCCJGC
+	static const float s_sprt_w[] = {176.0f, 104.0f, 208.0f, 136.0f, 208.0f};
+#else
 	static const float s_sprt_w[] = {264.0f, 264.0f, 264.0f, 264.0f, 264.0f};
+#endif
 	Mtx modelMtx;
 	Mtx44 screenMtx;
 	GXColor white;
@@ -8649,6 +8759,7 @@ inline int CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
+	int digitIdx;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	static const int s_TimeWTbl[] = {17, 10, 16, 16, 19, 17, 16, 16, 16, 15, 8};
 	static const unsigned char s_LocTex[][4] = {
@@ -8860,10 +8971,10 @@ nextListEntry:
 					MenuPcs.DrawRect(0, FLOAT_80331520, rowY, static_cast<float>(dw10), FLOAT_80331410,
 					         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 				} else {
-					for (int di = 0; di < digitCount; di++) {
+					for (digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						if (digitCount == 1) {
 							totalWidth = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
-						} else if (di == 0) {
+						} else if (digitIdx == 0) {
 							totalWidth = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) / 10];
 						} else {
 							totalWidth += s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
@@ -8888,7 +8999,7 @@ nextListEntry:
 					}
 					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
 #endif
-					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
+					for (digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
 						if (digitCount == 1) {
 							digit = static_cast<int>(slotData->m_scriptSysVal0) % 10;
@@ -9019,7 +9130,11 @@ nextListEntry:
 				}
 				const int hourRemainder = playHours % 100;
 				const int tens = hourRemainder / 10;
+#ifdef VERSION_GCCJGC
+				if (tens != 0) {
+#else
 				if (tens != 0 || playDigits[0] > 0) {
+#endif
 					playDigits[1] = tens;
 					playWidth += static_cast<float>(s_TimeWTbl[tens]);
 				} else {
@@ -9033,7 +9148,7 @@ nextListEntry:
 				playWidth += static_cast<float>(s_TimeWTbl[playDigits[3]]);
 				playWidth += static_cast<float>(s_TimeWTbl[playDigits[4]]);
 				float playX = FLOAT_80331518 - playWidth;
-				for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
+				for (digitIdx = 0; digitIdx < 5; digitIdx++) {
 					if (playDigits[digitIdx] >= 0) {
 						if (digitIdx == 3) {
 							const float colonW = static_cast<float>(s_TimeWTbl[10]);
@@ -9065,9 +9180,13 @@ nextListEntry:
 
 		// Draw text info for each save slot
 		for (slot = 0; slot < kMcListCount; slot++) {
+#ifdef VERSION_GCCJGC
+			char locationStr[32];
+#else
 			char locationStr[64];
 			char line1[64];
 			char line2[64];
+#endif
 			const McListInfo* const slotData = &m_wmCharaState[slot];
 			const float slotY = static_cast<float>(DOUBLE_80331498 * static_cast<double>(slot) + DOUBLE_80331490);
 			if (slotData->m_isBroken != 0 || static_cast<int>(slotData->m_scriptSysVal0) <= 0) {
@@ -9113,7 +9232,8 @@ nextListEntry:
 				} else if (locationIndex == 0x16) {
 #ifdef VERSION_GCCJGC
 					strcpy(locationStr, slotData->m_townName);
-					strcpy(locationStr + strlen(locationStr) - 4, "\x82\xCC\x8D\x60");
+					int len = strlen(locationStr);
+					strcpy(&locationStr[len - 4], "\x82\xCC\x8D\x60");
 #else
 					SetPortTownName(locationStr, slotData->m_townName);
 #endif
@@ -9147,7 +9267,9 @@ nextListEntry:
 #endif
 			}
 		}
+#ifndef VERSION_GCCJGC
 	}
+#endif
 	if (worldState->m_subState == 0x11) {
 		short mode = worldState->m_menuMode;
 		if (mode == 5) {
@@ -9171,6 +9293,7 @@ nextListEntry:
 		}
 #ifdef VERSION_GCCJGC
 		DrawInit();
+	}
 #endif
 	}
 #ifndef VERSION_GCCJGC
@@ -9989,7 +10112,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 
 	*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
 #ifdef VERSION_GCCJGC
-	*h = static_cast<short>(winMess->m_lineCount * 0x16 + 0x40);
+	*h = static_cast<short>(GetWinMess(winType)->m_lineCount * 0x16 + 0x40);
 #else
 	*h = static_cast<short>(winMess->m_lineCount * 0x1E + 0x40);
 #endif

@@ -18,8 +18,6 @@ class CGObjWork;
 struct Vec;
 class CFlatRuntime2;
 
-void SAFE_CAST_WORK(CGObjWork*);
-
 class CHairSet
 {
 public:

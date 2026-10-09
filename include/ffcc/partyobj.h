@@ -14,8 +14,6 @@ class CATEGOLY2TYPE;
 class CVector;
 struct Vec;
 
-void stageWeather();
-void calcWeightMax();
 
 struct PartyObjFlags {
     signed char commandActive : 1;
@@ -197,7 +195,7 @@ public:
 
     void bonus(int, int, CGPrgObj*);
     int canPlayerUseItem();
-    void canPlayerGoMenu();
+    int canPlayerGoMenu();
     int useItem(int);
 
     int canPlayerPutItem();

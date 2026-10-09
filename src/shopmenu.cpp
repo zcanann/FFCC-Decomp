@@ -28,12 +28,15 @@
 #include "ffcc/cardconst.h"
 #endif
 extern char s_shopmenu_cpp[];
-#ifdef VERSION_GCCJGC
+#if defined(VERSION_GCCJGC)
 #define SHOP_MENU_FILE "shopmenu.cpp"
-#define SHOP_MENU_LINE(pal, jp) (jp)
+#define SHOP_MENU_LINE(pal, us, jp) (jp)
+#elif defined(VERSION_GCCE01)
+#define SHOP_MENU_FILE s_shopmenu_cpp
+#define SHOP_MENU_LINE(pal, us, jp) (us)
 #else
 #define SHOP_MENU_FILE s_shopmenu_cpp
-#define SHOP_MENU_LINE(pal, jp) (pal)
+#define SHOP_MENU_LINE(pal, us, jp) (pal)
 #endif
 extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
@@ -176,107 +179,12 @@ extern const char s_Slash_80332d84[];
 extern const char lbl_80332E40[];
 extern const float FLOAT_80332E50;
 extern const char s_shop_80332e54[];
-extern char s_Blacksmith_801DEB38[];
-extern char s_Materials_801DEB44[];
-extern char s_Cannot_buy_801DEB50[];
-extern char s_Cannot_sell_801DEB5C[];
-extern char s_Quantity_801DEB6C[];
-extern char s_Strength_801DEB78[];
-extern char s_Cannot_be_crafted_here_801DEB84[];
-extern char s_Verkaufen_801DEB9C[];
-extern char s_Abbrechen_801DEBA8[];
-extern char s_Schmiede_801DEBB4[];
-extern char s_Guthaben_801DEBC0[];
-extern char lbl_801DEBCC[];
-extern char s_Inventar_801DEBD8[];
-extern char s_Herstellen_801DEBE4[];
-extern char lbl_801DEBF0[];
-extern char lbl_801DEBFC[];
-extern char lbl_801DEC0C[];
-extern char s_Anzahl_x_801DEC18[];
-extern char s_Falsche_Schmiede_801DEC24[];
-extern char s_Inventario_801DEC38[];
-extern char s_Utilizza_801DEC44[];
-extern char s_Non_puoi_acquistare_801DEC50[];
-extern char s_Non_puoi_vendere_801DEC68[];
-extern char lbl_801DEC7C[];
-extern char s_Irrealizzabile_qui_801DEC88[];
-extern char s_Forgeron_801DEC9C[];
-extern char lbl_801DECA8[];
-extern char s_En_stock_801DECB4[];
-extern char s_Non_achetable_801DECC0[];
-extern char s_Non_vendable_801DECD0[];
-extern char lbl_801DECE0[];
-extern char lbl_801DECEC[];
-extern char s_Infaisable_ici_801DECF8[];
-extern char s_Cancelar_801DED08[];
-extern char s_Honorario_801DED14[];
-extern char s_Materiales_801DED20[];
-extern char s_Reservas_801DED2C[];
-extern char lbl_801DED38[];
-extern char s_No_puedes_comprar_801DED44[];
-extern char s_No_vendible_801DED58[];
-extern char s_Cantidad_801DED68[];
-extern char lbl_801DED74[];
 #ifndef VERSION_GCCJGC
-const char lbl_80332B40[] = "Buy";
-const char lbl_80332B44[] = "Sell";
-const char lbl_80332B4C[] = "Cancel";
-const char lbl_80332B54[] = "Shop";
-const char lbl_80332B5C[] = "For:";
-const char lbl_80332B64[] = "gil";
-const char lbl_80332B68[] = "Fee";
-const char lbl_80332B6C[] = "Money";
-const char lbl_80332B74[] = "Stock";
-const char lbl_80332B7C[] = "Craft";
-const char lbl_80332B84[] = "Equip";
-const char lbl_80332B8C[] = "Price";
-const char lbl_80332B94[] = "Defence";
-const char lbl_80332B9C[4] = "";
-const char lbl_80332BA0[] = "Kaufen";
-const char lbl_80332BA8[] = "Laden";
-const char lbl_80332BB0[8] = "F\374r:";
-const char lbl_80332BB8[] = "Gil";
-const char lbl_80332BBC[] = "Kosten";
-const char lbl_80332BC4[] = "Preis";
-const char lbl_80332BCC[8] = "St\344rke";
-const char lbl_80332BD4[] = "Abwehr";
-const char lbl_80332BDC[] = "Compra";
-const char lbl_80332BE4[] = "Vendi";
-const char lbl_80332BEC[] = "Annulla";
-const char lbl_80332BF4[] = "Emporio";
-const char lbl_80332BFC[] = "Fabbro";
-const char lbl_80332C04[] = "Per:";
-const char lbl_80332C0C[] = "guil";
-const char lbl_80332C14[] = "Tariffa";
-const char lbl_80332C1C[] = "Denaro";
-const char lbl_80332C24[] = "Materie";
-const char lbl_80332C2C[] = "Forgia";
-const char lbl_80332C34[] = "Prezzo";
-const char lbl_80332C3C[] = "Forza";
-const char lbl_80332C44[] = "Difesa";
-const char lbl_80332C4C[] = "Acheter";
-const char lbl_80332C54[] = "Vendre";
-const char lbl_80332C5C[] = "Annuler";
-const char lbl_80332C64[] = "Magasin";
-const char lbl_80332C6C[] = "Pour:";
-const char lbl_80332C74[] = "gils";
-const char lbl_80332C7C[] = "Tarif";
-const char lbl_80332C84[] = "Argent";
-const char lbl_80332C8C[] = "Forger";
-const char lbl_80332C94[] = "Equiper";
-const char lbl_80332C9C[] = "Prix";
-const char lbl_80332CA4[] = "Force";
-const char lbl_80332CAC[] = "Comprar";
-const char lbl_80332CB4[] = "Vender";
-const char lbl_80332CBC[] = "Herrero";
-const char lbl_80332CC4[] = "Para:";
-const char lbl_80332CCC[] = "guiles";
-const char lbl_80332CD4[] = "Dinero";
-const char lbl_80332CDC[] = "Equipar";
-const char lbl_80332CE4[] = "Precio";
-const char lbl_80332CEC[] = "Fuerza";
-const char lbl_80332CF4[] = "Defensa";
+#ifdef VERSION_GCCE01
+#include "src/shopmenu_str_data_us.inc"
+#else
+#include "src/shopmenu_str_data.inc"
+#endif
 extern const char s_DecimalFormat_80332d14[] = "%d";
 extern const char s_TwoDigitFormat_80332d18[] = "%02d";
 extern const char s_Colon_80332d30[] = ":";
@@ -288,113 +196,6 @@ extern const char s_Minus_80332d50[] = "-";
 extern const char s_Slash_80332d84[] = "/";
 extern const char lbl_80332E40[] = "x";
 extern const char s_shop_80332e54[] = "shop";
-extern "C" char* g_strShopMenuMes[105] = {
-    (char*)lbl_80332B40,
-    (char*)lbl_80332B44,
-    (char*)lbl_80332B4C,
-    (char*)lbl_80332B54,
-    s_Blacksmith_801DEB38,
-    (char*)lbl_80332B5C,
-    (char*)lbl_80332B64,
-    (char*)lbl_80332B68,
-    (char*)lbl_80332B6C,
-    s_Materials_801DEB44,
-    (char*)lbl_80332B74,
-    (char*)lbl_80332B7C,
-    (char*)lbl_80332B84,
-    (char*)lbl_80332B8C,
-    s_Cannot_buy_801DEB50,
-    s_Cannot_sell_801DEB5C,
-    s_Quantity_801DEB6C,
-    s_Strength_801DEB78,
-    (char*)lbl_80332B94,
-    (char*)lbl_80332B9C,
-    s_Cannot_be_crafted_here_801DEB84,
-    (char*)lbl_80332BA0,
-    s_Verkaufen_801DEB9C,
-    s_Abbrechen_801DEBA8,
-    (char*)lbl_80332BA8,
-    s_Schmiede_801DEBB4,
-    (char*)lbl_80332BB0,
-    (char*)lbl_80332BB8,
-    (char*)lbl_80332BBC,
-    s_Guthaben_801DEBC0,
-    lbl_801DEBCC,
-    s_Inventar_801DEBD8,
-    s_Herstellen_801DEBE4,
-    lbl_801DEBF0,
-    (char*)lbl_80332BC4,
-    lbl_801DEBFC,
-    lbl_801DEC0C,
-    s_Anzahl_x_801DEC18,
-    (char*)lbl_80332BCC,
-    (char*)lbl_80332BD4,
-    (char*)lbl_80332B9C,
-    s_Falsche_Schmiede_801DEC24,
-    (char*)lbl_80332BDC,
-    (char*)lbl_80332BE4,
-    (char*)lbl_80332BEC,
-    (char*)lbl_80332BF4,
-    (char*)lbl_80332BFC,
-    (char*)lbl_80332C04,
-    (char*)lbl_80332C0C,
-    (char*)lbl_80332C14,
-    (char*)lbl_80332C1C,
-    (char*)lbl_80332C24,
-    s_Inventario_801DEC38,
-    (char*)lbl_80332C2C,
-    s_Utilizza_801DEC44,
-    (char*)lbl_80332C34,
-    s_Non_puoi_acquistare_801DEC50,
-    s_Non_puoi_vendere_801DEC68,
-    lbl_801DEC7C,
-    (char*)lbl_80332C3C,
-    (char*)lbl_80332C44,
-    (char*)lbl_80332B9C,
-    s_Irrealizzabile_qui_801DEC88,
-    (char*)lbl_80332C4C,
-    (char*)lbl_80332C54,
-    (char*)lbl_80332C5C,
-    (char*)lbl_80332C64,
-    s_Forgeron_801DEC9C,
-    (char*)lbl_80332C6C,
-    (char*)lbl_80332C74,
-    (char*)lbl_80332C7C,
-    (char*)lbl_80332C84,
-    lbl_801DECA8,
-    s_En_stock_801DECB4,
-    (char*)lbl_80332C8C,
-    (char*)lbl_80332C94,
-    (char*)lbl_80332C9C,
-    s_Non_achetable_801DECC0,
-    s_Non_vendable_801DECD0,
-    lbl_801DECE0,
-    (char*)lbl_80332CA4,
-    lbl_801DECEC,
-    (char*)lbl_80332B9C,
-    s_Infaisable_ici_801DECF8,
-    (char*)lbl_80332CAC,
-    (char*)lbl_80332CB4,
-    s_Cancelar_801DED08,
-    (char*)lbl_80332CAC,
-    (char*)lbl_80332CBC,
-    (char*)lbl_80332CC4,
-    (char*)lbl_80332CCC,
-    s_Honorario_801DED14,
-    (char*)lbl_80332CD4,
-    s_Materiales_801DED20,
-    s_Reservas_801DED2C,
-    lbl_801DED38,
-    (char*)lbl_80332CDC,
-    (char*)lbl_80332CE4,
-    s_No_puedes_comprar_801DED44,
-    s_No_vendible_801DED58,
-    s_Cantidad_801DED68,
-    (char*)lbl_80332CEC,
-    (char*)lbl_80332CF4,
-    (char*)lbl_80332B9C,
-    lbl_801DED74,
-};
 #endif
 
 STATIC_ASSERT(offsetof(CShopMenu, m_mode) == 0x4);
@@ -1087,7 +888,7 @@ void CMenuPcs::CreateShopMenu()
 {
     m_shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E2, 0x2DD)));
+            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E2, 0x2E2, 0x2DD)));
     m_shopMenu->Init(0);
 }
 
@@ -1104,7 +905,7 @@ void CMenuPcs::CreateSmithMenu()
 {
     m_shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E9, 0x2E4)));
+            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E9, 0x2E9, 0x2E4)));
     m_shopMenu->Init(9);
 }
 
@@ -1135,7 +936,7 @@ inline void CShopMenu::Init(int mode)
     CPartMng::PppPdtSlot* slot;
     pppCacheChunk* cacheChunks;
 
-    Graphic._WaitDrawDone(SHOP_MENU_FILE, SHOP_MENU_LINE(0x2FE, 0x2F9));
+    Graphic._WaitDrawDone(SHOP_MENU_FILE, SHOP_MENU_LINE(0x2FE, 0x2FE, 0x2F9));
     m_unk00 = nullptr;
     m_caravanWork = Game.m_scriptFoodBase[0];
     SetMode(mode);
@@ -1148,7 +949,7 @@ inline void CShopMenu::Init(int mode)
     slot = &PartMng.m_pdtSlots[m_pdtSlot];
     cacheChunks = slot->m_pppDataHead->m_cacheChunks;
     cacheChunks->m_pdt = reinterpret_cast<long*>(
-        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, SHOP_MENU_FILE, SHOP_MENU_LINE(0x32A, 0x325)));
+        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, SHOP_MENU_FILE, SHOP_MENU_LINE(0x32A, 0x32A, 0x325)));
     long* pdt = cacheChunks->m_pdt;
     pppCacheLoadShape(reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(pdt) + pdt[5]),
         slot->m_pppDataHead);
@@ -2680,7 +2481,7 @@ void CShopMenu::DrawShopBase()
             font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
             font->DrawInit();
 
-            font->SetPosX(118.0f);
+            font->SetPosX(104.0f);
             font->SetPosY(308.0f);
             Graphic.SetDrawDoneDebugData(0x10);
             if (m_listType == 0) {
@@ -3389,9 +3190,9 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     }
 
     char* helpText = new((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-                         s_shopmenu_cpp, 0xBFF) char[0x200];
+                         s_shopmenu_cpp, SHOP_MENU_LINE(0xBFF, 0xBD9, 0xBFF)) char[0x200];
     if ((helpText == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, 0xC01);
+        System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, SHOP_MENU_LINE(0xC01, 0xBDB, 0xC01));
     }
     memset(helpText, 0, 0x200);
     CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);
@@ -3488,7 +3289,11 @@ extern const double DOUBLE_80332D20 = 4503601774854144.0;
 extern const float FLOAT_80332d28 = 1.0f;
 extern const float FLOAT_80332d2c = 0.8f;
 extern const float FLOAT_80332d34 = -5.0f;
+#ifdef VERSION_GCCE01
+extern const float FLOAT_80332d3c = 280.0f;
+#else
 extern const float FLOAT_80332d3c = 264.0f;
+#endif
 extern const float FLOAT_80332d54 = 100.0f;
 extern const float FLOAT_80332d58 = 104.0f;
 extern const float FLOAT_80332d5c = 8.0f;
@@ -3496,7 +3301,11 @@ extern const float FLOAT_80332d60 = 0.25f;
 extern const float FLOAT_80332d64 = -6.0f;
 extern const float FLOAT_80332d68 = 136.0f;
 extern const float FLOAT_80332d6c = 172.0f;
+#ifdef VERSION_GCCE01
+extern const float FLOAT_80332d70 = 275.0f;
+#else
 extern const float FLOAT_80332d70 = 259.0f;
+#endif
 extern const float FLOAT_80332d74 = 18.0f;
 extern const float FLOAT_80332d78 = 0.5f;
 extern const float FLOAT_80332d7c = 352.0f;
@@ -3504,7 +3313,11 @@ extern const float FLOAT_80332d80 = 300.0f;
 extern const float FLOAT_80332d88 = 340.0f;
 extern const float FLOAT_80332d8c = 1.5f;
 extern const float FLOAT_80332d90 = 336.0f;
+#ifdef VERSION_GCCE01
+extern const float FLOAT_80332d94 = 554.0f;
+#else
 extern const float FLOAT_80332d94 = 558.0f;
+#endif
 extern const float FLOAT_80332d98 = 348.0f;
 extern const float FLOAT_80332D9C = 0.0f;
 extern const double DOUBLE_80332DA0 = 255.0;
@@ -3533,7 +3346,11 @@ extern const float FLOAT_80332E0C = 54.0f;
 extern const float FLOAT_80332E10 = -2.0f;
 extern const float FLOAT_80332E14 = 312.0f;
 extern const float FLOAT_80332E18 = 180.0f;
+#ifdef VERSION_GCCE01
+extern const float FLOAT_80332E1C = 512.0f;
+#else
 extern const float FLOAT_80332E1C = 520.0f;
+#endif
 extern const float FLOAT_80332E20 = 192.0f;
 extern const float FLOAT_80332E24 = 144.0f;
 extern const float FLOAT_80332E28 = 96.0f;

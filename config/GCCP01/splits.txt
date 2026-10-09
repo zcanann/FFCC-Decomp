@@ -1113,7 +1113,7 @@ mesmenu.cpp:
 	.rodata     start:0x801D9E90 end:0x801D9EC8
 	.data       start:0x8020F998 end:0x8020FA00
 	.sdata      start:0x8032E7E8 end:0x8032E800
-	.sdata2     start:0x803308D8 end:0x80330998
+	.sdata2     start:0x803308C8 end:0x80330998
 
 gobjwork.cpp:
 	extab       start:0x80007E04 end:0x80007F78
@@ -1746,7 +1746,7 @@ monobj_table.cpp:
 	.data       start:0x802129B0 end:0x802140F0
 
 singmenu.cpp:
-	.rodata start:0x801DE6AC end:0x801DE8A4
+	.rodata start:0x801DD6F8 end:0x801DE8B0
 	extab       start:0x80009C14 end:0x80009D04
 	extabindex  start:0x80010EE8 end:0x80011050
 	.text       start:0x801453F4 end:0x8014A940
@@ -1770,6 +1770,7 @@ shopmenu.cpp:
 	extab       start:0x80009D94 end:0x80009E54
 	extabindex  start:0x80011128 end:0x80011248
 	.text       start:0x801503C8 end:0x80159654
+	.rodata     start:0x801DEB38 end:0x801DED8C
 	.data       start:0x80214D90 end:0x80214FE0
 	.sbss       start:0x8032EED0 end:0x8032EED9
 	.sdata2     start:0x80332B40 end:0x80332E60

@@ -60,17 +60,6 @@ STATIC_ASSERT(sizeof(ScreenBreakDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(ScreenBreakDataOffsets, m_colorDataOffset) == 0x0);
 STATIC_ASSERT(offsetof(ScreenBreakDataOffsets, m_valueOffset) == 0x8);
 
-static const float kScreenBreakExtentScale = 2.0f;
-static const float kScreenBreakZero = 0.0f;
-static const float kScreenBreakTranslationRandLimit = 0.3f;
-static const float kScreenBreakMeshCenterScale = -0.5f;
-static const float kScreenBreakOne = 1.0f;
-static const float kScreenBreakNegativeOne = -1.0f;
-static const float kScreenBreakDegToRad = 0.017453292f;
-
-static const char sF999Root[] = "f999_root";
-static const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
-
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
 static inline CChara::CModel::CRefData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
 static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { return meshData->m_nodeIndex; }
@@ -80,424 +69,6 @@ static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32
 static inline VColor* GetScreenBreakColorData(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VColor*>(GetScreenBreakWork(screenBreak, offset)); }
 
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
-
-static int SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
-static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
-static void SB_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-static void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*);
-static void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
-
-/*
- * --INFO--
- * PAL Address: 0x8012d458
- * PAL Size: 168b
- * EN Address: 0x8012C788
- * EN Size: 168b
- * JP Address: 0x801293B0
- * JP Size: 168b
- */
-void pppRenderScreenBreak(pppScreenBreak* screenBreak, PScreenBreak*, _pppCtrlTable* ctrl)
-{
-    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
-    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
-    CChara::CModel* model = GetCharaModelPtr(handle);
-    model->SearchNode(const_cast<char*>(sF999Root));
-
-    if (value->m_backBufferReady == 0) {
-        Graphic.GetBackBufferRect2(
-            Graphic.m_savedFrameBuffer, value->m_backBufferTexObj, 0, 0, 0x280, 0x1C0, 0, (_GXTexFilter)1, (_GXTexFmt)4, 0);
-        value->m_backBufferReady = 1;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012d500
- * PAL Size: 880b
- * EN Address: 0x8012C830
- * EN Size: 880b
- * JP Address: 0x80129458
- * JP Size: 880b
- */
-void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* step, _pppCtrlTable* ctrl)
-{
-    if (ppvUserStopPartF != 0) {
-        return;
-    }
-
-    if (GraphicScreenBreakBlurEnabled() != 0) {
-        GraphicPcs.SetBlurParameter(0, 0, 0, 0, 0, 0, 0);
-    }
-
-    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
-    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
-    VColor* colorSource = GetScreenBreakColorData(screenBreak, offsets->m_colorDataOffset);
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
-    CChara::CModel* model = GetCharaModelPtr(handle);
-    model->SetCallbackContext(value, step);
-
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-
-    value->m_color.r = colorSource->m_color.rgba[0];
-    value->m_color.g = colorSource->m_color.rgba[1];
-    value->m_color.b = colorSource->m_color.rgba[2];
-    value->m_color.a = colorSource->m_color.rgba[3];
-    DCFlushRange(&value->m_color, sizeof(value->m_color));
-
-    CalcGraphValue(screenBreak, step->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,
-                   step->m_stepValue, step->m_arg3, step->m_graphPayload);
-
-    ScreenBreakPiece* pieceStorage = value->m_pieces;
-    if (pieceStorage == 0) {
-        pieceStorage = static_cast<ScreenBreakPiece*>(
-            pppMemAlloc(ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece), ppvEnv->m_stagePtr,
-                        const_cast<char*>(s_pppScreenBreak_cpp), 0x25E));
-        value->m_pieces = pieceStorage;
-        value->m_backBufferTexObj = static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr,
-                                                                      const_cast<char*>(s_pppScreenBreak_cpp), 0x25F));
-        InitPieceData(model, step, value);
-        PSVECNormalize(&step->m_gravityDir, &step->m_gravityDir);
-    }
-
-    float extentScale = kScreenBreakExtentScale;
-    float sx = extentScale * value->m_extent.x;
-    float sy = extentScale * value->m_extent.y;
-    ScreenBreakPiece* piece = value->m_pieces;
-    for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
-        switch (step->m_initWork) {
-        case 0:
-            piece->m_active = 1;
-            break;
-        case 1:
-            if (-piece->m_translation.y < (value->m_graphValue0 * sy) - value->m_extent.y) {
-                piece->m_active = 1;
-            }
-            break;
-        case 2:
-            float pieceY = piece->m_translation.y;
-            if (-pieceY > value->m_extent.y - (value->m_graphValue0 * sy)) {
-                piece->m_active = 1;
-            }
-            break;
-        case 3:
-            if (-piece->m_translation.x < (value->m_graphValue0 * sx) + -value->m_extent.x) {
-                piece->m_active = 1;
-            }
-            break;
-        case 4:
-            float pieceX = piece->m_translation.x;
-            if (-pieceX > value->m_extent.x - (value->m_graphValue0 * sx)) {
-                piece->m_active = 1;
-            }
-            break;
-        case 5: {
-            sx = value->m_extent.x;
-            sy = value->m_extent.y;
-            float x = value->m_graphValue0 * sx;
-            float y = value->m_graphValue0 * sy;
-            float pieceX = piece->m_translation.x;
-            if ((x >= pieceX) && (-pieceX <= x) &&
-                (y >= piece->m_translation.y) && (-piece->m_translation.y <= y)) {
-                piece->m_active = 1;
-            }
-            break;
-        }
-        case 6: {
-            sx = value->m_extent.x;
-            float x = value->m_graphValue0 * sx;
-            sy = value->m_extent.y;
-            float y = value->m_graphValue0 * sy;
-            if ((-piece->m_translation.x >= sx - x) || (-piece->m_translation.x <= -sx + x) ||
-                (-piece->m_translation.y >= sy - y) || (-piece->m_translation.y <= -sy + y)) {
-                piece->m_active = 1;
-            }
-            break;
-        }
-        default:
-            break;
-        }
-        piece++;
-    }
-
-    pppSetFpMatrix(ppvMng);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012d870
- * PAL Size: 156b
- * EN Address: 0x8012CBA0
- * EN Size: 156b
- * JP Address: 0x801297C8
- * JP Size: 156b
- */
-void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
-{
-    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
-    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
-    CChara::CModel* model = GetCharaModelPtr(handle);
-    if (model != 0) {
-        model->m_beforeDrawModelCallback = 0;
-        model->SetDrawMeshDLCallback(0);
-        model->SetBeforeMeshLockEnvCallback(0);
-        model->SetCallbackContext(0, 0);
-        model->SetBeforeCalcMatrixCallback(0);
-    }
-    if (value->m_pieces != 0) {
-        pppMemFree(value->m_pieces);
-        value->m_pieces = 0;
-    }
-    if (value->m_backBufferTexObj != 0) {
-        pppMemFree(value->m_backBufferTexObj);
-        value->m_backBufferTexObj = 0;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012d90c
- * PAL Size: 36b
- * EN Address: 0x8012CC3C
- * EN Size: 36b
- * JP Address: 0x80129864
- * JP Size: 36b
- */
-void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
-{
-    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
-    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
-    float zero = kScreenBreakZero;
-    value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012d930
- * PAL Size: 208b
- * EN Address: 0x8012CC60
- * EN Size: 208b
- * JP Address: 0x80129888
- * JP Size: 212b
- */
-void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
-{
-    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
-    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
-    CGObject* gObject = ppvMng->m_owner;
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(gObject, 0);
-    CChara::CModel* model = GetCharaModelPtr(handle);
-    gObject->m_displayFlags |= 0x40;
-    model->m_beforeDrawModelCallback = SB_BeforeDrawCallback;
-    float zero = kScreenBreakZero;
-    model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
-    model->SetBeforeMeshLockEnvCallback(SB_BeforeMeshLockEnvCallback);
-    model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
-    value->m_pieces = 0;
-    value->m_backBufferTexObj = 0;
-    value->m_extent.x = value->m_extent.y = value->m_extent.z = zero;
-    value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
-    value->m_backBufferReady = 0;
-    value->m_color.r = 0xFF;
-    value->m_color.g = 0xFF;
-    value->m_color.b = 0xFF;
-    value->m_color.a = 0xFF;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012da00
- * PAL Size: 44b
- * EN Address: 0x8012CD30
- * EN Size: 44b
- * JP Address: 0x8012995C
- * JP Size: 44b
- */
-static void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
-{
-    GXSetZMode(GX_TRUE, (GXCompare)7, GX_TRUE);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012da2c
- * PAL Size: 1020b
- * EN Address: 0x8012CD5C
- * EN Size: 1020b
- * JP Address: 0x80129988
- * JP Size: 916b
- */
-static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
-{
-    ScreenBreakPiece* piece;
-    S16Vec globalMax;
-
-    memset(work->m_pieces, 0, ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece));
-    float translationRandLimit = kScreenBreakTranslationRandLimit;
-    CChara::CMesh* meshBase = model->m_meshes;
-    float negativeRandLimit = -translationRandLimit;
-    ScreenBreakPiece* pieceBase = work->m_pieces;
-    globalMax.x = -0x7FFF;
-    globalMax.y = -0x7FFF;
-    globalMax.z = -0x7FFF;
-
-    for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
-        CChara::CMesh* mesh = &meshBase[i];
-        piece = &pieceBase[i];
-        ScreenBreakMeshData* meshData = mesh->m_data;
-        CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
-        node->m_flagsBits.m_flag_80 = 0;
-        PSMTXIdentity(node->m_localRuntimeMtx);
-
-        u32 vertexCount = meshData->m_vertexCount;
-        S16Vec meshMax;
-        meshMax.x = -0x7FFF;
-        meshMax.y = -0x7FFF;
-        meshMax.z = -0x7FFF;
-        S16Vec meshMin;
-        meshMin.x = 0x7FFF;
-        meshMin.y = 0x7FFF;
-        meshMin.z = 0x7FFF;
-
-        for (u32 j = 0; j < vertexCount; j++) {
-            globalMax.x = globalMax.x < meshData->m_vertices[j].x ? meshData->m_vertices[j].x : globalMax.x;
-            globalMax.y = globalMax.y < meshData->m_vertices[j].y ? meshData->m_vertices[j].y : globalMax.y;
-            globalMax.z = globalMax.z < meshData->m_vertices[j].z ? meshData->m_vertices[j].z : globalMax.z;
-            meshMin.x = meshMin.x < meshData->m_vertices[j].x ? meshMin.x : meshData->m_vertices[j].x;
-            meshMin.y = meshMin.y < meshData->m_vertices[j].y ? meshMin.y : meshData->m_vertices[j].y;
-            meshMin.z = meshMin.z < meshData->m_vertices[j].z ? meshMin.z : meshData->m_vertices[j].z;
-            meshMax.x = meshMax.x < meshData->m_vertices[j].x ? meshData->m_vertices[j].x : meshMax.x;
-            meshMax.y = meshMax.y < meshData->m_vertices[j].y ? meshData->m_vertices[j].y : meshMax.y;
-            meshMax.z = meshMax.z < meshData->m_vertices[j].z ? meshData->m_vertices[j].z : meshMax.z;
-        }
-
-        meshMax.x += meshMin.x;
-        meshMax.y += meshMin.y;
-        meshMax.z += meshMin.z;
-        gUtil.ConvI2FVector(piece->m_translation, meshMax, ScreenBreakModelRef(model)->m_posQuant);
-        PSVECScale(&piece->m_translation, &piece->m_translation, kScreenBreakMeshCenterScale);
-
-        float velocityX = piece->m_translation.x;
-        if (piece->m_translation.x > translationRandLimit) {
-            velocityX = Math.RandF(translationRandLimit);
-        }
-        if (piece->m_translation.x < negativeRandLimit) {
-            velocityX = -Math.RandF(translationRandLimit);
-        }
-
-        piece->m_velocity.x = velocityX;
-        piece->m_velocity.y = kScreenBreakOne;
-        piece->m_velocity.z = kScreenBreakNegativeOne;
-        PSVECNormalize(&piece->m_velocity, &piece->m_velocity);
-        Vec up = {0.0f, 1.0f, 0.0f};
-        PSVECCrossProduct(&piece->m_velocity, &up, &piece->m_axis);
-
-        float speed = Math.RandF(step->m_speedRand);
-        PSVECScale(&piece->m_velocity, &piece->m_velocity, step->m_speedBase + speed);
-
-        piece->m_offset.x = piece->m_offset.y = piece->m_offset.z = kScreenBreakZero;
-        piece->m_timer = kScreenBreakZero;
-
-        float angle = Math.RandF(static_cast<float>(step->m_angleRand));
-        angle = kScreenBreakExtentScale + angle;
-        piece->m_angle = kScreenBreakDegToRad * angle;
-        piece->m_active = 0;
-    }
-
-    gUtil.ConvI2FVector(work->m_extent, globalMax, ScreenBreakModelRef(model)->m_posQuant);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012de28
- * PAL Size: 776b
- * EN Address: 0x8012D158
- * EN Size: 776b
- * JP Address: 0x80129D1C
- * JP Size: 776b
- */
-static void SB_DrawMeshDLCallback(CChara::CModel* model, void* workContext, void*, int meshIndex, int drawListIndex, float (*) [4])
-{
-    VScreenBreak* work = static_cast<VScreenBreak*>(workContext);
-    ScreenBreakMeshRef* mesh = model->m_meshes;
-    mesh += meshIndex;
-    ScreenBreakMeshData* meshData = mesh->m_data;
-    ScreenBreakDisplayList* displayList = meshData->m_displayLists;
-
-    displayList += drawListIndex;
-
-    if (work->m_backBufferReady != 0) {
-        CMaterial* material = model->m_data->m_materialSet->m_materials[displayList->m_material];
-
-        MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
-        GXSetArray((GXAttr)0xB, &work->m_color, 4);
-
-        if (material->GetNumTexture() == 1) {
-            GXSetNumChans(1);
-            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-            GXSetTevKColor((GXTevKColorID)0, CColor(0xA0, 0xA0, 0xA0, 0xA0).color);
-            GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xC);
-            GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1C);
-            _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_RASC, GX_CC_KONST, GX_CC_RASC, GX_CC_ZERO);
-            _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_COMP_BGR24_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-            _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
-            _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-
-            _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-            GXSetTevKColor((GXTevKColorID)1, CColor(0x60, 0x60, 0x60, work->m_color.a).color);
-            GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
-            GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);
-            _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_KONST, GX_CC_CPREV, GX_CC_ZERO);
-            _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-            _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
-            _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-
-            _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-            GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1D);
-            _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_CPREV);
-            _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-            _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
-            _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-
-            GXSetNumTevStages(3);
-            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-            GXLoadTexObj(work->m_backBufferTexObj, (GXTexMapID)0);
-        }
-
-        GXCallDisplayList(displayList->m_data, displayList->m_size);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012e130
- * PAL Size: 296b
- * EN Address: 0x8012D460
- * EN Size: 296b
- * JP Address: 0x8012A024
- * JP Size: 296b
- */
-static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
-{
-    Vec lightDir;
-    GXLightObj lightObj;
-    CCameraPcs* camera = &CameraPcs;
-    float zero = kScreenBreakZero;
-
-    lightDir.x = camera->m_directionX - (30.0f + camera->m_positionX);
-    lightDir.y = camera->m_directionY - (30.0f + camera->m_positionY);
-    lightDir.z = camera->m_directionZ - (30.0f + camera->m_positionZ);
-    PSVECNormalize(&lightDir, &lightDir);
-
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, 1.0f, zero);
-    GXInitLightAttn(&lightObj, zero, zero, 1.0f, 4.0f, zero, -3.0f);
-
-    GXInitLightColor(&lightObj, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-    GXLoadLightObjImm(&lightObj, (GXLightID)1);
-    GXSetChanCtrl((GXChannelID)0, 1, (GXColorSrc)0, (GXColorSrc)1, 1, (GXDiffuseFn)2, (GXAttnFn)0);
-    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
-}
 
 /*
  * --INFO--
@@ -510,7 +81,7 @@ static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], 
  */
 static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext, void* stepContext)
 {
-    float zero = kScreenBreakZero;
+    float zero = 0.0f;
     VScreenBreak* work = static_cast<VScreenBreak*>(workContext);
     PScreenBreak* step = static_cast<PScreenBreak*>(stepContext);
     ScreenBreakPiece* pieceBase = work->m_pieces;
@@ -627,4 +198,416 @@ static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext,
     }
 
     return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012e130
+ * PAL Size: 296b
+ * EN Address: 0x8012D460
+ * EN Size: 296b
+ * JP Address: 0x8012A024
+ * JP Size: 296b
+ */
+static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
+{
+    Vec lightDir;
+    GXLightObj lightObj;
+    CCameraPcs* camera = &CameraPcs;
+    float zero = 0.0f;
+
+    lightDir.x = camera->m_directionX - (30.0f + camera->m_positionX);
+    lightDir.y = camera->m_directionY - (30.0f + camera->m_positionY);
+    lightDir.z = camera->m_directionZ - (30.0f + camera->m_positionZ);
+    PSVECNormalize(&lightDir, &lightDir);
+
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, 1.0f, zero);
+    GXInitLightAttn(&lightObj, zero, zero, 1.0f, 4.0f, zero, -3.0f);
+
+    GXInitLightColor(&lightObj, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    GXLoadLightObjImm(&lightObj, (GXLightID)1);
+    GXSetChanCtrl((GXChannelID)0, 1, (GXColorSrc)0, (GXColorSrc)1, 1, (GXDiffuseFn)2, (GXAttnFn)0);
+    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012de28
+ * PAL Size: 776b
+ * EN Address: 0x8012D158
+ * EN Size: 776b
+ * JP Address: 0x80129D1C
+ * JP Size: 776b
+ */
+static void SB_DrawMeshDLCallback(CChara::CModel* model, void* workContext, void*, int meshIndex, int drawListIndex, float (*) [4])
+{
+    VScreenBreak* work = static_cast<VScreenBreak*>(workContext);
+    ScreenBreakMeshRef* mesh = model->m_meshes;
+    mesh += meshIndex;
+    ScreenBreakMeshData* meshData = mesh->m_data;
+    ScreenBreakDisplayList* displayList = meshData->m_displayLists;
+
+    displayList += drawListIndex;
+
+    if (work->m_backBufferReady != 0) {
+        CMaterial* material = model->m_data->m_materialSet->m_materials[displayList->m_material];
+
+        MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
+        GXSetArray((GXAttr)0xB, &work->m_color, 4);
+
+        if (material->GetNumTexture() == 1) {
+            GXSetNumChans(1);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevKColor((GXTevKColorID)0, CColor(0xA0, 0xA0, 0xA0, 0xA0).color);
+            GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xC);
+            GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1C);
+            _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_RASC, GX_CC_KONST, GX_CC_RASC, GX_CC_ZERO);
+            _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_COMP_BGR24_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
+            _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+
+            _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevKColor((GXTevKColorID)1, CColor(0x60, 0x60, 0x60, work->m_color.a).color);
+            GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
+            GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);
+            _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_KONST, GX_CC_CPREV, GX_CC_ZERO);
+            _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
+            _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+
+            _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1D);
+            _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_CPREV);
+            _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+            _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+
+            GXSetNumTevStages(3);
+            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+            GXLoadTexObj(work->m_backBufferTexObj, (GXTexMapID)0);
+        }
+
+        GXCallDisplayList(displayList->m_data, displayList->m_size);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012da2c
+ * PAL Size: 1020b
+ * EN Address: 0x8012CD5C
+ * EN Size: 1020b
+ * JP Address: 0x80129988
+ * JP Size: 916b
+ */
+static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
+{
+    ScreenBreakPiece* piece;
+    S16Vec globalMax;
+
+    memset(work->m_pieces, 0, ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece));
+    float translationRandLimit = 0.3f;
+    CChara::CMesh* meshBase = model->m_meshes;
+    float negativeRandLimit = -translationRandLimit;
+    ScreenBreakPiece* pieceBase = work->m_pieces;
+    globalMax.x = -0x7FFF;
+    globalMax.y = -0x7FFF;
+    globalMax.z = -0x7FFF;
+
+    for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
+        CChara::CMesh* mesh = &meshBase[i];
+        piece = &pieceBase[i];
+        ScreenBreakMeshData* meshData = mesh->m_data;
+        CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
+        node->m_flagsBits.m_flag_80 = 0;
+        PSMTXIdentity(node->m_localRuntimeMtx);
+
+        u32 vertexCount = meshData->m_vertexCount;
+        S16Vec meshMax;
+        meshMax.x = -0x7FFF;
+        meshMax.y = -0x7FFF;
+        meshMax.z = -0x7FFF;
+        S16Vec meshMin;
+        meshMin.x = 0x7FFF;
+        meshMin.y = 0x7FFF;
+        meshMin.z = 0x7FFF;
+
+        for (u32 j = 0; j < vertexCount; j++) {
+            globalMax.x = globalMax.x < meshData->m_vertices[j].x ? meshData->m_vertices[j].x : globalMax.x;
+            globalMax.y = globalMax.y < meshData->m_vertices[j].y ? meshData->m_vertices[j].y : globalMax.y;
+            globalMax.z = globalMax.z < meshData->m_vertices[j].z ? meshData->m_vertices[j].z : globalMax.z;
+            meshMin.x = meshMin.x < meshData->m_vertices[j].x ? meshMin.x : meshData->m_vertices[j].x;
+            meshMin.y = meshMin.y < meshData->m_vertices[j].y ? meshMin.y : meshData->m_vertices[j].y;
+            meshMin.z = meshMin.z < meshData->m_vertices[j].z ? meshMin.z : meshData->m_vertices[j].z;
+            meshMax.x = meshMax.x < meshData->m_vertices[j].x ? meshData->m_vertices[j].x : meshMax.x;
+            meshMax.y = meshMax.y < meshData->m_vertices[j].y ? meshData->m_vertices[j].y : meshMax.y;
+            meshMax.z = meshMax.z < meshData->m_vertices[j].z ? meshData->m_vertices[j].z : meshMax.z;
+        }
+
+        meshMax.x += meshMin.x;
+        meshMax.y += meshMin.y;
+        meshMax.z += meshMin.z;
+        gUtil.ConvI2FVector(piece->m_translation, meshMax, ScreenBreakModelRef(model)->m_posQuant);
+        PSVECScale(&piece->m_translation, &piece->m_translation, -0.5f);
+
+        float velocityX = piece->m_translation.x;
+        if (piece->m_translation.x > translationRandLimit) {
+            velocityX = Math.RandF(translationRandLimit);
+        }
+        if (piece->m_translation.x < negativeRandLimit) {
+            velocityX = -Math.RandF(translationRandLimit);
+        }
+
+        piece->m_velocity.x = velocityX;
+        piece->m_velocity.y = 1.0f;
+        piece->m_velocity.z = -1.0f;
+        PSVECNormalize(&piece->m_velocity, &piece->m_velocity);
+        Vec up = {0.0f, 1.0f, 0.0f};
+        PSVECCrossProduct(&piece->m_velocity, &up, &piece->m_axis);
+
+        float speed = Math.RandF(step->m_speedRand);
+        PSVECScale(&piece->m_velocity, &piece->m_velocity, step->m_speedBase + speed);
+
+        piece->m_offset.x = piece->m_offset.y = piece->m_offset.z = 0.0f;
+        piece->m_timer = 0.0f;
+
+        float angle = Math.RandF(static_cast<float>(step->m_angleRand));
+        angle = 2.0f + angle;
+        piece->m_angle = 0.017453292f * angle;
+        piece->m_active = 0;
+    }
+
+    gUtil.ConvI2FVector(work->m_extent, globalMax, ScreenBreakModelRef(model)->m_posQuant);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012da00
+ * PAL Size: 44b
+ * EN Address: 0x8012CD30
+ * EN Size: 44b
+ * JP Address: 0x8012995C
+ * JP Size: 44b
+ */
+static void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
+{
+    GXSetZMode(GX_TRUE, (GXCompare)7, GX_TRUE);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012d930
+ * PAL Size: 208b
+ * EN Address: 0x8012CC60
+ * EN Size: 208b
+ * JP Address: 0x80129888
+ * JP Size: 212b
+ */
+void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
+{
+    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
+    CGObject* gObject = ppvMng->m_owner;
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(gObject, 0);
+    CChara::CModel* model = GetCharaModelPtr(handle);
+    gObject->m_displayFlags |= 0x40;
+    model->m_beforeDrawModelCallback = SB_BeforeDrawCallback;
+    float zero = 0.0f;
+    model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
+    model->SetBeforeMeshLockEnvCallback(SB_BeforeMeshLockEnvCallback);
+    model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
+    value->m_pieces = 0;
+    value->m_backBufferTexObj = 0;
+    value->m_extent.x = value->m_extent.y = value->m_extent.z = zero;
+    value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
+    value->m_backBufferReady = 0;
+    value->m_color.r = 0xFF;
+    value->m_color.g = 0xFF;
+    value->m_color.b = 0xFF;
+    value->m_color.a = 0xFF;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012d90c
+ * PAL Size: 36b
+ * EN Address: 0x8012CC3C
+ * EN Size: 36b
+ * JP Address: 0x80129864
+ * JP Size: 36b
+ */
+void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
+{
+    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
+    float zero = 0.0f;
+    value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012d870
+ * PAL Size: 156b
+ * EN Address: 0x8012CBA0
+ * EN Size: 156b
+ * JP Address: 0x801297C8
+ * JP Size: 156b
+ */
+void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
+{
+    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
+    CChara::CModel* model = GetCharaModelPtr(handle);
+    if (model != 0) {
+        model->m_beforeDrawModelCallback = 0;
+        model->SetDrawMeshDLCallback(0);
+        model->SetBeforeMeshLockEnvCallback(0);
+        model->SetCallbackContext(0, 0);
+        model->SetBeforeCalcMatrixCallback(0);
+    }
+    if (value->m_pieces != 0) {
+        pppMemFree(value->m_pieces);
+        value->m_pieces = 0;
+    }
+    if (value->m_backBufferTexObj != 0) {
+        pppMemFree(value->m_backBufferTexObj);
+        value->m_backBufferTexObj = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012d500
+ * PAL Size: 880b
+ * EN Address: 0x8012C830
+ * EN Size: 880b
+ * JP Address: 0x80129458
+ * JP Size: 880b
+ */
+void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* step, _pppCtrlTable* ctrl)
+{
+    if (ppvUserStopPartF != 0) {
+        return;
+    }
+
+    if (GraphicScreenBreakBlurEnabled() != 0) {
+        GraphicPcs.SetBlurParameter(0, 0, 0, 0, 0, 0, 0);
+    }
+
+    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
+    VColor* colorSource = GetScreenBreakColorData(screenBreak, offsets->m_colorDataOffset);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
+    CChara::CModel* model = GetCharaModelPtr(handle);
+    model->SetCallbackContext(value, step);
+
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+
+    value->m_color.r = colorSource->m_color.rgba[0];
+    value->m_color.g = colorSource->m_color.rgba[1];
+    value->m_color.b = colorSource->m_color.rgba[2];
+    value->m_color.a = colorSource->m_color.rgba[3];
+    DCFlushRange(&value->m_color, sizeof(value->m_color));
+
+    CalcGraphValue(screenBreak, step->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,
+                   step->m_stepValue, step->m_arg3, step->m_graphPayload);
+
+    ScreenBreakPiece* pieceStorage = value->m_pieces;
+    if (pieceStorage == 0) {
+        pieceStorage = static_cast<ScreenBreakPiece*>(
+            pppMemAlloc(ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece), ppvEnv->m_stagePtr,
+                        "pppScreenBreak.cpp", 0x25E));
+        value->m_pieces = pieceStorage;
+        value->m_backBufferTexObj = static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr,
+                                                                      "pppScreenBreak.cpp", 0x25F));
+        InitPieceData(model, step, value);
+        PSVECNormalize(&step->m_gravityDir, &step->m_gravityDir);
+    }
+
+    float extentScale = 2.0f;
+    float sx = extentScale * value->m_extent.x;
+    float sy = extentScale * value->m_extent.y;
+    ScreenBreakPiece* piece = value->m_pieces;
+    for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
+        switch (step->m_initWork) {
+        case 0:
+            piece->m_active = 1;
+            break;
+        case 1:
+            if (-piece->m_translation.y < (value->m_graphValue0 * sy) - value->m_extent.y) {
+                piece->m_active = 1;
+            }
+            break;
+        case 2:
+            float pieceY = piece->m_translation.y;
+            if (-pieceY > value->m_extent.y - (value->m_graphValue0 * sy)) {
+                piece->m_active = 1;
+            }
+            break;
+        case 3:
+            if (-piece->m_translation.x < (value->m_graphValue0 * sx) + -value->m_extent.x) {
+                piece->m_active = 1;
+            }
+            break;
+        case 4:
+            float pieceX = piece->m_translation.x;
+            if (-pieceX > value->m_extent.x - (value->m_graphValue0 * sx)) {
+                piece->m_active = 1;
+            }
+            break;
+        case 5: {
+            sx = value->m_extent.x;
+            sy = value->m_extent.y;
+            float x = value->m_graphValue0 * sx;
+            float y = value->m_graphValue0 * sy;
+            float pieceX = piece->m_translation.x;
+            if ((x >= pieceX) && (-pieceX <= x) &&
+                (y >= piece->m_translation.y) && (-piece->m_translation.y <= y)) {
+                piece->m_active = 1;
+            }
+            break;
+        }
+        case 6: {
+            sx = value->m_extent.x;
+            float x = value->m_graphValue0 * sx;
+            sy = value->m_extent.y;
+            float y = value->m_graphValue0 * sy;
+            if ((-piece->m_translation.x >= sx - x) || (-piece->m_translation.x <= -sx + x) ||
+                (-piece->m_translation.y >= sy - y) || (-piece->m_translation.y <= -sy + y)) {
+                piece->m_active = 1;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+        piece++;
+    }
+
+    pppSetFpMatrix(ppvMng);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012d458
+ * PAL Size: 168b
+ * EN Address: 0x8012C788
+ * EN Size: 168b
+ * JP Address: 0x801293B0
+ * JP Size: 168b
+ */
+void pppRenderScreenBreak(pppScreenBreak* screenBreak, PScreenBreak*, _pppCtrlTable* ctrl)
+{
+    ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
+    CChara::CModel* model = GetCharaModelPtr(handle);
+    model->SearchNode("f999_root");
+
+    if (value->m_backBufferReady == 0) {
+        Graphic.GetBackBufferRect2(
+            Graphic.m_savedFrameBuffer, value->m_backBufferTexObj, 0, 0, 0x280, 0x1C0, 0, (_GXTexFilter)1, (_GXTexFmt)4, 0);
+        value->m_backBufferReady = 1;
+    }
 }

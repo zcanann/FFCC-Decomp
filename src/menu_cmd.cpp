@@ -774,7 +774,11 @@ void CMenuPcs::CmdDraw()
 			x = static_cast<double>(nameEntry->x) + ((static_cast<float>(nameEntry->width) - textW) * 0.5);
 			y = static_cast<float>(nameEntry->y + 3);
 			nameFont->SetPosX(x);
+#ifdef VERSION_GCCJGC
+			nameFont->SetPosY(y);
+#else
 			nameFont->SetPosY(y - 4.0f);
+#endif
 			nameFont->Draw(text);
 		}
 	}
@@ -984,7 +988,11 @@ void CMenuPcs::CmdDraw()
 			x = static_cast<float>(textRow->x + 0x1C);
 			y = static_cast<float>(textRow->y + 0x0B);
 			listFont->SetPosX(static_cast<float>(textRow->x + 0x1C));
+#ifdef VERSION_GCCJGC
+			listFont->SetPosY(y);
+#else
 			listFont->SetPosY(y - 4.0f);
+#endif
 			listFont->Draw(text);
 		}
 
@@ -1064,7 +1072,11 @@ void CMenuPcs::CmdDraw()
 			    ((pitch - 19.8) * 0.5);
 			x = static_cast<float>(entry->x + 0x18);
 			choiceFont->SetPosX(static_cast<float>(entry->x + 0x18));
+#ifdef VERSION_GCCJGC
+			choiceFont->SetPosY(y);
+#else
 			choiceFont->SetPosY(y - 4.0f);
+#endif
 			choiceFont->Draw(text);
 		}
 		DrawInit();
@@ -1875,14 +1887,13 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 	}
 
-	int (*out)[2] = comboOut;
+	int n = 0;
 	for (int rank = 0; rank < 2; rank++) {
 		for (int i = 0; i < matchCount; i++) {
-			const int* m = matches[i];
-			if (rank + 2 == s_Unite[m[0]].count) {
-				out[0][0] = m[0];
-				out++;
-				out[-1][1] = m[1];
+			if (rank + 2 == s_Unite[matches[i][0]].count) {
+				comboOut[n][0] = matches[i][0];
+				comboOut[n][1] = matches[i][1];
+				n++;
 			}
 		}
 	}
@@ -2063,7 +2074,11 @@ void CMenuPcs::DrawUniteList()
 
 		drawY = static_cast<float>(entry->y + 3);
 		font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(drawY);
+#else
 		font->SetPosY(drawY - 4.0f);
+#endif
 		font->Draw(text);
 	}
 
@@ -2190,7 +2205,11 @@ void CMenuPcs::DrawUniteList()
 		    static_cast<double>(unitePanels->y) - 2.0);
 		font->SetPosX(static_cast<float>((static_cast<float>(unitePanels->width) - width) * 0.5 +
 		                                 static_cast<double>(unitePanels->x)));
+#ifdef VERSION_GCCJGC
+		font->SetPosY(drawY);
+#else
 		font->SetPosY(drawY - 4.0f);
+#endif
 		font->Draw(text);
 	}
 

@@ -123,9 +123,9 @@ public:
          * JP Address: TODO
          * JP Size: TODO
          */
-        int IsBanked() { return m_bank != 0; }
-        void SetLastFrame(int lastFrame) { m_flagsBits.m_clampFrames = lastFrame; }
-        void SetInterp(int interp) { m_flagsBits.m_blendEnabled = interp; }
+        int IsBanked() { return m_bank ? 1 : 0; }
+        void SetLastFrame(int lastFrame) { m_flagsBits.m_clampFrames = lastFrame ? 1 : 0; }
+        void SetInterp(int interp) { m_flagsBits.m_blendEnabled = interp ? 1 : 0; }
         void InitQuantize();
 
 		union {
@@ -437,6 +437,7 @@ public:
 		{
 			m_afterDrawMeshCallback = callback;
 		}
+		CTexAnimSet* GetTexAnimSet() { return m_texAnimSet; }
 		void SetBeforeCalcMatrixCallback(int (*callback)(CChara::CModel*, void*, void*))
 		{
 			m_beforeCalcMatrixCallback = callback;
@@ -520,7 +521,7 @@ public:
 	void gqrInit(unsigned long, unsigned long, unsigned long);
     void SetAmemStage(CMemory::CStage* stage) { m_amemLoadStage = stage; }
     CMemory::CStage* GetMemoryStage() { return m_amemStage; }
-    u32 GetAmemBaseAddress() const { return m_amemLoadStage->m_heapTop; }
+    u32 GetAmemBaseAddress() const { return reinterpret_cast<u32>(m_amemLoadStage->GetTop()); }
     u32& AmemSize() { return m_amemSize; }
     int GetDrawBufferIndex() const { return m_drawBufferIndex; }
     u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
@@ -532,7 +533,7 @@ public:
     };
     CDrawBuffer& GetDrawBuffer(int index) { return m_drawBuffers[index]; }
     u32& AmemAnimSize() { return m_amemAnimSize; }
-    u32 GetAmemAnimSize() const { return m_amemAnimSize; }
+    u32 GetAmemOffset() { return m_amemAnimSize; }
     void ResetAmem(int size) { m_amemAnimSize = size; }
     void TimeMogFur();
     void CalcMogScore();

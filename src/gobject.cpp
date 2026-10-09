@@ -218,6 +218,14 @@ inline void VECLerp(Vec* a, Vec* b, Vec* out, float t)
     PSVECAdd(&scaledA, &scaledB, out);
 }
 
+#if defined(VERSION_GCCJGC)
+#define GOBJECT_LINE(line, usLine, jpLine) (jpLine)
+#elif defined(VERSION_GCCE01)
+#define GOBJECT_LINE(line, usLine, jpLine) (usLine)
+#else
+#define GOBJECT_LINE(line, usLine, jpLine) (line)
+#endif
+
 static const char s_gobject_cpp[] = "gobject.cpp";
 static const char s_noTurnMotion[36] =
     "\203\136\201\133\203\223\203\202\201\133\203\126\203\207\203\223"
@@ -826,7 +834,7 @@ void CGObject::LoadShield(int itemId)
     }
 
     if (itemId > 0) {
-        m_shieldModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA23) CCharaPcs::CHandle;
+        m_shieldModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), GOBJECT_LINE(0xA23, 0xA23, 0xA15)) CCharaPcs::CHandle;
         m_shieldModelHandle->Add();
 
         const unsigned long textureVariant = (m_ownerType == 0)
@@ -856,7 +864,7 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
     }
 
     if (itemId > 0) {
-        m_weaponModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA11) CCharaPcs::CHandle;
+        m_weaponModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), GOBJECT_LINE(0xA11, 0xA11, 0xA03)) CCharaPcs::CHandle;
         m_weaponModelHandle->Add();
 
         const unsigned long textureVariant = (m_ownerType == 0)
@@ -882,7 +890,7 @@ void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant,
         m_charaModelHandle = 0;
     }
 
-    m_charaModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA01) CCharaPcs::CHandle;
+    m_charaModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), GOBJECT_LINE(0xA01, 0xA01, 0x9F3)) CCharaPcs::CHandle;
     m_charaModelHandle->Add();
     m_charaModelHandle->LoadModel(kind, modelId, variant, 0, -1, 0, arg3);
 }
@@ -959,7 +967,7 @@ void CGObject::SetTexAnim(char* name)
     }
 
     if (hasModel) {
-        texAnimSet = handle->m_model->m_texAnimSet;
+        texAnimSet = handle->m_model->GetTexAnimSet();
         if (texAnimSet != (CTexAnimSet*)0) {
             texAnimSet->Change(name, 0.0f, (CTexAnimSet::ANIM_TYPE)-2);
         }
@@ -2531,6 +2539,20 @@ stepMiss:
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800931FC
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapPcs::IsHitFaceFlag(char flag)
+{
+    g_MapHitFaceFlag = flag;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -2546,7 +2568,7 @@ void CGObject::bgCollision()
 
     if (m_bgColMask & 0x01)
     {
-        g_MapHitFaceFlag = 1;
+        MapPcs.IsHitFaceFlag(1);
 
         if (Game.m_currentMapId == 0x21)
         {
@@ -2557,7 +2579,7 @@ void CGObject::bgCollision()
             bgNormalCollision();
         }
 
-        g_MapHitFaceFlag = 0;
+        MapPcs.IsHitFaceFlag(0);
     }
 }
 
@@ -2698,7 +2720,11 @@ void CGObject::objectCollision()
         int dec = m_collisionPushTimerMax - 1;
         m_collisionPushTimerMax = dec & ~(dec >> 31);
     } else {
-        m_collisionPushTimerMax = 0x32;
+#ifdef VERSION_GCCP01
+        m_collisionPushTimerMax = 50;
+#else
+        m_collisionPushTimerMax = 60;
+#endif
     }
 
     PSVECSubtract(&self.capsulePos, &m_worldPosition, &m_groundHitOffset);
@@ -2766,10 +2792,7 @@ void CGObject::move()
 
         if ((!m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd != 0))
             || (m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd == 2))) {
-            m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
-            CFlatRuntime::CStack stack;
-            stack.m_word = (scriptMoveEnd == 2) ? 1 : 0;
-            gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);
+            CancelMove((scriptMoveEnd == 2) ? 1 : 0);
         }
 
         movingWithScript = 1;
@@ -2843,7 +2866,7 @@ void CGObject::move()
         if (movingWithScript) {
             cameraYaw = 0.0f;
         } else {
-            cameraYaw = CameraPcs.m_yaw;
+            cameraYaw = CameraPcs.GetRotate();
         }
 
         const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));
@@ -3093,7 +3116,11 @@ void CGObject::onCreate()
     m_lastBgAttr = 1.0f;
     m_shieldNodeFlagBits.m_bit08 = 0;
     m_shieldNodeFlagBits.m_bit04 = 0;
-    m_collisionPushTimerMax = 0x32;
+#ifdef VERSION_GCCP01
+    m_collisionPushTimerMax = 50;
+#else
+    m_collisionPushTimerMax = 60;
+#endif
 
     m_bgGroupMask = 0;
     m_lastBgGroup = 0;

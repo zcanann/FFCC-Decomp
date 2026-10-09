@@ -174,7 +174,17 @@ public:
     int CalcHitSlide(Vec*, float);
     void CalcHitPosition(Vec*);
     void SetMime(int, int, int);
-    void SetCalcMtx();
+    void SetCalcMtx()
+    {
+        m_localMtxDirty = 1;
+        m_calcMtxPending = 1;
+    }
+    void SetCameraSemiTransAlpha(int alpha, int frameCount)
+    {
+        m_cameraSemiTransTargetAlpha = static_cast<short>(alpha << 7);
+        m_cameraSemiTransStep = static_cast<short>(
+            (static_cast<int>(m_cameraSemiTransTargetAlpha) - static_cast<int>(m_cameraSemiTransAlpha)) / frameCount);
+    }
 
     CMapObj* m_parent;            // 0x00
     CMapObj* m_child;             // 0x04

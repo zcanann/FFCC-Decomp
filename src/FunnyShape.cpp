@@ -26,20 +26,6 @@ struct FS_Animation
 const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };
 const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
 const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
-static const float kFunnyShapeBoundsMaxInitial = 1000.0f;
-static const float kFunnyShapeBoundsMinInitial = -1000.0f;
-static const float kFunnyShapeZero = 0.0f;
-static const float kFunnyShapeViewportScale = 2.0f;
-static const float kFunnyShapeOne = 1.0f;
-static const float kFunnyShapeTexCoordDivisor = 4096.0f;
-static const float kFunnyShapePaddingScale = 0.5f;
-static const float kFunnyShapeNegativeOne = -1.0f;
-static const float kFunnyShapeUnusedZero = 0.0f;
-static const float kFunnyShapeDefaultOffsetX = 480.0f;
-static const float kFunnyShapeDefaultOffsetY = 336.0f;
-static const float kFunnyShapeTextureViewportOrigin = 20.0f;
-static const float kFunnyShapePi = 3.14f;
-static const float kFunnyShapeHalfTurnDegrees = 180.0f;
 
 namespace {
 static inline s16 S16At(const u8* p, u32 offset)
@@ -161,8 +147,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const s8 numTex = m_textureCount;
             Vec2d min;
             Vec2d max;
-            min.x = min.y = kFunnyShapeBoundsMaxInitial;
-            max.x = max.y = kFunnyShapeBoundsMinInitial;
+            min.x = min.y = 1000.0f;
+            max.x = max.y = -1000.0f;
             if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(m_texObjData[texIndex], GX_TEXMAP0);
             }
@@ -177,7 +163,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             if ((ShapeFlags(this) & 0x100) == 0) {
-                angle = kFunnyShapeZero;
+                angle = 0.0f;
             }
 
             const float rx0 = RotateShapeX(entry, 0x10, 0x12, angle);
@@ -239,37 +225,37 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 max.y = ry3;
             }
 
-            const float viewportScale = kFunnyShapeViewportScale;
+            const float viewportScale = 2.0f;
             const float viewportW = viewportScale * (max.x - min.x);
             const float viewportH = viewportScale * (max.y - min.y);
             GXSetViewport(min.x * viewportScale + offset.x, min.y * viewportScale + offset.y, viewportW,
-                          viewportH, kFunnyShapeZero, kFunnyShapeOne);
+                          viewportH, 0.0f, 1.0f);
 
             const s16 texX = S16At(entry, 0x20);
             const s16 texY = S16At(entry, 0x22);
             const s16 texW = S16At(entry, 0x24);
             const s16 texH = S16At(entry, 0x26);
-            u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
-            v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
-            u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
-            v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
+            u0 = static_cast<float>(texX) / 4096.0f;
+            v0 = 1.0f - static_cast<float>(texY) / 4096.0f;
+            u1 = u0 + static_cast<float>(texW) / 4096.0f;
+            v1 = v0 - static_cast<float>(texH) / 4096.0f;
             tex[1][0] = tex[2][0] = u0;
             tex[3][1] = tex[2][1] = v0;
             tex[0][0] = tex[3][0] = u1;
             tex[1][1] = tex[0][1] = v1;
 
-            const float padScale = kFunnyShapePaddingScale;
+            const float padScale = 0.5f;
             const float padW = viewportW * padScale * padScale;
             const float viewMaxX = max.x - padW;
             const float padH = viewportH * padScale * padScale;
             const float viewMaxY = max.y - padH;
-            const float invPadH = kFunnyShapeOne / padH;
-            const float invPadW = -(kFunnyShapeOne / padW);
+            const float invPadH = 1.0f / padH;
+            const float invPadW = -(1.0f / padW);
 
-            pos[0][2] = kFunnyShapeZero;
-            pos[1][2] = kFunnyShapeZero;
-            pos[2][2] = kFunnyShapeZero;
-            pos[3][2] = kFunnyShapeZero;
+            pos[0][2] = 0.0f;
+            pos[1][2] = 0.0f;
+            pos[2][2] = 0.0f;
+            pos[3][2] = 0.0f;
             pos[0][0] = invPadW * (rx0 - viewMaxX);
             pos[1][0] = invPadW * (rx1 - viewMaxX);
             pos[2][0] = invPadW * (rx3 - viewMaxX);
@@ -304,16 +290,16 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const s32 y1 = Div16Floor(S16At(entry, 0x16));
             GXSetViewport(offset.x + static_cast<float>(x0 * 2), offset.y + static_cast<float>(y0 * 2),
                           static_cast<float>((x1 - x0) * 2), static_cast<float>((y1 - y0) * 2),
-                          kFunnyShapeZero, kFunnyShapeOne);
+                          0.0f, 1.0f);
 
             const s16 texX = S16At(entry, 0x18);
             const s16 texY = S16At(entry, 0x1A);
             const s16 texW = S16At(entry, 0x1C);
             const s16 texH = S16At(entry, 0x1E);
-            u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
-            v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
-            u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
-            v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
+            u0 = static_cast<float>(texX) / 4096.0f;
+            v0 = 1.0f - static_cast<float>(texY) / 4096.0f;
+            u1 = u0 + static_cast<float>(texW) / 4096.0f;
+            v1 = v0 - static_cast<float>(texH) / 4096.0f;
             tex[0][0] = u0;
             tex[0][1] = v0;
             tex[1][0] = u1;
@@ -323,18 +309,18 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             tex[3][0] = u0;
             tex[3][1] = v1;
 
-            pos[0][0] = kFunnyShapeNegativeOne;
-            pos[0][1] = kFunnyShapeOne;
-            pos[0][2] = kFunnyShapeZero;
-            pos[1][0] = kFunnyShapeOne;
-            pos[1][1] = kFunnyShapeOne;
-            pos[1][2] = kFunnyShapeZero;
-            pos[2][0] = kFunnyShapeOne;
-            pos[2][1] = kFunnyShapeNegativeOne;
-            pos[2][2] = kFunnyShapeZero;
-            pos[3][0] = kFunnyShapeNegativeOne;
-            pos[3][1] = kFunnyShapeNegativeOne;
-            pos[3][2] = kFunnyShapeZero;
+            pos[0][0] = -1.0f;
+            pos[0][1] = 1.0f;
+            pos[0][2] = 0.0f;
+            pos[1][0] = 1.0f;
+            pos[1][1] = 1.0f;
+            pos[1][2] = 0.0f;
+            pos[2][0] = 1.0f;
+            pos[2][1] = -1.0f;
+            pos[2][2] = 0.0f;
+            pos[3][0] = -1.0f;
+            pos[3][1] = -1.0f;
+            pos[3][2] = 0.0f;
             memcpy(&color, entry + 0x8, sizeof(color));
             color = *reinterpret_cast<const GXColor*>(entry + 0x8);
         }
@@ -443,8 +429,8 @@ void CFunnyShape::RenderShape()
     SetDefaultStage();
 
     Vec2d offsetCopy;
-    offsetCopy.x = kFunnyShapeDefaultOffsetX;
-    offsetCopy.y = kFunnyShapeDefaultOffsetY;
+    offsetCopy.x = 480.0f;
+    offsetCopy.y = 336.0f;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
     RenderShape(shape, offsetCopy, 0.0f);
 }
@@ -487,8 +473,8 @@ void CFunnyShape::RenderTexture()
 
     const s16 width = m_textureHeaders[0]->width;
     const s16 height = m_textureHeaders[0]->height;
-    GXSetViewport(kFunnyShapeTextureViewportOrigin, kFunnyShapeTextureViewportOrigin,
-                  static_cast<float>(width), static_cast<float>(height), kFunnyShapeZero, kFunnyShapeOne);
+    GXSetViewport(20.0f, 20.0f,
+                  static_cast<float>(width), static_cast<float>(height), 0.0f, 1.0f);
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -500,9 +486,9 @@ void CFunnyShape::RenderTexture()
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
     const u32 colorWord = *reinterpret_cast<u32*>(&color);
-    float negOne = kFunnyShapeNegativeOne;
-    float one = kFunnyShapeOne;
-    float zero = kFunnyShapeZero;
+    float negOne = -1.0f;
+    float one = 1.0f;
+    float zero = 0.0f;
     GXWGFifo.f32 = negOne;
     GXWGFifo.f32 = one;
     GXWGFifo.f32 = zero;
@@ -555,13 +541,11 @@ void CFunnyShape::Render()
     }
 
     work = m_anmWork;
-    const float baseX = 320.0f;
-    const float baseY = 224.0f;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d posCopy;
-        posCopy.x = baseX;
-        posCopy.y = baseY;
+        posCopy.x = 320.0f;
+        posCopy.y = 224.0f;
         posCopy.x += work->x;
         posCopy.y += work->y;
 
@@ -605,27 +589,27 @@ void CFunnyShape::Update()
 
                 r = rand();
                 work->y = static_cast<float>(r % ShapeRange(this));
-                work->z = kFunnyShapeZero;
+                work->z = 0.0f;
                 work->delay = 0x200;
-                work->viewportX = work->viewportY = kFunnyShapeZero;
+                work->viewportX = work->viewportY = 0.0f;
 
                 r = rand();
                 work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
-                work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees;
+                work->angle = (3.14f * work->angle) / 180.0f;
 
                 r = rand();
                 if ((r % 2) != 0) {
-                    work->x *= kFunnyShapeNegativeOne;
+                    work->x *= -1.0f;
                 }
 
                 r = rand();
                 if ((r % 2) != 0) {
-                    work->y *= kFunnyShapeNegativeOne;
+                    work->y *= -1.0f;
                 }
 
                 if (noSpread != 0) {
                     work->frame = 0;
-                    work->x = work->y = kFunnyShapeZero;
+                    work->x = work->y = 0.0f;
                 }
             }
 
@@ -666,32 +650,32 @@ void CFunnyShape::InitAnmWork()
 
         r = rand();
         work->y = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
-        work->z = kFunnyShapeZero;
+        work->z = 0.0f;
 
         r = rand();
         const s16 shapeCount = AnimData(this)->frameCount;
         const s32 shapeDiv = r / shapeCount;
         work->frame = static_cast<s16>(r - shapeDiv * shapeCount);
         work->delay = 0x200;
-        work->viewportX = work->viewportY = kFunnyShapeZero;
+        work->viewportX = work->viewportY = 0.0f;
 
         r = rand();
         work->angle = static_cast<float>(r % 0x168);
-        work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees;
+        work->angle = (3.14f * work->angle) / 180.0f;
 
         r = rand();
         if ((r % 2) != 0) {
-            work->x *= kFunnyShapeNegativeOne;
+            work->x *= -1.0f;
         }
 
         r = rand();
         if ((r % 2) != 0) {
-            work->y *= kFunnyShapeNegativeOne;
+            work->y *= -1.0f;
         }
 
         if (noSpread != 0) {
             work->frame = 0;
-            work->x = work->y = kFunnyShapeZero;
+            work->x = work->y = 0.0f;
         }
 
         work++;

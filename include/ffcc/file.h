@@ -72,6 +72,7 @@ public:
 	void SyncCompleted(CHandle* handle);
 
 	void kick();
+	void readASync(CHandle*);
 	CHandle* CheckQueue();
 
 	void DrawError(DVDFileInfo& info, int errorCode);

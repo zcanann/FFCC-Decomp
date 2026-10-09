@@ -861,6 +861,18 @@ void CMenuPcs::SetManaWaterEffect()
 	m_manaWaterTimerA = Game.m_gameWork.m_timerA;
 }
 
+#ifdef VERSION_GCCP01
+#define OPTION_OPEN_STEP 0.04f
+#define OPTION_ROW_STEP 0.125f
+#define OPTION_COLUMN_STEP 0.2f
+#define OPTION_ROW_ANGLE_STEP 11.25f
+#else
+#define OPTION_OPEN_STEP (1.0f / 30.0f)
+#define OPTION_ROW_STEP 0.1f
+#define OPTION_COLUMN_STEP (1.0f / 6.0f)
+#define OPTION_ROW_ANGLE_STEP 9.0f
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x80179d28
@@ -899,7 +911,7 @@ void CMenuPcs::CalcOptionMenu()
 	optionChanged = 0;
 
 	if (m_optionMenuState == 0) {
-		m_optionOpenAnim += 0.04f;
+		m_optionOpenAnim += OPTION_OPEN_STEP;
 		if (!(m_optionOpenAnim >= 1.0f)) {
 			return;
 		}
@@ -910,9 +922,9 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (m_optionMenuState == 2) {
-		m_optionOpenAnim -= 0.04f;
-		m_optionRowAnim -= 0.125f;
-		m_optionColumnAnim -= 0.2f;
+		m_optionOpenAnim -= OPTION_OPEN_STEP;
+		m_optionRowAnim -= OPTION_ROW_STEP;
+		m_optionColumnAnim -= OPTION_COLUMN_STEP;
 
 		if (m_optionRowAnim <= 0.0f) {
 			m_optionRowAnim = 0.0f;
@@ -921,7 +933,7 @@ void CMenuPcs::CalcOptionMenu()
 			m_optionColumnAnim = 0.0f;
 		}
 		{
-			float divStep = 0.04f;
+			float divStep = OPTION_OPEN_STEP;
 			if (static_cast<int>(m_optionOpenAnim / divStep) == 5) {
 				Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 			}
@@ -946,14 +958,14 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (m_optionAnimPhase == 0) {
-		m_optionRowAnim += 0.125f;
+		m_optionRowAnim += OPTION_ROW_STEP;
 		m_optionAnimCounter++;
 		if (m_optionRowAnim >= 1.0f) {
 			m_optionAnimPhase = 1;
 			m_optionRowAnim = 1.0f;
 		}
 	} else if (m_optionAnimPhase == 1) {
-		m_optionColumnAnim += 0.2f;
+		m_optionColumnAnim += OPTION_COLUMN_STEP;
 		if (m_optionColumnAnim >= 1.0f) {
 			m_optionAnimPhase = 2;
 			m_optionColumnAnim = 1.0f;
@@ -1359,8 +1371,8 @@ void CMenuPcs::DrawOptionMenu()
 	}
 
 	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionRowAnim));
-	int rowAnimStep = static_cast<int>(m_optionRowAnim / 0.125f);
-	float rowAngle = static_cast<float>(rowAnimStep) * 11.25f;
+	int rowAnimStep = static_cast<int>(m_optionRowAnim / OPTION_ROW_STEP);
+	float rowAngle = static_cast<float>(rowAnimStep) * OPTION_ROW_ANGLE_STEP;
 	float rowSin = static_cast<float>(sin(0.017453292f * (2.0f * rowAngle)));
 	float rowCos = static_cast<float>(cos(0.017453292f * rowAngle));
 

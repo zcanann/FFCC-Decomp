@@ -60,7 +60,7 @@ public:
         int GetHeapUnuse();
         void heapInfo(unsigned long&, unsigned long&, unsigned long&);
         void GetTail();
-        void GetTop();
+        void* GetTop() { return reinterpret_cast<void*>(m_heapTop); }
     };
 
     struct CMode

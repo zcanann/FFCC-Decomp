@@ -1,7 +1,5 @@
 #include "ffcc/stopwatch.h"
 
-static const float s_stopwatchScale = 100.0f;
-
 /*
  * --INFO--
  * PAL Address: 0x8002147C
@@ -75,7 +73,7 @@ float CStopWatch::Get()
 	float ticks = static_cast<float>(total);
 	float denom = static_cast<float>(OSMicrosecondsToTicks(33333));
 	ticks = ticks / denom;
-	return s_stopwatchScale * ticks;
+	return 100.0f * ticks;
 }
 
 /*

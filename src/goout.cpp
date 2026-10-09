@@ -1437,8 +1437,7 @@ card_connected:;
                         break;
                     }
                 } else {
-                    g_freeCaravanIdx = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, transferWork, m_selectedTransferChara, 0);
-                    if (g_freeCaravanIdx < 0) {
+                    if ((g_freeCaravanIdx = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, transferWork, m_selectedTransferChara, 0)) < 0) {
                         m_returnGoOutMode = 0xF;
                         m_goOutMode = 0;
                         m_returnGoOutMode = 0xF;

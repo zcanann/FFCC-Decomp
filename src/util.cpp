@@ -78,27 +78,6 @@ static inline void SendTexQuadVerts(Vec v1, Vec v0, GXColor quadColor, Vec2d* uv
     GXWGFifo.f32 = v2;
 }
 
-static inline void RenderColorQuadVtx(Vec v1, Vec v0, GXColor quadColor)
-{
-    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80024E5C
@@ -342,7 +321,6 @@ void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
 void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 {
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-#ifdef VERSION_GCCJGC
     GXPosition3f32(pos1.x, pos1.y, pos1.z);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
 
@@ -354,35 +332,6 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 
     GXPosition3f32(pos1.x, pos2.y, pos1.z);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
-#else
-    f32 x2;
-    f32 x1 = pos1.x;
-    f32 y1 = pos1.y;
-
-    GXWGFifo.f32 = x1;
-    f32 z1 = pos1.z;
-    GXWGFifo.f32 = y1;
-    u32 rgba = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = z1;
-    x2 = pos2.x;
-    GXWGFifo.u32 = rgba;
-    f32 y2 = pos2.y;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y1;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-
-    GXWGFifo.f32 = x1;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-#endif
 }
 
 /*
@@ -396,7 +345,6 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
  */
 void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
-    u32* colorPtr = reinterpret_cast<u32*>(&color);
     float u0;
     float v0;
     float u1;
@@ -415,7 +363,6 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-#ifdef VERSION_GCCJGC
     GXPosition3f32(pos1.x, pos1.y, pos1.z);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
     GXTexCoord2f32(u0, v0);
@@ -431,42 +378,6 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     GXPosition3f32(pos1.x, pos2.y, pos1.z);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
     GXTexCoord2f32(u0, v1);
-#else
-    f32 x2;
-    f32 x1 = pos1.x;
-    f32 y1 = pos1.y;
-    GXWGFifo.f32 = x1;
-    f32 z1 = pos1.z;
-    GXWGFifo.f32 = y1;
-    u32 rgba = *colorPtr;
-    GXWGFifo.f32 = z1;
-    x2 = pos2.x;
-    GXWGFifo.u32 = rgba;
-    f32 y2 = pos2.y;
-    GXWGFifo.f32 = u0;
-    GXWGFifo.f32 = v0;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y1;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v0;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = x1;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u0;
-    GXWGFifo.f32 = v1;
-#endif
 }
 
 /*
@@ -596,17 +507,7 @@ void CUtil::DisableIndMtx()
  */
 void CUtil::BeginQuadEnv()
 {
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
-    float indMtx[2][3];
-
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f,
-               1.0f);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+    SetOrthoEnv();
 
     GXSetCullMode(GX_CULL_NONE);
     GXSetNumTexGens(1);
@@ -616,15 +517,11 @@ void CUtil::BeginQuadEnv()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE,
                   GX_AF_NONE);
     GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+    DisableIndMtx();
 }
 
 /*
@@ -658,36 +555,9 @@ void CUtil::EndQuadEnv()
  */
 void CUtil::ClearZBufferRect(float x, float y, float width, float height)
 {
-    Mtx44 screenMtx;
-    Mtx cameraMtx;
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
     GXColor white;
-    float indMtx[2][3];
 
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+    BeginQuadEnv();
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
 
     GXClearVtxDesc();
@@ -720,12 +590,9 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetColorUpdate(GX_FALSE);
     GXSetAlphaUpdate(GX_FALSE);
 
-    RenderColorQuadVtx(pos0, pos1, white);
+    RenderQuadNoTex(pos0, pos1, white);
 
-    CameraPcs.GetViewMatrix(cameraMtx);
-    CameraPcs.GetProjectionMatrix(screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+    EndQuadEnv();
     GXSetColorUpdate(GX_TRUE);
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
 }
@@ -741,37 +608,9 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
  */
 void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColor color)
 {
-    Mtx44 screenMtx;
-    Mtx cameraMtx;
-    Mtx44 orthoMtx;
-    float indMtx[2][3];
     GXColor white;
-    Mtx modelMtx;
 
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+    BeginQuadEnv();
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -799,12 +638,9 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     pos1.x = x2;
     pos1.y = y2;
     pos1.z = 0.0f;
-    RenderColorQuadVtx(pos0, pos1, color);
+    RenderQuadNoTex(pos0, pos1, color);
 
-    CameraPcs.GetViewMatrix(cameraMtx);
-    CameraPcs.GetProjectionMatrix(screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+    EndQuadEnv();
 }
 
 /*
@@ -819,38 +655,11 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
 void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTexObj* texObj, Vec2d* uv1, Vec2d* uv2,
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
-    Mtx44 screenMtx;
-    Mtx cameraMtx;
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
-    float indMtx[2][3];
     GXColor white;
     float x2;
     float y2;
 
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+    BeginQuadEnv();
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -862,7 +671,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
 
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     GXLoadTexObj(texObj, GX_TEXMAP0);
 
     white.r = 0xFF;
@@ -895,10 +704,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         SendTexQuadVerts(pos0, pos1, white, uv1, uv2);
     }
 
-    CameraPcs.GetViewMatrix(cameraMtx);
-    CameraPcs.GetProjectionMatrix(screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+    EndQuadEnv();
 
     if (GXGetTexObjFmt(texObj) == GX_TF_I8) {
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -917,38 +723,11 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
 void CUtil::RenderTextureQuad(float x, float y, float width, float height, CTexture* texture, Vec2d* uv1, Vec2d* uv2,
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
-    Mtx44 screenMtx;
-    Mtx cameraMtx;
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
-    float indMtx[2][3];
     GXColor white;
     float x2;
     float y2;
 
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+    BeginQuadEnv();
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -960,7 +739,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
 
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
 
     white.r = 0xFF;
@@ -996,10 +775,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
         SendTexQuadVerts(pos0, pos1, white, uv1, uv2);
     }
 
-    CameraPcs.GetViewMatrix(cameraMtx);
-    CameraPcs.GetProjectionMatrix(screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+    EndQuadEnv();
 
     if (GXGetTexObjFmt(&texture->m_texObj) == GX_TF_I8) {
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -1032,7 +808,7 @@ void CUtil::SetPaletteEnv(CTexture* texture)
     tevColor3.a = 0xFF;
     GXSetTevColor(static_cast<_GXTevRegID>(2), tevColor2);
     GXSetTevColor(static_cast<_GXTevRegID>(3), tevColor3);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 
     _GXSetTevSwapModeTable(static_cast<_GXTevSwapSel>(1), static_cast<_GXTevColorChan>(0),
                            static_cast<_GXTevColorChan>(3), static_cast<_GXTevColorChan>(3),
@@ -1212,16 +988,8 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
         max.z = max.z < vecs->z ? vecs->z : max.z;
     }
 
-    S16Vec finalMin = min;
-    int scale = 1 << shift;
-
-    minOut->x = (float)finalMin.x / (float)scale;
-    minOut->y = (float)finalMin.y / (float)scale;
-    minOut->z = (float)finalMin.z / (float)scale;
-    S16Vec finalMax = max;
-    maxOut->x = (float)finalMax.x / (float)scale;
-    maxOut->y = (float)finalMax.y / (float)scale;
-    maxOut->z = (float)finalMax.z / (float)scale;
+    ConvI2FVector(*minOut, min, shift);
+    ConvI2FVector(*maxOut, max, shift);
 }
 
 /*

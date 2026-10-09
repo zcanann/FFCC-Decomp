@@ -58,8 +58,8 @@ public:
         return m_redSound.DMAEntry(flags, direction, mainMemory, aramMemory, size, callback, callbackData);
     }
     int DMACheck(int id) { return m_redSound.DMACheck(id); }
-    int GetBgmMasterVolume() const { return m_bgmMasterVolume; }
-    int GetSeMasterVolume() const { return m_seMasterVolume; }
+    int GetBgmMasterVolume() { return m_bgmMasterVolume; }
+    int GetSeMasterVolume() { return m_seMasterVolume; }
     /*
      * --INFO--
      * PAL Address: 0x800B8FA0

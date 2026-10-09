@@ -71,63 +71,78 @@ inline int CMes::GET_2(char** text)
 	return acc;
 }
 
+inline void CGame::UPPERItemName(char* name)
+{
+	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
-#define ApplyCaseMode(text, caseMode)                                     \
-	if (caseMode != 0)                                                    \
-	{                                                                     \
-		if (caseMode == 1)                                                \
-		{                                                                 \
-			if ((text)[0] != '\0')                                        \
-			{                                                             \
-				strupr(text);                                            \
-			}                                                             \
-		}                                                                 \
-		else if (caseMode == 2)                                           \
-		{                                                                 \
-			char* caseModePtr = (text);                                   \
-			if (caseModePtr[0] != '\0')                                   \
-			{                                                             \
-				caseModePtr[0] = (char)std::toupper(caseModePtr[0]);        \
-			}                                                             \
-		}                                                                 \
-		else                                                              \
-		{                                                                 \
-			if ((text)[0] != '\0')                                        \
-			{                                                             \
-				strlwr(text);                                            \
-			}                                                             \
-		}                                                                 \
-		caseMode = 0;                                                     \
-	}
+		strupr(name);
 #else
-#define ApplyCaseMode(text, caseMode)                                     \
-	if (caseMode != 0)                                                    \
-	{                                                                     \
-		if (caseMode == 1)                                                \
-		{                                                                 \
-			if ((text)[0] != '\0')                                        \
-			{                                                             \
-				toupper_name_conflict(text);                              \
-			}                                                             \
-		}                                                                 \
-		else if (caseMode == 2)                                           \
-		{                                                                 \
-			char* caseModePtr = (text);                                   \
-			if (caseModePtr[0] != '\0')                                   \
-			{                                                             \
-				caseModePtr[0] = (char)toupperLatin1((unsigned char)caseModePtr[0]); \
-			}                                                             \
-		}                                                                 \
-		else                                                              \
-		{                                                                 \
-			if ((text)[0] != '\0')                                        \
-			{                                                             \
-				tolower_name_conflict(text);                              \
-			}                                                             \
-		}                                                                 \
-		caseMode = 0;                                                     \
-	}
+		toupper_name_conflict(name);
 #endif
+	}
+}
+
+inline void CGame::LowerItemName(char* name)
+{
+	if (name[0] != '\0') {
+#ifdef VERSION_GCCE01
+		strlwr(name);
+#else
+		tolower_name_conflict(name);
+#endif
+	}
+}
+
+inline void CGame::UPPERMonName(char* name)
+{
+	if (name[0] != '\0') {
+#ifdef VERSION_GCCE01
+		strupr(name);
+#else
+		toupper_name_conflict(name);
+#endif
+	}
+}
+
+inline void CGame::UpperMonName(char* name)
+{
+	if (name[0] != '\0') {
+#ifdef VERSION_GCCE01
+		name[0] = std::toupper(name[0]);
+#else
+		name[0] = toupperLatin1(name[0]);
+#endif
+	}
+}
+
+inline void CGame::LowerMonName(char* name)
+{
+	if (name[0] != '\0') {
+#ifdef VERSION_GCCE01
+		strlwr(name);
+#else
+		tolower_name_conflict(name);
+#endif
+	}
+}
+
+#define ApplyCaseMode(kind, text, caseMode) \
+	if (caseMode != 0)                       \
+	{                                        \
+		if (caseMode == 1)                   \
+		{                                    \
+			Game.UPPER##kind##Name(text);    \
+		}                                    \
+		else if (caseMode == 2)              \
+		{                                    \
+			Game.Upper##kind##Name(text);    \
+		}                                    \
+		else                                 \
+		{                                    \
+			Game.Lower##kind##Name(text);    \
+		}                                    \
+		caseMode = 0;                        \
+	}
 
 static inline CColor& MesColorRef(const CColor& color)
 {
@@ -453,7 +468,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				strcpy(out, Game.GetItemArt(value));
 				break;
 			}
-			ApplyCaseMode(out, caseMode);
+			ApplyCaseMode(Item, out, caseMode);
 			out += strlen(out);
 			src += 4;
 			break;
@@ -498,7 +513,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				strcpy(out, Game.GetMonArt(value));
 				break;
 			}
-			ApplyCaseMode(out, caseMode);
+			ApplyCaseMode(Mon, out, caseMode);
 			out += strlen(out);
 			src += 4;
 			break;
@@ -1212,7 +1227,7 @@ void CMes::addString(char** text, int branchMode)
 				strcpy(namePtr, Game.GetItemArt(value));
 				break;
 			}
-			ApplyCaseMode(namePtr, caseMode);
+			ApplyCaseMode(Item, namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
 			break;
@@ -1261,7 +1276,7 @@ void CMes::addString(char** text, int branchMode)
 			default:
 				break;
 			}
-			ApplyCaseMode(namePtr, caseMode);
+			ApplyCaseMode(Mon, namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
 			break;
@@ -1277,7 +1292,7 @@ void CMes::addString(char** text, int branchMode)
 			int value = mFlagVars[GET_1(text)] & 0xFFFF;
 			char* namePtr = nameTag2B;
 			strcpy(namePtr, Game.GetNPCName(value));
-			ApplyCaseMode(namePtr, caseMode);
+			ApplyCaseMode(Item, namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
 			break;
@@ -1293,7 +1308,7 @@ void CMes::addString(char** text, int branchMode)
 			int value = mFlagVars[GET_1(text)] & 0xFFFF;
 			char* namePtr = nameTag2C;
 			strcpy(namePtr, Game.GetPlaceName(value));
-			ApplyCaseMode(namePtr, caseMode);
+			ApplyCaseMode(Item, namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
 			break;
@@ -1309,7 +1324,7 @@ void CMes::addString(char** text, int branchMode)
 			int value = mFlagVars[GET_1(text)] & 0xFFFF;
 			char* namePtr = nameTag2D;
 			strcpy(namePtr, Game.GetPlaceName(value + 0x3C));
-			ApplyCaseMode(namePtr, caseMode);
+			ApplyCaseMode(Item, namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
 			break;

@@ -240,6 +240,7 @@ public:
     void SetNoFreeMergeMask(int);
     void SetCharaAllocStage(int);
     int GetNumTexShadow();
+    GXColor GetTexShadowColor() { return m_texShadowColor; }
     void GetTexShadow(int, int, _GXTexObj*, Vec*, float(*)[3][4]);
     void draw();
     void drawBefore();

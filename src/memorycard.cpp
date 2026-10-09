@@ -428,7 +428,7 @@ void Attach(long currentSlot, long result)
     if (result != 0)
         return;
 
-    MemoryCardMan.m_currentSlot = (char)currentSlot;
+    MemoryCardMan.SetMountChan(currentSlot);
 }
 
 /*
@@ -1065,7 +1065,7 @@ void CMemoryCardMan::EncodeData()
     const int wordCount = (kMemoryCardSaveBufferSize - offsetof(Mc::SaveDat, m_random)) / sizeof(u32);
     for (int count = 0; count < wordCount; count++)
     {
-        u32 rotated = __rlwnm(*ptr, rotAmount, 0, 31);
+        u32 rotated = rotlwi(*ptr, rotAmount);
         *ptr++ = LoadSwapped(&rotated);
     }
 }
@@ -1956,13 +1956,13 @@ void CMemoryCardMan::DecodeData()
 {
     Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
     u32* ptr = GetSaveEncodedWords(save);
-    const int rotAmount = 0x20 - (save->m_rotateKey % 0x20);
+    const int rotAmount = save->m_rotateKey % 0x20;
 
     const int wordCount = (kMemoryCardSaveBufferSize - offsetof(Mc::SaveDat, m_random)) / sizeof(u32);
     for (int count = 0; count < wordCount; count++)
     {
         u32 word = *ptr;
-        *ptr++ = __rlwnm(LoadSwapped(&word), rotAmount, 0, 31);
+        *ptr++ = rotrwi(LoadSwapped(&word), rotAmount);
     }
 }
 

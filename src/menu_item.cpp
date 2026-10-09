@@ -14,32 +14,18 @@ enum {
     ITEM_TEX_FRAME = 0x2D,
     ITEM_TEX_TAB = 0x46,
     ITEM_TEX_LIST = 0x36,
+    ITEM_TEX_EMPTY = 0x33,
 #else
     ITEM_TEX_FRAME = 0x2E,
     ITEM_TEX_TAB = 0x47,
     ITEM_TEX_LIST = 0x37,
+    ITEM_TEX_EMPTY = 0x34,
 #endif
 };
 
 typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
-
-static const float kItemZero = 0.0f;
-static const float kItemOne = 1.0f;
-static const double kItemOneDouble = 1.0;
-static const float kItemMarkXOffset = 12.0f;
-static const float kItemMarkHeight = 24.0f;
-static const double kItemHalfDouble = 0.5;
-static const float kItemColorMax = 255.0f;
-static const float kItemListFontScale = 0.9f;
-static const float kItemTextYOffset = 4.0f;
-static const float kItemHelpCenterX = 320.0f;
-static const float kItemHelpY = 352.0f;
-static const float kItemHelpScale = 3.0f;
-static const float kItemInitU = 128.0f;
-static const float kItemInitV = 8.0f;
-static const float kItemSmallScale = 0.75f;
 
 struct MenuItemOpenAnim {
     s16 x;
@@ -363,13 +349,13 @@ void CMenuPcs::ItemDraw()
             GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
             w = entry->alpha * w;
-            if (w > kItemZero) {
-                MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, kItemOne, kItemOne, kItemZero);
+            if (w > 0.0f) {
+                MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, 1.0f, 1.0f, 0.0f);
                 x += w;
                 u += w;
             }
 
-            if (w > kItemZero && w < entry->w) {
+            if (w > 0.0f && w < entry->w) {
                 colors[1].r = 0xFF;
                 colors[1].g = 0xFF;
                 colors[1].b = 0xFF;
@@ -378,9 +364,9 @@ void CMenuPcs::ItemDraw()
                 colors[3].g = 0xFF;
                 colors[3].b = 0xFF;
                 colors[3].a = 0;
-                w = (float)(kItemOneDouble / (double)entry->duration);
+                w = (float)(1.0 / (double)entry->duration);
                 w = w * entry->w;
-                MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, kItemOne, kItemOne, kItemZero);
+                MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, 1.0f, 1.0f, 0.0f);
             }
 
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -396,11 +382,11 @@ void CMenuPcs::ItemDraw()
                 if ((caravanWork->m_inventoryItems[menuIndex] <= 0) || EquipChk(menuIndex) ||
                     (hasLetterAttach && (caravanWork->m_inventoryItems[menuIndex] < 0x125))) {
                     if (EquipChk(menuIndex)) {
-                        DrawEquipMark((int)(x - kItemMarkXOffset), (int)((h - kItemMarkHeight) / 2.0 + y),
+                        DrawEquipMark((int)(x - 12.0f), (int)((h - 24.0f) / 2.0 + y),
                                       entry->alpha);
                     }
-                    texId = 0x34;
-                    itemAlpha = (float)((double)entry->alpha * kItemHalfDouble);
+                    texId = ITEM_TEX_EMPTY;
+                    itemAlpha = (float)((double)entry->alpha * 0.5);
                 }
 
                 if (texId == ITEM_TEX_LIST && drawIndex == m_itemMenuState->cursorIndex[0]) {
@@ -413,16 +399,16 @@ void CMenuPcs::ItemDraw()
             colors[0].r = 0xFF;
             colors[0].g = 0xFF;
             colors[0].b = 0xFF;
-            colors[0].a = (u8)(kItemColorMax * itemAlpha);
+            colors[0].a = (u8)(255.0f * itemAlpha);
             GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-            MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, kItemZero);
+            MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, 0.0f);
         }
     }
 
     listFont = GetFontItem();
-    listFont->SetMargin(kItemOne);
+    listFont->SetMargin(1.0f);
     listFont->SetShadow(0);
-    listFont->SetScale(kItemListFontScale);
+    listFont->SetScale(0.9f);
     listFont->DrawInit();
 
     for (i = 0; i < m_itemList->count; i++) {
@@ -438,7 +424,7 @@ void CMenuPcs::ItemDraw()
             menuIndex -= 0x40;
         }
 
-        listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(kItemColorMax * entry->alpha)).color);
+        listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * entry->alpha)).color);
 
         itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
@@ -456,7 +442,11 @@ void CMenuPcs::ItemDraw()
             x = (float)(entry[i].x + 0x1C);
             y = (float)(entry[i].y + 0xB);
             listFont->SetPosX(x);
-            listFont->SetPosY(y - kItemTextYOffset);
+#ifdef VERSION_GCCJGC
+            listFont->SetPosY(y);
+#else
+            listFont->SetPosY(y - 4.0f);
+#endif
             listFont->Draw(text);
         }
     }
@@ -471,16 +461,16 @@ void CMenuPcs::ItemDraw()
 
         itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
-            int iconY = (int)((float)(entry[i].y + 6) - kItemOne);
+            int iconY = (int)((float)(entry[i].y + 6) - 1.0f);
             int iconX = (int)((float)(entry[i].x + entry[i].w - 0x10));
-            DrawSingleIcon(itemId, iconX, iconY, entry->alpha, 0, kItemOne);
+            DrawSingleIcon(itemId, iconX, iconY, entry->alpha, 0, 1.0f);
         }
     }
 
     if (listState == 1) {
         entry = m_itemList->anims;
         float mark = CalcListPos(m_itemMenuState->scroll, 0x40, 1);
-        if (mark > kItemZero) {
+        if (mark > 0.0f) {
             DrawListPosMark((float)entry->x, (float)entry->y, mark);
         }
     }
@@ -511,20 +501,20 @@ void CMenuPcs::ItemDraw()
         }
 
         x += (float)((int)System.m_frameCounter % 8);
-        DrawCursor((int)x, (int)y, kItemOne);
+        DrawCursor((int)x, (int)y, 1.0f);
     }
 
     DrawInit();
     DrawSingLife();
 
     helpFont = GetFont22();
-    s8 helpAlpha = (s8)(kItemColorMax * entry->alpha);
+    s8 helpAlpha = (s8)(255.0f * entry->alpha);
     if (!foundSelected) {
         selectedItemId = -1;
     }
-    float helpY = kItemHelpY;
-    DrawHelpMessage(selectedItemId, helpFont, (int)(kItemHelpCenterX - w / 2), (int)helpY,
-                    CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, kItemOne, kItemHelpScale);
+    float helpY = 352.0f;
+    DrawHelpMessage(selectedItemId, helpFont, (int)(320.0f - w / 2), (int)helpY,
+                    CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, 1.0f, 3.0f);
 }
 
 /*
@@ -643,9 +633,9 @@ int CMenuPcs::ItemOpen()
         if (frame >= anim->startFrame) {
             if (anim->startFrame + anim->duration <= frame) {
                 finished++;
-                anim->alpha = kItemOne;
-                anim->dx = kItemZero;
-                anim->dy = kItemZero;
+                anim->alpha = 1.0f;
+                anim->dx = 0.0f;
+                anim->dy = 0.0f;
             } else {
                 anim->frame++;
                 anim->alpha = (1.0 / anim->duration) * anim->frame;
@@ -718,7 +708,7 @@ void CMenuPcs::ItemInit1()
     entry = &this->m_itemList->anims[index++];
     entry->flags = 2;
     entry->tex = ITEM_TEX_LIST;
-    progress = kItemOne;
+    progress = 1.0f;
     entry->startFrame = 0;
     entry->duration = 5;
     entry = &this->m_itemList->anims[index++];
@@ -766,7 +756,7 @@ void CMenuPcs::ItemInit()
     {
         entry = m_itemList->anims;
         for (int initCount = 0; initCount < 64; initCount++, entry++) {
-            entry->uvScale = kItemOne;
+            entry->uvScale = 1.0f;
         }
     }
 
@@ -777,9 +767,9 @@ void CMenuPcs::ItemInit()
     entry->y = 0x28;
     entry->w = 0x78;
     entry->h = 0x108;
-    entry->u = kItemInitU;
-    entry->v = kItemInitV;
-    entry->uvScale = kItemOne;
+    entry->u = 128.0f;
+    entry->v = 8.0f;
+    entry->uvScale = 1.0f;
     entry->startFrame = 5;
     entry->duration = 5;
 
@@ -789,9 +779,9 @@ void CMenuPcs::ItemInit()
     entry->y = 0xE;
     entry->w = 0x30;
     entry->h = 0x30;
-    entry->u = kItemZero;
-    entry->v = kItemZero;
-    entry->uvScale = kItemOne;
+    entry->u = 0.0f;
+    entry->v = 0.0f;
+    entry->uvScale = 1.0f;
     entry->startFrame = 0;
     entry->duration = 5;
 
@@ -801,9 +791,9 @@ void CMenuPcs::ItemInit()
     entry->w = 0x30;
     entry->h = 0x30;
     entry->y = 0x150 - entry->h;
-    entry->u = kItemZero;
-    entry->v = kItemZero;
-    entry->uvScale = kItemSmallScale;
+    entry->u = 0.0f;
+    entry->v = 0.0f;
+    entry->uvScale = 0.75f;
     entry->startFrame = 0;
     entry->duration = 5;
 
@@ -814,8 +804,8 @@ void CMenuPcs::ItemInit()
     entry->y = 8;
     entry->w = 0x48;
     entry->h = 0x140;
-    entry->u = kItemZero;
-    entry->v = kItemZero;
+    entry->u = 0.0f;
+    entry->v = 0.0f;
     entry->startFrame = 0;
     entry->duration = 5;
 
@@ -828,8 +818,8 @@ void CMenuPcs::ItemInit()
         entry->y = firstEntry->y + loopCount * 0x20;
         entry->w = 200;
         entry->h = 0x28;
-        entry->u = kItemZero;
-        entry->v = kItemZero;
+        entry->u = 0.0f;
+        entry->v = 0.0f;
         entry->startFrame = 7;
         entry->duration = 5;
     }

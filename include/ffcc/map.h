@@ -7,8 +7,8 @@
 #include "ffcc/mapocttree.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mapmesh.h"
-#include "ffcc/mapanim.h"
 #include "ffcc/mapshadow.h"
+#include "ffcc/mapanim.h"
 #include "ffcc/maplight.h"
 #include "ffcc/ptrarray.h"
 
@@ -113,11 +113,11 @@ public:
     CMaterialSet* m_materialSet;       // 0x213D4
     CTextureSet* m_textureSet;         // 0x213D8
     CMapTexAnimSet* m_mapTexAnimSet;   // 0x213DC
-    CPtrArray<CMapAnimRun*> m_mapAnimRunArray;      // 0x213E0
-    CPtrArray<CMapAnim*> m_mapAnimArray;            // 0x213FC
-    CPtrArray<CMapAnimKeyDt*> m_mapAnimKeyDtArray;  // 0x21418
-    CPtrArray<CMapShadow*> m_mapShadowArray;        // 0x21434
-    CPtrArray<CMapLightHolder*> m_mapLightHolderArrays[2]; // 0x21450
+    CMapAnimRunArray m_mapAnimRunArray;      // 0x213E0
+    CMapAnimArray m_mapAnimArray;            // 0x213FC
+    CMapAnimKeyDtArray m_mapAnimKeyDtArray;  // 0x21418
+    CMapShadowArray m_mapShadowArray;        // 0x21434
+    CMapLightHolderArray m_mapLightHolderArrays[2]; // 0x21450
     CMapShadowKeyInfo m_shadowKeyInfos[4]; // 0x21488
     CMapIdGrp m_mapIdGrpArray[256];     // 0x214E8
     CMapObj* m_rootMapObj;             // 0x228E8

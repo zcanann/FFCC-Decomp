@@ -15,19 +15,6 @@
 
 CWind Wind;
 
-const float kWindZero = 0.0f;
-const float kWindMinDistanceSq = 0.0001f;
-const float kWindOne = 1.0f;
-const float kWindHalf = 0.5f;
-const float kWindQuarterNegative = -0.25f;
-const float kWindPowerLowThreshold = 0.1f;
-const float kWindDirPositiveJitter = 0.2f;
-const float kWindDirNegativeJitter = -0.1f;
-const float kWindDirMaxOffset = 0.25f;
-const float kWindLerpRate = 0.05f;
-const float kWindVerticalBase = -0.5f;
-const float kWindAlphaScale = 255.0f;
-const double kWindSignedIntBias = 4503601774854144.0;
 extern "C" {
 const char sWindAddSphereFailedMsg[] = {
     0x95, 0x97, 0x82, 0xF0, 0x92, 0xC7, 0x89, 0xC1, 0x82, 0xC5, 0x82, 0xAB, 0x82, 0xDC, 0x82, 0xB9,
@@ -317,7 +304,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     Vec randTmp;
     Vec tmp;
     Vec tmp2;
-    zero = kWindZero;
+    zero = 0.0f;
     out->x = out->y = out->z = zero;
 
     if ((MenuPcs.m_mode == 2) || (Game.m_gameWork.m_gamePaused != 0)) {
@@ -339,22 +326,22 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                 const float deltaZ = pos->z - obj->centerZ;
                 const float deltaX = pos->x - obj->centerX;
                 float distanceSq = deltaX * deltaX + deltaZ * deltaZ;
-                float minDistanceSq = kWindMinDistanceSq;
+                float minDistanceSq = 0.0001f;
                 if (distanceSq < minDistanceSq) {
                     distanceSq = minDistanceSq;
                 }
 
                 if (obj->type == 2) {
                     if (distanceSq < obj->radiusSq) {
-                        const float lifeScale = kWindOne - obj->lifeRatio * obj->lifeRatio;
+                        const float lifeScale = 1.0f - obj->lifeRatio * obj->lifeRatio;
                         const float distance = sqrtf(distanceSq);
                         const float forceScale = lifeScale / distance;
                         out->x += deltaX * forceScale;
-                        out->y += (kWindVerticalBase + Math.RandF()) * lifeScale;
+                        out->y += (-0.5f + Math.RandF()) * lifeScale;
                         out->z += deltaZ * forceScale;
                     }
                 } else {
-                    PSVECScale(&obj->force, &tmp2, kWindOne - distanceSq / obj->radiusSq);
+                    PSVECScale(&obj->force, &tmp2, 1.0f - distanceSq / obj->radiusSq);
                     PSVECAdd(out, &tmp2, out);
                 }
             }
@@ -401,13 +388,13 @@ void CWind::Draw()
                 if (obj->type == 1) {
                     const CColor& color = CColor(0xff, 0xff, 0, 0xff);
                     Graphic.DrawSphere(viewMtx,
-                                       reinterpret_cast<Vec*>(&CVector(obj->centerX, kWindZero, obj->centerZ)),
+                                       reinterpret_cast<Vec*>(&CVector(obj->centerX, 0.0f, obj->centerZ)),
                                        obj->radius, const_cast<_GXColor*>(&color.color));
                 } else {
-                    u8 alpha = (u8)(kWindAlphaScale * (kWindOne - obj->lifeRatio));
+                    u8 alpha = (u8)(255.0f * (1.0f - obj->lifeRatio));
                     const CColor& color = CColor(0xff, 0xff, 0x80, alpha);
                     Graphic.DrawSphere(viewMtx,
-                                       reinterpret_cast<Vec*>(&CVector(obj->centerX, kWindZero, obj->centerZ)),
+                                       reinterpret_cast<Vec*>(&CVector(obj->centerX, 0.0f, obj->centerZ)),
                                        obj->radius, const_cast<_GXColor*>(&color.color));
                 }
             }
@@ -442,27 +429,27 @@ void CWind::Frame()
         if (obj->flagBits.active != 0) {
             rnd = Math.Rand(10);
             if (rnd == 0) {
-                obj->targetPower += obj->basePower * (((rnd = Math.Rand(3)) == 0) ? kWindHalf : kWindQuarterNegative);
+                obj->targetPower += obj->basePower * (((rnd = Math.Rand(3)) == 0) ? 0.5f : -0.25f);
                 f0 = obj->targetPower;
-                f1 = kWindZero;
+                f1 = 0.0f;
                 f1 = (f0 < f1) ? f1 : ((obj->basePower < f0) ? obj->basePower : f0);
                 obj->targetPower = f1;
             }
 
             if ((((obj->type == 0) || (obj->type == 1)) && ((rnd = Math.Rand(0x1E)), rnd == 0)) &&
-                (obj->curPower < kWindPowerLowThreshold * obj->basePower)) {
+                (obj->curPower < 0.1f * obj->basePower)) {
                 rnd = Math.Rand(3);
                 if (rnd == 0) {
-                    f1 = kWindDirPositiveJitter;
+                    f1 = 0.2f;
                 } else {
-                    f1 = kWindDirNegativeJitter;
+                    f1 = -0.1f;
                 }
 
                 f0 = obj->baseDir;
                 obj->targetDir = f0 * f1 + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
-                f1 = (f0 < f1) ? f1 : ((kWindDirMaxOffset + f1 < f0) ? kWindDirMaxOffset + f1 : f0);
+                f1 = (f0 < f1) ? f1 : ((0.25f + f1 < f0) ? 0.25f + f1 : f0);
                 obj->targetDir = f1;
             }
 
@@ -482,13 +469,13 @@ void CWind::Frame()
                 obj->maxZ = obj->centerZ + obj->radius;
             }
 
-            obj->curPower += kWindLerpRate * (obj->targetPower - obj->curPower);
-            obj->curDir += kWindDirPositiveJitter * Math.RandF() +
-                (kWindLerpRate * (obj->targetDir - obj->curDir) - kWindPowerLowThreshold);
+            obj->curPower += 0.05f * (obj->targetPower - obj->curPower);
+            obj->curDir += 0.2f * Math.RandF() +
+                (0.05f * (obj->targetDir - obj->curDir) - 0.1f);
 
             if ((obj->type == 0) || (obj->type == 1)) {
                 obj->force.x = obj->curPower * (float)sin((double)obj->curDir);
-                obj->force.y = obj->curPower * (kWindHalf * Math.RandF() + kWindQuarterNegative);
+                obj->force.y = obj->curPower * (0.5f * Math.RandF() + -0.25f);
                 obj->force.z = obj->curPower * (float)cos((double)obj->curDir);
             }
         }

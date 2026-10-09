@@ -2165,28 +2165,32 @@ void CMenuPcs::CmakeSexDraw()
 
     CFont* font = GetFont23();
     font->SetMargin(1.0f);
+#ifdef VERSION_GCCP01
     font->SetShadow(0);
+#else
+    font->SetShadow(1);
+#endif
     font->SetScale(1.0f);
     font->DrawInit();
 
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
-#ifdef VERSION_GCCJGC
-    float labelWidth;
-#else
+#ifdef VERSION_GCCP01
     float labelWidth = 0.0f;
+#else
+    float labelWidth;
 #endif
     int y;
     int i;
     for (i = 0, y = 0x9C; i < 2; ++i) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
-#ifdef VERSION_GCCJGC
-        labelWidth = width;
-#else
+#ifdef VERSION_GCCP01
         if (labelWidth < width) {
             labelWidth = width;
         }
+#else
+        labelWidth = width;
 #endif
         float x = static_cast<float>(-(width / 2.0 - 400.0));
         font->SetPosX(x);

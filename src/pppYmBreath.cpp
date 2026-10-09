@@ -13,15 +13,6 @@
 #include "ffcc/pppBreathParticle.h"
 #include "ffcc/pppShape.h"
 
-static const float kYmBreathZero = 0.0f;
-static const float kYmBreathDegToRad = 0.01745329238474369f;
-static const float kYmBreathNegativeOne = -1.0f;
-static const float kYmBreathFullTurnDegrees = 360.0f;
-static const float kYmBreathHalfCircleDegrees = 180.0f;
-static const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
-static const float kYmBreathSpreadScale = 2.0f;
-static const double kYmBreathHalfChance = 0.5;
-
 struct YmBreathParticleGroup {
     int active;
     signed char* particleIndices;
@@ -254,7 +245,7 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataO
 {
     VYmBreath* state = GetYmBreathWork(ymBreath, GetYmBreathDataOffsets(dataOffsets)->m_workOffset);
     PSMTXIdentity(state->m_matrix);
-    state->m_direction.x = state->m_direction.y = state->m_direction.z = kYmBreathZero;
+    state->m_direction.x = state->m_direction.y = state->m_direction.z = 0.0f;
 
     state->m_particleData = 0;
     state->m_particleWmats = 0;
@@ -343,8 +334,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
             drawMtx[0][0] = particle->m_rotationX * ppvMng->m_scale.x;
             drawMtx[1][1] = particle->m_rotationY * ppvMng->m_scale.y;
             drawMtx[2][2] = drawMtx[0][0];
-            if (kYmBreathZero != particle->m_angle) {
-                PSMTXRotRad(rotMtx, 'z', kYmBreathDegToRad * particle->m_angle);
+            if (0.0f != particle->m_angle) {
+                PSMTXRotRad(rotMtx, 'z', 0.017453292f * particle->m_angle);
                 PSMTXConcat(drawMtx, rotMtx, drawMtx);
             }
 
@@ -574,9 +565,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
             }
         }
 
-        work->m_direction.x = kYmBreathZero;
-        work->m_direction.y = kYmBreathZero;
-        work->m_direction.z = kYmBreathNegativeOne;
+        work->m_direction.x = 0.0f;
+        work->m_direction.y = 0.0f;
+        work->m_direction.z = -1.0f;
         PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
@@ -604,9 +595,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
             PSMTXConcat(particleMtx->m_matrix, ymBreath->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, &groupData->position, &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
-            rotMtx.value[0][3] = kYmBreathZero;
-            rotMtx.value[1][3] = kYmBreathZero;
-            rotMtx.value[2][3] = kYmBreathZero;
+            rotMtx.value[0][3] = 0.0f;
+            rotMtx.value[1][3] = 0.0f;
+            rotMtx.value[2][3] = 0.0f;
             groupData->scale = scaledOwner;
             pppCopyVector(dir, groupData->direction);
             PSMTXMultVec(rotMtx.value, &dir, &dir);
@@ -667,7 +658,7 @@ static void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmB
                                   particleData->m_shapeFrame2, particleData->m_shapeFrame0,
                                   params->m_shapeFrameArg);
             } else {
-                float zero = kYmBreathZero;
+                float zero = 0.0f;
 
                 if (SearchIndex(params, vYmBreath, foundGroup, foundSlot, (short)i)) {
                     groupTable[foundGroup].particleIndices[foundSlot] = -1;
@@ -729,11 +720,11 @@ static void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmB
         for (j = 0; j < (int)params->m_groupCount; j++) {
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
                 groupData->speed = params->m_groupSpeed;
-                unitVelocity.x = kYmBreathZero;
-                unitVelocity.y = kYmBreathZero;
-                unitVelocity.z = kYmBreathNegativeOne;
+                unitVelocity.x = 0.0f;
+                unitVelocity.y = 0.0f;
+                unitVelocity.z = -1.0f;
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.x = groupData->position.y = groupData->position.z = kYmBreathZero;
+                groupData->position.x = groupData->position.y = groupData->position.z = 0.0f;
                 PSMTXCopy(ppvMng->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }
@@ -792,11 +783,11 @@ static void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_
         particle->m_angleVelocity += params->m_angleAccel;
     }
 
-    while (kYmBreathHalfCircleDegrees <= particle->m_angle) {
-        particle->m_angle -= kYmBreathFullTurnDegrees;
+    while (180.0f <= particle->m_angle) {
+        particle->m_angle -= 360.0f;
     }
-    while (particle->m_angle < kYmBreathNegativeHalfCircleDegrees) {
-        particle->m_angle += kYmBreathFullTurnDegrees;
+    while (particle->m_angle < -180.0f) {
+        particle->m_angle += 360.0f;
     }
 
     particle->m_rotationX += particle->m_rotationVelocityX;
@@ -811,7 +802,7 @@ static void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_
 
     particle->m_scale += params->m_scaleAccel;
     if (params->m_disableScaleClamp == 0) {
-        float zero = kYmBreathZero;
+        float zero = 0.0f;
         if ((zero < params->m_scaleClampStart) && (params->m_scaleAccel < zero)) {
             if (particle->m_scale < zero) {
                 particle->m_scale = zero;
@@ -861,7 +852,7 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
     u8 flags;
 
     spread = (float)(unsigned int)pYmBreath->m_spread;
-    range = spread * kYmBreathSpreadScale;
+    range = spread * 2.0f;
 
     memset(particleData, 0, sizeof(PARTICLE_DATA));
     if (particleWmat != NULL) {
@@ -874,16 +865,16 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
     PYmBreath* params = pYmBreath;
     PARTICLE_DATA* particle = particleData;
 
-    baseDir.x = kYmBreathZero;
-    baseDir.y = kYmBreathZero;
-    baseDir.z = kYmBreathNegativeOne;
+    baseDir.x = 0.0f;
+    baseDir.y = 0.0f;
+    baseDir.z = -1.0f;
 
     angle.x = (int)(range * Math.RandF() - spread);
-    angle.x = (int)((float)(angle.x << 15) / kYmBreathHalfCircleDegrees);
+    angle.x = (int)((float)(angle.x << 15) / 180.0f);
     angle.y = (int)(range * Math.RandF() - spread);
-    angle.y = (int)((float)(angle.y << 15) / kYmBreathHalfCircleDegrees);
+    angle.y = (int)((float)(angle.y << 15) / 180.0f);
     angle.z = (int)(range * Math.RandF() - spread);
-    angle.z = (int)((float)(angle.z << 15) / kYmBreathHalfCircleDegrees);
+    angle.z = (int)((float)(angle.z << 15) / 180.0f);
 
     pppGetRotMatrixXYZ(rotMtx, &angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);
@@ -895,7 +886,7 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
     Vec directionNorm = particle->m_direction;
     pppNormalize(particle->m_direction, directionNorm);
 
-    if (kYmBreathZero != params->m_spawnOffset) {
+    if (0.0f != params->m_spawnOffset) {
         PSVECScale(&particle->m_direction, &particle->m_position, params->m_spawnOffset);
     }
 
@@ -914,11 +905,11 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
         flags = params->m_angleFlags;
         if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-            if (kYmBreathHalfChance < Math.RandF()) {
-                particle->m_angleRandom *= kYmBreathNegativeOne;
+            if (0.5 < Math.RandF()) {
+                particle->m_angleRandom *= -1.0f;
             }
         } else if ((flags & 2) != 0) {
-            particle->m_angleRandom *= kYmBreathNegativeOne;
+            particle->m_angleRandom *= -1.0f;
         }
     }
 
@@ -929,11 +920,11 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
         particle->m_angleVelocity += particle->m_angleRandom;
     }
 
-    while (kYmBreathHalfCircleDegrees <= particle->m_angle) {
-        particle->m_angle -= kYmBreathFullTurnDegrees;
+    while (180.0f <= particle->m_angle) {
+        particle->m_angle -= 360.0f;
     }
-    while (particle->m_angle < kYmBreathNegativeHalfCircleDegrees) {
-        particle->m_angle += kYmBreathFullTurnDegrees;
+    while (particle->m_angle < -180.0f) {
+        particle->m_angle += 360.0f;
     }
 
     particle->m_rotationX = params->m_rotationStartX;
@@ -947,27 +938,27 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
             particle->m_rotationAccelY = rotationAccel;
             particle->m_rotationAccelX = rotationAccel;
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
-                if (kYmBreathHalfChance < Math.RandF()) {
-                    particle->m_rotationAccelX *= kYmBreathNegativeOne;
-                    particle->m_rotationAccelY *= kYmBreathNegativeOne;
+                if (0.5 < Math.RandF()) {
+                    particle->m_rotationAccelX *= -1.0f;
+                    particle->m_rotationAccelY *= -1.0f;
                 }
             } else if ((params->m_rotationFlags & 2) != 0) {
-                particle->m_rotationAccelX *= kYmBreathNegativeOne;
-                particle->m_rotationAccelY *= kYmBreathNegativeOne;
+                particle->m_rotationAccelX *= -1.0f;
+                particle->m_rotationAccelY *= -1.0f;
             }
         } else {
             particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
-                if (kYmBreathHalfChance < Math.RandF()) {
-                    particle->m_rotationAccelX *= kYmBreathNegativeOne;
+                if (0.5 < Math.RandF()) {
+                    particle->m_rotationAccelX *= -1.0f;
                 }
-                if (kYmBreathHalfChance < Math.RandF()) {
-                    particle->m_rotationAccelY *= kYmBreathNegativeOne;
+                if (0.5 < Math.RandF()) {
+                    particle->m_rotationAccelY *= -1.0f;
                 }
             } else if ((params->m_rotationFlags & 2) != 0) {
-                particle->m_rotationAccelX *= kYmBreathNegativeOne;
-                particle->m_rotationAccelY *= kYmBreathNegativeOne;
+                particle->m_rotationAccelX *= -1.0f;
+                particle->m_rotationAccelY *= -1.0f;
             }
         }
     }
@@ -981,11 +972,11 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
         particle->m_rotationVelocityY += particle->m_rotationAccelY;
     }
 
-    float zero = kYmBreathZero;
+    float zero = 0.0f;
     particle->m_scale = params->m_groupSpeed;
     if (zero != params->m_scaleRandomRange) {
         float rand = Math.RandF();
-        float scaledRange = params->m_scaleRandomRange * kYmBreathSpreadScale;
+        float scaledRange = params->m_scaleRandomRange * 2.0f;
         particle->m_scale += scaledRange * rand - params->m_scaleRandomRange;
     }
 

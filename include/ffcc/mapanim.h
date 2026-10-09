@@ -36,6 +36,8 @@ public:
     ~CMapAnimKeyDt();
 };
 
+typedef CPtrArray<CMapAnimKeyDt*> CMapAnimKeyDtArray;
+
 class CMapAnimNode
 {
 public:
@@ -50,12 +52,14 @@ public:
     void interp(Vec* out, CMapAnimKey* keys, int trackCount, int frameInLoop);
 };
 
+typedef CPtrArray<CMapAnimNode*> CMapAnimNodeArray;
+
 class CMapAnim
 {
     friend class CMapAnimNode;
     friend class CMapMng;
 
-    CPtrArray<CMapAnimNode*> mapAnimNodes;
+    CMapAnimNodeArray mapAnimNodes;
     int m_startFrame;
     int m_endFrame;
 
@@ -65,6 +69,8 @@ public:
     void ReadOtmAnim(CChunkFile&);
     void Calc(long);
 };
+
+typedef CPtrArray<CMapAnim*> CMapAnimArray;
 
 class CMapAnimRun
 {
@@ -77,8 +83,14 @@ public:
     unsigned char m_animId;
     unsigned short m_mapAnimIndex;
 
+    CMapAnimRun()
+    {
+        m_currentFrame = -1;
+    }
     void Calc(long);
     void Start(int, int, int);
 };
+
+typedef CPtrArray<CMapAnimRun*> CMapAnimRunArray;
 
 #endif // _FFCC_MAPANIM_H_

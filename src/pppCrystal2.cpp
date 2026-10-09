@@ -60,7 +60,6 @@ static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {
 static const Crystal2TexMtx s_crystal2TexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
-static const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
 
 static inline int Crystal2FpClassify(float value)
 {
@@ -234,12 +233,12 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
     work = (Crystal2Work*)(pppCrystal2->m_workArea + ctrl->m_serializedDataOffsets[2]);
     if ((step->m_crystal.m_refractionMode != 0) && (work->m_refractionMap == 0)) {
         work->m_refractionMap = (HSD_ImageBuffer*)pppMemAlloc(
-            sizeof(HSD_ImageBuffer), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);
+            sizeof(HSD_ImageBuffer), ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xA8);
 
         textureInfo = work->m_refractionMap;
         textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
         textureInfo->m_imageData = (u8*)pppMemAlloc(
-            textureSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xAD);
+            textureSize, ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xAD);
         textureInfo->m_format = GX_TF_IA8;
         textureInfo->m_width = 0x20;
         textureInfo->m_height = 0x20;
@@ -293,7 +292,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
 
         DCFlushRange(textureInfo->m_imageData, textureInfo->m_bufferSize);
         work->m_refractionTexObj = (GXTexObj*)pppMemAlloc(
-            0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xB5);
+            0x20, ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xB5);
         GXInitTexObj(work->m_refractionTexObj, textureInfo->m_imageData, (u16)textureInfo->m_width,
                      (u16)textureInfo->m_height, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
     }

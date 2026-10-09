@@ -1487,7 +1487,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
         if (type != 0 && strcmp(picked, "\x81\x4A") == 0) {
             int group;
             int pos;
-            char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
+            char* last = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
             for (group = 0; group < 2; ++group) {
                 text = const_cast<char*>(s_NameEntryVoiced[group]);
                 int length = strlen(text);
@@ -1508,7 +1508,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
             }
             return 0;
         } else if (type != 0 && strcmp(picked, "\x81\x4B") == 0) {
-            char* last = s_CmakeInfo.m_name + strlen(s_CmakeInfo.m_name) - 2;
+            char* last = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
             int length = strlen(s_NameEntryVoiced[1]);
             const char* characters = s_NameEntryVoiced[1];
             for (int pos = 0; pos < length; pos += 2, characters += 2) {
@@ -2450,8 +2450,7 @@ void CMenuPcs::CmakeTribeDraw()
         hairBase += 4;
     }
 
-    y = 0x88;
-    for (i = 0; i < 4; i++, y += 0x1C) {
+    for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         txt = GetHairStr(hairBase + i);
 #ifdef VERSION_GCCJGC
         font->SetPosX(424.0f);

@@ -682,6 +682,8 @@ int CMenuPcs::CmdClose()
  */
 void CMenuPcs::CmdDraw()
 {
+	float h;
+	s32 itemCount;
 	s32 row;
 	s32 choice;
 	s32 hasItemHelp = false;
@@ -709,7 +711,7 @@ void CMenuPcs::CmdDraw()
 			x = static_cast<float>(cmdEntry->x);
 			y = static_cast<float>(cmdEntry->y);
 			w = static_cast<float>(cmdEntry->width);
-			float h = static_cast<float>(cmdEntry->height);
+			h = static_cast<float>(cmdEntry->height);
 			const float u = cmdEntry->u;
 
 			if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
@@ -808,7 +810,7 @@ void CMenuPcs::CmdDraw()
 		s32 specialRow = 0;
 		entry = &m_cmdList->entries[m_cmdList->count];
 		const s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		const s32 itemCount = letterBuf[0];
+		itemCount = letterBuf[0];
 		for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++, entry++) {
 			if (entry->tex >= 0) {
 				x = static_cast<float>(entry->x);
@@ -942,7 +944,7 @@ void CMenuPcs::CmdDraw()
 		listFont->DrawInit();
 
 		const s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		const s32 itemCount = letterBuf[0];
+		itemCount = letterBuf[0];
 		for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
 			entry = &m_cmdList->entries[idx];
 			if (entry->tex == kCmdRowTexture) {
@@ -1194,6 +1196,7 @@ void CMenuPcs::CmdDraw()
  */
 unsigned int CMenuPcs::CmdCtrlCur()
 {
+	int cursor;
 	s32 mode;
 	CCaravanWork* caravanWork;
 	short hold;
@@ -1222,7 +1225,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			}
 
 			CmdState* row2 = GetCmdStateView(this);
-			const int cursor = row2->selected[mode];
+			cursor = row2->selected[mode];
 			if (caravanWork->m_commandListExtra[cursor] < 0) {
 				for (int k = 1; k < 3; k++) {
 					if (caravanWork->m_commandListExtra[cursor - k] >= 0) {
@@ -1242,7 +1245,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				}
 
 				CmdState* row2 = GetCmdStateView(this);
-				const int cursor = row2->selected[mode];
+				cursor = row2->selected[mode];
 				if (caravanWork->m_commandListExtra[cursor] < 0) {
 					for (int k = 1; k < 3; k++) {
 						if (caravanWork->m_commandListExtra[cursor + k] >= 0) {
@@ -1960,6 +1963,10 @@ inline void CMenuPcs::CmdDismantle(int selected)
  */
 void CMenuPcs::DrawUniteList()
 {
+	float panelAlpha;
+	CFont* helpFont;
+	float panelX;
+	GXColor color;
 	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
 	s32 i;
 	s32 active;
@@ -1997,7 +2004,6 @@ void CMenuPcs::DrawUniteList()
 		drawW = static_cast<float>(entry->width - 8);
 		drawY = static_cast<float>(entry->y);
 		const float rectU = static_cast<float>(entry->u);
-		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
@@ -2127,7 +2133,7 @@ void CMenuPcs::DrawUniteList()
 
 		const s32 labelAnchor =
 		    (groupStart == GetCmdStateView(this)->selected[0]) ? groupStart + 1 : groupStart;
-		const float panelX =
+		panelX =
 		    static_cast<float>(topX - (GetCmdListStorage(this)->entries[labelAnchor].x - topX));
 		drawW = 208.0f;
 		drawH = 64.0f;
@@ -2137,7 +2143,7 @@ void CMenuPcs::DrawUniteList()
 		    (static_cast<float>(endEntry->y + endEntry->height - startEntry->y) - 64.0f) *
 		        0.5 +
 		    static_cast<double>(startEntry->y));
-		float panelAlpha;
+
 		if (GetCmdStateView(this)->mode == 3) {
 			panelAlpha = startEntry->alpha;
 		} else {
@@ -2145,7 +2151,6 @@ void CMenuPcs::DrawUniteList()
 			    fabs(static_cast<double>(panelX - static_cast<float>(topX))) / 64.0);
 		}
 
-		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
@@ -2231,7 +2236,7 @@ void CMenuPcs::DrawUniteList()
 			}
 #endif
 
-			CFont* const helpFont = GetFont22();
+			helpFont = GetFont22();
 			DrawHelpMessage(
 				helpId, helpFont,
 				static_cast<int>(-(drawW / 2.0f - 320.0f)),

@@ -1180,6 +1180,7 @@ static inline void DrawOptionLabel(CFont* font, int x, int y, _GXColor color,
  */
 void CMenuPcs::DrawOptionMenu()
 {
+	float specialRowCos;
 	CFont* font = m_fonts[0];
 	int langRow = Game.m_gameWork.m_languageId - 1;
 	float w;
@@ -1781,7 +1782,7 @@ void CMenuPcs::DrawOptionMenu()
 		int rowAnimFrame;
 #ifdef VERSION_GCCJGC
 		rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);
-		const float specialRowCos = static_cast<float>(
+		specialRowCos = static_cast<float>(
 			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f))));
 #elif defined(VERSION_GCCE01)
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
@@ -1789,7 +1790,7 @@ void CMenuPcs::DrawOptionMenu()
 		} else {
 			rowAnimFrame = 0x10;
 		}
-		const float specialRowCos = static_cast<float>(
+		specialRowCos = static_cast<float>(
 			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f))));
 #else
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
@@ -1797,7 +1798,7 @@ void CMenuPcs::DrawOptionMenu()
 		} else {
 			rowAnimFrame = 0xD;
 		}
-		const float specialRowCos = static_cast<float>(
+		specialRowCos = static_cast<float>(
 			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 6.923077f))));
 #endif
 

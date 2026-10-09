@@ -356,6 +356,7 @@ int CMenuPcs::EquipCtrlCur()
  */
 void CMenuPcs::EquipDraw()
 {
+	float textY;
 	int helpItem;
 	int helpFound = 0;
 	int mode;
@@ -432,7 +433,7 @@ void CMenuPcs::EquipDraw()
 				helpFound = 1;
 			}
 			float width = font->GetWidth(str);
-			float textY = (float)(item->y + 0xb);
+			textY = (float)(item->y + 0xb);
 			font->SetPosX((float)((((float)item->w - width) / 2.0) + (double)item->x));
 #ifdef VERSION_GCCJGC
 			font->SetPosY(textY);
@@ -585,7 +586,7 @@ void CMenuPcs::EquipDraw()
 			}
 
 			font->GetWidth(str);
-			float textY = (float)(textItem->y + 0xb);
+			textY = (float)(textItem->y + 0xb);
 			font->SetPosX((float)(textItem->x + 0x1c));
 #ifdef VERSION_GCCJGC
 			font->SetPosY(textY);

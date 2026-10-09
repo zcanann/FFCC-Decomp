@@ -111,21 +111,6 @@ static inline void CGMonObj_SetAttackMove(CGMonObj* monObj, CGPartyObj* target, 
 	monObj->m_moveWork.m_changeStat = changeStat;
 }
 
-static inline int CGMonObj_SearchNoticeParty(CGMonObj* monObj)
-{
-	if (monObj->m_targetDist < ((Game.m_gameWork.m_soundOptionFlag != 0) ? 10000.0 : 180.0)) {
-		float hitScale;
-		int colIndex;
-		monObj->checkCol(6, monObj->m_rotBaseY,
-		                 static_cast<float>(monObj->m_scriptHandle->m_romWork[0x64]),
-		                 &hitScale, &colIndex);
-		if (colIndex >= 0) {
-			return colIndex;
-		}
-	}
-	return -1;
-}
-
 static inline void CGMonObj_MoveToTarget(CGMonObj* monObj, float speedScale)
 {
 	monObj->moveVector(CVector(monObj->m_worldPosition) - CVector(reinterpret_cast<CGObject*>(Game.m_partyObjArr[monObj->m_targetPartyIndex])->m_worldPosition), speedScale, 1);
@@ -1801,7 +1786,7 @@ void CGMonObj::mlHide()
 	if (m_unk6BD != 0) {
 		partyIndex = m_targetPartyIndex;
 	} else {
-		partyIndex = CGMonObj_SearchNoticeParty(this);
+		partyIndex = mlWaitingCheck();
 	}
 
 	if (partyIndex >= 0) {
@@ -1903,7 +1888,7 @@ void CGMonObj::mlEscape()
 	}
 
 	{
-		int partyIndex = CGMonObj_SearchNoticeParty(this);
+		int partyIndex = mlWaitingCheck();
 
 		if (partyIndex >= 0) {
 			m_targetPartyIndex = partyIndex;
@@ -2108,43 +2093,118 @@ inline void CGMonObj::mlSet(int state)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 256b
+ * EN Address: 0x801365B4
+ * EN Size: 208b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::mlWaitingCheck()
+inline int CGMonObj::mlWaitingCheck()
 {
-	// TODO
+	if (m_targetDist < ((Game.m_gameWork.m_soundOptionFlag != 0) ? 10000.0 : 180.0)) {
+		float hitScale;
+		int colIndex;
+		checkCol(6, m_rotBaseY, static_cast<float>(m_scriptHandle->m_romWork[0x64]), &hitScale, &colIndex);
+		if (colIndex >= 0) {
+			return colIndex;
+		}
+	}
+	return -1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 836b
+ * EN Address: 0x80136684
+ * EN Size: 204b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::mlAway()
+inline void CGMonObj::mlAway()
 {
-	// TODO
+	if (m_targetPartyIndex >= 0) {
+		CGMonObj::m_aiWork.m_state = 0x21;
+		CGMonObj_SetChaseMove(this, Game.m_partyObjArr[m_targetPartyIndex], 0);
+		if (((m_moveWork.m_stateFlags & 1) != 0) ||
+			(m_stateFlags0Bits.unk1 != 0)) {
+			moveCancel();
+			if (m_targetPartyIndex >= 0) {
+				m_rotTargetY = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+			}
+			mlSet(1);
+		}
+	} else {
+		moveCancel();
+		mlSet(0);
+	}
 }
 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 1280b
+ * EN Address: 0x801368F8
+ * EN Size: 444b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::mlWaiting()
+inline void CGMonObj::mlWaiting()
 {
-	// TODO
+	if (m_scriptHandle->m_romWork[0x86] == 1) {
+		moveCancel();
+	}
+	if (m_chaseTimer == 0) {
+		m_rotTargetY = m_homeRotY;
+	}
+
+	int hitPartyIndex = mlWaitingCheck();
+
+	if (hitPartyIndex >= 0) {
+		m_targetPartyIndex = hitPartyIndex;
+		mlSet(2);
+		seKiduki();
+	} else {
+		unsigned short alertMode = *reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(this) + 0x104);
+		switch (alertMode) {
+		case 0:
+			CGMonObj::m_aiWork.m_state = 0;
+			break;
+		case 1:
+			CGMonObj::m_aiWork.m_state = 0x10;
+			break;
+		case 2: {
+			double soundLimit2 = (Game.m_gameWork.m_soundOptionFlag != 0) ? 10000.0 : 180.0;
+			if (static_cast<double>(m_targetDist) < soundLimit2) {
+				CGMonObj::m_aiWork.m_state = 0x1D;
+				mlEscapeCheck();
+			} else {
+				CGMonObj::m_aiWork.m_state = 0;
+			}
+			break;
+		}
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 220b
+ * EN Address: 0x80136AB4
+ * EN Size: 152b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::mlEscapeCheck()
+inline void CGMonObj::mlEscapeCheck()
 {
-	// TODO
+	float repopDist = static_cast<float>(m_scriptHandle->m_romWork[0x66]);
+	float homeDist = PSVECDistance(&m_homePosition, &m_worldPosition);
+	if (static_cast<double>(repopDist) <= static_cast<double>(homeDist)) {
+		mlEscape();
+	}
 }
 
 
@@ -2653,58 +2713,9 @@ void CGMonObj::aiAddDefault(int& targetIndex)
 		mlHide();
 		break;
 
-	case 0: {
-		if (m_scriptHandle->m_romWork[0x86] == 1) {
-			moveCancel();
-		}
-		if (m_chaseTimer == 0) {
-			m_rotTargetY = m_homeRotY;
-		}
-
-		int hitPartyIndex = CGMonObj_SearchNoticeParty(this);
-
-		if (hitPartyIndex >= 0) {
-			m_targetPartyIndex = hitPartyIndex;
-			mlSet(2);
-			seKiduki();
-		} else {
-			unsigned char* aiData;
-			if (m_aiState == 0) {
-				aiData = reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork);
-			} else {
-				aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-					(m_aiState +
-					 m_scriptHandle->m_romWork[0x80]) *
-						0x1D0 +
-					0x10;
-			}
-			unsigned short alertMode = *reinterpret_cast<unsigned short*>(aiData + 0x104);
-			switch (alertMode) {
-			case 0:
-				CGMonObj::m_aiWork.m_state = 0;
-				break;
-			case 1:
-				CGMonObj::m_aiWork.m_state = 0x10;
-				break;
-			case 2: {
-				double soundLimit2 = (Game.m_gameWork.m_soundOptionFlag != 0) ? 10000.0 : 180.0;
-				if (static_cast<double>(m_targetDist) < soundLimit2) {
-					CGMonObj::m_aiWork.m_state = 0x1D;
-					float repopDist =
-						static_cast<float>(m_scriptHandle->m_romWork[0x66]);
-					float homeDist = PSVECDistance(&m_homePosition, &m_worldPosition);
-					if (static_cast<double>(repopDist) <= static_cast<double>(homeDist)) {
-						mlEscape();
-					}
-				} else {
-					CGMonObj::m_aiWork.m_state = 0;
-				}
-				break;
-			}
-			}
-		}
+	case 0:
+		mlWaiting();
 		break;
-	}
 
 	case 2:
 		mlMove();
@@ -2718,26 +2729,9 @@ void CGMonObj::aiAddDefault(int& targetIndex)
 		mlEscape();
 		break;
 
-	case 5: {
-		{
-			if (m_targetPartyIndex >= 0) {
-				CGMonObj::m_aiWork.m_state = 0x21;
-				CGMonObj_SetChaseMove(this, Game.m_partyObjArr[m_targetPartyIndex], 0);
-				if (((m_moveWork.m_stateFlags & 1) != 0) ||
-					(m_stateFlags0Bits.unk1 != 0)) {
-					moveCancel();
-					if (m_targetPartyIndex >= 0) {
-						m_rotTargetY = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
-					}
-					mlSet(1);
-				}
-			} else {
-				moveCancel();
-				mlSet(0);
-			}
-		}
+	case 5:
+		mlAway();
 		break;
-	}
 
 	}
 

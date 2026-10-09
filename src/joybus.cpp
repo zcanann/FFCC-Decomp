@@ -200,6 +200,25 @@ inline JoyBus::JoyBus()
 
 /*
  * --INFO--
+ * PAL Address: 0x800b26d8
+ * PAL Size: 80b
+ * EN Address: 0x800bb308
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
+{
+    while (--len >= 0) {
+        int value = *crc;
+        *crc = static_cast<unsigned short>((value << 8) ^ JoyBusCrcTable[static_cast<unsigned char>(value >> 8) ^ *data++]);
+    }
+
+    return static_cast<unsigned short>(~static_cast<unsigned short>(*crc));
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -2866,19 +2885,7 @@ struct ThreadSleepAlarm {
     OSThread* thread;
 };
 
-/*
- * --INFO--
- * PAL Address: 0x800ae228
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void ThreadAlarmHandler(OSAlarm* alarm, OSContext*)
-{
-    OSResumeThread(((ThreadSleepAlarm*)alarm)->thread);
-}
+void ThreadAlarmHandler(OSAlarm* alarm, OSContext*);
 
 /*
  * --INFO--
@@ -2898,6 +2905,20 @@ void JoyBus::ThreadSleep(long long ticks)
     OSSetAlarm(&alarm.alarm, ticks, ThreadAlarmHandler);
     OSSuspendThread(alarm.thread);
     OSRestoreInterrupts(level);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800ae228
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void ThreadAlarmHandler(OSAlarm* alarm, OSContext*)
+{
+    OSResumeThread(((ThreadSleepAlarm*)alarm)->thread);
 }
 
 /*
@@ -3145,59 +3166,6 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
     return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800b26d8
- * PAL Size: 80b
- * EN Address: 0x800bb308
- * EN Size: 100b
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
-{
-    while (--len >= 0) {
-        int value = *crc;
-        *crc = static_cast<unsigned short>((value << 8) ^ JoyBusCrcTable[static_cast<unsigned char>(value >> 8) ^ *data++]);
-    }
-
-    return static_cast<unsigned short>(~static_cast<unsigned short>(*crc));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
-{
-    int result;
-
-    if (!IsThreadRunning())
-    {
-        result = 0;
-    }
-    else
-    {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-        if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
-        {
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-            result = -1;
-        }
-        else
-        {
-            m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = command;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-            result = 0;
-        }
-    }
-
-    return result;
 }
 
 /*
@@ -3521,29 +3489,33 @@ void JoyBus::ResetQueue(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-int JoyBus::SendMapNo(ThreadParam* threadParam)
+int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 {
-    unsigned int cmd;
-    int stageNo;
-    int stageNoSub;
+    int result;
 
-    int port = threadParam->m_portIndex;
+    if (!IsThreadRunning())
+    {
+        result = 0;
+    }
+    else
+    {
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-    GbaQue.GetStageNo(port, &stageNo, &stageNoSub);
+        if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
+        {
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = -1;
+        }
+        else
+        {
+            m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = command;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
+        }
+    }
 
-    cmd = 0;
-    ((unsigned char*)&cmd)[0] = 0x0E;
-    ((unsigned char*)&cmd)[1] = 1;
-    ((unsigned char*)&cmd)[2] = (unsigned char)stageNo;
-    ((unsigned char*)&cmd)[3] = (unsigned char)stageNoSub;
-
-    unsigned int queueCmd = cmd;
-
-    unsigned int result;
-
-    result = SetSendQueue(threadParam, queueCmd);
-
-    return result != 0 ? -1 : 0;
+    return result;
 }
 
 /*
@@ -3827,7 +3799,7 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * JP Address: 0x800AF030
  * JP Size: 2164b
  */
-int JoyBus::InitialCode(ThreadParam* threadParam)
+inline int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result;
     int status;
@@ -4380,6 +4352,36 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&posY, 0);
 
     result = SetSendQueue(threadParam, cmd);
+
+    return result != 0 ? -1 : 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int JoyBus::SendMapNo(ThreadParam* threadParam)
+{
+    unsigned int cmd;
+    int stageNo;
+    int stageNoSub;
+
+    int port = threadParam->m_portIndex;
+
+    GbaQue.GetStageNo(port, &stageNo, &stageNoSub);
+
+    cmd = 0;
+    ((unsigned char*)&cmd)[0] = 0x0E;
+    ((unsigned char*)&cmd)[1] = 1;
+    ((unsigned char*)&cmd)[2] = (unsigned char)stageNo;
+    ((unsigned char*)&cmd)[3] = (unsigned char)stageNoSub;
+
+    unsigned int queueCmd = cmd;
+
+    unsigned int result;
+
+    result = SetSendQueue(threadParam, queueCmd);
 
     return result != 0 ? -1 : 0;
 }

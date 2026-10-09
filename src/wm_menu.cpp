@@ -2584,19 +2584,7 @@ void CMenuPcs::CalcLoadMenu()
 						variant = -1;
 						gender = -1;
 					}
-					modelInfo = &m_wm.m_charaModelData[charaIdx];
-					int charaId;
-					int loadMode;
-					if (tribe >= 0) {
-						charaId = GetModelNo(tribe, variant, gender);
-						loadMode = 0;
-						modelInfo->m_modelChanged = 1;
-					} else {
-						loadMode = 3;
-						modelInfo->m_modelChanged = 0;
-						charaId = 0x43;
-					}
-					m_wm.m_handles[charaIdx + 0x20]->LoadModelASync(loadMode, charaId, 0);
+					ChgModel(charaIdx, tribe, variant, gender);
 				}
 
 				if (m_wmWorldState->m_menuMode != 8) {

@@ -811,8 +811,8 @@ pppYmLaser.cpp:
 
 gobjwork.cpp:
 	.text start:0x8009DAE4 end:0x800A26A8
-	.rodata     start:0x801D8EA0 end:0x801D8F50
-	.data       start:0x8020E88C end:0x8020E944
+	.rodata     start:0x801D8E00 end:0x801D8F50
+	.data       start:0x8020E880 end:0x8020E944
 	.sdata2     start:0x8032F958 end:0x8032F970
 	.sdata      start:0x8032D7E0 end:0x8032D7F8
 

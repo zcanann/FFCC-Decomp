@@ -1875,14 +1875,13 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 	}
 
-	int (*out)[2] = comboOut;
+	int n = 0;
 	for (int rank = 0; rank < 2; rank++) {
 		for (int i = 0; i < matchCount; i++) {
-			const int* m = matches[i];
-			if (rank + 2 == s_Unite[m[0]].count) {
-				out[0][0] = m[0];
-				out++;
-				out[-1][1] = m[1];
+			if (rank + 2 == s_Unite[matches[i][0]].count) {
+				comboOut[n][0] = matches[i][0];
+				comboOut[n][1] = matches[i][1];
+				n++;
 			}
 		}
 	}

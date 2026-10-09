@@ -6457,18 +6457,6 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
     return result;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-#ifndef VERSION_GCCJGC
-int CFile::IsDiskError()
-{
-	return m_isDiskError;
-}
-#endif
-
 namespace JoyBusConst {
 extern const unsigned int CTRL_GBA = 0x1;
 extern const unsigned int JOY_CODE_MASK = 0x10;

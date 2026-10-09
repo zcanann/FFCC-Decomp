@@ -66,7 +66,7 @@ public:
 	void Close(CHandle* handle);
 	int IsCompleted(CHandle* handle);
 #ifndef VERSION_GCCJGC
-	int IsDiskError();
+	int IsDiskError() { return m_isDiskError; }
 #endif
 	int IsFatalError() { return m_fatalDiskErrorFlag; }
 	void SyncCompleted(CHandle* handle);

@@ -215,26 +215,9 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 	}
 }
 
-static int getPadConnectedForSlot(int slot)
-{
-	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
-	if (blocked) {
-		return 0;
-	}
-
-	int selectedPort = Pad.m_debugPadPort;
-	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
-	return Pad.GetPadInputs()[idx].gbaMode;
-}
-
 static bool isMenuPcsCommandBusy()
 {
 	return MenuPcs.m_mode != 0;
-}
-
-static int getPartyJoybusPort(CGPartyObj* self)
-{
-	return static_cast<int>(reinterpret_cast<unsigned char*>(self->m_scriptHandle)[0xED]);
 }
 
 static unsigned short getItemKindFromCfd(int itemId)
@@ -676,7 +659,7 @@ void CGPartyObj::menu()
 
 	openMenu:
 		if (Game.m_gameWork.m_menuStageMode == 0) {
-			int connected = getPadConnectedForSlot(static_cast<char>(m_animStateMisc));
+			int connected = Pad.IsGba(static_cast<char>(m_animStateMisc));
 			if (connected != 0) {
 				if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
 					Sound.PlaySe(8, 0x40, 0x7F, 0);
@@ -689,19 +672,7 @@ void CGPartyObj::menu()
 			return;
 		}
 
-		int canOpenMenu;
-		if ((m_weaponNodeFlagBits.m_prg != 0) &&
-		    ((m_weaponNodeFlagAll.m_bits1.m_shield != 0) ||
-		     ((party.commandMode & 2) != 0) ||
-		     ((party.commandMode & 4) != 0)) &&
-		    (m_unk63CBits.m_bit80 != 0) &&
-		    (m_scriptHandle->m_hp != 0)) {
-			canOpenMenu = 1;
-		} else {
-			canOpenMenu = 0;
-		}
-
-		if (canOpenMenu) {
+		if (canPlayerGoMenu()) {
 			Joybus.ChgCtrlMode(portIndex);
 			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
 		} else {
@@ -714,7 +685,7 @@ void CGPartyObj::menu()
 		return;
 	}
 
-	if (getPadConnectedForSlot(static_cast<char>(m_animStateMisc)) == 0) {
+	if (Pad.IsGba(static_cast<char>(m_animStateMisc)) == 0) {
 		return;
 	}
 
@@ -2312,7 +2283,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		m_comboTarget = m_comboCenter;
 	}
 
-	endPSlotBit(0x10);
+	endTargetParticle();
 	CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 	int ofs = (targetSide != 0) ? 4 : 0;
 	CFlat.ResetParticleWork((ofs + 0x47 + work->m_joybusCaravanId) | 0x100, m_particleSlots[4]);
@@ -2323,17 +2294,16 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: 0x8013EB94
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::endTargetParticle()
+inline void CGPartyObj::endTargetParticle()
 {
-	PartyObjOverlay& party = m_partyData;
-	party.partyFlags &= 0xAF;
-	m_comboState = 0;
-	m_comboFrame = 0;
-	m_comboTarget = m_worldPosition;
-	m_comboCenter = m_worldPosition;
+	endPSlotBit(0x10);
 }
 
 /*
@@ -3236,15 +3206,17 @@ canUse:
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::canPlayerGoMenu()
+int CGPartyObj::canPlayerGoMenu()
 {
-	PartyObjOverlay& party = m_partyData;
-	unsigned short trig = Pad.GetButtonDown(m_animStateMisc);
-	if (m_lastStateId == 0 && (trig & 0x200) != 0) {
-		party.partyFlags |= 0x10;
-	} else if ((m_lastStateId != 0) || ((trig & 0x200) == 0)) {
-		party.partyFlags &= 0xEF;
+	if ((m_weaponNodeFlagBits.m_prg != 0) &&
+	    ((m_weaponNodeFlagAll.m_bits1.m_shield != 0) ||
+	     ((m_partyData.commandMode & 2) != 0) ||
+	     ((m_partyData.commandMode & 4) != 0)) &&
+	    (m_unk63CBits.m_bit80 != 0) &&
+	    (m_scriptHandle->m_hp != 0)) {
+		return 1;
 	}
+	return 0;
 }
 
 /*
@@ -3258,20 +3230,9 @@ void CGPartyObj::canPlayerGoMenu()
  */
 int CGPartyObj::useItem(int itemId)
 {
-	int canUse;
 	int result;
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) == 0) ||
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) == 0) ||
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) == 0) ||
-	    (m_scriptHandle->m_hp == 0)) {
-		canUse = 0;
-	} else {
-		canUse = 1;
-	}
-
-	if (!canUse) {
+	if (!canPlayerUseItem()) {
 		result = 0;
 	} else {
 		int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);

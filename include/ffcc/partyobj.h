@@ -197,7 +197,7 @@ public:
 
     void bonus(int, int, CGPrgObj*);
     int canPlayerUseItem();
-    void canPlayerGoMenu();
+    int canPlayerGoMenu();
     int useItem(int);
 
     int canPlayerPutItem();

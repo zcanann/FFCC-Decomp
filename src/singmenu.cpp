@@ -476,7 +476,7 @@ static inline int LoadSingMenuTextureStep(CMenuPcs* menu)
     if (menu->m_singleMenuTextureLoadState == 0) {
         char path[256];
 #ifdef VERSION_GCCJGC
-        sprintf(path, "dvd/menu/%s.tex", PTR_s_solo1.entries[loadIndex]);
+        sprintf(path, s_singMenuTexturePathFmt, PTR_s_solo1.entries[loadIndex]);
 #else
         sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
 #endif
@@ -622,7 +622,7 @@ void CMenuPcs::createSingleMenu()
         }
 
 #ifdef VERSION_GCCJGC
-        loadFont(1, "dvd/menu/subfont.fnt", 4, -1);
+        loadFont(1, s_singMenuSubfontPathFmt, 4, -1);
 #else
         char path[128];
         sprintf(path, s_singMenuSubfontPathFmt, Game.GetLangString());
@@ -1077,7 +1077,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
 #ifdef VERSION_GCCJGC
         font->SetPosY(y);
 #else
-        font->SetPosY(y - 5.0f);
+        font->SetPosY(y - 4.0f);
 #endif
 
         char* label;

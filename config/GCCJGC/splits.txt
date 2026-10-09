@@ -868,6 +868,7 @@ mesmenu.cpp:
 	.rodata start:0x801D49F8 end:0x801D4A08
 	.data start:0x8022CBB0 end:0x8022CC18
 	.text start:0x800996B0 end:0x8009C2A8
+	.sdata2 start:0x8034D5F0 end:0x8034D6C8
 
 MSL_C/PPCEABI/bare/H/gamecube.c:
 	.text	start:0x801B075C end:0x801B0768

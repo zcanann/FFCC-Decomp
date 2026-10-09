@@ -16,13 +16,6 @@
 
 #include "string.h"
 
-static const float kPolyGroupBaseXZ = 0.0f;
-static const float kPolyGroupBaseY = -100.0f;
-static const float kPolyGroupTopOffsetY = 5.0f;
-static const float kAStarEscapeInitialBestDist = -1000000.0f;
-static const float kDrawAStarSphereRadius = 10.0f;
-static const float kInfiniteCost = 10000000.0f;
-
 CAStar AStar;
 
 inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
@@ -38,9 +31,9 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
 
 static inline int getHitPolygonGroup(Vec* pos, unsigned long hitAttributeMask)
 {
-	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z),
-	                                CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ),
-	                                kPolyGroupBaseXZ, hitAttributeMask) != 0)
+	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + 5.0f, pos->z),
+	                                CVector(0.0f, -100.0f, 0.0f),
+	                                0.0f, hitAttributeMask) != 0)
 	{
 		return gMapHitFace->m_groupIndex;
 	}
@@ -63,9 +56,9 @@ int CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		return getHitPolygonGroup(pos, m_hitAttributeMask);
 	}
 
-	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z),
-	                                CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ),
-	                                kPolyGroupBaseXZ, hitAttributeMask) != 0)
+	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + 5.0f, pos->z),
+	                                CVector(0.0f, -100.0f, 0.0f),
+	                                0.0f, hitAttributeMask) != 0)
 	{
 		return gMapHitFace->m_groupIndex;
 	}
@@ -83,9 +76,9 @@ int CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
  */
 int CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
-	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z),
-	                                CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ),
-	                                kPolyGroupBaseXZ, m_hitAttributeMask) != 0)
+	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + 5.0f, pos->z),
+	                                CVector(0.0f, -100.0f, 0.0f),
+	                                0.0f, m_hitAttributeMask) != 0)
 	{
 		return gMapHitFace->m_groupIndex;
 	}
@@ -108,7 +101,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	CAPos* aheadBest = (CAPos*)0;
 	CAPos* behindBest = (CAPos*)0;
-	const float& initialBestDist = kAStarEscapeInitialBestDist;
+	float initialBestDist = -1000000.0f;
 	double aheadBestDist = initialBestDist;
 	double behindBestDist = aheadBestDist;
 	int i = 0;
@@ -129,7 +122,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					portalVec = CVector(m_portals[i].m_position) - CVector(base);
 					float dist = PSVECMag(portalVec);
 
-					if (dot >= kPolyGroupBaseXZ)
+					if (dot >= 0.0f)
 					{
 						if (aheadBestDist < dist)
 						{
@@ -343,14 +336,14 @@ void CAStar::drawAStar()
 
 		if (hasGroups)
 		{
-			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, kDrawAStarSphereRadius, CColor(0xFF, 0xFF, 0xFF, 0xFF));
+			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, 10.0f, CColor(0xFF, 0xFF, 0xFF, 0xFF));
 		}
 
 		for (int i = 0; i < 64; i++)
 		{
 			if (m_portals[i].IsUse())
 			{
-				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, kDrawAStarSphereRadius, CColor(0xFF, 0xFF, 0x00, 0xFF));
+				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, 10.0f, CColor(0xFF, 0xFF, 0x00, 0xFF));
 
 				for (int side = 0; side < 2; side++)
 				{
@@ -370,11 +363,11 @@ void CAStar::drawAStar()
 										GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
 										GXPosition3f32(
 											m_portals[i].m_position.x,
-											m_portals[i].m_position.y + kPolyGroupTopOffsetY,
+											m_portals[i].m_position.y + 5.0f,
 											m_portals[i].m_position.z);
 										GXPosition3f32(
 											m_portals[j].m_position.x,
-											m_portals[j].m_position.y + kPolyGroupTopOffsetY,
+											m_portals[j].m_position.y + 5.0f,
 											m_portals[j].m_position.z);
 									}
 								}
@@ -408,7 +401,7 @@ void CAStar::calcAStar()
 				continue;
 			}
 
-			m_bestPath.m_cost = kInfiniteCost;
+			m_bestPath.m_cost = 10000000.0f;
 
 			CATemp temp;
 
@@ -416,7 +409,7 @@ void CAStar::calcAStar()
 
 			check(from, (int)(unsigned int)to, temp);
 
-			if (m_bestPath.m_cost < kInfiniteCost)
+			if (m_bestPath.m_cost < 10000000.0f)
 			{
 				System.Printf(const_cast<char*>("\x8d\xc5\x92\x5a\x8c\x6f\x98\x48%d->%d=%.5fm "), from, to, m_bestPath.m_cost);
 

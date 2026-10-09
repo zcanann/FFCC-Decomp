@@ -7156,7 +7156,7 @@ void CMenuPcs::CalcCharaSelect()
 							int other;
 							for (other = 0; other < 4; other++) {
 								if (i != other && m_wm.m_charaSelectData[other].m_cmakePending != 0 &&
-								    m_wm.m_charaSelectData[other].m_currentSlot == currentSlot) {
+								    m_wm.m_charaSelectData[other].m_currentSlot == entry.m_currentSlot) {
 									Sound.PlaySe(4, 0x40, 0x7F, 0);
 									break;
 								}
@@ -7175,7 +7175,7 @@ void CMenuPcs::CalcCharaSelect()
 						int other;
 						for (other = 0; other < 4; other++) {
 							if (i != other && m_wm.m_charaSelectData[other].m_confirmed != 0 &&
-							    m_wm.m_charaSelectData[other].m_currentSlot == currentSlot) {
+							    m_wm.m_charaSelectData[other].m_currentSlot == entry.m_currentSlot) {
 								Sound.PlaySe(4, 0x40, 0x7F, 0);
 								break;
 							}

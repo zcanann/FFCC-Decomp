@@ -1488,19 +1488,19 @@ void CMenuPcs::DrawResultCountAnim()
 					int value;
 					if (this->m_bonusState->m_countFinished == 0) {
 #ifdef VERSION_GCCP01
-						double frame = (double)this->m_bonusState->m_frame - 8.333333134651184;
-						if (frame <= 0) {
+						if (this->m_bonusState->m_frame - 8.333333134651184 <= 0) {
 							value = 0;
-						} else if (frame < total) {
-							value = (int)frame;
+						} else if (this->m_bonusState->m_frame - 8.333333134651184 < total) {
+							value = (int)(this->m_bonusState->m_frame - 8.333333134651184);
 						} else {
 							value = total;
 						}
 #else
-						value = this->m_bonusState->m_frame - 10;
-						if (value <= 0) {
+						if (this->m_bonusState->m_frame - 10 <= 0) {
 							value = 0;
-						} else if (value >= total) {
+						} else if (this->m_bonusState->m_frame - 10 < total) {
+							value = this->m_bonusState->m_frame - 10;
+						} else {
 							value = total;
 						}
 #endif

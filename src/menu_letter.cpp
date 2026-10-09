@@ -1214,7 +1214,7 @@ void CMenuPcs::LetterListDraw()
 #endif
 		font->Draw(subject);
 
-		const char* npcName = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 9) & 0x1FF];
+		const char* npcName = Game.m_cFlatDataArr[1].GetTable(2)[(letter->Word0() >> 9) & 0x1FF];
 		font->SetPosX(352.0f);
 #ifdef VERSION_GCCJGC
 		font->SetPosY(static_cast<float>(y));

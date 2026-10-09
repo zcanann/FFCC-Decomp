@@ -3152,7 +3152,7 @@ inline void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     char* text;
     if (CheckSell(index)) {
-        text = Game.m_cFlatDataArr[1].TableStrings(6)[itemNo];
+        text = Game.m_cFlatDataArr[1].GetTable(6)[itemNo];
     } else {
         text = const_cast<char*>(s_cannotMakeHere);
     }
@@ -3188,7 +3188,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     int canSelect = CheckSell(sel);
     if (canSelect) {
-        sourceText = Game.m_cFlatDataArr[1].TableStrings(6)[itemNo];
+        sourceText = Game.m_cFlatDataArr[1].GetTable(6)[itemNo];
     } else {
         sourceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_CRAFT_HERE);
     }

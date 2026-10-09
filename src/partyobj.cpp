@@ -4149,7 +4149,7 @@ messageMenu:
 	    CGPartyObj::m_ghostWork.state != CGPartyObj::m_ghostWork.field20) {
 		if (!MenuPcs.m_battleMesMenus[5]->IsUse()) {
 			CGPartyObj::m_ghostWork.field20 = CGPartyObj::m_ghostWork.state;
-			MenuPcs.m_battleMesMenus[5]->Open(Game.m_cFlatDataArr[1].Message(CGPartyObj::m_ghostWork.state - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
+			MenuPcs.m_battleMesMenus[5]->Open(Game.m_cFlatDataArr[1].GetMes(CGPartyObj::m_ghostWork.state - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
 		}
 	}
 

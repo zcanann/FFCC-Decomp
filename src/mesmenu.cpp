@@ -608,13 +608,13 @@ void CMesMenu::onDraw()
                     font->SetScale(0.775f);
                     font->SetShadow(1);
                     font->SetMargin(0.0f);
-                    float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                    float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
                     font->DrawInit();
                     font->SetTlut(0xF);
                     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
                     font->SetPosX(iconX + (((m_menuIndex & 1) != 0) ? 62.0f : 82.0f - textWidth));
                     font->SetPosY(iconY + (float)(((m_menuIndex & 2) != 0) ? 8 : 31));
-                    font->Draw(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                    font->Draw(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
                     MenuPcs.DrawInit();
                 }
 
@@ -753,13 +753,13 @@ void CMesMenu::onDraw()
                         font->SetScale(0.775f);
                         font->SetShadow(1);
                         font->SetMargin(0.0f);
-                        float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                        float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
                         font->DrawInit();
                         font->SetTlut(0xF);
                         font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
                         font->SetPosX(iconX + ((anchorX != 0) ? 62.0f : 82.0f - textWidth));
                         font->SetPosY(iconY + (float)((anchorY != 0) ? 8 : 31));
-                        font->Draw(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                        font->Draw(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
                         MenuPcs.DrawInit();
                     }
 

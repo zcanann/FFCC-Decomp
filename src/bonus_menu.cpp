@@ -1,4 +1,6 @@
 #include "ffcc/bonus_menu.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gbaque.h"

@@ -800,7 +800,7 @@ mtx/vec.c:
 
 bonus_menu.cpp:
 	.text start:0x80132428 end:0x8013D528
-	.rodata start:0x801DC444 end:0x801DC4D4
+	.rodata start:0x801DC3F8 end:0x801DC4D4
 	.data start:0x802116A8 end:0x80211834
 	.sdata start:0x8032DA48 end:0x8032DA58
 	.sbss start:0x8032DE88 end:0x8032DE94

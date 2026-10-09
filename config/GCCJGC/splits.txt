@@ -711,7 +711,7 @@ mtx/vec.c:
 
 bonus_menu.cpp:
 	.text start:0x8012EF38 end:0x8013A1EC
-	.rodata start:0x801D8CB4 end:0x801D8D30
+	.rodata start:0x801D8C60 end:0x801D8D30
 	.data start:0x8022FFE8 end:0x80230178
 	.sdata start:0x8034B848 end:0x8034B858
 	.sbss start:0x8034BC90 end:0x8034BC9C

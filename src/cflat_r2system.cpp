@@ -508,26 +508,6 @@ inline float std::sinf(float x)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9C60
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
-{
-    const float* src = &other->x;
-    float x = *src++;
-    float y = *src++;
-    self->x = x;
-    float z = *src;
-    self->y = y;
-    self->z = z;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800BA19C
  * PAL Size: 352b
  * EN Address: 0x800CF7B8

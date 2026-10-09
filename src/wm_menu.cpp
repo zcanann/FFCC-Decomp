@@ -3304,14 +3304,14 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(msgId, msgParam);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short ss = m_wmWorldState->m_subState;
-				if (m_wmWorldState->m_state0E < 0 || ss == 0x14 || ss == 0x1c || ss == 0x1b) {
+				if (m_wmWorldState->m_state0E < 0 || m_wmWorldState->m_subState == 0x14 ||
+				    m_wmWorldState->m_subState == 0x1c || m_wmWorldState->m_subState == 0x1b) {
 					m_wmWorldState->m_subState = 3;
-				} else if (ss == 0x0E) {
+				} else if (m_wmWorldState->m_subState == 0x0E) {
 					ClrMcList();
 					m_wmWorldState->m_subState = 0x11;
 					m_wmWorldState->m_cardChannel = 0;
-				} else if (ss == 0x15) {
+				} else if (m_wmWorldState->m_subState == 0x15) {
 					m_wmWorldState->m_subState = 0x11;
 					m_wmWorldState->m_cardChannel = (short)m_mcCtrl.GetDno();
 					if (m_wmWorldState->m_menuMode == 8) {

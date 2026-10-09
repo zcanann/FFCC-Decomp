@@ -537,8 +537,11 @@ gobject.cpp:
 	.sdata      start:0x8032D748 end:0x8032D760
 
 chara.cpp:
+	extab       start:0x80007468 end:0x800075C8
+	extabindex  start:0x8000D4A4 end:0x8000D678
 	.sbss start:0x8032DD80 end:0x8032DD88
 	.text start:0x8006E46C end:0x8007345C
+	.ctors      start:0x801D4370 end:0x801D4374
 	.rodata     start:0x801D7FB8 end:0x801D8068
 	.data       start:0x801FBB50 end:0x801FBBB8
 	.bss        start:0x802E68A0 end:0x802E8918
@@ -1354,7 +1357,11 @@ charaobj.cpp:
 	.sdata      start:0x8032D928 end:0x8032D950
 
 p_chara.cpp:
+	extab       start:0x800075C8 end:0x80007828
+	extabindex  start:0x8000D678 end:0x8000D990
 	.text start:0x8007345C end:0x8007B570
+	.ctors      start:0x801D4374 end:0x801D4378
+	.rodata     start:0x801D8068 end:0x801D8AD0
 	.data       start:0x801FBBB8 end:0x801FC1C0
 	.bss        start:0x802E8918 end:0x802E9040
 	.sdata2     start:0x8032F1F0 end:0x8032F2F8

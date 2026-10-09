@@ -472,6 +472,7 @@ gobject.cpp:
 chara.cpp:
 	.sbss start:0x8034BBA0 end:0x8034BBA8
 	.text start:0x8006DE6C end:0x80072F18
+	.ctors      start:0x801D0690 end:0x801D0694
 	.rodata     start:0x801D3BD8 end:0x801D3C88
 	.data       start:0x801F1048 end:0x801F10B0
 	.bss        start:0x803031E0 end:0x80305258
@@ -1260,6 +1261,7 @@ TRK_MINNOW_DOLPHIN/targimpl.c:
 
 p_chara.cpp:
 	.text start:0x80072F18 end:0x8007AF9C
+	.ctors      start:0x801D0694 end:0x801D0698
 	.rodata     start:0x801D3C88 end:0x801D46D0
 	.data       start:0x801F10B0 end:0x801F16B8
 	.bss        start:0x80305258 end:0x80305980

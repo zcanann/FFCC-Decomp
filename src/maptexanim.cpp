@@ -35,9 +35,7 @@ static inline void ReplaceRef(CTexture*& slot, CTexture* texture)
 {
     CTexture* current = slot;
     if (current != 0) {
-        if (current->DecRef() == 0) {
-            delete current;
-        }
+        current->Release();
         slot = 0;
     }
 

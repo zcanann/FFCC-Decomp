@@ -445,9 +445,7 @@ CTexAnim::~CTexAnim()
 {
     CRef* refData = m_refData;
     if (refData != 0) {
-        if (refData->DecRef() == 0) {
-            delete refData;
-        }
+        refData->Release();
         m_refData = 0;
     }
 }
@@ -467,9 +465,7 @@ void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
     CRef* ref = m_refData;
 
     if (ref != 0) {
-        if (ref->DecRef() == 0) {
-            delete ref;
-        }
+        ref->Release();
         m_refData = 0;
     }
     CTexAnim::CRefData* refData = new (stage, "texanim.cpp", 0xD3) CTexAnim::CRefData;
@@ -536,9 +532,7 @@ void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
     CMaterial* material = m_refData->m_material;
 
     if (material != 0) {
-        if (material->DecRef() == 0) {
-            delete material;
-        }
+        material->Release();
         m_refData->m_material = 0;
     }
 

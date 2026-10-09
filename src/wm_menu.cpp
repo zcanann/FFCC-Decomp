@@ -1244,9 +1244,7 @@ void CMenuPcs::destroyWorld()
 	for (int i = 4; i < 6; i++) {
 		CRef* const obj = m_battleMesMenus[i];
 		if (obj != 0) {
-			if (obj->DecRef() == 0) {
-				delete obj;
-			}
+			obj->Release();
 			m_battleMesMenus[i] = 0;
 		}
 	}
@@ -1254,9 +1252,7 @@ void CMenuPcs::destroyWorld()
 	{
 		CRef* const obj = m_fonts[1];
 		if (obj != 0) {
-			if (obj->DecRef() == 0) {
-				delete obj;
-			}
+			obj->Release();
 			m_fonts[1] = 0;
 		}
 	}

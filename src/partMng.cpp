@@ -485,17 +485,13 @@ void CPartMng::Destroy()
 
     if (m_textureSet != 0) {
         CTextureSet* textureSet = m_textureSet;
-        if (textureSet->DecRef() == 0) {
-            delete textureSet;
-        }
+        textureSet->Release();
         m_textureSet = 0;
     }
 
     if (m_materialSet != 0) {
         CMaterialSet* materialSet = m_materialSet;
-        if (materialSet->DecRef() == 0) {
-            delete materialSet;
-        }
+        materialSet->Release();
         m_materialSet = 0;
     }
 

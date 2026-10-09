@@ -161,9 +161,7 @@ enum
 static inline void ReleaseRefObject(void* object)
 {
     CRef* ref = reinterpret_cast<CRef*>(object);
-    if (ref->DecRef() == 0) {
-        delete ref;
-    }
+    ref->Release();
 }
 
 static inline void ReleaseRefSlot(void** slot)
@@ -363,9 +361,7 @@ void CMenuPcs::destroy()
 
     CFont* font = m_fonts[0];
     if (font != nullptr) {
-        if (font->DecRef() == 0) {
-            delete font;
-        }
+        font->Release();
         m_fonts[0] = 0;
     }
 
@@ -618,9 +614,7 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
     for (int i = 0; i < textureCount; i++) {
         CTexture* texture = m_textures[i + textureStart];
         if (texture != nullptr) {
-            if (texture->DecRef() == 0) {
-                delete texture;
-            }
+            texture->Release();
             m_textures[i + textureStart] = 0;
         }
     }
@@ -628,9 +622,7 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
     for (int i = 0; i < textureSetCount; i++) {
         CTextureSet* textureSet = m_textureSets[i + textureSetStart];
         if (textureSet != nullptr) {
-            if (textureSet->DecRef() == 0) {
-                delete textureSet;
-            }
+            textureSet->Release();
             m_textureSets[i + textureSetStart] = 0;
         }
     }
@@ -1266,9 +1258,7 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
     CFont* font = m_fonts[fontNo + 2];
 
     if (font != 0) {
-        if (font->DecRef() == 0) {
-            delete font;
-        }
+        font->Release();
         m_fonts[fontNo + 2] = 0;
     }
 

@@ -52,9 +52,7 @@ struct ShadowCandidate
 
 static inline void ReleaseRefNonNull(CRef* object)
 {
-    if (object->DecRef() == 0) {
-        delete object;
-    }
+    object->Release();
 }
 
 static inline int HighestSetBit(unsigned int value)

@@ -469,9 +469,7 @@ void CMenuPcs::destroyBonus()
 
 	if (this->m_fonts[1] != 0) {
 		CFont* font = m_fonts[1];
-		if (font->DecRef() == 0) {
-			delete font;
-		}
+		font->Release();
 		this->m_fonts[1] = 0;
 	}
 

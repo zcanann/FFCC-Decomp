@@ -99,9 +99,7 @@ inline CMapTexAnimSet::~CMapTexAnimSet()
     for (int i = 0; i < m_count; i++) {
         CMapTexAnim* entry = m_anims[i];
         if (entry != 0) {
-            if (entry->DecRef() == 0) {
-                delete entry;
-            }
+            entry->Release();
             m_anims[i] = 0;
         }
     }

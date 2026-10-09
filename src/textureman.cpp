@@ -949,9 +949,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
                         amemCacheSet->AmemPrev();
                     }
 
-                    if (texture->DecRef() == 0) {
-                        delete texture;
-                    }
+                    texture->Release();
 
                     texture = m_textureArray[index];
                     texture->AddRef();
@@ -1015,9 +1013,7 @@ void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
         }
 
         CTexture* texture = m_textureArray[idx];
-        if (texture->DecRef() == 0) {
-            delete texture;
-        }
+        texture->Release();
 
         m_textureArray.SetAt(idx, 0);
     }

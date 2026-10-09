@@ -120,9 +120,7 @@ template <typename T>
 static inline void ReleaseSharedNonNull(T* ptr)
 {
     CRef* ref = ptr;
-    if (ref->DecRef() == 0) {
-        delete ref;
-    }
+    ref->Release();
 }
 
 template <typename T>
@@ -1068,9 +1066,7 @@ void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim* target, int releaseMa
             ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & loadAnim->m_mergeFlags) != 0))) {
             if (target == 0 || target == loadAnim) {
                 CRef* loadAnimRef = loadAnim;
-                if (loadAnimRef->DecRef() == 0) {
-                    delete loadAnimRef;
-                }
+                loadAnimRef->Release();
                 m_loadAnims.RemoveAt(static_cast<unsigned long>(i));
                 if (target != 0) {
                     return;

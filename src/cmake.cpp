@@ -181,9 +181,7 @@ static inline CCharaPcs::CHandle* GetCmakeCharaHandle(CMenuPcs* menu, int slot)
 static inline void ReleaseRefObject(void* object)
 {
     CRef* ref = reinterpret_cast<CRef*>(object);
-    if (ref->DecRef() == 0) {
-        delete ref;
-    }
+    ref->Release();
 }
 
 static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)

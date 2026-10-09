@@ -20,24 +20,20 @@
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
 
-static const char lbl_80330228[] = "pc";
-static const char lbl_8033022C[] = "c";
-static const char lbl_80330230[] = "_root";
-static const char lbl_80330238[] = "mon";
-static const char lbl_8033023C[] = "m";
-static const char lbl_80330240[] = "npc";
-static const char lbl_80330244[] = "n";
-static const char lbl_80330248[] = "fa";
-static const char lbl_8033024C[] = "f";
-static const char lbl_80330250[] = "wep";
-static const char lbl_80330254[] = "w";
-static const char lbl_80330258[] = "loc";
-static const char lbl_8033025C[] = "l";
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <math.h>
+
+const char* CCharaPcs::m_modelTable[6][3] = {
+    {"pc", "c", "_root"},
+    {"mon", "m", "_root"},
+    {"npc", "n", "_root"},
+    {"fa", "f", "_root"},
+    {"wep", "w", "_root"},
+    {"loc", "l", "_root"},
+};
 
 CCharaPcs CharaPcs;
 
@@ -2647,11 +2643,3 @@ CProcessCallbackTable CCharaPcs::m_table[3] = {
     },
 };
 
-const char* CCharaPcs::m_modelTable[6][3] = {
-    {lbl_80330228, lbl_8033022C, lbl_80330230},
-    {lbl_80330238, lbl_8033023C, lbl_80330230},
-    {lbl_80330240, lbl_80330244, lbl_80330230},
-    {lbl_80330248, lbl_8033024C, lbl_80330230},
-    {lbl_80330250, lbl_80330254, lbl_80330230},
-    {lbl_80330258, lbl_8033025C, lbl_80330230},
-};

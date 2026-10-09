@@ -31,48 +31,6 @@ static const char* amem_stateName[2] = {
     "NOUSE",
 };
 
-extern "C" const char s_memory_cpp[] = "memory.cpp";
-extern "C" const char sGetDataTimeoutBanner[] =
-    "===================================================================\n"
-    "===================================================================\n"
-    "                          GetData  TimeOut\n"
-    "===================================================================\n"
-    "===================================================================\n";
-extern "C" const char sHeapCorruptAbortDrawMsg[40] =
-    "\x83\x71\x81\x5b\x83\x76\x82\xaa\x88\xd9\x8f\xed\x82\xc8\x82\xcc"
-    "\x82\xc5\x95\x60\x89\xe6\x82\xf0\x92\x86\x8e\x7e\x82\xb5\x82\xdc"
-    "\x82\xb7\x81\x42\n";
-static const char s_drawHeapTitleFmt[] = "%4d %4d %4d";
-static const char s_heapWalkerStageNameFmt[] = "Stage Name = %s\n";
-static const char s_heapWalkerHeaderFmt[] =
-    "No  Flag Level Size    Total   Address  Prev     Next     Name                     Line \n";
-static const char s_heapWalkerSeparator[] = {
-    '-', '-', '-', ' ', '-', '-', '-', '-', ' ', '-', '-', '-',
-    '-', '-', ' ', '-', '-', '-', '-', '-', '-', '-', ' ', '-',
-    '-', '-', '-', '-', '-', '-', ' ', '-', '-', '-', '-', '-',
-    '-', '-', '-', ' ', '-', '-', '-', '-', '-', '-', '-', '-',
-    ' ', '-', '-', '-', '-', '-', '-', '-', '-', ' ', '-', '-',
-    '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-',
-    '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', ' ', '-'
-};
-extern const char sAmemCacheAddRefFmt[];
-extern const char sAmemCacheEntryFmt[];
-extern const char sRefCntCompareBanner[];
-extern const char sHeapWalkerEntryFmt[];
-extern const char sHeapWalkerUseUnuseFmt[];
-extern const char sHeapWalkerTitle[];
-extern const char sHeapWalkerUseFmt[];
-extern const char sHeapWalkerUnuseFmt[];
-extern const char sHeapWalkerTotalFmt[];
-extern char sStageFreeCorruptBlockFmt[];
-extern char sStageAllocNoMemoryFmt[];
-extern char sStageQuitBlockUnfreedAllocFmt[];
-extern char sCopyFromAMemorySyncTimeoutMsg[];
-extern char sCurrentMemoryStageName[];
-extern char sMainMemoryStageName[];
-extern char sDrawHeapUseUnuseFmt[];
-extern char sDrawHeapAmemAnimFmt[];
-extern unsigned int sHeapBarColors[];
 int g_alloc_ct;
 static int s_RefCnt0Compare;
 static int s_MaxRefCnt0Compare;
@@ -140,7 +98,7 @@ static inline void freeStageBlock(void* ptr)
         CMemory::CStage::CBlock* block = blockFromPayload(ptr);
         if ((block->m_magicStart != kMemoryBlockStartMagic) ||
             (block->m_magicEnd != kMemoryBlockEndMagic)) {
-            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block->m_source, block->m_line);
+            System.Printf(const_cast<char*>("CMemory.CStage.free: \211\363\202\352\202\304\202\242\202\334\202\267\201Baddress = %08x file = %s line = %d\n"), ptr, block->m_source, block->m_line);
         }
 
         block->m_flags = static_cast<unsigned char>(block->m_flags & ~kMemoryBlockUsedFlag);
@@ -162,13 +120,13 @@ static inline void freeStageBlock(void* ptr)
     }
 }
 
-static inline void freeStageBlockBase(void* ptr, const char* strBase)
+static inline void freeStageBlockBase(void* ptr)
 {
     if (ptr != (void*)nullptr) {
         CMemory::CStage::CBlock* block = blockFromPayload(ptr);
         if ((block->m_magicStart != kMemoryBlockStartMagic) ||
             (block->m_magicEnd != kMemoryBlockEndMagic)) {
-            System.Printf(const_cast<char*>(strBase + 0x1A0), ptr, block->m_source, block->m_line);
+            System.Printf(const_cast<char*>("CMemory.CStage.free: \211\363\202\352\202\304\202\242\202\334\202\267\201Baddress = %08x file = %s line = %d\n"), ptr, block->m_source, block->m_line);
         }
 
         block->m_flags = static_cast<unsigned char>(block->m_flags & ~kMemoryBlockUsedFlag);
@@ -229,39 +187,61 @@ static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
     }
 }
 
-static inline void releaseStageBufferBase(unsigned int ptr, const char* strBase) throw()
+static inline void releaseStageBufferBase(unsigned int ptr) throw()
 {
     if (ptr != 0) {
-        freeStageBlockBase(reinterpret_cast<void*>(ptr - 0x10), strBase);
+        freeStageBlockBase(reinterpret_cast<void*>(ptr - 0x10));
     }
 }
 
-static inline void stageReleaseMode2BufferBase(CMemory::CStage* stage, const char* strBase)
+static inline void stageReleaseMode2BufferBase(CMemory::CStage* stage)
 {
     unsigned int ptr = static_cast<unsigned int>(stageGetHeapHead(stage));
     if (ptr != 0) {
-        releaseStageBufferBase(ptr, strBase);
+        releaseStageBufferBase(ptr);
         stageSetHeapHead(stage, 0);
     }
 }
 
-static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage, const char* strBase)
+static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage)
 {
     CMemory::CMode& modeData = memory->Mode(stage->m_allocationMode);
 
     if (stage->m_allocationMode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
-            System.Printf(const_cast<char*>(strBase + 0x5d4), stageGetSourceName(stage));
+            System.Printf(const_cast<char*>("CMemory.CStage.quitBlock: \212J\225\372\202\263\202\352\202\304\202\242\202\310\202\242alloc\202\252\202\240\202\350\202\334\202\267\201B%s\n"), stageGetSourceName(stage));
             stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     } else {
-        stageReleaseMode2BufferBase(stage, strBase);
+        stageReleaseMode2BufferBase(stage);
     }
 
     stage->m_prev->m_next = stage->m_next;
     stage->m_next->m_prev = stage->m_prev;
     stage->m_next = modeData.m_freeList.m_next;
     modeData.m_freeList.m_next = stage;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001FDCC
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CheckSum(void* data, int size)
+{
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(data);
+    unsigned int checksum = 0x12345678;
+    int i;
+
+    for (i = size; i != 0; i--) {
+        checksum += *bytes++;
+    }
+
+    return checksum;
 }
 
 /*
@@ -322,24 +302,32 @@ void operator delete[](void* ptr)
 
 /*
  * --INFO--
- * PAL Address: 0x8001FDCC
- * PAL Size: 136b
+ * PAL Address: UNUSED
+ * PAL Size: 88b
+ * EN Address: UNUSED
+ * EN Size: 112b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* operator new(unsigned long size)
+{
+    System.Printf("operator new: \216g\227p\202\305\202\253\202\334\202\271\202\361\201B\n");
+    return nullptr;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 88b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CheckSum(void* data, int size)
+void* operator new[](unsigned long size)
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(data);
-    unsigned int checksum = 0x12345678;
-    int i;
-
-    for (i = size; i != 0; i--) {
-        checksum += *bytes++;
-    }
-
-    return checksum;
+    System.Printf("operator new: \216g\227p\202\305\202\253\202\334\202\271\202\361\201B\n");
+    return nullptr;
 }
 
 /*
@@ -402,10 +390,10 @@ void CMemory::Init()
         }
     }
 
-    CStage* stage = CreateStage(0x2000, sCurrentMemoryStageName, 0);
+    CStage* stage = CreateStage(0x2000, "CMemory.current", 0);
     m_currentMemoryStage = stage;
 
-    stage = CreateStage(0x4000, sMainMemoryStageName, 0);
+    stage = CreateStage(0x4000, "CMemory.memory", 0);
     m_mainMemoryStage = stage;
 }
 
@@ -420,8 +408,7 @@ void CMemory::Init()
  */
 void CMemory::Quit()
 {
-    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
-    stageDestroyAndPool(this, m_mainMemoryStage, strBase);
+    stageDestroyAndPool(this, m_mainMemoryStage);
 
     CMode* modeData = m_modes;
     for (int pass = 0; pass < 3; pass++, modeData++) {
@@ -433,19 +420,19 @@ void CMemory::Quit()
                 CStage* next = stage->m_next;
                 if (pass == 0) {
                     if (stage != m_currentMemoryStage) {
-                        System.Printf(const_cast<char*>(strBase + 0x7b0), stage->m_allocationSourceStr);
-                        stageDestroyAndPool(this, stage, strBase);
+                        System.Printf(const_cast<char*>("CMemory.Quit: \203X\203e\201[\203W%s\202\252\212J\225\372\202\263\202\352\202\304\202\242\202\334\202\271\202\361\201B\n"), stage->m_allocationSourceStr);
+                        stageDestroyAndPool(this, stage);
                     }
                 } else {
-                    System.Printf(const_cast<char*>(strBase + 0x7b0), stage->m_allocationSourceStr);
-                    stageDestroyAndPool(this, stage, strBase);
+                    System.Printf(const_cast<char*>("CMemory.Quit: \203X\203e\201[\203W%s\202\252\212J\225\372\202\263\202\352\202\304\202\242\202\334\202\271\202\361\201B\n"), stage->m_allocationSourceStr);
+                    stageDestroyAndPool(this, stage);
                 }
                 stage = next;
             }
         }
     }
 
-    stageDestroyAndPool(this, m_currentMemoryStage, strBase);
+    stageDestroyAndPool(this, m_currentMemoryStage);
 }
 
 /*
@@ -477,11 +464,10 @@ void CMemory::Frame()
  */
 void CMemory::HeapWalker()
 {
-    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
 
     System.Printf(const_cast<char*>("\n"));
     System.Printf(const_cast<char*>("//\n"));
-    System.Printf(const_cast<char*>(strBase + 0x754));
+    System.Printf(const_cast<char*>("// Heap Walker\n"));
     System.Printf(const_cast<char*>("//\n"));
 
     CMode* modeData = m_modes;
@@ -502,17 +488,17 @@ void CMemory::HeapWalker()
             unsigned int kb;
             do {
                 kb = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop) >> 10;
-                System.Printf(const_cast<char*>(strBase + 0x764), kb, stage->m_allocationSourceStr);
+                System.Printf(const_cast<char*>("Use  : %5dKB %s\n"), kb, stage->m_allocationSourceStr);
                 useTotal += kb;
 
                 kb = static_cast<unsigned int>(stage->m_next->m_heapTop - stage->m_heapBottom) >> 10;
-                System.Printf(const_cast<char*>(strBase + 0x778), kb);
+                System.Printf(const_cast<char*>("Unuse: %5dKB\n"), kb);
                 stage = stage->m_next;
                 unuseTotal += kb;
             } while (stage != listHead);
 
             System.Printf(
-                const_cast<char*>(strBase + 0x788), useTotal + unuseTotal, useTotal, unuseTotal);
+                const_cast<char*>("Total: %5dKB Use =%5dKB Unuse =%5dKB\n"), useTotal + unuseTotal, useTotal, unuseTotal);
         }
 
     }
@@ -595,12 +581,12 @@ void CMemory::Draw()
         }
 
         if (pass == 1) {
-            sprintf(line, sDrawHeapUseUnuseFmt, useTotalKB, unuseTotalKB);
+            sprintf(line, "USE=%d UNUSE=%d", useTotalKB, unuseTotalKB);
             Graphic.DrawDebugStringDirect(0x10, y, line, 8);
 
             int amemAnim = static_cast<int>(Chara.GetAmemOffset());
             int amemAnimKB = amemAnim / 1024;
-            sprintf(line, sDrawHeapAmemAnimFmt, amemAnimKB);
+            sprintf(line, "AMEM ANIM=%d", amemAnimKB);
             Graphic.DrawDebugStringDirect(0x10, y + 0xC, line, 8);
         }
     }
@@ -669,7 +655,6 @@ inline void CMemory::CStage::initBlock()
  */
 CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode)
 {
-    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
 
     if ((mode == 1) && (OSGetConsoleSimulatedMemSize() != 0x3000000)) {
         return (CMemory::CStage*)nullptr;
@@ -683,7 +668,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
         CStage* stage = modeData.m_freeList.m_next;
 
         if (stage == &modeData.m_freeList) {
-            System.Printf(const_cast<char*>(strBase + 0x6d4));
+            System.Printf(const_cast<char*>("CMemory.CreateStage: \203X\203e\201[\203W\202\360\215\354\220\254\202\305\202\253\202\334\202\271\202\361\201B\n"));
             return (CMemory::CStage*)nullptr;
         } else {
             CStage* list = &modeData.m_activeList;
@@ -712,7 +697,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                     if (mode == 2) {
                         CStage* backingStage = m_mainMemoryStage;
                         void* blockPool =
-                            backingStage->alloc(sizeof(CStage::CBlock) * 0x20 + 0x10, const_cast<char*>(strBase + 0x1e8), 0x228, 0);
+                            backingStage->alloc(sizeof(CStage::CBlock) * 0x20 + 0x10, const_cast<char*>("memory.cpp"), 0x228, 0);
                         stage->m_heapHead = reinterpret_cast<unsigned long>(
                             static_cast<CStage::CBlock*>(__construct_new_array(blockPool, 0, 0, sizeof(CStage::CBlock), 0x20)));
                         stage->m_blockCount = 0;
@@ -724,28 +709,11 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                 list = next;
             } while (list != &modeData.m_activeList);
 
-            System.Printf(const_cast<char*>(strBase + 0x708));
+            System.Printf(const_cast<char*>("CMemory.CreateStage: \203\201\203\202\203\212\202\252\221\253\202\350\202\334\202\271\202\361\201B\n"));
             HeapWalker();
         }
     }
     return (CMemory::CStage*)nullptr;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMemory::CStage::quitBlock()
-{
-    if (stageHasUnfreedBlocks(this)) {
-        System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(this));
-        heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
-    }
 }
 
 /*
@@ -892,7 +860,7 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
         watch.Stop();
         if (watch.Get() >= 9000.0f) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg));
+                System.Printf(const_cast<char*>("===================================================================\n                          CopyFromAMemorySync  TimeOut\n===================================================================\n"));
             }
             Sound.CheckDriver(1);
             watch.Reset();
@@ -902,6 +870,24 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
         }
     }
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemory::CStage::quitBlock()
+{
+    if (stageHasUnfreedBlocks(this)) {
+        System.Printf(const_cast<char*>("CMemory.CStage.quitBlock: \212J\225\372\202\263\202\352\202\304\202\242\202\310\202\242alloc\202\252\202\240\202\350\202\334\202\267\201B%s\n"), stageGetSourceName(this));
+        heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+    }
+}
+
 
 /*
  * --INFO--
@@ -985,7 +971,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
 
     if ((noError == 0) && (allocated == 0)) {
         System.Printf(
-            const_cast<char*>(sStageAllocNoMemoryFmt), stageGetSourceName(this), size,
+            const_cast<char*>("CMemory.CStage.alloc: stage_name=%s \203\201\203\202\203\212\202\252\221\253\202\350\202\334\202\271\202\361\201Bsize = %d file = %s line = %d\n"), stageGetSourceName(this), size,
             source != (char*)nullptr ? source : const_cast<char*>(""), line);
         heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
     }
@@ -1033,6 +1019,42 @@ void CMemory::CStage::setParam(void*, unsigned long)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 588b
+ * EN Address: UNUSED
+ * EN Size: 792b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CMemory::CStage::allocAMemory(unsigned long size, char* source, unsigned long line)
+{
+    void* allocated = alloc(size, source, line, 1);
+    if (allocated == nullptr) {
+        System.Printf("CMemory.CStage.allocAMemory: stage_name=%s \203\201\203\202\203\212\202\252\221\253\202\350\202\334\202\271\202\361\201Bsize = %d file = %s line = %d\n", stageGetSourceName(this), size, source, line);
+    }
+    return allocated;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 300b
+ * EN Address: UNUSED
+ * EN Size: 380b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemory::CStage::freeAMemory(void* ptr)
+{
+    if (ptr == nullptr) {
+        System.Printf("CMemory.CStage.freeAMemory: stage_name=%s %x \202\261\202\314\203A\203h\203\214\203X\202\315\212m\225\333\202\263\202\352\202\304\202\242\202\334\202\271\202\361\201B\n", stageGetSourceName(this), ptr);
+        return;
+    }
+    free(ptr);
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -1052,7 +1074,6 @@ void CMemory::CStage::free(void*)
  */
 int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 {
-    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
     int mode = stageGetAllocationMode(this);
     CBlock* node;
     if (mode == 2) {
@@ -1063,9 +1084,9 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 
     if (flag == -1) {
         System.Printf(const_cast<char*>("\n"));
-        System.Printf(const_cast<char*>(strBase + 0x364), stageGetSourceName(this));
-        System.Printf(const_cast<char*>(strBase + 0x378));
-        System.Printf(const_cast<char*>(strBase + 0x3d4));
+        System.Printf(const_cast<char*>("Stage Name = %s\n"), stageGetSourceName(this));
+        System.Printf(const_cast<char*>("No  Flag Level Size    Total   Address  Prev     Next     Name                     Line \n"));
+        System.Printf(const_cast<char*>("--- ---- ----- ------- ------- -------- -------- -------- ------------------------ -----\n"));
     }
 
     int totalSize = 0;
@@ -1088,7 +1109,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             if (size != 0) {
                 if (showFree != 0) {
                     System.Printf(
-                        const_cast<char*>(strBase + 0x430), freeCount, "FREE", 0, top - blockTail, totalSize, 0, 0, 0,
+                        const_cast<char*>("%3d %s %5d %7d %7d %08x %08x %08x %-24s %d\n"), freeCount, "FREE", 0, top - blockTail, totalSize, 0, 0, 0,
                         "", 0);
                 }
                 usedSize += size;
@@ -1100,7 +1121,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 int used = reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node->m_prev);
                 if (showUsed != 0) {
                     System.Printf(
-                        const_cast<char*>(strBase + 0x430), usedCount, "USE ",
+                        const_cast<char*>("%3d %s %5d %7d %7d %08x %08x %08x %-24s %d\n"), usedCount, "USE ",
                         node->m_level, used, totalSize, node->m_prev, 0, 0, node->m_source,
                         node->m_line);
                 }
@@ -1120,7 +1141,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                     const char* kind = ((node->m_flags & 4) != 0) ? "USE " : "FREE";
                     int index = ((node->m_flags & 4) != 0) ? usedCount : freeCount;
                     System.Printf(
-                        const_cast<char*>(strBase + 0x430), index, kind, level, node->m_size,
+                        const_cast<char*>("%3d %s %5d %7d %7d %08x %08x %08x %-24s %d\n"), index, kind, level, node->m_size,
                         totalSize, payloadFromBlock(node), node->m_prev, node->m_next,
                         source, line);
                 }
@@ -1142,8 +1163,8 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     }
 
     if (flag == -1) {
-        System.Printf(const_cast<char*>(strBase + 0x45c));
-        System.Printf(const_cast<char*>(strBase + 0x4b0), freeSize, usedSize);
+        System.Printf(const_cast<char*>("--- ---- ----- ------- -------- -------- -------- ------------------------ -----\n"));
+        System.Printf(const_cast<char*>("USE = %d UNUSE = %d\n"), freeSize, usedSize);
     }
 
     return freeSize;
@@ -1208,7 +1229,7 @@ void CMemory::CStage::drawHeapBar(int y)
             (static_cast<unsigned int>(reinterpret_cast<int>(curNode->m_prev)) !=
              static_cast<unsigned int>(reinterpret_cast<int>(prevNode)))) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
+                System.Printf(const_cast<char*>("\203q\201[\203v\202\252\210\331\217\355\202\310\202\314\202\305\225`\211\346\202\360\222\206\216~\202\265\202\334\202\267\201B\n"));
             }
             return;
         }
@@ -1302,7 +1323,7 @@ void CMemory::CStage::drawHeapTitle(int y)
         unsigned long blockSize = reinterpret_cast<unsigned long>(block->m_next) - reinterpret_cast<unsigned long>(block + 1);
         if ((block->m_size != blockSize) || (block->m_prev != prev)) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
+                System.Printf(const_cast<char*>("\203q\201[\203v\202\252\210\331\217\355\202\310\202\314\202\305\225`\211\346\202\360\222\206\216~\202\265\202\334\202\267\201B\n"));
             }
             return;
         }
@@ -1318,7 +1339,7 @@ void CMemory::CStage::drawHeapTitle(int y)
 
     int unuseKB = unuse / 1024;
     int maxUnuseKB = maxUnuse / 1024;
-    sprintf(buf, s_drawHeapTitleFmt, m_allocCount, unuseKB, maxUnuseKB);
+    sprintf(buf, "%4d %4d %4d", m_allocCount, unuseKB, maxUnuseKB);
     Graphic.DrawDebugStringDirect(0x208, y, buf, 8);
 }
 
@@ -1413,7 +1434,7 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CSt
         m_amemEnd = stage->m_heapBottom;
         m_amemLock = 0;
 
-        m_cacheTable = new (rStage, s_memory_cpp, 0x787) CAmemCache[m_cacheCount];
+        m_cacheTable = new (rStage, "memory.cpp", 0x787) CAmemCache[m_cacheCount];
     }
 }
 
@@ -1483,21 +1504,6 @@ void CAmemCacheSet::DestroyCache(int index)
     entry.m_refCnt0 = 0;
     entry.m_refCount = 0;
     entry.m_inUse = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CAmemCacheSet::RefCnt0Up(int index)
-{
-    CAmemCache& entry = cacheEntryAt(this, index);
-    entry.m_refCnt0++;
-    s_RefCnt0Compare++;
-    if (s_MaxRefCnt0Compare < s_RefCnt0Compare) {
-        s_MaxRefCnt0Compare = s_RefCnt0Compare;
-    }
 }
 
 /*
@@ -1601,7 +1607,7 @@ inline int CAmemCache::GetData(CMemory::CStage* rStage, char* source, int line)
                     watch.Stop();
                     if (watch.Get() >= 9000.0f) {
                         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                            System.Printf(const_cast<char*>(sGetDataTimeoutBanner));
+                            System.Printf(const_cast<char*>("===================================================================\n===================================================================\n                          GetData  TimeOut\n===================================================================\n===================================================================\n"));
                         }
                         Sound.CheckDriver(1);
                         watch.Reset();
@@ -1691,7 +1697,7 @@ short CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dma
         }
     } else {
         while (true) {
-            entry.m_workData = m_rStage->alloc(allocSize, const_cast<char*>(s_memory_cpp), 0x807, 1);
+            entry.m_workData = m_rStage->alloc(allocSize, const_cast<char*>("memory.cpp"), 0x807, 1);
             if (entry.m_workData != 0) {
                 break;
             }
@@ -1759,14 +1765,14 @@ inline int CAmemCache::IsEnable()
 inline void CAmemCacheSet::DumpCache()
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
+        System.Printf(const_cast<char*>("\n\n=================================================\n                    AMEM CACHE DUMP\n=================================================\n"));
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
         if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
             System.Printf(
-                const_cast<char*>(sAmemCacheEntryFmt), i, amem_stateName[entry.m_inUse ? 0 : 1],
+                const_cast<char*>("%03d %s  type=%s  RefCnt=%d  prio=%d  rmem=%08x\n"), i, amem_stateName[entry.m_inUse ? 0 : 1],
                 amem_typeName[entry.m_type], entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
     }
@@ -1832,7 +1838,6 @@ void CAmemCacheSet::Release(short index)
  */
 void CAmemCacheSet::AmemFreeLowPrio(int size)
 {
-    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
     unsigned int bestPriority = 0x7ffffff1;
     int currentSize = size;
     int i;
@@ -1851,13 +1856,13 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (bestEntry != 0) {
-            freeStageBlockBase(bestEntry->m_cacheData, strBase);
+            freeStageBlockBase(bestEntry->m_cacheData);
             bestEntry->m_cacheData = 0;
         }
 
-        unsigned int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(strBase + 0x1e8), 0x86D, 1));
+        unsigned int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>("memory.cpp"), 0x86D, 1));
         if (allocated != 0) {
-            freeStageBlockBase(reinterpret_cast<void*>(allocated), strBase);
+            freeStageBlockBase(reinterpret_cast<void*>(allocated));
             return;
         }
 
@@ -1872,14 +1877,14 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         if (m_releaseAction == 0 || m_releaseAction(m_releaseActionArg) == 0) {
             m_releaseCheck(m_releaseCheckArg);
             if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-                System.Printf(const_cast<char*>(strBase + 0x4c));
+                System.Printf(const_cast<char*>("\n\n=================================================\n                    AMEM CACHE DUMP\n=================================================\n"));
             }
 
             for (i = 0; i < m_cacheCount; i++) {
                 CAmemCache& entry = cacheEntryAt(this, i);
                 if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                     System.Printf(
-                        const_cast<char*>(strBase + 0xd8), i, amem_stateName[entry.m_inUse ? 0 : 1],
+                        const_cast<char*>("%03d %s  type=%s  RefCnt=%d  prio=%d  rmem=%08x\n"), i, amem_stateName[entry.m_inUse ? 0 : 1],
                         amem_typeName[entry.m_type], entry.m_refCount, entry.m_priority,
                         reinterpret_cast<int>(entry.m_cacheData));
                 }
@@ -1964,6 +1969,28 @@ int CAmemCacheSet::AmemGetFreeSize()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CAmemCacheSet::RefCnt0Up(int index)
+{
+    CAmemCache& entry = cacheEntryAt(this, index);
+    entry.m_refCnt0++;
+    s_RefCnt0Compare++;
+    if (s_MaxRefCnt0Compare < s_RefCnt0Compare) {
+        s_MaxRefCnt0Compare = s_RefCnt0Compare;
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            System.Printf("  CAmemCacheSet s_MaxRefCnt0Compare=%d\n", s_MaxRefCnt0Compare);
+        }
+    }
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -1988,10 +2015,9 @@ void CAmemCacheSet::RefCnt0Clear()
  */
 void CAmemCacheSet::RefCnt0Compare()
 {
-    const char* dumpBase = reinterpret_cast<const char*>(sHeapBarColors);
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(dumpBase + 0x10c));
+        System.Printf(const_cast<char*>("\n\n\n================================================\n"));
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
@@ -1999,13 +2025,13 @@ void CAmemCacheSet::RefCnt0Compare()
         if ((entry.m_inUse != 0 && entry.m_refCount != 0) &&
             static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(
-                const_cast<char*>(dumpBase + 0xd8), i, amem_stateName[entry.m_inUse ? 0 : 1], amem_typeName[entry.m_type],
+                const_cast<char*>("%03d %s  type=%s  RefCnt=%d  prio=%d  rmem=%08x\n"), i, amem_stateName[entry.m_inUse ? 0 : 1], amem_typeName[entry.m_type],
                 entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
     }
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(dumpBase + 0x144));
+        System.Printf(const_cast<char*>("================================================\n\n\n"));
     }
 }
 
@@ -2023,14 +2049,14 @@ void CAmemCacheSet::AssertCache()
     int i;
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
+        System.Printf(const_cast<char*>("\n\n=================================================\n                    AMEM CACHE DUMP\n=================================================\n"));
     }
 
     for (i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
         if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
             System.Printf(
-                const_cast<char*>(sAmemCacheEntryFmt), i, amem_stateName[entry.m_inUse ? 0 : 1],
+                const_cast<char*>("%03d %s  type=%s  RefCnt=%d  prio=%d  rmem=%08x\n"), i, amem_stateName[entry.m_inUse ? 0 : 1],
                 amem_typeName[entry.m_type], entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
     }

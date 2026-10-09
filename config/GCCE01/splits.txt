@@ -663,11 +663,12 @@ os/OSSemaphore.c:
 
 wm_menu.cpp:
 	.rodata start:0x801DA710 end:0x801DB3A0
-	.data start:0x8020F6BC end:0x8020F764
+	.data start:0x8020F6BC end:0x80210070
 	.text start:0x800E6364 end:0x80102378
 	.bss        start:0x802FE3C8 end:0x802FE410
 	.sbss       start:0x8032DDF8 end:0x8032DE20
 	.sdata      start:0x8032D888 end:0x8032D900
+	.sdata2     start:0x803301C0 end:0x803307E8
 
 mapocttree.cpp:
 	.text start:0x8002C4F8 end:0x8002F250

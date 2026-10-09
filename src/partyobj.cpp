@@ -93,11 +93,6 @@ extern const float FLOAT_80331b08 = 1.25f;
 
 GhostPartyWork CGPartyObj::m_ghostWork;
 
-struct SScriptShieldView { // script overlay: shield item table at +0xB6
-	unsigned char pad[0xB6];
-	short m_shields[8];
-};
-
 struct SScriptFoodView { // script overlay: food table at +0x3B8
 	unsigned char pad[0x3B8];
 	unsigned short m_foods[8];
@@ -720,34 +715,7 @@ void CGPartyObj::onFrameAlways()
 		party.target = 0;
 	}
 
-	if (m_scriptHandle->m_hp != 0 &&
-	    (m_motionMode == 1)) {
-		if (m_weaponModelHandle == nullptr) {
-			changeWeapon(party.weaponIndex, party.weaponItemId, 1);
-		}
-
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		int shieldIndex = *reinterpret_cast<short*>(script + 0xB0);
-		int shieldItem;
-		if (shieldIndex >= 0) {
-			SScriptShieldView* shields = reinterpret_cast<SScriptShieldView*>(script);
-			shieldItem = shields->m_shields[shieldIndex];
-		} else {
-			shieldItem = 0;
-		}
-		if (shieldItem > 0) {
-			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-			int shieldModel = rows[shieldItem].m_model & 0xFFF;
-			if (m_shieldModelHandle == nullptr || static_cast<unsigned int>(m_shieldModelHandle->m_charaNo) != static_cast<unsigned int>(shieldModel)) {
-				LoadShield(shieldModel);
-			}
-		} else {
-			LoadShield(-1);
-		}
-	} else {
-		LoadWeapon(-1, 0);
-		LoadShield(-1);
-	}
+	checkAndSetWeapon();
 
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->CalcStatus();
 	int port = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId;
@@ -2158,7 +2126,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 	                           reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 	                       .m_attacks[chain];
 
-	if (chain > 0 && m_stateFrame == attackEntry->m_moveStartFrame && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+	if (chain > 0 && m_stateFrame == attackEntry->m_moveStartFrame && !Game.m_gameWork.IsStreamStage()) {
 		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(attackEntry->m_moveSpeed);
 		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed,
 		    (attackEntry->m_moveEndFrame - attackEntry->m_moveStartFrame) + 1);
@@ -3547,7 +3515,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 	CGame::CBossArtifactStage* bossArtifacts;
 	int chosenCount;
 
-	bonusCount = (Game.m_gameWork.m_radarType != 0) ? 4 : 0x10;
+	bonusCount = Game.GetNumBonus();
 
 	System.Printf("\x83{\x81[\x83i\x83X\x83" "C\x83\x93\x83" "f\x83" "b\x83N\x83X\x8D\xC5\x91\xE5=%d\n", bonusCount);
 
@@ -3705,30 +3673,33 @@ void CGPartyObj::ChangeCommandMode(int mode)
  */
 inline void CGPartyObj::checkAndSetWeapon()
 {
-	if (m_scriptHandle == nullptr) {
-		return;
-	}
+	if (m_scriptHandle->m_hp != 0 &&
+	    (m_motionMode == 1)) {
+		if (m_weaponModelHandle == nullptr) {
+			changeWeapon(m_partyData.weaponIndex, m_partyData.weaponItemId, 1);
+		}
 
-	int weaponItem;
-	int weaponRef;
-	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
-	m_partyData.pendingWeaponItemId = weaponRef;
-	m_partyData.weaponIndex = weaponItem;
-	if (weaponItem <= 0) {
+		CCaravanWork* work = SAFE_CAST_CARAVAN_WORK(m_scriptHandle);
+		int shieldIndex = work->m_equipment[2];
+		int shieldItem;
+		if (shieldIndex >= 0) {
+			shieldItem = work->m_inventoryItems[shieldIndex];
+		} else {
+			shieldItem = 0;
+		}
+		if (shieldItem > 0) {
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			int shieldModel = rows[shieldItem].m_model & 0xFFF;
+			if (m_shieldModelHandle == nullptr || static_cast<unsigned int>(m_shieldModelHandle->m_charaNo) != static_cast<unsigned int>(shieldModel)) {
+				LoadShield(shieldModel);
+			}
+		} else {
+			LoadShield(-1);
+		}
+	} else {
 		LoadWeapon(-1, 0);
-	} else {
-		LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
-	}
-
-	int shieldIndex = reinterpret_cast<short*>(m_scriptHandle)[0x2C];
-	if (shieldIndex <= 0) {
 		LoadShield(-1);
-	} else {
-		int shieldItem = reinterpret_cast<short*>(m_scriptHandle)[0x5B + shieldIndex];
-		LoadShield((shieldItem > 0) ? (shieldItem & 0xFFF) : -1);
 	}
-
-	setIdleMotion();
 }
 
 /*
@@ -3742,7 +3713,6 @@ inline void CGPartyObj::checkAndSetWeapon()
  */
 void CGPartyObj::changeMotionMode(int mode)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	PartyObjOverlay& party = m_partyData;
 
 	if (m_motionMode == mode) {
@@ -3756,29 +3726,7 @@ void CGPartyObj::changeMotionMode(int mode)
 
 	CancelAnim(1);
 
-	if (party.flags.flag04) {
-		if (m_scriptHandle->m_hp == 0) {
-			addHp(m_scriptHandle->m_maxHp, static_cast<CGPrgObj*>(0));
-		}
-		party.flags.flag04 = 0;
-	}
-
-	enableDamageCol(1);
-
-	setIdleMotion();
-
-	if (m_scriptHandle->m_hp != 0) {
-		endPSlotBit(0x10000);
-		*reinterpret_cast<float*>(self + 0x694) = 1.0f;
-		m_bgColMask |= 0x1000E;
-	} else {
-		*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331A7C;
-		m_bgColMask &= 0xFFFEFFF1;
-		int particlePort = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId;
-		endPSlotBit(0x10000);
-		putParticle((particlePort + 3) | 0x100,
-		    *reinterpret_cast<int*>(self + 0x5A4), this, 1.0f, 0);
-	}
+	setAlive(1, 1);
 
 	if (mode == 1 && party.carryObject == 0 &&
 	    m_scriptHandle->m_hp != 0) {

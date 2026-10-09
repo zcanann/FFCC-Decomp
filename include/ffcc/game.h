@@ -58,6 +58,7 @@ public:
         bool IsBattleStage() { return m_bossArtifactStageIndex < 0xF; }
         bool IsMogStage() { return m_bossArtifactStageIndex == 0x19; }
         bool IsBonusStage() { return m_bossArtifactStageIndex < 0xE; }
+        int IsStreamStage() { return m_bossArtifactStageIndex == 0x17; }
         unsigned char GetLanguage() { return m_languageId; }
 
         unsigned char m_menuStageMode;                   // 0x00
@@ -204,6 +205,7 @@ public:
     char* GetMonNames(int);
     char* GetMonArts(int);
     char* GetMonName(int, int);
+    int GetNumBonus() { return m_gameWork.m_radarType != 0 ? 4 : 0x10; }
     char* GetSysMes(int);
     int GetEvtFlag(int);
     void SetEvtFlag(int, int);

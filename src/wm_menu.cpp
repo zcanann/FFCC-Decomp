@@ -49,7 +49,7 @@ extern "C" char* strstr(const char*, const char*);
 #define WM_TEXTURE_COUNT 47
 #endif
 
-unsigned char lbl_8032E8AC = 1;
+static unsigned char s_fade_mode = 1;
 struct WmMenuLightTable
 {
 	int m_diffuseCount;
@@ -844,7 +844,7 @@ void CMenuPcs::loadData()
 	m_wmWorldState->m_nextMenuMode = 0;
 	m_wmWorldState->m_delay = 0;
 	s_LoadCancelFlg = 1;
-	lbl_8032E8AC = 1;
+	s_fade_mode = 1;
 
 	for (i = 4; i < 6; i++) {
 		m_battleMesMenus[i] = new (MenuPcs.m_menuStage, "wm_menu.cpp", kMesMenuLine) CMesMenu;
@@ -2636,7 +2636,7 @@ void CMenuPcs::CalcTitleMenu()
 				s_LoadCancelFlg = 0;
 				return;
 			}
-			lbl_8032E8AC = 0;
+			s_fade_mode = 0;
 			THPSimpleInit(1);
 			THPSimpleOpen(OPMOVIE_FNAME);
 			int thpMemory = THPSimpleCalcNeedMemory();
@@ -4311,7 +4311,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Fade-in overlay (state 1)
 			state = m_wmWorldState->m_mainState;
-			if (state == 1 && static_cast<signed char>(lbl_8032E8AC) == 0) {
+			if (state == 1 && static_cast<signed char>(s_fade_mode) == 0) {
 				float fadeAlpha = static_cast<float>(-(0.025 *
 				                                        static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                        DOUBLE_80331420));
@@ -4497,7 +4497,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Fade out / transition to next state
 		state = m_wmWorldState->m_mainState;
-		if (state == 3 || (state == 1 && static_cast<signed char>(lbl_8032E8AC) != 0)) {
+		if (state == 3 || (state == 1 && static_cast<signed char>(s_fade_mode) != 0)) {
 			float fadeAlpha2;
 			if (state == 3) {
 				fadeAlpha2 = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter + 1));
@@ -4514,13 +4514,13 @@ void CMenuPcs::DrawTitleMenu()
 		if (state == 3 && m_wmWorldState->m_frameCounter >= 0xA) {
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
 			if (m_wmWorldState->m_state0E != 0) {
-				lbl_8032E8AC = 1;
+				s_fade_mode = 1;
 				const int channel = m_wmWorldState->m_cardChannel;
 				m_wmWorldState->m_changeRequest = 1;
 				CallWorldParam(7, channel, 0);
 				bytes[0x0D] = 0;
 			} else {
-				lbl_8032E8AC = 0;
+				s_fade_mode = 0;
 			}
 			m_wmWorldState->m_mainState = 0;
 			m_wmWorldState->m_frameCounter = 0;

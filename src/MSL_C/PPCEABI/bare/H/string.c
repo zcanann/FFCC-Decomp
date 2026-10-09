@@ -1,12 +1,11 @@
 #include "string.h"
 #include "stddef.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/errno.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h"
 
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
-char* strtok_null = msl_string_table_1;
-char* strtok_ptr  = msl_string_table_1;
-const unsigned char strtok_delimiter_table_init[32] = { 0 };
 
 size_t strlen(const char* str)
 {
@@ -258,22 +257,15 @@ char* strrchr(const char* str, int c)
  */
 char* strtok(char* str, const char* delim)
 {
-	unsigned char delimiter_table[32];
+	static char* n = "";
+	static char* s = "";
+	unsigned char delimiter_table[32] = { 0 };
 	int ch;
 	unsigned char* p;
 	char* tokenStart;
 
-	((unsigned int*)delimiter_table)[0] = ((const unsigned int*)strtok_delimiter_table_init)[0];
-	((unsigned int*)delimiter_table)[1] = ((const unsigned int*)strtok_delimiter_table_init)[1];
-	((unsigned int*)delimiter_table)[2] = ((const unsigned int*)strtok_delimiter_table_init)[2];
-	((unsigned int*)delimiter_table)[3] = ((const unsigned int*)strtok_delimiter_table_init)[3];
-	((unsigned int*)delimiter_table)[4] = ((const unsigned int*)strtok_delimiter_table_init)[4];
-	((unsigned int*)delimiter_table)[5] = ((const unsigned int*)strtok_delimiter_table_init)[5];
-	((unsigned int*)delimiter_table)[6] = ((const unsigned int*)strtok_delimiter_table_init)[6];
-	((unsigned int*)delimiter_table)[7] = ((const unsigned int*)strtok_delimiter_table_init)[7];
-
 	if (str != NULL) {
-		strtok_ptr = str;
+		s = str;
 	}
 
 	p = (unsigned char*)delim - 1;
@@ -281,7 +273,7 @@ char* strtok(char* str, const char* delim)
 		delimiter_table[(ch & 0xFF) >> 3] |= 1 << (ch & 7);
 	}
 
-	p = (unsigned char*)strtok_ptr - 1;
+	p = (unsigned char*)s - 1;
 	while ((ch = *++p) != '\0') {
 		if ((delimiter_table[(ch & 0xFF) >> 3] & (1 << (ch & 7))) == 0) {
 			break;
@@ -289,7 +281,7 @@ char* strtok(char* str, const char* delim)
 	}
 
 	if (ch == '\0') {
-		strtok_ptr = strtok_null;
+		s = n;
 		return NULL;
 	}
 
@@ -301,9 +293,9 @@ char* strtok(char* str, const char* delim)
 	}
 
 	if (ch == '\0') {
-		strtok_ptr = strtok_null;
+		s = n;
 	} else {
-		strtok_ptr = (char*)(p + 1);
+		s = (char*)(p + 1);
 		*p = '\0';
 	}
 
@@ -334,4 +326,150 @@ char* strstr(const char* str, const char* pat)
 	}
 
 	return NULL;
+}
+
+char* __strerror(int errnum, char* str);
+
+char* strerror(int errnum)
+{
+	static char error_string[256];
+
+	return __strerror(errnum, error_string);
+}
+
+char* __strerror(int errnum, char* str)
+{
+	switch (errnum) {
+	case E2BIG:
+		strcpy(str, "Argument list too long");
+		break;
+	case EACCES:
+		strcpy(str, "Permission denied");
+		break;
+	case EAGAIN:
+		strcpy(str, "Resource temporarily unavailable");
+		break;
+	case EBADF:
+		strcpy(str, "Bad file descriptor");
+		break;
+	case EBUSY:
+		strcpy(str, "Device busy");
+		break;
+	case ECHILD:
+		strcpy(str, "No child processes");
+		break;
+	case EDEADLK:
+		strcpy(str, "Resource deadlock avoided");
+		break;
+	case EDOM:
+		strcpy(str, "Numerical argument out of domain");
+		break;
+	case EEXIST:
+		strcpy(str, "File exists");
+		break;
+	case EFAULT:
+		strcpy(str, "Bad address");
+		break;
+	case EFBIG:
+		strcpy(str, "File too large");
+		break;
+	case EFPOS:
+		strcpy(str, "File Position Error");
+		break;
+	case EILSEQ:
+		strcpy(str, "Wide character encoding error");
+		break;
+	case EINTR:
+		strcpy(str, "Interrupted system call");
+		break;
+	case EINVAL:
+		strcpy(str, "Invalid argument");
+		break;
+	case EIO:
+		strcpy(str, "Input/output error");
+		break;
+	case EISDIR:
+		strcpy(str, "Is a directory");
+		break;
+	case EMFILE:
+		strcpy(str, "Too many open files");
+		break;
+	case EMLINK:
+		strcpy(str, "Too many links");
+		break;
+	case ENAMETOOLONG:
+		strcpy(str, "File name too long");
+		break;
+	case ENFILE:
+		strcpy(str, "Too many open files in system");
+		break;
+	case ENODEV:
+		strcpy(str, "Operation not supported by device");
+		break;
+	case ENOENT:
+		strcpy(str, "No such file or directory");
+		break;
+	case ENOERR:
+		strcpy(str, "No error detected");
+		break;
+	case ENOEXEC:
+		strcpy(str, "Exec format error");
+		break;
+	case ENOLCK:
+		strcpy(str, "No locks available");
+		break;
+	case ENOMEM:
+		strcpy(str, "Cannot allocate memory");
+		break;
+	case ENOSPC:
+		strcpy(str, "No space left on device");
+		break;
+	case ENOSYS:
+		strcpy(str, "Function not implemented");
+		break;
+	case ENOTDIR:
+		strcpy(str, "Not a directory");
+		break;
+	case ENOTEMPTY:
+		strcpy(str, "Directory not empty");
+		break;
+	case ENOTTY:
+		strcpy(str, "Inappropriate ioctl for device");
+		break;
+	case ENXIO:
+		strcpy(str, "Device not configured");
+		break;
+	case EPERM:
+		strcpy(str, "Operation not permitted");
+		break;
+	case EPIPE:
+		strcpy(str, "Broken pipe");
+		break;
+	case ERANGE:
+		strcpy(str, "Result too large");
+		break;
+	case EROFS:
+		strcpy(str, "Read-only file system");
+		break;
+	case ESIGPARM:
+		strcpy(str, "Signal error");
+		break;
+	case ESPIPE:
+		strcpy(str, "Illegal seek");
+		break;
+	case ESRCH:
+		strcpy(str, "No such process");
+		break;
+	case EUNKNOWN:
+		strcpy(str, "Unknown error");
+		break;
+	case EXDEV:
+		strcpy(str, "Cross-device link");
+		break;
+	default:
+		sprintf(str, "Unknown Error (%d)", errnum);
+		break;
+	}
+
+	return str;
 }

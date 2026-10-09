@@ -750,7 +750,7 @@ pppYmLaser.cpp:
 
 MSL_C/PPCEABI/bare/H/string.c:
 	.text start:0x801B3FA8 end:0x801B4428
-	.rodata start:0x801DB500 end:0x801DB520
+	.rodata start:0x801DB500 end:0x801DB890
 	.sdata start:0x8034BA00 end:0x8034BA08
 
 gobjwork.cpp:

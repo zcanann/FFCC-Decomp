@@ -2641,7 +2641,7 @@ MSL_C/PPCEABI/bare/H/signal.c:
 
 MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x801B8BF0 end:0x801B90B8
-	.rodata     start:0x801E70E0 end:0x801E7100
+	.rodata     start:0x801E70E0 end:0x801E7470
 	.sdata      start:0x8032EC18 end:0x8032EC20
 
 MSL_C/PPCEABI/bare/H/float.c:

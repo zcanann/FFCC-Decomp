@@ -470,6 +470,7 @@ static const int kMcYearTexture = 22;
 static const int kMcYearLabelTexture = 32;
 static const int kMcFaceTexture = 53;
 static const int kMcTimeTexture = 31;
+static const int kMoveHelpTexture = 34;
 #else
 static const int kMemoryCardBannerTexture = 31;
 static const int kMcSlotLeftTexture = 36;
@@ -493,6 +494,7 @@ static const int kMcYearTexture = 23;
 static const int kMcYearLabelTexture = 33;
 static const int kMcFaceTexture = 55;
 static const int kMcTimeTexture = 32;
+static const int kMoveHelpTexture = 35;
 #endif
 static Vec s_RingOrgPos;
 #ifdef VERSION_GCCJGC
@@ -2070,7 +2072,7 @@ void CMenuPcs::CalcMCardMenu()
 		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetSlot());
 		if (m_wmWorldState->m_mcResult == 0 && buttonsRepeat != 0) {
 			if ((buttonsRepeat & 8) != 0) {
-				if (m_wmWorldState->m_cardChannel < 1) {
+				if (m_wmWorldState->m_cardChannel <= 0) {
 					m_wmWorldState->m_cardChannel = 3;
 				} else {
 					m_wmWorldState->m_cardChannel--;
@@ -2771,6 +2773,10 @@ void CMenuPcs::CalcLoadMenu()
 	}
 }
 
+#ifdef VERSION_GCCJGC
+#define OPMOVIE_FNAME "dvd/movie/ffcc_op.thp"
+#endif
+
 /*
  * --INFO--
  * PAL Address: 0x800FCA2C
@@ -2783,7 +2789,6 @@ void CMenuPcs::CalcLoadMenu()
 void CMenuPcs::CalcTitleMenu()
 {
 #ifdef VERSION_GCCJGC
-	char* const OPMOVIE_FNAME = "dvd/movie/ffcc_op.thp";
 	const int kMovieBufferLine = 0xBC9;
 #else
 	static char* OPMOVIE_FNAME = "dvd/movie/ffcc_op.thp";
@@ -3169,7 +3174,13 @@ void CMenuPcs::drawWorld()
 			break;
 		default:
 			if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+#if defined(VERSION_GCCJGC)
+				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xD68, menuMode);
+#elif defined(VERSION_GCCE01)
+				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC37, menuMode);
+#else
 				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC59, menuMode);
+#endif
 			}
 			break;
 		}
@@ -3956,7 +3967,7 @@ void CMenuPcs::DrawMoveMenu()
 		moveAlpha = FLOAT_803313e8;
 	}
 	if (state > 0 && state < 3) {
-		DrawHelpBase(0x23, moveAlpha);
+		DrawHelpBase(kMoveHelpTexture, moveAlpha);
 	}
 	DrawWMFrame();
 
@@ -4993,11 +5004,21 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 	case 0x17:
 	case 0x18:
 	case 0x19:
+#ifndef VERSION_GCCJGC
 	case 0x1a:
+#endif
+#ifdef VERSION_GCCP01
 	case 0x1b:
+#endif
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+#if defined(VERSION_GCCJGC)
+			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x158D, code);
+#elif defined(VERSION_GCCE01)
+			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x14F9, code);
+#else
 			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x1521, code);
+#endif
 		}
 		break;
 	}
@@ -6528,7 +6549,11 @@ void CMenuPcs::CalcChara()
 	int handleIdx = 0x20;
 	for (i = 0; i < kWmMenuPlayerCount; i++, charaWork++, handleIdx++) {
 		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
+#ifdef VERSION_GCCJGC
+		if (handle->m_model == 0 || handle->m_model->m_texSet == 0) {
+#else
 		if (!handle->IsModelLoaded(1)) {
+#endif
 			charaWork->m_active = 0;
 			continue;
 		}
@@ -6655,6 +6680,19 @@ inline int CMenuPcs::GetAnimNo(int slot, int anim)
  */
 void CMenuPcs::PCAnimCtrl()
 {
+#ifdef VERSION_GCCP01
+	const int kIdleTime = 3000;
+	const int kRestTime = 6000;
+	const int kSleepTime = 9000;
+	const int kWakeTime = 12000;
+	const int kResumeTime = 2100;
+#else
+	const int kIdleTime = 3600;
+	const int kRestTime = 7200;
+	const int kSleepTime = 10800;
+	const int kWakeTime = 14400;
+	const int kResumeTime = 2700;
+#endif
 	WmCharaSelectEntry* const charaSelect = m_wm.m_charaSelectData;
 	int isSelected;
 	int i;
@@ -6694,7 +6732,7 @@ void CMenuPcs::PCAnimCtrl()
 		isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
 		if (isSelected == 0 &&
 		    m_wmWorldState->m_menuMode != 8 &&
-		    animState->m_animIndex == 0 && animState->m_timer >= 3000) {
+		    animState->m_animIndex == 0 && animState->m_timer >= kIdleTime) {
 			animState->m_animIndex = 4;
 			handle->SetAnim(GetAnimNo(i, animState->m_animIndex), -1, -1, blendMode, 0);
 			animState->m_frame = handle->m_model->GetNowFrame();
@@ -6702,14 +6740,14 @@ void CMenuPcs::PCAnimCtrl()
 			animState->m_timer = 0;
 		} else if (isSelected != 0 &&
 		           m_wmWorldState->m_menuMode != 8) {
-			if (animState->m_animIndex == 1 && animState->m_timer >= 12000) {
+			if (animState->m_animIndex == 1 && animState->m_timer >= kWakeTime) {
 				animState->m_animIndex = 0;
 				animState->m_timer = 0;
-			} else if (animState->m_animIndex == 2 && animState->m_timer >= 9000) {
+			} else if (animState->m_animIndex == 2 && animState->m_timer >= kSleepTime) {
 				animState->m_animIndex = 1;
-			} else if (animState->m_animIndex == 1 && animState->m_timer >= 6000 && animState->m_timer < 9000) {
+			} else if (animState->m_animIndex == 1 && animState->m_timer >= kRestTime && animState->m_timer < kSleepTime) {
 				animState->m_animIndex = 2;
-			} else if (animState->m_animIndex == 0 && animState->m_timer >= 3000) {
+			} else if (animState->m_animIndex == 0 && animState->m_timer >= kIdleTime) {
 				animState->m_animIndex = 1;
 			} else {
 				goto frameStep;
@@ -6732,7 +6770,7 @@ void CMenuPcs::PCAnimCtrl()
 					animState->m_frame = handle->m_model->GetNowFrame();
 					animState->m_endFrame = handle->m_model->GetEndFrame();
 					if (isSelected != 0) {
-						animState->m_timer = 0x834;
+						animState->m_timer = kResumeTime;
 					} else {
 						animState->m_timer = 0;
 					}
@@ -8157,7 +8195,11 @@ void CMenuPcs::SetAnim(int anim)
 
 	m_wmCharaAnimState[anim].m_animIndex = 0;
 	m_wmCharaAnimState[anim].m_nextAnimIndex = -1;
+#ifdef VERSION_GCCP01
 	m_wmCharaAnimState[anim].m_timer = rand() % 250;
+#else
+	m_wmCharaAnimState[anim].m_timer = rand() % 300;
+#endif
 
 	m_wm.m_handles[handleIdx]->SetAnim(animBase - 5, -1, -1,
 	    m_wm.m_handles[handleIdx]->GetCurrentAnimNumber() < 0 ? 0 : -1, 1);
@@ -8200,6 +8242,11 @@ void CMenuPcs::DrawCursor(int x, int y, float scale)
  */
 void CMenuPcs::CalcMainMenuSub()
 {
+#ifdef VERSION_GCCP01
+	const int kRotateFrames = 14;
+#else
+	const int kRotateFrames = 17;
+#endif
 	int i;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	const unsigned short btn = Pad.GetButtonDown(0);
@@ -8214,7 +8261,7 @@ void CMenuPcs::CalcMainMenuSub()
 					m_wmMenuTargetRotation += wrap;
 					m_wmMenuRotation += wrap;
 				}
-				m_wmWorldState->m_frameCounter = 0xE;
+				m_wmWorldState->m_frameCounter = kRotateFrames;
 				if (m_wmWorldState->m_cardChannel >= 4) {
 					m_wmWorldState->m_cardChannel = 0;
 				} else {
@@ -8228,7 +8275,7 @@ void CMenuPcs::CalcMainMenuSub()
 					m_wmMenuTargetRotation -= wrap2;
 					m_wmMenuRotation -= wrap2;
 				}
-				m_wmWorldState->m_frameCounter = 0xE;
+				m_wmWorldState->m_frameCounter = kRotateFrames;
 				if (m_wmWorldState->m_cardChannel <= 0) {
 					m_wmWorldState->m_cardChannel = 4;
 				} else {
@@ -9030,7 +9077,11 @@ nextListEntry:
 				}
 				const int hourRemainder = playHours % 100;
 				const int tens = hourRemainder / 10;
+#ifdef VERSION_GCCJGC
+				if (tens != 0) {
+#else
 				if (tens != 0 || playDigits[0] > 0) {
+#endif
 					playDigits[1] = tens;
 					playWidth += static_cast<float>(s_TimeWTbl[tens]);
 				} else {

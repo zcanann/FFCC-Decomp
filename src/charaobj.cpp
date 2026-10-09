@@ -2155,9 +2155,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 		}
 
+#ifdef VERSION_GCCJGC
+		if (staType != 4 && m_scriptHandle->m_statusTimers[4] != 0) {
+#else
 		if (staType != 4 &&
 		    !((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD && sourceObj->m_scriptHandle->m_baseDataIndex == 6 && staType == 0x6A) &&
 		    m_scriptHandle->m_statusTimers[4] != 0) {
+#endif
 			setSta(4, 0);
 		}
 		if (m_scriptHandle->m_statusTimers[0] != 0 && staType != 2 && staType != 0) {

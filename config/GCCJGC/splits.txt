@@ -747,6 +747,7 @@ chara_fur.cpp:
 	.sdata2     start:0x8034DDE0 end:0x8034DE90
 
 pppYmLaser.cpp:
+	.text       start:0x800CF9C0 end:0x800D0C20
 	.rodata start:0x801D5FA0 end:0x801D5FB0
 	extab       start:0x80008B14 end:0x80008B34
 	.sdata2     start:0x8034DAE0 end:0x8034DB18
@@ -2802,9 +2803,6 @@ menu.cpp:
 pppYmMoveCircle.cpp:
 	.text start:0x800CE9BC end:0x800CED1C
 	.sdata2     start:0x8034DA98 end:0x8034DAB8
-
-pppYmLaser.cpp:
-	.text start:0x800CF9C0 end:0x800D0C20
 
 pppYmMoveParabola.cpp:
 	extab start:0x80008B64 end:0x80008B74

@@ -415,6 +415,7 @@ partyobj.cpp:
 	.bss        start:0x8031BAD8 end:0x8031BB68
 	.sbss       start:0x8034BC58 end:0x8034BC70
 	.sdata      start:0x8034B780 end:0x8034B7B0
+	.rodata     start:0x801D8188 end:0x801D8550
 
 partMng.cpp:
 	extab start:0x80006F08 end:0x800070A8
@@ -614,6 +615,8 @@ singmenu.cpp:
 cflat_r2system.cpp:
 	.text start:0x800B049C end:0x800B7D34
 	.sdata2     start:0x8034D860 end:0x8034D864
+	.rodata     start:0x801D4EE0 end:0x801D52A8
+	.data       start:0x8022CD58 end:0x8022D410
 
 cflat_r2class.cpp:
 	extab start:0x800083C0 end:0x800083D8
@@ -964,6 +967,7 @@ TRK_MINNOW_DOLPHIN/nubinit.c:
 
 MenuUtil.cpp:
 	.text start:0x80171534 end:0x80175A90
+	.rodata     start:0x801DA5D0 end:0x801DB150
 
 TRK_MINNOW_DOLPHIN/nubevent.c:
 	.text	start:0x801A3624 end:0x801A384C
@@ -1263,6 +1267,7 @@ itemobj.cpp:
 	.data       start:0x8022F718 end:0x8022F898
 	.sbss       start:0x8034BC78 end:0x8034BC7C
 	.sdata      start:0x8034B7C8 end:0x8034B7F0
+	.rodata     start:0x801D8568 end:0x801D8780
 
 TRK_MINNOW_DOLPHIN/dispatch.c:
     .text start:0x801A4BE0 end:0x801A4C7C
@@ -2672,6 +2677,7 @@ p_mc.cpp:
 	.data       start:0x8022F550 end:0x8022F714
 	.sdata2     start:0x8034E7A8 end:0x8034E7B0
 	.sdata      start:0x8034B7B0 end:0x8034B7C8
+	.rodata     start:0x801D8550 end:0x801D8565
 
 pppScaleLoopAuto.cpp:
 	extab start:0x800097DC end:0x800097E4

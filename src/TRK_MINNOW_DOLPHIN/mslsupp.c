@@ -104,10 +104,17 @@ int __write_file(__file_handle file, unsigned char* buffer, size_t* count, __idl
 
 int __open_file(const char* name, file_modes mode, __file_handle* handle) {
     u32 result;
+#ifdef VERSION_GCCJGC
+    u32 binaryIO;
+    u32 ioMode;
+    u32 openMode;
+    u32 trkMode;
+#else
     u8 binaryIO;
     u8 ioMode;
     u8 openMode;
     u8 trkMode;
+#endif
 
     if (GetTRKConnected() == DS_NoError) {
         return DS_IOError;
@@ -148,11 +155,19 @@ int __open_file(const char* name, file_modes mode, __file_handle* handle) {
         break;
     }
 
+#ifdef VERSION_GCCJGC
+    if (binaryIO == 1) {
+        trkMode = (trkMode | 0x08) & 0xFF;
+    }
+
+    result = TRKOpenFile(DSMSG_OpenFile, (u32)name, trkMode & 0xFF, (u8*)handle);
+#else
     if (binaryIO == 1) {
         trkMode |= 0x08;
     }
 
     result = TRKOpenFile(DSMSG_OpenFile, (u32)name, trkMode, (u8*)handle);
+#endif
 
     switch ((u8)result) {
     case DS_IONoError:

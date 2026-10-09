@@ -18,53 +18,53 @@
 DSError TRKMessageSend(TRKBuffer* msg) {
 #ifdef VERSION_GCCJGC
     u8 checksum;
-    int i;
-    UARTError err;
-    {
-        u8 sum = 0;
-        int j;
-        for (j = 0; j < msg->length; j++) {
-            sum = (u8)(sum + msg->data[j]);
-        }
-        checksum = sum ^ 0xFF;
+    u8 byte;
+    u8 csByte;
+    s32 err;
+    s32 i;
+
+    checksum = 0;
+    for (i = 0; i < msg->length; i++) {
+        checksum = checksum + msg->data[i];
     }
+    checksum = checksum ^ 0xFF;
     err = WriteUART1(0x7E);
-    if (err == UART_NoError) {
+    if (err == 0) {
         for (i = 0; i < msg->length; i++) {
-            u8 byte = msg->data[i];
+            byte = msg->data[i];
             if (byte == 0x7E || byte == 0x7D) {
                 err = WriteUART1(0x7D);
                 byte ^= 0x20;
-                if (err != UART_NoError) {
+                if (err != 0) {
                     break;
                 }
             }
             err = WriteUART1(byte);
-            if (err != UART_NoError) {
+            if (err != 0) {
                 break;
             }
         }
     }
-    if (err == UART_NoError) {
-        u8 byte = checksum;
-        do {
-            if (byte == 0x7E || byte == 0x7D) {
+    if (err == 0) {
+        csByte = checksum;
+        for (i = 0; i < 1; i++) {
+            if (csByte == 0x7E || csByte == 0x7D) {
                 err = WriteUART1(0x7D);
-                byte ^= 0x20;
-                if (err != UART_NoError) {
+                csByte ^= 0x20;
+                if (err != 0) {
                     break;
                 }
             }
-            err = WriteUART1(byte);
-            if (err != UART_NoError) {
+            err = WriteUART1(csByte);
+            if (err != 0) {
                 break;
             }
-        } while (FALSE);
+        }
     }
-    if (err == UART_NoError) {
+    if (err == 0) {
         err = WriteUART1(0x7E);
     }
-    if (err == UART_NoError) {
+    if (err == 0) {
         err = WriteUARTFlush();
     }
     return err;

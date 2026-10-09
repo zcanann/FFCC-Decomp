@@ -88,11 +88,7 @@ void TRK_ppc_memcpy(register void* dest, register const void* src, register int 
  * JP Address: 0x801A9844
  * JP Size: 688b
  */
-#ifdef VERSION_GCCJGC
-DSError TRKValidMemory32(const void* addr, size_t length, u8 readWriteable)
-#else
 DSError TRKValidMemory32(const void* addr, size_t length, ValidMemoryOptions readWriteable)
-#endif
 {
 	DSError err = DS_InvalidMemory; /* assume range is invalid */
 
@@ -135,8 +131,13 @@ DSError TRKValidMemory32(const void* addr, size_t length, ValidMemoryOptions rea
 			** after the valid range.
 			*/
 
+#ifdef VERSION_GCCJGC
+			if ((((u8)readWriteable == VALIDMEM_Readable) && !gTRKMemMap[i].readable)
+			    || (((u8)readWriteable == VALIDMEM_Writeable) && !gTRKMemMap[i].writeable)) {
+#else
 			if (((readWriteable == VALIDMEM_Readable) && !gTRKMemMap[i].readable)
 			    || ((readWriteable == VALIDMEM_Writeable) && !gTRKMemMap[i].writeable)) {
+#endif
 				err = DS_InvalidMemory;
 			} else {
 				err = DS_NoError;
@@ -861,6 +862,56 @@ u32 TRKTargetGetPC(void)
  * JP Size: 520b
  */
 
+#ifdef VERSION_GCCJGC
+DSError TRKTargetSupportRequest(void) {
+    DSError error;
+    u32 spC;
+    size_t* length;
+    MessageCommandID commandId;
+    TRKEvent event;
+    u8 ioResult;
+
+    commandId = (u8) gTRKCPUState.Default.GPR[3];
+    if ((u32)commandId != DSMSG_ReadFile && (u32)commandId != DSMSG_WriteFile && (u32)commandId != DSMSG_OpenFile && (u32)commandId != DSMSG_CloseFile && (u32)commandId != DSMSG_PositionFile) {
+        TRKConstructEvent(&event, 4);
+        TRKPostEvent(&event);
+        return DS_NoError;
+    }
+    if ((u32)commandId == DSMSG_OpenFile) {
+        error = HandleOpenFileSupportRequest((char*) gTRKCPUState.Default.GPR[4], (u8)gTRKCPUState.Default.GPR[5], (u32*) gTRKCPUState.Default.GPR[6], &ioResult);
+        if (ioResult == DS_IONoError && error != DS_NoError) {
+            ioResult = DS_IOError;
+        }
+        gTRKCPUState.Default.GPR[3] = ioResult;
+    } else if ((u32)commandId == DSMSG_CloseFile) {
+        error = HandleCloseFileSupportRequest(gTRKCPUState.Default.GPR[4], &ioResult);
+        if (ioResult == DS_IONoError && error != DS_NoError) {
+            ioResult = DS_IOError;
+        }
+        gTRKCPUState.Default.GPR[3] = ioResult;
+    } else if ((u32)commandId == DSMSG_PositionFile) {
+        spC = *((u32*) gTRKCPUState.Default.GPR[5]);
+        error = HandlePositionFileSupportRequest(gTRKCPUState.Default.GPR[4], &spC, (u8)gTRKCPUState.Default.GPR[6], &ioResult);
+        if (ioResult == DS_IONoError && error != DS_NoError) {
+            ioResult = DS_IOError;
+        }
+        gTRKCPUState.Default.GPR[3] = ioResult;
+        *((u32*) gTRKCPUState.Default.GPR[5]) = spC;
+    } else {
+        length = (size_t*) gTRKCPUState.Default.GPR[5];
+        error = TRKSuppAccessFile((u8) gTRKCPUState.Default.GPR[4], (u8*) gTRKCPUState.Default.GPR[6], length, (DSIOResult*) &ioResult, TRUE, commandId == DSMSG_ReadFile);
+        if (ioResult == DS_IONoError && error != DS_NoError) {
+            ioResult = DS_IOError;
+        }
+        gTRKCPUState.Default.GPR[3] = ioResult;
+        if ((u32)commandId == DSMSG_ReadFile) {
+            TRK_flush_cache(gTRKCPUState.Default.GPR[6], *length);
+        }
+    }
+    gTRKCPUState.Default.PC += 4;
+    return error;
+}
+#else
 DSError TRKTargetSupportRequest()
 {
 	DSIOResult ioResult;
@@ -931,6 +982,7 @@ DSError TRKTargetSupportRequest()
 	gTRKCPUState.Default.PC += 4;
 	return error;
 }
+#endif
 
 /*
  * --INFO--

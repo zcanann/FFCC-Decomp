@@ -250,7 +250,7 @@ void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
 void CMapMesh::Draw(CMaterialSet* materialSet)
 {
     if (materialSet == 0) {
-        materialSet = MapMng.m_materialSet;
+        materialSet = g_MapMng.m_materialSet;
     }
 
     int remaining = static_cast<int>(m_displayListCount);
@@ -277,7 +277,7 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
  */
 void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count)
 {
-    CMapMng* mapMng = &MapMng;
+    CMapMng* mapMng = &g_MapMng;
     int remaining = count;
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
@@ -305,7 +305,7 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
  */
 void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
-    CMapMng* mapMng = &MapMng;
+    CMapMng* mapMng = &g_MapMng;
     int remaining = count;
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 

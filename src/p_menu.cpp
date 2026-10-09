@@ -543,7 +543,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 inline CMemory::CStage* CMenuPcs::GetStage(int stageSelect)
 {
     if (stageSelect == 3) {
-        return MapMng.m_stage;
+        return g_MapMng.m_stage;
     }
     if ((Game.m_gameWork.m_menuStageMode != 0) && (stageSelect != 0)) {
         if (stageSelect == 1) {
@@ -580,7 +580,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
 
-            CMemory::CStage* stage = (m_mode == 1) ? MapMng.m_stage : GetStage(stageSelect);
+            CMemory::CStage* stage = (m_mode == 1) ? g_MapMng.m_stage : GetStage(stageSelect);
 
             m_textureSets[i + textureSetStart] =
                 new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuTextureAllocationLine) CTextureSet;

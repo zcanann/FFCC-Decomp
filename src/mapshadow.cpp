@@ -27,10 +27,10 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET target, COctTree& octTree)
 
 	octTree.ClearShadow();
 	if (octTree.GetMapObject()->m_shadowTarget != 0) {
-		for (i = 0; i < (u32)MapMng.m_mapShadowArray.GetSize(); i++) {
+		for (i = 0; i < (u32)g_MapMng.m_mapShadowArray.GetSize(); i++) {
 			octTreeMask = octTree.GetMapObject()->m_shadowTarget;
 			if (((octTreeMask & (1U << i)) != 0) &&
-			    ((shadow = MapMng.m_mapShadowArray[i])->m_targetEnabled[target] != 0) &&
+			    ((shadow = g_MapMng.m_mapShadowArray[i])->m_targetEnabled[target] != 0) &&
 			    (shadow->m_materialMode == 0)) {
 				pos.x = shadow->m_modelA->m_worldMtx[0][3];
 				pos.y = shadow->m_modelA->m_worldMtx[1][3];
@@ -110,7 +110,7 @@ void CMapShadow::Init()
 	CMaterial* material;
 	CMaterialSet* materialSet;
 
-	materialSet = MapMng.m_materialSet;
+	materialSet = g_MapMng.m_materialSet;
 	material = materialSet->m_materials[m_materialIndex];
 	CTexture* texture = material->GetTexture(0);
 	width = (float)texture->m_width;

@@ -189,7 +189,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
                 break;
             }
         } else {
-            ch = gUtil.AsciiToMulti(c);
+            ch = Util.AsciiToMulti(c);
         drawChar:
             if (drawChars != 0) {
                 font->Draw(ch);

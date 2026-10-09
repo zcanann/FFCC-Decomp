@@ -37,11 +37,11 @@ void pppFrameChangeBGColor(pppChangeBGColor* changeBGColor, pppNoStep* stepData,
     }
 
     VColor* work = GetChangeBGColorWork(changeBGColor, ctrlTable);
-    MapMng.m_colorScaleEnable = 1;
-    MapMng.m_colorScale.r = work->m_color.rgba[0];
-    MapMng.m_colorScale.g = work->m_color.rgba[1];
-    MapMng.m_colorScale.b = work->m_color.rgba[2];
-    MapMng.m_colorScale.a = work->m_color.rgba[3];
+    g_MapMng.m_colorScaleEnable = 1;
+    g_MapMng.m_colorScale.r = work->m_color.rgba[0];
+    g_MapMng.m_colorScale.g = work->m_color.rgba[1];
+    g_MapMng.m_colorScale.b = work->m_color.rgba[2];
+    g_MapMng.m_colorScale.a = work->m_color.rgba[3];
 }
 
 /*

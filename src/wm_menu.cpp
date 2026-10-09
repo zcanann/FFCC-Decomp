@@ -7762,9 +7762,9 @@ void CMenuPcs::WMChgMenu()
 
 	newMenuMode = m_wmWorldState->m_menuMode;
 	if (newMenuMode == 6) {
-		MapMng.SetDraw(0);
+		g_MapMng.SetDraw(0);
 	} else if (prevMenuMode == 6 && newMenuMode != 6) {
-		MapMng.SetDraw(1);
+		g_MapMng.SetDraw(1);
 	}
 }
 
@@ -9897,7 +9897,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
  */
 inline void CMenuPcs::SetTextureLoc(int materialId)
 {
-	CMaterial* material = MapMng.GetMaterialID(materialId);
+	CMaterial* material = g_MapMng.GetMaterialID(materialId);
 	CTexture* texture = material->GetTexture(0);
 	TextureMan.SetTexture(GX_TEXMAP0, texture);
 

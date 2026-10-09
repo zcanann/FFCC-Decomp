@@ -347,7 +347,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         meshMax.x += meshMin.x;
         meshMax.y += meshMin.y;
         meshMax.z += meshMin.z;
-        gUtil.ConvI2FVector(piece->m_translation, meshMax, ScreenBreakModelRef(model)->m_posQuant);
+        Util.ConvI2FVector(piece->m_translation, meshMax, ScreenBreakModelRef(model)->m_posQuant);
         PSVECScale(&piece->m_translation, &piece->m_translation, -0.5f);
 
         float velocityX = piece->m_translation.x;
@@ -377,7 +377,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         piece->m_active = 0;
     }
 
-    gUtil.ConvI2FVector(work->m_extent, globalMax, ScreenBreakModelRef(model)->m_posQuant);
+    Util.ConvI2FVector(work->m_extent, globalMax, ScreenBreakModelRef(model)->m_posQuant);
 }
 
 /*

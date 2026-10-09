@@ -150,7 +150,7 @@ static void CalcReflectionVector2(
         u32 fmt = drawFmt & 7;
 
         dl = (u16*)((u8*)dl + 3);
-        if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
+        if (Util.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
         }
 
@@ -162,8 +162,8 @@ static void CalcReflectionVector2(
                 dl++;
             }
 
-            gUtil.ConvI2FVector(position, positions[posIndex], posScale);
-            gUtil.ConvI2FVector(normal, normals[normalIndex], normalScale);
+            Util.ConvI2FVector(position, positions[posIndex], posScale);
+            Util.ConvI2FVector(normal, normals[normalIndex], normalScale);
             PSMTXMultVec(nodeRotMtx, &position, &position);
             PSMTXMultVec(normalMtx, &normal, &normal);
 
@@ -194,7 +194,7 @@ static void CalcReflectionVector2(
             uv.y += half;
             uv.x = uv.x - scale * (warp * (uv.x - half));
             uv.y = uv.y - scale * (warp * (uv.y - half));
-            gUtil.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
+            Util.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
             uv.x = -reflectionVec[posIndex].x / (denomBias - reflectionVec[posIndex].z);
             uv.y = -reflectionVec[posIndex].y / (denomBias - reflectionVec[posIndex].z);
@@ -204,7 +204,7 @@ static void CalcReflectionVector2(
             uv.y += half;
             uv.x = uv.x - scale * (warp * (uv.x - half));
             uv.y = uv.y - scale * (warp * (uv.y - half));
-            gUtil.ConvF2IVector2d(texCoordB[posIndex], uv, 12);
+            Util.ConvF2IVector2d(texCoordB[posIndex], uv, 12);
         }
     }
 
@@ -771,7 +771,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(rectOrigin, rectOrigin, 0x80, 0x80);
-            gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f,
+            Util.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f,
                                     sourceIter, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
@@ -829,7 +829,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         CameraPcs.SetViewMatrix(savedCameraMtx);
-        gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f, &sceneTexObj,
+        Util.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f, &sceneTexObj,
                                 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
     } else {
         if (mana->m_paraboloidReady == 0) {
@@ -839,7 +839,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
                               mana->m_paraboloidMapSize, envTexture0->GetTexObj(), 1);
             drawParaboloidMap(sourceTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap,
                               mana->m_paraboloidMapSize, envTexture0->GetTexObj(), 0);
-            gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f, &sceneTexObj,
+            Util.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f, &sceneTexObj,
                                     0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
             mana->m_paraboloidReady = 1;
         }
@@ -1057,7 +1057,7 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
                         mana->m_displayListSize = displayList->m_size;
                         memcpy(mana->m_displayListCopies[dlIndex], displayList->m_data, displayList->m_size);
                         DCFlushRange(mana->m_displayListCopies[dlIndex], displayList->m_size);
-                        gUtil.ReWriteDisplayList(mana->m_displayListCopies[dlIndex], displayList->m_size, 3);
+                        Util.ReWriteDisplayList(mana->m_displayListCopies[dlIndex], displayList->m_size, 3);
                     }
                 }
 

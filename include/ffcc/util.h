@@ -51,6 +51,6 @@ public:
     virtual void Quit();
 };
 
-extern CUtil gUtil;
+extern CUtil Util;
 
 #endif // _FFCC_PPP_UTIL_H_

@@ -86,8 +86,8 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 	_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
 	_GXSetTevOp(GX_TEVSTAGE1, GX_MODULATE);
 
-	gUtil.BeginQuadEnv();
-	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
+	Util.BeginQuadEnv();
+	Util.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	GXSetNumTevStages(1);
 	GXSetNumTexGens(2);
 	GXSetNumChans(1);
@@ -190,7 +190,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 		GXTexCoord2f32(bottomZero, texV);
 	}
 
-	gUtil.EndQuadEnv();
+	Util.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
 	GXSetProjection(screenMtx, GX_PERSPECTIVE);
 	pppInitBlendMode();

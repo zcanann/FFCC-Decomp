@@ -128,10 +128,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
     GXProject(cameraPos.x + objPos.x, 0.0f, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
               &projX, &projY, &projZ);
 
-    gUtil.BeginQuadEnv();
+    Util.BeginQuadEnv();
     GXSetNumTevStages(2);
     GXSetNumTexGens(2);
-    gUtil.SetVtxFmt_POS_CLR_TEX();
+    Util.SetVtxFmt_POS_CLR_TEX();
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
@@ -204,7 +204,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
     quadB.y = 448.0f + expandY;
     quadB.z = quadZ;
 
-    gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);
+    Util.RenderQuad(quadA, quadB, drawColor, 0, 0);
 
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -338,7 +338,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
 
     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 
-    gUtil.SetVtxFmt_POS_CLR();
+    Util.SetVtxFmt_POS_CLR();
     quadColor.r = 0;
     quadColor.g = 0;
     quadColor.b = 0;
@@ -351,10 +351,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
     posB.y = (float)height;
     posB.z = 0.0f;
 
-    gUtil.BeginQuadEnv();
+    Util.BeginQuadEnv();
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    gUtil.RenderQuadNoTex(posA, posB, quadColor);
-    gUtil.EndQuadEnv();
+    Util.RenderQuadNoTex(posA, posB, quadColor);
+    Util.EndQuadEnv();
 
     GXSetViewport(0.0f, 0.0f, screenWidth, screenHeight, 0.0f, 1.0f);
     GXSetScissor(0, 0, (unsigned int)screenWidth, (unsigned int)screenHeight);
@@ -375,13 +375,13 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
             float offsetY = step->m_afterDrawOffsetY;
             scaledOffsetY = 1.3333334f * offsetY;
 
-            gUtil.RenderTextureQuad(-scaledOffsetY, -offsetY, screenWidth + scaledOffsetY,
+            Util.RenderTextureQuad(-scaledOffsetY, -offsetY, screenWidth + scaledOffsetY,
                                     screenHeight + offsetY,
                                     work->m_smallTexObj, 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
         }
 
-        gUtil.BeginQuadEnv();
-        gUtil.SetVtxFmt_POS_CLR_TEX();
+        Util.BeginQuadEnv();
+        Util.SetVtxFmt_POS_CLR_TEX();
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
@@ -401,13 +401,13 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
         posB.z = 0.0f;
 
         _GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_ONE, GX_BL_ONE, GX_LO_OR);
-        gUtil.RenderQuad(posA, posB, quadColor, 0, 0);
-        gUtil.EndQuadEnv();
+        Util.RenderQuad(posA, posB, quadColor, 0, 0);
+        Util.EndQuadEnv();
 
         Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_I8, 0);
     }
 
-    gUtil.RenderTextureQuad(0.0f, 0.0f, screenWidth, screenHeight, &backTexObj, 0, 0, 0,
+    Util.RenderTextureQuad(0.0f, 0.0f, screenWidth, screenHeight, &backTexObj, 0, 0, 0,
                             GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 

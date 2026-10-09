@@ -314,12 +314,12 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_VTXL = 0x5654584C,
     };
 
-    CMapMng& mng = MapMng;
+    CMapMng& mng = g_MapMng;
 
     Init();
 
     chunkFile.PushChunk();
-    int objIndex = this - MapMng.GetMapObjArray();
+    int objIndex = this - g_MapMng.GetMapObjArray();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
@@ -347,7 +347,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     m_mapData = &mng.m_mapHitArray[meshOrHitIdx];
                 } else {
                     CMapObjAtrMeshName* meshName =
-                        new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x84) CMapObjAtrMeshName();
+                        new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x84) CMapObjAtrMeshName();
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
                     strncpy(meshName->m_name, name, 0x20);
@@ -410,7 +410,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
             CMapObjAtrPointLight* pointLight =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
 
             if (chunk.m_version == 2) {
                 chunkFile.PushChunk();
@@ -486,7 +486,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
             CMapObjAtrSpotLight* spotLight =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x139) CMapObjAtrSpotLight();
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x139) CMapObjAtrSpotLight();
 
             if (chunk.m_version == 6) {
                 chunkFile.PushChunk();
@@ -504,7 +504,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         chunkFile.GetF4();
                         spotLight->m_falloff = chunkFile.GetF4();
                         unsigned short targetIndex = chunkFile.Get2();
-                        spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
+                        spotLight->m_target = &g_MapMng.m_mapObjArray[targetIndex];
                         spotLight->m_colorMode = chunkFile.Get1();
                         spotLight->m_useAltColor = chunkFile.Get1();
                         spotLight->m_angle = chunkFile.GetF4();
@@ -578,7 +578,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 chunkFile.GetF4();
                 spotLight->m_falloff = chunkFile.GetF4();
                 unsigned short targetIndex = chunkFile.Get2();
-                spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
+                spotLight->m_target = &g_MapMng.m_mapObjArray[targetIndex];
                 spotLight->m_colorMode = chunkFile.Get1();
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = chunkFile.GetF4();
@@ -603,7 +603,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 chunkFile.GetF4();
                 spotLight->m_falloff = chunkFile.GetF4();
                 unsigned short targetIndex = chunkFile.Get2();
-                spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
+                spotLight->m_target = &g_MapMng.m_mapObjArray[targetIndex];
                 spotLight->m_colorMode = chunkFile.Get1();
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = 48.0f;
@@ -613,7 +613,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             break;
         }
         case CHUNK_ANIM: {
-            CMapAnimRun* animRun = new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x21E) CMapAnimRun;
+            CMapAnimRun* animRun = new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x21E) CMapAnimRun;
             animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
             animRun->m_startFrame = static_cast<int>(chunkFile.Get4());
             animRun->m_endFrame = static_cast<int>(chunkFile.Get4());
@@ -624,7 +624,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             } else {
                 animRun->m_animId = 0;
             }
-            MapMng.GetMapAnimRunArray().Add(animRun);
+            g_MapMng.GetMapAnimRunArray().Add(animRun);
             break;
         }
         case CHUNK_AMBI: {
@@ -637,14 +637,14 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_LSDW: {
             CMapShadow* shadow =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x241) CMapShadow();
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x241) CMapShadow();
             shadow->m_yFilterMode = 0;
 
             if (chunk.m_version == 4) {
                 shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
-                shadow->m_modelA = &MapMng.m_mapObjArray[chunkFile.Get2()];
-                shadow->m_modelB = &MapMng.m_mapObjArray[chunkFile.Get2()];
-                shadow->m_modelC = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelA = &g_MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelB = &g_MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelC = &g_MapMng.m_mapObjArray[chunkFile.Get2()];
                 shadow->m_useFrustum = chunkFile.Get1();
                 shadow->m_shadowMaterialType = chunkFile.Get1();
                 shadow->m_targetEnabled[1] = (chunkFile.Get1() == 0);
@@ -665,9 +665,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 shadow->m_targetBounds[0].m_max.z = chunkFile.GetF4();
             } else if (chunk.m_version == 3) {
                 shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
-                shadow->m_modelA = &MapMng.m_mapObjArray[chunkFile.Get2()];
-                shadow->m_modelB = &MapMng.m_mapObjArray[chunkFile.Get2()];
-                shadow->m_modelC = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelA = &g_MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelB = &g_MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelC = &g_MapMng.m_mapObjArray[chunkFile.Get2()];
                 shadow->m_useFrustum = chunkFile.Get1();
                 shadow->m_shadowMaterialType = chunkFile.Get1();
                 chunkFile.Get1();
@@ -692,7 +692,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             shadow->CalcBound();
 
-            MapMng.GetMapShadowArray().Add(shadow);
+            g_MapMng.GetMapShadowArray().Add(shadow);
             break;
         }
         case CHUNK_PRIO: {
@@ -760,7 +760,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
             CMapObjAtrMime* mimeAttr =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
             CMapObjAtrMime* mime = mimeAttr;
 
             chunkFile.PushChunk();
@@ -771,7 +771,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
                         operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
-                                       MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x348));
+                                       g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x348));
 
                     chunkFile.PushChunk();
                     CChunkFile::CChunk vtxChunk;
@@ -782,7 +782,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                             float* vtx;
                             mime->m_vertexLists[vtxTableIndex++] = vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
-                                MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
+                                g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
                             mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
                             for (int i = 0; i < mime->m_vertexCount; i++) {
@@ -820,10 +820,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             break;
         }
         case CHUNK_SHKI: {
-            if (MapMng.m_shadowKeyInfoCount >= 4) {
+            if (g_MapMng.m_shadowKeyInfoCount >= 4) {
                 break;
             }
-            CMapShadowKeyInfo* keyInfo = &MapMng.m_shadowKeyInfos[MapMng.m_shadowKeyInfoCount++];
+            CMapShadowKeyInfo* keyInfo = &g_MapMng.m_shadowKeyInfos[g_MapMng.m_shadowKeyInfoCount++];
             keyInfo->m_key = chunkFile.Get4();
             keyInfo->m_frame = static_cast<short>(static_cast<int>(chunkFile.GetF4()));
             keyInfo->m_unknown06 = chunkFile.Get1();
@@ -843,7 +843,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
             CMapObjAtrPlaySta* playSta =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x39B) CMapObjAtrPlaySta();
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x39B) CMapObjAtrPlaySta();
             playSta->m_playStaNo = chunkFile.Get1();
             m_attribute = playSta;
             break;
@@ -961,10 +961,10 @@ void CMapObj::SetShow(int show)
  */
 void CMapObj::SetLink()
 {
-    CMapObj* cursor = MapMng.m_mapObjArray;
+    CMapObj* cursor = g_MapMng.m_mapObjArray;
     CMapObj* head = 0;
 
-    while ((cursor = MapMng.SearchChildMapObj(cursor, this)) != 0) {
+    while ((cursor = g_MapMng.SearchChildMapObj(cursor, this)) != 0) {
         cursor->m_next = head;
         head = cursor;
         cursor->SetLink();
@@ -1177,14 +1177,14 @@ void CMapObj::SetDrawEnv()
     if (m_useAmbientColor != 0) {
         mapColor = m_ambientColor;
     } else {
-        mapColor = MapMng.m_mapColor;
+        mapColor = g_MapMng.m_mapColor;
     }
 
-    if (MapMng.m_colorScaleEnable != 0) {
-        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
-        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
+    if (g_MapMng.m_colorScaleEnable != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * g_MapMng.m_colorScale.r) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * g_MapMng.m_colorScale.g) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * g_MapMng.m_colorScale.b) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * g_MapMng.m_colorScale.a) >> 8);
     }
 
     if (m_colorAlphaRate != 0xFF) {
@@ -1276,9 +1276,9 @@ void CMapObj::SetDrawFlag()
         if ((m_octTreeIndex == -1) && ((m_showFlags & 1) != 0)) {
             Mtx concatMtx;
 
-            PSMTXConcat(MapMng.m_scaledViewMtxSecondary, m_worldMtx, concatMtx);
+            PSMTXConcat(g_MapMng.m_scaledViewMtxSecondary, m_worldMtx, concatMtx);
             if (reinterpret_cast<CMapMesh*>(m_mapData)->GetBound()->CheckFrustum(
-                    MapMng.m_cameraPosition, concatMtx, MapMng.m_octTreeFrustumRange) != 0) {
+                    g_MapMng.m_cameraPosition, concatMtx, g_MapMng.m_octTreeFrustumRange) != 0) {
                 m_showFlags |= 4;
             }
         }
@@ -1297,7 +1297,7 @@ void CMapObj::SetDrawFlag()
 void CMapObj::DrawHit()
 {
     if ((m_mapDataType == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapMng.m_viewMtx, m_worldMtx);
+        MaterialMan.SetObjMatrix(g_MapMng.m_viewMtx, m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->Draw();
     }
 }
@@ -1314,7 +1314,7 @@ void CMapObj::DrawHit()
 void CMapObj::DrawHitWire()
 {
     if ((m_mapDataType == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapMng.m_viewMtx, m_worldMtx);
+        MaterialMan.SetObjMatrix(g_MapMng.m_viewMtx, m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawWire();
     }
 }
@@ -1331,7 +1331,7 @@ void CMapObj::DrawHitWire()
 void CMapObj::DrawHitNormal()
 {
     if ((m_mapDataType == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapMng.m_viewMtx, m_worldMtx);
+        MaterialMan.SetObjMatrix(g_MapMng.m_viewMtx, m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawNormal();
     }
 }

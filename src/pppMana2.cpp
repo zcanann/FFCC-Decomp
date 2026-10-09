@@ -612,7 +612,7 @@ static void CalcReflectionVector2(
         u32 fmt = drawFmt & 7;
 
         dl = (u16*)((u8*)dl + 3);
-        if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
+        if (Util.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
         }
         for (i = 0; i < itemCount; i++) {
@@ -629,8 +629,8 @@ static void CalcReflectionVector2(
                 dl++;
             }
 
-            gUtil.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
-            gUtil.ConvI2FVector(objSpaceNormal, normals[normalIndex], normalScale);
+            Util.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
+            Util.ConvI2FVector(objSpaceNormal, normals[normalIndex], normalScale);
             PSMTXMultVec(matrix, &objSpacePos, &objSpacePos);
             PSMTXMultVec(nodeRotMtx, &objSpaceNormal, &objSpaceNormal);
 
@@ -733,7 +733,7 @@ static void CalcReflectionVector2(
                 break;
             }
 
-            gUtil.ConvF2IVector2d(texCoord[normalIndex], uv, 12);
+            Util.ConvF2IVector2d(texCoord[normalIndex], uv, 12);
         }
     }
 
@@ -864,7 +864,7 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
             GXSetScissor(0, 0, 0x280, 0x1C0);
             float texQuadZero = 0.0f;
             float texQuadSize = 128.0f;
-            gUtil.RenderTextureQuad(texQuadZero, texQuadZero, texQuadSize,
+            Util.RenderTextureQuad(texQuadZero, texQuadZero, texQuadSize,
                                     texQuadSize, baseParaboloidTexObjs, 0, 0, 0,
                                     GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
             baseParaboloidTexObjs++;
@@ -875,10 +875,10 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
         GXSetScissor(0, 0, 0x280, 0x1C0);
         GXSetZTexture(GX_ZT_REPLACE, GX_TF_Z24X8, 0);
         GXSetColorUpdate(GX_FALSE);
-        gUtil.BeginQuadEnv();
+        Util.BeginQuadEnv();
         GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
         GXSetZCompLoc(GX_FALSE);
-        gUtil.SetVtxFmt_POS_CLR_TEX();
+        Util.SetVtxFmt_POS_CLR_TEX();
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
         _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
@@ -898,8 +898,8 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
         quadColor.g = 0xFF;
         quadColor.b = 0xFF;
         quadColor.a = 0;
-        gUtil.RenderQuad(quadMin, quadMax, quadColor, 0, 0);
-        gUtil.EndQuadEnv();
+        Util.RenderQuad(quadMin, quadMax, quadColor, 0, 0);
+        Util.EndQuadEnv();
         GXSetZTexture(GX_ZT_DISABLE, GX_TF_Z8, 0);
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_TRUE);
@@ -907,7 +907,7 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
         quadMin.x = 0.0f;
         quadMin.y = 0.0f;
         quadMin.z = 0.0f;
-        gUtil.RenderTextureQuad(quadMin.x, quadMin.y, 128.0f,
+        Util.RenderTextureQuad(quadMin.x, quadMin.y, 128.0f,
                                 128.0f, &sceneTexObj, 0, 0, 0, GX_BL_SRCALPHA,
                                 GX_BL_INVSRCALPHA);
         mana2->m_paraboloidReady = 1;
@@ -1127,7 +1127,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                         mana2Work->m_displayListSize = displayList->m_size;
                         memcpy(mana2Work->m_displayListCopies[dlIndex], displayList->m_data, displayList->m_size);
                         DCFlushRange(mana2Work->m_displayListCopies[dlIndex], displayList->m_size);
-                        gUtil.ReWriteDisplayList(mana2Work->m_displayListCopies[dlIndex], displayList->m_size, 1);
+                        Util.ReWriteDisplayList(mana2Work->m_displayListCopies[dlIndex], displayList->m_size, 1);
                     }
                 }
 

@@ -168,7 +168,7 @@ static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* context, voi
 
     offsetX = owner->m_localMatrix.value[0][3];
     offsetY = owner->m_localMatrix.value[1][3];
-    gUtil.GetDirectVector(&direct0, &direct1, cameraDir);
+    Util.GetDirectVector(&direct0, &direct1, cameraDir);
 
     localOffset0.x = offsetX * direct0.x;
     localOffset0.y = offsetX * direct0.y;

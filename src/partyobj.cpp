@@ -242,17 +242,17 @@ static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 
 inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
-	MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
+	g_MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
 }
 
 inline void CMapPcs::GetHitFaceNormal(Vec* normal)
 {
-	MapMng.m_hitMapObj->GetHitFaceNormal(normal);
+	g_MapMng.m_hitMapObj->GetHitFaceNormal(normal);
 }
 
 inline int CMapPcs::CalcHitSlide(Vec* move, float scale)
 {
-	return MapMng.m_hitMapObj->CalcHitSlide(move, scale);
+	return g_MapMng.m_hitMapObj->CalcHitSlide(move, scale);
 }
 
 inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
@@ -263,7 +263,7 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
 	cylinder.m_axis = *direction;
 	cylinder.m_radius = radius;
 
-	return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
+	return g_MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
 }
 
 // Original passes only two args at both statCharge/checkTargetParticle call

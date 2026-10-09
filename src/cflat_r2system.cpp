@@ -218,7 +218,7 @@ void CPartPcs::pppSetDebugHide(unsigned char hide)
  */
 inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
-    MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
+    g_MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
 }
 
 /*
@@ -238,7 +238,7 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
     cylinder.m_axis = *direction;
     cylinder.m_radius = radius;
 
-    return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
+    return g_MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
 }
 
 /*
@@ -1256,7 +1256,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x2F:
-        MapMng.SetIdGrpMask(*object->m_localBase, object->m_localBase[1]);
+        g_MapMng.SetIdGrpMask(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -1634,7 +1634,7 @@ renderedDone:
         color.r = static_cast<u8>(object->m_localBase[2]);
         color.g = static_cast<u8>(object->m_localBase[3]);
         color.b = static_cast<u8>(object->m_localBase[4]);
-        MapMng.SetIdGrpColor(*object->m_localBase, object->m_localBase[1], color);
+        g_MapMng.SetIdGrpColor(*object->m_localBase, object->m_localBase[1], color);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -1656,7 +1656,7 @@ renderedDone:
         break;
     }
     case -0x4F:
-        MapMng.SetMeshCameraSemiTransRange(
+        g_MapMng.SetMeshCameraSemiTransRange(
             static_cast<unsigned short>(*object->m_localBase),
             *reinterpret_cast<float*>(object->m_localBase + 1),
             *reinterpret_cast<float*>(object->m_localBase + 2),
@@ -2122,7 +2122,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x92:
-        MapMng.SetMapTexAnim(
+        g_MapMng.SetMapTexAnim(
             *object->m_localBase, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
@@ -2183,22 +2183,22 @@ renderedDone:
         outResult = 0;
         break;
     case -0x99: {
-        int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
-        MapMng.SetMapObjAnim(
+        int mapObjIndex = g_MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
+        g_MapMng.SetMapObjAnim(
             mapObjIndex, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
         break;
     }
     case -0xF2:
-        MapMng.SetMapAnimID(object->m_localBase[0], object->m_localBase[1],
+        g_MapMng.SetMapAnimID(object->m_localBase[0], object->m_localBase[1],
             object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
         break;
     case -0x9A: {
-        int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
-        MapMng.SetMapObjMime(mapObjIndex, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
+        int mapObjIndex = g_MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
+        g_MapMng.SetMapObjMime(mapObjIndex, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2405,9 +2405,9 @@ renderedDone:
     }
     case -0xBF:
         if (*reinterpret_cast<int*>(object->m_localBase + 2) != 0) {
-            MapMng.ShowMapObjChildID(*object->m_localBase, object->m_localBase[1]);
+            g_MapMng.ShowMapObjChildID(*object->m_localBase, object->m_localBase[1]);
         } else {
-            MapMng.ShowMapObjID(*object->m_localBase, object->m_localBase[1]);
+            g_MapMng.ShowMapObjID(*object->m_localBase, object->m_localBase[1]);
         }
         this->push(object, 0);
         outResult = 0;
@@ -2446,7 +2446,7 @@ renderedDone:
         break;
     case -0xC5: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        MapMng.SetMapObjWorldMapLightID(
+        g_MapMng.SetMapObjWorldMapLightID(
             *object->m_localBase,
             CColor(
                 static_cast<u8>(object->m_localBase[1]),
@@ -2490,9 +2490,9 @@ renderedDone:
         outResult = 0;
         break;
     case -0xC9: {
-        int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
+        int mapObjIndex = g_MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        MapMng.SetMapObjTransRate(
+        g_MapMng.SetMapObjTransRate(
             mapObjIndex, localFloats[1], localFloats[2], localFloats[3]);
         this->push(object, 0);
         outResult = 0;
@@ -2577,18 +2577,18 @@ renderedDone:
     }
     case -0xD3:
         if (*reinterpret_cast<int*>(object->m_localBase + 1) != 0) {
-            MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0x80, 0x3C);
+            g_MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0x80, 0x3C);
         } else {
-            MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0, 0x3C);
+            g_MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0, 0x3C);
         }
         this->push(object, 0);
         outResult = 0;
         break;
     case -0xD4:
         if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
-            MapMng.SetDrawRangeOctTree(*reinterpret_cast<float*>(object->m_localBase + 1));
+            g_MapMng.SetDrawRangeOctTree(*reinterpret_cast<float*>(object->m_localBase + 1));
         } else {
-            MapMng.SetDrawRangeMapObj(*reinterpret_cast<float*>(object->m_localBase + 1));
+            g_MapMng.SetDrawRangeMapObj(*reinterpret_cast<float*>(object->m_localBase + 1));
         }
         this->push(object, 0);
         outResult = 0;
@@ -2683,7 +2683,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xE0:
-        MapMng.SetMapObjPrioID(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]));
+        g_MapMng.SetMapObjPrioID(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2756,7 +2756,7 @@ renderedDone:
                 GX_FALSE);
             GXInitTexObjLOD(&backTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f,
                 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-            gUtil.RenderTextureQuad(
+            Util.RenderTextureQuad(
                 0.0f, 0.0f, 640.0f, 448.0f, &backTexObj, 0, 0,
                 CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1])),
                 GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

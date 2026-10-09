@@ -19,7 +19,7 @@ extern JoyBus Joybus;
 class CMaterialMan;
 extern CMaterialMan MaterialMan;
 class CMapMng;
-extern CMapMng MapMng;
+extern CMapMng g_MapMng;
 class CMemory;
 extern CMemory Memory;
 class CMemoryCardMan;

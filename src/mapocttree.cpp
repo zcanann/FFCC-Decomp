@@ -56,7 +56,7 @@ static const char s_mapocttree_cpp[] = "mapocttree.cpp";
 namespace {
 static inline CMapObj* GetMapObjByIndex(unsigned short index)
 {
-    return MapMng.GetMapObj(index);
+    return g_MapMng.GetMapObj(index);
 }
 
 }
@@ -536,8 +536,8 @@ void COctTree::SetDrawFlag()
 	Mtx localMtx;
 
 	if (((m_drawFlags & 1) == 0) && (m_mapObject->m_mapDataType == 1)) {
-		PSMTXConcat(MapMng.m_scaledViewMtxPrimary, m_mapObject->m_worldMtx, m_cullMtx);
-		PSMTXConcat(MapMng.m_viewMtx,
+		PSMTXConcat(g_MapMng.m_scaledViewMtxPrimary, m_mapObject->m_worldMtx, m_cullMtx);
+		PSMTXConcat(g_MapMng.m_viewMtx,
 		            m_mapObject->m_worldMtx, localMtx);
 		PSMTXInverse(localMtx, localMtx);
 
@@ -606,11 +606,11 @@ void COctTree::Draw(unsigned char drawType)
 		unsigned char mapDrawType = mapObj->m_drawPriority;
 		unsigned char targetDrawType = drawType;
 		if ((mapDrawType == targetDrawType) && ((mapObj->m_showFlags & 1) != 0)) {
-			if ((MapMng.m_underWaterTexPending != 0) &&
+			if ((g_MapMng.m_underWaterTexPending != 0) &&
 			    ((mapObj->m_bumpLight != 0) &&
 			     (reinterpret_cast<CLightPcs::CBumpLight*>(mapObj->m_bumpLight)->m_useViewSpace == 2))) {
 				MaterialMan.SetUnderWaterTex();
-				MapMng.m_underWaterTexPending = 0;
+				g_MapMng.m_underWaterTexPending = 0;
 			}
 
 			mapObj = m_mapObject;
@@ -723,7 +723,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 		if (farCount >= 8) {
 			return;
 		}
-		if (maxDepth < MapMng.m_octTreeDrawMinDepth) {
+		if (maxDepth < g_MapMng.m_octTreeDrawMinDepth) {
 			return;
 		}
 		if (andMask != 0) {
@@ -881,7 +881,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             }
 
             nodeCount = m_nodeCount;
-            m_nodePool = new (MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp), 0x59)
+            m_nodePool = new (g_MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp), 0x59)
                 COctNode[nodeCount];
             break;
         }

@@ -35,7 +35,7 @@ void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterStep* step, _pppCtrlTab
         (_pppFilterSerializedData*)(pppFilterObj->m_workArea + serializedOffset);
 
     if (step->m_dataValIndex == 0xFFFF) {
-        gUtil.RenderColorQuad(
+        Util.RenderColorQuad(
             0.0f, 0.0f, 640.0f, 448.0f,
             serializedData->m_color);
         return;
@@ -44,7 +44,7 @@ void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterStep* step, _pppCtrlTab
     int textureIndex = 0;
     CTexture* texture = ppvEnv->m_mapMeshPtr[step->m_dataValIndex]->GetTexture(
         ppvEnv->m_materialSetPtr, textureIndex);
-    gUtil.RenderTextureQuad(
+    Util.RenderTextureQuad(
         0.0f, 0.0f, 640.0f, 448.0f, &texture->m_texObj,
         0, 0, &serializedData->m_color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }

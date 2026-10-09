@@ -45,7 +45,7 @@ void CMapAnimRun::Calc(long frame)
     }
 
 runFrame:
-    CPtrArray<CMapAnim*>* mapAnimArray = &MapMng.GetMapAnimArray();
+    CPtrArray<CMapAnim*>* mapAnimArray = &g_MapMng.GetMapAnimArray();
     CMapAnim* mapAnim = (*mapAnimArray)[m_mapAnimIndex];
     mapAnim->Calc(m_currentFrame);
     if (++m_currentFrame > m_endFrame) {
@@ -143,7 +143,7 @@ inline CMapAnimKeyDt::CMapAnimKeyDt()
 inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAnim)
 {
     CChunkFile::CChunk chunk;
-    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &MapMng.GetMapAnimKeyDtArray();
+    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &g_MapMng.GetMapAnimKeyDtArray();
     int hasChunk;
 
     m_mapAnim = mapAnim;
@@ -151,27 +151,27 @@ inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAn
     while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(chunk))) != 0) {
         if (chunk.m_id == 0x4E494458) {
             int nodeIdx = static_cast<int>(chunkFile.Get4());
-            m_node = MapMng.GetMapObj(nodeIdx);
+            m_node = g_MapMng.GetMapObj(nodeIdx);
         } else if (chunk.m_id == 0x5452414E) {
             CMapAnimKeyDt* keyData =
-                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
             m_tracks = keyData;
             mapAnimKeyDtArray->Add(m_tracks);
             m_tracks->position.count = chunk.m_size >> 4;
             m_tracks->position.keys =
-                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
                     CMapAnimKey[m_tracks->position.count];
             memcpy(m_tracks->position.keys, chunkFile.GetAddress(), chunk.m_size);
         } else if (chunk.m_id == 0x524F5420) {
             m_tracks->rotation.count = chunk.m_size >> 4;
             m_tracks->rotation.keys =
-                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
                     CMapAnimKey[m_tracks->rotation.count];
             memcpy(m_tracks->rotation.keys, chunkFile.GetAddress(), chunk.m_size);
         } else if (chunk.m_id == 0x5343414C) {
             m_tracks->scale.count = chunk.m_size >> 4;
             m_tracks->scale.keys =
-                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
                     CMapAnimKey[m_tracks->scale.count];
             memcpy(m_tracks->scale.keys, chunkFile.GetAddress(), chunk.m_size);
         }
@@ -198,7 +198,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             m_startFrame = static_cast<int>(chunkFile.Get4());
             m_endFrame = static_cast<int>(chunkFile.Get4());
         } else if (chunk.m_id == 0x4E4F4445) {
-            CMapAnimNode* item = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2) CMapAnimNode;
+            CMapAnimNode* item = new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2) CMapAnimNode;
             item->ReadOtmAnimNode(chunkFile, this);
             mapAnimNodes.Add(item);
         }
@@ -240,7 +240,7 @@ CMapAnim::~CMapAnim()
  */
 CMapAnim::CMapAnim()
 {
-    mapAnimNodes.SetStage(MapMng.m_stage);
+    mapAnimNodes.SetStage(g_MapMng.m_stage);
 }
 
 /*

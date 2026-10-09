@@ -589,7 +589,7 @@ void CMenuPcs::calcBonus()
  */
 void CMenuPcs::drawBonus()
 {
-	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
+	Util.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
 
 #ifndef VERSION_GCCJGC
 	if ((unsigned int)System.m_execParam >= 1) {

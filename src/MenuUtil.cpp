@@ -1234,10 +1234,10 @@ void CMenuPcs::DrawOptionMenu()
 	CTexture* banner = m_wmOptionTextures[5];
 	w = static_cast<float>(banner->m_width);
 	h = static_cast<float>(banner->m_height);
-	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
-	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(h),
+	Util.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
+	Util.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(h),
 	             static_cast<unsigned int>(w), static_cast<unsigned int>(h));
-	gUtil.RenderTextureQuad(0.0f,
+	Util.RenderTextureQuad(0.0f,
 	                        224.0f - h / 2.0f - 14.0f,
 	                        640.0f, h, m_wmOptionTextures[5], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
@@ -1245,42 +1245,42 @@ void CMenuPcs::DrawOptionMenu()
 	CTexture* panel = m_wmOptionTextures[10];
 	w = static_cast<float>(panel->m_width);
 	h = static_cast<float>(panel->m_height);
-	gUtil.RenderTextureQuad(336.0f, 88.0f, w, h, panel, 0, 0, &color,
+	Util.RenderTextureQuad(336.0f, 88.0f, w, h, panel, 0, 0, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = 0.0f;
 	uv0.y = 1.0f;
 	uv1.x = 1.0f;
 	uv1.y = 0.0f;
-	gUtil.RenderTextureQuad(336.0f, 88.0f + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	Util.RenderTextureQuad(336.0f, 88.0f + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = 1.0f;
 	uv0.y = 0.0f;
 	uv1.x = 0.0f;
 	uv1.y = 1.0f;
-	gUtil.RenderTextureQuad(336.0f + w, 88.0f, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	Util.RenderTextureQuad(336.0f + w, 88.0f, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = 1.0f;
 	uv0.y = 1.0f;
 	uv1.x = 0.0f;
 	uv1.y = 0.0f;
-	gUtil.RenderTextureQuad(336.0f + w, 88.0f + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	Util.RenderTextureQuad(336.0f + w, 88.0f + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	CTexture* cursor = m_textures[0];
 	w = static_cast<float>(cursor->m_width);
 	h = static_cast<float>(cursor->m_height);
-	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(w),
+	Util.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(w),
 	             static_cast<unsigned int>(h));
-	gUtil.CalcUV(uv1.x, uv1.y, 0x20, 0x20, static_cast<unsigned int>(w),
+	Util.CalcUV(uv1.x, uv1.y, 0x20, 0x20, static_cast<unsigned int>(w),
 	             static_cast<unsigned int>(h));
-	gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(System.GetCounter()) % 8 + 0x1C),
+	Util.RenderTextureQuad(static_cast<float>(static_cast<int>(System.GetCounter()) % 8 + 0x1C),
 	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), 32.0f,
 	                        32.0f, m_textures[0], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* marker = m_wmOptionTextures[2];
 	w = static_cast<float>(marker->m_width);
-	gUtil.RenderTextureQuad(64.0f, static_cast<float>(m_optionIndex * 0x28 + 0x70),
+	Util.RenderTextureQuad(64.0f, static_cast<float>(m_optionIndex * 0x28 + 0x70),
 	                        w, static_cast<float>(marker->m_height), marker, 0, 0,
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1298,7 +1298,7 @@ void CMenuPcs::DrawOptionMenu()
 		uv0.y = 0.0f;
 		uv1.x = (i == m_optionIndex) ? 0.5f : 1.0f;
 		uv1.y = 1.0f;
-		gUtil.RenderTextureQuad(56.0f, static_cast<float>(i * 0x28 + 0x70),
+		Util.RenderTextureQuad(56.0f, static_cast<float>(i * 0x28 + 0x70),
 		                        w / 2.0f, h, m_wmOptionTextures[0], &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1322,7 +1322,7 @@ void CMenuPcs::DrawOptionMenu()
 #ifndef VERSION_GCCJGC
 	font->SetScaleX(1.0f);
 #endif
-	gUtil.RenderTextureQuad(0.0f, 384.0f, 640.0f, 40.0f,
+	Util.RenderTextureQuad(0.0f, 384.0f, 640.0f, 40.0f,
 #ifdef VERSION_GCCJGC
 	                        m_textures[30], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 #else
@@ -1388,12 +1388,12 @@ void CMenuPcs::DrawOptionMenu()
 		SetUv(uv1, 0.5f, 1.0f);
 		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
-		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
+		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 		SetUv(uv0, 0.5f, 0.0f);
 		SetUv(uv1, 1.0f, 1.0f);
-		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
+		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
 		                        row.rightIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1401,9 +1401,9 @@ void CMenuPcs::DrawOptionMenu()
 		CTexture* selectorTexture = m_wmOptionTextureSet->GetTexture(4);
 		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
 		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
-		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
-		gUtil.RenderTextureQuad((m_gameInitMode == 0) ? row.selector.x : 96.0f + row.selector.x, row.selector.y,
+		Util.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
+		Util.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
+		Util.RenderTextureQuad((m_gameInitMode == 0) ? row.selector.x : 96.0f + row.selector.x, row.selector.y,
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1503,12 +1503,12 @@ void CMenuPcs::DrawOptionMenu()
 		SetUv(uv1, 0.5f, 1.0f);
 		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
-		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
+		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 		SetUv(uv0, 0.5f, 0.0f);
 		SetUv(uv1, 1.0f, 1.0f);
-		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
+		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
 		                        row.rightIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1516,9 +1516,9 @@ void CMenuPcs::DrawOptionMenu()
 		CTexture* selectorTexture = m_wmOptionTextureSet->GetTexture(4);
 		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
 		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
-		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
-		gUtil.RenderTextureQuad((m_stereoMode == 0) ? row.selector.x : 112.0f + row.selector.x, row.selector.y,
+		Util.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
+		Util.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
+		Util.RenderTextureQuad((m_stereoMode == 0) ? row.selector.x : 112.0f + row.selector.x, row.selector.y,
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1622,49 +1622,49 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
 
-		gUtil.CalcUV(uv0.x, uv0.y, 0, 0x28, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x18, 0x40, meterWidth, meterHeight);
+		Util.CalcUV(uv0.x, uv0.y, 0, 0x28, meterWidth, meterHeight);
+		Util.CalcUV(uv1.x, uv1.y, 0x18, 0x40, meterWidth, meterHeight);
 		float iconWave = 20.0f * rowSin;
-		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + pos.leftIcon.x)),
+		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + pos.leftIcon.x)),
 		                        pos.leftIcon.y - iconWave, 24.0f, 24.0f, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x28, meterWidth, meterHeight);
-		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - pos.rightIcon.x))),
+		Util.CalcUV(uv0.x, uv0.y, 0, 0, meterWidth, meterHeight);
+		Util.CalcUV(uv1.x, uv1.y, 0x28, 0x28, meterWidth, meterHeight);
+		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - pos.rightIcon.x))),
 		                        pos.rightIcon.y + iconWave, 40.0f, 40.0f, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionColumnAnim));
 		if (leftHintOn != 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x58, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x70, meterWidth, meterHeight);
+			Util.CalcUV(uv0.x, uv0.y, 0x18, 0x58, meterWidth, meterHeight);
+			Util.CalcUV(uv1.x, uv1.y, 0x28, 0x70, meterWidth, meterHeight);
 		} else {
-			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x58, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x70, meterWidth, meterHeight);
+			Util.CalcUV(uv0.x, uv0.y, 0, 0x58, meterWidth, meterHeight);
+			Util.CalcUV(uv1.x, uv1.y, 0x10, 0x70, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(pos.leftArrow.x, pos.leftArrow.y, 16.0f, 24.0f, meterTexture, &uv0,
+		Util.RenderTextureQuad(pos.leftArrow.x, pos.leftArrow.y, 16.0f, 24.0f, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (rightHintOn != 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x60, 0x5C, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x48, 0x7C, meterWidth, meterHeight);
+			Util.CalcUV(uv0.x, uv0.y, 0x60, 0x5C, meterWidth, meterHeight);
+			Util.CalcUV(uv1.x, uv1.y, 0x48, 0x7C, meterWidth, meterHeight);
 		} else {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x5C, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x7C, meterWidth, meterHeight);
+			Util.CalcUV(uv0.x, uv0.y, 0x48, 0x5C, meterWidth, meterHeight);
+			Util.CalcUV(uv1.x, uv1.y, 0x30, 0x7C, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(pos.rightArrow.x, pos.rightArrow.y, 24.0f, 32.0f, meterTexture, &uv0,
+		Util.RenderTextureQuad(pos.rightArrow.x, pos.rightArrow.y, 24.0f, 32.0f, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		gUtil.CalcUV(uv0.x, uv0.y, 0x40, 0x28, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x50, 0x38, meterWidth, meterHeight);
+		Util.CalcUV(uv0.x, uv0.y, 0x40, 0x28, meterWidth, meterHeight);
+		Util.CalcUV(uv1.x, uv1.y, 0x50, 0x38, meterWidth, meterHeight);
 		Vec2d* bar = &pos.bar;
 		float barBaseX = bar->x;
 		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			gUtil.RenderTextureQuad(barBaseX + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
+			Util.RenderTextureQuad(barBaseX + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			if ((m_optionMenuState != 2) && (i + 1 <= m_bgmVolume)) {
-				gUtil.RenderTextureQuad(bar->x + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
+				Util.RenderTextureQuad(bar->x + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
 		}
@@ -1713,49 +1713,49 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
 
-		gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x28, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x40, meterWidth, meterHeight);
+		Util.CalcUV(uv0.x, uv0.y, 0x18, 0x28, meterWidth, meterHeight);
+		Util.CalcUV(uv1.x, uv1.y, 0x30, 0x40, meterWidth, meterHeight);
 		float iconWave = 20.0f * rowSin;
-		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + pos.leftIcon.x)),
+		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + pos.leftIcon.x)),
 		                        pos.leftIcon.y + iconWave, 24.0f, 24.0f, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		gUtil.CalcUV(uv0.x, uv0.y, 0x28, 0, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x50, 0x28, meterWidth, meterHeight);
-		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - pos.rightIcon.x))),
+		Util.CalcUV(uv0.x, uv0.y, 0x28, 0, meterWidth, meterHeight);
+		Util.CalcUV(uv1.x, uv1.y, 0x50, 0x28, meterWidth, meterHeight);
+		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - pos.rightIcon.x))),
 		                        pos.rightIcon.y - iconWave, 40.0f, 40.0f, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionColumnAnim));
 		if (leftHintOn != 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x40, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x58, meterWidth, meterHeight);
+			Util.CalcUV(uv0.x, uv0.y, 0x18, 0x40, meterWidth, meterHeight);
+			Util.CalcUV(uv1.x, uv1.y, 0x28, 0x58, meterWidth, meterHeight);
 		} else {
-			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x40, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x58, meterWidth, meterHeight);
+			Util.CalcUV(uv0.x, uv0.y, 0, 0x40, meterWidth, meterHeight);
+			Util.CalcUV(uv1.x, uv1.y, 0x10, 0x58, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(pos.leftArrow.x, pos.leftArrow.y, 16.0f, 24.0f, meterTexture, &uv0,
+		Util.RenderTextureQuad(pos.leftArrow.x, pos.leftArrow.y, 16.0f, 24.0f, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (rightHintOn != 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x60, 0x3C, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x48, 0x5C, meterWidth, meterHeight);
+			Util.CalcUV(uv0.x, uv0.y, 0x60, 0x3C, meterWidth, meterHeight);
+			Util.CalcUV(uv1.x, uv1.y, 0x48, 0x5C, meterWidth, meterHeight);
 		} else {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x3C, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x5C, meterWidth, meterHeight);
+			Util.CalcUV(uv0.x, uv0.y, 0x48, 0x3C, meterWidth, meterHeight);
+			Util.CalcUV(uv1.x, uv1.y, 0x30, 0x5C, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(pos.rightArrow.x, pos.rightArrow.y, 24.0f, 32.0f, meterTexture, &uv0,
+		Util.RenderTextureQuad(pos.rightArrow.x, pos.rightArrow.y, 24.0f, 32.0f, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		gUtil.CalcUV(uv0.x, uv0.y, 0x30, 0x28, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x40, 0x38, meterWidth, meterHeight);
+		Util.CalcUV(uv0.x, uv0.y, 0x30, 0x28, meterWidth, meterHeight);
+		Util.CalcUV(uv1.x, uv1.y, 0x40, 0x38, meterWidth, meterHeight);
 		Vec2d* bar = &pos.bar;
 		float barBaseX = bar->x;
 		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			gUtil.RenderTextureQuad(barBaseX + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
+			Util.RenderTextureQuad(barBaseX + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			if ((m_optionMenuState != 2) && (i + 1 <= m_seVolume)) {
-				gUtil.RenderTextureQuad(bar->x + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
+				Util.RenderTextureQuad(bar->x + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
 		}
@@ -1812,31 +1812,31 @@ void CMenuPcs::DrawOptionMenu()
 			float cursorWidth = static_cast<float>(cursorPanel->m_width);
 			float cursorHeight = static_cast<float>(cursorPanel->m_height);
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
-				gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(cursorWidth - 48.0f), 0,
+				Util.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(cursorWidth - 48.0f), 0,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				gUtil.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), 0x28,
+				Util.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), 0x28,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				const Vec2d* pp = &pts[k];
-				gUtil.RenderTextureQuad(pp->x, pp->y + static_cast<float>(y), 48.0f,
+				Util.RenderTextureQuad(pp->x, pp->y + static_cast<float>(y), 48.0f,
 				                        40.0f, cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA,
 				                        GX_BL_INVSRCALPHA);
 			}
 
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
-				gUtil.CalcUV(uv0.x, uv0.y, 0, 0x30, static_cast<unsigned int>(cursorWidth),
+				Util.CalcUV(uv0.x, uv0.y, 0, 0x30, static_cast<unsigned int>(cursorWidth),
 				             static_cast<unsigned int>(cursorHeight));
-				gUtil.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight),
+				Util.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight),
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				const Vec2d* pp1 = &pts[k + 1];
-				gUtil.RenderTextureQuad(pp1->x, pp1->y + static_cast<float>(y),
+				Util.RenderTextureQuad(pp1->x, pp1->y + static_cast<float>(y),
 				                        cursorWidth, 16.0f, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-				gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(cursorWidth), 0x30,
+				Util.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(cursorWidth), 0x30,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				gUtil.CalcUV(uv1.x, uv1.y, 0, static_cast<unsigned int>(cursorHeight),
+				Util.CalcUV(uv1.x, uv1.y, 0, static_cast<unsigned int>(cursorHeight),
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				gUtil.RenderTextureQuad(cursorWidth + pp1->x, pp1->y + static_cast<float>(y),
+				Util.RenderTextureQuad(cursorWidth + pp1->x, pp1->y + static_cast<float>(y),
 				                        cursorWidth, 16.0f, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
@@ -1846,12 +1846,12 @@ void CMenuPcs::DrawOptionMenu()
 			float modeH = static_cast<float>(modePanel->m_height);
 			unsigned int modeHeight = static_cast<unsigned int>(modeH);
 			unsigned int modeWidth = static_cast<unsigned int>(modeW);
-			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(modeW - 48.0f),
+			Util.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(modeW - 48.0f),
 			             uvY, modeWidth, modeHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY2, modeWidth, modeHeight);
+			Util.CalcUV(uv1.x, uv1.y, modeWidth, uvY2, modeWidth, modeHeight);
 			const Vec2d* pp2 = &pts[k + 2];
 			int modeXi = static_cast<int>(static_cast<float>(modeU) - pp2->x);
-			gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(modeXi) *
+			Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(modeXi) *
 			                                           specialRowCos + pp2->x)),
 			                        pp2->y + static_cast<float>(y), 40.0f, 24.0f,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
@@ -1860,9 +1860,9 @@ void CMenuPcs::DrawOptionMenu()
 			int step1 = static_cast<int>(24.0f + (static_cast<float>(modeU) - pp3->x));
 			int textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
 			if (m_specialModeFlags[i] == 0) {
-				gUtil.CalcUV(uv0.x, uv0.y, 0, uvY, modeWidth, modeHeight);
-				gUtil.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, modeWidth, modeHeight);
-				gUtil.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(y),
+				Util.CalcUV(uv0.x, uv0.y, 0, uvY, modeWidth, modeHeight);
+				Util.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, modeWidth, modeHeight);
+				Util.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(y),
 				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 #ifdef VERSION_GCCJGC
@@ -1914,9 +1914,9 @@ void CMenuPcs::DrawOptionMenu()
 #endif
 				const Vec2d* pp4e = &pts[k + 4];
 				int panelXi = static_cast<int>(pp4e->x + static_cast<float>(step1) * specialRowCos);
-				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);
-				gUtil.CalcUV(uv1.x, uv1.y, 0xE0, (i + 1) * 0x20, modeWidth, modeHeight);
-				gUtil.RenderTextureQuad(static_cast<float>(panelXi),
+				Util.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);
+				Util.CalcUV(uv1.x, uv1.y, 0xE0, (i + 1) * 0x20, modeWidth, modeHeight);
+				Util.RenderTextureQuad(static_cast<float>(panelXi),
 				                        pp4e->y + static_cast<float>(y), 112.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}

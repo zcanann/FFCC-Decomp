@@ -172,7 +172,7 @@ static inline float WrapAnimFrame(float value, float span)
 
 inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
-    MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
+    g_MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
 }
 
 inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
@@ -183,17 +183,17 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
     cylinder.m_axis = *direction;
     cylinder.m_radius = radius;
 
-    return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
+    return g_MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
 }
 
 inline void CMapPcs::GetHitFaceNormal(Vec* normal)
 {
-    MapMng.m_hitMapObj->GetHitFaceNormal(normal);
+    g_MapMng.m_hitMapObj->GetHitFaceNormal(normal);
 }
 
 inline int CMapPcs::CalcHitSlide(Vec* move, float scale)
 {
-    return MapMng.m_hitMapObj->CalcHitSlide(move, scale);
+    return g_MapMng.m_hitMapObj->CalcHitSlide(move, scale);
 }
 
 inline int CMapPcs::GetHitGrpNo()
@@ -203,7 +203,7 @@ inline int CMapPcs::GetHitGrpNo()
 
 inline unsigned long CMapPcs::GetHitGrpBit()
 {
-    return MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
+    return g_MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
 }
 
 namespace std {
@@ -324,8 +324,8 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     hitCylinder.m_axis.z = hitMove.z;
     hitCylinder.m_radius = hitRadius;
 
-    if (MapMng.CheckHitCylinderNear(&hitCylinder, &hitMove, hitMask) != 0) {
-        MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
+    if (g_MapMng.CheckHitCylinderNear(&hitCylinder, &hitMove, hitMask) != 0) {
+        g_MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
         centerPos.y -= m_capsuleHalfHeight;
         *outSafePos = centerPos;
         safeDistance = PSVECDistance(&m_worldPosition, &centerPos);
@@ -341,8 +341,8 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
         safeCylinder.m_axis = hitMove;
         safeCylinder.m_radius = safeRadius;
 
-        if (MapMng.CheckHitCylinderNear(&safeCylinder, &hitMove, hitMask) != 0) {
-            MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
+        if (g_MapMng.CheckHitCylinderNear(&safeCylinder, &hitMove, hitMask) != 0) {
+            g_MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
             safeDistance = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) -
                            PSVECDistance(&m_worldPosition, &centerPos);
         }

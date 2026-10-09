@@ -962,8 +962,8 @@ void CCameraPcs::calcMap()
             hitCylinder.m_axis.y = moveDelta.y;
             hitCylinder.m_axis.z = moveDelta.z;
             hitCylinder.m_radius = 10.0f;
-            if (MapMng.CheckHitCylinder(&hitCylinder, &moveDelta, 0xFFFFFFFF) != 0) {
-                MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, 2.0f);
+            if (g_MapMng.CheckHitCylinder(&hitCylinder, &moveDelta, 0xFFFFFFFF) != 0) {
+                g_MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, 2.0f);
             } else {
                 PositionVec().x += moveDelta.x;
                 PositionVec().y += moveDelta.y;
@@ -1008,7 +1008,7 @@ inline void CCameraPcs::createRampTex8()
     for (int i = 0; i < 1; i++) {
         m_fullScreenShadow.m_rampTexture[i] = 0;
         rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-        rampTex = new (MapMng.m_stage, "p_camera.cpp", 0x361) u8[rampTexSize];
+        rampTex = new (g_MapMng.m_stage, "p_camera.cpp", 0x361) u8[rampTexSize];
         m_fullScreenShadow.m_rampTexture[i] = rampTex;
     }
 
@@ -1038,7 +1038,7 @@ void CCameraPcs::createFullShadow()
     for (int i = 0; i < 1; i++) {
         m_fullScreenShadow.m_shadowTexture[i] = 0;
         m_fullScreenShadow.m_shadowTexture[i] =
-            new (MapMng.m_stage, "p_camera.cpp", 0x3A5)
+            new (g_MapMng.m_stage, "p_camera.cpp", 0x3A5)
                 u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
     }
 
@@ -1308,7 +1308,7 @@ void CCameraPcs::drawShadowBegin()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetNumTexGens(0);
-    MapMng.DrawMapShadow();
+    g_MapMng.DrawMapShadow();
 }
 
 /*

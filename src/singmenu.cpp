@@ -693,7 +693,7 @@ void CMenuPcs::drawSingleMenu()
         (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)) {
         DrawInit();
         DrawFilter(0, 0, 0, 0xFF);
-        gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
+        Util.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
         DrawInit();
 
         char menuType = SingleCaravanWork()->m_shopRequestState;

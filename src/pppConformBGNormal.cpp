@@ -131,11 +131,11 @@ void pppFrameConformBGNormal(pppConformBGNormal* conformBG, pppConformBGNormalSt
             emitterProbeCylinder.m_axis.z = 0.0f;
             emitterProbeCylinder.m_radius = 0.0f;
 
-            checkResult = MapMng.CheckHitCylinderNear((CMapCylinder*)&emitterProbeCylinder, &emitterProbeRay, 0xffffffff);
+            checkResult = g_MapMng.CheckHitCylinderNear((CMapCylinder*)&emitterProbeCylinder, &emitterProbeRay, 0xffffffff);
             hitFound = checkResult;
             if (checkResult != 0) {
-                MapMng.m_hitMapObj->CalcHitPosition(&hitPosition);
-                MapMng.m_hitMapObj->GetHitFaceNormal(&surfaceNormal);
+                g_MapMng.m_hitMapObj->CalcHitPosition(&hitPosition);
+                g_MapMng.m_hitMapObj->GetHitFaceNormal(&surfaceNormal);
                 if ((matrixY - 10.0f) > hitPosition.y) {
                     hitPosition.y = matrixY;
                 }
@@ -240,9 +240,9 @@ void pppFrameConformBGNormal(pppConformBGNormal* conformBG, pppConformBGNormalSt
                 ownerProbeCylinder.m_axis.z = 0.0f;
                 ownerProbeCylinder.m_radius = 0.0f;
 
-                hitFound = MapMng.CheckHitCylinderNear((CMapCylinder*)&ownerProbeCylinder, &ownerProbeRay, 0xffffffff);
+                hitFound = g_MapMng.CheckHitCylinderNear((CMapCylinder*)&ownerProbeCylinder, &ownerProbeRay, 0xffffffff);
                 if (hitFound != 0) {
-                    MapMng.m_hitMapObj->CalcHitPosition(&hitPosition);
+                    g_MapMng.m_hitMapObj->CalcHitPosition(&hitPosition);
                     ppvMng->m_matrix.value[0][3] = hitPosition.x;
                     ppvMng->m_matrix.value[1][3] = hitPosition.y;
                     ppvMng->m_matrix.value[2][3] = hitPosition.z;

@@ -44,52 +44,11 @@ extern CAStar AStar;
 
 extern int __float_huge[];
 
-extern const float FLOAT_80331A58 = 0.5f;
-extern const float FLOAT_80331A5C = 1800.0f;
-extern const double DOUBLE_80331A60 = 4503601774854144.0;
-extern const double DOUBLE_80331A68 = 4503599627370496.0;
-extern const float FLOAT_80331A70 = 0.1f;
-extern const float FLOAT_80331a74 = 0.95f;
-extern const float FLOAT_80331a78 = 0.0f;
-extern const float FLOAT_80331A7C = 0.3f;
-extern const float FLOAT_80331A80 = 0.7f;
-extern const float FLOAT_80331A84 = 1.5f;
 #ifdef VERSION_GCCP01
-extern const float FLOAT_80331A88 = 4.0f;
+static const int kPartyObjCarryArcFrames = 11;
 #else
-extern const float FLOAT_80331A88 = 3.5f;
+static const int kPartyObjCarryArcFrames = 14;
 #endif
-extern const double DOUBLE_80331A90 = 90.0;
-extern const float FLOAT_80331A98 = 10.0f;
-extern const double DOUBLE_80331AA8 = 300.0;
-extern const float FLOAT_80331AB0 = 3.0f;
-extern const float FLOAT_80331AB4 = 0.15f;
-extern const float FLOAT_80331AB8 = 3.1415927f;
-extern const float FLOAT_80331ABC = 0.25f;
-#ifdef VERSION_GCCP01
-extern const float FLOAT_80331AC0 = 11.0f;
-#else
-extern const float FLOAT_80331AC0 = 14.0f;
-#endif
-extern const float FLOAT_80331ac4 = 6.0f;
-extern const float FLOAT_80331ac8 = 1.5707964f;
-extern const float FLOAT_80331acc = -100.0f;
-extern const float FLOAT_80331ad0 = 5.0f;
-extern const float FLOAT_80331ad4 = 2.0f;
-#ifndef VERSION_GCCP01
-extern const float FLOAT_80330A80 = 4.0f;
-#endif
-extern const float FLOAT_80331ad8 = 0.7853982f;
-extern const float FLOAT_80331ADC = 0.01f;
-extern const float FLOAT_80331AE0 = 0.017453292f;
-extern const double DOUBLE_80331AE8 = 0.5;
-extern const double DOUBLE_80331AF0 = 3.0;
-extern const double DOUBLE_80331AF8 = 0.0;
-extern const float FLOAT_80331b00 = 1.1f;
-#ifdef VERSION_GCCP01
-extern const float FLOAT_80331b04 = 1.2f;
-#endif
-extern const float FLOAT_80331b08 = 1.25f;
 
 GhostPartyWork CGPartyObj::m_ghostWork;
 
@@ -229,11 +188,6 @@ static bool isBossArtifactStage()
 	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
 }
 
-static inline float LoadFloat(const float& value)
-{
-	return value;
-}
-
 static bool isFrameInterval(int frame, int interval)
 {
 	return frame % interval == 0;
@@ -352,7 +306,7 @@ void CGPartyObj::onCreate()
 
 	PartyObjOverlay& party = m_partyData;
 	party.unk6D0 = 0;
-	float targetDist = FLOAT_80331a78;
+	float targetDist = 0.0f;
 	party.attackSel = 0;
 	party.unk6CC = 0;
 	party.unk6BC = 0;
@@ -575,7 +529,7 @@ void CGPartyObj::onCancelStat(int state)
 			m_alpha = 1.0f;
 			m_bgColMask |= 0x1000E;
 		} else {
-			m_alpha = FLOAT_80331A7C;
+			m_alpha = 0.3f;
 			m_bgColMask &= 0xFFFEFFF1;
 		}
 		break;
@@ -595,12 +549,12 @@ void CGPartyObj::onCancelStat(int state)
 			m_alpha = 1.0f;
 			m_bgColMask |= 0x1000E;
 		} else {
-			m_alpha = FLOAT_80331A7C;
+			m_alpha = 0.3f;
 			m_bgColMask &= 0xFFFEFFF1;
 		}
 		break;
 	case 6:
-		m_twistTarget = FLOAT_80331a78;
+		m_twistTarget = 0.0f;
 		break;
 	default:
 		break;
@@ -765,9 +719,9 @@ traceJoin:
 		         (itemId == 400));
 
 		if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0) {
-			CGItemObj::CreateFromScript(0, 4, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
+			CGItemObj::CreateFromScript(0, 4, itemId, this, 0.0f, (CGItemObj::CCFS*)0);
 			if (static_cast<unsigned int>(Math.Rand(10)) == 0) {
-				CGItemObj::CreateFromScript(2, 4, 0x3039, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
+				CGItemObj::CreateFromScript(2, 4, 0x3039, this, 0.0f, (CGItemObj::CCFS*)0);
 			}
 		}
 
@@ -856,17 +810,17 @@ void CGPartyObj::onFramePreCalc()
 		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp == 0) {
 			float speedScale;
 			if (static_cast<int>(CFlatCenterState()) == 0) {
-				speedScale = FLOAT_80331b08;
+				speedScale = 1.25f;
 			} else {
 				speedScale = 1.0f;
 			}
 #ifdef VERSION_GCCP01
-			m_moveBaseSpeed = static_cast<float>(static_cast<int>(FLOAT_80331b04 * speedScale));
+			m_moveBaseSpeed = static_cast<float>(static_cast<int>(1.2f * speedScale));
 #else
 			m_moveBaseSpeed = speedScale;
 #endif
 		} else {
-			m_moveBaseSpeed = FLOAT_80331ad4;
+			m_moveBaseSpeed = 2.0f;
 		}
 		m_moveBaseSpeed *= m_pushScale;
 	}
@@ -1397,7 +1351,7 @@ void CGPartyObj::shouki()
 
 		const Vec* chalicePos = &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition;
 		float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
-		if (FLOAT_80331b00 * Game.unkFloat_0xca10 < chaliceDist ||
+		if (1.1f * Game.unkFloat_0xca10 < chaliceDist ||
 		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) {
 			if (m_unk688 != 2) {
 				deletePSlotBit(0x200);
@@ -1409,7 +1363,7 @@ void CGPartyObj::shouki()
 			m_unk688 = 2;
 		} else {
 			deletePSlotBit(0x200);
-			if (FLOAT_80331a74 * Game.unkFloat_0xca10 <= chaliceDist) {
+			if (0.95f * Game.unkFloat_0xca10 <= chaliceDist) {
 				int flagFrame = m_updateCounter;
 				if (flagFrame % 4 == 0) {
 					playSe3D(0x1E, 0x32, 0x96, 0, 0);
@@ -1480,7 +1434,6 @@ void CGPartyObj::onFrameStat()
 		return;
 	}
 
-
 	switch (m_lastStateId) {
 	case 0:
 		if (m_stateFrame == 0) {
@@ -1508,7 +1461,7 @@ void CGPartyObj::onFrameStat()
 		     (m_weaponNodeFlagAll.m_bits1.m_shield != 0) &&
 		     (m_weaponNodeFlagAll.m_bits1.m_menuReady != 0) &&
 		     (m_partyData.flags.commandActive == 0))) {
-			if ((FLOAT_80331a74 * Game.unkFloat_0xca10 < m_targetDist) &&
+			if ((0.95f * Game.unkFloat_0xca10 < m_targetDist) &&
 			    (m_scriptHandle->m_statusTimers[0] == 0) &&
 			    (m_scriptHandle->m_statusTimers[9] == 0) &&
 			    (m_scriptHandle->m_statusTimers[3] == 0) &&
@@ -1631,7 +1584,7 @@ void CGPartyObj::onFrameStat()
 			break;
 		case 1:
 			if (m_subFrame == 0) {
-				m_alpha = FLOAT_80331ABC;
+				m_alpha = 0.25f;
 				reqAnim(0x16, 1, 0);
 				enableDamageCol(0);
 			}
@@ -1669,7 +1622,7 @@ void CGPartyObj::onFrameStat()
 #else
 		if (m_stateFrame == 4 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 #endif
-			moveVectorHRot(FLOAT_80331AB8 + m_rotTargetY, FLOAT_80331a78, 1.0f, 10);
+			moveVectorHRot(3.1415927f + m_rotTargetY, 0.0f, 1.0f, 10);
 		}
 		if (isLoopAnim() != 0) {
 			changeStat(0, 0, 0);
@@ -1701,7 +1654,7 @@ void CGPartyObj::onFrameStat()
 				m_bgColMask |= 0x1000E;
 				m_scriptHandle->m_statusTimers[5] = 0x5A;
 			} else {
-				m_alpha = FLOAT_80331A7C;
+				m_alpha = 0.3f;
 				m_bgColMask &= 0xFFFEFFF1;
 				int port = SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_joybusCaravanId;
 				endPSlotBit(0x10000);
@@ -1951,14 +1904,14 @@ void CGPartyObj::statCharge()
 							       (CVector(delta) * (mag - static_cast<float>(maxReach))) / mag;
 							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
 						} else {
-							mag = FLOAT_80331a78;
+							mag = 0.0f;
 						}
 					}
-					if (FLOAT_80331a78 != mag) {
+					if (0.0f != mag) {
 						Move(reinterpret_cast<Vec*>(&dest), mag / static_cast<float>(static_cast<int>(dist)), dist, 1, 1, 0, 1);
 					}
 				} else {
-					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p->m_moveSpeed),
+					moveVectorRot(m_rotTargetY, 0.0f, 0.01f * static_cast<float>(p->m_moveSpeed),
 					    dist);
 				}
 			}
@@ -1977,16 +1930,16 @@ void CGPartyObj::statCharge()
 
 		unsigned int twistLimit = table->m_twistLimit;
 		if (twistLimit != 0) {
-			float angLimit = FLOAT_80331AE0 * static_cast<float>(twistLimit);
+			float angLimit = 0.017453292f * static_cast<float>(twistLimit);
 			if (phase == table->m_twistStartFrame) {
 				CVector diff = CVector(m_comboCenter) - CVector(m_worldPosition);
 				float horiz = sqrtf(diff.z * diff.z + diff.x * diff.x);
-				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {
+				if (0.0f != diff.y && 0.0f != horiz) {
 					float ang = -static_cast<float>(atan2(diff.y, horiz));
 					m_twistTarget = (ang < -angLimit) ? -angLimit : ((angLimit < ang) ? angLimit : ang);
 				}
 			} else if (phase == table->m_twistEndFrame) {
-				m_twistTarget = FLOAT_80331a78;
+				m_twistTarget = 0.0f;
 			}
 		}
 		break;
@@ -2068,8 +2021,8 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 		    m_worldPosition.z - radius <= obj->m_worldPosition.z &&
 		    m_worldPosition.x + radius >= obj->m_worldPosition.x &&
 		    m_worldPosition.z + radius >= obj->m_worldPosition.z) {
-			if (m_worldPosition.y + FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius >= obj->m_worldPosition.y &&
-			    m_worldPosition.y - FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius <= obj->m_worldPosition.y) {
+			if (m_worldPosition.y + 2.0f * obj->m_bodyEllipsoidRadius >= obj->m_worldPosition.y &&
+			    m_worldPosition.y - 2.0f * obj->m_bodyEllipsoidRadius <= obj->m_worldPosition.y) {
 				Vec diff;
 				PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
 				diff.y = 0.0f;
@@ -2112,7 +2065,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 		party.commandFlagBits.commandActive = 0;
 		party.commandFlagBits.flag40 = 0;
 
-		CGPrgObj* target = getBestAngleObject(FLOAT_80331ad4 * m_bodyEllipsoidRadius, FLOAT_80331ad8);
+		CGPrgObj* target = getBestAngleObject(2.0f * m_bodyEllipsoidRadius, 0.7853982f);
 		if (target != 0) {
 			m_rotTargetY = atan2(target->m_worldPosition.x - m_worldPosition.x,
 			                     target->m_worldPosition.z - m_worldPosition.z);
@@ -2127,8 +2080,8 @@ void CGPartyObj::onStatAttack(int chargeType)
 	                       .m_attacks[chain];
 
 	if (chain > 0 && m_stateFrame == attackEntry->m_moveStartFrame && !Game.m_gameWork.IsStreamStage()) {
-		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(attackEntry->m_moveSpeed);
-		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed,
+		const float stepSpeed = 0.01f * static_cast<float>(attackEntry->m_moveSpeed);
+		moveVectorRot(m_rotTargetY, 0.0f, stepSpeed,
 		    (attackEntry->m_moveEndFrame - attackEntry->m_moveStartFrame) + 1);
 	}
 
@@ -2221,28 +2174,24 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		party.flags.flag10 = 0;
 
 		Vec rayDir;
-		rayDir.x = sinf(m_rotTargetY) * FLOAT_80331A98;
-		rayDir.y = FLOAT_80331a78;
-		rayDir.z = cosf(m_rotTargetY) * FLOAT_80331A98;
+		rayDir.x = sinf(m_rotTargetY) * 10.0f;
+		rayDir.y = 0.0f;
+		rayDir.z = cosf(m_rotTargetY) * 10.0f;
 
 		Vec faceNormal;
 		float radius;
 		if (isGhostPartyTargetMode(this)) {
-			radius = FLOAT_80331AB0;
+			radius = 3.0f;
 		} else {
-#ifdef VERSION_GCCP01
-			radius = FLOAT_80331A88;
-#else
-			radius = FLOAT_80330A80;
-#endif
+			radius = 4.0f;
 		}
 
-		if (MapPcs.CheckHitCylinderNear(CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), &rayDir, radius, 0x30) != 0) {
+		if (MapPcs.CheckHitCylinderNear(CVector(m_worldPosition) + CVector(0.0f, 5.0f, 0.0f), &rayDir, radius, 0x30) != 0) {
 			MapPcs.CalcHitPosition(&m_comboCenter);
 		} else {
-			PSVECAdd(CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), &rayDir, &m_comboCenter);
+			PSVECAdd(CVector(m_worldPosition) + CVector(0.0f, 5.0f, 0.0f), &rayDir, &m_comboCenter);
 		}
-		if (MapPcs.CheckHitCylinderNear(&m_comboCenter, CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78), FLOAT_80331a78, 0x30) != 0) {
+		if (MapPcs.CheckHitCylinderNear(&m_comboCenter, CVector(0.0f, -100.0f, 0.0f), 0.0f, 0x30) != 0) {
 			MapPcs.CalcHitPosition(&m_comboCenter);
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosA = m_comboCenter;
 			MapPcs.GetHitFaceNormal(&faceNormal);
@@ -2255,7 +2204,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 	CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 	int ofs = (targetSide != 0) ? 4 : 0;
 	CFlat.ResetParticleWork((ofs + 0x47 + work->m_joybusCaravanId) | 0x100, m_particleSlots[4]);
-	CFlat.SetParticleWorkPos(m_comboCenter, FLOAT_80331a78);
+	CFlat.SetParticleWorkPos(m_comboCenter, 0.0f);
 	CFlat.SetParticleWorkParam(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId, 0);
 	CFlat.PutParticleWork();
 }
@@ -2352,7 +2301,7 @@ void CGPartyObj::checkTargetParticle()
 		if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    leader->m_comboState != 0) {
 			CVector toLeaderTarget = CVector(m_comboCenter) - CVector(leader->m_comboCenter);
-			if (PSVECMag(toLeaderTarget) > FLOAT_80331A98) {
+			if (PSVECMag(toLeaderTarget) > 10.0f) {
 				input.x = toLeaderTarget.x;
 				input.z = toLeaderTarget.z;
 			}
@@ -2366,11 +2315,11 @@ void CGPartyObj::checkTargetParticle()
 
 		party.flags.flag20 = 1;
 		input.Normalize();
-		PSVECScale(reinterpret_cast<Vec*>(&input), reinterpret_cast<Vec*>(&input), FLOAT_80331ad4);
+		PSVECScale(reinterpret_cast<Vec*>(&input), reinterpret_cast<Vec*>(&input), 2.0f);
 
 			float angle;
 			if (isGhostPartyTargetMode(this)) {
-				angle = FLOAT_80331AB8;
+				angle = 3.1415927f;
 			} else {
 				angle = CameraPcs.m_yaw;
 			}
@@ -2384,7 +2333,7 @@ void CGPartyObj::checkTargetParticle()
 
 		float dist = PSVECDistance(&m_worldPosition, targetPos);
 
-		float zero = LoadFloat(FLOAT_80331a78);
+		maxRange = 0.0f;
 		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x520) == 2) {
 			int scriptPtr = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58);
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19A);
@@ -2397,7 +2346,7 @@ void CGPartyObj::checkTargetParticle()
 			} else {
 				vFlag = 0;
 			}
-			maxRange = zero + (base + static_cast<float>(vFlag));
+			maxRange += base + static_cast<float>(vFlag);
 		} else {
 			int scriptPtr = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58);
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19C);
@@ -2410,7 +2359,7 @@ void CGPartyObj::checkTargetParticle()
 			} else {
 				vFlag = 0;
 			}
-			maxRange = zero + (base + static_cast<float>(vFlag));
+			maxRange += base + static_cast<float>(vFlag);
 		}
 
 		CVector move = CVector(*targetPos) - CVector(m_worldPosition);
@@ -2425,31 +2374,27 @@ void CGPartyObj::checkTargetParticle()
 		do {
 			float radius;
 			if (isGhostPartyTargetMode(this)) {
-				radius = FLOAT_80331AB0;
+				radius = 3.0f;
 			} else {
-#ifdef VERSION_GCCP01
-				radius = FLOAT_80331A88;
-#else
-				radius = FLOAT_80330A80;
-#endif
+				radius = 4.0f;
 			}
 
-			if (MapPcs.CheckHitCylinderNear(CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), move, radius, 0x30) == 0) {
+			if (MapPcs.CheckHitCylinderNear(CVector(*centerPos) + CVector(0.0f, 5.0f, 0.0f), move, radius, 0x30) == 0) {
 				break;
 			}
 			if (iter == 1) {
-				move.x = FLOAT_80331a78;
-				move.y = FLOAT_80331a78;
-				move.z = FLOAT_80331a78;
+				move.x = 0.0f;
+				move.y = 0.0f;
+				move.z = 0.0f;
 			} else {
-				MapPcs.CalcHitSlide(move, FLOAT_80331A98);
+				MapPcs.CalcHitSlide(move, 10.0f);
 			}
 			iter--;
 		} while (iter > 0);
 
-		PSVECAdd(CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), move, targetPos);
+		PSVECAdd(CVector(*centerPos) + CVector(0.0f, 5.0f, 0.0f), move, targetPos);
 
-		if (MapPcs.CheckHitCylinderNear(targetPos, CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78), FLOAT_80331a78, 0x30) != 0) {
+		if (MapPcs.CheckHitCylinderNear(targetPos, CVector(0.0f, -100.0f, 0.0f), 0.0f, 0x30) != 0) {
 			MapPcs.CalcHitPosition(targetPos);
 			{
 				Vec faceNormal;
@@ -2467,7 +2412,7 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	CVector delta = CVector(m_comboCenter) - CVector(m_worldPosition);
-	if (FLOAT_80331a78 < PSVECMag(delta)) {
+	if (0.0f < PSVECMag(delta)) {
 		m_rotTargetY = atan2(delta.x, delta.z);
 	}
 }
@@ -2493,13 +2438,13 @@ void CGPartyObj::moveCenterTargetParticle()
 		return;
 	}
 
-	float wave = static_cast<float>(sin(FLOAT_80331ac8 * ((float)(step + 1) / FLOAT_80331ac4)));
+	float wave = static_cast<float>(sin(1.5707964f * ((float)(step + 1) / 6.0f)));
 
 	CVector hitPos = CVector(m_comboTarget) + (CVector(m_comboCenter) - CVector(m_comboTarget)) * wave;
 
 	Vec hitNormal;
-	if (MapPcs.CheckHitCylinderNear(hitPos + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78),
-	                                CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78), FLOAT_80331a78, 0x30) != 0) {
+	if (MapPcs.CheckHitCylinderNear(hitPos + CVector(0.0f, 5.0f, 0.0f),
+	                                CVector(0.0f, -100.0f, 0.0f), 0.0f, 0x30) != 0) {
 		MapPcs.CalcHitPosition(hitPos);
 		MapPcs.GetHitFaceNormal(&hitNormal);
 
@@ -2813,19 +2758,15 @@ void CGPartyObj::statCarry()
 		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 		if (m_stateFrame == 0) {
 			CancelMove(1);
-			d = m_targetDist - FLOAT_80331ac4;
+			d = m_targetDist - 6.0f;
 			h = chalice->m_worldPosition.y - m_worldPosition.y;
 		}
 
-#ifdef VERSION_GCCP01
-		if (m_stateFrame <= 0x0B) {
-#else
-		if (m_stateFrame <= 0x0E) {
-#endif
-			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
+		if (m_stateFrame <= kPartyObjCarryArcFrames) {
+			const float phase = sinf((3.1415927f * static_cast<float>(m_stateFrame)) / kPartyObjCarryArcFrames);
 			m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
 			m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
-			m_extraMoveVec.y = h * phase + FLOAT_80331A98;
+			m_extraMoveVec.y = h * phase + 10.0f;
 		}
 	}
 	if (m_stateFrame == 0) {
@@ -2835,8 +2776,8 @@ void CGPartyObj::statCarry()
 	if (isLoopAnim() != 0) {
 		setIdleMotion();
 		changeStat(0, 0, 0);
-		m_extraMoveVec.x = FLOAT_80331a78;
-		m_extraMoveVec.z = FLOAT_80331a78;
+		m_extraMoveVec.x = 0.0f;
+		m_extraMoveVec.z = 0.0f;
 	}
 }
 
@@ -2860,19 +2801,15 @@ void CGPartyObj::statPut()
 		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 		if (m_stateFrame == 0) {
 			CancelMove(1);
-			d = FLOAT_80331AB0;
+			d = 3.0f;
 			h = chalice->m_worldPosition.y - m_worldPosition.y;
 		}
 
-#ifdef VERSION_GCCP01
-		if (m_stateFrame <= 0x0B) {
-#else
-		if (m_stateFrame <= 0x0E) {
-#endif
-			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
+		if (m_stateFrame <= kPartyObjCarryArcFrames) {
+			const float phase = sinf((3.1415927f * static_cast<float>(m_stateFrame)) / kPartyObjCarryArcFrames);
 			m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
 			m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
-			m_extraMoveVec.y = h * phase + FLOAT_80331A98;
+			m_extraMoveVec.y = h * phase + 10.0f;
 		}
 	}
 
@@ -3302,7 +3239,7 @@ int CGPartyObj::putItem(int itemId)
 	int result;
 	CGPrgObj* created;
 	if (canPlayerPutItem() != 0 &&
-	    (created = CGItemObj::CreateFromScript(0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0)) != nullptr) {
+	    (created = CGItemObj::CreateFromScript(0, 9, itemId, this, 0.0f, (CGItemObj::CCFS*)0)) != nullptr) {
 		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
 		    static_cast<short>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId);
 		if (Game.m_gameWork.m_menuStageMode == 0) {
@@ -3329,7 +3266,7 @@ int CGPartyObj::putGil(int amount)
 	int result;
 	CGPrgObj* created;
 	if (canPlayerPutItem() != 0 &&
-	    (created = CGItemObj::CreateFromScript(2, 1, amount, this, FLOAT_80331a78, (CGItemObj::CCFS*)0)) != nullptr) {
+	    (created = CGItemObj::CreateFromScript(2, 1, amount, this, 0.0f, (CGItemObj::CCFS*)0)) != nullptr) {
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(created) + 0x560) = 1;
 		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
 		    static_cast<short>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId);
@@ -3607,10 +3544,10 @@ void CGPartyObj::InitFinished()
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		m_pushParamA = 0;
-		m_bodyEllipsoidRadius = FLOAT_80331AB0;
-		m_capsuleHalfHeight = FLOAT_80331AB0;
-		m_extraMoveVec.y = FLOAT_80331A98;
-		m_turnFactor = FLOAT_80331AB4;
+		m_bodyEllipsoidRadius = 3.0f;
+		m_capsuleHalfHeight = 3.0f;
+		m_extraMoveVec.y = 10.0f;
+		m_turnFactor = 0.15f;
 		CGPartyObj::m_ghostWork.flagBits.flag80 = m_partyData.carryObject == 0;
 	}
 }
@@ -3817,7 +3754,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 			m_scriptHandle->m_statusTimers[5] = 0x5A;
 		}
 	} else {
-		m_alpha = FLOAT_80331A7C;
+		m_alpha = 0.3f;
 		m_bgColMask &= 0xFFFEFFF1;
 		int port = SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_joybusCaravanId;
 
@@ -3850,7 +3787,7 @@ void CGPartyObj::PutMemoryCapsule(int arg0, int arg1, int arg2, int arg3, char* 
 	ccfs.m_modelParam = arg2;
 	ccfs.m_pendingAnimFlags = arg3;
 	ccfs.m_pendingAnimName = arg4;
-	CGItemObj::CreateFromScript(0, 2, 399, this, FLOAT_80331a78, &ccfs);
+	CGItemObj::CreateFromScript(0, 2, 399, this, 0.0f, &ccfs);
 }
 
 /*
@@ -4002,13 +3939,13 @@ static inline int calcWeightMax()
 		scale = 1.0f;
 		break;
 	case 1:
-		scale = FLOAT_80331A58 * (1.0f - rate) + FLOAT_80331A58;
+		scale = 0.5f * (1.0f - rate) + 0.5f;
 		break;
 	case 2:
-		scale = FLOAT_80331A58 * rate + FLOAT_80331A58;
+		scale = 0.5f * rate + 0.5f;
 		break;
 	}
-	int weightMax = FLOAT_80331A5C * scale;
+	int weightMax = 1800.0f * scale;
 	return weightMax;
 }
 
@@ -4032,7 +3969,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 		outVec->x = m_partyDelta[0].x;
 		outVec->y = m_partyDelta[0].y;
 		outVec->z = m_partyDelta[0].z;
-		outVec->y = FLOAT_80331a78;
+		outVec->y = 0.0f;
 
 		outDist = PSVECMag(outVec);
 		outDist = (outDist < m_partyDistance[0]) ? outDist : m_partyDistance[0];
@@ -4058,7 +3995,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 			PSVECSubtract(&loopWork.trailPositions[i], nextPos, &delta);
 			outDist += PSVECMag(&delta);
 
-			delta.y = FLOAT_80331a78;
+			delta.y = 0.0f;
 			float flatStep = PSVECMag(&delta);
 			flatLen += flatStep;
 
@@ -4075,7 +4012,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	}
 
 	outDist = (outDist < flatLen) ? outDist : flatLen;
-	if (outDist > DOUBLE_80331AA8) {
+	if (outDist > 300.0) {
 		goto reset;
 	}
 }
@@ -4102,7 +4039,7 @@ void CGPartyObj::gpmCol()
 
 		CVector diffVec = CVector(leader->m_worldPosition) - CVector(*pos);
 
-		if (MapPcs.CheckHitCylinderNear(CVector(pos->x, FLOAT_80331A98 + pos->y, pos->z), diffVec, m_capsuleHalfHeight,
+		if (MapPcs.CheckHitCylinderNear(CVector(pos->x, 10.0f + pos->y, pos->z), diffVec, m_capsuleHalfHeight,
 		                                leader->m_bgHitMask & ~0x10U) != 0) {
 			activeTrailCount = activeTrailCount < i + 1 ? activeTrailCount : i + 1;
 		} else {
@@ -4138,8 +4075,7 @@ void CGPartyObj::ghostPartyMog()
 
 	distFar = calcWeightMax();
 
-
-	if (static_cast<double>(m_partyDistance[0]) > DOUBLE_80331A90) {
+	if (static_cast<double>(m_partyDistance[0]) > 90.0) {
 		CGPartyObj::m_ghostWork.state = 1;
 	} else {
 		int exceeded;
@@ -4266,14 +4202,13 @@ void CGPartyObj::gpmMove()
 		CGPartyObj::m_ghostWork.settleTimer = 0;
 	}
 
-	if (FLOAT_80331A70 < CGPartyObj::m_ghostWork.carrySpeed) {
+	if (0.1f < CGPartyObj::m_ghostWork.carrySpeed) {
 		moveVector(&CGPartyObj::m_ghostWork.carryDir, CGPartyObj::m_ghostWork.carrySpeed, 1);
 	}
-	CGPartyObj::m_ghostWork.carrySpeed *= FLOAT_80331a74;
-
+	CGPartyObj::m_ghostWork.carrySpeed *= 0.95f;
 
 	pressureLimit = calcWeightMax();
-	if (FLOAT_80331A58 < CGPartyObj::m_ghostWork.carrySpeed) {
+	if (0.5f < CGPartyObj::m_ghostWork.carrySpeed) {
 		int delta = -2;
 		if (m_partyData.carryObject != nullptr) {
 			delta = 2;
@@ -4321,7 +4256,7 @@ void CGPartyObj::gpmMove()
 				return;
 			}
 
-			float limit = (CGPartyObj::m_ghostWork.moodTimer != 0) ? FLOAT_80331A7C : FLOAT_80331A80;
+			float limit = (CGPartyObj::m_ghostWork.moodTimer != 0) ? 0.3f : 0.7f;
 			if (pathDist < Game.unkFloat_0xca10 * limit) {
 				if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 				    leader->m_subState == 1 &&
@@ -4355,7 +4290,7 @@ void CGPartyObj::gpmMove()
 			if (m_partyData.carryObject == nullptr &&
 			    (chalice->m_weaponNodeFlagBits.m_prg != 0) &&
 			    !reinterpret_cast<CGItemObj*>(chalice)->isCarry()) {
-				float pickupRadius = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * FLOAT_80331A84;
+				float pickupRadius = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * 1.5f;
 				if (chaliceDist < pickupRadius) {
 					CancelMove(1);
 					rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
@@ -4367,7 +4302,7 @@ void CGPartyObj::gpmMove()
 			}
 
 			if (moveKind == 0) {
-				float limit = (CGPartyObj::m_ghostWork.moodTimer != 0) ? FLOAT_80331A7C : FLOAT_80331A58;
+				float limit = (CGPartyObj::m_ghostWork.moodTimer != 0) ? 0.3f : 0.5f;
 				if (pathDist < Game.unkFloat_0xca10 * limit) {
 					return;
 				}
@@ -4393,11 +4328,15 @@ void CGPartyObj::gpmMove()
 		}
 
 		CGPartyObj::m_ghostWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
-		CGPartyObj::m_ghostWork.carrySpeed += FLOAT_80331A70;
-		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? 1.0f : FLOAT_80331A88;
+		CGPartyObj::m_ghostWork.carrySpeed += 0.1f;
+#ifdef VERSION_GCCP01
+		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? 1.0f : 4.0f;
+#else
+		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? 1.0f : 3.5f;
+#endif
 		float newSpeed = CGPartyObj::m_ghostWork.carrySpeed;
-		if (newSpeed < FLOAT_80331a78) {
-			newSpeed = FLOAT_80331a78;
+		if (newSpeed < 0.0f) {
+			newSpeed = 0.0f;
 		} else {
 			float speedLimit = speedScale * (m_moveBaseSpeed * Game.m_partyObjArr[0]->m_pushScale);
 			newSpeed = speedLimit < newSpeed ? speedLimit : newSpeed;

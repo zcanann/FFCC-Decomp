@@ -10,18 +10,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
-static const float kPppYmDeformationShpDegToRad = 0.017453292f;
-static const float kPppYmDeformationShpZero = 0.0f;
-static const float kPppYmDeformationShpOne = 1.0f;
-static const float kPppYmDeformationShpScreenCenterX = 320.0f;
-static const float kPppYmDeformationShpInvScreenCenterX = 0.003125f;
-static const float kPppYmDeformationShpScreenCenterY = 224.0f;
-static const float kPppYmDeformationShpInvScreenCenterY = 0.004464f;
-static const float kPppYmDeformationShpMaxBound = 1000.0f;
-static const float kPppYmDeformationShpMinBound = -1000.0f;
-static const float kPppYmDeformationShpTexCenter = -0.5f;
-static const float kPppYmDeformationShpNegOne = -1.0f;
-static const float kPppYmDeformationShpHalf = 0.5f;
 #include "ffcc/util.h"
 
 #include <dolphin/gx.h>
@@ -59,19 +47,19 @@ inline void calcScreenPos(Vec4d& out, Vec pos, Mtx drawMtx, Mtx44 screenMtx)
 	clipPos.x = worldPos.x;
 	clipPos.y = worldPos.y;
 	clipPos.z = worldPos.z;
-	clipPos.w = kPppYmDeformationShpOne;
+	clipPos.w = 1.0f;
 	Math.MTX44MultVec4(screenMtx, &clipPos, &out);
 	out.x = out.x / out.w;
 	out.y = out.y / out.w;
 	out.z = out.z / out.w;
-	out.x = kPppYmDeformationShpScreenCenterX + out.x / kPppYmDeformationShpInvScreenCenterX;
-	out.y = kPppYmDeformationShpScreenCenterY - out.y / kPppYmDeformationShpInvScreenCenterY;
+	out.x = 320.0f + out.x / 0.003125f;
+	out.y = 224.0f - out.y / 0.004464f;
 }
 
 inline void calcBoundaryBox(Vec& boundsMin, Vec& boundsMax, Vec4d* screenPos)
 {
-	boundsMin.y = kPppYmDeformationShpMaxBound;
-	boundsMax.y = kPppYmDeformationShpMinBound;
+	boundsMin.y = 1000.0f;
+	boundsMax.y = -1000.0f;
 	boundsMin.x = boundsMin.y;
 	boundsMax.x = boundsMax.y;
 
@@ -91,16 +79,16 @@ inline void calcBoundaryBox(Vec& boundsMin, Vec& boundsMax, Vec4d* screenPos)
 	}
 
 	if (((int)boundsMin.x % 2) != 0) {
-		boundsMin.x -= kPppYmDeformationShpOne;
+		boundsMin.x -= 1.0f;
 	}
 	if (((int)boundsMin.y % 2) != 0) {
-		boundsMin.y -= kPppYmDeformationShpOne;
+		boundsMin.y -= 1.0f;
 	}
 	if (((int)boundsMax.x % 2) != 0) {
-		boundsMax.x += kPppYmDeformationShpOne;
+		boundsMax.x += 1.0f;
 	}
 	if (((int)boundsMax.y % 2) != 0) {
-		boundsMax.y += kPppYmDeformationShpOne;
+		boundsMax.y += 1.0f;
 	}
 }
 
@@ -121,28 +109,28 @@ inline void setVertexPos(Vec* vertices, s8 orientation, float left, float top, f
 	if (orientation == 0) {
 		vertices[0].x = left;
 		vertices[0].y = top;
-		vertices[0].z = kPppYmDeformationShpZero;
+		vertices[0].z = 0.0f;
 		vertices[1].x = right;
 		vertices[1].y = top;
-		vertices[1].z = kPppYmDeformationShpZero;
+		vertices[1].z = 0.0f;
 		vertices[2].x = right;
 		vertices[2].y = bottom;
-		vertices[2].z = kPppYmDeformationShpZero;
+		vertices[2].z = 0.0f;
 		vertices[3].x = left;
 		vertices[3].y = bottom;
-		vertices[3].z = kPppYmDeformationShpZero;
+		vertices[3].z = 0.0f;
 	} else if (orientation == 1) {
 		vertices[0].x = left;
-		vertices[0].y = kPppYmDeformationShpZero;
+		vertices[0].y = 0.0f;
 		vertices[0].z = top;
 		vertices[1].x = right;
-		vertices[1].y = kPppYmDeformationShpZero;
+		vertices[1].y = 0.0f;
 		vertices[1].z = top;
 		vertices[2].x = right;
-		vertices[2].y = kPppYmDeformationShpZero;
+		vertices[2].y = 0.0f;
 		vertices[2].z = bottom;
 		vertices[3].x = left;
-		vertices[3].y = kPppYmDeformationShpZero;
+		vertices[3].y = 0.0f;
 		vertices[3].z = bottom;
 	}
 }
@@ -152,28 +140,28 @@ inline void setVertexPos(Vec& v0, Vec& v1, Vec& v2, Vec& v3, float halfSize, s8 
 	if (orientation == 0) {
 		v0.x = -halfSize;
 		v0.y = halfSize;
-		v0.z = kPppYmDeformationShpZero;
+		v0.z = 0.0f;
 		v1.x = halfSize;
 		v1.y = halfSize;
-		v1.z = kPppYmDeformationShpZero;
+		v1.z = 0.0f;
 		v2.x = halfSize;
 		v2.y = -halfSize;
-		v2.z = kPppYmDeformationShpZero;
+		v2.z = 0.0f;
 		v3.x = -halfSize;
 		v3.y = -halfSize;
-		v3.z = kPppYmDeformationShpZero;
+		v3.z = 0.0f;
 	} else if (orientation == 1) {
 		v0.x = -halfSize;
-		v0.y = kPppYmDeformationShpZero;
+		v0.y = 0.0f;
 		v0.z = -halfSize;
 		v1.x = halfSize;
-		v1.y = kPppYmDeformationShpZero;
+		v1.y = 0.0f;
 		v1.z = -halfSize;
 		v2.x = halfSize;
-		v2.y = kPppYmDeformationShpZero;
+		v2.y = 0.0f;
 		v2.z = halfSize;
 		v3.x = -halfSize;
-		v3.y = kPppYmDeformationShpZero;
+		v3.y = 0.0f;
 		v3.z = halfSize;
 	}
 }
@@ -183,28 +171,28 @@ inline void setVertexPos(Vec& v0, Vec& v1, Vec& v2, Vec& v3, float halfX, float 
 	if (orientation == 0) {
 		v0.x = -halfX;
 		v0.y = halfY;
-		v0.z = kPppYmDeformationShpZero;
+		v0.z = 0.0f;
 		v1.x = halfX;
 		v1.y = halfY;
-		v1.z = kPppYmDeformationShpZero;
+		v1.z = 0.0f;
 		v2.x = halfX;
 		v2.y = -halfY;
-		v2.z = kPppYmDeformationShpZero;
+		v2.z = 0.0f;
 		v3.x = -halfX;
 		v3.y = -halfY;
-		v3.z = kPppYmDeformationShpZero;
+		v3.z = 0.0f;
 	} else if (orientation == 1) {
 		v0.x = -halfX;
-		v0.y = kPppYmDeformationShpZero;
+		v0.y = 0.0f;
 		v0.z = halfY;
 		v1.x = halfX;
-		v1.y = kPppYmDeformationShpZero;
+		v1.y = 0.0f;
 		v1.z = halfY;
 		v2.x = halfX;
-		v2.y = kPppYmDeformationShpZero;
+		v2.y = 0.0f;
 		v2.z = -halfY;
 		v3.x = -halfX;
-		v3.y = kPppYmDeformationShpZero;
+		v3.y = 0.0f;
 		v3.z = -halfY;
 	}
 }
@@ -231,13 +219,13 @@ inline void SetUpIndWarp(VYmDeformationShp* state)
 		state->m_angle = 1;
 	}
 
-	PSMTXRotRad(drawMtx, 'z', kPppYmDeformationShpDegToRad * (float)state->m_angle);
+	PSMTXRotRad(drawMtx, 'z', 0.017453292f * (float)state->m_angle);
 	indMtx[0][0] = drawMtx[0][0] * state->m_scale.m_value;
 	indMtx[0][1] = drawMtx[0][1] * state->m_scale.m_value;
-	indMtx[0][2] = kPppYmDeformationShpZero;
+	indMtx[0][2] = 0.0f;
 	indMtx[1][0] = drawMtx[1][0] * state->m_scale.m_value;
 	indMtx[1][1] = drawMtx[1][1] * state->m_scale.m_value;
-	indMtx[1][2] = kPppYmDeformationShpZero;
+	indMtx[1][2] = 0.0f;
 	GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
 
@@ -285,30 +273,30 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* object, pppYmDeformationShpS
 		if (step->m_splitMode == 0) {
 			s8 orientation = step->m_orientation;
 			setVertexPos(vertices[0], vertices[1], vertices[2], vertices[3], (float)(u8)step->m_size, orientation);
-			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, kPppYmDeformationShpOne, kPppYmDeformationShpOne);
+			setVertexUV(uvs, 0.0f, 0.0f, 1.0f, 1.0f);
 			RenderDeformationShape(object, state, vertices, uvs);
 		} else {
 			short size = step->m_size;
 			short split = step->m_splitSize;
 			float uvRemainder;
-			float uvSplit = (kPppYmDeformationShpOne / (float)((u8)step->m_size << 1)) * (float)(size - split);
+			float uvSplit = (1.0f / (float)((u8)step->m_size << 1)) * (float)(size - split);
 
 			setVertexPos(vertices, (s8)step->m_orientation, -size, -split, -split, split);
-			setVertexUV(uvs, kPppYmDeformationShpZero, uvSplit, uvSplit, kPppYmDeformationShpOne - uvSplit);
+			setVertexUV(uvs, 0.0f, uvSplit, uvSplit, 1.0f - uvSplit);
 			RenderDeformationShape(object, state, vertices, uvs);
 
-			uvRemainder = kPppYmDeformationShpOne - uvSplit;
+			uvRemainder = 1.0f - uvSplit;
 			setVertexPos(vertices, (s8)step->m_orientation, size, -split, split, split);
-			setVertexUV(uvs, kPppYmDeformationShpOne, uvSplit, uvRemainder, uvRemainder);
+			setVertexUV(uvs, 1.0f, uvSplit, uvRemainder, uvRemainder);
 			RenderDeformationShape(object, state, vertices, uvs);
 
 			if (step->m_splitMode == 1) {
 				setVertexPos(vertices, (s8)step->m_orientation, -size, -size, size, -split);
-				setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, kPppYmDeformationShpOne, uvSplit);
+				setVertexUV(uvs, 0.0f, 0.0f, 1.0f, uvSplit);
 				RenderDeformationShape(object, state, vertices, uvs);
 
 				setVertexPos(vertices, (s8)step->m_orientation, -size, split, size, size);
-				setVertexUV(uvs, kPppYmDeformationShpZero, uvRemainder, kPppYmDeformationShpOne, kPppYmDeformationShpOne);
+				setVertexUV(uvs, 0.0f, uvRemainder, 1.0f, 1.0f);
 				RenderDeformationShape(object, state, vertices, uvs);
 			}
 		}
@@ -382,21 +370,21 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 	texMtx[0][2] = ppvScreenMatrix[0][2];
 	texMtx[1][2] = ppvScreenMatrix[1][2];
 	texMtx[2][2] = ppvScreenMatrix[2][2];
-	texMtx[0][0] = texMtx[0][0] * (kPppYmDeformationShpScreenCenterX / (float)width);
-	texMtx[1][1] = texMtx[1][1] * -(kPppYmDeformationShpScreenCenterY / (float)height);
-	texMtx[0][2] = kPppYmDeformationShpTexCenter;
-	texMtx[1][2] = kPppYmDeformationShpTexCenter;
-	texMtx[2][2] = kPppYmDeformationShpNegOne;
+	texMtx[0][0] = texMtx[0][0] * (320.0f / (float)width);
+	texMtx[1][1] = texMtx[1][1] * -(224.0f / (float)height);
+	texMtx[0][2] = -0.5f;
+	texMtx[1][2] = -0.5f;
+	texMtx[2][2] = -1.0f;
 
 	PSMTXConcat(texMtx, object->m_drawMatrix.value, tempMtx);
-	projectedOrigin.z = kPppYmDeformationShpZero;
-	projectedOrigin.y = kPppYmDeformationShpZero;
-	projectedOrigin.x = kPppYmDeformationShpZero;
+	projectedOrigin.z = 0.0f;
+	projectedOrigin.y = 0.0f;
+	projectedOrigin.x = 0.0f;
 	PSMTXMultVec(tempMtx, &projectedOrigin, &projectedOrigin);
 	projectedOrigin.x = projectedOrigin.x / projectedOrigin.z;
 	projectedOrigin.y = projectedOrigin.y / projectedOrigin.z;
-	texMtx[0][2] = kPppYmDeformationShpNegOne + projectedOrigin.x;
-	texMtx[1][2] = kPppYmDeformationShpNegOne + projectedOrigin.y;
+	texMtx[0][2] = -1.0f + projectedOrigin.x;
+	texMtx[1][2] = -1.0f + projectedOrigin.y;
 	PSMTXConcat(texMtx, object->m_drawMatrix.value, tempMtx);
 
 	for (i = 0; i < 4; i++) {
@@ -418,8 +406,8 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 		}
 	}
 
-	texScaleX = kPppYmDeformationShpOne / (float)width;
-	texScaleY = kPppYmDeformationShpOne / (float)height;
+	texScaleX = 1.0f / (float)width;
+	texScaleY = 1.0f / (float)height;
 	texOffsetX = screenPos[minXIndex].x;
 	texOffsetX -= (float)left;
 	texOffsetX = texScaleX * texOffsetX;
@@ -429,7 +417,7 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 
 	if (originalLeft < 0) {
 		if (640 < (originalLeft + originalWidth)) {
-			texMtx[0][2] = texMtx[0][2] + (kPppYmDeformationShpHalf - projectedOrigin.x);
+			texMtx[0][2] = texMtx[0][2] + (0.5f - projectedOrigin.x);
 		} else {
 			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
@@ -438,7 +426,7 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 				}
 			}
 			texOffsetX = texScaleX * (((float)originalLeft + (float)originalWidth) - screenPos[maxIndex].x);
-			texMtx[0][2] = texMtx[0][2] + (texPos[maxIndex].x + texOffsetX - kPppYmDeformationShpOne);
+			texMtx[0][2] = texMtx[0][2] + (texPos[maxIndex].x + texOffsetX - 1.0f);
 		}
 	} else if (640 < (originalLeft + originalWidth)) {
 		texMtx[0][2] = texMtx[0][2] + offsetX;
@@ -448,7 +436,7 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 
 	if (originalTop < 0) {
 		if (448 < (originalTop + originalHeight)) {
-			texMtx[1][2] = texMtx[1][2] + (kPppYmDeformationShpHalf - projectedOrigin.y);
+			texMtx[1][2] = texMtx[1][2] + (0.5f - projectedOrigin.y);
 		} else {
 			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
@@ -457,7 +445,7 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 				}
 			}
 			texOffsetY = texScaleY * (((float)originalTop + (float)originalHeight) - screenPos[maxIndex].y);
-			texMtx[1][2] = texMtx[1][2] + (texPos[maxIndex].y + texOffsetY - kPppYmDeformationShpOne);
+			texMtx[1][2] = texMtx[1][2] + (texPos[maxIndex].y + texOffsetY - 1.0f);
 		}
 	} else {
 		texMtx[1][2] = texMtx[1][2] + offsetY;
@@ -554,7 +542,7 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, _pppCtrlTable*)
  */
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
 {
-	float zero = kPppYmDeformationShpZero;
+	float zero = 0.0f;
 	VYmDeformationShp* state = DeformationShpState(object, ctrl);
 
 	state->m_scale.m_value = state->m_scale.m_velocity = state->m_scale.m_acceleration = zero;
@@ -572,7 +560,7 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* object, _pppCtrlTable* c
  */
 void pppConstructYmDeformationShp(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
 {
-	float zero = kPppYmDeformationShpZero;
+	float zero = 0.0f;
 	VYmDeformationShp* state = DeformationShpState(object, ctrl);
 
 	state->m_backBuffer = 0;

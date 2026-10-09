@@ -60,14 +60,6 @@ STATIC_ASSERT(sizeof(ScreenBreakDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(ScreenBreakDataOffsets, m_colorDataOffset) == 0x0);
 STATIC_ASSERT(offsetof(ScreenBreakDataOffsets, m_valueOffset) == 0x8);
 
-static const float kScreenBreakExtentScale = 2.0f;
-static const float kScreenBreakZero = 0.0f;
-static const float kScreenBreakTranslationRandLimit = 0.3f;
-static const float kScreenBreakMeshCenterScale = -0.5f;
-static const float kScreenBreakOne = 1.0f;
-static const float kScreenBreakNegativeOne = -1.0f;
-static const float kScreenBreakDegToRad = 0.017453292f;
-
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
 static inline CChara::CModel::CRefData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
 static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { return meshData->m_nodeIndex; }
@@ -89,7 +81,7 @@ static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive;
  */
 static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext, void* stepContext)
 {
-    float zero = kScreenBreakZero;
+    float zero = 0.0f;
     VScreenBreak* work = static_cast<VScreenBreak*>(workContext);
     PScreenBreak* step = static_cast<PScreenBreak*>(stepContext);
     ScreenBreakPiece* pieceBase = work->m_pieces;
@@ -222,7 +214,7 @@ static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], 
     Vec lightDir;
     GXLightObj lightObj;
     CCameraPcs* camera = &CameraPcs;
-    float zero = kScreenBreakZero;
+    float zero = 0.0f;
 
     lightDir.x = camera->m_directionX - (30.0f + camera->m_positionX);
     lightDir.y = camera->m_directionY - (30.0f + camera->m_positionY);
@@ -314,7 +306,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
     S16Vec globalMax;
 
     memset(work->m_pieces, 0, ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece));
-    float translationRandLimit = kScreenBreakTranslationRandLimit;
+    float translationRandLimit = 0.3f;
     CChara::CMesh* meshBase = model->m_meshes;
     float negativeRandLimit = -translationRandLimit;
     ScreenBreakPiece* pieceBase = work->m_pieces;
@@ -356,7 +348,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         meshMax.y += meshMin.y;
         meshMax.z += meshMin.z;
         gUtil.ConvI2FVector(piece->m_translation, meshMax, ScreenBreakModelRef(model)->m_posQuant);
-        PSVECScale(&piece->m_translation, &piece->m_translation, kScreenBreakMeshCenterScale);
+        PSVECScale(&piece->m_translation, &piece->m_translation, -0.5f);
 
         float velocityX = piece->m_translation.x;
         if (piece->m_translation.x > translationRandLimit) {
@@ -367,8 +359,8 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         }
 
         piece->m_velocity.x = velocityX;
-        piece->m_velocity.y = kScreenBreakOne;
-        piece->m_velocity.z = kScreenBreakNegativeOne;
+        piece->m_velocity.y = 1.0f;
+        piece->m_velocity.z = -1.0f;
         PSVECNormalize(&piece->m_velocity, &piece->m_velocity);
         Vec up = {0.0f, 1.0f, 0.0f};
         PSVECCrossProduct(&piece->m_velocity, &up, &piece->m_axis);
@@ -376,12 +368,12 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         float speed = Math.RandF(step->m_speedRand);
         PSVECScale(&piece->m_velocity, &piece->m_velocity, step->m_speedBase + speed);
 
-        piece->m_offset.x = piece->m_offset.y = piece->m_offset.z = kScreenBreakZero;
-        piece->m_timer = kScreenBreakZero;
+        piece->m_offset.x = piece->m_offset.y = piece->m_offset.z = 0.0f;
+        piece->m_timer = 0.0f;
 
         float angle = Math.RandF(static_cast<float>(step->m_angleRand));
-        angle = kScreenBreakExtentScale + angle;
-        piece->m_angle = kScreenBreakDegToRad * angle;
+        angle = 2.0f + angle;
+        piece->m_angle = 0.017453292f * angle;
         piece->m_active = 0;
     }
 
@@ -420,7 +412,7 @@ void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
     CChara::CModel* model = GetCharaModelPtr(handle);
     gObject->m_displayFlags |= 0x40;
     model->m_beforeDrawModelCallback = SB_BeforeDrawCallback;
-    float zero = kScreenBreakZero;
+    float zero = 0.0f;
     model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
     model->SetBeforeMeshLockEnvCallback(SB_BeforeMeshLockEnvCallback);
     model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
@@ -448,7 +440,7 @@ void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
 {
     ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(ctrl);
     VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
-    float zero = kScreenBreakZero;
+    float zero = 0.0f;
     value->m_graphValue0 = value->m_graphValue1 = value->m_graphValue2 = zero;
 }
 
@@ -533,7 +525,7 @@ void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* step, _pppCt
         PSVECNormalize(&step->m_gravityDir, &step->m_gravityDir);
     }
 
-    float extentScale = kScreenBreakExtentScale;
+    float extentScale = 2.0f;
     float sx = extentScale * value->m_extent.x;
     float sy = extentScale * value->m_extent.y;
     ScreenBreakPiece* piece = value->m_pieces;

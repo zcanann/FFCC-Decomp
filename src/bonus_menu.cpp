@@ -1613,7 +1613,8 @@ void CMenuPcs::CalcResultCloseAnim()
 	if (this->m_bonusState->m_initialized == 0) {
 		for (i = 0; i < (int)m_bonusAnim->header.count; i++) {
 			m_bonusAnim->sprites[i].timer = 0;
-			m_bonusAnim->sprites[i].motionY = m_bonusAnim->sprites[i].motionX = 0.0f;
+			m_bonusAnim->sprites[i].motionX = 0.0f;
+			m_bonusAnim->sprites[i].motionY = 0.0f;
 		}
 
 		int base = 0;

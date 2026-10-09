@@ -8223,6 +8223,7 @@ void CMenuPcs::CalcMainMenuSub()
 	const int kRotateFrames = 17;
 #endif
 	int i;
+	int n;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	const unsigned short btn = Pad.GetButtonDown(0);
 
@@ -8281,17 +8282,16 @@ void CMenuPcs::CalcMainMenuSub()
 					m_wmWorldState->m_nextMenuMode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				} else if ((btn & 0x200) != 0) {
-					int valid;
 					m_wmMenuRotation = m_wmMenuTargetRotation;
-					for (i = valid = 0; i < 4; i++) {
+					for (i = n = 0; i < 4; i++) {
 						if (Game.m_gameWork.m_menuStageMode != 0 && i != 0) {
 							break;
 						}
 						if (m_wmWorldState->m_backupParams[i] >= 0) {
-							valid++;
+							n++;
 						}
 					}
-					if (valid == 0) {
+					if (n == 0) {
 						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					} else {
 						m_wmWorldState->m_delay = 1;
@@ -8348,7 +8348,6 @@ void CMenuPcs::CalcMainMenuSub()
 
 			WmWorldObjInfo* const panel = &worldObj[i];
 			panel->m_active = 1;
-			int frame;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
 				modelScale *= DOUBLE_803315D8;
@@ -8382,15 +8381,15 @@ void CMenuPcs::CalcMainMenuSub()
 				if (ms != 2) {
 					if (ms < 2) {
 #ifdef VERSION_GCCJGC
-						frame = 0x14 - (ms * 10 + m_wmWorldState->m_frameCounter);
+						n = 0x14 - (ms * 10 + m_wmWorldState->m_frameCounter);
 #else
-						frame = 0x13 - (ms * 10 + m_wmWorldState->m_frameCounter);
-						if (static_cast<int>(frame) < 0) {
-							frame = 0;
+						n = 0x13 - (ms * 10 + m_wmWorldState->m_frameCounter);
+						if (static_cast<int>(n) < 0) {
+							n = 0;
 						}
 #endif
 					} else {
-						frame = m_wmWorldState->m_frameCounter + (ms - 3) * 10;
+						n = m_wmWorldState->m_frameCounter + (ms - 3) * 10;
 					}
 				}
 			}
@@ -8401,8 +8400,12 @@ void CMenuPcs::CalcMainMenuSub()
 			} else if (i == 1) {
 				if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
 				    m_wmWorldState->m_mainState != 2) {
+#ifdef VERSION_GCCJGC
+					float inner = static_cast<float>(DOUBLE_80331600 * (static_cast<double>(n) / DOUBLE_80331608));
+#else
 					float inner = static_cast<float>(DOUBLE_80331600 *
-					    (static_cast<double>(static_cast<float>(frame)) / DOUBLE_80331608));
+					    (static_cast<double>(static_cast<float>(n)) / DOUBLE_80331608));
+#endif
 					float rot = static_cast<float>(
 					    DOUBLE_803315F0 * (DOUBLE_803315F8 + inner));
 					PSMTXRotRad(modelMtx, 'x', rot);
@@ -8436,7 +8439,7 @@ void CMenuPcs::CalcMainMenuSub()
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
-				double u = static_cast<double>(frame) / DOUBLE_80331608;
+				double u = static_cast<double>(n) / DOUBLE_80331608;
 				float m00 = modelMtx[0][3];
 				float m10 = modelMtx[1][3];
 				float m20 = modelMtx[2][3];
@@ -8454,7 +8457,7 @@ void CMenuPcs::CalcMainMenuSub()
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
 				float openScale2 = static_cast<float>(
-				    static_cast<float>(DOUBLE_803313F8 * (static_cast<double>(frame) / DOUBLE_80331608)) +
+				    static_cast<float>(DOUBLE_803313F8 * (static_cast<double>(n) / DOUBLE_80331608)) +
 				    DOUBLE_80331420);
 				PSMTXScale(workMtx, openScale2, openScale2, openScale2);
 				PSMTXConcat(workMtx, modelMtx, modelMtx);

@@ -375,7 +375,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		return;
 	}
 
-	const int materialCount = m_data->m_materialSet->m_materials.GetSize();
+	const int materialCount = m_data->m_materialSet->GetNumMaterial();
 
 	int hasFurMaterial = 0;
 	for (int i = 0; i < materialCount; i++) {

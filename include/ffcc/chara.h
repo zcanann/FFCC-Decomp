@@ -520,7 +520,7 @@ public:
 	void gqrInit(unsigned long, unsigned long, unsigned long);
     void SetAmemStage(CMemory::CStage* stage) { m_amemLoadStage = stage; }
     CMemory::CStage* GetMemoryStage() { return m_amemStage; }
-    u32 GetAmemBaseAddress() const { return m_amemLoadStage->m_heapTop; }
+    u32 GetAmemBaseAddress() const { return reinterpret_cast<u32>(m_amemLoadStage->GetTop()); }
     u32& AmemSize() { return m_amemSize; }
     int GetDrawBufferIndex() const { return m_drawBufferIndex; }
     u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }

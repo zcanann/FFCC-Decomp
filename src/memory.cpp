@@ -2159,13 +2159,3 @@ void CMemory::CStage::GetTail()
 	// TODO
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemory::CStage::GetTop()
-{
-	// TODO
-}
-

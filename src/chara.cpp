@@ -345,11 +345,6 @@ static inline s16& ModelChest1Index(CChara::CModel* model)
 	return model->m_data->m_chest1NodeIndex;
 }
 
-static inline float TexAnimSetChin(CTexAnimSet* texAnimSet)
-{
-	return texAnimSet->GetChin();
-}
-
 static inline Quaternion& NodePreviousQuat(CChara::CNode* node)
 {
 	return node->m_previousQuat;
@@ -1336,7 +1331,7 @@ void CChara::CModel::calcMatrix()
 					}
 					srt.m_rotation.z += m_chestAmp * tiltScale;
 				} else if (nodeIndex == ModelChest1Index(this) && ModelTexAnimSet(this) != 0) {
-					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
+					srt.m_rotation.z += m_texAnimSet->GetChin();
 				}
 				if (NodeAnimNode0(node)->IsScale()) {
 					Math.SRTToMatrix(animMtx, &srt);

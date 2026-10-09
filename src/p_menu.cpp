@@ -85,6 +85,8 @@ static const char sMenuGc22FontPathFmt[] = "dvd/menu/gc22.fnt";
 #else
 static const char sMenuGc22FontPathFmt[] = "dvd/%smenu/gc22.fnt";
 #endif
+static const char sMenuCommonName[] = "common";
+static const char sMenuWinName[] = "win";
 static const char sMenuTexKasoru[] = "kasoru";
 static const char sMenuTexPause[] = "pause";
 static const char sMenuTexWin1_0[] = "win1_0";
@@ -153,10 +155,6 @@ enum
     MenuBattleTextureStart = MenuCommonTextureCount,
     MenuFaceTexture = MenuBattleTextureStart + 2
 };
-
-static const char sMenuCommonName[] = "common";
-static const char sMenuWinName[] = "win";
-
 
 static inline void ReleaseRefObject(void* object)
 {

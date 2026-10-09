@@ -981,6 +981,7 @@ TRK_MINNOW_DOLPHIN/nubinit.c:
 MenuUtil.cpp:
 	.text start:0x80171534 end:0x80175A90
 	.rodata     start:0x801DA5D0 end:0x801DB150
+	.sdata2 start:0x8034F9D8 end:0x8034FAF0
 
 TRK_MINNOW_DOLPHIN/nubevent.c:
 	.text	start:0x801A3624 end:0x801A384C

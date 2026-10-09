@@ -1138,7 +1138,7 @@ auto_09_8034B8EB_sdata:
 	.sdata start:0x8034B8EB end:0x8034B8F0 align:1
 
 TRK_MINNOW_DOLPHIN/targsupp.s:
-	.text	start:0x801A9B00 end:0x801A9B20
+	.text	start:0x801A9B00 end:0x801A9B20 align:16
 
 file.cpp:
 	.rodata start:0x801D0700 end:0x801D094C

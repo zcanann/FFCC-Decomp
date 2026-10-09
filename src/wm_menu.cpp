@@ -8574,7 +8574,8 @@ void CMenuPcs::DrawMainMenuSub()
 		    static_cast<short>(static_cast<int>(clipPos.y - FLOAT_803315B4));
 		m_wm.m_worldObjData[i].m_viewportWidth = 0x280;
 		m_wm.m_worldObjData[i].m_viewportHeight = 0x1C0;
-		m_wm.m_worldObjData[i].m_cameraPosition.y = m_wm.m_worldObjData[i].m_cameraPosition.x = FLOAT_803313dc;
+		m_wm.m_worldObjData[i].m_cameraPosition.x = FLOAT_803313dc;
+		m_wm.m_worldObjData[i].m_cameraPosition.y = FLOAT_803313dc;
 		m_wm.m_worldObjData[i].m_cameraPosition.z = FLOAT_80331598;
 	}
 
@@ -8839,7 +8840,11 @@ nextListEntry:
 			         static_cast<float>(static_cast<float>(DOUBLE_80331498 * static_cast<double>(slot) + DOUBLE_80331490) -
 			                            DOUBLE_80331510),
 			         FLOAT_803314D8, FLOAT_803314D8,
+#ifdef VERSION_GCCJGC
+			         static_cast<float>(DOUBLE_80331490 * static_cast<double>(slot) + 104.0), 432.0f,
+#else
 			         static_cast<float>(DOUBLE_80331490 * static_cast<double>(slot)), FLOAT_803313e0,
+#endif
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}

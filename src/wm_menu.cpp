@@ -9070,9 +9070,13 @@ nextListEntry:
 
 		// Draw text info for each save slot
 		for (slot = 0; slot < kMcListCount; slot++) {
+#ifdef VERSION_GCCJGC
+			char locationStr[32];
+#else
 			char locationStr[64];
 			char line1[64];
 			char line2[64];
+#endif
 			const McListInfo* const slotData = &m_wmCharaState[slot];
 			const float slotY = static_cast<float>(DOUBLE_80331498 * static_cast<double>(slot) + DOUBLE_80331490);
 			if (slotData->m_isBroken != 0 || static_cast<int>(slotData->m_scriptSysVal0) <= 0) {
@@ -9118,7 +9122,8 @@ nextListEntry:
 				} else if (locationIndex == 0x16) {
 #ifdef VERSION_GCCJGC
 					strcpy(locationStr, slotData->m_townName);
-					strcpy(locationStr + strlen(locationStr) - 4, "\x82\xCC\x8D\x60");
+					int len = strlen(locationStr);
+					strcpy(&locationStr[len - 4], "\x82\xCC\x8D\x60");
 #else
 					SetPortTownName(locationStr, slotData->m_townName);
 #endif
@@ -9152,7 +9157,9 @@ nextListEntry:
 #endif
 			}
 		}
+#ifndef VERSION_GCCJGC
 	}
+#endif
 	if (worldState->m_subState == 0x11) {
 		short mode = worldState->m_menuMode;
 		if (mode == 5) {
@@ -9176,6 +9183,7 @@ nextListEntry:
 		}
 #ifdef VERSION_GCCJGC
 		DrawInit();
+	}
 #endif
 	}
 #ifndef VERSION_GCCJGC

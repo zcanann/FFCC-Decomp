@@ -21,10 +21,12 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-#ifdef VERSION_GCCJGC
-#define BONUS_LINE(line, jpLine) (jpLine)
+#if defined(VERSION_GCCJGC)
+#define BONUS_LINE(line, usLine, jpLine) (jpLine)
+#elif defined(VERSION_GCCE01)
+#define BONUS_LINE(line, usLine, jpLine) (usLine)
 #else
-#define BONUS_LINE(line, jpLine) (line)
+#define BONUS_LINE(line, usLine, jpLine) (line)
 #endif
 
 static const float s_PCYpos[4] = {-11.14f, -7.1f, -11.55f, -11.14f};
@@ -208,14 +210,14 @@ void CMenuPcs::createBonus()
 	loadFont(0, fontPath, 1, -1);
 #endif
 
-	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xDD, 0xD4)) BonusSummaryData;
+	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xDD, 0xDD, 0xD4)) BonusSummaryData;
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (i = 0; i < BonusSummaryData::kArtifactCount; i++) {
 		s_Rinfo->m_artifacts[i] = -1;
 	}
 
-	this->m_bonusState = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE5, 0xDC)) BonusMenuState;
-	m_effectWork = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE6, 0xDD)) EffectInfo[0x28];
+	this->m_bonusState = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE5, 0xE5, 0xDC)) BonusMenuState;
+	m_effectWork = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE6, 0xE6, 0xDD)) EffectInfo[0x28];
 
 	for (i = 0; i < 0x28; i++) {
 		m_effectWork[i].m_effectNo = -1;
@@ -223,12 +225,12 @@ void CMenuPcs::createBonus()
 		m_effectWork[i].m_slotNo = -1;
 	}
 	memset(this->m_bonusState, 0, sizeof(*this->m_bonusState));
-	s_Base = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF1, 0xE8)) BonusBaseInfo;
+	s_Base = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF1, 0xF1, 0xE8)) BonusBaseInfo;
 	memset(s_Base, 0, sizeof(*s_Base));
-	m_bonusAnim = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF5, 0xEC)) BonusAnimList;
+	m_bonusAnim = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF5, 0xF5, 0xEC)) BonusAnimList;
 	memset(m_bonusAnim, 0, sizeof(BonusAnimList));
-	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF8, 0xEF)) WmWorldObjInfo[24];
-	this->m_menuWindowInfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xFA, 0xF1)) MenuWindowInfo;
+	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF8, 0xF8, 0xEF)) WmWorldObjInfo[24];
+	this->m_menuWindowInfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xFA, 0xFA, 0xF1)) MenuWindowInfo;
 	memset(this->m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 	const float depth = 100.0f;
 	const float zero = 0.0f;
@@ -383,7 +385,7 @@ void CMenuPcs::createBonus()
 				break;
 			}
 			CCharaPcs::CHandle* handle =
-			    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x183, 0x179)) CCharaPcs::CHandle;
+			    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x183, 0x183, 0x179)) CCharaPcs::CHandle;
 			this->m_wm.m_handles[slotIdx] = handle;
 			this->m_wm.m_handles[slotIdx]->Add();
 			unsigned long modelCode = s_Rinfo->m_party[i % pc].m_partySlot + 0x83;
@@ -401,7 +403,7 @@ void CMenuPcs::createBonus()
 				m_wm.m_handles[i] = 0;
 			} else {
 				CCharaPcs::CHandle* itemHandle =
-				    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x19C, 0x192)) CCharaPcs::CHandle;
+				    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x19C, 0x19C, 0x192)) CCharaPcs::CHandle;
 				m_wm.m_handles[i] = itemHandle;
 				m_wm.m_handles[i]->Add();
 				unsigned short itemModelCode =
@@ -2478,13 +2480,8 @@ void CMenuPcs::CalcSelectOpenAnim()
  */
 void CMenuPcs::DrawSelectOpenAnim()
 {
-#ifdef VERSION_GCCJGC
-	enum { kSourceAllocLine = 0x9CD, kSourceErrorLine = 0x9D0,
-	       kConvertedAllocLine = 0x9D6, kConvertedErrorLine = 0x9D9 };
-#else
-	enum { kSourceAllocLine = 0xA9C, kSourceErrorLine = 0xA9F,
-	       kConvertedAllocLine = 0xAA5, kConvertedErrorLine = 0xAA8 };
-#endif
+	enum { kSourceAllocLine = BONUS_LINE(0xA9C, 0xA97, 0x9CD), kSourceErrorLine = BONUS_LINE(0xA9F, 0xA9A, 0x9D0),
+	       kConvertedAllocLine = BONUS_LINE(0xAA5, 0xAA0, 0x9D6), kConvertedErrorLine = BONUS_LINE(0xAA8, 0xAA3, 0x9D9) };
 	if (this->m_bonusState->m_initialized == 0) {
 		return;
 	}

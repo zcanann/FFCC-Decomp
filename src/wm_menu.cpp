@@ -5954,6 +5954,7 @@ inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFo
  */
 void CMenuPcs::CalcWMFrame()
 {
+	int i;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	short mainState = m_wmWorldState->m_mainState;
 	if (mainState == 0) {
@@ -6054,25 +6055,24 @@ void CMenuPcs::CalcWMFrame()
 		const double dV10 = DOUBLE_80331490;
 		const double dV12 = DOUBLE_80331540;
 		const double dV11 = DOUBLE_80331538;
-		int wmDigitIdx;
-		for (wmDigitIdx = topDigitIdx; wmDigitIdx >= 0; wmDigitIdx--) {
-				int digit = digits[wmDigitIdx];
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_x = (short)digitX;
+		for (i = topDigitIdx; i >= 0; i--) {
+				int digit = digits[i];
+				m_wm.m_frameData->m_yearSprites[i].m_x = (short)digitX;
 				int digitW = s_YearWTbl[digit];
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_y = kWorldYearDigitY;
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_width = (short)digitW;
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_height = 0x20;
+				m_wm.m_frameData->m_yearSprites[i].m_y = kWorldYearDigitY;
+				m_wm.m_frameData->m_yearSprites[i].m_width = (short)digitW;
+				m_wm.m_frameData->m_yearSprites[i].m_height = 0x20;
 				int col = digit % 5;
 				int row = digit / 5;
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_u = (float)(dV10 * (double)(float)col);
-				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_v = (float)(dV12 * (double)(float)row + dV11);
+				m_wm.m_frameData->m_yearSprites[i].m_u = (float)(dV10 * (double)(float)col);
+				m_wm.m_frameData->m_yearSprites[i].m_v = (float)(dV12 * (double)(float)row + dV11);
 				digitX = digitX + digitW;
 		}
 	}
 
 	if ((m_wmChgFlags & WMDATA_CHG_YEAR) != 0 ||
 	    (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0)) {
-		for (int i = 0; i < digitCount; i++) {
+		for (i = 0; i < digitCount; i++) {
 			if (i != 0 && digitCount != 2) {
 				break;
 			}
@@ -8971,10 +8971,10 @@ nextListEntry:
 					MenuPcs.DrawRect(0, FLOAT_80331520, rowY, static_cast<float>(dw10), FLOAT_80331410,
 					         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 				} else {
-					for (int di = 0; di < digitCount; di++) {
+					for (digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						if (digitCount == 1) {
 							totalWidth = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
-						} else if (di == 0) {
+						} else if (digitIdx == 0) {
 							totalWidth = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) / 10];
 						} else {
 							totalWidth += s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];

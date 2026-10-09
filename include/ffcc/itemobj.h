@@ -128,6 +128,7 @@ public:
 	static void DeleteAllFieldItem();
 	static void DispAllFieldItem(int);
 	int GetCID();
+	int isCarry() { return m_owner ? 1 : 0; }
 
 	union Flags {
 		unsigned char m_flags;

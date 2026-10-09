@@ -1226,11 +1226,7 @@ void CGPartyObj::command()
 				caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 				if (weaponItem != party.unk6BC ||
 				    weaponRef != getEquipWeaponInventoryItem(caravan)) {
-					int newWeaponRef = getEquipWeaponInventoryItem(caravan);
-					party.pendingWeaponIndex = party.unk6BC;
-					party.pendingWeaponItemId = newWeaponRef;
-					party.commandFlagBits.flag20 = 1;
-					changeStat(0x0F, 0, 0);
+					changeWeapon(party.unk6BC, getEquipWeaponInventoryItem(caravan), 0);
 					return;
 				}
 
@@ -1287,10 +1283,7 @@ void CGPartyObj::command()
 				int weaponRef;
 				caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 				if (weaponItem != caravan->GetIdxCmdList() || weaponRef != itemId) {
-					party.pendingWeaponIndex = caravan->GetIdxCmdList();
-					party.pendingWeaponItemId = itemId;
-					party.commandFlagBits.flag20 = 1;
-					changeStat(0x0F, 0, 0);
+					changeWeapon(caravan->GetIdxCmdList(), itemId, 0);
 					return;
 				}
 				m_itemId = itemId;
@@ -4536,7 +4529,7 @@ void CGPartyObj::gpmMove()
 		} else {
 			if (m_partyData.carryObject == nullptr &&
 			    (chalice->m_weaponNodeFlagBits.m_prg != 0) &&
-			    reinterpret_cast<CGItemObj*>(chalice)->m_owner == 0) {
+			    !reinterpret_cast<CGItemObj*>(chalice)->isCarry()) {
 				float pickupRadius = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * FLOAT_80331A84;
 				if (chaliceDist < pickupRadius) {
 					CancelMove(1);

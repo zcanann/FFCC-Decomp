@@ -157,7 +157,7 @@ inline void CGMonObj::suikomiSub(CGObject* target, float zOffset)
 	float dist = sqrtf(distSq);
 
 	if (0.0f < dist) {
-		float accel = 1.0f / dist * (0.25f * (dist / 37.5f));
+		float accel = 1.0f / dist * (0.25f * (dist / MON_FRAMES(45.0f, 37.5f)));
 		dx *= accel;
 		dz *= accel;
 		target->m_groundHitOffset.x += dx;
@@ -2616,7 +2616,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			m_bgColMask &= 0xfff7fffd;
 			Vec* moveDir = &reinterpret_cast<GiantCrabBossWork*>(m_boss)->m_moveTarget;
 			float moveScale = PSVECDistance(moveDir, &m_worldPosition);
-			moveScale *= 0.0625f;
+			moveScale /= MON_FRAMES(20.0f, 16.0f);
 			Move(moveDir, moveScale, MON_FRAMES(0x14, 0x10), 1, 0, 0, 0);
 
 			int targetIdx = m_targetPartyIndex;

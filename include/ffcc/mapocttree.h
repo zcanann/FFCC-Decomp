@@ -75,7 +75,11 @@ public:
 class COctNode
 {
 public:
-	COctNode();
+	COctNode()
+	{
+		m_lightFlags = 0;
+		m_shadowFlags = 0;
+	}
 	CBound* GetBound() { return &m_bound; }
 
 	CBound m_bound;         // 0x00

@@ -196,20 +196,6 @@ void CFlatRuntime::clear()
 
 /*
  * --INFO--
- * PAL Address: 0x800695fc
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CFlatRuntime::CClass::CClass()
-{
-	m_variableCount = 2;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80068DF8
  * PAL Size: 2052b
  * EN Address: 0x80068760

@@ -2109,37 +2109,6 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
 
 /*
  * --INFO--
- * PAL Address: 0x8001D934
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CAmemCache::CAmemCache()
-{
-    m_cacheData = 0;
-    m_workData = 0;
-    m_refCount = 0;
-    m_size = 0;
-    m_inUse = 0;
-    m_priority = 0;
-    m_dmaCopy = 1;
-    m_type = 0xFF;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CAmemCache::~CAmemCache()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

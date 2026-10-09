@@ -126,8 +126,18 @@ public:
         PDT,
     };
 
-    CAmemCache();
-    ~CAmemCache();
+    CAmemCache()
+    {
+        m_cacheData = 0;
+        m_workData = 0;
+        m_refCount = 0;
+        m_size = 0;
+        m_inUse = 0;
+        m_priority = 0;
+        m_dmaCopy = 1;
+        m_type = 0xFF;
+    }
+    ~CAmemCache() {}
     void Destroy(CMemory::CStage*);
     int GetData(CMemory::CStage*, char*, int);
     void SetData(void*, int);

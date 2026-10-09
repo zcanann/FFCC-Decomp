@@ -79,7 +79,7 @@ typedef char CMapCylinder_size_check[(sizeof(CMapCylinder) == 0x40) ? 1 : -1];
 class CMapHitFace
 {
 public:
-    CMapHitFace();
+    CMapHitFace() {}
 
     Vec m_normal;                   // 0x00
     float m_planeD;                 // 0x0c

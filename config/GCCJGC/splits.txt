@@ -1100,7 +1100,7 @@ TRK_MINNOW_DOLPHIN/targsupp.s:
 
 file.cpp:
 	.rodata start:0x801D0700 end:0x801D094C
-	.data start:0x801DC5C0 end:0x801DC610
+	.data start:0x801DC5C0 end:0x801DC620
 	.sdata start:0x8034B1C0 end:0x8034B1D0
 	.sdata2 start:0x8034C3C0 end:0x8034C3E8
 	extab start:0x800056F0 end:0x80005768
@@ -1231,7 +1231,7 @@ math.cpp:
 	.rodata start:0x801D0FF0 end:0x801D1000
 	.data start:0x801DC710 end:0x801DC730
 	.sdata start:0x8034B200 end:0x8034B210
-	.sdata2 start:0x8034C498 end:0x8034C4F8
+	.sdata2 start:0x8034C498 end:0x8034C4F4
 	extab start:0x800059C8 end:0x80005A58
 	extabindex start:0x8000B1E8 end:0x8000B2C0
 	.bss start:0x80257DD8 end:0x80258188

@@ -177,19 +177,6 @@ static inline _GXColor ModulateColor(const _GXColor& src, const _GXColor& shade)
 
 /*
  * --INFO--
- * PAL Address: 0x8007b848
- * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CCharaPcs::~CCharaPcs()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8007a51c
  * PAL Size: 1124b
  * EN Address: TODO

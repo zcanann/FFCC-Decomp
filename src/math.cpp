@@ -451,11 +451,11 @@ int CBound::CheckFrustum0(CBound& outBound)
 int CBound::CheckFrustum0(float farPlane)
 {
     unsigned int clipMask;
+    unsigned int insideMask;
     unsigned int outsideMask;
     int xIndex;
     int yIndex;
     int zIndex;
-    unsigned int insideMask;
     float farthestZ;
     float zero;
     Vec vertex;
@@ -496,9 +496,9 @@ int CBound::CheckFrustum0(float farPlane)
                         clipMask = 0x10;
                     }
                     if (transformed.y > -transformed.z) {
-                        clipMask = (unsigned char)(clipMask | 0x14);
+                        clipMask = (clipMask | 0x14) & 0xFF;
                     } else if (transformed.y < transformed.z) {
-                        clipMask = (unsigned char)(clipMask | 0x18);
+                        clipMask = (clipMask | 0x18) & 0xFF;
                     }
                 } else {
                     if (transformed.x > -transformed.z) {
@@ -509,9 +509,9 @@ int CBound::CheckFrustum0(float farPlane)
                         clipMask = 0;
                     }
                     if (transformed.y > -transformed.z) {
-                        clipMask = (unsigned char)(clipMask | 4);
+                        clipMask = (clipMask | 4) & 0xFF;
                     } else if (transformed.y < transformed.z) {
-                        clipMask = (unsigned char)(clipMask | 8);
+                        clipMask = (clipMask | 8) & 0xFF;
                     }
                 }
                 zIndex++;
@@ -526,11 +526,11 @@ int CBound::CheckFrustum0(float farPlane)
     if (farthestZ < farPlane) {
         return 0;
     }
-    if ((unsigned char)insideMask != 0) {
+    if ((insideMask & 0xFF) != 0) {
         return 0;
     }
 
-    return (unsigned char)outsideMask == 0 ? 2 : 1;
+    return (outsideMask & 0xFF) == 0 ? 2 : 1;
 }
 
 /*

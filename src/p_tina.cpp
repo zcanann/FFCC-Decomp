@@ -13,6 +13,29 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: UNUSED
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void MTXConcatVec(Mtx src, Vec* trans, Mtx dst)
+{
+    static Mtx m = {
+        {1.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f, 0.0f},
+    };
+
+    m[0][3] = trans->x;
+    m[1][3] = trans->y;
+    m[2][3] = trans->z;
+    MTXConcat(src, m, dst);
+}
+
 extern "C" unsigned char g_IsDrawHeapSize = 1;
 
 
@@ -37,67 +60,6 @@ extern const char sTinaGbaResourceStrings[] = {
     (char)0x73, (char)0x00, (char)0x00, (char)0x00,
 };
 #endif
-extern const char sPartPcsGameTableName[] = "CPartPcs(GAME)";
-extern const char sPartPcsViewerTableName[] = "CPartPcs(PART_VIEWER)";
-extern const char sPartPcsClassName[] = "CPartPcs";
-extern const char sPartPcsManagerClassName[] = "CManager";
-extern const char sPartPcsProcessClassName[] = "CProcess";
-extern const char sMiruraPdtPathFmt[] = "dvd/tina/stage%03d/mirura";
-extern const char sLocationTitlePdtPathFmt[] = "dvd/tina/stage%03d/title";
-#ifdef VERSION_GCCJGC
-extern const char sMenuPdtPathFmt[] = "dvd/menu/%s";
-#else
-extern const char sMenuPdtPathFmt[] = "dvd/%smenu/%s";
-#endif
-extern const char sMonsterPdtPathFmt[] = "dvd/tina/mon/m%03d";
-extern const char sMonsterVariantPdtPathFmt[] = "dvd/tina/mon/m%03d_%c";
-extern const char sFieldPdtPathFmt[] = "dvd/tina/stage%03d/fp%03d";
-static const char s_p_tina_cpp[] = "p_tina.cpp";
-extern const char sPartPcsTitleFmt[0x0C] = "Tina [%c]";
-extern const char sPartPcsCalcProfileFmt[0x18] = "clc=%.3f%%  max=%.3f%%";
-extern const char sPartPcsDrawProfileFmt[0x18] = "drw=%.3f%%  max=%.3f%%";
-extern const char sPartPcsHeapProfileFmt[0x18] = "hpm=%.3f%%  max=%.3f%%";
-extern const char sTinaParticleAMemFreeFmt[] = {
-    (char)0x0A, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x0A, (char)0x20, (char)0x20, (char)0x20,
-    (char)0x20, (char)0x20, (char)0x20, (char)0x83, (char)0x70, (char)0x81, (char)0x5B, (char)0x83,
-    (char)0x65, (char)0x83, (char)0x42, (char)0x83, (char)0x4E, (char)0x83, (char)0x8B, (char)0x20,
-    (char)0x41, (char)0x2D, (char)0x4D, (char)0x45, (char)0x4D, (char)0x20, (char)0x83, (char)0x74,
-    (char)0x83, (char)0x8A, (char)0x81, (char)0x5B, (char)0x3D, (char)0x25, (char)0x64, (char)0x20,
-    (char)0x4B, (char)0x62, (char)0x79, (char)0x74, (char)0x65, (char)0x0A, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
-    (char)0x3D, (char)0x0A, (char)0x0A, (char)0x00,
-};
-extern const char sPartPcsDataStageName[0x10] = "CPartPcs.dat";
-extern const char sPartPcsAmemStageName[0x10] = "CPartPcs.amem";
-extern const char sChobitBasePath[] = "dvd/tina/chobit";
-extern const char sChobit0Path[0x14] = "dvd/tina/chobit_0";
-extern const char sChobit1Path[0x14] = "dvd/tina/chobit_1";
-extern const char sChobit2Path[0x14] = "dvd/tina/chobit_2";
-extern const char sChobit3Path[0x14] = "dvd/tina/chobit_3";
-extern const char sChobit4Path[0x14] = "dvd/tina/chobit_4";
-extern const char sPartPcsPrioTimeFmt[0x34] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
-extern const char sTinaDeleteNoticeMsg[] = {
-    (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
-    (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
-    (char)0x82, (char)0xF0, (char)0x8D, (char)0xED, (char)0x8F, (char)0x9C, (char)0x82, (char)0xB5,
-    (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
-#ifndef VERSION_GCCJGC
-    (char)0x00, (char)0x00, (char)0x00, (char)0x00,
-#endif
-};
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -127,7 +89,7 @@ inline CPartPcs::~CPartPcs()
 CPartPcs PartPcs;
 CProcessCallbackTable CPartPcs::m_table[2] = {
     {
-        const_cast<char*>(sPartPcsGameTableName),
+        "CPartPcs(GAME)",
         static_cast<CProcessCallback>(&CPartPcs::create),
         static_cast<CProcessCallback>(&CPartPcs::destroy),
         {
@@ -142,7 +104,7 @@ CProcessCallbackTable CPartPcs::m_table[2] = {
         },
     },
     {
-        const_cast<char*>(sPartPcsViewerTableName),
+        "CPartPcs(PART_VIEWER)",
         static_cast<CProcessCallback>(&CPartPcs::createViewer),
         static_cast<CProcessCallback>(&CPartPcs::destroy),
         {
@@ -333,7 +295,7 @@ unsigned int pppFreeMngStPrioForData()
 	if ((unsigned int)System.m_execParam >= 3) {
 		char* pdtName = PartMng.m_pdtSlots[selectedMngSt->m_kind].m_name;
 		System.Printf(
-			const_cast<char*>(sPartPcsPrioTimeFmt),
+			"  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n",
 			(unsigned int)selectedMngSt->m_prioTime,
 			(unsigned int)selectedMngSt->m_prio,
 			(int)selectedMngSt->m_kind,
@@ -341,13 +303,13 @@ unsigned int pppFreeMngStPrioForData()
 			pdtName);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(const_cast<char*>(sTinaDeleteNoticeMsg));
+		System.Printf("                \x82\xF0\x8D\xED\x8F\x9C\x82\xB5\x82\xDC\x82\xB7\x81" "B\n");
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(g_MsgFlashy);
 	}
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0xfc);
+	Graphic._WaitDrawDone("p_tina.cpp", 0xfc);
 	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(selectedMngSt));
 	return 1;
 }
@@ -401,20 +363,20 @@ inline void CPartPcs::create0()
     usb->m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
-        stage = Memory.CreateStage(0x180000, const_cast<char*>(sPartPcsDataStageName), 0);
+        stage = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
         usb->m_stageAmem = 0;
     } else {
-        stage = Memory.CreateStage(0x180000, const_cast<char*>(sPartPcsDataStageName), 0);
+        stage = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
-        stage = Memory.CreateStage(0x400000, const_cast<char*>(sPartPcsAmemStageName), 2);
+        stage = Memory.CreateStage(0x400000, "CPartPcs.amem", 2);
         usb->m_stageAmem = stage;
     }
 
     ppvAmemCacheSet.Init(
-        const_cast<char*>(sPartPcsClassName),
+        "CPartPcs",
         PartPcs.m_usbStreamState.m_stageLoad,
         PartPcs.m_usbStreamState.m_stageAmem,
         0x400,
@@ -462,14 +424,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    PartMng.pppLoadPtx(const_cast<char*>(sChobitBasePath), 1, 1, 0, 0);
-    PartMng.pppLoadPmd(const_cast<char*>(sChobitBasePath));
-    PartMng.pppLoadPan(const_cast<char*>(sChobitBasePath));
-    PartMng.pppLoadPdt(const_cast<char*>(sChobit0Path), 1, 1, 0, 0);
-    PartMng.pppLoadPdt(const_cast<char*>(sChobit1Path), 2, 1, 0, 0);
-    PartMng.pppLoadPdt(const_cast<char*>(sChobit2Path), 3, 1, 0, 0);
-    PartMng.pppLoadPdt(const_cast<char*>(sChobit3Path), 4, 1, 0, 0);
-    PartMng.pppLoadPdt(const_cast<char*>(sChobit4Path), 5, 1, 0, 0);
+    PartMng.pppLoadPtx("dvd/tina/chobit", 1, 1, 0, 0);
+    PartMng.pppLoadPmd("dvd/tina/chobit");
+    PartMng.pppLoadPan("dvd/tina/chobit");
+    PartMng.pppLoadPdt("dvd/tina/chobit_0", 1, 1, 0, 0);
+    PartMng.pppLoadPdt("dvd/tina/chobit_1", 2, 1, 0, 0);
+    PartMng.pppLoadPdt("dvd/tina/chobit_2", 3, 1, 0, 0);
+    PartMng.pppLoadPdt("dvd/tina/chobit_3", 4, 1, 0, 0);
+    PartMng.pppLoadPdt("dvd/tina/chobit_4", 5, 1, 0, 0);
     ppvAmemCacheSet.AmemSetLock();
 }
 
@@ -495,20 +457,20 @@ void CPartPcs::createViewer()
     usb->m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
-        stage = Memory.CreateStage(0x180000, const_cast<char*>(sPartPcsDataStageName), 0);
+        stage = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
         usb->m_stageAmem = 0;
     } else {
-        stage = Memory.CreateStage(0x180000, const_cast<char*>(sPartPcsDataStageName), 0);
+        stage = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
-        stage = Memory.CreateStage(0x400000, const_cast<char*>(sPartPcsAmemStageName), 2);
+        stage = Memory.CreateStage(0x400000, "CPartPcs.amem", 2);
         usb->m_stageAmem = stage;
     }
 
     ppvAmemCacheSet.Init(
-        const_cast<char*>(sPartPcsClassName),
+        "CPartPcs",
         PartPcs.m_usbStreamState.m_stageLoad,
         PartPcs.m_usbStreamState.m_stageAmem,
         0x400,
@@ -594,7 +556,7 @@ void CPartPcs::calc()
 
 		m_usbStreamState.m_printFreeOnNext = 0;
 		freeSize = ppvAmemCacheSet.AmemGetFreeSize();
-		System.Printf(const_cast<char*>(sTinaParticleAMemFreeFmt), freeSize / 1024);
+		System.Printf("\n===========================================================\n      \x83p\x81[\x83" "e\x83" "B\x83N\x83\x8B A-MEM \x83t\x83\x8A\x81[=%d Kbyte\n===========================================================\n\n", freeSize / 1024);
 	}
 	ppvAmemCacheSet.CalcPrio();
 	PartMng.pppPartCalc();
@@ -782,14 +744,14 @@ void CPartPcs::draw()
  */
 void CPartPcs::drawShadowViewer()
 {
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x308);
+    Graphic._WaitDrawDone("p_tina.cpp", 0x308);
     g_par_draw_prof.Start();
     g_par_calc_prof.Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
     g_par_calc_prof.Stop();
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x30f);
+    Graphic._WaitDrawDone("p_tina.cpp", 0x30f);
     g_par_draw_prof.Stop();
     pppClearDrawEnv();
 }
@@ -805,14 +767,14 @@ void CPartPcs::drawShadowViewer()
  */
 void CPartPcs::drawViewer()
 {
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x31a);
+    Graphic._WaitDrawDone("p_tina.cpp", 0x31a);
     g_par_draw_prof.Start();
     g_par_calc_prof.Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
     g_par_calc_prof.Stop();
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x322);
+    Graphic._WaitDrawDone("p_tina.cpp", 0x322);
     g_par_draw_prof.Stop();
     pppClearDrawEnv();
 }
@@ -1018,14 +980,14 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::drawAfterViewer()
 {
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x3f1);
+	Graphic._WaitDrawDone("p_tina.cpp", 0x3f1);
 	g_par_draw_prof.Start();
 	g_par_calc_prof.Start();
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
 	g_par_calc_prof.Stop();
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x3fb);
+	Graphic._WaitDrawDone("p_tina.cpp", 0x3fb);
 	g_par_draw_prof.Stop();
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
@@ -1041,20 +1003,20 @@ void CPartPcs::drawAfterViewer()
 
 	s_debugSpinnerFrameCounter++;
 	Graphic.Printf(
-		const_cast<char*>(sPartPcsTitleFmt), sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
+		"Tina [%c]", sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
-		const_cast<char*>(sPartPcsCalcProfileFmt),
+		"clc=%.3f%%  max=%.3f%%",
 		(double)g_par_calc_prof.GetTime(),
 		(double)g_par_calc_prof.GetMax());
 	Graphic.Printf(
-		const_cast<char*>(sPartPcsDrawProfileFmt),
+		"drw=%.3f%%  max=%.3f%%",
 		(double)g_par_draw_prof.GetTime(),
 		(double)g_par_draw_prof.GetMax());
 	Graphic.Printf(
-		const_cast<char*>(sPartPcsHeapProfileFmt),
+		"hpm=%.3f%%  max=%.3f%%",
 		(double)((float)gPppHeapUseRateWords[0] / 100.0f),
 		(double)((float)gPppHeapUseRateWords[1] / 100.0f));
 }
@@ -1144,7 +1106,7 @@ static void LoadFieldPdt0(int mapId, int floorId)
 
     PartPcs.m_usbStreamState.m_fieldLoadReq = 1;
 
-    sprintf(path, sFieldPdtPathFmt, mapId, floorId);
+    sprintf(path, "dvd/tina/stage%03d/fp%03d", mapId, floorId);
     pdtSlot = PartMng.pppLoadPtx(path, 0, 1, 0, 0);
     if (pdtSlot != 0) {
         pdtSlot = PartMng.pppLoadPdt(path, 0, 1, 0, 0);
@@ -1226,9 +1188,9 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
     char path[256];
 
     if (variant == 0) {
-        sprintf(path, sMonsterPdtPathFmt, monsterId);
+        sprintf(path, "dvd/tina/mon/m%03d", monsterId);
     } else {
-        sprintf(path, sMonsterVariantPdtPathFmt, monsterId, variant + 0x61);
+        sprintf(path, "dvd/tina/mon/m%03d_%c", monsterId, variant + 0x61);
     }
 
     PartMng.InitAmem(0, 0, 0);
@@ -1283,9 +1245,9 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     char path[0x100];
 
 #ifdef VERSION_GCCJGC
-    sprintf(path, sMenuPdtPathFmt, fileName);
+    sprintf(path, "dvd/menu/%s", fileName);
 #else
-    sprintf(path, sMenuPdtPathFmt, Game.GetLangString(), fileName);
+    sprintf(path, "dvd/%smenu/%s", Game.GetLangString(), fileName);
 #endif
 
     if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -1351,7 +1313,7 @@ void CPartPcs::StartLocationTitle()
     char path[1024];
     CGame* game = &Game;
 
-    sprintf(path, sLocationTitlePdtPathFmt, game->m_currentMapId);
+    sprintf(path, "dvd/tina/stage%03d/title", game->m_currentMapId);
     loaded = PartMng.pppLoadPtx(path, 6, 0, 0, 0);
     if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 6, 0, 0, 0), loaded != 0))) {
         m_usbStreamState.m_blockOnFrame = 1;
@@ -1388,7 +1350,7 @@ void CPartPcs::StartMiruraEvent()
     char path[1024];
     CGame* game = &Game;
 
-    sprintf(path, sMiruraPdtPathFmt, game->m_currentMapId);
+    sprintf(path, "dvd/tina/stage%03d/mirura", game->m_currentMapId);
     loaded = PartMng.pppLoadPtx(path, 7, 0, 0, 0);
     if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 7, 0, 0, 0), loaded != 0))) {
         m_usbStreamState.m_miruraEventActive = 1;
@@ -1409,5 +1371,3 @@ void CPartPcs::EndMiruraEvent()
     PartMng.pppReleasePdt(7);
     m_usbStreamState.m_miruraEventActive = 0;
 }
-
-#pragma pool_data off

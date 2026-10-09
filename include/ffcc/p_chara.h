@@ -213,8 +213,6 @@ public:
     static CProcessCallbackTable m_table[3];
     static const char* m_modelTable[6][3];
 
-    ~CCharaPcs();
-
     void Init();
     void Quit();
     int GetTable(unsigned long);

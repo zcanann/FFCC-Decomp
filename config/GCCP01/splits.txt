@@ -24,7 +24,7 @@ file.cpp:
 	.text       start:0x80012BAC end:0x80013D70
 	.ctors      start:0x801D53A4 end:0x801D53A8
 	.rodata     start:0x801D5480 end:0x801D5FC0
-	.data       start:0x801E81A0 end:0x801E8310
+	.data       start:0x801E81A0 end:0x801E8320
 	.bss        start:0x8021ED40 end:0x8021EEB0
 	.sdata      start:0x8032E3C0 end:0x8032E3D0
 	.sdata2     start:0x8032F600 end:0x8032F630
@@ -897,8 +897,8 @@ gobject.cpp:
 	extab       start:0x80007850 end:0x80007988
 	extabindex  start:0x8000D9CC end:0x8000DBA0
 	.text       start:0x8007BE40 end:0x80082278
-	.rodata     start:0x801D9BD0 end:0x801D9BDC
-	.data       start:0x801FD360 end:0x801FD3A4
+	.rodata     start:0x801D9B70 end:0x801D9C00
+	.data       start:0x801FD340 end:0x801FD3A4
 	.sdata      start:0x8032E768 end:0x8032E780
 	.sdata2     start:0x80330338 end:0x80330448
 

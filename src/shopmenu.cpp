@@ -41,8 +41,6 @@ extern char s_shopmenu_cpp[];
 extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
 #ifdef VERSION_GCCJGC
-static const unsigned int gShopMenuAmbientWhite = 0xFFFFFFFF;
-static const unsigned int gShopMenuMaterialWhiteBase = 0xFFFFFFFF;
 static const unsigned int DAT_80332D04 = 0xFFFFFFFF;
 static const unsigned int DAT_80332D08 = 0xFFFFFFFF;
 static const unsigned int DAT_80332D0C = 0xFFFFFFFF;
@@ -104,8 +102,6 @@ static const float FLOAT_80332E44 = 356.0f;
 static const float FLOAT_80332e48 = 40.0f;
 static const float FLOAT_80332e4c = 250.0f;
 #else
-extern const unsigned int gShopMenuAmbientWhite;
-extern const unsigned int gShopMenuMaterialWhiteBase;
 extern const unsigned int DAT_80332D04;
 extern const unsigned int DAT_80332D08;
 extern const unsigned int DAT_80332D0C;
@@ -770,14 +766,14 @@ inline void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigne
     pppShapeAnimFrame* frame = &shapeData->m_frames[groupNo];
     tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<unsigned char*>(shapeData) + frame->m_shapeOffset);
 
-    _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
-    mat.a = alpha;
-
     MaterialMan.InitEnv();
     MaterialMan.LockEnv();
 
-    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(const_cast<unsigned int*>(&gShopMenuAmbientWhite)));
+    _GXColor amb = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor mat = {0xFF, 0xFF, 0xFF, 0xFF};
+    mat.a = alpha;
+
+    GXSetChanAmbColor(GX_COLOR0A0, amb);
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
@@ -3283,8 +3279,6 @@ inline void CShopMenu::setFaceAlpha(int, int alpha)
 }
 
 #ifndef VERSION_GCCJGC
-extern const unsigned int gShopMenuAmbientWhite = 0xFFFFFFFF;
-extern const unsigned int gShopMenuMaterialWhiteBase = 0xFFFFFFFF;
 extern const unsigned int DAT_80332D04 = 0xFFFFFFFF;
 extern const unsigned int DAT_80332D08 = 0xFFFFFFFF;
 extern const unsigned int DAT_80332D0C = 0xFFFFFFFF;

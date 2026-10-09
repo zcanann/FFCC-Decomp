@@ -79,25 +79,6 @@ enum GraphicCppStringOffset {
     kGraphicCppDrawDoneFmt = 0x1AC,
 };
 
-
-
-extern const float kGraphicZeroF = 0.0f;
-extern const float kGraphicOneF = 1.0f;
-extern const float FLOAT_8032F6C8 = 640.0f;
-extern const float FLOAT_8032F6CC = 448.0f;
-extern const float kGraphicSphereNegativeX = -1.0f;
-extern const double kGraphicHalfF64 = 4503599627370496.0;
-extern const float kGraphicSpherePi = 3.1415927410125732f;
-extern const double DOUBLE_8032F6E8 = 4503601774854144.0;
-extern const float kGraphicSmallBackTextureWidth = 320.0f;
-extern const float kGraphicSmallBackTextureHeight = 224.0f;
-extern const float FLOAT_8032F6F8 = 16777215.0f;
-extern const float FLOAT_8032F6FC = 0.7f;
-extern const float kGraphicSphereRingDivisor = 6.0f;
-extern const float kGraphicSphereSegmentAngle = 0.7853981852531433f;
-extern const float kGraphicBlurAlphaScale = -100.0f;
-extern const float kGraphicNoiseTexScaleU = 0.015625f;
-extern const float kGraphicNoiseTexScaleV = 0.010416667163372f;
 extern const char sGraphicUnknownOrderName[4] = "---";
 
 struct GraphicSleepAlarm {
@@ -132,11 +113,6 @@ STATIC_ASSERT(offsetof(CGraphic, m_drawDoneFile) == 0x7368);
 STATIC_ASSERT(offsetof(CGraphic, m_drawDoneLine) == 0x736C);
 STATIC_ASSERT(offsetof(CGraphic, m_drawDoneCounter) == 0x7370);
 
-extern "C" {
-}
-
-
-
 /*
  * --INFO--
  * Address:	TODO
@@ -147,7 +123,6 @@ int checkThread(void*)
 	Graphic.Thread();
 	return 0;
 }
-
 
 /*
  * --INFO--
@@ -171,7 +146,7 @@ void CGraphic::Init()
     m_fogColor.b = 0;
     m_fogColor.a = 0;
 
-    m_fogStart = m_fogEnd = kGraphicZeroF;
+    m_fogStart = m_fogEnd = 0.0f;
 
     m_defaultCopyClearColor.r = m_fogColor.r;
     m_defaultCopyClearColor.g = m_fogColor.g;
@@ -226,8 +201,8 @@ void CGraphic::Init()
     VIConfigure(m_renderMode);
     GXInit(m_fifoBuffer, kGraphicFifoSize);
 
-    GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(m_renderMode->fbWidth),
-                  static_cast<f32>(m_renderMode->efbHeight), kGraphicZeroF, kGraphicOneF);
+    GXSetViewport(0.0f, 0.0f, static_cast<f32>(m_renderMode->fbWidth),
+                  static_cast<f32>(m_renderMode->efbHeight), 0.0f, 1.0f);
     GXSetScissor(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
 #ifdef VERSION_GCCJGC
     u16 scaledHeight = GXSetDispCopyYScale(GXGetYScaleFactor(m_renderMode->efbHeight, m_renderMode->xfbHeight));
@@ -437,8 +412,8 @@ void CGraphic::SetStdPixelFmt()
  */
 void CGraphic::SetViewport()
 {
-    GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(m_renderMode->fbWidth), static_cast<f32>(m_renderMode->efbHeight),
-                  kGraphicZeroF, kGraphicOneF);
+    GXSetViewport(0.0f, 0.0f, static_cast<f32>(m_renderMode->fbWidth), static_cast<f32>(m_renderMode->efbHeight),
+                  0.0f, 1.0f);
     GXSetScissor(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
 }
 
@@ -458,7 +433,7 @@ void CGraphic::BeginFrame()
     GXRenderModeObj* renderMode = m_renderMode;
     u16 width = renderMode->fbWidth;
     u16 height = renderMode->efbHeight;
-    GXSetViewport(kGraphicZeroF, kGraphicZeroF, (f32)width, (f32)height, kGraphicZeroF, kGraphicOneF);
+    GXSetViewport(0.0f, 0.0f, (f32)width, (f32)height, 0.0f, 1.0f);
     GXInvalidateVtxCache();
     GXInvalidateTexAll();
 
@@ -804,16 +779,16 @@ void CGraphic::DrawDebugString()
 
     GXRenderModeObj* renderMode = m_renderMode;
     C_MTXOrtho(proj,
-               kGraphicZeroF,
+               0.0f,
 #ifdef VERSION_GCCJGC
                static_cast<float>(renderMode->xfbHeight),
 #else
                static_cast<float>(renderMode->efbHeight),
 #endif
-               kGraphicZeroF,
+               0.0f,
                static_cast<float>(renderMode->fbWidth),
-               kGraphicZeroF,
-               kGraphicBlurAlphaScale);
+               0.0f,
+               -100.0f);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
 
     PSMTXIdentity(model);
@@ -834,10 +809,10 @@ void CGraphic::DrawDebugString()
     GXSetCurrentMtx(0);
 
     GXInitTexObj(&texObj, m_tDebugFont, 0x40, 0x60, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
 
-    PSMTXScale(texMtx, kGraphicNoiseTexScaleU, kGraphicNoiseTexScaleV, kGraphicOneF);
+    PSMTXScale(texMtx, 0.015625f, 0.010416667f, 1.0f);
     GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
@@ -872,16 +847,16 @@ void CGraphic::InitDebugString()
 
     GXRenderModeObj* renderMode = m_renderMode;
     C_MTXOrtho(proj,
-               kGraphicZeroF,
+               0.0f,
 #ifdef VERSION_GCCJGC
                static_cast<float>(renderMode->xfbHeight),
 #else
                static_cast<float>(renderMode->efbHeight),
 #endif
-               kGraphicZeroF,
+               0.0f,
                static_cast<float>(renderMode->fbWidth),
-               kGraphicZeroF,
-               kGraphicBlurAlphaScale);
+               0.0f,
+               -100.0f);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
 
     PSMTXIdentity(model);
@@ -900,10 +875,10 @@ void CGraphic::InitDebugString()
     GXSetCullMode(GX_CULL_NONE);
     GXSetCurrentMtx(0);
     GXInitTexObj(&texObj, m_tDebugFont, 0x40, 0x60, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
 
-    PSMTXScale(texMtx, kGraphicNoiseTexScaleU, kGraphicNoiseTexScaleV, kGraphicOneF);
+    PSMTXScale(texMtx, 0.015625f, 0.010416667f, 1.0f);
     GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
@@ -1109,29 +1084,29 @@ void CGraphic::makeSphere()
     float (*vertex)[3];
 
     int vertexCount = 0;
-    vertices[0][0] = kGraphicSphereNegativeX;
-    vertices[0][1] = kGraphicZeroF;
-    vertices[vertexCount++][2] = kGraphicZeroF;
+    vertices[0][0] = -1.0f;
+    vertices[0][1] = 0.0f;
+    vertices[vertexCount++][2] = 0.0f;
     vertex = &vertices[vertexCount];
 
     for (int ring = 0; ring < 5; ring++) {
-        float pitch = (kGraphicSpherePi * (float)(ring + 1)) / kGraphicSphereRingDivisor;
-        float x = kGraphicSphereNegativeX * (float)cos(pitch);
-        float radius = kGraphicSphereNegativeX * (float)sin(pitch);
+        float pitch = (3.1415927f * (float)(ring + 1)) / 6.0f;
+        float x = -1.0f * (float)cos(pitch);
+        float radius = -1.0f * (float)sin(pitch);
 
         rowVertex = vertex;
         for (int seg = 0; seg < 8; seg++) {
             (*rowVertex)[0] = x;
-            (*rowVertex)[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
-            vertices[vertexCount++][2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
+            (*rowVertex)[1] = radius * (float)sin(0.7853982f * (float)seg);
+            vertices[vertexCount++][2] = radius * (float)cos(0.7853982f * (float)seg);
             vertex++;
             rowVertex++;
         }
     }
 
-    vertices[vertexCount][0] = kGraphicOneF;
-    vertices[vertexCount][1] = kGraphicZeroF;
-    vertices[vertexCount][2] = kGraphicZeroF;
+    vertices[vertexCount][0] = 1.0f;
+    vertices[vertexCount][1] = 0.0f;
+    vertices[vertexCount][2] = 0.0f;
 
     m_sphereDisplayListSize = 0x880;
     m_sphereDisplayList = new (m_graphicStage, const_cast<char*>(sGraphicSourceStrings), GraphicSphereDisplayListLine) u8[m_sphereDisplayListSize];
@@ -1385,8 +1360,8 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
         GXInvalidateTexAll();
         GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width, height,
                      static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF,
-                        kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f,
+                        0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     } else {
         return 0;
     }
@@ -1476,8 +1451,8 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
 void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
 {
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	float tex1 = kGraphicOneF;
-	float tex0 = kGraphicZeroF;
+	float tex1 = 1.0f;
+	float tex0 = 0.0f;
 	GXPosition3f32(pos1.x, pos1.y, pos1.z);
 	GXColor1u32(*reinterpret_cast<u32*>(&color1));
 	GXTexCoord2f32(tex0, tex0);
@@ -1571,10 +1546,10 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 	CameraPcs.GetPosition(&cameraPos);
 	hasNearAlpha = 0;
-	cameraPos.y = kGraphicZeroF;
+	cameraPos.y = 0.0f;
 	hasFarAlpha = 0;
 
-	targetPos.y = kGraphicZeroF;
+	targetPos.y = 0.0f;
 	PSVECSubtract(&targetPos, &cameraPos, &cameraToTarget);
 
 	GXGetProjectionv(gxProjection);
@@ -1586,7 +1561,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXProject(cameraPos.x + scaledDir.x, targetPos.y, cameraPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);
 
-		nearAlpha = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
+		nearAlpha = static_cast<unsigned int>(projZ * 16777215.0f) >> 16;
 		if ((unsigned int)nearAlpha >= 0xFF) {
 			nearAlpha = 0xFF;
 		}
@@ -1600,7 +1575,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXProject(targetPos.x + scaledDir.x, targetPos.y, targetPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);
 
-		farAlpha = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
+		farAlpha = static_cast<unsigned int>(projZ * 16777215.0f) >> 16;
 		if (farAlpha == 0) {
 			farAlpha = 0xFF;
 		}
@@ -1625,7 +1600,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	gUtil.SetOrthoEnv();
 
 	xOffset = (float)blurWidth;
-	yOffset = xOffset * FLOAT_8032F6FC;
+	yOffset = xOffset * 0.7f;
 
 	for (int pass = 0; pass < 2; pass++) {
 		if ((pass == 0) && !((mode != 2) && hasNearAlpha && (mode != 1) && hasFarAlpha)) {
@@ -1688,44 +1663,44 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXSetNumTevStages(2);
 		GXSetNumTexGens(2);
 
-		quadMin.x = kGraphicZeroF;
-		quadMin.y = kGraphicZeroF;
-		quadMin.z = kGraphicZeroF;
-		quadMax.x = FLOAT_8032F6C8;
-		quadMax.y = FLOAT_8032F6CC;
-		quadMax.z = kGraphicZeroF;
+		quadMin.x = 0.0f;
+		quadMin.y = 0.0f;
+		quadMin.z = 0.0f;
+		quadMax.x = 640.0f;
+		quadMax.y = 448.0f;
+		quadMax.z = 0.0f;
 		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 
 		quadMin.x = -xOffset;
-		quadMin.y = kGraphicZeroF;
-		quadMin.z = kGraphicZeroF;
-		quadMax.x = FLOAT_8032F6C8 - xOffset;
-		quadMax.y = FLOAT_8032F6CC;
-		quadMax.z = kGraphicZeroF;
+		quadMin.y = 0.0f;
+		quadMin.z = 0.0f;
+		quadMax.x = 640.0f - xOffset;
+		quadMax.y = 448.0f;
+		quadMax.z = 0.0f;
 		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 
 		quadMin.x = xOffset;
-		quadMin.y = kGraphicZeroF;
-		quadMin.z = kGraphicZeroF;
-		quadMax.x = FLOAT_8032F6C8 + xOffset;
-		quadMax.y = FLOAT_8032F6CC;
-		quadMax.z = kGraphicZeroF;
+		quadMin.y = 0.0f;
+		quadMin.z = 0.0f;
+		quadMax.x = 640.0f + xOffset;
+		quadMax.y = 448.0f;
+		quadMax.z = 0.0f;
 		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 
-		quadMin.x = kGraphicZeroF;
+		quadMin.x = 0.0f;
 		quadMin.y = -yOffset;
-		quadMin.z = kGraphicZeroF;
-		quadMax.x = FLOAT_8032F6C8;
-		quadMax.y = FLOAT_8032F6CC - yOffset;
-		quadMax.z = kGraphicZeroF;
+		quadMin.z = 0.0f;
+		quadMax.x = 640.0f;
+		quadMax.y = 448.0f - yOffset;
+		quadMax.z = 0.0f;
 		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 
-		quadMin.x = kGraphicZeroF;
+		quadMin.x = 0.0f;
 		quadMin.y = yOffset;
-		quadMin.z = kGraphicZeroF;
-		quadMax.x = FLOAT_8032F6C8;
-		quadMax.y = FLOAT_8032F6CC + yOffset;
-		quadMax.z = kGraphicZeroF;
+		quadMin.z = 0.0f;
+		quadMax.x = 640.0f;
+		quadMax.y = 448.0f + yOffset;
+		quadMax.z = 0.0f;
 		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 	}
 }
@@ -1780,53 +1755,53 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     white.a = 0xFF;
 
     GetBackBufferRect2(m_scratchTextureBuffer, &tempTex, 0, 0, 0x140, 0xE0, 0x46000, filter, GX_TF_RGBA8, 0);
-    quadMin.x = kGraphicZeroF;
-    quadMin.y = kGraphicZeroF;
-    quadMin.z = kGraphicZeroF;
+    quadMin.x = 0.0f;
+    quadMin.y = 0.0f;
+    quadMin.z = 0.0f;
     quadMax.x = static_cast<float>(halfWidth);
     quadMax.y = static_cast<float>(halfHeight);
-    quadMax.z = kGraphicZeroF;
+    quadMax.z = 0.0f;
     GXLoadTexObj(&tempTex, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0x140, 0, 0x140, 0xE0, 0, filter, format, 0);
     quadMin.x = static_cast<float>(halfWidth);
-    quadMin.y = kGraphicZeroF;
-    quadMin.z = kGraphicZeroF;
+    quadMin.y = 0.0f;
+    quadMin.z = 0.0f;
     quadMax.x = static_cast<float>(width);
     quadMax.y = static_cast<float>(halfHeight);
-    quadMax.z = kGraphicZeroF;
+    quadMax.z = 0.0f;
     GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
-    quadMin.x = kGraphicZeroF;
+    quadMin.x = 0.0f;
     quadMin.y = static_cast<float>(halfHeight);
-    quadMin.z = kGraphicZeroF;
+    quadMin.z = 0.0f;
     quadMax.x = static_cast<float>(halfWidth);
     quadMax.y = static_cast<float>(height);
-    quadMax.z = kGraphicZeroF;
+    quadMax.z = 0.0f;
     GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0x140, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
     quadMin.x = static_cast<float>(halfWidth);
     quadMin.y = static_cast<float>(halfHeight);
-    quadMin.z = kGraphicZeroF;
+    quadMin.z = 0.0f;
     quadMax.x = static_cast<float>(width);
     quadMax.y = static_cast<float>(height);
-    quadMax.z = kGraphicZeroF;
+    quadMax.z = 0.0f;
     GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(src, texObj, 0, 0, static_cast<int>(width), static_cast<int>(height), textureSize, filter, format, 0);
     GXLoadTexObj(&tempTex, GX_TEXMAP0);
-    quadMin.x = kGraphicZeroF;
-    quadMin.y = kGraphicZeroF;
-    quadMin.z = kGraphicZeroF;
-    quadMax.x = kGraphicSmallBackTextureWidth;
-    quadMax.y = kGraphicSmallBackTextureHeight;
-    quadMax.z = kGraphicZeroF;
+    quadMin.x = 0.0f;
+    quadMin.y = 0.0f;
+    quadMin.z = 0.0f;
+    quadMax.x = 320.0f;
+    quadMax.y = 224.0f;
+    quadMax.z = 0.0f;
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     CameraPcs.GetViewMatrix(cameraMtx);
@@ -1907,24 +1882,24 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
         int negativeBlurOffset = -blurOffsetInt;
         u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + i * 0x46000;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
 
         if (mode == 1) {
-            quadMin.x = kGraphicZeroF;
-            quadMin.y = kGraphicZeroF;
-            quadMin.z = kGraphicZeroF;
-            quadMax.x = FLOAT_8032F6C8;
-            quadMax.y = FLOAT_8032F6CC;
-            quadMax.z = kGraphicZeroF;
+            quadMin.x = 0.0f;
+            quadMin.y = 0.0f;
+            quadMin.z = 0.0f;
+            quadMax.x = 640.0f;
+            quadMax.y = 448.0f;
+            quadMax.z = 0.0f;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         } else if (mode == 0) {
             quadMin.x = static_cast<float>(negativeBlurOffset);
             quadMin.y = static_cast<float>(negativeBlurOffset);
-            quadMin.z = kGraphicZeroF;
+            quadMin.z = 0.0f;
             quadMax.x = static_cast<float>(640 - negativeBlurOffset);
             quadMax.y = static_cast<float>(448 - negativeBlurOffset);
-            quadMax.z = kGraphicZeroF;
+            quadMax.z = 0.0f;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         }
     }

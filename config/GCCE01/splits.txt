@@ -816,7 +816,7 @@ menu_cmd.cpp:
 
 chara_fur.cpp:
 	.text start:0x800DEDE4 end:0x800E3EA8
-	.rodata     start:0x801DA5AC end:0x801DA658
+	.rodata     start:0x801DA560 end:0x801DA658
 	.bss        start:0x802FE368 end:0x802FE3C4
 	.sbss       start:0x8032DDC8 end:0x8032DDF4
 	.sdata2     start:0x80330090 end:0x80330128

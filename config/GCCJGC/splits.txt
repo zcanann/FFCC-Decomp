@@ -737,7 +737,7 @@ pppMana2.cpp:
 
 chara_fur.cpp:
 	.text start:0x800DC85C end:0x800E1A00
-	.rodata     start:0x801D618C end:0x801D6238
+	.rodata     start:0x801D6138 end:0x801D6238
 	.bss        start:0x8031AC98 end:0x8031ACF4
 	.sbss       start:0x8034BBE0 end:0x8034BC0C
 	.sbss2      start:0x803501E8 end:0x803501F8

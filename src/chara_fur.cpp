@@ -1,4 +1,6 @@
 #include "ffcc/chara_fur.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 #include "global.h"
 #include "ffcc/chara.h"
 #include "ffcc/charaobj.h"

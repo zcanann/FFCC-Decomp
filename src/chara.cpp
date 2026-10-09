@@ -1743,9 +1743,9 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	GXSetCullMode(static_cast<GXCullMode>(cullMode));
 	LightPcs.SetAmbientAlpha(m_lightAlpha);
 
-	CCharaMeshRaw* mesh = m_meshes;
-	int lastLightEnable = 0;
 	int lastZWrite = 0;
+	int lastLightEnable = 0;
+	CCharaMeshRaw* mesh = m_meshes;
 
 	for (int meshIndex = 0; meshIndex < m_data->m_meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {

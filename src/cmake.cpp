@@ -2165,7 +2165,11 @@ void CMenuPcs::CmakeSexDraw()
 
     CFont* font = GetFont23();
     font->SetMargin(1.0f);
+#ifdef VERSION_GCCJGC
+    font->SetShadow(1);
+#else
     font->SetShadow(0);
+#endif
     font->SetScale(1.0f);
     font->DrawInit();
 

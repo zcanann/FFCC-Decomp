@@ -1476,7 +1476,7 @@ void CGMonObj::onStatDie()
 			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
 			return;
 		}
-		if (subFrame != 0x19) {
+		if (subFrame != MON_FRAMES(0x1E, 0x19)) {
 			return;
 		}
 
@@ -2018,7 +2018,7 @@ void CGMonObj::isValidTarget()
 	}
 
 	CGObjWork* handle = m_scriptHandle;
-	if (((handle->m_romWork[0x86] != 1) || (m_moveWork.m_frame < 0x19)) &&
+	if (((handle->m_romWork[0x86] != 1) || (m_moveWork.m_frame < MON_FRAMES(0x1E, 0x19))) &&
 	    ((SAFE_CAST_MON_WORK(handle)->m_romWork[0x86] == 1) || !(homeDist < kMonObjHalf * maxDist))) {
 		goto check_home;
 	}

@@ -786,7 +786,11 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 			color = 4;
 			break;
 		case 3:
+#ifdef VERSION_GCCP01
 			color = 6;
+#else
+			color = 5;
+#endif
 			break;
 		case 4:
 			color = 7;

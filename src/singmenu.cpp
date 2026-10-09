@@ -506,7 +506,7 @@ static inline int LoadSingMenuTextureStep(CMenuPcs* menu)
         int texIdx = menu->m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->Find(s_singleMenuModelTextureTable[i].textureName);
         CTexture* tex = menu->m_textureSets[s_singleMenuModelTextureTable[i].textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
         tex->AddRef();
-        menu->m_textures[i + 45] = tex;
+        menu->m_textures[SINGMENU_TEX_ID(i + 45)] = tex;
     }
     return 1;
 }
@@ -2594,11 +2594,11 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
                                     1.0f, 1.0f, 0.0f);
 
     if (value <= 0x28) {
-        tex = 0x59;
+        tex = SINGMENU_TEX_ID(0x59);
     } else if (value <= 0x3C) {
-        tex = 0x57;
+        tex = SINGMENU_TEX_ID(0x57);
     } else {
-        tex = 0x55;
+        tex = SINGMENU_TEX_ID(0x55);
     }
 
     int bars = value / 10;

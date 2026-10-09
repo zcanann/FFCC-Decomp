@@ -1527,7 +1527,11 @@ void CMenuPcs::drawBattle()
             int fillWidth = ((totalWidth - 16) * m_battleHud.m_gaugeValue) / m_battleHud.m_gaugeMax;
             const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * fade));
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
+#ifdef VERSION_GCCJGC
+            MenuPcs.DrawBar(left, markerY, static_cast<float>(totalWidth), static_cast<CMenuPcs::TEX>(0x19), 8.0f);
+#else
             MenuPcs.DrawBar(left, markerY, static_cast<float>(totalWidth), static_cast<CMenuPcs::TEX>(0x1A), 8.0f);
+#endif
 
             const CColor fillTop(0xFF, (m_battleHud.m_gaugeCounter * 0xFF) / 16, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(255.0f * fade));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);

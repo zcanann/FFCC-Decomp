@@ -4,10 +4,6 @@
 
 #include <dolphin/mtx.h>
 
-extern "C" {
-const float kPppParMoveLineZero = 0.0f;
-}
-
 static inline Vec* MoveLineCurrentPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -41,7 +37,7 @@ void pppParMoveLine(_pppPObject* obj, ParMoveLineParams* params)
     PSVECSubtract(&ppvMng->m_paramVec0, MoveLinePreviousPosition(ppvMng), &moveDelta);
 
     positionX = pppMngSt->m_position.x;
-    zero = kPppParMoveLineZero;
+    zero = 0.0f;
     MoveLineCurrentPosition(pppMngSt)->x = positionX;
     MoveLineCurrentPosition(pppMngSt)->y = pppMngSt->m_position.y;
     MoveLineCurrentPosition(pppMngSt)->z = pppMngSt->m_position.z;

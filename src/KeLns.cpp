@@ -1,8 +1,5 @@
 #include "ffcc/KeLns.h"
 #include "ffcc/pppPart.h"
-extern "C" {
-const float kKeLnsLineDefaultLength = 1.0f;
-}
 
 /*
  * --INFO--
@@ -16,5 +13,5 @@ const float kKeLnsLineDefaultLength = 1.0f;
 void KeLnsLp_Init(_KeLnsLp* kelnsLp)
 {
 	pppUnitMatrix(kelnsLp->matrix);
-	kelnsLp->field_0x9c = kKeLnsLineDefaultLength;
+	kelnsLp->field_0x9c = 1.0f;
 }

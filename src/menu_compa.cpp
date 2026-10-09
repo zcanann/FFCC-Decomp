@@ -28,19 +28,6 @@ enum {
 
 typedef unsigned char u8;
 
-static const float kCompaZero = 0.0f;
-static const float kCompaTileHeight = 24.0f;
-static const float kCompaOne = 1.0f;
-static const float kCompaColorMax = 255.0f;
-static const float kCompaFoodIconWidth = 328.0f;
-static const float kCompaFoodIconHeight = 40.0f;
-static const float kCompaNameFontScaleX = 0.8f;
-static const float kCompaTextYOffset = 4.0f;
-static const float kCompaJobFontScale = 1.2f;
-static const float kCompaJobYOffset = 2.0f;
-static const float kCompaFoodIconUvScale = 0.75f;
-static const float kCompaFrameU = 72.0f;
-
 static const char sCompaFamilyCountErrorFmt[] = "%s(%d):family cnt error!!(%d)\n";
 static const char s_menu_compa_cpp[] = "menu_compa.cpp";
 
@@ -53,18 +40,18 @@ static inline void CompaDrawWindow(CompaOpenAnim* entry, float x, float y, float
 		float end = y + h;
 		while (static_cast<float>(yStep) < end) {
 			int tileH;
-			if (end - static_cast<float>(yStep) >= kCompaTileHeight) {
+			if (end - static_cast<float>(yStep) >= 24.0f) {
 				tileH = 0x18;
 			} else {
 				tileH = static_cast<int>(end - static_cast<float>(yStep));
 			}
 			MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-			                 w, static_cast<float>(tileH), u, v, colors, kCompaOne, kCompaOne, kCompaZero);
+			                 w, static_cast<float>(tileH), u, v, colors, 1.0f, 1.0f, 0.0f);
 			yStep += 0x18;
 		}
 	} else {
 		MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
-		                 kCompaOne, kCompaOne, kCompaZero);
+		                 1.0f, 1.0f, 0.0f);
 	}
 }
 
@@ -135,14 +122,14 @@ void CMenuPcs::CompaDraw()
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				fillW = entry->alpha * w;
-				if (fillW > kCompaZero) {
+				if (fillW > 0.0f) {
 					CompaDrawWindow(entry, x, y, fillW, h, u, v, colors);
 
 					u += fillW;
 					x += fillW * entry->uvScale;
 				}
 
-				if (fillW > kCompaZero && fillW < static_cast<float>(entry->w)) {
+				if (fillW > 0.0f && fillW < static_cast<float>(entry->w)) {
 					colors[1].r = 0xFF;
 					colors[1].g = 0xFF;
 					colors[1].b = 0xFF;
@@ -163,9 +150,9 @@ void CMenuPcs::CompaDraw()
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
-				colors[0].a = static_cast<unsigned char>(alpha * kCompaColorMax);
+				colors[0].a = static_cast<unsigned char>(alpha * 255.0f);
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, kCompaZero);
+				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, 0.0f);
 			}
 		}
 	}
@@ -173,7 +160,7 @@ void CMenuPcs::CompaDraw()
 	colors[0].r = 0xFF;
 	colors[0].g = 0xFF;
 	colors[0].b = 0xFF;
-	colors[0].a = static_cast<unsigned char>(this->m_compaList->entries[0].alpha * kCompaColorMax);
+	colors[0].a = static_cast<unsigned char>(this->m_compaList->entries[0].alpha * 255.0f);
 	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCompaFoodTexture));
 
@@ -198,8 +185,8 @@ void CMenuPcs::CompaDraw()
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
 			y,
-			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
-			kCompaOne, kCompaZero);
+			328.0f, 40.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f);
 	}
 
 	drawIndex = 0;
@@ -246,7 +233,7 @@ void CMenuPcs::CompaDraw()
 			icon,
 			static_cast<int>(iconX),
 			static_cast<int>(iconY),
-			compaList->entries[0].alpha, 1, kCompaOne);
+			compaList->entries[0].alpha, 1, 1.0f);
 
 		shown++;
 		drawIndex++;
@@ -254,17 +241,17 @@ void CMenuPcs::CompaDraw()
 
 	font = GetFontItem();
 	compaList = this->m_compaList;
-	font->SetMargin(kCompaOne);
+	font->SetMargin(1.0f);
 	font->SetShadow(0);
 #ifdef VERSION_GCCP01
-	font->SetScaleX(kCompaNameFontScaleX);
-	font->SetScaleY(kCompaOne);
+	font->SetScaleX(0.8f);
+	font->SetScaleY(1.0f);
 #else
-	font->SetScale(kCompaOne);
+	font->SetScale(1.0f);
 #endif
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)).color);
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	shown = drawIndex = 0;
@@ -292,7 +279,7 @@ void CMenuPcs::CompaDraw()
 #ifdef VERSION_GCCJGC
 		font->SetPosY(y);
 #else
-		font->SetPosY(y - kCompaTextYOffset);
+		font->SetPosY(y - 4.0f);
 #endif
 		font->Draw(name);
 
@@ -305,7 +292,7 @@ void CMenuPcs::CompaDraw()
 #ifdef VERSION_GCCJGC
 		font->SetPosY(y);
 #else
-		font->SetPosY(y - kCompaTextYOffset);
+		font->SetPosY(y - 4.0f);
 #endif
 		font->Draw(value);
 
@@ -314,17 +301,17 @@ void CMenuPcs::CompaDraw()
 	}
 
 	font = m_fonts[4];
-	font->SetMargin(kCompaOne);
+	font->SetMargin(1.0f);
 #ifdef VERSION_GCCJGC
 	font->SetShadow(1);
-	font->SetScale(kCompaOne);
+	font->SetScale(1.0f);
 #else
 	font->SetShadow(0);
-	font->SetScale(kCompaJobFontScale);
+	font->SetScale(1.2f);
 #endif
 	font->DrawInit();
 	compaList = this->m_compaList;
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)).color);
 
 	job = GetJobStr(caravanWork->m_jobType);
 	font->GetWidth(job);
@@ -333,7 +320,7 @@ void CMenuPcs::CompaDraw()
 #ifdef VERSION_GCCJGC
 	font->SetPosY(jobY);
 #else
-	font->SetPosY(jobY - kCompaTextYOffset - kCompaJobYOffset);
+	font->SetPosY(jobY - 4.0f - 2.0f);
 #endif
 	font->Draw(job);
 
@@ -364,9 +351,9 @@ int CMenuPcs::CompaClose()
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
                 finishedCount = finishedCount + 1;
-                entry->alpha = kCompaZero;
-                entry->dx = kCompaZero;
-                entry->dy = kCompaZero;
+                entry->alpha = 0.0f;
+                entry->dx = 0.0f;
+                entry->dy = 0.0f;
             } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha =
@@ -427,7 +414,7 @@ inline void CMenuPcs::CompaInit0()
 	CompaOpenAnim* entry = m_compaList->entries;
 	while (entryCount > 0) {
 		entry->frame = 0;
-		entry->alpha = kCompaOne;
+		entry->alpha = 1.0f;
 		entry++;
 		entryCount--;
 	}
@@ -514,9 +501,9 @@ int CMenuPcs::CompaOpen()
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
                 finishedCount = finishedCount + 1;
-                entry->alpha = kCompaOne;
-                entry->dx = kCompaZero;
-                entry->dy = kCompaZero;
+                entry->alpha = 1.0f;
+                entry->dx = 0.0f;
+                entry->dy = 0.0f;
             } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha = (float)((1.0 / (double)entry->duration) * (double)entry->frame);
@@ -555,7 +542,7 @@ void CMenuPcs::CompaInit()
 	memset(this->m_compaList, 0, sizeof(*this->m_compaList));
 
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	float one = kCompaOne;
+	float one = 1.0f;
 	for (int count = 64; count != 0; count--) {
 		entry->uvScale = one;
 		entry++;
@@ -569,9 +556,9 @@ void CMenuPcs::CompaInit()
 	setupEntry->y = 0x30;
 	setupEntry->w = 0x198;
 	setupEntry->h = 0x18;
-	setupEntry->u = kCompaZero;
-	setupEntry->v = kCompaZero;
-	setupEntry->uvScale = kCompaOne;
+	setupEntry->u = 0.0f;
+	setupEntry->v = 0.0f;
+	setupEntry->uvScale = 1.0f;
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
@@ -581,9 +568,9 @@ void CMenuPcs::CompaInit()
 	setupEntry->y = 0x48;
 	setupEntry->w = 0x198;
 	setupEntry->h = 200;
-	setupEntry->u = kCompaZero;
-	setupEntry->v = kCompaZero;
-	setupEntry->uvScale = kCompaOne;
+	setupEntry->u = 0.0f;
+	setupEntry->v = 0.0f;
+	setupEntry->uvScale = 1.0f;
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
@@ -593,9 +580,9 @@ void CMenuPcs::CompaInit()
 	setupEntry->y = 0x110;
 	setupEntry->w = 0x198;
 	setupEntry->h = 0x18;
-	setupEntry->u = kCompaZero;
-	setupEntry->v = kCompaZero;
-	setupEntry->uvScale = kCompaOne;
+	setupEntry->u = 0.0f;
+	setupEntry->v = 0.0f;
+	setupEntry->uvScale = 1.0f;
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
@@ -605,9 +592,9 @@ void CMenuPcs::CompaInit()
 	setupEntry->y = 0xe;
 	setupEntry->w = 0x30;
 	setupEntry->h = 0x30;
-	setupEntry->u = kCompaZero;
-	setupEntry->v = kCompaZero;
-	setupEntry->uvScale = kCompaOne;
+	setupEntry->u = 0.0f;
+	setupEntry->v = 0.0f;
+	setupEntry->uvScale = 1.0f;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
@@ -617,9 +604,9 @@ void CMenuPcs::CompaInit()
 	setupEntry->w = 0x30;
 	setupEntry->h = 0x30;
 	setupEntry->y = static_cast<short>(0x150 - setupEntry->h);
-	setupEntry->u = kCompaZero;
-	setupEntry->v = kCompaZero;
-	setupEntry->uvScale = kCompaFoodIconUvScale;
+	setupEntry->u = 0.0f;
+	setupEntry->v = 0.0f;
+	setupEntry->uvScale = 0.75f;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
@@ -630,8 +617,8 @@ void CMenuPcs::CompaInit()
 	setupEntry->y = 8;
 	setupEntry->w = 0x30;
 	setupEntry->h = 0x140;
-	setupEntry->u = kCompaFrameU;
-	setupEntry->v = kCompaZero;
+	setupEntry->u = 72.0f;
+	setupEntry->v = 0.0f;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 

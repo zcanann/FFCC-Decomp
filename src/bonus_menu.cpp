@@ -2654,10 +2654,10 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font->DrawInit();
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
-		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
-		char* title = Game.GetShortItemName(idx);
 		float centerX = (float)((double)sprite->x + (double)(float)sprite->w / 2.0);
 		float centerY = (float)((double)sprite->y + (double)(float)sprite->h / 2.0);
+		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
+		char* title = Game.GetShortItemName(idx);
 		font->SetPosX((float)(centerX - font->GetWidth(title) / 2.0));
 #ifdef VERSION_GCCJGC
 		font->SetPosY(centerY - 44.0f);

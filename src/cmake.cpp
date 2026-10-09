@@ -258,14 +258,6 @@ static inline unsigned char* GetCmakeRosterEntry(CMenuPcs* menu, int slot)
     return reinterpret_cast<unsigned char*>(MenuS32(menu, 0x814) + 0x7930 + slot * 0xC30);
 }
 
-static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
-{
-    if (CmakeResult(menu) != 0) {
-        return menu->GetFontItem();
-    }
-    return menu->GetFont23();
-}
-
 #ifdef VERSION_GCCJGC
 #include "ffcc/cmake_jp.inc"
 static const char s_cmakeSubfontPath[] = "dvd/menu/subfont.fnt";
@@ -1333,7 +1325,12 @@ inline void CMenuPcs::DrawCmakeBallCursor(int x, int y, float alpha)
  */
 inline void CMenuPcs::DrawCmakeCharaText(int table, float alpha)
 {
-    CFont* font = GetCmakeKeyboardFont(this);
+    CFont* font;
+    if (CmakeResult(this) != 0) {
+        font = GetFontItem();
+    } else {
+        font = GetFont23();
+    }
     font->SetShadow(0);
     font->SetScale(1.0f);
     font->DrawInit();

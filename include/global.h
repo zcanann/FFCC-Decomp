@@ -81,6 +81,12 @@
 
 #endif // _DEBUG
 
+#ifdef _DEBUG
+#define FFCC_ASSERT(exp) ASSERT(exp)
+#else
+#define FFCC_ASSERT(exp) ((void)(exp))
+#endif
+
 #ifdef __MWERKS__
 #define GLUE(a, b) a##b
 #define GLUE2(a, b) GLUE(a, b)

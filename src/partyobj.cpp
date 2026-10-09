@@ -4484,16 +4484,3 @@ void CGPartyObj::onDraw()
 	CGObject::onDraw();
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8011a574
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGPartyObj::GetCID()
-{
-	return 0x6D;
-}

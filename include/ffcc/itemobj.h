@@ -93,7 +93,7 @@ STATIC_ASSERT(offsetof(SCharaItemRow, m_attackEndFrame) == 0x22);
 class CGItemObj : public CGPrgObj
 {
 public:
-	CGItemObj();
+	CGItemObj() {}
 
 	struct CCFS
 	{
@@ -127,7 +127,7 @@ public:
 	static void ItemJump(int, float);
 	static void DeleteAllFieldItem();
 	static void DispAllFieldItem(int);
-	int GetCID();
+	int GetCID() { return 0x1d; }
 	int isCarry() { return m_owner ? 1 : 0; }
 
 	union Flags {

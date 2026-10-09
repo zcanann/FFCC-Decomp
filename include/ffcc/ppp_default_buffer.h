@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-extern u8 gPppDefaultValueBuffer[];
+extern u8 gPppDefaultValueBuffer[0x40];
 
 #ifdef __cplusplus
 }

@@ -33,7 +33,7 @@ public:
     static AiWork m_aiWork;
     static u8 m_boss[0x8C];
 
-    CGMonObj();
+    CGMonObj() {}
 
     class CMoveWork
     {
@@ -128,7 +128,7 @@ public:
     void sysControl(int);
     void onChangePrg(int);
     void footSe();
-    int GetCID();
+    int GetCID() { return 0xAD; }
 
     void alwaysFuncDefault();
     void alwaysFuncMeteoParasite();

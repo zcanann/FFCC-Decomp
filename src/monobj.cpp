@@ -3652,18 +3652,3 @@ inline void CGMonObj::footSe()
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80112d54
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::GetCID()
-{
-	return 0xAD;
-}
-
-

@@ -310,10 +310,10 @@ void CMenuPcs::MoneyDraw()
 	int j;
 	CFont* font;
 	float x;
+	int selectionState;
 	int mode;
 	float y;
 	const char* label;
-	int selectionState;
 	GXColor colors[4];
 	float w;
 	float h;

@@ -6,7 +6,7 @@
 class CGBaseObj : public CFlatRuntime::CObject
 {
 public:
-	CGBaseObj();
+	CGBaseObj() {}
 
 	inline virtual int GetCID();               // vtable entry 0xC
 	inline virtual void InitFinished();        // vtable entry 0x10

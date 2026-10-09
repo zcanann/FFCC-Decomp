@@ -9,6 +9,10 @@
 #include "ffcc/game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/system.h"
+#include "ffcc/joybusconst.h"
+#ifdef VERSION_GCCP01
+#include "ffcc/cardconst.h"
+#endif
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
@@ -44,63 +48,18 @@ STATIC_ASSERT(offsetof(CRomLetterWork, m_linkValueConditions) == 0x1C);
 STATIC_ASSERT(offsetof(CRomLetterWork, m_compareRules) == 0x1E);
 STATIC_ASSERT(offsetof(CRomLetterWork, m_eventRules) == 0x2E);
 
-extern char sWorldMapSortFormatBlock[];
-#if defined(VERSION_GCCJGC)
-#define WORLD_MAP_SORT_FORMAT_OFFSET 0x70
-#elif defined(VERSION_GCCE01)
-#define WORLD_MAP_SORT_FORMAT_OFFSET 0x68
-#else
-#define WORLD_MAP_SORT_FORMAT_OFFSET 0x64
-#endif
-static const char sNoWorldReturnItemWarning[] = {
-	(char)0x83, (char)0x8F, (char)0x81, (char)0x5B, (char)0x83, (char)0x8B, (char)0x83, (char)0x68,
-	(char)0x82, (char)0xC9, (char)0x8C, (char)0x4A, (char)0x82, (char)0xE8, (char)0x89, (char)0x7A,
-	(char)0x82, (char)0xB9, (char)0x82, (char)0xC8, (char)0x82, (char)0xA2, (char)0x83, (char)0x41,
-	(char)0x83, (char)0x43, (char)0x83, (char)0x65, (char)0x83, (char)0x80, (char)0x82, (char)0xF0,
-	(char)0x8D, (char)0xED, (char)0x8F, (char)0x9C, (char)0x82, (char)0xB5, (char)0x82, (char)0xDC,
-	(char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, 0x00, 0x00, 0x00
-};
-static const char sTempArtifactIndexWarning[] = {
-	(char)0x83, (char)0x65, (char)0x83, (char)0x93, (char)0x83, (char)0x7C, (char)0x83, (char)0x89,
-	(char)0x83, (char)0x8A, (char)0x83, (char)0x41, (char)0x81, (char)0x5B, (char)0x83, (char)0x65,
-	(char)0x83, (char)0x42, (char)0x83, (char)0x74, (char)0x83, (char)0x40, (char)0x83, (char)0x4E,
-	(char)0x83, (char)0x67, (char)0x82, (char)0xC9, (char)0x82, (char)0xE6, (char)0x82, (char)0xC1,
-	(char)0x82, (char)0xC4, (char)0x91, (char)0x9D, (char)0x89, (char)0xC1, (char)0x82, (char)0xB5,
-	(char)0x82, (char)0xC4, (char)0x82, (char)0xA2, (char)0x82, (char)0xBD, (char)0x63, (char)0x6F,
-	(char)0x6D, (char)0x6C, (char)0x69, (char)0x73, (char)0x74, (char)0x3D, (char)0x25, (char)0x64,
-	(char)0x82, (char)0xCC, (char)0x83, (char)0x43, (char)0x83, (char)0x93, (char)0x83, (char)0x66,
-	(char)0x83, (char)0x62, (char)0x83, (char)0x4E, (char)0x83, (char)0x58, (char)0x82, (char)0xCC,
-	(char)0x82, (char)0xDD, (char)0x82, (char)0xF0, (char)0x8D, (char)0xED, (char)0x8F, (char)0x9C,
-	(char)0x82, (char)0xB5, (char)0x82, (char)0xDC, (char)0x82, (char)0xB5, (char)0x82, (char)0xBD,
-	(char)0x81, (char)0x42, (char)0x0A, 0x00
-};
-static const char sUnnamedItemName[] = {
-	(char)0x81, (char)0x69, (char)0x82, (char)0xC8, (char)0x82, (char)0xDC, (char)0x82, (char)0xA6,
-	(char)0x82, (char)0xC8, (char)0x82, (char)0xB5, (char)0x81, (char)0x6A, 0x00, 0x00
-};
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 472b
+ * PAL Address: 0x800a2d8c
+ * PAL Size: 72b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGObjWork::CalcStatus()
+CGObjWork::~CGObjWork()
 {
-	if (m_statusTimers[6] != 0) {
-		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
-		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
-	}
-	if (m_statusTimers[1] != 0) {
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
-	}
-	if (m_statusTimers[3] != 0) {
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
-	}
 }
 
 /*
@@ -134,15 +93,26 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 
 /*
  * --INFO--
- * PAL Address: 0x800a2d8c
- * PAL Size: 72b
+ * PAL Address: UNUSED
+ * PAL Size: 472b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CGObjWork::~CGObjWork()
+void CGObjWork::CalcStatus()
 {
+	if (m_statusTimers[6] != 0) {
+		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
+		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
+	}
+	if (m_statusTimers[1] != 0) {
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
+	}
+	if (m_statusTimers[3] != 0) {
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
+	}
 }
 
 /*
@@ -161,7 +131,7 @@ CCaravanWork::CCaravanWork()
 	m_jobType = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
-	sprintf((char*)m_name, const_cast<char*>(sUnnamedItemName));
+	sprintf((char*)m_name, "\x81\x69\x82\xC8\x82\xDC\x82\xA6\x82\xC8\x82\xB5\x81\x6A");
 	m_letterMeta[0] = 0xFFFF;
 	m_letterMeta[1] = 0xFFFF;
 	m_letterMeta[2] = 0xFFFF;
@@ -247,7 +217,7 @@ void CCaravanWork::LoadInit()
 	m_jobType = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
-	sprintf((char*)m_name, const_cast<char*>(sUnnamedItemName));
+	sprintf((char*)m_name, "\x81\x69\x82\xC8\x82\xDC\x82\xA6\x82\xC8\x82\xB5\x81\x6A");
 	m_letterMeta[0] = 0xFFFF;
 	m_letterMeta[1] = 0xFFFF;
 	m_letterMeta[2] = 0xFFFF;
@@ -360,6 +330,33 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 	m_artifactRelated[4] =
 		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[bonusCondition + 8]
 			.m_values[2];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800A269C
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCaravanWork::IsOutOfShouki()
+{
+	unsigned char result = 0;
+	CGPartyObj* ownerObj = static_cast<CGPartyObj*>(m_ownerObj);
+
+	if (ownerObj->m_targetDist > 0.95f * Game.unkFloat_0xca10) {
+		if (m_hp != 0) {
+			if ((CFlatRuntime2Storage().m_gameFlagBits.m_flagBit7 != 0 ||
+				 CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) &&
+				ownerObj->m_weaponNodeFlagAll.m_bits1.m_shield != 0) {
+				result = 1;
+			}
+		}
+	}
+
+	return result;
 }
 
 /*
@@ -1605,6 +1602,68 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
 
 /*
  * --INFO--
+ * PAL Address: 0x800a0210
+ * PAL Size: 936b
+ * EN Address: 0x800B48F0
+ * EN Size: 476b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCaravanWork::SafeDeleteTempItem()
+{
+	if (System.GetErrorLevel() >= 3U) {
+		System.Printf("\x83\x8F\x81\x5B\x83\x8B\x83\x68\x82\xC9\x8C\x4A\x82\xE8\x89\x7A\x82\xB9\x82\xC8\x82\xA2\x83\x41\x83\x43\x83\x65\x83\x80\x82\xF0\x8D\xED\x8F\x9C\x82\xB5\x82\xDC\x82\xB7\x81\x42\n");
+	}
+
+	int hp;
+	int totalSlots;
+	int strength;
+	int magic;
+	int defense;
+	CalcArtifactStatus(0, 0, hp, totalSlots, strength, magic, defense);
+
+	totalSlots += (short)m_baseCmdListSlots;
+	for (int slotIndex = totalSlots; slotIndex < 8; slotIndex++) {
+		if (m_commandListInventorySlotRef[slotIndex] >= 0) {
+			m_commandListInventorySlotRef[slotIndex] = -1;
+			if (System.GetErrorLevel() >= 3U) {
+				System.Printf("\x83\x65\x83\x93\x83\x7C\x83\x89\x83\x8A\x83\x41\x81\x5B\x83\x65\x83\x42\x83\x74\x83\x40\x83\x4E\x83\x67\x82\xC9\x82\xE6\x82\xC1\x82\xC4\x91\x9D\x89\xC1\x82\xB5\x82\xC4\x82\xA2\x82\xBD" "comlist=%d\x82\xCC\x83\x43\x83\x93\x83\x66\x83\x62\x83\x4E\x83\x58\x82\xCC\x82\xDD\x82\xF0\x8D\xED\x8F\x9C\x82\xB5\x82\xDC\x82\xB5\x82\xBD\x81\x42\n", slotIndex);
+			}
+		}
+	}
+
+	short invalidItem = -1;
+	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 0] = invalidItem;
+	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 1] = invalidItem;
+	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 2] = invalidItem;
+	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 3] = invalidItem;
+
+	for (int i = 0; i < 64; i++) {
+		short item = m_inventoryItems[i];
+#ifdef VERSION_GCCP01
+		if ((item >= 0x100) && (item <= 0x124) && (item != -1)) {
+#else
+		if ((item >= 0x100) && (item <= 0x124)) {
+#endif
+			m_inventoryItems[i] = invalidItem;
+			m_inventoryItemCount--;
+		}
+	}
+
+	for (int slotIndex2 = 2; slotIndex2 < 8; slotIndex2++) {
+		int slot = m_commandListInventorySlotRef[slotIndex2];
+		if (slot >= 0 && m_inventoryItems[slot] < 0) {
+			m_commandListInventorySlotRef[slotIndex2] = -1;
+		}
+	}
+
+	m_currentCmdListIndex = 0;
+	m_weaponIdx = 0;
+	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
+}
+
+/*
+ * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 52b
  * EN Address: TODO
@@ -1612,7 +1671,7 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CCaravanWork::ClampStatus(short& cmdSlots, unsigned short& hpMax)
+void CCaravanWork::ClampStatus(short& cmdSlots, unsigned short& hpMax)
 {
 	cmdSlots = (cmdSlots < 8) ? cmdSlots : 8;
 	hpMax = (hpMax < 0x10) ? hpMax : 0x10;
@@ -1627,7 +1686,7 @@ inline void CCaravanWork::ClampStatus(short& cmdSlots, unsigned short& hpMax)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int& cmdSlots, int& strength, int& magic, int& defense)
+void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int& cmdSlots, int& strength, int& magic, int& defense)
 {
 	hp = 0;
 	cmdSlots = 0;
@@ -1664,68 +1723,6 @@ inline void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int&
 			}
 		}
 	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a0210
- * PAL Size: 936b
- * EN Address: 0x800B48F0
- * EN Size: 476b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCaravanWork::SafeDeleteTempItem()
-{
-	if (System.GetErrorLevel() >= 3U) {
-		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
-	}
-
-	int hp;
-	int totalSlots;
-	int strength;
-	int magic;
-	int defense;
-	CalcArtifactStatus(0, 0, hp, totalSlots, strength, magic, defense);
-
-	totalSlots += (short)m_baseCmdListSlots;
-	for (int slotIndex = totalSlots; slotIndex < 8; slotIndex++) {
-		if (m_commandListInventorySlotRef[slotIndex] >= 0) {
-			m_commandListInventorySlotRef[slotIndex] = -1;
-			if (System.GetErrorLevel() >= 3U) {
-				System.Printf(const_cast<char*>(sTempArtifactIndexWarning), slotIndex);
-			}
-		}
-	}
-
-	short invalidItem = -1;
-	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 0] = invalidItem;
-	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 1] = invalidItem;
-	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 2] = invalidItem;
-	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 3] = invalidItem;
-
-	for (int i = 0; i < 64; i++) {
-		short item = m_inventoryItems[i];
-#ifdef VERSION_GCCP01
-		if ((item >= 0x100) && (item <= 0x124) && (item != -1)) {
-#else
-		if ((item >= 0x100) && (item <= 0x124)) {
-#endif
-			m_inventoryItems[i] = invalidItem;
-			m_inventoryItemCount--;
-		}
-	}
-
-	for (int slotIndex2 = 2; slotIndex2 < 8; slotIndex2++) {
-		int slot = m_commandListInventorySlotRef[slotIndex2];
-		if (slot >= 0 && m_inventoryItems[slot] < 0) {
-			m_commandListInventorySlotRef[slotIndex2] = -1;
-		}
-	}
-
-	m_currentCmdListIndex = 0;
-	m_weaponIdx = 0;
-	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 }
 
 /*
@@ -1944,6 +1941,22 @@ int CCaravanWork::CanPlayerUseItem()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCaravanWork::ValidCmdList(int cmdListIdx)
+{
+	FFCC_ASSERT(0 <= cmdListIdx && cmdListIdx < m_numCmdListSlots);
+	FFCC_ASSERT(m_commandListInventorySlotRef[cmdListIdx] != -1 || cmdListIdx < 2);
+	FFCC_ASSERT(m_inventoryItems[m_commandListInventorySlotRef[cmdListIdx]] != 0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8009fa18
  * PAL Size: 8b
  * EN Address: TODO
@@ -1990,40 +2003,6 @@ int CCaravanWork::IsUseCmdList(int cmdListIdx)
 	return isInvalid ? 0 : 1;
 }
 
-inline int CCaravanWork::SearchCombiTop(int cmdListIdx)
-{
-	for (; cmdListIdx >= 0; cmdListIdx--) {
-		if (m_commandListExtra[cmdListIdx] != -1) {
-			break;
-		}
-	}
-	return cmdListIdx;
-}
-
-inline int CCaravanWork::GetNumCombi(int cmdListIdx)
-{
-	int numGrouped;
-	if (Game.m_gameWork.m_menuStageMode == 0) {
-		numGrouped = 1;
-	} else if (m_commandListExtra[cmdListIdx] == 0) {
-		numGrouped = 1;
-	} else {
-		int topIdx = SearchCombiTop(cmdListIdx);
-
-		numGrouped = 1;
-		int nextIdx = topIdx + 1;
-		short numSlots = m_numCmdListSlots;
-		for (int n = topIdx + 1; n < numSlots; n++) {
-			if (m_commandListExtra[nextIdx] != -1) {
-				break;
-			}
-			numGrouped++;
-			nextIdx++;
-		}
-	}
-	return numGrouped;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8009f890
@@ -2055,6 +2034,46 @@ unsigned int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 	}
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8009f730
+ * PAL Size: 352b
+ * EN Address: 0x800B5828
+ * EN Size: 420b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdListIdx)
+{
+	ValidCmdList(cmdListIdx);
+	int groupedCount = GetNumCombi(cmdListIdx);
+
+	if (groupedCount > 1) {
+		cmdListIdx = SearchCombiTop(cmdListIdx);
+		FFCC_ASSERT(0 <= cmdListIdx && cmdListIdx < m_numCmdListSlots);
+		FFCC_ASSERT(cmdListIdx + groupedCount <= m_numCmdListSlots);
+
+		short cmdId = m_commandListExtra[cmdListIdx];
+		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
+			firstCmdIdx = cmdListIdx;
+			SItemFlatRow* items = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			int i = 0;
+			for (; groupedCount > 0; groupedCount--) {
+				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
+				short itemId = (short)m_inventoryItems[invSlot];
+				FFCC_ASSERT(itemId > 0);
+				int itemType = items[itemId].m_kind;
+				if (itemType == 1) {
+					itemCmdListIdx = cmdListIdx + i;
+					return 1;
+				}
+				i++;
+			}
+		}
+	}
+
+	return 0;
+}
 
 /*
  * --INFO--
@@ -2128,6 +2147,8 @@ int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
  */
 int CCaravanWork::GetCmdListItem(int cmdListIdx)
 {
+	ValidCmdList(cmdListIdx);
+
 	int result;
 	int inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
 
@@ -2149,12 +2170,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 		int numGrouped = GetNumCombi(cmdListIdx);
 
 		if (numGrouped > 1) {
-			for (int n = cmdListIdx; n >= 0; n--) {
-				if (m_commandListExtra[cmdListIdx] != -1) {
-					break;
-				}
-				cmdListIdx--;
-			}
+			cmdListIdx = SearchCombiTop(cmdListIdx);
 
 			int cmdResult = m_commandListExtra[cmdListIdx];
 			int cmdTopIdx;
@@ -2198,6 +2214,64 @@ void CCaravanWork::DelCmdListAndItem(int cmdListIdx, int updateJoybus)
 	if (m_currentCmdListIndex == cmdListIdx) {
 		m_currentCmdListIndex = nextCmdIdx;
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCaravanWork::SearchCombiTop(int cmdListIdx)
+{
+	FFCC_ASSERT(0 <= cmdListIdx && cmdListIdx < m_numCmdListSlots);
+	FFCC_ASSERT(m_commandListExtra[cmdListIdx] != 0);
+	for (; cmdListIdx >= 0; cmdListIdx--) {
+		if (m_commandListExtra[cmdListIdx] != -1) {
+			break;
+		}
+	}
+	FFCC_ASSERT(cmdListIdx >= 0);
+	FFCC_ASSERT(m_commandListExtra[cmdListIdx] != -1);
+	return cmdListIdx;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCaravanWork::GetNumCombi(int cmdListIdx)
+{
+	int numGrouped;
+
+	FFCC_ASSERT(0 <= cmdListIdx && cmdListIdx < m_numCmdListSlots);
+	if (Game.m_gameWork.m_menuStageMode == 0) {
+		numGrouped = 1;
+	} else if (m_commandListExtra[cmdListIdx] == 0) {
+		numGrouped = 1;
+	} else {
+		int topIdx = SearchCombiTop(cmdListIdx);
+
+		numGrouped = 1;
+		int nextIdx = topIdx + 1;
+		short numSlots = m_numCmdListSlots;
+		for (int n = topIdx + 1; n < numSlots; n++) {
+			if (m_commandListExtra[nextIdx] != -1) {
+				break;
+			}
+			numGrouped++;
+			nextIdx++;
+		}
+	}
+	return numGrouped;
 }
 
 /*
@@ -2323,22 +2397,21 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
  */
 void CCaravanWork::SortBeforeReturnWorldMap()
 {
-	char* fmtBase = sWorldMapSortFormatBlock;
 	short lhs;
 	short rhs;
 
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 
 	for (int i = 0; i < 0x40; i++) {
-		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET, i, m_inventoryItems[i]);
+		System.Printf("item%d = %d\n", i, m_inventoryItems[i]);
 	}
 
 	for (int i = 2; i < 8; i++) {
-		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET + 0x10, i, m_commandListInventorySlotRef[i]);
+		System.Printf("commandidx%d = %d\n", i, m_commandListInventorySlotRef[i]);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET + 0x24, i, m_equipment[i]);
+		System.Printf("equipidx%d = %d\n", i, m_equipment[i]);
 	}
 
 	for (int i = 0; i < 0x3F; i++) {
@@ -2394,15 +2467,15 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 	}
 
 	for (int i = 0; i < 0x40; i++) {
-		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET, i, m_inventoryItems[i]);
+		System.Printf("item%d = %d\n", i, m_inventoryItems[i]);
 	}
 
 	for (int i = 2; i < 8; i++) {
-		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET + 0x10, i, m_commandListInventorySlotRef[i]);
+		System.Printf("commandidx%d = %d\n", i, m_commandListInventorySlotRef[i]);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET + 0x24, i, m_equipment[i]);
+		System.Printf("equipidx%d = %d\n", i, m_equipment[i]);
 	}
 }
 
@@ -2492,70 +2565,6 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 	for (int i = 0; i < count; i++) {
 		m_commandListExtra[startIdx + i] = 0;
 	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8009f730
- * PAL Size: 352b
- * EN Address: 0x800B5828
- * EN Size: 420b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdListIdx)
-{
-	int groupedCount = GetNumCombi(cmdListIdx);
-
-	if (groupedCount > 1) {
-		cmdListIdx = SearchCombiTop(cmdListIdx);
-
-		short cmdId = m_commandListExtra[cmdListIdx];
-		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
-			firstCmdIdx = cmdListIdx;
-			SItemFlatRow* items = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			int i = 0;
-			for (; groupedCount > 0; groupedCount--) {
-				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
-				short itemId = (short)m_inventoryItems[invSlot];
-				int itemType = items[itemId].m_kind;
-				if (itemType == 1) {
-					itemCmdListIdx = cmdListIdx + i;
-					return 1;
-				}
-				i++;
-			}
-		}
-	}
-
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8009e1c0
- * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CCaravanWork::GetArtifactIncludeHpMax()
-{
-	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
-	int hpMax;
-	int cmdSlots;
-	int strength;
-	int magic;
-	int defense;
-
-	CalcArtifactStatus(0, 0, hpMax, cmdSlots, strength, magic, defense);
-
-	hpMax += baseData->m_maxHp;
-	if (hpMax >= 0x10) {
-		return 0x10;
-	}
-	return hpMax;
 }
 
 /*
@@ -2689,27 +2698,27 @@ void CMonWork::CalcStatus()
 
 /*
  * --INFO--
- * PAL Address: 0x800A269C
- * PAL Size: 132b
+ * PAL Address: 0x8009e1c0
+ * PAL Size: 316b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::IsOutOfShouki()
+int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	unsigned char result = 0;
-	CGPartyObj* ownerObj = static_cast<CGPartyObj*>(m_ownerObj);
+	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+	int hpMax;
+	int cmdSlots;
+	int strength;
+	int magic;
+	int defense;
 
-	if (ownerObj->m_targetDist > 0.95f * Game.unkFloat_0xca10) {
-		if (m_hp != 0) {
-			if ((CFlatRuntime2Storage().m_gameFlagBits.m_flagBit7 != 0 ||
-				 CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) &&
-				ownerObj->m_weaponNodeFlagAll.m_bits1.m_shield != 0) {
-				result = 1;
-			}
-		}
+	CalcArtifactStatus(0, 0, hpMax, cmdSlots, strength, magic, defense);
+
+	hpMax += baseData->m_maxHp;
+	if (hpMax >= 0x10) {
+		return 0x10;
 	}
-
-	return result;
+	return hpMax;
 }

@@ -1540,7 +1540,7 @@ int CMenuPcs::LetterCtrlCur()
 			} else {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
-#ifdef VERSION_GCCJGC
+#ifndef VERSION_GCCP01
 		}
 		if ((press & 0x200) != 0) {
 #else

@@ -947,16 +947,6 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-COctNode::COctNode()
-{
-	m_lightFlags = 0;
-	m_shadowFlags = 0;
-}
-/*
- * --INFO--
  * PAL Address: 0x8002f384
  * PAL Size: 120b
  * EN Address: TODO

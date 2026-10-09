@@ -29,7 +29,7 @@ public:
 	class CClass
 	{
 	public:
-		CClass();
+		CClass() { m_variableCount = 2; }
 		s32 m_index;              // 0x000
 		char m_name[0x20];        // 0x004
 		s32 m_functionTable[0x80]; // 0x024

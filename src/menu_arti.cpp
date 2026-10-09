@@ -144,6 +144,7 @@ int CMenuPcs::ArtiCtrlCur()
  */
 void CMenuPcs::ArtiDraw()
 {
+	float itemAlpha;
 	short artiState;
 	ArtiOpenAnim* entry;
 	const CCaravanWork* caravanWork;
@@ -229,7 +230,7 @@ void CMenuPcs::ArtiDraw()
 			} else {
 				float animAlpha = entry->alpha;
 				int texId = tex;
-				float itemAlpha = animAlpha;
+				itemAlpha = animAlpha;
 				if (tex == kArtiRowTexture) {
 					int itemCount = caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + (drawIndex + m_artiState->scrollOffset)];
 					if (itemCount > 0) {

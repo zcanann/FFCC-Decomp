@@ -23,9 +23,9 @@ extern const Vec sMap21TangentAxis;
 class CGObject : public CGBaseObj
 {
 public:
-    CGObject();
+    CGObject() {}
 
-    virtual int GetCID();     // vtable entry 0x10
+    virtual int GetCID() { return 5; }     // vtable entry 0x10
 	virtual void onCreate();  // vtable entry 0x1c
 	virtual void onDestroy(); // vtable entry 0x20
     virtual void onDraw();    // vtable entry 0x28
@@ -99,10 +99,10 @@ public:
      * JP Size: TODO
      */
     virtual float onAlphaUpdate() { return 1.0f; }
-    virtual void onAnimPoint(int, int);
-    virtual int onHit(int, CGObject*, int, Vec*);
-    virtual void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
-    virtual void onDrawDebug(CFont*, float, float&, float);
+    virtual void onAnimPoint(int, int) {}
+    virtual int onHit(int, CGObject*, int, Vec*) { return 0; }
+    virtual void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*) {}
+    virtual void onDrawDebug(CFont*, float, float&, float) {}
 
     struct AttackCol
     {

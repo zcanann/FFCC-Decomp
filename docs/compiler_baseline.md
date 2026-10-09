@@ -1,7 +1,7 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1h for Japan.
-GC/2.0p1h is derived during the build from the bundled GC/2.0p1 (see below).
+The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1i for Japan.
+GC/2.0p1i is derived during the build from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -115,3 +115,31 @@ and `CGPartyObj::gpmCol`). On a frozen BFBB checkout (built on 2.0p1e, where
 the parts were first developed) e3ns is 0 / -1 on game code, the one loss being
 `xBoxFromCircle`, BFBB's documented E3n counter-witness, and 0 / 0 on
 RenderWare; dsl is 0 / 0 on both. PAL and USA (GC/2.5) are unaffected.
+
+## GC/2.0p1i: three more corrections (ksa, pwcp, c3a)
+
+`tools/patch_compiler_ffcc2.py` derives GC/2.0p1i from GC/2.0p1h
+(`6114c0c66bc9b4ded51a1a278402a753ab12792c` to
+`58c5e3ccd07f5ce533695ecedd1a2a7f1eca1d13`) with 8 byte edits, each checked
+against its expected old bytes; the research source is kept in the script. None
+of these behaviours exists in a stock compiler (1.3.2 to 3.0a5.2), so all are
+emulation corrections, each located with BFBB's in-process may-alias probe:
+
+- `ksa`: Alias.c's per-access pass no longer downgrades an access to worst_case
+  because another reaching definition of its base register has no alias; the
+  access keeps its own alias (three bytes at 0x5124D7, 0x5124E2, 0x5124EE).
+  Example: `target = cond ? &gPppDefaultValueBuffer[0] : workArea + off`
+  followed by byte stores through `target`, where retail loads the int-to-float
+  constant once and hoists the target loads.
+- `pwcp`: prologue worst_case stores (stw/stwu/stmw) may alias a later load of
+  a stack-passed parameter, so those loads stay below the register saves
+  (functions with more than eight arguments).
+- `c3a`: a subrange store to a named static orders a later whole `@` literal
+  load of at most 8 bytes, whatever its flags (may_alias entry 3).
+
+Measured against GC/2.0p1h on the current tree: Japan +23 / -0 exact functions,
+no partial score lower in any region, one more Japanese unit linked; PAL and USA
+unaffected. On a frozen BFBB checkout the three parts together are +4 / -0
+(game +3, RenderWare +1) with no partial losses. The accompanying source fix
+declares `gPppDefaultValueBuffer[0x40]` with its real size; the incomplete
+array type had made 2.0p1a's clause S treat its halves as aliasing.

@@ -356,11 +356,12 @@ int CMenuPcs::EquipCtrlCur()
  */
 void CMenuPcs::EquipDraw()
 {
+	float textY;
 	int helpItem;
 	int helpFound = 0;
+	CCaravanWork* caravanWork;
 	int mode;
 	int listState;
-	CCaravanWork* caravanWork;
 	EquipOpenAnim* item;
 	float x;
 	float y;
@@ -373,9 +374,9 @@ void CMenuPcs::EquipDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	mode = static_cast<int>(m_equipState->mode);
-	listState = static_cast<int>(m_equipState->listState);
 	caravanWork = Game.m_scriptFoodBase[0];
+	listState = static_cast<int>(m_equipState->listState);
+	mode = static_cast<int>(m_equipState->mode);
 	item = m_equipList->entries;
 
 	for (int i = 0; i < m_equipList->count; i++, item++) {
@@ -432,7 +433,7 @@ void CMenuPcs::EquipDraw()
 				helpFound = 1;
 			}
 			float width = font->GetWidth(str);
-			float textY = (float)(item->y + 0xb);
+			textY = (float)(item->y + 0xb);
 			font->SetPosX((float)((((float)item->w - width) / 2.0) + (double)item->x));
 #ifdef VERSION_GCCJGC
 			font->SetPosY(textY);
@@ -585,7 +586,7 @@ void CMenuPcs::EquipDraw()
 			}
 
 			font->GetWidth(str);
-			float textY = (float)(textItem->y + 0xb);
+			textY = (float)(textItem->y + 0xb);
 			font->SetPosX((float)(textItem->x + 0x1c));
 #ifdef VERSION_GCCJGC
 			font->SetPosY(textY);

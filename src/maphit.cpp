@@ -733,19 +733,6 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 
 /*
  * --INFO--
- * PAL Address: 0x80026d38
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapHitFace::CMapHitFace()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80026d5c
  * PAL Size: 144b
  * EN Address: TODO

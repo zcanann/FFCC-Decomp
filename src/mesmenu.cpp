@@ -32,7 +32,7 @@ enum
 #endif
 };
 
-int tXY[4] = {1, 0, -1, 0};
+static int tXY[4] = {1, 0, -1, 0};
 
 /*
  * --INFO--

@@ -208,9 +208,9 @@ char* CMenuPcs::GetTribeStr(int index)
 #endif
 
 extern "C" {
-extern int s_DynamicMess[5];
+int s_DynamicMess[5];
 }
-extern char s_DynamicMessStr[0x400];
+static char s_DynamicMessStr[0x400];
 extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[];
 
 extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
@@ -2233,10 +2233,6 @@ void CMenuPcs::SetSingDynamicWinMessInfo(
     }
 }
 
-extern "C" {
-int s_DynamicMess[5];
-}
-char s_DynamicMessStr[0x400];
 
 /*
  * --INFO--

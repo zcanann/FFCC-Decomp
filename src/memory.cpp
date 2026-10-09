@@ -1734,8 +1734,7 @@ short CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dma
  */
 int CAmemCacheSet::IsEnable(short index)
 {
-    unsigned int value = reinterpret_cast<unsigned int>(cacheEntryAt(this, index).m_cacheData);
-    return ((0u - value) | value) >> 31;
+    return cacheEntryAt(this, index).IsEnable();
 }
 
 /*
@@ -1743,9 +1742,9 @@ int CAmemCacheSet::IsEnable(short index)
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCache::IsEnable()
+inline int CAmemCache::IsEnable()
 {
-	// TODO
+    return m_cacheData != 0;
 }
 
 /*

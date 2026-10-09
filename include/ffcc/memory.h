@@ -131,7 +131,7 @@ public:
     void Destroy(CMemory::CStage*);
     int GetData(CMemory::CStage*, char*, int);
     void SetData(void*, int);
-    void IsEnable();
+    int IsEnable();
     void Init();
 };
 

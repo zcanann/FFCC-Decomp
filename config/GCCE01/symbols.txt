@@ -17729,14 +17729,14 @@ g_map_draw_prof = .sbss:0x8032DCB0; // type:object size:0x1 scope:global align:4
 @477 = .rodata:0x801D6668; // type:object size:0xA scope:local align:1
 @566 = .rodata:0x801D6674; // type:object size:0x10F scope:local align:1
 @637 = .rodata:0x801D6784; // type:object size:0x18 scope:local align:1
-@662 = .rodata:0x801D6650; // type:object size:0x9 scope:local align:1
-@663 = .rodata:0x801D665C; // type:object size:0x9 scope:local align:1
+@666 = .rodata:0x801D6650; // type:object size:0x9 scope:local align:1
+@667 = .rodata:0x801D665C; // type:object size:0x9 scope:local align:1
 @437 = .sdata2:0x8032E9C8; // type:object size:0x4 scope:local align:1
 @438 = .sdata2:0x8032E9CC; // type:object size:0x4 scope:local align:1
 @563 = .sdata2:0x8032E9D0; // type:object size:0x4 scope:local align:1
 @564 = .sdata2:0x8032E9D4; // type:object size:0x4 scope:local align:1
 @565 = .sdata2:0x8032E9D8; // type:object size:0x4 scope:local align:1
-@660 = .sdata2:0x8032E9C0; // type:object size:0x8 scope:local align:1
+@664 = .sdata2:0x8032E9C0; // type:object size:0x8 scope:local align:1
 
 gap_rodata_801D6B81 = .rodata:0x801D6B81; // type:object size:0x7 scope:local align:1
 

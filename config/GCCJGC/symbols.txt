@@ -16049,14 +16049,14 @@ g_map_draw_prof = .sbss:0x8034BAD0; // type:object size:0x1 scope:global align:4
 @477 = .rodata:0x801D2280; // type:object size:0xA scope:local align:1
 @566 = .rodata:0x801D228C; // type:object size:0x10F scope:local align:1
 @637 = .rodata:0x801D239C; // type:object size:0x18 scope:local align:1
-@662 = .rodata:0x801D2268; // type:object size:0x9 scope:local align:1
-@663 = .rodata:0x801D2274; // type:object size:0x9 scope:local align:1
+@666 = .rodata:0x801D2268; // type:object size:0x9 scope:local align:1
+@667 = .rodata:0x801D2274; // type:object size:0x9 scope:local align:1
 @437 = .sdata2:0x8034C760; // type:object size:0x4 scope:local align:1
 @438 = .sdata2:0x8034C764; // type:object size:0x4 scope:local align:1
 @563 = .sdata2:0x8034C768; // type:object size:0x4 scope:local align:1
 @564 = .sdata2:0x8034C76C; // type:object size:0x4 scope:local align:1
 @565 = .sdata2:0x8034C770; // type:object size:0x4 scope:local align:1
-@660 = .sdata2:0x8034C758; // type:object size:0x8 scope:local align:1
+@664 = .sdata2:0x8034C758; // type:object size:0x8 scope:local align:1
 
 gap_rodata_801D2799 = .rodata:0x801D2799; // type:object size:0x7 scope:local align:1
 

@@ -308,12 +308,6 @@ inline void GbaQueue::ClrShopFlg(int channel)
 	m_shopFlags &= ~(1 << channel);
 	m_shopStatusFlags &= ~(1 << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
-
-	for (int retry = 0; retry < 10; retry++) {
-		if (Joybus.SetMType(channel, 0) == 0) {
-			break;
-		}
-	}
 }
 
 /*
@@ -327,12 +321,6 @@ inline void GbaQueue::ClrSmithFlg(int channel)
 	m_shopFlags &= ~(0x10 << channel);
 	m_shopStatusFlags &= ~(0x10 << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
-
-	for (int retry = 0; retry < 10; retry++) {
-		if (Joybus.SetMType(channel, 0) == 0) {
-			break;
-		}
-	}
 }
 
 /*
@@ -424,12 +412,10 @@ void GbaQueue::LoadAll()
 
 			if ((resetMask & (1 << i)) != 0) {
 				if (Game.m_scriptFoodBase[i]->m_shopRequestState == 1) {
-					ClrShopFlg(i);
-					Game.m_scriptFoodBase[i]->CallShop(0, 0, 0, 0, 0);
+					ShopEnd(i);
 				}
 				if (Game.m_scriptFoodBase[i]->m_shopRequestState == 2) {
-					ClrSmithFlg(i);
-					Game.m_scriptFoodBase[i]->CallShop(1, 0, 0, 0, 0);
+					SmithEnd(i);
 				}
 			}
 
@@ -475,13 +461,11 @@ void GbaQueue::ClrShopMode()
 		}
 
 		if (Game.m_scriptFoodBase[i]->m_shopRequestState == 1) {
-			ClrShopFlg(i);
-			Game.m_scriptFoodBase[i]->CallShop(0, 0, 0, 0, 0);
+			ShopEnd(i);
 		}
 
 		if (Game.m_scriptFoodBase[i]->m_shopRequestState == 2) {
-			ClrSmithFlg(i);
-			Game.m_scriptFoodBase[i]->CallShop(1, 0, 0, 0, 0);
+			SmithEnd(i);
 		}
 
 		if (m_shopStatusFlags & (1 << i)) {
@@ -540,7 +524,7 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: TODO
+ * PAL Size: 72b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -548,13 +532,8 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
  */
 inline void GbaQueue::ResetQueue()
 {
-	for (int channel = 0; channel < 4; channel++) {
-		OSWaitSemaphore(accessSemaphores + channel);
-		memset(m_queue[channel], 0, sizeof(m_queue[channel]));
-		m_queueCount[channel] = 0;
-		m_queueFull[channel] = 0;
-		OSSignalSemaphore(accessSemaphores + channel);
-	}
+	memset(m_queue, 0, sizeof(m_queue));
+	memset(m_queueCount, 0, sizeof(m_queueCount));
 }
 
 /*
@@ -752,8 +731,7 @@ void GbaQueue::ExecutQueue()
 
 	memcpy(localQueueData, m_queue, sizeof(localQueueData));
 	memcpy(localQueueCount, m_queueCount, sizeof(localQueueCount));
-	memset(m_queue, 0, sizeof(localQueueData));
-	memset(m_queueCount, 0, sizeof(localQueueCount));
+	ResetQueue();
 
 	for (channel = 0; channel < 4; channel++) {
 		OSSignalSemaphore(accessSemaphores + channel);
@@ -843,8 +821,7 @@ void GbaQueue::ExecutQueue()
 					} else if (cmdBytes[1] == 6) {
 						CMakeBarthday(channel, queueWords[i]);
 					} else if (cmdBytes[1] == 7) {
-						ClrShopFlg(channel);
-						Game.m_scriptFoodBase[channel]->CallShop(0, 0, 0, 0, 0);
+						ShopEnd(channel);
 					} else if (cmdBytes[1] == 8) {
 #ifdef VERSION_GCCP01
 						if (Game.m_scriptFoodBase[channel] != 0)
@@ -867,8 +844,7 @@ void GbaQueue::ExecutQueue()
 							SetSmithData(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 0x0B) {
-						ClrSmithFlg(channel);
-						Game.m_scriptFoodBase[channel]->CallShop(1, 0, 0, 0, 0);
+						SmithEnd(channel);
 					} else if (cmdBytes[1] == 0x15) {
 						for (int s = 0; s < 4; s++) {
 							OSWaitSemaphore(accessSemaphores + s);
@@ -3372,10 +3348,13 @@ inline void GbaQueue::ShopEnd(int channel)
 {
 	ClrShopFlg(channel);
 
-	CCaravanWork* caravanWork = Game.m_scriptFoodBase[channel];
-	if (caravanWork != 0) {
-		caravanWork->CallShop(0, 0, 0, 0, 0);
+	for (int retry = 0; retry < 10; retry++) {
+		if (Joybus.SetMType(channel, 0) == 0) {
+			break;
+		}
 	}
+
+	Game.m_scriptFoodBase[channel]->CallShop(0, 0, 0, 0, 0);
 }
 
 /*
@@ -3387,10 +3366,13 @@ inline void GbaQueue::SmithEnd(int channel)
 {
 	ClrSmithFlg(channel);
 
-	CCaravanWork* caravanWork = Game.m_scriptFoodBase[channel];
-	if (caravanWork != 0) {
-		caravanWork->CallShop(1, 0, 0, 0, 0);
+	for (int retry = 0; retry < 10; retry++) {
+		if (Joybus.SetMType(channel, 0) == 0) {
+			break;
+		}
 	}
+
+	Game.m_scriptFoodBase[channel]->CallShop(1, 0, 0, 0, 0);
 }
 
 /*

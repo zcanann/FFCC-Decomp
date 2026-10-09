@@ -1453,7 +1453,7 @@ inline CGame::CGameWork::CGameWork()
  */
 const char* CGame::GetLangString()
 {
-#ifdef VERSION_GCCE01
+#if defined(VERSION_GCCE01) || defined(VERSION_GCCJGC)
     return "";
 #else
     const char* localLangDirs[] = {

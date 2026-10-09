@@ -24,7 +24,7 @@ public:
     void close(int);
     void CloseRequest(int);
     void SetPos(float, float);
-    int IsUse();
+    int IsUse() { return (m_active != 0) && (m_state <= 1) && (m_mes.GetWait() != 4); }
     int GetValue(int);
     void SetValue(int, int);
     void SetIndex(int index)
@@ -34,7 +34,6 @@ public:
         m_mes.SetPlayerIndex(index);
 #endif
     }
-    int IsActiveMessage() { return (m_active != 0) && (m_state <= 1) && (m_mes.GetWait() != 4); }
 
 private:
     int m_active;              // 0x0008

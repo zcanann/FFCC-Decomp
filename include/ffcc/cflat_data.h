@@ -25,7 +25,7 @@ public:
 
 	void Create(void*);
 	void Destroy();
-    char* GetMes(int);
+    char* GetMes(int index) { return m_mesPtr[index]; }
 
     DataEntry& Data(int index) { return m_data[index]; }
     void* GetData(int index) { return m_data[index].m_data; }

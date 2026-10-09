@@ -206,7 +206,7 @@ public:
     char* GetMonArts(int);
     char* GetMonName(int, int);
     int GetNumBonus() { return m_gameWork.m_radarType != 0 ? 4 : 0x10; }
-    char* GetSysMes(int);
+    char* GetSysMes(int index) { return m_cFlatDataArr[1].GetMes(index); }
     int GetEvtFlag(int);
     void SetEvtFlag(int, int);
 

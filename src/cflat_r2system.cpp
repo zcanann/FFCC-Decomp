@@ -609,25 +609,6 @@ void CGraphicPcs::ReqScreenCapture()
 
 /*
  * --INFO--
- * PAL Address: 0x800B9484
- * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline int CMesMenu::IsUse()
-{
-    unsigned char result = 0;
-    if (m_active != 0 && m_state <= 1 && m_mes.GetWait() != 4) {
-        result = 1;
-    }
-
-    return result;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B94DC
  * PAL Size: 16b
  * EN Address: 0x800CF354
@@ -666,48 +647,6 @@ inline void CMesMenu::SetValue(int index, int value)
 inline int CSystem::GetErrorLevel()
 {
     return m_execParam;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9504
- * PAL Size: 16b
- * EN Address: 0x800CF3C4
- * EN Size: 16b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline char* CFlatData::GetMes(int index)
-{
-    return m_mesPtr[index];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9514
- * PAL Size: 20b
- * EN Address: 0x800CECB0
- * EN Size: 56b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline char* CGame::GetSysMes(int index)
-{
-    return m_cFlatDataArr[1].GetMes(index);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9528
- * PAL Size: 16b
- * EN Address: 0x800CEF2C
- * EN Size: 16b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CMesMenu* CMenuPcs::GetMesMenu(int index)
-{
-    return m_battleMesMenus[index];
 }
 
 /*

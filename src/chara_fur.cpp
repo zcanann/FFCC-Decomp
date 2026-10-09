@@ -187,19 +187,6 @@ static inline CTexture* FindMogFurTexture(CChara::CModel* model)
 	return textureSet->m_textureArray[textureIdx];
 }
 
-static inline void OpenMogHintMessage(int messageId)
-{
-	if (messageId < 0) {
-		return;
-	}
-
-	if (MenuPcs.m_battleMesMenus[5]->IsActiveMessage()) {
-		return;
-	}
-
-	MenuPcs.m_battleMesMenus[5]->Open(Game.m_cFlatDataArr[1].Message(messageId + 8), 0x160, 0x20, 0x220, 0, -1, -1);
-}
-
 } // namespace
 
 /*
@@ -1446,7 +1433,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 	}
 
-	OpenMogHintMessage(messageId);
+	if (messageId >= 0 && !MenuPcs.GetMesMenu(5)->IsUse()) {
+		MenuPcs.GetMesMenu(5)->Open(Game.GetSysMes(messageId + 8), 0x160, 0x20, 0x220, 0, -1, -1);
+	}
 	m_mogWork.m_frameCount++;
 }
 

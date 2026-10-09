@@ -161,7 +161,7 @@ void CRingMenu::onCalc()
 			(CFlatEnabledEventFlags() >> 2) & 1;
 		if (m_displayDirection != static_cast<int>(targetAnimDirection)) {
 #ifdef VERSION_GCCP01
-			System.Printf("ringMenu\x95\x8e\xa6on/off\x82\xaa\x95\xcf\x8d\x58\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42%d-%d\n", m_menuIndex, targetAnimDirection);
+			System.Printf("ringMenu表示on/offが変更されました。%d-%d\n", m_menuIndex, targetAnimDirection);
 #endif
 			m_displayDirection = !m_displayDirection;
 			m_displayCounter = 0x10 - m_displayCounter;

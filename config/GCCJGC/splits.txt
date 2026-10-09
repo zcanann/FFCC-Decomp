@@ -418,6 +418,7 @@ partyobj.cpp:
 	.sbss       start:0x8034BC58 end:0x8034BC70
 	.sdata      start:0x8034B780 end:0x8034B7B0
 	.rodata     start:0x801D8188 end:0x801D8550
+	.sdata2     start:0x8034E6F0 end:0x8034E7A8
 
 partMng.cpp:
 	extab start:0x80006F08 end:0x800070A8
@@ -472,6 +473,7 @@ gobject.cpp:
 	.sdata      start:0x8034B568 end:0x8034B580
 	extab       start:0x800078D8 end:0x80007A10
 	extabindex  start:0x8000D9A8 end:0x8000DB7C
+	.sdata2     start:0x8034D088 end:0x8034D188
 
 chara.cpp:
 	.sbss start:0x8034BBA0 end:0x8034BBA8
@@ -488,6 +490,9 @@ cflat_runtime2.cpp:
 	.bss start:0x802B5840 end:0x803031E0
 	.sbss start:0x8034BB98 end:0x8034BBA0
 	.sdata      start:0x8034B4C8 end:0x8034B4D8
+	.rodata     start:0x801D3A68 end:0x801D3BD8
+	.data       start:0x801F0F88 end:0x801F1048
+	.sdata2     start:0x8034CE90 end:0x8034CEF8
 
 cflat_runtime.cpp:
 	.text start:0x80065100 end:0x80068f5c
@@ -718,6 +723,7 @@ menu_cmd.cpp:
 pppYmMana.cpp:
 	.text start:0x800D2088 end:0x800D5B64
 	.rodata     start:0x801D5FC8 end:0x801D5FD8
+	.sdata2     start:0x8034DB68 end:0x8034DBE8
 
 pppMana2.cpp:
 	.text start:0x80102220 end:0x801052F8
@@ -1309,6 +1315,7 @@ itemobj.cpp:
 	.sbss       start:0x8034BC78 end:0x8034BC7C
 	.sdata      start:0x8034B7C8 end:0x8034B7F0
 	.rodata     start:0x801D8568 end:0x801D8780
+	.sdata2     start:0x8034E7B0 end:0x8034E860
 
 TRK_MINNOW_DOLPHIN/dispatch.c:
     .text start:0x801A4BE0 end:0x801A4C7C
@@ -1397,6 +1404,7 @@ pppYmMegaBirthShpTail3.cpp:
 	.sdata2     start:0x8034D2E0 end:0x8034D320
 	extab       start:0x80007B38 end:0x80007B68
 	extabindex  start:0x8000DD38 end:0x8000DD80
+	.bss        start:0x80305A40 end:0x80305A70
 
 pppYmMegaBirthShpTail2.cpp:
 	.text start:0x8008A0D8 end:0x8008BEB0
@@ -1405,6 +1413,7 @@ pppYmMegaBirthShpTail2.cpp:
 	.sdata2     start:0x8034D2A0 end:0x8034D2E0
 	extab       start:0x80007B08 end:0x80007B38
 	extabindex  start:0x8000DCF0 end:0x8000DD38
+	.bss        start:0x80305A10 end:0x80305A40
 
 pppRyjMegaBirth.cpp:
 	.text start:0x80081648 end:0x800835C0
@@ -1813,6 +1822,7 @@ pppScreenBreak.cpp:
 	.text start:0x801293B0 end:0x8012A4D8
 	.sdata2 start:0x8034E950 end:0x8034E988
 	.rodata start:0x801D8C00 end:0x801D8C38
+	.data       start:0x8022FF68 end:0x8022FF84
 
 auto_801DA5BC_rodata:
 	.rodata start:0x801DA5BC end:0x801DA5C0 align:4
@@ -2583,6 +2593,7 @@ p_system.cpp:
 	.rodata     start:0x801D27A0 end:0x801D27C1
 	.data       start:0x801DE450 end:0x801DE614
 	.sdata      start:0x8034B408 end:0x8034B420
+	.sbss       start:0x8034BB08 end:0x8034BB0C
 
 mapshadow.cpp:
 	extab start:0x80006B3C end:0x80006B54
@@ -2841,6 +2852,7 @@ p_mc.cpp:
 	.sdata2     start:0x8034E7A8 end:0x8034E7B0
 	.sdata      start:0x8034B7B0 end:0x8034B7C8
 	.rodata     start:0x801D8550 end:0x801D8565
+	.sbss       start:0x8034BC70 end:0x8034BC74
 
 pppScaleLoopAuto.cpp:
 	extab start:0x800097DC end:0x800097E4
@@ -2864,6 +2876,7 @@ pppConstrainCameraDir.cpp:
 	.text start:0x8013EE34 end:0x8013F07C
 	extab       start:0x80009C5C end:0x80009C64
 	extabindex  start:0x80010E64 end:0x80010E70
+	.sdata2     start:0x8034ED20 end:0x8034ED30
 
 pppFilter.cpp:
 	extab start:0x80009C64 end:0x80009C6C

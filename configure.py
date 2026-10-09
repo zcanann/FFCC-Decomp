@@ -237,7 +237,7 @@ cflags_base = [
     "-RTTI off",
     "-fp_contract on",
     "-str reuse",
-    "-multibyte",  # For Wii compilers, replace with `-enc SJIS`
+    *([] if config.version in ("GCCP01", "GCCE01") else ["-multibyte"]),  # PAL/USA retail strings were built without SJIS awareness
     "-i include",
     f"-i build/{config.version}/include",
     f"-DBUILD_VERSION={version_num}",

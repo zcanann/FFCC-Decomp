@@ -1218,7 +1218,7 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 
 	static int frame = 0;
 	if (frame != static_cast<int>(System.GetCounter())) {
-		printf("CFlatRuntime2.AddDebugDrawCC: " "\x8e\x8b\x90\xfc\x83\x60\x83\x46\x83\x62\x83\x4e\x83\x66\x83\x6f\x83\x62\x83\x4f" "\x95\x8e\xa6\x82\xf0\x82\xb1\x82\xea\x88\xc8\x8f\xe3\x92\xc7\x89\xc1\x82\xc5" "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n");
+		printf("CFlatRuntime2.AddDebugDrawCC: " "視線チェックデバッグ表示をこれ以上追加できません。\n");
 		frame = System.GetCounter();
 	}
 }

@@ -485,6 +485,7 @@ partyobj.cpp:
 	.bss        start:0x802FF1B8 end:0x802FF248
 	.sbss       start:0x8032DE50 end:0x8032DE68
 	.sdata      start:0x8032D980 end:0x8032D9B0
+	.sdata2     start:0x803309F8 end:0x80330AB8
 
 partMng.cpp:
 	extab start:0x80006E68 end:0x80007008
@@ -539,6 +540,7 @@ gobject.cpp:
 	.sdata      start:0x8032D748 end:0x8032D760
 	extab       start:0x80007840 end:0x80007978
 	extabindex  start:0x8000D9B4 end:0x8000DB88
+	.sdata2     start:0x8032F300 end:0x8032F408
 
 chara.cpp:
 	extab       start:0x80007468 end:0x800075C8
@@ -566,6 +568,7 @@ cflat_runtime.cpp:
 	.rodata     start:0x801D7E28 end:0x801D7E50
 	.data       start:0x801FB870 end:0x801FBA88
 	.sdata2     start:0x8032F0E0 end:0x8032F100
+	.sdata      start:0x8032D6A0 end:0x8032D6A8
 
 joybus.cpp:
 	.data start:0x8020E9A0 end:0x8020E9BC
@@ -604,6 +607,7 @@ monobj_boss.cpp:
 	.text start:0x8012d90c end:0x80132428
 	.data       start:0x80211648 end:0x802116A8
 	.sbss       start:0x8032DE80 end:0x8032DE88
+	.sdata2     start:0x80330C98 end:0x80330D80
 
 p_menu.cpp:
 	.text start:0x80093814 end:0x80097174
@@ -770,6 +774,7 @@ p_light.cpp:
 pppYmMana.cpp:
 	.text start:0x800D4448 end:0x800D7EDC
 	.rodata     start:0x801DA3F0 end:0x801DA400
+	.sdata2     start:0x8032FE00 end:0x8032FE80
 
 pppMana2.cpp:
 	.text start:0x8010558C end:0x801085E4
@@ -1402,6 +1407,7 @@ itemobj.cpp:
 	.data       start:0x80210DD8 end:0x80210F58
 	.sbss       start:0x8032DE70 end:0x8032DE74
 	.sdata      start:0x8032D9C8 end:0x8032D9F0
+	.sdata2     start:0x80330AC0 end:0x80330B70
 
 pppPart.cpp:
 	.text start:0x800539EC end:0x80057184
@@ -1473,6 +1479,7 @@ pppYmMegaBirthShpTail3.cpp:
 	.sdata2     start:0x8032F560 end:0x8032F5A0
 	extab       start:0x80007AA0 end:0x80007AD0
 	extabindex  start:0x8000DD44 end:0x8000DD8C
+	.bss        start:0x802E9100 end:0x802E9130
 
 pppYmMegaBirthShpTail2.cpp:
 	.text start:0x8008A660 end:0x8008C434
@@ -1481,6 +1488,7 @@ pppYmMegaBirthShpTail2.cpp:
 	.sdata2     start:0x8032F520 end:0x8032F560
 	extab       start:0x80007A70 end:0x80007AA0
 	extabindex  start:0x8000DCFC end:0x8000DD44
+	.bss        start:0x802E90D0 end:0x802E9100
 
 pppRyjMegaBirth.cpp:
 	.text start:0x80081C14 end:0x80083B80
@@ -1852,6 +1860,7 @@ pppScreenBreak.cpp:
 	.text start:0x8012C788 end:0x8012D90C
 	.sdata2 start:0x80330C60 end:0x80330C98
 	.rodata start:0x801DC398 end:0x801DC3D0
+	.data       start:0x80211628 end:0x80211644
 
 auto_801D9FC3_rodata:
 	.rodata start:0x801D9FC3 end:0x801D9FC8 align:1
@@ -2924,6 +2933,7 @@ pppConstrainCameraDir.cpp:
 	.text start:0x80142208 end:0x80142450
 	extab       start:0x80009BEC end:0x80009BF4
 	extabindex  start:0x80010EAC end:0x80010EB8
+	.sdata2     start:0x80331048 end:0x80331058
 
 singmenu.cpp:
 	.text start:0x80144564 end:0x80149A34

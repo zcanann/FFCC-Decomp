@@ -4,7 +4,7 @@
 #include "ffcc/pppYmEnv.h"
 #include "dolphin/gx/GXPixel.h"
 
-void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+static void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 
 STATIC_ASSERT(sizeof(CharaZEnvCtrlDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(CharaZEnvCtrlDataOffsets, m_workOffset) == 0x0);
@@ -78,7 +78,7 @@ void pppConCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void* callbackParam, int)
+static void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void* callbackParam, int)
 {
 	pppCharaZEnvCtrlStep* step = (pppCharaZEnvCtrlStep*)callbackParam;
 	GXSetZMode((GXBool)step->m_zEnable, GX_LEQUAL, (GXBool)step->m_zWriteEnable);

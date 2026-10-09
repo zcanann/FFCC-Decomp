@@ -19,8 +19,6 @@ class CFile;
 class CUtil;
 class CCameraPcs;
 
-int checkThread(void*);
-void wakeup(OSAlarm*, OSContext*);
 void sleep();
 void std_sinf(float);
 void std_cosf(float);

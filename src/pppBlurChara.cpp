@@ -50,8 +50,8 @@ static inline VColor* GetBlurColorData(pppBlurChara* blurChara, const _pppCtrlTa
         blurChara->m_workArea + GetBlurCharaDataOffsets(ctrl)->m_colorDataOffset);
 }
 
-void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
-void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
+static void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+static void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
 
 /*
  * --INFO--
@@ -318,7 +318,7 @@ void pppConstructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
  * JP Address: 0x800DB578
  * JP Size: 1084b
  */
-void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void* param)
+static void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void* param)
 {
     pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(context);
     pppBlurCharaStep* step = reinterpret_cast<pppBlurCharaStep*>(param);
@@ -420,7 +420,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
  * JP Address: 0x800DB9B4
  * JP Size: 64b
  */
-void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
+static void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x10000));

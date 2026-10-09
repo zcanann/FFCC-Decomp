@@ -9,7 +9,6 @@ class CMapCylinder;
 class CMapHit;
 class CBound;
 
-int FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
 
 class CMapCylinder
 {

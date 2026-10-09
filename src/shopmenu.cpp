@@ -176,6 +176,10 @@ extern const char s_shop_80332e54[];
 #include "src/shopmenu_str_data_us.inc"
 #else
 #include "src/shopmenu_str_data.inc"
+
+static void drawShapeSeqGrouad(int, int, int, int, float, float, _GXColor, _GXColor, _GXColor, _GXColor);
+static void drawShapeSeqScale(int, int, int, int, float, float, unsigned char);
+static void drawShapeSeq(int, int, int, int, unsigned char, unsigned char, unsigned char, float, unsigned char);
 #endif
 extern const char s_DecimalFormat_80332d14[] = "%d";
 extern const char s_TwoDigitFormat_80332d18[] = "%02d";
@@ -791,7 +795,7 @@ inline void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigne
  * JP Address: TODO
  * JP Size: TODO
  */
-void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, unsigned char flipX, unsigned char flipY,
+static void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, unsigned char flipX, unsigned char flipY,
                   float zOffset, unsigned char tlut)
 {
     setOrtho(x, y, flipX != 0 ? FLOAT_80332DD0 : FLOAT_80332d78, flipY != 0 ? FLOAT_80332d78 : FLOAT_80332DD0, zOffset);
@@ -807,7 +811,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
  * JP Address: TODO
  * JP Size: TODO
  */
-void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
+static void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
 {
     setOrtho(x, y, scaleX, -scaleY, FLOAT_80332D9C);
     drawShapeSeq0(shapeNo, groupNo, alpha, 0);
@@ -822,7 +826,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
  * JP Address: TODO
  * JP Size: TODO
  */
-void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, _GXColor colorA,
+static void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, _GXColor colorA,
                         _GXColor colorB, _GXColor colorC, _GXColor colorD)
 {
     setOrtho(x, y, scaleX, -scaleY, FLOAT_80332D9C);

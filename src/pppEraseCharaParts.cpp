@@ -16,7 +16,7 @@ STATIC_ASSERT(sizeof(EraseCharaPartsDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(EraseCharaPartsDataOffsets, m_sourceColorOffset) == 0x0);
 STATIC_ASSERT(offsetof(EraseCharaPartsDataOffsets, m_callbackColorOffset) == 0x4);
 
-void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 
 static inline EraseCharaPartsDataOffsets* GetEraseCharaPartsDataOffsets(_pppCtrlTable* ctrl)
 {

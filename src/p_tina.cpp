@@ -13,6 +13,11 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+static unsigned char pppAmemDeletePmng(unsigned long);
+static unsigned char pppAmemRefCntError(unsigned long);
+static unsigned int pppFreeMngStPrioForData();
+static unsigned char pppNotAllocAmemCacheRmem(unsigned long);
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -215,7 +220,7 @@ int CPartPcs::GetTable(unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char pppNotAllocAmemCacheRmem(unsigned long)
+static unsigned char pppNotAllocAmemCacheRmem(unsigned long)
 {
 	PartMng.pppDumpMngSt();
 	return 0;
@@ -230,7 +235,7 @@ unsigned char pppNotAllocAmemCacheRmem(unsigned long)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int pppFreeMngStPrioForData()
+static unsigned int pppFreeMngStPrioForData()
 {
 	_pppMngSt* selectedMngSt = 0;
 	char* partMngBase = reinterpret_cast<char*>(&PartMng);
@@ -323,7 +328,7 @@ unsigned int pppFreeMngStPrioForData()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char pppAmemDeletePmng(unsigned long)
+static unsigned char pppAmemDeletePmng(unsigned long)
 {
 	return pppFreeMngStPrioForData();
 }
@@ -337,7 +342,7 @@ unsigned char pppAmemDeletePmng(unsigned long)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char pppAmemRefCntError(unsigned long)
+static unsigned char pppAmemRefCntError(unsigned long)
 {
 	return 1;
 }

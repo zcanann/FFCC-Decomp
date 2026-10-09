@@ -6,6 +6,8 @@
 
 #include <math.h>
 
+static int FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
+
 static const float kMapHitInitialTMin = 10.0f;
 static const float kMapHitEdgeBackoff = 0.5f;
 static const float kMapHitFaceBackoff = 0.30000001192092896f;
@@ -782,7 +784,7 @@ CMapHit::CMapHit()
  * JP Address: TODO
  * JP Size: TODO
  */
-int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
+static int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
 {
     Vec orthogonal;
     Vec bitangent;

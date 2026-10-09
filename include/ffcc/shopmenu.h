@@ -17,9 +17,6 @@ void bButtonNoRepeat(unsigned short);
 void setOrtho(int, int, float, float, float);
 void drawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);
 void drawShapeSeq0(int, int, unsigned char, unsigned char);
-void drawShapeSeq(int, int, int, int, unsigned char, unsigned char, unsigned char, float, unsigned char);
-void drawShapeSeqScale(int, int, int, int, float, float, unsigned char);
-void drawShapeSeqGrouad(int, int, int, int, float, float, _GXColor, _GXColor, _GXColor, _GXColor);
 void drawGrouadQuad(int, int, int, int, _GXColor, _GXColor, _GXColor, _GXColor);
 
 class CShopMenu

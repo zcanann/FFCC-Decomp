@@ -19,6 +19,9 @@
 #include "dolphin/vi.h"
 #include "dolphin/vi/vifuncs.h"
 
+static int checkThread(void*);
+static void wakeup(OSAlarm*, OSContext*);
+
 CGraphic Graphic;
 
 #ifdef VERSION_GCCP01
@@ -130,7 +133,7 @@ STATIC_ASSERT(offsetof(CGraphic, m_drawDoneCounter) == 0x7370);
  * Address:	TODO
  * Size:	TODO
  */
-int checkThread(void*)
+static int checkThread(void*)
 {
 	Graphic.Thread();
 	return 0;
@@ -511,7 +514,7 @@ void CGraphic::SetDrawDoneDebugDataPartControl(int partControl)
  * JP Address: TODO
  * JP Size: TODO
  */
-void wakeup(OSAlarm* alarm, OSContext*)
+static void wakeup(OSAlarm* alarm, OSContext*)
 {
     GraphicSleepAlarm* sleepAlarm = reinterpret_cast<GraphicSleepAlarm*>(alarm);
     OSResumeThread(sleepAlarm->thread);

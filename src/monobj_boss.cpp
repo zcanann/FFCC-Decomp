@@ -815,8 +815,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 					playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
 				}
 				if (m_stateFrame % 3 == 0) {
-					CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
-					chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
+					putParticleFromItem(m_itemId, 2, m_particleSlots[0], 0);
 				}
 			}
 			statAttack();

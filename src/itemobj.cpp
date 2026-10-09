@@ -745,8 +745,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
 			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(partyObj);
 
-			CGObject* attachSelf = this;
-			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
+			Attach(partyObj, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = 0.0f;
 		} else {

@@ -1834,8 +1834,6 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
  */
 void CGMonObj::mlHide()
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
 	if (m_unk6BE != 0) {
 		return;
 	}
@@ -1850,10 +1848,9 @@ void CGMonObj::mlHide()
 	}
 
 	if (partyIndex >= 0) {
-		CGObject* object = reinterpret_cast<CGObject*>(this);
 		int action = m_actionBranch;
-		unsigned short noticeFlags = object->m_scriptHandle->m_romWork[0x7F];
-		int monClass = object->m_scriptHandle->m_baseDataIndex;
+		unsigned short noticeFlags = m_scriptHandle->m_romWork[0x7F];
+		int monClass = m_scriptHandle->m_baseDataIndex;
 
 		if ((action == 0) && ((noticeFlags & 0x80) != 0)) {
 			notice = true;
@@ -1867,7 +1864,7 @@ void CGMonObj::mlHide()
 		}
 	}
 
-	int classId = (*reinterpret_cast<int**>(mon + 0x58))[4];
+	int classId = m_scriptHandle->m_baseDataIndex;
 	switch (classId) {
 	case 0x6A:
 		notice = true;

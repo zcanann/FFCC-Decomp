@@ -101,7 +101,8 @@ struct LKShooterBossWork {
 };
 
 struct SawBossWork {
-    u8 m_pad00[0x08];
+    float m_angle;
+    float m_wavePhase;
     int m_cooldown;
     u8 m_pad0C[0x08];
     union {
@@ -1991,12 +1992,11 @@ void CGMonObj::attackedFuncSaw()
  */
 void CGMonObj::moveFrameFuncSaw()
 {
-	const float wave = 0.25f * (1.0f + sinf(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4))) + 0.5f;
-	m_moveWork.m_targetPos.x = wave * (80.0f * sinf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
-	m_moveWork.m_targetPos.z = wave * (130.0f * cosf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
-	*reinterpret_cast<float*>(CGMonObj::m_boss) +=
-	    0.0005f * (0.5f - (wave - 0.5f)) + 0.01f;
-	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) += 0.025f;
+	const float wave = 0.25f * (1.0f + sinf(reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->m_wavePhase)) + 0.5f;
+	m_moveWork.m_targetPos.x = wave * (80.0f * sinf(reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->m_angle));
+	m_moveWork.m_targetPos.z = wave * (130.0f * cosf(reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->m_angle));
+	reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->m_angle += 0.0005f * (0.5f - (wave - 0.5f)) + 0.01f;
+	reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->m_wavePhase += 0.025f;
 }
 
 /*

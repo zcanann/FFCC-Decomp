@@ -32,10 +32,7 @@ enum
 #endif
 };
 
-extern "C" {
-int s_mesMenuShakePattern[4] = {1, 0, -1, 0};
-int s_mesMenuIconFrames[4] = {1, 6, 7, 6};
-}
+int tXY[4] = {1, 0, -1, 0};
 
 /*
  * --INFO--
@@ -434,6 +431,8 @@ void CMesMenu::onCalc()
 #else
 void CMesMenu::onDraw()
 {
+    static int tCut[4] = {1, 6, 7, 6};
+
     if ((m_menuIndex == 0) &&
         (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 30) >> 31) != 0)) {
         int iconFrame = 0;
@@ -455,9 +454,9 @@ void CMesMenu::onDraw()
             unsigned int buttons = Pad.GetButton(0);
 
             if ((buttons & 0x100) != 0) {
-                iconFrame = s_mesMenuIconFrames[(System.m_frameCounter & 6) >> 1];
+                iconFrame = tCut[(System.m_frameCounter & 6) >> 1];
             } else {
-                iconFrame = s_mesMenuIconFrames[0];
+                iconFrame = tCut[0];
             }
             break;
         }
@@ -676,14 +675,14 @@ void CMesMenu::onDraw()
         if (foodTimer == 0) {
             foodShakeX = 0;
         } else {
-            foodShakeX = (foodTimer >> 2) * s_mesMenuShakePattern[3 - ((foodTimer + 1) & 3)];
+            foodShakeX = (foodTimer >> 2) * tXY[3 - ((foodTimer + 1) & 3)];
         }
         float shakeX = (float)foodShakeX;
         int foodShakeY;
         if (foodTimer == 0) {
             foodShakeY = 0;
         } else {
-            foodShakeY = (foodTimer >> 2) * s_mesMenuShakePattern[3 - (foodTimer & 3)];
+            foodShakeY = (foodTimer >> 2) * tXY[3 - (foodTimer & 3)];
         }
         float shakeY = (float)foodShakeY;
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
@@ -949,8 +948,8 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
             heartPulse = pulseAmp * heartPulse + pulseOne;
             heartPulse *= pulseBase;
             int timer = m_heartDropTimers[heartIndex];
-            float shakeX = (float)((timer == 0) ? 0 : (timer >> 2) * s_mesMenuShakePattern[(timer + 1) & 3]);
-            float shakeY = (float)((timer == 0) ? 0 : (timer >> 2) * s_mesMenuShakePattern[timer & 3]);
+            float shakeX = (float)((timer == 0) ? 0 : (timer >> 2) * tXY[(timer + 1) & 3]);
+            float shakeY = (float)((timer == 0) ? 0 : (timer >> 2) * tXY[timer & 3]);
 
             MenuPcs.DrawRect(3, heartBaseX + shakeX, heartBaseY + shakeY, 24.0f, 24.0f, heartZero, heartZero,
                              heartPulse, heartPulse, heartZero);

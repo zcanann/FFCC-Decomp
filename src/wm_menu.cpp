@@ -1827,6 +1827,8 @@ void CMenuPcs::CalcMCardMenu()
 #endif
 				m_wmWorldState->m_state0E = -1;
 				m_wmWorldState->m_counter1A = 10;
+			} else {
+				break;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
@@ -1853,8 +1855,7 @@ void CMenuPcs::CalcMCardMenu()
 				m_wmWorldState->m_cardChannel = 1;
 			} else if (subState == 0x19) {
 				winType = 0x19;
-				messType = 1;
-				m_wmWorldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = messType = 1;
 			} else {
 				winType = 0x12;
 				m_wmWorldState->m_cardChannel = 1;
@@ -2027,7 +2028,7 @@ void CMenuPcs::CalcMCardMenu()
 					m_mcCtrl.SetDno(0);
 				}
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.GetDno();
-			} else {
+			} else if (s_Serial == m_mcCtrl.GetSerial()) {
 				m_mcCtrl.SetDno((int)gWmMenuCursorX[1]);
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.GetDno();
 			}
@@ -2400,6 +2401,8 @@ void CMenuPcs::CalcLoadMenu()
 #endif
 				m_wmWorldState->m_state0E = -1;
 				m_wmWorldState->m_counter1A = 10;
+			} else {
+				break;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
@@ -2421,9 +2424,8 @@ void CMenuPcs::CalcLoadMenu()
 				m_wmWorldState->m_cardChannel = 0;
 				winType = 4;
 			} else if (subState == 0x19) {
-				messType = 1;
 				winType = 0x19;
-				m_wmWorldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = messType = 1;
 			} else {
 				winType = 5;
 				m_wmWorldState->m_cardChannel = 1;
@@ -7752,7 +7754,9 @@ void CMenuPcs::WMChgMenu()
 	} else if (prevMenuMode == 5) {
 		if (changeRequest == 1) {
 			m_wmWorldState->m_menuMode = 0;
+#ifndef VERSION_GCCJGC
 			bytes[0xD] = 0;
+#endif
 			m_wmWorldState->m_cardChannel = 0;
 			CallWorldParam(1, 1, 0);
 		} else if (changeRequest == -1) {

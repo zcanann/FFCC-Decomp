@@ -126,12 +126,41 @@ void CCameraPcs::SetIsAbsolute(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 356b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCameraPcs::addWorldMap()
+inline void CCameraPcs::addWorldMap()
 {
-	// TODO
+    Mtx worldMapMtx;
+    Mtx tempMtx;
+
+    PSMTXCopy(m_worldMapMatrix, worldMapMtx);
+    if (m_worldMapEffect.m_duration != 0 && m_worldMapEffect.m_timer != 0) {
+        const double t = static_cast<double>(3.1415927f *
+            (1.0f - static_cast<float>(m_worldMapEffect.m_timer) /
+            static_cast<float>(m_worldMapEffect.m_duration)));
+        float f = static_cast<float>(cos(t));
+        f = 0.5f * (1.0f + f);
+
+        PSMTXRotRad(tempMtx, 'x', m_worldMapEffect.m_rotX * f);
+        PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
+        PSMTXRotRad(tempMtx, 'y', m_worldMapEffect.m_rotY * f);
+        PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
+
+        const float scale = (1.0f + m_worldMapEffect.m_scale) -
+            m_worldMapEffect.m_scale * (1.0f - f);
+        PSMTXScale(tempMtx, scale, scale, scale);
+        PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
+
+        if (m_worldMapEffect.m_paused == 0) {
+            m_worldMapEffect.m_timer -= 1;
+        }
+    }
+    PSMTXConcat(m_cameraMatrix, worldMapMtx, m_cameraMatrix);
 }
 
 /*
@@ -1386,8 +1415,6 @@ void CCameraPcs::calc()
 {
     Mtx zRotMtx;
     Mtx invMtx;
-    Mtx tempMtx;
-    Mtx worldMapMtx;
     Vec up;
 
     unsigned short buttons = Pad.GetDebugButtonDown(0);
@@ -1408,8 +1435,8 @@ void CCameraPcs::calc()
         m_pitch += 0.017453292f * (5.0f * stickV);
 
         float triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                             ? 0.0f
-                             : CameraPadInput(0).stickXF;
+                           ? 0.0f
+                           : CameraPadInput(0).stickXF;
         m_distance += 5.0f * triggerL;
 
         float triggerR = Pad.GetTriggerLeft(0);
@@ -1427,8 +1454,8 @@ void CCameraPcs::calc()
         const float cosXCosY = static_cast<float>(cos(yaw)) * static_cast<float>(cos(pitch));
 
         float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                             ? 0.0f
-                             : CameraPadInput(0).stickYF;
+                           ? 0.0f
+                           : CameraPadInput(0).stickYF;
         const float camMove = 10.0f * panStick;
 
         m_targetX = sinXCosY * camMove + m_targetX;
@@ -1462,29 +1489,7 @@ void CCameraPcs::calc()
     C_MTXLookAt(m_cameraMatrix, &PositionVec(), &up, &TargetVec());
 
     if (Game.m_currentMapId == 0x21) {
-        PSMTXCopy(m_worldMapMatrix, worldMapMtx);
-        if (m_worldMapEffect.m_duration != 0 && m_worldMapEffect.m_timer != 0) {
-            const double t = static_cast<double>(3.1415927f *
-                (1.0f - static_cast<float>(m_worldMapEffect.m_timer) /
-                static_cast<float>(m_worldMapEffect.m_duration)));
-            float f = static_cast<float>(cos(t));
-            f = 0.5f * (1.0f + f);
-
-            PSMTXRotRad(tempMtx, 'x', m_worldMapEffect.m_rotX * f);
-            PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
-            PSMTXRotRad(tempMtx, 'y', m_worldMapEffect.m_rotY * f);
-            PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
-
-            const float scale = (1.0f + m_worldMapEffect.m_scale) -
-                m_worldMapEffect.m_scale * (1.0f - f);
-            PSMTXScale(tempMtx, scale, scale, scale);
-            PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
-
-            if (m_worldMapEffect.m_paused == 0) {
-                m_worldMapEffect.m_timer -= 1;
-            }
-        }
-        PSMTXConcat(m_cameraMatrix, worldMapMtx, m_cameraMatrix);
+        addWorldMap();
     }
 
     PSMTXRotRad(zRotMtx, 'z', m_zRotate);

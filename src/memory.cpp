@@ -560,7 +560,7 @@ void CMemory::Draw()
             sprintf(line, sDrawHeapUseUnuseFmt, useTotalKB, unuseTotalKB);
             Graphic.DrawDebugStringDirect(0x10, y, line, 8);
 
-            int amemAnim = static_cast<int>(Chara.GetAmemAnimSize());
+            int amemAnim = static_cast<int>(Chara.GetAmemOffset());
             int amemAnimKB = amemAnim / 1024;
             sprintf(line, sDrawHeapAmemAnimFmt, amemAnimKB);
             Graphic.DrawDebugStringDirect(0x10, y + 0xC, line, 8);

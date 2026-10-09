@@ -532,7 +532,7 @@ public:
     };
     CDrawBuffer& GetDrawBuffer(int index) { return m_drawBuffers[index]; }
     u32& AmemAnimSize() { return m_amemAnimSize; }
-    u32 GetAmemAnimSize() const { return m_amemAnimSize; }
+    u32 GetAmemOffset() { return m_amemAnimSize; }
     void ResetAmem(int size) { m_amemAnimSize = size; }
     void TimeMogFur();
     void CalcMogScore();

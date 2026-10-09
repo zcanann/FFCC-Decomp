@@ -123,7 +123,7 @@ public:
          * JP Address: TODO
          * JP Size: TODO
          */
-        int IsBanked() { return m_bank != 0; }
+        int IsBanked() { return m_bank ? 1 : 0; }
         void SetLastFrame(int lastFrame) { m_flagsBits.m_clampFrames = lastFrame; }
         void SetInterp(int interp) { m_flagsBits.m_blendEnabled = interp; }
         void InitQuantize();

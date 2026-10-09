@@ -945,7 +945,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 
         for (int heartIndex = 0; heartIndex < (int)((unsigned int)scriptFood->m_maxHp >> 1); heartIndex++) {
             int heartValue = m_heartValue - heartIndex * 0xC;
-            float heartPulse = (float)sin(pulseSinScale * -((float)m_heartGrowTimers[heartIndex] * pulseTimerScale - pulseOne));
+            float heartPulse = (float)sin(pulseSinScale * (pulseOne - (float)m_heartGrowTimers[heartIndex] * pulseTimerScale));
             heartPulse = pulseAmp * heartPulse + pulseOne;
             heartPulse *= pulseBase;
             int timer = m_heartDropTimers[heartIndex];

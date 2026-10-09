@@ -471,6 +471,10 @@ os/OSThread.c:
 
 pppRyjMegaBirthModel.cpp:
 	.text start:0x80083B80 end:0x8008788C
+	.rodata     start:0x801D8B78 end:0x801D8B91
+	.data       start:0x801FC250 end:0x801FC2A0
+	.bss        start:0x802E9070 end:0x802E90D0
+	.sdata2     start:0x8032F458 end:0x8032F4AC
 
 partyobj.cpp:
 	.text start:0x801198D4 end:0x80123CC8
@@ -528,6 +532,9 @@ p_camera.cpp:
 
 gobject.cpp:
 	.text start:0x8007B7F4 end:0x80081C14
+	.rodata     start:0x801D8B30 end:0x801D8B3C
+	.data       start:0x801FC1E0 end:0x801FC224
+	.sdata      start:0x8032D748 end:0x8032D760
 
 chara.cpp:
 	.sbss start:0x8032DD80 end:0x8032DD88
@@ -587,6 +594,8 @@ monobj.cpp:
 
 monobj_boss.cpp:
 	.text start:0x8012d90c end:0x80132428
+	.data       start:0x80211648 end:0x802116A8
+	.sbss       start:0x8032DE80 end:0x8032DE88
 
 p_menu.cpp:
 	.text start:0x80093814 end:0x80097174
@@ -791,6 +800,10 @@ pppYmLaser.cpp:
 
 gobjwork.cpp:
 	.text start:0x8009DAE4 end:0x800A26A8
+	.rodata     start:0x801D8EA0 end:0x801D8F50
+	.data       start:0x8020E88C end:0x8020E944
+	.sdata2     start:0x8032F958 end:0x8032F970
+	.sdata      start:0x8032D7E0 end:0x8032D7F8
 
 MSL_C/PPCEABI/bare/H/string.c:
 	.text start:0x801B7AD0 end:0x801B7F98
@@ -874,6 +887,7 @@ ringmenu.cpp:
 	.rodata start:0x801D8F50 end:0x801D8F5C
 	.data start:0x8020E948 end:0x8020E99C
 	.sdata start:0x8032D7F8 end:0x8032D810
+	.sdata2     start:0x8032F970 end:0x8032FAB0
 
 exi/EXIUart.c:
 	.text	start:0x80182970 end:0x80182F44
@@ -1343,6 +1357,10 @@ axfx/reverb_hi.c:
 
 itemobj.cpp:
 	.text start:0x80123EA8 end:0x80126338
+	.rodata     start:0x801DBD08 end:0x801DBF18
+	.data       start:0x80210DD8 end:0x80210F58
+	.sbss       start:0x8032DE70 end:0x8032DE74
+	.sdata      start:0x8032D9C8 end:0x8032D9F0
 
 pppPart.cpp:
 	.text start:0x800539EC end:0x80057184
@@ -1404,12 +1422,22 @@ astar.cpp:
 
 pppYmMegaBirthShpTail3.cpp:
 	.text start:0x8008C434 end:0x8008E63C
+	.rodata     start:0x801D8BE8 end:0x801D8C03
+	.data       start:0x801FC2C8 end:0x801FC2F0
+	.sdata2     start:0x8032F560 end:0x8032F5A0
 
 pppYmMegaBirthShpTail2.cpp:
 	.text start:0x8008A660 end:0x8008C434
+	.rodata     start:0x801D8BC8 end:0x801D8BE3
+	.data       start:0x801FC2A0 end:0x801FC2C8
+	.sdata2     start:0x8032F520 end:0x8032F560
 
 pppRyjMegaBirth.cpp:
 	.text start:0x80081C14 end:0x80083B80
+	.rodata     start:0x801D8B60 end:0x801D8B74
+	.data       start:0x801FC228 end:0x801FC250
+	.bss        start:0x802E9040 end:0x802E9070
+	.sdata2     start:0x8032F408 end:0x8032F458
 
 pppYmBreath.cpp:
 	.text start:0x800BF700 end:0x800C1040

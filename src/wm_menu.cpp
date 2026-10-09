@@ -269,7 +269,9 @@ unsigned char lbl_8032EE1C;
 char gWmMenuCursorX[2];
 char gWmMenuCursorY[2];
 static u64 s_Serial;
+#ifndef VERSION_GCCJGC
 unsigned char gWmMenuScriptValueCache;
+#endif
 
 extern const char lbl_80331380[4] = {'?','?','?','?'};
 extern const float FLOAT_803313dc = 0.0f;
@@ -6005,10 +6007,12 @@ void CMenuPcs::CalcWMFrame()
 	} else {
 		yearValue = Game.m_gameWork.m_scriptSysVal0 + m_wmYear;
 	}
+#ifndef VERSION_GCCJGC
 	gWmMenuScriptValueCache = (unsigned char)yearValue;
 	if ((int)yearValue > 99) {
 		gWmMenuScriptValueCache = 100;
 	}
+#endif
 
 	int digitCount = ((int)yearValue > 9) ? 2 : 1;
 	if ((int)yearValue > 99) {

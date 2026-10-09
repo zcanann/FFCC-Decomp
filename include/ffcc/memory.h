@@ -92,7 +92,7 @@ public:
     void CopyFromAMemory(void*, void*, unsigned long);
     void CopyToAMemorySync(void*, void*, unsigned long);
     void CopyFromAMemorySync(void*, void*, unsigned long);
-    void IsCopyCompleted(int);
+    int IsCopyCompleted(int);
     int& DefaultGroup() { return m_defaultGroup; }
 
 private:

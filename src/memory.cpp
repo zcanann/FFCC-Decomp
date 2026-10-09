@@ -865,7 +865,7 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
                            static_cast<int>(size), 0, 0);
     CStopWatch watch(const_cast<char*>("no name"));
     watch.Start();
-    while (Sound.DMACheck(dmaId) != 0) {
+    while (!IsCopyCompleted(dmaId)) {
         watch.Stop();
         watch.Get();
         watch.Start();
@@ -888,7 +888,7 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
                            static_cast<int>(size), 0, 0);
     CStopWatch watch(const_cast<char*>("no name"));
     watch.Start();
-    while (Sound.DMACheck(dmaId) != 0) {
+    while (!IsCopyCompleted(dmaId)) {
         watch.Stop();
         if (watch.Get() >= 9000.0f) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
@@ -908,9 +908,9 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::IsCopyCompleted(int)
+inline int CMemory::IsCopyCompleted(int dmaId)
 {
-	// TODO
+    return Sound.DMACheck(dmaId) == 0;
 }
 
 /*

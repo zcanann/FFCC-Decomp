@@ -424,18 +424,18 @@ void CRingMenu::onDraw()
 	float iconAlphaScale;
 	float posAltX;
 
-	iconAlphaScale = showScale * transitionScale;
 	const float glowOffset = 32.0f * (1.0f - pulse);
 	alphaScaleBase = 255.0f * showScale * transitionScale;
+	iconAlphaScale = showScale * transitionScale;
 	posLeft = -glowOffset;
 	posAltX = 472.0f + glowOffset;
 	posAltY = 256.0f + glowOffset;
-	posMainY = 192.0f + glowOffset;
 #ifdef VERSION_GCCJGC
 	posMainX = posAltX;
 #else
 	posMainX = posAltX - 40.0f;
 #endif
+	posMainY = 192.0f + glowOffset;
 
 	for (int group = 2; group >= 0; group--) {
 		float posX;

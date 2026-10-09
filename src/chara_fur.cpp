@@ -179,14 +179,6 @@ static inline void StopMogLoopSe(MogWorkState& work)
 	}
 }
 
-static inline CTexture* FindMogFurTexture(CChara::CModel* model)
-{
-	CTextureSet* textureSet = model->m_texSet;
-
-	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
-	return textureSet->m_textureArray[textureIdx];
-}
-
 } // namespace
 
 /*
@@ -978,7 +970,9 @@ int CChara::CModel::PickFur(
 	}
 
 	if (doPaint != 0 && hitPaintable != 0) {
-		CTexture* texture = FindMogFurTexture(this);
+		CTextureSet* textureSet = GetTextureSet();
+		unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
+		CTexture* texture = textureSet->m_textureArray[textureIdx];
 		if (texture != 0) {
 			unsigned short* furTexels = reinterpret_cast<unsigned short*>(texture->m_imageData);
 			int furTexWidth = texture->m_width;
@@ -1021,12 +1015,12 @@ int CChara::CModel::PickFur(
  */
 void CChara::CModel::InitMogFurTex()
 {
-	CTextureSet* textureSet = m_texSet;
+	CTextureSet* textureSet = GetTextureSet();
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
 	CTexture* texture = textureSet->GetTexture(textureIdx);
 
 	if ((texture != 0) && (texture->m_format == GX_TF_RGB565)) {
-		texture->m_format = GX_TF_RGB5A3;
+		texture->SetFormat(GX_TF_RGB5A3);
 		CopyFurTex(0);
 
 		texture->InitTexObj();
@@ -1099,7 +1093,9 @@ void CChara::InitFurTexBuffer()
 inline void CChara::CModel::CopyFurTex(int loadFromTexture)
 {
 	Graphic._WaitDrawDone("chara_fur.cpp", 0x506);
-	CTexture* texture = FindMogFurTexture(this);
+	CTextureSet* textureSet = GetTextureSet();
+	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
+	CTexture* texture = textureSet->m_textureArray[textureIdx];
 	if (texture == 0) {
 		return;
 	}

@@ -3106,7 +3106,8 @@ void CGObject::onCreate()
     m_lookAtTarget = 0;
     m_currentAlpha = m_alphaTarget = 1.0f;
     m_shieldNodeFlagBits.m_bit20 = 0;
-    m_bounceFactor = m_bgAttrValue = m_animBlend = 1.0f;
+    m_bgAttrValue = m_animBlend = 1.0f;
+    m_bounceFactor = 1.0f;
     m_gravityY = 0.0f;
     m_jumpLandingDampening = 0.0f;
 

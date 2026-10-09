@@ -43,8 +43,6 @@ static const _GXColor s_mapDbgLightColor = { 0xFF, 0xFF, 0xFF, 0xFF };
 static const _GXColor s_mapDbgMaterialColor = { 0xFF, 0xFF, 0xFF, 0xFF };
 static const _GXColor s_mapDbgAmbientColor = { 0x40, 0x40, 0x40, 0xFF };
 static const char s_mapNewLine[] = "\n";
-extern "C" unsigned char Vec_80245758[];
-
 static const Vec kMapHitLightDir0 = { 1.0f, 1.0f, 1.0f };
 static const Vec kMapHitLightDir1 = { -1.0f, 1.0f, -1.0f };
 static const char s_set_bg_camera_semi_trans_missing_fmt[] =

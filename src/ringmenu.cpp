@@ -793,20 +793,17 @@ void CRingMenu::drawGBA()
 	const float alphaBase = 255.0f * gbaAnim;
 	MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>(0.5f * alphaBase * showScale)));
 
-	const float drawAngle = 0.2f * (2.0f * (cycle - 0.5f));
 	const float invSize = 1.0f - sizePulse;
 	const float orbitX = 5.0f * (sizePulse * sinB);
 	const float orbitY = 10.0f * (sizePulse * sinA);
-	const float drawX = posX + orbitX;
-	const float drawY = posY - orbitY;
-	MenuPcs.DrawRect(3, 8.0f + drawX, 8.0f + drawY, 80.0f, 48.0f,
+	MenuPcs.DrawRect(3, 8.0f + (posX + orbitX), 8.0f + (posY - orbitY), 80.0f, 48.0f,
 	                                 0.0f, static_cast<float>(m_menuIndex * 0x30), 0.75f * (1.0f + invSize),
-	                                 0.75f * (sizePulse + invSize), drawAngle);
+	                                 0.75f * (sizePulse + invSize), 0.2f * (2.0f * (cycle - 0.5f)));
 
 	const float alphaLit = alphaBase * showScale;
 	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaLit)));
-	MenuPcs.DrawRect(3, drawX, drawY, 80.0f, 48.0f, 0.0f, static_cast<float>(m_menuIndex * 0x30),
-	                                 0.75f * sizePulse, 0.75f * sizePulse, drawAngle);
+	MenuPcs.DrawRect(3, posX + orbitX, posY - orbitY, 80.0f, 48.0f, 0.0f, static_cast<float>(m_menuIndex * 0x30),
+	                                 0.75f * sizePulse, 0.75f * sizePulse, 0.2f * (2.0f * (cycle - 0.5f)));
 
 	const unsigned int flatFlags = CFlatEnabledEventFlags();
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
@@ -816,7 +813,7 @@ void CRingMenu::drawGBA()
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(0.5f * (alphaLit * (1.0f + blink))));
 			MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha)));
-			MenuPcs.DrawRect(3, drawX, drawY, 48.0f, 48.0f, 0.0f, 240.0f,
+			MenuPcs.DrawRect(3, posX + orbitX, posY - orbitY, 48.0f, 48.0f, 0.0f, 240.0f,
 			                                 1.0f, 1.0f, 0.0f);
 		} else {
 			int frameTex = (static_cast<int>(System.m_frameCounter) >> 1) % 16;
@@ -824,7 +821,7 @@ void CRingMenu::drawGBA()
 				frameTex &= 1;
 			}
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_SUNA));
-			MenuPcs.DrawRect(3, drawX, drawY, 48.0f, 48.0f, 0.0f,
+			MenuPcs.DrawRect(3, posX + orbitX, posY - orbitY, 48.0f, 48.0f, 0.0f,
 			                                 static_cast<float>(frameTex * 0x30), 1.0f, 1.0f, 0.0f);
 		}
 	}

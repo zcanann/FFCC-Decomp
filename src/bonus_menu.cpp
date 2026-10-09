@@ -2642,11 +2642,11 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font = this->m_fonts[1];
 		font->SetMargin(1.0f);
 		font->SetShadow(0);
-#ifdef VERSION_GCCJGC
-		font->SetScale(0.9f);
-#else
+#ifdef VERSION_GCCP01
 		font->SetScaleX(0.7200000286102295f);
 		font->SetScaleY(0.8999999761581421f);
+#else
+		font->SetScale(0.9f);
 #endif
 		font->DrawInit();
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
@@ -2681,10 +2681,10 @@ void CMenuPcs::DrawSelectOpenAnim()
 #endif
 		strlen(converted);
 
-#ifdef VERSION_GCCJGC
-		float lineY = centerY - 11.0f;
-#else
+#ifdef VERSION_GCCP01
 		float lineY = centerY - 11.0f - 7.0f;
+#else
+		float lineY = centerY - 11.0f;
 #endif
 		for (int line = 0;; line++) {
 			char* lineText = (line != 0) ? strtok(0, const_cast<char*>("\n")) : strtok(converted, const_cast<char*>("\n"));

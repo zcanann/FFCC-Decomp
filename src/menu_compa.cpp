@@ -99,7 +99,7 @@ void CMenuPcs::CompaDraw()
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	entry = this->m_compaList->entries;
-	for (i = 0; i < this->m_compaList->count; i++, entry++) {
+	for (int i = 0; i < this->m_compaList->count; i++, entry++) {
 		tex = entry->tex;
 		if (tex >= 0) {
 			x = static_cast<float>(entry->x);

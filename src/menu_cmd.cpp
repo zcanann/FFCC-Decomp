@@ -682,6 +682,8 @@ int CMenuPcs::CmdClose()
  */
 void CMenuPcs::CmdDraw()
 {
+	s32 row;
+	s32 choice;
 	s32 hasItemHelp = false;
 	s32 helpId;
 	float rowH;
@@ -949,7 +951,7 @@ void CMenuPcs::CmdDraw()
 		}
 
 		CmdListEntry* textRow = entry;
-		for (s32 row = 0; row < 8; row++, textRow++) {
+		for (row = 0; row < 8; row++, textRow++) {
 			if ((itemCount <= 8) && (row + m_cmdState->scrollTop >= itemCount)) {
 				break;
 			}
@@ -998,7 +1000,7 @@ void CMenuPcs::CmdDraw()
 		DrawInit();
 
 		CmdListEntry* iconRow = entry;
-		for (s32 row = 0; row < 8; row++, iconRow++) {
+		for (row = 0; row < 8; row++, iconRow++) {
 			if ((itemCount <= 8) && (row + m_cmdState->scrollTop >= itemCount)) {
 				break;
 			}
@@ -1054,7 +1056,7 @@ void CMenuPcs::CmdDraw()
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * entry->alpha)).color);
 
 		const s32 choices = (1.0 == static_cast<double>(entry->scale)) ? 2 : 3;
-		for (s32 choice = 0; choice < choices; choice++) {
+		for (choice = 0; choice < choices; choice++) {
 			const char* text;
 			if (choice == 0) {
 				text = GetMenuStr(0x0D);
@@ -1721,6 +1723,7 @@ inline void CMenuPcs::ChkCmdActive(int itemIndex)
  */
 int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
+	int slot;
 	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
 	int itemKinds[10];
 	int matches[5][2];
@@ -1750,7 +1753,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	memset(candidates, 0xff, sizeof(candidates));
 
-	for (int slot = 2; slot < 8; slot++) {
+	for (slot = 2; slot < 8; slot++) {
 		if (slot == selected) {
 			if (caravan->m_commandListExtra[slot] == 0) {
 				candidates[slot] = 0;
@@ -1769,7 +1772,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	memset(itemKinds, 0xff, sizeof(itemKinds));
 
-	for (int slot = 2; slot < 8; slot++) {
+	for (slot = 2; slot < 8; slot++) {
 		if (caravan->m_numCmdListSlots <= slot) {
 			break;
 		}
@@ -1821,7 +1824,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			k = ok = 0;
 			for (; k < len1 - 1; k++) {
-				const int slot = selected - (len1 - 1 - k);
+				slot = selected - (len1 - 1 - k);
 				if (candidates[slot] != 0) {
 					break;
 				}
@@ -1840,7 +1843,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		for (int i = 0; i < baseLen; i++, start++) {
 			k = ok = 0;
 			for (; k < baseLen; k++) {
-				const int slot = i + (selected - ((baseLen - 1) - k));
+				slot = i + (selected - ((baseLen - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
@@ -1870,7 +1873,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 			k = ok = 0;
 			for (; k < len; k++) {
-				const int slot = start + (selected - ((len - 1) - k));
+				slot = start + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}

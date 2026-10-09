@@ -1761,7 +1761,7 @@ void CMapMng::Draw()
                 GXSetZMode(1, GX_LEQUAL, 0);
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
                 GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-                GXSetChanMatColor(GX_COLOR0A0, CharaPcs.m_texShadowColor);
+                GXSetChanMatColor(GX_COLOR0A0, CharaPcs.GetTexShadowColor());
                 _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
                 _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
                 GXSetNumTevStages(1);
@@ -1779,9 +1779,9 @@ void CMapMng::Draw()
                     for (int i = 0; i < batchCount; i++) {
                         GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX3x4);
                         GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));
-                        GXSetTexCoordGen2(
+                        GXSetTexCoordGen(
                             static_cast<GXTexCoordID>(i), GX_TG_MTX3x4, GX_TG_POS,
-                            static_cast<GXTexMtx>(texMtx), 0, GX_PTIDENTITY);
+                            static_cast<GXTexMtx>(texMtx));
                         GXSetTevDirect(static_cast<GXTevStageID>(stage));
                         _GXSetTevOrder(
                             static_cast<GXTevStageID>(stage), static_cast<GXTexCoordID>(i),
@@ -1897,7 +1897,7 @@ void CMapMng::Draw()
         }
 
         GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, 0, GX_PTIDENTITY);
+        GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
         GXSetNumTevStages(1);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -2258,12 +2258,8 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
     for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* mapObj = &m_mapObjArray[i];
         if (mapObj->m_meshId == id) {
-            mapObj->m_cameraSemiTransTargetAlpha = static_cast<short>(alpha << 7);
+            mapObj->SetCameraSemiTransAlpha(alpha, frameCount);
             found = 1;
-            mapObj->m_cameraSemiTransStep = static_cast<short>(
-                (static_cast<int>(mapObj->m_cameraSemiTransTargetAlpha) -
-                 static_cast<int>(mapObj->m_cameraSemiTransAlpha)) /
-                frameCount);
         }
     }
 

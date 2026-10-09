@@ -437,7 +437,7 @@ void CGItemObj::onFrameStat()
 			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
+			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtId();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
@@ -469,7 +469,7 @@ void CGItemObj::onFrameStat()
 			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
+			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtId();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;

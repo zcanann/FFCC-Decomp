@@ -80,7 +80,7 @@ public:
         void loadModelASyncFrame();
         int IsLoadModelASyncCompleted();
         void CancelLoadModelASync();
-        int GetPdtSlot() const;
+        int GetPdtId();
         float GetLoadAnimTotalFrame(int);
 
         int m_charaKind;                    // 0x000
@@ -332,7 +332,7 @@ public:
     u32 m_noFreeMergeMask;                    // 0x718
 };
 
-inline int CCharaPcs::CHandle::GetPdtSlot() const
+inline int CCharaPcs::CHandle::GetPdtId()
 {
     return m_pdtLoadRef != 0 ? m_pdtLoadRef->m_pdtSlot : -1;
 }

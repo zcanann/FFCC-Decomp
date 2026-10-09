@@ -177,7 +177,7 @@ static inline int CharaObjResolveParticleBank(CGCharaObj* charaObj, int particle
 {
 	switch (particleClass) {
 	case 0xFE:
-		return charaObj->m_charaModelHandle->GetPdtSlot();
+		return charaObj->m_charaModelHandle->GetPdtId();
 	case 0xFD:
 	case 0xFF:
 		return -1;
@@ -1036,7 +1036,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 	int particleBank = items[itemId].m_particleBank;
 	if (particleBank != 0xFFFF && particleBank != 0xFF) {
 		if (particleBank == 0xFE) {
-			particleBank = sourceObj->m_charaModelHandle->GetPdtSlot();
+			particleBank = sourceObj->m_charaModelHandle->GetPdtId();
 		}
 		if (particleBank == 0xFD) {
 			particleBank = 0xFFFFFFFF;
@@ -1107,7 +1107,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				endPSlotBit(0x4);
 				if (isIceJ) {
-					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
+					int modelPdtNo = m_charaModelHandle->GetPdtId();
 					putParticle((modelPdtNo << 8) | 0x16, 0, this, 1.0f, 0);
 				} else {
 					putParticle(0x10B, 0, this, 0.1f * m_attackColRadius, 0);
@@ -1187,7 +1187,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 1:
 				endPSlotBit(0x40);
 				if (isIceJ) {
-					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
+					int modelPdtNo = m_charaModelHandle->GetPdtId();
 					putParticle((modelPdtNo << 8) | 0x14, m_particleSlots[6], this, 1.0f, 0);
 				} else {
 					putParticle(0x12A, m_particleSlots[6], this, 0.1f * m_attackColRadius, 0);
@@ -1196,7 +1196,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				endPSlotBit(0x4);
 				if (isIceJ) {
-					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
+					int modelPdtNo = m_charaModelHandle->GetPdtId();
 					putParticleBindTrace((modelPdtNo << 8) | 0x15, m_particleSlots[2], this, 1.0f, 0);
 				} else {
 					putParticle(0x10A, m_particleSlots[2], this, 0.1f * m_attackColRadius, 0);
@@ -1208,7 +1208,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 4:
 				endPSlotBit(0x80);
 				if (isIceJ) {
-					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
+					int modelPdtNo = m_charaModelHandle->GetPdtId();
 					putParticle((modelPdtNo << 8) | 0x17, m_particleSlots[7], this, 1.0f, 0);
 				} else {
 					putParticle(0x130, m_particleSlots[7], this, 0.1f * m_attackColRadius, 0);
@@ -2332,7 +2332,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		particleBank = -1;
 		break;
 	case 0xFE:
-		particleBank = m_charaModelHandle->GetPdtSlot();
+		particleBank = m_charaModelHandle->GetPdtId();
 		break;
 	case 0xFF:
 		hasParticle = 0;

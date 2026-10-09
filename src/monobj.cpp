@@ -915,14 +915,14 @@ void CGMonObj::onFrameStat()
 			playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
 			if (anim == 0xF) {
 				if (classId == 0x5E) {
-					int dataNo = m_charaModelHandle->GetPdtSlot();
+					int dataNo = m_charaModelHandle->GetPdtId();
 					putParticle((dataNo << 8) | 8, 0, this, 1.0f, 0);
 				} else {
-					int dataNo = m_charaModelHandle->GetPdtSlot();
+					int dataNo = m_charaModelHandle->GetPdtId();
 					putParticle((dataNo << 8) | 7, 0, this, 1.0f, 0);
 				}
 			} else {
-				int dataNo = m_charaModelHandle->GetPdtSlot();
+				int dataNo = m_charaModelHandle->GetPdtId();
 				putParticle((dataNo << 8) | 2, 2, this, 1.0f, 0);
 			}
 		}
@@ -946,7 +946,7 @@ void CGMonObj::onFrameStat()
 			m_displayFlags |= 1;
 			reqAnim(0xD, 0, 0);
 			playSe3D(seId, 0x32, 0x96, 0, (Vec*)0);
-			int dataNo = m_charaModelHandle->GetPdtSlot();
+			int dataNo = m_charaModelHandle->GetPdtId();
 			putParticle((dataNo << 8) | 4, 0, this, 1.0f, 0);
 		}
 		if (isLoopAnim() != 0) {
@@ -976,7 +976,7 @@ void CGMonObj::onFrameStat()
 			m_displayFlags |= 1;
 			reqAnim(0xB, 0, 0);
 			playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
-			int dataNo = m_charaModelHandle->GetPdtSlot();
+			int dataNo = m_charaModelHandle->GetPdtId();
 			putParticle(particleBase | (dataNo << 8), 0, this, 1.0f, 0);
 		}
 		if (isLoopAnim() != 0) {
@@ -1013,7 +1013,7 @@ void CGMonObj::onFrameStat()
 	case 0x36:
 		if (m_subState == 0) {
 			if (m_subFrame == 0) {
-				int dataNo = m_charaModelHandle->GetPdtSlot();
+				int dataNo = m_charaModelHandle->GetPdtId();
 				putParticle((dataNo << 8) | 4, 0, this, 1.0f, 0);
 				reqAnim(0xF, 1, 0);
 				unsigned int soundId = 0;
@@ -1148,7 +1148,7 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	}
 
 	if (particleId != 0xFFFF) {
-		int dataNo = m_charaModelHandle->GetPdtSlot();
+		int dataNo = m_charaModelHandle->GetPdtId();
 		putParticle(particleId | (dataNo << 8), 0, this, 1.0f, 0);
 	}
 
@@ -1322,7 +1322,7 @@ void CGMonObj::onStatDie()
 			int pId = m_scriptHandle->m_romWork[0xCF];
 			if (pId != 0xFFFF) {
 				int dataNo = -1;
-				dataNo = m_charaModelHandle->GetPdtSlot();
+				dataNo = m_charaModelHandle->GetPdtId();
 				putParticle(pId | (dataNo << 8), 0, this, 0.1f * m_attackColRadius, 0);
 			}
 
@@ -3090,7 +3090,7 @@ void CGMonObj::setIceJEffect(int enabled)
 	if (enabled != 0) {
 		unsigned short count = m_scriptHandle->m_romWork[0xD5];
 		for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
-			int dataNo = m_charaModelHandle->GetPdtSlot();
+			int dataNo = m_charaModelHandle->GetPdtId();
 			putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x5A8), this, 1.0f, 0);
 		}
 	}
@@ -3127,12 +3127,12 @@ inline void CGMonObj::setUndeadEffect(int weaponMode, int enabled)
 	int particleBase = weaponMode ? 0x46 : 0x3C;
 	if (enabled) {
 		for (int i = 0; i < count; i++) {
-			int dataNo = m_charaModelHandle->GetPdtSlot();
+			int dataNo = m_charaModelHandle->GetPdtId();
 			int particleId = particleBase + i;
 			putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[12], this, 1.0f, 0);
 		}
 	} else if (isUndead && count != 0) {
-		int dataNo = m_charaModelHandle->GetPdtSlot();
+		int dataNo = m_charaModelHandle->GetPdtId();
 		putParticleBindTrace((particleBase + 9) | (dataNo << 8), m_particleSlots[12], this, 1.0f, 0);
 	}
 }
@@ -3259,7 +3259,7 @@ void CGMonObj::setRepop(int mode)
 			break;
 		}
 
-		int dataNo = m_charaModelHandle->GetPdtSlot();
+		int dataNo = m_charaModelHandle->GetPdtId();
 		int particleId = i + 0x50 + particleBase;
 		putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[16], this, 1.0f, 0);
 	}
@@ -3268,7 +3268,7 @@ void CGMonObj::setRepop(int mode)
 
 	unsigned short countB = m_scriptHandle->m_romWork[0xD5];
 	for (int i = 0; i < static_cast<int>(countB); i++) {
-		int dataNo = m_charaModelHandle->GetPdtSlot();
+		int dataNo = m_charaModelHandle->GetPdtId();
 		putParticleBindTrace((i + 0x5A) | (dataNo << 8), m_particleSlots[17], this, 1.0f, 0);
 	}
 

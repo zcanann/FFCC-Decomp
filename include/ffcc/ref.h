@@ -7,8 +7,13 @@ public:
 	CRef();
 	virtual ~CRef();
 	void AddRef() { refCount++; }
-	int DecRef() { return --refCount; }
 	int GetRef() { return refCount; }
+	void Release()
+	{
+		if (--refCount == 0) {
+			delete this;
+		}
+	}
 
 	int refCount;
 };

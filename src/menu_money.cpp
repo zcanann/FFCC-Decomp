@@ -421,7 +421,7 @@ void CMenuPcs::MoneyDraw()
 		x = (float)window->x;
 		y = (float)(window->y + 0x20);
 		y += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
-		x += (float)((int)System.m_frameCounter % 8);
+		x += (float)((int)System.GetCounter() % 8);
 		DrawCursor((int)x, (int)y, 1.0f);
 	}
 }
@@ -451,23 +451,21 @@ int CMenuPcs::MoneyClose()
 		}
 
 		if (anim->startFrame + anim->duration <= frame) {
-			float zero = 0.0f;
 			finished++;
-			anim->alpha = zero;
-			anim->dx = zero;
-			anim->dy = zero;
+			anim->alpha = 0.0f;
+			anim->dx = 0.0f;
+			anim->dy = 0.0f;
 		} else {
 			anim->frame++;
-			double one = 1.0;
 			double duration = (double)anim->duration;
 			double animFrame = (double)anim->frame;
-			double rate = one / duration;
-			anim->alpha = (float)(one - rate * animFrame);
+			double rate = 1.0 / duration;
+			anim->alpha = (float)(1.0 - rate * animFrame);
 			if ((anim->flags & 2) == 0) {
 				duration = (double)anim->duration;
 				animFrame = (double)anim->frame;
-				rate = one / duration;
-				float ratio = (float)(one - rate * animFrame);
+				rate = 1.0 / duration;
+				float ratio = (float)(1.0 - rate * animFrame);
 				float dx = anim->targetX - (float)anim->x;
 				float dy = anim->targetY - (float)anim->y;
 				anim->dx = dx * ratio;

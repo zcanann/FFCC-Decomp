@@ -124,27 +124,25 @@ inline void CMenuPcs::TmpArtiInit0()
  */
 inline void CMenuPcs::TmpArtiInit()
 {
+    int i;
+    TmpArtiEntry* entry;
     memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
 
-    float one = 1.0f;
-    TmpArtiEntry* entry = m_tmpArtiList->entries;
-    for (int i = 0; i < 64; i++, entry++) {
-        entry->z = one;
+    entry = m_tmpArtiList->entries;
+    for (i = 0; i < 64; i++, entry++) {
+        entry->z = 1.0f;
     }
 
-    double center = 216.0;
-    double half = 0.5;
-    float zero = 0.0f;
     entry = m_tmpArtiList->entries;
-    for (int row = 0; row < 4; row++, entry++) {
+    for (i = 0; i < 4; i++, entry++) {
         entry->tex = kTmpArtiRowTexture;
         entry->width = 200;
         entry->height = 0x28;
-        entry->x = (short)(int)(center - (double)entry->width * half);
-        entry->y = row * (entry->height - 8) + 0x60;
-        entry->s = zero;
-        entry->t = zero;
-        entry->startFrame = row;
+        entry->x = (short)(216.0 - entry->width / 2.0);
+        entry->y = i * (entry->height - 8) + 0x60;
+        entry->s = 0.0f;
+        entry->t = 0.0f;
+        entry->startFrame = i;
         entry->duration = 3;
     }
 
@@ -259,12 +257,11 @@ void CMenuPcs::TmpArtiDraw()
  */
 unsigned int CMenuPcs::TmpArtiClose()
 {
-	float zero;
+	int i;
 	TmpArtiEntry* entry;
 	int completedItems;
 	int itemCount;
 	int currentFrame;
-	int count;
 	unsigned int result;
 
 	completedItems = 0;
@@ -272,7 +269,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 	itemCount = this->m_tmpArtiList->count;
 	entry = this->m_tmpArtiList->entries;
 	currentFrame = this->m_tmpArtiState->frame;
-	for (int remaining = itemCount; remaining > 0; remaining--) {
+	for (i = 0; i < itemCount; i++) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
@@ -291,13 +288,11 @@ unsigned int CMenuPcs::TmpArtiClose()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		zero = 0.0f;
 		entry = this->m_tmpArtiList->entries;
-		for (count = itemCount; count > 0; count--) {
+		for (i = 0; i < itemCount; i++, entry++) {
 			entry->startFrame = 0;
 			entry->duration = 1;
-			entry->alpha = zero;
-			entry++;
+			entry->alpha = 0.0f;
 		}
 		result = 1;
 	}
@@ -339,6 +334,7 @@ int CMenuPcs::TmpArtiCtrl()
  */
 unsigned int CMenuPcs::TmpArtiOpen()
 {
+	int i;
 	TmpArtiEntry* entry;
 	int completedItems;
 	int itemCount;
@@ -346,36 +342,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	unsigned int result;
 
 	if (this->m_tmpArtiState->initialized == '\0') {
-		memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
-		float one = 1.0f;
-		entry = m_tmpArtiList->entries;
-		for (int k = 64; k != 0; k--) {
-			entry->z = one;
-			entry++;
-		}
-
-		double half = 0.5;
-		double center = 216.0;
-		float zero = 0.0f;
-		int row = 0;
-		entry = m_tmpArtiList->entries;
-		for (int k = 4; k != 0; k--) {
-			entry->tex = kTmpArtiRowTexture;
-			entry->width = 200;
-			entry->height = 0x28;
-			entry->x = (short)(int)-((double)entry->width * half - center);
-			entry->y = row * (entry->height - 8) + 0x60;
-			entry->s = zero;
-			entry->t = zero;
-			entry->startFrame = row;
-			row++;
-			entry->duration = 3;
-			entry++;
-		}
-
-		m_tmpArtiList->count = 4;
-		m_tmpArtiState->unk_26 = 0;
-		m_tmpArtiState->initialized = 1;
+		TmpArtiInit();
 	}
 
 	completedItems = 0;
@@ -383,7 +350,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	itemCount = this->m_tmpArtiList->count;
 	entry = this->m_tmpArtiList->entries;
 	currentFrame = this->m_tmpArtiState->frame;
-	for (int remaining = itemCount; remaining > 0; remaining--) {
+	for (i = 0; i < itemCount; i++) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
@@ -398,13 +365,11 @@ unsigned int CMenuPcs::TmpArtiOpen()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		float one = 1.0f;
 		entry = this->m_tmpArtiList->entries;
-		for (int count = itemCount; count > 0; count--) {
+		for (i = 0; i < itemCount; i++, entry++) {
 			entry->startFrame = 0;
 			entry->duration = 1;
-			entry->alpha = one;
-			entry++;
+			entry->alpha = 1.0f;
 		}
 		result = 1;
 	}

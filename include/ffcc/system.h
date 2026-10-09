@@ -81,7 +81,7 @@ public:
     COrder* GetOrder(int);
     int GetNumOrder() { return m_orderCount; }
     int GetIdxCurrentOrder() { return m_currentOrderIndex; }
-    unsigned int GetCounter();
+    unsigned int GetCounter() { return m_frameCounter; }
     int GetErrorLevel();
     int IsGdev();
     static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);

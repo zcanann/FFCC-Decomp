@@ -32,6 +32,10 @@ public:
     int GetTable(unsigned long);
 
     void create();
+    void create0();
+    void ChangeDataStage(CMemory::CStage*);
+    void ResetDataStage();
+    void SetUSBData();
     void createLoad();
     void createViewer();
     void destroy();

@@ -171,7 +171,6 @@ GbaQueue::~GbaQueue()
 void GbaQueue::Init()
 {
 	int i;
-	char* obj = reinterpret_cast<char*>(this);
 
 	memset(m_queue, 0, sizeof(m_queue));
 	memset(m_queueCount, 0, sizeof(m_queueCount));
@@ -197,8 +196,8 @@ void GbaQueue::Init()
 	m_mapNo = 0xFF;
 	m_stageNo = 0xFF;
 	m_stageFlags = 0;
-	*reinterpret_cast<unsigned short*>(obj + 0x44E) = 0;
-	*reinterpret_cast<unsigned short*>(obj + 0x450) = 0;
+	m_unk44E = 0;
+	m_unk450 = 0;
 
 	m_letterDatFlg = 0;
 	m_makeMapObjFlg = 0;
@@ -223,7 +222,7 @@ void GbaQueue::Init()
 	m_chgScouFlags = 0;
 	m_singleMode = 0;
 	m_controllerMode = 0;
-	obj[0x2D58] = 0;
+	m_unk2D58 = 0;
 	m_prevOutOfShoukiFlags = 0;
 	m_outOfShoukiFlags = 0;
 	m_pauseMode = 0;

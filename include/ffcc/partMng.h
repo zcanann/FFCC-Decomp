@@ -457,6 +457,8 @@ public:
 
     _pppMngSt* pppGetFreePppMngSt();
     int pppGetNumFreePppMngSt();
+    unsigned int IsLoadPart();
+    void InitAmem(void*, unsigned long, unsigned char);
     struct PppPdtSlot;
     PppPdtSlot* pppGetFreePppDataMngSt();
 

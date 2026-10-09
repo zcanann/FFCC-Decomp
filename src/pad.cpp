@@ -253,7 +253,7 @@ void CPad::Frame()
 						{
 							input->button[channel] = static_cast<u16>(input->button[channel] | PAD_TRIGGER_R);
 						}
-						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
+						if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0)
 						{
 							if (__abs(input->stickX) >= m_stickDigitalThreshold ||
 							    __abs(input->stickY) >= m_stickDigitalThreshold)

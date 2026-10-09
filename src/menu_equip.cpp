@@ -105,7 +105,6 @@ bool CMenuPcs::ChkEquipActive(int index)
 int CMenuPcs::EquipClose0()
 {
 	float moveT;
-	double one;
 	EquipOpenAnim* item;
 	int timer;
 	int itemCount;
@@ -131,12 +130,11 @@ int CMenuPcs::EquipClose0()
 				item->dy = 0.0f;
 			} else {
 				item->step = item->step + 1;
-				one = 1.0;
 				double recip = 1.0 / (double)item->duration;
 				item->alpha = (float)-(recip * (double)item->step - 1.0);
 				if ((item->flags & 2) == 0) {
-					recip = one / (double)item->duration;
-					moveT = (float)-(recip * (double)item->step - one);
+					recip = 1.0 / (double)item->duration;
+					moveT = (float)-(recip * (double)item->step - 1.0);
 					float dx = item->targetX - (float)item->x;
 					float dy = item->targetY - (float)item->y;
 					item->dx = dx * moveT;
@@ -150,8 +148,7 @@ int CMenuPcs::EquipClose0()
 	int result = 0;
 	if (itemCount == doneCount) {
 		EquipOpenAnim* selected = &m_equipList->entries[m_equipState->selected[0]];
-		double half = 0.5;
-		selected->x = (s16)(int)(216.0 - (double)selected->w * half);
+		selected->x = (s16)(216.0 - selected->w / 2.0);
 		result = 1;
 	}
 
@@ -171,7 +168,6 @@ int CMenuPcs::EquipOpen0()
 {
 	EquipOpenAnim* item;
 	float moveT;
-	double one;
 	int timer;
 	int doneCount;
 	int itemCount;
@@ -198,11 +194,10 @@ int CMenuPcs::EquipOpen0()
 				item->dy = 0.0f;
 			} else {
 				item->step = item->step + 1;
-				one = 1.0;
 				double recip = 1.0 / (double)item->duration;
 				item->alpha = (float)(recip * (double)item->step);
 				if ((item->flags & 2) == 0) {
-					recip = one / (double)item->duration;
+					recip = 1.0 / (double)item->duration;
 					moveT = (float)(recip * (double)item->step);
 					float dx = item->targetX - (float)item->x;
 					float dy = item->targetY - (float)item->y;
@@ -522,7 +517,7 @@ void CMenuPcs::EquipDraw()
 							if (((chk + 1) >= letterCount) || equipped || !ChkEquipActive(chk + 1)) {
 								if (equipped) {
 									int markX = (int)(x - 12.0f);
-									int markY = (int)((double)(h - 24.0f) * 0.5 + (double)y);
+									int markY = (int)((double)(h - 24.0f) / 2.0 + (double)y);
 									DrawEquipMark(markX, markY, item->alpha);
 								}
 								texId = EQUIP_TEX_PLATE;
@@ -565,11 +560,10 @@ void CMenuPcs::EquipDraw()
 			}
 		}
 
-		float colorMax = 255.0f;
 		EquipOpenAnim* textItem = item;
 		int idx;
 		for (int i = 0; (i < 8) && ((idx = i + m_equipState->scroll) < letterCount); textItem++, i++) {
-			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(colorMax * item->alpha)).color);
+			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)).color);
 
 			char* str;
 			if (idx == 0) {
@@ -644,7 +638,7 @@ void CMenuPcs::EquipDraw()
 			cx = (float)(item->x - 0x14);
 			cy = (float)((item->h - 0x20) / 2.0 + item->y);
 		}
-		cx += (float)((int)System.m_frameCounter % 8);
+		cx += (float)((int)System.GetCounter() % 8);
 		DrawCursor((int)cx, (int)cy, 1.0f);
 	}
 
@@ -696,13 +690,14 @@ int CMenuPcs::EquipClose()
 {
 	EquipOpenAnim* item;
 	int doneCount = 0;
+	int i;
 
 	m_equipState->frame = m_equipState->frame + 1;
 	int itemCount = static_cast<int>(m_equipList->count);
 	int timer = static_cast<int>(m_equipState->frame);
 	item = m_equipList->entries;
 
-	for (int i = 0; i < itemCount; i++) {
+	for (i = 0; i < itemCount; i++) {
 		if (item->startFrame <= timer) {
 			if (item->startFrame + item->duration <= timer) {
 				doneCount++;
@@ -719,15 +714,13 @@ int CMenuPcs::EquipClose()
 		item++;
 	}
 
-	float zeroAlpha = 0.0f;
 	int result = 0;
 	if (m_equipList->count == doneCount) {
 		item = m_equipList->entries;
-		for (int k = itemCount; k > 0; k--) {
+		for (i = 0; i < itemCount; i++, item++) {
 			item->startFrame = 0;
 			item->duration = 1;
-			item->alpha = zeroAlpha;
-			item++;
+			item->alpha = 0.0f;
 		}
 		result = 1;
 	}
@@ -745,19 +738,17 @@ int CMenuPcs::EquipClose()
  */
 inline void CMenuPcs::EquipInit0()
 {
-	float one;
 	int i;
 	EquipOpenAnim* entry;
 	int idx;
 	int itemCount;
 	CCaravanWork* caravanWork;
 
-	one = 1.0f;
 	caravanWork = Game.m_scriptFoodBase[0];
 	entry = m_equipList->entries;
 	for (i = 0; i < m_equipList->count; i++) {
-		entry->alpha = one;
-		entry->scale = one;
+		entry->alpha = 1.0f;
+		entry->scale = 1.0f;
 		entry++;
 	}
 
@@ -818,10 +809,6 @@ int CMenuPcs::EquipCtrl()
  */
 int CMenuPcs::EquipOpen()
 {
-	float zeroUV;
-	double centerX;
-	double half;
-	float one;
 	int doneCount;
 	s16* letterBuffer;
 	int itemCount;
@@ -830,30 +817,22 @@ int CMenuPcs::EquipOpen()
 
 	if ((signed char)m_equipState->initialized == 0) {
 		memset(m_equipList, 0, sizeof(EquipOpenAnimList));
-		one = 1.0f;
 		entry = m_equipList->entries;
-		for (int k = 64; k != 0; k--) {
-			entry->scale = one;
-			entry++;
+		for (int i = 0; i < 64; i++, entry++) {
+			entry->scale = 1.0f;
 		}
 
-		half = 0.5;
-		centerX = 216.0;
-		zeroUV = 0.0f;
-		int idx = 0;
 		entry = m_equipList->entries;
-		for (int k = 4; k != 0; k--) {
+		for (int i = 0; i < 4; i++, entry++) {
 			entry->tex = EQUIP_TEX_PLATE;
 			entry->w = 200;
 			entry->h = 0x28;
-			entry->x = (s16)(int)-((double)entry->w * half - centerX);
-			entry->y = idx * (entry->h - 8) + 0x60;
-			entry->u = zeroUV;
-			entry->v = zeroUV;
-			entry->startFrame = idx;
-			idx++;
+			entry->x = (s16)(216.0 - entry->w / 2.0);
+			entry->y = i * (entry->h - 8) + 0x60;
+			entry->u = 0.0f;
+			entry->v = 0.0f;
+			entry->startFrame = i;
 			entry->duration = 3;
-			entry++;
 		}
 
 		m_equipList->count = 4;
@@ -895,15 +874,13 @@ int CMenuPcs::EquipOpen()
 		entry++;
 	}
 
-	one = 1.0f;
 	int result = 0;
 	if (m_equipList->count == doneCount) {
 		entry = m_equipList->entries;
-		for (int k = itemCount; k > 0; k--) {
+		for (int i = 0; i < itemCount; i++, entry++) {
 			entry->startFrame = 0;
 			entry->duration = 1;
-			entry->alpha = one;
-			entry++;
+			entry->alpha = 1.0f;
 		}
 		result = 1;
 	}
@@ -924,7 +901,6 @@ void CMenuPcs::EquipInit1()
 	int n;
 	EquipOpenAnim* listEntry;
 	int k;
-	float zeroAlpha;
 
 	int i = (int)m_equipList->count;
 
@@ -992,12 +968,11 @@ void CMenuPcs::EquipInit1()
 	}
 
 	m_equipList->listEnd = i;
-	zeroAlpha = 0.0f;
 	n = (int)m_equipList->listEnd - (int)m_equipList->count;
 	listEntry = &m_equipList->entries[m_equipList->count];
 	for (k = n; k > 0; k--) {
 		listEntry->step = 0;
-		listEntry->alpha = zeroAlpha;
+		listEntry->alpha = 0.0f;
 		listEntry++;
 	}
 }

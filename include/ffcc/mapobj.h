@@ -69,8 +69,7 @@ public:
     {
         m_type = SPOT_LIGHT;
         m_light = 0;
-        m_falloff = 0.0f;
-        m_intensity = 0.0f;
+        m_intensity = m_falloff = 0.0f;
         m_colorMode = 0;
         m_useAltColor = 0;
         m_keyFrameCount = 0;

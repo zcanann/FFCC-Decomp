@@ -39,9 +39,7 @@ static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
         CRef* ref = reinterpret_cast<CRef*>(ptr);
-        if (ref->DecRef() == 0) {
-            delete ref;
-        }
+        ref->Release();
         ptr = 0;
     }
 }
@@ -390,9 +388,7 @@ void CCharaPcs::calcViewer()
                         CChara::CAnim* oldAnim = self->m_viewerAnimBank[self->m_viewerAnimLoadedCount];
                         if (oldAnim != 0) {
                             CRef* ref = reinterpret_cast<CRef*>(oldAnim);
-                            if (ref->DecRef() == 0) {
-                                delete ref;
-                            }
+                            ref->Release();
                             self->m_viewerAnimBank[self->m_viewerAnimLoadedCount] = 0;
                         }
                         File.Read(fileHandle);

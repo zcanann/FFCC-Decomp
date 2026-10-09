@@ -556,7 +556,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	if (m_currentMenu->m_statusBits.m_selected != 0) {
 		u8 alpha = 0xC0;
 
-		if ((System.m_frameCounter >> 2 & 1) != 0) {
+		if ((System.GetCounter() >> 2 & 1) != 0) {
 			alpha = 0xFF;
 		}
 

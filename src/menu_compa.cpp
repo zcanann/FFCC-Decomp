@@ -99,7 +99,7 @@ void CMenuPcs::CompaDraw()
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	entry = this->m_compaList->entries;
-	for (i = 0; i < this->m_compaList->count; i++, entry++) {
+	for (int i = 0; i < this->m_compaList->count; i++, entry++) {
 		tex = entry->tex;
 		if (tex >= 0) {
 			x = static_cast<float>(entry->x);
@@ -542,9 +542,8 @@ void CMenuPcs::CompaInit()
 	memset(this->m_compaList, 0, sizeof(*this->m_compaList));
 
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	float one = 1.0f;
 	for (int count = 64; count != 0; count--) {
-		entry->uvScale = one;
+		entry->uvScale = 1.0f;
 		entry++;
 	}
 

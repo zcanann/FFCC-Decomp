@@ -164,6 +164,25 @@ public:
      * --INFO--
      * PAL Address: UNUSED
      * PAL Size: TODO
+     * EN Address: 0x8011FB08
+     * EN Size: 44b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SetWorldZoomCam(int paused, unsigned short frames, float rotX, float rotY, float scale)
+    {
+        m_worldMapEffect.m_paused = paused;
+        m_worldMapEffect.m_timer = frames;
+        m_worldMapEffect.m_duration = frames;
+        m_worldMapEffect.m_rotX = rotX;
+        m_worldMapEffect.m_rotY = rotY;
+        m_worldMapEffect.m_scale = scale;
+    }
+
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
      * EN Address: 0x80022F3C
      * EN Size: 132b
      * JP Address: TODO
@@ -245,10 +264,20 @@ public:
     void drawShadowEnd();
     void drawShadowChrBegin();
     void SetFullScreenShadow(float (*)[4], long);
-    void SetFullScreenShadowCamLen(float);
-    void SetFullScreenShadowRot(float, float);
-    void SetFullScreenShadowPos(Vec*, float);
-    void SetFullScreenShadowEnable(unsigned char);
+    void SetFullScreenShadowCamLen(float len) { m_fullScreenShadowCamLen = len; }
+    void SetFullScreenShadowRot(float rotX, float rotY)
+    {
+        m_fullScreenShadow.m_rotX = rotX;
+        m_fullScreenShadow.m_rotY = rotY;
+    }
+    void SetFullScreenShadowPos(Vec* position, float len)
+    {
+        m_fullScreenShadowPosition.x = position->x;
+        m_fullScreenShadowPosition.y = position->y;
+        m_fullScreenShadowPosition.z = position->z;
+        m_fullScreenShadow.m_scale = len;
+    }
+    void SetFullScreenShadowEnable(unsigned char enable) { m_fullScreenShadowEnabled = enable; }
     void drawShadowEndAll();
 
     // Material editor
@@ -267,14 +296,24 @@ public:
     void calcPart();
 
     // Misc
-    void SetShadowAuto(int);
-    void SetFov(float);
-    void SetFromScript();
+    void SetShadowAuto(int enable) { m_shadowAuto = enable; }
+    void SetFov(float fov) { m_fov = fov; }
+    void SetFromScript() { m_fromScript = 1; }
     void SetOffsetZBuff(float);
-    void SetZRotate(float);
-    void SetPosition(Vec*);
-    void SetRefPosition(Vec*);
-    int IsAbsolute();
+    void SetZRotate(float zRotate) { m_zRotate = zRotate; }
+    void SetPosition(Vec* position)
+    {
+        m_positionX = position->x;
+        m_positionY = position->y;
+        m_positionZ = position->z;
+    }
+    void SetRefPosition(Vec* position)
+    {
+        m_targetX = position->x;
+        m_targetY = position->y;
+        m_targetZ = position->z;
+    }
+    int IsAbsolute() { return m_isAbsolute; }
     void addWorldMap();
     float GetRotate() { return m_yaw; }
     void SetIsAbsolute(int);

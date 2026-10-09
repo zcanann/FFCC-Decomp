@@ -84,15 +84,15 @@ public:
     void Free(void*);
     void IncHeapWalkerLevel();
     void DecHeapWalkerLevel();
-    void ResetDefaultGroup();
-    void SetDefaultGroup(int);
+    void ResetDefaultGroup() { m_defaultGroup = 0; }
+    void SetDefaultGroup(int group) { m_defaultGroup = group; }
     int GetHeapWalkerLevel() const { return m_heapWalkerLevel; }
     int GetDefaultGroup() const { return m_defaultGroup; }
     void CopyToAMemory(void*, void*, unsigned long);
     void CopyFromAMemory(void*, void*, unsigned long);
     void CopyToAMemorySync(void*, void*, unsigned long);
     void CopyFromAMemorySync(void*, void*, unsigned long);
-    void IsCopyCompleted(int);
+    int IsCopyCompleted(int);
     int& DefaultGroup() { return m_defaultGroup; }
 
 private:
@@ -131,7 +131,7 @@ public:
     void Destroy(CMemory::CStage*);
     int GetData(CMemory::CStage*, char*, int);
     void SetData(void*, int);
-    void IsEnable();
+    int IsEnable();
     void Init();
 };
 

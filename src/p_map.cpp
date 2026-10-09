@@ -23,19 +23,6 @@ public:
     ~CRelProfile();
 };
 
-/*
- * --INFO--
- * PAL Address: 0x80036254
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CRelProfile::~CRelProfile()
-{
-}
-
 inline CMapPcs::CMapPcs()
 {
 }
@@ -94,6 +81,19 @@ static char oldMapFileName[0x100] = "";
 
 /*
  * --INFO--
+ * PAL Address: 0x80036254
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CRelProfile::~CRelProfile()
+{
+}
+
+/*
+ * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 228b
  * EN Address: TODO
@@ -120,488 +120,81 @@ inline void mapInitDrawEnv()
 
 /*
  * --INFO--
- * PAL Address: 0x80034988
- * PAL Size: 540b
+ * PAL Address: 0x80035E78
+ * PAL Size: 12b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::drawAfterViewer()
+void CMapPcs::Init()
 {
-    if (m_mapCalcReady == 0) {
-        if (m_drawEnabled != 0) {
-            Mtx44 screenMtx;
-            Mtx cameraMtx;
-
-            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
-
-            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
-
-            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-            PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-
-            GXSetColorUpdate(GX_TRUE);
-            GXSetAlphaUpdate(GX_FALSE);
-            GXSetCullMode(GX_CULL_FRONT);
-            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-            _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
-
-            MapMng.DrawAfter();
-
-            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                CBound bound;
-                bound = CameraPcs.m_shadowRectBound;
-                const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
-                GXColor color = colorObj.color;
-                Graphic.DrawBound(bound, color);
-            }
-        }
-    }
+	m_forceMapReload = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80034ba4
- * PAL Size: 540b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapPcs::drawAfter()
-{
-    if (m_mapCalcReady == 0) {
-        if (m_drawEnabled != 0) {
-            Mtx cameraMtx;
-            Mtx44 screenMtx;
-
-            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
-
-            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
-
-            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-            PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-
-            GXSetColorUpdate(GX_TRUE);
-            GXSetAlphaUpdate(GX_FALSE);
-            GXSetCullMode(GX_CULL_FRONT);
-            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-            _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
-
-            MapMng.DrawAfter();
-
-            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                CBound bound;
-                bound = CameraPcs.m_shadowRectBound;
-                Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
-            }
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034dc0
- * PAL Size: 532b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapPcs::drawViewer()
-{
-    if ((m_drawEnabled != 0) &&
-        (m_mapCalcReady == 0) &&
-        (m_drawEnabled != 0)) {
-        Mtx44 screenMtx;
-        Mtx cameraMtx;
-
-        if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2C4);
-        }
-
-        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
-
-        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
-
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(MapMng.m_fogEnable, 0);
-
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_FRONT);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
-
-        MapMng.Draw();
-
-        if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2E0);
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034fd4
- * PAL Size: 532b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapPcs::drawBeforeViewer()
-{
-    if ((m_drawEnabled != 0) &&
-        (m_mapCalcReady == 0) &&
-        (m_drawEnabled != 0)) {
-        Mtx44 screenMtx;
-        Mtx cameraMtx;
-
-        if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x298);
-        }
-
-        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
-
-        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
-
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(MapMng.m_fogEnable, 0);
-
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_FRONT);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
-
-        MapMng.DrawBefore();
-
-        if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2B2);
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800351e8
- * PAL Size: 524b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapPcs::draw()
-{
-    if ((m_mapCalcReady == 0) &&
-        (m_drawEnabled != 0)) {
-        Mtx cameraMtx;
-        Mtx44 screenMtx;
-
-        if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2C4);
-        }
-
-        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
-
-        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
-
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(MapMng.m_fogEnable, 0);
-
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_FRONT);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
-
-        MapMng.Draw();
-
-        if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2E0);
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800353f4
- * PAL Size: 524b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapPcs::drawBefore()
-{
-    if ((m_mapCalcReady == 0) &&
-        (m_drawEnabled != 0)) {
-        Mtx cameraMtx;
-        Mtx44 screenMtx;
-
-        if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x298);
-        }
-
-        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
-
-        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
-
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(MapMng.m_fogEnable, 0);
-
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_FRONT);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
-
-        MapMng.DrawBefore();
-
-        if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2B2);
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80035600
+ * PAL Address: 0x80035E74
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::drawShadow()
+void CMapPcs::Quit()
 {
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80035604
- * PAL Size: 32b
+ * PAL Address: 0x80035E60
+ * PAL Size: 20b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::calcViewer()
+int CMapPcs::GetTable(unsigned long tableIndex)
 {
-    CMapPcs::calc();
+	return reinterpret_cast<int>(&CMapPcs::m_table[tableIndex]);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80035624
- * PAL Size: 796b
+ * PAL Address: 0x80035E20
+ * PAL Size: 64b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::calc()
+void CMapPcs::create()
 {
-    Vec cameraPos;
-    Mtx cameraMtx;
-    Mtx44 screenMtx;
+    m_viewerMode = 0;
+    m_drawEnabled = 1;
+    m_useStoredViewMtx = 0;
 
-    MapMng.LoadMapNoSyncCalc();
-    MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-    MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-    MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
-
-    if (m_useStoredViewMtx != 0) {
-        memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
-        memcpy(screenMtx, m_screenMtx, sizeof(Mtx44));
-    } else {
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-    }
-    MapMng.SetViewMtx(cameraMtx, screenMtx);
-
-    if (m_forceMapReload != 0) {
-        MapMng.DestroyMap();
-        LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
-        MapMng.SetDrawRangeOctTree(1000000000.0f);
-        MapMng.SetDrawRangeMapObj(1000000000.0f);
-        MapMng.m_asyncLoadState.m_mapLoadStart = 0;
-        MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
-        MapMng.m_asyncLoadState.m_mapLoadSize = 0;
-        MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
-        MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
-        MapMng.m_asyncLoadState.m_mapReadMode = 0;
-        MapMng.ReadMtx(m_mapName);
-        MapMng.ReadMpl(m_mapName);
-        MapMng.ReadOtm(m_mapName);
-        MapMng.ReadMid(m_mapName);
-        if ((m_viewerMode != 0) &&
-            (strcmp(oldMapFileName, m_mapName) != 0)) {
-            strcpy(oldMapFileName, m_mapName);
-            if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
-                if (rootNode != 0) {
-                    float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
-                    center *= 0.5f;
-                    cameraPos.x = center;
-                    center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
-                    center *= 0.5f;
-                    cameraPos.y = center;
-                    center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
-                    center *= 0.5f;
-                    cameraPos.z = center;
-                } else {
-                    CMapObj* mapObj = MapMng.GetMapObj(1);
-                    cameraPos.x = mapObj->m_localPosition.x;
-                    cameraPos.y = mapObj->m_localPosition.y;
-                    cameraPos.z = mapObj->m_localPosition.z;
-                }
-            }
-            cameraPos.y += 1.0f;
-            CameraPcs.m_positionX = cameraPos.x;
-            CameraPcs.m_positionY = cameraPos.y;
-            CameraPcs.m_positionZ = cameraPos.z;
-        }
-
-        if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-            System.Printf(
-                const_cast<char*>("\n\n=============================================================\n"
-    "                   LoadMap [%s] OK\n"
-    "                   m_mapobj_n = %d\n"
-    "                   m_octtree_n = %d\n"
-    "                   memFree=%d Kbyte\n"
-    "=============================================================\n\n\n"),
-                m_mapName,
-                MapMng.m_mapObjCount,
-                MapMng.m_octTreeCount,
-                MapMng.m_stage->GetHeapUnuse() / 1024);
-        }
-
-        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(1);
-        unsigned int mapLightHolderIndex = 0;
-        if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
-            (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
-                &MapMng.m_mapColor, static_cast<Vec*>(0));
-        }
-
-        m_forceMapReload = 0;
-        m_mapCalcReady = 1;
-    } else {
-        m_mapCalcReady = 0;
-        MapMng.Calc();
-    }
+    MapMng.Create();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80035940
- * PAL Size: 24b
+ * PAL Address: 0x80035DD0
+ * PAL Size: 80b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::calcInit()
+void CMapPcs::createViewer()
 {
-    MapMng.m_colorScaleEnable = 0;
-}
+    m_viewerMode = 0;
+    m_drawEnabled = 1;
+    m_useStoredViewMtx = 0;
 
-/*
- * --INFO--
- * PAL Address: 0x80035958
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapPcs::destroy()
-{
-    MapMng.Destroy();
-}
+    MapMng.Create();
 
-/*
- * --INFO--
- * PAL Address: 0x80035980
- * PAL Size: 260b
- * EN Address: 0x8003F834
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMapPcs::IsLoadMapCompleted()
-{
-    return MapMng.IsLoadMap();
+    m_viewerMode = 1;
 }
 
 /*
@@ -714,78 +307,486 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
 /*
  * --INFO--
- * PAL Address: 0x80035DD0
- * PAL Size: 80b
+ * PAL Address: 0x80035980
+ * PAL Size: 260b
+ * EN Address: 0x8003F834
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMapPcs::IsLoadMapCompleted()
+{
+    return MapMng.IsLoadMap();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80035958
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::createViewer()
+void CMapPcs::destroy()
 {
-    m_viewerMode = 0;
-    m_drawEnabled = 1;
-    m_useStoredViewMtx = 0;
-
-    MapMng.Create();
-
-    m_viewerMode = 1;
+    MapMng.Destroy();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80035E20
- * PAL Size: 64b
+ * PAL Address: 0x80035940
+ * PAL Size: 24b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::create()
+void CMapPcs::calcInit()
 {
-    m_viewerMode = 0;
-    m_drawEnabled = 1;
-    m_useStoredViewMtx = 0;
-
-    MapMng.Create();
+    MapMng.m_colorScaleEnable = 0;
 }
+
 /*
  * --INFO--
- * PAL Address: 0x80035E60
- * PAL Size: 20b
+ * PAL Address: 0x80035624
+ * PAL Size: 796b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMapPcs::GetTable(unsigned long tableIndex)
+void CMapPcs::calc()
 {
-	return reinterpret_cast<int>(&CMapPcs::m_table[tableIndex]);
+    Vec cameraPos;
+    Mtx cameraMtx;
+    Mtx44 screenMtx;
+
+    MapMng.LoadMapNoSyncCalc();
+    MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+    MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+    MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+
+    if (m_useStoredViewMtx != 0) {
+        memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
+        memcpy(screenMtx, m_screenMtx, sizeof(Mtx44));
+    } else {
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    }
+    MapMng.SetViewMtx(cameraMtx, screenMtx);
+
+    if (m_forceMapReload != 0) {
+        MapMng.DestroyMap();
+        LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
+        MapMng.SetDrawRangeOctTree(1000000000.0f);
+        MapMng.SetDrawRangeMapObj(1000000000.0f);
+        MapMng.m_asyncLoadState.m_mapLoadStart = 0;
+        MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
+        MapMng.m_asyncLoadState.m_mapLoadSize = 0;
+        MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
+        MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
+        MapMng.m_asyncLoadState.m_mapReadMode = 0;
+        MapMng.ReadMtx(m_mapName);
+        MapMng.ReadMpl(m_mapName);
+        MapMng.ReadOtm(m_mapName);
+        MapMng.ReadMid(m_mapName);
+        if ((m_viewerMode != 0) &&
+            (strcmp(oldMapFileName, m_mapName) != 0)) {
+            strcpy(oldMapFileName, m_mapName);
+            if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
+                COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
+                if (rootNode != 0) {
+                    float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
+                    center *= 0.5f;
+                    cameraPos.x = center;
+                    center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
+                    center *= 0.5f;
+                    cameraPos.y = center;
+                    center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
+                    center *= 0.5f;
+                    cameraPos.z = center;
+                } else {
+                    CMapObj* mapObj = MapMng.GetMapObj(1);
+                    cameraPos.x = mapObj->m_localPosition.x;
+                    cameraPos.y = mapObj->m_localPosition.y;
+                    cameraPos.z = mapObj->m_localPosition.z;
+                }
+            }
+            cameraPos.y += 1.0f;
+            CameraPcs.m_positionX = cameraPos.x;
+            CameraPcs.m_positionY = cameraPos.y;
+            CameraPcs.m_positionZ = cameraPos.z;
+        }
+
+        if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+            System.Printf(
+                const_cast<char*>("\n\n=============================================================\n"
+    "                   LoadMap [%s] OK\n"
+    "                   m_mapobj_n = %d\n"
+    "                   m_octtree_n = %d\n"
+    "                   memFree=%d Kbyte\n"
+    "=============================================================\n\n\n"),
+                m_mapName,
+                MapMng.m_mapObjCount,
+                MapMng.m_octTreeCount,
+                MapMng.m_stage->GetHeapUnuse() / 1024);
+        }
+
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(1);
+        unsigned int mapLightHolderIndex = 0;
+        if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
+            (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
+                &MapMng.m_mapColor, static_cast<Vec*>(0));
+        }
+
+        m_forceMapReload = 0;
+        m_mapCalcReady = 1;
+    } else {
+        m_mapCalcReady = 0;
+        MapMng.Calc();
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80035E74
+ * PAL Address: 0x80035604
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::calcViewer()
+{
+    CMapPcs::calc();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80035600
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::Quit()
+void CMapPcs::drawShadow()
 {
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80035E78
- * PAL Size: 12b
+ * PAL Address: 0x800353f4
+ * PAL Size: 524b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::Init()
+void CMapPcs::drawBefore()
 {
-	m_forceMapReload = 0;
+    if ((m_mapCalcReady == 0) &&
+        (m_drawEnabled != 0)) {
+        Mtx cameraMtx;
+        Mtx44 screenMtx;
+
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x298);
+        }
+
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
+
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
+
+        GXSetColorUpdate(GX_TRUE);
+        GXSetAlphaUpdate(GX_FALSE);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+        MapMng.DrawBefore();
+
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2B2);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800351e8
+ * PAL Size: 524b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::draw()
+{
+    if ((m_mapCalcReady == 0) &&
+        (m_drawEnabled != 0)) {
+        Mtx cameraMtx;
+        Mtx44 screenMtx;
+
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2C4);
+        }
+
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
+
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
+
+        GXSetColorUpdate(GX_TRUE);
+        GXSetAlphaUpdate(GX_FALSE);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+        MapMng.Draw();
+
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2E0);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034fd4
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::drawBeforeViewer()
+{
+    if ((m_drawEnabled != 0) &&
+        (m_mapCalcReady == 0) &&
+        (m_drawEnabled != 0)) {
+        Mtx44 screenMtx;
+        Mtx cameraMtx;
+
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x298);
+        }
+
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
+
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
+
+        GXSetColorUpdate(GX_TRUE);
+        GXSetAlphaUpdate(GX_FALSE);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+        MapMng.DrawBefore();
+
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2B2);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034dc0
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::drawViewer()
+{
+    if ((m_drawEnabled != 0) &&
+        (m_mapCalcReady == 0) &&
+        (m_drawEnabled != 0)) {
+        Mtx44 screenMtx;
+        Mtx cameraMtx;
+
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2C4);
+        }
+
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
+
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
+
+        GXSetColorUpdate(GX_TRUE);
+        GXSetAlphaUpdate(GX_FALSE);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+        MapMng.Draw();
+
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2E0);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034ba4
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::drawAfter()
+{
+    if (m_mapCalcReady == 0) {
+        if (m_drawEnabled != 0) {
+            Mtx cameraMtx;
+            Mtx44 screenMtx;
+
+            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
+
+            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+
+            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+            PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+
+            GXSetColorUpdate(GX_TRUE);
+            GXSetAlphaUpdate(GX_FALSE);
+            GXSetCullMode(GX_CULL_FRONT);
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+            _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+            MapMng.DrawAfter();
+
+            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
+                CBound bound;
+                bound = CameraPcs.m_shadowRectBound;
+                Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034988
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::drawAfterViewer()
+{
+    if (m_mapCalcReady == 0) {
+        if (m_drawEnabled != 0) {
+            Mtx44 screenMtx;
+            Mtx cameraMtx;
+
+            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
+
+            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+
+            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+            PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+
+            GXSetColorUpdate(GX_TRUE);
+            GXSetAlphaUpdate(GX_FALSE);
+            GXSetCullMode(GX_CULL_FRONT);
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+            _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+            MapMng.DrawAfter();
+
+            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
+                CBound bound;
+                bound = CameraPcs.m_shadowRectBound;
+                const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
+                GXColor color = colorObj.color;
+                Graphic.DrawBound(bound, color);
+            }
+        }
+    }
 }

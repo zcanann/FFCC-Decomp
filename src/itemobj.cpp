@@ -437,7 +437,7 @@ void CGItemObj::onFrameStat()
 			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
+			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtId();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
@@ -469,7 +469,7 @@ void CGItemObj::onFrameStat()
 			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
+			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtId();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
@@ -745,8 +745,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
 			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(partyObj);
 
-			CGObject* attachSelf = this;
-			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
+			Attach(partyObj, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = 0.0f;
 		} else {
@@ -1090,7 +1089,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 
 			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_currentAlpha).color);
 
-			char* name = Game.m_cFlatDataArr[1].TableStrings(2)[m_memoryCapsuleNameIndex];
+			char* name = Game.m_cFlatDataArr[1].GetTable(2)[m_memoryCapsuleNameIndex];
 			float width = font->GetWidth(name);
 			float depthScale = 1.0f / (m_screenDepth - 10.0f);
 			float posY = 224.0f - 224.0f * m_projection.z * depthScale;

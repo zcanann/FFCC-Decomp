@@ -92,7 +92,7 @@ public:
     void aiTargetAttackRomMon(int);
     void checkCol(int, float, float, float*, int*);
     void mlSet(int);
-    void mlWaitingCheck();
+    int mlWaitingCheck();
     void mlAway();
     void mlHide();
     void mlWaiting();

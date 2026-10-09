@@ -172,9 +172,7 @@ void CFontMan::Quit()
 {
 	CFont* font = m_font;
 	if (font != 0) {
-		if (font->DecRef() == 0) {
-			delete font;
-		}
+		font->Release();
 		m_font = 0;
 	}
 
@@ -235,9 +233,7 @@ CFont::~CFont()
 {
 	if (texturePtr != 0) {
 		CTexture* texture = texturePtr;
-		if (texture->DecRef() == 0) {
-			delete texture;
-		}
+		texture->Release();
 		texturePtr = 0;
 	}
 

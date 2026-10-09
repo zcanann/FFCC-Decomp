@@ -159,8 +159,12 @@ public:
     char* MakeArtsMonNames(char*, int);
     char* MakeNumMonName(char*, int, int);
     const char* GetLangString();
-    void SetNextScript(CGame::CNextScript* nextScript);
-    void SetNextScriptNewGame();
+    void SetNextScript(CGame::CNextScript* nextScript)
+    {
+        m_nextScript = *nextScript;
+        m_newGameFlag = 1;
+    }
+    void SetNextScriptNewGame() { m_nextScriptFlags = 1; }
     int IsWorldMap() { return m_currentMapId == 0x21; }
     int IsPartyExist(int);
     char* GetItemName(int);
@@ -173,16 +177,16 @@ public:
     int GetMark() { return m_gameWork.m_gameInitFlag; }
     void SetMark(int mark) { m_gameWork.m_gameInitFlag = mark; }
 #ifdef VERSION_GCCJGC
-    char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].TableStrings(0)[itemIndex]; }
+    char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].GetTable(0)[itemIndex]; }
 #else
-    char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 4]; }
+    char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].GetTable(0)[itemIndex * 5 + 4]; }
 #endif
-    char* GetRingName(int ringIndex) { return m_cFlatDataArr[1].TableStrings(4)[ringIndex]; }
-    char* GetHelpName(int helpIndex) { return m_cFlatDataArr[1].TableStrings(6)[helpIndex]; }
-    char* GetBonusName(int bonusIndex) { return m_cFlatDataArr[1].TableStrings(7)[bonusIndex]; }
-    char* GetNPCName(int npcIndex) { return m_cFlatDataArr[1].TableStrings(2)[npcIndex]; }
-    char* GetLetterSubject(int subjectIndex) { return m_cFlatDataArr[1].TableStrings(5)[subjectIndex]; }
-    char* GetPlaceName(int placeIndex) { return m_cFlatDataArr[1].TableStrings(3)[placeIndex]; }
+    char* GetRingName(int ringIndex) { return m_cFlatDataArr[1].GetTable(4)[ringIndex]; }
+    char* GetHelpName(int helpIndex) { return m_cFlatDataArr[1].GetTable(6)[helpIndex]; }
+    char* GetBonusName(int bonusIndex) { return m_cFlatDataArr[1].GetTable(7)[bonusIndex]; }
+    char* GetNPCName(int npcIndex) { return m_cFlatDataArr[1].GetTable(2)[npcIndex]; }
+    char* GetLetterSubject(int subjectIndex) { return m_cFlatDataArr[1].GetTable(5)[subjectIndex]; }
+    char* GetPlaceName(int placeIndex) { return m_cFlatDataArr[1].GetTable(3)[placeIndex]; }
     void UPPERItemName(char* name);
     void UpperItemName(char* name)
     {
@@ -198,8 +202,8 @@ public:
     void UPPERMonName(char* name);
     void UpperMonName(char* name);
     void LowerMonName(char* name);
-    char* GetLetter(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x10); }
-    char* GetLetterReply(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x11); }
+    char* GetLetter(int letterType) { return m_cFlatDataArr[1].GetMes(letterType * 2 + 0x10); }
+    char* GetLetterReply(int letterType) { return m_cFlatDataArr[1].GetMes(letterType * 2 + 0x11); }
     char* GetMonName(int);
     char* GetMonArt(int);
     char* GetMonNames(int);
@@ -297,9 +301,9 @@ STATIC_ASSERT(sizeof(CGame) == 0x11F88);
 inline char* CGame::GetItemName(int itemIndex)
 {
 #ifdef VERSION_GCCJGC
-    return m_cFlatDataArr[1].TableStrings(0)[itemIndex];
+    return m_cFlatDataArr[1].GetTable(0)[itemIndex];
 #else
-    return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 1];
+    return m_cFlatDataArr[1].GetTable(0)[itemIndex * 5 + 1];
 #endif
 }
 
@@ -310,7 +314,7 @@ inline char* CGame::GetItemName(int itemIndex)
  */
 inline char* CGame::GetItemArt(int itemIndex)
 {
-    return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5];
+    return m_cFlatDataArr[1].GetTable(0)[itemIndex * 5];
 }
 
 /*
@@ -320,7 +324,7 @@ inline char* CGame::GetItemArt(int itemIndex)
  */
 inline char* CGame::GetItemNames(int itemIndex)
 {
-    return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 3];
+    return m_cFlatDataArr[1].GetTable(0)[itemIndex * 5 + 3];
 }
 
 /*
@@ -330,7 +334,7 @@ inline char* CGame::GetItemNames(int itemIndex)
  */
 inline char* CGame::GetItemArts(int itemIndex)
 {
-    return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 2];
+    return m_cFlatDataArr[1].GetTable(0)[itemIndex * 5 + 2];
 }
 
 /*
@@ -351,9 +355,9 @@ inline char* CGame::GetItemName(int itemIndex, int count)
 inline char* CGame::GetMonName(int monIndex)
 {
 #ifdef VERSION_GCCJGC
-    return m_cFlatDataArr[1].TableStrings(1)[monIndex];
+    return m_cFlatDataArr[1].GetTable(1)[monIndex];
 #else
-    return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 1];
+    return m_cFlatDataArr[1].GetTable(1)[monIndex * 5 + 1];
 #endif
 }
 
@@ -364,7 +368,7 @@ inline char* CGame::GetMonName(int monIndex)
  */
 inline char* CGame::GetMonArt(int monIndex)
 {
-    return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5];
+    return m_cFlatDataArr[1].GetTable(1)[monIndex * 5];
 }
 
 /*
@@ -374,7 +378,7 @@ inline char* CGame::GetMonArt(int monIndex)
  */
 inline char* CGame::GetMonNames(int monIndex)
 {
-    return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 3];
+    return m_cFlatDataArr[1].GetTable(1)[monIndex * 5 + 3];
 }
 
 /*
@@ -384,7 +388,7 @@ inline char* CGame::GetMonNames(int monIndex)
  */
 inline char* CGame::GetMonArts(int monIndex)
 {
-    return m_cFlatDataArr[1].TableStrings(1)[monIndex * 5 + 2];
+    return m_cFlatDataArr[1].GetTable(1)[monIndex * 5 + 2];
 }
 
 /*

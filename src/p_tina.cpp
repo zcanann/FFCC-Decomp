@@ -13,7 +13,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" const char sNoNameProfileLabel[];
 extern "C" unsigned char g_IsDrawHeapSize = 1;
 
 
@@ -183,8 +182,8 @@ struct _pppFieldPdtData
     _pppFieldParticleData m_particles[1];
 };
 
-CProfile g_par_calc_prof(const_cast<char*>(sNoNameProfileLabel));
-CProfile g_par_draw_prof(const_cast<char*>(sNoNameProfileLabel));
+CProfile g_par_calc_prof("no name");
+CProfile g_par_draw_prof("no name");
 
 /*
  * --INFO--
@@ -383,14 +382,14 @@ unsigned char pppAmemRefCntError(unsigned long)
 
 /*
  * --INFO--
- * PAL Address: 0x8005357C
+ * PAL Address: UNUSED
  * PAL Size: 328b
- * EN Address: 0x8005fe94
- * EN Size: 40b
+ * EN Address: 0x8005FD34
+ * EN Size: 352b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartPcs::create()
+inline void CPartPcs::create0()
 {
     CUSBStreamDataState* usb = &m_usbStreamState;
     CMemory::CStage* stage;
@@ -428,6 +427,20 @@ void CPartPcs::create()
 
     ::memset(&PartMng, 0, 0x23FD8);
     PartMng.Create();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005357C
+ * PAL Size: 328b
+ * EN Address: 0x8005fe94
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::create()
+{
+    create0();
 }
 
 /*
@@ -589,6 +602,28 @@ void CPartPcs::calc()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 64b
+ * EN Address: 0x800619D8
+ * EN Size: 132b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartPcs::SetUSBData()
+{
+    int packetCode;
+
+    if (m_usbStreamData.IsUSBStreamDataDone()) {
+        packetCode = m_usbStreamData.m_packetCode;
+        if (packetCode != 0) {
+            PartMng.pppDataRcv(packetCode, reinterpret_cast<char*>(m_usbStreamData.m_data), m_usbStreamData.m_sizeBytes);
+        }
+        m_usbStreamData.SetUSBStreamDataDone();
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8005309C
  * PAL Size: 156b
  * EN Address: 0x800602d0
@@ -598,21 +633,13 @@ void CPartPcs::calc()
  */
 void CPartPcs::calcViewer()
 {
-    int packetCode;
-
     g_par_calc_prof.Start();
     PartMng.pppEditBeforeCalc();
     PartMng.pppEditPartCalc();
     g_par_calc_prof.Stop();
 
     USBPcs.mccReadData();
-    if (m_usbStreamData.IsUSBStreamDataDone()) {
-        packetCode = m_usbStreamData.m_packetCode;
-        if (packetCode != 0) {
-            PartMng.pppDataRcv(packetCode, reinterpret_cast<char*>(m_usbStreamData.m_data), m_usbStreamData.m_sizeBytes);
-        }
-        m_usbStreamData.SetUSBStreamDataDone();
-    }
+    SetUSBData();
 }
 
 /*
@@ -963,10 +990,6 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 	PartMng.m_pppMng[index].m_nodeScaleInitialized = 1;
 }
 
-extern "C" {
-const char sNoNameProfileLabel[] = "no name";
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8005295C
@@ -1036,10 +1059,43 @@ void CPartPcs::drawAfterViewer()
 		(double)((float)gPppHeapUseRateWords[1] / 100.0f));
 }
 
-static inline unsigned int IsPartAsyncIdle(CPartMng* partMng)
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x80061A5C
+ * EN Size: 200b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartMng::InitAmem(void* amemBase, unsigned long loadCacheParam, unsigned char mode)
+{
+    m_partAMemBase = reinterpret_cast<unsigned int>(amemBase);
+    m_partAMemCursor = reinterpret_cast<unsigned int>(amemBase);
+    m_partLoadCacheParam = loadCacheParam;
+    m_partChunkIndex = 0;
+    m_asyncHandleCount = 0;
+
+    if (loadCacheParam != 0) {
+        if (mode == 1) {
+            m_partLoadMode = 2;
+        } else if (mode == 2) {
+            m_partLoadMode = 3;
+            for (int i = 0; i < 0x10; i++) {
+                m_partAsyncBusy[i] = 0;
+            }
+        } else {
+            m_partLoadMode = 1;
+        }
+    } else {
+        m_partLoadMode = 0;
+    }
+}
+
+inline unsigned int CPartMng::IsLoadPart()
 {
     for (int i = 0; i < 16; i++) {
-        if (partMng->m_partAsyncBusy[i] != 0) {
+        if (m_partAsyncBusy[i] != 0) {
             return 0;
         }
     }
@@ -1058,7 +1114,7 @@ static inline unsigned int IsPartAsyncIdle(CPartMng* partMng)
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    return IsPartAsyncIdle(&PartMng);
+    return PartMng.IsLoadPart();
 }
 
 /*
@@ -1121,30 +1177,39 @@ static void LoadFieldPdt0(int mapId, int floorId)
  */
 void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned long loadCacheParam, unsigned char mode)
 {
-    CPartMng* state = &PartMng;
+    PartMng.InitAmem(amemBase, loadCacheParam, mode);
+    LoadFieldPdt0(mapId, floorId);
+}
 
-    state->m_partAMemBase = reinterpret_cast<unsigned int>(amemBase);
-    state->m_partAMemCursor = reinterpret_cast<unsigned int>(amemBase);
-    state->m_partLoadCacheParam = loadCacheParam;
-    state->m_partChunkIndex = 0;
-    state->m_asyncHandleCount = 0;
-
-    if (loadCacheParam != 0) {
-        if (mode == 1) {
-            state->m_partLoadMode = 2;
-        } else if (mode == 2) {
-            state->m_partLoadMode = 3;
-            for (int i = 0; i < 0x10; i++) {
-                state->m_partAsyncBusy[i] = 0;
-            }
-        } else {
-            state->m_partLoadMode = 1;
-        }
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 276b
+ * EN Address: 0x800613B4
+ * EN Size: 280b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static int loadPdtPtx(char* path, void* pdtData, int pdtCount, void* ptxData, int ptxCount, int useData)
+{
+    int pdtSlotIndex = PartMng.pppGetFreeDataMng();
+    if (pdtSlotIndex == -1) {
+        pdtSlotIndex = -1;
     } else {
-        state->m_partLoadMode = 0;
+        if (PartMng.pppLoadPtx(path, pdtSlotIndex, useData, ptxData, ptxCount) == 0) {
+            PartMng.pppReleasePdt(pdtSlotIndex);
+            pdtSlotIndex = -1;
+        } else {
+            if (PartMng.pppLoadPdt(path, pdtSlotIndex, useData, pdtData, pdtCount) == 0) {
+                PartMng.pppReleasePdt(pdtSlotIndex);
+                pdtSlotIndex = -1;
+            } else {
+                PartPcs.m_usbStreamState.m_printFreeOnNext = 1;
+            }
+        }
     }
 
-    LoadFieldPdt0(mapId, floorId);
+    return pdtSlotIndex;
 }
 
 /*
@@ -1158,7 +1223,6 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
  */
 int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
 {
-    int pdtSlotIndex;
     char path[256];
 
     if (variant == 0) {
@@ -1167,31 +1231,39 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
         sprintf(path, sMonsterVariantPdtPathFmt, monsterId, variant + 0x61);
     }
 
-    PartMng.m_partAMemBase = 0;
-    PartMng.m_partAMemCursor = 0;
-    PartMng.m_partLoadCacheParam = 0;
-    PartMng.m_partChunkIndex = 0;
-    PartMng.m_asyncHandleCount = 0;
-    PartMng.m_partLoadMode = 0;
+    PartMng.InitAmem(0, 0, 0);
 
-    pdtSlotIndex = PartMng.pppGetFreeDataMng();
-    if (pdtSlotIndex == -1) {
-        pdtSlotIndex = -1;
-    } else {
-        if (PartMng.pppLoadPtx(path, pdtSlotIndex, 1, ptxData, ptxCount) == 0) {
-            PartMng.pppReleasePdt(pdtSlotIndex);
-            pdtSlotIndex = -1;
-        } else {
-            if (PartMng.pppLoadPdt(path, pdtSlotIndex, 1, pdtData, pdtCount) == 0) {
-                PartMng.pppReleasePdt(pdtSlotIndex);
-                pdtSlotIndex = -1;
-            } else {
-                PartPcs.m_usbStreamState.m_printFreeOnNext = 1;
-            }
-        }
-    }
+    return loadPdtPtx(path, pdtData, pdtCount, ptxData, ptxCount, 1);
+}
 
-    return pdtSlotIndex;
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: 0x8006014C
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartPcs::ChangeDataStage(CMemory::CStage* stage)
+{
+    m_usbStreamState.m_stageLoad = stage;
+    ppvAmemCacheSet.SetRStage(stage);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: 0x80060194
+ * EN Size: 64b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartPcs::ResetDataStage()
+{
+    m_usbStreamState.m_stageLoad = m_usbStreamState.m_stageDefault;
+    ppvAmemCacheSet.SetRStage(m_usbStreamState.m_stageDefault);
 }
 
 /*
@@ -1222,15 +1294,9 @@ int CPartPcs::LoadMenuPdt(char* fileName)
         stage = MenuPcs.m_menuStage;
     }
 
-    m_usbStreamState.m_stageLoad = stage;
-    ppvAmemCacheSet.SetRStage(stage);
+    ChangeDataStage(stage);
 
-    PartMng.m_partAMemBase = 0;
-    PartMng.m_partAMemCursor = 0;
-    PartMng.m_partLoadCacheParam = 0;
-    PartMng.m_partChunkIndex = 0;
-    PartMng.m_asyncHandleCount = 0;
-    PartMng.m_partLoadMode = 0;
+    PartMng.InitAmem(0, 0, 0);
 
     pdtSlotIndex = PartMng.pppGetFreeDataMng();
     if (pdtSlotIndex == -1) {
@@ -1251,8 +1317,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
         }
     }
 
-    m_usbStreamState.m_stageLoad = m_usbStreamState.m_stageDefault;
-    ppvAmemCacheSet.SetRStage(m_usbStreamState.m_stageDefault);
+    ResetDataStage();
 
     return pdtSlotIndex;
 }

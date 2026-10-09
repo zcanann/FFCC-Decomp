@@ -316,9 +316,9 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
  */
 void CAStar::drawAStar()
 {
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
+	if ((DbgMenuPcs.GetDbgFlag() & 0x400) != 0)
 	{
-		if (static_cast<int>(System.m_frameCounter) % 30 == 0)
+		if (static_cast<int>(System.GetCounter()) % 30 == 0)
 		{
 			for (int group = 0; group < 64; group++)
 			{

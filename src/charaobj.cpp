@@ -177,7 +177,7 @@ static inline int CharaObjResolveParticleBank(CGCharaObj* charaObj, int particle
 {
 	switch (particleClass) {
 	case 0xFE:
-		return charaObj->m_charaModelHandle->GetPdtSlot();
+		return charaObj->m_charaModelHandle->GetPdtId();
 	case 0xFD:
 	case 0xFF:
 		return -1;
@@ -422,7 +422,7 @@ void CGCharaObj::onFramePostCalc()
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
 			unsigned short padMask = Pad.GetButtonDown(m_animStateMisc);
-			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
+			if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
 				padMask |= Pad.GetButtonDownAnalog(m_animStateMisc);
 			}
 			if ((padMask & 0xF) != 0) {
@@ -1036,7 +1036,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 	int particleBank = items[itemId].m_particleBank;
 	if (particleBank != 0xFFFF && particleBank != 0xFF) {
 		if (particleBank == 0xFE) {
-			particleBank = sourceObj->m_charaModelHandle->GetPdtSlot();
+			particleBank = sourceObj->m_charaModelHandle->GetPdtId();
 		}
 		if (particleBank == 0xFD) {
 			particleBank = 0xFFFFFFFF;
@@ -1092,9 +1092,9 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
+	clampedValue = value < 0 ? 0 : value;
 	CGObjWork* work = SAFE_CAST_WORK(m_scriptHandle);
 	int current = work->m_statusTimers[staIndex];
-	clampedValue = value < 0 ? 0 : value;
 
 	if (current != 0 && clampedValue == 0) {
 		switch (staIndex) {
@@ -1107,7 +1107,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				endPSlotBit(0x4);
 				if (isIceJ) {
-					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
+					int modelPdtNo = m_charaModelHandle->GetPdtId();
 					putParticle((modelPdtNo << 8) | 0x16, 0, this, 1.0f, 0);
 				} else {
 					putParticle(0x10B, 0, this, 0.1f * m_attackColRadius, 0);
@@ -1187,7 +1187,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 1:
 				endPSlotBit(0x40);
 				if (isIceJ) {
-					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
+					int modelPdtNo = m_charaModelHandle->GetPdtId();
 					putParticle((modelPdtNo << 8) | 0x14, m_particleSlots[6], this, 1.0f, 0);
 				} else {
 					putParticle(0x12A, m_particleSlots[6], this, 0.1f * m_attackColRadius, 0);
@@ -1196,7 +1196,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				endPSlotBit(0x4);
 				if (isIceJ) {
-					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
+					int modelPdtNo = m_charaModelHandle->GetPdtId();
 					putParticleBindTrace((modelPdtNo << 8) | 0x15, m_particleSlots[2], this, 1.0f, 0);
 				} else {
 					putParticle(0x10A, m_particleSlots[2], this, 0.1f * m_attackColRadius, 0);
@@ -1208,7 +1208,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 4:
 				endPSlotBit(0x80);
 				if (isIceJ) {
-					int modelPdtNo = m_charaModelHandle->GetPdtSlot();
+					int modelPdtNo = m_charaModelHandle->GetPdtId();
 					putParticle((modelPdtNo << 8) | 0x17, m_particleSlots[7], this, 1.0f, 0);
 				} else {
 					putParticle(0x130, m_particleSlots[7], this, 0.1f * m_attackColRadius, 0);
@@ -1622,7 +1622,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
  */
 void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 {
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlagsRaw() & 4) != 0) {
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlag() & 4) != 0) {
 		return;
 	}
 
@@ -1809,7 +1809,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		System.Printf("生き返り後の無敵期間でダメージOFF中\n");
 		return;
 	}
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlagsRaw() & 4) != 0) {
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlag() & 4) != 0) {
 		System.Printf("デバッグ無敵でダメージOFF中\n");
 		return;
 	}
@@ -2271,11 +2271,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					}
 				}
 			} else {
-				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
+				if (((DbgMenuPcs.GetDbgFlag() & 0x20) != 0 ||
 				     static_cast<CGPartyObj*>(sourceObj)->m_partyData.unk6CC == 2) &&
 				    (calcRegist(0x69, itemId, resistType, allowEffect, effectResult, 0), allowEffect != 0)) {
 					int chance = IsKindOf(0xAD) ? m_scriptHandle->m_romWork[0xCD] : 0x32;
-					if (chance != 0 && (DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0) {
+					if (chance != 0 && (DbgMenuPcs.GetDbgFlag() & 0x20) != 0) {
 						chance = 100;
 					}
 					if (chance != 0 && static_cast<unsigned int>(Math.Rand(100)) <= static_cast<unsigned int>(chance)) {
@@ -2332,7 +2332,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		particleBank = -1;
 		break;
 	case 0xFE:
-		particleBank = m_charaModelHandle->GetPdtSlot();
+		particleBank = m_charaModelHandle->GetPdtId();
 		break;
 	case 0xFF:
 		hasParticle = 0;
@@ -2881,7 +2881,7 @@ int CGCharaObj::calcCastTime(int itemId)
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
 	if ((m_weaponNodeFlagBits.m_prg && (static_cast<int>(CFlatCenterState()) == 0)) &&
-	    ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0)) {
+	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[0x100];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		double posYDouble;
@@ -2925,7 +2925,7 @@ void CGCharaObj::StaticFrame()
 			unsigned char* script = reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle);
 			unsigned short hp = *reinterpret_cast<unsigned short*>(script + 0x1C);
 			if (hp != 0 && static_cast<int>(hp) <= static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(script + 0x1A)) >> 2)) {
-				if ((static_cast<int>(System.m_frameCounter) % 0x1E) == 0) {
+				if ((static_cast<int>(System.GetCounter()) % 0x1E) == 0) {
 					Sound.PlaySe(0x53, 0x40, 0x7F, 0);
 				}
 				break;
@@ -3058,7 +3058,7 @@ void CGCharaObj::combi2()
 		comboCenter /= static_cast<float>(participantCount);
 	}
 
-	System.Printf("combi: %d: combi%dに決定\n", System.m_frameCounter, comboData->m_command);
+	System.Printf("combi: %d: combi%dに決定\n", System.GetCounter(), comboData->m_command);
 
 	leadParty = candidates[participantCount - 1];
 	playedComboSe = 0;

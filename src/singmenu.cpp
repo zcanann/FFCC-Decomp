@@ -314,9 +314,7 @@ void CMenuPcs::destroySingleMenu()
 
     CFont* font = m_fonts[4];
     if (font != 0) {
-        if (font->DecRef() == 0) {
-            delete font;
-        }
+        font->Release();
         m_fonts[4] = 0;
     }
 
@@ -606,9 +604,7 @@ void CMenuPcs::createSingleMenu()
 
             CFont* font = m_fonts[4];
             if (font != 0) {
-                if (font->DecRef() == 0) {
-                    delete font;
-                }
+                font->Release();
                 m_fonts[4] = 0;
             }
 

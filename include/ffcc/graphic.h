@@ -87,7 +87,7 @@ public:
 
     _GXTexObj* GetBackBufferRect(int&, int&, int&, int&, int);
     void GetBackBufferRect2(void*, _GXTexObj*, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int);
-    unsigned char* GetTmpFrameBuffer();
+    unsigned char* GetTmpFrameBuffer() { return static_cast<unsigned char*>(m_scratchTextureBuffer); }
 
     void RenderTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);
     void RenderNoTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);

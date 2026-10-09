@@ -80,7 +80,7 @@ public:
         void loadModelASyncFrame();
         int IsLoadModelASyncCompleted();
         void CancelLoadModelASync();
-        int GetPdtSlot() const;
+        int GetPdtId();
         float GetLoadAnimTotalFrame(int);
 
         int m_charaKind;                    // 0x000
@@ -231,14 +231,32 @@ public:
     int TryReleaseAnimBank(int);
     void SetSpecularAlpha(int);
     void InitEnv(int);
-    void SetTexShadowRadius(float);
-    void SetTexShadowColor(_GXColor);
-    void SetTexShadowPos(Vec*);
-    void SetMapShadeColor(int, CColor);
-    void SetAmbient(int, _GXColor*);
-    void SetDiffuse(int, unsigned long, _GXColor*, Vec*);
-    void SetNoFreeMergeMask(int);
-    void SetCharaAllocStage(int);
+    void SetTexShadowRadius(float texShadowRadius) { m_texShadowRadius = texShadowRadius; }
+    void SetTexShadowColor(_GXColor color) { m_texShadowColor = color; }
+    void SetTexShadowPos(Vec* vec) { m_texShadowPos = *vec; }
+    void SetMapShadeColor(int shadeIndex, CColor color) { m_viewerChoiceColor[shadeIndex] = color; }
+    void SetAmbient(int index, _GXColor* color)
+    {
+        m_viewerAmbientColor[index].r = color->r;
+        m_viewerAmbientColor[index].g = color->g;
+        m_viewerAmbientColor[index].b = color->b;
+        m_viewerAmbientColor[index].a = color->a;
+    }
+    void SetDiffuse(int lightIndex, unsigned long lightSet, _GXColor* color, Vec* direction)
+    {
+        m_viewerDiffuseColor[lightIndex][lightSet].r = color->r;
+        m_viewerDiffuseColor[lightIndex][lightSet].g = color->g;
+        m_viewerDiffuseColor[lightIndex][lightSet].b = color->b;
+        m_viewerDiffuseColor[lightIndex][lightSet].a = color->a;
+        if (lightIndex != 0) {
+            return;
+        }
+        m_viewerDiffusePos[lightSet].x = direction->x;
+        m_viewerDiffusePos[lightSet].y = direction->y;
+        m_viewerDiffusePos[lightSet].z = direction->z;
+    }
+    void SetNoFreeMergeMask(int mask) { m_noFreeMergeMask = mask; }
+    void SetCharaAllocStage(int stage) { m_charaAllocStage = stage; }
     int GetNumTexShadow();
     GXColor GetTexShadowColor() { return m_texShadowColor; }
     void GetTexShadow(int, int, _GXTexObj*, Vec*, float(*)[3][4]);
@@ -332,7 +350,7 @@ public:
     u32 m_noFreeMergeMask;                    // 0x718
 };
 
-inline int CCharaPcs::CHandle::GetPdtSlot() const
+inline int CCharaPcs::CHandle::GetPdtId()
 {
     return m_pdtLoadRef != 0 ? m_pdtLoadRef->m_pdtSlot : -1;
 }

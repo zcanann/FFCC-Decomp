@@ -32,7 +32,7 @@ void CMesMenu::onDraw()
             unsigned int buttons = Pad.GetButton(0);
 
             if ((buttons & 0x100) != 0) {
-                iconFrame = tCut[(System.m_frameCounter & 6) >> 1];
+                iconFrame = tCut[(System.GetCounter() & 6) >> 1];
             } else {
                 iconFrame = tCut[0];
             }
@@ -190,13 +190,13 @@ void CMesMenu::onDraw()
                     font->SetScale(0.775f);
                     font->SetShadow(1);
                     font->SetMargin(1.0f);
-                    float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                    float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
                     font->DrawInit();
                     font->SetTlut(0xF);
                     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
                     font->SetPosX(iconX + (((m_menuIndex & 1) != 0) ? 70.0f : 74.0f - textWidth));
                     font->SetPosY(iconY + (float)(((m_menuIndex & 2) != 0) ? 8 : 31));
-                    font->Draw(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                    font->Draw(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
                     MenuPcs.DrawInit();
                 }
 
@@ -302,13 +302,13 @@ void CMesMenu::onDraw()
                         font->SetScale(0.775f);
                         font->SetShadow(1);
                         font->SetMargin(1.0f);
-                        float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                        float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
                         font->DrawInit();
                         font->SetTlut(0xF);
                         font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
                         font->SetPosX(iconX + ((anchorX != 0) ? 70.0f : 74.0f - textWidth));
                         font->SetPosY(iconY + (float)((anchorY != 0) ? 8 : 31));
-                        font->Draw(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                        font->Draw(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
                         MenuPcs.DrawInit();
                     }
 
@@ -350,21 +350,18 @@ void CMesMenu::onDraw()
             float alpha255 = 255.0f * windowScale;
             MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * alpha255) * stageBlend)).Ref());
             float fadeScale = 1.0f - pulseScale;
-            float rotation = 0.2f * (2.0f * (time - 0.5f));
             float promptX = (float)(int)(40.0f + drawX);
             float promptY = (float)(int)(32.0f + drawY);
             float driftX = 5.0f * (pulseScale * sinX);
             float driftY = 10.0f * (pulseScale * sinY);
-            float waveX = promptX + driftX;
-            float waveY = promptY - driftY;
             MenuPcs.DrawRect(
-                3, 8.0f + waveX, 8.0f + waveY, 80.0f, 48.0f, 0.0f,
+                3, 8.0f + (promptX + driftX), 8.0f + (promptY - driftY), 80.0f, 48.0f, 0.0f,
                 0.0f, 0.75f * (1.0f + fadeScale), 0.75f * (pulseScale + fadeScale),
-                rotation);
+                0.2f * (2.0f * (time - 0.5f)));
             MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255 * stageBlend)).Ref());
             MenuPcs.DrawRect(
-                3, waveX, waveY, 80.0f, 48.0f, 0.0f, 0.0f,
-                0.75f * pulseScale, 0.75f * pulseScale, rotation);
+                3, promptX + driftX, promptY - driftY, 80.0f, 48.0f, 0.0f, 0.0f,
+                0.75f * pulseScale, 0.75f * pulseScale, 0.2f * (2.0f * (time - 0.5f)));
         }
 
         if (m_state == 1) {

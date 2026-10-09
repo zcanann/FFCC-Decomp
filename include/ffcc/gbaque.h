@@ -235,7 +235,10 @@ private:
     int m_stageNo;                    // 0x0444
     int m_mapNo;                      // 0x0448
     unsigned char m_stageFlags;       // 0x044C
-    unsigned char _pad44D[0x7];       // 0x044D
+    unsigned char _pad44D;            // 0x044D
+    unsigned short m_unk44E;          // 0x044E
+    unsigned short m_unk450;          // 0x0450
+    unsigned char _pad452[0x2];       // 0x0452
     GbaPInfo m_playerData[4]; // 0x0454
     GbaPInfo m_playerHistory[4]; // 0x07C4
     GbaQueueMapEntity m_enemies[64];            // 0x0B34
@@ -280,7 +283,7 @@ private:
     char m_chgScouFlags;              // 0x2D55
     char m_singleMode;                // 0x2D56
     char m_controllerMode;            // 0x2D57
-    unsigned char _pad2D58;           // 0x2D58
+    char m_unk2D58;                   // 0x2D58
     unsigned char m_prevOutOfShoukiFlags; // 0x2D59
     unsigned char m_outOfShoukiFlags;     // 0x2D5A
     char m_pauseMode;                 // 0x2D5B

@@ -46,26 +46,6 @@ inline int CSystem::GetErrorLevel()
     return m_execParam;
 }
 
-inline void CMemory::ResetDefaultGroup()
-{
-    m_defaultGroup = 0;
-}
-
-inline void CMemory::SetDefaultGroup(int group)
-{
-    m_defaultGroup = group;
-}
-
-inline void* CFile::GetBuffer()
-{
-    return m_readBuffer;
-}
-
-inline unsigned char* CGraphic::GetTmpFrameBuffer()
-{
-    return static_cast<unsigned char*>(m_scratchTextureBuffer);
-}
-
 static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
 static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
 static const char s_CCharaPcs_PART_801D914C[] = "CCharaPcs(PART)";
@@ -120,9 +100,7 @@ template <typename T>
 static inline void ReleaseSharedNonNull(T* ptr)
 {
     CRef* ref = ptr;
-    if (ref->DecRef() == 0) {
-        delete ref;
-    }
+    ref->Release();
 }
 
 template <typename T>
@@ -877,7 +855,7 @@ void CCharaPcs::draw()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
         handle = handle->m_next;
@@ -896,7 +874,7 @@ void CCharaPcs::drawBefore()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(3, 1);
         }
         handle = handle->m_next;
@@ -944,7 +922,7 @@ void CCharaPcs::drawMakeTexShadow()
 
     handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(2, 1);
         }
         handle = handle->m_next;
@@ -973,7 +951,7 @@ void CCharaPcs::drawShadow()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(1, 1);
         }
         handle = handle->m_next;
@@ -1068,9 +1046,7 @@ void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim* target, int releaseMa
             ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & loadAnim->m_mergeFlags) != 0))) {
             if (target == 0 || target == loadAnim) {
                 CRef* loadAnimRef = loadAnim;
-                if (loadAnimRef->DecRef() == 0) {
-                    delete loadAnimRef;
-                }
+                loadAnimRef->Release();
                 m_loadAnims.RemoveAt(static_cast<unsigned long>(i));
                 if (target != 0) {
                     return;
@@ -1654,7 +1630,7 @@ void CCharaPcs::drawOverlap()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
         handle = handle->m_next;
@@ -2139,6 +2115,25 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int, int mer
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CCharaPcs::CHandle::FreeModel()
+{
+    Graphic._WaitDrawDone("p_chara.cpp", 0x8C9);
+    PartMng.pppDeleteCHandle(this);
+
+    ReleaseShared(m_model);
+    ReleaseShared(m_textureSet);
+    ReleaseShared(m_modelLoadRef);
+    ReleaseShared(m_texLoadRef);
+    ReleaseShared(m_pdtLoadRef);
+
+    CharaPcs.releaseUnuseLoadModel(0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800754E8
  * PAL Size: 532b
  * EN Address: 0x80088bec
@@ -2164,25 +2159,6 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
     ReleaseSharedNonNull(m_animSlot[animIndex]);
     CharaPcs.releaseUnuseLoadAnim(m_animSlot[animIndex], 0);
     m_animSlot[animIndex] = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::FreeModel()
-{
-    Graphic._WaitDrawDone("p_chara.cpp", 0x8C9);
-    PartMng.pppDeleteCHandle(this);
-
-    ReleaseShared(m_model);
-    ReleaseShared(m_textureSet);
-    ReleaseShared(m_modelLoadRef);
-    ReleaseShared(m_texLoadRef);
-    ReleaseShared(m_pdtLoadRef);
-
-    CharaPcs.releaseUnuseLoadModel(0);
 }
 
 /*
@@ -2245,7 +2221,7 @@ void CCharaPcs::CHandle::Calc()
  */
 void CCharaPcs::CHandle::Draw(int drawPass)
 {
-	unsigned int dbgMenuFlags = DbgMenuPcs.GetDbgFlagsRaw();
+	unsigned int dbgMenuFlags = DbgMenuPcs.GetDbgFlag();
 	if ((dbgMenuFlags & 0x8000) != 0) {
 		if ((drawPass == 4) && ((m_flags & 0x10000) != 0)) {
 			draw(3, 0);
@@ -2561,6 +2537,24 @@ int CCharaPcs::CHandle::IsLoadModelASyncCompleted()
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CCharaPcs::CHandle::CancelLoadModelASync()
+{
+    if (m_asyncFileHandle != 0) {
+        if (System.GetErrorLevel() >= 2U) {
+            System.Printf("モデル非同期読み込み中にキャンセルされました。\n");
+        }
+        File.Close(m_asyncFileHandle);
+        m_asyncFileHandle = 0;
+    }
+
+    m_asyncState = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80073D64
  * PAL Size: 68b
  * EN Address: 0x800736CC
@@ -2584,24 +2578,6 @@ int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
 	}
 
 	return false;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::CancelLoadModelASync()
-{
-    if (m_asyncFileHandle != 0) {
-        if (System.GetErrorLevel() >= 2U) {
-            System.Printf("モデル非同期読み込み中にキャンセルされました。\n");
-        }
-        File.Close(m_asyncFileHandle);
-        m_asyncFileHandle = 0;
-    }
-
-    m_asyncState = 0;
 }
 
 /*

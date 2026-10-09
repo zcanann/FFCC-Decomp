@@ -472,6 +472,7 @@ gobject.cpp:
 chara.cpp:
 	.sbss start:0x8034BBA0 end:0x8034BBA8
 	.text start:0x8006DE6C end:0x80072F18
+	.ctors      start:0x801D0690 end:0x801D0694
 	.rodata     start:0x801D3BD8 end:0x801D3C88
 	.data       start:0x801F1048 end:0x801F10B0
 	.bss        start:0x803031E0 end:0x80305258
@@ -601,6 +602,7 @@ cmake.cpp:
 	.sdata2 start:0x8034F770 end:0x8034F7B8
 	.sdata start:0x8034B860 end:0x8034B868
 	.bss        start:0x80327458 end:0x80327480
+	.sbss start:0x8034BCF0 end:0x8034BCF4
 
 
 shopmenu.cpp:
@@ -698,6 +700,7 @@ menu_cmd.cpp:
 	.sbss start:0x8034BCB0 end:0x8034BCB4
 	.rodata start:0x801D94C0 end:0x801D9658
 	.data start:0x80231D70 end:0x80231D84
+	.sdata2 start:0x8034F1B8 end:0x8034F298
 
 pppYmMana.cpp:
 	.text start:0x800D2088 end:0x800D5B64
@@ -764,9 +767,11 @@ MSL_C/PPCEABI/bare/H/printf.c:
 
 menu_equip.cpp:
 	.text start:0x80155A1C end:0x80158124
+	.sdata2 start:0x8034F4C0 end:0x8034F528
 
 menu_item.cpp:
 	.text start:0x80153EA0 end:0x80155A1C
+	.sdata2 start:0x8034F470 end:0x8034F4C0
 
 menu_arti.cpp:
 	.text start:0x8015A460 end:0x8015B97C
@@ -869,7 +874,7 @@ mesmenu.cpp:
 	.rodata start:0x801D49F8 end:0x801D4A08
 	.data start:0x8022CBB0 end:0x8022CC18
 	.text start:0x800996B0 end:0x8009C2A8
-	.sdata2 start:0x8034D5F0 end:0x8034D6C8
+	.sdata2 start:0x8034D5F0 end:0x8034D6C4
 
 MSL_C/PPCEABI/bare/H/gamecube.c:
 	.text	start:0x801B075C end:0x801B0768
@@ -1259,6 +1264,7 @@ TRK_MINNOW_DOLPHIN/targimpl.c:
 
 p_chara.cpp:
 	.text start:0x80072F18 end:0x8007AF9C
+	.ctors      start:0x801D0694 end:0x801D0698
 	.rodata     start:0x801D3C88 end:0x801D46D0
 	.data       start:0x801F10B0 end:0x801F16B8
 	.bss        start:0x80305258 end:0x80305980

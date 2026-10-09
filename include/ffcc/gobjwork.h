@@ -313,8 +313,8 @@ public:
     void BackupTutorialItem(int);
     void UniteComList(int, int, int);
     void UnuniteComList(int, int);
-    void SetEvtWord(int, short);
-    int GetEvtWord(int);
+    void SetEvtWord(int evtWordIndex, short evtWord) { m_evtWordArr[evtWordIndex] = evtWord; }
+    int GetEvtWord(int evtWordIndex) { return m_evtWordArr[evtWordIndex]; }
     void SetEvtFlag(int, int);
     int GetEvtFlag(int);
     int GetArtifactIncludeHpMax();

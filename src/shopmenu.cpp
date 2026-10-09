@@ -2629,8 +2629,8 @@ void CShopMenu::DrawItemList()
             MenuPcs.DrawInit();
             int cursorY = y - 0x14;
             if (m_subMode == 0) {
-                MenuPcs.DrawCursor(0x114 + (static_cast<int>(System.m_frameCounter) % 8), cursorY, FLOAT_80332d28);
-            } else if ((System.m_frameCounter & 1) == 0) {
+                MenuPcs.DrawCursor(0x114 + (static_cast<int>(System.GetCounter()) % 8), cursorY, FLOAT_80332d28);
+            } else if ((System.GetCounter() & 1) == 0) {
                 MenuPcs.DrawCursor(0x114, cursorY, FLOAT_80332d28);
             }
         } else {
@@ -2656,7 +2656,7 @@ void CShopMenu::DrawItemList()
         ++itemIndex;
     }
 
-    int pulse = abs(static_cast<int>(System.m_frameCounter) % 0x14 - 10);
+    int pulse = abs(static_cast<int>(System.GetCounter()) % 0x14 - 10);
     unsigned char alpha = static_cast<unsigned char>(255.0 * (0.05 * static_cast<double>(pulse) + 0.5));
     float scale = static_cast<float>(0.5 * (0.03 * static_cast<double>(pulse) + 0.7));
 
@@ -3082,7 +3082,11 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         posX = x + 0x40;
         _drawNoShadowFont(font, textBuffer, posX, static_cast<float>(y), 0x18, 0x12);
 
+#ifdef VERSION_GCCE01
+        posX = x + 0x118;
+#else
         posX = x + 0x108;
+#endif
         DrawDec(statValue, 0x1A, posX, static_cast<float>(y), FLOAT_80332d34, 0, 1, 0x12);
 
         font->DrawInit();
@@ -3148,7 +3152,7 @@ inline void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     char* text;
     if (CheckSell(index)) {
-        text = Game.m_cFlatDataArr[1].TableStrings(6)[itemNo];
+        text = Game.m_cFlatDataArr[1].GetTable(6)[itemNo];
     } else {
         text = const_cast<char*>(s_cannotMakeHere);
     }
@@ -3184,7 +3188,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     int canSelect = CheckSell(sel);
     if (canSelect) {
-        sourceText = Game.m_cFlatDataArr[1].TableStrings(6)[itemNo];
+        sourceText = Game.m_cFlatDataArr[1].GetTable(6)[itemNo];
     } else {
         sourceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_CRAFT_HERE);
     }

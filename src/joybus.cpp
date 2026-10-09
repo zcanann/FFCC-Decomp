@@ -150,20 +150,6 @@ static inline void ClearJoyDataPacketPayload(JoyBus* joybus, int port)
 
 /*
  * --INFO--
- * PAL Address: 0x800b138c
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CSystem::GetCounter()
-{
-	return m_frameCounter;
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -4415,7 +4401,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     {
     case 0:
     {
-        if (((int)System.m_frameCounter % 4) != 0)
+        if (((int)System.GetCounter() % 4) != 0)
         {
             return 0;
         }

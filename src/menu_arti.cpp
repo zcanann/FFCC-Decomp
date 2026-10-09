@@ -235,8 +235,7 @@ void CMenuPcs::ArtiDraw()
 					if (itemCount > 0) {
 					} else {
 						texId = kArtiEmptyRowTexture;
-						double half = 0.5;
-						itemAlpha = (float)(half * (double)animAlpha);
+						itemAlpha = animAlpha * 0.5;
 					}
 
 					if (texId == kArtiRowTexture && drawIndex == m_artiState->selections[0]) {
@@ -330,7 +329,7 @@ void CMenuPcs::ArtiDraw()
 		entry += m_artiState->selections[0];
 		x = (float)(entry->x - 0x14);
 		y = (float)((entry->h - 0x20) / 2.0 + entry->y);
-		x += (float)((int)System.m_frameCounter % 8);
+		x += (float)((int)System.GetCounter() % 8);
 		DrawCursor((int)x, (int)y, 1.0f);
 	}
 
@@ -379,11 +378,10 @@ int CMenuPcs::ArtiClose()
 	for (int i = 0; i < count; i++, anim++) {
 		if (frame >= anim->startFrame) {
 			if (anim->startFrame + anim->duration <= frame) {
-				float zeroF = 0.0f;
 				finished++;
-				anim->alpha = zeroF;
-				anim->dx = zeroF;
-				anim->dy = zeroF;
+				anim->alpha = 0.0f;
+				anim->dx = 0.0f;
+				anim->dy = 0.0f;
 			} else {
 				anim->step++;
 				anim->alpha = 1.0 - (1.0 / anim->duration) * anim->step;
@@ -457,11 +455,10 @@ int CMenuPcs::ArtiOpen()
 	for (int i = 0; i < count; i++, entry++) {
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
-				float zero = 0.0f;
 				finished++;
 				entry->alpha = 1.0f;
-				entry->dx = zero;
-				entry->dy = zero;
+				entry->dx = 0.0f;
+				entry->dy = 0.0f;
 			} else {
 				entry->step++;
 				entry->alpha = (1.0 / entry->duration) * entry->step;
@@ -597,7 +594,6 @@ void CMenuPcs::ArtiInit()
 	float titleAlpha = 128.0f;
 	float titleScale = 8.0f;
 	float one = 1.0f;
-	float zero = 0.0f;
 	entry->u = titleAlpha;
 	entry->v = titleScale;
 	entry->scale = one;
@@ -610,8 +606,8 @@ void CMenuPcs::ArtiInit()
 	entry->y = 0xe;
 	entry->w = 0x30;
 	entry->h = 0x30;
-	entry->u = zero;
-	entry->v = zero;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
 	entry->scale = one;
 	entry->startFrame = 0;
 	entry->duration = 5;
@@ -623,8 +619,8 @@ void CMenuPcs::ArtiInit()
 	entry->h = 0x30;
 	entry->y = 0x150 - entry->h;
 	float rightScale = 0.75f;
-	entry->u = zero;
-	entry->v = zero;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
 	entry->scale = rightScale;
 	entry->startFrame = 0;
 	entry->duration = 5;
@@ -636,8 +632,8 @@ void CMenuPcs::ArtiInit()
 	entry->y = 8;
 	entry->w = 0x48;
 	entry->h = 0x140;
-	entry->u = zero;
-	entry->v = zero;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
 	entry->startFrame = 0;
 	entry->duration = 5;
 
@@ -650,8 +646,8 @@ void CMenuPcs::ArtiInit()
 		entry->y = entry0->y + loopCount * 0x20;
 		entry->w = 200;
 		entry->h = 0x28;
-		entry->u = zero;
-		entry->v = zero;
+		entry->u = 0.0f;
+		entry->v = 0.0f;
 		entry->startFrame = 7;
 		entry->duration = 5;
 	}

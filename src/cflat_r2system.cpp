@@ -54,7 +54,6 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
 }
 
 extern const float kCFlatPadStickZero = 0.0f;
-extern const float kCFlatOneF;
 
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
@@ -196,34 +195,6 @@ static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* run
 
 /*
  * --INFO--
- * PAL Address: 0x800B8F80
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGame::SetNextScriptNewGame()
-{
-    m_nextScriptFlags = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B8F90
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetFullScreenShadowCamLen(float len)
-{
-    m_fullScreenShadowCamLen = len;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B8FA8
  * PAL Size: 8b
  * EN Address: TODO
@@ -268,45 +239,6 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
     cylinder.m_radius = radius;
 
     return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9060
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned char* CGraphic::GetTmpFrameBuffer()
-{
-    return static_cast<unsigned char*>(m_scratchTextureBuffer);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9068
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMiniGamePcs::GetMiniGameParam(int id)
-{
-    switch (id) {
-    case 0x2000:
-        return m_miniGameParams[0];
-    case 0x2001:
-        return m_miniGameParams[1];
-    case 0x2002:
-        return m_miniGameParams[2];
-    case 0x2003:
-        return m_miniGameParams[3];
-    }
-
-    return 0;
 }
 
 /*
@@ -357,188 +289,6 @@ inline void CGame::CGameWork::ClearEvtWork()
 
 /*
  * --INFO--
- * PAL Address: 0x800B91EC
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetShadowAuto(int enable)
-{
-    m_shadowAuto = enable;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B91F4
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::SetTexShadowRadius(float texShadowRadius)
-{
-    m_texShadowRadius = texShadowRadius;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B91FC
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::SetTexShadowColor(_GXColor color)
-{
-    m_texShadowColor = color;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9228
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::SetTexShadowPos(Vec* vec)
-{
-    m_texShadowPos = *vec;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9244
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCaravanWork::SetEvtWord(int evtWordIndex, short evtWord)
-{
-    m_evtWordArr[evtWordIndex] = evtWord;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9254
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CCaravanWork::GetEvtWord(int evtWordIndex)
-{
-    return m_evtWordArr[evtWordIndex];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B931C
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMes::SetTempValue(int index, int value)
-{
-    m_tempVar[index] = value;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9394
- * PAL Size: 44b
- * EN Address: 0x800CF1AC
- * EN Size: 68b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
-{
-    m_viewerChoiceColor[shadeIndex] = color;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B93C0
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::SetNoFreeMergeMask(int mask)
-{
-    m_noFreeMergeMask = mask;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B93C8
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemory::ResetDefaultGroup()
-{
-    m_defaultGroup = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B93D4
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemory::SetDefaultGroup(int group)
-{
-    m_defaultGroup = group;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B93DC
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::SetCharaAllocStage(int stage)
-{
-    m_charaAllocStage = stage;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B93E4
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::SetUseDOF(int enabled)
-{
-    m_dofFlag = enabled;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B93EC
  * PAL Size: 44b
  * EN Address: TODO
@@ -549,20 +299,6 @@ void CGraphicPcs::SetUseDOF(int enabled)
 inline void CFile::CHandle::Close()
 {
     File.Close(this);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9418
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void* CFile::GetBuffer()
-{
-    return m_readBuffer;
 }
 
 /*
@@ -591,20 +327,6 @@ inline void CFile::CHandle::SyncCompleted()
 inline void CFile::CHandle::Read()
 {
     File.Read(this);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9478
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGraphicPcs::ReqScreenCapture()
-{
-    m_copySaveFlag = 1;
 }
 
 /*
@@ -694,52 +416,6 @@ void CMapPcs::IsHitDrawMode(char drawMode)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9628
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetFullScreenShadowRot(float rotX, float rotY)
-{
-    m_fullScreenShadow.m_rotX = rotX;
-    m_fullScreenShadow.m_rotY = rotY;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9634
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetFullScreenShadowPos(Vec* position, float len)
-{
-    m_fullScreenShadowPosition.x = position->x;
-    m_fullScreenShadowPosition.y = position->y;
-    m_fullScreenShadowPosition.z = position->z;
-    m_fullScreenShadow.m_scale = len;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9654
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetFullScreenShadowEnable(unsigned char enable)
-{
-    m_fullScreenShadowEnabled = enable;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B9680
  * PAL Size: 120b
  * EN Address: TODO
@@ -755,48 +431,6 @@ inline void VECLerp(Vec* a, Vec* b, Vec* out, float t)
     PSVECScale(a, &scaledA, 1.0f - t);
     PSVECScale(b, &scaledB, t);
     PSVECAdd(&scaledA, &scaledB, out);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B96F8
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::SetDiffuse(int lightIndex, unsigned long lightSet, _GXColor* color, Vec* direction)
-{
-    m_viewerDiffuseColor[lightIndex][lightSet].r = color->r;
-    m_viewerDiffuseColor[lightIndex][lightSet].g = color->g;
-    m_viewerDiffuseColor[lightIndex][lightSet].b = color->b;
-    m_viewerDiffuseColor[lightIndex][lightSet].a = color->a;
-
-    if (lightIndex != 0) {
-        return;
-    }
-
-    m_viewerDiffusePos[lightSet].x = direction->x;
-    m_viewerDiffusePos[lightSet].y = direction->y;
-    m_viewerDiffusePos[lightSet].z = direction->z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9754
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::SetAmbient(int index, _GXColor* color)
-{
-    m_viewerAmbientColor[index].r = color->r;
-    m_viewerAmbientColor[index].g = color->g;
-    m_viewerAmbientColor[index].b = color->b;
-    m_viewerAmbientColor[index].a = color->a;
 }
 
 /*
@@ -828,63 +462,6 @@ inline void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
 inline float std::fmodf(float x, float y)
 {
     return (float)fmod((double)x, (double)y);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9918
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetFov(float fov)
-{
-    m_fov = fov;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9920
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetZRotate(float zRotate)
-{
-    m_zRotate = zRotate;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9928
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGame::SetNextScript(CGame::CNextScript* nextScript)
-{
-    m_nextScript = *nextScript;
-    m_newGameFlag = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9BB0
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CDbgMenuPcs::GetDbgFlag()
-{
-    return m_dbgFlags;
 }
 
 /*
@@ -931,52 +508,6 @@ inline float std::sinf(float x)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9C1C
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetFromScript()
-{
-    m_fromScript = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9C28
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetPosition(Vec* position)
-{
-    m_positionX = position->x;
-    m_positionY = position->y;
-    m_positionZ = position->z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9C44
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::SetRefPosition(Vec* position)
-{
-    m_targetX = position->x;
-    m_targetY = position->y;
-    m_targetZ = position->z;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B9C60
  * PAL Size: 28b
  * EN Address: TODO
@@ -993,20 +524,6 @@ extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
     float z = *src;
     self->y = y;
     self->z = z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9C7C
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CCameraPcs::IsAbsolute()
-{
-    return m_isAbsolute;
 }
 
 /*
@@ -1624,7 +1141,7 @@ renderedDone:
 
                     Vec result;
                     Math.CalcSpline(&result, &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position,
-                                    p1->m_distance - p0->m_distance, scaleB, p3->m_distance - p2->m_distance, segmentT, kCFlatOneF);
+                                    p1->m_distance - p0->m_distance, scaleB, p3->m_distance - p2->m_distance, segmentT, 1.0f);
                     *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
                     *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
                     *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;

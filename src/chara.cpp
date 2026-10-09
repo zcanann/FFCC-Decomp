@@ -655,9 +655,7 @@ CChara::CModel::CRefData::~CRefData()
 	}
 	CMaterialSet* materialSet = m_materialSet;
 	if (materialSet != 0) {
-		if (materialSet->DecRef() == 0) {
-			delete materialSet;
-		}
+		materialSet->Release();
 		m_materialSet = 0;
 	}
 }
@@ -700,33 +698,25 @@ CChara::CModel::~CModel()
 {
 	CTextureSet* texSet = m_texSet;
 	if (texSet != 0) {
-		if (texSet->DecRef() == 0) {
-			delete texSet;
-		}
+		texSet->Release();
 		m_texSet = 0;
 	}
 
 	CAnim* anim = m_anim;
 	if (anim != 0) {
-		if (anim->DecRef() == 0) {
-			delete anim;
-		}
+		anim->Release();
 		m_anim = 0;
 	}
 
 	CTexAnimSet* texAnimSet = m_texAnimSet;
 	if (texAnimSet != 0) {
-		if (texAnimSet->DecRef() == 0) {
-			delete texAnimSet;
-		}
+		texAnimSet->Release();
 		m_texAnimSet = 0;
 	}
 
 	CRefData* refData = m_data;
 	if (refData != 0) {
-		if (refData->DecRef() == 0) {
-			delete refData;
-		}
+		refData->Release();
 		m_data = 0;
 	}
 
@@ -971,7 +961,8 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 				u32 currentNode = 0;
 				while (chunkFile.GetNextChunk(chunk)) {
 					if (chunk.m_id == CharaFourCC('N', 'A', 'M', 'E')) {
-						currentNode = SearchNode(chunkFile.GetString());
+						char* name = chunkFile.GetString();
+						currentNode = SearchNode(name);
 					} else if (chunk.m_id == CharaFourCC('D', 'Y', 'N', ' ')) {
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
@@ -1028,9 +1019,7 @@ void CChara::CModel::setup()
 	CTextureSet* oldTexSet = m_texSet;
 	if (texSet != oldTexSet) {
 		if (oldTexSet != 0) {
-			if (oldTexSet->DecRef() == 0) {
-				delete oldTexSet;
-			}
+			oldTexSet->Release();
 			m_texSet = 0;
 		}
 		m_texSet = texSet;
@@ -1754,9 +1743,9 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	GXSetCullMode(static_cast<GXCullMode>(cullMode));
 	LightPcs.SetAmbientAlpha(m_lightAlpha);
 
-	CCharaMeshRaw* mesh = m_meshes;
-	int lastLightEnable = 0;
 	int lastZWrite = 0;
+	int lastLightEnable = 0;
+	CCharaMeshRaw* mesh = m_meshes;
 
 	for (int meshIndex = 0; meshIndex < m_data->m_meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -1973,9 +1962,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	if (anim != m_anim) {
 		CAnim* oldAnim = m_anim;
 		if (oldAnim != 0) {
-			if (oldAnim->DecRef() == 0) {
-				delete oldAnim;
-			}
+			oldAnim->Release();
 			m_anim = 0;
 		}
 		m_anim = anim;
@@ -2060,9 +2047,7 @@ void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
 
 	if (texSet != oldTexSet) {
 		if (oldTexSet != 0) {
-			if (oldTexSet->DecRef() == 0) {
-				delete oldTexSet;
-			}
+			oldTexSet->Release();
 			m_texSet = 0;
 		}
 		m_texSet = texSet;

@@ -1960,8 +1960,10 @@ void CMenuPcs::DrawResultCloseAnim()
 							MenuPcs.DrawRect(0, x, y, fillWidth, (float)sprite->h,
 							    mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 							x += fillWidth;
+							mulX = fillWidth;
 						}
-						if (fillWidth < (float)sprite->w) {
+						int w = sprite->w;
+						if (fillWidth < (float)w) {
 							colors[1].r = 0xFF;
 							colors[1].g = 0xFF;
 							colors[1].b = 0xFF;
@@ -1970,8 +1972,8 @@ void CMenuPcs::DrawResultCloseAnim()
 							colors[3].g = 0xFF;
 							colors[3].b = 0xFF;
 							colors[3].a = 0;
-							MenuPcs.DrawRect(0, x, y, (float)(1.0 / (double)sprite->duration) * (float)sprite->w, (float)sprite->h,
-							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
+							MenuPcs.DrawRect(0, x, y, (float)(1.0 / (double)sprite->duration) * (float)w, (float)sprite->h,
+							    mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 						}
 					}
 				} else {

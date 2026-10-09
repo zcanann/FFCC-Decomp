@@ -123,31 +123,6 @@ enum {
 	kBonusCheckMarkTexture
 };
 
-static inline void InitBonusEffectSlots(CMenuPcs* menu)
-{
-	for (int i = 0; i < 40; i++) {
-		menu->m_effectWork[i].m_effectNo = -1;
-		menu->m_effectWork[i].m_partNo = -1;
-		menu->m_effectWork[i].m_slotNo = -1;
-	}
-}
-
-static inline void SetupSelectCloseSpriteMotion(CMenuPcs::Sprt2* sprite)
-{
-	sprite->startFrame = 0;
-#ifdef VERSION_GCCP01
-	sprite->duration = 8;
-#else
-	sprite->duration = 10;
-#endif
-	sprite->x = (short)(int)sprite->targetX;
-	sprite->y = (short)(int)sprite->targetY;
-	sprite->motionX = 240.0f;
-	sprite->motionY = 0.0f;
-	sprite->targetX = (float)sprite->x + sprite->motionX;
-	sprite->targetY = (float)sprite->y + sprite->motionY;
-}
-
 } // namespace
 
 /*
@@ -242,7 +217,11 @@ void CMenuPcs::createBonus()
 	this->m_bonusState = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE5, 0xDC)) BonusMenuState;
 	m_effectWork = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xE6, 0xDD)) EffectInfo[0x28];
 
-	InitBonusEffectSlots(this);
+	for (i = 0; i < 0x28; i++) {
+		m_effectWork[i].m_effectNo = -1;
+		m_effectWork[i].m_partNo = -1;
+		m_effectWork[i].m_slotNo = -1;
+	}
 	memset(this->m_bonusState, 0, sizeof(*this->m_bonusState));
 	s_Base = new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0xF1, 0xE8)) BonusBaseInfo;
 	memset(s_Base, 0, sizeof(*s_Base));
@@ -1557,18 +1536,16 @@ void CMenuPcs::DrawResultCountAnim()
 			int partyIndex = textIndex % activePartyCount;
 			int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
 			if (textIndex < activePartyCount) {
-				int __p12 = partySlot;
-				CCaravanWork* caravanWork = Game.m_scriptFoodBase[__p12];
+				CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 				strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 			} else {
 				CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 				int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
-				int __p2 = strIdx;
 #ifdef VERSION_GCCJGC
 				strcpy(text, "\x81\x9A");
-				strcat(text, Game.m_cFlatDataArr[1].TableStrings(7)[__p2]);
+				strcat(text, Game.GetBonusName(strIdx));
 #else
-				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[__p2]);
+				strcpy(text, Game.GetBonusName(strIdx));
 #endif
 			}
 
@@ -2040,7 +2017,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					strcpy(text, "\x81\x9A");
 					strcat(text, Game.GetBonusName(strIdx));
 #else
-					strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
+					strcpy(text, Game.GetBonusName((int)caravanWork->m_bonusCondition * 2 + 1));
 #endif
 				}
 
@@ -2695,7 +2672,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", kConvertedErrorLine);
 		}
 		memset(converted, 0, 0x200);
-		strcpy(source, Game.m_cFlatDataArr[1].TableStrings(6)[idx]);
+		strcpy(source, Game.GetHelpName(idx));
 #ifdef VERSION_GCCJGC
 		CMes::MakeAgbString(converted, source);
 #else
@@ -3109,7 +3086,14 @@ void CMenuPcs::CalcSelectCloseAnim()
 		s_PlayerTop = idx;
 		for (i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			SetupSelectCloseSpriteMotion(spr);
+			spr->startFrame = 0;
+			spr->duration = kFadeFrames;
+			spr->x = (short)(int)spr->targetX;
+			spr->y = (short)(int)spr->targetY;
+			spr->motionX = 240.0f;
+			spr->motionY = 0.0f;
+			spr->targetX = (float)spr->x + spr->motionX;
+			spr->targetY = (float)spr->y + spr->motionY;
 		}
 
 		idx += activePartyCount;
@@ -3124,13 +3108,27 @@ void CMenuPcs::CalcSelectCloseAnim()
 		idx += 8;
 		for (i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			SetupSelectCloseSpriteMotion(spr);
+			spr->startFrame = 0;
+			spr->duration = kFadeFrames;
+			spr->x = (short)(int)spr->targetX;
+			spr->y = (short)(int)spr->targetY;
+			spr->motionX = 240.0f;
+			spr->motionY = 0.0f;
+			spr->targetX = (float)spr->x + spr->motionX;
+			spr->targetY = (float)spr->y + spr->motionY;
 		}
 
 		idx += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			SetupSelectCloseSpriteMotion(spr);
+			spr->startFrame = 0;
+			spr->duration = kFadeFrames;
+			spr->x = (short)(int)spr->targetX;
+			spr->y = (short)(int)spr->targetY;
+			spr->motionX = 240.0f;
+			spr->motionY = 0.0f;
+			spr->targetX = (float)spr->x + spr->motionX;
+			spr->targetY = (float)spr->y + spr->motionY;
 		}
 
 		idx += activePartyCount;

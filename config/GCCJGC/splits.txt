@@ -437,7 +437,7 @@ memory.cpp:
 	.text start:0x8001BB40 end:0x8001F6CC
 	.data start:0x801DC730 end:0x801DC758
 	.sdata start:0x8034B210 end:0x8034B228
-	.sdata2 start:0x8034C4F8 end:0x8034C520
+	.sdata2 start:0x8034C4F8 end:0x8034C56C
 	.rodata     start:0x801D1000 end:0x801D1820
 	.sbss       start:0x8034BA58 end:0x8034BA60
 
@@ -614,7 +614,7 @@ cmake.cpp:
 	.text start:0x80167050 end:0x8016F384
 	.rodata start:0x801DA370 end:0x801DA5BC
 	.data start:0x80231F20 end:0x8023200C
-	.sdata2 start:0x8034F770 end:0x8034F7B8
+	.sdata2 start:0x8034F770 end:0x8034F948
 	.sdata start:0x8034B860 end:0x8034B868
 	.bss        start:0x80327458 end:0x80327480
 	.sbss start:0x8034BCF0 end:0x8034BCF4
@@ -630,7 +630,7 @@ shopmenu.cpp:
 
 singmenu.cpp:
 	.rodata start:0x801D8E78 end:0x801D9460
-	.data start:0x802318B8 end:0x80231D1C
+	.data start:0x802318B8 end:0x80231D6C
 	.sdata2 start:0x8034ED40 end:0x8034F1B8
 	.bss        start:0x80326F30 end:0x80327348
 	.sdata      start:0x8034B858 end:0x8034B860

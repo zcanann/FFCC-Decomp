@@ -504,7 +504,7 @@ memory.cpp:
 	.text start:0x8001C0E4 end:0x8001FC68
 	.data start:0x801E72F0 end:0x801E7318
 	.sdata start:0x8032D3F0 end:0x8032D408
-	.sdata2 start:0x8032E760 end:0x8032E788
+	.sdata2 start:0x8032E760 end:0x8032E7D4
 	.rodata     start:0x801D53F0 end:0x801D5C10
 	.sbss       start:0x8032DC38 end:0x8032DC40
 
@@ -699,7 +699,7 @@ cmake.cpp:
 	extab       start:0x8000A06C end:0x8000A11C
 
 singmenu.cpp:
-	.rodata start:0x801DC620 end:0x801DD888
+	.rodata start:0x801DC620 end:0x801DD8E8
 	.bss        start:0x8030A610 end:0x8030AA28
 	.sdata      start:0x8032DA58 end:0x8032DA60
 	.sbss       start:0x8032DE98 end:0x8032DEA8
@@ -801,10 +801,10 @@ mtx/vec.c:
 bonus_menu.cpp:
 	.text start:0x80132428 end:0x8013D528
 	.rodata start:0x801DC444 end:0x801DC4D4
-	.data start:0x802116A8 end:0x802117FC
+	.data start:0x802116A8 end:0x80211834
 	.sdata start:0x8032DA48 end:0x8032DA58
 	.sbss start:0x8032DE88 end:0x8032DE94
-	.sdata2 start:0x80330D80 end:0x80330E18
+	.sdata2 start:0x80330D80 end:0x80330F58
 
 menu_cmd.cpp:
 	.text start:0x80149A34 end:0x8014F4BC

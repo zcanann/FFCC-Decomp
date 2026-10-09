@@ -4171,7 +4171,7 @@ void CMenuPcs::DrawLoadMenu()
 				    m_wmWorldState->m_subState == 0x1C || m_wmWorldState->m_subState == 0x1B ||
 				    m_wmWorldState->m_subState == 0x17) {
 					m_wmWorldState->m_subState = 3;
-				} else if (subState == 0x18) {
+				} else if (m_wmWorldState->m_subState == 0x18) {
 					m_wmWorldState->m_nextMenuMode = 1;
 					m_wmWorldState->m_delay = 1;
 					m_wmTransitionCode = 4;
@@ -4295,7 +4295,7 @@ void CMenuPcs::DrawLoadMenu()
 					if (dRes == 1) m_wmWorldState->m_subState = 0x0E;
 					else if (dRes == -2) m_wmWorldState->m_subState = 7;
 					else m_wmWorldState->m_subState = 0x0F;
-				} else if (subState == 0x1A) {
+				} else if (m_wmWorldState->m_subState == 0x1A) {
 					short dRes = m_wmWorldState->m_mcResult;
 					if (dRes == 1) m_wmWorldState->m_subState = 0x1C;
 					else if (dRes == -2) m_wmWorldState->m_subState = 7;

@@ -124,27 +124,25 @@ inline void CMenuPcs::TmpArtiInit0()
  */
 inline void CMenuPcs::TmpArtiInit()
 {
+    int i;
+    TmpArtiEntry* entry;
     memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
 
-    float one = 1.0f;
-    TmpArtiEntry* entry = m_tmpArtiList->entries;
-    for (int i = 0; i < 64; i++, entry++) {
-        entry->z = one;
+    entry = m_tmpArtiList->entries;
+    for (i = 0; i < 64; i++, entry++) {
+        entry->z = 1.0f;
     }
 
-    double center = 216.0;
-    double half = 0.5;
-    float zero = 0.0f;
     entry = m_tmpArtiList->entries;
-    for (int row = 0; row < 4; row++, entry++) {
+    for (i = 0; i < 4; i++, entry++) {
         entry->tex = kTmpArtiRowTexture;
         entry->width = 200;
         entry->height = 0x28;
-        entry->x = (short)(int)(center - (double)entry->width * half);
-        entry->y = row * (entry->height - 8) + 0x60;
-        entry->s = zero;
-        entry->t = zero;
-        entry->startFrame = row;
+        entry->x = (short)(216.0 - entry->width / 2.0);
+        entry->y = i * (entry->height - 8) + 0x60;
+        entry->s = 0.0f;
+        entry->t = 0.0f;
+        entry->startFrame = i;
         entry->duration = 3;
     }
 
@@ -346,36 +344,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	unsigned int result;
 
 	if (this->m_tmpArtiState->initialized == '\0') {
-		memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
-		float one = 1.0f;
-		entry = m_tmpArtiList->entries;
-		for (int k = 64; k != 0; k--) {
-			entry->z = one;
-			entry++;
-		}
-
-		double half = 0.5;
-		double center = 216.0;
-		float zero = 0.0f;
-		int row = 0;
-		entry = m_tmpArtiList->entries;
-		for (int k = 4; k != 0; k--) {
-			entry->tex = kTmpArtiRowTexture;
-			entry->width = 200;
-			entry->height = 0x28;
-			entry->x = (short)(int)-((double)entry->width * half - center);
-			entry->y = row * (entry->height - 8) + 0x60;
-			entry->s = zero;
-			entry->t = zero;
-			entry->startFrame = row;
-			row++;
-			entry->duration = 3;
-			entry++;
-		}
-
-		m_tmpArtiList->count = 4;
-		m_tmpArtiState->unk_26 = 0;
-		m_tmpArtiState->initialized = 1;
+		TmpArtiInit();
 	}
 
 	completedItems = 0;

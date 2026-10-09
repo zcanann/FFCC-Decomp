@@ -235,8 +235,7 @@ void CMenuPcs::ArtiDraw()
 					if (itemCount > 0) {
 					} else {
 						texId = kArtiEmptyRowTexture;
-						double half = 0.5;
-						itemAlpha = (float)(half * (double)animAlpha);
+						itemAlpha = animAlpha * 0.5;
 					}
 
 					if (texId == kArtiRowTexture && drawIndex == m_artiState->selections[0]) {

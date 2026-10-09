@@ -334,22 +334,14 @@ inline void CMenuPcs::MLstInit()
 	int i;
 	short yPos;
 	int initializedCount;
-	double itemCenter;
-	double xOrigin;
-	float zero;
-	float one;
 	MenuLstEntry* entry;
 
 	memset(this->m_menuLstList, 0, sizeof(MenuLstList));
-	one = 1.0f;
 	entry = this->m_menuLstList->entries;
 	for (i = 0; i < 64; i++, entry++) {
-		entry->z = one;
+		entry->z = 1.0f;
 	}
 
-	xOrigin = 216.0;
-	itemCenter = 0.5;
-	zero = 0.0f;
 	initializedCount = 0;
 	yPos = 0x18;
 	for (i = 0; i < 9; i++) {
@@ -358,11 +350,11 @@ inline void CMenuPcs::MLstInit()
 		entry->tex = kMLstRowTexture;
 		entry->width = 0xE0;
 		entry->height = 0x28;
-		entry->x = (short)(int)-(((double)entry->width * itemCenter) - xOrigin);
+		entry->x = (short)(216.0 - entry->width / 2.0);
 		entry->y = yPos;
 		yPos += 0x20;
-		entry->s = zero;
-		entry->t = zero;
+		entry->s = 0.0f;
+		entry->t = 0.0f;
 		entry->startFrame = i;
 		entry->duration = 4;
 	}

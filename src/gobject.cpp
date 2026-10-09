@@ -2706,7 +2706,11 @@ void CGObject::objectCollision()
         int dec = m_collisionPushTimerMax - 1;
         m_collisionPushTimerMax = dec & ~(dec >> 31);
     } else {
-        m_collisionPushTimerMax = 0x32;
+#ifdef VERSION_GCCP01
+        m_collisionPushTimerMax = 50;
+#else
+        m_collisionPushTimerMax = 60;
+#endif
     }
 
     PSVECSubtract(&self.capsulePos, &m_worldPosition, &m_groundHitOffset);
@@ -3101,7 +3105,11 @@ void CGObject::onCreate()
     m_lastBgAttr = 1.0f;
     m_shieldNodeFlagBits.m_bit08 = 0;
     m_shieldNodeFlagBits.m_bit04 = 0;
-    m_collisionPushTimerMax = 0x32;
+#ifdef VERSION_GCCP01
+    m_collisionPushTimerMax = 50;
+#else
+    m_collisionPushTimerMax = 60;
+#endif
 
     m_bgGroupMask = 0;
     m_lastBgGroup = 0;

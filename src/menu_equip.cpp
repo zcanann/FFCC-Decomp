@@ -359,9 +359,9 @@ void CMenuPcs::EquipDraw()
 	float textY;
 	int helpItem;
 	int helpFound = 0;
+	CCaravanWork* caravanWork;
 	int mode;
 	int listState;
-	CCaravanWork* caravanWork;
 	EquipOpenAnim* item;
 	float x;
 	float y;

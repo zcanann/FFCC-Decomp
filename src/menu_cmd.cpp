@@ -1727,13 +1727,13 @@ inline void CMenuPcs::ChkCmdActive(int itemIndex)
 int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
 	int slot;
+	int matchCount;
 	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
 	int itemKinds[10];
 	int matches[5][2];
 	int candidates[10];
 	int k;
 	int ok;
-	int matchCount;
 
 	if (comboOut != nullptr) {
 		for (int i = 0; i < 5; i++) {
@@ -1967,7 +1967,6 @@ void CMenuPcs::DrawUniteList()
 	CFont* helpFont;
 	float panelX;
 	GXColor color;
-	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
 	s32 i;
 	s32 active;
 	s32 groupSize;
@@ -1975,6 +1974,7 @@ void CMenuPcs::DrawUniteList()
 	float drawY;
 	float drawW;
 	float drawH;
+	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

@@ -7466,13 +7466,15 @@ void CMenuPcs::DrawCharaName()
 	float plateW = 64.0f;
 	const double xOffsetDefault =
 	    -(DOUBLE_80331418 * static_cast<double>(plateW) - DOUBLE_80331678);
-	for (int row = 0; row < 2; row++) {
+	int row;
+	int col;
+	for (row = 0; row < 2; row++) {
 		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
 		y += FLOAT_80331684;
 		if (row != 0) {
 			y += FLOAT_80331548;
 		}
-		for (int col = 0; col < 4; col++) {
+		for (col = 0; col < 4; col++) {
 			const int slot = row * 4 + col;
 			if ((confirmedMask & (1u << slot)) != 0) {
 				const char* const text = reinterpret_cast<const char*>(
@@ -7506,17 +7508,17 @@ void CMenuPcs::DrawCharaName()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
 
 	CSystem* const sys = &System;
-	for (int row2 = 0; row2 < 2; row2++) {
-		float y = FLOAT_80331478 + static_cast<float>(row2 * 0xB8);
+	for (row = 0; row < 2; row++) {
+		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
 		y += FLOAT_80331688;
-		if (row2 != 0) {
+		if (row != 0) {
 			y += FLOAT_80331548;
 		}
 #ifndef VERSION_GCCJGC
 		y -= FLOAT_80331550;
 #endif
-		for (int col = 0; col < 4; col++) {
-			const int slot = row2 * 4 + col;
+		for (col = 0; col < 4; col++) {
+			const int slot = row * 4 + col;
 			int restoreColor;
 			restoreColor = 0;
 			const char* text;

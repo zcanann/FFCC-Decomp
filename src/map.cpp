@@ -2490,83 +2490,11 @@ void CMapMng::ShowMapMeshID(int id, int show)
     }
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8002f45c
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMng::SetDrawRangeMapObj(float drawRange)
-{
-    m_octTreeFrustumRange = -drawRange;
-}
 
-/*
- * --INFO--
- * PAL Address: 0x8002f46c
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMng::SetDrawRangeOctTree(float drawRange)
-{
-    m_octTreeDrawMinDepth = -drawRange;
-}
 
-/*
- * --INFO--
- * PAL Address: 0x8002f47c
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
-{
-    int objIndex = GetMapObjIdx(static_cast<unsigned short>(id));
 
-    const Vec spotPosition = position;
-    const _GXColor spotColor = color;
-    CMapObj* mapObj = m_mapObjArray + objIndex;
-    CMapObjAtr* attr = mapObj->m_attribute;
 
-    switch (attr->m_type) {
-    case CMapObjAtr::SPOT_LIGHT:
-    {
-        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-        spotAttr->m_color = spotColor;
-        mapObj->m_localRotation.x = spotPosition.x;
-        mapObj->m_localRotation.y = spotPosition.y;
-        mapObj->m_localRotation.z = spotPosition.z;
-        mapObj->m_localMtxDirty = 1;
-        mapObj->m_calcMtxPending = 1;
-        break;
-    }
-    }
-}
 
-/*
- * --INFO--
- * PAL Address: 0x8002f548
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
-{
-    CMapObj& mapObj = m_mapObjArray[mapObjIndex];
-    mapObj.m_transRateX = x;
-    mapObj.m_transRateY = y;
-    mapObj.m_transRateZ = z;
-}
 
 /*
  * --INFO--
@@ -2590,12 +2518,91 @@ void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f548
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapObjWorldMapLightIdx(int, _GXColor, Vec)
+void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
 {
-	// TODO
+    CMapObj& mapObj = m_mapObjArray[mapObjIndex];
+    mapObj.m_transRateX = x;
+    mapObj.m_transRateY = y;
+    mapObj.m_transRateZ = z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::SetMapObjWorldMapLightIdx(int objIndex, _GXColor color, Vec position)
+{
+    CMapObj* mapObj = m_mapObjArray + objIndex;
+    CMapObjAtr* attr = mapObj->m_attribute;
+
+    switch (attr->m_type) {
+    case CMapObjAtr::SPOT_LIGHT:
+    {
+        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
+        spotAttr->m_color = color;
+        mapObj->m_localRotation.x = position.x;
+        mapObj->m_localRotation.y = position.y;
+        mapObj->m_localRotation.z = position.z;
+        mapObj->m_localMtxDirty = 1;
+        mapObj->m_calcMtxPending = 1;
+        break;
+    }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002f47c
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
+{
+    int objIndex = GetMapObjIdx(static_cast<unsigned short>(id));
+    SetMapObjWorldMapLightIdx(objIndex, color, position);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002f46c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::SetDrawRangeOctTree(float drawRange)
+{
+    m_octTreeDrawMinDepth = -drawRange;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002f45c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::SetDrawRangeMapObj(float drawRange)
+{
+    m_octTreeFrustumRange = -drawRange;
 }
 
 /*

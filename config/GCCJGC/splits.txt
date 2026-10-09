@@ -638,7 +638,7 @@ singmenu.cpp:
 
 cflat_r2system.cpp:
 	.text start:0x800B049C end:0x800B7D34
-	.sdata2     start:0x8034D860 end:0x8034D864
+	.sdata2     start:0x8034D860 end:0x8034D8F0
 	.rodata     start:0x801D4EE0 end:0x801D52A8
 	.data       start:0x8022CD58 end:0x8022D410
 	extab       start:0x80008308 end:0x800083C0

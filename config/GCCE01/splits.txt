@@ -710,7 +710,7 @@ cflat_r2system.cpp:
 	.text start:0x800B218C end:0x800B9B98
 	.rodata     start:0x801D92C8 end:0x801D9690
 	.data       start:0x8020E9C0 end:0x8020F080
-	.sdata2     start:0x8032FAE8 end:0x8032FAEC
+	.sdata2     start:0x8032FAE8 end:0x8032FB80
 
 cflat_r2class.cpp:
 	.text start:0x800B9B98 end:0x800BD0E4

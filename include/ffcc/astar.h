@@ -90,6 +90,7 @@ public:
 	CAPos* getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup);
 	int calcSpecialPolygonGroup(Vec* pos);
 	int calcPolygonGroup(Vec* pos, int hitAttributeMask);
+	int isAStar() { return m_portalCount ? 1 : 0; }
 
 	unsigned int m_flags;                   // 0x00
 	unsigned int m_hitAttributeMask;        // 0x4

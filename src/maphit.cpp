@@ -382,6 +382,28 @@ void CMapHit::GetHitFaceNormal(Vec* out)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 180b
+ * EN Address: 0x8002FE30
+ * EN Size: 160b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline int CheckLineCylinder(const Vec& lineStart, const Vec& lineDirection, const CMapCylinder& cyl, float& outT)
+{
+    Vec rayStart = cyl.m_bottom;
+    Vec rayDirection = cyl.m_axis;
+
+    CMapCylinder edgeCylinder;
+    edgeCylinder.m_bottom = lineStart;
+    edgeCylinder.m_axis = lineDirection;
+    edgeCylinder.m_radius = cyl.m_radius;
+
+    return FindIntersection(rayStart, rayDirection, edgeCylinder, outT);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80025df4
  * PAL Size: 2300b
  * EN Address: TODO
@@ -568,16 +590,8 @@ edge_loop:
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
 
-                Vec rayStart = g_hit_cyl.m_bottom;
-                Vec rayDirection = g_hit_cyl.m_axis;
-
-                CMapCylinder edgeCylinder;
-                edgeCylinder.m_bottom = previous;
-                edgeCylinder.m_axis = edge;
-                edgeCylinder.m_radius = g_hit_cyl.m_radius;
-
                 float edgeT;
-                if (FindIntersection(rayStart, rayDirection, edgeCylinder, edgeT) != 0 &&
+                if (CheckLineCylinder(previous, edge, g_hit_cyl, edgeT) != 0 &&
                     edgeT < g_hit_t_min) {
                     g_hit_t = edgeT;
                     edgeIndex = i;
@@ -881,9 +895,10 @@ cylinder_body:
         if (disc > 0.0) {
             disc = sqrtf(disc);
             f32 t;
-            f32 negB = -capB;
-            t = negB - disc;
-            if ((t * localDirection.z) + pz <= 0.0) {
+            f32 z;
+            t = -capB - disc;
+            z = (t * localDirection.z) + pz;
+            if (z <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;
@@ -891,8 +906,9 @@ cylinder_body:
                 return 0;
             }
 
-            t = negB + disc;
-            if ((t * localDirection.z) + pz <= 0.0) {
+            t = -capB + disc;
+            z = (t * localDirection.z) + pz;
+            if (z <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;
@@ -915,9 +931,10 @@ cylinder_body:
         if (disc > 0.0) {
             disc = sqrtf(disc);
             f32 t;
-            f32 negB = -capB;
-            t = negB - disc;
-            if ((t * localDirection.z) + pz >= axisLen) {
+            f32 z;
+            t = -capB - disc;
+            z = (t * localDirection.z) + pz;
+            if (z >= axisLen) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;
@@ -925,8 +942,9 @@ cylinder_body:
                 return 0;
             }
 
-            t = negB + disc;
-            if ((t * localDirection.z) + pz >= axisLen) {
+            t = -capB + disc;
+            z = (t * localDirection.z) + pz;
+            if (z >= axisLen) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;

@@ -553,7 +553,7 @@ config.libs = [
             Object(NonMatching, "manager.cpp"),
             Object(NonMatching, "map.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "mapanim.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
-            Object(NonMatching, "maphit.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01"), "maphit.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "maplight.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapmesh.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "mapobj.cpp", extra_cflags=["-RTTI on", "-str reuse,nopool,readonly", "-inline auto,deferred"]),

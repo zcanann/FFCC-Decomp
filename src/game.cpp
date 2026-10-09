@@ -769,24 +769,24 @@ void CGame::loadCfd()
     }
 
     unkCFlatData0[0] = (unsigned int)m_cFlatDataArr[0].GetData(0);
-    ASSERT(unkCFlatData0[0]);
+    FFCC_ASSERT(unkCFlatData0[0]);
     unkCFlatData0[1] = (unsigned int)m_cFlatDataArr[0].GetData(1);
-    ASSERT(unkCFlatData0[1]);
+    FFCC_ASSERT(unkCFlatData0[1]);
     unkCFlatData0[2] = (unsigned int)m_cFlatDataArr[0].GetData(2);
-    ASSERT(unkCFlatData0[2]);
+    FFCC_ASSERT(unkCFlatData0[2]);
     m_romLetterWorkBase = (unsigned int)m_cFlatDataArr[2].GetData(0);
-    ASSERT(m_romLetterWorkBase);
+    FFCC_ASSERT(m_romLetterWorkBase);
     unk_flat3_field_8_0xc7dc = (unsigned int)m_cFlatDataArr[3].GetData(0);
-    ASSERT(unk_flat3_field_8_0xc7dc);
+    FFCC_ASSERT(unk_flat3_field_8_0xc7dc);
     m_combiTable = reinterpret_cast<CCombi2*>(m_cFlatDataArr[3].GetData(1));
-    ASSERT(m_combiTable);
-    ASSERT((m_cFlatDataArr[3].m_data[1].m_size % sizeof(CCombi2)) == 0);
+    FFCC_ASSERT(m_combiTable);
+    FFCC_ASSERT((m_cFlatDataArr[3].m_data[1].m_size % sizeof(CCombi2)) == 0);
     m_combiCount = m_cFlatDataArr[3].m_data[1].m_size / sizeof(CCombi2);
-    ASSERT(m_combiCount);
+    FFCC_ASSERT(m_combiCount);
     unk_flat3_field_30_0xc7e0 = (unsigned int)m_cFlatDataArr[3].GetData(2);
-    ASSERT(unk_flat3_field_30_0xc7e0);
+    FFCC_ASSERT(unk_flat3_field_30_0xc7e0);
     m_bossArtifactBase = reinterpret_cast<CBossArtifactStage*>(m_cFlatDataArr[3].GetData(3));
-    ASSERT(m_bossArtifactBase);
+    FFCC_ASSERT(m_bossArtifactBase);
 }
 
 /*

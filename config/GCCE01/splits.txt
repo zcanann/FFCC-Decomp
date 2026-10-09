@@ -1025,6 +1025,7 @@ TRK_MINNOW_DOLPHIN/main_gdev.c:
 MenuUtil.cpp:
 	.text start:0x801757B8 end:0x80179E64
 	.data       start:0x802148C8 end:0x80214A58
+	.rodata     start:0x801E1EE8 end:0x801E26E8
 
 OdemuExi2/DebuggerDriver.c:
 	.text start:0x801BB3F4 end:0x801BBE74
@@ -1375,6 +1376,7 @@ game.cpp:
 	.data       start:0x801E71E0 end:0x801E7280
 	.sdata      start:0x8032D3B0 end:0x8032D3C8
 	.sbss       start:0x8032DC20 end:0x8032DC25
+	.rodata     start:0x801D4F20 end:0x801D51D8
 
 p_chara_viewer.cpp:
 	.rodata start:0x801D9700 end:0x801D9888

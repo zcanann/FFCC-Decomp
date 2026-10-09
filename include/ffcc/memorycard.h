@@ -145,6 +145,9 @@ public:
     int McChkConnect(int chan);
     void Crc32(int, unsigned char*, unsigned int*);
     void EncodeData();
+    void SetMountChan(int chan) { m_currentSlot = chan; }
+    unsigned int rotlwi(int value, int shift) { return __rlwnm(value, shift, 0, 31); }
+    unsigned int rotrwi(int value, int shift) { return __rlwnm(value, 32 - shift, 0, 31); }
     void DecodeData();
 
     void CalcSaveDatHpMax(::Mc::SaveDat*);

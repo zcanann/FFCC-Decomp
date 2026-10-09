@@ -9320,8 +9320,10 @@ inline void CMenuPcs::DrawPageMark()
 #endif
 	const int phase = abs(static_cast<int>(System.GetCounter()) % 20 - 10);
 	const float scale = static_cast<float>(0.03 * phase + 0.7);
-	float x = 220.0f;
-	x -= 40.0;
+	float w = 40.0f;
+	double left = 220.0;
+	left -= w;
+	float x = left;
 	float y = 369.0f;
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color;

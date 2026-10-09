@@ -73,6 +73,18 @@ static inline int FurTexelIndex(int x, int y, int tileRowStride)
 	return index;
 }
 
+namespace std {
+inline double sqrt(int x)
+{
+	return ::sqrt(static_cast<double>(x));
+}
+
+inline double atan2(int y, int x)
+{
+	return ::atan2(static_cast<double>(y), static_cast<double>(x));
+}
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -1458,7 +1470,7 @@ void CChara::CalcMogScore()
 		for (int x = 0; x < 0x40; x++) {
 			const int dx = x - 0x20;
 			const int dy = y - 0x20;
-			const int dist = static_cast<int>(sqrt(static_cast<double>(static_cast<int>(dx * dx + dy * dy))));
+			const int dist = static_cast<int>(std::sqrt(dx * dx + dy * dy));
 
 			if (dist >= 0x40) {
 				continue;
@@ -1481,7 +1493,7 @@ void CChara::CalcMogScore()
 			m_sharedState.m_mogFur.m_alphaScore += a;
 
 			const int ring = dist % 12;
-			int angle = static_cast<int>(MTXRadToDeg(atan2(static_cast<double>(dx), static_cast<double>(dy)))) + 0x168;
+			int angle = static_cast<int>(MTXRadToDeg(std::atan2(dx, dy))) + 0x168;
 			angle %= 0x2D;
 
 			for (int i = 0; i < 3; i++) {

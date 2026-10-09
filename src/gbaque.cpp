@@ -420,25 +420,9 @@ void GbaQueue::LoadAll()
 			}
 
 			if ((m_shopStatusFlags & (1 << i)) != 0) {
-				OSWaitSemaphore(accessSemaphores + i);
-				m_shopFlags = static_cast<unsigned char>(m_shopFlags | (1 << i));
-				OSSignalSemaphore(accessSemaphores + i);
-				if (Joybus.SetMType(i, 2) != 0) {
-					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags | (1 << i));
-				} else {
-					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~(1 << i));
-				}
-			} else {
-				if ((m_shopStatusFlags & (0x10 << i)) != 0) {
-					OSWaitSemaphore(accessSemaphores + i);
-					m_shopFlags = static_cast<unsigned char>(m_shopFlags | (0x10 << i));
-					OSSignalSemaphore(accessSemaphores + i);
-					if (Joybus.SetMType(i, 3) != 0) {
-						m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags | (0x10 << i));
-					} else {
-						m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~(0x10 << i));
-					}
-				}
+				SetShopFlg(i);
+			} else if ((m_shopStatusFlags & (0x10 << i)) != 0) {
+				SetSmithFlg(i);
 			}
 		}
 	}
@@ -469,23 +453,9 @@ void GbaQueue::ClrShopMode()
 		}
 
 		if (m_shopStatusFlags & (1 << i)) {
-			OSWaitSemaphore(accessSemaphores + i);
-			m_shopFlags |= 1 << i;
-			OSSignalSemaphore(accessSemaphores + i);
-			if (Joybus.SetMType(i, 2) != 0) {
-				m_shopStatusFlags |= 1 << i;
-			} else {
-				m_shopStatusFlags &= ~(1 << i);
-			}
+			SetShopFlg(i);
 		} else if (m_shopStatusFlags & (0x10 << i)) {
-			OSWaitSemaphore(accessSemaphores + i);
-			m_shopFlags |= 0x10 << i;
-			OSSignalSemaphore(accessSemaphores + i);
-			if (Joybus.SetMType(i, 3) != 0) {
-				m_shopStatusFlags |= 0x10 << i;
-			} else {
-				m_shopStatusFlags &= ~(0x10 << i);
-			}
+			SetSmithFlg(i);
 		}
 	}
 }

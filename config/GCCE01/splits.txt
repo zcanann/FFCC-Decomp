@@ -725,6 +725,7 @@ graphic.cpp:
 	.text start:0x800161FC end:0x80019D7C
 	.bss start:0x8022FE08 end:0x8023B498
 	.rodata     start:0x801D5278 end:0x801D5290
+	.data       start:0x801E7280 end:0x801E72D0
 	.sdata      start:0x8032D3C8 end:0x8032D3E0
 	.sbss       start:0x8032DC28 end:0x8032DC38
 	.sdata2     start:0x8032E688 end:0x8032E6E0

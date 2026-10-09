@@ -3082,7 +3082,11 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         posX = x + 0x40;
         _drawNoShadowFont(font, textBuffer, posX, static_cast<float>(y), 0x18, 0x12);
 
+#ifdef VERSION_GCCE01
+        posX = x + 0x118;
+#else
         posX = x + 0x108;
+#endif
         DrawDec(statValue, 0x1A, posX, static_cast<float>(y), FLOAT_80332d34, 0, 1, 0x12);
 
         font->DrawInit();

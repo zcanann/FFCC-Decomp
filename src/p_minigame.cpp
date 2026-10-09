@@ -44,48 +44,16 @@ inline CMiniGamePcs::CMiniGamePcs()
     STATIC_ASSERT(sizeof(CMiniGamePcs) == 0x64A0);
 }
 
-extern const char sMiniGamePcsGameProcessName[] = "CMiniGamePcs(GAME)";
-extern const char sMiniGamePcsProcessName[] = "CMiniGamePcs";
-extern const char sMiniGameManagerClassName[] = "CManager";
-extern const char sMiniGameProcessClassName[12] = "CProcess";
 CMiniGamePcs MiniGamePcs;
 
 CProcessCallbackTable CMiniGamePcs::m_table = {
-    const_cast<char*>(sMiniGamePcsGameProcessName),
+    "CMiniGamePcs(GAME)",
     static_cast<CProcessCallback>(&CMiniGamePcs::create),
     static_cast<CProcessCallback>(&CMiniGamePcs::destroy),
     {
         {static_cast<CProcessCallback>(&CMiniGamePcs::calc), 0x24, 0},
     },
 };
-static const char s_miniGameManagerTag[] = "GMGR";
-static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
-static const char s_miniGameEnd1111Text[] = "MiniGameEnd 1111\n";
-static const char s_miniGameEnd2222Text[] = "MiniGameEnd 2222\n";
-static const char s_miniGamePadRaceResultFmt[] = "GBA_PADCODE_RACE_RESULT  play=%d  result=%d\n";
-static const char s_miniGamePadRaceEndText[] = "GBA_PADCODE_RACE_END\n";
-static const char s_miniGamePadMgrEndText[] = "GBA_PADCODE_MGR_END\n";
-static const char s_miniGamePadMgrContinueText[] = "GBA_PADCODE_MGR_CONTINUE\n";
-static const char s_miniGameManagerFileFmt[] = "%s/mgr%02d.bin";
-static const char s_miniGameManagerDir[] = "dvd/minigame/mgr";
-static const char s_miniGameManagerSpFileFmt[] = "%s/mgrsp%02d.bin";
-static const char s_miniGameFileInfoFmt[] = "\n\nMINIGAME FILE=%s  SPFILE=%s\n\n\n";
-static const char s_miniGameRaceHeader[] = "\n\n===================================================\n\n\nm_IsRaceEnd\n";
-static const char s_miniGameRaceResultFmt[] = "    P%d = %d\n";
-static const char s_miniGameSeparator[] = "\n\n==================================================\n";
-static const char s_miniGameContinueText[] = "\n\nMINI GAME CONTINUE\n\n";
-static const char s_miniGameMgrEndStartText[] = "CallMiniGameParam  MGR_CALL_MGR_END\n";
-static const char s_miniGameMgrEndEndText[] = "CallMiniGameParam  MGR_CALL_MGR_END OK!!!\n";
-static const char s_miniGameEndBannerText[] = "\x83\x7E\x83\x6A\x83\x51\x81\x5B\x83\x80\x8F\x49\x97\xB9\n";
-static const char s_miniGameConnectedLineFmt[] = "isConnectedLine Chan=%d  Line = %d\n";
-static const char s_miniGameSetPortFmt[] = "chan=%d  MG_GBA_THREAD_MSG_SETPORT_ct=%d\n";
-static const char s_miniGameRetryFmt[] = "retry=%d  chan=%d\n";
-static const char s_miniGameContextRecvFmt[] = "chan=%d  step=%d  contextRecvOffset=%d\n";
-static const char s_miniGameSourceLineFmt[] = "%s : %d\n";
-static const char s_miniGameSourceName[] = "p_minigame.cpp";
-static const char s_miniGameRecvStatusFmt[] = "ret=%d  status=0x%02x  step=%d  contextRecvOffset=%d\n";
-static const char s_miniGameFlagsRetryFmt[] = "GBA_JSTAT_FLAGS_MASK retry chan=%d\n";
-static const char s_miniGamePsf1RetryFmt[] = "GBA_JSTAT_PSF1 retry chan=%d\n\0\0";
 
 enum {
     GBA_PADCODE_RACE_RESULT = 0x1000,
@@ -327,38 +295,6 @@ inline void CMiniGamePcs::GbaThreadInit(long channel, MgGbaThreadParam* param, O
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 496b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMiniGamePcs::MiniGameEnd()
-{
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameEnd0000Text));
-    }
-
-    EndThread();
-
-    m_playerMask = 0xF;
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameEnd1111Text));
-    }
-
-    Joybus.RestartThread();
-
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameEnd2222Text));
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
@@ -541,15 +477,15 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     m_miniGameReady = 0;
 
     m_managerImage =
-        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1) unsigned char[0x40000];
+        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>("p_minigame.cpp"), 0xF1) unsigned char[0x40000];
     m_managerSpImage =
-        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) unsigned char[0x40000];
+        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>("p_minigame.cpp"), 0xF2) unsigned char[0x40000];
 
     m_sessionId = OSGetTick();
     *reinterpret_cast<unsigned int*>(m_managerImage + 200) = m_sessionId;
     *reinterpret_cast<unsigned int*>(m_managerSpImage + 200) = m_sessionId;
 
-    strncpy(m_managerTag, s_miniGameManagerTag, 4);
+    strncpy(m_managerTag, "GMGR", 4);
 
     MiniGameFileRead(managerFilePath, m_managerImage, m_managerImageSize);
     AdjustGbaImageRegistry(reinterpret_cast<char*>(m_managerImage), m_managerTag);
@@ -704,7 +640,7 @@ retry_loop:
         param->m_result = 3;
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x234);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x234);
         }
         param->m_connected = 0;
         goto receive_message;
@@ -713,7 +649,7 @@ retry_loop:
     elapsed = OSGetTime() - startTime;
     if (elapsed > timeoutTicks)
     {
-        System.Printf(const_cast<char*>(s_miniGameRetryFmt), retryLine, channel);
+        System.Printf(const_cast<char*>("retry=%d  chan=%d\n"), retryLine, channel);
         if (ret != 3)
         {
             ret = 1;
@@ -721,7 +657,7 @@ retry_loop:
         param->m_result = static_cast<unsigned char>(ret);
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x241);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x241);
         }
         param->m_connected = 0;
         goto receive_message;
@@ -734,7 +670,7 @@ retry_loop:
     case 2:
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x248);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x248);
         }
         param->m_connected = 0;
         param->m_result = static_cast<unsigned char>(GBAReset(channel, &param->m_status));
@@ -742,7 +678,7 @@ retry_loop:
     case 3:
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x24F);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x24F);
         }
         param->m_connected = 0;
         ret = GBAReset(channel, &param->m_status);
@@ -757,7 +693,7 @@ retry_loop:
     case 4:
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x25D);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x25D);
         }
         param->m_connected = 0;
         ret = GBAGetStatus(channel, &param->m_status);
@@ -785,7 +721,7 @@ retry_loop:
         }
         goto comm_fail;
     case 5:
-        System.Printf(const_cast<char*>(s_miniGameContextRecvFmt), channel, step, contextRecvOffset);
+        System.Printf(const_cast<char*>("chan=%d  step=%d  contextRecvOffset=%d\n"), channel, step, contextRecvOffset);
         if (contextRecvOffset >= 0x60)
         {
             retryLine = 0x27A;
@@ -796,9 +732,9 @@ retry_loop:
         {
             goto context_proc;
         }
-        System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x27F);
+        System.Printf(const_cast<char*>("%s : %d\n"), "p_minigame.cpp", 0x27F);
 comm_fail:
-        System.Printf(const_cast<char*>(s_miniGameRecvStatusFmt), ret,
+        System.Printf(const_cast<char*>("ret=%d  status=0x%02x  step=%d  contextRecvOffset=%d\n"), ret,
                              param->m_status & GBA_JSTAT_FLAGS_MASK, step, contextRecvOffset);
         if (ret == 0)
         {
@@ -807,7 +743,7 @@ comm_fail:
         param->m_result = static_cast<unsigned char>(ret);
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x287);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x287);
         }
         param->m_connected = 0;
         goto receive_message;
@@ -834,7 +770,7 @@ context_proc:
             ret = GBAWrite(channel, writeSrc, &param->m_status);
             if (!(ret == 0 && (param->m_status & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
             {
-                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2A1);
+                System.Printf(const_cast<char*>("%s : %d\n"), "p_minigame.cpp", 0x2A1);
                 goto comm_fail;
             }
             step++;
@@ -850,7 +786,7 @@ context_proc:
             ret = GBARead(channel, &param->m_contextBytes[contextRecvOffset], &param->m_status);
             if (!(ret == 0 && (param->m_status & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
             {
-                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2B2);
+                System.Printf(const_cast<char*>("%s : %d\n"), "p_minigame.cpp", 0x2B2);
                 goto comm_fail;
             }
             contextRecvOffset += 4;
@@ -870,7 +806,7 @@ recv_next:
         ret = 1;
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x2C3);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x2C3);
         }
         param->m_connected = 0;
         param->m_imageType = 1;
@@ -901,7 +837,7 @@ recv_next:
     case 7:
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x2DC);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x2DC);
         }
         param->m_connected = 0;
         param->m_imageType = 1;
@@ -1071,7 +1007,7 @@ ctx_done7:
     case 8:
         if (param->m_connected != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x312);
+            System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), channel, 0x312);
         }
         param->m_connected = 0;
         param->m_imageType = 1;
@@ -1222,7 +1158,7 @@ ctx_done8:
             ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), &param->m_status);
             if (ret != 0)
             {
-                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x33C);
+                System.Printf(const_cast<char*>("%s : %d\n"), "p_minigame.cpp", 0x33C);
                 goto comm_fail;
             }
             startTime = OSGetTime();
@@ -1239,7 +1175,7 @@ ctx_done8:
                 GbaThreadSleep(OSMicrosecondsToTicks(100));
                 if (OSGetTime() - startTime > OSMillisecondsToTicks(200))
                 {
-                    System.Printf(const_cast<char*>(s_miniGameFlagsRetryFmt), channel);
+                    System.Printf(const_cast<char*>("GBA_JSTAT_FLAGS_MASK retry chan=%d\n"), channel);
                     command = 0x10000000;
                     ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), &param->m_status);
                     startTime = OSGetTime();
@@ -1258,7 +1194,7 @@ ctx_done8:
             ret = GBARead(channel, reinterpret_cast<u8*>(&param->m_receivedPacket), &param->m_status);
             if (ret != 0 || ((param->m_receivedPacket >> 24) != 0x20))
             {
-                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x372);
+                System.Printf(const_cast<char*>("%s : %d\n"), "p_minigame.cpp", 0x372);
                 goto comm_fail;
             }
             retryLine = 0x376;
@@ -1274,7 +1210,7 @@ ctx_done8:
         }
         if (ret != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x383);
+            System.Printf(const_cast<char*>("%s : %d\n"), "p_minigame.cpp", 0x383);
             goto comm_fail;
         }
 
@@ -1287,12 +1223,12 @@ ctx_done8:
             }
             if (elapsed > OSMillisecondsToTicks(200))
             {
-                System.Printf(const_cast<char*>(s_miniGamePsf1RetryFmt), channel);
+                System.Printf(const_cast<char*>("GBA_JSTAT_PSF1 retry chan=%d\n\0\0"), channel);
                 command = 0x70000000;
                 ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), &param->m_status);
                 if (ret != 0)
                 {
-                    System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x397);
+                    System.Printf(const_cast<char*>("%s : %d\n"), "p_minigame.cpp", 0x397);
                     goto comm_fail;
                 }
                 startTime = OSGetTime();
@@ -1314,7 +1250,7 @@ transfer_done:
         {
             goto write_next;
         }
-        System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x3AC);
+        System.Printf(const_cast<char*>("%s : %d\n"), "p_minigame.cpp", 0x3AC);
         goto comm_fail;
 write_next:
         retryLine = 0x3B0;
@@ -1357,7 +1293,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 
     if (param->m_connected != 0)
     {
-        System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), static_cast<int>(param->m_channel), 0x3E1);
+        System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), static_cast<int>(param->m_channel), 0x3E1);
     }
     param->m_connected = 0;
     param->m_connectionReset = 0;
@@ -1377,9 +1313,9 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 
             if (param->m_connected != 0)
             {
-                System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), static_cast<int>(param->m_channel), 0x3FC);
+                System.Printf(const_cast<char*>("isConnectedLine Chan=%d  Line = %d\n"), static_cast<int>(param->m_channel), 0x3FC);
             }
-            System.Printf(const_cast<char*>(s_miniGameSetPortFmt), static_cast<int>(param->m_channel), MG_GBA_THREAD_MSG_SETPORT_ct);
+            System.Printf(const_cast<char*>("chan=%d  MG_GBA_THREAD_MSG_SETPORT_ct=%d\n"), static_cast<int>(param->m_channel), MG_GBA_THREAD_MSG_SETPORT_ct);
             OSSendMessage(&param->m_queue, reinterpret_cast<OSMessage>(5), 1);
         }
         else
@@ -1483,12 +1419,12 @@ void CMiniGamePcs::calc()
             char managerFile[256];
             char managerSpFile[256];
 
-            sprintf(managerFile, s_miniGameManagerFileFmt, s_miniGameManagerDir, m_managerIndex);
-            sprintf(managerSpFile, s_miniGameManagerSpFileFmt, s_miniGameManagerDir, m_managerIndex);
+            sprintf(managerFile, "%s/mgr%02d.bin", "dvd/minigame/mgr", m_managerIndex);
+            sprintf(managerSpFile, "%s/mgrsp%02d.bin", "dvd/minigame/mgr", m_managerIndex);
 
             if ((unsigned int)System.m_execParam >= 3)
             {
-                System.Printf(const_cast<char*>(s_miniGameFileInfoFmt), managerFile, managerSpFile);
+                System.Printf(const_cast<char*>("\n\nMINIGAME FILE=%s  SPFILE=%s\n\n\n"), managerFile, managerSpFile);
             }
 
             MiniGameGo(managerFile, managerSpFile);
@@ -1499,12 +1435,12 @@ void CMiniGamePcs::calc()
     case 3:
         if (m_raceEnded != 0)
         {
-            System.Printf(const_cast<char*>(s_miniGameRaceHeader));
+            System.Printf(const_cast<char*>("\n\n===================================================\n\n\nm_IsRaceEnd\n"));
             for (int i = 0; i < 4; i++)
             {
-                System.Printf(const_cast<char*>(s_miniGameRaceResultFmt), i + 1, static_cast<int>(m_miniGameParams[i]));
+                System.Printf(const_cast<char*>("    P%d = %d\n"), i + 1, static_cast<int>(m_miniGameParams[i]));
             }
-            System.Printf(const_cast<char*>(s_miniGameSeparator));
+            System.Printf(const_cast<char*>("\n\n==================================================\n"));
 
             CallMiniGameParam(0x3000, 0, 0);
             m_raceEnded = 0;
@@ -1518,7 +1454,7 @@ void CMiniGamePcs::calc()
             m_miniGameParams[3] = -1;
             if ((unsigned int)System.m_execParam >= 3)
             {
-                System.Printf(const_cast<char*>(s_miniGameContinueText));
+                System.Printf(const_cast<char*>("\n\nMINI GAME CONTINUE\n\n"));
             }
 
             CallMiniGameParam(0x3002, 0, 0);
@@ -1532,14 +1468,14 @@ void CMiniGamePcs::calc()
 
         if (1 <= (unsigned int)System.m_execParam)
         {
-            System.Printf(const_cast<char*>(s_miniGameMgrEndStartText));
+            System.Printf(const_cast<char*>("CallMiniGameParam  MGR_CALL_MGR_END\n"));
         }
 
         CallMiniGameParam(0x3001, 0, 0);
 
         if (1 <= (unsigned int)System.m_execParam)
         {
-            System.Printf(const_cast<char*>(s_miniGameMgrEndEndText));
+            System.Printf(const_cast<char*>("CallMiniGameParam  MGR_CALL_MGR_END OK!!!\n"));
         }
 
         MiniGameEnd();
@@ -1551,7 +1487,7 @@ void CMiniGamePcs::calc()
 
         if (1 <= (unsigned int)System.m_execParam)
         {
-            System.Printf(const_cast<char*>(s_miniGameEndBannerText));
+            System.Printf(const_cast<char*>("\x83\x7E\x83\x6A\x83\x51\x81\x5B\x83\x80\x8F\x49\x97\xB9\n"));
         }
 
         if (1 <= (unsigned int)System.m_execParam)
@@ -1588,7 +1524,7 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
             System.Printf(g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadRaceResultFmt), player, rawPadCode & 0xFF);
+            System.Printf(const_cast<char*>("GBA_PADCODE_RACE_RESULT  play=%d  result=%d\n"), player, rawPadCode & 0xFF);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             System.Printf(g_MsgFlashy);
@@ -1600,7 +1536,7 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
             System.Printf(g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadRaceEndText));
+            System.Printf(const_cast<char*>("GBA_PADCODE_RACE_END\n"));
         }
         if (1 <= (unsigned int)System.m_execParam) {
             System.Printf(g_MsgFlashy);
@@ -1612,7 +1548,7 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
             System.Printf(g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadMgrEndText));
+            System.Printf(const_cast<char*>("GBA_PADCODE_MGR_END\n"));
         }
         if (1 <= (unsigned int)System.m_execParam) {
             System.Printf(g_MsgFlashy);
@@ -1624,7 +1560,7 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
             System.Printf(g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadMgrContinueText));
+            System.Printf(const_cast<char*>("GBA_PADCODE_MGR_CONTINUE\n"));
         }
         if (1 <= (unsigned int)System.m_execParam) {
             System.Printf(g_MsgFlashy);
@@ -1847,3 +1783,35 @@ next_player:
 }
 
 #pragma pool_data off
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 496b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMiniGamePcs::MiniGameEnd()
+{
+    if (1 <= (unsigned int)System.m_execParam)
+    {
+        System.Printf(const_cast<char*>("MiniGameEnd 0000\n"));
+    }
+
+    EndThread();
+
+    m_playerMask = 0xF;
+    if (1 <= (unsigned int)System.m_execParam)
+    {
+        System.Printf(const_cast<char*>("MiniGameEnd 1111\n"));
+    }
+
+    Joybus.RestartThread();
+
+    if (1 <= (unsigned int)System.m_execParam)
+    {
+        System.Printf(const_cast<char*>("MiniGameEnd 2222\n"));
+    }
+}

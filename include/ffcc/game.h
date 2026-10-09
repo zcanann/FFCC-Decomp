@@ -159,8 +159,12 @@ public:
     char* MakeArtsMonNames(char*, int);
     char* MakeNumMonName(char*, int, int);
     const char* GetLangString();
-    void SetNextScript(CGame::CNextScript* nextScript);
-    void SetNextScriptNewGame();
+    void SetNextScript(CGame::CNextScript* nextScript)
+    {
+        m_nextScript = *nextScript;
+        m_newGameFlag = 1;
+    }
+    void SetNextScriptNewGame() { m_nextScriptFlags = 1; }
     int IsWorldMap() { return m_currentMapId == 0x21; }
     int IsPartyExist(int);
     char* GetItemName(int);

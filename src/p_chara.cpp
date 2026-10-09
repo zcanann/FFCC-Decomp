@@ -46,26 +46,6 @@ inline int CSystem::GetErrorLevel()
     return m_execParam;
 }
 
-inline void CMemory::ResetDefaultGroup()
-{
-    m_defaultGroup = 0;
-}
-
-inline void CMemory::SetDefaultGroup(int group)
-{
-    m_defaultGroup = group;
-}
-
-inline void* CFile::GetBuffer()
-{
-    return m_readBuffer;
-}
-
-inline unsigned char* CGraphic::GetTmpFrameBuffer()
-{
-    return static_cast<unsigned char*>(m_scratchTextureBuffer);
-}
-
 static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
 static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
 static const char s_CCharaPcs_PART_801D914C[] = "CCharaPcs(PART)";

@@ -84,8 +84,8 @@ public:
     void Free(void*);
     void IncHeapWalkerLevel();
     void DecHeapWalkerLevel();
-    void ResetDefaultGroup();
-    void SetDefaultGroup(int);
+    void ResetDefaultGroup() { m_defaultGroup = 0; }
+    void SetDefaultGroup(int group) { m_defaultGroup = group; }
     int GetHeapWalkerLevel() const { return m_heapWalkerLevel; }
     int GetDefaultGroup() const { return m_defaultGroup; }
     void CopyToAMemory(void*, void*, unsigned long);

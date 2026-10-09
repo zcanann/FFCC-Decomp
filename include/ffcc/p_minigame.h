@@ -102,7 +102,20 @@ public:
     void MiniGameEnd();
 
     void CallMiniGameParam(int, int, int);
-    int GetMiniGameParam(int);
+    int GetMiniGameParam(int id)
+    {
+        switch (id) {
+        case 0x2000:
+            return m_miniGameParams[0];
+        case 0x2001:
+            return m_miniGameParams[1];
+        case 0x2002:
+            return m_miniGameParams[2];
+        case 0x2003:
+            return m_miniGameParams[3];
+        }
+        return 0;
+    }
     void SetMiniGameParam(int, int);
     void SetNumPlayer();
 

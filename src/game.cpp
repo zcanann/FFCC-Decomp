@@ -83,11 +83,6 @@ inline void CFile::CHandle::Close()
     File.Close(this);
 }
 
-inline void* CFile::GetBuffer()
-{
-    return m_readBuffer;
-}
-
 inline int CMapPcs::GetLightHolderSize(CMapLightHolder::TYPE type)
 {
     return MapMng.GetMapLightHolderArray(type).GetSize();
@@ -110,20 +105,6 @@ inline int CMapPcs::GetCharLightHolderSize()
 inline void CMapPcs::GetCharLightHolder(long index, _GXColor* color, Vec* pos)
 {
     GetLightHolder(CMapLightHolder::TYPE_CHARA, index, color, pos);
-}
-
-inline void CCharaPcs::SetAmbient(int index, _GXColor* color)
-{
-    m_viewerAmbientColor[index] = *color;
-}
-
-inline void CCharaPcs::SetDiffuse(int index, unsigned long light, _GXColor* color, Vec* pos)
-{
-    m_viewerDiffuseColor[index][light] = *color;
-
-    if (index == 0) {
-        m_viewerDiffusePos[light] = *pos;
-    }
 }
 
 /*

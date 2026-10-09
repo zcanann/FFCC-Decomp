@@ -59,7 +59,7 @@ public:
 	int GetLength(CHandle* handle);
 	void BackAllFilesToQueue(CHandle* handle);
 	void Read(CHandle* handle);
-	void* GetBuffer();
+	void* GetBuffer() { return m_readBuffer; }
 	void LockBuffer();
 	void UnlockBuffer();
 	void ReadASync(CHandle* handle);

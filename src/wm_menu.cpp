@@ -406,6 +406,11 @@ extern const float FLOAT_8033168C = 3.5f;
 extern const float FLOAT_80331690 = 0.0546875f;
 extern const float FLOAT_80331694 = -50.0f;
 extern const float FLOAT_80331698 = 1.2000000476837158f;
+#ifdef VERSION_GCCP01
+#define WM_MODEL_FRAME_STEP FLOAT_80331698
+#else
+#define WM_MODEL_FRAME_STEP 1.0f
+#endif
 extern const float FLOAT_8033169C = 2.200000047683716f;
 extern const float FLOAT_803316A0 = 3.3000001907348633f;
 extern const float FLOAT_803316A4 = -0.4399999976158142f;
@@ -1510,7 +1515,7 @@ void CMenuPcs::calcWorld()
 
 	if (animState == 1) {
 		if (animTime < animEnd) {
-			m_wm.m_handles[1]->m_model->AddFrame(FLOAT_80331698);
+			m_wm.m_handles[1]->m_model->AddFrame(WM_MODEL_FRAME_STEP);
 			m_wmWorldState->m_frameCounter = 0;
 		} else {
 			if (m_wmWorldState->m_frameCounter >= 10) {
@@ -1556,7 +1561,7 @@ void CMenuPcs::calcWorld()
 			m_wmNextAnim = 0;
 		} else {
 			if (animTime < animEnd) {
-				m_wm.m_handles[1]->m_model->AddFrame(FLOAT_80331698);
+				m_wm.m_handles[1]->m_model->AddFrame(WM_MODEL_FRAME_STEP);
 			} else {
 				m_wm.m_handles[1]->SetAnim(1, -1, -1, -1, 0);
 				m_wmWorldParams->m_anim = 1;
@@ -1564,7 +1569,7 @@ void CMenuPcs::calcWorld()
 		}
 	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
 		if (animTime < animEnd) {
-			m_wm.m_handles[1]->m_model->AddFrame(FLOAT_80331698);
+			m_wm.m_handles[1]->m_model->AddFrame(WM_MODEL_FRAME_STEP);
 		} else {
 			m_wm.m_handles[1]->SetAnim(0, -1, -1, -1, 0);
 			m_wmWorldParams->m_anim = 0;
@@ -6805,7 +6810,7 @@ void CMenuPcs::PCAnimCtrl()
 			const float frame = animState->m_frame;
 			const float frameEnd = animState->m_endFrame;
 			if (frame < frameEnd) {
-				handle->m_model->AddFrame(FLOAT_80331698);
+				handle->m_model->AddFrame(WM_MODEL_FRAME_STEP);
 				animState->m_timer++;
 			} else {
 				if (animState->m_animIndex == 3 || animState->m_animIndex == 4 || animState->m_animIndex == 5) {

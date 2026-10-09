@@ -402,8 +402,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_localScale.z = 1.0f;
             }
 
-            m_localMtxDirty = 1;
-            m_calcMtxPending = 1;
+            SetCalcMtx();
             break;
         }
         case CHUNK_PLIT: {
@@ -614,11 +613,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             break;
         }
         case CHUNK_ANIM: {
-            CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
-                operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x21E));
-            if (animRun != 0) {
-                animRun->m_currentFrame = -1;
-            }
+            CMapAnimRun* animRun = new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x21E) CMapAnimRun;
             animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
             animRun->m_startFrame = static_cast<int>(chunkFile.Get4());
             animRun->m_endFrame = static_cast<int>(chunkFile.Get4());
@@ -695,12 +690,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 shadow->m_targetBoundsScale = 1.0f;
             }
 
-            shadow->m_targetBounds[1].m_min.x = shadow->m_targetBounds[0].m_min.x * shadow->m_targetBoundsScale;
-            shadow->m_targetBounds[1].m_min.y = shadow->m_targetBounds[0].m_min.y * shadow->m_targetBoundsScale;
-            shadow->m_targetBounds[1].m_min.z = shadow->m_targetBounds[0].m_min.z * shadow->m_targetBoundsScale;
-            shadow->m_targetBounds[1].m_max.x = shadow->m_targetBounds[0].m_max.x * shadow->m_targetBoundsScale;
-            shadow->m_targetBounds[1].m_max.y = shadow->m_targetBounds[0].m_max.y * shadow->m_targetBoundsScale;
-            shadow->m_targetBounds[1].m_max.z = shadow->m_targetBounds[0].m_max.z * shadow->m_targetBoundsScale;
+            shadow->CalcBound();
 
             MapMng.GetMapShadowArray().Add(shadow);
             break;

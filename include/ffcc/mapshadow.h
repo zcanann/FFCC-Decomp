@@ -33,6 +33,15 @@ public:
     void Init();
     void Calc();
     void Draw();
+    void CalcBound()
+    {
+        m_targetBounds[1].m_min.x = m_targetBounds[0].m_min.x * m_targetBoundsScale;
+        m_targetBounds[1].m_min.y = m_targetBounds[0].m_min.y * m_targetBoundsScale;
+        m_targetBounds[1].m_min.z = m_targetBounds[0].m_min.z * m_targetBoundsScale;
+        m_targetBounds[1].m_max.x = m_targetBounds[0].m_max.x * m_targetBoundsScale;
+        m_targetBounds[1].m_max.y = m_targetBounds[0].m_max.y * m_targetBoundsScale;
+        m_targetBounds[1].m_max.z = m_targetBounds[0].m_max.z * m_targetBoundsScale;
+    }
 
     int m_enabled;           // 0x00
     u16 m_materialIndex;     // 0x04

@@ -83,6 +83,10 @@ public:
     unsigned char m_animId;
     unsigned short m_mapAnimIndex;
 
+    CMapAnimRun()
+    {
+        m_currentFrame = -1;
+    }
     void Calc(long);
     void Start(int, int, int);
 };

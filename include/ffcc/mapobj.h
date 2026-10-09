@@ -174,7 +174,11 @@ public:
     int CalcHitSlide(Vec*, float);
     void CalcHitPosition(Vec*);
     void SetMime(int, int, int);
-    void SetCalcMtx();
+    void SetCalcMtx()
+    {
+        m_localMtxDirty = 1;
+        m_calcMtxPending = 1;
+    }
     void SetCameraSemiTransAlpha(int alpha, int frameCount)
     {
         m_cameraSemiTransTargetAlpha = static_cast<short>(alpha << 7);

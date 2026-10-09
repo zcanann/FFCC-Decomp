@@ -273,11 +273,7 @@ void CGItemObj::onFrameStat()
 	case 0x1b:
 		if (m_stateFrame <= kItemObjExpandFrames) {
 			float wobble = kItemObjHalfPi * (float)m_stateFrame;
-#ifdef VERSION_GCCP01
-			wobble *= kItemObjWobblePhaseScale;
-#else
-			wobble /= 10.0f;
-#endif
+			wobble /= kItemObjExpandFrames;
 			wobble = (float)sin((double)wobble);
 
 			m_rotationZ = wobble;
@@ -410,11 +406,7 @@ void CGItemObj::onFrameStat()
 
 			if (m_subFrame <= kItemObjExpandFrames) {
 				float wobble = kItemObjHalfPi * (float)m_subFrame;
-#ifdef VERSION_GCCP01
-				wobble *= kItemObjWobblePhaseScale;
-#else
-				wobble /= 10.0f;
-#endif
+				wobble /= kItemObjExpandFrames;
 				wobble = (float)sin((double)wobble);
 
 				m_rotationZ = wobble;
@@ -897,17 +889,10 @@ void CGItemObj::onFrameAlways()
 	int countdown = m_itemJumpCountdown;
 
 	if (countdown != 0) {
-#ifdef VERSION_GCCP01
-		const float& scale = kItemObjWobblePhaseScale;
-#endif
 		countdown--;
 		m_itemJumpCountdown = countdown < 0 ? 0 : countdown;
 		float radius = m_savedBodyRadius * (float)(kItemObjExpandFrames - m_itemJumpCountdown);
-#ifdef VERSION_GCCP01
-		m_bodyEllipsoidRadius = radius * scale;
-#else
-		m_bodyEllipsoidRadius = radius / 10.0f;
-#endif
+		m_bodyEllipsoidRadius = radius / kItemObjExpandFrames;
 	}
 
 	if (m_worldParamA == 0xA) {

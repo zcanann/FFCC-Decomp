@@ -3209,7 +3209,7 @@ void CMenuPcs::DrawMCardMenu()
 	if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_subState >= 0x11) {
 		cursorY = 24.0f;
 		cursorX = cursorY;
-		cursorY = (float)((double)cursorY - 16.0);
+		cursorY -= 16.0;
 		cursorX += 32.0f;
 		int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {
@@ -3908,7 +3908,7 @@ void CMenuPcs::DrawLoadMenu()
 	if (state == 2 && m_wmWorldState->m_subState >= 0x11) {
 		cursorY0 = 24.0f;
 		cursorXbase = cursorY0;
-		cursorY0 = static_cast<float>(static_cast<double>(cursorY0) - 16.0);
+		cursorY0 -= 16.0;
 		cursorXbase += 32.0f;
 		int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {

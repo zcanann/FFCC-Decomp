@@ -1457,12 +1457,13 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 int CMenuPcs::AddNameChara(int add, int column, int row, int table)
 {
     if (add == 0) {
-        int count = GetCharaCnt(s_CmakeInfo.m_name);
+        char* name = s_CmakeInfo.m_name;
+        int count = GetCharaCnt(name);
         if (count == 0) {
             return -1;
         }
         int length = strlen(s_CmakeInfo.m_name);
-        if (GetCharaType(s_CmakeInfo.m_name, count - 1) == 0) {
+        if (GetCharaType(name, count - 1) == 0) {
             s_CmakeInfo.m_name[length - 1] = '\0';
         } else {
             s_CmakeInfo.m_name[length - 2] = '\0';

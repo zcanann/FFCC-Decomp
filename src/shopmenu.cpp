@@ -2481,7 +2481,7 @@ void CShopMenu::DrawShopBase()
             font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
             font->DrawInit();
 
-            font->SetPosX(118.0f);
+            font->SetPosX(104.0f);
             font->SetPosY(308.0f);
             Graphic.SetDrawDoneDebugData(0x10);
             if (m_listType == 0) {

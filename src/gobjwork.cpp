@@ -45,6 +45,13 @@ STATIC_ASSERT(offsetof(CRomLetterWork, m_compareRules) == 0x1E);
 STATIC_ASSERT(offsetof(CRomLetterWork, m_eventRules) == 0x2E);
 
 extern char sWorldMapSortFormatBlock[];
+#if defined(VERSION_GCCJGC)
+#define WORLD_MAP_SORT_FORMAT_OFFSET 0x70
+#elif defined(VERSION_GCCE01)
+#define WORLD_MAP_SORT_FORMAT_OFFSET 0x68
+#else
+#define WORLD_MAP_SORT_FORMAT_OFFSET 0x64
+#endif
 static const char sNoWorldReturnItemWarning[] = {
 	(char)0x83, (char)0x8F, (char)0x81, (char)0x5B, (char)0x83, (char)0x8B, (char)0x83, (char)0x68,
 	(char)0x82, (char)0xC9, (char)0x8C, (char)0x4A, (char)0x82, (char)0xE8, (char)0x89, (char)0x7A,
@@ -2323,15 +2330,15 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 
 	for (int i = 0; i < 0x40; i++) {
-		System.Printf(fmtBase + 0x64, i, m_inventoryItems[i]);
+		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET, i, m_inventoryItems[i]);
 	}
 
 	for (int i = 2; i < 8; i++) {
-		System.Printf(fmtBase + 0x74, i, m_commandListInventorySlotRef[i]);
+		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET + 0x10, i, m_commandListInventorySlotRef[i]);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		System.Printf(fmtBase + 0x88, i, m_equipment[i]);
+		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET + 0x24, i, m_equipment[i]);
 	}
 
 	for (int i = 0; i < 0x3F; i++) {
@@ -2387,15 +2394,15 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 	}
 
 	for (int i = 0; i < 0x40; i++) {
-		System.Printf(fmtBase + 0x64, i, m_inventoryItems[i]);
+		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET, i, m_inventoryItems[i]);
 	}
 
 	for (int i = 2; i < 8; i++) {
-		System.Printf(fmtBase + 0x74, i, m_commandListInventorySlotRef[i]);
+		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET + 0x10, i, m_commandListInventorySlotRef[i]);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		System.Printf(fmtBase + 0x88, i, m_equipment[i]);
+		System.Printf(fmtBase + WORLD_MAP_SORT_FORMAT_OFFSET + 0x24, i, m_equipment[i]);
 	}
 }
 

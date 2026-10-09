@@ -599,9 +599,11 @@ os/OSSemaphore.c:
 	.text start:0x8017AC20 end:0x8017ADA4
 
 wm_menu.cpp:
-	.rodata start:0x801D777C end:0x801D787C
+	.rodata start:0x801D6B9C end:0x801D7BF8
 	.text start:0x800E3E28 end:0x800FEFE8
 	.bss        start:0x8031ACF8 end:0x8031AD40
+	.data       start:0x8022E3A0 end:0x8022E9B0
+	.sdata      start:0x8034B6A8 end:0x8034B700
 
 mapocttree.cpp:
 	.text start:0x8002BE38 end:0x8002EB80

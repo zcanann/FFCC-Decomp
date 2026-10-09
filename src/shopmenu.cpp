@@ -28,12 +28,15 @@
 #include "ffcc/cardconst.h"
 #endif
 extern char s_shopmenu_cpp[];
-#ifdef VERSION_GCCJGC
+#if defined(VERSION_GCCJGC)
 #define SHOP_MENU_FILE "shopmenu.cpp"
-#define SHOP_MENU_LINE(pal, jp) (jp)
+#define SHOP_MENU_LINE(pal, us, jp) (jp)
+#elif defined(VERSION_GCCE01)
+#define SHOP_MENU_FILE s_shopmenu_cpp
+#define SHOP_MENU_LINE(pal, us, jp) (us)
 #else
 #define SHOP_MENU_FILE s_shopmenu_cpp
-#define SHOP_MENU_LINE(pal, jp) (pal)
+#define SHOP_MENU_LINE(pal, us, jp) (pal)
 #endif
 extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
@@ -1087,7 +1090,7 @@ void CMenuPcs::CreateShopMenu()
 {
     m_shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E2, 0x2DD)));
+            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E2, 0x2E2, 0x2DD)));
     m_shopMenu->Init(0);
 }
 
@@ -1104,7 +1107,7 @@ void CMenuPcs::CreateSmithMenu()
 {
     m_shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E9, 0x2E4)));
+            SHOP_MENU_FILE, SHOP_MENU_LINE(0x2E9, 0x2E9, 0x2E4)));
     m_shopMenu->Init(9);
 }
 
@@ -1135,7 +1138,7 @@ inline void CShopMenu::Init(int mode)
     CPartMng::PppPdtSlot* slot;
     pppCacheChunk* cacheChunks;
 
-    Graphic._WaitDrawDone(SHOP_MENU_FILE, SHOP_MENU_LINE(0x2FE, 0x2F9));
+    Graphic._WaitDrawDone(SHOP_MENU_FILE, SHOP_MENU_LINE(0x2FE, 0x2FE, 0x2F9));
     m_unk00 = nullptr;
     m_caravanWork = Game.m_scriptFoodBase[0];
     SetMode(mode);
@@ -1148,7 +1151,7 @@ inline void CShopMenu::Init(int mode)
     slot = &PartMng.m_pdtSlots[m_pdtSlot];
     cacheChunks = slot->m_pppDataHead->m_cacheChunks;
     cacheChunks->m_pdt = reinterpret_cast<long*>(
-        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, SHOP_MENU_FILE, SHOP_MENU_LINE(0x32A, 0x325)));
+        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, SHOP_MENU_FILE, SHOP_MENU_LINE(0x32A, 0x32A, 0x325)));
     long* pdt = cacheChunks->m_pdt;
     pppCacheLoadShape(reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(pdt) + pdt[5]),
         slot->m_pppDataHead);
@@ -3389,9 +3392,9 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     }
 
     char* helpText = new((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-                         s_shopmenu_cpp, 0xBFF) char[0x200];
+                         s_shopmenu_cpp, SHOP_MENU_LINE(0xBFF, 0xBD9, 0xBFF)) char[0x200];
     if ((helpText == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, 0xC01);
+        System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, SHOP_MENU_LINE(0xC01, 0xBDB, 0xC01));
     }
     memset(helpText, 0, 0x200);
     CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);

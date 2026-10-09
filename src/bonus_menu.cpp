@@ -895,12 +895,12 @@ void CMenuPcs::CalcResultOpenAnim()
 				int extent = w3 + 0x20;
 				int centerX = (int)(float)((double)(float)((double)w3 * 0.5 + (double)sprite->x) - 320.0);
 				int centerY = (int)(float)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 224.0);
-				m_wm.m_worldObjData[activePartyCount + i].m_viewportX = (short)centerX;
-				m_wm.m_worldObjData[activePartyCount + i].m_viewportY = (short)centerY;
-				m_wm.m_worldObjData[activePartyCount + i].m_scissorX = sprite->x - 0x10;
-				m_wm.m_worldObjData[activePartyCount + i].m_scissorY = sprite->y - 0x10;
-				m_wm.m_worldObjData[activePartyCount + i].m_scissorWidth = extent;
-				m_wm.m_worldObjData[activePartyCount + i].m_scissorHeight = extent;
+				(&m_wm.m_worldObjData[activePartyCount])[i].m_viewportX = (short)centerX;
+				(&m_wm.m_worldObjData[activePartyCount])[i].m_viewportY = (short)centerY;
+				(&m_wm.m_worldObjData[activePartyCount])[i].m_scissorX = sprite->x - 0x10;
+				(&m_wm.m_worldObjData[activePartyCount])[i].m_scissorY = sprite->y - 0x10;
+				(&m_wm.m_worldObjData[activePartyCount])[i].m_scissorWidth = extent;
+				(&m_wm.m_worldObjData[activePartyCount])[i].m_scissorHeight = extent;
 			}
 		}
 

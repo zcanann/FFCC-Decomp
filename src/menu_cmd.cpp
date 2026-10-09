@@ -817,8 +817,8 @@ void CMenuPcs::CmdDraw()
 				y = static_cast<float>(entry->y);
 				w = static_cast<float>(entry->width);
 				rowH = static_cast<float>(entry->height);
-				rowU = entry->u;
 				t = entry->v;
+				rowU = entry->u;
 
 				if (idx == m_cmdList->count) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
@@ -1130,8 +1130,8 @@ void CMenuPcs::CmdDraw()
 					y += 8.0f;
 				}
 			} else {
-				y = (entry->height - 0x20) / 2.0 + entry->y;
 				x = static_cast<float>(entry->x - 0x14);
+				y = (entry->height - 0x20) / 2.0 + entry->y;
 			}
 		}
 
@@ -2001,8 +2001,8 @@ void CMenuPcs::DrawUniteList()
 
 		CmdListEntry* const entry = &GetCmdListStorage(this)->entries[i];
 		const float rectX = static_cast<float>(entry->x + 4);
-		drawW = static_cast<float>(entry->width - 8);
 		drawY = static_cast<float>(entry->y);
+		drawW = static_cast<float>(entry->width - 8);
 		const float rectU = static_cast<float>(entry->u);
 		color.r = 0xFF;
 		color.g = 0xFF;
@@ -2075,8 +2075,8 @@ void CMenuPcs::DrawUniteList()
 		float x = static_cast<float>((static_cast<float>(entry->width) - width) / 2.0 +
 		                             static_cast<double>(entry->x));
 		if (topX != entry->x) {
-			const float t = static_cast<float>(fabs(static_cast<double>(topX - entry->x)) / 64.0);
 			const float target = static_cast<float>(entry->x + entry->width - 0x18) - width;
+			const float t = static_cast<float>(fabs(static_cast<double>(topX - entry->x)) / 64.0);
 			x = (target - x) * t + x;
 		}
 

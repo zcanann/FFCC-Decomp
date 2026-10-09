@@ -1381,8 +1381,8 @@ void CMenuPcs::DrawOptionMenu()
 		row.rightText.y = 185.0f;
 #endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
-		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
+		unsigned int sideWidth = sideTexture->m_width;
 
 		SetUv(uv0, 0.0f, 0.0f);
 		SetUv(uv1, 0.5f, 1.0f);
@@ -1496,8 +1496,8 @@ void CMenuPcs::DrawOptionMenu()
 		row.rightText.y = 185.0f;
 #endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
-		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
+		unsigned int sideWidth = sideTexture->m_width;
 
 		SetUv(uv0, 0.0f, 0.0f);
 		SetUv(uv1, 0.5f, 1.0f);
@@ -1900,8 +1900,8 @@ void CMenuPcs::DrawOptionMenu()
 				DrawFont(textXi + 8, static_cast<int>(-4.0f + (4.0f + (pp3->y + static_cast<float>(y)))),
 				         color, 7, OPT_MES(19), 1.0f, 1.0f);
 #else
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(19);
+				CFont* fnt = m_fonts[0];
 				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
 				fnt->SetScale(1.0f);

@@ -429,8 +429,8 @@ void CMenuPcs::EquipDraw()
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			char* str = Game.GetShortItemName(itemIdx);
 			if ((m_equipState->mode == 0) && (i == static_cast<int>(m_equipState->selected[0]))) {
-				helpItem = itemIdx;
 				helpFound = 1;
+				helpItem = itemIdx;
 			}
 			float width = font->GetWidth(str);
 			textY = (float)(item->y + 0xb);

@@ -435,7 +435,7 @@ memory.cpp:
 	.data start:0x801DC730 end:0x801DC758
 	.sdata start:0x8034B210 end:0x8034B228
 	.sdata2 start:0x8034C4F8 end:0x8034C520
-	.rodata     start:0x801D11E8 end:0x801D1428
+	.rodata     start:0x801D1000 end:0x801D1820
 	.sbss       start:0x8034BA58 end:0x8034BA60
 
 materialman.cpp:

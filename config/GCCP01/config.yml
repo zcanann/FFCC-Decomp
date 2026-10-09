@@ -163,3 +163,7 @@ sections:
   - name: .bss2
     vram: 0x80333DE0
     size: 0x24
+
+# Heap bar colour 0x80000080 in CMemory::CStage::drawHeapBar is data, not a pointer.
+block_relocations:
+  - source: 0x801D64D8

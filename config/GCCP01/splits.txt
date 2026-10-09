@@ -78,7 +78,7 @@ memory.cpp:
 	extabindex  start:0x8000B2CC end:0x8000B434
 	.text       start:0x8001C2F0 end:0x8001FE74
 	.ctors      start:0x801D53B4 end:0x801D53B8
-	.rodata     start:0x801D6690 end:0x801D68D0
+	.rodata     start:0x801D64A8 end:0x801D6CC8
 	.data       start:0x801E8470 end:0x801E8498
 	.bss        start:0x8023C888 end:0x80244028
 	.sdata      start:0x8032E410 end:0x8032E428

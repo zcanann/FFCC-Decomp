@@ -100,3 +100,7 @@ export_all: true
 # Alternatively, you can set extab_padding on any affected objects in
 # configure.py, in order to exactly match the original DOL.
 clean_extab: false
+
+# Heap bar colour 0x80000080 in CMemory::CStage::drawHeapBar is data, not a pointer.
+block_relocations:
+  - source: 0x801D1030

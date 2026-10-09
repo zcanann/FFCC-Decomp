@@ -502,7 +502,7 @@ memory.cpp:
 	.data start:0x801E72F0 end:0x801E7318
 	.sdata start:0x8032D3F0 end:0x8032D408
 	.sdata2 start:0x8032E760 end:0x8032E788
-	.rodata     start:0x801D55D8 end:0x801D5818
+	.rodata     start:0x801D53F0 end:0x801D5C10
 	.sbss       start:0x8032DC38 end:0x8032DC40
 
 materialman.cpp:

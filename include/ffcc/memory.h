@@ -50,6 +50,8 @@ public:
         void initBlock();
         void quitBlock();
         void* alloc(unsigned long, char*, unsigned long, int);
+        void* allocAMemory(unsigned long, char*, unsigned long);
+        void freeAMemory(void*);
         void setDefaultParam(unsigned long);
         void resDefaultParam();
         void setParam(void*, unsigned long);

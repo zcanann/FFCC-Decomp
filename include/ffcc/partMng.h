@@ -457,6 +457,7 @@ public:
 
     _pppMngSt* pppGetFreePppMngSt();
     int pppGetNumFreePppMngSt();
+    unsigned int IsLoadPart();
     struct PppPdtSlot;
     PppPdtSlot* pppGetFreePppDataMngSt();
 

@@ -383,14 +383,14 @@ unsigned char pppAmemRefCntError(unsigned long)
 
 /*
  * --INFO--
- * PAL Address: 0x8005357C
+ * PAL Address: UNUSED
  * PAL Size: 328b
- * EN Address: 0x8005fe94
- * EN Size: 40b
+ * EN Address: 0x8005FD34
+ * EN Size: 352b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartPcs::create()
+inline void CPartPcs::create0()
 {
     CUSBStreamDataState* usb = &m_usbStreamState;
     CMemory::CStage* stage;
@@ -428,6 +428,20 @@ void CPartPcs::create()
 
     ::memset(&PartMng, 0, 0x23FD8);
     PartMng.Create();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005357C
+ * PAL Size: 328b
+ * EN Address: 0x8005fe94
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::create()
+{
+    create0();
 }
 
 /*
@@ -1036,10 +1050,10 @@ void CPartPcs::drawAfterViewer()
 		(double)((float)gPppHeapUseRateWords[1] / 100.0f));
 }
 
-static inline unsigned int IsPartAsyncIdle(CPartMng* partMng)
+inline unsigned int CPartMng::IsLoadPart()
 {
     for (int i = 0; i < 16; i++) {
-        if (partMng->m_partAsyncBusy[i] != 0) {
+        if (m_partAsyncBusy[i] != 0) {
             return 0;
         }
     }
@@ -1058,7 +1072,7 @@ static inline unsigned int IsPartAsyncIdle(CPartMng* partMng)
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    return IsPartAsyncIdle(&PartMng);
+    return PartMng.IsLoadPart();
 }
 
 /*
@@ -1196,6 +1210,36 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: 0x8006014C
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartPcs::ChangeDataStage(CMemory::CStage* stage)
+{
+    m_usbStreamState.m_stageLoad = stage;
+    ppvAmemCacheSet.SetRStage(stage);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: 0x80060194
+ * EN Size: 64b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartPcs::ResetDataStage()
+{
+    m_usbStreamState.m_stageLoad = m_usbStreamState.m_stageDefault;
+    ppvAmemCacheSet.SetRStage(m_usbStreamState.m_stageDefault);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80052128
  * PAL Size: 392b
  * EN Address: 0x80051F1C
@@ -1222,8 +1266,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
         stage = MenuPcs.m_menuStage;
     }
 
-    m_usbStreamState.m_stageLoad = stage;
-    ppvAmemCacheSet.SetRStage(stage);
+    ChangeDataStage(stage);
 
     PartMng.m_partAMemBase = 0;
     PartMng.m_partAMemCursor = 0;
@@ -1251,8 +1294,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
         }
     }
 
-    m_usbStreamState.m_stageLoad = m_usbStreamState.m_stageDefault;
-    ppvAmemCacheSet.SetRStage(m_usbStreamState.m_stageDefault);
+    ResetDataStage();
 
     return pdtSlotIndex;
 }

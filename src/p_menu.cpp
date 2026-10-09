@@ -144,11 +144,13 @@ enum
 #ifdef VERSION_GCCJGC
     MenuFontAllocationLine = 0xF4,
     MenuTextureAllocationLine = 0x17C,
+    MenuDrawDoneLine = 0x1AA,
     MenuMessageAllocationLine = 0x485,
     MenuRingAllocationLine = 0x48C,
 #else
     MenuFontAllocationLine = 0xF8,
     MenuTextureAllocationLine = 0x182,
+    MenuDrawDoneLine = 0x1B0,
     MenuMessageAllocationLine = 0x48B,
     MenuRingAllocationLine = 0x492,
 #endif
@@ -649,7 +651,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
     int i;
 
     if (m_mode != static_cast<int>(mode)) {
-        Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), 0x1B0);
+        Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), MenuDrawDoneLine);
         currentMode = m_mode;
         switch (currentMode) {
         case -1:

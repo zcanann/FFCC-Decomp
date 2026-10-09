@@ -2751,10 +2751,10 @@ void CMenuPcs::CalcSelectWait()
 			}
 		}
 		{
-			short count = m_bonusAnim->header.count;
-			CMenuPcs::Sprt2* cursor = &m_bonusAnim->sprites[count];
-			CMenuPcs::Sprt2* partySprite = cursor - activePartyCount * 2;
+			int count = m_bonusAnim->header.count;
+			CMenuPcs::Sprt2* cursor = &m_bonusAnim->sprites[count++];
 			cursor->kind = kBonusCursorTexture;
+			CMenuPcs::Sprt2* partySprite = cursor - activePartyCount * 2;
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
 			cursor->w = 0x40;
@@ -2769,7 +2769,7 @@ void CMenuPcs::CalcSelectWait()
 #endif
 			cursor->depth = 1.0f;
 			cursor->flags = 0;
-			m_bonusAnim->header.count = (short)(count + 1);
+			m_bonusAnim->header.count = count;
 			m_bonusAnim->sprites[2].flags = 0;
 			this->m_bonusState->m_currentRank = 0;
 			this->m_bonusState->m_selection = 4;
@@ -2785,7 +2785,7 @@ void CMenuPcs::CalcSelectWait()
 	frame = (int)this->m_bonusState->m_frame;
 
 	for (i = 0; i < activePartyCount; i++) {
-		if (s_Rinfo->m_party[i].m_rank == this->m_bonusState->m_currentRank) {
+		if (this->m_bonusState->m_currentRank == s_Rinfo->m_party[i].m_rank) {
 			break;
 		}
 	}
@@ -2879,7 +2879,6 @@ void CMenuPcs::CalcSelectWait()
 		CMenuPcs::Sprt2* spr2 = &m_bonusAnim->sprites[2];
 		count2 = m_bonusAnim->header.count;
 		spr2->x = (short)(int)s_Base->m_artifactPositions[this->m_bonusState->m_selection].x;
-		spr2 = &m_bonusAnim->sprites[2];
 		spr2->y = (short)(int)s_Base->m_artifactPositions[this->m_bonusState->m_selection].y;
 		if (spr2->timer < spr2->duration) {
 			spr2->alpha = (float)spr2->timer / (float)spr2->duration;

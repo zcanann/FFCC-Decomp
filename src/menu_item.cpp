@@ -14,10 +14,12 @@ enum {
     ITEM_TEX_FRAME = 0x2D,
     ITEM_TEX_TAB = 0x46,
     ITEM_TEX_LIST = 0x36,
+    ITEM_TEX_EMPTY = 0x33,
 #else
     ITEM_TEX_FRAME = 0x2E,
     ITEM_TEX_TAB = 0x47,
     ITEM_TEX_LIST = 0x37,
+    ITEM_TEX_EMPTY = 0x34,
 #endif
 };
 
@@ -383,7 +385,7 @@ void CMenuPcs::ItemDraw()
                         DrawEquipMark((int)(x - 12.0f), (int)((h - 24.0f) / 2.0 + y),
                                       entry->alpha);
                     }
-                    texId = 0x34;
+                    texId = ITEM_TEX_EMPTY;
                     itemAlpha = (float)((double)entry->alpha * 0.5);
                 }
 
@@ -440,7 +442,11 @@ void CMenuPcs::ItemDraw()
             x = (float)(entry[i].x + 0x1C);
             y = (float)(entry[i].y + 0xB);
             listFont->SetPosX(x);
+#ifdef VERSION_GCCJGC
+            listFont->SetPosY(y);
+#else
             listFont->SetPosY(y - 4.0f);
+#endif
             listFont->Draw(text);
         }
     }

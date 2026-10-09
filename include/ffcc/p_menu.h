@@ -19,6 +19,11 @@ extern "C" const char* gSingMenuTribeTableJp[4];
 extern "C" const char* gSingMenuJobTableJp[8];
 extern "C" const char* gSingMenuHairTableJp[32];
 extern "C" const char* gSingMenuAttrTableJp[20];
+
+#define GetMenuStr(index) ((char*)gSingMenuTextTableJp[index])
+#define GetTribeStr(index) ((char*)gSingMenuTribeTableJp[index])
+#define GetJobStr(index) ((char*)gSingMenuJobTableJp[index])
+#define GetHairStr(index) ((char*)gSingMenuHairTableJp[index])
 #endif
 
 class CColor;
@@ -456,9 +461,7 @@ public:
     void DrawHelpMessageUS(int, CFont*, int, int, _GXColor, int, float, float);
     void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
     void DrawEquipMark(int, int, float);
-#ifdef VERSION_GCCJGC
-    char* GetMenuStr(int index) { return (char*)gSingMenuTextTableJp[index]; }
-#else
+#ifndef VERSION_GCCJGC
     char* GetMenuStr(int);
 #endif
 
@@ -628,11 +631,7 @@ public:
     void WMChgMenu();
     void GetOptionData();
     const char* GetSkillStr(int);
-#ifdef VERSION_GCCJGC
-    char* GetTribeStr(int index) { return (char*)gSingMenuTribeTableJp[index]; }
-    char* GetJobStr(int index) { return (char*)gSingMenuJobTableJp[index]; }
-    char* GetHairStr(int index) { return (char*)gSingMenuHairTableJp[index]; }
-#else
+#ifndef VERSION_GCCJGC
     char* GetTribeStr(int);
     char* GetJobStr(int);
     char* GetHairStr(int);

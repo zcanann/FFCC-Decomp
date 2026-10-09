@@ -29,6 +29,12 @@
 #define BONUS_LINE(line, usLine, jpLine) (line)
 #endif
 
+#ifdef VERSION_GCCP01
+#define BONUS_MODEL_SPIN 2.4
+#else
+#define BONUS_MODEL_SPIN 2.0
+#endif
+
 static const float s_PCYpos[4] = {-11.14f, -7.1f, -11.55f, -11.14f};
 static const float s_PCScl[4] = {0.87f, 0.78f, 0.78f, 0.87f};
 static const float s_AnimX[3] = {9.1f, 13.7f, 27.9f};
@@ -531,7 +537,7 @@ void CMenuPcs::destroyBonus()
 void CMenuPcs::calcBonus()
 {
 	this->m_bonusState->m_modelRotation =
-	    static_cast<float>((double)this->m_bonusState->m_modelRotation - 2.4);
+	    static_cast<float>((double)this->m_bonusState->m_modelRotation - BONUS_MODEL_SPIN);
 
 	if (m_bonusAnim->header.finished != 0) {
 		this->m_bonusState->m_phase++;
@@ -1577,7 +1583,7 @@ void CMenuPcs::DrawResultCountAnim()
 				font->SetShadow(0);
 				font->SetScale(1.0f);
 #else
-				font->SetScaleX(0.7f);
+				font->SetScaleX(0.8f);
 				font->SetScaleY(1.0f);
 				font->SetShadow(0);
 #endif

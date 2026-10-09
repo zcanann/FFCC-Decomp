@@ -152,15 +152,6 @@ static inline int CGMonObj_SearchNoticeParty(CGMonObj* monObj)
 	return -1;
 }
 
-static inline void CGMonObj_PlayNoticeSe(CGMonObj* monObj)
-{
-	CGObjWork* scriptHandle = monObj->m_scriptHandle;
-	int se = Math.Rand(3);
-	unsigned short* romWork = scriptHandle->m_romWork;
-	se += romWork[0xC8] * 1000 + romWork[0xC9];
-	monObj->playSe3D(se, 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
-}
-
 static inline void CGMonObj_MoveToTarget(CGMonObj* monObj, float speedScale)
 {
 	monObj->moveVector(CVector(monObj->m_worldPosition) - CVector(reinterpret_cast<CGObject*>(Game.m_partyObjArr[monObj->m_targetPartyIndex])->m_worldPosition), speedScale, 1);
@@ -740,6 +731,46 @@ void CGMonObj::onCancelStat(int state)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: 0x80133E7C
+ * EN Size: 84b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CGMonObj::isValidTarget()
+{
+	if ((m_targetPartyIndex < 0) ||
+		((m_targetPartyIndex >= 0) &&
+		 (reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_scriptHandle->m_hp == 0))) {
+		return 0;
+	}
+	return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 320b
+ * EN Address: 0x80133ED0
+ * EN Size: 160b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGMonObj::seKiduki()
+{
+	if (m_unk6B8 == 0) {
+		CGObjWork* scriptHandle = m_scriptHandle;
+		int se = Math.Rand(3);
+		unsigned short* romWork = scriptHandle->m_romWork;
+		se += romWork[0xC8] * 1000 + romWork[0xC9];
+		playSe3D(se, 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+		m_unk6B8 = 1;
+	}
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -756,16 +787,7 @@ void CGMonObj::onFrameStat()
 	case 0x11:
 	case 0x1E:
 		if (object->m_scriptHandle->m_hp != 0) {
-			int targetPartyIndex = m_targetPartyIndex;
-			int hasValidTarget;
-			if ((targetPartyIndex < 0) ||
-				((targetPartyIndex >= 0) &&
-				 (reinterpret_cast<CGObject*>(Game.m_partyObjArr[targetPartyIndex])->m_scriptHandle->m_hp == 0))) {
-				hasValidTarget = 0;
-			} else {
-				hasValidTarget = 1;
-			}
-			if (!hasValidTarget) {
+			if (!isValidTarget()) {
 				m_targetPartyIndex = -1;
 				prgObj->changeStat(0, 0, 0);
 			}
@@ -788,9 +810,9 @@ void CGMonObj::onFrameStat()
 
 	case 3: {
 		SET_DRAW_FLAG();
-		if ((prgObj->m_stateFrame == 0) && (object->CancelAnim(1), m_unk6B8 == 0)) {
-			CGMonObj_PlayNoticeSe(this);
-			m_unk6B8 = 1;
+		if (prgObj->m_stateFrame == 0) {
+			object->CancelAnim(1);
+			seKiduki();
 		}
 
 		int targetPartyIndex = m_targetPartyIndex;
@@ -892,45 +914,13 @@ void CGMonObj::onFrameStat()
 
 	case 0x10:
 		SET_DRAW_FLAG();
-		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(-1, 0, 0);
-		}
-		if (static_cast<unsigned int>(Math.Rand(0x32)) == 0) {
-			if (static_cast<unsigned int>(Math.Rand(2)) == 0) {
-				object->m_rotTargetY += 0.2f;
-			} else {
-				object->m_rotTargetY -= 0.2f;
-			}
-		}
+		statWatch();
 		break;
 
 
 	case 0x1D:
 		SET_DRAW_FLAG();
-		switch (prgObj->m_subState) {
-		case 0:
-			if (prgObj->m_subFrame == 0) {
-				CGObjWork* scriptHandle = object->m_scriptHandle;
-				int rand = Math.Rand(0x50);
-				float angle = kMonObjTwo * (kMonObjPi * Math.RandF());
-				float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-					(0.01f * static_cast<float>(scriptHandle->m_romWork[0x6A]) + kMonObjEpsilon);
-				object->moveVectorRot(angle, 0.0f, kMonObjQuarter * speedScale, rand + 10);
-			} else {
-				unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
-				if ((object->m_weaponNodeFlagAll.m_bits1.m_bit20 == 0) ||
-					(object->m_stateFlags0Bits.unk1 != 0)) {
-					object->CancelMove(1);
-					prgObj->changeSubStat(1);
-				}
-			}
-			break;
-		case 1:
-			if (static_cast<unsigned int>(Math.Rand(100)) == 0) {
-				prgObj->changeSubStat(0);
-			}
-			break;
-		}
+		statAround();
 		break;
 
 
@@ -1896,7 +1886,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::seKiduki()
+void CGMonObj::mlHide()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
@@ -1970,7 +1960,7 @@ void CGMonObj::seKiduki()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::isValidTarget()
+void CGMonObj::mlEscape()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 #define script9 (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork))
@@ -2079,7 +2069,7 @@ void CGMonObj::moveCancel()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::statAround()
+void CGMonObj::mlMove()
 {
 	CGMonObj* monObj = this;
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
@@ -2264,15 +2254,6 @@ void CGMonObj::mlAway()
 	// TODO
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlHide()
-{
-	// TODO
-}
 
 /*
  * --INFO--
@@ -2294,15 +2275,6 @@ void CGMonObj::mlEscapeCheck()
 	// TODO
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlEscape()
-{
-	// TODO
-}
 
 /*
  * --INFO--
@@ -2398,16 +2370,6 @@ void CGMonObj::moveChaseAndStat(CGCharaObj*, int, float, int, int)
 	// TODO
 }
 
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlMove()
-{
-	// TODO
-}
 
 /*
  * --INFO--
@@ -2597,7 +2559,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::statWatch()
+void CGMonObj::mlAttack()
 {
 	CGMonObj* monObj = this;
 #define mon (reinterpret_cast<unsigned char*>(monObj))
@@ -2820,7 +2782,7 @@ void CGMonObj::statWatch()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::statMove(int* targetIndex)
+void CGMonObj::aiAddDefault(int& targetIndex)
 {
 #define monObj (this)
 #define mon (reinterpret_cast<unsigned char*>(this))
@@ -2828,7 +2790,7 @@ void CGMonObj::statMove(int* targetIndex)
 #define prgObj (reinterpret_cast<CGPrgObj*>(this))
 	switch (m_chaseState) {
 	case 4:
-		monObj->seKiduki();
+		monObj->mlHide();
 		break;
 
 	case 0: {
@@ -2846,10 +2808,7 @@ void CGMonObj::statMove(int* targetIndex)
 			m_chaseState = 2;
 			m_chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
-			if (monObj->m_unk6B8 == 0) {
-				CGMonObj_PlayNoticeSe(monObj);
-				monObj->m_unk6B8 = 1;
-			}
+			monObj->seKiduki();
 		} else {
 			unsigned char* aiData;
 			if (monObj->m_aiState == 0) {
@@ -2877,7 +2836,7 @@ void CGMonObj::statMove(int* targetIndex)
 						static_cast<float>(object->m_scriptHandle->m_romWork[0x66]);
 					float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
 					if (static_cast<double>(repopDist) <= static_cast<double>(homeDist)) {
-						monObj->isValidTarget();
+						monObj->mlEscape();
 					}
 				} else {
 					CGMonObj::m_aiWork.m_state = 0;
@@ -2890,15 +2849,15 @@ void CGMonObj::statMove(int* targetIndex)
 	}
 
 	case 2:
-		monObj->statAround();
+		monObj->mlMove();
 		break;
 
 	case 1:
-		monObj->statWatch();
+		monObj->mlAttack();
 		break;
 
 	case 3:
-		monObj->isValidTarget();
+		monObj->mlEscape();
 		break;
 
 	case 5: {
@@ -2939,28 +2898,6 @@ void CGMonObj::statMove(int* targetIndex)
 #undef monObj
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::mlAttack()
-{
-	// TODO
-}
-
-
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::aiAddDefault(int&)
-{
-	// TODO
-}
 
 /*
  * --INFO--
@@ -2998,6 +2935,61 @@ int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, in
 	return 0;
 #undef aiPriority
 #undef aiBranch
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 168b
+ * EN Address: 0x80138A98
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGMonObj::statWatch()
+{
+	if (m_stateFrame == 0) {
+		reqAnim(-1, 0, 0);
+	}
+	if (static_cast<unsigned int>(Math.Rand(0x32)) == 0) {
+		if (static_cast<unsigned int>(Math.Rand(2)) == 0) {
+			m_rotTargetY += 0.2f;
+		} else {
+			m_rotTargetY -= 0.2f;
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 432b
+ * EN Address: 0x80138B44
+ * EN Size: 376b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGMonObj::statAround()
+{
+	switch (m_subState) {
+	case 0:
+		if (m_subFrame == 0) {
+			CGObjWork* work = m_scriptHandle;
+			int rand = Math.Rand(0x50);
+			float angle = kMonObjTwo * (kMonObjPi * Math.RandF());
+			float speedScale = m_pushScale * (0.01f * static_cast<float>(work->m_romWork[0x6A]) + kMonObjEpsilon);
+			moveVectorRot(angle, 0.0f, kMonObjQuarter * speedScale, rand + 10);
+		} else if ((m_weaponNodeFlagAll.m_bits1.m_bit20 == 0) || (m_stateFlags0Bits.unk1 != 0)) {
+			CancelMove(1);
+			changeSubStat(1);
+		}
+		break;
+	case 1:
+		if (static_cast<unsigned int>(Math.Rand(100)) == 0) {
+			changeSubStat(0);
+		}
+		break;
+	}
 }
 
 /*
@@ -3703,7 +3695,7 @@ void CGMonObj::moveFrame()
 void CGMonObj::logicFuncDefault()
 {
 	int targetIndex = 0;
-	statMove(&targetIndex);
+	aiAddDefault(targetIndex);
 }
 
 /*

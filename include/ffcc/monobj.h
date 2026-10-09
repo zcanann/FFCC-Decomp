@@ -74,7 +74,7 @@ public:
     void onChangeStat(int);
     void setActionParam(int);
     void onCancelStat(int);
-    void isValidTarget();
+    int isValidTarget();
     void seKiduki();
     void onFrameStat();
     void onStatMagic();
@@ -120,7 +120,7 @@ public:
     void setUndeadEffect(int, int);
     unsigned int IsDispRader();
     void setRepop(int);
-    void statMove(int*);
+    void statMove();
     void moveAStar(int, int, Vec&);
     void moveFrame();
     void logicFuncDefault();

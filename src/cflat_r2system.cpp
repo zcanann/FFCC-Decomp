@@ -3842,7 +3842,11 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
                 languageValue = 1;
                 break;
             case 1:
+#ifdef VERSION_GCCE01
+                languageValue = 2;
+#else
                 languageValue = 3;
+#endif
                 break;
             case 2:
                 languageValue = 5;

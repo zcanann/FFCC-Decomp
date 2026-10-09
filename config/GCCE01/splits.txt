@@ -751,9 +751,11 @@ p_light.cpp:
 
 pppYmMana.cpp:
 	.text start:0x800D4448 end:0x800D7EDC
+	.rodata     start:0x801DA3F0 end:0x801DA400
 
 pppMana2.cpp:
 	.text start:0x8010558C end:0x801085E4
+	.rodata     start:0x801DB3B8 end:0x801DB3D8
 
 mtx/mtx.c:
 	.text start:0x8018489C end:0x801852D8

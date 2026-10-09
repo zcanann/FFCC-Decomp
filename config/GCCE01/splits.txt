@@ -684,7 +684,7 @@ mapocttree.cpp:
 
 shopmenu.cpp:
 	.text start:0x8014F4BC end:0x801586D0
-	.rodata     start:0x801DDB18 end:0x801DDD74
+	.rodata     start:0x801DDB18 end:0x801DDDAC
 	.sdata2     start:0x80331AE0 end:0x80331E00
 	.data       start:0x80213C10 end:0x80213E60
 	.sbss       start:0x8032DEB0 end:0x8032DEB9

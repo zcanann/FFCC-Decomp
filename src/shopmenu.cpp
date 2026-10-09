@@ -27,18 +27,14 @@
 #include "ffcc/joybusconst.h"
 #include "ffcc/cardconst.h"
 #endif
-extern char s_shopmenu_cpp[];
-#if defined(VERSION_GCCJGC)
 #define SHOP_MENU_FILE "shopmenu.cpp"
+#if defined(VERSION_GCCJGC)
 #define SHOP_MENU_LINE(pal, us, jp) (jp)
 #elif defined(VERSION_GCCE01)
-#define SHOP_MENU_FILE s_shopmenu_cpp
 #define SHOP_MENU_LINE(pal, us, jp) (us)
 #else
-#define SHOP_MENU_FILE s_shopmenu_cpp
 #define SHOP_MENU_LINE(pal, us, jp) (pal)
 #endif
-extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
 #ifdef VERSION_GCCJGC
 static const unsigned int DAT_80332D04 = 0xFFFFFFFF;
@@ -3190,9 +3186,9 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     }
 
     char* helpText = new((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-                         s_shopmenu_cpp, SHOP_MENU_LINE(0xBFF, 0xBD9, 0xBFF)) char[0x200];
+                         SHOP_MENU_FILE, SHOP_MENU_LINE(0xBFF, 0xBD9, 0xBFF)) char[0x200];
     if ((helpText == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, SHOP_MENU_LINE(0xC01, 0xBDB, 0xC01));
+        System.Printf("%s(%d): Error: memory allocation error\n", SHOP_MENU_FILE, SHOP_MENU_LINE(0xC01, 0xBDB, 0xC01));
     }
     memset(helpText, 0, 0x200);
     CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);

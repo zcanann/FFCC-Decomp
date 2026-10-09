@@ -6,6 +6,9 @@
 #include <Dolphin/types.h>
 #include <dolphin/mtx.h>
 
+template <class T>
+class CPtrArray;
+
 class CMapPcs;
 class CMapObj;
 class COctTree;
@@ -56,6 +59,8 @@ public:
 };
 
 typedef char CMapShadow_size_check[(sizeof(CMapShadow) == 0xF4) ? 1 : -1];
+
+typedef CPtrArray<CMapShadow*> CMapShadowArray;
 
 void CMapShadowInsertOctTree(CMapShadow::TARGET, COctTree&);
 

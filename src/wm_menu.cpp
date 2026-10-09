@@ -8304,7 +8304,11 @@ void CMenuPcs::CalcMainMenuSub()
 
 		if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay == 0) {
 			m_wmWorldState->m_titleState++;
+#ifdef VERSION_GCCP01
 			if (m_wmWorldState->m_titleState >= 100) {
+#else
+			if (m_wmWorldState->m_titleState >= 120) {
+#endif
 				m_wmWorldState->m_titleState = 0;
 			}
 		} else {
@@ -8320,7 +8324,7 @@ void CMenuPcs::CalcMainMenuSub()
 
 			WmWorldObjInfo* const panel = &worldObj[i];
 			panel->m_active = 1;
-			int frame = 0;
+			int frame;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
 				modelScale *= DOUBLE_803315D8;
@@ -8334,8 +8338,8 @@ void CMenuPcs::CalcMainMenuSub()
 			panel->m_transform.m_position.y = zero;
 			panel->m_transform.m_position.z = FLOAT_803315E0;
 			panel->m_transform.m_rotation.x = zero;
-			panel->m_transform.m_rotation.y = FLOAT_803315E4 * static_cast<float>(i);
 			panel->m_transform.m_rotation.z = zero;
+			panel->m_transform.m_rotation.y = FLOAT_803315E4 * static_cast<float>(i);
 
 			PSMTXRotRad(workMtx, 'y', FLOAT_803314bc * panel->m_transform.m_rotation.y);
 			PSMTXMultVecSR(workMtx, &panel->m_transform.m_position, &modelPos);
@@ -8353,10 +8357,14 @@ void CMenuPcs::CalcMainMenuSub()
 				const int ms = m_wmWorldState->m_mainState;
 				if (ms != 2) {
 					if (ms < 2) {
+#ifdef VERSION_GCCJGC
+						frame = 0x14 - (ms * 10 + m_wmWorldState->m_frameCounter);
+#else
 						frame = 0x13 - (ms * 10 + m_wmWorldState->m_frameCounter);
 						if (static_cast<int>(frame) < 0) {
 							frame = 0;
 						}
+#endif
 					} else {
 						frame = m_wmWorldState->m_frameCounter + (ms - 3) * 10;
 					}

@@ -4564,10 +4564,10 @@ void CMenuPcs::DrawTitleMenu()
 			float alpha;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
+				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314E8);
 				fX = static_cast<float>(-(kTitleSlideDistance *
 				                           (static_cast<double>(5 - timer) / DOUBLE_80331798) -
 				                           static_cast<double>(fX)));
-				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314E8);
 			} else {
 				alpha = FLOAT_803313e8;
 			}
@@ -4650,8 +4650,8 @@ void CMenuPcs::DrawTitleMenu()
 			if (m_wmWorldState->m_flag09 == 0 &&
 			    i == m_wmWorldState->m_cardChannel) {
 				int timer = (int)m_wmWorldState->m_titleState;
-				float cursorScale = static_cast<float>(DOUBLE_803317A8 * static_cast<double>(timer) +
-				                                        static_cast<double>(FLOAT_803313e8));
+				float cursorScale = FLOAT_803313e8;
+				cursorScale += DOUBLE_803317A8 * static_cast<double>(timer);
 				int cursorAlpha = static_cast<int>(kColorScale *
 				                                   static_cast<float>(-(DOUBLE_803317B0 * static_cast<double>(timer) -
 				                                                        DOUBLE_80331420)));
@@ -4745,8 +4745,9 @@ void CMenuPcs::DrawTitleMenu()
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
 			if (m_wmWorldState->m_state0E != 0) {
 				lbl_8032E8AC = 1;
+				const int channel = m_wmWorldState->m_cardChannel;
 				m_wmWorldState->m_changeRequest = 1;
-				CallWorldParam(7, m_wmWorldState->m_cardChannel, 0);
+				CallWorldParam(7, channel, 0);
 				bytes[0x0D] = 0;
 			} else {
 				lbl_8032E8AC = 0;
@@ -4755,7 +4756,7 @@ void CMenuPcs::DrawTitleMenu()
 			m_wmWorldState->m_frameCounter = 0;
 			m_wmWorldState->m_worldReady = 0;
 		} else if (state != 2) {
-			unsigned int threshold = 10;
+			int threshold = 10;
 			m_wmWorldState->m_frameCounter++;
 			if (m_wmWorldState->m_mainState == 1) {
 				threshold = 0x28;
@@ -4774,7 +4775,7 @@ void CMenuPcs::DrawTitleMenu()
 					m_wmWorldState->m_titleState = 0;
 					CallWorldParam(9, 1, 0);
 				}
-			} else if (m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= kTitleIdleFrames) {
+			} else if (state == 2 && m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= kTitleIdleFrames) {
 				m_wmWorldState->m_state0E = 0;
 				m_wmWorldState->m_mainState++;
 				m_wmWorldState->m_frameCounter = 0;
@@ -8758,6 +8759,7 @@ inline int CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
+	int digitIdx;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	static const int s_TimeWTbl[] = {17, 10, 16, 16, 19, 17, 16, 16, 16, 15, 8};
 	static const unsigned char s_LocTex[][4] = {
@@ -8997,7 +8999,7 @@ nextListEntry:
 					}
 					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
 #endif
-					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
+					for (digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
 						if (digitCount == 1) {
 							digit = static_cast<int>(slotData->m_scriptSysVal0) % 10;
@@ -9146,7 +9148,7 @@ nextListEntry:
 				playWidth += static_cast<float>(s_TimeWTbl[playDigits[3]]);
 				playWidth += static_cast<float>(s_TimeWTbl[playDigits[4]]);
 				float playX = FLOAT_80331518 - playWidth;
-				for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
+				for (digitIdx = 0; digitIdx < 5; digitIdx++) {
 					if (playDigits[digitIdx] >= 0) {
 						if (digitIdx == 3) {
 							const float colonW = static_cast<float>(s_TimeWTbl[10]);

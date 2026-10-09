@@ -2925,7 +2925,7 @@ void CGCharaObj::StaticFrame()
 			unsigned char* script = reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle);
 			unsigned short hp = *reinterpret_cast<unsigned short*>(script + 0x1C);
 			if (hp != 0 && static_cast<int>(hp) <= static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(script + 0x1A)) >> 2)) {
-				if ((static_cast<int>(System.m_frameCounter) % 0x1E) == 0) {
+				if ((static_cast<int>(System.GetCounter()) % 0x1E) == 0) {
 					Sound.PlaySe(0x53, 0x40, 0x7F, 0);
 				}
 				break;
@@ -3058,7 +3058,7 @@ void CGCharaObj::combi2()
 		comboCenter /= static_cast<float>(participantCount);
 	}
 
-	System.Printf("combi: %d: combi%dに決定\n", System.m_frameCounter, comboData->m_command);
+	System.Printf("combi: %d: combi%dに決定\n", System.GetCounter(), comboData->m_command);
 
 	leadParty = candidates[participantCount - 1];
 	playedComboSe = 0;

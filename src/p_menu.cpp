@@ -1317,7 +1317,7 @@ void CMenuPcs::drawPause()
     }
 
     SetTexture(static_cast<TEX>(1));
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * (0.5f * (1.0f + sinf(static_cast<int>(System.m_frameCounter) * 0.1f)))));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * (0.5f * (1.0f + sinf(static_cast<int>(System.GetCounter()) * 0.1f)))));
     SetColor(color);
     DrawRect(3, 320.0f, 224.0f, 120.0f, 56.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }

@@ -1132,7 +1132,7 @@ void CMenuPcs::CmdDraw()
 			}
 		}
 
-		const s32 frame = static_cast<s32>(System.m_frameCounter) % 8;
+		const s32 frame = static_cast<s32>(System.GetCounter()) % 8;
 		x += static_cast<float>(frame);
 		DrawCursor(static_cast<s32>(x), static_cast<s32>(y), 1.0f);
 	}

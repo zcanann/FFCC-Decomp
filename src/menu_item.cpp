@@ -500,7 +500,7 @@ void CMenuPcs::ItemDraw()
             y += (float)(m_itemMenuState->cursorIndex[1] * SingWinMessHeight());
         }
 
-        x += (float)((int)System.m_frameCounter % 8);
+        x += (float)((int)System.GetCounter() % 8);
         DrawCursor((int)x, (int)y, 1.0f);
     }
 

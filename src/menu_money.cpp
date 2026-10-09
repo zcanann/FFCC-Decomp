@@ -421,7 +421,7 @@ void CMenuPcs::MoneyDraw()
 		x = (float)window->x;
 		y = (float)(window->y + 0x20);
 		y += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
-		x += (float)((int)System.m_frameCounter % 8);
+		x += (float)((int)System.GetCounter() % 8);
 		DrawCursor((int)x, (int)y, 1.0f);
 	}
 }

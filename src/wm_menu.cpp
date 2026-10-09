@@ -9478,7 +9478,7 @@ inline void CMenuPcs::DrawPageMark()
 #else
 	const int kPageMarkTexture = 43;
 #endif
-	const int phase = abs(static_cast<int>(System.m_frameCounter) % 20 - 10);
+	const int phase = abs(static_cast<int>(System.GetCounter()) % 20 - 10);
 	const float scale = static_cast<float>(0.03 * phase + 0.7);
 	float x = 220.0f;
 	x -= 40.0;

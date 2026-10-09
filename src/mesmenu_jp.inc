@@ -32,7 +32,7 @@ void CMesMenu::onDraw()
             unsigned int buttons = Pad.GetButton(0);
 
             if ((buttons & 0x100) != 0) {
-                iconFrame = tCut[(System.m_frameCounter & 6) >> 1];
+                iconFrame = tCut[(System.GetCounter() & 6) >> 1];
             } else {
                 iconFrame = tCut[0];
             }

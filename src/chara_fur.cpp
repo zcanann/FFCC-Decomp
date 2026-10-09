@@ -1088,7 +1088,7 @@ void CChara::InitFurTexBuffer()
 	}
 
 	fur.m_dirty = 0;
-	Chara.MogFur().m_timestamp = System.m_frameCounter;
+	Chara.MogFur().m_timestamp = System.GetCounter();
 	memset(fur.m_score, 0, 0x40);
 	CalcMogScore();
 }
@@ -1277,7 +1277,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 		case 3: {
 			brushColor = CColor(0xF, 0xF, 0xF, 4);
-			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
+			doPaint = (static_cast<int>(System.GetCounter()) % 4) == 0;
 			break;
 		}
 		case 4:
@@ -1285,7 +1285,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				brushColor = CColor(0, 0, 0, 2);
 			}
 			eraseMode = 1;
-			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
+			doPaint = (static_cast<int>(System.GetCounter()) % 4) == 0;
 			break;
 		}
 		_GXColor centerBefore;
@@ -1328,8 +1328,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			}
 
 			if (doPaint != 0) {
-				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
-				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
+				int emitParticle = ((static_cast<int>(System.GetCounter()) % 2) == 0);
+				int playGate = ((static_cast<int>(System.GetCounter()) % 4) == 0);
 				int particleNo = 0;
 				int seId = 0;
 				CColor particleColorObj(centerBefore);
@@ -1360,8 +1360,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					}
 					seId = 0x249f4;
 					particleNo = 0x74;
-					emitParticle = ((static_cast<int>(System.m_frameCounter) % 8) == 0);
-					playGate = ((static_cast<int>(System.m_frameCounter) % 16) == 0);
+					emitParticle = ((static_cast<int>(System.GetCounter()) % 8) == 0);
+					playGate = ((static_cast<int>(System.GetCounter()) % 16) == 0);
 					break;
 				case 4:
 					m_mogWork.m_offColorTicks = 0;
@@ -1374,7 +1374,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 						particleColor.a = 0;
 					}
 					seId = 0x249f3;
-					playGate = ((static_cast<int>(System.m_frameCounter) % 8) == 0);
+					playGate = ((static_cast<int>(System.GetCounter()) % 8) == 0);
 					break;
 				}
 
@@ -1610,7 +1610,7 @@ void CChara::CalcMogScore()
 void CChara::TimeMogFur()
 {
 	int y, x;
-	const int frameCounter = static_cast<int>(System.m_frameCounter);
+	const int frameCounter = static_cast<int>(System.GetCounter());
 
 	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
 		MogFur().m_timestamp = frameCounter;

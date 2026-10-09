@@ -683,7 +683,7 @@ void CRingMenu::onDraw()
 							float blink;
 							if (selected != 0) {
 								MenuPcs.SetColor(CColor(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha)));
-								blink = static_cast<float>(static_cast<int>((System.m_frameCounter >> 2) & 1));
+								blink = static_cast<float>(static_cast<int>((System.GetCounter() >> 2) & 1));
 							} else {
 								if (caravanWork->IsUseCmdList(i)) {
 									MenuPcs.SetColor(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha)));
@@ -816,7 +816,7 @@ void CRingMenu::drawGBA()
 			MenuPcs.DrawRect(3, posX + orbitX, posY - orbitY, 48.0f, 48.0f, 0.0f, 240.0f,
 			                                 1.0f, 1.0f, 0.0f);
 		} else {
-			int frameTex = (static_cast<int>(System.m_frameCounter) >> 1) % 16;
+			int frameTex = (static_cast<int>(System.GetCounter()) >> 1) % 16;
 			if (frameTex >= 4) {
 				frameTex &= 1;
 			}
@@ -1003,7 +1003,7 @@ void CRingMenu::DrawIcon()
 
 	float posX = 320.0f * clipPos.x + 320.0f;
 	float posY = 224.0f - 224.0f * clipPos.y;
-	unsigned char blinkAlpha = color[static_cast<int>(System.m_frameCounter) % 16];
+	unsigned char blinkAlpha = color[static_cast<int>(System.GetCounter()) % 16];
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_NAVI));
 	int iconRow;

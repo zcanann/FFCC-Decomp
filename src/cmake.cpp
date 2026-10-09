@@ -1025,7 +1025,7 @@ inline void CMenuPcs::DrawCrystal(int x, int y, float alpha)
         static_cast<float>(x),
         static_cast<float>(y),
         32.0f, 48.0f,
-        static_cast<float>(((static_cast<int>(System.m_frameCounter) >> 1) % 8) << 5), 0.0f,
+        static_cast<float>(((static_cast<int>(System.GetCounter()) >> 1) % 8) << 5), 0.0f,
         1.0f, 1.0f, 0.0f);
 }
 
@@ -1169,7 +1169,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 
     if (yesNoSel != 0) {
         tx -= 0x20;
-        tx += static_cast<int>(System.m_frameCounter) % 8;
+        tx += static_cast<int>(System.GetCounter()) % 8;
         DrawCursor(tx, cursorY, alpha);
     }
 }
@@ -1531,7 +1531,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
             cursorBase = yesX;
         }
         cursorBase -= 0x24;
-        cursorBase += static_cast<int>(System.m_frameCounter) % 8;
+        cursorBase += static_cast<int>(System.GetCounter()) % 8;
         DrawCursor(cursorBase, 0x175, alpha);
     }
 }
@@ -1902,7 +1902,7 @@ void CMenuPcs::CmakeNameDraw()
         y = 0x70;
         x += 26.9f * static_cast<float>(m_cmakeState->m_select);
         y += m_cmakeState->m_row * 0x20;
-        x += static_cast<int>(System.m_frameCounter) % 8;
+        x += static_cast<int>(System.GetCounter()) % 8;
         DrawCursor(x, y, 1.0f);
     }
 
@@ -2092,7 +2092,7 @@ void CMenuPcs::CmakeSexDraw()
         float cx = 400.0 - labelWidth / 2.0;
         float cy = 156.0f;
         cy += static_cast<float>(sel * 0x28);
-        cx += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+        cx += static_cast<float>(static_cast<int>(System.GetCounter()) % 8);
         DrawCursor(static_cast<int>(cx - labelWidth / 2.0), static_cast<int>(cy), 1.0f);
     }
 }
@@ -2357,10 +2357,10 @@ void CMenuPcs::CmakeTribeDraw()
         float cursorY = static_cast<float>(0x88 + m_cmakeState->m_select * 0x1C);
 
         if (m_cmakeState->m_fieldSelect == 0) {
-            tribeX += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+            tribeX += static_cast<float>(static_cast<int>(System.GetCounter()) % 8);
             DrawCursor(static_cast<int>(tribeX), static_cast<int>(cursorY), alpha);
         } else {
-            if ((System.m_frameCounter & 1) != 0) {
+            if ((System.GetCounter() & 1) != 0) {
                 DrawCursor(static_cast<int>(tribeX), static_cast<int>(cursorY), alpha);
             }
 
@@ -2369,7 +2369,7 @@ void CMenuPcs::CmakeTribeDraw()
 #else
             float hairX = 348.0f;
 #endif
-            hairX += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+            hairX += static_cast<float>(static_cast<int>(System.GetCounter()) % 8);
             DrawCursor(
                 static_cast<int>(hairX),
                 static_cast<int>(static_cast<float>(0x88 + m_cmakeState->m_row * 0x1C)), alpha);
@@ -2586,7 +2586,7 @@ void CMenuPcs::CmakeJobDraw()
         }
         float jx = static_cast<float>(cursorX);
         jx -= 36.0f;
-        jx += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+        jx += static_cast<float>(static_cast<int>(System.GetCounter()) % 8);
         DrawCursor(static_cast<int>(jx),
             static_cast<int>(static_cast<float>(sel % 4 * 0x28 + 0x70)), alpha);
     }
@@ -3116,7 +3116,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     if (m_cmakeState->m_mode == 1) {
         float cursorX = 196.0f;
-        cursorX += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+        cursorX += static_cast<float>(static_cast<int>(System.GetCounter()) % 8);
         DrawCursor(static_cast<int>(cursorX), static_cast<int>(static_cast<float>(0x70 + m_cmakeState->m_select * 0x28)), alpha);
     }
 }
@@ -3345,7 +3345,7 @@ void CMenuPcs::CmakeVillageDraw()
         y = 0x70;
         x += 26.9f * static_cast<float>(villageWork->m_select);
         y += villageWork->m_row * 0x20;
-        x += static_cast<int>(System.m_frameCounter) % 8;
+        x += static_cast<int>(System.GetCounter()) % 8;
         DrawCursor(x, y, 1.0f);
     }
 

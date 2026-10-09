@@ -638,7 +638,7 @@ void CMenuPcs::EquipDraw()
 			cx = (float)(item->x - 0x14);
 			cy = (float)((item->h - 0x20) / 2.0 + item->y);
 		}
-		cx += (float)((int)System.m_frameCounter % 8);
+		cx += (float)((int)System.GetCounter() % 8);
 		DrawCursor((int)cx, (int)cy, 1.0f);
 	}
 

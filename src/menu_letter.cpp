@@ -1254,7 +1254,7 @@ void CMenuPcs::LetterListDraw()
 		iconY += 0x20;
 	}
 
-	const int cursorX = static_cast<int>(32.0f + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8));
+	const int cursorX = static_cast<int>(32.0f + static_cast<float>(static_cast<int>(System.GetCounter()) % 8));
 	const int cursorY = static_cast<int>(static_cast<float>(m_letterMenuState->listCursor * 0x20 + 0x60));
 	DrawCursor(cursorX, cursorY, 1.0f);
 }
@@ -1422,7 +1422,7 @@ void CMenuPcs::LetterMessDraw()
 			y0 = static_cast<float>(m_menuWindowInfo->y + (itemSel + 0x20));
 		}
 
-		int frameAnim = static_cast<int>(System.m_frameCounter) % 8;
+		int frameAnim = static_cast<int>(System.GetCounter()) % 8;
 		x0 += static_cast<float>(frameAnim);
 		DrawCursor(static_cast<int>(x0), static_cast<int>(y0), 1.0f);
 	}
@@ -1953,7 +1953,7 @@ void CMenuPcs::LetterDrawPageMark(int pageMark)
 {
 	float markX = 592.0f;
 	float markY = 160.0f;
-	const int absPhase = abs(static_cast<int>(System.m_frameCounter) % 0x14 - 10);
+	const int absPhase = abs(static_cast<int>(System.GetCounter()) % 0x14 - 10);
 	const float markScale = static_cast<float>(0.7 + 0.03 * static_cast<double>(absPhase));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

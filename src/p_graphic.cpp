@@ -344,7 +344,7 @@ void CGraphicPcs::drawEnd()
 			x += 0x60;
 		}
 
-		sprintf(debugInputString, s_debug_frame_fmt, System.m_frameCounter);
+		sprintf(debugInputString, s_debug_frame_fmt, System.GetCounter());
 		Graphic.DrawDebugStringDirect(port * 0x60 + 0x10, 0x1A8, debugInputString, 8);
 	}
 

@@ -1278,7 +1278,7 @@ void CMenuPcs::DrawOptionMenu()
 	             static_cast<unsigned int>(h));
 	gUtil.CalcUV(uv1.x, uv1.y, 0x20, 0x20, static_cast<unsigned int>(w),
 	             static_cast<unsigned int>(h));
-	gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(System.m_frameCounter) % 8 + 0x1C),
+	gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(System.GetCounter()) % 8 + 0x1C),
 	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), 32.0f,
 	                        32.0f, m_textures[0], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);

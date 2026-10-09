@@ -2629,8 +2629,8 @@ void CShopMenu::DrawItemList()
             MenuPcs.DrawInit();
             int cursorY = y - 0x14;
             if (m_subMode == 0) {
-                MenuPcs.DrawCursor(0x114 + (static_cast<int>(System.m_frameCounter) % 8), cursorY, FLOAT_80332d28);
-            } else if ((System.m_frameCounter & 1) == 0) {
+                MenuPcs.DrawCursor(0x114 + (static_cast<int>(System.GetCounter()) % 8), cursorY, FLOAT_80332d28);
+            } else if ((System.GetCounter() & 1) == 0) {
                 MenuPcs.DrawCursor(0x114, cursorY, FLOAT_80332d28);
             }
         } else {
@@ -2656,7 +2656,7 @@ void CShopMenu::DrawItemList()
         ++itemIndex;
     }
 
-    int pulse = abs(static_cast<int>(System.m_frameCounter) % 0x14 - 10);
+    int pulse = abs(static_cast<int>(System.GetCounter()) % 0x14 - 10);
     unsigned char alpha = static_cast<unsigned char>(255.0 * (0.05 * static_cast<double>(pulse) + 0.5));
     float scale = static_cast<float>(0.5 * (0.03 * static_cast<double>(pulse) + 0.7));
 

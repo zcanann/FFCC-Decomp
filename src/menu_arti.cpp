@@ -329,7 +329,7 @@ void CMenuPcs::ArtiDraw()
 		entry += m_artiState->selections[0];
 		x = (float)(entry->x - 0x14);
 		y = (float)((entry->h - 0x20) / 2.0 + entry->y);
-		x += (float)((int)System.m_frameCounter % 8);
+		x += (float)((int)System.GetCounter() % 8);
 		DrawCursor((int)x, (int)y, 1.0f);
 	}
 

@@ -135,7 +135,7 @@ void CMenuPcs::MLstDraw()
 		MenuLstEntry* curItem = &this->m_menuLstList->entries[this->m_menuLstState->cursor];
 		float cursorX = (float)(curItem->x - 0x38);
 		float cursorY = (curItem->height - 0x20) / 2.0 + curItem->y;
-		cursorX += (float)((int)System.m_frameCounter % 8);
+		cursorX += (float)((int)System.GetCounter() % 8);
 		DrawCursor((int)cursorX, (int)cursorY, 1.0f);
 	}
 

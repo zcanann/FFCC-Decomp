@@ -1952,6 +1952,7 @@ static void _VoiceDropedCallback(void* dropped)
 void EnvelopeKeyExecute()
 {
     RedVoiceDATA* voiceData = RedVoiceDataGetBegin();
+    int pitch;
     int voiceIndex = 0;
 
     do {
@@ -1990,7 +1991,7 @@ void EnvelopeKeyExecute()
             u32 envChanged = 0;
 
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_PITCH_DIRTY) != 0) {
-                int pitch = voiceData->m_targetPitch;
+                pitch = voiceData->m_targetPitch;
                 voiceFlags |= AX_SYNC_FLAG_COPYRATIO;
                 voice->pb.src.ratioHi = (u16)(((u32)pitch >> REDSOUND_AX_HIGH_WORD_SHIFT) & REDSOUND_AX_SRC_RATIO_HI_MASK);
                 voice->pb.src.ratioLo = (u16)pitch;
@@ -2149,7 +2150,7 @@ void EnvelopeKeyExecute()
  */
 static void _KeyOnControl()
 {
-    RedVoiceStartMask voiceStartMask;
+    volatile RedVoiceStartMask voiceStartMask;
     RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
     int work;
@@ -2165,7 +2166,7 @@ static void _KeyOnControl()
         voiceData = RedVoiceDataGetBegin();
         do {
             if ((reserve->m_track != 0) && (reserve->m_track->m_waveData != 0)) {
-                voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, &voiceStartMask.m_low);
+                voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, (int*)&voiceStartMask.m_low);
             }
             reserve++;
         } while ((voiceData != 0) && (reserve < RedKeyOnGetEnd(RedKeyOnDataGet())));

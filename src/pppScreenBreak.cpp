@@ -213,12 +213,11 @@ static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], 
 {
     Vec lightDir;
     GXLightObj lightObj;
-    CCameraPcs* camera = &CameraPcs;
     float zero = 0.0f;
 
-    lightDir.x = camera->m_directionX - (30.0f + camera->m_positionX);
-    lightDir.y = camera->m_directionY - (30.0f + camera->m_positionY);
-    lightDir.z = camera->m_directionZ - (30.0f + camera->m_positionZ);
+    lightDir.x = CameraPcs.m_directionX - (30.0f + CameraPcs.m_positionX);
+    lightDir.y = CameraPcs.m_directionY - (30.0f + CameraPcs.m_positionY);
+    lightDir.z = CameraPcs.m_directionZ - (30.0f + CameraPcs.m_positionZ);
     PSVECNormalize(&lightDir, &lightDir);
 
     GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, 1.0f, zero);

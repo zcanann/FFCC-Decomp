@@ -7280,7 +7280,6 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
 
-	CSystem* const sys = &System;
 	for (i = 0; i < 2; i++) {
 		float y = 10.0f + static_cast<float>(i * 0xB8);
 		y += 134.0f;
@@ -7326,7 +7325,7 @@ void CMenuPcs::DrawCharaName()
 #else
 				text = emptyText[1];
 #endif
-				const int phase = static_cast<int>(sys->m_frameCounter) % 20 - 10;
+				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
 				if (this->m_wmWorldState->m_mainState == 2) {
 					const int absPhase = abs(phase);
 					fade = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(absPhase) - DOUBLE_80331420));

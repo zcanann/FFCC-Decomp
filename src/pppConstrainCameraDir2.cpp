@@ -84,7 +84,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* constrainCameraDir, pppC
 
             Vec direct0;
             Vec direct1;
-            gUtil.GetDirectVector(&direct0, &direct1, cameraDir);
+            Util.GetDirectVector(&direct0, &direct1, cameraDir);
 
             Vec localOffset0;
             localOffset0.x = localX * direct0.x;

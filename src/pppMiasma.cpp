@@ -361,7 +361,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             drawColor.rgba[2] = 0;
             drawColor.rgba[3] = 0xFF;
         }
-        gUtil.RenderColorQuad(0.0f, yPos, width,
+        Util.RenderColorQuad(0.0f, yPos, width,
                               height, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv(
@@ -451,7 +451,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
                 drawColor.rgba[2] = 0;
                 drawColor.rgba[3] = 0xFF;
             }
-            gUtil.RenderColorQuad(0.0f, yPos, width,
+            Util.RenderColorQuad(0.0f, yPos, width,
                                   height, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -521,11 +521,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         }
 
         Graphic.SetViewport();
-        gUtil.RenderTextureQuad(0.0f, yPos, width,
+        Util.RenderTextureQuad(0.0f, yPos, width,
                                 height, &backSceneTex, 0, 0,
                                 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-        gUtil.BeginQuadEnv();
-        gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
+        Util.BeginQuadEnv();
+        Util.SetVtxFmt_POS_CLR_TEX0_TEX1();
 
         if (step->m_initWOrk == 0) {
             tevSwapChannel = 0;
@@ -609,13 +609,13 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             pppInitBlendMode();
             pppSetBlendMode(0);
             if (step->m_arg3 != 2) {
-                gUtil.RenderQuadTex2(quadA, quadB, packedColor.color, 0, 0);
+                Util.RenderQuadTex2(quadA, quadB, packedColor.color, 0, 0);
             }
         }
 
-        gUtil.InitConstantRegister();
-        gUtil.BeginQuadEnv();
-        gUtil.SetVtxFmt_POS_CLR_TEX();
+        Util.InitConstantRegister();
+        Util.BeginQuadEnv();
+        Util.SetVtxFmt_POS_CLR_TEX();
         if (step->m_arg3 != 1) {
             GXSetTevDirect(GX_TEVSTAGE0);
             GXLoadTexObj(&miasmaMaskTex, GX_TEXMAP0);
@@ -716,16 +716,16 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             quadB.x = width;
             quadB.y = yPos + height;
             quadB.z = 0.0f;
-            gUtil.RenderQuad(quadA, quadB, packedWork.color, 0, 0);
+            Util.RenderQuad(quadA, quadB, packedWork.color, 0, 0);
         }
 
-        gUtil.InitConstantRegister();
+        Util.InitConstantRegister();
         slice++;
     } while (slice < 2);
 
-    gUtil.EndQuadEnv();
+    Util.EndQuadEnv();
     pppInitBlendMode();
     _GXSetTevSwapMode(0, 0, 0);
     Graphic.SetViewport();
-    gUtil.InitConstantRegister();
+    Util.InitConstantRegister();
 }

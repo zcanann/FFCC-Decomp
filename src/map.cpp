@@ -29,7 +29,7 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-CMapMng MapMng;
+CMapMng g_MapMng;
 unsigned char g_MapHitDrawMode;
 unsigned char g_MapHitFaceFlag;
 char g_StrTmp[0x400];
@@ -43,8 +43,6 @@ static const _GXColor s_mapDbgLightColor = { 0xFF, 0xFF, 0xFF, 0xFF };
 static const _GXColor s_mapDbgMaterialColor = { 0xFF, 0xFF, 0xFF, 0xFF };
 static const _GXColor s_mapDbgAmbientColor = { 0x40, 0x40, 0x40, 0xFF };
 static const char s_mapNewLine[] = "\n";
-extern "C" unsigned char Vec_80245758[];
-
 static const Vec kMapHitLightDir0 = { 1.0f, 1.0f, 1.0f };
 static const Vec kMapHitLightDir1 = { -1.0f, 1.0f, -1.0f };
 static const char s_set_bg_camera_semi_trans_missing_fmt[] =
@@ -218,7 +216,7 @@ int CMapKeyFrame::IsRun()
 void CMapKeyFrame::ReadJun(CChunkFile& chunkFile, int count)
 {
     m_junCount = static_cast<unsigned char>(count);
-    m_junTable = new (MapMng.m_stage, "map.cpp", 0xC1) unsigned char[m_junCount];
+    m_junTable = new (g_MapMng.m_stage, "map.cpp", 0xC1) unsigned char[m_junCount];
 
     for (int i = 0; i < static_cast<int>(m_junCount); i++) {
         m_junTable[i] = chunkFile.Get1();
@@ -252,8 +250,8 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
 {
     m_isRun = 1;
     m_keyCount = static_cast<unsigned char>(count);
-    m_keyFrame = new (MapMng.m_stage, "map.cpp", 0xD5) float[m_keyCount];
-    m_keyValue = new (MapMng.m_stage, "map.cpp", 0xD6) float[m_keyCount];
+    m_keyFrame = new (g_MapMng.m_stage, "map.cpp", 0xD5) float[m_keyCount];
+    m_keyValue = new (g_MapMng.m_stage, "map.cpp", 0xD6) float[m_keyCount];
 
     for (int i = 0; i < static_cast<int>(m_keyCount); i++) {
         m_keyFrame[i] = chunkFile.GetF4();
@@ -261,7 +259,7 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
     }
 
     if (m_mode == 1) {
-        m_splineTable = new (MapMng.m_stage, "map.cpp", 0xDE) float[m_keyCount];
+        m_splineTable = new (g_MapMng.m_stage, "map.cpp", 0xDE) float[m_keyCount];
         Math.MakeSpline1Dtable(static_cast<int>(m_keyCount) - 1, m_keyValue, m_keyFrame, m_splineTable);
     }
 }
@@ -939,10 +937,10 @@ int CMapMng::ReadMtx(char* mapName)
 {
     int append = 0;
 
-    MapMng.SetDraw(1);
+    g_MapMng.SetDraw(1);
 
     if (m_asyncLoadState.m_mapReadMode != 2 && m_asyncLoadState.m_mapReadMode != 3) {
-        CMemory::CStage* stage = MapMng.m_stage;
+        CMemory::CStage* stage = g_MapMng.m_stage;
         CTextureSet* textureSet = new (stage, "map.cpp", 0x3A9) CTextureSet;
         m_textureSet = textureSet;
     }
@@ -1029,7 +1027,7 @@ int CMapMng::ReadMpl(char* mapName)
 {
     char* strTmp = g_StrTmp;
 
-    MapMng.SetDraw(1);
+    g_MapMng.SetDraw(1);
 
     for (int loadIndex = 0;; loadIndex++) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
@@ -1084,12 +1082,12 @@ int CMapMng::ReadMpl(char* mapName)
                             if (meshCount >= 0xA0) {
                                 return 0;
                             }
-                            m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, MapMng.m_stage, 1, 1);
+                            m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, g_MapMng.m_stage, 1, 1);
                             break;
                         }
                         case 0x44534554: {
                             short& meshCount = m_mapMeshCount;
-                            m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, MapMng.m_stage, 1, 1);
+                            m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, g_MapMng.m_stage, 1, 1);
                             meshCount += 1;
                             break;
                         }
@@ -1132,7 +1130,7 @@ int CMapMng::ReadOtm(char* mapName)
 {
     unsigned long size;
 
-    MapMng.SetDraw(1);
+    g_MapMng.SetDraw(1);
     char* strTmp = g_StrTmp;
     void* filePtr;
     sprintf(strTmp, "%s.otm", mapName);
@@ -1190,7 +1188,7 @@ int CMapMng::ReadOtm(char* mapName)
                 switch (chunk.m_id) {
                 case 0x4D534554: {
                     m_materialSet =
-                        new (MapMng.m_stage, "map.cpp", 0x482) CMaterialSet();
+                        new (g_MapMng.m_stage, "map.cpp", 0x482) CMaterialSet();
                     m_materialSet->SetDefaultSize(0x180, 0);
                     m_materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                     break;
@@ -1198,7 +1196,7 @@ int CMapMng::ReadOtm(char* mapName)
 
                 case 0x41534554: {
                     m_mapTexAnimSet =
-                        new (MapMng.m_stage, "map.cpp", 0x49A) CMapTexAnimSet();
+                        new (g_MapMng.m_stage, "map.cpp", 0x49A) CMapTexAnimSet();
                     m_mapTexAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
                     break;
                 }
@@ -1208,7 +1206,7 @@ int CMapMng::ReadOtm(char* mapName)
                     if (meshCount >= 0xA0) {
                         return 0;
                     }
-                    m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, MapMng.m_stage, 0, 1);
+                    m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, g_MapMng.m_stage, 0, 1);
                     meshCount += 1;
                     break;
                 }
@@ -1234,7 +1232,7 @@ int CMapMng::ReadOtm(char* mapName)
                 }
 
                 case 0x414E494D: {
-                    CMapAnim* mapAnim = new (MapMng.m_stage, "map.cpp", 0x4BF) CMapAnim();
+                    CMapAnim* mapAnim = new (g_MapMng.m_stage, "map.cpp", 0x4BF) CMapAnim();
                     mapAnim->ReadOtmAnim(chunkFile);
                     GetMapAnimArray().Add(mapAnim);
                     break;
@@ -1257,7 +1255,7 @@ int CMapMng::ReadOtm(char* mapName)
 
         lithCase: {
             CMapLightHolder* light = static_cast<CMapLightHolder*>(
-                operator new(0x10, MapMng.m_stage, "map.cpp", 0x4D3));
+                operator new(0x10, g_MapMng.m_stage, "map.cpp", 0x4D3));
             unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
             lightRaw[0] = chunkFile.Get1();
             lightRaw[1] = chunkFile.Get1();
@@ -1439,7 +1437,7 @@ int CMapMng::ReadMid(char* mapName)
                     goto octtreeFound;
                 }
                 nextMapObj++;
-            } while (nextMapObj - MapMng.m_mapObjArray < m_mapObjCount);
+            } while (nextMapObj - g_MapMng.m_mapObjArray < m_mapObjCount);
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_read_mid_ground_error));
             }
@@ -1483,17 +1481,17 @@ int CMapMng::ReadMid(char* mapName)
         chunkFile.PopChunk();
     }
 
-    CMapHit* mapHitArray = MapMng.m_mapHitArray;
+    CMapHit* mapHitArray = g_MapMng.m_mapHitArray;
     for (int i = 0; i < m_mapObjCount; i++) {
-        unsigned char type = MapMng.m_mapObjArray[i].m_mapDataType;
+        unsigned char type = g_MapMng.m_mapObjArray[i].m_mapDataType;
         if (type == 2 || type == 3) {
-            CMapHit* hit = static_cast<CMapHit*>(MapMng.m_mapObjArray[i].m_mapData);
+            CMapHit* hit = static_cast<CMapHit*>(g_MapMng.m_mapObjArray[i].m_mapData);
             int hitIndex = hit - mapHitArray;
             if (hitIndex >= m_mapHitCount) {
                 if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                     System.Printf(const_cast<char*>(s_read_mid_mesh_count_error));
                 }
-                MapMng.m_mapObjArray[i].m_mapData = 0;
+                g_MapMng.m_mapObjArray[i].m_mapData = 0;
             }
         }
     }
@@ -1558,7 +1556,7 @@ void CMapMng::Calc()
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        MapMng.m_mapObjArray[i].Calc();
+        g_MapMng.m_mapObjArray[i].Calc();
     }
 
     CMapTexAnimSet* mapTexAnimSet = m_mapTexAnimSet;
@@ -1582,7 +1580,7 @@ void CMapMng::Calc()
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        MapMng.m_mapObjArray[i].SetDrawFlag();
+        g_MapMng.m_mapObjArray[i].SetDrawFlag();
     }
 }
 
@@ -1655,7 +1653,7 @@ void CMapMng::DrawBefore()
 
         if ((g_MapHitDrawMode & 8) == 0) {
             for (int i = 0; i < m_mapObjCount; i++) {
-                CMapObj* mapObj = MapMng.GetMapObj(i);
+                CMapObj* mapObj = g_MapMng.GetMapObj(i);
                 mapObj->Draw(0xFE);
             }
 
@@ -1701,7 +1699,7 @@ void CMapMng::Draw()
         }
 
         for (int i = 0; i < m_mapObjCount; i++) {
-            MapMng.m_mapObjArray[i].Draw(0x40);
+            g_MapMng.m_mapObjArray[i].Draw(0x40);
         }
 
         PartPcs.DrawShoki();
@@ -1713,7 +1711,7 @@ void CMapMng::Draw()
         LightPcs.SetNumDiffuse(0);
 
         for (int i = 0; i < m_mapObjCount; i++) {
-            MapMng.m_mapObjArray[i].Draw(0);
+            g_MapMng.m_mapObjArray[i].Draw(0);
         }
 
         for (int i = 0; i < m_octTreeCount; i++) {
@@ -1724,7 +1722,7 @@ void CMapMng::Draw()
             CharaPcs.drawMakeTexShadow();
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_S16, 0xE, GX_S16, 10);
             MaterialMan.InitEnv();
-            Graphic.SetFog(MapMng.GetFogEnable(), 0);
+            Graphic.SetFog(g_MapMng.GetFogEnable(), 0);
 
             GXSetColorUpdate(1);
             GXSetAlphaUpdate(0);
@@ -1903,7 +1901,7 @@ void CMapMng::Draw()
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
         for (int i = 0; i < m_mapObjCount; i++) {
-            MapMng.m_mapObjArray[i].DrawHit();
+            g_MapMng.m_mapObjArray[i].DrawHit();
         }
 
         CameraPcs.SetOffsetZBuff(0.0f);
@@ -1931,11 +1929,11 @@ void CMapMng::Draw()
         CameraPcs.SetOffsetZBuff(-0.1f);
 
         for (int i = 0; i < m_mapObjCount; i++) {
-            MapMng.m_mapObjArray[i].DrawHitWire();
+            g_MapMng.m_mapObjArray[i].DrawHitWire();
         }
 
         for (int i = 0; i < m_mapObjCount; i++) {
-            MapMng.m_mapObjArray[i].DrawHitNormal();
+            g_MapMng.m_mapObjArray[i].DrawHitNormal();
         }
 
         CameraPcs.SetOffsetZBuff(0.0f);
@@ -1970,7 +1968,7 @@ void CMapMng::DrawAfter()
             }
 
             for (int i = 0; i < m_mapObjCount; i++) {
-                CMapObj* mapObj = MapMng.GetMapObj(i);
+                CMapObj* mapObj = g_MapMng.GetMapObj(i);
                 mapObj->Draw(2);
             }
         }

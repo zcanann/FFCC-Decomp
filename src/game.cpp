@@ -85,12 +85,12 @@ inline void CFile::CHandle::Close()
 
 inline int CMapPcs::GetLightHolderSize(CMapLightHolder::TYPE type)
 {
-    return MapMng.GetMapLightHolderArray(type).GetSize();
+    return g_MapMng.GetMapLightHolderArray(type).GetSize();
 }
 
 inline void CMapPcs::GetLightHolder(CMapLightHolder::TYPE type, long index, _GXColor* color, Vec* pos)
 {
-    CPtrArray<CMapLightHolder*>& holders = MapMng.GetMapLightHolderArray(type);
+    CPtrArray<CMapLightHolder*>& holders = g_MapMng.GetMapLightHolderArray(type);
 
     if (static_cast<unsigned long>(index) < static_cast<unsigned long>(holders.GetSize())) {
         holders[index]->GetLightHolder(color, pos);
@@ -550,7 +550,7 @@ void CGame::clearWorkScript()
     m_gameWork.m_soundOptionFlag = 0;
     m_gameWork.m_gameOverFlag = 0;
 
-    MapMng.DestroyMap();
+    g_MapMng.DestroyMap();
     CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
     Sound.StopAndFreeAllSe(0);
     Wind.ClearAll();
@@ -828,11 +828,11 @@ void CGame::Calc()
     gCFlatRuntime().ResetPerformance();
     CFlatRuntime2Storage().CFlatRuntime2::Frame(1, 0);
 
-    if ((m_currentMapId == 0x21) && ((mapObjIdx = MapMng.GetMapObjIdx(0)) >= 0)) {
+    if ((m_currentMapId == 0x21) && ((mapObjIdx = g_MapMng.GetMapObjIdx(0)) >= 0)) {
         static float a = 0.0f;
         a += 0.001f;
         PSMTXRotRad(rotMtx, 'y', a);
-        MapMng.SetMapObjLMtx(mapObjIdx, rotMtx);
+        g_MapMng.SetMapObjLMtx(mapObjIdx, rotMtx);
     }
 }
 

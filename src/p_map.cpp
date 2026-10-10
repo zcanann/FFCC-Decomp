@@ -197,7 +197,7 @@ void CMapPcs::create()
     m_drawEnabled = 1;
     m_useStoredViewMtx = 0;
 
-    MapMng.Create();
+    g_MapMng.Create();
 }
 
 /*
@@ -215,7 +215,7 @@ void CMapPcs::createViewer()
     m_drawEnabled = 1;
     m_useStoredViewMtx = 0;
 
-    MapMng.Create();
+    g_MapMng.Create();
 
     m_viewerMode = 1;
 }
@@ -241,42 +241,42 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     sprintf(mapPath, "dvd/map/stg%03d/map%03d", stageNo, mapNo);
 
     if (mode != 2) {
-        MapMng.DestroyMap();
+        g_MapMng.DestroyMap();
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
-        MapMng.SetDrawRangeOctTree(1000000000.0f);
-        MapMng.SetDrawRangeMapObj(1000000000.0f);
+        g_MapMng.SetDrawRangeOctTree(1000000000.0f);
+        g_MapMng.SetDrawRangeMapObj(1000000000.0f);
     }
 
-    MapMng.m_asyncLoadState.m_mapLoadStart = mapPtr;
-    MapMng.m_asyncLoadState.m_mapLoadCursor = mapPtr;
-    MapMng.m_asyncLoadState.m_mapLoadSize = mapSize;
-    MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
-    MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
+    g_MapMng.m_asyncLoadState.m_mapLoadStart = mapPtr;
+    g_MapMng.m_asyncLoadState.m_mapLoadCursor = mapPtr;
+    g_MapMng.m_asyncLoadState.m_mapLoadSize = mapSize;
+    g_MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
+    g_MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
     if (mapSize != 0) {
         if (mode == 1) {
-            MapMng.m_asyncLoadState.m_mapReadMode = 2;
+            g_MapMng.m_asyncLoadState.m_mapReadMode = 2;
         } else if (mode == 2) {
-            MapMng.m_asyncLoadState.m_mapReadMode = 3;
+            g_MapMng.m_asyncLoadState.m_mapReadMode = 3;
             for (int i = 0; i < 0x10; i++) {
-                MapMng.m_asyncLoadState.m_asyncHandles[i] = 0;
+                g_MapMng.m_asyncLoadState.m_asyncHandles[i] = 0;
             }
         } else {
-            MapMng.m_asyncLoadState.m_mapReadMode = 1;
+            g_MapMng.m_asyncLoadState.m_mapReadMode = 1;
         }
     } else {
-        MapMng.m_asyncLoadState.m_mapReadMode = 0;
+        g_MapMng.m_asyncLoadState.m_mapReadMode = 0;
     }
 
-    MapMng.ReadMtx(mapPath);
-    MapMng.ReadMpl(mapPath);
-    MapMng.ReadOtm(mapPath);
-    MapMng.ReadMid(mapPath);
+    g_MapMng.ReadMtx(mapPath);
+    g_MapMng.ReadMpl(mapPath);
+    g_MapMng.ReadOtm(mapPath);
+    g_MapMng.ReadMid(mapPath);
 
     if (static_cast<unsigned char>(mode - 1) > 1) {
         if ((m_viewerMode != 0) && (strcmp(oldMapFileName, mapPath) != 0)) {
             strcpy(oldMapFileName, mapPath);
-            if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
+            if (g_MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
+                COctNode* rootNode = g_MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
                     float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
                     center *= 0.5f;
@@ -288,7 +288,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                     center *= 0.5f;
                     cameraPos.z = center;
                 } else {
-                    CMapObj* mapObj = MapMng.GetMapObj(1);
+                    CMapObj* mapObj = g_MapMng.GetMapObj(1);
                     cameraPos.x = mapObj->m_localPosition.x;
                     cameraPos.y = mapObj->m_localPosition.y;
                     cameraPos.z = mapObj->m_localPosition.z;
@@ -309,16 +309,16 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     "                   memFree=%d Kbyte\n"
     "=============================================================\n\n\n"),
                 mapPath,
-                static_cast<int>(MapMng.m_mapObjCount),
-                static_cast<int>(MapMng.m_octTreeCount),
-                MapMng.m_stage->GetHeapUnuse() / 1024);
+                static_cast<int>(g_MapMng.m_mapObjCount),
+                static_cast<int>(g_MapMng.m_octTreeCount),
+                g_MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>& mapLightHolderArr = MapMng.GetMapLightHolderArray(1);
+        CPtrArray<CMapLightHolder*>& mapLightHolderArr = g_MapMng.GetMapLightHolderArray(1);
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > mapLightHolderIndex) {
             mapLightHolderArr[mapLightHolderIndex]->GetLightHolder(
-                &MapMng.m_mapColor, static_cast<Vec*>(0));
+                &g_MapMng.m_mapColor, static_cast<Vec*>(0));
         }
     }
 
@@ -339,7 +339,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 int CMapPcs::IsLoadMapCompleted()
 {
-    return MapMng.IsLoadMap();
+    return g_MapMng.IsLoadMap();
 }
 
 /*
@@ -353,7 +353,7 @@ int CMapPcs::IsLoadMapCompleted()
  */
 void CMapPcs::destroy()
 {
-    MapMng.Destroy();
+    g_MapMng.Destroy();
 }
 
 /*
@@ -367,7 +367,7 @@ void CMapPcs::destroy()
  */
 void CMapPcs::calcInit()
 {
-    MapMng.m_colorScaleEnable = 0;
+    g_MapMng.m_colorScaleEnable = 0;
 }
 
 /*
@@ -385,10 +385,10 @@ void CMapPcs::calc()
     Mtx cameraMtx;
     Mtx44 screenMtx;
 
-    MapMng.LoadMapNoSyncCalc();
-    MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-    MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-    MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+    g_MapMng.LoadMapNoSyncCalc();
+    g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+    g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+    g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
     if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
@@ -397,28 +397,28 @@ void CMapPcs::calc()
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     }
-    MapMng.SetViewMtx(cameraMtx, screenMtx);
+    g_MapMng.SetViewMtx(cameraMtx, screenMtx);
 
     if (m_forceMapReload != 0) {
-        MapMng.DestroyMap();
+        g_MapMng.DestroyMap();
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
-        MapMng.SetDrawRangeOctTree(1000000000.0f);
-        MapMng.SetDrawRangeMapObj(1000000000.0f);
-        MapMng.m_asyncLoadState.m_mapLoadStart = 0;
-        MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
-        MapMng.m_asyncLoadState.m_mapLoadSize = 0;
-        MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
-        MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
-        MapMng.m_asyncLoadState.m_mapReadMode = 0;
-        MapMng.ReadMtx(m_mapName);
-        MapMng.ReadMpl(m_mapName);
-        MapMng.ReadOtm(m_mapName);
-        MapMng.ReadMid(m_mapName);
+        g_MapMng.SetDrawRangeOctTree(1000000000.0f);
+        g_MapMng.SetDrawRangeMapObj(1000000000.0f);
+        g_MapMng.m_asyncLoadState.m_mapLoadStart = 0;
+        g_MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
+        g_MapMng.m_asyncLoadState.m_mapLoadSize = 0;
+        g_MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
+        g_MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
+        g_MapMng.m_asyncLoadState.m_mapReadMode = 0;
+        g_MapMng.ReadMtx(m_mapName);
+        g_MapMng.ReadMpl(m_mapName);
+        g_MapMng.ReadOtm(m_mapName);
+        g_MapMng.ReadMid(m_mapName);
         if ((m_viewerMode != 0) &&
             (strcmp(oldMapFileName, m_mapName) != 0)) {
             strcpy(oldMapFileName, m_mapName);
-            if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
+            if (g_MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
+                COctNode* rootNode = g_MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
                     float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
                     center *= 0.5f;
@@ -430,7 +430,7 @@ void CMapPcs::calc()
                     center *= 0.5f;
                     cameraPos.z = center;
                 } else {
-                    CMapObj* mapObj = MapMng.GetMapObj(1);
+                    CMapObj* mapObj = g_MapMng.GetMapObj(1);
                     cameraPos.x = mapObj->m_localPosition.x;
                     cameraPos.y = mapObj->m_localPosition.y;
                     cameraPos.z = mapObj->m_localPosition.z;
@@ -451,23 +451,23 @@ void CMapPcs::calc()
     "                   memFree=%d Kbyte\n"
     "=============================================================\n\n\n"),
                 m_mapName,
-                MapMng.m_mapObjCount,
-                MapMng.m_octTreeCount,
-                MapMng.m_stage->GetHeapUnuse() / 1024);
+                g_MapMng.m_mapObjCount,
+                g_MapMng.m_octTreeCount,
+                g_MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(1);
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &g_MapMng.GetMapLightHolderArray(1);
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
             (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
-                &MapMng.m_mapColor, static_cast<Vec*>(0));
+                &g_MapMng.m_mapColor, static_cast<Vec*>(0));
         }
 
         m_forceMapReload = 0;
         m_mapCalcReady = 1;
     } else {
         m_mapCalcReady = 0;
-        MapMng.Calc();
+        g_MapMng.Calc();
     }
 }
 
@@ -520,14 +520,14 @@ void CMapPcs::drawBefore()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+        g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(MapMng.m_fogEnable, 0);
+        g_MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -543,7 +543,7 @@ void CMapPcs::drawBefore()
         _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
         _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-        MapMng.DrawBefore();
+        g_MapMng.DrawBefore();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
             Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2B2);
@@ -573,14 +573,14 @@ void CMapPcs::draw()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+        g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(MapMng.m_fogEnable, 0);
+        g_MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -596,7 +596,7 @@ void CMapPcs::draw()
         _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
         _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-        MapMng.Draw();
+        g_MapMng.Draw();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
             Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2E0);
@@ -627,14 +627,14 @@ void CMapPcs::drawBeforeViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+        g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(MapMng.m_fogEnable, 0);
+        g_MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -650,7 +650,7 @@ void CMapPcs::drawBeforeViewer()
         _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
         _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-        MapMng.DrawBefore();
+        g_MapMng.DrawBefore();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
             Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2B2);
@@ -681,14 +681,14 @@ void CMapPcs::drawViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+        g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(MapMng.m_fogEnable, 0);
+        g_MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -704,7 +704,7 @@ void CMapPcs::drawViewer()
         _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
         _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-        MapMng.Draw();
+        g_MapMng.Draw();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
             Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2E0);
@@ -730,9 +730,9 @@ void CMapPcs::drawAfter()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+            g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+            g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+            g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -751,7 +751,7 @@ void CMapPcs::drawAfter()
             _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
             _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-            MapMng.DrawAfter();
+            g_MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBound bound;
@@ -780,9 +780,9 @@ void CMapPcs::drawAfterViewer()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+            g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+            g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+            g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -801,7 +801,7 @@ void CMapPcs::drawAfterViewer()
             _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
             _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-            MapMng.DrawAfter();
+            g_MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBound bound;

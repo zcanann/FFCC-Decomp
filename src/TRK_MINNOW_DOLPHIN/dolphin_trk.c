@@ -136,6 +136,7 @@ initCommTableSuccess:
 #endif // clang-format on
 }
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x801ADAD8
@@ -191,6 +192,7 @@ initCommTableSuccessBBA:
 	blr
 #endif // clang-format on
 }
+#endif
 
 static inline void dataCacheBlockInvalidate(register void* param_1)
 {

@@ -274,7 +274,7 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
 {
     switch (stageIndex) {
     case 1:
-        return MapMng.m_stage;
+        return g_MapMng.m_stage;
     case 2:
         return PartPcs.m_usbStreamState.m_stageLoad;
     case 3:
@@ -914,7 +914,7 @@ void CCharaPcs::drawMakeTexShadow()
     Graphic.SetViewport();
     Graphic.SetStdPixelFmt();
     Graphic.SetCopyClear(savedCopyClearColor, 0xFFFFFF);
-    gUtil.RenderTextureQuad(
+    Util.RenderTextureQuad(
         0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), &backBufferTexObj, 0, 0, 0,
         GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }

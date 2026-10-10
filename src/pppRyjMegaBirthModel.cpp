@@ -8,6 +8,11 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
+static void calc_particle(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColor*);
+static void birth(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
+static void calc(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
+static void set_matrix(_pppPObject*, pppFMATRIX, pppFMATRIX, PRyjMegaBirthModel*, _PARTICLE_DATA*, _PARTICLE_WMAT*, pppFMATRIX&, unsigned char);
+
 static _PARTICLE_WMAT g_matKeep;
 static _PARTICLE_WMAT g_matTmp;
 
@@ -188,7 +193,7 @@ void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* of
  * JP Address: TODO
  * JP Size: TODO
  */
-void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMegaBirthModel* params,
+static void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMegaBirthModel* params,
                 _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, pppFMATRIX& out, unsigned char copyOut)
 {
     pppFMATRIX r;
@@ -459,7 +464,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* params, _ppp
  * JP Address: TODO
  * JP Size: TODO
  */
-void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
+static void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
           PRyjMegaBirthModel* pRyjMegaBirthModel, _PARTICLE_DATA* particleData,
           VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
@@ -590,7 +595,7 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
  * JP Address: TODO
  * JP Size: TODO
  */
-void birth(
+static void birth(
     _pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color,
     _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, _PARTICLE_COLOR* particleColor)
 {
@@ -1273,7 +1278,7 @@ void birth(
  * JP Address: TODO
  * JP Size: TODO
  */
-void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color)
+static void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color)
 {
     _PARTICLE_DATA* particleData;
     _PARTICLE_WMAT* particleWMat;

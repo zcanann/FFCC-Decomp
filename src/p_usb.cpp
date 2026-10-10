@@ -52,9 +52,8 @@ static inline unsigned int Swap32(unsigned int x)
  */
 void CUSBPcs::Init()
 {
-    CMemory* memory = &Memory;
 
-	m_smallStage = memory->CreateStage(0x2000, "CUSBPcs", 0);
+	m_smallStage = Memory.CreateStage(0x2000, "CUSBPcs", 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, "plot/kmitsuru/");

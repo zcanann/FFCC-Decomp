@@ -5,6 +5,8 @@
 
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
+static void game(int, char**);
+
 static const char kDefaultScriptName[] = "ffcc_0";
 #ifndef VERSION_GCCJGC
 static const char kLanguageArgUs[] = "us";
@@ -25,7 +27,7 @@ static const char kLanguageArgSp[] = "sp";
  * JP Address: TODO
  * JP Size: TODO
  */
-void game(int argc, char** argv)
+static void game(int argc, char** argv)
 {
     int copyScriptName;
     int i;
@@ -57,7 +59,7 @@ void game(int argc, char** argv)
     Game.Quit();
 }
 #else
-void game(int argc, char** argv);
+static void game(int argc, char** argv);
 #endif
 
 /*

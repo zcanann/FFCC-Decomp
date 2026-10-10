@@ -250,6 +250,6 @@ public:
     unsigned char GetFogEnable() { return m_fogEnable; }
 };
 
-extern CMapMng MapMng;
+extern CMapMng g_MapMng;
 
 #endif // _FFCC_MAP_H_

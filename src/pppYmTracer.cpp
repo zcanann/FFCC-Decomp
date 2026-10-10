@@ -113,7 +113,7 @@ void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCt
             0.0f,
             step->m_tracer.m_drawEnvColor1, step->m_tracer.m_drawEnvColor0,
             step->m_tracer.m_blendMode, 0, 1, 1, 0);
-        gUtil.SetVtxFmt_POS_CLR_TEX();
+        Util.SetVtxFmt_POS_CLR_TEX();
 
         textureIndex[0] = 0;
         texture = (CTexture*)mapMesh->GetTexture(ppvEnv->m_materialSetPtr, textureIndex[0]);
@@ -271,9 +271,9 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
             f32 stepScale = 1.0f / (f32)(step->m_tracer.m_splineCount + 1);
 
             for (i = 0; i < (s32)(u32)step->m_tracer.m_splineCount; i++) {
-                gUtil.GetSplinePos(splineFrom[(step->m_tracer.m_splineCount - 1) - i], entries[3].from, entries[2].from,
+                Util.GetSplinePos(splineFrom[(step->m_tracer.m_splineCount - 1) - i], entries[3].from, entries[2].from,
                                           entries[1].from, entries[0].from, stepScale * (f32)(i + 1), 1.0f);
-                gUtil.GetSplinePos(splineTo[(step->m_tracer.m_splineCount - 1) - i], entries[3].to, entries[2].to,
+                Util.GetSplinePos(splineTo[(step->m_tracer.m_splineCount - 1) - i], entries[3].to, entries[2].to,
                                           entries[1].to, entries[0].to, stepScale * (f32)(i + 1), 1.0f);
 
                 splineCount++;

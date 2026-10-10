@@ -107,7 +107,7 @@ inline CFontGlyphEntry* CFont::searchChar(unsigned short ch)
 {
 #ifdef VERSION_GCCJGC
     if (ch < 0x80) {
-        ch = gUtil.AsciiToMulti(static_cast<unsigned char>(ch));
+        ch = Util.AsciiToMulti(static_cast<unsigned char>(ch));
     }
 #endif
 	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];

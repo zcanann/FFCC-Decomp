@@ -198,7 +198,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
         GXSetVtxDesc((GXAttr)0xB, (GXAttrType)3);
         GXSetVtxDesc((GXAttr)0xD, (GXAttrType)3);
         pppDrawMesh(model, 0, 0);
-        gUtil.DisableIndMtx();
+        Util.DisableIndMtx();
     }
 }
 

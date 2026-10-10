@@ -4,7 +4,7 @@
 #include "ffcc/textureman.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
-CUtil gUtil;
+CUtil Util;
 
 #ifdef VERSION_GCCJGC
 unsigned short CUtil::m_atom[96] = {

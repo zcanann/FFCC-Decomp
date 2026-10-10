@@ -9,10 +9,6 @@ struct Vec;
 struct pppIVECTOR3;
 struct pppFVECTOR4;
 
-unsigned char pppNotAllocAmemCacheRmem(unsigned long);
-unsigned int pppFreeMngStPrioForData();
-unsigned char pppAmemDeletePmng(unsigned long);
-unsigned char pppAmemRefCntError(unsigned long);
 
 class CPartPcs : public CProcess
 {

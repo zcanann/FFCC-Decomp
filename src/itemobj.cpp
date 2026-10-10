@@ -1135,7 +1135,7 @@ void CGItemObj::ItemJump(int state, float jump)
 			cylinder.m_axis.z = 0.0f;
 			cylinder.m_radius = 0.0f;
 
-			if (MapMng.CheckHitCylinderNear(&cylinder, &move, mapMask) != 0 &&
+			if (g_MapMng.CheckHitCylinderNear(&cylinder, &move, mapMask) != 0 &&
 			    g_hit_lpface_min->m_groupIndex == state) {
 				object->m_groundHitOffset.y += jump;
 			}

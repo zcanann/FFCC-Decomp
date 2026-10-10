@@ -47,7 +47,7 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
 	cylinder.m_axis = *direction;
 	cylinder.m_radius = radius;
 
-	return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
+	return g_MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
 }
 
 inline float CMapPcs::GetHitT()

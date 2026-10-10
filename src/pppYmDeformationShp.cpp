@@ -266,7 +266,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* object, pppYmDeformationShpS
 		_GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
-		gUtil.SetVtxFmt_POS_TEX0_TEX1();
+		Util.SetVtxFmt_POS_TEX0_TEX1();
 		GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
 		SetUpIndWarp(state);
 

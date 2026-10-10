@@ -160,7 +160,7 @@ void pppRenderRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetLineWidth(pRain->m_lineWidth, GX_TO_ZERO);
-    gUtil.SetVtxFmt_POS_CLR_TEX();
+    Util.SetVtxFmt_POS_CLR_TEX();
 
     drop = work->drops;
     baseX = ppvMng->m_matrix.value[0][3];

@@ -3209,7 +3209,7 @@ void CMenuPcs::DrawMCardMenu()
 	if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_subState >= 0x11) {
 		cursorY = 24.0f;
 		cursorX = cursorY;
-		cursorY = (float)((double)cursorY - 16.0);
+		cursorY -= 16.0;
 		cursorX += 32.0f;
 		int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {
@@ -3304,14 +3304,14 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(msgId, msgParam);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short ss = m_wmWorldState->m_subState;
-				if (m_wmWorldState->m_state0E < 0 || ss == 0x14 || ss == 0x1c || ss == 0x1b) {
+				if (m_wmWorldState->m_state0E < 0 || m_wmWorldState->m_subState == 0x14 ||
+				    m_wmWorldState->m_subState == 0x1c || m_wmWorldState->m_subState == 0x1b) {
 					m_wmWorldState->m_subState = 3;
-				} else if (ss == 0x0E) {
+				} else if (m_wmWorldState->m_subState == 0x0E) {
 					ClrMcList();
 					m_wmWorldState->m_subState = 0x11;
 					m_wmWorldState->m_cardChannel = 0;
-				} else if (ss == 0x15) {
+				} else if (m_wmWorldState->m_subState == 0x15) {
 					m_wmWorldState->m_subState = 0x11;
 					m_wmWorldState->m_cardChannel = (short)m_mcCtrl.GetDno();
 					if (m_wmWorldState->m_menuMode == 8) {
@@ -3908,7 +3908,7 @@ void CMenuPcs::DrawLoadMenu()
 	if (state == 2 && m_wmWorldState->m_subState >= 0x11) {
 		cursorY0 = 24.0f;
 		cursorXbase = cursorY0;
-		cursorY0 = static_cast<float>(static_cast<double>(cursorY0) - 16.0);
+		cursorY0 -= 16.0;
 		cursorXbase += 32.0f;
 		int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {
@@ -7280,7 +7280,6 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
 
-	CSystem* const sys = &System;
 	for (i = 0; i < 2; i++) {
 		float y = 10.0f + static_cast<float>(i * 0xB8);
 		y += 134.0f;
@@ -7326,7 +7325,7 @@ void CMenuPcs::DrawCharaName()
 #else
 				text = emptyText[1];
 #endif
-				const int phase = static_cast<int>(sys->m_frameCounter) % 20 - 10;
+				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
 				if (this->m_wmWorldState->m_mainState == 2) {
 					const int absPhase = abs(phase);
 					fade = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(absPhase) - DOUBLE_80331420));
@@ -7762,9 +7761,9 @@ void CMenuPcs::WMChgMenu()
 
 	newMenuMode = m_wmWorldState->m_menuMode;
 	if (newMenuMode == 6) {
-		MapMng.SetDraw(0);
+		g_MapMng.SetDraw(0);
 	} else if (prevMenuMode == 6 && newMenuMode != 6) {
-		MapMng.SetDraw(1);
+		g_MapMng.SetDraw(1);
 	}
 }
 
@@ -9320,8 +9319,10 @@ inline void CMenuPcs::DrawPageMark()
 #endif
 	const int phase = abs(static_cast<int>(System.GetCounter()) % 20 - 10);
 	const float scale = static_cast<float>(0.03 * phase + 0.7);
-	float x = 220.0f;
-	x -= 40.0;
+	float w = 40.0f;
+	double left = 220.0;
+	left -= w;
+	float x = left;
 	float y = 369.0f;
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color;
@@ -9895,7 +9896,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
  */
 inline void CMenuPcs::SetTextureLoc(int materialId)
 {
-	CMaterial* material = MapMng.GetMaterialID(materialId);
+	CMaterial* material = g_MapMng.GetMaterialID(materialId);
 	CTexture* texture = material->GetTexture(0);
 	TextureMan.SetTexture(GX_TEXMAP0, texture);
 

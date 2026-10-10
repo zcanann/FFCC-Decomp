@@ -208,7 +208,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     CMaterial* material = (*materials)[materialIndex];
 
     unsigned char fogEnable = material->m_fogEnable;
-    if ((static_cast<int>(Game.m_currentSceneId) == 3) && (MapMng.m_fogEnable == 0)) {
+    if ((static_cast<int>(Game.m_currentSceneId) == 3) && (g_MapMng.m_fogEnable == 0)) {
         fogEnable = 0;
     }
 
@@ -2340,7 +2340,7 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMt
  */
 void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shadowIndex, unsigned long materialFlag)
 {
-    CMaterialSet* materialSet = MapMng.m_materialSet;
+    CMaterialSet* materialSet = g_MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[shadow.m_materialIndex];
 
@@ -2409,8 +2409,8 @@ inline int chkbit32(unsigned long* bits, unsigned long index)
  */
 void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shadowBit32, float (*viewMtx) [4])
 {
-    for (long i = 0; i < static_cast<unsigned int>(MapMng.GetMapShadowArray().GetSize()); i++) {
-        CMapShadow* shadow = MapMng.GetMapShadowArray()[i];
+    for (long i = 0; i < static_cast<unsigned int>(g_MapMng.GetMapShadowArray().GetSize()); i++) {
+        CMapShadow* shadow = g_MapMng.GetMapShadowArray()[i];
 
         if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
             continue;
@@ -2446,7 +2446,7 @@ void CMaterialMan::SetPosition(
     if (target == static_cast<CMapShadow::TARGET>(0)) {
         ShadowCandidate shadowCandidates[128];
         candidateWrite = shadowCandidates;
-        mapShadowArray = &MapMng.GetMapShadowArray();
+        mapShadowArray = &g_MapMng.GetMapShadowArray();
         int candidateCount = 0;
 
         for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
@@ -2519,7 +2519,7 @@ void CMaterialMan::SetPosition(
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
-        mapShadowArray = &MapMng.GetMapShadowArray();
+        mapShadowArray = &g_MapMng.GetMapShadowArray();
         for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
             CMapShadow* shadow = (*mapShadowArray)[i];
 
@@ -2568,7 +2568,7 @@ int CMaterialMan::GetCharaShadow(
 {
     CBound searchBound(position, rangeXZ, rangeY);
 
-    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
+    CPtrArray<CMapShadow*>* mapShadowArray = &g_MapMng.GetMapShadowArray();
 
     ShadowCandidate shadowCandidates[128];
     ShadowCandidate* candidateWrite = shadowCandidates;
@@ -2597,7 +2597,7 @@ int CMaterialMan::GetCharaShadow(
 
         if (shadow->m_materialMode == 1) {
             if (outputCount < maxShadows) {
-                materialsOut[outputCount] = MapMng.m_materialSet->m_materials[shadow->m_materialIndex];
+                materialsOut[outputCount] = g_MapMng.m_materialSet->m_materials[shadow->m_materialIndex];
                 shadowMtxOut[outputCount++] = shadow->m_shadowMtx;
             }
             continue;
@@ -2648,7 +2648,7 @@ int CMaterialMan::GetCharaShadow(
         }
         nearest->distance = 20000000000000.0f;
         if (outputCount < maxShadows) {
-            materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearest->shadow->m_materialIndex];
+            materialsOut[outputCount] = g_MapMng.m_materialSet->m_materials[nearest->shadow->m_materialIndex];
             shadowMtxOut[outputCount++] = nearest->shadow->m_shadowMtx;
         }
     }
@@ -2667,7 +2667,7 @@ int CMaterialMan::GetCharaShadow(
  */
 void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, float (*viewMtx) [4])
 {
-    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
+    CPtrArray<CMapShadow*>* mapShadowArray = &g_MapMng.GetMapShadowArray();
 
     for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];

@@ -49,8 +49,8 @@ void pppFrameYmCheckBGHeight(pppYmCheckBGHeight* obj, pppYmCheckBGHeightStep* st
         cylinder.m_axis.z = zero;
         cylinder.m_radius = zero;
 
-        if (MapMng.CheckHitCylinderNear(&cylinder, &direction, (unsigned long)-1) != 0) {
-            MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
+        if (g_MapMng.CheckHitCylinderNear(&cylinder, &direction, (unsigned long)-1) != 0) {
+            g_MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             if ((currentY - step->m_fallLimit) > hitPos.y) {
                 finalY = currentY;
             } else {

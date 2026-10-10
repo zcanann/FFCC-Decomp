@@ -95,7 +95,7 @@ void pppRenderYmTracer2(pppYmTracer2* tracer, pppYmTracer2Step* step, _pppCtrlTa
             0.0f,
             step->m_tracer.m_drawEnvColor1, step->m_tracer.m_drawEnvColor0,
             step->m_tracer.m_blendMode, 0, 1, 1, 0);
-        gUtil.SetVtxFmt_POS_CLR_TEX();
+        Util.SetVtxFmt_POS_CLR_TEX();
 
         textureIndex[0] = 0;
         texture = (CTexture*)mapMesh->GetTexture(ppvEnv->m_materialSetPtr, textureIndex[0]);

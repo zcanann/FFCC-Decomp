@@ -27,18 +27,14 @@
 #include "ffcc/joybusconst.h"
 #include "ffcc/cardconst.h"
 #endif
-extern char s_shopmenu_cpp[];
-#if defined(VERSION_GCCJGC)
 #define SHOP_MENU_FILE "shopmenu.cpp"
+#if defined(VERSION_GCCJGC)
 #define SHOP_MENU_LINE(pal, us, jp) (jp)
 #elif defined(VERSION_GCCE01)
-#define SHOP_MENU_FILE s_shopmenu_cpp
 #define SHOP_MENU_LINE(pal, us, jp) (us)
 #else
-#define SHOP_MENU_FILE s_shopmenu_cpp
 #define SHOP_MENU_LINE(pal, us, jp) (pal)
 #endif
-extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
 #ifdef VERSION_GCCJGC
 static const unsigned int DAT_80332D04 = 0xFFFFFFFF;
@@ -180,6 +176,10 @@ extern const char s_shop_80332e54[];
 #include "src/shopmenu_str_data_us.inc"
 #else
 #include "src/shopmenu_str_data.inc"
+
+static void drawShapeSeqGrouad(int, int, int, int, float, float, _GXColor, _GXColor, _GXColor, _GXColor);
+static void drawShapeSeqScale(int, int, int, int, float, float, unsigned char);
+static void drawShapeSeq(int, int, int, int, unsigned char, unsigned char, unsigned char, float, unsigned char);
 #endif
 extern const char s_DecimalFormat_80332d14[] = "%d";
 extern const char s_TwoDigitFormat_80332d18[] = "%02d";
@@ -795,7 +795,7 @@ inline void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigne
  * JP Address: TODO
  * JP Size: TODO
  */
-void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, unsigned char flipX, unsigned char flipY,
+static void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, unsigned char flipX, unsigned char flipY,
                   float zOffset, unsigned char tlut)
 {
     setOrtho(x, y, flipX != 0 ? FLOAT_80332DD0 : FLOAT_80332d78, flipY != 0 ? FLOAT_80332d78 : FLOAT_80332DD0, zOffset);
@@ -811,7 +811,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
  * JP Address: TODO
  * JP Size: TODO
  */
-void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
+static void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
 {
     setOrtho(x, y, scaleX, -scaleY, FLOAT_80332D9C);
     drawShapeSeq0(shapeNo, groupNo, alpha, 0);
@@ -826,7 +826,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
  * JP Address: TODO
  * JP Size: TODO
  */
-void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, _GXColor colorA,
+static void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, _GXColor colorA,
                         _GXColor colorB, _GXColor colorC, _GXColor colorD)
 {
     setOrtho(x, y, scaleX, -scaleY, FLOAT_80332D9C);
@@ -3190,9 +3190,9 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     }
 
     char* helpText = new((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
-                         s_shopmenu_cpp, SHOP_MENU_LINE(0xBFF, 0xBD9, 0xBFF)) char[0x200];
+                         SHOP_MENU_FILE, SHOP_MENU_LINE(0xBFF, 0xBD9, 0xBFF)) char[0x200];
     if ((helpText == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, SHOP_MENU_LINE(0xC01, 0xBDB, 0xC01));
+        System.Printf("%s(%d): Error: memory allocation error\n", SHOP_MENU_FILE, SHOP_MENU_LINE(0xC01, 0xBDB, 0xC01));
     }
     memset(helpText, 0, 0x200);
     CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);

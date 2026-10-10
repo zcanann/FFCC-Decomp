@@ -176,21 +176,8 @@ static const char* s_NameEntryStr[] = {
 
 enum { CMAKE_NAME_PAGE_COUNT = sizeof(s_NameEntryStr) / sizeof(s_NameEntryStr[0]) / 5 };
 
-static const char s_world2[] = "world2";
-static const char s_crystal[] = "crystal";
-static const char s_world27[] = "world27";
-static const char s_world28[] = "world28";
-static const char s_world29[] = "world29";
-static const char s_world44[] = "world44";
-static const char s_world45[] = "world45";
-static const char s_world48[] = "world48";
-static const char s_world49[] = "world49";
-#ifndef VERSION_GCCJGC
-static const char s_world51[] = "world51";
-#endif
-
 char* PTR_s_world2[] = {
-    (char*)s_world2,
+    "world2",
     0,
     0,
     0,
@@ -201,16 +188,16 @@ char* PTR_s_world2[] = {
     0,
 };
 CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
-    {8, (char*)s_crystal},
-    {8, (char*)s_world27},
-    {8, (char*)s_world28},
-    {8, (char*)s_world29},
-    {8, (char*)s_world44},
-    {8, (char*)s_world45},
-    {8, (char*)s_world48},
-    {8, (char*)s_world49},
+    {8, "crystal"},
+    {8, "world27"},
+    {8, "world28"},
+    {8, "world29"},
+    {8, "world44"},
+    {8, "world45"},
+    {8, "world48"},
+    {8, "world49"},
 #ifndef VERSION_GCCJGC
-    {8, (char*)s_world51},
+    {8, "world51"},
 #endif
 };
 

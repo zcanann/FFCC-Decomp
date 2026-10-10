@@ -125,8 +125,8 @@ void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
                     &color, (pppFMATRIX*)0, 0.0f, step->m_colum.m_drawEnvColor1,
                     step->m_colum.m_drawEnvColor0, step->m_arg3, 0, 0, 1, 0);
 
-                gUtil.BeginQuadEnv();
-                gUtil.SetVtxFmt_POS_CLR_TEX();
+                Util.BeginQuadEnv();
+                Util.SetVtxFmt_POS_CLR_TEX();
                 _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -146,10 +146,10 @@ void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
                     PSVECAdd(&shapePosA, &center, &shapePosA);
                     PSVECAdd(&shapePosB, &center, &shapePosB);
 
-                    gUtil.RenderQuad(shapePosA, shapePosB, *(GXColor*)color.rgba, &uvA, &uvB);
+                    Util.RenderQuad(shapePosA, shapePosB, *(GXColor*)color.rgba, &uvA, &uvB);
                 }
 
-                gUtil.EndQuadEnv();
+                Util.EndQuadEnv();
                 pppSetBlendMode(0);
                 values++;
             }
@@ -187,9 +187,9 @@ void pppFrameColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
                 values->m_scaleStep = values->m_scaleStep + step->m_colum.m_scaleStepBase;
                 values->m_positionScale = Math.RandF(step->m_colum.m_positionRange);
                 values->m_positionScale = values->m_positionScale + step->m_colum.m_positionBase;
-                values->m_colorR = gUtil.GetNoise(step->m_colum.m_noiseR);
-                values->m_colorG = gUtil.GetNoise(step->m_colum.m_noiseG);
-                values->m_colorB = gUtil.GetNoise(step->m_colum.m_noiseB);
+                values->m_colorR = Util.GetNoise(step->m_colum.m_noiseR);
+                values->m_colorG = Util.GetNoise(step->m_colum.m_noiseG);
+                values->m_colorB = Util.GetNoise(step->m_colum.m_noiseB);
                 values++;
             }
         }

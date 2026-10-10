@@ -65,7 +65,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     color.b = 0;
     color.a = 0xFF;
 
-    gUtil.RenderColorQuad(0.0f, 0.0f, originalWidth, originalHeight, color);
+    Util.RenderColorQuad(0.0f, 0.0f, originalWidth, originalHeight, color);
 
     width = GXGetTexObjWidth(targetTexObj);
     height = GXGetTexObjHeight(targetTexObj);
@@ -191,7 +191,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         uvMax.x = 0.0f;
         uvMax.y = 1.0f;
 
-        gUtil.RenderTextureQuad(0.0f, 0.0f, width, height, targetTexObj, &uvMin, &uvMax,
+        Util.RenderTextureQuad(0.0f, 0.0f, width, height, targetTexObj, &uvMin, &uvMax,
                                 0, (GXBlendFactor)4, (GXBlendFactor)5);
         Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, originalWidth, originalHeight, 0, GX_LINEAR, GX_TF_RGB565, 0);
     }

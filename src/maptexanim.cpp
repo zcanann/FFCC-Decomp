@@ -206,7 +206,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
         case 0x54414E4D:
-            ref = new (MapMng.m_stage, const_cast<char*>(s_maptexanim_cpp),
+            ref = new (g_MapMng.m_stage, const_cast<char*>(s_maptexanim_cpp),
                 0x24) CMapTexAnim;
 
             ref->m_materialIndex = chunkFile.Get2();
@@ -232,7 +232,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             chunkFile.Get4();
             chunkFile.Get4();
             unsigned short* frameTable =
-                new (MapMng.m_stage, const_cast<char*>(s_maptexanim_cpp), 0x3B)
+                new (g_MapMng.m_stage, const_cast<char*>(s_maptexanim_cpp), 0x3B)
                     unsigned short[ref->m_frameCount];
             ref->m_frameTable = frameTable;
 

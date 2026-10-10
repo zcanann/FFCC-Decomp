@@ -140,7 +140,7 @@ usb.cpp:
 	extabindex  start:0x8000B5D8 end:0x8000B5FC
 	.text       start:0x8002244C end:0x80022724
 	.ctors      start:0x801D53C8 end:0x801D53CC
-	.rodata     start:0x801D6F90 end:0x801D7060
+	.rodata     start:0x801D6F90 end:0x801D7060 align:8
 	.data       start:0x801E8898 end:0x801E88B4
 	.bss        start:0x802455C0 end:0x80245640
 	.sdata      start:0x8032E478 end:0x8032E488
@@ -172,7 +172,7 @@ mapmesh.cpp:
 	extabindex  start:0x8000B7C4 end:0x8000B860
 	.text       start:0x80027774 end:0x800287D0
 	.rodata     start:0x801D70B0 end:0x801D70BC
-	.sbss       start:0x8032EC98 end:0x8032EC9C
+	.sbss       start:0x8032EC98 end:0x8032EC9C align:8
 	.sdata2     start:0x8032F930 end:0x8032F938
 
 mapobj.cpp:
@@ -203,7 +203,7 @@ map.cpp:
 	.data       start:0x801E8960 end:0x801E89B4
 	.bss        start:0x80245758 end:0x802685E0
 	.sdata      start:0x8032E4D0 end:0x8032E508
-	.sbss       start:0x8032ECB8 end:0x8032ECC0
+	.sbss       start:0x8032ECB8 end:0x8032ECC0 align:8
 	.sdata2     start:0x8032F978 end:0x8032F9F8
 
 p_map.cpp:
@@ -859,7 +859,7 @@ cflat_runtime2.cpp:
 	.ctors      start:0x801D540C end:0x801D5410
 	.rodata     start:0x801D8F10 end:0x801D9078
 	.data       start:0x801FCC08 end:0x801FCCD0
-	.bss        start:0x80299F40 end:0x802E78E0
+	.bss        start:0x80299F40 end:0x802E78E0 align:32
 	.sdata      start:0x8032E6C8 end:0x8032E6D8
 	.sbss       start:0x8032ED98 end:0x8032EDA0
 	.sdata2     start:0x80330138 end:0x803301A8
@@ -1067,7 +1067,7 @@ p_menu.cpp:
 	.ctors      start:0x801D541C end:0x801D5420
 	.rodata     start:0x801D9CF0 end:0x801D9DC8
 	.data       start:0x8020EDF8 end:0x8020F2F8
-	.bss        start:0x802EA1A0 end:0x802EAA60
+	.bss        start:0x802EA1A0 end:0x802EAA60 align:32
 	.sdata      start:0x8032E7A0 end:0x8032E7C0
 	.sdata2     start:0x80330708 end:0x80330870
 
@@ -1164,7 +1164,7 @@ cflat_r2system.cpp:
 	.text       start:0x800B28F0 end:0x800BA2FC
 	.rodata     start:0x801DA3B0 end:0x801DA778
 	.data       start:0x8020FB30 end:0x802101F0
-	.sdata2     start:0x80330B30 end:0x80330B34
+	.sdata2     start:0x80330B30 end:0x80330BC8
 
 cflat_r2class.cpp:
 	extab       start:0x80008338 end:0x80008350
@@ -1432,7 +1432,7 @@ chara_fur.cpp:
 	extab       start:0x80008D14 end:0x80008D84
 	extabindex  start:0x8000F868 end:0x8000F910
 	.text       start:0x800DF618 end:0x800E46DC
-	.rodata     start:0x801DB694 end:0x801DB740
+	.rodata     start:0x801DB648 end:0x801DB740
 	.bss        start:0x802FF3A8 end:0x802FF404
 	.sbss       start:0x8032EDE8 end:0x8032EE14
 	.sdata2     start:0x803310D8 end:0x80331170
@@ -1456,7 +1456,7 @@ wm_menu.cpp:
 	extab       start:0x80008DE4 end:0x80009024
 	extabindex  start:0x8000F9A0 end:0x8000FD00
 	.text       start:0x800E6B98 end:0x80102FB4
-	.rodata     start:0x801DB7F8 end:0x801DC49C
+	.rodata     start:0x801DB7F8 end:0x801DC4B8
 	.data       start:0x80210750 end:0x802111E8
 	.bss        start:0x802FF408 end:0x802FF450
 	.sdata      start:0x8032E8A8 end:0x8032E920
@@ -1664,7 +1664,7 @@ bonus_menu.cpp:
 	extab       start:0x80009A34 end:0x80009AC4
 	extabindex  start:0x80010C18 end:0x80010CF0
 	.text       start:0x80133108 end:0x8013E294
-	.rodata     start:0x801DD55C end:0x801DD5EC
+	.rodata     start:0x801DD510 end:0x801DD5EC
 	.data       start:0x80212820 end:0x802129B0
 	.sdata      start:0x8032EA68 end:0x8032EA78
 	.sbss       start:0x8032EEA8 end:0x8032EEB8
@@ -1747,7 +1747,7 @@ monobj_table.cpp:
 	.data       start:0x802129B0 end:0x802140F0
 
 singmenu.cpp:
-	.rodata start:0x801DD6F8 end:0x801DE8B0
+	.rodata start:0x801DD6F8 end:0x801DE910
 	extab       start:0x80009C14 end:0x80009D04
 	extabindex  start:0x80010EE8 end:0x80011050
 	.text       start:0x801453F4 end:0x8014A940
@@ -1771,7 +1771,7 @@ shopmenu.cpp:
 	extab       start:0x80009D94 end:0x80009E54
 	extabindex  start:0x80011128 end:0x80011248
 	.text       start:0x801503C8 end:0x80159654
-	.rodata     start:0x801DEB38 end:0x801DED8C
+	.rodata     start:0x801DEB38 end:0x801DEDC4
 	.data       start:0x80214D90 end:0x80214FE0
 	.sbss       start:0x8032EED0 end:0x8032EED9
 	.sdata2     start:0x80332B40 end:0x80332E60
@@ -1941,7 +1941,7 @@ os/OSCache.c:
 
 os/OSContext.c:
 	.text       start:0x8017D4F8 end:0x8017DD68
-	.data       start:0x80216C18 end:0x80216DF0
+	.data       start:0x80216C18 end:0x80216DF0 align:8
 
 os/OSError.c:
 	.text       start:0x8017DD68 end:0x8017E2E8
@@ -1978,7 +1978,7 @@ os/OSReboot.c:
 
 os/OSReset.c:
 	.text       start:0x8017F478 end:0x8017F86C
-	.sbss       start:0x8032EFA8 end:0x8032EFB0
+	.sbss       start:0x8032EFA8 end:0x8032EFB0 align:8
 
 os/OSResetSW.c:
 	.text       start:0x8017F86C end:0x8017FBF8
@@ -2109,7 +2109,7 @@ vi/vi.c:
 	.data       start:0x802177E0 end:0x80217BB0
 	.bss        start:0x8030CB48 end:0x8030CC90
 	.sdata      start:0x8032EB08 end:0x8032EB11
-	.sbss       start:0x8032F0E0 end:0x8032F114
+	.sbss       start:0x8032F0E0 end:0x8032F114 align:8
 	.sbss       start:0x8032F118 end:0x8032F134
 
 pad/Padclamp.c:
@@ -2168,7 +2168,7 @@ ax/AXOut.c:
 
 ax/AXSPB.c:
 	.text       start:0x80192DA0 end:0x80193268
-	.bss        start:0x80314900 end:0x80314940
+	.bss        start:0x80314900 end:0x80314940 align:32
 	.sbss       start:0x8032F268 end:0x8032F28C
 
 ax/AXVPB.c:
@@ -2239,7 +2239,7 @@ dsp/dsp_debug.c:
 
 dsp/dsp_task.c:
 	.text       start:0x80197CFC end:0x80198580
-	.data       start:0x8021C038 end:0x8021C178
+	.data       start:0x8021C038 end:0x8021C178 align:4
 	.sbss       start:0x8032F2C8 end:0x8032F2E0
 
 card/CARDBios.c:
@@ -2251,7 +2251,7 @@ card/CARDBios.c:
 
 card/CARDUnlock.c:
 	.text       start:0x801998E8 end:0x8019AB48
-	.data       start:0x8021C1E0 end:0x8021C340
+	.data       start:0x8021C1E0 end:0x8021C340 align:32
 	.sdata      start:0x8032EB78 end:0x8032EB80
 
 card/CARDRdwr.c:
@@ -2367,7 +2367,7 @@ gx/GXPerf.c:
 gba/GBA.c:
 	.text       start:0x801A740C end:0x801A76FC
 	.data       start:0x8021CB38 end:0x8021CB48
-	.bss        start:0x80328220 end:0x80328720
+	.bss        start:0x80328220 end:0x80328720 align:16
 	.sbss       start:0x8032F350 end:0x8032F358
 
 gba/GBAGetProcessStatus.c:
@@ -2388,7 +2388,7 @@ gba/GBAXfer.c:
 
 gba/GBAKey.c:
 	.text       start:0x801A8D9C end:0x801A9004
-	.data       start:0x8021CB78 end:0x8021CF20
+	.data       start:0x8021CB78 end:0x8021CF20 align:4
 
 TRK_MINNOW_DOLPHIN/mainloop.c:
 	.text       start:0x801A9004 end:0x801A90FC
@@ -2641,7 +2641,7 @@ MSL_C/PPCEABI/bare/H/signal.c:
 
 MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x801B8BF0 end:0x801B90B8
-	.rodata     start:0x801E70E0 end:0x801E7100
+	.rodata     start:0x801E70E0 end:0x801E7470
 	.sdata      start:0x8032EC18 end:0x8032EC20
 
 MSL_C/PPCEABI/bare/H/float.c:

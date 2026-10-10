@@ -26,7 +26,7 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
     cylinder.m_axis = *direction;
     cylinder.m_radius = radius;
 
-    return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
+    return g_MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
 }
 
 static inline int getHitPolygonGroup(Vec* pos, unsigned long hitAttributeMask)
@@ -322,7 +322,7 @@ void CAStar::drawAStar()
 		{
 			for (int group = 0; group < 64; group++)
 			{
-				MapMng.SetIdGrpColor(group, 0, CColor(Math.Rand(0xff), Math.Rand(0xff), Math.Rand(0xff), 0xFF).color);
+				g_MapMng.SetIdGrpColor(group, 0, CColor(Math.Rand(0xff), Math.Rand(0xff), Math.Rand(0xff), 0xFF).color);
 			}
 		}
 

@@ -224,11 +224,11 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
         cyl.m_axis = beamAxis;
         cyl.m_radius = 0.0f;
 
-        int check = MapMng.CheckHitCylinderNear(&cyl, &beamAxis, 0xffffffff);
+        int check = g_MapMng.CheckHitCylinderNear(&cyl, &beamAxis, 0xffffffff);
         int hit = 0;
         if (check != 0) {
             hit = 1;
-            MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
+            g_MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0) {
             if (work->m_spawnEnabled != 0) {
@@ -363,7 +363,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
     _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    gUtil.SetVtxFmt_POS_CLR_TEX();
+    Util.SetVtxFmt_POS_CLR_TEX();
     GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
 
     halfWidth = work->m_halfWidth;
@@ -475,7 +475,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
         GXEnd();
 
         if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-            gUtil.SetVtxFmt_POS_CLR();
+            Util.SetVtxFmt_POS_CLR();
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
             GXSetNumTexGens(0);

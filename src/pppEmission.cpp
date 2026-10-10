@@ -89,8 +89,8 @@ static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIn
     return model->m_meshes[meshIndex].m_data;
 }
 
-void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
+static void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, PEmission* step)
 {

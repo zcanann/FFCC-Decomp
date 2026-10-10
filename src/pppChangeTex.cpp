@@ -176,7 +176,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		for (meshIdx = 0; meshIdx < model0->GetRefData()->m_meshCount; meshIdx++, meshList++) {
 			meshData = meshList->m_data;
 			if (strcmp(meshData->m_name, "obj") == 0) {
-				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, meshList->GetVertex(),
+				Util.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, meshList->GetVertex(),
 				    meshData->m_vertexCount, model0->m_data->m_posQuant);
 			}
 
@@ -196,7 +196,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 				(*dlEntry)->m_data = pppMemAlloc(
 				    dlInfo->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp), 0x18D);
 				memcpy((*dlEntry)->m_data, dlInfo->m_data, dlInfo->m_size);
-				gUtil.ReWriteDisplayList((*dlEntry)->m_data, (unsigned long)dlInfo->m_size, 1);
+				Util.ReWriteDisplayList((*dlEntry)->m_data, (unsigned long)dlInfo->m_size, 1);
 				dlEntry--;
 			}
 

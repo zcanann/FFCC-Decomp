@@ -304,7 +304,7 @@ void CMes::addString(char** text, int branchMode)
         goto updateBounds;
 
     renderChar:
-        uch = gUtil.AsciiToMulti(ch);
+        uch = Util.AsciiToMulti(ch);
     renderGlyph:
         {
             CMesCharCell* glyph = &m_chars[mCounter];

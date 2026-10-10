@@ -56,7 +56,11 @@ u8 GXTexImage3Ids[8] = { 0x94, 0x95, 0x96, 0x97, 0xB4, 0xB5, 0xB6, 0xB7 };
 u8 GXTexTlutIds[8] = { 0x98, 0x99, 0x9A, 0x9B, 0xB8, 0xB9, 0xBA, 0xBB };
 u8 GX2HWFiltConv[6] = { 0x00, 0x04, 0x01, 0x05, 0x02, 0x06 };
 
+#ifdef VERSION_GCCP01
 static void __GXGetTexTileShift(GXTexFmt fmt, u32* rowTileS, u32* colTileS) {
+#else
+static inline void __GXGetTexTileShift(GXTexFmt fmt, u32* rowTileS, u32* colTileS) {
+#endif
     switch (fmt) {
     case GX_TF_I4:
     case 0x8:
@@ -793,6 +797,7 @@ GXTlutRegionCallback GXSetTlutRegionCallback(GXTlutRegionCallback f) {
     return oldcb;
 }
 
+#ifdef VERSION_GCCP01
 void GXPreLoadEntireTexture(GXTexObj* tex_obj, GXTexRegion* region) {
     GXBool isMipMap;
     GXBool is32bit; 
@@ -947,6 +952,7 @@ void GXPreLoadEntireTexture(GXTexObj* tex_obj, GXTexRegion* region) {
     // needed to match debug
     maxLevelIndex; maxLevelIndex; base; base; base; tmem1; tmem1; tmem2; tmem2;
 }
+#endif
 
 void GXSetTexCoordScaleManually(GXTexCoordID coord, GXBool enable, u16 ss, u16 ts) {
     CHECK_GXBEGIN(1989, "GXSetTexCoordScaleManually");

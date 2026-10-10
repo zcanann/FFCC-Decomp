@@ -2885,7 +2885,7 @@ struct ThreadSleepAlarm {
     OSThread* thread;
 };
 
-void ThreadAlarmHandler(OSAlarm* alarm, OSContext*);
+static void ThreadAlarmHandler(OSAlarm* alarm, OSContext*);
 
 /*
  * --INFO--
@@ -2916,7 +2916,7 @@ void JoyBus::ThreadSleep(long long ticks)
  * JP Address: TODO
  * JP Size: TODO
  */
-void ThreadAlarmHandler(OSAlarm* alarm, OSContext*)
+static void ThreadAlarmHandler(OSAlarm* alarm, OSContext*)
 {
     OSResumeThread(((ThreadSleepAlarm*)alarm)->thread);
 }

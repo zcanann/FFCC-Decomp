@@ -176,7 +176,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				(*dlEntry)->m_data = pppMemAlloc(
 				    dlInfo->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x174);
 				memcpy((*dlEntry)->m_data, dlInfo->m_data, dlInfo->m_size);
-				gUtil.ReWriteDisplayList((*dlEntry)->m_data, (unsigned long)dlInfo->m_size, 1);
+				Util.ReWriteDisplayList((*dlEntry)->m_data, (unsigned long)dlInfo->m_size, 1);
 				DCFlushRange((*dlEntry)->m_data, (unsigned long)dlInfo->m_size);
 				dlEntry = dlEntry - 1;
 			}

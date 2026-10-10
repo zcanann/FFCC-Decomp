@@ -252,7 +252,7 @@ static void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned
         s16 triCount;
 
         stream = (u16*)((u8*)stream + 3);
-        if (gUtil.IsHasDrawFmtDL(drawCmd) == 0) {
+        if (Util.IsHasDrawFmtDL(drawCmd) == 0) {
             keepReading = 0;
         } else {
             triCount = (s16)(drawCount - 2);
@@ -280,9 +280,9 @@ static void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned
                     S16Vec posQuantized = *sourcePos;
                     Vec posFloat;
 
-                    gUtil.ConvI2FVector(posFloat, posQuantized, model->GetRefData()->m_posQuant);
+                    Util.ConvI2FVector(posFloat, posQuantized, model->GetRefData()->m_posQuant);
                     PSMTXMultVec(meshMtx, &posFloat, &posFloat);
-                    gUtil.ConvF2IVector(polygonData->m_pos[outVertex], posFloat,
+                    Util.ConvF2IVector(polygonData->m_pos[outVertex], posFloat,
                         model->GetRefData()->m_posQuant);
                 } else {
                     polygonData->m_pos[outVertex] = workPositions[posIndex];
@@ -366,10 +366,10 @@ static void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_
             normal.y *= (rand() % 2) ? 1.0f : -1.0f;
             normal.z *= (rand() % 2) ? 1.0f : -1.0f;
             PSVECNormalize(&normal, &normal);
-            gUtil.ConvF2IVector(polygon->m_normalA, normal, model->GetRefData()->m_normQuant);
+            Util.ConvF2IVector(polygon->m_normalA, normal, model->GetRefData()->m_normQuant);
         } else {
             polygon->m_normalA = workNormals[polygon->m_nrmIndices[0]];
-            gUtil.ConvI2FVector(normal, workNormals[polygon->m_nrmIndices[0]], model->GetRefData()->m_normQuant);
+            Util.ConvI2FVector(normal, workNormals[polygon->m_nrmIndices[0]], model->GetRefData()->m_normQuant);
         }
 
         PSVECCrossProduct(&up, &normal, &tangent);
@@ -388,7 +388,7 @@ static void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_
             polygon->m_normalA.y = rand() % 2;
         }
 
-        gUtil.ConvF2IVector(polygon->m_normalB, tangent, model->GetRefData()->m_normQuant);
+        Util.ConvF2IVector(polygon->m_normalB, tangent, model->GetRefData()->m_normQuant);
         polygon++;
     }
 }
@@ -437,9 +437,9 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
                         if (needsMtxUpdate) {
                             S16Vec* srcPos = mesh->GetVertex() + polygon->m_posIndices[i];
                             Vec transformedPos;
-                            gUtil.ConvI2FVector(transformedPos, *srcPos, model->GetRefData()->m_posQuant);
+                            Util.ConvI2FVector(transformedPos, *srcPos, model->GetRefData()->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
-                            gUtil.ConvF2IVector(transformed[i], transformedPos, model->GetRefData()->m_posQuant);
+                            Util.ConvF2IVector(transformed[i], transformedPos, model->GetRefData()->m_posQuant);
                         } else {
                             transformed[i] = mesh->GetVertex()[polygon->m_posIndices[i]];
                         }
@@ -510,14 +510,14 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
 
                         for (int i = 0; i < 3; i++) {
                             S16Vec pos = polygon->m_pos[i];
-                            gUtil.ConvI2FVector(verts[i], pos, model->GetRefData()->m_posQuant);
+                            Util.ConvI2FVector(verts[i], pos, model->GetRefData()->m_posQuant);
                             PSVECAdd(&center, &verts[i], &center);
                         }
 
                         PSVECScale(&center, &center, 0.3333333f);
 
-                        gUtil.ConvI2FVector(axis, polygon->m_normalB, model->GetRefData()->m_normQuant);
-                        gUtil.ConvI2FVector(velocity, polygon->m_normalA, model->GetRefData()->m_normQuant);
+                        Util.ConvI2FVector(axis, polygon->m_normalB, model->GetRefData()->m_normQuant);
+                        Util.ConvI2FVector(velocity, polygon->m_normalA, model->GetRefData()->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, 0.017453292f * (float)polygon->m_rotationDeg);
@@ -572,7 +572,7 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
                             verts[i].y += stepData->m_direction.y * work->m_payloadGraphValue0;
                             verts[i].z += stepData->m_direction.z * work->m_payloadGraphValue0;
 
-                            gUtil.ConvF2IVector(polygon->m_pos[i], verts[i], model->GetRefData()->m_posQuant);
+                            Util.ConvF2IVector(polygon->m_pos[i], verts[i], model->GetRefData()->m_posQuant);
                         }
                         polygon->m_fallFrames++;
                     }
@@ -806,7 +806,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                 CharaBreakMeshData* meshData = mesh->GetRefData();
 
                 if (strcmp(meshData->m_name, "obj") == 0) {
-                    gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax,
+                    Util.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax,
                         mesh->GetVertex(), meshData->m_vertexCount,
                         model->GetRefData()->m_posQuant);
                 }
@@ -875,9 +875,9 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
 #endif
 
                     memcpy((*dlEntries)->m_rewrittenDisplayList, displayList->m_data, displayList->m_size);
-                    gUtil.ReWriteDisplayList((*dlEntries)->m_rewrittenDisplayList, displayList->m_size, 1);
+                    Util.ReWriteDisplayList((*dlEntries)->m_rewrittenDisplayList, displayList->m_size, 1);
 
-                    u32 polygonCount = gUtil.GetNumPolygonFromDL((*dlEntries)->m_rewrittenDisplayList, displayList->m_size);
+                    u32 polygonCount = Util.GetNumPolygonFromDL((*dlEntries)->m_rewrittenDisplayList, displayList->m_size);
 #if !defined(VERSION_GCCP01)
                     totalPolygonCount += polygonCount;
 #endif

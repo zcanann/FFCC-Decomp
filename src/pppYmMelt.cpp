@@ -435,8 +435,8 @@ void CalcPolygonHeight(
         cylinder.m_axis.z = rayDirection.z;
         cylinder.m_radius = zero;
 
-        if (MapMng.CheckHitCylinderNear(&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {
-            MapMng.m_hitMapObj->CalcHitPosition(&vertex->m_position);
+        if (g_MapMng.CheckHitCylinderNear(&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {
+            g_MapMng.m_hitMapObj->CalcHitPosition(&vertex->m_position);
             if ((previousY - ctrl->m_maxDropDistance) > vertex->m_position.y) {
                 vertex->m_position.y = previousY;
                 if (ctrl->m_hideWhenNoGround != 0) {

@@ -1073,7 +1073,7 @@ void CPartMng::SetFp()
         switch (mode) {
         case 2:
         case 4:
-            m_pppMng[i].m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(fp->m_mapObjIndex));
+            m_pppMng[i].m_mapObjIndex = static_cast<short>(g_MapMng.GetMapObjEffectIdx(fp->m_mapObjIndex));
             break;
         case 3:
         case 5:
@@ -1880,10 +1880,10 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_editCursorEnabled = 1;
         return;
     case 0x20:
-        MapMng.ShowMapObjID(payloadWords[1], payloadWords[0]);
+        g_MapMng.ShowMapObjID(payloadWords[1], payloadWords[0]);
         return;
     case 0x21:
-        MapMng.ShowMapMeshID(payloadWords[1], payloadWords[0]);
+        g_MapMng.ShowMapMeshID(payloadWords[1], payloadWords[0]);
         return;
     case 0xfe:
         break;
@@ -3593,7 +3593,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     switch (mode) {
     case 2:
     case 4:
-        mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(fp->m_mapObjIndex));
+        mng->m_mapObjIndex = static_cast<short>(g_MapMng.GetMapObjEffectIdx(fp->m_mapObjIndex));
         break;
     case 3:
     case 5:

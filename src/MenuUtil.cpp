@@ -1386,9 +1386,9 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideWidth = sideTexture->GetWidth();
 
 		SetUv(uv0, 0.0f, 0.0f);
-		SetUv(uv1, 0.5f, 1.0f);
 		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
+		SetUv(uv1, 0.5f, 1.0f);
 		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
@@ -1485,9 +1485,9 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideWidth = sideTexture->GetWidth();
 
 		SetUv(uv0, 0.0f, 0.0f);
-		SetUv(uv1, 0.5f, 1.0f);
 		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
+		SetUv(uv1, 0.5f, 1.0f);
 		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

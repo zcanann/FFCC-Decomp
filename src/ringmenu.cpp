@@ -205,7 +205,7 @@ void CRingMenu::onCalc()
 			                     ? Chara.MogFur().m_commandIndex
 			                     : caravanWork->GetIdxCmdList();
 
-			int* trackedCmd = (Game.m_gameWork.IsMogStage())
+			int* trackedCmd = (Game.m_gameWork.IsMogStage() & 1)
 			                      ? &Chara.MogFur().m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 
@@ -367,6 +367,7 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
  */
 void CRingMenu::onDraw()
 {
+	float showScale;
 	float fullAlpha;
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
 		return;
@@ -377,7 +378,7 @@ void CRingMenu::onDraw()
 		return;
 	}
 
-	float showScale = m_displayCounter / 16.0f;
+	showScale = m_displayCounter / 16.0f;
 	if (m_displayDirection != 0) {
 		showScale = 1.0f - showScale;
 	}

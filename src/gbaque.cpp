@@ -2037,7 +2037,7 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 	subjectWrite = subjectNameBuf;
 	entryWrite = letterEntryBuf;
 
-	for (int i = 0; i < letterCount; i++) {
+	for (int i = 0; i < letterCount; i++, entryWrite += 2) {
 		int matchedSubject = -1;
 		int matchedNpc = -1;
 
@@ -2116,7 +2116,6 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 		}
 
 		(reinterpret_cast<unsigned char*>(entryWrite))[6] = static_cast<unsigned char>(flags);
-		entryWrite += 2;
 	}
 
 	unsigned int header[4];

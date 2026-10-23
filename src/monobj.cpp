@@ -591,18 +591,23 @@ void CGMonObj::setActionParam(int state)
 	m_unk558 = m_unk554 + 1;
 	m_unk55C = m_unk558 + 1;
 
-	const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
-	int actionType = items[m_itemId].m_actionType;
-	switch (actionType) {
+	SCharaItemRow* items = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
+	switch (items[m_itemId].m_actionType) {
 	case 0:
 	case 1:
 	case 3:
-		items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
-		m_castFrameStart = items[m_itemId].m_attackStartFrame;
-		items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
-		m_castFrameEnd = items[m_itemId].m_attackEndFrame;
-		items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
-		m_castFrameCurrent = items[m_itemId].m_attackEndFrame;
+		{
+			SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
+			m_castFrameStart = rows[m_itemId].m_attackStartFrame;
+		}
+		{
+			SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
+			m_castFrameEnd = rows[m_itemId].m_attackEndFrame;
+		}
+		{
+			SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
+			m_castFrameCurrent = rows[m_itemId].m_attackEndFrame;
+		}
 		break;
 	case 2:
 		m_unk68C = CGCharaObj::calcCastTime(m_itemId);
@@ -2123,8 +2128,9 @@ inline int CGMonObj::mlWaitingCheck()
 inline void CGMonObj::mlAway()
 {
 	if (m_targetPartyIndex >= 0) {
+		CGPartyObj* party = Game.m_partyObjArr[m_targetPartyIndex];
 		CGMonObj::m_aiWork.m_state = 0x21;
-		CGMonObj_SetChaseMove(this, Game.m_partyObjArr[m_targetPartyIndex], 0);
+		CGMonObj_SetChaseMove(this, party, 0);
 		if (((m_moveWork.m_stateFlags & 1) != 0) ||
 			(m_stateFlags0Bits.unk1 != 0)) {
 			moveCancel();
@@ -3085,8 +3091,8 @@ void CGMonObj::setIceJEffect(int enabled)
 	endPSlotBit(0x20000);
 
 	if (enabled != 0) {
-		unsigned short count = m_scriptHandle->m_romWork[0xD5];
-		for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
+		int count = m_scriptHandle->m_romWork[0xD5];
+		for (int i = 0; i < count; i++) {
 			int dataNo = m_charaModelHandle->GetPdtId();
 			putParticleBindTrace((i + 0x5A) | (dataNo << 8), m_particleSlots[0x11], this, 1.0f, 0);
 		}
@@ -3261,13 +3267,7 @@ void CGMonObj::setRepop(int mode)
 		putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[16], this, 1.0f, 0);
 	}
 
-	endPSlotBit(0x20000);
-
-	unsigned short countB = m_scriptHandle->m_romWork[0xD5];
-	for (int i = 0; i < static_cast<int>(countB); i++) {
-		int dataNo = m_charaModelHandle->GetPdtId();
-		putParticleBindTrace((i + 0x5A) | (dataNo << 8), m_particleSlots[17], this, 1.0f, 0);
-	}
+	setIceJEffect(1);
 
 	if ((m_scriptHandle->m_romWork[0x7F] & 1) == 0) {
 		return;

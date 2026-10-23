@@ -439,23 +439,6 @@ inline void VECLerp(Vec* a, Vec* b, Vec* out, float t)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9784
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
-{
-    Vec scaled;
-
-    PSVECScale(b, &scaled, scale);
-    PSVECAdd(a, &scaled, out);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B98F4
  * PAL Size: 36b
  * EN Address: TODO
@@ -854,8 +837,9 @@ renderedDone:
             int lowBit = modeBits & 1;
             int highBit = modeBits & 2;
             int segmentCount = pointCount + 1 - (lowBit + ((modeBits >> 1) & 1));
+            int first = (modeBits & 1) ? 1 : 0;
             float scaled = t * static_cast<float>(segmentCount);
-            int baseIndex = (modeBits & 1 ? 1 : 0) + static_cast<int>(scaled);
+            int baseIndex = first + static_cast<int>(scaled);
             float segmentT = std::fmodf(scaled, 1.0f);
 
             CVector delta = CVector(m_pathPoints[1].m_position) - CVector(m_pathPoints[0].m_position);
@@ -1519,8 +1503,8 @@ renderedDone:
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         int mode = *object->m_localBase;
         mode &= 3;
-        float alpha = static_cast<float>(static_cast<int>(object->m_localBase[1]));
-        alpha /= static_cast<float>(static_cast<int>(object->m_localBase[2]));
+        int num = object->m_localBase[1];
+        int den = object->m_localBase[2];
         Quaternion start;
         Quaternion end;
         Quaternion rotation;
@@ -1532,6 +1516,7 @@ renderedDone:
         end.y = localFloats[8];
         end.z = localFloats[9];
         end.w = localFloats[10];
+        float alpha = static_cast<float>(num) / static_cast<float>(den);
 
         if (mode == 3) {
             float s = std::sinf(3.1415927f * alpha + 1.5707964f);

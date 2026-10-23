@@ -1171,17 +1171,20 @@ void CMenuPcs::DrawResultOpenAnim()
 							x += fillWidth;
 							mulX = fillWidth;
 						}
-						if (fillWidth > 0.0f && fillWidth < (float)sprite->w) {
-							colors[1].r = 0xFF;
-							colors[1].g = 0xFF;
-							colors[1].b = 0xFF;
-							colors[1].a = 0;
-							colors[3].r = 0xFF;
-							colors[3].g = 0xFF;
-							colors[3].b = 0xFF;
-							colors[3].a = 0;
-							MenuPcs.DrawRect(0, x, y, (float)sprite->w * (float)(1.0 / (double)sprite->duration), (float)sprite->h,
-							    mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
+						if (fillWidth > 0.0f) {
+							int w = sprite->w;
+							if (fillWidth < (float)w) {
+								colors[1].r = 0xFF;
+								colors[1].g = 0xFF;
+								colors[1].b = 0xFF;
+								colors[1].a = 0;
+								colors[3].r = 0xFF;
+								colors[3].g = 0xFF;
+								colors[3].b = 0xFF;
+								colors[3].a = 0;
+								MenuPcs.DrawRect(0, x, y, (float)w * (float)(1.0 / (double)sprite->duration), (float)sprite->h,
+								    mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
+							}
 						}
 					} else {
 						if (s_CntTop <= i && i < s_CntTop + activePartyCount) {
@@ -3307,6 +3310,8 @@ inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
 	int digitIndex;
 	int digits[3];
 	int digitCount;
+	float digitW;
+	float digitX;
 
 	if (value >= 100) {
 		digitCount = 3;
@@ -3323,8 +3328,9 @@ inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
 		digits[0] = value;
 	}
 
-	float digitW = (float)sprite->w;
-	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
+	digitW = digitCount * sprite->w;
+	digitX = (3.0 * sprite->w - digitW) / 2 + sprite->x;
+	digitW = sprite->w;
 	for (digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 		MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 		    (float)(sprite->w * digits[digitIndex]), sprite->mulY,

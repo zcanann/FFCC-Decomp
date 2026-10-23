@@ -7,7 +7,22 @@
 
 struct Vec;
 
-void VECMultAdd(Vec*, Vec*, Vec*, float);
+/*
+ * --INFO--
+ * PAL Address: 0x800B9784
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
+{
+    Vec scaled;
+
+    PSVECScale(b, &scaled, scale);
+    PSVECAdd(a, &scaled, out);
+}
 
 /*
  * --INFO--

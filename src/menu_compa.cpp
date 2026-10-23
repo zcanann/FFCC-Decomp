@@ -146,8 +146,8 @@ void CMenuPcs::CompaDraw()
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
-				colors[0].a = static_cast<unsigned char>(alpha * 255.0f);
 				colors[0].b = 0xFF;
+				colors[0].a = static_cast<unsigned char>(alpha * 255.0f);
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, 0.0f);
 			}

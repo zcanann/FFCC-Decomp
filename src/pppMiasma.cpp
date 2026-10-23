@@ -275,10 +275,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     float secondaryScale;
     GXTexObj secondaryMaskTex;
     GXColor stepColor;
-    CGraphic* graphicPtr;
     u32 scissorHeight;
     MiasmaFrameWork* work;
     int slice;
+    CGraphic* graphicPtr;
 
 #if defined(VERSION_GCCP01)
     Graphic.SetDrawDoneDebugData(0x31);

@@ -892,10 +892,8 @@ void CGPartyObj::command()
 		ringCommandArg = caravan->GetIdxCmdList();
 	}
 
-	if (((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
-	     (m_unk63CBits.m_bit80 != 0) &&
-	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9B]) << 24) & 0xC0000000) >> 31) != 0)) &&
-	    Joybus.GetCtrlMode(padSlot) != 1) {
+	if ((m_weaponNodeFlagBits.m_prg != 0) && (m_unk63CBits.m_bit80 != 0) &&
+	    (m_weaponNodeFlagAll.m_bits1.m_shield != 0) && Joybus.GetCtrlMode(padSlot) != 1) {
 		if (m_scriptHandle->m_hp != 0) {
 		if (party.secondaryTarget != nullptr) {
 			primaryAvailable = true;
@@ -2243,8 +2241,8 @@ void CGPartyObj::checkTargetParticle()
 			input.z += Pad.GetLeftStickY(m_animStateMisc);
 		}
 
-			if (input.x == 0.0f && input.z == 0.0f) {
-				unsigned short held = Pad.GetButton(m_animStateMisc);
+		if (input.x == 0.0f && input.z == 0.0f) {
+			unsigned short held = Pad.GetButton(m_animStateMisc);
 			if ((held & 1) != 0) {
 				input.x += 1.0f;
 			}
@@ -2271,29 +2269,27 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	if (input.x != 0.0f || input.z != 0.0f) {
-#define targetPos (&m_comboCenter)
-#define centerPos (&m_comboTarget)
 		float maxRange;
 
 		party.flags.flag20 = 1;
 		input.Normalize();
 		PSVECScale(reinterpret_cast<Vec*>(&input), reinterpret_cast<Vec*>(&input), 2.0f);
 
-			float angle;
-			if (isGhostPartyTargetMode(this)) {
-				angle = 3.1415927f;
-			} else {
-				angle = CameraPcs.m_yaw;
-			}
+		float angle;
+		if (isGhostPartyTargetMode(this)) {
+			angle = 3.1415927f;
+		} else {
+			angle = CameraPcs.m_yaw;
+		}
 
 		float s = sin(angle);
 		float c = cos(angle);
-		float inX = input.x;
-		float inZ = input.z;
-		targetPos->x += inX * c - inZ * s;
-		targetPos->z += inX * s + inZ * c;
+		float rx = input.x * c - input.z * s;
+		float rz = input.x * s + input.z * c;
+		m_comboCenter.x += rx;
+		m_comboCenter.z += rz;
 
-		float dist = PSVECDistance(&m_worldPosition, targetPos);
+		float dist = PSVECDistance(&m_worldPosition, &m_comboCenter);
 
 		maxRange = 0.0f;
 		if (m_lastStateId == 2) {
@@ -2324,14 +2320,12 @@ void CGPartyObj::checkTargetParticle()
 			maxRange += base + static_cast<float>(vFlag);
 		}
 
-		CVector move = CVector(*targetPos) - CVector(m_worldPosition);
+		CVector move = CVector(m_comboCenter) - CVector(m_worldPosition);
 		if (dist > maxRange) {
-			Vec scaled;
-			PSVECScale(move, &scaled, maxRange / dist);
-			PSVECAdd(&m_worldPosition, &scaled, targetPos);
+			VECMultAdd(&m_worldPosition, move, &m_comboCenter, maxRange / dist);
 		}
 
-		move = CVector(*targetPos) - CVector(*centerPos);
+		move = CVector(m_comboCenter) - CVector(m_comboTarget);
 		int iter = 4;
 		do {
 			float radius;
@@ -2341,34 +2335,30 @@ void CGPartyObj::checkTargetParticle()
 				radius = 4.0f;
 			}
 
-			if (MapPcs.CheckHitCylinderNear(CVector(*centerPos) + CVector(0.0f, 5.0f, 0.0f), move, radius, 0x30) == 0) {
+			if (MapPcs.CheckHitCylinderNear(CVector(m_comboTarget) + CVector(0.0f, 5.0f, 0.0f), move, radius, 0x30) == 0) {
 				break;
 			}
 			if (iter == 1) {
-				move.x = 0.0f;
-				move.y = 0.0f;
-				move.z = 0.0f;
+				move.x = move.y = move.z = 0.0f;
 			} else {
 				MapPcs.CalcHitSlide(move, 10.0f);
 			}
 			iter--;
 		} while (iter > 0);
 
-		PSVECAdd(CVector(*centerPos) + CVector(0.0f, 5.0f, 0.0f), move, targetPos);
+		PSVECAdd(CVector(m_comboTarget) + CVector(0.0f, 5.0f, 0.0f), move, &m_comboCenter);
 
-		if (MapPcs.CheckHitCylinderNear(targetPos, CVector(0.0f, -100.0f, 0.0f), 0.0f, 0x30) != 0) {
-			MapPcs.CalcHitPosition(targetPos);
+		if (MapPcs.CheckHitCylinderNear(&m_comboCenter, CVector(0.0f, -100.0f, 0.0f), 0.0f, 0x30) != 0) {
+			MapPcs.CalcHitPosition(&m_comboCenter);
 			{
 				Vec faceNormal;
-				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosA = *targetPos;
+				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosA = m_comboCenter;
 				MapPcs.GetHitFaceNormal(&faceNormal);
 				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosB = faceNormal;
 			}
 		}
 
-		*centerPos = *targetPos;
-#undef targetPos
-#undef centerPos
+		m_comboTarget = m_comboCenter;
 	} else {
 		party.flags.flag20 = 0;
 	}
@@ -3838,22 +3828,22 @@ static inline int magicReady()
  */
 static inline int chooseMagic()
 {
-	int choices = 0;
+	int count = 0;
 	int i;
 	for (i = 0; i < 3; i++) {
 		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
-			choices++;
+			count++;
 		}
 	}
 
-	int pick = Math.Rand(choices);
-	int cursor = 0;
+	int pick = Math.Rand(count);
+	count = 0;
 	for (i = 0; i < 3; i++) {
 		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
-			if (cursor == pick) {
+			if (count == pick) {
 				return i;
 			}
-			cursor++;
+			count++;
 		}
 	}
 	return 0;

@@ -439,23 +439,6 @@ inline void VECLerp(Vec* a, Vec* b, Vec* out, float t)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9784
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
-{
-    Vec scaled;
-
-    PSVECScale(b, &scaled, scale);
-    PSVECAdd(a, &scaled, out);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B98F4
  * PAL Size: 36b
  * EN Address: TODO

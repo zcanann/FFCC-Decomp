@@ -2272,17 +2272,7 @@ void CMenuPcs::CmakeTribeDraw()
         0.0f, 0.0f, 1.0f, 0.90909094f, 0.0f);
 
     DrawCmakeTitle(3, alpha, 1.0f);
-    {
-        int tribe = m_cmakeState->m_select;
-        SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
-        MenuPcs.DrawRect(
-            0,
-            351.0f, 96.0f, 184.0f, 184.0f,
-            static_cast<float>((tribe & 1) * 0xB8),
-            static_cast<float>((tribe / 2) * 0xB8),
-            1.0f, 1.0f, 0.0f);
-    }
+    DrawCmakeCrest(m_cmakeState->m_select, 0, 0, alpha);
 
     int i;
     CFont* font;
@@ -2728,25 +2718,9 @@ void CMenuPcs::CmakeResultDraw()
     }
 
     if ((m_cmakeState->m_mode == 2) && (m_cmakeState->m_resultDir < 0)) {
-        int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        SetCmakeBlendMatColor(1.0f);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
-        MenuPcs.DrawRect(
-            0,
-            351.0f, 96.0f, 184.0f, 184.0f,
-            static_cast<float>((tribe & 1) * 0xB8),
-            static_cast<float>((tribe / 2) * 0xB8),
-            1.0f, 1.0f, 0.0f);
+        DrawCmakeCrest(s_CmakeInfo.m_tribe, 0, 0, 1.0f);
     } else {
-        int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
-        MenuPcs.DrawRect(
-            0,
-            351.0f, 96.0f, 184.0f, 184.0f,
-            static_cast<float>((tribe & 1) * 0xB8),
-            static_cast<float>((tribe / 2) * 0xB8),
-            1.0f, 1.0f, 0.0f);
+        DrawCmakeCrest(s_CmakeInfo.m_tribe, 0, 0, alpha);
     }
 
     int yesNoSel;
@@ -2997,15 +2971,7 @@ void CMenuPcs::CmakeResultDraw1()
         alpha = 1.0f;
     }
     {
-        int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        SetCmakeBlendMatColor(alpha);
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
-        MenuPcs.DrawRect(
-            0,
-            351.0f, 96.0f, 184.0f, 184.0f,
-            static_cast<float>((tribe & 1) * 0xB8),
-            static_cast<float>((tribe / 2) * 0xB8),
-            1.0f, 1.0f, 0.0f);
+        DrawCmakeCrest(s_CmakeInfo.m_tribe, 0, 0, alpha);
     }
 
     CFont* labelFont = GetFont23();

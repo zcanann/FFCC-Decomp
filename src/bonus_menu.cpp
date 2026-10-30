@@ -932,8 +932,9 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite = &m_bonusAnim->sprites[i + 1];
 				float centerX = 0.0f;
 				float centerY = (float)((double)(float)((double)sprite->h / 2.0 + (double)sprite->y) - 224.0);
-				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportX = (short)centerX;
-				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportY = (short)centerY;
+				delta = activePartyCount * 2 + i;
+				m_wm.m_worldObjData[delta].m_viewportX = (short)centerX;
+				m_wm.m_worldObjData[delta].m_viewportY = (short)centerY;
 			}
 		}
 

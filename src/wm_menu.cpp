@@ -3212,6 +3212,7 @@ void CMenuPcs::DrawMCardMenu()
 		DrawCursor((int)cursorY, (int)cursorX, 1.0f);
 
 		DrawMcObj();
+		RestoreProjection();
 	}
 
 	// State machine for MC operations
@@ -3907,6 +3908,7 @@ void CMenuPcs::DrawLoadMenu()
 		DrawCursor((int)cursorY0, (int)cursorXbase, 1.0f);
 
 		DrawMcObj();
+		RestoreProjection();
 	}
 
 	// State machine for MC operations
@@ -4966,6 +4968,7 @@ inline void CMenuPcs::DrawObj(int kind)
 		DrawChara();
 	} else if (kind == 1) {
 		DrawMcObj();
+		RestoreProjection();
 	} else {
 		DrawWMFrame();
 		DrawFukidashi();
@@ -9177,7 +9180,6 @@ inline void CMenuPcs::DrawMcObj()
 		}
 	}
 	DrawInit();
-	RestoreProjection();
 }
 
 /*

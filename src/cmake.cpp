@@ -1190,12 +1190,7 @@ inline void CMenuPcs::DrawCmakeBallCursor(int x, int y, float alpha)
  */
 inline void CMenuPcs::DrawCmakeCharaText(int table, float alpha)
 {
-    CFont* font;
-    if (m_menuResultCode != 0) {
-        font = GetFontItem();
-    } else {
-        font = GetFont23();
-    }
+    CFont* font = (m_menuResultCode != 0) ? GetFontItem() : GetFont23();
     font->SetShadow(0);
     font->SetScale(1.0f);
     font->DrawInit();
@@ -1207,10 +1202,11 @@ inline void CMenuPcs::DrawCmakeCharaText(int table, float alpha)
     int i;
     int tableBase = table * 5;
     const char* rowText;
+    for (i = 0; i < 5; i++) {
 #ifdef VERSION_GCCJGC
-    for (i = 0, y = 0x70; i < 5; i++, y += 0x20) {
+        y = 0x70 + i * 0x20;
 #else
-    for (i = 0, y = 0x6C; i < 5; i++, y += 0x20) {
+        y = 0x6C + i * 0x20;
 #endif
         rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);
@@ -2301,8 +2297,8 @@ void CMenuPcs::CmakeTribeDraw()
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
     for (i = 0; i < 4; i++) {
-        y = 0x88 + i * 0x1C;
         txt = GetTribeStr(i);
+        y = 0x88 + i * 0x1C;
         font->SetPosX(264.0f);
 #ifdef VERSION_GCCJGC
         font->SetPosY(static_cast<float>(y));

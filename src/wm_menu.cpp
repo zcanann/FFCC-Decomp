@@ -8078,12 +8078,10 @@ void CMenuPcs::CalcMainMenuSub()
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			}
 
-			const float selA = m_wmMenuTargetRotation;
-			const float selB = m_wmMenuRotation;
-			const float hi = (selB < selA) ? selA : selB;
-			const float lo = (selB < selA) ? selB : selA;
+			const float hi = (m_wmMenuRotation < m_wmMenuTargetRotation) ? m_wmMenuTargetRotation : m_wmMenuRotation;
+			const float lo = (m_wmMenuRotation < m_wmMenuTargetRotation) ? m_wmMenuRotation : m_wmMenuTargetRotation;
 			const float delta = 0.1850000023841858f * (hi - lo);
-			if (selB <= selA) {
+			if (m_wmMenuRotation <= m_wmMenuTargetRotation) {
 				m_wmMenuRotation += delta;
 			} else {
 				m_wmMenuRotation -= delta;
@@ -8195,19 +8193,18 @@ void CMenuPcs::CalcMainMenuSub()
 			PSMTXIdentity(workMtx);
 
 			if (i == 1) {
-				const int ms = m_wmWorldState->m_mainState;
-				if (ms != 2) {
-					if (ms < 2) {
+				if (m_wmWorldState->m_mainState != 2) {
+					if (m_wmWorldState->m_mainState < 2) {
 #ifdef VERSION_GCCJGC
-						n = 0x14 - (ms * 10 + m_wmWorldState->m_frameCounter);
+						n = 0x14 - (m_wmWorldState->m_mainState * 10 + m_wmWorldState->m_frameCounter);
 #else
-						n = 0x13 - (ms * 10 + m_wmWorldState->m_frameCounter);
+						n = 0x13 - (m_wmWorldState->m_mainState * 10 + m_wmWorldState->m_frameCounter);
 						if (static_cast<int>(n) < 0) {
 							n = 0;
 						}
 #endif
 					} else {
-						n = m_wmWorldState->m_frameCounter + (ms - 3) * 10;
+						n = m_wmWorldState->m_frameCounter + (m_wmWorldState->m_mainState - 3) * 10;
 					}
 				}
 			}

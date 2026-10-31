@@ -9,6 +9,38 @@ class CMapCylinder;
 class CMapObj;
 class COctNode;
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x8001DBC4
+ * EN Size: 156b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void VECMinimize(const Vec* a, const Vec* b, Vec* out)
+{
+	out->x = (a->x < b->x) ? a->x : b->x;
+	out->y = (a->y < b->y) ? a->y : b->y;
+	out->z = (a->z < b->z) ? a->z : b->z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x8001DB28
+ * EN Size: 156b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void VECMaximize(const Vec* a, const Vec* b, Vec* out)
+{
+	out->x = (a->x > b->x) ? a->x : b->x;
+	out->y = (a->y > b->y) ? a->y : b->y;
+	out->z = (a->z > b->z) ? a->z : b->z;
+}
+
 class CBound
 {
 public:
@@ -23,11 +55,38 @@ public:
 	 */
 	CBound()
 	{
+		Reset();
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: TODO
+	 * EN Address: 0x8001DC60
+	 * EN Size: 36b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void Reset()
+	{
 		float max = -10000000000.0f;
 		float min = 10000000000.0f;
 
 		m_min.x = m_min.y = m_min.z = min;
 		m_max.x = m_max.y = m_max.z = max;
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: TODO
+	 * EN Address: 0x8001DAD4
+	 * EN Size: 84b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void Add(Vec* point)
+	{
+		VECMinimize(&m_min, point, &m_min);
+		VECMaximize(&m_max, point, &m_max);
 	}
 	/*
 	 * --INFO--

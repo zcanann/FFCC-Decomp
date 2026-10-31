@@ -807,19 +807,13 @@ void CGame::Calc()
         m_gameWork.m_frameCounter++;
     }
 
-    m_partyBound.m_min.x = m_partyBound.m_min.y = m_partyBound.m_min.z = 1.0E+10f;
-    m_partyBound.m_max.x = m_partyBound.m_max.y = m_partyBound.m_max.z = -1.0E+10f;
+    m_partyBound.Reset();
 
     for (int i = 0; i < 4; i++) {
         CGPartyObj* partyObj = m_partyObjArr[i];
 
         if (partyObj != 0) {
-            m_partyBound.m_min.x = (m_partyBound.m_min.x < partyObj->m_worldPosition.x) ? m_partyBound.m_min.x : partyObj->m_worldPosition.x;
-            m_partyBound.m_min.y = (m_partyBound.m_min.y < partyObj->m_worldPosition.y) ? m_partyBound.m_min.y : partyObj->m_worldPosition.y;
-            m_partyBound.m_min.z = (m_partyBound.m_min.z < partyObj->m_worldPosition.z) ? m_partyBound.m_min.z : partyObj->m_worldPosition.z;
-            m_partyBound.m_max.x = (m_partyBound.m_max.x > partyObj->m_worldPosition.x) ? m_partyBound.m_max.x : partyObj->m_worldPosition.x;
-            m_partyBound.m_max.y = (m_partyBound.m_max.y > partyObj->m_worldPosition.y) ? m_partyBound.m_max.y : partyObj->m_worldPosition.y;
-            m_partyBound.m_max.z = (m_partyBound.m_max.z > partyObj->m_worldPosition.z) ? m_partyBound.m_max.z : partyObj->m_worldPosition.z;
+            m_partyBound.Add(&partyObj->m_worldPosition);
         }
     }
 

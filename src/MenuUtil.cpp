@@ -549,18 +549,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 	}
 
-	int rangeKind;
-	if ((1 <= msgNo) && (msgNo < 0x45)) {
-		rangeKind = 1;
-	} else if ((0x45 <= msgNo) && (msgNo < 0x7F)) {
-		rangeKind = 0x45;
-	} else if ((0x7F <= msgNo) && (msgNo < 0x9F)) {
-		rangeKind = 0x7F;
-	} else {
-		rangeKind = 0;
-	}
-
-	if (rangeKind != 0) {
+	if (IsItemEquip(msgNo) != 0) {
 		int i;
 		int baseIndex = drawPrefix + 2;
 		u32 baseY = lineBaseY[baseIndex];
@@ -824,6 +813,27 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: 0x8019B1E8
+ * EN Size: 80b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::IsItemEquip(int itemNo)
+{
+	if ((1 <= itemNo) && (itemNo < 0x45)) {
+		return 1;
+	} else if ((0x45 <= itemNo) && (itemNo < 0x7F)) {
+		return 0x45;
+	} else if ((0x7F <= itemNo) && (itemNo < 0x9F)) {
+		return 0x7F;
+	}
+	return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80179e9c
  * PAL Size: 244b
  * EN Address: TODO
@@ -915,6 +925,26 @@ void CMenuPcs::GetOptionData()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: 0x8019B560
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::InitOptionMenuParam()
+{
+	m_optionIndex = 0;
+	m_optionMenuState = 0;
+	m_optionOpenAnim = 0.0f;
+	m_optionRowAnim = 0.0f;
+	m_optionColumnAnim = 0.0f;
+	m_optionAnimCounter = 0;
+	m_optionAnimPhase = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80179328
  * PAL Size: 2560b
  * EN Address: TODO
@@ -962,13 +992,7 @@ void CMenuPcs::CalcOptionMenu()
 		}
 
 		m_artiState->optionCloseReady = 1;
-		m_optionIndex = 0;
-		m_optionMenuState = 0;
-		m_optionOpenAnim = 0.0f;
-		m_optionRowAnim = 0.0f;
-		m_optionColumnAnim = 0.0f;
-		m_optionAnimCounter = 0;
-		m_optionAnimPhase = 0;
+		InitOptionMenuParam();
 		return;
 	}
 

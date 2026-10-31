@@ -456,6 +456,7 @@ public:
     float GetFontWidth(char*, float, float);
     int GetLongHelpString(CFont*, int, int);
     void CalcHelpLine(int, int&, int&);
+    int IsItemEquip(int);
     void DrawFont(int, int, _GXColor, int, char*, float, float);
     void DrawFont2(int, int, _GXColor, int, char*, float, float, float);
     void DrawHelpMessageUS(int, CFont*, int, int, _GXColor, int, float, float);
@@ -630,6 +631,7 @@ public:
     void WMSubMenuInit();
     void WMChgMenu();
     void GetOptionData();
+    void InitOptionMenuParam();
     const char* GetSkillStr(int);
 #ifndef VERSION_GCCJGC
     char* GetTribeStr(int);

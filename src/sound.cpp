@@ -360,7 +360,7 @@ void CSound::Draw()
 {
     Mtx cameraMatrix;
     GXColor lineColor;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
+    CameraPcs.GetViewMatrix(cameraMatrix);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc((u8)0);
@@ -427,23 +427,23 @@ void CSound::loadWaveFrame()
             unsigned int curOffset = (unsigned int)waveOffset;
             CFile::CHandle* handle = waveFile;
             handle->SetReadSize(readSize, curOffset);
-            File.ReadASync(waveFile);
+            waveFile->ReadASync();
 
             if (waveSyncMode != 0) {
-                File.SyncCompleted(waveFile);
+                waveFile->SyncCompleted();
             }
 
             waveRemain -= (int)readSize;
             waveOffset += (int)readSize;
             waveState = 1;
-        } else if (waveState == 1 && File.IsCompleted(waveFile)) {
-            m_redSound.SetWaveData(waveID, File.m_readBuffer, waveFile->GetReadSize());
+        } else if (waveState == 1 && waveFile->IsCompleted()) {
+            m_redSound.SetWaveData(waveID, File.GetBuffer(), waveFile->GetReadSize());
 
             Sound.WaitASync();
 
             waveState = 0;
             if (waveRemain == 0) {
-                File.Close(waveFile);
+                waveFile->Close();
                 waveFile = 0;
             } else {
                 waveFile->Reset();
@@ -478,7 +478,7 @@ void CSound::loadWaveFrame()
                     unsigned int curOffset = (unsigned int)streamOffset;
                     CFile::CHandle* handle = streamFile;
                     handle->SetReadSize(readSize, curOffset);
-                    File.ReadASync(streamFile);
+                    streamFile->ReadASync();
 
                     streamOffset += readSize;
                     streamRemain -= readSize;
@@ -486,12 +486,12 @@ void CSound::loadWaveFrame()
                     streamState = 1;
                 }
             }
-        } else if (File.IsCompleted(streamFile)) {
-            memcpy(reinterpret_cast<u8*>(m_streamBuffer) + (1 - streamHalf) * 0x10000, File.m_readBuffer, 0x10000);
+        } else if (streamFile->IsCompleted()) {
+            memcpy(reinterpret_cast<u8*>(m_streamBuffer) + (1 - streamHalf) * 0x10000, File.GetBuffer(), 0x10000);
             streamState = 0;
 
             if (streamRemain == 0) {
-                File.Close(streamFile);
+                streamFile->Close();
                 streamFile = 0;
             } else {
                 streamFile->Reset();
@@ -520,7 +520,7 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
         sprintf(wavePath, "dvd/sound/wave/wave%04d.wd", waveNo);
         m_waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (m_waveFile != 0) {
-            m_waveRemain = File.GetLength(m_waveFile);
+            m_waveRemain = m_waveFile->GetLength();
             m_waveOffset = 0;
             m_waveState = 0;
             m_waveID = waveId;
@@ -548,7 +548,7 @@ void CSound::CancelLoadWaveASync()
 {
     CFile::CHandle*& handle = m_waveFile;
     if (handle != 0) {
-        File.Close(handle);
+        handle->Close();
         handle = 0;
         System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
             "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
@@ -590,10 +590,10 @@ void CSound::LoadBgm(int bgmId)
 
         CFile::CHandle* handle = File.Open(musicPath, 0, CFile::PRI_LOW);
         if (handle != 0) {
-            File.Read(handle);
-            File.SyncCompleted(handle);
-            m_redSound.SetMusicData(File.m_readBuffer);
-            File.Close(handle);
+            handle->Read();
+            handle->SyncCompleted();
+            m_redSound.SetMusicData(File.GetBuffer());
+            handle->Close();
         }
     }
 }
@@ -704,10 +704,10 @@ void CSound::LoadBlock()
         sprintf(sePath, "dvd/sound/se/block/se%03d.seb", i);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
-            File.Read(handle);
-            File.SyncCompleted(handle);
-            m_redSound.SetSeBlockData(i, File.m_readBuffer);
-            File.Close(handle);
+            handle->Read();
+            handle->SyncCompleted();
+            m_redSound.SetSeBlockData(i, File.GetBuffer());
+            handle->Close();
         }
     }
 }
@@ -748,10 +748,10 @@ void CSound::LoadSe(int seId)
         sprintf(sePath, "dvd/sound/se/sep/se%06d.sep", seId);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
-            File.Read(handle);
-            File.SyncCompleted(handle);
-            m_redSound.SetSeSepData(File.m_readBuffer);
-            File.Close(handle);
+            handle->Read();
+            handle->SyncCompleted();
+            m_redSound.SetSeSepData(File.GetBuffer());
+            handle->Close();
             if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
                 System.Printf("\x1B[31mMerge: \x95\x88\x96\xCA\x82\xF0" "DVD\x82\xA9\x82\xE7\x93\xC7\x82\xDD\x8D\x9E"
                     "\x82\xDD\x82\xDC\x82\xB5\x82\xBD\x81\x42%d\n\x1B[0m", seId);
@@ -797,7 +797,7 @@ void CSound::LoadWave(int waveId)
                 System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
             } else if (m_redSound.ReentryWaveData(waveId) == -1) {
                 if (waveFile != 0) {
-                    File.Close(waveFile);
+                    waveFile->Close();
                     waveFile = 0;
                     System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
                         "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
@@ -811,7 +811,7 @@ void CSound::LoadWave(int waveId)
                 waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
 
                 if (waveFile != 0) {
-                    m_waveRemain = File.GetLength(waveFile);
+                    m_waveRemain = waveFile->GetLength();
                     m_waveOffset = 0;
                     m_waveState = 0;
                     m_waveID = -1;
@@ -845,7 +845,7 @@ void CSound::LoadWave(void* waveData)
 
     if (m_redSound.ReentryWaveData(RedWaveHeadFromData(waveData)->m_waveNo) == -1) {
         if (waveFile != 0) {
-            File.Close(waveFile);
+            waveFile->Close();
             waveFile = 0;
             System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
                 "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
@@ -1034,7 +1034,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<Vec*>(&CameraPcs.m_targetX),
             se3D->m_farDistance);
         if (lineHit != 0) {
-            PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
+            PSMTXMultVec(CameraPcs.GetViewMatrix(), &nearestPoint, &nearestPoint);
             if (nearestDistance < se3D->m_nearDistance) {
                 outVolume = 0x7F;
             } else {
@@ -1073,7 +1073,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
         }
 
-        PSMTXMultVec(CameraPcs.m_cameraMatrix, &se3D->m_position, &nearestPoint);
+        PSMTXMultVec(CameraPcs.GetViewMatrix(), &se3D->m_position, &nearestPoint);
         scaledDistSq = distScale * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs.m_targetX), &se3D->m_position);
         scaledFarSq = distScale * (se3D->m_farDistance * (se3D->m_farDistance * distScale));
         if (scaledDistSq < scaledFarSq) {
@@ -1496,7 +1496,7 @@ void CSound::LoadStream(int streamID)
         }
 
         if (m_streamFile != 0) {
-            File.Close(m_streamFile);
+            m_streamFile->Close();
             m_streamFile = 0;
         }
 
@@ -1508,15 +1508,15 @@ void CSound::LoadStream(int streamID)
         if (m_streamFile != 0) {
             CFile::CHandle* streamFile = m_streamFile;
             streamFile->SetReadSize(0x20000, 0);
-            File.Read(m_streamFile);
-            File.SyncCompleted(m_streamFile);
-            memcpy(m_streamBuffer, File.m_readBuffer, 0x20000);
+            m_streamFile->Read();
+            m_streamFile->SyncCompleted();
+            memcpy(m_streamBuffer, File.GetBuffer(), 0x20000);
             m_streamOffset = 0x20000;
             m_streamHalf = 0;
-            m_streamRemain = File.GetLength(m_streamFile) - 0x20000;
+            m_streamRemain = m_streamFile->GetLength() - 0x20000;
             m_streamState = 0;
             m_streamWaveID = streamID;
-            File.Close(m_streamFile);
+            m_streamFile->Close();
             m_streamFile = 0;
         }
     }
@@ -1601,7 +1601,7 @@ void CSound::StopStream()
     }
 
     if (m_streamFile != 0) {
-        File.Close(m_streamFile);
+        m_streamFile->Close();
         m_streamFile = 0;
     }
     m_streamPlaying = 0;

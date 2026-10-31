@@ -15,10 +15,14 @@ static struct BulkXfer sBulkXfer;
 static u16 sXferCrc[16];
 static struct StageNo sStageNo;
 
-extern s8 gReplyTimer;
+s8 gNewLetter;
+s8 gReplyTimer;
+s8 gXferActive;
+u16 gDataFlags;
 s8 gXferErrorCount;
 s8 gReplyWaiting;
 u8 gStaticMap;
+s8 gReplyResult;
 
 const s8 sStaticMapStages[12][2] = {
     { 1, 0 }, { 1, 2 }, { 12, 0 }, { 13, 0 }, { 33, 0 }, { 34, 0 },

@@ -293,48 +293,6 @@ inline void CGame::CGameWork::ClearEvtWork()
 
 /*
  * --INFO--
- * PAL Address: 0x800B93EC
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CFile::CHandle::Close()
-{
-    File.Close(this);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9420
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CFile::CHandle::SyncCompleted()
-{
-    File.SyncCompleted(this);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B944C
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CFile::CHandle::Read()
-{
-    File.Read(this);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B94DC
  * PAL Size: 16b
  * EN Address: 0x800CF354

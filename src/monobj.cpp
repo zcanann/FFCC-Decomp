@@ -99,22 +99,6 @@ static inline void CGMonObj_SetChaseMove(CGMonObj* monObj, CGPartyObj* target, u
 	monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(target);
 }
 
-static inline void CGMonObj_SetAttackMove(CGMonObj* monObj, CGPartyObj* target, float range, int changeStat)
-{
-	if (monObj->m_moveWork.m_mode != 2) {
-		monObj->m_moveWork.Clear();
-		monObj->m_moveWork.m_flags = 0x325;
-		if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(monObj) + 0x102) & 0x40) != 0) {
-			monObj->m_moveWork.m_flags |= 0x10000;
-		}
-		monObj->m_moveWork.SetFlags(0, 0);
-		monObj->m_moveWork.m_mode = 2;
-	}
-	monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(target);
-	monObj->m_moveWork.m_range = range;
-	monObj->m_moveWork.m_changeStat = changeStat;
-}
-
 static inline void CGMonObj_MoveToTarget(CGMonObj* monObj, float speedScale)
 {
 	monObj->moveVector(CVector(monObj->m_worldPosition) - CVector(reinterpret_cast<CGObject*>(Game.m_partyObjArr[monObj->m_targetPartyIndex])->m_worldPosition), speedScale, 1);
@@ -703,10 +687,7 @@ inline void CGMonObj::seKiduki()
 {
 	if (m_unk6B8 == 0) {
 		CGObjWork* scriptHandle = m_scriptHandle;
-		int se = Math.Rand(3);
-		unsigned short* romWork = scriptHandle->m_romWork;
-		se += romWork[0xC8] * 1000 + romWork[0xC9];
-		playSe3D(se, 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+		playSe3D(scriptHandle->m_romWork[0xC9] + scriptHandle->m_romWork[0xC8] * 1000 + Math.Rand(3), 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
 		m_unk6B8 = 1;
 	}
 }
@@ -2043,7 +2024,6 @@ body:
 					short aiState = m_aiState;
 					if ((reinterpret_cast<CMonAiAction*>(CGMonObj_GetAiData(this) + 0x110)[nextAction].m_flags & 0x20) != 0) {
 						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-						actionState = 0x21;
 						moveChase(target);
 						mlSet(5);
 						return;
@@ -2065,9 +2045,7 @@ body:
 							(aiState + SAFE_CAST_MON_WORK(handleB)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
 					int actionParam = static_cast<short>(reinterpret_cast<CMonAiAction*>(aiScript4 + 0x110)[nextAction].m_changeStat);
-					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-					actionState = 0x21;
-					CGMonObj_SetAttackMove(this, target, actionRange, actionParam);
+					moveChaseAndStat(Game.m_partyObjArr[targetPartyIndex], 0, actionRange, actionParam, 0);
 				}
 			} else {
 				actionState = nextAction - 0xE;
@@ -2251,14 +2229,15 @@ inline void CGMonObj::resetWork()
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Size: 388b
+ * EN Address: 0x80136E10
+ * EN Size: 228b
  * JP Address: TODO
  * JP Size: TODO
  */
 inline void CGMonObj::moveChase(CGCharaObj* target)
 {
+	CGMonObj::m_aiWork.m_state = 0x21;
 	if (m_moveWork.m_mode != 4) {
 		m_moveWork.Clear();
 		m_moveWork.m_flags = 0x855;
@@ -2298,12 +2277,28 @@ void CGMonObj::moveAway(CGCharaObj*, int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 428b
+ * EN Address: 0x80137128
+ * EN Size: 292b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::moveChaseAndStat(CGCharaObj*, int, float, int, int)
+inline void CGMonObj::moveChaseAndStat(CGCharaObj* target, int on, float range, int changeStat, int off)
 {
-	// TODO
+	CGMonObj::m_aiWork.m_state = 0x21;
+	if (m_moveWork.m_mode != 2) {
+		m_moveWork.Clear();
+		m_moveWork.m_flags = 0x325;
+		if ((*reinterpret_cast<unsigned short*>(CGMonObj_GetAiData(this) + 0x102) & 0x40) != 0) {
+			m_moveWork.m_flags |= 0x10000;
+		}
+		m_moveWork.SetFlags(on, off);
+		m_moveWork.m_mode = 2;
+	}
+	m_moveWork.m_target = target;
+	m_moveWork.m_range = range;
+	m_moveWork.m_changeStat = changeStat;
 }
 
 
@@ -2642,9 +2637,7 @@ void CGMonObj::mlAttack()
 				} else {
 					short aiState = m_aiState;
 					if ((reinterpret_cast<CMonAiAction*>(CGMonObj_GetAiData(this) + 0x110)[attackResult].m_flags & 0x20) != 0) {
-						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
-						actionState = 0x21;
-						moveChase(party);
+						moveChase(Game.m_partyObjArr[selectedTarget]);
 						chaseState = 5;
 						chaseTimer = 0;
 						m_chaseDirty = 1;
@@ -2666,9 +2659,7 @@ void CGMonObj::mlAttack()
 							(aiState + SAFE_CAST_MON_WORK(handle)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
 					int changeStat = static_cast<short>(reinterpret_cast<CMonAiAction*>(aiData4 + 0x110)[attackResult].m_changeStat);
-					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
-					actionState = 0x21;
-					CGMonObj_SetAttackMove(this, party, range, changeStat);
+					moveChaseAndStat(Game.m_partyObjArr[selectedTarget], 0, range, changeStat, 0);
 				}
 			} else {
 				actionState = attackResult - 0xE;

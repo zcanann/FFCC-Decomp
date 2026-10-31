@@ -144,7 +144,7 @@ static inline void SetCmakeBlendMatColor(float alpha)
 
 static inline void SetCmakeFontColor(CFont* font, float alpha)
 {
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 }
 
 #ifdef VERSION_GCCJGC
@@ -735,6 +735,11 @@ inline void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
  */
 void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
+    int posX;
+    int posY;
+    int width;
+    int height;
+
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -747,20 +752,27 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((m_menuResultCode != 0) ? CMAKE_TEX_VILLAGE_WORLD28 : CMAKE_TEX_WORLD28));
+    posX = 214;
+    posY = 32;
+    width = 112;
+    height = 56;
     MenuPcs.DrawRect(
-        0, 214.0f, 32.0f, 112.0f, 56.0f,
+        0, posX, posY, width, height,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 474;
     MenuPcs.DrawRect(
-        8, 474.0f, 32.0f, 112.0f, 56.0f,
+        8, posX, posY, width, height,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((m_menuResultCode != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
-    int baseX = 0x116;
-    double offsCalc = static_cast<double>(40.0f - 40.0f * x) / 2.0 + 32.0;
-    int offsU = static_cast<int>(offsCalc);
+    posX = 278;
+    width = 248;
+    height = 40;
+    double offsCalc = static_cast<double>(height - height * x) / 2.0 + 32.0;
+    posY = static_cast<int>(offsCalc);
     float offs = static_cast<float>(static_cast<int>(offsCalc));
     MenuPcs.DrawRect(
-        0, 278.0f, offs, 248.0f, 40.0f,
+        0, posX, offs, width, height,
         0.0f, 264.0f, 1.0f, x, 0.0f);
 
     if (x < 1.0) {
@@ -769,11 +781,13 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((m_menuResultCode != 0) ? CMAKE_TEX_VILLAGE_WORLD45 : CMAKE_TEX_WORLD45));
 
-    baseX += 20.0;
-    offsU += 8.0;
+    posX += 20.0;
+    posY += 8.0;
+    width = 208;
+    height = 24;
     MenuPcs.DrawRect(
-        0, static_cast<float>(baseX), static_cast<float>(offsU), 208.0f, 24.0f,
-        0.0f, static_cast<float>(page * 0x18), 1.0f, 1.0f, 0.0f);
+        0, posX, posY, width, height,
+        0.0f, page * height, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -787,6 +801,10 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
  */
 inline void CMenuPcs::DrawCrystal(int x, int y, float alpha)
 {
+    int width;
+    int height;
+    int frame;
+
     AlphaNormal();
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -798,12 +816,12 @@ inline void CMenuPcs::DrawCrystal(int x, int y, float alpha)
     GXSetChanMatColor(GX_COLOR0A0, color);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((m_menuResultCode != 0) ? CMAKE_TEX_VILLAGE_CRYSTAL : CMAKE_TEX_CRYSTAL));
+    width = 32;
+    height = 48;
+    frame = (static_cast<int>(System.GetCounter()) >> 1) % 8;
     MenuPcs.DrawRect(
-        0,
-        static_cast<float>(x),
-        static_cast<float>(y),
-        32.0f, 48.0f,
-        static_cast<float>(((static_cast<int>(System.GetCounter()) >> 1) % 8) << 5), 0.0f,
+        0, x, y, width, height,
+        frame * width, 0.0f,
         1.0f, 1.0f, 0.0f);
 }
 
@@ -927,7 +945,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)));
 
     int tx;
     int cursorY;
@@ -1052,40 +1070,50 @@ inline void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
  */
 void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 {
-    float textW;
-
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
     float nameW = 161.0f;
-    int nameX = static_cast<int>(-(nameW / 2.0 - 400.0));
+    double centerX = 400.0;
+    int nameX = static_cast<int>(centerX - nameW / 2.0);
 
-    int baseY = (x != 0) ? 0x130 : 300;
+    int baseY;
+    if (x != 0) {
+        baseY = 0x130;
+    } else {
+        baseY = 300;
+    }
 
     CFont* font = GetFont22();
     font->SetShadow(1);
     font->SetScale(1.0f);
     font->DrawInit();
-    font->renderFlags.fixedWidth = 1;
+    font->SetFixed(1);
     font->SetMargin(1.0f);
 
     alpha = 255.0f * alpha;
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)).color);
-    font->SetTlut(6);
+    unsigned char a8 = static_cast<unsigned char>(alpha);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, a8));
+    int tlut = 6;
+    font->SetTlut(tlut);
 
-    textW = font->GetWidth(text);
-    font->SetPosX(static_cast<float>(nameX));
+    float textW = font->GetWidth(text);
+    float posX = static_cast<float>(nameX);
+    font->SetPosX(posX);
 #ifdef VERSION_GCCJGC
-    font->SetPosY(static_cast<float>(baseY));
+    int posY = baseY;
 #else
-    font->SetPosY(static_cast<float>(baseY - 4));
+    int posY = baseY - 4;
 #endif
+    font->SetPosY(static_cast<float>(posY));
     font->Draw(text);
-    font->renderFlags.fixedWidth = 0;
+    font->SetFixed(0);
     DrawInit();
 
-    if (y != 0) {
-        DrawCrystal(static_cast<int>(static_cast<float>(nameX) + textW), baseY - 0x10, alpha);
+    if (y == 0) {
+        return;
     }
+
+    DrawCrystal(static_cast<int>(static_cast<float>(nameX) + textW), baseY - 0x10, alpha);
 }
 
 /*
@@ -1266,7 +1294,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)));
 
     text = GetMenuStr(1);
 #ifdef VERSION_GCCJGC
@@ -1831,7 +1859,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
 
 #ifdef VERSION_GCCP01
     float labelWidth = 0.0f;
@@ -2075,7 +2103,7 @@ void CMenuPcs::CmakeTribeDraw()
     font->SetShadow(0);
     font->SetScale(1.0f);
     font->DrawInit();
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
 
     for (i = 0; i < 4; i++) {
         txt = GetTribeStr(i);
@@ -2094,7 +2122,7 @@ void CMenuPcs::CmakeTribeDraw()
     font->SetShadow(1);
     font->SetScale(1.0f);
     font->DrawInit();
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
     font->SetTlut(6);
 
     hairBase = m_cmakeState->m_select * 8;
@@ -2328,7 +2356,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr(i);
@@ -2532,7 +2560,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
     const char* value;
 #ifndef VERSION_GCCJGC
@@ -2561,7 +2589,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {
@@ -2771,7 +2799,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
     const char* value;
 #ifndef VERSION_GCCJGC
@@ -2800,7 +2828,7 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {

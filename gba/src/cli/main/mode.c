@@ -8,11 +8,24 @@
 #include "window.h"
 #include "screen.h"
 
+s32 gScreen;
+u32 gMode;
+s8 gScreenStep;
+s8 gLetterAttachKind;
+s8 gInfoWinReady;
+s32 gSubState;
+u32 gScreenUnused;
+s32 gScreenInitDone;
 struct Window gWindows[5];
 s8 gOpenMenuReq;
 u16 gMask;
+s32 gSavedScreen;
+s32 gSubMode;
+s8 gLinkEstablished;
+s32 gScreenPhase;
+s8 gMsgScreenId;
+s8 gShopMenuPos[2];
 
-extern u32 gScreenUnused;
 s32 CmdListScreen_Init(void);
 s32 CmdListScreen_Main(void);
 s32 CmdListScreen_Exit(void);

@@ -1150,6 +1150,7 @@ void CMenuPcs::LetterDraw()
 void CMenuPcs::LetterListDraw()
 {
 	SingleFadeEntry* panels = m_singleFadeState->entries;
+	CCaravanWork::CLetterWork* letter;
 
 	if ((static_cast<char>(s_OpenClose) != 0) && (static_cast<char>(m_singleMenuCtrlResetFlag) == '\0')) {
 		DrawSingleCrescent(1.0f,
@@ -1172,7 +1173,7 @@ void CMenuPcs::LetterListDraw()
 	font->SetScale(1.0f);
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * panels[1].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * panels[1].alpha)));
 
 	char* menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((640.0f - font->GetWidth(menuTitle)) / 2.0);
@@ -1182,7 +1183,7 @@ void CMenuPcs::LetterListDraw()
 		return;
 	}
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 
@@ -1191,7 +1192,7 @@ void CMenuPcs::LetterListDraw()
 	int letterIndex;
 	float yf;
 	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
-		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
+		letter = &caravanWork->m_letters[letterIndex];
 		yf = static_cast<float>(y);
 
 		int tlut;
@@ -1323,7 +1324,7 @@ void CMenuPcs::LetterMessDraw()
 	font->DrawInit();
 	font->SetTlut(0x1C);
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * animState->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * animState->entries[0].alpha)));
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
 	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x535, 0x52F, 0x49B)) char[kLetterTextScratchSize];
@@ -1482,7 +1483,7 @@ int CMenuPcs::LetterCtrlCur()
 			if ((cursor < 8) && (cursor < letterCount - 1)) {
 				m_letterMenuState->listCursor = m_letterMenuState->listCursor + 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
-			} else if (m_letterMenuState->topIndex + cursor < letterCount - 1) {
+			} else if (cursor + m_letterMenuState->topIndex < letterCount - 1) {
 				m_letterMenuState->topIndex = m_letterMenuState->topIndex + 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
@@ -1894,7 +1895,6 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x13));
-	double decoY0 = y0 - 8.0;
 	float decoX = xw - 16.0f;
 	decoX1 = 8.0 + decoX;
 	double decoY1 = 8.0 + (yh - 24.0f);
@@ -1911,7 +1911,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 			dy = static_cast<float>(decoY1);
 			flip |= 4;
 		} else {
-			dy = static_cast<float>(decoY0);
+			dy = static_cast<float>(y0 - 8.0);
 		}
 		MenuPcs.DrawRect(
 		    flip, dx, dy, 16.0f, 24.0f,

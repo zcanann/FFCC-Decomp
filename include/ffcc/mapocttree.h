@@ -9,6 +9,38 @@ class CMapCylinder;
 class CMapObj;
 class COctNode;
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x8001DBC4
+ * EN Size: 156b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void VECMinimize(const Vec* a, const Vec* b, Vec* out)
+{
+	out->x = (a->x < b->x) ? a->x : b->x;
+	out->y = (a->y < b->y) ? a->y : b->y;
+	out->z = (a->z < b->z) ? a->z : b->z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x8001DB28
+ * EN Size: 156b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void VECMaximize(const Vec* a, const Vec* b, Vec* out)
+{
+	out->x = (a->x > b->x) ? a->x : b->x;
+	out->y = (a->y > b->y) ? a->y : b->y;
+	out->z = (a->z > b->z) ? a->z : b->z;
+}
+
 class CBound
 {
 public:
@@ -23,6 +55,19 @@ public:
 	 */
 	CBound()
 	{
+		Reset();
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: TODO
+	 * EN Address: 0x8001DC60
+	 * EN Size: 36b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void Reset()
+	{
 		float max = -10000000000.0f;
 		float min = 10000000000.0f;
 
@@ -33,11 +78,54 @@ public:
 	 * --INFO--
 	 * PAL Address: UNUSED
 	 * PAL Size: TODO
+	 * EN Address: 0x8001DAD4
+	 * EN Size: 84b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void Add(Vec* point)
+	{
+		VECMinimize(&m_min, point, &m_min);
+		VECMaximize(&m_max, point, &m_max);
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: TODO
 	 * EN Address: TODO
 	 * EN Size: TODO
 	 * JP Address: TODO
 	 * JP Size: TODO
 	 */
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: UNUSED
+	 * EN Address: 0x80044378
+	 * EN Size: 84b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void Add(CBound* other)
+	{
+		VECMinimize(&m_min, &other->m_min, &m_min);
+		VECMaximize(&m_max, &other->m_max, &m_max);
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: UNUSED
+	 * EN Address: 0x800401C4
+	 * EN Size: 76b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void GetCenter(Vec* center)
+	{
+		center->x = (m_min.x + m_max.x) / 2.0f;
+		center->y = (m_min.y + m_max.y) / 2.0f;
+		center->z = (m_min.z + m_max.z) / 2.0f;
+	}
 	CBound(Vec* position, float rangeXZ, float rangeY)
 	{
 		m_min.x = position->x - rangeXZ;

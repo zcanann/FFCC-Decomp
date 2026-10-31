@@ -261,9 +261,7 @@ void CGItemObj::onFrameStat()
 				if (static_cast<int>(CFlatCenterState()) == 1) {
 					Vec partyCenter;
 
-					partyCenter.x = (Game.m_partyBound.m_min.x + Game.m_partyBound.m_max.x) / 2.0f;
-					partyCenter.y = (Game.m_partyBound.m_min.y + Game.m_partyBound.m_max.y) / 2.0f;
-					partyCenter.z = (Game.m_partyBound.m_min.z + Game.m_partyBound.m_max.z) / 2.0f;
+					Game.m_partyBound.GetCenter(&partyCenter);
 					distance = PSVECDistance(&m_worldPosition, &partyCenter);
 				}
 			}
@@ -1088,7 +1086,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 		    0.0f != m_currentAlpha) {
 			font->SetTlut(7);
 
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_currentAlpha).color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_currentAlpha));
 
 			char* name = Game.m_cFlatDataArr[1].GetTable(2)[m_memoryCapsuleNameIndex];
 			float width = font->GetWidth(name);

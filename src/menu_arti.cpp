@@ -275,7 +275,7 @@ void CMenuPcs::ArtiDraw()
 		float colorMax = 255.0f;
 		u8 alpha = (u8)(colorMax * entry->alpha);
 		menuIndex = i + m_artiState->scrollOffset;
-		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha).color);
+		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha));
 
 		if (caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + menuIndex] <= 0) {
 			text = GetMenuStr(0x14);
@@ -344,11 +344,11 @@ void CMenuPcs::ArtiDraw()
 		text = GetMenuStr(0x14);
 		float helpY = 352.0f;
 		DrawFont((int)CalcCenteringPos(text, helpFont), (int)helpY,
-		         CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, text, 1.0f, 3.0f);
+		         CColor(0xFF, 0xFF, 0xFF, helpAlpha), 10, text, 1.0f, 3.0f);
 	} else {
 		float helpY = 352.0f;
 		DrawHelpMessage(selectedArtifactId, helpFont, (int)(320.0f - w / 2),
-		                (int)helpY, CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, 1.0f,
+		                (int)helpY, CColor(0xFF, 0xFF, 0xFF, helpAlpha), 10, 1.0f,
 		                3.0f);
 	}
 }

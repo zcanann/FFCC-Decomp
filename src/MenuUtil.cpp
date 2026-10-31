@@ -14,7 +14,7 @@
 #include "ffcc/util.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
-#include <math.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h>
 
 // Disc-path constants for the dead-stripped CGame::SetGbaSP method.
 static const char s_dvd_gba_801E3058[] = "dvd/gba/";
@@ -247,12 +247,6 @@ char* g_strMenuUtilMes[] = {
 
 
 namespace {
-static inline void SetUv(Vec2d& uv, float u, float v)
-{
-	uv.x = u;
-	uv.y = v;
-}
-
 static inline int GetOptionHelpX(char* text, CFont* font)
 {
 	font->SetShadow(1);
@@ -549,18 +543,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 	}
 
-	int rangeKind;
-	if ((1 <= msgNo) && (msgNo < 0x45)) {
-		rangeKind = 1;
-	} else if ((0x45 <= msgNo) && (msgNo < 0x7F)) {
-		rangeKind = 0x45;
-	} else if ((0x7F <= msgNo) && (msgNo < 0x9F)) {
-		rangeKind = 0x7F;
-	} else {
-		rangeKind = 0;
-	}
-
-	if (rangeKind != 0) {
+	if (IsItemEquip(msgNo) != 0) {
 		int i;
 		int baseIndex = drawPrefix + 2;
 		u32 baseY = lineBaseY[baseIndex];
@@ -824,6 +807,27 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: 0x8019B1E8
+ * EN Size: 80b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::IsItemEquip(int itemNo)
+{
+	if ((1 <= itemNo) && (itemNo < 0x45)) {
+		return 1;
+	} else if ((0x45 <= itemNo) && (itemNo < 0x7F)) {
+		return 0x45;
+	} else if ((0x7F <= itemNo) && (itemNo < 0x9F)) {
+		return 0x7F;
+	}
+	return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80179e9c
  * PAL Size: 244b
  * EN Address: TODO
@@ -915,6 +919,26 @@ void CMenuPcs::GetOptionData()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: 0x8019B560
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::InitOptionMenuParam()
+{
+	m_optionIndex = 0;
+	m_optionMenuState = 0;
+	m_optionOpenAnim = 0.0f;
+	m_optionRowAnim = 0.0f;
+	m_optionColumnAnim = 0.0f;
+	m_optionAnimCounter = 0;
+	m_optionAnimPhase = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80179328
  * PAL Size: 2560b
  * EN Address: TODO
@@ -962,13 +986,7 @@ void CMenuPcs::CalcOptionMenu()
 		}
 
 		m_artiState->optionCloseReady = 1;
-		m_optionIndex = 0;
-		m_optionMenuState = 0;
-		m_optionOpenAnim = 0.0f;
-		m_optionRowAnim = 0.0f;
-		m_optionColumnAnim = 0.0f;
-		m_optionAnimCounter = 0;
-		m_optionAnimPhase = 0;
+		InitOptionMenuParam();
 		return;
 	}
 
@@ -1219,7 +1237,7 @@ void CMenuPcs::DrawOptionMenu()
 {
 	float specialRowCos;
 	CFont* font = m_fonts[0];
-	int langRow = Game.m_gameWork.m_languageId - 1;
+	int langRow = Game.m_gameWork.GetLanguage() - 1;
 	float h;
 	float w;
 	int leftXi;
@@ -1391,8 +1409,8 @@ void CMenuPcs::DrawOptionMenu()
 	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionRowAnim));
 	float angleStep = OPTION_ROW_ANGLE_STEP;
 	float rowRad = 0.017453292f * (static_cast<float>(static_cast<int>(m_optionRowAnim / OPTION_ROW_STEP)) * angleStep);
-	float rowSin = static_cast<float>(sin(0.017453292f * (2.0f * (static_cast<float>(static_cast<int>(m_optionRowAnim / OPTION_ROW_STEP)) * angleStep))));
-	float rowCos = static_cast<float>(cos(rowRad));
+	float rowSin = std::sinf(0.017453292f * (2.0f * (static_cast<float>(static_cast<int>(m_optionRowAnim / OPTION_ROW_STEP)) * angleStep)));
+	float rowCos = std::cosf(rowRad);
 
 	switch (m_optionIndex) {
 	case 0: {
@@ -1411,15 +1429,19 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideHeight = sideTexture->GetHeight();
 		unsigned int sideWidth = sideTexture->GetWidth();
 
-		SetUv(uv0, 0.0f, 0.0f);
+		uv0.x = 0.0f;
+		uv0.y = 0.0f;
 		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
-		SetUv(uv1, 0.5f, 1.0f);
+		uv1.x = 0.5f;
+		uv1.y = 1.0f;
 		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-		SetUv(uv0, 0.5f, 0.0f);
-		SetUv(uv1, 1.0f, 1.0f);
+		uv0.x = 0.5f;
+		uv0.y = 0.0f;
+		uv1.x = 1.0f;
+		uv1.y = 1.0f;
 		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
 		                        row.rightIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
@@ -1510,15 +1532,19 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideHeight = sideTexture->GetHeight();
 		unsigned int sideWidth = sideTexture->GetWidth();
 
-		SetUv(uv0, 0.0f, 0.0f);
+		uv0.x = 0.0f;
+		uv0.y = 0.0f;
 		float sideW = static_cast<float>(sideWidth) / 2.0f;
 		float sideH = static_cast<float>(sideHeight);
-		SetUv(uv1, 0.5f, 1.0f);
+		uv1.x = 0.5f;
+		uv1.y = 1.0f;
 		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-		SetUv(uv0, 0.5f, 0.0f);
-		SetUv(uv1, 1.0f, 1.0f);
+		uv0.x = 0.5f;
+		uv0.y = 0.0f;
+		uv1.x = 1.0f;
+		uv1.y = 1.0f;
 		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
 		                        row.rightIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
@@ -1778,8 +1804,7 @@ void CMenuPcs::DrawOptionMenu()
 		int rowAnimFrame;
 #ifdef VERSION_GCCJGC
 		rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);
-		specialRowCos = static_cast<float>(
-			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f))));
+		specialRowCos = std::cosf(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f));
 #elif defined(VERSION_GCCE01)
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
 			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);
@@ -1787,8 +1812,7 @@ void CMenuPcs::DrawOptionMenu()
 			rowAnimFrame = 0x10;
 		}
 		float frameAngle = 5.625f;
-		specialRowCos = static_cast<float>(
-			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle))));
+		specialRowCos = std::cosf(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle));
 #else
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
 			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.07692308f);
@@ -1796,8 +1820,7 @@ void CMenuPcs::DrawOptionMenu()
 			rowAnimFrame = 0xD;
 		}
 		float frameAngle = 6.923077f;
-		specialRowCos = static_cast<float>(
-			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle))));
+		specialRowCos = std::cosf(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle));
 #endif
 
 		leftXi = 0;

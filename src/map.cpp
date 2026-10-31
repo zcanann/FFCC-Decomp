@@ -566,17 +566,17 @@ void* CMapMng::MapFileRead(char* path, unsigned long& size)
     } else {
         CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
         if (handle != 0) {
-            size = File.GetLength(handle);
+            size = handle->GetLength();
             if (m_asyncLoadState.m_mapReadMode == 3) {
-                File.ReadASync(handle);
+                handle->ReadASync();
                 filePtr = reinterpret_cast<void*>(1);
                 m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = handle;
                 m_asyncLoadState.m_asyncOpenIndex += 1;
             } else {
-                File.Read(handle);
-                File.SyncCompleted(handle);
-                filePtr = File.m_readBuffer;
-                File.Close(handle);
+                handle->Read();
+                handle->SyncCompleted();
+                filePtr = File.GetBuffer();
+                handle->Close();
                 if (m_asyncLoadState.m_mapReadMode == 2) {
                     Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, size);
                     m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex] = size;
@@ -611,7 +611,7 @@ int CMapMng::MapCheckFileRead(char* path)
 
     CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
     if (handle != 0) {
-        File.Close(handle);
+        handle->Close();
         return 1;
     }
     return 0;
@@ -630,11 +630,11 @@ void CMapMng::LoadMapNoSyncCalc()
 {
     for (int i = 0; i < 0x10; i++) {
         if (m_asyncLoadState.m_asyncHandles[i] != 0) {
-            int completed = File.IsCompleted(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
+            int completed = reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i])->IsCompleted();
             if (completed != 0) {
                 int len;
                 void* readBuffer = File.m_readBuffer;
-                len = File.GetLength(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
+                len = reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i])->GetLength();
                 void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
 
                 Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);
@@ -644,7 +644,7 @@ void CMapMng::LoadMapNoSyncCalc()
                 m_asyncLoadState.m_mapLoadCursor =
                     reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + len;
 
-                File.Close(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
+                reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i])->Close();
                 m_asyncLoadState.m_asyncHandles[i] = 0;
             }
         }
@@ -1024,9 +1024,8 @@ int CMapMng::ReadMtx(char* mapName)
  */
 int CMapMng::ReadMpl(char* mapName)
 {
-    char* strTmp = g_StrTmp;
-
     g_MapMng.SetDraw(1);
+    char* strTmp = g_StrTmp;
 
     for (int loadIndex = 0;; loadIndex++) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
@@ -1610,7 +1609,7 @@ void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
     GXLightObj lightObj;
     Vec v;
     Mtx cameraMtx;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
 
     v.x = 100000.0f * -lightDir.x;
     float dirZ;
@@ -1689,7 +1688,7 @@ void CMapMng::Draw()
     LightPcs.SetNumDiffuse(0);
 
     Mtx44 projection;
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+    CameraPcs.GetProjectionMatrix(projection);
     GXSetProjection(projection, GX_PERSPECTIVE);
     m_underWaterTexPending = 1;
 
@@ -1954,7 +1953,7 @@ void CMapMng::DrawAfter()
 {
     if ((m_mapObjCount != 0) && (m_mapReadReady != 0)) {
         Mtx44 projection;
-        PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+        CameraPcs.GetProjectionMatrix(projection);
         GXSetProjection(projection, GX_PERSPECTIVE);
 
         GXSetColorUpdate(1);

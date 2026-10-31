@@ -808,6 +808,7 @@ static int FindIntersection(const Vec& start, const Vec& direction, const CMapCy
     Vec bitangent;
     Vec axis = cyl.m_axis;
     const f32 axisLen = PSVECMag(&axis);
+    f32 disc;
     PSVECScale(&axis, &axis, kMapHitUnitScale / axisLen);
 
     const f32 axisX = axis.x;
@@ -845,7 +846,7 @@ static int FindIntersection(const Vec& start, const Vec& direction, const CMapCy
     const f32 radiusSq = radius * radius;
 
     if (fabs(localDirection.z) >= 0.999999999999) {
-        f32 disc = radiusSq - px * px - py * py;
+        disc = radiusSq - px * px - py * py;
         if (disc >= 0.0) {
             disc = sqrtf(disc);
             outT = (-(pz + disc)) * tScale;
@@ -862,7 +863,7 @@ cylinder_body:
         const f32 vxSq = localDirection.x * localDirection.x;
         const f32 vySq = vy * vy;
         const f32 radialA = vxSq + vySq;
-        f32 disc = radialB * radialB - radialA * radialC;
+        disc = radialB * radialB - radialA * radialC;
         if (disc < 0.0) {
             return 0;
         }

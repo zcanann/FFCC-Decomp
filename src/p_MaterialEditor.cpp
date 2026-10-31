@@ -248,7 +248,7 @@ void CMaterialEditorPcs::calcViewer()
     srt.m_position.z = -m_usbTransform.m_cameraPosition.z;
     CameraPcs.SetViewerSRT(&srt);
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
+    CameraPcs.GetViewMatrix(cameraMatrix);
 
     m_unkMatrix.value[0][0] = m_usbTransform.m_viewMatrix[0][0];
     m_unkMatrix.value[0][1] = m_usbTransform.m_viewMatrix[0][1];

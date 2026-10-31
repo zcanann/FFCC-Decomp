@@ -226,7 +226,7 @@ void CMenuPcs::TmpArtiDraw()
 	for (i = 0; i < 4; i++, entry++) {
 		if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] >= 0) {
 			float alpha = entry->alpha;
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * alpha).color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * alpha));
 
 			const char* text = Game.GetShortItemName(caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i]);
 			float width = font->GetWidth(text);

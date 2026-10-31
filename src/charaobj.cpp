@@ -2113,10 +2113,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			putHitParticleFromItem(sourceObj, itemId);
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 				CGObjWork* work = m_scriptHandle;
-				int seNo = work->m_romWork[0xC9] +
-					(work->m_romWork[0xC8] * 1000) + 6 +
-					Math.Rand(3);
-				playSe3D(seNo, 0x32, 0x96, 0, 0);
+				playSe3D(work->m_romWork[0xC9] + (work->m_romWork[0xC8] * 1000) + 6 + Math.Rand(3),
+				         0x32, 0x96, 0, 0);
 			}
 		}
 

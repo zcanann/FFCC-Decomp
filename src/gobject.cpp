@@ -965,14 +965,14 @@ void CGObject::boundCheck()
     Mtx44 screenMtx;
     int clipMask;
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
     PSMTXCopy(cameraMtx, clipMtx);
     clipMtx[3][2] = 0.0f;
     clipMtx[3][1] = 0.0f;
     clipMtx[3][0] = 0.0f;
     clipMtx[3][3] = 1.0f;
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
@@ -1482,7 +1482,7 @@ void CGObject::onDraw()
         PSMTXConcat(posMtx, scaleMtx, scaleMtx);
         GXLoadPosMtxImm(scaleMtx, GX_PNMTX0);
 
-        GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0xFF, 0x00, 0xFF).color);
+        GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0xFF, 0x00, 0xFF));
         Graphic.DrawSphere();
     }
 
@@ -2824,9 +2824,7 @@ void CGObject::move()
                 const s32 cflatCenterState = CFlatCenterState();
                 if (cflatCenterState == 1) {
                     Vec partyCenter;
-                    partyCenter.x = (Game.m_partyBound.m_min.x + Game.m_partyBound.m_max.x) / 2.0f;
-                    partyCenter.y = (Game.m_partyBound.m_min.y + Game.m_partyBound.m_max.y) / 2.0f;
-                    partyCenter.z = (Game.m_partyBound.m_min.z + Game.m_partyBound.m_max.z) / 2.0f;
+                    Game.m_partyBound.GetCenter(&partyCenter);
 
                     Vec centerDelta;
                     PSVECSubtract(&m_worldPosition, &partyCenter, &centerDelta);

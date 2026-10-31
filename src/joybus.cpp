@@ -320,10 +320,10 @@ void JoyBus::CreateInit()
         System.Printf(const_cast<char*>(s_not_found_error_fmt), path);
     }
 
-    File.Read(file);
-    File.SyncCompleted(file);
+    file->Read();
+    file->SyncCompleted();
 
-    unsigned int len = File.GetLength(file);
+    unsigned int len = file->GetLength();
     m_fileBaseA_dup = len;
 
     if (m_fileBaseA == 0)
@@ -337,9 +337,9 @@ void JoyBus::CreateInit()
     }
 
     memset((void*)m_fileBaseA, 0, m_fileBaseA_dup);
-    memcpy((void*)m_fileBaseA, File.m_readBuffer, m_fileBaseA_dup);
+    memcpy((void*)m_fileBaseA, File.GetBuffer(), m_fileBaseA_dup);
 
-    File.Close(file);
+    file->Close();
 
     if (m_fileBaseB == 0)
     {
@@ -452,13 +452,13 @@ int JoyBus::LoadBin()
         return -1;
     }
 
-    File.Read(file);
-    File.SyncCompleted(file);
+    file->Read();
+    file->SyncCompleted();
 
-    int size = File.GetLength(file);
+    int size = file->GetLength();
     m_gbaBootImageSize = size;
-    memcpy(m_gbaBootImage, File.m_readBuffer, m_gbaBootImageSize);
-    File.Close(file);
+    memcpy(m_gbaBootImage, File.GetBuffer(), m_gbaBootImageSize);
+    file->Close();
 
     m_diskId = File.GetCurrentDiskID();
     m_gbaBootImage[0xAC] = m_diskId->gameName[0];
@@ -521,17 +521,17 @@ int JoyBus::LoadMap(int stageId, int mapId)
         return -1;
     }
 
-    File.Read(fileHandle);
-    File.SyncCompleted(fileHandle);
+    fileHandle->Read();
+    fileHandle->SyncCompleted();
 
-    unsigned int len = File.GetLength(fileHandle);
+    unsigned int len = fileHandle->GetLength();
 
     m_fileBaseB_dup = len;
 
     memset(m_fileBaseB, 0, 0x5000UL);
-    memcpy(m_fileBaseB, File.m_readBuffer, m_fileBaseB_dup);
+    memcpy(m_fileBaseB, File.GetBuffer(), m_fileBaseB_dup);
 
-	File.Close(fileHandle);
+	fileHandle->Close();
 
     return 0;
 }

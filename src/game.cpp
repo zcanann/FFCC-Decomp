@@ -68,21 +68,6 @@ struct GameNameRow
 
 CGame Game;
 
-inline void CFile::CHandle::Read()
-{
-    File.Read(this);
-}
-
-inline void CFile::CHandle::SyncCompleted()
-{
-    File.SyncCompleted(this);
-}
-
-inline void CFile::CHandle::Close()
-{
-    File.Close(this);
-}
-
 inline int CMapPcs::GetLightHolderSize(CMapLightHolder::TYPE type)
 {
     return g_MapMng.GetMapLightHolderArray(type).GetSize();
@@ -807,19 +792,13 @@ void CGame::Calc()
         m_gameWork.m_frameCounter++;
     }
 
-    m_partyBound.m_min.x = m_partyBound.m_min.y = m_partyBound.m_min.z = 1.0E+10f;
-    m_partyBound.m_max.x = m_partyBound.m_max.y = m_partyBound.m_max.z = -1.0E+10f;
+    m_partyBound.Reset();
 
     for (int i = 0; i < 4; i++) {
         CGPartyObj* partyObj = m_partyObjArr[i];
 
         if (partyObj != 0) {
-            m_partyBound.m_min.x = (m_partyBound.m_min.x < partyObj->m_worldPosition.x) ? m_partyBound.m_min.x : partyObj->m_worldPosition.x;
-            m_partyBound.m_min.y = (m_partyBound.m_min.y < partyObj->m_worldPosition.y) ? m_partyBound.m_min.y : partyObj->m_worldPosition.y;
-            m_partyBound.m_min.z = (m_partyBound.m_min.z < partyObj->m_worldPosition.z) ? m_partyBound.m_min.z : partyObj->m_worldPosition.z;
-            m_partyBound.m_max.x = (m_partyBound.m_max.x > partyObj->m_worldPosition.x) ? m_partyBound.m_max.x : partyObj->m_worldPosition.x;
-            m_partyBound.m_max.y = (m_partyBound.m_max.y > partyObj->m_worldPosition.y) ? m_partyBound.m_max.y : partyObj->m_worldPosition.y;
-            m_partyBound.m_max.z = (m_partyBound.m_max.z > partyObj->m_worldPosition.z) ? m_partyBound.m_max.z : partyObj->m_worldPosition.z;
+            m_partyBound.Add(&partyObj->m_worldPosition);
         }
     }
 
@@ -1165,6 +1144,11 @@ CGPartyObj* CGame::GetPartyObj(int index)
 }
 
 #ifndef VERSION_GCCJGC
+static inline const char* GetArtSeparator(unsigned char hasSeparator)
+{
+    return hasSeparator != 0 ? " " : "";
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800141E0
@@ -1191,10 +1175,7 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
             }
         }
 
-        const char* separator = "";
-        if (hasSeparator != 0) {
-            separator = " ";
-        }
+        const char* separator = GetArtSeparator(hasSeparator);
 
         sprintf(out, "%s%s%s", prefix, separator, name);
     }
@@ -1224,10 +1205,7 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
         }
     }
 
-    const char* separator = "";
-    if (hasSeparator != 0) {
-        separator = " ";
-    }
+    const char* separator = GetArtSeparator(hasSeparator);
 
     sprintf(out, "%s%s%s", prefix, separator, itemName);
     return out;
@@ -1274,10 +1252,7 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
             }
         }
 
-        const char* separator = "";
-        if (hasSeparator != 0) {
-            separator = " ";
-        }
+        const char* separator = GetArtSeparator(hasSeparator);
 
         sprintf(out, "%s%s%s", prefix, separator, name);
     }
@@ -1307,10 +1282,7 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
         }
     }
 
-    const char* separator = "";
-    if (hasSeparator != 0) {
-        separator = " ";
-    }
+    const char* separator = GetArtSeparator(hasSeparator);
 
     sprintf(out, "%s%s%s", prefix, separator, monName);
     return out;

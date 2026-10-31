@@ -278,6 +278,7 @@ inline CMapObjAtrMeshName::CMapObjAtrMeshName()
  */
 int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 {
+    int i;
     enum {
         CHUNK_AMBI = 0x414D4249,
         CHUNK_ANIM = 0x414E494D,
@@ -319,7 +320,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     Init();
 
     chunkFile.PushChunk();
-    short objIndex = this - g_MapMng.GetMapObjArray();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
@@ -407,7 +407,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PLIT: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
             CMapObjAtrPointLight* pointLight =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
@@ -425,7 +425,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         chunkFile.Get1();
 
                         pointLight->m_colorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(pointLight->m_colorCount); i++) {
+                        for (i = 0; i < static_cast<int>(pointLight->m_colorCount); i++) {
                             pointLight->m_colors[i].r = chunkFile.Get1();
                             pointLight->m_colors[i].g = chunkFile.Get1();
                             pointLight->m_colors[i].b = chunkFile.Get1();
@@ -433,7 +433,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         }
 
                         pointLight->m_altColorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(pointLight->m_altColorCount); i++) {
+                        for (i = 0; i < static_cast<int>(pointLight->m_altColorCount); i++) {
                             pointLight->m_altColors[i].r = chunkFile.Get1();
                             pointLight->m_altColors[i].g = chunkFile.Get1();
                             pointLight->m_altColors[i].b = chunkFile.Get1();
@@ -483,7 +483,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_SLIT: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
             CMapObjAtrSpotLight* spotLight =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x139) CMapObjAtrSpotLight();
@@ -518,7 +518,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         chunkFile.Get4();
 
                         spotLight->m_colorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(spotLight->m_colorCount); i++) {
+                        for (i = 0; i < static_cast<int>(spotLight->m_colorCount); i++) {
                             spotLight->m_colors[i].r = chunkFile.Get1();
                             spotLight->m_colors[i].g = chunkFile.Get1();
                             spotLight->m_colors[i].b = chunkFile.Get1();
@@ -526,7 +526,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         }
 
                         spotLight->m_altColorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(spotLight->m_altColorCount); i++) {
+                        for (i = 0; i < static_cast<int>(spotLight->m_altColorCount); i++) {
                             spotLight->m_altColors[i].r = chunkFile.Get1();
                             spotLight->m_altColors[i].g = chunkFile.Get1();
                             spotLight->m_altColors[i].b = chunkFile.Get1();
@@ -757,7 +757,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_MIME: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
             CMapObjAtrMime* mimeAttr =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
@@ -785,7 +785,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                                 g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
                             mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
-                            for (int i = 0; i < mime->m_vertexCount; i++) {
+                            for (i = 0; i < mime->m_vertexCount; i++) {
                                 vtx[0] = chunkFile.GetF4();
                                 vtx[1] = chunkFile.GetF4();
                                 vtx[2] = chunkFile.GetF4();
@@ -840,7 +840,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PSTA: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
             CMapObjAtrPlaySta* playSta =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x39B) CMapObjAtrPlaySta();
@@ -1076,7 +1076,7 @@ void CMapObj::Calc()
             pos.x = m_worldMtx[0][3];
             pos.y = m_worldMtx[1][3];
             pos.z = m_worldMtx[2][3];
-            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+            CameraPcs.GetViewMatrix(cameraMtx);
             PSMTXMultVec(cameraMtx, &pos, &posCam);
             posCam.z = -posCam.z;
 

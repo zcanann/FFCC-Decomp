@@ -341,13 +341,13 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         m_fonts[0]->AddRef();
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-        File.Read(fileHandle);
-        File.SyncCompleted(fileHandle);
+        fileHandle->Read();
+        fileHandle->SyncCompleted();
 
         m_fonts[slot] = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuFontAllocationLine) CFont;
-        m_fonts[slot]->Create(File.m_readBuffer, stage);
+        m_fonts[slot]->Create(File.GetBuffer(), stage);
 
-        File.Close(fileHandle);
+        fileHandle->Close();
     }
 
     if (tlutMode < 2) {
@@ -514,17 +514,17 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
-            File.Read(fileHandle);
-            File.SyncCompleted(fileHandle);
+            fileHandle->Read();
+            fileHandle->SyncCompleted();
 
             CMemory::CStage* stage = (m_mode == 1) ? g_MapMng.m_stage : GetStage(stageSelect);
 
             m_textureSets[i + textureSetStart] =
                 new (MenuPcs.m_menuStage, "p_menu.cpp", MenuTextureAllocationLine) CTextureSet;
 
-            m_textureSets[i + textureSetStart]->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
+            m_textureSets[i + textureSetStart]->Create(File.GetBuffer(), stage, 0, 0, 0, 0);
 
-            File.Close(fileHandle);
+            fileHandle->Close();
         }
     }
 
@@ -577,7 +577,6 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
 void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
     int currentMode;
-    int i;
 
     if (m_mode != static_cast<int>(mode)) {
         Graphic._WaitDrawDone("p_menu.cpp", MenuDrawDoneLine);
@@ -586,18 +585,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
         case -1:
             break;
         case 0:
-            ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
-            freeTexture(2, 2, MenuBattleTextureStart, 10);
-
-            for (i = 0; i < 4; i++) {
-                ReleaseRefSlot(reinterpret_cast<void**>(&m_battleRingMenus[i]));
-            }
-
-            for (i = 0; i < 12; i++) {
-                ReleaseRefSlot(reinterpret_cast<void**>(&m_battleMesMenus[i]));
-            }
-
-            destroySingleMenu();
+            destroyBattle();
             destroyVillageMenu();
             break;
         case 1:
@@ -605,6 +593,9 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
             break;
         case 2:
             destroyBonus();
+            break;
+        default:
+            FFCC_ASSERT(0);
             break;
         }
 
@@ -622,6 +613,9 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
             break;
         case 2:
             createBonus();
+            break;
+        default:
+            FFCC_ASSERT(0);
             break;
         }
     }
@@ -704,7 +698,7 @@ void CMenuPcs::DrawInit()
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
     GXSetZCompLoc(GX_FALSE);
     GXSetCurrentMtx(0);
@@ -776,7 +770,7 @@ inline void CMenuPcs::DrawQuit()
 {
 	Mtx44 screenMtx;
 
-	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+	CameraPcs.GetProjectionMatrix(screenMtx);
 	GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
@@ -1299,15 +1293,13 @@ void CMenuPcs::createBattle()
     loadTexture(tName, 2, 2, tTmp, MenuBattleTextureStart, 10, 0);
 
     for (int i = 0; i < 12; i++) {
-        CMesMenu* menu = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuMessageAllocationLine) CMesMenu;
-        m_battleMesMenus[i] = menu;
+        m_battleMesMenus[i] = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuMessageAllocationLine) CMesMenu;
         m_battleMesMenus[i]->SetIndex(i);
         m_battleMesMenus[i]->Create();
     }
 
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuRingAllocationLine) CRingMenu;
-        m_battleRingMenus[i] = menu;
+        m_battleRingMenus[i] = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuRingAllocationLine) CRingMenu;
         m_battleRingMenus[i]->SetIndex(i);
         m_battleRingMenus[i]->Create();
     }
@@ -1326,17 +1318,7 @@ void CMenuPcs::createBattle()
         color.g = static_cast<u8>(((int)color.g + avg2) / 3);
         color.b = static_cast<u8>(((int)color.b + avg2) / 3);
 
-        const unsigned long tlutFmt = GetTexture(static_cast<TEX>(MenuFaceTexture))->m_format;
-        int tlutOffset;
-        if (tlutFmt == 9) {
-            tlutOffset = 0x100;
-        } else if (tlutFmt == 8) {
-            tlutOffset = 0x10;
-        } else {
-            tlutOffset = 0;
-        }
-
-        CTexture::SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, color);
+        GetTexture(static_cast<TEX>(MenuFaceTexture))->SetExternalTlutColor(m_externalFontTlut, i, color);
     }
 
     GetTexture(static_cast<TEX>(MenuFaceTexture))->FlushExternalTlut(m_externalFontTlut);
@@ -1356,24 +1338,28 @@ inline void CMenuPcs::destroyBattle()
 {
     int i;
 
-    for (i = 0; i < 10; i++) {
-        ReleaseRefSlot(reinterpret_cast<void**>(m_textures + MenuBattleTextureStart + i));
+    if (m_fonts[1] != 0) {
+        m_fonts[1]->Release();
+        m_fonts[1] = 0;
     }
 
-    for (i = 0; i < 2; i++) {
-        ReleaseRefSlot(reinterpret_cast<void**>(m_textureSets + 2 + i));
-    }
+    freeTexture(2, 2, MenuBattleTextureStart, 10);
 
     for (i = 0; i < 4; i++) {
-        ReleaseRefSlot(reinterpret_cast<void**>(&m_battleRingMenus[i]));
+        if (m_battleRingMenus[i] != 0) {
+            m_battleRingMenus[i]->Release();
+            m_battleRingMenus[i] = 0;
+        }
     }
 
     for (i = 0; i < 12; i++) {
-        ReleaseRefSlot(reinterpret_cast<void**>(&m_battleMesMenus[i]));
+        if (m_battleMesMenus[i] != 0) {
+            m_battleMesMenus[i]->Release();
+            m_battleMesMenus[i] = 0;
+        }
     }
 
     destroySingleMenu();
-    destroyVillageMenu();
 }
 
 /*
@@ -1435,13 +1421,13 @@ void CMenuPcs::drawBattle()
         Mtx44 viewMtx;
         Mtx44 screenMtx;
         Vec4d projected;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
         PSMTXCopy(cameraMtx, reinterpret_cast<MtxPtr>(viewMtx));
         viewMtx[3][2] = 0.0f;
         viewMtx[3][1] = 0.0f;
         viewMtx[3][0] = 0.0f;
         viewMtx[3][3] = 1.0f;
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        CameraPcs.GetProjectionMatrix(screenMtx);
         PSMTX44Concat(screenMtx, viewMtx, screenMtx);
         Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
 

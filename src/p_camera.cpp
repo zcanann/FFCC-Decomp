@@ -609,7 +609,7 @@ void CCameraPcs::draw()
         posZ = shadowPos->z;
         posY = shadowPos->y;
         posX = shadowPos->x;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -642,7 +642,7 @@ void CCameraPcs::draw()
         refPosX = shadowRefPos->x;
         refPosZ = shadowRefPos->z;
         refPosY = shadowRefPos->y;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -1146,18 +1146,7 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
             continue;
         }
 
-        shadowRectBound.m_min.x =
-            (shadowRectBound.m_min.x < worldBound.m_min.x) ? shadowRectBound.m_min.x : worldBound.m_min.x;
-        shadowRectBound.m_min.y =
-            (shadowRectBound.m_min.y < worldBound.m_min.y) ? shadowRectBound.m_min.y : worldBound.m_min.y;
-        shadowRectBound.m_min.z =
-            (shadowRectBound.m_min.z < worldBound.m_min.z) ? shadowRectBound.m_min.z : worldBound.m_min.z;
-        shadowRectBound.m_max.x =
-            (shadowRectBound.m_max.x > worldBound.m_max.x) ? shadowRectBound.m_max.x : worldBound.m_max.x;
-        shadowRectBound.m_max.y =
-            (shadowRectBound.m_max.y > worldBound.m_max.y) ? shadowRectBound.m_max.y : worldBound.m_max.y;
-        shadowRectBound.m_max.z =
-            (shadowRectBound.m_max.z > worldBound.m_max.z) ? shadowRectBound.m_max.z : worldBound.m_max.z;
+        shadowRectBound.Add(&worldBound);
         count += 1;
     }
 

@@ -248,7 +248,7 @@ void CMenuPcs::CompaDraw()
 #endif
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)));
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	shown = drawIndex = 0;
@@ -308,13 +308,13 @@ void CMenuPcs::CompaDraw()
 	font->SetScale(1.2f);
 #endif
 	font->DrawInit();
-	compaList = this->m_compaList;
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)).color);
+	CompaOpenAnimList* anim = this->m_compaList;
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * anim->entries[0].alpha)));
 
 	name = GetJobStr(caravanWork->m_jobType);
 	font->GetWidth(name);
-	jobY = static_cast<float>(compaList->entries[0].y + 0x20);
-	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
+	jobY = static_cast<float>(anim->entries[0].y + 0x20);
+	font->SetPosX(static_cast<float>(anim->entries[0].x + 0x18));
 #ifdef VERSION_GCCJGC
 	font->SetPosY(jobY);
 #else

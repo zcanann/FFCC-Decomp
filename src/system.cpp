@@ -174,7 +174,7 @@ void CSystem::Init()
             unsigned int mapSize;
             unsigned int offset;
 
-            mapSize = File.GetLength(fileHandle);
+            mapSize = fileHandle->GetLength();
             m_mapSize = mapSize;
             remaining = mapSize;
             m_mapBuffer = new ((CMemory::CStage*)m_mapStage, "system.cpp", SystemMapAllocationLine) unsigned char[mapSize];
@@ -190,13 +190,13 @@ void CSystem::Init()
                 }
 
                 fileHandle->SetReadSize(count, offset);
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
-                memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, count);
+                fileHandle->Read();
+                fileHandle->SyncCompleted();
+                memcpy((unsigned char*)m_mapBuffer + offset, File.GetBuffer(), count);
 
                 offset += count;
             }
-            File.Close(fileHandle);
+            fileHandle->Close();
             Printf("コンパイラのmap情報を" SYSTEM_MAP_FILE "から読み込みました。\n");
         }
     }

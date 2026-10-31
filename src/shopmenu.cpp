@@ -711,7 +711,7 @@ inline void setOrtho(int x, int y, float scaleX, float scaleY, float zOffset)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char tlut)
+inline void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char blendMode)
 {
     MaterialMan.LockEnv();
     MaterialMan.SetMaterialMenu(materialSet, shape->m_entries[0].m_textureIndex, 0);
@@ -721,7 +721,11 @@ inline void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned ch
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     for (int i = 0; i < shape->m_shapeCount; i++) {
-        GXCallDisplayList(shape->m_entries[i].m_displayList, 0x60);
+        tagOAN3_SHAPE_ENTRY* entry = &shape->m_entries[i];
+        if (blendMode == 0xFF) {
+            pppSetBlendMode(entry->m_blendMode);
+        }
+        GXCallDisplayList(entry->m_displayList, 0x60);
     }
 }
 
@@ -753,7 +757,7 @@ inline void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigne
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    drawShp(shape, ppvEnv->m_materialSetPtr, tlut);
+    drawShp(shape, ppvEnv->m_materialSetPtr, 0);
 }
 
 /*
@@ -808,14 +812,9 @@ static void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float sca
     MaterialMan.InitEnv();
     MaterialMan.LockEnv();
 
-#ifdef VERSION_GCCJGC
     _GXColor ambColor = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor matColor = {0, 0, 0, 0};
     GXSetChanAmbColor(GX_COLOR0A0, ambColor);
-#else
-    _GXColor matColor = {0, 0, 0, 0};
-    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(const_cast<unsigned int*>(&DAT_80332D04)));
-#endif
     GXSetChanMatColor(GX_COLOR0A0, matColor);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
@@ -1808,6 +1807,7 @@ void CShopMenu::DrawSmith0()
 #ifdef VERSION_GCCJGC
 void CShopMenu::DrawMake()
 {
+    int i;
     DrawMakeBase();
 
     drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, 0.0f, 0);
@@ -1880,7 +1880,7 @@ void CShopMenu::DrawMake()
     int rowY = 300;
     CMenuPcs::MaterialInfo recipeMaterial;
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
-    for (int i = 0; i < 3; i++, rowY += 0x1E) {
+    for (i = 0; i < 3; i++, rowY += 0x1E) {
         if (recipeMaterial.m_itemNo[i] <= 0) {
             break;
         }

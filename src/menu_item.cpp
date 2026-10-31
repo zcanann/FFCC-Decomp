@@ -424,7 +424,7 @@ void CMenuPcs::ItemDraw()
             menuIndex -= 0x40;
         }
 
-        listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * entry->alpha)).color);
+        listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * entry->alpha)));
 
         itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
@@ -514,7 +514,7 @@ void CMenuPcs::ItemDraw()
     }
     float helpY = 352.0f;
     DrawHelpMessage(selectedItemId, helpFont, (int)(320.0f - w / 2), (int)helpY,
-                    CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, 1.0f, 3.0f);
+                    CColor(0xFF, 0xFF, 0xFF, helpAlpha), 10, 1.0f, 3.0f);
 }
 
 /*

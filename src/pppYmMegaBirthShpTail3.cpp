@@ -871,7 +871,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
     u32 shapeFrameStep;
     float segDy;
     float colorStepA;
-    float curX;
     float diffB;
     u32 shapeFrameCount;
     float curY;
@@ -917,10 +916,11 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
 
     for (i = 0; i < work->m_maxParticles; i++) {
         if (particle->m_life != 0) {
+            float curX;
             count = step->m_drawCount;
-            alphaMul = (float)colorWork->m_alpha / 16384.0f;
-            countMinusOne = (float)(count - 1);
             lastIndex = particle->m_historyCount - 1;
+            countMinusOne = (float)(count - 1);
+            alphaMul = (float)colorWork->m_alpha / 16384.0f;
             S4ToF32(&colorStart, work->m_colorStart);
             S4ToF32(&colorEnd, work->m_colorEnd);
             colorStart.w *= alphaMul;
@@ -931,7 +931,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
             diffR = colorStart.x - colorEnd.x;
             diffG = colorStart.y - colorEnd.y;
             diffB = colorStart.z - colorEnd.z;
-            if (countMinusOne != 0.0f) {
+            if (countMinusOne) {
                 colorStepR = diffR / countMinusOne;
                 colorStepG = diffG / countMinusOne;
                 colorStepB = diffB / countMinusOne;

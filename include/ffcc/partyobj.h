@@ -10,7 +10,6 @@ class CGPrgObj;
 class CFont;
 class CCaravanWork;
 class CGame;
-class CATEGOLY2TYPE;
 class CVector;
 struct Vec;
 

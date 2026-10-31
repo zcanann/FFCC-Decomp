@@ -2439,8 +2439,8 @@ void pppSetProjection()
  */
 void CPartMng::pppSetRendMatrix()
 {
-    PSMTX44Copy(CameraPcs.m_screenMatrix, ppvScreenMatrix);
-    PSMTXCopy(CameraPcs.m_cameraMatrix, ppvCameraMatrix);
+    CameraPcs.GetProjectionMatrix(ppvScreenMatrix);
+    CameraPcs.GetViewMatrix(ppvCameraMatrix);
     ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
     ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
     ppvScreenMatrixZbuff = ppvScreenMatrix[2][3];
@@ -2845,7 +2845,7 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
         return fileData;
     } else if (readBuffer != 0 || (fileHandle = File.Open(filePath, 0, CFile::PRI_LOW)) != 0) {
         if (m_partLoadMode == 3) {
-            File.ReadASync(fileHandle);
+            fileHandle->ReadASync();
             m_partAsyncBusy[m_asyncHandleCount] = fileHandle;
             m_asyncHandleCount++;
             return reinterpret_cast<void*>(1);
@@ -2855,11 +2855,11 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
                 fileSize = readBufferSize;
                 fileData = readBuffer;
             } else {
-                fileSize = File.GetLength(fileHandle);
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
+                fileSize = fileHandle->GetLength();
+                fileHandle->Read();
+                fileHandle->SyncCompleted();
                 fileData = File.m_readBuffer;
-                File.Close(fileHandle);
+                fileHandle->Close();
             }
             if (m_partLoadMode == 2) {
                 Memory.CopyToAMemorySync(fileData, reinterpret_cast<void*>(m_partAMemCursor), fileSize);
@@ -2888,10 +2888,10 @@ void CPartMng::LoadPartNoSyncCalc()
 {
     for (int i = 0; i < 0x10; i++) {
         if (m_partAsyncBusy[i] != 0) {
-            if (File.IsCompleted(m_partAsyncBusy[i])) {
+            if (m_partAsyncBusy[i]->IsCompleted()) {
                 int len;
                 void* readBuffer = File.m_readBuffer;
-                len = File.GetLength(m_partAsyncBusy[i]);
+                len = m_partAsyncBusy[i]->GetLength();
                 void* amemCursor = reinterpret_cast<void*>(m_partAMemCursor);
 
                 Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1f) & ~0x1f);
@@ -2900,7 +2900,7 @@ void CPartMng::LoadPartNoSyncCalc()
                 m_partChunkIndex++;
                 m_partAMemCursor += len;
 
-                File.Close(m_partAsyncBusy[i]);
+                m_partAsyncBusy[i]->Close();
                 m_partAsyncBusy[i] = 0;
             }
         }

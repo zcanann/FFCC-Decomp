@@ -364,7 +364,7 @@ void CWind::Draw()
 {
     Mtx viewMtx;
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
+    CameraPcs.GetViewMatrix(viewMtx);
     _GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
     GXSetZCompLoc(0);
     _GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);

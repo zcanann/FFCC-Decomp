@@ -487,18 +487,7 @@ void CFont::SetTlut(int index)
  */
 void CFont::SetTlutColor(int tlutIndex, int colorIndex, _GXColor color)
 {
-	unsigned int format = texturePtr->m_format;
-	int colorCount;
-
-	if (format == 9) {
-		colorCount = 0x100;
-	} else if (format == 8) {
-		colorCount = 0x10;
-	} else {
-		colorCount = 0;
-	}
-
-	texturePtr->SetExternalTlutColor(&m_tlutData[tlutIndex * 0x40], colorCount, colorIndex, color);
+	texturePtr->SetExternalTlutColor(&m_tlutData[tlutIndex * 0x40], colorIndex, color);
 }
 
 /*
@@ -535,7 +524,7 @@ void CFont::DrawInit()
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXColor localColor = m_color;
     GXSetChanMatColor(GX_COLOR0A0, localColor);
-    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
     CFontRenderFlagBits& renderFlagBits = renderFlags;
     if (renderFlagBits.zCompare != 0 || renderFlagBits.zUpdate != 0) {
@@ -606,7 +595,7 @@ void CFont::DrawQuit()
 {
     Mtx44 screenMtx;
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 

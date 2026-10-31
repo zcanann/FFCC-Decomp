@@ -8,8 +8,6 @@
 #include "radar.h"
 #include "screen.h"
 
-extern vu16 gBgScroll[4][2];
-
 static u32 sKeyRepeatTimer;
 static u32 sWaitKeyRelease;
 static u32 sPrevMenuHasInput;
@@ -18,7 +16,22 @@ static s8 sShakeX;
 static s8 sShakeY;
 static s8 sScrollDirty;
 static s8 sAlarmTimer;
+u16 gKeysReleased;
+u8 gReconnectPending;
+u8 gInputLockFrames;
+u16 gKeysRepeat;
+u8 gWasConnected;
+u8 gLinkStarted;
+u16 gKeysHeld;
+u16 gKeysNew;
+u16 gKeysToggled;
+u16 gKeysPrev;
 u8 gIntrMainRam[0x100];
+u16 gKeysCurrent;
+u8 gSpMode;
+u32 gFrameCount;
+u8 gMenuHasInput;
+vu16 gBgScroll[4][2];
 
 typedef void (*IntrFunc)(void);
 

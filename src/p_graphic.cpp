@@ -340,6 +340,7 @@ void CGraphicPcs::drawBar()
 {
     Mtx44 ortho;
     Mtx identity;
+    CSystem::COrder* textOrder;
     C_MTXOrtho(ortho, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
@@ -424,17 +425,17 @@ void CGraphicPcs::drawBar()
     if (textFlag) {
         Graphic.InitDebugString();
 
-        order = System.GetFirstOrder();
+        textOrder = System.GetFirstOrder();
         x = kDebugBarLeft;
         int i = 0;
         y = 0x10;
         for (; i < orderCount; i++) {
-            const int priority = order->m_priority;
-            const float width = (kGraphicScreenCenterX * order->m_lastTime) / 100.0f;
+            const int priority = textOrder->m_priority;
+            const float width = (kGraphicScreenCenterX * textOrder->m_lastTime) / 100.0f;
 
             if (priority != 0x27) {
                 char debugString[260];
-                sprintf(debugString, "%s(%d) %.3f%%", order->m_debugName, order->m_insertIndex, order->m_lastTime);
+                sprintf(debugString, "%s(%d) %.3f%%", textOrder->m_debugName, textOrder->m_insertIndex, textOrder->m_lastTime);
 
                 if (priority == 0x17) {
                     char extraString[256];
@@ -449,12 +450,12 @@ void CGraphicPcs::drawBar()
                 x += width;
             }
 
-            order = System.GetNextOrder(order);
+            textOrder = System.GetNextOrder(textOrder);
             y += kDebugBarLineStep;
         }
     }
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, ortho);
+    CameraPcs.GetProjectionMatrix(ortho);
     GXSetProjection(ortho, GX_PERSPECTIVE);
 }
 
@@ -665,13 +666,13 @@ void CGraphicPcs::drawScreenFade()
     C_MTXOrtho(orthoMtx, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
     PSMTXCopy(cameraMtx, screenMtx);
     screenMtx[3][2] = kGraphicZero;
     screenMtx[3][1] = kGraphicZero;
     screenMtx[3][0] = kGraphicZero;
     screenMtx[3][3] = 1.0f;
-    PSMTX44Copy(CameraPcs.m_screenMatrix, worldScreenMtx);
+    CameraPcs.GetProjectionMatrix(worldScreenMtx);
     PSMTX44Concat(worldScreenMtx, screenMtx, worldScreenMtx);
 
     GXClearVtxDesc();
@@ -705,7 +706,7 @@ void CGraphicPcs::drawScreenFade()
         GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-        GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+        GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF));
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
@@ -873,7 +874,7 @@ void CGraphicPcs::drawScreenFade()
         }
     }
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);
+    CameraPcs.GetProjectionMatrix(orthoMtx);
     GXSetProjection(orthoMtx, GX_PERSPECTIVE);
 }
 

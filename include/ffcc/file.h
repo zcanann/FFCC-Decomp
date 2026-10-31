@@ -46,6 +46,9 @@ public:
 		unsigned int m_nextOffset;
 
 	public:
+		int GetLength();
+		void ReadASync();
+		int IsCompleted();
 		void SyncCompleted();
 		void Read();
 		void Close();
@@ -89,5 +92,89 @@ public:
 };
 
 extern CFile File;
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: 0x8002cd80
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CFile::CHandle::GetLength()
+{
+	return File.GetLength(this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: 0x8003e424
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFile::CHandle::ReadASync()
+{
+	File.ReadASync(this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: 0x8003e454
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CFile::CHandle::IsCompleted()
+{
+	return File.IsCompleted(this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B93EC
+ * PAL Size: 44b
+ * EN Address: 0x8001DA3C
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFile::CHandle::Close()
+{
+	File.Close(this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9420
+ * PAL Size: 44b
+ * EN Address: 0x8001DA74
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFile::CHandle::SyncCompleted()
+{
+	File.SyncCompleted(this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B944C
+ * PAL Size: 44b
+ * EN Address: 0x8001DAA4
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFile::CHandle::Read()
+{
+	File.Read(this);
+}
 
 #endif // _FFCC_FILE_H

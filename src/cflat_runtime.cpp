@@ -1171,12 +1171,26 @@ void CFlatRuntime::systemVal(CFlatRuntime::CObject*, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 188b
+ * EN Address: 0x80077844
+ * EN Size: 192b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::setSystemVal(CFlatRuntime::CObject*, int)
+inline void CFlatRuntime::setSystemVal(CFlatRuntime::CObject* object, int mode)
 {
-	// TODO
+	unsigned int* sp = object->m_sp;
+	unsigned int* top = sp - 1;
+	int valIndex;
+	object->m_sp = top;
+	const u32 systemValue = sp[-2];
+	valIndex = static_cast<int>(systemValue) >> 13;
+	if (((systemValue >> 12) & 1) != 0) {
+		onSetClassSystemVal(valIndex, reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF)), reinterpret_cast<CStack*>(top), mode);
+	} else {
+		onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), mode);
+	}
 }
 
 /*
@@ -1552,50 +1566,17 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			break;
 		}
 		case 0x13:
-		case 0x16: {
-			unsigned int* sp = object->m_sp;
-			int valIndex;
-			unsigned int* top = sp - 1;
-			object->m_sp = top;
-			const u32 systemValue = sp[-2];
-			valIndex = static_cast<int>(systemValue) >> 13;
-			if (((systemValue >> 12) & 1) != 0) {
-				onSetClassSystemVal(valIndex, reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF)), reinterpret_cast<CStack*>(top), 0);
-			} else {
-				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), 0);
-			}
+		case 0x16:
+			setSystemVal(object, 0);
 			break;
-		}
 		case 0x14:
-		case 0x17: {
-			unsigned int* sp = object->m_sp;
-			int valIndex;
-			unsigned int* top = sp - 1;
-			object->m_sp = top;
-			const u32 systemValue = sp[-2];
-			valIndex = static_cast<int>(systemValue) >> 13;
-			if (((systemValue >> 12) & 1) != 0) {
-				onSetClassSystemVal(valIndex, reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF)), reinterpret_cast<CStack*>(top), 1);
-			} else {
-				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), 1);
-			}
+		case 0x17:
+			setSystemVal(object, 1);
 			break;
-		}
 		case 0x15:
-		case 0x18: {
-			unsigned int* sp = object->m_sp;
-			int valIndex;
-			unsigned int* top = sp - 1;
-			object->m_sp = top;
-			const u32 systemValue = sp[-2];
-			valIndex = static_cast<int>(systemValue) >> 13;
-			if (((systemValue >> 12) & 1) != 0) {
-				onSetClassSystemVal(valIndex, reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF)), reinterpret_cast<CStack*>(top), -1);
-			} else {
-				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), -1);
-			}
+		case 0x18:
+			setSystemVal(object, -1);
 			break;
-		}
 		case 0x19:
 		case 0x1A:
 		case 0x1B:

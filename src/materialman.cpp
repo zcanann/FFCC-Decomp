@@ -847,8 +847,8 @@ void CMaterialMan::SetUnderWaterTex()
     Mtx matrixB;
     Mtx matrixA;
     PSMTXIdentity(matrixA);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-    PSMTXCopy(CameraPcs.m_cameraMatrix, matrixB);
+    CameraPcs.GetProjectionMatrix(screenMtx);
+    CameraPcs.GetViewMatrix(matrixB);
 
     matrixA[0][0] = screenMtx[0][0];
     matrixA[1][0] = screenMtx[1][0];
@@ -882,6 +882,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     CMaterial* material;
     unsigned int tevBit;
     int isStd1000 = 0;
+    int texCoordId;
     SetStdEnv();
 
     material = materialSet->m_materials[materialIndex];
@@ -1364,7 +1365,6 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXSetVtxDesc(GX_VA_TEX1, GX_INDEX16);
                 m_vtxDescMode = 2;
             }
-            int texCoordId;
             if ((tevBit & 0x40) != 0) {
                 texCoordId = m_texScroll1TexCoord;
             } else {

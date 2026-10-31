@@ -192,12 +192,12 @@ void CCharaPcs::drawViewer()
         GXTexCoord2s16(static_cast<short>(width * 2), static_cast<short>(height * 2));
         GXPosition3s16(0, static_cast<short>(height), 0);
         GXTexCoord2s16(0, static_cast<short>(height * 2));
-        PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
+        CameraPcs.GetProjectionMatrix(projMtx);
         GXSetProjection(projMtx, GX_PERSPECTIVE);
     }
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
+    CameraPcs.GetProjectionMatrix(projMtx);
     GXSetProjection(projMtx, GX_PERSPECTIVE);
 
     if (self->m_viewerDrawGrid != 0) {
@@ -333,14 +333,14 @@ void CCharaPcs::calcViewer()
                 self->m_viewerAnim[0] = 0;
                 self->m_viewerTextureSet[0] = 0;
 
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
+                fileHandle->Read();
+                fileHandle->SyncCompleted();
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, "p_chara_viewer.cpp", 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
-                self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
+                self->m_viewerModel[0]->Create(File.GetBuffer(), self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
                 self->m_viewerModel[0]->m_flags10CBits.m_flag10C_40 = 1;
-                File.Close(fileHandle);
+                fileHandle->Close();
             }
             self->m_viewerLoadModel = 0;
         }
@@ -349,10 +349,10 @@ void CCharaPcs::calcViewer()
             System.Printf("CCharaPcs.calcViewer: %s\n", self->m_viewerDynamicsPath);
             CFile::CHandle* fileHandle = File.Open(self->m_viewerDynamicsPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
-                self->m_viewerModel[0]->CreateDynamics(File.m_readBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
-                File.Close(fileHandle);
+                fileHandle->Read();
+                fileHandle->SyncCompleted();
+                self->m_viewerModel[0]->CreateDynamics(File.GetBuffer(), self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
+                fileHandle->Close();
             }
             self->m_viewerLoadDynamics = 0;
         }
@@ -370,13 +370,13 @@ void CCharaPcs::calcViewer()
                 System.Printf("CCharaPcs.calcViewer: %s\n", self->m_viewerAnimPath);
                 CFile::CHandle* fileHandle = File.Open(self->m_viewerAnimPath, 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
-                    File.Read(fileHandle);
-                    File.SyncCompleted(fileHandle);
+                    fileHandle->Read();
+                    fileHandle->SyncCompleted();
                     CChara::CAnim* anim =
                         new (CharaPcs.m_stage, "p_chara_viewer.cpp", 0x111) CChara::CAnim;
                     self->m_viewerAnim[0] = anim;
-                    self->m_viewerAnim[0]->Create(File.m_readBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
-                    File.Close(fileHandle);
+                    self->m_viewerAnim[0]->Create(File.GetBuffer(), self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
+                    fileHandle->Close();
                 }
                 self->m_viewerLoadAnim = 0;
             } else {
@@ -391,14 +391,14 @@ void CCharaPcs::calcViewer()
                             ref->Release();
                             self->m_viewerAnimBank[self->m_viewerAnimLoadedCount] = 0;
                         }
-                        File.Read(fileHandle);
-                        File.SyncCompleted(fileHandle);
+                        fileHandle->Read();
+                        fileHandle->SyncCompleted();
                         CChara::CAnim* anim =
                             new (CharaPcs.m_stage, "p_chara_viewer.cpp", 0x124) CChara::CAnim;
                         self->m_viewerAnimBank[self->m_viewerAnimLoadedCount] = anim;
-                        self->m_viewerAnimBank[self->m_viewerAnimLoadedCount]->Create(File.m_readBuffer,
+                        self->m_viewerAnimBank[self->m_viewerAnimLoadedCount]->Create(File.GetBuffer(),
                                                                                       self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
-                        File.Close(fileHandle);
+                        fileHandle->Close();
                         if (self->m_viewerAnimLoadedCount == 0) {
                             self->m_viewerAnim[0] = self->m_viewerAnimBank[self->m_viewerAnimLoadedCount];
                             reinterpret_cast<CRef*>(self->m_viewerAnim[0])->AddRef();
@@ -415,10 +415,10 @@ void CCharaPcs::calcViewer()
             CFile::CHandle* fileHandle = File.Open(self->m_viewerTexturePath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 ReleaseShared(self->m_viewerTextureSet[0]);
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
-                self->m_viewerTextureSet[0] = createTextureSet(File.m_readBuffer, 0);
-                File.Close(fileHandle);
+                fileHandle->Read();
+                fileHandle->SyncCompleted();
+                self->m_viewerTextureSet[0] = createTextureSet(File.GetBuffer(), 0);
+                fileHandle->Close();
             }
             self->m_viewerLoadTexture = 0;
         }
@@ -721,10 +721,10 @@ void CCharaPcs::createViewer()
     sprintf(pathBuf, "%sback.tex", USBPcs.m_rootPath);
     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
     if (fileHandle != 0) {
-        File.Read(fileHandle);
-        File.SyncCompleted(fileHandle);
-        self->m_viewerBackTextureSet = createTextureSet(File.m_readBuffer, 0);
-        File.Close(fileHandle);
+        fileHandle->Read();
+        fileHandle->SyncCompleted();
+        self->m_viewerBackTextureSet = createTextureSet(File.GetBuffer(), 0);
+        fileHandle->Close();
     }
 
     CLightPcs::CBumpLight bumpLight;

@@ -792,10 +792,10 @@ void CMemoryCardMan::SetMcIconImage()
 #endif
     }
 
-    File.Read(h);
-    File.SyncCompleted(h);
+    h->Read();
+    h->SyncCompleted();
 
-    int len = File.GetLength(h);
+    int len = h->GetLength();
 
     if (len != 0x2A00 && static_cast<unsigned int>(System.m_execParam) >= 1)
     {
@@ -808,9 +808,9 @@ void CMemoryCardMan::SetMcIconImage()
     }
 
     char* saveBuffer = m_saveBuffer;
-    memcpy(saveBuffer + 0x40, File.m_readBuffer, len);
+    memcpy(saveBuffer + 0x40, File.GetBuffer(), len);
 
-    File.Close(h);
+    h->Close();
 
     m_cardStat.commentAddr = 0;
     m_cardStat.iconAddr    = 0x40;
@@ -1233,6 +1233,7 @@ void CMemoryCardMan::MakeSaveData()
 void CMemoryCardMan::SetLoadData()
 {
     Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
+    int c;
 
     if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
@@ -1303,7 +1304,7 @@ void CMemoryCardMan::SetLoadData()
 
     int count;
     int i;
-    for (int c = 0; c < 8; c++)
+    for (c = 0; c < 8; c++)
     {
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
         CCaravanWork* caravanWork = &g->m_caravanWorkArr[c];

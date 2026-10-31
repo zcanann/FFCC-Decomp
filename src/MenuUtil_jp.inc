@@ -22,16 +22,7 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
     font->SetTlut(tlut);
     font->SetColor(color);
 
-    int rangeKind;
-    if (1 <= msgNo && msgNo < 0x45) {
-        rangeKind = 1;
-    } else if (0x45 <= msgNo && msgNo < 0x7F) {
-        rangeKind = 0x45;
-    } else if (0x7F <= msgNo && msgNo < 0x9F) {
-        rangeKind = 0x7F;
-    } else {
-        rangeKind = 0;
-    }
+    int rangeKind = IsItemEquip(msgNo);
     int firstLine;
     int lineMax;
     CalcHelpLine(msgNo, firstLine, lineMax);

@@ -7815,11 +7815,11 @@ void CMenuPcs::ChgAllModel()
  */
 void CMenuPcs::ChgAllModel2()
 {
+	int isFemale;
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
 		const Mc::CharaDat& character = m_cmakeWork->m_characters[i];
 		int tribe;
-		int isFemale;
 		int appearance;
 
 		if (character.m_exists != 0) {

@@ -1078,6 +1078,8 @@ void CMenuPcs::CalcResultOpenAnim()
 void CMenuPcs::DrawResultOpenAnim()
 {
 	int i;
+	float x;
+	float y;
 	int lastKind;
 	int modelIndex;
 	CMenuPcs::Sprt2* sprite;
@@ -1153,8 +1155,8 @@ void CMenuPcs::DrawResultOpenAnim()
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
 					if (sprite->kind == kBonusFrameTexture) {
-						float x = (float)sprite->x;
-						float y = (float)sprite->y;
+						x = (float)sprite->x;
+						y = (float)sprite->y;
 						float fillWidth;
 						if (sprite->duration > sprite->timer) {
 							fillWidth = (float)((1.0 / (double)sprite->duration) * (double)(sprite->timer - 1));
@@ -1232,8 +1234,8 @@ void CMenuPcs::DrawResultOpenAnim()
 #endif
 					}
 
-					float x = (float)sprite->x + sprite->motionX;
-					float y = (float)sprite->y + sprite->motionY;
+					x = (float)sprite->x + sprite->motionX;
+					y = (float)sprite->y + sprite->motionY;
 #ifndef VERSION_GCCJGC
 					if (modelIndex < activePartyCount) {
 						y -= 4.0f;
@@ -1872,6 +1874,8 @@ void CMenuPcs::CalcResultCloseAnim()
 void CMenuPcs::DrawResultCloseAnim()
 {
 	int i;
+	float x;
+	float y;
 	CMenuPcs::Sprt2* sprite;
 	int lastKind;
 	int modelIndex;
@@ -1962,8 +1966,8 @@ void CMenuPcs::DrawResultCloseAnim()
 						continue;
 					}
 					{
-						float x = (float)sprite->x;
-						float y = (float)sprite->y;
+						x = (float)sprite->x;
+						y = (float)sprite->y;
 						float fillWidth;
 						if (sprite->duration > sprite->timer) {
 							fillWidth = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)(sprite->timer - 1));
@@ -2042,8 +2046,8 @@ void CMenuPcs::DrawResultCloseAnim()
 #endif
 				}
 
-				float x = (float)sprite->x + sprite->motionX;
-				float y = (float)sprite->y + sprite->motionY;
+				x = (float)sprite->x + sprite->motionX;
+				y = (float)sprite->y + sprite->motionY;
 #ifndef VERSION_GCCJGC
 				if (modelIndex < activePartyCount) {
 					y -= 4.0f;

@@ -32,32 +32,10 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
     } else {
         rangeKind = 0;
     }
-    int firstLine = 500;
+    int firstLine;
     int lineMax;
-    if (0 <= msgNo && msgNo <= 0x9E) {
-        firstLine = msgNo * 3 + 0x1F5;
-        lineMax = 3;
-    } else if (0x9F <= msgNo && msgNo <= 0xFF) {
-        firstLine = msgNo + 0x333;
-        lineMax = 1;
-    } else if (0x100 <= msgNo && msgNo <= 0x206) {
-        firstLine = (msgNo - 0x100) * 2 + 0x433;
-        lineMax = 2;
-    } else if (0x207 <= msgNo && msgNo <= 0x258) {
-        firstLine = (msgNo - 0x207) * 3 + 0x641;
-        lineMax = 3;
-    } else if (0x259 <= msgNo && msgNo <= 0x268) {
-        firstLine = (msgNo - 0x259) * 3 + 0x737;
-        lineMax = 3;
-    }
-    int maxWidth = -1;
-    for (int line = firstLine; line < firstLine + lineMax; line++) {
-        int width = CMes::drawTagString(font, Game.GetHelpName(line), 0, 0, 0);
-        if (width < maxWidth) {
-            width = maxWidth;
-        }
-        maxWidth = width;
-    }
+    CalcHelpLine(msgNo, firstLine, lineMax);
+    int maxWidth = GetLongHelpString(font, firstLine, lineMax);
     if (rangeKind != 0) {
         int y = lineBaseY[0];
         for (int i = 1; i <= 2; i++) {
@@ -182,14 +160,7 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
         }
     } else {
         int lineCount = lineMax;
-        int widthMax = -1;
-        for (int line = firstLine; line < firstLine + lineMax; line++) {
-            int width = CMes::drawTagString(font, Game.GetHelpName(line), 0, 0, 0);
-            if (width < widthMax) {
-                width = widthMax;
-            }
-            widthMax = width;
-        }
+        int widthMax = GetLongHelpString(font, firstLine, lineMax);
         int x = 320 - widthMax / 2;
         for (int i = 0; i < lineMax; i++) {
             if (strlen(Game.GetHelpName(firstLine + i)) <= 2) {

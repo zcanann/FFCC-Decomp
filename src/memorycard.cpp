@@ -792,10 +792,10 @@ void CMemoryCardMan::SetMcIconImage()
 #endif
     }
 
-    File.Read(h);
-    File.SyncCompleted(h);
+    h->Read();
+    h->SyncCompleted();
 
-    int len = File.GetLength(h);
+    int len = h->GetLength();
 
     if (len != 0x2A00 && static_cast<unsigned int>(System.m_execParam) >= 1)
     {
@@ -808,9 +808,9 @@ void CMemoryCardMan::SetMcIconImage()
     }
 
     char* saveBuffer = m_saveBuffer;
-    memcpy(saveBuffer + 0x40, File.m_readBuffer, len);
+    memcpy(saveBuffer + 0x40, File.GetBuffer(), len);
 
-    File.Close(h);
+    h->Close();
 
     m_cardStat.commentAddr = 0;
     m_cardStat.iconAddr    = 0x40;

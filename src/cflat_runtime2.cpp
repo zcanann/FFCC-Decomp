@@ -614,10 +614,10 @@ int CFlatRuntime2::Load(char* fileName)
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
-		File.Read(fileHandle);
-		File.SyncCompleted(fileHandle);
-		reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
-		File.Close(fileHandle);
+		fileHandle->Read();
+		fileHandle->SyncCompleted();
+		reinterpret_cast<CFlatRuntime*>(this)->Create(File.GetBuffer());
+		fileHandle->Close();
 	} else {
 		return 0;
 	}
@@ -633,10 +633,10 @@ int CFlatRuntime2::Load(char* fileName)
 
 			fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 			if (fileHandle != 0) {
-				File.Read(fileHandle);
-				File.SyncCompleted(fileHandle);
-				debugChunk = reinterpret_cast<CFlatRuntime*>(this)->CreateDebug(File.m_readBuffer, debugChunk);
-				File.Close(fileHandle);
+				fileHandle->Read();
+				fileHandle->SyncCompleted();
+				debugChunk = reinterpret_cast<CFlatRuntime*>(this)->CreateDebug(File.GetBuffer(), debugChunk);
+				fileHandle->Close();
 			} else {
 				return 0;
 			}
@@ -886,7 +886,7 @@ void CFlatRuntime2::Destroy()
 		CFlatLayerResource* layer = &m_layerResources[i];
 		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle != 0) {
-			File.Close(fileHandle);
+			fileHandle->Close();
 			layer->m_fileHandle = 0;
 		}
 
@@ -918,7 +918,7 @@ void CFlatRuntime2::Calc()
 			continue;
 		}
 
-		if (File.IsCompleted(fileHandle)) {
+		if (fileHandle->IsCompleted()) {
 			CTextureSet* textureSet = layer->m_textureSet;
 			if (textureSet != 0) {
 				delete textureSet;
@@ -927,13 +927,13 @@ void CFlatRuntime2::Calc()
 
 			textureSet = new (getStage(), "cflat_runtime2.cpp", 0x335) CTextureSet;
 			layer->m_textureSet = textureSet;
-			void* readBuffer = File.m_readBuffer;
+			void* readBuffer = File.GetBuffer();
 			layer->m_textureSet->Create(
 				readBuffer,
 				GET_CHARA_ALLOC_STAGE_S(layer->m_allocStage, Game.m_mainStage),
 				0, 0, 0, 0);
 
-			File.Close(layer->m_fileHandle);
+			layer->m_fileHandle->Close();
 			layer->m_fileHandle = 0;
 		}
 	}
@@ -1331,18 +1331,18 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
-		File.Read(fileHandle);
-		File.SyncCompleted(fileHandle);
+		fileHandle->Read();
+		fileHandle->SyncCompleted();
 
 		textureSet = new (getStage(), "cflat_runtime2.cpp", 0x4F4) CTextureSet;
 		m_layerResources[layerNo].m_textureSet = textureSet;
-		void* readBuffer = File.m_readBuffer;
+		void* readBuffer = File.GetBuffer();
 		m_layerResources[layerNo].m_textureSet->Create(
 			readBuffer,
 			GET_CHARA_ALLOC_STAGE_S(CharaPcs.m_charaAllocStage, Game.m_mainStage),
 			0, 0, 0, 0);
 
-		File.Close(fileHandle);
+		fileHandle->Close();
 	}
 }
 
@@ -1369,7 +1369,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 {
 	CFile::CHandle* fileHandle = m_layerResources[layerNo].m_fileHandle;
 	if (fileHandle != 0) {
-		File.Close(fileHandle);
+		fileHandle->Close();
 		m_layerResources[layerNo].m_fileHandle = 0;
 	}
 
@@ -1388,7 +1388,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 
 	m_layerResources[layerNo].m_fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (m_layerResources[layerNo].m_fileHandle != 0) {
-		File.ReadASync(m_layerResources[layerNo].m_fileHandle);
+		m_layerResources[layerNo].m_fileHandle->ReadASync();
 	}
 
 	m_layerResources[layerNo].m_allocStage = CharaPcs.m_charaAllocStage;

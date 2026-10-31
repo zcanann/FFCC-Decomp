@@ -1215,8 +1215,8 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         return;
     }
 
-    File.Read(fileHandle);
-    File.SyncCompleted(fileHandle);
+    fileHandle->Read();
+    fileHandle->SyncCompleted();
 
     CChunkFile chunkFile(File.GetBuffer());
     while (chunkFile.GetNextChunk(chunk)) {
@@ -1242,7 +1242,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         }
     }
 
-    File.Close(fileHandle);
+    fileHandle->Close();
 }
 
 /*
@@ -1270,8 +1270,8 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
 
-            File.Read(fileHandle);
-            File.SyncCompleted(fileHandle);
+            fileHandle->Read();
+            fileHandle->SyncCompleted();
 
             CChunkFile chunkFile(File.GetBuffer());
             CChunkFile::CChunk chunk;
@@ -1385,7 +1385,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                 chunkFile.PopChunk();
             }
 
-            File.Close(fileHandle);
+            fileHandle->Close();
         } else {
             System.Printf("CCharaPcs.LoadMergeFile: %dはありません。\n", mergeFileId);
             break;
@@ -1860,12 +1860,12 @@ foundTexture:
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
-            File.Read(fileHandle);
-            File.SyncCompleted(fileHandle);
+            fileHandle->Read();
+            fileHandle->SyncCompleted();
 
             m_texLoadRef = CharaPcs.loadTexture(File.GetBuffer(), charaKind, charaNo, textureVariant, mergeFileId,
                                                 mergeFlags, 0, 0);
-            File.Close(fileHandle);
+            fileHandle->Close();
 
             m_texLoadRef->AddRef();
             m_textureSet = m_texLoadRef->m_textureSet;
@@ -1960,11 +1960,11 @@ int CCharaPcs::CHandle::LoadModel(
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
-            File.Read(fileHandle);
-            File.SyncCompleted(fileHandle);
+            fileHandle->Read();
+            fileHandle->SyncCompleted();
 
             m_modelLoadRef = CharaPcs.loadModel(File.GetBuffer(), charaKind, static_cast<int>(charaNo), mergeFileId, mergeFlags, 0, 0);
-            File.Close(fileHandle);
+            fileHandle->Close();
             m_modelLoadRef->AddRef();
             m_model = m_modelLoadRef->m_model;
             m_model->AddRef();
@@ -1973,10 +1973,10 @@ int CCharaPcs::CHandle::LoadModel(
             strcat(path, ".chd");
             fileHandle = File.Open(path, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
+                fileHandle->Read();
+                fileHandle->SyncCompleted();
                 m_model->CreateDynamics(File.GetBuffer(), HandleModelStage(charaKind, 0));
-                File.Close(fileHandle);
+                fileHandle->Close();
                 if (System.GetErrorLevel() >= 1U) {
                     System.Printf("\x1b[31mMerge: ダイナミクスをDVDから読み込みました。type = %d number = %d\n", charaKind, static_cast<int>(charaNo));
                 }
@@ -2068,10 +2068,10 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int, int mer
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
-            File.Read(fileHandle);
-            File.SyncCompleted(fileHandle);
+            fileHandle->Read();
+            fileHandle->SyncCompleted();
             loadAnimBuffer(File.GetBuffer(), animName, charaKind, charaNo, mergeFileId, mergeFlags);
-            File.Close(fileHandle);
+            fileHandle->Close();
 
             if (System.GetErrorLevel() >= 1U) {
                 System.Printf("\x1b[31mMerge: アニメーションをDVDから読み込みました。name = %s type = %d number = %d\n\x1b[0m", animName, charaKind, charaNo);
@@ -2452,7 +2452,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
             loadModelASyncFrame();
             return;
         }
-        File.ReadASync(m_asyncFileHandle);
+        m_asyncFileHandle->ReadASync();
         m_asyncState++;
         return;
     }
@@ -2460,7 +2460,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     if (asyncState != 2 && asyncState != 4 && asyncState != 6) {
         return;
     }
-    if (!File.IsCompleted(m_asyncFileHandle)) {
+    if (!m_asyncFileHandle->IsCompleted()) {
         return;
     }
 
@@ -2482,7 +2482,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         m_textureVariant = m_asyncTextureVariant;
     }
 
-    File.Close(m_asyncFileHandle);
+    m_asyncFileHandle->Close();
     m_asyncFileHandle = 0;
     if (m_asyncState == 6) {
         m_asyncState = 7;
@@ -2516,7 +2516,7 @@ void CCharaPcs::CHandle::CancelLoadModelASync()
         if (System.GetErrorLevel() >= 2U) {
             System.Printf("モデル非同期読み込み中にキャンセルされました。\n");
         }
-        File.Close(m_asyncFileHandle);
+        m_asyncFileHandle->Close();
         m_asyncFileHandle = 0;
     }
 

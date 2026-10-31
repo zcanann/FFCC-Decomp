@@ -341,13 +341,13 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         m_fonts[0]->AddRef();
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-        File.Read(fileHandle);
-        File.SyncCompleted(fileHandle);
+        fileHandle->Read();
+        fileHandle->SyncCompleted();
 
         m_fonts[slot] = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuFontAllocationLine) CFont;
-        m_fonts[slot]->Create(File.m_readBuffer, stage);
+        m_fonts[slot]->Create(File.GetBuffer(), stage);
 
-        File.Close(fileHandle);
+        fileHandle->Close();
     }
 
     if (tlutMode < 2) {
@@ -514,17 +514,17 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
-            File.Read(fileHandle);
-            File.SyncCompleted(fileHandle);
+            fileHandle->Read();
+            fileHandle->SyncCompleted();
 
             CMemory::CStage* stage = (m_mode == 1) ? g_MapMng.m_stage : GetStage(stageSelect);
 
             m_textureSets[i + textureSetStart] =
                 new (MenuPcs.m_menuStage, "p_menu.cpp", MenuTextureAllocationLine) CTextureSet;
 
-            m_textureSets[i + textureSetStart]->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
+            m_textureSets[i + textureSetStart]->Create(File.GetBuffer(), stage, 0, 0, 0, 0);
 
-            File.Close(fileHandle);
+            fileHandle->Close();
         }
     }
 

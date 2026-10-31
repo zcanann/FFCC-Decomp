@@ -68,21 +68,6 @@ struct GameNameRow
 
 CGame Game;
 
-inline void CFile::CHandle::Read()
-{
-    File.Read(this);
-}
-
-inline void CFile::CHandle::SyncCompleted()
-{
-    File.SyncCompleted(this);
-}
-
-inline void CFile::CHandle::Close()
-{
-    File.Close(this);
-}
-
 inline int CMapPcs::GetLightHolderSize(CMapLightHolder::TYPE type)
 {
     return g_MapMng.GetMapLightHolderArray(type).GetSize();

@@ -9510,9 +9510,9 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		sh = static_cast<float>(m_menuWindowInfo->height);
 	}
 
-	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
 	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313F8));
 	sy = static_cast<float>(static_cast<int>(static_cast<double>(sy) - DOUBLE_803313F8));
+	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
 	sh = static_cast<float>(static_cast<int>(static_cast<double>(sh) - DOUBLE_80331420));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -9529,8 +9529,6 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase : kMcWindowTextureBase));
 	right = (sx + sw) - 32.0f;
 	bottom = (sy + sh) - 32.0f;
-	const float* pZw1 = &FLOAT_803313dc;
-	const float uv0 = *pZw1;
 	for (rectIdx = 0; rectIdx < 4; rectIdx++) {
 		float x;
 		float y;
@@ -9547,7 +9545,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		} else {
 			y = sy;
 		}
-		MenuPcs.DrawRect(flags, x, y, 32.0f, 32.0f, uv0, uv0, FLOAT_803313e8, FLOAT_803313e8, uv0);
+		MenuPcs.DrawRect(flags, x, y, 32.0f, 32.0f, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 2 : kMcWindowTextureBase + 1));

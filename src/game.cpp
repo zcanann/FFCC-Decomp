@@ -1144,6 +1144,11 @@ CGPartyObj* CGame::GetPartyObj(int index)
 }
 
 #ifndef VERSION_GCCJGC
+static inline const char* GetArtSeparator(unsigned char hasSeparator)
+{
+    return hasSeparator != 0 ? " " : "";
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800141E0
@@ -1170,10 +1175,7 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
             }
         }
 
-        const char* separator = "";
-        if (hasSeparator != 0) {
-            separator = " ";
-        }
+        const char* separator = GetArtSeparator(hasSeparator);
 
         sprintf(out, "%s%s%s", prefix, separator, name);
     }
@@ -1203,10 +1205,7 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
         }
     }
 
-    const char* separator = "";
-    if (hasSeparator != 0) {
-        separator = " ";
-    }
+    const char* separator = GetArtSeparator(hasSeparator);
 
     sprintf(out, "%s%s%s", prefix, separator, itemName);
     return out;
@@ -1253,10 +1252,7 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
             }
         }
 
-        const char* separator = "";
-        if (hasSeparator != 0) {
-            separator = " ";
-        }
+        const char* separator = GetArtSeparator(hasSeparator);
 
         sprintf(out, "%s%s%s", prefix, separator, name);
     }
@@ -1286,10 +1282,7 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
         }
     }
 
-    const char* separator = "";
-    if (hasSeparator != 0) {
-        separator = " ";
-    }
+    const char* separator = GetArtSeparator(hasSeparator);
 
     sprintf(out, "%s%s%s", prefix, separator, monName);
     return out;

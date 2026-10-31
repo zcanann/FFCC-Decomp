@@ -14,8 +14,18 @@ struct CaravanNames {
     s8 slotMap[4];
 };
 
+s8 gScouterDirty;
+s8 gItemUseFlags;
+struct MapObjList gMapObjs;
+#if !defined(VERSION_GCCJGC)
+u8 gLanguage;
+#endif
 struct Session gSession;
 struct ScouterHit gScouterHit;
+struct Marker gEnemyMarkers[64];
+u8 gRadarType;
+struct Marker gTreasureMarkers[16];
+char gBonusStr[2][65];
 extern struct CaravanNames gCaravanNames;
 static u32 sMapObjDrawFlagsIn;
 static u16 sBasePos[2];

@@ -7,8 +7,6 @@ MPlayFunc gMPlayJumpTable[36];
 struct CgbChannel gCgbChans[4];
 struct MusicPlayerInfo gMPlayInfo_BGM;
 struct MusicPlayerInfo gMPlayInfo_SE1;
-struct MusicPlayerInfo gMPlayInfo_SE2;
-struct MusicPlayerInfo gMPlayInfo_SE3;
 u8 gMPlayMemAccArea[0x10];
 
 void m4aSoundInit(void)

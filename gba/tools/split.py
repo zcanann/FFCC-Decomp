@@ -480,9 +480,11 @@ class Emitter:
             out.append(f"\t{name} 0x{ordered[0].start:08X}{kind} :")
             out.append("\t{")
             for split in ordered:
-                name = split.section if split.unit in compiled else self.input_section(split)
                 if split.section == ".common" and split.unit in compiled:
-                    name = "COMMON"
+                    # The object's COMMON symbols, placed by common_layout.py.
+                    out.append(f"\t\tINCLUDE {common_layout_path(objects[split.unit])}")
+                    continue
+                name = split.section if split.unit in compiled else self.input_section(split)
                 out.append(f"\t\t{objects[split.unit]}({name})")
             if index == common_fallback:
                 out.append("\t\t*(COMMON)")
@@ -491,6 +493,11 @@ class Emitter:
         out.append("\t/DISCARD/ : { *(.ARM.attributes) *(.comment) }")
         out.append("}")
         return "\n".join(out) + "\n"
+
+
+def common_layout_path(obj: str) -> str:
+    """The linker script fragment placing a compiled object's COMMON symbols."""
+    return (obj[:-2] if obj.endswith(".o") else obj) + ".common.ld"
 
 
 def load_emitter(data: bytes, config: Path) -> "Emitter":

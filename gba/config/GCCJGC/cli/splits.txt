@@ -328,35 +328,23 @@ regional_bss:
 main/sound_data:
 	.bss        start:0x03002850 end:0x03002990 align:8
 
-regional_bss:
-	.bss        start:0x03002990 end:0x030029C0
-
 main/main:
-	.common     start:0x030029C0 end:0x03002AC0 align:16
-
-regional_bss:
-	.bss        start:0x03002AC0 end:0x03002AF0
+	.common     start:0x03002990 end:0x03002AE0 align:16
 
 main/xfer:
-	.common     start:0x03002AF0 end:0x03002AFC align:4
-
-regional_bss:
-	.bss        start:0x03002AFC end:0x03002CA0
+	.common     start:0x03002AE0 end:0x03002B00 align:4
 
 main/session:
-	.common     start:0x03002CA0 end:0x03002DD0 align:16
-
-regional_bss:
-	.bss        start:0x03002DD0 end:0x03002FB0
+	.common     start:0x03002B00 end:0x03002FA4 align:16
 
 main/cmake:
 	.common     start:0x03002FB0 end:0x03002FCC align:16
 
 regional_bss:
-	.bss        start:0x03002FCC end:0x030030B0
+	.bss        start:0x03002FD0 end:0x03003090
 
 main/mode:
-	.common     start:0x030030B0 end:0x030032E8 align:16
+	.common     start:0x03003090 end:0x03003300 align:16
 
-regional_bss:
-	.bss        start:0x030032E8 end:0x030044C1 align:4
+m4a/m4a:
+	.common     start:0x03003300 end:0x030044D0 align:16

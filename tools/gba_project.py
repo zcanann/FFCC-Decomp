@@ -395,6 +395,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
         n.rule("gba_ld_r", f"{prefix_str}ld{exe} -r -o $out $in", description="LINK $out")
         n.rule("gba_common_view", f"{prefix_str}ld{exe} -r -d -T {_path(tools / 'common.ld')} -o $out $in",
                description="COMMON $out")
+        n.rule("gba_common_layout", f"$python {_path(tools / 'common_layout.py')} $in $config $unit -o $out",
+               description="LAYOUT $out", restat=True)
         n.rule("gba_rename_data", f"{prefix_str}objcopy{exe} --rename-section .rodata=.rodata.$name "
                "--rename-section .data=.data.$name $in $out", description="OBJCOPY $out")
         n.rule("gba_strip_attributes", f"{prefix_str}objcopy{exe} -R .ARM.attributes $in $out",
@@ -600,6 +602,17 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 n.build(view, "gba_common_view", bases[unit],
                         implicit=binutils_stamp + [_path(tools / "common.ld")])
                 comparison_bases[unit] = view
+            # The final link places linked units' COMMON symbols in their
+            # recovered order (see gba/tools/common_layout.py). The linker
+            # script includes each fragment from beside its object.
+            common_layouts = []
+            for unit in sorted(_common_units(config_dir) & complete):
+                layout = _path(Path(bases[unit]).with_suffix(".common.ld"))
+                n.build(layout, "gba_common_layout", bases[unit],
+                        implicit=[_path(tools / "common_layout.py"), _path(tools / "split.py"),
+                                  _path(config_dir / "symbols.txt"), _path(config_dir / "splits.txt")],
+                        variables={"config": _path(config_dir), "unit": unit})
+                common_layouts.append(layout)
 
             asm = [_path(out / "asm" / f"{u}.s") for u in units]
             ldscript = _path(out / "ldscript.ld")
@@ -647,7 +660,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 config.extra_objdiff_units.append(unit_config)
 
             elf = _path(out / f"{program}.elf")
-            n.build(elf, "gba_ld", implicit=linked + [ldscript],
+            n.build(elf, "gba_ld", implicit=linked + [ldscript] + common_layouts,
                     variables={"ldscript": ldscript, "map": _path(out / f"{program}.map")})
             image = _path(out / bins[category].name)
             n.build(image, "gba_objcopy", elf)

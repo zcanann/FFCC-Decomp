@@ -1510,19 +1510,7 @@ void CGPartyObj::onFrameStat()
 		}
 		break;
 	case 0x0F:
-		if (m_stateFrame == 0) {
-			reqAnim(0x29, 0, 0);
-		}
-#ifdef VERSION_GCCP01
-		if (m_stateFrame == 4) {
-#else
-		if (m_stateFrame == 5) {
-#endif
-			changeWeapon(m_partyData.pendingWeaponIndex, m_partyData.pendingWeaponItemId, 1);
-		}
-		if (isLoopAnim() != 0) {
-			changeStat(0, 0, 0);
-		}
+		statWeaponChange();
 		break;
 	case 0x13:
 		if (m_stateFrame == 0) {
@@ -3338,15 +3326,26 @@ inline void CGPartyObj::statJump()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 336b
+ * EN Address: 0x80141850
+ * EN Size: 140b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void CGPartyObj::statWeaponChange()
 {
-	PartyObjOverlay& party = m_partyData;
-	changeWeapon(party.weaponIndex, party.weaponItemId, 0);
-
-	if (m_subFrame > 1) {
+	if (m_stateFrame == 0) {
+		reqAnim(0x29, 0, 0);
+	}
+#ifdef VERSION_GCCP01
+	if (m_stateFrame == 4) {
+#else
+	if (m_stateFrame == 5) {
+#endif
+		changeWeapon(m_partyData.pendingWeaponIndex, m_partyData.pendingWeaponItemId, 1);
+	}
+	if (isLoopAnim() != 0) {
 		changeStat(0, 0, 0);
 	}
 }

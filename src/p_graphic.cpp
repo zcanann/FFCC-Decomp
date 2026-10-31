@@ -902,17 +902,18 @@ inline void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int cent
  */
 inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor topColor, _GXColor bottomColor)
 {
+    float z = 0.0f;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(x0, y0, kGraphicZero);
+    GXPosition3f32(x0, y0, z);
     GXColor1u32(*(u32*)&topColor);
     GXTexCoord2u16(0, 0);
-    GXPosition3f32(x1, y0, kGraphicZero);
+    GXPosition3f32(x1, y0, z);
     GXColor1u32(*(u32*)&topColor);
     GXTexCoord2u16(2, 0);
-    GXPosition3f32(x1, y1, kGraphicZero);
+    GXPosition3f32(x1, y1, z);
     GXColor1u32(*(u32*)&bottomColor);
     GXTexCoord2u16(2, 2);
-    GXPosition3f32(x0, y1, kGraphicZero);
+    GXPosition3f32(x0, y1, z);
     GXColor1u32(*(u32*)&bottomColor);
     GXTexCoord2u16(0, 2);
 }

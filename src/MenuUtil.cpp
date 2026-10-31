@@ -294,10 +294,29 @@ struct MenuOptionMeterLayout {
 inline void CMenuPcs::CalcHelpLine(int msgNo, int& firstLine, int& lineMax)
 {
 	firstLine = 500;
+#ifdef VERSION_GCCJGC
+	if (0 <= msgNo && msgNo <= 0x9E) {
+		firstLine = msgNo * 3 + 0x1F5;
+		lineMax = 3;
+	} else if (0x9F <= msgNo && msgNo <= 0xFF) {
+		firstLine = msgNo + 0x333;
+		lineMax = 1;
+	} else if (0x100 <= msgNo && msgNo <= 0x206) {
+		firstLine = (msgNo - 0x100) * 2 + 0x433;
+		lineMax = 2;
+	} else if (0x207 <= msgNo && msgNo <= 0x258) {
+		firstLine = (msgNo - 0x207) * 3 + 0x641;
+		lineMax = 3;
+	} else if (0x259 <= msgNo && msgNo <= 0x268) {
+		firstLine = (msgNo - 0x259) * 3 + 0x737;
+		lineMax = 3;
+	}
+#else
 	if ((0 <= msgNo) && (msgNo <= 0x268)) {
 		firstLine = msgNo * 3 + 0x1F5;
 		lineMax = 3;
 	}
+#endif
 }
 
 /*
@@ -312,6 +331,16 @@ inline void CMenuPcs::CalcHelpLine(int msgNo, int& firstLine, int& lineMax)
 inline int CMenuPcs::GetLongHelpString(CFont* font, int firstLine, int lineMax)
 {
 	int maxWidth = -1;
+#ifdef VERSION_GCCJGC
+	for (int line = firstLine; line < firstLine + lineMax; line++) {
+		int width = CMes::drawTagString(font, Game.GetHelpName(line), 0, 0, 0);
+		if (width < maxWidth) {
+			width = maxWidth;
+		}
+		maxWidth = width;
+	}
+	return maxWidth;
+#else
 	CMemory::CStage* stage;
 	if (Game.m_gameWork.m_menuStageMode != 0) {
 		stage = MenuPcs.m_stageF4;
@@ -326,11 +355,7 @@ inline int CMenuPcs::GetLongHelpString(CFont* font, int firstLine, int lineMax)
 	for (int line = firstLine; line < firstLine + lineMax; line++) {
 		char* msg = Game.GetHelpName(line);
 		memset(temp, 0, 0x200);
-#ifdef VERSION_GCCJGC
-		CMes::MakeAgbString(temp, msg);
-#else
 		CMes::MakeAgbString(temp, msg, 0, 1);
-#endif
 		if (strlen(temp) != 0) {
 			int width = static_cast<int>(CMes::GetTagStringWidth(font, msg));
 			if (width < maxWidth) {
@@ -341,6 +366,7 @@ inline int CMenuPcs::GetLongHelpString(CFont* font, int firstLine, int lineMax)
 	}
 	delete[] temp;
 	return maxWidth;
+#endif
 }
 
 /*

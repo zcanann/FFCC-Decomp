@@ -491,9 +491,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			CMaterial* shadowMaterials[2] = {0, 0};
 			MtxPtr shadowMatrices[2] = {0, 0};
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, modelPos, 100.0f, 20.0f, 0);
+			int texMtxId = GX_TEXMTX1;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				const int shadowTexMap = shadowIndex + 3;
-				const int shadowTexMtxId = GX_TEXMTX1 + shadowIndex * 3;
+				const int shadowTexMtxId = texMtxId;
+				texMtxId += 3;
 				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), shadowMaterials[shadowIndex]->GetTexture(0));
 
 				Mtx shadowTexMtx;

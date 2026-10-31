@@ -340,6 +340,7 @@ void CGraphicPcs::drawBar()
 {
     Mtx44 ortho;
     Mtx identity;
+    CSystem::COrder* textOrder;
     C_MTXOrtho(ortho, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
@@ -424,17 +425,17 @@ void CGraphicPcs::drawBar()
     if (textFlag) {
         Graphic.InitDebugString();
 
-        order = System.GetFirstOrder();
+        textOrder = System.GetFirstOrder();
         x = kDebugBarLeft;
         int i = 0;
         y = 0x10;
         for (; i < orderCount; i++) {
-            const int priority = order->m_priority;
-            const float width = (kGraphicScreenCenterX * order->m_lastTime) / 100.0f;
+            const int priority = textOrder->m_priority;
+            const float width = (kGraphicScreenCenterX * textOrder->m_lastTime) / 100.0f;
 
             if (priority != 0x27) {
                 char debugString[260];
-                sprintf(debugString, "%s(%d) %.3f%%", order->m_debugName, order->m_insertIndex, order->m_lastTime);
+                sprintf(debugString, "%s(%d) %.3f%%", textOrder->m_debugName, textOrder->m_insertIndex, textOrder->m_lastTime);
 
                 if (priority == 0x17) {
                     char extraString[256];
@@ -449,7 +450,7 @@ void CGraphicPcs::drawBar()
                 x += width;
             }
 
-            order = System.GetNextOrder(order);
+            textOrder = System.GetNextOrder(textOrder);
             y += kDebugBarLineStep;
         }
     }

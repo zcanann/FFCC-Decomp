@@ -1120,6 +1120,7 @@ void CFlatRuntime2::Draw()
 
 		CDebugDrawCC* entry = m_debugDrawCCEntries;
 		for (int i = 0; i < m_debugDrawCCCount; i++, entry++) {
+			int k;
 			GXColor* drawColor;
 			if (entry->m_flagBits.m_bit6 != 0) {
 				drawColor = &redColor;
@@ -1174,15 +1175,15 @@ void CFlatRuntime2::Draw()
 				vtx += 3;
 			}
 
-			for (j = 0, vtx = verts; j < 8; j++) {
-				const float angle = 0.7853982f * static_cast<float>(j);
+			for (k = 0, vtx = verts; k < 8; k++) {
+				const float angle = 0.7853982f * static_cast<float>(k);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
 				GXWGFifo.f32 = vtx[0];
 				GXWGFifo.f32 = vtx[1];
 				GXWGFifo.f32 = vtx[2];
-				const int next = (j + 1) & 7;
+				const int next = (k + 1) & 7;
 				GXWGFifo.f32 = ringVerts[next * 3];
 				GXWGFifo.f32 = ringVerts[next * 3 + 1];
 				GXWGFifo.f32 = ringVerts[next * 3 + 2];

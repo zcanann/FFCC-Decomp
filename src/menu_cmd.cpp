@@ -282,22 +282,19 @@ void CMenuPcs::CmdInit()
  */
 inline void CMenuPcs::CmdInit0()
 {
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
-
-	for (s32 i = 0; i < list->count; i++) {
-		entries[i].alpha = 1.0f;
-		entries[i].scale = 1.0f;
+	s32 i;
+	s32 idx;
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+	CmdListEntry* entry = GetCmdListStorage(this)->entries;
+	for (i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++, entry++) {
+		entry->alpha = 1.0f;
+		entry->scale = 1.0f;
 	}
 
-	const u32 count = static_cast<u32>(Game.m_scriptFoodBase[0]->m_numCmdListSlots);
-	if (count == 0) {
-		return;
-	}
-
-	for (s32 i = static_cast<s32>(count) - 1, idx = 0; i >= 0; i--, idx++) {
-		entries[i].startFrame = idx;
-		entries[i].duration = 3;
+	for (i = static_cast<s32>(caravanWork->m_numCmdListSlots) - 1, idx = 0; i >= 0; i--, idx++) {
+		entry = &GetCmdListStorage(this)->entries[i];
+		entry->startFrame = idx;
+		entry->duration = 3;
 	}
 
 	GetCmdStateView(this)->commandResult = 0;
@@ -591,20 +588,7 @@ int CMenuPcs::CmdCtrl()
 	}
 
 	if (actionHandled != 0) {
-		CmdListEntry* entry = GetCmdListStorage(this)->entries;
-		CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
-		for (s32 i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++, entry++) {
-			entry->alpha = 1.0f;
-			entry->scale = 1.0f;
-		}
-
-		for (s32 i = static_cast<s32>(caravanWork->m_numCmdListSlots) - 1, idx = 0; i >= 0; i--, idx++) {
-			CmdListEntry* e = &GetCmdListStorage(this)->entries[i];
-			e->startFrame = idx;
-			e->duration = 3;
-		}
-
-		GetCmdStateView(this)->commandResult = 0;
+		CmdInit0();
 	}
 	return actionHandled;
 }

@@ -239,22 +239,24 @@ extern "C" void sendCombiToScript__10CGCharaObjFP10CGCharaObjii(CGCharaObj* self
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80144244
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline int CATEGOLY2TYPE(int value)
+inline int CATEGOLY2TYPE(int category)
 {
-	switch (value) {
-	case 0:
-		return 0;
+	switch (category) {
 	case 1:
-		return 9;
-	case 2:
-		return 6;
-	case 3:
-		return 2;
+	case 0x100:
+	case 0x125:
+		return 0;
+	case 0x190:
+		return 1;
 	default:
-		return -1;
+		return 2;
 	}
 }
 
@@ -1056,15 +1058,8 @@ void CGPartyObj::command()
 				changeStat(0x20, 0, 0);
 			}
 
-			CGObject* scriptTarget = party.secondaryTarget != nullptr ?
-				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target;
-			party.flags.commandActive = 1;
-
-			CFlatRuntime::CStack stack[2];
-			stack[0].m_word = primaryCommand;
-			stack[1].m_word = scriptTarget != nullptr ?
-				*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptTarget) + 0x30) : 0;
-			gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
+			callCommandScript(primaryCommand, party.secondaryTarget != nullptr ?
+				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target);
 			return;
 		}
 
@@ -1193,22 +1188,8 @@ void CGPartyObj::command()
 		*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(party.target) + 0x550) = this;
 		reinterpret_cast<CGPrgObj*>(party.target)->changeStat(0x0E, 0, 0);
 
+		int kindClass = CATEGOLY2TYPE(*reinterpret_cast<unsigned short*>(Game.m_itemTable + party.target->m_worldParamB * 0x48));
 		int itemIdx = party.target->m_worldParamB;
-		int kind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemIdx * 0x48);
-		int kindClass;
-		switch (kind) {
-		case 1:
-		case 0x100:
-		case 0x125:
-			kindClass = 0;
-			break;
-		case 0x190:
-			kindClass = 1;
-			break;
-		default:
-			kindClass = 2;
-			break;
-		}
 
 		if (kindClass == 0 || kindClass == 2) {
 			int addedItem;
@@ -1237,12 +1218,7 @@ void CGPartyObj::command()
 		}
 	}
 
-	CGObject* tgt = party.target;
-	party.flags.commandActive = 1;
-	CFlatRuntime::CStack stack[2];
-	stack[0].m_word = secondaryCommand;
-	stack[1].m_word = tgt != nullptr ? *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(tgt) + 0x30) : 0;
-	gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
+	callCommandScript(secondaryCommand, party.target);
 	if (secondaryCommand == 5) {
 		carry(1, static_cast<CGObject*>(0), 0);
 	} else if (secondaryCommand == 7 || secondaryCommand == 8) {
@@ -1254,47 +1230,21 @@ void CGPartyObj::command()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: 0x8013CBA4
+ * EN Size: 148b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline void CGPartyObj::callCommandScript(int mode, CGObject* target)
+inline void CGPartyObj::callCommandScript(int command, CGObject* target)
 {
-	m_partyData.target = target;
+	m_partyData.flags.commandActive = 1;
 
-	switch (mode) {
-	case 0:
-		if (target != nullptr && m_lastStateId == 0 && target != this) {
-			changeStat(0x0C, 0, 0);
-		}
-		break;
-	case 1:
-		if (m_lastStateId == 0) {
-			changeStat(1, 0, 0);
-		}
-		break;
-	case 2:
-		if (canPlayerUseItem() != 0) {
-			useItem(0);
-		}
-		break;
-	case 3:
-		if (canPlayerPutItem() != 0) {
-			putItem(0);
-		}
-		break;
-	case 4:
-		if (m_lastStateId == 0) {
-			changeStat(0x0B, 0, 0);
-		}
-		break;
-	case 5:
-		if (m_lastStateId == 0) {
-			changeStat(0x0D, 0, 0);
-		}
-		break;
-	default:
-		break;
-	}
+	CFlatRuntime::CStack stack[2];
+	stack[0].m_word = command;
+	stack[1].m_word = target != nullptr ? target->m_particleId : 0;
+	gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
 }
 
 /*

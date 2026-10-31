@@ -432,6 +432,7 @@ void CMesMenu::onCalc()
 void CMesMenu::onDraw()
 {
     float alpha255;
+    float baseX;
     static int tCut[4] = {1, 6, 7, 6};
 
     if ((m_menuIndex == 0) &&
@@ -527,7 +528,7 @@ void CMesMenu::onDraw()
 #else
         float posX = m_baseX + m_offsetX;
 #endif
-        float baseX = posX + pulseX;
+        baseX = posX + pulseX;
         float pulseY;
         if (maskY != 0) {
             pulseY = pulse;
@@ -731,9 +732,9 @@ void CMesMenu::onDraw()
                         iconEdgeX = (width - 144.0f) - (-10.0f);
                     }
                     anchorY = (iconAnchor - 1) & 2;
-                    float iconX = 0.0f;
-                    iconX = drawX + iconX;
-                    iconX += iconEdgeX;
+                    float wobble = 0.0f;
+                    float wobbleX = drawX + wobble;
+                    float iconX = wobbleX + iconEdgeX;
                     float iconEdgeY;
                     if (anchorY != 0) {
                         iconEdgeY = (-8.0f) + height;

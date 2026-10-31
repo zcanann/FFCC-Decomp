@@ -2098,8 +2098,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 #else
 	enum { kFadeFrames = 10, kArtifactDuration = 40 };
 #endif
-	CMenuPcs::Sprt2* sprite;
 	int i;
+	CMenuPcs::Sprt2* sprite;
 	int tribeId;
 	CCharaPcs::CHandle* handle;
 	int frame;
@@ -2193,8 +2193,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->motionY = 0.0f;
 			spr->targetX = (float)spr->x + spr->motionX;
 			spr->targetY = (float)spr->y + spr->motionY;
-			spr->flags = 1;
 			y += 0x60;
+			spr->flags = 1;
 		}
 
 		idx += activePartyCount;
@@ -2360,8 +2360,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
 			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			float fy = (float)sprite->y;
-			float ty = sprite->targetY;
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
+			float ty = sprite->targetY;
 			sprite->motionY = (ty - fy) * progress;
 		}
 

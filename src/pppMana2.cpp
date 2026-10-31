@@ -639,9 +639,9 @@ static void CalcReflectionVector2(
             C_VECReflect(&cameraVector, &objSpaceNormal, vtxReflection);
 
             float absAxis[3];
-            absAxis[0] = fabsf(vtxReflection->x);
-            absAxis[1] = fabsf(vtxReflection->y);
-            absAxis[2] = fabsf(vtxReflection->z);
+            absAxis[0] = __fabs(vtxReflection->x);
+            absAxis[1] = __fabs(vtxReflection->y);
+            absAxis[2] = __fabs(vtxReflection->z);
 
             axis = 0;
             maxAxis = absAxis[0];

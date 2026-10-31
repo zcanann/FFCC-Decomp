@@ -2371,10 +2371,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 			sprite = &m_bonusAnim->sprites[4 + i];
 			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
 			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
-			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
-			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
+			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
 			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
+			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
 			if ((double)m_wm.m_worldObjData[i].m_scissorX < 0.0) {
 				m_wm.m_worldObjData[i].m_scissorX = 0;
 			}

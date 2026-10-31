@@ -2438,14 +2438,13 @@ void CMenuPcs::CalcSelectOpenAnim()
 					angle = (float)(45.0 * (double)tribeId);
 				} else {
 					int last = sprite->timer - 1;
+					float step;
 					if (last <= fcvIndex) {
-						srcVec.x = s_AnimX[2] -
-						    (float)last * ((s_AnimX[2] - s_AnimX[1]) / (float)fcvIndex);
+						step = (s_AnimX[2] - s_AnimX[1]) / (float)fcvIndex;
+						srcVec.x = s_AnimX[2] - (float)last * step;
 					} else {
-						srcVec.x = s_AnimX[1] -
-						    ((s_AnimX[1] - s_AnimX[0]) /
-						    ((float)phase - (float)fcvIndex)) *
-						    (float)(last - fcvIndex);
+						step = (s_AnimX[1] - s_AnimX[0]) / ((float)phase - (float)fcvIndex);
+						srcVec.x = s_AnimX[1] - step * (float)(last - fcvIndex);
 					}
 					angle = (float)((-90.0) + (double)(rate * (float)last));
 				}

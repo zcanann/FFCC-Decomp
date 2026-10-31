@@ -3014,15 +3014,11 @@ void CMenuPcs::DrawMainMenu()
 	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
-		const double* pRmm1 = &DOUBLE_803314E8;
-		frameAlpha = static_cast<float>(*pRmm1 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (state > 0 && state < 4) {
-		const float* pOmm1 = &FLOAT_803313e8;
-		frameAlpha = *pOmm1;
+		frameAlpha = FLOAT_803313e8;
 	} else {
-		const double* pRmm2 = &DOUBLE_803314E8;
-		const double* pUmm1 = &DOUBLE_80331420;
-		frameAlpha = static_cast<float>(-(*pRmm2 * static_cast<double>(m_wmWorldState->m_frameCounter) - *pUmm1));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
 
 	DrawWMFrame0(1, frameAlpha);
@@ -3031,15 +3027,11 @@ void CMenuPcs::DrawMainMenu()
 		const int tileState = m_wmWorldState->m_mainState;
 		float tileAlpha;
 		if (tileState == 1) {
-			const double* pRmm3 = &DOUBLE_803314E8;
-			tileAlpha = static_cast<float>(*pRmm3 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			tileAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		} else if (tileState == 2) {
-			const float* pOmm3 = &FLOAT_803313e8;
-			tileAlpha = *pOmm3;
+			tileAlpha = FLOAT_803313e8;
 		} else {
-			const double* pRmm4 = &DOUBLE_803314E8;
-			const double* pUmm2 = &DOUBLE_80331420;
-			tileAlpha = static_cast<float>(-(*pRmm4 * static_cast<double>(m_wmWorldState->m_frameCounter) - *pUmm2));
+			tileAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 		}
 		tileAlpha *= 0.5;
 		DrawMainMenuBase(tileAlpha);
@@ -3052,18 +3044,13 @@ void CMenuPcs::DrawMainMenu()
 		const int helpState = m_wmWorldState->m_mainState;
 		float helpAlpha;
 		if (helpState == 1) {
-			const double* pRmm5 = &DOUBLE_803314E8;
-			helpAlpha = static_cast<float>(*pRmm5 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			helpAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		} else if (helpState == 2) {
-			const float* pOmm8 = &FLOAT_803313e8;
-			helpAlpha = *pOmm8;
+			helpAlpha = FLOAT_803313e8;
 		} else {
-			const double* pRmm6 = &DOUBLE_803314E8;
-			const double* pUmm3 = &DOUBLE_80331420;
-			helpAlpha = static_cast<float>(-(*pRmm6 * static_cast<double>(m_wmWorldState->m_frameCounter) - *pUmm3));
+			helpAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 		}
-		const double* pFmm1 = &DOUBLE_803314F0;
-		if (static_cast<double>(helpAlpha) > *pFmm1) {
+		if (static_cast<double>(helpAlpha) > DOUBLE_803314F0) {
 			DrawHelpBase(kMemoryCardBannerTexture, helpAlpha);
 
 #ifdef VERSION_GCCJGC
@@ -3179,18 +3166,13 @@ void CMenuPcs::DrawMCardMenu()
 	if (state > 0 && state < 4) {
 		float alpha;
 		if (state == 1) {
-			const double* pRate = &DOUBLE_803314E8;
-			alpha = (float)(*pRate * (double)(int)m_wmWorldState->m_frameCounter);
+			alpha = (float)(DOUBLE_803314E8 * (double)(int)m_wmWorldState->m_frameCounter);
 		} else if (state == 2) {
-			const float* pOne = &FLOAT_803313e8;
-			alpha = *pOne;
+			alpha = FLOAT_803313e8;
 		} else {
-			const double* pRate = &DOUBLE_803314E8;
-			const double* pFull = &DOUBLE_80331420;
-			alpha = (float)-(*pRate * (double)(int)m_wmWorldState->m_frameCounter - *pFull);
+			alpha = (float)-(DOUBLE_803314E8 * (double)(int)m_wmWorldState->m_frameCounter - DOUBLE_80331420);
 		}
-		const double* pThresh = &DOUBLE_803314F0;
-		if (alpha > *pThresh) {
+		if (alpha > DOUBLE_803314F0) {
 			DrawHelpBase(kMemoryCardBannerTexture, alpha);
 		}
 	}
@@ -3549,23 +3531,15 @@ void CMenuPcs::DrawCMakeMenu()
 	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
-		const double* pRate = &DOUBLE_803314E8;
-		frameAlpha = static_cast<float>(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter));
+		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (state == 1) {
-		const double* pRate = &DOUBLE_80331460;
-		const double* pOne = &DOUBLE_80331420;
-		frameAlpha = static_cast<float>(-(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter) - *pOne));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	} else if (state == 2) {
-		const float* pHalf = &FLOAT_80331434;
-		frameAlpha = *pHalf;
+		frameAlpha = FLOAT_80331434;
 	} else if (state == 3) {
-		const double* pRate = &DOUBLE_80331460;
-		const double* pHalf = &DOUBLE_803313F8;
-		frameAlpha = static_cast<float>(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter) + *pHalf);
+		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) + FLOAT_80331434);
 	} else {
-		const double* pRate = &DOUBLE_803314E8;
-		const double* pOne = &DOUBLE_80331420;
-		frameAlpha = static_cast<float>(-(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter) - *pOne));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
 
 	DrawWMFrame0(3, frameAlpha);
@@ -3576,15 +3550,11 @@ void CMenuPcs::DrawCMakeMenu()
 	if (contentState > 0 && contentState < 4) {
 		float contentAlpha;
 		if (contentState == 1) {
-			const double* pRate2 = &DOUBLE_803314E8;
-			contentAlpha = static_cast<float>(*pRate2 * static_cast<double>(contentWS->m_frameCounter));
+			contentAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(contentWS->m_frameCounter));
 		} else if (contentState == 2) {
-			const float* pOne2 = &FLOAT_803313e8;
-			contentAlpha = *pOne2;
+			contentAlpha = FLOAT_803313e8;
 		} else {
-			const double* pRate2 = &DOUBLE_803314E8;
-			const double* pOne2 = &DOUBLE_80331420;
-			contentAlpha = static_cast<float>(-(*pRate2 * static_cast<double>(contentWS->m_frameCounter) - *pOne2));
+			contentAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(contentWS->m_frameCounter) - FLOAT_803313e8));
 		}
 
 		DrawCharaBase();
@@ -3607,12 +3577,10 @@ void CMenuPcs::DrawCMakeMenu()
 		}
 
 		int textAlpha;
-		const float* pOneCmp = &FLOAT_803313e8;
-		if (contentAlpha > *pOneCmp) {
+		if (contentAlpha > FLOAT_803313e8) {
 			textAlpha = 0xFF;
 		} else {
-			const float* p255 = &FLOAT_80331458;
-			textAlpha = static_cast<int>(*p255 * contentAlpha);
+			textAlpha = static_cast<int>(FLOAT_80331458 * contentAlpha);
 		}
 		DrawHelpBase(kMemoryCardBannerTexture, contentAlpha);
 		if (m_wmWorldState->m_menuMode == 3) {
@@ -6620,39 +6588,31 @@ void CMenuPcs::DrawChara()
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			float alpha;
 			if (m_wmWorldState->m_mainState == 2) {
-				const float* pOneAl = &FLOAT_803313e8;
-				alpha = *pOneAl;
+				alpha = FLOAT_803313e8;
 			} else {
 				alpha = m_wm.m_handles[i + 0x20]->m_model->m_lightAlpha;
 			}
 			double colorScaleD;
 			if (selectedMask != 0) {
-				const double* pFull = &DOUBLE_80331420;
-				colorScaleD = *pFull;
+				colorScaleD = DOUBLE_80331420;
 			} else {
-				const double* pDim = &DOUBLE_80331448;
-				colorScaleD = *pDim;
+				colorScaleD = DOUBLE_80331448;
 			}
 			const float colorScale = static_cast<float>(colorScaleD);
-			const double* pAScale = &DOUBLE_80331508;
 			GXColor color;
 			color.r = static_cast<unsigned char>(FLOAT_80331458 * colorScale);
 			color.g = static_cast<unsigned char>(FLOAT_80331458 * colorScale);
 			color.b = static_cast<unsigned char>(FLOAT_80331458 * colorScale);
-			color.a = static_cast<unsigned char>(*pAScale * static_cast<double>(alpha));
+			color.a = static_cast<unsigned char>(DOUBLE_80331508 * static_cast<double>(alpha));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 			const float* pX1 = &FLOAT_8033161C;
-			const float* pX2 = &FLOAT_8033168C;
-			const float* pY1 = &FLOAT_803314cc;
-			const float* pSc1 = &FLOAT_80331690;
-			float x = *pX1 - *pX2;
-			float y = *pY1;
-			float scale = *pSc1;
+			float x = *pX1 - FLOAT_8033168C;
+			float y = FLOAT_803314cc;
+			float scale = FLOAT_80331690;
 			if (selectedMask != 0) {
-				const float* pSel = &FLOAT_803315d4;
-				scale *= *pSel;
-				x *= *pSel;
-				y *= *pSel;
+				scale *= FLOAT_803315d4;
+				x *= FLOAT_803315d4;
+				y *= FLOAT_803315d4;
 			}
 			MenuPcs.DrawRect3d(0, x, y, -50.0f, 128.0f, 104.0f,
 			                   FLOAT_803313dc, FLOAT_803313dc, scale, scale);

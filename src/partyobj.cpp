@@ -1472,25 +1472,7 @@ void CGPartyObj::onFrameStat()
 		statCharge();
 		break;
 	case 7:
-		if (m_stateFrame == 0) {
-			m_partyData.unk6D0 = 0;
-		}
-		if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
-			changeStat(1, 0, 0);
-		} else {
-			m_partyData.unk6D0++;
-#ifdef VERSION_GCCP01
-			if (m_partyData.unk6D0 >= 6) {
-#else
-			if (m_partyData.unk6D0 >= 8) {
-#endif
-				changeStat(6, 0, 0);
-			} else {
-				if ((Pad.GetButtonDown(m_animStateMisc) & 0x200) != 0) {
-					changeStat(0, 0, 0);
-				}
-			}
-		}
+		statAttackSel();
 		break;
 	case 0x0B:
 		statCarry();
@@ -1501,83 +1483,19 @@ void CGPartyObj::onFrameStat()
 		statPut();
 		break;
 	case 0x0E:
-		if (m_stateFrame == 0) {
-			reqAnim(9, 0, 0);
-			playSe3D(0x1F, 0x32, 0x96, 0, 0);
-		}
-		if (isLoopAnim() != 0) {
-			changeStat(0, 0, 0);
-		}
+		statPickup();
 		break;
 	case 0x0F:
 		statWeaponChange();
 		break;
 	case 0x13:
-		if (m_stateFrame == 0) {
-			damageDelete();
-			reqAnim(0x21, 0, 0);
-		}
-		if (isLoopAnim() != 0) {
-			changeStat(0, 0, 0);
-		}
+		statRebound();
 		break;
 	case 0x14:
-		switch (m_subState) {
-		case 0:
-			if (m_subFrame == 0) {
-				playSe3D(0x2F, 0x32, 0x96, 0, 0);
-				reqAnim(0x15, 0, 0);
-			}
-			if (isLoopAnim() != 0) {
-				changeSubStat(1);
-			}
-			break;
-		case 1:
-			if (m_subFrame == 0) {
-				m_alpha = 0.25f;
-				reqAnim(0x16, 1, 0);
-				enableDamageCol(0);
-			}
-			if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
-#ifdef VERSION_GCCP01
-				if (m_subFrame >= 0x19) {
-#else
-				if (m_subFrame >= 0x1E) {
-#endif
-					playSe3D(0x30, 0x32, 0x96, 0, 0);
-				}
-				m_alpha = 1.0f;
-				changeSubStat(2);
-				enableDamageCol(1);
-			}
-			break;
-		case 2:
-			if (m_subFrame == 0) {
-				reqAnim(0x17, 0, 0);
-			}
-			if (isLoopAnim() != 0) {
-				changeStat(0, 0, 0);
-			}
-			break;
-		}
+		statHide();
 		break;
 	case 0x15:
-		if (m_stateFrame == 0) {
-			playSe3D(0x40, 0x32, 0x96, 0, 0);
-			reqAnim(0x15, 0, 0);
-			enableDamageCol(0);
-		}
-#ifdef VERSION_GCCP01
-		if (m_stateFrame == 3 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-#else
-		if (m_stateFrame == 4 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-#endif
-			moveVectorHRot(3.1415927f + m_rotTargetY, 0.0f, 1.0f, 10);
-		}
-		if (isLoopAnim() != 0) {
-			changeStat(0, 0, 0);
-			enableDamageCol(1);
-		}
+		statJump();
 		break;
 	case 0x1A:
 		statKorobi();
@@ -1910,22 +1828,34 @@ void CGPartyObj::statCharge()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 376b
+ * EN Address: 0x8013E1DC
+ * EN Size: 224b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void CGPartyObj::statAttackSel()
 {
-	if (m_subState == 0 && m_subFrame == 0) {
-		putTargetParticle(0, 1);
+	if (m_stateFrame == 0) {
+		m_partyData.unk6D0 = 0;
 	}
-
-	unsigned short trig = Pad.GetButtonDown(m_animStateMisc);
-	if ((trig & 0x200) != 0) {
-		changeStat(0, 0, 0);
-		return;
+	if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
+		changeStat(1, 0, 0);
+	} else {
+		m_partyData.unk6D0++;
+#ifdef VERSION_GCCP01
+		if (m_partyData.unk6D0 >= 6) {
+#else
+		if (m_partyData.unk6D0 >= 8) {
+#endif
+			changeStat(6, 0, 0);
+		} else {
+			if ((Pad.GetButtonDown(m_animStateMisc) & 0x200) != 0) {
+				changeStat(0, 0, 0);
+			}
+		}
 	}
-
-	onStatAttack(1);
 }
 
 /*
@@ -2784,23 +2714,20 @@ void CGPartyObj::statPut()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 132b
+ * EN Address: 0x80140780
+ * EN Size: 136b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void CGPartyObj::statPickup()
 {
-	if (m_subState == 0 && m_subFrame == 0) {
-		reqAnim(0x21, 0, 0);
+	if (m_stateFrame == 0) {
+		reqAnim(9, 0, 0);
+		playSe3D(0x1F, 0x32, 0x96, 0, 0);
 	}
-
-	unsigned short trig = Pad.GetButtonDown(m_animStateMisc);
-	if ((trig & 0x200) != 0) {
-		changeStat(0, 0, 0);
-		return;
-	}
-
-	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
-		carry(0, reinterpret_cast<CGObject*>(m_partyData.carryTarget), 1);
+	if (isLoopAnim() != 0) {
 		changeStat(0, 0, 0);
 	}
 }
@@ -3219,22 +3146,20 @@ int CGPartyObj::putGil(int amount)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: 0x80141404
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void CGPartyObj::statRebound()
 {
-	if ((m_subState == 0) && (m_subFrame == 0)) {
-		reqAnim(0x1C, 0, 0);
-		enableDamageCol(0);
+	if (m_stateFrame == 0) {
+		damageDelete();
+		reqAnim(0x21, 0, 0);
 	}
-
-	if (m_subFrame == 8) {
-		playSe3D(0x22, 0x32, 0x96, 0, 0);
-	}
-
-	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
-		enableDamageCol(1);
+	if (isLoopAnim() != 0) {
 		changeStat(0, 0, 0);
 	}
 }
@@ -3282,45 +3207,81 @@ void CGPartyObj::statKorobi()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 504b
+ * EN Address: 0x801415A8
+ * EN Size: 428b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void CGPartyObj::statHide()
 {
-	if (m_subFrame == 0) {
-		enableDamageCol(0);
-		commandFinished();
-		CancelMove(1);
-	}
-
-	moveCenterTargetParticle();
-	checkTargetParticle();
-
-	if (m_subFrame > 0x20) {
-		enableDamageCol(1);
-		changeStat(0, 0, 0);
+	switch (m_subState) {
+	case 0:
+		if (m_subFrame == 0) {
+			playSe3D(0x2F, 0x32, 0x96, 0, 0);
+			reqAnim(0x15, 0, 0);
+		}
+		if (isLoopAnim() != 0) {
+			changeSubStat(1);
+		}
+		break;
+	case 1:
+		if (m_subFrame == 0) {
+			m_alpha = 0.25f;
+			reqAnim(0x16, 1, 0);
+			enableDamageCol(0);
+		}
+		if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
+#ifdef VERSION_GCCP01
+			if (m_subFrame >= 0x19) {
+#else
+			if (m_subFrame >= 0x1E) {
+#endif
+				playSe3D(0x30, 0x32, 0x96, 0, 0);
+			}
+			m_alpha = 1.0f;
+			changeSubStat(2);
+			enableDamageCol(1);
+		}
+		break;
+	case 2:
+		if (m_subFrame == 0) {
+			reqAnim(0x17, 0, 0);
+		}
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
+		break;
 	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 244b
+ * EN Address: 0x80141754
+ * EN Size: 252b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void CGPartyObj::statJump()
 {
-	if ((m_subState == 0) && (m_subFrame == 0)) {
-		reqAnim(0x22, 0, 0);
+	if (m_stateFrame == 0) {
+		playSe3D(0x40, 0x32, 0x96, 0, 0);
+		reqAnim(0x15, 0, 0);
 		enableDamageCol(0);
 	}
-
-	if (m_subFrame == 1) {
-		playSe3D(0x1F, 0x32, 0x96, 0, 0);
+#ifdef VERSION_GCCP01
+	if (m_stateFrame == 3 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+#else
+	if (m_stateFrame == 4 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+#endif
+		moveVectorHRot(3.1415927f + m_rotTargetY, 0.0f, 1.0f, 10);
 	}
-
 	if (isLoopAnim() != 0) {
-		enableDamageCol(1);
 		changeStat(0, 0, 0);
+		enableDamageCol(1);
 	}
 }
 

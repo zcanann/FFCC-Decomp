@@ -43,6 +43,19 @@ def common_symbols(path: Path) -> Dict[str, Tuple[int, int]]:
     return result
 
 
+def fragment(split, configured, compiled: Dict[str, Tuple[int, int]]) -> str:
+    """Linker script text placing configured COMMON symbols at their addresses."""
+    out = []
+    for s in configured:
+        align, size = compiled[s.name]
+        out += [f". = ALIGN({align});",
+                f"ASSERT(ABSOLUTE(.) == 0x{s.address:08X}, \"{s.name}: COMMON layout differs from config\");",
+                f"{s.name} = .;",
+                f". += 0x{size:X};"]
+    out.append(f"ASSERT(ABSOLUTE(.) == 0x{split.end:08X}, \"{split.unit}: COMMON range end differs from config\");")
+    return "\n".join(out) + "\n"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("object", type=Path)
@@ -65,15 +78,7 @@ def main() -> None:
         extra = sorted(compiled.keys() - names)
         sys.exit(f"{args.unit}: COMMON symbols differ from config; missing {missing}, unexpected {extra}")
 
-    out = []
-    for s in configured:
-        align, size = compiled[s.name]
-        out += [f". = ALIGN({align});",
-                f"ASSERT(ABSOLUTE(.) == 0x{s.address:08X}, \"{s.name}: COMMON layout differs from config\");",
-                f"{s.name} = .;",
-                f". += 0x{size:X};"]
-    out.append(f"ASSERT(ABSOLUTE(.) == 0x{split.end:08X}, \"{args.unit}: COMMON range end differs from config\");")
-    text = "\n".join(out) + "\n"
+    text = fragment(split, configured, compiled)
     if not args.output.exists() or args.output.read_text() != text:
         args.output.write_text(text)
 

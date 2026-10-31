@@ -497,6 +497,8 @@ class Emitter:
 
 def common_layout_path(obj: str) -> str:
     """The linker script fragment placing a compiled object's COMMON symbols."""
+    if len(obj) > 1 and obj[0] == obj[-1] == '"':
+        return '"' + common_layout_path(obj[1:-1]) + '"'
     return (obj[:-2] if obj.endswith(".o") else obj) + ".common.ld"
 
 

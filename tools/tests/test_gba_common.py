@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from gba.tools.gbaanalysis import Analysis, EWRAM_BASE, IWRAM_BASE
+from gba.tools.common_layout import common_symbols, fragment
 from gba.tools.split import Emitter, Split, Symbol, parse_splits, write_splits
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -66,6 +67,9 @@ class GbaCommonTests(unittest.TestCase):
                     emitter = Emitter(Analysis(EWRAM_BASE, bytes(16 if loaded else 12)), [], ranges)
                     objects = {name: '"' + (work / (name + ".o")).as_posix() + '"'
                                for name in ("owner", "other")}
+                    shared = Symbol("shared", ".common", address, "object", 4)
+                    (work / "owner.common.ld").write_text(
+                        fragment(ranges[3], [shared], common_symbols(work / "owner.o")))
                     (work / "final.ld").write_text(emitter.linker_script(objects, set(objects)))
                     tool("ld", "-T", work / "final.ld", "-o", work / "final.elf")
                     tool("objcopy", "-O", "binary", "-j", ".text", "-j", ".data",

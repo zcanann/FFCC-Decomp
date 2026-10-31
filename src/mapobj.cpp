@@ -319,7 +319,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     Init();
 
     chunkFile.PushChunk();
-    short objIndex = this - g_MapMng.GetMapObjArray();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
@@ -407,7 +406,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PLIT: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
             CMapObjAtrPointLight* pointLight =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
@@ -483,7 +482,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_SLIT: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
             CMapObjAtrSpotLight* spotLight =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x139) CMapObjAtrSpotLight();
@@ -757,7 +756,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_MIME: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
             CMapObjAtrMime* mimeAttr =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
@@ -840,7 +839,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PSTA: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
             CMapObjAtrPlaySta* playSta =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x39B) CMapObjAtrPlaySta();

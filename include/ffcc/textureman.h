@@ -78,6 +78,10 @@ public:
     void SetTlutColor(int, _GXColor);
     static _GXColor GetExternalTlutColor(void*, int, int);
     static void SetExternalTlutColor(void*, int, int, _GXColor&);
+    void SetExternalTlutColor(void* tlut, int index, _GXColor& color)
+    {
+        SetExternalTlutColor(tlut, GetNumTlut(), index, color);
+    }
     void FlushTlut();
     void FlushExternalTlut(void*);
 

@@ -487,18 +487,7 @@ void CFont::SetTlut(int index)
  */
 void CFont::SetTlutColor(int tlutIndex, int colorIndex, _GXColor color)
 {
-	unsigned int format = texturePtr->m_format;
-	int colorCount;
-
-	if (format == 9) {
-		colorCount = 0x100;
-	} else if (format == 8) {
-		colorCount = 0x10;
-	} else {
-		colorCount = 0;
-	}
-
-	texturePtr->SetExternalTlutColor(&m_tlutData[tlutIndex * 0x40], colorCount, colorIndex, color);
+	texturePtr->SetExternalTlutColor(&m_tlutData[tlutIndex * 0x40], colorIndex, color);
 }
 
 /*

@@ -606,10 +606,11 @@ void CMenuPcs::createSingleMenu()
         }
     } else {
         if (m_singleMenuStageActive == 0) {
-            m_stageF0 = CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM];
+            m_stageF0 = CharaPcs.GetAnimStage();
             m_singleMenuStageActive = 1;
         }
 
+        FFCC_ASSERT(m_fonts[4] == 0);
 #ifdef VERSION_GCCJGC
         loadFont(1, "dvd/menu/subfont.fnt", 4, -1);
 #else
@@ -629,6 +630,8 @@ void CMenuPcs::createSingleMenu()
             m_singMenuState = 0;
             m_menuWindowInfo = 0;
             m_shopMenu = 0;
+        } else {
+            FFCC_ASSERT(0);
         }
     }
 }
@@ -1607,43 +1610,57 @@ void CMenuPcs::SingleDrawCtrl()
  */
 void CMenuPcs::DrawSingleHelpWim(float alpha)
 {
+    int posX;
+    int posY;
+    int width;
+    int height;
+
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int alphaInt = static_cast<int>(255.0f * alpha);
     _GXColor color;
     color.r = 0xFF;
     color.g = 0xFF;
     color.b = 0xFF;
-    color.a = static_cast<u8>(alphaInt);
+    color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
     MenuPcs.SetTexture(SingMenuTex(0x23));
-    MenuPcs.DrawRect(0, 32.0f, 312.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, 576.0f, 312.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 32.0f, 384.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(0xC, 576.0f, 384.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 32;
+    posY = 312;
+    width = 32;
+    height = 32;
+    MenuPcs.DrawRect(0, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 576;
+    MenuPcs.DrawRect(8, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 32;
+    posY = 384;
+    MenuPcs.DrawRect(4, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 576;
+    MenuPcs.DrawRect(0xC, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(SingMenuTex(0x27));
-    MenuPcs.DrawRect(0, 64.0f, 312.0f, 512.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 64.0f, 384.0f, 512.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 64;
+    posY = 312;
+    width = 512;
+    MenuPcs.DrawRect(0, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    posY = 384;
+    MenuPcs.DrawRect(4, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(SingMenuTex(0x24));
-    MenuPcs.DrawRect(0, 32.0f, 344.0f, 32.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, 576.0f, 344.0f, 32.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 32;
+    posY = 344;
+    width = 32;
+    height = 40;
+    MenuPcs.DrawRect(0, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 576;
+    MenuPcs.DrawRect(8, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(SingMenuTex(0x2B));
-    MenuPcs.DrawRect(8, 64.0f, 344.0f, 512.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
+    posX = 64;
+    width = 512;
+    MenuPcs.DrawRect(8, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -2460,8 +2477,6 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 #else
     unsigned short raceBits;
     int raceType;
-    char* text;
-    char* suffix;
 
     GetItemType(itemNo, 1);
     raceBits = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[itemNo].m_equipFlags;
@@ -2470,25 +2485,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     outText[0] = '\0';
 
     if (raceLow == 0xF) {
-        switch (Game.m_gameWork.m_languageId) {
-        case 2:
-            text = (char*)s_MenuStr_ge[19];
-            break;
-        case 3:
-            text = (char*)s_MenuStr_it[19];
-            break;
-        case 4:
-            text = (char*)s_MenuStr_fr[19];
-            break;
-        case 5:
-            text = (char*)s_MenuStr_sp[19];
-            break;
-        case 1:
-        default:
-            text = (char*)s_MenuStr_us[19];
-            break;
-        }
-        strcpy(outText, text);
+        strcpy(outText, GetMenuStr(19));
         return;
     }
 
@@ -2499,26 +2496,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     }
 
     if (raceType < 4) {
-        switch (Game.m_gameWork.m_languageId) {
-        case 2:
-            text = (char*)s_TribeStr_ge[raceType];
-            break;
-        case 3:
-            text = (char*)s_TribeStr_it[raceType];
-            break;
-        case 4:
-            text = (char*)s_TribeStr_fr[raceType];
-            break;
-        case 5:
-            text = (char*)s_TribeStr_sp[raceType];
-            break;
-        case 1:
-        default:
-            text = (char*)s_TribeStr_us[raceType];
-            break;
-        }
-
-        strcpy(outText, text);
+        strcpy(outText, GetTribeStr(raceType));
         if (static_cast<int>(Game.m_gameWork.m_languageId) == 2) {
             strcat(outText, "s");
         }
@@ -2527,30 +2505,13 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     if (raceLow != 0 && genderMask != 0) {
         strcpy(outText, " ");
     }
+
     if (genderMask == 0) {
         return;
     }
 
     raceType = (genderMask >> 5) & 1;
-    switch (Game.m_gameWork.m_languageId) {
-    case 2:
-        suffix = (char*)s_MenuStr_ge[raceType + 17];
-        break;
-    case 3:
-        suffix = (char*)s_MenuStr_it[raceType + 17];
-        break;
-    case 4:
-        suffix = (char*)s_MenuStr_fr[raceType + 17];
-        break;
-    case 5:
-        suffix = (char*)s_MenuStr_sp[raceType + 17];
-        break;
-    case 1:
-    default:
-        suffix = (char*)s_MenuStr_us[raceType + 17];
-        break;
-    }
-    strcat(outText, suffix);
+    strcat(outText, GetMenuStr(raceType + 17));
 #endif
 }
 

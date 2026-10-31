@@ -265,9 +265,6 @@ libc/stdlib/mprec:
 course:
 	.rodata     start:0x02013BD8 end:0x02014648 align:4
 
-regional_data:
-	.rodata     start:0x02014648 end:0x02014650
-
 sound_data:
 	.data       start:0x02014650 end:0x02015860 align:4
 

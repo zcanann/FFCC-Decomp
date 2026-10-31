@@ -259,14 +259,8 @@ main/session:
 main/artifact:
 	.bss        start:0x03002774 end:0x0300277C align:4
 
-regional_bss:
-	.bss        start:0x0300277C end:0x03002780
-
 main/cmake:
 	.bss        start:0x03002780 end:0x030027AD align:8
-
-regional_bss:
-	.bss        start:0x030027AD end:0x030027B0 align:1
 
 main/cmdlist:
 	.bss        start:0x030027B0 end:0x030027C0 align:4
@@ -274,20 +268,11 @@ main/cmdlist:
 main/family:
 	.bss        start:0x030027C0 end:0x030027C2 align:4
 
-regional_bss:
-	.bss        start:0x030027C2 end:0x030027C4 align:1
-
 main/equip:
 	.bss        start:0x030027C4 end:0x030027C9 align:4
 
-regional_bss:
-	.bss        start:0x030027C9 end:0x030027CC align:1
-
 main/item:
 	.bss        start:0x030027CC end:0x030027D6 align:4
-
-regional_bss:
-	.bss        start:0x030027D6 end:0x030027D8 align:1
 
 main/letter:
 	.bss        start:0x030027D8 end:0x030027F4 align:4
@@ -295,20 +280,11 @@ main/letter:
 main/menu:
 	.bss        start:0x030027F4 end:0x030027F6 align:4
 
-regional_bss:
-	.bss        start:0x030027F6 end:0x030027F8 align:1
-
 main/radar:
 	.bss        start:0x030027F8 end:0x030027F9 align:4
 
-regional_bss:
-	.bss        start:0x030027F9 end:0x030027FC align:1
-
 main/gil:
 	.bss        start:0x030027FC end:0x0300280A align:4
-
-regional_bss:
-	.bss        start:0x0300280A end:0x0300280C align:1
 
 main/scouter:
 	.bss        start:0x0300280C end:0x03002814 align:4
@@ -316,17 +292,11 @@ main/scouter:
 main/shop:
 	.bss        start:0x03002814 end:0x0300281F align:4
 
-regional_bss:
-	.bss        start:0x0300281F end:0x03002820 align:1
-
 main/smith:
 	.bss        start:0x03002820 end:0x03002840 align:8
 
 main/favorite:
 	.bss        start:0x03002840 end:0x0300284A align:8
-
-regional_bss:
-	.bss        start:0x0300284A end:0x0300284C align:1
 
 main/tmpartifact:
 	.bss        start:0x0300284C end:0x03002850 align:4
@@ -341,13 +311,7 @@ main/xfer:
 	.common     start:0x03002AE0 end:0x03002B00 align:4
 
 main/session:
-	.common     start:0x03002B00 end:0x03002FA4 align:16
-
-main/cmake:
-	.common     start:0x03002FB0 end:0x03002FCC align:16
-
-regional_bss:
-	.bss        start:0x03002FD0 end:0x03003090
+	.common     start:0x03002B00 end:0x03003084 align:16
 
 main/mode:
 	.common     start:0x03003090 end:0x03003300 align:16

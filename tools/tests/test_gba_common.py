@@ -35,6 +35,15 @@ class GbaCommonTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 parse_splits(path)
 
+    def test_common_range_starts_at_object_alignment(self):
+        configured = [Symbol("flag", ".common", IWRAM_BASE + 16, "object", 4),
+                      Symbol("table", ".common", IWRAM_BASE + 32, "object", 32)]
+        compiled = {"flag": (4, 4), "table": (16, 32)}
+        text = fragment(Split("owner", ".common", IWRAM_BASE + 16, IWRAM_BASE + 64), configured, compiled)
+        self.assertTrue(text.startswith(". = ALIGN(16);\n"))
+        text = fragment(Split("owner", ".common", IWRAM_BASE + 16, IWRAM_BASE + 64, 8), configured, compiled)
+        self.assertTrue(text.startswith(". = ALIGN(8);\n"))
+
     @unittest.skipUnless((BIN / ("arm-none-eabi-ld" + EXE)).is_file(), "GBA binutils required")
     def test_claimed_common_does_not_move_unclaimed_storage(self):
         def tool(name, *args):

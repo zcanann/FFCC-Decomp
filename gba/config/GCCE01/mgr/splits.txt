@@ -268,9 +268,6 @@ libc/arm/syscalls:
 course:
 	.rodata     start:0x02013C14 end:0x02014684 align:4
 
-regional_data:
-	.rodata     start:0x02014684 end:0x02014690
-
 sound_data:
 	.data       start:0x02014690 end:0x020158A0 align:4
 

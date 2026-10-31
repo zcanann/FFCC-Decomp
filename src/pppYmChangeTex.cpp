@@ -105,8 +105,8 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	Mtx modelMtx;
 	int cutoffYFixed;
 	short cutoffY;
-	u8 negativeRamp;
 	unsigned char fallbackAlpha;
+	u8 negativeRamp;
 
 	if (ppvUserStopPartF != 0) {
 		return;
@@ -212,9 +212,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				for (int tries = 7; tries != 0; tries--) {
 					if ((float)delta > threshold * 0.5f) {
 						if (negativeRamp == 0xFF) {
-							vertColors->a = negativeRamp - (level << 4);
+							vertColors[v].a = negativeRamp - (level << 4);
 						} else {
-							vertColors->a = (u8)(level << 4);
+							vertColors[v].a = (u8)(level << 4);
 						}
 						break;
 					}
@@ -222,10 +222,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 					level = level + 1;
 				}
 			} else {
-				vertColors->a = fallbackAlpha;
+				vertColors[v].a = fallbackAlpha;
 			}
 
-			vertColors++;
 		}
 
 	}

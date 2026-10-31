@@ -1454,6 +1454,7 @@ void CMenuPcs::DrawResultCountAnim()
 	int lastKind;
 	int modelIndex;
 	int activePartyCount;
+	CMenuPcs::Sprt2* sprite;
 
 	if (this->m_bonusState->m_initialized == 0) {
 		return;
@@ -1468,7 +1469,7 @@ void CMenuPcs::DrawResultCountAnim()
 
 	doubleCount = activePartyCount * 2;
 	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
-		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
+		sprite = &m_bonusAnim->sprites[i];
 
 		if (sprite->kind >= 0 || sprite->kind == -2) {
 			if (sprite->kind == -2) {
@@ -1549,7 +1550,7 @@ void CMenuPcs::DrawResultCountAnim()
 	int textIndex;
 	char text[128];
 	for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
-		Sprt2* sprite = &m_bonusAnim->sprites[i];
+		sprite = &m_bonusAnim->sprites[i];
 		if (sprite->kind == -1) {
 			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
@@ -2507,6 +2508,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	int i;
 	int kind;
 	int lastKind;
+	float lineY;
 	CMenuPcs::Sprt2* artiSprite;
 
 	activePartyCount = s_Rinfo->m_partyCount;
@@ -2695,9 +2697,9 @@ void CMenuPcs::DrawSelectOpenAnim()
 		strlen(converted);
 
 #ifdef VERSION_GCCP01
-		float lineY = centerY - 11.0f - 7.0f;
+		lineY = centerY - 11.0f - 7.0f;
 #else
-		float lineY = centerY - 11.0f;
+		lineY = centerY - 11.0f;
 #endif
 		for (int line = 0;; line++) {
 			char* lineText = (line != 0) ? strtok(0, const_cast<char*>("\n")) : strtok(converted, const_cast<char*>("\n"));

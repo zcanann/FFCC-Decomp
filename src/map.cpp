@@ -1024,9 +1024,8 @@ int CMapMng::ReadMtx(char* mapName)
  */
 int CMapMng::ReadMpl(char* mapName)
 {
-    char* strTmp = g_StrTmp;
-
     g_MapMng.SetDraw(1);
+    char* strTmp = g_StrTmp;
 
     for (int loadIndex = 0;; loadIndex++) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);

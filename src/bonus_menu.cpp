@@ -3375,7 +3375,6 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameCornerTexture));
 	const float right = (x + w) - corner;
-	const float bottom = (y + h) - corner;
 	for (int i = 0; i < 4; i++) {
 		float drawX;
 		float drawY;
@@ -3393,12 +3392,12 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 			texV = 0.0f;
 		} else if (i == 2) {
 			drawX = x;
-			drawY = bottom;
+			drawY = (y + h) - corner;
 			texU = 0.0f;
 			texV = corner;
 		} else {
 			drawX = right;
-			drawY = bottom;
+			drawY = (y + h) - corner;
 			texU = corner;
 			texV = corner;
 		}
@@ -3410,7 +3409,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	float innerW = (float)((double)w - 64.0);
 	MenuPcs.DrawRect(0, xCorner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameBottomTexture));
-	MenuPcs.DrawRect(0, xCorner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, xCorner, (y + h) - corner, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameLeftTexture));
 	float innerH = (float)((double)h - 64.0);
 	float yCorner = corner + y;

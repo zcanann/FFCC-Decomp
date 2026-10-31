@@ -918,9 +918,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
     for (i = 0; i < work->m_maxParticles; i++) {
         if (particle->m_life != 0) {
             count = step->m_drawCount;
+            lastIndex = particle->m_historyCount - 1;
             countMinusOne = (float)(count - 1);
             alphaMul = (float)colorWork->m_alpha / 16384.0f;
-            lastIndex = particle->m_historyCount - 1;
             S4ToF32(&colorStart, work->m_colorStart);
             S4ToF32(&colorEnd, work->m_colorEnd);
             colorStart.w *= alphaMul;

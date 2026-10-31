@@ -873,6 +873,10 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
         if (particle->m_life != 0) {
             segCursor = 0.0f;
             count = step->m_drawCount;
+            nextIndex = particle->m_historyIndex;
+            shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) +
+                                                     shapeAnim->m_frames[particle->m_drawFrame].m_shapeOffset);
+            lastIndex = particle->m_historyCount - 1;
             countMinusOne = (float)(count - 1);
             alphaMul = (float)colorWork->m_alpha / 16384.0f;
             U8ToF32(&colorStart, (u8*)&step->m_colorStart);
@@ -883,10 +887,6 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
             diffR = colorStart.x - colorEnd.x;
             diffG = colorStart.y - colorEnd.y;
             diffB = colorStart.z - colorEnd.z;
-            lastIndex = particle->m_historyCount - 1;
-            nextIndex = particle->m_historyIndex;
-            shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) +
-                                                     shapeAnim->m_frames[particle->m_drawFrame].m_shapeOffset);
             if (countMinusOne != segCursor) {
                 colorStepR = diffR / countMinusOne;
                 colorStepG = diffG / countMinusOne;

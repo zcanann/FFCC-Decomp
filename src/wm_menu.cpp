@@ -5047,10 +5047,11 @@ static inline void SetPortTownName(char* dst, const char* townName)
 void CMenuPcs::CalcFukidashi()
 {
 	int padIdx;
-	int i;
 	int slotIdx;
 	int cnt;
 	WmWorldObjInfo* slot;
+	int viewportX;
+	int viewportY;
 	if (m_wmBubbleVisible != 1) {
 		return;
 	}
@@ -5193,10 +5194,10 @@ void CMenuPcs::CalcFukidashi()
 #endif
 
 	// Setup model viewport slots
-	int viewportY = m_wm.m_bubbleData->m_sprites[0].m_y - 0x0E;
-	int viewportX = m_wm.m_bubbleData->m_sprites[0].m_x - 0x28;
-	for (i = 6; i <= 16; i++) {
-		slot = &m_wm.m_worldObjData[i];
+	viewportY = m_wm.m_bubbleData->m_sprites[0].m_y - 0x0E;
+	viewportX = m_wm.m_bubbleData->m_sprites[0].m_x - 0x28;
+	for (cnt = 6; cnt <= 16; cnt++) {
+		slot = &m_wm.m_worldObjData[cnt];
 		slot->m_active = 0;
 		slot->m_viewportX = viewportX;
 		slot->m_viewportY = viewportY;
@@ -9480,6 +9481,8 @@ void CMenuPcs::SetMcWinInfo(int x, int y)
  */
 void CMenuPcs::DrawMcWin(short state, short kind)
 {
+	double innerWidthD;
+	float innerX;
 	if (state >= 0 && m_menuWindowInfo->state != state) {
 		m_menuWindowInfo->state = state;
 	}
@@ -9552,8 +9555,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 2 : kMcWindowTextureBase + 1));
-	const float innerX = 32.0f + sx;
-	const double innerWidthD = static_cast<double>(sw) - 64.0;
+	innerX = 32.0f + sx;
+	innerWidthD = static_cast<double>(sw) - 64.0;
 	float y = sy;
 	const float innerWidthF = static_cast<float>(innerWidthD);
 	for (rectIdx = 0; rectIdx < 2; rectIdx++) {

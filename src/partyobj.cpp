@@ -1085,7 +1085,9 @@ void CGPartyObj::command()
 					return;
 				}
 
-				m_itemId = getEquipWeaponInventoryItem(caravan);
+				CCaravanWork* work = caravan;
+				short equip = work->m_equipment[0];
+				m_itemId = equip >= 0 ? work->m_inventoryItems[equip] : 0;
 				changeStat(7, 0, 0);
 				return;
 			}

@@ -1807,6 +1807,7 @@ void CShopMenu::DrawSmith0()
 #ifdef VERSION_GCCJGC
 void CShopMenu::DrawMake()
 {
+    int i;
     DrawMakeBase();
 
     drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, 0.0f, 0);
@@ -1879,7 +1880,7 @@ void CShopMenu::DrawMake()
     int rowY = 300;
     CMenuPcs::MaterialInfo recipeMaterial;
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
-    for (int i = 0; i < 3; i++, rowY += 0x1E) {
+    for (i = 0; i < 3; i++, rowY += 0x1E) {
         if (recipeMaterial.m_itemNo[i] <= 0) {
             break;
         }

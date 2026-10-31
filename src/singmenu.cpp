@@ -949,6 +949,8 @@ void CMenuPcs::DrawSingleStat(float alpha)
 {
     CFont* font;
     float y;
+    int i;
+    char* label;
 #ifdef VERSION_GCCP01
     int languageId = Game.m_gameWork.m_languageId;
 #endif
@@ -1065,7 +1067,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     float statYStep = 36.0f;
     float statPosX0 = 592.0f;
     y = statY0;
-    for (int i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         font->SetPosX(440.0f);
 #ifdef VERSION_GCCJGC
         font->SetPosY(y);
@@ -1073,7 +1075,6 @@ void CMenuPcs::DrawSingleStat(float alpha)
         font->SetPosY(y - 4.0f);
 #endif
 
-        char* label;
 #ifdef VERSION_GCCJGC
         label = GetMenuStr(i + 5);
 #else

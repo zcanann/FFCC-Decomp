@@ -871,7 +871,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
     u32 shapeFrameStep;
     float segDy;
     float colorStepA;
-    float curX;
     float diffB;
     u32 shapeFrameCount;
     float curY;
@@ -917,6 +916,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
 
     for (i = 0; i < work->m_maxParticles; i++) {
         if (particle->m_life != 0) {
+            float curX;
             count = step->m_drawCount;
             lastIndex = particle->m_historyCount - 1;
             countMinusOne = (float)(count - 1);

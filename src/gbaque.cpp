@@ -1992,6 +1992,7 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 	CCaravanWork* scriptFood;
 	char* subjectWrite;
 	char tempName[kGbaQueueLetterTempNameBytes];
+	int j;
 
 	scriptFood = Game.m_scriptFoodBase[channel];
 
@@ -2043,7 +2044,7 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 
 		const CCaravanWork::CLetterWork* cur = &scriptFood->m_letters[i];
 
-		for (int j = 0; j < i; j++) {
+		for (j = 0; j < i; j++) {
 			const CCaravanWork::CLetterWork* prev = &scriptFood->m_letters[j];
 			if (cur->SenderId() == prev->SenderId()) {
 				matchedNpc = j;

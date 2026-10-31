@@ -1233,6 +1233,7 @@ void CMemoryCardMan::MakeSaveData()
 void CMemoryCardMan::SetLoadData()
 {
     Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
+    int c;
 
     if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
@@ -1303,7 +1304,7 @@ void CMemoryCardMan::SetLoadData()
 
     int count;
     int i;
-    for (int c = 0; c < 8; c++)
+    for (c = 0; c < 8; c++)
     {
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
         CCaravanWork* caravanWork = &g->m_caravanWorkArr[c];

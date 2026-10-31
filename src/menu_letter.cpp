@@ -1150,6 +1150,7 @@ void CMenuPcs::LetterDraw()
 void CMenuPcs::LetterListDraw()
 {
 	SingleFadeEntry* panels = m_singleFadeState->entries;
+	CCaravanWork::CLetterWork* letter;
 
 	if ((static_cast<char>(s_OpenClose) != 0) && (static_cast<char>(m_singleMenuCtrlResetFlag) == '\0')) {
 		DrawSingleCrescent(1.0f,
@@ -1191,7 +1192,7 @@ void CMenuPcs::LetterListDraw()
 	int letterIndex;
 	float yf;
 	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
-		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
+		letter = &caravanWork->m_letters[letterIndex];
 		yf = static_cast<float>(y);
 
 		int tlut;

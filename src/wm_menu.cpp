@@ -7266,8 +7266,7 @@ void CMenuPcs::DrawCharaName()
 #endif
 				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
 				if (this->m_wmWorldState->m_mainState == 2) {
-					const int absPhase = abs(phase);
-					fade = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(absPhase) - DOUBLE_80331420));
+					fade = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(abs(phase)) - DOUBLE_80331420));
 					restoreColor = 1;
 				}
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF, FLOAT_80331458 * fade).color);

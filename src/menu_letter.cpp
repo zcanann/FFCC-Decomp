@@ -1482,7 +1482,7 @@ int CMenuPcs::LetterCtrlCur()
 			if ((cursor < 8) && (cursor < letterCount - 1)) {
 				m_letterMenuState->listCursor = m_letterMenuState->listCursor + 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
-			} else if (m_letterMenuState->topIndex + cursor < letterCount - 1) {
+			} else if (cursor + m_letterMenuState->topIndex < letterCount - 1) {
 				m_letterMenuState->topIndex = m_letterMenuState->topIndex + 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {

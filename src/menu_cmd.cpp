@@ -951,7 +951,7 @@ void CMenuPcs::CmdDraw()
 
 			const float alpha = entry->alpha;
 			listFont->SetColor(
-			    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)).color);
+			    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)));
 
 			const char* text;
 			if (displayIdx < 2) {
@@ -1040,7 +1040,7 @@ void CMenuPcs::CmdDraw()
 		choiceFont->DrawInit();
 		choiceFont->SetTlut(7);
 		choiceFont->SetColor(
-		    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * entry->alpha)).color);
+		    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * entry->alpha)));
 
 		choices = (1.0 == static_cast<double>(entry->scale)) ? 2 : 3;
 		for (choice = 0; choice < choices; choice++) {
@@ -1166,7 +1166,7 @@ void CMenuPcs::CmdDraw()
 	float helpY = 352.0f;
 	DrawHelpMessage(
 	    helpId, helpFont, static_cast<int>(helpX), static_cast<int>(helpY),
-	    CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10,
+	    CColor(0xFF, 0xFF, 0xFF, helpAlpha), 10,
 	    1.0f, 3.0f);
 }
 
@@ -2010,7 +2010,7 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const float alpha = (GetCmdStateView(this)->mode == 3) ? 1.0f : entry->alpha;
-		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)).color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)));
 
 		if (i < 2) {
 			text = GetMenuStr(i + 9);
@@ -2139,7 +2139,7 @@ void CMenuPcs::DrawUniteList()
 
 	for (i = 0; i < s_ucnt; i++, unitePanels++) {
 		const float alpha = (GetCmdStateView(this)->mode == 3) ? 1.0f : unitePanels->alpha;
-		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)).color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)));
 
 		const int itemId = caravan->m_commandListExtra[s_UniteTop[i]];
 		if (itemId == 0x207) {
@@ -2191,7 +2191,7 @@ void CMenuPcs::DrawUniteList()
 				helpId, helpFont,
 				static_cast<int>(-(drawW / 2.0f - 320.0f)),
 				static_cast<int>(drawY),
-				CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10,
+				CColor(0xFF, 0xFF, 0xFF, helpAlpha), 10,
 				1.0f, 3.0f);
 		}
 		}

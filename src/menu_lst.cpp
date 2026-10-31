@@ -110,7 +110,7 @@ void CMenuPcs::MLstDraw()
 
 	item = this->m_menuLstList->entries;
 	for (i = 0; i < this->m_menuLstList->count; item++, i++) {
-		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha)).color);
+		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha)));
 
 		const char* text = GetMenuStr(i + 0x2e);
 		font->GetWidth(text);
@@ -149,7 +149,7 @@ void CMenuPcs::MLstDraw()
 		helpFont,
 		(int)helpX,
 		(int)helpY,
-		CColor(0xff, 0xff, 0xff, (signed char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
+		CColor(0xff, 0xff, 0xff, (signed char)(255.0f * this->m_menuLstList->entries[0].alpha)),
 		0x0a,
 		1.0f,
 		3.0f);

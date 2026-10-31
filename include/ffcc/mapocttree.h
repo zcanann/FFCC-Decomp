@@ -97,6 +97,35 @@ public:
 	 * JP Address: TODO
 	 * JP Size: TODO
 	 */
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: UNUSED
+	 * EN Address: 0x80044378
+	 * EN Size: 84b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void Add(CBound* other)
+	{
+		VECMinimize(&m_min, &other->m_min, &m_min);
+		VECMaximize(&m_max, &other->m_max, &m_max);
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: UNUSED
+	 * EN Address: 0x800401C4
+	 * EN Size: 76b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void GetCenter(Vec* center)
+	{
+		center->x = (m_min.x + m_max.x) / 2.0f;
+		center->y = (m_min.y + m_max.y) / 2.0f;
+		center->z = (m_min.z + m_max.z) / 2.0f;
+	}
 	CBound(Vec* position, float rangeXZ, float rangeY)
 	{
 		m_min.x = position->x - rangeXZ;

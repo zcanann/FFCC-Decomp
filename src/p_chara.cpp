@@ -218,7 +218,7 @@ void CCharaPcs::Init()
 
     m_charaAllocStage = 0;
     m_overlapEnabled = 0;
-    CopyColor(&m_texShadowColor, CColor(0x00, 0x00, 0x40, 0x40).color);
+    CopyColor(&m_texShadowColor, CColor(0x00, 0x00, 0x40, 0x40));
     m_texShadowPos = CVector(0.0f, 100.0f, 0.0f);
     m_texShadowRadius = 500.0f;
     m_texShadowSize = 0x80;
@@ -729,7 +729,7 @@ void CCharaPcs::InitEnv(int envMode)
 
 
     if (envMode == 1 || envMode == 2) {
-        LightPcs.SetAmbient(CColor(0x00, 0x00, 0x00, 0xFF).color);
+        LightPcs.SetAmbient(CColor(0x00, 0x00, 0x00, 0xFF));
         LightPcs.SetNumDiffuse(0);
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
     } else {
@@ -881,7 +881,7 @@ void CCharaPcs::drawMakeTexShadow()
     GXSetAlphaUpdate(GX_TRUE);
     GXSetViewport(0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), 0.0f, 1.0f);
     GXSetScissor(0, 0, static_cast<unsigned int>(m_texShadowSize), static_cast<unsigned int>(m_texShadowSize));
-    Graphic.SetCopyClear(CColor(0x00, 0x00, 0x00, 0x00).color, 0xFFFFFF);
+    Graphic.SetCopyClear(CColor(0x00, 0x00, 0x00, 0x00), 0xFFFFFF);
 
     m_texShadowTextureOffset = 0;
     m_texShadowTextureBase = Graphic.GetTmpFrameBuffer();
@@ -1558,7 +1558,7 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
-    GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0x00, 0x00, 0xFF).color);
+    GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0x00, 0x00, 0xFF));
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -1610,7 +1610,7 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0x00, 0x00, static_cast<unsigned char>(m_overlapAlpha & 0xFF)).color);
+    GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0x00, 0x00, static_cast<unsigned char>(m_overlapAlpha & 0xFF)));
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
@@ -1643,7 +1643,7 @@ void CCharaPcs::drawOverlap()
     }
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
-    GXSetChanMatColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    GXSetChanMatColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF));
     GXLoadTexObj(backBufferTex, GX_TEXMAP0);
     PSMTXScale(texMtx, 1.0f / 640.0f, 1.0f / 448.0f, 1.0f);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);

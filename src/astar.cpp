@@ -326,7 +326,7 @@ void CAStar::drawAStar()
 		{
 			for (int group = 0; group < 64; group++)
 			{
-				g_MapMng.SetIdGrpColor(group, 0, CColor(Math.Rand(0xff), Math.Rand(0xff), Math.Rand(0xff), 0xFF).color);
+				g_MapMng.SetIdGrpColor(group, 0, CColor(Math.Rand(0xff), Math.Rand(0xff), Math.Rand(0xff), 0xFF));
 			}
 		}
 

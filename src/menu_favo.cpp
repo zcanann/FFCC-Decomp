@@ -185,7 +185,7 @@ void CMenuPcs::FavoDraw()
 	memset(textBuf, 0, sizeof(textBuf));
 	for (i = 0; i < 8; i++) {
 		font->SetTlut(6);
-		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry[i].alpha)).color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry[i].alpha)));
 		x = static_cast<float>(entry[i].x - 0xC);
 		y = static_cast<float>(entry[i].y + 0xA);
 		font->SetFixed(1);
@@ -209,7 +209,7 @@ void CMenuPcs::FavoDraw()
 	memset(textBuf, 0, sizeof(textBuf));
 
 	for (i = 0; i < 8; i++) {
-		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry[i].alpha)).color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry[i].alpha)));
 		char* name = Game.GetShortItemName(static_cast<char>(s_rank[i].foodId) + 0x17D);
 		y = static_cast<float>(entry[i].y + 0xB);
 		x = static_cast<float>(entry[i].x + 0x1C);

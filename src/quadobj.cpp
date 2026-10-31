@@ -105,7 +105,7 @@ int CGQuadObj::isInner(Vec* vec)
 void CGQuadObj::onDraw()
 {
     if (m_vertexCount != 0 && (CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_QuadBounds) != 0) {
-        GXSetChanMatColor(GX_COLOR0A0, CColor(0xff, 0xff, 0xff, 0xff).color);
+        GXSetChanMatColor(GX_COLOR0A0, CColor(0xff, 0xff, 0xff, 0xff));
         GXLoadPosMtxImm(CameraPcs.m_cameraMatrix, GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 

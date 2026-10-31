@@ -248,7 +248,7 @@ void CMenuPcs::CompaDraw()
 #endif
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)));
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	shown = drawIndex = 0;
@@ -309,7 +309,7 @@ void CMenuPcs::CompaDraw()
 #endif
 	font->DrawInit();
 	compaList = this->m_compaList;
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)));
 
 	name = GetJobStr(caravanWork->m_jobType);
 	font->GetWidth(name);

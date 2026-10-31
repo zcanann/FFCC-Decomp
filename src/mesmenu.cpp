@@ -608,7 +608,7 @@ void CMesMenu::onDraw()
                     float textWidth = font->GetWidth(Game.GetNPCName(m_nameIndex));
                     font->DrawInit();
                     font->SetTlut(0xF);
-                    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
+                    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)));
                     font->SetPosX(iconX + (((m_menuIndex & 1) != 0) ? 62.0f : 82.0f - textWidth));
                     font->SetPosY(iconY + (float)(((m_menuIndex & 2) != 0) ? 8 : 31));
                     font->Draw(Game.GetNPCName(m_nameIndex));
@@ -655,7 +655,7 @@ void CMesMenu::onDraw()
         float titleWidth = font->GetWidth(reinterpret_cast<char*>(scriptFood->m_name));
         font->DrawInit();
         font->SetTlut(0xF);
-        font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).color);
+        font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)));
         font->SetPosX(baseX + (((m_menuIndex & 1) != 0) ? (-62.0f) - titleWidth : 62.0f));
         font->SetPosY(27.0f + frameY);
         font->Draw(reinterpret_cast<char*>(scriptFood->m_name));
@@ -753,7 +753,7 @@ void CMesMenu::onDraw()
                         float textWidth = font->GetWidth(Game.GetNPCName(m_nameIndex));
                         font->DrawInit();
                         font->SetTlut(0xF);
-                        font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
+                        font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)));
                         font->SetPosX(iconX + ((anchorX != 0) ? 62.0f : 82.0f - textWidth));
                         font->SetPosY(iconY + (float)((anchorY != 0) ? 8 : 31));
                         font->Draw(Game.GetNPCName(m_nameIndex));

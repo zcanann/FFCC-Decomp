@@ -610,20 +610,20 @@ retry:
         {
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
-            Util.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255).color);
+            Util.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255));
             memcpy((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), (void*)((char*)Graphic.GetFrameBuffer() + 0x34800), FileErrorCopySize);
             DCFlushRange((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), FileErrorCopySize);
         }
         else
         {
-            Util.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
+            Util.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255));
         }
 
         font->SetScale(0.8f);
         font->SetShadow(1);
         font->SetMargin(0.0f);
         font->SetZMode(0, 0);
-        font->SetColor(CColor(255, 255, 255, 255).color);
+        font->SetColor(CColor(255, 255, 255, 255));
         font->SetTlut(usingFallbackFont ? -1 : 7);
         font->DrawInit();
 
@@ -718,7 +718,7 @@ retry:
         }
         else
         {
-            Util.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
+            Util.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255));
             GXCopyDisp(Graphic.GetFrameBuffer(), GX_FALSE);
         }
 

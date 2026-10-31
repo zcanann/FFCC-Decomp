@@ -144,7 +144,7 @@ static inline void SetCmakeBlendMatColor(float alpha)
 
 static inline void SetCmakeFontColor(CFont* font, float alpha)
 {
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 }
 
 #ifdef VERSION_GCCJGC
@@ -927,7 +927,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)));
 
     int tx;
     int cursorY;
@@ -1069,7 +1069,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->SetMargin(1.0f);
 
     alpha = 255.0f * alpha;
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)));
     font->SetTlut(6);
 
     textW = font->GetWidth(text);
@@ -1266,7 +1266,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)));
 
     text = GetMenuStr(1);
 #ifdef VERSION_GCCJGC
@@ -1831,7 +1831,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
 
 #ifdef VERSION_GCCP01
     float labelWidth = 0.0f;
@@ -2075,7 +2075,7 @@ void CMenuPcs::CmakeTribeDraw()
     font->SetShadow(0);
     font->SetScale(1.0f);
     font->DrawInit();
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
 
     for (i = 0; i < 4; i++) {
         txt = GetTribeStr(i);
@@ -2094,7 +2094,7 @@ void CMenuPcs::CmakeTribeDraw()
     font->SetShadow(1);
     font->SetScale(1.0f);
     font->DrawInit();
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
     font->SetTlut(6);
 
     hairBase = m_cmakeState->m_select * 8;
@@ -2328,7 +2328,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr(i);
@@ -2532,7 +2532,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
     const char* value;
 #ifndef VERSION_GCCJGC
@@ -2561,7 +2561,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {
@@ -2771,7 +2771,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
     const char* value;
 #ifndef VERSION_GCCJGC
@@ -2800,7 +2800,7 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
+    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {

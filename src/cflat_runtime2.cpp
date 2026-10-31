@@ -1034,7 +1034,7 @@ void CFlatRuntime2::Draw()
 	font->SetZMode(0, 0);
 	font->DrawInit();
 	font->SetTlut(7);
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
 	for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
 		object->DrawDebug(font);

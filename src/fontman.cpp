@@ -535,7 +535,7 @@ void CFont::DrawInit()
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXColor localColor = m_color;
     GXSetChanMatColor(GX_COLOR0A0, localColor);
-    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
     CFontRenderFlagBits& renderFlagBits = renderFlags;
     if (renderFlagBits.zCompare != 0 || renderFlagBits.zUpdate != 0) {

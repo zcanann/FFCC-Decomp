@@ -1172,7 +1172,7 @@ void CMenuPcs::LetterListDraw()
 	font->SetScale(1.0f);
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * panels[1].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * panels[1].alpha)));
 
 	char* menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((640.0f - font->GetWidth(menuTitle)) / 2.0);
@@ -1182,7 +1182,7 @@ void CMenuPcs::LetterListDraw()
 		return;
 	}
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 
@@ -1323,7 +1323,7 @@ void CMenuPcs::LetterMessDraw()
 	font->DrawInit();
 	font->SetTlut(0x1C);
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * animState->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * animState->entries[0].alpha)));
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
 	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x535, 0x52F, 0x49B)) char[kLetterTextScratchSize];

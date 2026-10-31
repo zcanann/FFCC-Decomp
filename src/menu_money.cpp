@@ -394,7 +394,7 @@ void CMenuPcs::MoneyDraw()
 	font->SetScale(0.9f);
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * entry->alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * entry->alpha)));
 
 	label = GetMenuStr(0x15);
 	for (i = 0; i < 2; i++) {

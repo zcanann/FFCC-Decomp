@@ -228,15 +228,7 @@ static inline void SetViewerStartPos(int viewerMode, char* mapName)
         if (g_MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
             COctNode* rootNode = g_MapMng.GetOctTreeArray()->GetRootNode();
             if (rootNode != 0) {
-                float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
-                center *= 0.5f;
-                cameraPos.x = center;
-                center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
-                center *= 0.5f;
-                cameraPos.y = center;
-                center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
-                center *= 0.5f;
-                cameraPos.z = center;
+                rootNode->m_bound.GetCenter(&cameraPos);
             } else {
                 CMapObj* mapObj = g_MapMng.GetMapObj(1);
                 cameraPos.x = mapObj->m_localPosition.x;
@@ -734,7 +726,7 @@ void CMapPcs::drawAfter()
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBound bound;
                 bound = CameraPcs.m_shadowRectBound;
-                Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
+                Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF));
             }
         }
     }

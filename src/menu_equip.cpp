@@ -462,7 +462,7 @@ void CMenuPcs::EquipDraw()
 	item = m_equipList->entries;
 	for (i = 0; i < 4; i++, item++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)).color);
+			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)));
 			itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			str = Game.GetShortItemName(itemIdx);
 			if ((m_equipState->mode == 0) && (i == static_cast<int>(m_equipState->selected[0]))) {
@@ -599,7 +599,7 @@ void CMenuPcs::EquipDraw()
 
 		textItem = item;
 		for (k = 0; (k < 8) && ((idx = k + m_equipState->scroll) < letterCount); textItem++, k++) {
-			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)).color);
+			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)));
 
 			if (idx == 0) {
 				str = GetMenuStr(0xb);
@@ -697,13 +697,13 @@ void CMenuPcs::EquipDraw()
 	}
 
 	helpY = 352.0f;
-	DrawHelpMessage(helpItem, helpFont, (int)(320.0f - w / 2), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)helpAlpha).color, 10,
+	DrawHelpMessage(helpItem, helpFont, (int)(320.0f - w / 2), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)helpAlpha), 10,
 	                1.0f, 3.0f);
 	if (m_equipState->mode == 1) {
 		item = &m_equipList->entries[m_equipList->count];
 		listHelpAlpha = (int)(255.0f * item->alpha);
 		if (listIndex < 1) {
-			DrawHelpMessage(0x265, helpFont, (int)(320.0f - w / 2), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)listHelpAlpha).color, 10,
+			DrawHelpMessage(0x265, helpFont, (int)(320.0f - w / 2), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)listHelpAlpha), 10,
 			                1.0f, 3.0f);
 		}
 	}

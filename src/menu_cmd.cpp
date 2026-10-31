@@ -1041,9 +1041,9 @@ void CMenuPcs::CmdDraw()
 			const float pitch = static_cast<float>(
 			    ((static_cast<float>(listEntry->height) * listEntry->scale) - 16.0) /
 			    choices);
+			x = static_cast<float>(listEntry->x + 0x18);
 			y = ((pitch * static_cast<float>(choice)) + static_cast<float>(listEntry->y + 8)) +
 			    ((pitch - 19.8) / 2.0);
-			x = static_cast<float>(listEntry->x + 0x18);
 			choiceFont->SetPosX(static_cast<float>(listEntry->x + 0x18));
 #ifdef VERSION_GCCJGC
 			choiceFont->SetPosY(y);

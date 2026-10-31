@@ -792,7 +792,7 @@ renderedDone:
 
         if ((mode & 4) != 0) {
             int pointCount = m_pathPointCount < 3 ? m_pathPointCount : m_pathPointCount;
-            int lowBit = modeBits & 1;
+            u32 lowBit = modeBits & 1;
             int highBit = modeBits & 2;
             int segmentCount = pointCount + 1 - (lowBit + ((modeBits >> 1) & 1));
             int first = (modeBits & 1) ? 1 : 0;

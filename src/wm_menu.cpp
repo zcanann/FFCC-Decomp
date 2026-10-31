@@ -1577,8 +1577,8 @@ void CMenuPcs::CalcMCardMenu()
 			else if (subState == 10) { winType = 0xB; }
 			else if (subState == 0xE) { winType = 0xC; }
 			else if (subState == 0xF) { winType = 0xD; }
-			else if (subState == 0x1C) { messType = 1; winType = 0x1B; }
-			else if (subState == 0x1B) { messType = 1; winType = 0x1C; }
+			else if (subState == 0x1C) { winType = 0x1B; messType = 1; }
+			else if (subState == 0x1B) { winType = 0x1C; messType = 1; }
 			else if (subState == 0x15) { playOpenSe = false; winType = 0xE; }
 			else { winType = 0xF; }
 			short windowWidth;
@@ -2157,8 +2157,8 @@ void CMenuPcs::CalcLoadMenu()
 			else if (subState == 10) { winType = 0xB; }
 			else if (subState == 0xE) { winType = 0xC; }
 			else if (subState == 0xF) { winType = 0xD; }
-			else if (subState == 0x1C) { winType = 0x1B; messType = 1; }
-			else if (subState == 0x1B) { winType = 0x1C; messType = 1; }
+			else if (subState == 0x1C) { messType = 1; winType = 0x1B; }
+			else if (subState == 0x1B) { messType = 1; winType = 0x1C; }
 			else if (subState == 0x18) { playOpenSe = false; winType = 0x10; }
 			else if (subState == 0x17) { winType = 0x11; }
 			else { winType = 0x13; }
@@ -5194,8 +5194,8 @@ void CMenuPcs::CalcFukidashi()
 #endif
 
 	// Setup model viewport slots
-	viewportY = m_wm.m_bubbleData->m_sprites[0].m_y - 0x0E;
 	viewportX = m_wm.m_bubbleData->m_sprites[0].m_x - 0x28;
+	viewportY = m_wm.m_bubbleData->m_sprites[0].m_y - 0x0E;
 	for (cnt = 6; cnt <= 16; cnt++) {
 		slot = &m_wm.m_worldObjData[cnt];
 		slot->m_active = 0;

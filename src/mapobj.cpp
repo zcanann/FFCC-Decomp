@@ -1076,7 +1076,7 @@ void CMapObj::Calc()
             pos.x = m_worldMtx[0][3];
             pos.y = m_worldMtx[1][3];
             pos.z = m_worldMtx[2][3];
-            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+            CameraPcs.GetViewMatrix(cameraMtx);
             PSMTXMultVec(cameraMtx, &pos, &posCam);
             posCam.z = -posCam.z;
 

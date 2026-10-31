@@ -606,7 +606,7 @@ void CFont::DrawQuit()
 {
     Mtx44 screenMtx;
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 

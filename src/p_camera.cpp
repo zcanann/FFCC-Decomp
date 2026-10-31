@@ -609,7 +609,7 @@ void CCameraPcs::draw()
         posZ = shadowPos->z;
         posY = shadowPos->y;
         posX = shadowPos->x;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -642,7 +642,7 @@ void CCameraPcs::draw()
         refPosX = shadowRefPos->x;
         refPosZ = shadowRefPos->z;
         refPosY = shadowRefPos->y;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);

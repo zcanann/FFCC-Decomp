@@ -390,8 +390,8 @@ void CMapPcs::calc()
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
         memcpy(screenMtx, m_screenMtx, sizeof(Mtx44));
     } else {
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
+        CameraPcs.GetProjectionMatrix(screenMtx);
     }
     g_MapMng.SetViewMtx(cameraMtx, screenMtx);
 
@@ -494,8 +494,8 @@ void CMapPcs::drawBefore()
         g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
         g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
+        CameraPcs.GetProjectionMatrix(screenMtx);
         g_MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
@@ -547,8 +547,8 @@ void CMapPcs::draw()
         g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
         g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
+        CameraPcs.GetProjectionMatrix(screenMtx);
         g_MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
@@ -601,8 +601,8 @@ void CMapPcs::drawBeforeViewer()
         g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
         g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
+        CameraPcs.GetProjectionMatrix(screenMtx);
         g_MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
@@ -655,8 +655,8 @@ void CMapPcs::drawViewer()
         g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
         g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
+        CameraPcs.GetProjectionMatrix(screenMtx);
         g_MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
@@ -704,8 +704,8 @@ void CMapPcs::drawAfter()
             g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
             g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-            PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+            CameraPcs.GetViewMatrix(cameraMtx);
+            CameraPcs.GetProjectionMatrix(screenMtx);
 
             GXSetColorUpdate(GX_TRUE);
             GXSetAlphaUpdate(GX_FALSE);
@@ -754,8 +754,8 @@ void CMapPcs::drawAfterViewer()
             g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
             g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-            PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+            CameraPcs.GetViewMatrix(cameraMtx);
+            CameraPcs.GetProjectionMatrix(screenMtx);
 
             GXSetColorUpdate(GX_TRUE);
             GXSetAlphaUpdate(GX_FALSE);

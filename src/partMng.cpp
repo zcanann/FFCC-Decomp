@@ -2439,8 +2439,8 @@ void pppSetProjection()
  */
 void CPartMng::pppSetRendMatrix()
 {
-    PSMTX44Copy(CameraPcs.m_screenMatrix, ppvScreenMatrix);
-    PSMTXCopy(CameraPcs.m_cameraMatrix, ppvCameraMatrix);
+    CameraPcs.GetProjectionMatrix(ppvScreenMatrix);
+    CameraPcs.GetViewMatrix(ppvCameraMatrix);
     ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
     ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
     ppvScreenMatrixZbuff = ppvScreenMatrix[2][3];

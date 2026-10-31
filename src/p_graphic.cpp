@@ -454,7 +454,7 @@ void CGraphicPcs::drawBar()
         }
     }
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, ortho);
+    CameraPcs.GetProjectionMatrix(ortho);
     GXSetProjection(ortho, GX_PERSPECTIVE);
 }
 
@@ -665,13 +665,13 @@ void CGraphicPcs::drawScreenFade()
     C_MTXOrtho(orthoMtx, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
     PSMTXCopy(cameraMtx, screenMtx);
     screenMtx[3][2] = kGraphicZero;
     screenMtx[3][1] = kGraphicZero;
     screenMtx[3][0] = kGraphicZero;
     screenMtx[3][3] = 1.0f;
-    PSMTX44Copy(CameraPcs.m_screenMatrix, worldScreenMtx);
+    CameraPcs.GetProjectionMatrix(worldScreenMtx);
     PSMTX44Concat(worldScreenMtx, screenMtx, worldScreenMtx);
 
     GXClearVtxDesc();
@@ -873,7 +873,7 @@ void CGraphicPcs::drawScreenFade()
         }
     }
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);
+    CameraPcs.GetProjectionMatrix(orthoMtx);
     GXSetProjection(orthoMtx, GX_PERSPECTIVE);
 }
 

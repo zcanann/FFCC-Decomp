@@ -965,14 +965,14 @@ void CGObject::boundCheck()
     Mtx44 screenMtx;
     int clipMask;
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
     PSMTXCopy(cameraMtx, clipMtx);
     clipMtx[3][2] = 0.0f;
     clipMtx[3][1] = 0.0f;
     clipMtx[3][0] = 0.0f;
     clipMtx[3][3] = 1.0f;
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {

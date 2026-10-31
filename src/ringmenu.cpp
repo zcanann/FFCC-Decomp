@@ -969,7 +969,7 @@ void CRingMenu::DrawIcon()
 
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[m_menuIndex];
 	Mtx cameraMtx;
-	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+	CameraPcs.GetViewMatrix(cameraMtx);
 
 	Vec viewPos;
 	Vec4d clipPos;
@@ -984,7 +984,7 @@ void CRingMenu::DrawIcon()
 	viewPos.z = (viewPos.z < -50.0f) ? viewPos.z : -50.0f;
 
 	Mtx44 screenMtx;
-	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+	CameraPcs.GetProjectionMatrix(screenMtx);
 	Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 
 	float invW = 1.0f / clipPos.w;

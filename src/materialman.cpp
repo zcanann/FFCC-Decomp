@@ -847,8 +847,8 @@ void CMaterialMan::SetUnderWaterTex()
     Mtx matrixB;
     Mtx matrixA;
     PSMTXIdentity(matrixA);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-    PSMTXCopy(CameraPcs.m_cameraMatrix, matrixB);
+    CameraPcs.GetProjectionMatrix(screenMtx);
+    CameraPcs.GetViewMatrix(matrixB);
 
     matrixA[0][0] = screenMtx[0][0];
     matrixA[1][0] = screenMtx[1][0];

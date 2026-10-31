@@ -360,7 +360,7 @@ void CSound::Draw()
 {
     Mtx cameraMatrix;
     GXColor lineColor;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
+    CameraPcs.GetViewMatrix(cameraMatrix);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc((u8)0);
@@ -1034,7 +1034,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<Vec*>(&CameraPcs.m_targetX),
             se3D->m_farDistance);
         if (lineHit != 0) {
-            PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
+            PSMTXMultVec(CameraPcs.GetViewMatrix(), &nearestPoint, &nearestPoint);
             if (nearestDistance < se3D->m_nearDistance) {
                 outVolume = 0x7F;
             } else {
@@ -1073,7 +1073,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
         }
 
-        PSMTXMultVec(CameraPcs.m_cameraMatrix, &se3D->m_position, &nearestPoint);
+        PSMTXMultVec(CameraPcs.GetViewMatrix(), &se3D->m_position, &nearestPoint);
         scaledDistSq = distScale * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs.m_targetX), &se3D->m_position);
         scaledFarSq = distScale * (se3D->m_farDistance * (se3D->m_farDistance * distScale));
         if (scaledDistSq < scaledFarSq) {

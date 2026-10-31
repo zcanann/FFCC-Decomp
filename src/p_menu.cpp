@@ -776,7 +776,7 @@ inline void CMenuPcs::DrawQuit()
 {
 	Mtx44 screenMtx;
 
-	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+	CameraPcs.GetProjectionMatrix(screenMtx);
 	GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
@@ -1435,13 +1435,13 @@ void CMenuPcs::drawBattle()
         Mtx44 viewMtx;
         Mtx44 screenMtx;
         Vec4d projected;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
         PSMTXCopy(cameraMtx, reinterpret_cast<MtxPtr>(viewMtx));
         viewMtx[3][2] = 0.0f;
         viewMtx[3][1] = 0.0f;
         viewMtx[3][0] = 0.0f;
         viewMtx[3][3] = 1.0f;
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        CameraPcs.GetProjectionMatrix(screenMtx);
         PSMTX44Concat(screenMtx, viewMtx, screenMtx);
         Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
 

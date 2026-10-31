@@ -1610,7 +1610,7 @@ void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
     GXLightObj lightObj;
     Vec v;
     Mtx cameraMtx;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
 
     v.x = 100000.0f * -lightDir.x;
     float dirZ;
@@ -1689,7 +1689,7 @@ void CMapMng::Draw()
     LightPcs.SetNumDiffuse(0);
 
     Mtx44 projection;
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+    CameraPcs.GetProjectionMatrix(projection);
     GXSetProjection(projection, GX_PERSPECTIVE);
     m_underWaterTexPending = 1;
 
@@ -1954,7 +1954,7 @@ void CMapMng::DrawAfter()
 {
     if ((m_mapObjCount != 0) && (m_mapReadReady != 0)) {
         Mtx44 projection;
-        PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+        CameraPcs.GetProjectionMatrix(projection);
         GXSetProjection(projection, GX_PERSPECTIVE);
 
         GXSetColorUpdate(1);

@@ -330,7 +330,7 @@ void CAStar::drawAStar()
 			}
 		}
 
-		float (*drawMtx)[4] = CameraPcs.m_cameraMatrix;
+		float (*drawMtx)[4] = CameraPcs.GetViewMatrix();
 		bool hasGroups = false;
 
 		if (m_currentGroup != 0 && m_previousGroup != 0)

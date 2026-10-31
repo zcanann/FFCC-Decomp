@@ -192,12 +192,12 @@ void CCharaPcs::drawViewer()
         GXTexCoord2s16(static_cast<short>(width * 2), static_cast<short>(height * 2));
         GXPosition3s16(0, static_cast<short>(height), 0);
         GXTexCoord2s16(0, static_cast<short>(height * 2));
-        PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
+        CameraPcs.GetProjectionMatrix(projMtx);
         GXSetProjection(projMtx, GX_PERSPECTIVE);
     }
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
+    CameraPcs.GetProjectionMatrix(projMtx);
     GXSetProjection(projMtx, GX_PERSPECTIVE);
 
     if (self->m_viewerDrawGrid != 0) {

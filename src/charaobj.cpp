@@ -2126,18 +2126,18 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			if (counterState >= 0) {
 				switch (counterState) {
 				case 0:
-					counterType = 1;
 					counterItem = 0x207;
+					counterType = 1;
 					counterSe = 0x7E1;
 					break;
 				case 1:
-					counterType = 0;
 					counterItem = 0x20B;
+					counterType = 0;
 					counterSe = 0x7E2;
 					break;
 				case 2:
-					counterType = 4;
 					counterItem = 0x20F;
+					counterType = 4;
 					counterSe = 0x7E3;
 					break;
 				}

@@ -843,8 +843,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				delta = idx - 1;
 				sprite = &m_bonusAnim->sprites[idx + k];
 				sprite->kind = kBonusCountTexture;
-				src = sprite - delta;
 				sprite->x = 0x200;
+				src = sprite - delta;
 				sprite->y = (short)(src->y + 0xC);
 				sprite->w = 0x20;
 				sprite->h = 0x28;

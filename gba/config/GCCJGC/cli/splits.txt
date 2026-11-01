@@ -232,14 +232,8 @@ main/link:
 main/xfer:
 	.bss        start:0x03000880 end:0x030008BC align:8
 
-regional_bss:
-	.bss        start:0x030008BC end:0x030008C0 align:1
-
 main/session:
 	.bss        start:0x030008C0 end:0x030008E1 align:8
-
-regional_bss:
-	.bss        start:0x030008E1 end:0x030008E8 align:1
 
 main/text:
 	.bss        start:0x030008E8 end:0x03001174 align:8
@@ -253,26 +247,14 @@ main/obj:
 main/cmdlist:
 	.bss        start:0x03002774 end:0x03002783 align:4
 
-regional_bss:
-	.bss        start:0x03002783 end:0x03002784 align:1
-
 main/radar:
 	.bss        start:0x03002784 end:0x03002785 align:4
-
-regional_bss:
-	.bss        start:0x03002785 end:0x03002788 align:1
 
 main/favorite:
 	.bss        start:0x03002788 end:0x03002792 align:8
 
-regional_bss:
-	.bss        start:0x03002792 end:0x03002794 align:1
-
 main/family:
 	.bss        start:0x03002794 end:0x03002796 align:4
-
-regional_bss:
-	.bss        start:0x03002796 end:0x03002798 align:1
 
 main/letter:
 	.bss        start:0x03002798 end:0x030027B4 align:4
@@ -280,32 +262,17 @@ main/letter:
 main/item:
 	.bss        start:0x030027B4 end:0x030027BE align:4
 
-regional_bss:
-	.bss        start:0x030027BE end:0x030027C0 align:1
-
 main/gil:
 	.bss        start:0x030027C0 end:0x030027CE align:4
-
-regional_bss:
-	.bss        start:0x030027CE end:0x030027D0 align:1
 
 main/cmake:
 	.bss        start:0x030027D0 end:0x030027FD align:8
 
-regional_bss:
-	.bss        start:0x030027FD end:0x03002800 align:1
-
 main/equip:
 	.bss        start:0x03002800 end:0x03002805 align:4
 
-regional_bss:
-	.bss        start:0x03002805 end:0x03002808 align:1
-
 main/shop:
 	.bss        start:0x03002808 end:0x03002813 align:4
-
-regional_bss:
-	.bss        start:0x03002813 end:0x03002818 align:1
 
 main/smith:
 	.bss        start:0x03002818 end:0x03002838 align:8
@@ -322,9 +289,6 @@ main/tmpartifact:
 main/menu:
 	.bss        start:0x0300284C end:0x0300284E align:4
 
-regional_bss:
-	.bss        start:0x0300284E end:0x03002850 align:1
-
 main/sound_data:
 	.bss        start:0x03002850 end:0x03002990 align:8
 
@@ -335,13 +299,7 @@ main/xfer:
 	.common     start:0x03002AE0 end:0x03002B00 align:4
 
 main/session:
-	.common     start:0x03002B00 end:0x03002FA4 align:16
-
-main/cmake:
-	.common     start:0x03002FB0 end:0x03002FCC align:16
-
-regional_bss:
-	.bss        start:0x03002FD0 end:0x03003090
+	.common     start:0x03002B00 end:0x03003084 align:16
 
 main/mode:
 	.common     start:0x03003090 end:0x03003300 align:16

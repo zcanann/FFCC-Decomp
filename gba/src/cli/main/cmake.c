@@ -24,8 +24,6 @@
 #define CMAKE_CONFIRM_TEXT_WIDTH 23
 #endif
 
-struct CMakeData gCMakeData;
-
 static s8 sCMakeResult;
 static s8 sCMakeCursor[2];
 static s8 sCMakeBirthday[2];

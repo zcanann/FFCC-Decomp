@@ -45,7 +45,10 @@ def common_symbols(path: Path) -> Dict[str, Tuple[int, int]]:
 
 def fragment(split, configured, compiled: Dict[str, Tuple[int, int]]) -> str:
     """Linker script text placing configured COMMON symbols at their addresses."""
-    out = []
+    # Like ld's per-object COMMON input section, the range starts at the largest
+    # alignment of its symbols unless the split records the section alignment.
+    section_align = split.alignment or max((compiled[s.name][0] for s in configured), default=1)
+    out = [f". = ALIGN({section_align});"]
     for s in configured:
         align, size = compiled[s.name]
         out += [f". = ALIGN({align});",

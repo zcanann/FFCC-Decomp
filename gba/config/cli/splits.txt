@@ -308,13 +308,7 @@ main/xfer:
 	.common     start:0x03002AE0 end:0x03002B00 align:4
 
 main/session:
-	.common     start:0x03002B00 end:0x03002FA4 align:16
-
-main/cmake:
-	.common     start:0x03002FB0 end:0x03002FCC align:16
-
-bss:
-	.bss        start:0x03002FD0 end:0x03003090
+	.common     start:0x03002B00 end:0x03003084 align:16
 
 main/mode:
 	.common     start:0x03003090 end:0x03003300 align:16

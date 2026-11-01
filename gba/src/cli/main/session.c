@@ -11,7 +11,7 @@
 /* Names of the caravan's members, and per save slot a nibble with the member index */
 struct CaravanNames {
     char names[8][16];
-    s8 slotMap[4];
+    u8 slotMap[4];
 };
 
 s8 gScouterDirty;
@@ -26,12 +26,14 @@ struct Marker gEnemyMarkers[64];
 u8 gRadarType;
 struct Marker gTreasureMarkers[16];
 char gBonusStr[2][65];
-extern struct CaravanNames gCaravanNames;
+struct CMakeData gCMakeData;
+struct Member gParty[4];
+u8 gRadarMode;
+struct CaravanNames gCaravanNames;
 static u32 sMapObjDrawFlagsIn;
 static u16 sBasePos[2];
 static u16 sPrevBasePos[2];
 static struct Marker sPartyMarkers[4];
-extern u8 gUnusedBytes[8];
 static s8 sBackdropTribe;
 
 /*
@@ -69,7 +71,7 @@ void Session_Init(void)
         sPrevBasePos[i] = 0;
     }
     for (i = 0; i < 8; i++)
-        gUnusedBytes[i] |= 0xFF;
+        gCaravanNames.slotMap[i] |= 0xFF;
     for (i = 0; i < 4; i++)
         gParty[i].name = Msg_GetSystem(0);
     for (i = 0; i < 8; i++)
@@ -215,7 +217,7 @@ void Session_OnPlayerStat(u8 *data)
     memcpy(&gCaravanNames, p, sizeof(gCaravanNames));
     p += sizeof(gCaravanNames);
     for (i = 0; i < 8; i++) {
-        n = gCaravanNames.slotMap[i >> 1];
+        n = (s8)gCaravanNames.slotMap[i >> 1];
         if (i & 1)
             n &= 15;
         else

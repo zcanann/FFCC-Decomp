@@ -555,7 +555,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "graphic_dbgfont.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gxfunc.cpp"),
             Object(NonMatching, "itemobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
-            Object(MatchingFor("GCCP01", "GCCE01"), "joybus.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "joybus.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "KeLns.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "LocationTitle2.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "main.cpp", extra_cflags=["-str reuse,readonly"]),

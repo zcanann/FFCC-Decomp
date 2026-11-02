@@ -4194,12 +4194,18 @@ void CGPartyObj::gpmMove()
 
 		CGPartyObj::m_ghostWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
 		CGPartyObj::m_ghostWork.carrySpeed += 0.1f;
+		float newSpeed;
+		float speedScale;
+		if (CGPartyObj::m_ghostWork.pressure >= pressureLimit) {
+			speedScale = 1.0f;
+		} else {
 #ifdef VERSION_GCCP01
-		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? 1.0f : 4.0f;
+			speedScale = 4.0f;
 #else
-		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? 1.0f : 3.5f;
+			speedScale = 3.5f;
 #endif
-		float newSpeed = CGPartyObj::m_ghostWork.carrySpeed;
+		}
+		newSpeed = CGPartyObj::m_ghostWork.carrySpeed;
 		if (newSpeed < 0.0f) {
 			newSpeed = 0.0f;
 		} else {

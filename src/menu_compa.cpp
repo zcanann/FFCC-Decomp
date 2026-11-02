@@ -53,6 +53,11 @@ static inline void CompaDrawWindow(CompaOpenAnim* entry, float x, float y, float
 	}
 }
 
+static inline CompaOpenAnimList* GetCompaList(CMenuPcs* menu)
+{
+	return menu->m_compaList;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80160edc
@@ -161,7 +166,7 @@ void CMenuPcs::CompaDraw()
 	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCompaFoodTexture));
 
-	compaList = this->m_compaList;
+	compaList = GetCompaList(this);
 	for (shown = familyCount = 2; shown < 7; shown++) {
 		if (caravanWork->m_evtWordArr[19 + shown] > 0) {
 			familyCount++;
@@ -236,7 +241,7 @@ void CMenuPcs::CompaDraw()
 	}
 
 	font = GetFontItem();
-	compaList = this->m_compaList;
+	compaList = GetCompaList(this);
 	font->SetMargin(1.0f);
 	font->SetShadow(0);
 #ifdef VERSION_GCCP01

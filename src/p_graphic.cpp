@@ -331,10 +331,10 @@ static inline void setBarColor(GXColor& dst, const u32& colorWord)
  * --INFO--
  * PAL Address: 0x8004674C
  * PAL Size: 2812b
- * EN Address: 0x800514DC
- * EN Size: 2500b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80046540
+ * EN Size: 2812b
+ * JP Address: 0x80046040
+ * JP Size: 2900b
  */
 void CGraphicPcs::drawBar()
 {
@@ -649,10 +649,10 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
  * --INFO--
  * PAL Address: 0x80045178
  * PAL Size: 4256b
- * EN Address: 0x80052678
- * EN Size: 4836b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044F6C
+ * EN Size: 4256b
+ * JP Address: 0x80044978
+ * JP Size: 4508b
  */
 void CGraphicPcs::drawScreenFade()
 {
@@ -903,20 +903,34 @@ inline void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int cent
  */
 inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor topColor, _GXColor bottomColor)
 {
+    PPCWGPipe* fifo = (PPCWGPipe*)GXFIFO_ADDR;
     float z = 0.0f;
+
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(x0, y0, z);
-    GXColor1u32(*(u32*)&topColor);
-    GXTexCoord2u16(0, 0);
-    GXPosition3f32(x1, y0, z);
-    GXColor1u32(*(u32*)&topColor);
-    GXTexCoord2u16(2, 0);
-    GXPosition3f32(x1, y1, z);
-    GXColor1u32(*(u32*)&bottomColor);
-    GXTexCoord2u16(2, 2);
-    GXPosition3f32(x0, y1, z);
-    GXColor1u32(*(u32*)&bottomColor);
-    GXTexCoord2u16(0, 2);
+    fifo->f32 = x0;
+    fifo->f32 = y0;
+    fifo->f32 = z;
+    fifo->u32 = *(u32*)&topColor;
+    fifo->u16 = 0;
+    fifo->u16 = 0;
+    fifo->f32 = x1;
+    fifo->f32 = y0;
+    fifo->f32 = z;
+    fifo->u32 = *(u32*)&topColor;
+    fifo->u16 = 2;
+    fifo->u16 = 0;
+    fifo->f32 = x1;
+    fifo->f32 = y1;
+    fifo->f32 = z;
+    fifo->u32 = *(u32*)&bottomColor;
+    fifo->u16 = 2;
+    fifo->u16 = 2;
+    fifo->f32 = x0;
+    fifo->f32 = y1;
+    fifo->f32 = z;
+    fifo->u32 = *(u32*)&bottomColor;
+    fifo->u16 = 0;
+    fifo->u16 = 2;
 }
 
 /*

@@ -2855,9 +2855,8 @@ void CShopMenu::DrawItemInfo0()
         float unitWidth = font->GetWidth(unitText);
         float rightX = FLOAT_80332d3c - unitWidth;
         amountRightX = static_cast<int>(rightX - FLOAT_80332d5c);
-        int totalGil = getBuySellGil(itemNo);
 
-        DrawDec(totalGil, 0x1B, amountRightX, FLOAT_80332d68, FLOAT_80332d64, 0, 1, 0x12);
+        DrawDec(getBuySellGil(itemNo), 0x1B, amountRightX, FLOAT_80332d68, FLOAT_80332d64, 0, 1, 0x12);
 
         font->SetMargin(FLOAT_80332d28);
         _drawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightX)), FLOAT_80332d68, 0x19, 0x12);

@@ -2484,14 +2484,13 @@ void CMenuPcs::CalcLoadMenu()
 				subState++;
 			} while (subState < 4);
 
-			int entryIdx = 0;
 			int bestIdx = -1;
-			for (; entryIdx < 4; entryIdx++) {
-				const McListInfo& entry = m_wmCharaState[entryIdx];
+			for (subState = 0; subState < 4; subState++) {
+				const McListInfo& entry = m_wmCharaState[subState];
 				if (entry.m_isBroken == 0
 				    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
 					if (bestIdx < 0) {
-						bestIdx = entryIdx;
+						bestIdx = subState;
 					} else if (saveTimes[bestIdx].year <= currentTime->year
 					           && (saveTimes[bestIdx].year < currentTime->year
 					               || (saveTimes[bestIdx].yday <= currentTime->yday
@@ -2505,7 +2504,7 @@ void CMenuPcs::CalcLoadMenu()
 					                                               || (saveTimes[bestIdx].msec <= currentTime->msec
 					                                                   && (saveTimes[bestIdx].msec < currentTime->msec
 					                                                       || saveTimes[bestIdx].usec < currentTime->usec)))))))))))) {
-						bestIdx = entryIdx;
+						bestIdx = subState;
 					}
 				}
 				currentTime++;
@@ -5046,8 +5045,6 @@ static inline void SetPortTownName(char* dst, const char* townName)
  */
 void CMenuPcs::CalcFukidashi()
 {
-	int padIdx;
-	int slotIdx;
 	int cnt;
 	WmWorldObjInfo* slot;
 	int viewportX;
@@ -5293,20 +5290,20 @@ void CMenuPcs::CalcFukidashi()
 	// Player character model slots
 	short field1a = (unsigned int)m_wmIconFlags;
 	if ((field1a & 0x200) != 0 && (field1a & 0xF) != 0) {
-		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
 		int playerCount;
 		for (bitIdx = playerCount = 0; bitIdx < 4; bitIdx++) {
 			if ((field1a & (1 << bitIdx)) != 0) playerCount++;
 		}
 
-		slotIdx = 0;
-		for (padIdx = 0; padIdx < 4; padIdx++) {
-			if ((m_wmIconFlags & (1 << padIdx)) != 0) {
-				int slot8 = padIdx + 8;
+		cnt = 0;
+		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
+		for (bitIdx = 0; bitIdx < 4; bitIdx++) {
+			if ((m_wmIconFlags & (1 << bitIdx)) != 0) {
+				int slot8 = bitIdx + 8;
 				WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[slot8];
 				worldObj->m_active = 1;
 				worldObj->m_transform.m_position.x = 3.5999999046325684f;
-				if (slotIdx == 0) {
+				if (cnt == 0) {
 					if (playerCount == 2) {
 						worldObj->m_transform.m_position.y = 2.4000000953674316f;
 					} else {
@@ -5316,7 +5313,7 @@ void CMenuPcs::CalcFukidashi()
 					worldObj->m_transform.m_position.y = -1.2000000476837158f;
 				}
 				if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
-					if (padIdx == 0 && playerCount == 1) {
+					if (bitIdx == 0 && playerCount == 1) {
 						worldObj->m_transform.m_position.y = static_cast<float>(
 						    static_cast<double>(worldObj->m_transform.m_position.y) - 1.2);
 					} else {
@@ -5366,7 +5363,7 @@ void CMenuPcs::CalcFukidashi()
 				    DOUBLE_803314A8 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount - 1].time)) {
 					worldObj->m_frameCounter = 0;
 				}
-				slotIdx++;
+				cnt++;
 			}
 		}
 	}

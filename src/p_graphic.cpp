@@ -45,7 +45,6 @@ static const float kGraphicScreenHeight = 448.0f;
 static const float kGraphicScreenWidth = 640.0f;
 static const float kGraphicScreenCenterX = 320.0f;
 static const float kGraphicScreenCenterY = 224.0f;
-static const float kGraphicHalf = 0.5f;
 static const float kDebugBarLeft = 16.0f;
 static const float kDebugBarTop = 440.0f;
 static const float kDebugBarRight = 336.0f;
@@ -784,8 +783,12 @@ void CGraphicPcs::drawScreenFade()
                 GXLoadTexObj(&Graphic.m_smallBackTexObj, GX_TEXMAP0);
 
                 t = slotData->m_amplitude * (1.0f - t);
-                const float offX = slotData->m_stretch * ((kGraphicScreenCenterX * t) * (float)sin((double)slotData->m_phase));
-                const float offY = slotData->m_stretch * ((kGraphicScreenCenterY * t) * (float)cos((double)slotData->m_phase));
+                float wave = (float)sin((double)slotData->m_phase);
+                float extent = kGraphicScreenCenterX * t;
+                const float offX = slotData->m_stretch * (extent * wave);
+                wave = (float)cos((double)slotData->m_phase);
+                extent = kGraphicScreenCenterY * t;
+                const float offY = slotData->m_stretch * (extent * wave);
                 t += 1.0f;
 
                 drawSFRect((kGraphicScreenCenterX + offX) - kGraphicScreenCenterX * t,
@@ -833,8 +836,8 @@ void CGraphicPcs::drawScreenFade()
                     baseColor2.b = slotData->m_colorB.b;
                     baseColor2.a = slotData->m_colorB.a;
 
-                    const float t0 = (float)row * kGraphicHalf;
-                    const float t1 = (float)(row + 1) * kGraphicHalf;
+                    const float t0 = (float)row / 2.0f;
+                    const float t1 = (float)(row + 1) / 2.0f;
                     gradColor[0].color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
                     gradColor[0].color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
                     gradColor[0].color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);

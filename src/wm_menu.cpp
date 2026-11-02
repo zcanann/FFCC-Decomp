@@ -7330,7 +7330,6 @@ void CMenuPcs::DrawCMLife()
 		                            FLOAT_803313e8));
 	}
 	int slot;
-	int row;
 	int col;
 	int i;
 	unsigned int readyMask = 0;
@@ -7376,21 +7375,20 @@ void CMenuPcs::DrawCMLife()
 		}
 
 		GXColor color;
+		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
 		color.r = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red));
 		color.g = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green));
 		color.b = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blue));
-		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
-		row = slot / 4;
 		col = slot % 4;
 		float xBase;
 		float y;
 		float x;
 		xBase = 32.0f + static_cast<float>(col * 0x90);
-		y = 10.0f + static_cast<float>(row * 0xB8);
+		y = 10.0f + static_cast<float>((slot / 4) * 0xB8);
 		float yTmp = y;
-		if (row != 0) {
+		if ((slot / 4) != 0) {
 			float rowAdd = 8.0f;
 			yTmp = y + rowAdd;
 		}
@@ -7426,7 +7424,7 @@ void CMenuPcs::DrawCMLife()
 			} else {
 				texV = 40.0f;
 			}
-			if (row != 0) {
+			if ((slot / 4) != 0) {
 				y += 8.0f;
 			}
 			y += 100.0;
@@ -7816,17 +7814,17 @@ void CMenuPcs::ChgAllModel()
  */
 void CMenuPcs::ChgAllModel2()
 {
-	int isFemale;
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
-		const Mc::CharaDat& character = m_cmakeWork->m_characters[i];
 		int tribe;
 		int appearance;
+		int isFemale;
+		const Mc::CharaDat& character = m_cmakeWork->m_characters[i];
 
 		if (character.m_exists != 0) {
-			isFemale = character.m_genderFlag;
-			appearance = character.m_appearanceVariant;
 			tribe = character.m_tribeId;
+			appearance = character.m_appearanceVariant;
+			isFemale = character.m_genderFlag;
 		} else {
 			tribe = -1;
 			modelData->m_modelNo = -1;
@@ -9267,8 +9265,8 @@ inline void CMenuPcs::DrawPageMark()
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kPageMarkTexture));
 
-	x += (48.0f - 48.0f * scale) * 0.5;
-	y += (40.0f - 40.0f * scale) * 0.5;
+	x += (48.0f - 48.0f * scale) / 2.0;
+	y += (40.0f - 40.0f * scale) / 2.0;
 	if ((m_pageMarkFlags & 2) != 0) {
 		MenuPcs.DrawRect(8, x, y, 48.0f, 40.0f, 0.0f, 0.0f, scale, scale, 0.0f);
 	}
@@ -9293,25 +9291,23 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 		return;
 	}
 
-	float u0;
-	float v0;
 	float u1;
 	float v1;
 
 	if ((flags & 8) != 0) {
 		u1 = tx + FLOAT_80331434;
-		u0 = (tx + w) - FLOAT_80331434;
+		tx = (tx + w) - FLOAT_80331434;
 	} else {
 		u1 = (tx + w) - FLOAT_80331434;
-		u0 = tx + FLOAT_80331434;
+		tx += FLOAT_80331434;
 	}
 
 	if ((flags & 4) != 0) {
 		v1 = ty + FLOAT_80331434;
-		v0 = (v1 + h) - FLOAT_80331434;
+		ty = (v1 + h) - FLOAT_80331434;
 	} else {
 		v1 = (ty + h) - FLOAT_80331434;
-		v0 = ty + FLOAT_80331434;
+		ty += FLOAT_80331434;
 	}
 
 	float wS = w * scaleX;
@@ -9354,11 +9350,11 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 		if ((i & 1) != 0) {
 			uu = u1;
 		} else {
-			uu = u0;
+			uu = tx;
 		}
 		float vv;
 		if (i < 2) {
-			vv = v0;
+			vv = ty;
 		} else {
 			vv = v1;
 		}
@@ -9381,25 +9377,23 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		return;
 	}
 
-	float u1;
 	float v1;
-	float u0;
-	float v0;
+	float u1;
 
 	if ((flags & 8) != 0) {
 		u1 = tx + FLOAT_80331434;
-		u0 = (tx + w) - FLOAT_80331434;
+		tx = (tx + w) - FLOAT_80331434;
 	} else {
 		u1 = (tx + w) - FLOAT_80331434;
-		u0 = tx + FLOAT_80331434;
+		tx += FLOAT_80331434;
 	}
 
 	if ((flags & 4) != 0) {
 		v1 = ty + FLOAT_80331434;
-		v0 = (v1 + h) - FLOAT_80331434;
+		ty = (v1 + h) - FLOAT_80331434;
 	} else {
 		v1 = (ty + h) - FLOAT_80331434;
-		v0 = ty + FLOAT_80331434;
+		ty += FLOAT_80331434;
 	}
 
 	float wS = w * scaleX;
@@ -9437,13 +9431,13 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		if ((i & 1) != 0) {
 			uu = u1;
 		} else {
-			uu = u0;
+			uu = tx;
 		}
 		float vv;
 		if (i < 2) {
-			vv = v0;
-		} else {
 			vv = v1;
+		} else {
+			vv = ty;
 		}
 		GXTexCoord2f32(uu, vv);
 	}

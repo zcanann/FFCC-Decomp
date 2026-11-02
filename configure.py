@@ -565,7 +565,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01"), "maphit.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "maplight.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapmesh.cpp", extra_cflags=["-sdata 8"]),
-            Object(NonMatching, "mapobj.cpp", extra_cflags=["-RTTI on", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapobj.cpp", extra_cflags=["-RTTI on", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapocttree.cpp", extra_cflags=["-sdata 8"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapshadow.cpp", cflags=cflags_game_cpp_exceptions, extra_cflags=["-sdata2 8"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "maptexanim.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),

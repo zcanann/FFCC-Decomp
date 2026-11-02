@@ -2043,6 +2043,7 @@ void CMenuPcs::InitSaveLoadMenu()
 void CMenuPcs::CalcLoadMenu()
 {
 	int playOpenSe = 0;
+	int winType;
 	int messType;
 	m_textureLocIndex = 0;
 
@@ -2147,7 +2148,6 @@ void CMenuPcs::CalcLoadMenu()
 	case 0x1C: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			playOpenSe = true;
-			int winType;
 			messType = 0;
 			if (subState == 5) { winType = 1; }
 			else if (subState == 6) { winType = 2; }
@@ -2155,8 +2155,8 @@ void CMenuPcs::CalcLoadMenu()
 			else if (subState == 10) { winType = 0xB; }
 			else if (subState == 0xE) { winType = 0xC; }
 			else if (subState == 0xF) { winType = 0xD; }
-			else if (subState == 0x1C) { messType = 1; winType = 0x1B; }
-			else if (subState == 0x1B) { messType = 1; winType = 0x1C; }
+			else if (subState == 0x1C) { winType = 0x1B; messType = 1; }
+			else if (subState == 0x1B) { winType = 0x1C; messType = 1; }
 			else if (subState == 0x18) { playOpenSe = false; winType = 0x10; }
 			else if (subState == 0x17) { winType = 0x11; }
 			else { winType = 0x13; }
@@ -8434,11 +8434,12 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
  */
 inline int CMenuPcs::ChkMcDataCnt()
 {
+	McListInfo* entry;
 	int count;
 	int i;
 	for (i = count = 0; i < kMcListCount; i++) {
-		const McListInfo& entry = m_wmCharaState[i];
-		if (entry.m_isBroken == 0 && static_cast<int>(entry.m_scriptSysVal0) > 0) {
+		entry = &m_wmCharaState[i];
+		if (entry->m_isBroken == 0 && static_cast<int>(entry->m_scriptSysVal0) > 0) {
 			count++;
 		}
 	}

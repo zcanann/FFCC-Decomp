@@ -758,18 +758,10 @@ void CGraphicPcs::drawScreenFade()
                 pos.y += slotData->m_targetYOffs;
                 PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
-                const float sx = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
-                pos.x = sx;
-                const float sy = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
-                pos.y = sy;
-                float clampedX = 0.0f;
-                clampedX = (sx < clampedX) ? clampedX : ((kGraphicScreenWidth < sx) ? kGraphicScreenWidth : sx);
-                pos.x = clampedX;
-                {
-                    float clampedY = 0.0f;
-                    clampedY = (pos.y < clampedY) ? clampedY : ((kGraphicScreenHeight < pos.y) ? kGraphicScreenHeight : pos.y);
-                    pos.y = clampedY;
-                }
+                pos.x = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
+                pos.y = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
+                pos.x = (pos.x < 0.0f) ? 0.0f : ((kGraphicScreenWidth < pos.x) ? kGraphicScreenWidth : pos.x);
+                pos.y = (pos.y < 0.0f) ? 0.0f : ((kGraphicScreenHeight < pos.y) ? kGraphicScreenHeight : pos.y);
 
                 radius = (int)(1280.0f * (1.0f - fadeWave));
                 drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor, baseColor);

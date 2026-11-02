@@ -2474,11 +2474,10 @@ void CMenuPcs::CalcLoadMenu()
 				}
 			}
 			OSCalendarTime saveTimes[kMcListCount];
-			OSCalendarTime* currentTime = saveTimes;
 			subState = 0;
 			do {
 				OSTicksToCalendarTime(m_wmCharaState[subState].m_saveTime,
-				                      &currentTime[subState]);
+				                      &saveTimes[subState]);
 				subState++;
 			} while (subState < 4);
 
@@ -2489,23 +2488,22 @@ void CMenuPcs::CalcLoadMenu()
 				    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
 					if (bestIdx < 0) {
 						bestIdx = subState;
-					} else if (saveTimes[bestIdx].year <= currentTime->year
-					           && (saveTimes[bestIdx].year < currentTime->year
-					               || (saveTimes[bestIdx].yday <= currentTime->yday
-					                   && (saveTimes[bestIdx].yday < currentTime->yday
-					                       || (saveTimes[bestIdx].hour <= currentTime->hour
-					                           && (saveTimes[bestIdx].hour < currentTime->hour
-					                               || (saveTimes[bestIdx].min <= currentTime->min
-					                                   && (saveTimes[bestIdx].min < currentTime->min
-					                                       || (saveTimes[bestIdx].sec <= currentTime->sec
-					                                           && (saveTimes[bestIdx].sec < currentTime->sec
-					                                               || (saveTimes[bestIdx].msec <= currentTime->msec
-					                                                   && (saveTimes[bestIdx].msec < currentTime->msec
-					                                                       || saveTimes[bestIdx].usec < currentTime->usec)))))))))))) {
+					} else if (saveTimes[bestIdx].year <= saveTimes[subState].year
+					           && (saveTimes[bestIdx].year < saveTimes[subState].year
+					               || (saveTimes[bestIdx].yday <= saveTimes[subState].yday
+					                   && (saveTimes[bestIdx].yday < saveTimes[subState].yday
+					                       || (saveTimes[bestIdx].hour <= saveTimes[subState].hour
+					                           && (saveTimes[bestIdx].hour < saveTimes[subState].hour
+					                               || (saveTimes[bestIdx].min <= saveTimes[subState].min
+					                                   && (saveTimes[bestIdx].min < saveTimes[subState].min
+					                                       || (saveTimes[bestIdx].sec <= saveTimes[subState].sec
+					                                           && (saveTimes[bestIdx].sec < saveTimes[subState].sec
+					                                               || (saveTimes[bestIdx].msec <= saveTimes[subState].msec
+					                                                   && (saveTimes[bestIdx].msec < saveTimes[subState].msec
+					                                                       || saveTimes[bestIdx].usec < saveTimes[subState].usec)))))))))))) {
 						bestIdx = subState;
 					}
 				}
-				currentTime++;
 			}
 			if (bestIdx < 0) bestIdx = 0;
 

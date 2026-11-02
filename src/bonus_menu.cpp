@@ -416,7 +416,7 @@ void CMenuPcs::createBonus()
 			slotIdx++;
 		}
 
-		for (j = 0; j < BonusSummaryData::kArtifactCount; j++, k++) {
+		for (j = 0; j < BonusSummaryData::kArtifactCount; k++, j++) {
 			int itemId = s_Rinfo->m_artifacts[j];
 			if (itemId <= 0) {
 				m_wm.m_handles[k] = 0;

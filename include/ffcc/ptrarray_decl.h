@@ -12,12 +12,12 @@ public:
 
     int Add(T item);
     void SetAt(unsigned long index, T item);
+    T GetAt(unsigned long index);
     unsigned long GetSize();
     void RemoveAll();
     void ReleaseAndRemoveAll();
     void DeleteAndRemoveAll();
     void RemoveAt(unsigned long index);
-    T GetAt(unsigned long index);
     T operator[](unsigned long index);
     void SetStage(CMemory::CStage* stage);
     void SetDefaultSize(unsigned long defaultSize);

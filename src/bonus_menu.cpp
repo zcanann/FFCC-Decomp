@@ -1817,13 +1817,13 @@ void CMenuPcs::CalcResultCloseAnim()
 	}
 	Mtx scaleMtx;
 	{
+		CCharaPcs::CHandle* handle;
 		int total2 = activePartyCount * 2;
 		i = 0;
 		int spriteIndex = total2 + 1;
 
-		for (; i < total2; i++, spriteIndex++) {
+		for (; i < total2; i++) {
 			sprite = &m_bonusAnim->sprites[spriteIndex];
-			CCharaPcs::CHandle* handle;
 			if (i < activePartyCount) {
 				handle = s_Rinfo->m_party[i].m_partyHandle;
 				delta = s_Rinfo->m_party[i].m_tribeId;
@@ -1861,7 +1861,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			} else {
 				handle->m_model->m_lightAlpha = sprite->alpha;
 			}
-
+			spriteIndex++;
 		}
 	}
 

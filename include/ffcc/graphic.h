@@ -144,8 +144,8 @@ public:
     _GXColor m_defaultCopyClearColor;
     u8 _pad_0x7363[0x1];
     s32 m_drawDoneWaiting;
-    char* m_drawDoneFile;
-    s32 m_drawDoneLine;
+    char* volatile m_drawDoneFile;
+    volatile s32 m_drawDoneLine;
     volatile s32 m_drawDoneCounter;
 };
 

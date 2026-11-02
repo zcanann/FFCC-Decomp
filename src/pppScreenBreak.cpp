@@ -146,8 +146,8 @@ static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext,
     }
 
     for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
+        ScreenBreakMeshData* meshData = mesh[i].m_data;
         ScreenBreakPiece* piece = &pieceBase[i];
-        ScreenBreakMeshData* meshData = mesh->m_data;
         if (piece->m_active != 0) {
             MtxPtr nodeMtx = model->GetNode(meshData->m_nodeIndex)->GetLocalMatrix();
 
@@ -193,8 +193,6 @@ static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext,
             invTransMtx[2][3] = invTransOffset.z;
             PSMTXConcat(invTransMtx, nodeMtx, nodeMtx);
         }
-
-        mesh++;
     }
 
     return 1;

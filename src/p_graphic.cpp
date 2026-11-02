@@ -317,6 +317,15 @@ void CGraphicPcs::drawEnd()
 	Graphic.EndFrame();
 }
 
+static inline bool isDrawDebugText()
+{
+    bool drawText = false;
+    if (Pad.IsDebug(0) != 0 && Joybus.GetPadType(0) != 0x40000) {
+        drawText = true;
+    }
+    return drawText;
+}
+
 static inline void setBarColor(GXColor& dst, const u32& colorWord)
 {
     const GXColor* src = (const GXColor*)&colorWord;
@@ -368,12 +377,7 @@ void CGraphicPcs::drawBar()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-    int drawText = 0;
-    int padState = Pad.IsDebug(0);
-    if ((padState != 0) && (Joybus.GetPadType(0) != 0x40000)) {
-        drawText = 1;
-    }
-    const int textFlag = (u8)drawText;
+    const int textFlag = isDrawDebugText();
 
     float x = kDebugBarLeft;
     GXColor barColor = {0x80, 0x80, 0x80, 0xFF};

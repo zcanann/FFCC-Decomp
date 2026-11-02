@@ -51,13 +51,13 @@ void CMenuPcs::MLstDraw()
 	short menuMode;
 	int i;
 	MenuLstEntry* item;
-	float y;
-	float h;
 	float w;
-	float x;
-	float v;
 	float textX;
 	float textY;
+	float x;
+	float y;
+	float h;
+	float v;
 	GXColor colors[4];
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

@@ -3244,11 +3244,10 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	}
 
 	outData[4] = equipCount;
-	outData += 5;
-	memcpy(outData, equipIndices, indexBytes - 1);
+	memcpy(outData + 5, equipIndices, indexBytes - 1);
 
 	dataSize = indexBytes + 4;
-	outData += indexBytes - 1;
+	outData += indexBytes + 4;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = localPlayerData.m_items[equipIndices[i]];
 		SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemId];

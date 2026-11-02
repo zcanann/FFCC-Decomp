@@ -30,7 +30,7 @@ static const char s_FF_Crystal_Chronicles_801E3088[] = "FF Crystal Chronicles";
 #endif
 
 #ifndef VERSION_GCCJGC
-char* g_strMenuUtilMes[] = {
+char* g_strMenuUtilMes[][20] = {
 #ifdef VERSION_GCCE01
 	"Strength",
 	"Defense",
@@ -274,7 +274,7 @@ struct MenuOptionMeterLayout {
 	Vec2d maxLabel;
 };
 
-#define OPT_MES(n) g_strMenuUtilMes[langRow * 20 + (n)]
+#define OPT_MES(n) g_strMenuUtilMes[langRow][n]
 
 /*
  * --INFO--
@@ -567,13 +567,13 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	const SItemFlatRow* item = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable) + msgNo;
 	u16 flags = item->m_equipFlags;
 	if ((flags & 0x100) != 0) {
-		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20]);
+		strcpy(scratch, g_strMenuUtilMes[languageIndex][0]);
 	} else if ((flags & 0x200) != 0) {
-		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20 + 1]);
+		strcpy(scratch, g_strMenuUtilMes[languageIndex][1]);
 	} else if ((flags & 0x400) != 0) {
-		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20 + 1]);
+		strcpy(scratch, g_strMenuUtilMes[languageIndex][1]);
 	} else if ((flags & 0x800) != 0) {
-		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20 + 1]);
+		strcpy(scratch, g_strMenuUtilMes[languageIndex][1]);
 	} else if ((flags & 0x1000) != 0) {
 		strcpy(scratch, "");
 	} else if ((flags & 0x2000) != 0) {
@@ -1236,7 +1236,7 @@ static inline void DrawOptionLabel(CMenuPcs* menu, int x, int y, _GXColor color,
 void CMenuPcs::DrawOptionMenu()
 {
 	float specialRowCos;
-	CFont* font = m_fonts[0];
+	CFont* font = GetFont22();
 	int langRow = Game.m_gameWork.GetLanguage() - 1;
 	float h;
 	float w;
@@ -1274,14 +1274,13 @@ void CMenuPcs::DrawOptionMenu()
 	};
 #else
 	char* optionText[5] = { 0, 0, 0, 0, 0 };
-	char** mes = &g_strMenuUtilMes[langRow * 20];
 	int idx = 2;
 	for (int n = 0; n < 5; n++) {
-		optionText[n] = mes[idx++];
+		optionText[n] = g_strMenuUtilMes[langRow][idx++];
 	}
 	char* helpText[5] = { 0, 0, 0, 0, 0 };
 	for (int n = 0; n < 5; n++) {
-		helpText[n] = mes[idx++];
+		helpText[n] = g_strMenuUtilMes[langRow][idx++];
 	}
 
 #endif

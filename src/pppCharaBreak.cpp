@@ -656,8 +656,13 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 
     ClearCharaBreakModelCallbacks(model);
 
+#if defined(VERSION_GCCP01)
     meshBufferSlot = work->m_meshBuffers;
     perMeshBuffers = meshBufferSlot;
+#else
+    perMeshBuffers = work->m_meshBuffers;
+    meshBufferSlot = perMeshBuffers;
+#endif
     mesh = model->GetMesh();
 
 #if defined(VERSION_GCCP01)
@@ -723,6 +728,9 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
     CChara::CModel* model;
     CChara::CMesh* mesh;
     CharaBreakDisplayList* displayList;
+#if !defined(VERSION_GCCP01)
+    u32 totalPolygonCount;
+#endif
     u32 i;
     int dl;
 
@@ -778,7 +786,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
 
     if (work->m_meshBuffers == NULL) {
 #if !defined(VERSION_GCCP01)
-        u32 totalPolygonCount = 0;
+        totalPolygonCount = 0;
 #endif
         work->m_miscValue = -10000.0f;
 #if defined(VERSION_GCCP01)

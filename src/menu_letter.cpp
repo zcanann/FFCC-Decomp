@@ -953,7 +953,7 @@ inline int CMenuPcs::LetterAttachWinClose()
  */
 int CMenuPcs::LetterConfirmOpen()
 {
-	CCaravanWork* caravanWork = GetLetterCaravanWork();
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 #ifndef VERSION_GCCJGC
 	int languageId = Game.m_gameWork.m_languageId;
 #endif

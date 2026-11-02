@@ -1203,7 +1203,7 @@ void CMenuPcs::CalcDiaryMenu()
 #ifdef VERSION_GCCP01
 	static bool s_wmMenuLastMountState = false;
 
-	const bool mounted = MemoryCardMan.m_currentSlot != -1;
+	const bool mounted = MemoryCardMan.IsMcMount();
 	if (mounted != s_wmMenuLastMountState) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 			System.Printf("mount = %s\n", mounted ? "TRUE" : "FALSE");
@@ -1465,6 +1465,7 @@ void CMenuPcs::CalcMCardMenu()
 	int playOpenSe = false;
 	unsigned int buttonsDown = Pad.GetButtonDown(0);
 	unsigned short buttonsRepeat = GetButtonRepeat(0);
+	int winType;
 	int messType;
 
 	if ((signed char)m_wmWorldState->m_worldReady == 0) {
@@ -1568,7 +1569,6 @@ void CMenuPcs::CalcMCardMenu()
 	case 0x1C: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			playOpenSe = true;
-			int winType;
 			messType = 0;
 			if (subState == 5) { winType = 1; }
 			else if (subState == 6) { winType = 2; }
@@ -1577,8 +1577,8 @@ void CMenuPcs::CalcMCardMenu()
 			else if (subState == 10) { winType = 0xB; }
 			else if (subState == 0xE) { winType = 0xC; }
 			else if (subState == 0xF) { winType = 0xD; }
-			else if (subState == 0x1C) { winType = 0x1B; messType = 1; }
-			else if (subState == 0x1B) { winType = 0x1C; messType = 1; }
+			else if (subState == 0x1C) { messType = 1; winType = 0x1B; }
+			else if (subState == 0x1B) { messType = 1; winType = 0x1C; }
 			else if (subState == 0x15) { playOpenSe = false; winType = 0xE; }
 			else { winType = 0xF; }
 			short windowWidth;
@@ -1683,7 +1683,6 @@ void CMenuPcs::CalcMCardMenu()
 	case 0x19: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			messType = 0;
-			int winType;
 			if (subState == 8) {
 				m_wmWorldState->m_cardChannel = 0;
 				winType = 4;
@@ -1956,11 +1955,10 @@ inline void CMenuPcs::CalcCMakeMenu()
 	if (m_wmWorldState->m_mainState <= 4) {
 		CalcCharaSelect();
 		CalcCharaBase();
-		short state = m_wmWorldState->m_mainState;
 		int frameStep;
-		if (state == 0) {
+		if (m_wmWorldState->m_mainState == 0) {
 			frameStep = m_wmWorldState->m_frameCounter - 10;
-		} else if (state > 0 && state < 4) {
+		} else if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 			frameStep = 0;
 		} else {
 			frameStep = -m_wmWorldState->m_frameCounter;
@@ -3157,13 +3155,13 @@ void CMenuPcs::DrawMCardMenu()
 
 	float cursorX;
 	float cursorY;
-	short state = m_wmWorldState->m_mainState;
+	short state;
 	short ss2;
-	if (state > 0 && state < 4) {
+	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		float alpha;
-		if (state == 1) {
+		if (m_wmWorldState->m_mainState == 1) {
 			alpha = (float)(DOUBLE_803314E8 * (double)(int)m_wmWorldState->m_frameCounter);
-		} else if (state == 2) {
+		} else if (m_wmWorldState->m_mainState == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
 			alpha = (float)-(DOUBLE_803314E8 * (double)(int)m_wmWorldState->m_frameCounter - DOUBLE_80331420);
@@ -3197,8 +3195,8 @@ void CMenuPcs::DrawMCardMenu()
 	state = m_wmWorldState->m_mainState;
 	if (state == 2 && m_wmWorldState->m_delay == 0) {
 		short winState;
-		short subState = m_wmWorldState->m_subState;
-		switch ((int)subState) {
+		state = m_wmWorldState->m_subState;
+		switch ((int)state) {
 		case 0:
 		case 2:
 			winState = m_menuWindowInfo->state;
@@ -3299,8 +3297,7 @@ void CMenuPcs::DrawMCardMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(6, 0);
-				short r = m_wmWorldState->m_mcResult;
-				if (r != 0 && r == 1) {
+				if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult == 1) {
 					m_wmWorldState->m_subState = 0xc;
 				}
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
@@ -3481,7 +3478,7 @@ void CMenuPcs::DrawMCardMenu()
 			}
 			break;
 		}
-		if ((int)subState != (int)m_wmWorldState->m_subState) {
+		if ((int)state != (int)m_wmWorldState->m_subState) {
 			m_wmWorldState->m_flag09 = 0;
 			m_wmWorldState->m_counter1A = 0;
 			m_wmWorldState->m_state0E = 0;
@@ -3878,9 +3875,9 @@ void CMenuPcs::DrawLoadMenu()
 	// State machine for MC operations
 	state = m_wmWorldState->m_mainState;
 	if (state == 2 && m_wmWorldState->m_delay == 0) {
-		short subState = m_wmWorldState->m_subState;
+		state = m_wmWorldState->m_subState;
 		short winState;
-		switch ((int)subState) {
+		switch ((int)state) {
 		case 0:
 		case 2:
 			winState = m_menuWindowInfo->state;
@@ -3984,8 +3981,7 @@ void CMenuPcs::DrawLoadMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(6, 0);
-				short cRes4 = m_wmWorldState->m_mcResult;
-				if (cRes4 != 0 && cRes4 == 1) {
+				if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult == 1) {
 					m_wmWorldState->m_subState = 0xC;
 				}
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
@@ -4044,11 +4040,10 @@ void CMenuPcs::DrawLoadMenu()
 				}
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short ynResult = m_wmWorldState->m_mcResult;
-				if (ynResult < 0) {
-					if (ynResult == -1) m_wmWorldState->m_subState = 5;
-					else if (ynResult == -2) m_wmWorldState->m_subState = 8;
-					else if (ynResult == -3) m_wmWorldState->m_subState = 6;
+				if (m_wmWorldState->m_mcResult < 0) {
+					if (m_wmWorldState->m_mcResult == -1) m_wmWorldState->m_subState = 5;
+					else if (m_wmWorldState->m_mcResult == -2) m_wmWorldState->m_subState = 8;
+					else if (m_wmWorldState->m_mcResult == -3) m_wmWorldState->m_subState = 6;
 					else m_wmWorldState->m_subState = 7;
 				} else if (m_wmWorldState->m_state0E < 0) {
 					if (m_wmWorldState->m_subState == 0x19) {
@@ -4159,7 +4154,7 @@ void CMenuPcs::DrawLoadMenu()
 			}
 			break;
 		}
-		if ((int)subState != (int)m_wmWorldState->m_subState) {
+		if ((int)state != (int)m_wmWorldState->m_subState) {
 			m_wmWorldState->m_flag09 = 0;
 			m_wmWorldState->m_counter1A = 0;
 			m_wmWorldState->m_state0E = 0;
@@ -4436,9 +4431,8 @@ void CMenuPcs::DrawTitleMenu()
 		}
 
 		// Fade out / transition to next state
-		state = m_wmWorldState->m_mainState;
-		if (state == 3 || (state == 1 && static_cast<signed char>(s_fade_mode) != 0)) {
-			if (state == 3) {
+		if (m_wmWorldState->m_mainState == 3 || (m_wmWorldState->m_mainState == 1 && static_cast<signed char>(s_fade_mode) != 0)) {
+			if (m_wmWorldState->m_mainState == 3) {
 				fadeAlpha2 = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter + 1));
 			} else {
 				fadeAlpha2 = static_cast<float>(-(0.025 * static_cast<double>(m_wmWorldState->m_frameCounter) -
@@ -4450,7 +4444,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// End state handling
 		state = m_wmWorldState->m_mainState;
-		if (state == 3 && m_wmWorldState->m_frameCounter >= 0xA) {
+		if (m_wmWorldState->m_mainState == 3 && m_wmWorldState->m_frameCounter >= 0xA) {
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
 			if (m_wmWorldState->m_state0E != 0) {
 				s_fade_mode = 1;

@@ -674,6 +674,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	LightPcs.EnableLight(1, 0);
 }
 
+static inline float Min(float a, float b)
+{
+	return (a < b) ? a : b;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800e2174
@@ -729,8 +734,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 				int reduce = (targetColor.a * (4 - distance)) / 4;
 				a = (a - reduce < 0) ? 0 : a - reduce;
 			} else {
-				float k = (float)(distance / 4) + (float)(7 - targetColor.a) / 7.0f;
-				k = (1.0f < k) ? 1.0f : k;
+				float k = Min((float)(distance / 4) + (float)(7 - targetColor.a) / 7.0f, 1.0f);
 				r = (int)((float)r * k + (float)targetColor.r * (1.0f - k));
 				g = (int)((float)g * k + (float)targetColor.g * (1.0f - k));
 				b = (int)((float)b * k + (float)targetColor.b * (1.0f - k));

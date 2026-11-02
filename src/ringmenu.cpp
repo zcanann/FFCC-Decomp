@@ -568,13 +568,13 @@ void CRingMenu::onDraw()
 		}
 
 		textX2 = 64.0f + drawX;
-#ifdef VERSION_GCCJGC
 		textX0 = textX2;
+#ifdef VERSION_GCCJGC
 		textY0 = 5.0f + drawY;
 		textX1 = 56.0f + drawX;
 		textY1 = 3.0f + drawY;
 #else
-		textX0 = textX2 + 20.0f;
+		textX0 += 20.0f;
 		textY0 = (5.0f + drawY) - 4.0f;
 		textX1 = (56.0f + drawX) + 20.0f;
 		textY1 = (3.0f + drawY) - 4.0f;

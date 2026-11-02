@@ -8218,9 +8218,16 @@ void CMenuPcs::CalcMainMenuSub()
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
 				double u = static_cast<double>(n) / 20.0;
-				modelMtx[0][3] += static_cast<float>(static_cast<float>(-modelMtx[0][3] * u) * u);
-				modelMtx[1][3] += static_cast<float>(static_cast<float>(-0.2 - modelMtx[1][3] * u) * u);
-				modelMtx[2][3] += static_cast<float>(static_cast<float>(51.5 - modelMtx[2][3]) * u);
+				float d;
+				d = -modelMtx[0][3] * u;
+				d *= u;
+				modelMtx[0][3] += d;
+				d = -0.2 - modelMtx[1][3] * u;
+				d *= u;
+				modelMtx[1][3] += d;
+				d = 51.5 - modelMtx[2][3];
+				d *= u;
+				modelMtx[2][3] += d;
 			}
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == i &&
@@ -8231,9 +8238,8 @@ void CMenuPcs::CalcMainMenuSub()
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
-				float openScale2 = static_cast<float>(
-				    static_cast<float>(DOUBLE_803313F8 * (static_cast<double>(n) / 20.0)) +
-				    DOUBLE_80331420);
+				float openScale2 = DOUBLE_803313F8 * (static_cast<double>(n) / 20.0);
+				openScale2 += DOUBLE_80331420;
 				PSMTXScale(workMtx, openScale2, openScale2, openScale2);
 				PSMTXConcat(workMtx, modelMtx, modelMtx);
 			}

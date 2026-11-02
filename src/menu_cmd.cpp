@@ -2076,8 +2076,8 @@ void CMenuPcs::DrawUniteList()
 		const float panelTone = active ? 64.0f : 0.0f;
 		CmdListEntry* const startEntry = &GetCmdListStorage(this)->entries[groupStart];
 		drawY = static_cast<float>(
-		    (static_cast<float>(endEntry->y + endEntry->height - startEntry->y) - 64.0f) *
-		        0.5 +
+		    (static_cast<float>(endEntry->y + endEntry->height - startEntry->y) - 64.0f) /
+		        2.0 +
 		    static_cast<double>(startEntry->y));
 
 		if (GetCmdStateView(this)->mode == 3) {

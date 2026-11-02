@@ -803,8 +803,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		{
 			for (i = 0; i < activePartyCount; i++) {
 				sprite = &m_bonusAnim->sprites[i + 1];
-				src = sprite + activePartyCount;
-				sprite->startFrame = src->startFrame + src->duration;
+				sprite->startFrame = sprite[activePartyCount].startFrame + sprite[activePartyCount].duration;
 			}
 		}
 
@@ -1781,8 +1780,10 @@ void CMenuPcs::CalcResultCloseAnim()
 			float ty = sprite->targetY;
 			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			float fy = (float)sprite->y;
-			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (ty - fy) * progress;
+			float dx = sprite->targetX - (float)sprite->x;
+			float dy = ty - fy;
+			sprite->motionX = dx * progress;
+			sprite->motionY = dy * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -2364,9 +2365,11 @@ void CMenuPcs::CalcSelectOpenAnim()
 		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
 			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			float fy = (float)sprite->y;
-			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
+			float dx = sprite->targetX - (float)sprite->x;
+			sprite->motionX = dx * progress;
 			float ty = sprite->targetY;
-			sprite->motionY = (ty - fy) * progress;
+			float dy = ty - fy;
+			sprite->motionY = dy * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -3202,8 +3205,10 @@ void CMenuPcs::CalcSelectCloseAnim()
 			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
-			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (ty - fy) * progress;
+			float dx = sprite->targetX - (float)sprite->x;
+			float dy = ty - fy;
+			sprite->motionX = dx * progress;
+			sprite->motionY = dy * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {

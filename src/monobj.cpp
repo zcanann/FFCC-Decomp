@@ -70,6 +70,15 @@ struct CMonAiAction {
 	unsigned short m_changeStat;
 };
 
+inline int CGame::CGameWork::GetArtifactStageLevel()
+{
+	if (IsBattleStage()) {
+		int stage = m_bossArtifactStageTable[m_bossArtifactStageIndex];
+		return (stage < 2) ? stage : 2;
+	}
+	return 0;
+}
+
 static inline unsigned char* CGMonObj_GetAiData(CGMonObj* monObj)
 {
 	if (monObj->m_aiState == 0) {
@@ -1460,8 +1469,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 {
 	m_unk6BF = 1;
 
-	unsigned short prgFlags = static_cast<unsigned short>(prgObj->GetCID());
-	if ((prgFlags & 0x6D) == 0x6D) {
+	if (prgObj->IsKindOf(0x6D)) {
 		unsigned char* aiData;
 		if (m_aiState == 0) {
 			aiData = reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork);
@@ -1474,8 +1482,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 		int attackerIndex = SAFE_CAST_CARAVAN_WORK(prgObj->m_scriptHandle)->m_joybusCaravanId;
 		if ((static_cast<int>(*reinterpret_cast<unsigned short*>(aiData + 0x106)) == 1) || (m_targetPartyIndex < 0)) {
 			if ((static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode) != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-				prgFlags = static_cast<unsigned short>(prgObj->GetCID());
-				if ((prgFlags & 0x6D) == 0x6D) {
+				if (prgObj->IsKindOf(0x6D)) {
 					if (SAFE_CAST_CARAVAN_WORK(prgObj->m_scriptHandle)->m_joybusCaravanId != 0) {
 						goto skip_target_update;
 					}
@@ -2360,7 +2367,6 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
-		int artifactLevel;
 		int actionType;
 		if (m_scriptHandle->m_romWork[0x86] == 1) {
 			actionType = actionFlags & 3;
@@ -2372,15 +2378,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
-		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-			artifactLevel = 2;
-			if (stage < 2) {
-				artifactLevel = stage;
-			}
-		} else {
-			artifactLevel = 0;
-		}
+		int artifactLevel = Game.m_gameWork.GetArtifactStageLevel();
 
 		if (((actionType == 1) && (artifactLevel <= 0)) ||
 			((actionType == 2) && (artifactLevel <= 1))) {
@@ -2530,7 +2528,7 @@ void CGMonObj::mlAttack()
 					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
-					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
+					 !party->IsKindOf(0x6D) ||
 					 (SAFE_CAST_CARAVAN_WORK(reinterpret_cast<CGObject*>(party)->m_scriptHandle)->m_joybusCaravanId == 0))) {
 					validCount++;
 				}
@@ -2552,7 +2550,7 @@ void CGMonObj::mlAttack()
 					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
-					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
+					 !party->IsKindOf(0x6D) ||
 					 (SAFE_CAST_CARAVAN_WORK(reinterpret_cast<CGObject*>(party)->m_scriptHandle)->m_joybusCaravanId == 0))) {
 					if (m_partyDistance[partyIndex] < homeRange2) {
 						selectedTarget = partyIndex;
@@ -2778,13 +2776,43 @@ int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, in
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 244b
+ * EN Address: UNUSED
+ * EN Size: 284b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::aiNotFind(int seqId, int priority, float rate, int range)
+{
+	if (priority <= CGMonObj::m_aiWork.m_priority) {
+		return 0;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		if ((Game.m_partyObjArr[i] != NULL) && (m_partyDistance[i] < static_cast<float>(range))) {
+			return 0;
+		}
+	}
+
+	if (Math.RandF() < rate) {
+		CGMonObj::m_aiWork.m_state = seqId;
+		CGMonObj::m_aiWork.m_priority = priority;
+		return 1;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 168b
  * EN Address: 0x80138A98
  * EN Size: 172b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGMonObj::statWatch()
+void CGMonObj::statWatch()
 {
 	if (m_stateFrame == 0) {
 		reqAnim(-1, 0, 0);
@@ -2807,7 +2835,7 @@ inline void CGMonObj::statWatch()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGMonObj::statAround()
+void CGMonObj::statAround()
 {
 	switch (m_subState) {
 	case 0:

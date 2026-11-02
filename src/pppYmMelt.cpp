@@ -293,6 +293,16 @@ inline void InitPolygonData(PYmMelt* ctrl, VERTEX_DATA* vertexData, s16 phaseOff
  */
 void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offsets)
 {
+    VERTEX_DATA* rowVertex;
+    VERTEX_DATA* vertex;
+    float x;
+    float step;
+    float halfWidth;
+    float matrixY;
+    float rowStart;
+    float rot;
+    float z;
+    Mtx rotMtx;
     s16 phaseWork;
     int gridCount;
     int vertexCount;
@@ -300,7 +310,6 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
     YmMeltWork* work;
     VColor* colorWork;
     VERTEX_DATA* vertexBase;
-    float matrixY;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -324,7 +333,28 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
         phaseWork = ctrl->m_phasePeriod;
         work->m_phaseOffset = angleSeed % phaseWork;
         phaseWork = work->m_phaseOffset;
-        InitPolygonData(ctrl, vertexBase, phaseWork);
+        halfWidth = ctrl->m_stepValue;
+        halfWidth *= 0.5f;
+        step = ctrl->m_stepValue / (f32)ctrl->m_gridSize;
+        rot = 0.017453292f * (f32)phaseWork;
+        vertex = vertexBase;
+
+        for (rowStart = z = -halfWidth; z <= halfWidth; z += step) {
+            rowVertex = vertex;
+            for (x = rowStart; x <= halfWidth; x += step) {
+                rowVertex->m_position.x = x;
+                rowVertex->m_position.y = 0.0f;
+                rowVertex->m_position.z = z;
+
+                if (phaseWork != 0) {
+                    PSMTXRotRad(rotMtx, 'y', rot);
+                    PSMTXMultVec(rotMtx, &rowVertex->m_position, &rowVertex->m_position);
+                }
+
+                rowVertex++;
+                vertex++;
+            }
+        }
 
         CalcPolygonHeight(ctrl, vertexBase, (_GXColor*)&colorWork->m_color, matrixY);
     }

@@ -419,8 +419,6 @@ void CWind::Frame()
     WindObject* obj;
     int i;
     u32 rnd;
-    float f0;
-    float f1;
 
     obj = m_objects;
     i = 0;
@@ -430,27 +428,13 @@ void CWind::Frame()
             rnd = Math.Rand(10);
             if (rnd == 0) {
                 obj->targetPower += obj->basePower * (((rnd = Math.Rand(3)) == 0) ? 0.5f : -0.25f);
-                f0 = obj->targetPower;
-                f1 = 0.0f;
-                f1 = (f0 < f1) ? f1 : ((obj->basePower < f0) ? obj->basePower : f0);
-                obj->targetPower = f1;
+                obj->targetPower = (obj->targetPower < 0.0f) ? 0.0f : ((obj->basePower < obj->targetPower) ? obj->basePower : obj->targetPower);
             }
 
             if ((((obj->type == 0) || (obj->type == 1)) && ((rnd = Math.Rand(0x1E)), rnd == 0)) &&
                 (obj->curPower < 0.1f * obj->basePower)) {
-                rnd = Math.Rand(3);
-                if (rnd == 0) {
-                    f1 = 0.2f;
-                } else {
-                    f1 = -0.1f;
-                }
-
-                f0 = obj->baseDir;
-                obj->targetDir = f0 * f1 + obj->targetDir;
-                f0 = obj->targetDir;
-                f1 = obj->baseDir;
-                f1 = (f0 < f1) ? f1 : ((0.25f + f1 < f0) ? 0.25f + f1 : f0);
-                obj->targetDir = f1;
+                obj->targetDir += obj->baseDir * (((rnd = Math.Rand(3)) == 0) ? 0.2f : -0.1f);
+                obj->targetDir = (obj->targetDir < obj->baseDir) ? obj->baseDir : ((obj->baseDir + 0.25f < obj->targetDir) ? obj->baseDir + 0.25f : obj->targetDir);
             }
 
             if (obj->type == 2) {

@@ -802,7 +802,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "USBStreamData.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "vector.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "wind.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "wind.cpp"),
             Object(NonMatching, "wm_menu.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
             # Retail addresses local message tables separately and stores literals read-only.
             Object(MatchingFor("GCCP01", "GCCE01"), "wmm_str.cpp", extra_cflags=["-str reuse,readonly", "-pooldata off", "-inline auto,deferred"]),

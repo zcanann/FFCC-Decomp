@@ -225,6 +225,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     float upperLat;
     float z;
     float ringLat;
+    float stripLon;
     float lx;
     float ly;
     float upperSin;
@@ -288,22 +289,22 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, ringVertexCount * 2);
         i = 0;
-        lon = zero;
+        stripLon = zero;
         while (i <= (int)detail) {
-            lx = ringSin * (float)cos(lon);
-            ly = ringSin * (float)sin(lon);
+            lx = ringSin * (float)cos(stripLon);
+            ly = ringSin * (float)sin(stripLon);
             GXPosition3f32(lx, ly, ringCos);
             GXNormal3f32(-2.0f * lx * ringCos,
                          -2.0f * ly * ringCos, ringNormalZ);
 
-            ux = upperSin * (float)cos(lon);
-            uy = upperSin * (float)sin(lon);
+            ux = upperSin * (float)cos(stripLon);
+            uy = upperSin * (float)sin(stripLon);
             GXPosition3f32(ux, uy, upperCos);
             GXNormal3f32(-2.0f * ux * upperCos,
                          -2.0f * uy * upperCos, upperNormalZ);
 
             i++;
-            lon = (6.2831855f * (float)i) / (float)detail;
+            stripLon = (6.2831855f * (float)i) / (float)detail;
         }
     }
 

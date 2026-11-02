@@ -3204,8 +3204,10 @@ void CMenuPcs::DrawMCardMenu()
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
 #ifdef VERSION_GCCJGC
-				float rectY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
-				float rectX = (float)(m_menuWindowInfo->x + 28) + (float)(m_wmWorldState->m_cardChannel * 124);
+				float rectY;
+				float rectX = (float)(m_menuWindowInfo->x + 28);
+				rectY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+				rectX += (float)(m_wmWorldState->m_cardChannel * 124);
 #else
 				float rectY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float rectX = (float)GetSlotABXPos((int)m_wmWorldState->m_cardChannel);
@@ -3319,6 +3321,7 @@ void CMenuPcs::DrawMCardMenu()
 				int msgParam = 0;
 #ifdef VERSION_GCCJGC
 				int msgId;
+				float rectY;
 				float rectX;
 				short ss = m_wmWorldState->m_subState;
 				if (ss == 8) { msgId = 4; rectX = (float)(m_menuWindowInfo->x + 72); }
@@ -3326,7 +3329,7 @@ void CMenuPcs::DrawMCardMenu()
 				else if (ss == 0x19) { msgId = 0x19; msgParam = 1; rectX = (float)(m_menuWindowInfo->x + 55); }
 				else { msgId = 0x12; rectX = (float)(m_menuWindowInfo->x + 77); }
 				DrawMcWinMess(msgId, msgParam);
-				float rectY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+				rectY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
 				rectX += (float)(m_wmWorldState->m_cardChannel * 80);
 #else
 				int msgId;
@@ -3814,7 +3817,7 @@ void CMenuPcs::DrawLoadMenu()
 			DrawHelpBase(kMemoryCardBannerTexture, alpha);
 		}
 	}
-	if (alpha < FLOAT_803313dc) alpha = FLOAT_803313dc;
+	if (alpha < 0.0f) alpha = 0.0f;
 
 	unsigned int uAlpha;
 	if (alpha > FLOAT_803313e8) {
@@ -3885,8 +3888,10 @@ void CMenuPcs::DrawLoadMenu()
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
 #ifdef VERSION_GCCJGC
-				float slotY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
-				float slotX = (float)(m_menuWindowInfo->x + 28) + (float)(m_wmWorldState->m_cardChannel * 124);
+				float slotY;
+				float slotX = (float)(m_menuWindowInfo->x + 28);
+				slotY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+				slotX += (float)(m_wmWorldState->m_cardChannel * 124);
 #else
 				float slotY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float slotX = (float)GetSlotABXPos(m_wmWorldState->m_cardChannel);
@@ -4008,13 +4013,14 @@ void CMenuPcs::DrawLoadMenu()
 				int ymsgId = 0;
 				int ymsgParam = 0;
 #ifdef VERSION_GCCJGC
+				float ynY;
 				float ynX;
 				short ys = m_wmWorldState->m_subState;
 				if (ys == 8) { ymsgId = 4; ynX = (float)(m_menuWindowInfo->x + 72); }
 				else if (ys == 0x19) { ymsgId = 0x19; ymsgParam = 1; ynX = (float)(m_menuWindowInfo->x + 55); }
 				else { ymsgId = 5; ynX = (float)(m_menuWindowInfo->x + 83); }
 				DrawMcWinMess(ymsgId, ymsgParam);
-				float ynY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+				ynY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
 				ynX += (float)(m_wmWorldState->m_cardChannel * 80);
 #else
 				short ys = m_wmWorldState->m_subState;
@@ -9769,7 +9775,9 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	CFont* font;
 	const char* const* msgTable;
 	int maxWidth;
+#ifndef VERSION_GCCJGC
 	const WinMessEntry* winMess;
+#endif
 
 	font = GetFont22();
 	font->SetMargin(FLOAT_803313e8);
@@ -9778,10 +9786,17 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 
 	msgTable = GetMcWinMessBuff(messType);
 	maxWidth = 0;
+#ifndef VERSION_GCCJGC
 	winMess = GetWinMess(winType);
+#endif
 
+#ifdef VERSION_GCCJGC
+	for (i = 0; i < GetWinMess(winType)->m_lineCount; i++) {
+		const short msgId = GetWinMess(winType)->m_messageIds[i];
+#else
 	for (i = 0; i < winMess->m_lineCount; i++) {
 		const short msgId = winMess->m_messageIds[i];
+#endif
 		const char* text = msgTable[msgId];
 #ifndef VERSION_GCCJGC
 		if (text != 0) {

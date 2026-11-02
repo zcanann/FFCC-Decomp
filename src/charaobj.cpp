@@ -2864,7 +2864,7 @@ void CGCharaObj::combi2()
 	int j;
 	int k;
 	int hasNearbyPartner;
-	int playedComboSe;
+	CGPartyObj* party;
 	CGPartyObj* leadParty;
 	CGPartyObj* candidates[5];
 	int candidateCount = 0;
@@ -2969,9 +2969,9 @@ void CGCharaObj::combi2()
 	System.Printf("combi: %d: combi%dに決定\n", System.GetCounter(), comboData->m_command);
 
 	leadParty = candidates[participantCount - 1];
-	playedComboSe = 0;
+	int playedComboSe = 0;
 	for (i = 0; i < participantCount; i++) {
-		CGPartyObj* party = candidates[i];
+		party = candidates[i];
 		unsigned int comboMode = 0xFFFFFFFF;
 
 		if (isShared1F8 != 0) {
@@ -2988,8 +2988,8 @@ void CGCharaObj::combi2()
 			}
 
 			if (party == leadParty) {
-				party->m_comboItemState = static_cast<int>(comboMode);
-				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
+				leadParty->m_comboItemState = static_cast<int>(comboMode);
+				leadParty->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 			} else {
 				party->m_comboCenter = leadParty->m_worldPosition;
 				party->m_itemId = 0;

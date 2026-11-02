@@ -974,9 +974,9 @@ void CMenuPcs::DrawSingleStat(float alpha)
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kStatTexSlice));
-    float sliceY = 40.0f;
+    float sliceY;
     float sliceHeight = 8.0f;
-    for (; sliceY < 408.0f; sliceY += sliceHeight) {
+    for (sliceY = 40.0f; sliceY < 408.0f; sliceY += sliceHeight) {
         if ((408.0f - sliceY) < sliceHeight) {
             sliceHeight = 408.0f - sliceY;
         }
@@ -1032,7 +1032,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
                                      0.0f, 88.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
-    font = m_fonts[0];
+    font = GetFont22();
     font->SetMargin(1.0f);
     font->SetShadow(1);
     font->SetScale(0.8999999761581421f);
@@ -2025,7 +2025,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     int lineCount;
     int maxWidth;
     CFont* font;
-    font = m_fonts[0];
+    font = GetFont22();
     #ifdef VERSION_GCCJGC
     font->SetMargin(4.0f);
 #else
@@ -2124,7 +2124,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     int maxWidth;
     int lineCount;
 
-    font = m_fonts[0];
+    font = GetFont22();
     #ifdef VERSION_GCCJGC
     font->SetMargin(4.0f);
 #else
@@ -2527,6 +2527,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
  */
 void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 {
+    int barY;
     int tex;
     int barX;
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2567,7 +2568,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
     barX = x + 0x10;
-    int barY = y + 8;
+    barY = y + 8;
     MenuPcs.DrawRect(0, static_cast<float>(barX), static_cast<float>(barY),
                                     4.0f, 8.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);

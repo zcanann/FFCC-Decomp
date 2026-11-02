@@ -2499,6 +2499,8 @@ void CMenuPcs::CmakeResultDraw()
 {
     int i;
     const char* value;
+    float x;
+    float y;
     CmakeMenuState* state = m_cmakeState;
     int frame = static_cast<int>(state->m_frame) - 1;
     float alpha;
@@ -2574,15 +2576,16 @@ void CMenuPcs::CmakeResultDraw()
 #endif
     for (i = 0; i < 4; i++) {
         value = GetMenuStr(0x2A + i);
+        y = 0x70 + i * 0x28;
 
 #ifndef VERSION_GCCJGC
         labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(value));
 #endif
         labelFont->SetPosX(232.0f);
 #ifdef VERSION_GCCJGC
-        labelFont->SetPosY(0x70 + i * 0x28);
+        labelFont->SetPosY(y);
 #else
-        labelFont->SetPosY(0x70 + i * 0x28 - 4.0f);
+        labelFont->SetPosY(y - 4.0f);
 #endif
         labelFont->Draw(value);
     }
@@ -2613,11 +2616,11 @@ void CMenuPcs::CmakeResultDraw()
         }
 
 #ifdef VERSION_GCCJGC
-        float x = 336.0f;
+        x = 336.0f;
 #else
-        float x = 8.0f + labelWidths[i];
+        x = 8.0f + labelWidths[i];
 #endif
-        float y = static_cast<float>(0x70 + i * 0x28);
+        y = 0x70 + i * 0x28;
         float valueWidth = valueFont->GetWidth(value);
         valueFont->SetPosX(x);
 #ifdef VERSION_GCCJGC
@@ -2754,6 +2757,8 @@ void CMenuPcs::CmakeResultDraw1()
 {
     int i;
     const char* value;
+    float x;
+    float y;
     CmakeMenuState* state = m_cmakeState;
     int frame = static_cast<int>(state->m_frame) - 1;
     float alpha;
@@ -2814,15 +2819,16 @@ void CMenuPcs::CmakeResultDraw1()
 #endif
     for (i = 0; i < 4; i++) {
         value = GetMenuStr(0x2A + i);
+        y = 0x70 + i * 0x28;
 
 #ifndef VERSION_GCCJGC
         labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(value));
 #endif
         labelFont->SetPosX(232.0f);
 #ifdef VERSION_GCCJGC
-        labelFont->SetPosY(0x70 + i * 0x28);
+        labelFont->SetPosY(y);
 #else
-        labelFont->SetPosY(0x70 + i * 0x28 - 4.0f);
+        labelFont->SetPosY(y - 4.0f);
 #endif
         labelFont->Draw(value);
     }
@@ -2853,11 +2859,11 @@ void CMenuPcs::CmakeResultDraw1()
         }
 
 #ifdef VERSION_GCCJGC
-        float x = 336.0f;
+        x = 336.0f;
 #else
-        float x = 8.0f + labelWidths[i];
+        x = 8.0f + labelWidths[i];
 #endif
-        float y = static_cast<float>(0x70 + i * 0x28);
+        y = 0x70 + i * 0x28;
         float valueWidth = static_cast<float>(valueFont->GetWidth(value));
         valueFont->SetPosX(x);
 #ifdef VERSION_GCCJGC

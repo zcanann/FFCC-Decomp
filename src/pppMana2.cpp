@@ -687,15 +687,15 @@ static void CalcReflectionVector2(
                 if (vtxReflection->y >= 0.0f) {
                     vtxColor->g += 0x7F;
                     uv.x += reflected.x / invAxis;
-                    uv.x *= 0.25f;
                     uv.y += reflected.z / invAxis;
+                    uv.x *= 0.25f;
                     uv.y *= 0.25f;
                     uv.x += 0.5f;
                 } else {
                     vtxColor->g -= 0x7F;
                     uv.x -= reflected.x / invAxis;
-                    uv.x *= 0.25f;
                     uv.y += reflected.z / invAxis;
+                    uv.x *= 0.25f;
                     uv.y *= 0.25f;
                     uv.x += 0.25f;
                     uv.y += 0.5f;
@@ -707,8 +707,8 @@ static void CalcReflectionVector2(
                     vtxColor->b += 0x7F;
                     uv.x += reflected.x / invAxis;
                     uv.y -= reflected.y / invAxis;
-                    uv.y *= 0.25f;
                     uv.x *= 0.25f;
+                    uv.y *= 0.25f;
                     uv.y += 0.25f;
                 } else {
                     vtxColor->b -= 0x7F;

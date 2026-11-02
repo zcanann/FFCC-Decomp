@@ -678,7 +678,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppLerpPos.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppLight.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppLocationTitle.cpp"),
-            Object(NonMatching, "pppMana2.cpp", extra_cflags=["-str reuse,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01"), "pppMana2.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixLoc.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixScl.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixXYZ.cpp"),

@@ -100,11 +100,12 @@ void pppRenderYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offse
     YmMeltDataOffsets* dataOffsets = GetYmMeltDataOffsets(offsets);
     work = reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + dataOffsets->m_workOffset);
     colorWork = reinterpret_cast<VColor*>(ymMelt->m_workArea + dataOffsets->m_colorWorkOffset);
-    if (ctrl->m_dataValIndex == 0xFFFF) {
+    s32 dataValIndex = ctrl->m_dataValIndex;
+    if (dataValIndex == 0xFFFF) {
         return;
     }
 
-    shape = ppvEnv->m_shapeTablePtr[ctrl->m_dataValIndex];
+    shape = ppvEnv->m_shapeTablePtr[dataValIndex];
 
     pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, 0.0f,
                   ctrl->m_drawEnvColor1, ctrl->m_drawEnvColor0, ctrl->m_blendMode, 2, 1, 1, 0);

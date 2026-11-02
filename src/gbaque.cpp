@@ -334,34 +334,33 @@ inline void GbaQueue::ClrSmithFlg(int channel)
 void GbaQueue::LoadAll()
 {
 	int i;
-	char prevMenuStageMode;
-	char spModeBits;
+	char mode;
 	char spModeChangeBits;
 
 	for (i = 0; i < 4; i++) {
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 
-	prevMenuStageMode = m_singleMode;
+	mode = m_singleMode;
 	m_singleMode = static_cast<char>(Game.m_gameWork.m_menuStageMode != 0);
-	if (prevMenuStageMode != m_singleMode) {
+	if (mode != m_singleMode) {
 		m_playModeFlags = 0xF;
 	}
 
-	spModeBits = 0;
+	mode = 0;
 	for (i = 0; i < 4; i++) {
 		if (Game.GetGbaSP(i) != 0) {
-			spModeBits = static_cast<char>(spModeBits | (1 << i));
+			mode = static_cast<char>(mode | (1 << i));
 		}
 	}
 
-	spModeChangeBits = static_cast<char>(spModeBits ^ m_spModeBits);
+	spModeChangeBits = static_cast<char>(mode ^ m_spModeBits);
 	for (i = 0; i < 4; i++) {
 		if ((spModeChangeBits & (1 << i)) != 0) {
 			m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | (1 << i));
 		}
 	}
-	m_spModeBits = spModeBits;
+	m_spModeBits = mode;
 
 	for (i = 0; i < 4; i++) {
 		OSSignalSemaphore(&accessSemaphores[i]);

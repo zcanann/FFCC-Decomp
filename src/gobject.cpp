@@ -1182,6 +1182,7 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
     Vec toTarget;
     Vec targetDir;
     Vec toOther;
+    Vec otherPos;
     CGObject* best;
 
     origin.x = m_worldPosition.x;
@@ -1207,12 +1208,12 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
         if ((other->m_attrFlags & static_cast<unsigned int>(classMask)) == 0) {
             continue;
         }
-        const float otherX = other->m_worldPosition.x;
-        const float otherY = other->m_worldPosition.y;
-        const float otherZ = other->m_worldPosition.z;
-        if (!(otherX - maxDist <= origin.x) || !(otherY - maxDist <= origin.y)
-            || !(otherZ - maxDist <= origin.z) || !(otherX + maxDist >= origin.x)
-            || !(otherY + maxDist >= origin.y) || !(otherZ + maxDist >= origin.z)) {
+        otherPos.x = other->m_worldPosition.x;
+        otherPos.y = other->m_worldPosition.y;
+        otherPos.z = other->m_worldPosition.z;
+        if (!(otherPos.x - maxDist <= origin.x) || !(otherPos.y - maxDist <= origin.y)
+            || !(otherPos.z - maxDist <= origin.z) || !(otherPos.x + maxDist >= origin.x)
+            || !(otherPos.y + maxDist >= origin.y) || !(otherPos.z + maxDist >= origin.z)) {
             continue;
         }
 

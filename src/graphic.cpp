@@ -1078,27 +1078,22 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
 void CGraphic::makeSphere()
 {
     float vertices[42][3];
-    float (*rowVertex)[3];
-    float (*vertex)[3];
-
     int vertexCount = 0;
-    vertices[0][0] = -1.0f;
-    vertices[0][1] = 0.0f;
+
+    vertices[vertexCount][0] = -1.0f;
+    vertices[vertexCount][1] = 0.0f;
     vertices[vertexCount++][2] = 0.0f;
-    vertex = &vertices[vertexCount];
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (3.1415927f * (float)(ring + 1)) / 6.0f;
         float x = -1.0f * (float)cos(pitch);
         float radius = -1.0f * (float)sin(pitch);
 
-        rowVertex = vertex;
         for (int seg = 0; seg < 8; seg++) {
-            (*rowVertex)[0] = x;
-            (*rowVertex)[1] = radius * (float)sin(0.7853982f * (float)seg);
-            vertices[vertexCount++][2] = radius * (float)cos(0.7853982f * (float)seg);
-            vertex++;
-            rowVertex++;
+            vertices[vertexCount][0] = x;
+            vertices[vertexCount][1] = radius * (float)sin(0.7853982f * (float)seg);
+            float cosine = (float)cos(0.7853982f * (float)seg);
+            vertices[vertexCount++][2] = radius * cosine;
         }
     }
 

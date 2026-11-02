@@ -762,9 +762,9 @@ void CGPartyObj::onFramePreCalc()
 			if (m_partyData.weaponIndex != weaponIndex || m_partyData.weaponItemId != itemId) {
 				bool needsImmediateChange = !m_weaponNodeFlagBits.m_prg ||
 				    !m_weaponNodeFlagAll.m_bits1.m_shield || m_partyData.carryObject != 0 ||
-				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
-				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
-				    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0;
+				    (m_scriptHandle->m_statusTimers[0] != 0 ||
+				     m_scriptHandle->m_statusTimers[9] != 0 ||
+				     m_scriptHandle->m_statusTimers[3] != 0);
 				changeWeapon(weaponIndex, itemId, needsImmediateChange);
 			}
 		}

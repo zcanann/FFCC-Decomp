@@ -2078,10 +2078,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         font->SetTlut((activeMask & (1 << i)) != 0 ? 7 : 8);
 
 #ifdef VERSION_GCCJGC
-        if (useDynamic != 0) {
-            text = s_DynamicMessStr + i * 0x80;
-        } else {
+        if (!useDynamic) {
             text = GetMenuStr(s_SingMess[messageNo].textIds[i]);
+        } else {
+            text = s_DynamicMessStr + i * 0x80;
         }
 #else
         if (useDynamic == 0) {

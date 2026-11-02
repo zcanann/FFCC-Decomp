@@ -467,6 +467,12 @@ void CCameraPcs::calc()
     }
 
     if (m_isAbsolute == 0) {
+        float cosPitch;
+        float sinYaw;
+        float sinY;
+        float cosPitchZ;
+        float cosYaw;
+
         float stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                            ? 0.0f
                            : CameraPadInput(0).substickXF;
@@ -490,11 +496,13 @@ void CCameraPcs::calc()
 
         float yaw = m_yaw;
         float pitch = m_pitch;
-        float cosPitch = static_cast<float>(cos(pitch));
-        float sinYaw = static_cast<float>(sin(yaw));
+        cosPitch = static_cast<float>(cos(pitch));
+        sinYaw = static_cast<float>(sin(yaw));
         const float sinXCosY = sinYaw * cosPitch;
-        float sinY = static_cast<float>(sin(pitch));
-        const float cosXCosY = static_cast<float>(cos(yaw)) * static_cast<float>(cos(pitch));
+        sinY = static_cast<float>(sin(pitch));
+        cosPitchZ = static_cast<float>(cos(pitch));
+        cosYaw = static_cast<float>(cos(yaw));
+        const float cosXCosY = cosYaw * cosPitchZ;
 
         float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                            ? 0.0f

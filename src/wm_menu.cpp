@@ -4322,7 +4322,11 @@ void CMenuPcs::DrawTitleMenu()
 			GXSetChanMatColor(GX_COLOR0A0, matColor);
 			MenuPcs.DrawRect(0, selX, fY,
 			         kTitleSelectionWidth, 56.0f,
+#ifdef VERSION_GCCJGC
+			         kTitleSelectionWidth, FLOAT_803313dc,
+#else
 			         FLOAT_803313dc, 56.0f,
+#endif
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 			AlphaNormal();
 		}
@@ -4438,7 +4442,7 @@ void CMenuPcs::DrawTitleMenu()
 				fadeAlpha2 = static_cast<float>(-(0.025 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                 DOUBLE_80331420));
 			}
-			if (fadeAlpha2 >= FLOAT_803313e8) fadeAlpha2 = FLOAT_803313e8;
+			if (fadeAlpha2 >= 1.0f) fadeAlpha2 = 1.0f;
 			DrawFilter(0, 0, 0, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha2)));
 		}
 
@@ -7415,8 +7419,10 @@ void CMenuPcs::DrawCMLife()
 				y += 8.0f;
 			}
 			y += 100.0;
+			x = xBase;
+			x += 12.0;
 			MenuPcs.DrawRect(
-			    0, static_cast<float>(xBase + 12.0),
+			    0, x,
 			                                y, 120.0f,
 			                                40.0f, FLOAT_803313dc,
 			                                texV,
@@ -8203,17 +8209,15 @@ void CMenuPcs::CalcMainMenuSub()
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
-				double u = static_cast<double>(n) / 20.0;
-				float d;
-				d = -modelMtx[0][3] * u;
-				d *= u;
-				modelMtx[0][3] += d;
-				d = -0.2 - modelMtx[1][3] * u;
-				d *= u;
-				modelMtx[1][3] += d;
-				d = 51.5 - modelMtx[2][3];
-				d *= u;
-				modelMtx[2][3] += d;
+				float d0 = -modelMtx[0][3] * (static_cast<double>(n) / 20.0);
+				d0 *= (static_cast<double>(n) / 20.0);
+				modelMtx[0][3] += d0;
+				float d1 = -0.2 - modelMtx[1][3] * (static_cast<double>(n) / 20.0);
+				d1 *= (static_cast<double>(n) / 20.0);
+				modelMtx[1][3] += d1;
+				float d2 = 51.5 - modelMtx[2][3];
+				d2 *= (static_cast<double>(n) / 20.0);
+				modelMtx[2][3] += d2;
 			}
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == i &&

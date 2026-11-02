@@ -13,8 +13,8 @@ struct CLineSegment {
 template <int PointCount>
 struct CLine {
     CLine();
-    int Calc(Vec*, float*, unsigned long*, float*, Vec*, float);
     int IsInner(Vec*, float);
+    int Calc(Vec*, float*, unsigned long*, float*, Vec*, float);
     void Draw();
     void CalcBound();
 

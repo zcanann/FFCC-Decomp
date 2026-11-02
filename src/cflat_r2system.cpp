@@ -202,7 +202,7 @@ static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* run
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartPcs::pppSetDebugHide(unsigned char hide)
+inline void CPartPcs::pppSetDebugHide(unsigned char hide)
 {
     UsbStream(this)->m_disableShokiDraw = hide;
 }
@@ -371,7 +371,7 @@ inline void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::IsHitDrawMode(char drawMode)
+inline void CMapPcs::IsHitDrawMode(char drawMode)
 {
     g_MapHitDrawMode = drawMode;
 }

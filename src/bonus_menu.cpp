@@ -1658,7 +1658,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			sprite->x -= sprite->motionX;
 		}
 
 		base += activePartyCount;
@@ -1690,7 +1690,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
-			sprite->x = (unsigned short)(int)((float)sprite->x - sprite->motionX);
+			sprite->x -= sprite->motionX;
 		}
 
 		base += activePartyCount;
@@ -1715,7 +1715,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
-			sprite->x = (unsigned short)(int)((float)sprite->x - sprite->motionX);
+			sprite->x -= sprite->motionX;
 		}
 
 		base += activePartyCount;
@@ -1732,7 +1732,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			sprite->x -= sprite->motionX;
 		}
 
 		{

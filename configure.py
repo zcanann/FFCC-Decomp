@@ -524,7 +524,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_data.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_r2class.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(
-                NonMatching,
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "cflat_r2system.cpp",
                 extra_cflags=["-str reuse,nopool,readonly", "-use_lmw_stmw on", "-inline auto,deferred"],
             ),

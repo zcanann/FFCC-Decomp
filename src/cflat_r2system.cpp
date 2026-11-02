@@ -581,9 +581,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 }
 
                 {
-                    char* scan = spec + 1;
+                    int scan = 1;
                     char c;
-                    while ((c = *scan) != '\0') {
+                    while ((c = spec[scan]) != '\0') {
                         switch (c) {
                         case 'd':
                         case 'x':
@@ -792,9 +792,11 @@ renderedDone:
 
         if ((mode & 4) != 0) {
             int pointCount = m_pathPointCount < 3 ? m_pathPointCount : m_pathPointCount;
-            u32 lowBit = modeBits & 1;
+            int lowBit = modeBits & 1;
             int highBit = modeBits & 2;
-            int segmentCount = pointCount + 1 - (lowBit + ((modeBits >> 1) & 1));
+            int skipCount = lowBit;
+            skipCount += (modeBits >> 1) & 1;
+            int segmentCount = pointCount + 1 - skipCount;
             int first = (modeBits & 1) ? 1 : 0;
             float scaled = t * static_cast<float>(segmentCount);
             int baseIndex = first + static_cast<int>(scaled);

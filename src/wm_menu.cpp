@@ -4459,10 +4459,12 @@ void CMenuPcs::DrawTitleMenu()
 			m_wmWorldState->m_frameCounter = 0;
 			m_wmWorldState->m_worldReady = 0;
 		} else if (state != 2) {
-			int threshold = 10;
+			int threshold;
 			m_wmWorldState->m_frameCounter++;
 			if (m_wmWorldState->m_mainState == 1) {
 				threshold = 0x28;
+			} else {
+				threshold = 10;
 			}
 			if (m_wmWorldState->m_frameCounter > threshold) {
 				m_wmWorldState->m_frameCounter = 0;

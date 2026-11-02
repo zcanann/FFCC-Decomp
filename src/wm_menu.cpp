@@ -5533,7 +5533,7 @@ void CMenuPcs::DrawFukidashi()
 	if (m_wmPlaceNo == 5) {
 		strcpy(nameBuffer, "\x82\xCC\x8A\xD9");
 		float w2 = fontFC->GetWidth(nameBuffer);
-		fontFC->SetPosX((240.0f - w2) * FLOAT_80331434 +
+		fontFC->SetPosX((240.0f - w2) / 2.0f +
 		                (float)m_wm.m_bubbleData->m_sprites[0].m_x);
 		fontFC->SetPosY((float)(m_wm.m_bubbleData->m_sprites[4].m_y + 0x16));
 		fontFC->Draw(nameBuffer);
@@ -5542,7 +5542,7 @@ void CMenuPcs::DrawFukidashi()
 	if (twoLines != 0) {
 		strcpy(nameBuffer, "");
 		float w2 = fontFC->GetWidth(secondLine);
-		fontFC->SetPosX((240.0f - w2) * FLOAT_80331434 +
+		fontFC->SetPosX((240.0f - w2) / 2.0f +
 		                (float)m_wm.m_bubbleData->m_sprites[0].m_x);
 		fontFC->SetPosY((float)(m_wm.m_bubbleData->m_sprites[4].m_y + 0x16));
 		fontFC->Draw(secondLine);
@@ -7154,8 +7154,8 @@ void CMenuPcs::DrawCharaName()
 	confirmedMask = 0;
 	activeMask = 0;
 	pendingMask = 0;
-	const WmCharaSelectEntry* entry = selectEntries;
-	for (i = 0; i < 4; i++, entry++) {
+	for (i = 0; i < 4; i++) {
+		const WmCharaSelectEntry* entry = &selectEntries[i];
 		if (entry->m_connected != 0) {
 			const unsigned int bit = 1u << entry->m_currentSlot;
 			activeMask |= bit;
@@ -7197,12 +7197,12 @@ void CMenuPcs::DrawCharaName()
 				const char* const text = reinterpret_cast<const char*>(
 				    Game.m_caravanWorkArr[slot].m_name);
 				xBase = 32.0f + static_cast<float>(j * 0x90);
-				const float width = font->GetWidth(text);
+				float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
 				if (width / 2.0 > plateW) {
-					const float widthPlus = static_cast<float>(width + 8.0);
-					scale = static_cast<float>(widthPlus / 2.0 / plateW);
-					xBase = static_cast<float>((144.0f - widthPlus) / 2.0 + xBase);
+					width += 8.0;
+					scale = static_cast<float>(width / 2.0 / plateW);
+					xBase = static_cast<float>((144.0f - width) / 2.0 + xBase);
 				} else {
 					xBase = static_cast<float>(xOffsetDefault / 2.0 + xBase);
 				}

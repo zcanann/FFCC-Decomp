@@ -3379,7 +3379,6 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameCornerTexture));
-	const float right = (x + w) - corner;
 	for (int i = 0; i < 4; i++) {
 		float drawX;
 		float drawY;
@@ -3391,7 +3390,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 			texU = 0.0f;
 			texV = 0.0f;
 		} else if (i == 1) {
-			drawX = right;
+			drawX = (x + w) - corner;
 			drawY = y;
 			texU = corner;
 			texV = 0.0f;
@@ -3401,7 +3400,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 			texU = 0.0f;
 			texV = corner;
 		} else {
-			drawX = right;
+			drawX = (x + w) - corner;
 			drawY = (y + h) - corner;
 			texU = corner;
 			texV = corner;
@@ -3420,7 +3419,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	float yCorner = corner + y;
 	MenuPcs.DrawRect(0, x, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameRightTexture));
-	MenuPcs.DrawRect(0, right, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, (x + w) - corner, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameFillTexture));
 	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - 64.0), (float)((double)h - 64.0), 0.0f, 0.0f, texScale, texScale, 0.0f);
 }

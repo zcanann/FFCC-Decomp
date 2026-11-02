@@ -3599,13 +3599,13 @@ void CMenuPcs::DrawCMakeMenu()
 			         7, textList[textIndex], 1.0f, 1.0f);
 #else
 			int mesNo = 5;
+			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
+			char* textList[3] = {0};
 #ifdef VERSION_GCCP01
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x4B);
 #else
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x5A);
 #endif
-			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
-			char* textList[3] = {0};
 			for (int i = 0; i < 3; i++) {
 				textList[i] = mes[mesNo++];
 			}
@@ -5865,7 +5865,9 @@ void CMenuPcs::DrawWMFrame()
 {
 
 	GXColor matColor;
+	float suffixY;
 	float suffixX;
+	s32 languageYOffset;
 	short sVar = m_wmWorldState->m_mainState;
 	float alpha;
 	if (sVar == 0) {
@@ -5979,9 +5981,9 @@ void CMenuPcs::DrawWMFrame()
 			digitCnt = 3;
 		}
 #ifdef VERSION_GCCJGC
-		const s32 languageYOffset = 0;
+		languageYOffset = 0;
 #else
-		const s32 languageYOffset = language != 5 ? 0 : 0xE;
+		languageYOffset = language != 5 ? 0 : 0xE;
 #endif
 
 		if (digitCnt == 3) {
@@ -6031,11 +6033,10 @@ void CMenuPcs::DrawWMFrame()
 		if (digitCnt != 3 && language != 5) {
 			Sprt* digit = &m_wm.m_frameData->m_yearSprites[0];
 			float suffixU = FLOAT_803313dc;
-			suffixX = static_cast<float>(digit->m_width) * digit->m_scale +
-			                static_cast<float>(digit->m_x);
-			                static_cast<float>(digit->m_x);
-			float suffixY = static_cast<float>(digit->m_y);
 			float suffixScale = digit->m_scale;
+			suffixX = static_cast<float>(digit->m_width) * suffixScale +
+			                static_cast<float>(digit->m_x);
+			suffixY = static_cast<float>(digit->m_y);
 			if (language == 1) {
 				if (s_NowDispYear / 10 == 1) {
 					suffixU = 72.0f;
@@ -8959,7 +8960,7 @@ nextListEntry:
 					fontF8->SetPosY(locationY);
 					fontF8->Draw(locationStr);
 				} else {
-					locationY = locationY + 4.0f;
+					locationY += 4.0f;
 					SplitPlace2(locationStr, line1, line2, fontF8, 0x90);
 					const float w1 = fontF8->GetWidth(line1);
 					fontF8->SetPosX(496.0f - w1);

@@ -790,26 +790,26 @@ void CLightPcs::CBumpLight::MakeLightMap()
             float dFactor = 2.0f;
             float dHalf = 1.0f;
             for (u32 x = 0; x < 0x21; x++) {
-                float t0 = dFactor * fy;
-                float x0 = t0 / 32.0f - dHalf;
-                float tz = dFactor * (float)x;
-                float z0 = tz / 32.0f - dHalf;
-                float xd0 = x0 / dInv;
-                float zd = z0 / dInv;
-                float t1 = dFactor * (float)(y + 1);
-                float dist0 = z0 * z0 + x0 * x0;
-                dist0 = dist0 < dHalf ? sqrtf(dHalf - dist0) : 0.0f;
+                Vec pos;
+                Vec nrm;
 
-                GXPosition3f32(x0, z0, dW);
-                GXNormal3f32(xd0, zd, dist0);
+                pos.x = (dFactor * fy) / 32.0f - dHalf;
+                pos.y = (dFactor * (float)x) / 32.0f - dHalf;
+                nrm.x = pos.x / dInv;
+                nrm.y = pos.y / dInv;
+                nrm.z = pos.y * pos.y + pos.x * pos.x;
+                nrm.z = nrm.z < dHalf ? sqrtf(dHalf - nrm.z) : 0.0f;
 
-                float x1 = t1 / 32.0f - dHalf;
-                float xd1 = x1 / dInv;
-                float dist1 = z0 * z0 + x1 * x1;
-                dist1 = dist1 < dHalf ? sqrtf(dHalf - dist1) : 0.0f;
+                GXPosition3f32(pos.x, pos.y, dW);
+                GXNormal3f32(nrm.x, nrm.y, nrm.z);
 
-                GXPosition3f32(x1, z0, dW);
-                GXNormal3f32(xd1, zd, dist1);
+                pos.x = (dFactor * (float)(y + 1)) / 32.0f - dHalf;
+                nrm.x = pos.x / dInv;
+                nrm.z = pos.y * pos.y + pos.x * pos.x;
+                nrm.z = nrm.z < dHalf ? sqrtf(dHalf - nrm.z) : 0.0f;
+
+                GXPosition3f32(pos.x, pos.y, dW);
+                GXNormal3f32(nrm.x, nrm.y, nrm.z);
             }
 
             y++;

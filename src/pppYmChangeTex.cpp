@@ -356,11 +356,11 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
  */
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, float (*) [4])
 {
+	GXColor** meshColorArrays;
 	pppYmChangeTexState* state = (pppYmChangeTexState*)callbackContext;
 	pppYmChangeTexStep* step = (pppYmChangeTexStep*)callbackParam;
 	ChangeTexMeshRef* meshes = model->GetMesh();
 	ChangeTexDisplayListCopy* displayListPtr;
-	GXColor** meshColorArrays;
 	GXColor* meshColorArray;
 	CTexture* texture;
 	ChangeTexMeshData* meshData;
@@ -370,7 +370,8 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* callbac
 	if (step->m_changeTex.m_mode != 0) {
 		meshColorArrays = state->m_meshColorArrays;
 		texture = state->m_texture;
-		meshData = meshes[meshIdx].m_data;
+		meshes += meshIdx;
+		meshData = meshes->m_data;
 		displayList = meshData->m_displayLists;
 		if (meshColorArrays != 0) {
 			meshColorArray = meshColorArrays[meshIdx];

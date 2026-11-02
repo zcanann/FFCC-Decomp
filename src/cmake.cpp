@@ -1130,8 +1130,17 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 #ifdef VERSION_GCCJGC
 int CMenuPcs::AddNameChara(int add, int column, int row, int table)
 {
+    char* text;
+    char* tail;
+    const char* characters;
+    int index;
+    int group;
+    int pos;
+    char* name;
+    char* last;
+
     if (add == 0) {
-        char* name = s_CmakeInfo.m_name;
+        name = s_CmakeInfo.m_name;
         int count = GetCharaCnt(name);
         if (count == 0) {
             return -1;
@@ -1145,7 +1154,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
     } else {
         char picked[3];
         memset(picked, 0, 3);
-        char* text = const_cast<char*>(s_NameEntryStr[row + table * 5]);
+        text = const_cast<char*>(s_NameEntryStr[row + table * 5]);
         GetChara(text, column, picked);
         int count = GetCharaCnt(s_CmakeInfo.m_name);
         if (count >= 7) {
@@ -1164,9 +1173,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
             return -1;
         }
         if (type != 0 && strcmp(picked, "\x81\x4A") == 0) {
-            int group;
-            int pos;
-            char* last = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
+            last = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
             for (group = 0; group < 2; ++group) {
                 text = const_cast<char*>(s_NameEntryVoiced[group]);
                 int length = strlen(text);
@@ -1187,12 +1194,12 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
             }
             return 0;
         } else if (type != 0 && strcmp(picked, "\x81\x4B") == 0) {
-            char* last = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
+            tail = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
             int length = strlen(s_NameEntryVoiced[1]);
-            const char* characters = s_NameEntryVoiced[1];
-            for (int pos = 0; pos < length; pos += 2, characters += 2) {
-                if (memcmp(characters, last, 2) == 0) {
-                    last[1] += 2;
+            characters = s_NameEntryVoiced[1];
+            for (index = 0; index < length; index += 2, characters += 2) {
+                if (memcmp(characters, tail, 2) == 0) {
+                    tail[1] += 2;
                     return 0;
                 }
             }

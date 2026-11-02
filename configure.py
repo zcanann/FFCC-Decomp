@@ -551,7 +551,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gobject.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "gobjwork.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01"), "goout.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "graphic.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "graphic.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "graphic_dbgfont.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "gxfunc.cpp"),
             Object(NonMatching, "itemobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),

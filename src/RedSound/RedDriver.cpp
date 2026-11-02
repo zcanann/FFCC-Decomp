@@ -1,3 +1,4 @@
+#define FFCC_REDSOUND_REDDRIVER_CPP
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedEntry.h"

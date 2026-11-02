@@ -7371,10 +7371,10 @@ void CMenuPcs::DrawCMLife()
 		}
 
 		GXColor color;
-		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
-		color.r = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red));
-		color.g = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green));
-		color.b = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blue));
+		color.r = FLOAT_80331458 * red;
+		color.g = FLOAT_80331458 * green;
+		color.b = FLOAT_80331458 * blue;
+		color.a = alphaF;
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
 		col = slot % 4;

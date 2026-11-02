@@ -514,7 +514,7 @@ config.libs = [
     {
         "lib": "Game",
         # Japanese compatibility baseline; provenance: docs/compiler_baseline.md.
-        "mw_version": "GC/2.0p1j" if config.version == "GCCJGC" else "GC/2.5",
+        "mw_version": "GC/2.0p1k" if config.version == "GCCJGC" else "GC/2.5",
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
@@ -597,18 +597,18 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_chara_viewer.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_dbgmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_FunnyShape.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
-            Object(MatchingFor("GCCP01", "GCCE01"), "p_game.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(MatchingFor("GCCP01", "GCCE01"), "p_gba.cpp", cflags=[*cflags_game_cpp_exceptions, "-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_game.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_gba.cpp", cflags=[*cflags_game_cpp_exceptions, "-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "p_graphic.cpp", cflags=[*cflags_game_cpp_exceptions, "-RTTI on", "-sdata 8", "-str reuse,readonly", "-pooldata off", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_light.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01"), "p_map.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_MaterialEditor.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
-            Object(MatchingFor("GCCP01", "GCCE01"), "p_mc.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_mc.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_menu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "p_minigame.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-common off", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_sample.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_sound.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(MatchingFor("GCCP01", "GCCE01"), "p_system.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_system.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_tina.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "p_usb.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
@@ -1350,16 +1350,18 @@ config.progress_report_args = [
     # "--config", "functionRelocDiffs=data_value",
 ]
 
-# Japanese game compiler: GC/2.0p1j, derived during the build from the stock
+# Japanese game compiler: GC/2.0p1k, derived during the build from the stock
 # GC/2.0p1 by tools/patch_compiler.py (2.0p1a) and tools/patch_compiler_rw.py
 # (2.0p1b..g), both imported from the BFBB decomp, then by
 # tools/patch_compiler_ffcc.py (2.0p1h), tools/patch_compiler_ffcc2.py
-# (2.0p1i) and tools/patch_compiler_ffcc3.py (2.0p1j). Every step is guarded by
-# the SHA-1 of its input and output. See docs/compiler_baseline.md.
+# (2.0p1i), tools/patch_compiler_ffcc3.py (2.0p1j) and
+# tools/patch_compiler_ffcc4.py (2.0p1k). Every step is guarded by the SHA-1 of
+# its input and output. See docs/compiler_baseline.md.
 BFBB_COMPILER = "GC/2.0p1g"
 FFCC_COMPILER_H = "GC/2.0p1h"
 FFCC_COMPILER_I = "GC/2.0p1i"
-JP_GAME_COMPILER = "GC/2.0p1j"
+FFCC_COMPILER_J = "GC/2.0p1j"
+JP_GAME_COMPILER = "GC/2.0p1k"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
     {
@@ -1389,6 +1391,12 @@ config.custom_build_rules = [
     {
         "name": "patch_compiler_ffcc3",
         "command": "$python tools/patch_compiler_ffcc3.py $out",
+        "description": "PATCH $out",
+        "restat": True,
+    },
+    {
+        "name": "patch_compiler_ffcc4",
+        "command": "$python tools/patch_compiler_ffcc4.py $out",
         "description": "PATCH $out",
         "restat": True,
     },
@@ -1432,11 +1440,19 @@ config.custom_build_steps = {
             ],
         },
         {
-            "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
+            "outputs": [_compilers_dir / FFCC_COMPILER_J / "mwcceppc.exe"],
             "rule": "patch_compiler_ffcc3",
             "implicit": [
                 _compilers_dir / FFCC_COMPILER_I / "mwcceppc.exe",
                 Path("tools") / "patch_compiler_ffcc3.py",
+            ],
+        },
+        {
+            "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
+            "rule": "patch_compiler_ffcc4",
+            "implicit": [
+                _compilers_dir / FFCC_COMPILER_J / "mwcceppc.exe",
+                Path("tools") / "patch_compiler_ffcc4.py",
             ],
         },
     ]

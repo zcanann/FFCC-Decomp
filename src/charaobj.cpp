@@ -3084,10 +3084,9 @@ next_link:
  */
 inline int CGCharaObj::scCheckItem(CCombi2Set* set, CGCharaObj* object, int lastSlot)
 {
-    int item = object->m_itemId;
     SCharaItemRow* items = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-    int kind = items[item].m_effect;
-    if ((lastSlot && kind == 0x1F8 && set->m_item == 0x1F8) || item == set->m_item) {
+    int kind = items[object->m_itemId].m_effect;
+    if ((lastSlot && kind == 0x1F8 && set->m_item == 0x1F8) || object->m_itemId == set->m_item) {
         return 1;
     }
     return 0;
@@ -3133,7 +3132,6 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			break;
 		}
 
-		int reqLast = reqCount - 1;
 		CCombi2Set* slotCursor = combiCursor->m_sets;
 		CGCharaObj* partyObj;
 		int slot = 0;
@@ -3161,7 +3159,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 				break;
 			}
 
-			if (slot == reqLast) {
+			if (slot == reqCount - 1) {
 				found = combiIndex;
 			}
 		}

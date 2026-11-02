@@ -670,7 +670,7 @@ config.libs = [
             ),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppKeLns.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppKeShpTail.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppKeShpTail2X.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppKeShpTail2X.cpp"),
             Object(NonMatching, "pppKeShpTail3X.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppKeZCrctShp.cpp"),
             Object(NonMatching, "pppLaser.cpp", extra_cflags=["-str reuse,pool,readonly", "-inline auto,deferred"]),

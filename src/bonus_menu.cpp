@@ -320,8 +320,8 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_artifacts[BonusSummaryData::kTemporaryArtifactCount + k] = bossArtifact->m_values[k];
 		}
 
-		s_Rinfo->m_missingArtifactMask = 0;
-		for (k = 0; k < BonusSummaryData::kArtifactCount; k++) {
+		s_Rinfo->m_missingArtifactMask = k = 0;
+		for (; k < BonusSummaryData::kArtifactCount; k++) {
 			if (s_Rinfo->m_artifacts[k] < 0) {
 				s_Rinfo->m_missingArtifactMask =
 				    (unsigned char)(s_Rinfo->m_missingArtifactMask | (1 << k));

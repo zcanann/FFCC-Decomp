@@ -604,7 +604,15 @@ retry:
         Graphic._WaitDrawDone("file.cpp", FileErrorDrawBeginLine);
 
         int hasScratchTexture = Graphic.IsAvailableTempBuffer();
-        int compactLayout = (bool)(hasScratchTexture && usingFallbackFont == 0);
+        bool useScratch = false;
+        if (hasScratchTexture)
+        {
+            if (usingFallbackFont == 0)
+            {
+                useScratch = true;
+            }
+        }
+        int compactLayout = useScratch;
 
         if (compactLayout)
         {
@@ -627,11 +635,7 @@ retry:
         font->SetTlut(usingFallbackFont ? -1 : 7);
         font->DrawInit();
 
-        int baseY = 200;
-        if (compactLayout)
-        {
-            baseY = 0x20;
-        }
+        int baseY = compactLayout ? 0x20 : 200;
 
         int msgIndex = 0;
         switch (errorCode)

@@ -205,7 +205,7 @@ void CRingMenu::onCalc()
 			                     ? Chara.MogFur().m_commandIndex
 			                     : caravanWork->GetIdxCmdList();
 
-			int* trackedCmd = (Game.m_gameWork.IsMogStage() & 1)
+			int* trackedCmd = (Game.m_gameWork.IsMogStage() & 0xFF)
 			                      ? &Chara.MogFur().m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 

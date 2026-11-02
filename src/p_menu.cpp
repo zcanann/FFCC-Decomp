@@ -66,7 +66,7 @@ CProcessCallbackTable CMenuPcs::m_table = {
     {
         {static_cast<CProcessCallback>(&CMenuPcs::calc), 0x1A, 0},
         {static_cast<CProcessCallback>(&CMenuPcs::draw), 0x49, 1},
-        {reinterpret_cast<CProcessCallback>(&CMenuPcs::loadTextureAsync), 0x1A, 0x10},
+        {static_cast<CProcessCallback>(&CMenuPcs::calcSingleMenu), 0x1A, 0x10},
         {static_cast<CProcessCallback>(&CMenuPcs::drawSingleMenu), 0x49, 0x11},
     },
 };

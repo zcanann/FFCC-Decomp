@@ -595,7 +595,7 @@ public:
     void SetProjection(int);
     void RestoreProjection();
     void DrawObj(int);
-    void loadTextureAsync(char**, int, int, CTmp*, int, int, int);
+    int loadTextureAsync(char**, int, int, CTmp*, int, int, int);
     void CalcPitcher();
     void CalcFukidashi();
     void SetCrystalCageAttr();

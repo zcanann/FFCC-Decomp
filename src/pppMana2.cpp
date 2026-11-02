@@ -665,7 +665,7 @@ static void CalcReflectionVector2(
             case 0:
                 invAxis = 2.0f * reflected.x;
                 if (vtxReflection->x >= 0.0f) {
-                    vtxColor->r = (u8)(vtxColor->r + 0x7F);
+                    vtxColor->r += 0x7F;
                     uv.x -= reflected.z / invAxis;
                     uv.y -= reflected.y / invAxis;
                     uv.x *= 0.25f;
@@ -673,7 +673,7 @@ static void CalcReflectionVector2(
                     uv.x += 0.25f;
                     uv.y += 0.25f;
                 } else {
-                    vtxColor->r = (u8)(vtxColor->r - 0x7F);
+                    vtxColor->r -= 0x7F;
                     uv.x -= reflected.z / invAxis;
                     uv.y += reflected.y / invAxis;
                     uv.x *= 0.25f;
@@ -685,14 +685,14 @@ static void CalcReflectionVector2(
             case 1:
                 invAxis = 2.0f * reflected.y;
                 if (vtxReflection->y >= 0.0f) {
-                    vtxColor->g = (u8)(vtxColor->g + 0x7F);
+                    vtxColor->g += 0x7F;
                     uv.x += reflected.x / invAxis;
                     uv.x *= 0.25f;
                     uv.y += reflected.z / invAxis;
                     uv.y *= 0.25f;
                     uv.x += 0.5f;
                 } else {
-                    vtxColor->g = (u8)(vtxColor->g - 0x7F);
+                    vtxColor->g -= 0x7F;
                     uv.x -= reflected.x / invAxis;
                     uv.x *= 0.25f;
                     uv.y += reflected.z / invAxis;
@@ -704,14 +704,14 @@ static void CalcReflectionVector2(
             case 2:
                 invAxis = 2.0f * reflected.z;
                 if (vtxReflection->z >= 0.0f) {
-                    vtxColor->b = (u8)(vtxColor->b + 0x7F);
+                    vtxColor->b += 0x7F;
                     uv.x += reflected.x / invAxis;
                     uv.y -= reflected.y / invAxis;
                     uv.y *= 0.25f;
                     uv.x *= 0.25f;
                     uv.y += 0.25f;
                 } else {
-                    vtxColor->b = (u8)(vtxColor->b - 0x7F);
+                    vtxColor->b -= 0x7F;
                     uv.x += reflected.x / invAxis;
                     uv.y += reflected.y / invAxis;
                     uv.x *= 0.25f;

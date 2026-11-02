@@ -6803,8 +6803,7 @@ void CMenuPcs::CalcCharaSelect()
 			}
 		}
 
-		i = 0;
-		while (i < 8) {
+		for (i = 0; i < 8; i++) {
 			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(i))) == 0) &&
 			    ((pendingMask & (1u << static_cast<unsigned int>(i))) == 0)) {
 				const int handleIdx = i + 0x20;
@@ -6814,7 +6813,6 @@ void CMenuPcs::CalcCharaSelect()
 					ChgModel(i, -1, -1, -1);
 				}
 			}
-			i++;
 		}
 #endif
 

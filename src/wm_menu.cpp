@@ -2760,14 +2760,14 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		entry.m_connected = 0;
 	}
 
-	unsigned short repeat;
-	unsigned short down;
+	unsigned short padRepeat[4];
+	unsigned short padTrig[4];
 	if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
-		repeat = Pad.GetButtonRepeat(chan);
-		down = Pad.GetButtonDown(chan);
+		padRepeat[chan] = Pad.GetButtonRepeat(chan);
+		padTrig[chan] = Pad.GetButtonDown(chan);
 	} else {
-		repeat = 0;
-		down = repeat;
+		padRepeat[chan] = 0;
+		padTrig[chan] = 0;
 	}
 
 	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {
@@ -2776,7 +2776,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 
 	WmCharaSelectEntry& curEntry = m_wm.m_charaSelectData[chan];
 	int cursor = static_cast<int>(curEntry.m_currentSlot);
-	if ((repeat & 0x0C) != 0) {
+	if ((padRepeat[chan] & 0x0C) != 0) {
 		if (cursor < 4) {
 			cursor += 4;
 		} else {
@@ -2785,7 +2785,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 	}
 
-	if ((repeat & 1) != 0) {
+	if ((padRepeat[chan] & 1) != 0) {
 		const int row = static_cast<int>(cursor) >> 2;
 		if (cursor > ((row != 0) ? 4 : 0)) {
 			cursor--;
@@ -2793,11 +2793,8 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 			cursor += 3;
 		}
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
-	} else if ((repeat & 2) != 0) {
-		int rowEnd = 3;
-		if ((cursor >> 2) != 0) {
-			rowEnd = 7;
-		}
+	} else if ((padRepeat[chan] & 2) != 0) {
+		int rowEnd = ((cursor >> 2) != 0) ? 7 : 3;
 		if (cursor < rowEnd) {
 			cursor++;
 		} else {
@@ -2807,28 +2804,26 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	}
 
 	curEntry.m_currentSlot = static_cast<short>(cursor);
-	if ((repeat & 0x6F) != 0) {
+	if ((padRepeat[chan] & 0x6F) != 0) {
 		return;
 	}
 
-	if ((down & 0x100) != 0) {
-		int exists;
+	if ((padTrig[chan] & 0x100) != 0) {
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
-			exists = m_cmakeWork->m_characters[curEntry.m_currentSlot].m_exists;
-		} else {
-			exists = Game.m_caravanWorkArr[curEntry.m_currentSlot].m_shopState;
-		}
-
-		if (exists == 0) {
-			Sound.PlaySe(4, 0x40, 0x7F, 0);
-		} else {
-			curEntry.m_confirmed = 1;
-			Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-			if (state != 0) {
-				m_wmCharaAnimState[cursor].m_nextAnimIndex = 3;
+			if (m_cmakeWork->m_characters[curEntry.m_currentSlot].m_exists == 0) {
+				goto notExist;
 			}
+		} else if (Game.m_caravanWorkArr[curEntry.m_currentSlot].m_shopState == 0) {
+		notExist:
+			Sound.PlaySe(4, 0x40, 0x7F, 0);
+			return;
 		}
-	} else if ((down & 0x200) != 0) {
+		curEntry.m_confirmed = 1;
+		Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+		if (state != 0) {
+			m_wmCharaAnimState[cursor].m_nextAnimIndex = 3;
+		}
+	} else if ((padTrig[chan] & 0x200) != 0) {
 		curEntry.m_cancelled = 1;
 		Sound.PlaySe(0x34, 0x40, 0x7F, 0);
 	}

@@ -9617,9 +9617,9 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
 	CFont* font;
 	const char* const* msgTable;
+	const WinMessEntry* winMess;
 	int i;
 	int maxWidth;
-	const WinMessEntry* winMess;
 	int textWidth;
 #ifdef VERSION_GCCJGC
 	int msgId;
@@ -9650,7 +9650,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	float posX;
 	if (winType != 0) {
 #ifdef VERSION_GCCJGC
-		winMess = GetWinMess(winType);
+		winMess = &gMcWindowsJp[winType];
 #endif
 		maxWidth = 0;
 #ifdef VERSION_GCCJGC
@@ -9679,7 +9679,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
 #ifdef VERSION_GCCJGC
-	winMess = GetWinMess(winType);
+	winMess = &gMcWindowsJp[winType];
 #else
 	lineHeight = 30.0f;
 #endif

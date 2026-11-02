@@ -729,7 +729,7 @@ void CMenuPcs::CmdDraw()
 		}
 	}
 
-	CFont* nameFont = m_fonts[4];
+	CFont* nameFont = GetFontItem();
 	nameFont->SetMargin(1.0f);
 	nameFont->SetShadow(0);
 	nameFont->SetScale(0.9f);
@@ -2115,7 +2115,7 @@ void CMenuPcs::DrawUniteList()
 			0.0f);
 	}
 
-	font = m_fonts[0];
+	font = GetFont22();
 	font->SetMargin(1.0f);
 	font->SetShadow(1);
 	font->SetScale(1.0f);

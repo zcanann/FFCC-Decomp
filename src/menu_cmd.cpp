@@ -604,8 +604,11 @@ int CMenuPcs::CmdCtrl()
  */
 int CMenuPcs::CmdClose()
 {
+	s32 ret;
+
 	if (GetCmdStateView(this)->commandResult == 0) {
-		if (UniteCloseAnim(-1) != 0) {
+		ret = UniteCloseAnim(-1);
+		if (ret != 0) {
 			GetCmdStateView(this)->transitionTimer = 0;
 			GetCmdStateView(this)->commandResult = 1;
 		}
@@ -639,7 +642,7 @@ int CMenuPcs::CmdClose()
 		entry++;
 	}
 
-	s32 ret = 0;
+	ret = 0;
 	CmdListStorage* const list = GetCmdListStorage(this);
 	if (list->count == doneCount) {
 		CmdListEntry* p = list->entries;

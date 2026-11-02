@@ -1170,10 +1170,11 @@ void CMenuPcs::CmdDraw()
 unsigned int CMenuPcs::CmdCtrlCur()
 {
 	int cursor;
-	s32 mode;
 	CCaravanWork* caravanWork;
 	short hold;
 	short press;
+	s32 cmdCount;
+	s32 mode;
 	s16* list;
 	list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	caravanWork = Game.m_scriptFoodBase[0];
@@ -1184,10 +1185,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		return 0;
 	}
 
-	mode = GetCmdMode(this);
+	mode = GetCmdStateView(this)->mode;
 
 	if (mode == 0) {
-		const s32 cmdCount = caravanWork->m_numCmdListSlots;
+		cmdCount = caravanWork->m_numCmdListSlots;
 
 		if ((hold & 8) != 0) {
 			CmdState* row = GetCmdStateView(this);
@@ -1268,7 +1269,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		int itemCount = static_cast<int>(reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0))[0]);
 
 		if (!((hold & 8) == 0)) {
-			CmdState* sv1 = GetCmdStateView(this);
+			CmdState* sv1 = m_cmdState;
 			CmdState* row = sv1;
 			if (!(row->selected[mode] == 0)) {
 				row->selected[mode]--;
@@ -1295,7 +1296,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					if (itemCount <= 8) {
 						GetCmdStateView(this)->selected[mode] = 0;
 					} else if (GetCmdStateView(this)->scrollTop < itemCount - 1) {
-						GetCmdStateView(this)->scrollTop++;
+						GetCmdStateView(this)->scrollTop = GetCmdStateView(this)->scrollTop + 1;
 					} else {
 						GetCmdStateView(this)->scrollTop = 0;
 					}

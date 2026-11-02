@@ -541,7 +541,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "chunkfile.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cmake.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "color.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "file.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "file.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(Matching, "strcase.c"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "FS_USB_Process.cpp", cflags=cflags_game_cpp_exceptions),

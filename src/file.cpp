@@ -389,6 +389,40 @@ void CFile::ReadASync(CFile::CHandle* fileHandle)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFile::Write(CFile::CHandle* fileHandle, void* buffer, unsigned long size)
+{
+	if (2 <= (unsigned int)System.m_execParam)
+	{
+		System.Printf("CFile.Write: USB\203\202\201[\203h\202\305\202\315\202\240\202\350\202\334\202\271\202\361\201B\n");
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFile::Write(char* path, void* buffer, unsigned long size)
+{
+	if (2 <= (unsigned int)System.m_execParam)
+	{
+		System.Printf("CFile.Write: USB\203\202\201[\203h\202\305\202\315\202\240\202\350\202\334\202\271\202\361\201B\n");
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8001366C
  * PAL Size: 156b
  * EN Address: TODO

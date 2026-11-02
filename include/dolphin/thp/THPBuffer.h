@@ -26,7 +26,7 @@ typedef struct THPAudioBuffer {
 typedef struct THPReadBuffer {
 	u8* mPtr;         // _00
 	s32 mFrameNumber; // _04
-	BOOL mIsValid;    // _08
+	volatile BOOL mIsValid; // _08
 } THPReadBuffer;
 
 #ifdef __cplusplus

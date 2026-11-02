@@ -12,6 +12,7 @@
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
 extern char SoundBuffer[];
 extern "C" Vec gGoblinKingTeleportPoints[] = {
@@ -153,6 +154,7 @@ inline void CGMonObj::suikomiSub(CGObject* target, float zOffset)
 
 	if (0.0f < dist) {
 		float accel = 1.0f / dist * (0.25f * (dist / MON_FRAMES(45.0f, 37.5f)));
+		int frames = abs(MON_FRAMES(45, 37) - m_stateFrame);
 		dx *= accel;
 		dz *= accel;
 		target->m_groundHitOffset.x += dx;
@@ -192,8 +194,9 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 			}
 		}
 
-		if ((Game.m_chaliceObject != 0) && (reinterpret_cast<CGItemObj*>(Game.m_chaliceObject)->m_owner == 0)) {
-			suikomiSub(Game.m_chaliceObject, zOffset);
+		CGObject* chalice = Game.m_chaliceObject;
+		if ((chalice != 0) && (reinterpret_cast<CGItemObj*>(chalice)->m_owner == 0)) {
+			suikomiSub(chalice, zOffset);
 		}
 
 		if (m_stateFrame == endFrame) {

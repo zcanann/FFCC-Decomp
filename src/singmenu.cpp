@@ -347,11 +347,6 @@ void CMenuPcs::SingMenuInit()
 
     m_wm.m_worldObjData = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, "singmenu.cpp", SINGMENU_LINE(0x5DD, 0x5D8, 0x57E)) WmWorldObjInfo[1];
 
-    float left = 440.0f;
-    float top = 88.0f;
-    float width = 96.0f;
-    left += 28.0f;
-    int scissorX = static_cast<int>(12.0f + left);
     for (int i = 0; i < 1; i++) {
         m_wm.m_worldObjData[i].m_transform.Identity();
         m_wm.m_worldObjData[i].m_active = 0;
@@ -368,14 +363,19 @@ void CMenuPcs::SingMenuInit()
         m_wm.m_worldObjData[i].m_scissorWidth = 0x280;
         m_wm.m_worldObjData[i].m_scissorHeight = 0x1C0;
     }
+    float left = 440.0f;
+    float top = 88.0f;
+    float width = 96.0f;
+    left += 28.0f;
     double half = 0.5;
     float centerX = 4.0 + (width * half + left);
-    float centerY = top * half + top;
+    float centerY = top;
+    centerY += top * half;
     centerX -= 320.0;
     centerY -= 224.0;
     m_wm.m_worldObjData->m_viewportX = static_cast<s16>(centerX - 4.0);
-    m_wm.m_worldObjData->m_viewportY = static_cast<s16>(static_cast<int>(centerY));
-    m_wm.m_worldObjData->m_scissorX = scissorX;
+    m_wm.m_worldObjData->m_viewportY = static_cast<s16>(centerY);
+    m_wm.m_worldObjData->m_scissorX = static_cast<int>(12.0f + left);
     m_wm.m_worldObjData->m_scissorY = static_cast<int>(top - 8.0f);
     m_wm.m_worldObjData->m_scissorWidth = 0x48;
     m_wm.m_worldObjData->m_scissorHeight = 0x58;
@@ -394,8 +394,8 @@ void CMenuPcs::SingMenuInit()
         m_singleMenuMode = 8;
         gSingMenuForcedSelection = -1;
     }
-    s_WinMessScl = 0.8999999761581421f;
-    m_singleLifeTimer = -1;
+    SetSingWinScl(0.9f);
+    SingLifeInit(-1);
     m_singleMenuCtrlResetFlag = 1;
     m_singleMenuInitialized = 1;
 }
@@ -946,25 +946,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
     char* charaName = reinterpret_cast<char*>(SingleCaravanWork()->m_name);
     float titleWidth = static_cast<float>(font->GetWidth(charaName));
-    font->SetTlut(0x12);
-    float titleX = 152.0f - titleWidth;
-    titleX = 440.0f + static_cast<float>(0.5 * titleX);
-    font->SetPosX(1.0f + titleX);
-#ifdef VERSION_GCCJGC
-    font->SetPosY(57.0f);
-#else
-    font->SetPosY(53.0f);
-#endif
-    font->Draw(charaName);
-
-    font->SetTlut(0x17);
-    font->SetPosX(titleX);
-#ifdef VERSION_GCCJGC
-    font->SetPosY(56.0f);
-#else
-    font->SetPosY(52.0f);
-#endif
-    font->Draw(charaName);
+    DrawShadowFont(font, charaName, 440.0f + static_cast<float>((152.0f - titleWidth) / 2.0), 56.0f, 0x17, 0x12);
 
     font->SetTlut(0x15);
     float statY0 = 184.0f;

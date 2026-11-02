@@ -3410,7 +3410,7 @@ void CMenuPcs::CalcSingleCMakeChara()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::DrawSingleCMakeChara(float alpha)
+void CMenuPcs::DrawSingleCMakeChara(float alpha)
 {
     WmWorldObjInfo* worldObjects = m_wm.m_worldObjData;
     int handleIndex = static_cast<int>(m_singleCmakeSlot) + 0x20;

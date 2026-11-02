@@ -2178,6 +2178,13 @@ void CShopMenu::DrawSoubi()
 #else
 void CShopMenu::DrawSoubi()
 {
+    char* cancelText;
+    char* equipText;
+    int barX;
+    int cancelTextX;
+    int equipTextX;
+    int languageId;
+
     DrawSoubiBase();
 
     drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332D9C, 0);
@@ -2198,7 +2205,7 @@ void CShopMenu::DrawSoubi()
     DrawItemInfo(m_resultItem, 0x98, 0x7E, 0x98, 0x9C, 0x98, 0xBA, 0x138);
     MenuPcs.DrawInit();
 
-    int barX = 0x1F6;
+    barX = 0x1F6;
     while (barX > 0x42) {
         drawShapeSeq(0xC, 0, barX, 0x17C, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         barX -= 0x10;
@@ -2219,17 +2226,17 @@ void CShopMenu::DrawSoubi()
 #endif
     labelFont->DrawInit();
 
-    int languageId = static_cast<int>(Game.m_gameWork.GetLanguage()) - 1;
+    languageId = static_cast<int>(Game.m_gameWork.GetLanguage()) - 1;
     labelFont->SetPosY(FLOAT_80332E08);
-    char* equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
-    int equipTextX = 0x1F8;
+    equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
+    equipTextX = 0x1F8;
     equipTextX += (FLOAT_80332DD4 - labelFont->GetWidth(equipText)) / 2;
     labelFont->SetPosX(static_cast<float>(equipTextX));
     labelFont->SetPosY(FLOAT_80332E08);
     labelFont->Draw(equipText);
 
-    char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
-    int cancelTextX = 0x1F8;
+    cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
+    cancelTextX = 0x1F8;
     cancelTextX += (FLOAT_80332DD4 - labelFont->GetWidth(cancelText)) / 2;
     labelFont->SetPosX(static_cast<float>(cancelTextX));
     labelFont->SetPosY(FLOAT_80332d88);

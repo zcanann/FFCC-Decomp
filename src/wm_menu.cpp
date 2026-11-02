@@ -5037,6 +5037,8 @@ static inline void SetPortTownName(char* dst, const char* townName)
 void CMenuPcs::CalcFukidashi()
 {
 	int cnt;
+	WmWorldObjInfo* worldObj;
+	int slot8;
 	WmWorldObjInfo* slot;
 	int viewportX;
 	int viewportY;
@@ -5132,6 +5134,8 @@ void CMenuPcs::CalcFukidashi()
 	char tempBuf[64];
 	char secondLine[64];
 #endif
+	Mtx rotXMtx, rxMtx;
+	Mtx rotYMtx, ryMtx;
 	char fieldVal = m_wmPlaceNo;
 	if (fieldVal == 0x0F) {
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
@@ -5143,7 +5147,8 @@ void CMenuPcs::CalcFukidashi()
 #ifdef VERSION_GCCJGC
 	} else if (fieldVal == 5) {
 		strcpy(nameBuffer, Game.GetPlaceName(fieldVal));
-		*strstr(nameBuffer, "\x82\xCC\x8A\xD9") = 0;
+		char* p = strstr(nameBuffer, "\x82\xCC\x8A\xD9");
+		*p = 0;
 #endif
 	} else {
 		strcpy(nameBuffer, Game.GetPlaceName(fieldVal));
@@ -5161,7 +5166,7 @@ void CMenuPcs::CalcFukidashi()
 	int textYOffset = 0x4C;
 	m_wm.m_bubbleData->m_sprites[4].m_x =
 	    static_cast<short>(static_cast<int>(
-	        (240.0f - nameWidthF) * FLOAT_80331434 +
+	        (240.0f - nameWidthF) / 2 +
 	        static_cast<float>(static_cast<int>(m_wm.m_bubbleData->m_sprites[0].m_x))));
 	float cameraZ = 50.0f;
 	float cameraXY = FLOAT_803313dc;
@@ -5217,7 +5222,7 @@ void CMenuPcs::CalcFukidashi()
 			modelIdx = bitIdx + 0x0C;
 		}
 
-		WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[modelIdx];
+		worldObj = &m_wm.m_worldObjData[modelIdx];
 		worldObj->m_active = 1;
 		worldObj->m_transform.m_position.x = modelPosZero;
 		worldObj->m_transform.m_position.y = modelPosZero;
@@ -5230,16 +5235,13 @@ void CMenuPcs::CalcFukidashi()
 		}
 		if ((m_wmIconFlags & 0xF) != 0) {
 			worldObj->m_transform.m_position.x = -3.5f;
-			worldObj->m_transform.m_position.y = static_cast<float>(
-			    static_cast<double>(worldObj->m_transform.m_position.y) + DOUBLE_80331420);
+			worldObj->m_transform.m_position.y += DOUBLE_80331420;
 		} else if ((m_wmIconFlags & 0x200) != 0) {
 			worldObj->m_transform.m_position.x = FLOAT_803313dc;
-			worldObj->m_transform.m_position.y = static_cast<float>(
-			    static_cast<double>(worldObj->m_transform.m_position.y) + DOUBLE_80331420);
+			worldObj->m_transform.m_position.y += DOUBLE_80331420;
 		} else {
 			worldObj->m_transform.m_position.x = -1.7000000476837158f;
-			worldObj->m_transform.m_position.y = static_cast<float>(
-			    static_cast<double>(worldObj->m_transform.m_position.y) + 1.6);
+			worldObj->m_transform.m_position.y += 1.6;
 		}
 
 		// Spline evaluation for Y position
@@ -5256,7 +5258,6 @@ void CMenuPcs::CalcFukidashi()
 		worldObj->m_transform.m_rotation.x = 0.2617993950843811f;
 
 		// Matrix setup
-		Mtx rotXMtx, rotYMtx;
 		PSMTXScale(scaleMtx, worldObj->m_transform.m_scale.x, worldObj->m_transform.m_scale.y, worldObj->m_transform.m_scale.z);
 		PSMTXRotRad(rotXMtx, 'x', worldObj->m_transform.m_rotation.x);
 		PSMTXRotRad(rotYMtx, 'y', worldObj->m_transform.m_rotation.y);
@@ -5287,11 +5288,10 @@ void CMenuPcs::CalcFukidashi()
 		}
 
 		cnt = 0;
-		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
 		for (bitIdx = 0; bitIdx < 4; bitIdx++) {
 			if ((m_wmIconFlags & (1 << bitIdx)) != 0) {
-				int slot8 = bitIdx + 8;
-				WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[slot8];
+				slot8 = bitIdx + 8;
+				worldObj = &m_wm.m_worldObjData[slot8];
 				worldObj->m_active = 1;
 				worldObj->m_transform.m_position.x = 3.5999999046325684f;
 				if (cnt == 0) {
@@ -5305,11 +5305,9 @@ void CMenuPcs::CalcFukidashi()
 				}
 				if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 					if (bitIdx == 0 && playerCount == 1) {
-						worldObj->m_transform.m_position.y = static_cast<float>(
-						    static_cast<double>(worldObj->m_transform.m_position.y) - 1.2);
+						worldObj->m_transform.m_position.y -= 1.2;
 					} else {
-						worldObj->m_transform.m_position.y = static_cast<float>(
-						    static_cast<double>(worldObj->m_transform.m_position.y) - 0.9);
+						worldObj->m_transform.m_position.y -= 0.9;
 					}
 				}
 				worldObj->m_transform.m_position.z = FLOAT_803313dc;
@@ -5335,7 +5333,6 @@ void CMenuPcs::CalcFukidashi()
 					worldObj->m_transform.m_rotation.x = 0.2617993950843811f;
 				}
 
-				Mtx rxMtx, ryMtx;
 				PSMTXScale(scaleMtx, worldObj->m_transform.m_scale.x, worldObj->m_transform.m_scale.y, worldObj->m_transform.m_scale.z);
 				PSMTXRotRad(rxMtx, 'x', worldObj->m_transform.m_rotation.x);
 				PSMTXRotRad(ryMtx, 'y', worldObj->m_transform.m_rotation.y);
@@ -5351,7 +5348,7 @@ void CMenuPcs::CalcFukidashi()
 
 				worldObj->m_frameCounter = worldObj->m_frameCounter + 1;
 				if (static_cast<double>(static_cast<float>(worldObj->m_frameCounter)) >=
-				    DOUBLE_803314A8 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount - 1].time)) {
+				    DOUBLE_803314A8 * static_cast<double>(s_WoodTrns.keys[s_WoodTrns.keyCount - 1].time)) {
 					worldObj->m_frameCounter = 0;
 				}
 				cnt++;
@@ -5469,7 +5466,8 @@ void CMenuPcs::DrawFukidashi()
 #ifdef VERSION_GCCJGC
 	} else if (fieldVal == 5) {
 		strcpy(nameBuffer, Game.GetPlaceName(fieldVal));
-		*strstr(nameBuffer, "\x82\xCC\x8A\xD9") = 0;
+		char* p = strstr(nameBuffer, "\x82\xCC\x8A\xD9");
+		*p = 0;
 #endif
 	} else {
 		strcpy(nameBuffer, Game.GetPlaceName(fieldVal));
@@ -5477,24 +5475,17 @@ void CMenuPcs::DrawFukidashi()
 #ifndef VERSION_GCCJGC
 	Game.UpperItemName(nameBuffer);
 
-	int textW = 0xD8;
+	CFont* font;
 	char tempBuf[64];
 	char secondLine[64];
 	secondLine[0] = 0;
-	CFont* const font = GetFontWorld();
-	if (m_wmIconFlags != 0) {
-		textW = 0xA2;
-	}
+	font = GetFontWorld();
+	int textW = m_wmIconFlags != 0 ? 0xA2 : 0xD8;
 	font->SetMargin(FLOAT_803313e8);
 	font->SetShadow(0);
 	font->SetScale(FLOAT_803313e8);
 	double nameWidth = (double)font->GetWidth(nameBuffer);
-	int twoLines;
-	if (nameWidth > (double)(float)textW) {
-		twoLines = 1;
-	} else {
-		twoLines = 0;
-	}
+	int twoLines = nameWidth > (double)(float)textW ? 1 : 0;
 	if (twoLines != 0) {
 		strcpy(tempBuf, nameBuffer);
 		char* spacePos = strrchr(tempBuf, 0x20);
@@ -5856,6 +5847,9 @@ void CMenuPcs::DrawWMFrame()
 	float suffixY;
 	float suffixX;
 	s32 languageYOffset;
+#ifndef VERSION_GCCJGC
+	int i;
+#endif
 	short sVar = m_wmWorldState->m_mainState;
 	float alpha;
 	if (sVar == 0) {
@@ -5918,10 +5912,10 @@ void CMenuPcs::DrawWMFrame()
 	    DOUBLE_80331508 *
 	    (static_cast<float>(m_wm.m_frameData->m_titleFrame) /
 	     10.0)));
+	matColor.a = gaugeAlpha;
 	matColor.r = 0xFF;
 	matColor.g = 0xFF;
 	matColor.b = 0xFF;
-	matColor.a = gaugeAlpha;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 	const float kZeroG = FLOAT_803313dc;
 	MenuPcs.DrawRect(0,
@@ -5977,10 +5971,10 @@ void CMenuPcs::DrawWMFrame()
 		if (digitCnt == 3) {
 			int alphaInt =
 			    static_cast<int>(DOUBLE_80331508 * static_cast<double>(m_wm.m_frameData->m_yearSprites[0].m_alpha));
+			matColor.a = alphaInt;
 			matColor.r = 0xFF;
 			matColor.g = 0xFF;
 			matColor.b = 0xFF;
-			matColor.a = alphaInt;
 			GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 			const float kZero3 = FLOAT_803313dc;
 			MenuPcs.DrawRect(0,
@@ -5994,15 +5988,18 @@ void CMenuPcs::DrawWMFrame()
 				m_wm.m_frameData->m_yearSprites[0].m_scale,
 				kZero3);
 		} else {
+#ifdef VERSION_GCCJGC
+			int i;
+#endif
 			const double k255 = DOUBLE_80331508;
 			const float kZero = FLOAT_803313dc;
-			for (int i = 0; i < digitCnt; i++) {
+			for (i = 0; i < digitCnt; i++) {
 				int alphaInt =
 				    static_cast<int>(k255 * static_cast<double>(m_wm.m_frameData->m_yearSprites[i].m_alpha));
-					matColor.r = 0xFF;
+				matColor.a = alphaInt;
+				matColor.r = 0xFF;
 				matColor.g = 0xFF;
 				matColor.b = 0xFF;
-				matColor.a = alphaInt;
 				GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 				MenuPcs.DrawRect(0,
 					(float)m_wm.m_frameData->m_yearSprites[i].m_x,
@@ -6046,10 +6043,10 @@ void CMenuPcs::DrawWMFrame()
 			int alphaInt =
 			    static_cast<int>(DOUBLE_80331508 * static_cast<double>(digit->m_alpha));
 			MenuPcs.SetAttrFmt((FMT)0);
+			matColor.a = alphaInt;
 			matColor.r = 0xFF;
 			matColor.g = 0xFF;
 			matColor.b = 0xFF;
-			matColor.a = alphaInt;
 			GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 			MenuPcs.SetTexture((TEX)0x34);
 			MenuPcs.DrawRect(0,

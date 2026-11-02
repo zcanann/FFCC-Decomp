@@ -6815,15 +6815,18 @@ void CMenuPcs::CalcCharaSelect()
 			}
 		}
 
-		for (i = 0; i < 8; i++) {
-			const int handleIdx = i + 0x20;
+		i = 0;
+		while (i < 8) {
 			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(i))) == 0) &&
-			    ((pendingMask & (1u << static_cast<unsigned int>(i))) == 0) &&
-			    Game.m_caravanWorkArr[i].m_shopState == 0 &&
-			    m_wm.m_handles[handleIdx]->IsModelLoaded(1) &&
-			    m_wm.m_handles[handleIdx]->m_charaKind != 3) {
-				ChgModel(i, -1, -1, -1);
+			    ((pendingMask & (1u << static_cast<unsigned int>(i))) == 0)) {
+				const int handleIdx = i + 0x20;
+				if (Game.m_caravanWorkArr[i].m_shopState == 0 &&
+				    m_wm.m_handles[handleIdx]->IsModelLoaded(1) &&
+				    m_wm.m_handles[handleIdx]->m_charaKind != 3) {
+					ChgModel(i, -1, -1, -1);
+				}
 			}
+			i++;
 		}
 #endif
 

@@ -110,10 +110,7 @@ public:
      */
     int IsDebug(long port)
     {
-        bool suppress = false;
-        if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
-            suppress = true;
-        }
+        const bool suppress = m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1);
         int result;
         if (suppress) {
             result = 0;
@@ -134,10 +131,7 @@ public:
      */
     int IsOrAnalog(long port)
     {
-        bool suppress = false;
-        if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
-            suppress = true;
-        }
+        const bool suppress = m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1);
         int result;
         if (suppress) {
             result = 0;
@@ -158,10 +152,7 @@ public:
      */
     unsigned short GetButtonDownAnalog(long port)
     {
-        bool suppress = false;
-        if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
-            suppress = true;
-        }
+        const bool suppress = m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1);
         int result;
         if (suppress) {
             result = 0;
@@ -391,12 +382,8 @@ inline unsigned short CPad::GetButton(long padIndex)
  */
 inline float CPad::GetLeftStickY(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     float result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0.0f;
@@ -419,12 +406,8 @@ inline float CPad::GetLeftStickY(long padIndex)
  */
 inline float CPad::GetLeftStickX(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     float result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0.0f;
@@ -447,12 +430,8 @@ inline float CPad::GetLeftStickX(long padIndex)
  */
 inline float CPad::GetRightStickY(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     float result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0.0f;
@@ -475,12 +454,8 @@ inline float CPad::GetRightStickY(long padIndex)
  */
 inline float CPad::GetRightStickX(long padIndex)
 {
-    bool shouldZero = false;
+    const bool shouldZero = m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1);
     float result;
-
-    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
-        shouldZero = true;
-    }
 
     if (shouldZero) {
         result = 0.0f;

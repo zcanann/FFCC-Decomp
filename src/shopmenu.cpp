@@ -2395,40 +2395,39 @@ void CShopMenu::DrawShopBase()
     Graphic.SetDrawDoneDebugData(2);
     InitDrawEnvShape();
 
-    int panelY;
+    int y;
     if (m_mode <= 2) {
-        panelY = 0xE6;
+        y = 0xE6;
     } else if (m_mode <= 8) {
-        panelY = 0x154;
+        y = 0x154;
     } else if (m_mode <= 0xB) {
-        panelY = 0x118;
+        y = 0x118;
     }
 
     Graphic.SetDrawDoneDebugData(3);
-    DrawObi(panelY + 0x22);
+    DrawObi(y + 0x22);
     Graphic.SetDrawDoneDebugData(4);
 
     if (m_mode >= 3) {
         int listX;
-        int listY;
         if (m_mode >= 9) {
             listX = 0x118;
-            listY = 0xAA;
+            y = 0xAA;
         } else {
             listX = 0x64;
-            listY = 0xAA;
+            y = 0xAA;
         }
         int barX;
         for (barX = listX + 0x48; barX < 0x244; barX += 8) {
             Graphic.SetDrawDoneDebugData(5);
-            drawShapeSeq(0x10, 0, barX, listY + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+            drawShapeSeq(0x10, 0, barX, y + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
             Graphic.SetDrawDoneDebugData(6);
         }
         Graphic.SetDrawDoneDebugData(7);
-        drawShapeSeq(0xD, 0, listX + 0x46, listY - 3, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        drawShapeSeq(0xD, 0, listX + 0x46, y - 3, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(8);
         Graphic.SetDrawDoneDebugData(9);
-        drawShapeSeq(8, 0, barX, listY + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        drawShapeSeq(8, 0, barX, y + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(10);
 
         if (m_mode <= 8) {

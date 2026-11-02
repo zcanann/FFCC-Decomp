@@ -656,9 +656,9 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	const int classLocalCount = (classIndex == -1) ? 0 : classBase->m_localCount;
 
+	int requiredWords = classLocalCount + 0x60;
 	CStackBlock* scanNode = m_stackBlocks.m_next;
-	const int requiredWords = classLocalCount + 0x60;
-	const int noScan = static_cast<u8>(scanNode == &m_stackBlocks);
+	int noScan = (scanNode == &m_stackBlocks);
 	for (;;) {
 		if (noScan != 0 ||
 		    scanNode->m_offset + scanNode->m_size + requiredWords <= scanNode->m_next->m_offset) {

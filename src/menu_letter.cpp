@@ -1448,8 +1448,12 @@ void CMenuPcs::LetterMessDraw()
  */
 int CMenuPcs::LetterCtrlCur()
 {
-	int press = static_cast<s16>(Pad.GetButtonDown(0));
-	int hold = static_cast<s16>(Pad.GetButtonRepeat(0));
+	int letterCount;
+	short press;
+	short hold;
+
+	press = Pad.GetButtonDown(0);
+	hold = Pad.GetButtonRepeat(0);
 
 	if (hold == 0) {
 		return 0;
@@ -1458,7 +1462,7 @@ int CMenuPcs::LetterCtrlCur()
 	CCaravanWork* const caravanWork = GetLetterCaravanWork();
 	int menuMode = m_letterMenuState->mode;
 	if (menuMode == 0) {
-		int letterCount = caravanWork->m_letterCount;
+		letterCount = caravanWork->m_letterCount;
 		if ((letterCount == 0) && ((hold & 0xC) != 0)) {
 			Sound.PlaySe(4, 0x40, 0x7F, 0);
 			return 0;

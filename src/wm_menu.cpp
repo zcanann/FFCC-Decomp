@@ -3591,8 +3591,8 @@ void CMenuPcs::DrawCMakeMenu()
 			         7, textList[textIndex], 1.0f, 1.0f);
 #else
 			int mesNo = 5;
-			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 			char* textList[3] = {0};
+			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
 #ifdef VERSION_GCCP01
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x4B);
 #else
@@ -8809,8 +8809,7 @@ nextListEntry:
 						} else {
 							texU = static_cast<float>(DOUBLE_803314F0);
 						}
-						const float du = static_cast<float>(faceNo % 100) * FLOAT_80331468;
-						texU += du;
+						texU += static_cast<float>(faceNo % 100) * FLOAT_80331468;
 						const float* pW68f = &FLOAT_80331468;
 						MenuPcs.DrawRect(0, iconX, iconY, *pW68f, *pW68f,
 						         texU,

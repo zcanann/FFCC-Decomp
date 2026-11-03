@@ -1263,14 +1263,15 @@ void InfoWin_GetDescLine(s32 line, char *dst)
     for (i = 0; i <= line; i++) {
         s = strchr(p, '\n');
         if (i == line) {
-            if (s == NULL) {
-                strcpy(dst, p);
-            } else {
+            do {
+                if (s == NULL) {
+                    strcpy(dst, p);
+                    break;
+                }
                 len = s - p;
                 memcpy(dst, p, len);
-                s = dst + len;
-                *s = 0;
-            }
+                dst[len] = 0;
+            } while (0);
             break;
         }
         if (s == NULL) {

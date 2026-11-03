@@ -728,7 +728,6 @@ void CRingMenu::drawGBA()
 	float sinA;
 	float sinB;
 	float angle;
-	float alphaBase;
 	float showScale;
 	float posX;
 	float posY;
@@ -796,8 +795,7 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_GBA));
 
-	alphaBase = 255.0f * gbaAnim;
-	MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>(0.5f * alphaBase * showScale)));
+	MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>(0.5f * (255.0f * gbaAnim) * showScale)));
 
 	invSize = 1.0f - sizePulse;
 	orbitX = 5.0f * (sizePulse * sinB);
@@ -806,7 +804,7 @@ void CRingMenu::drawGBA()
 	                                 0.0f, static_cast<float>(m_menuIndex * 0x30), 0.75f * (1.0f + invSize),
 	                                 0.75f * (sizePulse + invSize), 0.2f * (2.0f * (cycle - 0.5f)));
 
-	alphaLit = alphaBase * showScale;
+	alphaLit = (255.0f * gbaAnim) * showScale;
 	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaLit)));
 	MenuPcs.DrawRect(3, posX + orbitX, posY - orbitY, 80.0f, 48.0f, 0.0f, static_cast<float>(m_menuIndex * 0x30),
 	                                 0.75f * sizePulse, 0.75f * sizePulse, 0.2f * (2.0f * (cycle - 0.5f)));

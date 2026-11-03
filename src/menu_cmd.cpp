@@ -2017,8 +2017,7 @@ void CMenuPcs::DrawUniteList()
 		                             static_cast<double>(entry->x));
 		if (topX != entry->x) {
 			const float target = static_cast<float>(entry->x + entry->width - 0x18) - width;
-			const float t = static_cast<float>(__fabs(static_cast<double>(topX - entry->x)) / 64.0);
-			x = (target - x) * t + x;
+			x = (target - x) * static_cast<float>(__fabs(static_cast<double>(topX - entry->x)) / 64.0) + x;
 		}
 
 		drawY = static_cast<float>(entry->y + 3);
@@ -2097,7 +2096,7 @@ void CMenuPcs::DrawUniteList()
 		color.a = static_cast<u8>(255.0f * panelAlpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
-		unitePanels[s_ucnt].x = static_cast<u16>(panelX);
+		unitePanels[s_ucnt].x = panelX;
 		unitePanels[s_ucnt].y = static_cast<s16>(drawY);
 		unitePanels[s_ucnt].width = static_cast<s16>(drawW);
 		unitePanels[s_ucnt].height = static_cast<s16>(drawH);

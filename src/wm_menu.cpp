@@ -7065,12 +7065,14 @@ void CMenuPcs::CalcCharaSelect()
 			for (i = 0; i < kWmMenuControllerCount; i++) {
 				WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 				if (entry.m_cmakePending != 0) {
+#ifdef VERSION_GCCP01
 					entry.m_confirmed = 0;
 					entry.m_cmakePending = 0;
 					entry.m_cmakeReady = 0;
-#ifndef VERSION_GCCP01
+#else
 					int retry;
-					for (retry = 0; retry < 10; retry++) {
+					entry.m_cmakeReady = entry.m_cmakePending = entry.m_confirmed = retry = 0;
+					for (; retry < 10; retry++) {
 						if (Joybus.SetMType(i, 4) == 0) {
 							break;
 						}

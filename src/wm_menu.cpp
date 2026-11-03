@@ -3615,10 +3615,11 @@ void CMenuPcs::DrawCMakeMenu()
 				switch (g_pGoOutMenu->m_goOutMode) {
 				case 0x0E: {
 #ifdef VERSION_GCCJGC
-					char text[256] = "\x83\x8D\x81\x5B\x83\x68\x82\xB7\x82\xE9\x83\x66\x81\x5B\x83\x5E\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
-					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(text, 22)), 391,
+					char textList[1][256] = {"\x83\x8D\x81\x5B\x83\x68\x82\xB7\x82\xE9\x83\x66\x81\x5B\x83\x5E\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2"};
+					int mesNo = 0;
+					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(textList[mesNo], 22)), 391,
 					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
-					                 7, text, 1.0f, 1.0f);
+					                 7, textList[mesNo], 1.0f, 1.0f);
 #else
 					int mesNo = 8;
 					const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
@@ -3633,10 +3634,11 @@ void CMenuPcs::DrawCMakeMenu()
 				}
 				case 0x0F: {
 #ifdef VERSION_GCCJGC
-					char text[256] = "\x88\xDA\x93\xAE\x82\xB7\x82\xE9\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
-					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(text, 22)), 391,
+					char textList[1][256] = {"\x88\xDA\x93\xAE\x82\xB7\x82\xE9\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2"};
+					int mesNo = 0;
+					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(textList[mesNo], 22)), 391,
 					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
-					                 7, text, 1.0f, 1.0f);
+					                 7, textList[mesNo], 1.0f, 1.0f);
 #else
 					int mesNo = 9;
 					const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
@@ -3655,10 +3657,11 @@ void CMenuPcs::DrawCMakeMenu()
 				switch (g_pGoOutMenu->m_deleteMode) {
 				case 2: {
 #ifdef VERSION_GCCJGC
-					char text[256] = "\x8D\xED\x8F\x9C\x82\xB7\x82\xE9\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
-					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(text, 22)), 391,
+					char textList[1][256] = {"\x8D\xED\x8F\x9C\x82\xB7\x82\xE9\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2"};
+					int mesNo = 0;
+					MenuPcs.DrawFont(static_cast<int>(MenuPcs.CalcCenteringPos(textList[mesNo], 22)), 391,
 					                 CColor(255, 255, 255, static_cast<unsigned char>(textAlpha)).color,
-					                 7, text, 1.0f, 1.0f);
+					                 7, textList[mesNo], 1.0f, 1.0f);
 #else
 					int mesNo = 10;
 					const int languageIndex = Game.m_gameWork.GetLanguage() - 1;
@@ -8981,18 +8984,20 @@ nextListEntry:
 		short mode = m_wmWorldState->m_menuMode;
 		if (mode == 5) {
 #ifdef VERSION_GCCJGC
-			char text[256] = "\x83\x8D\x81\x5B\x83\x68\x82\xB7\x82\xE9\x83\x66\x81\x5B\x83\x5E\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2";
-			DrawFont((int)CalcCenteringPos(text, 22), 391,
-			         CColor(255, 255, 255, 255).color, 7, text, 1.0f, 1.0f);
+			char textList[1][256] = {"\x83\x8D\x81\x5B\x83\x68\x82\xB7\x82\xE9\x83\x66\x81\x5B\x83\x5E\x82\xF0\x91\x49\x82\xF1\x82\xC5\x82\xAD\x82\xBE\x82\xB3\x82\xA2"};
+			int mesNo = 0;
+			DrawFont((int)CalcCenteringPos(textList[mesNo], 22), 391,
+			         CColor(255, 255, 255, 255).color, 7, textList[mesNo], 1.0f, 1.0f);
 #else
 			DrawFont2(static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(2)), 0.800000011920929f, FLOAT_803313e8)), 0x187,
 			          CColor(0xFF, 0xFF, 0xFF, 0xFF).color, 7, const_cast<char*>(GetMcStr(2)), 0.800000011920929f, FLOAT_803313e8, FLOAT_803313e8);
 #endif
 		} else if (mode == 2) {
 #ifdef VERSION_GCCJGC
-			char text[256] = "\x83\x66\x81\x5B\x83\x5E\x82\xF0\x82\xC7\x82\xB1\x82\xC9\x83\x5A\x81\x5B\x83\x75\x82\xB5\x82\xDC\x82\xB7\x82\xA9\x81\x48";
-			DrawFont((int)CalcCenteringPos(text, 22), 391,
-			         CColor(255, 255, 255, 255).color, 7, text, 1.0f, 1.0f);
+			char textList[1][256] = {"\x83\x66\x81\x5B\x83\x5E\x82\xF0\x82\xC7\x82\xB1\x82\xC9\x83\x5A\x81\x5B\x83\x75\x82\xB5\x82\xDC\x82\xB7\x82\xA9\x81\x48"};
+			int mesNo = 0;
+			DrawFont((int)CalcCenteringPos(textList[mesNo], 22), 391,
+			         CColor(255, 255, 255, 255).color, 7, textList[mesNo], 1.0f, 1.0f);
 #else
 			DrawFont2(static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(3)), 0.800000011920929f, FLOAT_803313e8)), 0x187,
 			          CColor(0xFF, 0xFF, 0xFF, 0xFF).color, 7, const_cast<char*>(GetMcStr(3)), 0.800000011920929f, FLOAT_803313e8, FLOAT_803313e8);

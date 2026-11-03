@@ -942,9 +942,7 @@ int CChara::CModel::PickFur(
 										CVector planeDelta = CVector(verts[0].m_viewPos) - ray[0];
 										const float rayDot = PSVECDotProduct(normal, rayDir);
 										const float planeDot = PSVECDotProduct(normal, planeDelta);
-										Vec scaledRay;
-										PSVECScale(rayDir, &scaledRay, planeDot / rayDot);
-										PSVECAdd(ray[0], &scaledRay, hitViewPos);
+										VECMultAdd(ray[0], rayDir, hitViewPos, planeDot / rayDot);
 
 										CVector hitTo[3];
 										CVector area[3];

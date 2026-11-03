@@ -265,6 +265,7 @@ public:
     int AddTmpArtifact(int, int*);
     int CanAddGil(int);
     int AddGil(int);
+    const int& GetGil() { return m_gil; }
     int GetFoodRank(int);
     void SearchRomLetterWork(CRomLetterWork**, int);
     int ShopRequest(int, int, int, int, int, int, int);

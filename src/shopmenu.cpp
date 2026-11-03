@@ -1807,6 +1807,7 @@ void CShopMenu::DrawSmith0()
 #ifdef VERSION_GCCJGC
 void CShopMenu::DrawMake()
 {
+    int rowY;
     int i;
     DrawMakeBase();
 
@@ -1838,7 +1839,7 @@ void CShopMenu::DrawMake()
     } else {
         gilTlut = 2;
     }
-    DrawDecScale(m_caravanWork->m_gil, gilTlut, 0x1E2, 180.0f, -4.0f, 1.5f, 1, 1, 0x12);
+    DrawDecScale(m_caravanWork->GetGil(), gilTlut, 0x1E2, 180.0f, -4.0f, 1.5f, 1, 1, 0x12);
 
     font->SetScale(1.0f);
     _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 258.0f, 188.0f, 0x19, 0x12);
@@ -1877,10 +1878,10 @@ void CShopMenu::DrawMake()
     _drawNoShadowFont(headerFont, "\x82\xD0\x82\xC2\x82\xE6\x82\xA4\x82\xC8\x82\xE0\x82\xCC", 130.0f, 260.0f, 4, 0x12);
     _drawNoShadowFont(headerFont, "\x82\xB5\x82\xE5\x82\xB6\x82\xB7\x82\xA4", 400.0f, 260.0f, 9, 0x12);
 
-    int rowY = 300;
+    rowY = 300;
     CMenuPcs::MaterialInfo recipeMaterial;
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
-    for (i = 0; i < 3; i++, rowY += 0x1E) {
+    for (i = 0; i < 3; i++) {
         if (recipeMaterial.m_itemNo[i] <= 0) {
             break;
         }
@@ -1895,11 +1896,9 @@ void CShopMenu::DrawMake()
 
         int ownedCount = getItemHaveCnt(recipeMaterial.m_itemNo[i]);
         DrawDec(recipeMaterial.m_count[i], 0x1B, 0x168, rowY, -3.0f, 0, 1, 0x12);
-        int ownedTlut = 2;
-        if (ownedCount >= recipeMaterial.m_count[i]) {
-            ownedTlut = 0x1B;
-        }
+        int ownedTlut = (ownedCount >= recipeMaterial.m_count[i]) ? 0x1B : 2;
         DrawDec(ownedCount, ownedTlut, 0x1CC, rowY, -3.0f, 1, 1, 0x12);
+        rowY += 0x1E;
     }
     MenuPcs.DrawInit();
 
@@ -1981,7 +1980,7 @@ void CShopMenu::DrawMake()
     } else {
         gilTlut = 2;
     }
-    DrawDecScale(m_caravanWork->m_gil, gilTlut, x, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
+    DrawDecScale(m_caravanWork->GetGil(), gilTlut, x, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
 
     font->SetScale(FLOAT_80332d28);
     font->DrawInit();
@@ -2076,11 +2075,8 @@ void CShopMenu::DrawMake()
 
         int ownedCount = getItemHaveCnt(recipeMaterial.m_itemNo[i]);
 
-        int ownedTlut = 2;
         makeMarginW = FLOAT_80332E10;
-        if (ownedCount >= recipeMaterial.m_count[i]) {
-            ownedTlut = 0x1B;
-        }
+        int ownedTlut = (ownedCount >= recipeMaterial.m_count[i]) ? 0x1B : 2;
         DrawDec(ownedCount, ownedTlut, 452, rowY, FLOAT_80332d64, 1, 1, 0x12);
         rowY += 0x1E;
     }

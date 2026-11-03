@@ -759,8 +759,7 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE));
 
-	gbaAnimRaw = static_cast<float>(
-	    sin(static_cast<double>((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f)));
+	gbaAnimRaw = sinf((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f);
 	gbaAnim = gbaAnimRaw;
 	if (m_gbaConnectedFlag == 1) {
 		gbaAnim = 1.0f - gbaAnimRaw;
@@ -790,8 +789,8 @@ void CRingMenu::drawGBA()
 	}
 
 	angle = 3.1415927410125732f * cycle;
-	sinA = static_cast<float>(sin(static_cast<double>(angle)));
-	sinB = static_cast<float>(sin(static_cast<double>(-1.5707963705062866f + angle)));
+	sinA = sinf(angle);
+	sinB = sinf(-1.5707963705062866f + angle);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_GBA));
 
@@ -813,7 +812,7 @@ void CRingMenu::drawGBA()
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
 		if (static_cast<unsigned char>(Joybus.IsInitSend(m_menuIndex)) == 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_SUNA));
-			const float blink = static_cast<float>(sin(static_cast<double>(0.1f * static_cast<float>(m_commonFrameCounter))));
+			const float blink = sinf(0.1f * static_cast<float>(m_commonFrameCounter));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(0.5f * (alphaLit * (1.0f + blink))));
 			MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha)));

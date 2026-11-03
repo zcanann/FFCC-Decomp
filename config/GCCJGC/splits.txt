@@ -631,6 +631,7 @@ shopmenu.cpp:
 	.rodata     start:0x801D9658 end:0x801D9788
 	.sbss       start:0x8034BCB8 end:0x8034BCC0
 	.sdata2     start:0x8034F298 end:0x8034F470
+	.sbss2      start:0x80350200 end:0x80350204
 
 singmenu.cpp:
 	.rodata start:0x801D8E78 end:0x801D94C0 align:4
@@ -1531,6 +1532,7 @@ goout.cpp:
 	.bss start:0x80327408 end:0x80327458
 	.sbss start:0x8034BCE8 end:0x8034BCF0
 	.text start:0x80162A00 end:0x80166CFC
+	.sdata2 start:0x8034F750 end:0x8034F755
 
 gx/GXPerf.c:
 	.text start:0x801A0EDC end:0x801A1934

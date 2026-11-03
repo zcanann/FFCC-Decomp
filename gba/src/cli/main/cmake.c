@@ -1195,7 +1195,6 @@ s32 CMakeLookScreen_OpenLooks(void)
     struct Window *prev;
     s32 row;
     s32 half;
-    s32 line;
     s32 i;
     s32 tile;
     s32 pal;
@@ -1222,11 +1221,10 @@ s32 CMakeLookScreen_OpenLooks(void)
         if (gCMakeData.look & 0x80)
             i += 4;
         Text_Print(Msg_GetLook(i + row), TEXT_DRAW);
-        line = half + 3;
-        Window_PutText(&tmp, line, 0);
+        Window_PutText(&tmp, half + 3, 0);
         for (i = 0; i < ARRAY_COUNT(buf); i++)
             buf[i] = 0x3FF;
-        tile = tmp.width * (line * 2) + 128;
+        tile = tmp.width * ((half + 3) * 2) + 128;
         pal = 0x7000;
         for (i = 0; i < tmp.width; i++) {
             buf[i] = tile++ | pal;

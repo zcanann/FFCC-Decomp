@@ -915,12 +915,12 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
     {
         float u1;
         float v1;
+        float scaledW;
+        float scaledH;
         float x0;
         float y0;
         float x1;
         float y1;
-        float scaledW;
-        float scaledH;
         float z = 0.0f;
 
         if ((attr & 8) != 0) {
@@ -942,16 +942,24 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         scaledW = w * us;
         scaledH = h * vs;
 
-        x0 = ((attr & 1) != 0) ? x - scaledW * 0.5f : x;
-        y0 = ((attr & 2) != 0) ? y - scaledH * 0.5f : y;
+        if ((attr & 1) != 0) {
+            x0 = x - scaledW * 0.5f;
+        } else {
+            x0 = x;
+        }
+        if ((attr & 2) != 0) {
+            y0 = y - scaledH * 0.5f;
+        } else {
+            y0 = y;
+        }
 
         x1 = x0 + scaledW;
         y1 = y0 + scaledH;
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
         if (0.0f != angle) {
-            float s = static_cast<float>(sin(angle));
-            float c = static_cast<float>(cos(angle));
+            float s = sinf(angle);
+            float c = cosf(angle);
             x0 -= x;
             y0 -= y;
             x1 -= x;
@@ -1001,12 +1009,12 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
     {
         float u1;
         float v1;
+        float scaledW;
+        float scaledH;
         float x0;
         float y0;
         float x1;
         float y1;
-        float scaledW;
-        float scaledH;
         float z = 0.0f;
 
         if ((attr & 8) != 0) {
@@ -1028,16 +1036,24 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         scaledW = w * us;
         scaledH = h * vs;
 
-        x0 = ((attr & 1) != 0) ? x - scaledW * 0.5f : x;
-        y0 = ((attr & 2) != 0) ? y - scaledH * 0.5f : y;
+        if ((attr & 1) != 0) {
+            x0 = x - scaledW * 0.5f;
+        } else {
+            x0 = x;
+        }
+        if ((attr & 2) != 0) {
+            y0 = y - scaledH * 0.5f;
+        } else {
+            y0 = y;
+        }
 
         x1 = x0 + scaledW;
         y1 = y0 + scaledH;
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
         if (0.0f != angle) {
-            float s = static_cast<float>(sin(angle));
-            float c = static_cast<float>(cos(angle));
+            float s = sinf(angle);
+            float c = cosf(angle);
             x0 -= x;
             y0 -= y;
             x1 -= x;
@@ -1059,15 +1075,15 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
             GXTexCoord2f32(u1, v1);
         } else {
-            GXPosition3f32(x0, y0, z);
+            GXPosition3f32(x, y, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
             GXTexCoord2f32(u, v);
 
-            GXPosition3f32(x1, y0, z);
+            GXPosition3f32(x1, y, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
             GXTexCoord2f32(u1, v);
 
-            GXPosition3f32(x0, y1, z);
+            GXPosition3f32(x, y1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
             GXTexCoord2f32(u, v1);
 

@@ -1943,12 +1943,14 @@ void CShopMenu::DrawMake()
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
 
+    char* raceText;
     char* itemName = GetItemName(m_resultItem);
-    _drawShadowFont(font, itemName, FLOAT_80332d54, FLOAT_80332E0C, 0x18, 0x12);
+    int x = 100;
+    _drawShadowFont(font, itemName, x, FLOAT_80332E0C, 0x18, 0x12);
 
     int languageId = static_cast<int>(Game.m_gameWork.GetLanguage()) - 1;
-    char* raceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_RACE);
-    int x = 180;
+    raceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_RACE);
+    x += 80;
     _drawNoShadowFont(font, raceText, x, FLOAT_80332d58, 0x18, 0x12);
 
     x += FLOAT_80332d5c + font->GetWidth(raceText);
@@ -1970,8 +1972,7 @@ void CShopMenu::DrawMake()
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
     float makeMarginW = FLOAT_80332E10;
-    x = FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c;
-    DrawDecScale(makeGil, 0x13, x, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
+    DrawDecScale(makeGil, 0x13, FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
 
     x = FLOAT_80332E1C - gilUnitWidth - FLOAT_80332d5c;
     int gilTlut;

@@ -2739,7 +2739,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 		DrawMcWinMess(0x18, 1);
 		DrawInit();
 #ifdef VERSION_GCCJGC
-		float cursorX = (float)(this->m_menuWindowInfo->x + 32) + (float)(this->m_bonusState->m_confirmSelection * 80);
+		float cursorX = (float)(this->m_menuWindowInfo->x + 32);
+		cursorX += (float)(this->m_bonusState->m_confirmSelection * 80);
 		float cursorY = (float)(this->m_menuWindowInfo->y + 76);
 #else
 		float cursorY = (float)(this->m_menuWindowInfo->y + this->m_menuWindowInfo->height - 0x3e);

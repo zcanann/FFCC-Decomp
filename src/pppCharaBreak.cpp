@@ -404,6 +404,7 @@ static void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_
  */
 static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* model)
 {
+    S16Vec* dst;
     POLYGON_DATA* polygon;
     CharaBreakStep* stepData = (CharaBreakStep*)step;
     CChara::CMesh* mesh = model->GetMesh();
@@ -425,28 +426,30 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
         for (int dl = mesh->GetRefData()->m_displayListCount - 1; dl >= 0; dl--) {
             CharaBreakDisplayListPair** displayListPairs =
                 work->m_meshBuffers[meshIndex];
-            polygon = displayListPairs[dl]->m_polygonData;
+            POLYGON_DATA* polygons = displayListPairs[dl]->m_polygonData;
 
             for (int polyIndex = 0; polyIndex < displayListPairs[dl]->m_polygonCount; polyIndex++) {
                 S16Vec transformed[3];
+                polygon = &polygons[polyIndex];
 
                 if (polygon->m_enabled == 0) {
                     int flags[3] = {0, 0, 0};
 
+                    dst = transformed;
                     for (int i = 0; i < 3; i++) {
                         if (needsMtxUpdate) {
                             S16Vec* srcPos = mesh->GetVertex() + polygon->m_posIndices[i];
                             Vec transformedPos;
                             Util.ConvI2FVector(transformedPos, *srcPos, model->GetRefData()->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
-                            Util.ConvF2IVector(transformed[i], transformedPos, model->GetRefData()->m_posQuant);
+                            Util.ConvF2IVector(*dst, transformedPos, model->GetRefData()->m_posQuant);
                         } else {
-                            transformed[i] = mesh->GetVertex()[polygon->m_posIndices[i]];
+                            *dst = mesh->GetVertex()[polygon->m_posIndices[i]];
                         }
 
                         if (stepData->m_clipMode == 0) {
                             if (stepData->m_worldSpaceMode == 1) {
-                                if (transformed[i].y < threshold) {
+                                if (dst->y < threshold) {
                                     flags[i] = 1;
                                 }
                             } else if (polygon->m_pos[i].y < threshold) {
@@ -454,13 +457,14 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
                             }
                         } else if (stepData->m_clipMode == 1) {
                             if (stepData->m_worldSpaceMode == 1) {
-                                if (transformed[i].y > threshold) {
+                                if (dst->y > threshold) {
                                     flags[i] = 1;
                                 }
                             } else if (polygon->m_pos[i].y > threshold) {
                                 flags[i] = 1;
                             }
                         }
+                        dst++;
                     }
 
                     for (int i = 0; i < 3; i++) {
@@ -577,8 +581,6 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
                         polygon->m_fallFrames++;
                     }
                 }
-
-                polygon++;
             }
         }
 

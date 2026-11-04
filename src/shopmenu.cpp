@@ -412,21 +412,25 @@ mode_3_6_common:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 116b
+ * EN Address: 0x80174038
+ * EN Size: 164b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getItemCnt()
 {
-    int listType = m_listType;
-    if (listType == 0) {
+    if (m_listType == 0) {
         return m_caravanWork->m_shopListCount;
     }
-    if (listType == 1) {
+    if (m_listType == 1) {
         return 0x40;
     }
-    if (listType == 2) {
+    if (m_listType == 2) {
         return m_itemCount;
     }
+    FFCC_ASSERT(0);
     return -1;
 }
 
@@ -446,8 +450,12 @@ inline int CShopMenu::calcGilRatio(int baseGil)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: 0x80174104
+ * EN Size: 248b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getItemNo(int index)
 {
@@ -464,6 +472,7 @@ inline int CShopMenu::getItemNo(int index)
         }
         return m_caravanWork->m_inventoryItems[mapped];
     }
+    FFCC_ASSERT(0);
     return -1;
 }
 
@@ -536,6 +545,7 @@ inline int CShopMenu::getBuySellGil(int itemNo)
     } else if (m_listType == 1) {
         gil = getSellGil(itemNo);
     } else {
+        FFCC_ASSERT(0);
         gil = -1;
     }
     return gil;

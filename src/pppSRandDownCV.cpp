@@ -17,12 +17,11 @@ static inline SRandDownCVDataOffsets* GetSRandDownCVDataOffsets(_pppCtrlTable* c
 
 static inline float randf(unsigned char flag)
 {
-    float value = -Math.RandF();
+    float value = Math.RandF();
+    value = -value;
     if (flag != 0) {
         float random = Math.RandF();
-        float blend = value - random;
-        float scale = 0.5f;
-        value = blend * scale;
+        value = (value - random) / 2.0f;
     }
     return value;
 }

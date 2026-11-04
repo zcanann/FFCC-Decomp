@@ -19,8 +19,7 @@
 template <class T>
 CPtrArray<T>::CPtrArray()
 {
-    m_size = 0;
-    m_numItems = 0;
+    m_numItems = m_size = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -94,8 +93,7 @@ void CPtrArray<T>::RemoveAll()
         delete[] m_items;
         m_items = 0;
     }
-    m_size = 0;
-    m_numItems = 0;
+    m_numItems = m_size = 0;
 }
 
 template <class T>
@@ -104,8 +102,7 @@ void CPtrArray<T>::ReleaseAndRemoveAll()
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
         T item = m_items[i];
         if (item != 0) {
-            CRef* ref = item;
-            ref->Release();
+            item->Release();
             m_items[i] = 0;
         }
     }

@@ -186,11 +186,9 @@ static inline int CharaObjResolveParticleBank(CGCharaObj* charaObj, int particle
  * JP Size: TODO
  */
 
-static __inline SCharaItemRow* CharaObjItemRow(int itemId)
+static __inline SCharaItemRow* CharaObjItemTable()
 {
-	SCharaItemRow* row = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-	row += itemId;
-	return row;
+	return reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 }
 
 static __inline float CharaObjGetStatusMultiplier(int offset)
@@ -1720,14 +1718,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			putParticle(0x200, 0, hitPos, 2.0f * (0.1f * m_attackColRadius), 0x1D);
 		}
 	} else if ((resistType > 1 || (resistType == 1 &&
-	           ((CharaObjItemRow(itemId)->m_flags32 & 1) == 0))) &&
+	           ((CharaObjItemTable()[itemId].m_flags32 & 1) == 0))) &&
 	           (static_cast<unsigned int>(staType - 8) <= 1 || staType == 6 || staType == 3)) {
 		putParticle(0x201, 0, hitPos, 2.0f * (0.1f * m_attackColRadius), 0x65);
 	}
 
 	damageClamp = 0;
 	if (m_lastStateId == 8 && m_subState == 1 &&
-	    ((CharaObjItemRow(itemId)->m_flags2C & 8) == 0)) {
+	    ((CharaObjItemTable()[itemId].m_flags2C & 8) == 0)) {
 		CVector frontDelta = CVector(sourceObj->m_worldPosition) - CVector(m_worldPosition);
 		float frontMag = PSVECMag(frontDelta);
 		if (frontMag > 0.0f) {
@@ -1779,7 +1777,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	if (itemEffect == 0x1F8 &&
 	    sourceObj->m_weaponNodeFlagAll.m_bits1.m_bit20 != 0 &&
-	    ((CharaObjItemRow(m_itemId)->m_status & 0xFF) == 3)) {
+	    ((CharaObjItemTable()[m_itemId].m_status & 0xFF) == 3)) {
 		CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
 		moveVectorH(delta, 2.0f, 10);
 		m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
@@ -1836,7 +1834,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 0x6A: {
 				unsigned int basePower;
 				if (itemEffect == 0x1F8) {
-					basePower = CharaObjItemRow(itemId)->m_basePower;
+					basePower = CharaObjItemTable()[itemId].m_basePower;
 				} else {
 					basePower = 0;
 				}
@@ -1874,7 +1872,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
 				    sourceObj->m_scriptHandle->m_elementResistances[3] == 0) {
 					unsigned int srcEntryKind =
-						CharaObjItemRow(sourceChara->m_itemId)->m_status & 0xFF;
+						CharaObjItemTable()[sourceChara->m_itemId].m_status & 0xFF;
 					if (sourceObj->m_lastStateId == 6 && srcEntryKind <= 1) {
 						break;
 					}

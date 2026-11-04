@@ -291,7 +291,11 @@ public:
         }
         return total;
     }
-    int GetTotalBonus2() { return m_artifactRelated[0] + m_artifactRelated[1] - m_artifactRelated[2]; }
+    int GetTotalBonus2()
+    {
+        int bonus = m_artifactRelated[0] + m_artifactRelated[1] - m_artifactRelated[2];
+        return bonus;
+    }
     void ValidCmdList(int);
     int GetIdxCmdList();
     int GetNumCmdList() { return m_numCmdListSlots; }

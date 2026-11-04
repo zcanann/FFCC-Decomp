@@ -172,8 +172,7 @@ public:
     void SetWorldZoomCam(int paused, unsigned short frames, float rotX, float rotY, float scale)
     {
         m_worldMapEffect.m_paused = paused;
-        m_worldMapEffect.m_timer = frames;
-        m_worldMapEffect.m_duration = frames;
+        m_worldMapEffect.m_duration = m_worldMapEffect.m_timer = frames;
         m_worldMapEffect.m_rotX = rotX;
         m_worldMapEffect.m_rotY = rotY;
         m_worldMapEffect.m_scale = scale;

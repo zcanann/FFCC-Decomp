@@ -271,9 +271,7 @@ public:
     }
     void SetFullScreenShadowPos(Vec* position, float len)
     {
-        m_fullScreenShadowPosition.x = position->x;
-        m_fullScreenShadowPosition.y = position->y;
-        m_fullScreenShadowPosition.z = position->z;
+        m_fullScreenShadowPosition = *position;
         m_fullScreenShadow.m_scale = len;
     }
     void SetFullScreenShadowEnable(unsigned char enable) { m_fullScreenShadowEnabled = enable; }

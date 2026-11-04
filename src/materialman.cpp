@@ -111,7 +111,9 @@ inline CMaterialMan::CMaterialMan()
  */
 inline void CMaterialMan::IncNumTevStage()
 {
-    m_numTevStage = ((m_numTevStage & 0xFF) + 1) & 0xFF;
+    unsigned char numTevStage = m_numTevStage;
+    numTevStage++;
+    m_numTevStage = numTevStage;
 }
 
 /*
@@ -125,16 +127,9 @@ inline void CMaterialMan::IncNumTevStage()
  */
 inline void CMaterialMan::SetStdEnv()
 {
-    int stdValue = m_stdTexMapId;
-
-    m_texMapIdCur = stdValue;
-    m_texMapIdCurShadow = stdValue;
-    stdValue = m_stdTexMtx;
-    m_texMtxCur = stdValue;
-    m_texMtxCurShadow = stdValue;
-    stdValue = m_stdTexCoordId;
-    m_texCoordIdCur = stdValue;
-    m_texCoordIdCurShadow = stdValue;
+    m_texMapIdCurShadow = m_texMapIdCur = m_stdTexMapId;
+    m_texMtxCurShadow = m_texMtxCur = m_stdTexMtx;
+    m_texCoordIdCurShadow = m_texCoordIdCur = m_stdTexCoordId;
     m_curEnvTevBit = m_stdEnvTevBit;
 }
 
@@ -2914,8 +2909,7 @@ inline CTexScroll::CTexScroll()
 {
     m_u0 = m_v0 = 0.0f;
     m_u1 = m_v1 = 0.0f;
-    m_type1 = 0;
-    m_type0 = 0;
+    m_type0 = m_type1 = 0;
 }
 
 /*
@@ -3794,7 +3788,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
  */
 inline void CMaterial::IncNumTexture()
 {
-    m_textureCount++;
+    m_textureCount = m_textureCount + 1;
 }
 
 /*

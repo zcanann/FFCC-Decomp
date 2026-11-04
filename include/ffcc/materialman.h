@@ -75,12 +75,9 @@ public:
         m_curEnvTevBit = 0x000ACE0F;
         m_activeEnvTevBit = 0xFFFFFFFF;
         m_vtxDescMode = 0xFF;
-        m_stdTexMapId = 0;
-        m_texMapIdCur = 0;
-        m_stdTexMtx = 0x1E;
-        m_texMtxCur = 0x1E;
-        m_stdTexCoordId = 0;
-        m_texCoordIdCur = 0;
+        m_texMapIdCur = m_stdTexMapId = 0;
+        m_texMtxCur = m_stdTexMtx = 0x1E;
+        m_texCoordIdCur = m_stdTexCoordId = 0;
         m_blendMode = 0xFF;
         m_fogEnable = 0xFF;
         m_shadowMaterialCount = 0;

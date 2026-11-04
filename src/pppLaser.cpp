@@ -319,8 +319,8 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
     s32 dataValIndex = step->m_dataValIndex;
     u32 count;
     s32 i;
-    short alphaStep;
-    char alphaMax;
+    u8 alphaStep;
+    u8 alphaMax;
     float negHalfWidth;
     float length;
     float halfWidth;
@@ -435,12 +435,12 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
         }
 
         GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
-        alphaMax = step->m_laser.m_trailAlpha;
+        alphaMax = (u8)step->m_laser.m_trailAlpha;
         color.r = step->m_laser.m_trailColorR;
         color.g = step->m_laser.m_trailColorG;
-        alphaStep = (u8)((u8)alphaMax / (s32)step->m_laser.m_pointCount);
         color.b = step->m_laser.m_trailColorB;
         color.a = alphaMax;
+        alphaStep = (u8)color.a / step->m_laser.m_pointCount;
 
         GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
         for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
@@ -448,13 +448,13 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
             trailStartColor.r = color.r;
             trailStartColor.g = color.g;
             trailStartColor.b = color.b;
-            trailStartColor.a = (u8)alphaMax - alphaStep * j;
+            trailStartColor.a = alphaMax - alphaStep * j;
 
             _GXColor trailEndColor;
             trailEndColor.r = color.r;
             trailEndColor.g = color.g;
             trailEndColor.b = color.b;
-            trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
+            trailEndColor.a = alphaMax - alphaStep * (j + 1);
 
             GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
             GXColor1u32(*(u32*)&trailStartColor);

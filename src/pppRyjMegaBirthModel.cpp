@@ -117,7 +117,8 @@ static inline void wrap_particle_rotation_triplet_s32(s32* rotation)
 
 static inline float get_rand()
 {
-    return Math.RandF();
+    float r = Math.RandF();
+    return r;
 }
 
 static inline signed char get_noise(u8 span)

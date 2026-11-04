@@ -75,7 +75,8 @@ static inline unsigned char clamp_u8(float value)
 
 static inline float get_rand()
 {
-	return Math.RandF();
+	float r = Math.RandF();
+	return r;
 }
 
 static inline signed char get_noise(u8 span)

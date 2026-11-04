@@ -48,10 +48,7 @@ float atan2(float y, float x);
 float fmodf(float x, float y);
 }
 
-static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
-{
-    return &self->m_usbStreamState;
-}
+
 
 extern const float kCFlatPadStickZero = 0.0f;
 
@@ -204,7 +201,7 @@ static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* run
  */
 inline void CPartPcs::pppSetDebugHide(unsigned char hide)
 {
-    UsbStream(this)->m_disableShokiDraw = hide;
+    m_usbStreamState.m_disableShokiDraw = hide;
 }
 
 /*

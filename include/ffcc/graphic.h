@@ -53,7 +53,7 @@ public:
 #endif
     void _WaitDrawDone(char*, int);
     void* GetFrameBuffer() { return m_frameBuffer; }
-    int IsAvailableTempBuffer() { return m_scratchTextureBuffer != 0; }
+    int IsAvailableTempBuffer() { return m_scratchTextureBuffer != 0 ? 1 : 0; }
     void Thread();
     int IsFifoOver();
     int IsFrameRateOver();

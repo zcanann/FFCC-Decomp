@@ -131,7 +131,7 @@ public:
     void McDelFile(int chan);
 
     bool IsBrokenFile();
-    int IsMcMount() { return m_currentSlot != -1; }
+    int IsMcMount() { return m_currentSlot != -1 ? 1 : 0; }
 
     void MakeSaveData();
     void SetLoadData();

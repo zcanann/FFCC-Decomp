@@ -2568,10 +2568,11 @@ void CShopMenu::DrawItemList()
     int row;
     int y = 0x4C;
     int itemIndex = m_listTop;
-    unsigned int selectableFrame = 10;
+    int frame = 10;
     if (m_listType == 2) {
-        selectableFrame = 0xF;
+        frame = 0xF;
     }
+    int selectableFrame = frame;
 
     for (row = 0; row < m_visibleRows; ++row, y += 0x1C) {
         int itemCount = getItemCnt();
@@ -2584,7 +2585,7 @@ void CShopMenu::DrawItemList()
 
         int canTrade = CheckSell(itemIndex);
 
-        int frame = 0xE;
+        frame = 0xE;
         if (canTrade != 0) {
             frame = selectableFrame;
         }
@@ -2594,11 +2595,13 @@ void CShopMenu::DrawItemList()
             frameX = 0x198;
             drawShapeSeq(frame, 1, frameX, y - 4, 0xFF, 0, 0, FLOAT_80332D9C, 0);
             MenuPcs.DrawInit();
+            int cursorX = 0x114;
             int cursorY = y - 0x14;
             if (m_subMode == 0) {
-                MenuPcs.DrawCursor(0x114 + (static_cast<int>(System.GetCounter()) % 8), cursorY, FLOAT_80332d28);
+                cursorX += static_cast<int>(System.GetCounter()) % 8;
+                MenuPcs.DrawCursor(cursorX, cursorY, FLOAT_80332d28);
             } else if ((System.GetCounter() & 1) == 0) {
-                MenuPcs.DrawCursor(0x114, cursorY, FLOAT_80332d28);
+                MenuPcs.DrawCursor(cursorX, cursorY, FLOAT_80332d28);
             }
         } else {
             frameX = 0x1B8;
@@ -2615,8 +2618,7 @@ void CShopMenu::DrawItemList()
             font->DrawInit();
             font->SetPosX(static_cast<float>(frameX - 0x54));
             font->SetPosY(static_cast<float>(y - 0x14));
-            char* name = GetItemName(itemNo);
-            font->Draw(name);
+            font->Draw(GetItemName(itemNo));
             MenuPcs.DrawInit();
             MenuPcs.DrawSingleIcon(itemNo, frameX + 0x54, y - 0x18, FLOAT_80332d28, 0, FLOAT_80332d28);
         }

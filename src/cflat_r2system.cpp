@@ -420,7 +420,7 @@ inline float std::fmodf(float x, float y)
  */
 inline float std::atan2(float y, float x)
 {
-    return (float)::atan2((double)y, (double)x);
+    return atan2f(y, x);
 }
 
 /*

@@ -216,7 +216,7 @@ float atan2(float y, float x);
 
 inline float std::atan2(float y, float x)
 {
-    return (float)::atan2((double)y, (double)x);
+    return atan2f(y, x);
 }
 
 inline void VECLerp(Vec* a, Vec* b, Vec* out, float t)

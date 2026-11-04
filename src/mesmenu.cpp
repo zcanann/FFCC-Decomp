@@ -790,7 +790,12 @@ void CMesMenu::onDraw()
             float windowScale = stateBlend * stageBlend;
             float pulseScale = 0.25f * (1.0f - windowScale) + 1.0f;
             float timeRaw = fmod(0.05f * (float)m_stateTimer, 2.0);
-            float time = (timeRaw > 1.0f) ? (2.0f - timeRaw) : timeRaw;
+            float time;
+            if (timeRaw > 1.0f) {
+                time = 2.0f - timeRaw;
+            } else {
+                time = timeRaw;
+            }
 
             float angle = 3.1415927f * time;
             float sinY = sinf(angle);

@@ -967,9 +967,9 @@ void CMes::Draw()
 					font->SetScaleX(0.01f * (float)glyph->m_scaleX);
 					font->SetScaleY(glyphScaleY);
 #endif
-					font->renderFlags.snapPosition = 1;
+					font->SetAlign(1);
 					font->Draw(glyph->m_char);
-					font->renderFlags.snapPosition = 0;
+					font->SetAlign(0);
 				}
 			}
 		}
@@ -1633,7 +1633,7 @@ void CMes::addString(char** text, int branchMode)
 			glyph->m_x = mCurrentX;
 			glyph->m_y = (short)(int)mCurrentY;
 
-			font->renderFlags.snapPosition = 1;
+			font->SetAlign(1);
 			float width;
 			if (uch < 0x20)
 			{
@@ -1645,7 +1645,7 @@ void CMes::addString(char** text, int branchMode)
 			}
 			glyph->m_width = width;
 			float packedScale = 100.0f;
-			font->renderFlags.snapPosition = 0;
+			font->SetAlign(0);
 
 			glyph->m_reveal = mRevealCursor;
 			glyph->m_fadeFrames = mTextAlign;

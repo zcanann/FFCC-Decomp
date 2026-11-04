@@ -67,6 +67,7 @@ public:
 
 	void SetShadow(int);
 	void SetFixed(int fixed) { renderFlags.fixedWidth = fixed; }
+	void SetAlign(int align) { renderFlags.snapPosition = align; }
 	void SetColor(_GXColor);
 	void SetTlut(int);
 	void SetTlutColor(int, int, _GXColor);

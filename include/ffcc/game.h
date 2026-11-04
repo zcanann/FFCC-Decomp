@@ -56,9 +56,9 @@ public:
             }
             return numPlayer;
         }
-        bool IsBattleStage() { return m_bossArtifactStageIndex < 0xF; }
-        bool IsMogStage() { return m_bossArtifactStageIndex == 0x19; }
-        bool IsBonusStage() { return m_bossArtifactStageIndex < 0xE; }
+        int IsBattleStage() { return m_bossArtifactStageIndex < 0xF; }
+        int IsMogStage() { return m_bossArtifactStageIndex == 0x19; }
+        int IsBonusStage() { return m_bossArtifactStageIndex < 0xE; }
         int IsStreamStage() { return m_bossArtifactStageIndex == 0x17; }
         int GetArtifactStageLevel();
         unsigned char GetLanguage() { return m_languageId; }

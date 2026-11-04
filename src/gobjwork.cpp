@@ -2287,30 +2287,29 @@ int CCaravanWork::GetNumCombi(int cmdListIdx)
  */
 int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 {
-	while (true) {
-		short prev = cmdListIdx;
-		cmdListIdx = prev + dir;
+	int idx = cmdListIdx;
 
-		if (cmdListIdx < 0) {
-			cmdListIdx += m_numCmdListSlots;
-		} else if (cmdListIdx > m_numCmdListSlots - 1) {
-			cmdListIdx -= m_numCmdListSlots;
-		}
+	while (true) {
+		int prev = idx;
+		idx += dir;
+		idx = (idx < 0) ? idx + m_numCmdListSlots
+		    : (idx > m_numCmdListSlots - 1) ? idx - m_numCmdListSlots
+		                                    : idx;
 
 		if (Game.m_gameWork.m_menuStageMode != 0) {
-			if (m_commandListExtra[cmdListIdx] == -1) {
+			if (m_commandListExtra[idx] == -1) {
 				continue;
 			}
-			if (dir == -1 && m_commandListExtra[cmdListIdx] == -1) {
+			if (dir == -1 && m_commandListExtra[idx] == -1) {
 				if (0 < m_commandListExtra[prev]) {
 					continue;
 				}
 			}
 		}
 
-		int item = GetCmdListItem(cmdListIdx);
-		if (cmdListIdx < 2 || item > 0) {
-			return cmdListIdx;
+		int item = GetCmdListItem(idx);
+		if (idx < 2 || item > 0) {
+			return idx;
 		}
 	}
 }

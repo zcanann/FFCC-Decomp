@@ -1408,8 +1408,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 	}
 
-	unsigned int base = 0;
 	int itemType;
+	unsigned int base = 0;
 	switch (staIndex) {
 		case 1:
 			base = Game.m_battleParams[0x7];

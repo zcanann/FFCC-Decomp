@@ -279,8 +279,7 @@ void CGItemObj::onFrameStat()
 	}
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
-			const CVector& attachOffset = CVector(0.0f, 0.0f, 0.0f);
-			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
+			Vec* attachOffsetPtr = CVector(0.0f, 0.0f, 0.0f);
 			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(m_owner);
 			Attach(m_owner, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
 			changeStat(0, 0, 0);
@@ -640,8 +639,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition = owner->m_worldPosition;
 			newItem->SetPosBG(&newItem->m_worldPosition, 1);
 
-			const CVector& moveVec = CVector((float)sin((double)launchAngle), 10.0f, (float)cos((double)launchAngle));
-			newItem->MoveVector((Vec*)const_cast<CVector*>(&moveVec), 8.0f, 1, 0, 1, 0);
+			newItem->MoveVector(CVector((float)sin((double)launchAngle), 10.0f, (float)cos((double)launchAngle)), 8.0f, 1, 0, 1, 0);
 		}
 
 		if ((createFlags & 2) != 0) {
@@ -712,8 +710,7 @@ inline void CGItemObj::safeDetach(int throwItem, float speed)
 
 		speed = (float)cos((double)m_owner->m_rotTargetY);
 		float ownerSin = (float)sin((double)m_owner->m_rotTargetY);
-		const CVector& moveVec = CVector(ownerSin, 0.1f, speed);
-		MoveVector(reinterpret_cast<Vec*>(const_cast<CVector*>(&moveVec)), moveSpeed, 1, 0, 1, 0);
+		MoveVector(CVector(ownerSin, 0.1f, speed), moveSpeed, 1, 0, 1, 0);
 	}
 
 	m_owner = 0;
@@ -740,8 +737,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		m_carryFrame = carryMode;
 
 		if (carryMode == 0) {
-			const CVector& attachOffset = CVector(0.0f, 0.0f, 0.0f);
-			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
+			Vec* attachOffsetPtr = CVector(0.0f, 0.0f, 0.0f);
 			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(partyObj);
 
 			Attach(partyObj, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
@@ -824,9 +820,7 @@ void CGItemObj::statPot()
 			m_moveOffset.x = m_moveOffset.z = 0.0f;
 			m_bgColMask |= 0x80000;
 
-			const CVector& damageOffset = CVector(0.0f, 0.0f, 0.0f);
-			SetDamageCol(0, "f051_root", 15.0f, 15.0f,
-			             reinterpret_cast<Vec*>(const_cast<CVector*>(&damageOffset)));
+			SetDamageCol(0, "f051_root", 15.0f, 15.0f, CVector(0.0f, 0.0f, 0.0f));
 			m_damageColliders[0].m_hitMask = 9;
 		}
 		break;

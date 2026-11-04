@@ -26,7 +26,7 @@ public:
 	 * JP Address: TODO
 	 * JP Size: TODO
 	 */
-	bool IsKindOf(unsigned short cid)
+	int IsKindOf(unsigned short cid)
 	{
 		return (static_cast<unsigned short>(GetCID()) & cid) == cid;
 	}

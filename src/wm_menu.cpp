@@ -9483,8 +9483,10 @@ void CMenuPcs::SetMcWinInfo(int x, int y)
  */
 void CMenuPcs::DrawMcWin(short state, short kind)
 {
-	double innerWidthD;
-	float innerX;
+	int i;
+
+	float topScale;
+	double innerW;
 	if (state >= 0 && m_menuWindowInfo->state != state) {
 		m_menuWindowInfo->state = state;
 	}
@@ -9493,35 +9495,36 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		return;
 	}
 
-	const float centerX = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width / 2.0);
-	const float centerY = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(m_menuWindowInfo->height / 2.0);
+	float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) / 2.0);
+	float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) / 2.0);
+	float height;
+	float width;
 
-	float right;
-	float sw;
-	float sy;
-	float sh;
-	float sx;
-	float bottom;
 	if (m_menuWindowInfo->state != 1) {
-		sx = centerX - 32.0f;
-		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - 32.0f) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
-		sx -= xAdd;
-		sw = static_cast<float>(2.0 * static_cast<double>(32.0f + xAdd));
-		sy = centerY - 32.0f;
-		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - 32.0f) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
-		sy -= yAdd;
-		sh = static_cast<float>(2.0 * static_cast<double>(32.0f + yAdd));
+		float leftScale = (left - m_menuWindowInfo->x - 32.0f) / kMcWindowFrames;
+		leftScale *= m_menuWindowInfo->frame;
+		topScale = (top - m_menuWindowInfo->y - 32.0f) / kMcWindowFrames;
+		topScale *= m_menuWindowInfo->frame;
+		width = static_cast<float>(2.0 * static_cast<double>(32.0f + leftScale));
+		left = (left - 32.0f) - leftScale;
+		height = static_cast<float>(2.0 * static_cast<double>(32.0f + topScale));
+		top = (top - 32.0f) - topScale;
 	} else {
-		sx = static_cast<float>(m_menuWindowInfo->x);
-		sy = static_cast<float>(m_menuWindowInfo->y);
-		sw = static_cast<float>(m_menuWindowInfo->width);
-		sh = static_cast<float>(m_menuWindowInfo->height);
+		left = static_cast<float>(m_menuWindowInfo->x);
+		top = static_cast<float>(m_menuWindowInfo->y);
+		width = static_cast<float>(m_menuWindowInfo->width);
+		height = static_cast<float>(m_menuWindowInfo->height);
 	}
 
-	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313F8));
-	sy = static_cast<float>(static_cast<int>(static_cast<double>(sy) - DOUBLE_803313F8));
-	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
-	sh = static_cast<float>(static_cast<int>(static_cast<double>(sh) - DOUBLE_80331420));
+	int leftPx = static_cast<int>(static_cast<double>(left) - DOUBLE_803313F8);
+	int topPx = static_cast<int>(static_cast<double>(top) - DOUBLE_803313F8);
+	int widthPx = static_cast<int>(static_cast<double>(width) - DOUBLE_80331420);
+	int heightPx = static_cast<int>(static_cast<double>(height) - DOUBLE_80331420);
+
+	float x0 = static_cast<float>(leftPx);
+	float y0 = static_cast<float>(topPx);
+	float w = static_cast<float>(widthPx);
+	float h = static_cast<float>(heightPx);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color;
@@ -9530,62 +9533,59 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	color.b = 0xFF;
 	color.a = 0xFF;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-
-	int rectIdx;
-	unsigned long flags;
-
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase : kMcWindowTextureBase));
-	right = (sx + sw) - 32.0f;
-	bottom = (sy + sh) - 32.0f;
-	for (rectIdx = 0; rectIdx < 4; rectIdx++) {
+	float x1 = x0 + w - 32.0f;
+	float y1 = y0 + h - 32.0f;
+	unsigned long uvFlag;
+	for (i = 0; i < 4; i++) {
+		uvFlag = 0;
 		float x;
+		if ((i & 1) != 0) {
+			uvFlag |= 8;
+			x = x1;
+		} else {
+			x = x0;
+		}
 		float y;
-		flags = 0;
-		if (rectIdx & 1) {
-			x = right;
-			flags |= 8;
+		if ((i & 2) != 0) {
+			uvFlag |= 4;
+			y = y1;
 		} else {
-			x = sx;
+			y = y0;
 		}
-		if (rectIdx & 2) {
-			y = bottom;
-			flags |= 4;
-		} else {
-			y = sy;
-		}
-		MenuPcs.DrawRect(flags, x, y, 32.0f, 32.0f, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		MenuPcs.DrawRect(uvFlag, x, y, 32.0f, 32.0f, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 2 : kMcWindowTextureBase + 1));
-	innerX = 32.0f + sx;
-	innerWidthD = static_cast<double>(sw) - 64.0;
-	float y = sy;
-	const float innerWidthF = static_cast<float>(innerWidthD);
-	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
-		flags = 0;
-		if (rectIdx != 0) {
-			y = bottom;
-			flags |= 4;
+	float innerX = 32.0f + x0;
+	innerW = static_cast<double>(w) - 64.0;
+	float yy = y0;
+	float innerWf = static_cast<float>(innerW);
+	for (i = 0; i < 2; i++) {
+		uvFlag = 0;
+		if (i != 0) {
+			yy = y1;
+			uvFlag |= 4;
 		}
-		MenuPcs.DrawRect(flags, innerX, y, innerWidthF, 32.0f, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		MenuPcs.DrawRect(uvFlag, innerX, yy, innerWf, 32.0f, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 1 : kMcWindowTextureBase + 2));
-	const float innerY = 32.0f + sy;
-	const double innerHeightD = static_cast<double>(sh) - 64.0;
-	const float innerHeightF = static_cast<float>(innerHeightD);
-	float x = sx;
-	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
-		flags = 0;
-		if (rectIdx != 0) {
-			x = right;
-			flags |= 8;
+	float innerY = 32.0f + y0;
+	double innerH = static_cast<double>(h) - 64.0;
+	float innerHf = static_cast<float>(innerH);
+	float xx = x0;
+	for (i = 0; i < 2; i++) {
+		uvFlag = 0;
+		if (i != 0) {
+			xx = x1;
+			uvFlag |= 8;
 		}
-		MenuPcs.DrawRect(flags, x, innerY, 32.0f, innerHeightF, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, innerHf, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 3 : kMcWindowTextureBase + 3));
-	MenuPcs.DrawRect(flags, innerX, innerY, static_cast<float>(innerWidthD), static_cast<float>(innerHeightD), FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+	MenuPcs.DrawRect(uvFlag, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH), FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 	if (m_menuWindowInfo->state == 0) {
 		m_menuWindowInfo->frame++;

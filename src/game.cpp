@@ -70,15 +70,13 @@ CGame Game;
 
 inline int CMapPcs::GetLightHolderSize(CMapLightHolder::TYPE type)
 {
-    return g_MapMng.GetMapLightHolderArray(type).GetSize();
+    return g_MapMng.m_mapLightHolderArrays[type].GetSize();
 }
 
 inline void CMapPcs::GetLightHolder(CMapLightHolder::TYPE type, long index, _GXColor* color, Vec* pos)
 {
-    CPtrArray<CMapLightHolder*>& holders = g_MapMng.GetMapLightHolderArray(type);
-
-    if (static_cast<unsigned long>(index) < static_cast<unsigned long>(holders.GetSize())) {
-        holders[index]->GetLightHolder(color, pos);
+    if (index < g_MapMng.m_mapLightHolderArrays[type].GetSize()) {
+        g_MapMng.m_mapLightHolderArrays[type][index]->GetLightHolder(color, pos);
     }
 }
 

@@ -161,18 +161,6 @@ public:
     {
         return m_mapShadowArray;
     }
-    CPtrArray<CMapLightHolder*>& GetMapLightHolderArray(int index)
-    {
-        return m_mapLightHolderArrays[index];
-    }
-    CPtrArray<CMapLightHolder*>* GetMapLightHolderArrays()
-    {
-        return m_mapLightHolderArrays;
-    }
-    CMapIdGrp* GetMapIdGrpArray()
-    {
-        return m_mapIdGrpArray;
-    }
 
     ~CMapMng();
 	

@@ -207,7 +207,7 @@ inline int CMapPcs::GetHitGrpNo()
 
 inline unsigned long CMapPcs::GetHitGrpBit()
 {
-    return g_MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
+    return g_MapMng.m_mapIdGrpArray[gMapHitFace->m_groupIndex].m_mask;
 }
 
 namespace std {

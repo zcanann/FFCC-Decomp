@@ -311,7 +311,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                 g_MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>& mapLightHolderArr = g_MapMng.GetMapLightHolderArray(1);
+        CPtrArray<CMapLightHolder*>& mapLightHolderArr = g_MapMng.m_mapLightHolderArrays[1];
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > mapLightHolderIndex) {
             mapLightHolderArr[mapLightHolderIndex]->GetLightHolder(
@@ -426,7 +426,7 @@ void CMapPcs::calc()
                 g_MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &g_MapMng.GetMapLightHolderArray(1);
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &g_MapMng.m_mapLightHolderArrays[1];
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
             (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(

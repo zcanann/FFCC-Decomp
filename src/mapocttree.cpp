@@ -21,12 +21,7 @@
  */
 inline void setbit32(unsigned long* arg0, unsigned long arg1)
 {
-	unsigned long offset;
-	unsigned long mask;
-
-	offset = arg1 & 0x1f;
-	mask = 1UL << offset;
-	arg0[arg1 >> 5] |= mask;
+	arg0[arg1 >> 5] |= 1 << (arg1 & 0x1f);
 }
 
 static void ClearLight_r(COctNode*);

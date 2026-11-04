@@ -30,8 +30,8 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 CMapMng g_MapMng;
-unsigned char g_MapHitDrawMode;
-unsigned char g_MapHitFaceFlag;
+char g_MapHitDrawMode;
+char g_MapHitFaceFlag;
 char g_StrTmp[0x400];
 
 
@@ -303,7 +303,7 @@ void CMapMng::Create()
     GetMapShadowArray().SetStage(m_stage);
 
     for (int i = 0; i < 2; i++) {
-        GetMapLightHolderArray(i).SetStage(m_stage);
+        m_mapLightHolderArrays[i].SetStage(m_stage);
     }
 
     g_MapHitFaceFlag = 0;
@@ -492,12 +492,12 @@ void CMapMng::DestroyMapShadow()
 void CMapMng::DestroyMapLightHolder()
 {
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < GetMapLightHolderArray(i).GetSize(); j++) {
-            if (GetMapLightHolderArray(i)[j] != 0) {
-                delete GetMapLightHolderArray(i)[j];
+        for (int j = 0; j < m_mapLightHolderArrays[i].GetSize(); j++) {
+            if (m_mapLightHolderArrays[i][j] != 0) {
+                delete m_mapLightHolderArrays[i][j];
             }
         }
-        GetMapLightHolderArray(i).RemoveAll();
+        m_mapLightHolderArrays[i].RemoveAll();
     }
 }
 
@@ -1263,7 +1263,7 @@ int CMapMng::ReadOtm(char* mapName)
             *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
             *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
 
-            GetMapLightHolderArray(chunk.m_arg0).Add(light);
+            m_mapLightHolderArrays[chunk.m_arg0].Add(light);
             continue;
         }
         }
@@ -1962,7 +1962,7 @@ void CMapMng::DrawAfter()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        if (static_cast<signed char>(g_MapHitDrawMode) == 0) {
+        if (g_MapHitDrawMode == 0) {
             for (int i = 0; i < m_octTreeCount; i++) {
                 m_octTreeArray[i].Draw(2);
             }
@@ -2159,7 +2159,7 @@ void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
  */
 void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
 {
-    GetMapIdGrpArray()[mapIdGrpIndex].m_mask = mask;
+    m_mapIdGrpArray[mapIdGrpIndex].m_mask = mask;
 }
 
 /*

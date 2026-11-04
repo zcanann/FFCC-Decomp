@@ -1399,7 +1399,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					continue;
 				}
 
-				const int sourceIdx = evtRule & 0x7FF;
+				int sourceIdx = evtRule & 0x7FF;
 
 				switch (sourceType) {
 				case 1:

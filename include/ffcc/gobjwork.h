@@ -439,7 +439,10 @@ inline int CCaravanWork::GetEvtFlag(int evtFlagIndex)
     int mask = 1 << (evtFlagIndex % 8);
     unsigned int flag = value & mask;
 
-    return flag != 0;
+    if (flag != 0) {
+        return 1;
+    }
+    return 0;
 }
 
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);

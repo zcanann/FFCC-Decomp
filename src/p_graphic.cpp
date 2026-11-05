@@ -434,11 +434,12 @@ void CGraphicPcs::drawBar()
         y = 0x10;
         for (; i < orderCount; i++) {
             const int priority = textOrder->m_priority;
-            const float width = (kGraphicScreenCenterX * textOrder->m_lastTime) / 100.0f;
+            const float lastTime = textOrder->m_lastTime;
+            const float width = (kGraphicScreenCenterX * lastTime) / 100.0f;
 
             if (priority != 0x27) {
                 char debugString[260];
-                sprintf(debugString, "%s(%d) %.3f%%", textOrder->m_debugName, textOrder->m_insertIndex, textOrder->m_lastTime);
+                sprintf(debugString, "%s(%d) %.3f%%", textOrder->m_debugName, textOrder->m_insertIndex, lastTime);
 
                 if (priority == 0x17) {
                     char extraString[256];

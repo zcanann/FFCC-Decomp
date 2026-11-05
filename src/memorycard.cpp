@@ -1304,6 +1304,7 @@ void CMemoryCardMan::SetLoadData()
 
     int count;
     int i;
+    int letter;
     for (c = 0; c < 8; c++)
     {
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
@@ -1358,26 +1359,26 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_gil = savedCharacter.m_gil;
         memcpy(caravanWork->m_name, savedCharacter.m_name, sizeof(savedCharacter.m_name));
         caravanWork->m_letterCount = savedCharacter.m_letterCount;
-        for (count = 0; count < 100; count++)
+        for (letter = 0; letter < 100; letter++)
         {
-            caravanWork->m_letters[count].FlagsBits().m_attachmentIsGil =
-                savedCharacter.m_letters[count].FlagsBits().m_attachmentIsGil;
-            caravanWork->m_letters[count].HeaderBitsRef().m_messageType =
-                savedCharacter.m_letters[count].HeaderBitsRef().m_messageType;
-            caravanWork->m_letters[count].WordBitsRef().m_senderId =
-                savedCharacter.m_letters[count].WordBitsRef().m_senderId;
-            caravanWork->m_letters[count].AttachmentBitsRef().m_value =
-                savedCharacter.m_letters[count].AttachmentBitsRef().m_value;
-            memcpy(caravanWork->m_letters[count].m_half.m_tempVars, savedCharacter.m_letters[count].m_half.m_tempVars,
-                   sizeof(savedCharacter.m_letters[count].m_half.m_tempVars));
-            caravanWork->m_letters[count].FlagsBits().m_opened =
-                savedCharacter.m_letters[count].FlagsBits().m_opened;
-            caravanWork->m_letters[count].FlagsBits().m_attachmentClaimed =
-                savedCharacter.m_letters[count].FlagsBits().m_attachmentClaimed;
-            caravanWork->m_letters[count].FlagsBits().m_replySent =
-                savedCharacter.m_letters[count].FlagsBits().m_replySent;
-            caravanWork->m_letters[count].FlagsBits().m_hasReply =
-                savedCharacter.m_letters[count].FlagsBits().m_hasReply;
+            caravanWork->m_letters[letter].FlagsBits().m_attachmentIsGil =
+                savedCharacter.m_letters[letter].FlagsBits().m_attachmentIsGil;
+            caravanWork->m_letters[letter].HeaderBitsRef().m_messageType =
+                savedCharacter.m_letters[letter].HeaderBitsRef().m_messageType;
+            caravanWork->m_letters[letter].WordBitsRef().m_senderId =
+                savedCharacter.m_letters[letter].WordBitsRef().m_senderId;
+            caravanWork->m_letters[letter].AttachmentBitsRef().m_value =
+                savedCharacter.m_letters[letter].AttachmentBitsRef().m_value;
+            memcpy(caravanWork->m_letters[letter].m_half.m_tempVars, savedCharacter.m_letters[letter].m_half.m_tempVars,
+                   sizeof(savedCharacter.m_letters[letter].m_half.m_tempVars));
+            caravanWork->m_letters[letter].FlagsBits().m_opened =
+                savedCharacter.m_letters[letter].FlagsBits().m_opened;
+            caravanWork->m_letters[letter].FlagsBits().m_attachmentClaimed =
+                savedCharacter.m_letters[letter].FlagsBits().m_attachmentClaimed;
+            caravanWork->m_letters[letter].FlagsBits().m_replySent =
+                savedCharacter.m_letters[letter].FlagsBits().m_replySent;
+            caravanWork->m_letters[letter].FlagsBits().m_hasReply =
+                savedCharacter.m_letters[letter].FlagsBits().m_hasReply;
         }
 
         for (int artifact = 0; artifact < 96; artifact++)

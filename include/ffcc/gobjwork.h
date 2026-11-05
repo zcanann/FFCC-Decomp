@@ -310,6 +310,16 @@ public:
     void DelCmdListAndItem(int, int);
     int GetNumCombi(int);
     int GetNextCmdListIdx(int, int);
+    int GetCurCmdListItem()
+    {
+        int idx = GetIdxCmdList();
+        return GetCmdListItem(idx);
+    }
+    void StepIdxCmdList(int dir)
+    {
+        int idx = GetNextCmdListIdx(GetIdxCmdList(), dir);
+        SetIdxCmdList(idx);
+    }
     int CanPlayerPutItem();
     void GetCurrentWeaponItem(int&, int&);
     void SetCurrentWeaponIdx(int);

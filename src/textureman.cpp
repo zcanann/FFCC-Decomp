@@ -172,17 +172,6 @@ CTexture::CTexture()
     m_usesExternalAddress = 0;
 }
 
-static inline int TextureTlutEntryCount(unsigned int format)
-{
-    if (format == GX_TF_C8) {
-        return kTextureC8TlutEntries;
-    }
-    if (format == GX_TF_C4) {
-        return kTextureC4TlutEntries;
-    }
-    return 0;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8003B8D8
@@ -234,15 +223,14 @@ void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, i
  */
 void CTexture::InitTexObj()
 {
-    unsigned int format = m_format;
-    if ((format == GX_TF_C8) || (format == GX_TF_C4)) {
+    if ((m_format == GX_TF_C8) || (m_format == GX_TF_C4)) {
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
-                       static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
+                       static_cast<GXCITexFmt>(m_format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
         SetExternalTlut(m_tlutData, 0);
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
-                     static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
+                     static_cast<GXTexFmt>(m_format), static_cast<GXTexWrapMode>(m_wrapMode),
                      static_cast<GXTexWrapMode>(m_wrapMode), (1 < m_maxLod) ? GX_TRUE : GX_FALSE);
     }
 
@@ -481,15 +469,14 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
  */
 inline _GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, int index)
 {
-    unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
-    unsigned int packed = tlut[index] | (tlut[index + tlutOffset] << 16);
+    unsigned int packed = reinterpret_cast<unsigned short*>(tlutData)[index] |
+                          (reinterpret_cast<unsigned short*>(tlutData)[index + tlutOffset] << 16);
     _GXColor color;
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(&packed);
 
-    color.a = bytes[0];
-    color.r = bytes[3];
-    color.g = bytes[2];
-    color.b = bytes[1];
+    color.a = reinterpret_cast<unsigned char*>(&packed)[0];
+    color.r = reinterpret_cast<unsigned char*>(&packed)[3];
+    color.g = reinterpret_cast<unsigned char*>(&packed)[2];
+    color.b = reinterpret_cast<unsigned char*>(&packed)[1];
     return color;
 }
 
@@ -533,15 +520,13 @@ void CTexture::SetTlutColor(int index, _GXColor color)
 void CTexture::SetExternalTlutColor(void* tlutData, int tlutOffset, int index, _GXColor& color)
 {
     unsigned int packedColor;
-    unsigned char* packedBytes = reinterpret_cast<unsigned char*>(&packedColor);
-    packedBytes[3] = color.r;
-    packedBytes[0] = color.a;
-    packedBytes[1] = color.b;
-    packedBytes[2] = color.g;
+    reinterpret_cast<unsigned char*>(&packedColor)[3] = color.r;
+    reinterpret_cast<unsigned char*>(&packedColor)[0] = color.a;
+    reinterpret_cast<unsigned char*>(&packedColor)[1] = color.b;
+    reinterpret_cast<unsigned char*>(&packedColor)[2] = color.g;
 
-    unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
-    tlut[index + tlutOffset] = static_cast<unsigned short>(packedColor >> 16);
-    tlut[index] = static_cast<unsigned short>(packedColor);
+    reinterpret_cast<unsigned short*>(tlutData)[index + tlutOffset] = static_cast<unsigned short>(packedColor >> 16);
+    reinterpret_cast<unsigned short*>(tlutData)[index] = static_cast<unsigned short>(packedColor);
 }
 
 /*
@@ -573,8 +558,7 @@ inline void CTexture::CopyTlut(_GXColor* colors)
  */
 void CTexture::FlushTlut()
 {
-    int numEntries = GetNumTlut();
-    DCFlushRange(m_tlutData, numEntries << 2);
+    DCFlushRange(m_tlutData, GetNumTlut() << 2);
 }
 
 /*
@@ -588,7 +572,7 @@ void CTexture::FlushTlut()
  */
 void CTexture::FlushExternalTlut(void* tlutData)
 {
-    FlushExternalTlut(tlutData, m_format);
+    FlushExternalTlut(tlutData, GetNumTlut());
 }
 
 /*
@@ -600,9 +584,8 @@ void CTexture::FlushExternalTlut(void* tlutData)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CTexture::FlushExternalTlut(void* tlutData, int format)
+inline void CTexture::FlushExternalTlut(void* tlutData, int numEntries)
 {
-    int numEntries = TextureTlutEntryCount(format);
     DCFlushRange(tlutData, numEntries << 2);
 }
 

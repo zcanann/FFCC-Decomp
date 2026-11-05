@@ -72,7 +72,7 @@ public:
 
     int CheckName(char*);
     void SetExternalTlut(void*, int);
-    void FlushExternalTlut(void*, int);
+    static void FlushExternalTlut(void*, int);
     _GXColor GetTlutColor(int);
     void CopyTlut(_GXColor*);
     void SetTlutColor(int, _GXColor);

@@ -212,6 +212,20 @@ public:
      * --INFO--
      * PAL Address: UNUSED
      * PAL Size: TODO
+     * EN Address: TODO
+     * EN Size: TODO
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void GetShadowBound(CBound& bound)
+    {
+        bound = m_shadowRectBound;
+    }
+
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
      * EN Address: 0x80023044
      * EN Size: 8b
      * JP Address: TODO

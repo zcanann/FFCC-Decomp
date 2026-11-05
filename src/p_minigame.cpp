@@ -156,7 +156,7 @@ inline void AdjustGbaImageRegistry(char* image, char* tag)
         checksum -= bytes[offset];
         offset++;
     }
-    bytes[offset] = checksum;
+    bytes[offset] = static_cast<unsigned char>(checksum);
 }
 
 /*

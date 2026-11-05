@@ -880,6 +880,7 @@ public:
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
     CFont* GetFont22() { return m_fonts[0]; }
     CFont* GetFont23() { return m_fonts[1]; }
+    CFont* GetExtraFont(int index) { return m_fonts[index + 2]; }
     CRingMenu* GetRingMenu(int index) { return m_battleRingMenus[index]; }
     CMesMenu* GetMesMenu(int index) { return m_battleMesMenus[index]; }
     void CopyNowCaravanDat(Mc::SaveDat*);

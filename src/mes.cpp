@@ -150,7 +150,7 @@ static inline CColor& MesColorRef(const CColor& color)
 #ifdef VERSION_GCCJGC
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-    int lineStartX = (int)font->posX;
+    int lineStartX = (int)font->GetPosX();
     unsigned short ch;
     int width = 0;
     int continueDraw = 1;
@@ -168,8 +168,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
             case 0:
                 if (breakOnLineTag != 0) {
                     font->SetPosX((float)lineStartX);
-                    float lineAdvance = font->GetHeight();
-                    font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
+                    font->SetPosY((float)lineBaseY + (font->GetPosY() + font->GetHeight()));
                 }
                 break;
             case 1:
@@ -190,7 +189,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 #else
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	int lineStartX = (int)font->posX;
+	int lineStartX = (int)font->GetPosX();
 	unsigned short ch;
 	int width = 0;
 	int continueDraw = 1;
@@ -212,8 +211,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 				if (breakOnLineTag != 0)
 				{
 					font->SetPosX((float)lineStartX);
-					float lineAdvance = font->GetHeight();
-					font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
+					font->SetPosY((float)lineBaseY + (font->GetPosY() + font->GetHeight()));
 				}
 				break;
 			case 1:
@@ -816,13 +814,13 @@ inline CFont* CMes::getFont(int fontIndex, int draw)
 	switch (fontIndex)
 	{
 	case 0:
-		font = MenuPcs.m_fonts[0];
+		font = MenuPcs.GetFont22();
 		break;
 	case 2:
-		font = MenuPcs.m_fonts[2];
+		font = MenuPcs.GetExtraFont(0);
 		break;
 	case 3:
-		font = MenuPcs.m_fonts[2];
+		font = MenuPcs.GetExtraFont(0);
 		break;
 	}
 	font->SetShadow(mShadow);
@@ -831,9 +829,7 @@ inline CFont* CMes::getFont(int fontIndex, int draw)
 	font->SetScale(mScaleX);
 #else
 	font->SetMargin(0.0f);
-	float scaleY = mScaleY;
-	font->SetScaleX(mScaleX);
-	font->SetScaleY(scaleY);
+	font->SetScale(mScaleX, mScaleY);
 #endif
 	if (draw)
 	{

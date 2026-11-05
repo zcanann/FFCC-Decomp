@@ -64,6 +64,11 @@ public:
 	void SetScale(float);
 	void SetScaleX(float);
 	void SetScaleY(float);
+	void SetScale(float x, float y)
+	{
+		SetScaleX(x);
+		SetScaleY(y);
+	}
 
 	void SetShadow(int);
 	void SetFixed(int fixed) { renderFlags.fixedWidth = fixed; }
@@ -86,6 +91,8 @@ public:
 	float GetWidth(const char* text) { return GetWidth(const_cast<char*>(text)); }
 	float GetWidth(unsigned short);
 	float GetHeight() { return m_glyphHeight * scaleY; }
+	float GetPosX() { return posX; }
+	float GetPosY() { return posY; }
 
 	CFontGlyphEntry* searchChar(unsigned short);
 	int getNextChar(char**, unsigned short*);

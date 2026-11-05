@@ -165,7 +165,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
-		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
+		padInput = Pad.m_padInputs[padOffset].buttonDown[0];
 	}
 
 	if ((padInput & 0x100) != 0) {
@@ -257,7 +257,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
-		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
+		padInput = Pad.m_padInputs[padOffset].buttonDown[0];
 	}
 	if ((padInput & 4) != 0) {
 		CDM* start = m_selectedMenu;
@@ -275,7 +275,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
-		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
+		padInput = Pad.m_padInputs[padOffset].buttonDown[0];
 	}
 	if ((padInput & 8) != 0) {
 		CDM* start = m_selectedMenu;
@@ -297,7 +297,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
-		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
+		padInput = Pad.m_padInputs[padOffset].buttonDown[0];
 	}
 	if ((padInput & 0x200) != 0) {
 		memset(m_menuPool, 0, sizeof(m_menuPool));

@@ -544,7 +544,7 @@ void CCharaPcs::calcViewer()
             rotY = 0.0f;
         } else {
             unsigned int padIndex = (Pad.m_debugPadPort == 4) ? 0 : 4;
-            rotY = Pad.GetPadInputs()[padIndex].substickXF;
+            rotY = Pad.m_padInputs[padIndex].substickXF;
         }
         srt.m_rotation.y += rotY;
         srt.m_position.x = translateX;

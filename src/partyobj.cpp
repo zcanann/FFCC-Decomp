@@ -1949,7 +1949,7 @@ void CGPartyObj::onStatShield()
 			unsigned int padIndex =
 			    padSlot &
 			    ~((int)~(selectedPort - padSlot | padSlot - selectedPort) >> 31);
-			trig = Pad.GetPadInputs()[padIndex].button[0];
+			trig = Pad.m_padInputs[padIndex].button[0];
 		}
 		if ((trig & 0x100) == 0) {
 			changeSubStat(3);

@@ -39,7 +39,7 @@ inline void* operator new(unsigned long, void* ptr)
 
 static inline CPad::PadInput& CameraPadInput(int port)
 {
-    return Pad.GetPadInputs()[(Pad.m_debugPadPort == port) ? 0 : port];
+    return Pad.m_padInputs[(Pad.m_debugPadPort == port) ? 0 : port];
 }
 
 namespace {

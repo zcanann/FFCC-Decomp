@@ -641,7 +641,7 @@ public:
     void WMChgMenu();
     void GetOptionData();
     void InitOptionMenuParam();
-    const char* GetSkillStr(int);
+    char* GetSkillStr(int);
 #ifndef VERSION_GCCJGC
     char* GetTribeStr(int);
     char* GetJobStr(int);

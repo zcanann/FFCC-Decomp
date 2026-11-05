@@ -581,7 +581,7 @@ config.libs = [
             Object(NonMatching, "menu_compa.cpp", cflags=cflags_game_cpp_exceptions, extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_equip.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_favo.cpp", extra_cflags=["-str reuse,readonly"]),
-            Object(NonMatching, "menu_item.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_item.cpp"),
             Object(NonMatching, "menu_letter.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_lst.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01"), "menu_money.cpp"),

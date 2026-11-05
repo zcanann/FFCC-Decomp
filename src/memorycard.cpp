@@ -1271,16 +1271,16 @@ void CMemoryCardMan::SetLoadData()
     Sound.SetSeMasterVolume(saveDat->m_seVolume);
     Sound.SetStereo(Sound.IsStereo());
 
-    CGame* g = &Game;
-    g->m_gameWork.m_gameInitFlag = saveDat->m_gameInitFlag != 0;
+    Game.m_gameWork.m_gameInitFlag = saveDat->m_gameInitFlag != 0;
     for (int i = 0; i < 4; i++)
     {
-        g->m_gameWork.m_spModeFlags[i] = saveDat->m_spModeFlags[i] != 0;
+        Game.m_gameWork.m_spModeFlags[i] = saveDat->m_spModeFlags[i] ? 1 : 0;
     }
 
     int count;
     int i;
     int letter;
+    CGame* g = &Game;
     for (c = 0; c < 8; c++)
     {
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];

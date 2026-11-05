@@ -574,7 +574,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ME_AppRequest.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "ME_USB_process.cpp", cflags=[*cflags_game_cpp_exceptions, "-sdata2 8", "-str reuse,readonly"]),
             Object(NonMatching, "memory.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "memorycard.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "memorycard.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_arti.cpp"),
             Object(NonMatching, "menu_cmd.cpp", extra_cflags=["-str reuse,nopool,readonly", "-pool off", "-inline auto,deferred"]),

@@ -723,7 +723,7 @@ void CMapPcs::drawAfter()
 
             g_MapMng.DrawAfter();
 
-            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
+            if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBound bound;
                 CameraPcs.GetShadowBound(bound);
                 Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF));
@@ -773,7 +773,7 @@ void CMapPcs::drawAfterViewer()
 
             g_MapMng.DrawAfter();
 
-            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
+            if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBound bound;
                 CameraPcs.GetShadowBound(bound);
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);

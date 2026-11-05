@@ -1094,8 +1094,8 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 			    ->m_objs[reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex]
 			    ->changeStat(0x65, 0, 0);
 			reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x25, 0, 0);
-			CFlatBossState() = CFlatBossState() + 1;
-			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlatGameFlags())->bits.m_bit5 = 1;
+			CFlat.m_bossState = CFlat.m_bossState + 1;
+			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlat.m_gameFlags)->bits.m_bit5 = 1;
 		} else if (isLoopAnim() != 0) {
 			SetAnimSlot(0, 0);
 			changeStat(0, 0, 0);
@@ -1316,7 +1316,7 @@ int CGMonObj::calcBranchFuncGigasLoad(int)
 {
 	if (((Game.m_monObjects[1] != 0) &&
 	     (1 < reinterpret_cast<CMonWork*>(Game.m_monObjects[1]->m_scriptHandle)->m_hp)) &&
-	    (CFlatBossState() == 1)) {
+	    (CFlat.m_bossState == 1)) {
 		return 0;
 	}
 	return 1;
@@ -1355,7 +1355,7 @@ void CGMonObj::damagedFuncGigasLoad()
 	case 0:
 		changeStat(4, 0, 0);
 		m_actionBranch = 1;
-		CFlatBossState() = 1;
+		CFlat.m_bossState = 1;
 		break;
 	}
 }
@@ -1452,8 +1452,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		statAttack();
 		return;
 	case 0x65:
-		if ((CFlatBossState() != 0) && (m_stateFrame == MON_FRAMES(0x2D, 0x25))) {
-			int flatCount = CFlatBossState();
+		if ((CFlat.m_bossState != 0) && (m_stateFrame == MON_FRAMES(0x2D, 0x25))) {
+			int flatCount = CFlat.m_bossState;
 			if (flatCount >= 1) {
 				if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
 				    ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
@@ -1464,30 +1464,30 @@ void CGMonObj::frameStatFuncTetsukyojin()
 					putParticle((pdtNo << 8) | 0x2D, 0, reinterpret_cast<CGObject*>(this), 1.0f, 0x101E4);
 
 					if (m_actionBranch == 0) {
-						CFlatBossState() = CFlatBossState() - 1;
+						CFlat.m_bossState = CFlat.m_bossState - 1;
 					}
 					m_actionBranch = 1;
 					m_unk6C8 = 0;
 				}
 			} else {
-				CFlatBossState() = 0;
+				CFlat.m_bossState = 0;
 			}
 		}
 		statAttack();
 		return;
 	case 0x66:
-		if (CFlatBossState() >= 1) {
+		if (CFlat.m_bossState >= 1) {
 			if ((m_actionBranch == 1) && (m_stateFrame == 0)) {
 				m_bgColMask &= 0xFFF3FFFD;
 				m_actionBranch = 2;
-				CFlatBossSubState() = 1;
+				CFlat.m_bossSubState = 1;
 				stack[0].m_word = 10;
 				stack[1].m_word = 0;
 				stack[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+				CFlat.SystemCall(0, 1, 9, 3, stack, 0);
 			}
 
-			if (CFlatBossSubState() == 0) {
+			if (CFlat.m_bossSubState == 0) {
 				m_actionBranch = 0;
 				m_unk6C8 = 0;
 				changeStat(0, 0, 0);
@@ -1562,7 +1562,7 @@ void CGMonObj::changeStatFuncTetsukyojin(int stat)
  */
 int CGMonObj::calcBranchFuncLich(int)
 {
-	const int flatFlags = CFlatBossState();
+	const int flatFlags = CFlat.m_bossState;
 	return ((flatFlags >> 1) & 1) ^ 1;
 }
 
@@ -1577,12 +1577,12 @@ int CGMonObj::calcBranchFuncLich(int)
  */
 void CGMonObj::frameStatFuncLich()
 {
-	if (((CFlatBossState() & 1) == 0) && (reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0)) {
+	if (((CFlat.m_bossState & 1) == 0) && (reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0)) {
 		reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 = 0;
 		reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 1;
 		m_unk6C8 = 0;
 		playSe3D(0x1157C, 0x32, 0x96, 0, 0);
-	} else if (((CFlatBossState() & 1) != 0) && (reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 == 0)) {
+	} else if (((CFlat.m_bossState & 1) != 0) && (reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 == 0)) {
 		reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 = 1;
 		reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 1;
 		m_unk6C8 = 0;
@@ -1607,7 +1607,7 @@ void CGMonObj::frameStatFuncLich()
 		         reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->m_lichTeleportVec);
 		break;
 	case 0x65:
-		if (m_stateFrame == 0 && CFlatBossState() == 3) {
+		if (m_stateFrame == 0 && CFlat.m_bossState == 3) {
 			changeStat(0, 0, 0);
 		} else {
 			statAttack();
@@ -1616,7 +1616,7 @@ void CGMonObj::frameStatFuncLich()
 				stack[0].m_word = 10;
 				stack[1].m_word = 1;
 				stack[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+				CFlat.SystemCall(0, 1, 9, 3, stack, 0);
 			}
 		}
 		break;
@@ -1824,7 +1824,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 	LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss);
 
 	if (work->m_stunTimer == 0) {
-		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
+		if (work->bits.m_bit40 == 0 && (CFlat.m_bossState & 2) == 0) {
 			const CVector& left = CVector(-100.0f, 0.0f, -110.0f);
 			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&left)), &m_worldPosition) < 200.0f &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
@@ -1834,7 +1834,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 				return 100;
 			}
 		}
-		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
+		if (work->bits.m_bit20 == 0 && (CFlat.m_bossState & 1) == 0) {
 			const CVector& right = CVector(110.0f, 0.0f, 110.0f);
 			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&right)), &m_worldPosition) < 200.0f &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_rightCooldown == 0) {
@@ -1888,8 +1888,8 @@ void CGMonObj::frameStatFuncLKShooter()
 
 		moveFrame();
 		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-		    ((m_actionBranch == 1) && ((CFlatBossState() & 1) != 0)) ||
-		    ((m_actionBranch == 2) && ((CFlatBossState() & 2) != 0))) {
+		    ((m_actionBranch == 1) && ((CFlat.m_bossState & 1) != 0)) ||
+		    ((m_actionBranch == 2) && ((CFlat.m_bossState & 2) != 0))) {
 			changeStat(0, 0, 0);
 		}
 		return;
@@ -1965,7 +1965,7 @@ void CGMonObj::moveFrameFuncSaw()
  */
 void CGMonObj::logicFuncSaw()
 {
-	int bossState = CFlatBossState();
+	int bossState = CFlat.m_bossState;
 
 	if (bossState == 0 && reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
 		reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
@@ -2089,7 +2089,7 @@ void CGMonObj::cancelStatFuncSaw()
  */
 int CGMonObj::calcBranchFuncGoblinKing(int)
 {
-	return CFlatBossState();
+	return CFlat.m_bossState;
 }
 
 /*
@@ -2208,7 +2208,7 @@ void CGMonObj::alwaysFuncOrcKing()
 		}
 		playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
 		*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
-		CFlatBossState() = 1;
+		CFlat.m_bossState = 1;
 	}
 
 	if (*reinterpret_cast<int*>(CGMonObj::m_boss) != 0) {

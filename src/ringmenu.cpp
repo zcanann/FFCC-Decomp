@@ -148,7 +148,7 @@ void CRingMenu::onCalc()
 {
 	if ((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1)) {
 		const unsigned int targetAnimDirection =
-			(CFlatEnabledEventFlags() >> 2) & 1;
+			((CFlat.m_eventFlags & CFlat.m_eventMask) >> 2) & 1;
 		if (m_displayDirection != static_cast<int>(targetAnimDirection)) {
 #ifdef VERSION_GCCP01
 			System.Printf("ringMenu表示on/offが変更されました。%d-%d\n", m_menuIndex, targetAnimDirection);
@@ -672,7 +672,7 @@ void CRingMenu::onDraw()
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 					if ((caravanWork != 0)
 					    && (static_cast<signed char>(
-					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
+					            static_cast<int>((static_cast<unsigned int>(CFlat.m_gameFlags) << 30) & 0xC0000000) >> 31)
 					        == 0)) {
 						fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
@@ -810,7 +810,7 @@ void CRingMenu::drawGBA()
 	MenuPcs.DrawRect(3, posX + orbitX, posY - orbitY, 80.0f, 48.0f, 0.0f, static_cast<float>(m_menuIndex * 0x30),
 	                                 0.75f * sizePulse, 0.75f * sizePulse, 0.2f * (2.0f * (cycle - 0.5f)));
 
-	const unsigned int flatFlags = CFlatEnabledEventFlags();
+	const unsigned int flatFlags = (CFlat.m_eventFlags & CFlat.m_eventMask);
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
 		if (static_cast<unsigned char>(Joybus.IsInitSend(m_menuIndex)) == 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_SUNA));
@@ -953,7 +953,7 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	const unsigned int flatFlags = CFlatEnabledEventFlags();
+	const unsigned int flatFlags = (CFlat.m_eventFlags & CFlat.m_eventMask);
 	if ((flatFlags & 1) == 0) {
 		return;
 	}

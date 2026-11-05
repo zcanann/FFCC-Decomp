@@ -1268,7 +1268,7 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
  */
 void CMenuPcs::drawPause()
 {
-    if (((CFlatEventFlags() & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
+    if (((CFlat.m_eventFlags & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
         return;
     }
 

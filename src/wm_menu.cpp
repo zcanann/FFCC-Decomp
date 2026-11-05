@@ -4780,7 +4780,7 @@ void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
 	stackData[1].m_word = p1;
 	stackData[2].m_word = p2;
 
-	gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
+	CFlat.SystemCall(0, 1, 4, 3, stackData, 0);
 }
 
 /*

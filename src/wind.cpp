@@ -380,7 +380,7 @@ void CWind::Draw()
     GXSetVtxDesc((_GXAttr)9, (_GXAttrType)1);
     GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)9, (_GXCompCnt)1, (_GXCompType)4, 0);
 
-    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Wind) != 0) {
+    if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_Wind) != 0) {
         WindObject* obj = m_objects;
         int i = 0;
         do {

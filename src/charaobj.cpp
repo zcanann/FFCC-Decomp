@@ -147,7 +147,7 @@ static inline unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, u
 // extlwi/srawi/extsb rather than a single rlwinm mask. Returns nonzero if set.
 static inline int CharaObjGameFlagBit5Set()
 {
-	return static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 26 >> 30) << 30 >> 31) != 0;
+	return static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlat.m_gameFlags) << 26 >> 30) << 30 >> 31) != 0;
 }
 
 static inline int CharaObjDecodeHitParticleSe(unsigned short seData)
@@ -235,7 +235,7 @@ void CGCharaObj::onCreate()
 	memset(m_unk6AC, 0, sizeof(m_unk6AC));
 
 	for (int i = 0; i < 0x16; i++) {
-		m_particleSlots[i] = CFlatRuntime2Storage().GetFreeParticleSlot();
+		m_particleSlots[i] = CFlat.GetFreeParticleSlot();
 	}
 }
 
@@ -559,7 +559,7 @@ void CGCharaObj::endPSlotBit(int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if ((static_cast<unsigned int>(slotMask) & (1U << i)) != 0) {
-			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+			CFlat.EndParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -577,7 +577,7 @@ void CGCharaObj::deletePSlotBit(int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if (((unsigned int)slotMask & (1U << i)) != 0) {
-			CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
+			CFlat.DeleteParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -886,19 +886,14 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 
 	int particleIndex = hitParam->m_particleIndex;
 	int classId = hitParam->m_classId;
-	CGPrgObj* sourceObj;
-	if (classId != 0) {
-		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(classId));
-	} else {
-		sourceObj = 0;
-	}
+	CGPrgObj* sourceObj = static_cast<CGPrgObj*>(CFlat.IntToClass(classId));
 
 	unsigned short sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0xD) == 0xD) {
 		onDamage(sourceObj, particleIndex, -1, colliderIndex, hitPos);
 	}
 
-	CFlatRuntime2Storage().IgnoreParticle(effectIndex, this);
+	CFlat.IgnoreParticle(effectIndex, this);
 	SCharaItemRow* items = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 	if ((items[particleIndex].m_particleFlags & 0x100) != 0) {
 		PartMng.pppEndPart(effectIndex);
@@ -958,15 +953,15 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 				particleBank = 3;
 			}
 
-			CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
+			CFlat.ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
 			SCharaItemRow* flagRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			particleFlags = flagRows[itemId].m_particleFlags;
 			if ((particleFlags & 0x200) != 0) {
-				CFlatRuntime2Storage().SetParticleWorkBind(this);
+				CFlat.SetParticleWorkBind(this);
 			} else {
-				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, 0.0f);
+				CFlat.SetParticleWorkPos(*l_pHitCross, 0.0f);
 			}
-			CFlatRuntime2Storage().PutParticleWork();
+			CFlat.PutParticleWork();
 		}
 	}
 
@@ -1510,7 +1505,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 
 	if (hpValue != 0 && delta < 0) {
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-		    reinterpret_cast<CharaObjSignedLowBit*>(&CFlatGameFlags())->m_low != 0 &&
+		    reinterpret_cast<CharaObjSignedLowBit*>(&CFlat.m_gameFlags)->m_low != 0 &&
 		    static_cast<int>(hpValue + delta) <= 0) {
 			delta = -(static_cast<int>(hpValue) - 1);
 		}
@@ -1540,7 +1535,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 				int stackArgs[2];
 				stackArgs[0] = -1;
 				stackArgs[1] = 0;
-				gCFlatRuntime().SystemCall(
+				CFlat.SystemCall(
 					reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x14, 2,
 					reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 			}
@@ -2257,12 +2252,12 @@ checkParticle:
 			}
 	}
 	} else {
-		CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
+		CFlat.ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
 		SCharaItemRow* scaleRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-		CFlatRuntime2Storage().SetParticleWorkScale((static_cast<float>(scaleRows[effectId].m_scale) * 0.01f) + 1.0e-07f);
-		CFlatRuntime2Storage().SetParticleWorkParam(effectId, this);
+		CFlat.SetParticleWorkScale((static_cast<float>(scaleRows[effectId].m_scale) * 0.01f) + 1.0e-07f);
+		CFlat.SetParticleWorkParam(effectId, this);
 		SCharaItemRow* speedRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-		CFlatRuntime2Storage().SetParticleWorkSpeed((static_cast<float>(speedRows[effectId].m_speed) * 0.01f) + 1.0e-07f);
+		CFlat.SetParticleWorkSpeed((static_cast<float>(speedRows[effectId].m_speed) * 0.01f) + 1.0e-07f);
 		seNo = 0;
 
 		switch (effectArg0) {
@@ -2272,7 +2267,7 @@ checkParticle:
 			if (decoded != 0) {
 				unsigned short seFlag = seRows[effectId].m_seFlag;
 				if ((seFlag & 0x8000) != 0) {
-					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
+					CFlat.SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
 				} else {
 					seNo = decoded;
 				}
@@ -2285,7 +2280,7 @@ checkParticle:
 			if (decoded != 0) {
 				unsigned short seFlag = seRows[effectId].m_seFlag1;
 				if ((seFlag & 0x8000) != 0) {
-					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
+					CFlat.SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
 				} else {
 					seNo = decoded;
 				}
@@ -2297,7 +2292,7 @@ checkParticle:
 			int decoded = CharaObjDecodeSe(seRows[effectId].m_se2);
 			if (decoded != 0) {
 				if ((seRows[effectId].m_particleFlags & 0x400) != 0) {
-					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, 0);
+					CFlat.SetParticleWorkSe(decoded, 2, 0);
 				} else {
 					seNo = decoded;
 				}
@@ -2326,11 +2321,11 @@ checkParticle:
 				colType = 9;
 				break;
 			}
-			CFlatRuntime2Storage().SetParticleWorkCol(colType, -1, (static_cast<float>(colRows[effectId].m_field04) * 0.01f) + 1.0e-07f);
+			CFlat.SetParticleWorkCol(colType, -1, (static_cast<float>(colRows[effectId].m_field04) * 0.01f) + 1.0e-07f);
 		}
 
 		if ((particleEntry & 0x100) != 0) {
-			CFlatRuntime2Storage().SetParticleWorkBind(this);
+			CFlat.SetParticleWorkBind(this);
 		} else if ((particleEntry & 0x200) != 0) {
 			SCharaItemRow* distRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			float distance = static_cast<float>(distRows[effectId].m_distance) * 1.0f;
@@ -2338,27 +2333,27 @@ checkParticle:
 			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
 			offsetPos.y = m_worldPosition.y;
 			offsetPos.z = m_worldPosition.z + cosf(m_rotTargetY) * distance;
-			CFlatRuntime2Storage().SetParticleWorkPos(offsetPos, m_rotTargetY);
-			CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
+			CFlat.SetParticleWorkPos(offsetPos, m_rotTargetY);
+			CFlat.SetParticleWorkVector(m_rotTargetY, 0.0f);
 			SCharaItemRow* traceRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((traceRows[effectId].m_particleFlags & 0x2000) != 0) {
 				int partyIndex = reinterpret_cast<CGMonObj*>(this)->m_targetPartyIndex;
 				if (partyIndex >= 0 && partyIndex < 4) {
-					CFlatRuntime2Storage().SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
+					CFlat.SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
 				}
 			}
 			SCharaItemRow* targetRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((targetRows[effectId].m_particleFlags & 0x4000) != 0) {
-				CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
-				CFlatRuntime2Storage().SetParticleWorkTarget(m_comboCenter);
-				CFlatRuntime2Storage().SetParticleWorkTrace(this);
+				CFlat.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
+				CFlat.SetParticleWorkTarget(m_comboCenter);
+				CFlat.SetParticleWorkTrace(this);
 			}
 		} else if (pos != 0) {
-			CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
+			CFlat.SetParticleWorkPos(*pos, m_rotTargetY);
 		} else if ((particleEntry & 0x400) != 0) {
-			CFlatRuntime2Storage().SetParticleWorkPos(m_comboCenter, 0.0f);
+			CFlat.SetParticleWorkPos(m_comboCenter, 0.0f);
 		} else {
-			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
+			CFlat.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
 		Vec sideOffset;
@@ -2374,10 +2369,10 @@ checkParticle:
 					angleOffset = -1.5707964f;
 				}
 				float angle = baseAngle + angleOffset;
-				CFlatRuntime2Storage().m_particleWorkPos.x = 18.0f * sinf(angle) + m_worldPosition.x;
-				CFlatRuntime2Storage().m_particleWorkPos.z = 18.0f * cosf(angle) + m_worldPosition.z;
-				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
-				CFlatRuntime2Storage().PutParticleWork();
+				CFlat.m_particleWorkPos.x = 18.0f * sinf(angle) + m_worldPosition.x;
+				CFlat.m_particleWorkPos.z = 18.0f * cosf(angle) + m_worldPosition.z;
+				CFlat.SetParticleWorkVector(m_rotTargetY, 0.0f);
+				CFlat.PutParticleWork();
 				emittedCustom = 1;
 			}
 			break;
@@ -2386,8 +2381,8 @@ checkParticle:
 				if (pos == 0) {
 					return;
 				}
-				CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
-				CFlatRuntime2Storage().PutParticleWork();
+				CFlat.SetParticleWorkPos(*pos, m_rotTargetY);
+				CFlat.PutParticleWork();
 				emittedCustom = 1;
 			}
 			break;
@@ -2399,8 +2394,8 @@ checkParticle:
 		case 0x478:
 			if (effectArg0 == 3) {
 				for (int i = 7; i <= 0x0B; i++) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkNo((particleBank << 8) | i);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
@@ -2409,17 +2404,17 @@ checkParticle:
 		case 0x46E:
 			if (effectArg0 == 2) {
 				if (m_stateFrame >= kLateItemParticleFrame) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
+					CFlat.SetParticleWorkNo((particleBank << 8) | 0x1D);
 					CVector randomPos = CVector(0.0f, 7.0f, 165.0f) + CVector(Math.RandFPM(60.0f), 0.0f, Math.RandFPM(60.0f));
-					CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkPos(randomPos, m_rotTargetY);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
 			if (effectArg0 == 3) {
 				for (int i = 0x0D; i <= 0x1C; i++) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkNo((particleBank << 8) | i);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
@@ -2429,18 +2424,18 @@ checkParticle:
 				int a = m_unk68C;
 				int b = m_comboFramePrev;
 				if (a * 3 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkSe(0x872, 2, 0);
+					CFlat.SetParticleWorkSe(0x872, 2, 0);
 				} else if (a * 2 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkSe(0x871, 2, 0);
+					CFlat.SetParticleWorkSe(0x871, 2, 0);
 				}
 			}
 			if (effectArg0 == 3) {
 				int a = m_unk68C;
 				int b = m_comboFramePrev;
 				if (a * 3 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x75));
+					CFlat.SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x75));
 				} else if (a * 2 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x73));
+					CFlat.SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x73));
 				}
 			}
 			break;
@@ -2448,8 +2443,8 @@ checkParticle:
 		case 0x409:
 			if (effectArg0 == 3) {
 				for (int i = 3; i <= 8; i++) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkNo((particleBank << 8) | i);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
@@ -2463,11 +2458,11 @@ checkParticle:
 					PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 					int side = (i == 0) ? 76 : -76;
 					PSMTXMultVec(rotMtx, CVector(static_cast<float>(side), 0.0f, 60.0f), &sideOffset);
-					CFlatRuntime2Storage().m_particleWorkPos.x = m_worldPosition.x + sideOffset.x;
-					CFlatRuntime2Storage().m_particleWorkPos.y = m_worldPosition.y + sideOffset.y;
-					CFlatRuntime2Storage().m_particleWorkPos.z = m_worldPosition.z + sideOffset.z;
-					CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.m_particleWorkPos.x = m_worldPosition.x + sideOffset.x;
+					CFlat.m_particleWorkPos.y = m_worldPosition.y + sideOffset.y;
+					CFlat.m_particleWorkPos.z = m_worldPosition.z + sideOffset.z;
+					CFlat.SetParticleWorkVector(m_rotTargetY, 0.0f);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
@@ -2490,11 +2485,11 @@ checkParticle:
 			int fanCount = fanRows[effectId].m_fanCount;
 			if (effectArg0 == 3 && fanCount > 1) {
 				for (int i = 0; i < fanCount; i++) {
-					CFlatRuntime2Storage().SetParticleWorkVector(6.2831855f * static_cast<float>(i) / static_cast<float>(fanCount), 0.0f);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkVector(6.2831855f * static_cast<float>(i) / static_cast<float>(fanCount), 0.0f);
+					CFlat.PutParticleWork();
 				}
 			} else {
-				CFlatRuntime2Storage().PutParticleWork();
+				CFlat.PutParticleWork();
 			}
 		}
 		}
@@ -2758,7 +2753,7 @@ int CGCharaObj::calcCastTime(int itemId)
  */
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
-	if ((m_weaponNodeFlagBits.m_prg && (static_cast<int>(CFlatCenterState()) == 0)) &&
+	if ((m_weaponNodeFlagBits.m_prg && (CFlat.m_centerState == 0)) &&
 	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[0x100];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -3065,7 +3060,7 @@ next_link:
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);
 		stackArgs[1] = scriptArg;
-		gCFlatRuntime().SystemCall(
+		CFlat.SystemCall(
 			reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x17, 2,
 			reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 	}

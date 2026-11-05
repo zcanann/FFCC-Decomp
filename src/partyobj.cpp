@@ -194,7 +194,7 @@ static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 
 #define PARTY_CARRY_ANIM(self, heldAnim, plainAnim) \
 	(PARTY_GHOST_TARGET_MODE(self) ? PARTY_GHOST_CARRY_ANIM \
-	                               : (static_cast<int>(CFlat.m_centerState) == 1 ? PARTY_ANIM_ROW(self).heldAnim \
+	                               : (CFlat.m_centerState == 1 ? PARTY_ANIM_ROW(self).heldAnim \
 	                                                                             : PARTY_ANIM_ROW(self).plainAnim))
 
 inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
@@ -571,10 +571,10 @@ void CGPartyObj::menu()
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			int connected = Pad.IsGba(static_cast<char>(m_animStateMisc));
 			if (connected != 0) {
-				if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
+				if ((CFlat.m_eventFlags & CFlatEventFlagByte_GbaSound) != 0) {
 					Sound.PlaySe(8, 0x40, 0x7F, 0);
 				}
-			} else if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
+			} else if ((CFlat.m_eventFlags & CFlatEventFlagByte_GbaSound) != 0) {
 				Sound.PlaySe(7, 0x40, 0x7F, 0);
 			}
 
@@ -604,7 +604,7 @@ void CGPartyObj::menu()
 	}
 
 	Joybus.ChgCtrlMode(portIndex);
-	if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
+	if ((CFlat.m_eventFlags & CFlatEventFlagByte_GbaSound) != 0) {
 		Sound.PlaySe(8, 0x40, 0x7F, 0);
 	}
 }
@@ -636,8 +636,8 @@ void CGPartyObj::onFrameAlways()
 	int port = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId;
 	int showTraceParticle;
 	if ((static_cast<int>(Game.m_gameWork.m_gameInitFlag) == 0) ||
-	    (CFlatRuntime2Storage().m_gameFlagBits.m_flagBit3 == 0) ||
-	    (CFlatRuntime2Storage().m_gameFlagBits.m_flagBit2 == 0) ||
+	    (CFlat.m_gameFlagBits.m_flagBit3 == 0) ||
+	    (CFlat.m_gameFlagBits.m_flagBit2 == 0) ||
 	    ((m_weaponNodeFlagBits.m_prg == 0) ||
 	     (m_weaponNodeFlagAll.m_bits1.m_shield == 0)) ||
 	    (m_lastStateId == 6 || m_lastStateId == 2)) {
@@ -751,7 +751,7 @@ void CGPartyObj::onFramePreCalc()
 
 		int weaponIndex;
 		int itemId;
-		if (static_cast<int>(CFlatCenterState()) == 0) {
+		if (CFlat.m_centerState == 0) {
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponIndex, itemId);
 			if (m_partyData.weaponIndex != weaponIndex || m_partyData.weaponItemId != itemId) {
 				bool needsImmediateChange = !m_weaponNodeFlagBits.m_prg ||
@@ -770,7 +770,7 @@ void CGPartyObj::onFramePreCalc()
 		if (m_partyData.carryObject != nullptr ||
 		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp == 0) {
 			float speedScale;
-			if (static_cast<int>(CFlatCenterState()) == 0) {
+			if (CFlat.m_centerState == 0) {
 				speedScale = 1.25f;
 			} else {
 				speedScale = 1.0f;
@@ -940,7 +940,7 @@ void CGPartyObj::command()
 				}
 				break;
 			case 0xC8:
-				if (static_cast<int>(CFlatCenterState()) == 0) {
+				if (CFlat.m_centerState == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x0B;
 				} else {
@@ -949,7 +949,7 @@ void CGPartyObj::command()
 				}
 				break;
 			case 0xC9:
-				if (static_cast<int>(CFlatCenterState()) == 0) {
+				if (CFlat.m_centerState == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x0A;
 				} else {
@@ -958,7 +958,7 @@ void CGPartyObj::command()
 				}
 				break;
 			case 0xCA:
-				if (static_cast<int>(CFlatCenterState()) == 0) {
+				if (CFlat.m_centerState == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x1C;
 				} else {
@@ -1228,7 +1228,7 @@ inline void CGPartyObj::callCommandScript(int command, CGObject* target)
 	CFlatRuntime::CStack stack[2];
 	stack[0].m_word = command;
 	stack[1].m_word = target != nullptr ? target->m_particleId : 0;
-	gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
+	CFlat.SystemCall(this, 2, 0x14, 2, stack, 0);
 }
 
 /*
@@ -1243,14 +1243,14 @@ inline void CGPartyObj::callCommandScript(int command, CGObject* target)
 void CGPartyObj::shouki()
 {
 	if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp != 0 &&
-	    (CFlatRuntime2Storage().m_gameFlagBits.m_flagBit7 != 0 ||
-	     CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) &&
+	    (CFlat.m_gameFlagBits.m_flagBit7 != 0 ||
+	     CFlat.m_gameFlagBits.m_flagBit4 != 0) &&
 	    m_weaponNodeFlagAll.m_bits1.m_shield != 0) {
 
 		const Vec* chalicePos = &Game.m_chaliceObject->m_worldPosition;
 		float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
 		if (1.1f * Game.unkFloat_0xca10 < chaliceDist ||
-		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) {
+		    CFlat.m_gameFlagBits.m_flagBit4 != 0) {
 			if (m_unk688 != 2) {
 				deletePSlotBit(0x200);
 				CFlat.ResetParticleWork(1, m_particleSlots[9]);
@@ -1278,7 +1278,7 @@ void CGPartyObj::shouki()
 		}
 
 		if (m_unk688 == 0 &&
-		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 == 0) {
+		    CFlat.m_gameFlagBits.m_flagBit4 == 0) {
 			int healCount = 0;
 			if (m_partyData.carryObject == Game.m_chaliceObject) {
 				if (isFrameInterval(m_updateCounter, Game.m_battleParams[2])) {
@@ -1303,7 +1303,7 @@ void CGPartyObj::shouki()
 			}
 			if (isFrameInterval(m_updateCounter, damageInterval)) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
-				if (CFlatRuntime2Storage().m_gameFlagBits.m_flagBit5 == 0) {
+				if (CFlat.m_gameFlagBits.m_flagBit5 == 0) {
 					addHp(-1, static_cast<CGPrgObj*>(0));
 				}
 			}
@@ -2986,7 +2986,7 @@ int CGPartyObj::useItem(int itemId)
 			}
 			stack[0].m_word = itemId;
 			stack[1].m_word = pausedFlag;
-			gCFlatRuntime().SystemCall(this, 2, 0x15, 2, stack, 0);
+			CFlat.SystemCall(this, 2, 0x15, 2, stack, 0);
 			result = 1;
 		}
 	}
@@ -3523,7 +3523,7 @@ void CGPartyObj::changeMotionMode(int mode)
 void CGPartyObj::setIdleMotion()
 {
 	if (m_partyData.carryObject != 0) {
-		if (CFlatItemCarryMode() == 0) {
+		if (CFlat.m_centerState == 0) {
 			if (m_motionMode == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
@@ -4278,7 +4278,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	CGCharaObj::onDrawDebug(font, x, y, z);
 
 	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<int>(CFlatCenterState()) == 0) &&
+	    (CFlat.m_centerState == 0) &&
 	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[256];
 		if ((Game.m_gameWork.m_menuStageMode != 0) &&

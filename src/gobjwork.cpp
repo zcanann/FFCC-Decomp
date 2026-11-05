@@ -347,8 +347,8 @@ int CCaravanWork::IsOutOfShouki()
 
 	if (ownerObj->m_targetDist > 0.95f * Game.unkFloat_0xca10) {
 		if (m_hp != 0) {
-			if ((CFlatRuntime2Storage().m_gameFlagBits.m_flagBit7 != 0 ||
-				 CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) &&
+			if ((CFlat.m_gameFlagBits.m_flagBit7 != 0 ||
+				 CFlat.m_gameFlagBits.m_flagBit4 != 0) &&
 				ownerObj->m_weaponNodeFlagAll.m_bits1.m_shield != 0) {
 				result = 1;
 			}
@@ -415,7 +415,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	stack[0].m_word = m_letters[letterIdx].m_bits.m_messageType;
 	stack[1].m_word = m_letters[letterIdx].m_bits.m_senderId;
-	gCFlatRuntime().SystemCall(
+	CFlat.SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
 	for (int i = 0; i < 4; i++) {
@@ -465,7 +465,7 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	stack[3].m_word = param4;
 	stack[4].m_word = param5;
 
-	gCFlatRuntime().SystemCall(
+	CFlat.SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
 	letter->SetReplySent();
@@ -1597,7 +1597,7 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
 	args[2].m_word = arg1;
 	args[3].m_word = arg2;
 	args[4].m_word = arg3;
-	gCFlatRuntime().SystemCall(
+	CFlat.SystemCall(
 		reinterpret_cast<CFlatRuntime::CObject*>(m_ownerObj), 2, 0x12, 5, args, 0);
 }
 

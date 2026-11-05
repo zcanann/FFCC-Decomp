@@ -2286,7 +2286,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             viewMtx[1][1] *= -1.0f;
             viewMtx[2][1] *= -1.0f;
         } else if ((m_flags & 8) != 0) {
-            PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);
+            PSMTXConcat(viewMtx, CFlat.m_centerMatrix, viewMtx);
         }
     } else if (drawPass == 2) {
         CVector modelPos;

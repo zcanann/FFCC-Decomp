@@ -1411,7 +1411,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 	CGCharaObj::onDrawDebug(font, posX, posY, posZ);
 
 	if ((static_cast<signed char>((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31)) != 0) &&
-			(static_cast<int>(CFlatCenterState()) == 0) &&
+			(CFlat.m_centerState == 0) &&
 		((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[0x100];
 		int aiMasked = m_groupTag & 0x7FFF;

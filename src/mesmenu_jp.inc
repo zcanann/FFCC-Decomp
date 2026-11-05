@@ -12,7 +12,7 @@ void CMesMenu::onDraw()
     static int tCut[4] = {1, 6, 7, 6};
 
     if ((m_menuIndex == 0) &&
-        (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 30) >> 31) != 0)) {
+        (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlat.m_gameFlags) << 30) >> 31) != 0)) {
         int iconFrame = 0;
         int charaMode = Chara.MogFur().m_commandIndex;
         switch (charaMode) {

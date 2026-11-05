@@ -39,11 +39,6 @@ static const int kItemObjCapsuleUseFrame = 16;
 u32 g_tempFlag;
 extern char SoundBuffer[];
 
-static inline CFlatRuntime2* ItemCFlatRuntime()
-{
-	return &CFlat;
-}
-
 static inline bool ItemIsMultiBossStage()
 {
 	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF;
@@ -85,7 +80,7 @@ void CGItemObj::onCreate()
 	m_itemJumpCountdown = 0;
 	memset(&m_memoryCapsuleNameIndex, 0,
 	       sizeof(m_memoryCapsuleNameIndex) + sizeof(m_pendingAnimFlags) + sizeof(m_pendingAnimName));
-	m_particleSlot = ItemCFlatRuntime()->GetFreeParticleSlot();
+	m_particleSlot = CFlat.GetFreeParticleSlot();
 }
 
 /*
@@ -103,7 +98,7 @@ void CGItemObj::onDestroy()
 		delete m_pendingModelHandle;
 	}
 
-	ItemCFlatRuntime()->DeleteParticleSlot(m_particleSlot, 0);
+	CFlat.DeleteParticleSlot(m_particleSlot, 0);
 	CGPrgObj::onDestroy();
 }
 
@@ -258,7 +253,7 @@ void CGItemObj::onFrameStat()
 			if (Game.m_chaliceObject != 0) {
 				distance = PSVECDistance(&m_worldPosition, &Game.m_chaliceObject->m_worldPosition);
 			} else {
-				if (static_cast<int>(CFlatCenterState()) == 1) {
+				if (CFlat.m_centerState == 1) {
 					Vec partyCenter;
 
 					Game.m_partyBound.GetCenter(&partyCenter);
@@ -271,7 +266,7 @@ void CGItemObj::onFrameStat()
 				m_alphaStep = 0.1f;
 				m_alphaTarget = zero;
 				m_bgColMask = 1;
-				ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
+				CFlat.EndParticle(m_charaModelHandle);
 				changeStat(9, 0, 0);
 			}
 		}
@@ -296,7 +291,7 @@ void CGItemObj::onFrameStat()
 			    (static_cast<unsigned short>(m_owner->GetCID()) & 0x6D) == 0x6D &&
 			    reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId != 0) {
 				launchSpeed = 1.0f;
-			} else if (static_cast<int>(CFlatCenterState()) == 1) {
+			} else if (CFlat.m_centerState == 1) {
 				int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
 				    2 <= reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_tribeId) {
@@ -337,7 +332,7 @@ void CGItemObj::onFrameStat()
 			m_alphaStep = 0.1f;
 #endif
 			m_alphaTarget = zero;
-			ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
+			CFlat.EndParticle(m_charaModelHandle);
 		} else if (m_stateFrame == kItemObjDeleteFrame) {
 			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
@@ -433,7 +428,7 @@ void CGItemObj::onFrameStat()
 
 		if (m_stateFrame == 0) {
 			m_alphaTarget = zero;
-			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
+			CFlat.EndParticleSlot(m_particleSlot, 0);
 
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtId();
 
@@ -451,7 +446,7 @@ void CGItemObj::onFrameStat()
 			CFlatRuntime::CStack stack;
 			stack.m_word = 0;
 			bossWork->m_capsules[ownerSlot] = 0;
-			gCFlatRuntime().SystemCall(
+			CFlat.SystemCall(
 			    m_owner, 2, 0x16, 1, &stack, 0);
 
 			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
@@ -465,7 +460,7 @@ void CGItemObj::onFrameStat()
 
 		if (m_stateFrame == 0) {
 			m_alphaTarget = zero;
-			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
+			CFlat.EndParticleSlot(m_particleSlot, 0);
 
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtId();
 
@@ -492,7 +487,7 @@ void CGItemObj::onFrameStat()
 
 				CFlatRuntime::CStack stack;
 				stack.m_word = 1;
-				gCFlatRuntime().SystemCall(
+				CFlat.SystemCall(
 				    m_owner, 2, 0x16, 1, &stack, 0);
 			} else {
 				if ((unsigned int)System.m_execParam >= 2U) {
@@ -526,9 +521,9 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		CGItemObj* bestItemObj = 0;
 		int shortestLifetime = 0x00989680;
 
-		for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst();
+		for (CGItemObj* itemObj = CFlat.FindGItemObjFirst();
 			 itemObj != 0;
-			 itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+			 itemObj = CFlat.FindGItemObjNext(itemObj)) {
 			if (itemObj->m_owner == 0 &&
 				itemObj->m_stateFlags0Bits.unk4 != 0 &&
 				(((int)(char)itemObj->m_ownerSlot & deleteMask) != 0) && itemObj->m_lifeTimer < shortestLifetime) {
@@ -538,7 +533,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		}
 
 		if (bestItemObj != 0) {
-			gCFlatRuntime().deleteObject(bestItemObj);
+			CFlat.deleteObject(bestItemObj);
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf("\x8F\xC1\x82\xB9\x82\xE9\x83I\x83u\x83W\x83" "F\x83N\x83g\x82\xAA\x82\xA0\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81" "B\n");
@@ -563,7 +558,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
  */
 unsigned int CGItemObj::CanCreateFromScript()
 {
-	int numFreeObjects = ItemCFlatRuntime()->getNumFreeObject(5);
+	int numFreeObjects = CFlat.getNumFreeObject(5);
 
 	return numFreeObjects > 0;
 }
@@ -580,7 +575,7 @@ unsigned int CGItemObj::CanCreateFromScript()
 CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
-	int freeItemCount = ItemCFlatRuntime()->getNumFreeObject(5);
+	int freeItemCount = CFlat.getNumFreeObject(5);
 	System.Printf("num free item = %d\n", freeItemCount);
 
 	if (freeItemCount == 0) {
@@ -603,7 +598,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
 	inStack[4].m_float = launchAngle;
 	g_tempFlag = createFlags;
-	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
+	CFlat.SystemCall(0, 1, 7, 5, inStack, &outStack);
 
 	if (createMode != 1) {
 		CGItemObj* newItem = static_cast<CGItemObj*>(CFlat.intToClass((int)outStack.m_word));
@@ -767,7 +762,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		stack[0].m_word = 3;
 		stack[1].m_word = carryState != 0;
 		stack[2].m_word = 0;
-		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+		CFlat.SystemCall(0, 1, 9, 3, stack, 0);
 	}
 }
 
@@ -826,7 +821,7 @@ void CGItemObj::statPot()
 		break;
 	case 1:
 		if (m_subFrame == kItemObjParticleEndFrame) {
-			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
+			CFlat.EndParticleSlot(m_particleSlot, 0);
 		}
 		break;
 	}
@@ -856,21 +851,21 @@ void CGItemObj::onFrameAlways()
 		int canUseTrace;
 
 		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
-		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit3 != 0 &&
-		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit2 != 0 &&
+		    CFlat.m_gameFlagBits.m_flagBit3 != 0 &&
+		    CFlat.m_gameFlagBits.m_flagBit2 != 0 &&
 		    m_weaponNodeFlagBits.m_prg != 0 &&
-		    static_cast<int>(CFlatCenterState()) == 0 && m_owner == 0) {
+		    CFlat.m_centerState == 0 && m_owner == 0) {
 			canUseTrace = true;
 		} else {
 			canUseTrace = false;
 		}
 
-		if (canUseTrace && CFlatItemTraceParticleSlot() == 0) {
-			CFlatItemTraceParticleSlot() = ItemCFlatRuntime()->GetFreeParticleSlot();
-			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, 1.0f, 0);
-		} else if (!canUseTrace && CFlatItemTraceParticleSlot() != 0) {
-			ItemCFlatRuntime()->EndParticleSlot(CFlatItemTraceParticleSlot(), 0);
-			CFlatItemTraceParticleSlot() = 0;
+		if (canUseTrace && CFlat.m_itemTraceParticleSlot == 0) {
+			CFlat.m_itemTraceParticleSlot = CFlat.GetFreeParticleSlot();
+			putParticleTrace(0x141, CFlat.m_itemTraceParticleSlot, this, 1.0f, 0);
+		} else if (!canUseTrace && CFlat.m_itemTraceParticleSlot != 0) {
+			CFlat.EndParticleSlot(CFlat.m_itemTraceParticleSlot, 0);
+			CFlat.m_itemTraceParticleSlot = 0;
 		}
 	}
 }
@@ -911,25 +906,19 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 				break;
 			}
 
-			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
-			ItemCFlatRuntime()->ResetParticleWork(particleNo | 0x100, m_particleSlot);
-			ItemCFlatRuntime()->SetParticleWorkPos(m_worldPosition, 0.0f);
-			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, 1.0f);
-			ItemCFlatRuntime()->SetParticleWorkParam(classControl, this);
-			ItemCFlatRuntime()->PutParticleWork();
+			CFlat.EndParticleSlot(m_particleSlot, 0);
+			CFlat.ResetParticleWork(particleNo | 0x100, m_particleSlot);
+			CFlat.SetParticleWorkPos(m_worldPosition, 0.0f);
+			CFlat.SetParticleWorkCol(9, 0, 1.0f);
+			CFlat.SetParticleWorkParam(classControl, this);
+			CFlat.PutParticleWork();
 			m_bgColMask &= 0xFFF7FFFF;
 			addSubStat();
 		}
 	} else if ((worldParamA == 0xCB && m_lastStateId == 0x24) || m_lastStateId == 0x25) {
 		if ((static_cast<unsigned int>(particleAttr - 0x66) <= 1U) || (particleAttr == 0x65)) {
 			int classId = hitParam->m_classId;
-			CGObject* classObj;
-
-			if (classId != 0) {
-				classObj = reinterpret_cast<CGObject*>(ItemCFlatRuntime()->intToClass(classId));
-			} else {
-				classObj = 0;
-			}
+			CGObject* classObj = CFlat.IntToClass(classId);
 
 			unsigned short cid = classObj->GetCID();
 
@@ -941,7 +930,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 		return;
 	}
 
-	ItemCFlatRuntime()->IgnoreParticle(effectIndex, this);
+	CFlat.IgnoreParticle(effectIndex, this);
 }
 
 /*
@@ -1108,8 +1097,8 @@ void CGItemObj::DrawOmoideName(CFont* font)
  */
 void CGItemObj::ItemJump(int state, float jump)
 {
-	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
-	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+	for (CGItemObj* itemObj = CFlat.FindGItemObjFirst(); itemObj != 0;
+	     itemObj = CFlat.FindGItemObjNext(itemObj)) {
 		CGObject* object = itemObj;
 
 		if ((object->m_objectFlags & 0x10) == 0) {
@@ -1149,8 +1138,8 @@ void CGItemObj::ItemJump(int state, float jump)
  */
 void CGItemObj::DeleteAllFieldItem()
 {
-	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
-	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+	for (CGItemObj* itemObj = CFlat.FindGItemObjFirst(); itemObj != 0;
+	     itemObj = CFlat.FindGItemObjNext(itemObj)) {
 		if (itemObj->m_owner == 0 &&
 		    itemObj->m_stateFlags0Bits.unk4 != 0) {
 			itemObj->CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
@@ -1169,8 +1158,8 @@ void CGItemObj::DeleteAllFieldItem()
  */
 void CGItemObj::DispAllFieldItem(int show)
 {
-	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
-	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+	for (CGItemObj* itemObj = CFlat.FindGItemObjFirst(); itemObj != 0;
+	     itemObj = CFlat.FindGItemObjNext(itemObj)) {
 		if (itemObj->m_owner == 0 &&
 		    itemObj->m_stateFlags0Bits.unk4 != 0) {
 			if (show != 0) {

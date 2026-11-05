@@ -64,7 +64,7 @@ inline void CMesMenu::close(int closeReason)
     m_mes.Set(0, 0);
     stack[0].m_word = m_menuIndex;
     stack[1].m_word = m_closeReason;
-    gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
+    CFlat.SystemCall(0, 1, 3, 2, stack, 0);
     m_state = 4;
     m_active = 0;
     if (m_menuIndex < 4) {
@@ -186,9 +186,9 @@ void CMesMenu::onCalc()
 
     unsigned int stageBit = 0;
     if (m_menuIndex < 4) {
-        stageBit = CFlatEnabledEventFlags() & 1;
+        stageBit = (CFlat.m_eventFlags & CFlat.m_eventMask) & 1;
     } else {
-        stageBit = CFlatEnabledEventFlags() & 2;
+        stageBit = (CFlat.m_eventFlags & CFlat.m_eventMask) & 2;
     }
 
     int desiredStageFlag = stageBit ? 1 : 0;
@@ -435,7 +435,7 @@ void CMesMenu::onDraw()
     static int tCut[4] = {1, 6, 7, 6};
 
     if ((m_menuIndex == 0) &&
-        (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 30) >> 31) != 0)) {
+        (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlat.m_gameFlags) << 30) >> 31) != 0)) {
         int iconFrame = 0;
         int charaMode = Chara.MogFur().m_commandIndex;
         switch (charaMode) {

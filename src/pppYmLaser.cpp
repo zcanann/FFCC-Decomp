@@ -426,7 +426,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 		}
 		GXEnd();
 
-		if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
+		if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
 			Util.SetVtxFmt_POS_CLR();
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -469,7 +469,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			GXSetPointSize(8, GX_TO_ZERO);
 			GXSetZMode(1, GX_LEQUAL, 0);
 
-			if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
+			if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
 				float radius = ppvMng->m_hitScale * step->m_laser.m_hitScale;
 				float distance = PSVECDistance(work->m_points, &work->m_origin);
 				debugSource.x = zero;

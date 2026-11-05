@@ -67,7 +67,7 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
     radius = pppMngSt->m_hitScale * step->m_radiusScale;
     pppHitCylinderSendSystem(pppMngSt, &origin, &hitVector, radius, step->m_height);
 
-    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
+    if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
         debugColor.r = 0xFF;
         debugColor.g = 0xFF;
         debugColor.b = 0xFF;

@@ -1384,9 +1384,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				}
 
 				if (emitParticle != 0) {
-					CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
-					CFlatRuntime2Storage().SetParticleWorkPos(worldPos, 0.0f);
-					const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
+					CFlat.ResetParticleWork(particleNo | 0x100, 0);
+					CFlat.SetParticleWorkPos(worldPos, 0.0f);
+					const int particleIndex = CFlat.PutParticleWork();
 					pppFVECTOR4 color = {0.0f, 0.0f, 0.0f, 0.0f};
 					color.x = static_cast<float>(particleColor.r) / 15.0f;
 					color.y = static_cast<float>(particleColor.g) / 15.0f;
@@ -1443,7 +1443,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		stack[0].m_word = 2;
 		stack[1].m_word = 0;
 		stack[2].m_word = 0;
-		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+		CFlat.SystemCall(0, 1, 9, 3, stack, 0);
 	}
 
 	if (messageId >= 0 && !MenuPcs.GetMesMenu(5)->IsUse()) {

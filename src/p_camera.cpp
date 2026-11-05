@@ -590,7 +590,7 @@ void CCameraPcs::SetStdProjectionMatrix()
 void CCameraPcs::draw()
 {
     if ((m_isAbsolute == 0) ||
-        ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
+        ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_Camera) != 0)) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -1112,8 +1112,8 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
                     1.0f);
     CBound::SetFrustum(eyePos, frustumMtx);
 
-    for (gObject = CFlatRuntime2Storage().FindGObjFirst(); gObject != 0;
-         gObject = CFlatRuntime2Storage().FindGObjNext(gObject))
+    for (gObject = CFlat.FindGObjFirst(); gObject != 0;
+         gObject = CFlat.FindGObjNext(gObject))
     {
         unsigned int displayFlags;
         bool include = false;

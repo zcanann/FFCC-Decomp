@@ -307,7 +307,7 @@ inline void CMiniGamePcs::CallMiniGameParam(int code, int param1, int param2)
     stack[0].m_word = code;
     stack[1].m_word = param1;
     stack[2].m_word = param2;
-    gCFlatRuntime().SystemCall(0, 1, 8, 3, stack, 0);
+    CFlat.SystemCall(0, 1, 8, 3, stack, 0);
 }
 
 /*

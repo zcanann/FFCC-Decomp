@@ -586,7 +586,7 @@ void CGObject::move()
                     speed *= 4.0f;
                 }
 
-                const s32 cflatCenterState = CFlatCenterState();
+                const s32 cflatCenterState = CFlat.m_centerState;
                 if (cflatCenterState == 1) {
                     Vec partyCenter;
                     Game.m_partyBound.GetCenter(&partyCenter);
@@ -598,7 +598,7 @@ void CGObject::move()
 
                     const float dirDot = PSVECDotProduct(&moveVec, &centerDelta);
                     if (0.0f < dirDot) {
-                        centerDist /= CFlatCenterDistanceScale();
+                        centerDist /= CFlat.m_centerDistanceScale;
                         const float clampDist = ClampFloat(centerDist, 0.0f, 1.0f);
                         speed *= -((clampDist * clampDist) - 1.0f);
                     }
@@ -1180,7 +1180,7 @@ void CGObject::hit()
                     stackIn[5].m_float = hitPos.z;
                     stackIn[6].m_word = static_cast<CGCharaObj*>(this)->m_itemId;
                     CFlatRuntime::CStack stackOut;
-                    gCFlatRuntime().SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
+                    CFlat.SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
                     const int hitResult = onHit(attackIndex, other, damageIndex, &hitPos);
                     if (hitResult == 1) {
                         goto nextObject;
@@ -1617,7 +1617,7 @@ void CGObject::update()
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
                             stackIn[1].m_word = static_cast<unsigned int>(animRef->m_points[i].m_type);
-                            gCFlatRuntime().SystemCall(this, 2, 9, 2, stackIn, 0);
+                            CFlat.SystemCall(this, 2, 9, 2, stackIn, 0);
                             onAnimPoint(m_animSlotSel, animRef->m_points[i].m_type);
                         }
                     }
@@ -1642,11 +1642,11 @@ void CGObject::update()
                         m_turnSpeed = 0.0f;
                     } else {
                         CancelAnim(1);
-                        gCFlatRuntime().SystemCall(this, 2, 10, 0, 0, 0);
+                        CFlat.SystemCall(this, 2, 10, 0, 0, 0);
                     }
                 } else {
                     CancelAnim(1);
-                    gCFlatRuntime().SystemCall(this, 2, 10, 0, 0, 0);
+                    CFlat.SystemCall(this, 2, 10, 0, 0, 0);
                 }
             }
         }
@@ -1941,7 +1941,7 @@ void CGObject::CancelMove(int moveType)
 
     CFlatRuntime::CStack arg;
     arg.m_word = static_cast<u32>(moveType);
-    gCFlatRuntime().SystemCall(this, 2, 7, 1, &arg, 0);
+    CFlat.SystemCall(this, 2, 7, 1, &arg, 0);
 }
 
 /*
@@ -2445,7 +2445,7 @@ void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int collide
     stack[7].m_word = hitParam->m_particleIndex;
     stack[8].m_word = static_cast<int>(hitParam->m_classId);
 
-    gCFlatRuntime().SystemCall(this, 2, 0xB, 9, stack, 0);
+    CFlat.SystemCall(this, 2, 0xB, 9, stack, 0);
 
     onHitParticle(effectIndex, kind, nodeIndex, colliderIndex, pos, hitParam);
 }

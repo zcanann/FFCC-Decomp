@@ -444,9 +444,9 @@ void CGraphicPcs::drawBar()
                 if (priority == 0x17) {
                     char extraString[256];
                     sprintf(extraString, " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%",
-                            CFlatMoveTime(), CFlatBgCollisionTime(),
-                            CFlatObjectCollisionTime(), CFlatUpdateTime(),
-                            CFlatHitTime(), CFlatPerformanceTotalTime());
+                            CFlat.m_moveTime, CFlat.m_bgCollisionTime,
+                            CFlat.m_objectCollisionTime, CFlat.m_updateTime,
+                            CFlat.m_hitTime, CFlat.m_performance.m_totalTime);
                     strcat(debugString, extraString);
                 }
 

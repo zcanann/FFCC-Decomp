@@ -55,7 +55,7 @@ void CGBaseObj::onTalk(CGBaseObj* other, int talkType)
 	CFlatRuntime::CStack stack[2];
 	stack[0].m_word = (u32)other->m_particleId;
 	stack[1].m_word = (u32)talkType;
-	gCFlatRuntime().SystemCall(this, 2, 6, 2, stack, 0);
+	CFlat.SystemCall(this, 2, 6, 2, stack, 0);
 }
 
 /*
@@ -72,7 +72,7 @@ void CGBaseObj::onPush(CGBaseObj* other, int pushType)
 	CFlatRuntime::CStack stack[2];
 	stack[0].m_word = (u32)other->m_particleId;
 	stack[1].m_word = (u32)pushType;
-	gCFlatRuntime().SystemCall(this, 2, 4, 2, stack, 0);
+	CFlat.SystemCall(this, 2, 4, 2, stack, 0);
 }
 
 /*

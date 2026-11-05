@@ -119,12 +119,6 @@ STATIC_ASSERT(sizeof(SPartyAnimRow) == 0x1CA);
 STATIC_ASSERT(offsetof(SPartyAnimRow, m_chargeAttacks) == 0x36);
 STATIC_ASSERT(offsetof(SPartyAnimRow, m_carryAnim0) == 0x1C2);
 
-static inline int getEquipWeaponInventoryItem(CCaravanWork* work)
-{
-	int equip0 = work->m_equipment[0];
-	return equip0 >= 0 ? work->m_inventoryItems[equip0] : 0;
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -1075,14 +1069,12 @@ void CGPartyObj::command()
 				int weaponRef;
 				caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 				if (weaponItem != party.unk6BC ||
-				    weaponRef != getEquipWeaponInventoryItem(caravan)) {
-					changeWeapon(party.unk6BC, getEquipWeaponInventoryItem(caravan), 0);
+				    weaponRef != (SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_equipment[0] >= 0 ? SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_inventoryItems[SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_equipment[0]] : 0)) {
+					changeWeapon(party.unk6BC, SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_equipment[0] >= 0 ? SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_inventoryItems[SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_equipment[0]] : 0, 0);
 					return;
 				}
 
-				CCaravanWork* work = caravan;
-				short equip = work->m_equipment[0];
-				m_itemId = equip >= 0 ? work->m_inventoryItems[equip] : 0;
+				m_itemId = SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_equipment[0] >= 0 ? SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_inventoryItems[SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_equipment[0]] : 0;
 				changeStat(7, 0, 0);
 				return;
 			}

@@ -3,6 +3,7 @@
 
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/map.h"
+#include "ffcc/p_map.h"
 #include "ffcc/game.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/memory.h"
@@ -91,6 +92,40 @@ float ppvChrScl[3] ATTRIBUTE_ALIGN(8);
 Mtx ppvUnitMatrix ATTRIBUTE_ALIGN(8);
 Vec ppvZeroVector ATTRIBUTE_ALIGN(8);
 CAmemCacheSet ppvAmemCacheSet;
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006640C
+ * EN Size: 56b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
+{
+	g_MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80044720
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMapPcs::CheckHitCylinder(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+{
+	CMapCylinder cylinder;
+
+	cylinder.m_bottom = *cylinderBottom;
+	cylinder.m_axis = *direction;
+	cylinder.m_radius = radius;
+
+	return g_MapMng.CheckHitCylinder(&cylinder, direction, hitMask);
+}
 
 /*
  * --INFO--
@@ -291,7 +326,9 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
  */
 void pppCopyVector(Vec& dest, Vec source)
 {
-	dest = source;
+	dest.x = source.x;
+	dest.y = source.y;
+	dest.z = source.z;
 }
 
 /*
@@ -477,7 +514,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	}
 	while (canRetry);
 
-	ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
+	pppHeapCheckLeak(ppvEnv->m_stagePtr);
 	PartMng.pppDumpMngSt();
 	ppvMemAllocErrorF = 1;
 allocDone:
@@ -561,16 +598,13 @@ unsigned long pppHeapUseRate(CMemory::CStage* stage)
 	unsigned long heapTotal;
 	unsigned long heapUseRate;
 	unsigned long heapUnused;
-	unsigned long result;
 
 	stage->heapInfo(heapTotal, heapUseRate, heapUnused);
 	if (heapTotal == 0) {
-		result = 10000;
-	} else {
-		result = (heapUseRate * 10000) / heapTotal;
+		return 10000;
 	}
 
-	return result;
+	return (heapUseRate * 10000) / heapTotal;
 }
 
 /*
@@ -690,8 +724,7 @@ static inline void callConProg(_pppPObject* object)
  */
 _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 {
-	_pppPDataVal* dataVal = pppPDataVal;
-	_pppProgSetDef* programSet = dataVal->m_programSetDef;
+	_pppProgSetDef* programSet = pppPDataVal->m_programSetDef;
 	_pppPObject* newObject = (_pppPObject*)pppMemAlloc(
 		programSet->m_workBaseOffset + programSet->m_numStages * sizeof(u32),
 		ppvEnv->m_stagePtr, "pppPart.cpp", PPPPART_LINE(0x305, 0x2DC, 0x2DB));
@@ -710,14 +743,14 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	_pppPObjLink* iter = pppMngSt->m_pppPObjLinkHead.m_next;
 	if (iter == 0)
 	{
-		dataVal->m_pppPObjLink = &newObject->m_link;
+		pppPDataVal->m_pppPObjLink = &newObject->m_link;
 		pppMngSt->m_pppPObjLinkHead.m_next = &newObject->m_link;
 		newObject->m_link.m_next = 0;
 	}
-	else if (dataVal->m_pppPObjLink != 0)
+	else if (pppPDataVal->m_pppPObjLink != 0)
 	{
-		newObject->m_link.m_next = dataVal->m_pppPObjLink->m_next;
-		dataVal->m_pppPObjLink->m_next = &newObject->m_link;
+		newObject->m_link.m_next = pppPDataVal->m_pppPObjLink->m_next;
+		pppPDataVal->m_pppPObjLink->m_next = &newObject->m_link;
 	}
 	else
 	{
@@ -728,7 +761,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			_pppProgSetDef* iterSet = iter->m_owner->m_programSetDef;
 			if (iterSet->m_sortKey >= sortKey)
 			{
-				dataVal->m_pppPObjLink = &newObject->m_link;
+				pppPDataVal->m_pppPObjLink = &newObject->m_link;
 				prev->m_next = &newObject->m_link;
 				newObject->m_link.m_next = iter;
 				goto done_insert;
@@ -736,13 +769,13 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			prev = iter;
 			iter = iter->m_next;
 		} while (iter != 0);
-		dataVal->m_pppPObjLink = &newObject->m_link;
+		pppPDataVal->m_pppPObjLink = &newObject->m_link;
 		prev->m_next = &newObject->m_link;
 		newObject->m_link.m_next = 0;
 	}
 
 done_insert:
-	dataVal->m_activeCount++;
+	pppPDataVal->m_activeCount++;
 	callConProg(newObject);
 	return newObject;
 }
@@ -1316,7 +1349,7 @@ inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
  */
 void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 {
-	short shapeCount = *shapeList++;
+	int shapeCount = *shapeList++;
 	for (short i = 0; i < shapeCount; i++)
 	{
 		pppCacheLoadShapeTexture(pppDataHead->m_shapes[*shapeList++], PartMng.m_materialSet);
@@ -1337,10 +1370,9 @@ static inline void callInitProg(_pppMngSt* pppMngSt)
 	for (int i = 0; i < pppMngSt->m_numControlPrograms; i++)
 	{
 		pppProg* prog = ((pppProg**)pppMngSt->m_pppPObjLinkHead.m_owner)[i];
-		pppProgInitCallback fn = prog->m_pppFunctionInit;
-		if (fn != 0)
+		if (prog->m_pppFunctionInit != 0)
 		{
-			fn(pppMngSt);
+			prog->m_pppFunctionInit(pppMngSt);
 		}
 	}
 }
@@ -2159,29 +2191,17 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 
 	if (0.0f != cylScale)
 	{
-		u32 cylinderAttribute = pppMngSt->m_cylinderAttribute;
-		CMapCylinder cylinder;
-		cylinder.m_bottom = *origin;
-		cylinder.m_axis = *vector;
-		cylinder.m_radius = cylScale;
-
-		if (g_MapMng.CheckHitCylinder(&cylinder, vector, cylinderAttribute) != 0)
+		if (MapPcs.CheckHitCylinder(origin, vector, cylScale, pppMngSt->m_cylinderAttribute) != 0)
 		{
 			if (Game.m_currentSceneId == 7)
 			{
 				pppMngSt->m_hitBgFlag = 1;
-				if ((pppMngSt->m_soundEffectData.m_soundEffectSlot >= 0) &&
-					(pppMngSt->m_soundEffectData.m_soundEffectHandle >= 0))
-				{
-					Sound.FadeOutSe3D(pppMngSt->m_soundEffectData.m_soundEffectHandle,
-						pppMngSt->m_soundEffectData.m_soundEffectFadeFrames);
-					pppMngSt->m_soundEffectData.m_soundEffectHandle = -1;
-				}
+				pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
 			}
 			else
 			{
 				Vec hitPos;
-				g_MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
+				MapPcs.CalcHitPosition(&hitPos);
 				s32 partIndex = pppMngSt - PartMng.m_pppMng;
 				Game.HitParticleBG(partIndex, pppMngSt->m_kind, pppMngSt->m_nodeIndex, &hitPos, &pppMngSt->m_hitParams);
 			}

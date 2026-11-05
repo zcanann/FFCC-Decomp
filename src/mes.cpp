@@ -443,14 +443,14 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			case 0x3D:
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeArtItemName(out, value, count);
 				break;
 			}
 			case 0x3F:
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeNumItemName(out, value, count);
 				break;
 			}
@@ -488,14 +488,14 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			case 0x3E:
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeArtMonName(out, value, count);
 				break;
 			}
 			case 0x40:
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeNumMonName(out, value, count);
 				break;
 			}

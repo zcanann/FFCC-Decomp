@@ -481,19 +481,6 @@ void CMenuPcs::createWorld()
 
 /*
  * --INFO--
- * PAL Address: 0x80102e9c
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMenuPcs::EffectInfo::EffectInfo()
-{
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

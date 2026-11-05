@@ -994,7 +994,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
 #endif
         font->Draw(label);
 
-        font->renderFlags.fixedWidth = 1;
+        font->SetFixed(1);
 #ifdef VERSION_GCCP01
         if (languageId == 2) {
             font->SetMargin(-5.0f);
@@ -1025,12 +1025,12 @@ void CMenuPcs::DrawSingleStat(float alpha)
         font->SetPosX(statPosX0 - valueW);
         font->Draw(valueText);
 
-        font->renderFlags.fixedWidth = 0;
+        font->SetFixed(0);
         font->SetMargin(1.0f);
         y += statYStep;
     }
 
-    font->renderFlags.fixedWidth = 0;
+    font->SetFixed(0);
     font->SetMargin(1.0f);
     DrawInit();
 }

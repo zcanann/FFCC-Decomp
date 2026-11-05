@@ -381,7 +381,16 @@ public:
         int m_slotNo;
         CGObject m_object;
 
-        EffectInfo();
+        /*
+         * --INFO--
+         * PAL Address: 0x80102e9c
+         * PAL Size: 56b
+         * EN Address: TODO
+         * EN Size: TODO
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        EffectInfo() {}
     };
     struct EffectEntry
     {

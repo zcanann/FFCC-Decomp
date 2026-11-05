@@ -1669,7 +1669,6 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  */
 void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
 {
-	int counterType;
 	int damageAmount;
 	CGCharaObj* sourceChara = static_cast<CGCharaObj*>(sourceObj);
 	int staType;
@@ -1860,7 +1859,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (sourceObj->IsKindOf(0x6D) != 0 && itemEffect == 0x1F8) {
 					hasBonus = 1;
 				}
-				unsigned int bonus = hasBonus ? static_cast<int>(static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[5])) : 0;
+				int bonus = hasBonus ? static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[5]) : 0;
 				damageAmount = clampedDamage + bonus;
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x42));
@@ -1896,9 +1895,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 
 				int clampedDamage = 1;
+				unsigned int defense;
 				unsigned int sourcePower = powerSource->m_scriptHandle->m_magic;
 				float multiplier = CharaObjGetStatusMultiplier(0x2E);
-				unsigned int defense = m_scriptHandle->m_defense;
+				defense = m_scriptHandle->m_defense;
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(static_cast<int>(basePower + sourcePower))) - defense;
 				if (rawDamage >= 1) {
 					clampedDamage = rawDamage;
@@ -1924,8 +1924,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					}
 				}
 				System.Printf("PC->MON GRAダメージ %d\n", damageAmount);
-				int nextSta = calcSta(10, itemId, sourceObj);
-				setSta(10, nextSta);
+				setSta(10, calcSta(10, itemId, sourceObj));
 				break;
 			}
 			default:
@@ -2004,8 +2003,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					SCharaItemRow* srcPowerRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 					rawSourcePower = srcPowerRows[itemId].m_sourcePower;
 				}
-				unsigned int sourcePower = rawSourcePower;
 				unsigned int defense = m_scriptHandle->m_defense;
+				unsigned int sourcePower = rawSourcePower;
 				float defenseRate;
 				if (sourceObj->IsKindOf(0xAD) != 0) {
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
@@ -2118,24 +2117,25 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D &&
 		    m_scriptHandle->m_hp != 0) {
+			int counterType;
 			int counterItem;
 			int counterSe;
 			int counterState = sourceChara->m_comboItemState;
 			if (counterState >= 0) {
 				switch (counterState) {
 				case 0:
-					counterItem = 0x207;
 					counterType = 1;
+					counterItem = 0x207;
 					counterSe = 0x7E1;
 					break;
 				case 1:
-					counterItem = 0x20B;
 					counterType = 0;
+					counterItem = 0x20B;
 					counterSe = 0x7E2;
 					break;
 				case 2:
-					counterItem = 0x20F;
 					counterType = 4;
+					counterItem = 0x20F;
 					counterSe = 0x7E3;
 					break;
 				}

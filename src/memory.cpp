@@ -2068,16 +2068,6 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
  * Address:	TODO
  * Size:	TODO
  */
-inline void CAmemCache::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 inline void CMemory::CStage::GetTail()
 {
 	// TODO

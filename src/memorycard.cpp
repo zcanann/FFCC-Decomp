@@ -239,19 +239,21 @@ static inline u32 LoadSwapped(u32* p)
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline int FindCardFile(char* filename, CARDStat* stat)
+static inline int name2idx(char* filename)
 {
-    int fileNo = 0;
-    while (fileNo < 0x7F)
+    CARDStat stat;
+    int fileNo;
+    s32 result;
+    for (fileNo = 0; fileNo < 0x7F; fileNo++)
     {
-        if (CARDGetStatus(1, fileNo, stat) >= 0)
+        result = CARDGetStatus(1, fileNo, &stat);
+        if (result >= 0)
         {
-            if (strcmp(filename, reinterpret_cast<char*>(stat)) == 0)
+            if (strcmp(filename, stat.fileName) == 0)
             {
                 return fileNo;
             }
         }
-        fileNo++;
     }
     return -1;
 }
@@ -335,7 +337,6 @@ void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, i
     int result;
     unsigned long sectorSize;
     CARDFileInfo fileInfo;
-    CARDStat stat;
 
     result = CARDMount(1, m_mountWorkArea, 0);
     if (((result != 0) && (result != -6)) || (result = CARDCheckAsync(1, 0), result >= 0))
@@ -370,7 +371,7 @@ checkResult:
                     goto readFile;
                 }
 
-                result = FindCardFile(filename, &stat);
+                result = name2idx(filename);
 
                 if ((result >= 0) && (CARDFastOpen(1, result, &fileInfo) >= 0))
                 {

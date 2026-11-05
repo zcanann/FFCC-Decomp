@@ -4504,7 +4504,11 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0: {
 		m_wmPrevArea = m_wmArea;
 		m_wmArea = static_cast<unsigned char>(value);
+#ifdef VERSION_GCCJGC
+		m_wmChgFlags = m_wmChgFlags | WMDATA_CHG_AREA;
+#else
 		m_wmChgFlags |= WMDATA_CHG_AREA;
+#endif
 		break;
 	}
 	case 1:
@@ -4531,7 +4535,11 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 8: {
 		m_wmPrevYear = m_wmYear;
 		m_wmYear = static_cast<unsigned char>(value);
+#ifdef VERSION_GCCJGC
+		m_wmChgFlags = m_wmChgFlags | WMDATA_CHG_YEAR;
+#else
 		m_wmChgFlags |= WMDATA_CHG_YEAR;
+#endif
 		break;
 	}
 	case 9:

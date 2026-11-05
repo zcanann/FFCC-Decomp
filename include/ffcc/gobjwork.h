@@ -129,109 +129,15 @@ public:
     class CLetterWork
     {
     public:
-        struct Halfwords {
-            unsigned short m_header;
-            unsigned short m_attachment;
-            unsigned short m_tempVars[4];
-        };
-        struct Words {
-            unsigned int m_word0;
-            unsigned int m_word1;
-            unsigned int m_word2;
-        };
-        struct WordPair {
-            unsigned int m_word1;
-            unsigned int m_word2;
-        };
-        struct SplitWords {
-            unsigned int m_word0;
-            WordPair m_pair;
-        };
-        struct FlagBits {
-            unsigned char m_opened : 1;
-            unsigned char m_attachmentClaimed : 1;
-            unsigned char m_replySent : 1;
-            unsigned char m_hasReply : 1;
-            unsigned char m_attachmentIsGil : 1;
-            unsigned char m_rest : 3;
-        };
-        struct HeaderBits {
-            unsigned short m_opened : 1;
-            unsigned short m_attachmentClaimed : 1;
-            unsigned short m_replySent : 1;
-            unsigned short m_hasReply : 1;
-            unsigned short m_attachmentIsGil : 1;
-            unsigned short m_messageType : 9;
-            unsigned short m_pad : 2;
-        };
-        struct AttachmentBits {
-            unsigned short m_pad : 7;
-            unsigned short m_value : 9;
-        };
-        struct LetterBits {
-            unsigned int m_opened : 1;
-            unsigned int m_attachmentClaimed : 1;
-            unsigned int m_replySent : 1;
-            unsigned int m_hasReply : 1;
-            unsigned int m_attachmentIsGil : 1;
-            unsigned int m_messageType : 9;
-            unsigned int m_senderId : 9;
-            unsigned int m_attachValue : 9;
-        };
-        struct WordBits {
-            unsigned int m_pad : 14;
-            unsigned int m_senderId : 9;
-            unsigned int m_attachValue : 9;
-        };
-
-        unsigned int Word0() const { return m_words.m_word0; }
-        void SetWord0(unsigned int word)
-        {
-            m_words.m_word0 = word;
-        }
-        unsigned int Word1() const { return m_words.m_word1; }
-        void SetWord1(unsigned int word) { m_words.m_word1 = word; }
-        unsigned int Word2() const { return m_words.m_word2; }
-        void SetWord2(unsigned int word) { m_words.m_word2 = word; }
-        unsigned char Flags() const { return reinterpret_cast<const unsigned char*>(&m_half.m_header)[0]; }
-        const FlagBits& FlagsBits() const { return *reinterpret_cast<const FlagBits*>(&m_half.m_header); }
-        FlagBits& FlagsBits() { return *reinterpret_cast<FlagBits*>(&m_half.m_header); }
-        void SetFlags(unsigned char flags)
-        {
-            reinterpret_cast<unsigned char*>(&m_half.m_header)[0] = flags;
-        }
-        bool IsOpened() const { return FlagsBits().m_opened != 0; }
-        void SetOpened()
-        {
-            FlagsBits().m_opened = 1;
-        }
-        bool IsAttachmentClaimed() const { return FlagsBits().m_attachmentClaimed != 0; }
-        void SetAttachmentClaimed() { FlagsBits().m_attachmentClaimed = 1; }
-        bool IsReplySent() const { return FlagsBits().m_replySent != 0; }
-        void SetReplySent()
-        {
-            FlagsBits().m_replySent = 1;
-        }
-        bool HasReply() const { return FlagsBits().m_hasReply != 0; }
-        bool AttachmentIsGil() const { return FlagsBits().m_attachmentIsGil != 0; }
-        unsigned short HeaderWord() const { return m_half.m_header; }
-        HeaderBits& HeaderBitsRef() { return *reinterpret_cast<HeaderBits*>(&m_half.m_header); }
-        void SetMessageType(unsigned short type) { HeaderBitsRef().m_messageType = type; }
-        unsigned short MessageType() const { return (HeaderWord() >> 2) & 0x1FF; }
-        unsigned int SenderId() const { return (Word0() >> 9) & 0x1FF; }
-        unsigned short AttachmentWord() const { return m_half.m_attachment; }
-        unsigned int AttachmentValue() const { return AttachmentWord() & 0x1FF; }
-        AttachmentBits& AttachmentBitsRef() { return *reinterpret_cast<AttachmentBits*>(&m_half.m_attachment); }
-        WordBits& WordBitsRef() { return *reinterpret_cast<WordBits*>(&m_words.m_word0); }
-        void SetAttachmentValue(unsigned short value) { AttachmentBitsRef().m_value = value; }
-        unsigned short TempVar(int index) const { return m_half.m_tempVars[index]; }
-
-        union {
-            Halfwords m_half;
-            Words m_words;
-            SplitWords m_split;
-            LetterBits m_bits;
-        };
+        unsigned int m_opened : 1;
+        unsigned int m_attachmentClaimed : 1;
+        unsigned int m_replySent : 1;
+        unsigned int m_hasReply : 1;
+        unsigned int m_attachmentIsGil : 1;
+        unsigned int m_messageType : 9;
+        unsigned int m_senderId : 9;
+        unsigned int m_attachValue : 9;
+        unsigned short m_tempVars[4];
     };
 
     CCaravanWork();

@@ -131,9 +131,9 @@ public:
 	class CVal
 	{
 	public:
-		u8 m_type;
-		u8 m_flags;
-		u16 m_value;
+		s8 m_type;
+		s8 m_flags;
+		s16 m_value;
 	};
 	
 	CFlatRuntime();

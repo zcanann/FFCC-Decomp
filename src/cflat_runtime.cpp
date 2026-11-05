@@ -916,36 +916,23 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
  */
 inline void CFlatRuntime::callCleanup(CFlatRuntime::CObject* object)
 {
-	CStack returnTemp;
-	CStack codePosTemp;
 	CStack returnValue;
-	CStack packedFlags;
-	CStack previousActive;
 	CStack previousCodePos;
-	CStack previousLocalBase;
 
-	object->m_sp--;
-	returnValue.m_word = *object->m_sp;
-	returnTemp.m_int = returnValue.m_int;
-	object->m_sp--;
-	packedFlags.m_word = *object->m_sp;
-	object->m_sp--;
-	previousActive.m_word = *object->m_sp;
-	object->m_sp--;
-	previousCodePos.m_word = *object->m_sp;
-	codePosTemp.m_int = previousCodePos.m_int;
-	object->m_sp--;
-	previousLocalBase.m_word = *object->m_sp;
+	returnValue = pop(object);
+	int packedFlags = pop(object).m_int;
+	int previousCallFlag = pop(object).m_int;
+	previousCodePos = pop(object);
+	unsigned int* previousLocalBase = reinterpret_cast<unsigned int*>(pop(object).m_word);
 
 	object->m_sp = object->m_localBase;
-	*object->m_sp = returnTemp.m_word;
-	object->m_sp++;
-	object->m_localBase = reinterpret_cast<unsigned int*>(previousLocalBase.m_int);
-	object->m_codePos = codePosTemp.m_word;
-	object->m_flagBits.m_callFlag = static_cast<s8>(previousActive.m_int);
-	object->m_waitCounter = packedFlags.m_int >> 16;
-	object->m_requestPending = (packedFlags.m_word >> 15) & 1;
-	object->m_argCount = static_cast<s16>(packedFlags.m_word);
+	push(object, &returnValue, 0);
+	object->m_localBase = previousLocalBase;
+	object->m_codeIndex = previousCodePos.m_codeIndex;
+	object->m_flagBits.m_callFlag = static_cast<s8>(previousCallFlag);
+	object->m_waitCounter = packedFlags >> 16;
+	object->m_requestPending = (packedFlags >> 15) & 1;
+	object->m_argCount = static_cast<s16>(packedFlags);
 }
 
 /*
@@ -1013,18 +1000,23 @@ void CFlatRuntime::push(CFlatRuntime::CObject* object, int value)
  */
 inline void CFlatRuntime::push(CFlatRuntime::CObject* object, CFlatRuntime::CStack* value, int)
 {
-	*reinterpret_cast<CStack*>(object->m_sp) = *value;
+	*object->m_sp = value->m_int;
 	object->m_sp++;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::pushAddress(CFlatRuntime::CObject*, CFlatRuntime::CStack*)
+void CFlatRuntime::pushAddress(CFlatRuntime::CObject* object, CFlatRuntime::CStack* value)
 {
-	// TODO
+	*object->m_sp = reinterpret_cast<u32>(value);
+	object->m_sp++;
 }
 
 /*
@@ -1462,7 +1454,9 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			CFunc* func = m_funcs + (arg & 0xFFFF);
 
 			if ((static_cast<int>(arg) >> 16) >= 0) {
-				const int funcIndex = m_classes[object->m_classIndex].m_functionTable[func->m_systemIndex];
+				CClass* cls = m_classes;
+				cls += object->m_classIndex;
+				const int funcIndex = cls->m_functionTable[func->m_systemIndex];
 				if (funcIndex < 0) {
 					continue;
 				}
@@ -1499,7 +1493,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			continue;
 		case 0x0B: {
 			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
-			CClass* cls = &m_classes[newObject->m_activeClassIndex];
+			CClass* cls = m_classes;
+			cls += newObject->m_activeClassIndex;
 			CFunc* func = m_funcs + cls->m_functionTable[0];
 
 			for (int i = 0; i < func->m_argCount; i++) {

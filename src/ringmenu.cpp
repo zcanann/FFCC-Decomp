@@ -397,13 +397,15 @@ void CRingMenu::onDraw()
 	sin(static_cast<double>((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f));
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	float cycle = static_cast<float>(fmod(static_cast<double>(0.05f * static_cast<float>(m_commonFrameCounter)),
-	                                      2.0));
-	float cycleAngle = 3.1415927410125732f;
-	if (cycle > 1.0f) {
-		cycle = 2.0f - cycle;
+	float cycleRaw = 0.05f * static_cast<float>(m_commonFrameCounter);
+	cycleRaw = static_cast<float>(fmod(static_cast<double>(cycleRaw), 2.0));
+	float cycle;
+	if (cycleRaw > 1.0f) {
+		cycle = 2.0f - cycleRaw;
+	} else {
+		cycle = cycleRaw;
 	}
-	cycleAngle = cycleAngle * cycle;
+	float cycleAngle = 3.1415927410125732f * cycle;
 	sin(static_cast<double>(cycleAngle));
 	sin(static_cast<double>(-1.5707963705062866f + cycleAngle));
 

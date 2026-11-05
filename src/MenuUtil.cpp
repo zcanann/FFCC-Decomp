@@ -907,8 +907,8 @@ void CMenuPcs::SetManaWaterEffect()
  */
 void CMenuPcs::GetOptionData()
 {
-	m_gameInitMode = Game.GetMark() == 0;
-	m_stereoMode = !Sound.IsStereo();
+	m_gameInitMode = (Game.GetMark() == 0) ? 1 : 0;
+	m_stereoMode = (Sound.IsStereo() == 0) ? 1 : 0;
 	m_bgmVolume = Sound.GetBgmMasterVolume() / 10;
 	m_seVolume = Sound.GetSeMasterVolume() / 10;
 

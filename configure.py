@@ -518,7 +518,7 @@ config.libs = [
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
-            Object(NonMatching, "astar.cpp", extra_cflags=["-str reuse,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "astar.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "baseobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "bonus_menu.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_data.cpp", extra_cflags=["-str reuse,readonly"]),

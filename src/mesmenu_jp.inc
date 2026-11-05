@@ -83,12 +83,12 @@ void CMesMenu::onDraw()
         stateBlend = 0.0f;
     }
 
-    float height;
-    float drawX;
-    float drawY;
-    float width;
-
+    float alphaF;
     if (m_menuIndex < 4) {
+        float width;
+        float height;
+        float drawX;
+        float drawY;
         CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
         if (scriptFood == 0) {
             return;
@@ -158,7 +158,7 @@ void CMesMenu::onDraw()
             drawY += edgeY;
 
             float stateAlpha = 255.0f * stateBlend;
-            float alphaF = stateAlpha * stageBlend;
+            alphaF = stateAlpha * stageBlend;
             MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
             MenuPcs.DrawWindow(drawX, drawY, width, height, static_cast<CMenuPcs::TEX>(2), 32.0f);
 
@@ -258,14 +258,14 @@ void CMesMenu::onDraw()
             (float)foodU, (float)foodV, 1.0f, 1.0f,
             0.0f);
     } else {
-        width = m_windowWidth * stateBlend;
-        height = m_windowHeight * stateBlend;
-        drawX = (0.5f * m_windowWidth + (m_baseX)) - 0.5f * width;
-        drawY = (0.5f * m_windowHeight + (m_baseY)) - 0.5f * height;
+        float width = m_windowWidth * stateBlend;
+        float height = m_windowHeight * stateBlend;
+        float drawX = (0.5f * m_windowWidth + (m_baseX)) - 0.5f * width;
+        float drawY = (0.5f * m_windowHeight + (m_baseY)) - 0.5f * height;
 
         if ((m_flags & 1) == 0) {
             float stateAlpha = 255.0f * stateBlend;
-            float alphaF = stateAlpha * stageBlend;
+            alphaF = stateAlpha * stageBlend;
             MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
 
             MenuPcs.DrawWindow(drawX, drawY, width, height,
@@ -276,6 +276,7 @@ void CMesMenu::onDraw()
                 if (iconAnchor != 0) {
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
                     MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
+                    int anchorY;
                     int anchorX = (iconAnchor - 1) & 1;
                     float iconEdgeX;
                     if (anchorX != 0) {
@@ -283,10 +284,10 @@ void CMesMenu::onDraw()
                     } else {
                         iconEdgeX = (width - 144.0f) - (-10.0f);
                     }
-                    int anchorY = (iconAnchor - 1) & 2;
-                    float iconX = 0.0f;
-                    iconX = drawX + iconX;
-                    iconX += iconEdgeX;
+                    anchorY = (iconAnchor - 1) & 2;
+                    float wobble = 0.0f;
+                    float wobbleX = drawX + wobble;
+                    float iconX = wobbleX + iconEdgeX;
                     float iconEdgeY;
                     if (anchorY != 0) {
                         iconEdgeY = (-8.0f) + height;
@@ -342,6 +343,7 @@ void CMesMenu::onDraw()
             float windowScale = stateBlend * stageBlend;
             float pulseScale = 0.25f * (1.0f - windowScale) + 1.0f;
             float timeRaw = fmod(0.05f * (float)m_stateTimer, 2.0);
+            float angle;
             float time;
             if (timeRaw > 1.0f) {
                 time = 2.0f - timeRaw;
@@ -349,7 +351,7 @@ void CMesMenu::onDraw()
                 time = timeRaw;
             }
 
-            float angle = 3.1415927f * time;
+            angle = 3.1415927f * time;
             float sinY = sinf(angle);
             float sinX = sinf((-1.5707964f) + angle);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuGbaTexture));

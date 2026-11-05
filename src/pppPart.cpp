@@ -54,11 +54,6 @@ STATIC_ASSERT(offsetof(_pppProgSetDef, m_startFrame) == 0x10);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_stages) == 0x28);
 
 
-static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
-{
-	return pppMngSt->m_owner->m_charaModelHandle->m_model;
-}
-
 _pppMngSt* ppvMng;
 _pppEnvSt* ppvEnv;
 extern "C" {
@@ -904,6 +899,89 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 108b
+ * EN Address: 0x80066190
+ * EN Size: 108b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float CGObject::GetModelAlpha()
+{
+	u8 hasModel = 0;
+	if (m_charaModelHandle != 0 && m_charaModelHandle->m_model != 0) {
+		hasModel = 1;
+	}
+	float alpha;
+	if (hasModel != 0) {
+		alpha = m_charaModelHandle->m_model->m_lightAlpha;
+	} else {
+		alpha = m_currentAlpha;
+	}
+	return alpha;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x800661FC
+ * EN Size: 64b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CGObject::IsDisp()
+{
+	return (m_displayFlags & 1) != 0 && (m_displayFlags & 0x400000) == 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006623C
+ * EN Size: 16b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CGObject::IsFirstDraw()
+{
+	return m_weaponNodeFlagBits.m_unk40;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 296b
+ * EN Address: 0x80063494
+ * EN Size: 260b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppSetBindChrSync(_pppMngSt* pppMngSt)
+{
+	if (pppMngSt->m_ownerFacing == 0) {
+		pppMngSt->m_ownerFacing = pppMngSt->m_owner->IsFirstDraw();
+	}
+
+	if (pppMngSt->m_ownerFlagsInitialized == 0) {
+		pppMngSt->m_slotVisible = pppMngSt->m_owner->IsDisp();
+	}
+
+	if (pppMngSt->m_nodeScaleInitialized == 0) {
+		pppMngSt->m_ownerScale = pppMngSt->m_owner->GetModelAlpha();
+		if (0.0 == pppMngSt->m_ownerScale) {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		} else if (1.0 == pppMngSt->m_ownerScale) {
+			pppMngSt->m_useOwnerScaleSign = 0;
+		} else {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		}
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 80055b80
  * PAL Size: 2172b
  * EN Address: TODO
@@ -1024,44 +1102,9 @@ MatrixMode3:
 		goto LocalOnly;
 	}
 
-	if (pppMngSt->m_ownerFacing == 0) {
-		u8 ownerWeaponFlagsHi = pppMngSt->m_owner->m_weaponNodeFlagBytes.m_flags0;
-		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
-	}
+	pppSetBindChrSync(pppMngSt);
 
-	if (pppMngSt->m_ownerFlagsInitialized == 0) {
-		u8 visible = 0;
-		u32 flags = pppMngSt->m_owner->m_displayFlags;
-		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-	}
-
-	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
-		u8 hasModelScale = 0;
-		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
-			hasModelScale = 1;
-		}
-		float ownerScale;
-		if (hasModelScale != 0) {
-			ownerScale = ownerHandle->m_model->m_lightAlpha;
-		} else {
-			ownerScale = pppMngSt->m_owner->m_currentAlpha;
-		}
-		pppMngSt->m_ownerScale = ownerScale;
-		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-	}
-
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	goto ApplyRotatedMatrix;
 
@@ -1080,44 +1123,9 @@ MatrixMode5:
 		goto LocalOnly;
 	}
 
-	if (pppMngSt->m_ownerFacing == 0) {
-		u8 ownerWeaponFlagsHi = pppMngSt->m_owner->m_weaponNodeFlagBytes.m_flags0;
-		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
-	}
+	pppSetBindChrSync(pppMngSt);
 
-	if (pppMngSt->m_ownerFlagsInitialized == 0) {
-		u8 visible = 0;
-		u32 flags = pppMngSt->m_owner->m_displayFlags;
-		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-	}
-
-	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
-		u8 hasModelScale = 0;
-		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
-			hasModelScale = 1;
-		}
-		float ownerScale;
-		if (hasModelScale != 0) {
-			ownerScale = ownerHandle->m_model->m_lightAlpha;
-		} else {
-			ownerScale = pppMngSt->m_owner->m_currentAlpha;
-		}
-		pppMngSt->m_ownerScale = ownerScale;
-		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-	}
-
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	goto ApplyTranslatedMatrix;
 
@@ -1126,44 +1134,9 @@ MatrixMode6:
 		goto LocalOnly;
 	}
 
-	if (pppMngSt->m_ownerFacing == 0) {
-		u8 ownerWeaponFlagsHi = pppMngSt->m_owner->m_weaponNodeFlagBytes.m_flags0;
-		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
-	}
+	pppSetBindChrSync(pppMngSt);
 
-	if (pppMngSt->m_ownerFlagsInitialized == 0) {
-		u8 visible = 0;
-		u32 flags = pppMngSt->m_owner->m_displayFlags;
-		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-	}
-
-	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
-		u8 hasModelScale = 0;
-		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
-			hasModelScale = 1;
-		}
-		float ownerScale;
-		if (hasModelScale != 0) {
-			ownerScale = ownerHandle->m_model->m_lightAlpha;
-		} else {
-			ownerScale = pppMngSt->m_owner->m_currentAlpha;
-		}
-		pppMngSt->m_ownerScale = ownerScale;
-		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-	}
-
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
@@ -1175,44 +1148,9 @@ MatrixMode7:
 		goto LocalOnly;
 	}
 
-	if (pppMngSt->m_ownerFacing == 0) {
-		u8 ownerWeaponFlagsHi = pppMngSt->m_owner->m_weaponNodeFlagBytes.m_flags0;
-		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
-	}
+	pppSetBindChrSync(pppMngSt);
 
-	if (pppMngSt->m_ownerFlagsInitialized == 0) {
-		u8 visible = 0;
-		u32 flags = pppMngSt->m_owner->m_displayFlags;
-		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-	}
-
-	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
-		u8 hasModelScale = 0;
-		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
-			hasModelScale = 1;
-		}
-		float ownerScale;
-		if (hasModelScale != 0) {
-			ownerScale = ownerHandle->m_model->m_lightAlpha;
-		} else {
-			ownerScale = pppMngSt->m_owner->m_currentAlpha;
-		}
-		pppMngSt->m_ownerScale = ownerScale;
-		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-	}
-
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSMTXMultVecSR(nodeMtx, &ppvMng->m_position, &tmpPos);
 	ppvMng->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;

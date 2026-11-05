@@ -843,7 +843,7 @@ int CChara::CModel::PickFur(
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 					int vertexIndex = 0;
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
-						for (; count--; vertexIndex++, indices += 4) {
+						while (count--) {
 							register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
 							register const S16Vec2d* uvPtr = mesh->m_data->m_uvs;
 							register int uvOff = indices[3] * sizeof(*uvPtr);
@@ -967,13 +967,16 @@ int CChara::CModel::PickFur(
 											outWorldPos->y = hitViewPos.y;
 											outWorldPos->z = hitViewPos.z;
 										}
-										if (material->IsFurEnabled()) {
-											hitPaintable = paintableMaterial;
-											nearestDepth = depth;
+										if (!material->IsFurEnabled()) {
+											continue;
 										}
+										hitPaintable = paintableMaterial;
+										nearestDepth = depth;
 									}
 								}
 							}
+							vertexIndex++;
+							indices += 4;
 						}
 						cursor = reinterpret_cast<const unsigned char*>(indices);
 					} else if (primitive == 0) {

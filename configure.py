@@ -531,7 +531,7 @@ config.libs = [
             Object(NonMatching, "cflat_runtime.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_runtime2.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(
-                NonMatching,
+                MatchingFor("GCCP01"),
                 "chara_anim.cpp",
                 extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"],
             ),

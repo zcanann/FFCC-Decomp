@@ -1082,7 +1082,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 
 			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_currentAlpha));
 
-			char* name = Game.m_cFlatDataArr[1].GetTable(2)[m_memoryCapsuleNameIndex];
+			char* name = Game.GetNPCName(m_memoryCapsuleNameIndex);
 			float width = font->GetWidth(name);
 			float depthScale = 1.0f / (m_screenDepth - 10.0f);
 			float posY = 224.0f - 224.0f * m_projection.z * depthScale;

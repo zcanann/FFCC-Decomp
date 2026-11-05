@@ -1161,7 +1161,7 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
     if (count > 1) {
         MakeNumItemName(out, itemIndex, count);
     } else {
-        char** itemTable = m_cFlatDataArr[1].GetTable(0);
+        char** itemTable = m_cFlatDataArr[1].GetTable(0).m_strings;
         unsigned char hasSeparator = 0;
         char* prefix = itemTable[itemIndex * 5];
         char* name = itemTable[itemIndex * 5 + 1];
@@ -1191,7 +1191,7 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
  */
 char* CGame::MakeArtsItemNames(char* out, int itemIndex)
 {
-    GameNameRow* itemTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].GetTable(0));
+    GameNameRow* itemTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].GetTable(0).m_strings);
     unsigned char hasSeparator = 0;
     char* prefix = itemTable[itemIndex].m_artPrefix;
     char* itemName = itemTable[itemIndex].m_artName;
@@ -1238,7 +1238,7 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
     if (count > 1) {
         MakeNumMonName(out, monIndex, count);
     } else {
-        char** monTable = m_cFlatDataArr[1].GetTable(1);
+        char** monTable = m_cFlatDataArr[1].GetTable(1).m_strings;
         unsigned char hasSeparator = 0;
         char* prefix = monTable[monIndex * 5];
         char* name = monTable[monIndex * 5 + 1];
@@ -1268,7 +1268,7 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
  */
 char* CGame::MakeArtsMonNames(char* out, int monIndex)
 {
-    GameNameRow* monTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].GetTable(1));
+    GameNameRow* monTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].GetTable(1).m_strings);
     unsigned char hasSeparator = 0;
     char* prefix = monTable[monIndex].m_artPrefix;
     char* monName = monTable[monIndex].m_artName;

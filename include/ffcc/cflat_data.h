@@ -26,7 +26,7 @@ public:
 	void Create(void*);
 	void Destroy();
     void* GetData(int index) { return m_data[index].m_data; }
-    char** GetTable(int index) { return m_tabl[index].m_strings; }
+    TableEntry& GetTable(int index) { return m_tabl[index]; }
     char* GetMes(int index) { return m_mesPtr[index]; }
     int GetNumMes() { return m_numMes; }
 

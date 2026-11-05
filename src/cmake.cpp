@@ -1574,7 +1574,7 @@ int CMenuPcs::CmakeNameCtrl()
                     }
                     if (found == 0) {
                         for (i = 0; i < 0x100; i++) {
-                            if (strcmp(Game.m_cFlatDataArr[1].GetTable(2)[i], s_CmakeInfo.m_name) == 0) {
+                            if (strcmp(Game.GetNPCName(i), s_CmakeInfo.m_name) == 0) {
                                 found = 1;
                                 break;
                             }

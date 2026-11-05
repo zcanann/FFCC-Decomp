@@ -54,7 +54,7 @@ inline int CMes::GET_2(char** text)
 	return acc;
 }
 
-inline void CGame::UPPERItemName(char* name)
+inline char* CGame::UPPERItemName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -63,9 +63,10 @@ inline void CGame::UPPERItemName(char* name)
 		toupper_name_conflict(name);
 #endif
 	}
+	return name;
 }
 
-inline void CGame::LowerItemName(char* name)
+inline char* CGame::LowerItemName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -74,9 +75,10 @@ inline void CGame::LowerItemName(char* name)
 		tolower_name_conflict(name);
 #endif
 	}
+	return name;
 }
 
-inline void CGame::UPPERMonName(char* name)
+inline char* CGame::UPPERMonName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -85,9 +87,10 @@ inline void CGame::UPPERMonName(char* name)
 		toupper_name_conflict(name);
 #endif
 	}
+	return name;
 }
 
-inline void CGame::UpperMonName(char* name)
+inline char* CGame::UpperMonName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -96,9 +99,10 @@ inline void CGame::UpperMonName(char* name)
 		name[0] = toupperLatin1(name[0]);
 #endif
 	}
+	return name;
 }
 
-inline void CGame::LowerMonName(char* name)
+inline char* CGame::LowerMonName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -107,6 +111,7 @@ inline void CGame::LowerMonName(char* name)
 		tolower_name_conflict(name);
 #endif
 	}
+	return name;
 }
 
 #define ApplyCaseMode(kind, text, caseMode) \
@@ -319,7 +324,7 @@ void CMes::MakeAgbString(char* out, char* src)
             {
                 char varIndex = (char)(((unsigned char)src[3] & 0x0F) << 4);
                 varIndex |= (unsigned char)src[4] & 0x0F;
-                strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3) + 0x3C)[m_tempVar[varIndex]]);
+                strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3).m_strings + 0x3C)[m_tempVar[varIndex]]);
                 out += strlen(out);
                 src += 4;
                 break;
@@ -538,7 +543,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		{
 			signed char varIndex = (char)(((unsigned char)op[2] & 0x0F) << 4);
 			varIndex |= (unsigned char)op[3] & 0x0F;
-			strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3) + 0x3C)[CMes::m_tempVar[varIndex]]);
+			strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3).m_strings + 0x3C)[CMes::m_tempVar[varIndex]]);
 			out += strlen(out);
 			src += 4;
 			break;

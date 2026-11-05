@@ -980,7 +980,11 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
                     (0.0f != particle->m_history[nextIndex].y) ||
                     (0.0f != particle->m_history[nextIndex].z)) {
                     workRand = (workRand * 0x80d + 7) & 0xFFFF;
-                    shape = pppShapeFrame(shapeAnim, ((particleShapeFrame + workRand) / shapeFrameStep) % shapeFrameCount);
+                    {
+                        u32 shapeIdx = (particleShapeFrame + workRand) / shapeFrameStep;
+                        shapeIdx %= shapeFrameCount;
+                        shape = pppShapeFrame(shapeAnim, shapeIdx);
+                    }
 
                     pppUnitMatrix(drawMtx);
                     drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;

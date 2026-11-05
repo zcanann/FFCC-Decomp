@@ -277,8 +277,8 @@ void CMes::MakeAgbString(char* out, char* src)
                 break;
             case 8:
             {
-                char varIndex = (char)(((unsigned char)src[3] & 0x0F) << 4);
-                varIndex |= (unsigned char)src[4] & 0x0F;
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, reinterpret_cast<char*>(Game.m_caravanWorkArr[m_tempVar[varIndex]].m_name));
                 out += strlen(out);
                 src += 4;
@@ -286,8 +286,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 9:
             {
-                char varIndex = (char)(((unsigned char)src[3] & 0x0F) << 4);
-                varIndex |= (unsigned char)src[4] & 0x0F;
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetItemName(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 4;
@@ -295,8 +295,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2A:
             {
-                char varIndex = (char)(((unsigned char)src[3] & 0x0F) << 4);
-                varIndex |= (unsigned char)src[4] & 0x0F;
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetMonName(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 4;
@@ -304,8 +304,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2B:
             {
-                char varIndex = (char)(((unsigned char)src[3] & 0x0F) << 4);
-                varIndex |= (unsigned char)src[4] & 0x0F;
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetNPCName(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 4;
@@ -313,8 +313,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2C:
             {
-                char varIndex = (char)(((unsigned char)src[3] & 0x0F) << 4);
-                varIndex |= (unsigned char)src[4] & 0x0F;
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetPlaceName(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 4;
@@ -322,8 +322,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2D:
             {
-                char varIndex = (char)(((unsigned char)src[3] & 0x0F) << 4);
-                varIndex |= (unsigned char)src[4] & 0x0F;
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3).m_strings + 0x3C)[m_tempVar[varIndex]]);
                 out += strlen(out);
                 src += 4;
@@ -331,8 +331,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2E:
             {
-                char varIndex = (char)(((unsigned char)src[1] & 0x0F) << 4);
-                varIndex |= (unsigned char)src[2] & 0x0F;
+                char* p = src + 1;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetLetterSubject(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 2;
@@ -344,8 +344,8 @@ void CMes::MakeAgbString(char* out, char* src)
                 break;
             case 0x30:
             {
-                char varIndex = (char)(((unsigned char)src[1] & 0x0F) << 4);
-                varIndex |= (unsigned char)src[2] & 0x0F;
+                char* p = src + 1;
+                int varIndex = GET_1(&p);
                 sprintf(out, "%d", m_tempVar[varIndex]);
                 out += strlen(out);
                 src += 2;
@@ -388,7 +388,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	{
 		if ((unsigned char)c == 0xFF)
 		{
-		unsigned int tag = ((unsigned int)(unsigned char)src[1] - 0xA0U) & 0xFFU;
+		unsigned int tag = (unsigned char)(src[1] - 0xA0);
 		const unsigned char* op = (const unsigned char*)src + 2;
 		src++;
 
@@ -418,8 +418,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		case 8:
 		{
-			signed char varIndex = (char)(((unsigned char)op[2] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[3] & 0x0F;
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			strcpy(out, (char*)Game.m_caravanWorkArr[CMes::m_tempVar[varIndex]].m_name);
 			out += strlen(out);
 			src += 4;
@@ -433,8 +433,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x3D:
 		case 0x3F:
 		{
-			signed char varIndex = (char)(((unsigned char)op[2] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[3] & 0x0F;
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			int value = CMes::m_tempVar[varIndex];
 			switch (tag)
 			{
@@ -450,16 +450,16 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				break;
 			case 0x3D:
 			{
-				signed char countIdx = (char)(((unsigned char)op[4] & 0x0F) << 4);
-				countIdx |= (unsigned char)op[5] & 0x0F;
+				char* q = (char*)op + 4;
+				int countIdx = GET_1(&q);
 				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeArtItemName(out, value, count);
 				break;
 			}
 			case 0x3F:
 			{
-				signed char countIdx = (char)(((unsigned char)op[4] & 0x0F) << 4);
-				countIdx |= (unsigned char)op[5] & 0x0F;
+				char* q = (char*)op + 4;
+				int countIdx = GET_1(&q);
 				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeNumItemName(out, value, count);
 				break;
@@ -481,8 +481,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x3E:
 		case 0x40:
 		{
-			signed char varIndex = (char)(((unsigned char)op[2] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[3] & 0x0F;
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			int value = CMes::m_tempVar[varIndex];
 			switch (tag)
 			{
@@ -498,16 +498,16 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				break;
 			case 0x3E:
 			{
-				signed char countIdx = (char)(((unsigned char)op[4] & 0x0F) << 4);
-				countIdx |= (unsigned char)op[5] & 0x0F;
+				char* q = (char*)op + 4;
+				int countIdx = GET_1(&q);
 				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeArtMonName(out, value, count);
 				break;
 			}
 			case 0x40:
 			{
-				signed char countIdx = (char)(((unsigned char)op[4] & 0x0F) << 4);
-				countIdx |= (unsigned char)op[5] & 0x0F;
+				char* q = (char*)op + 4;
+				int countIdx = GET_1(&q);
 				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeNumMonName(out, value, count);
 				break;
@@ -523,8 +523,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2B:
 		{
-			signed char varIndex = (char)(((unsigned char)op[2] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[3] & 0x0F;
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			strcpy(out, Game.GetNPCName(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
@@ -532,8 +532,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2C:
 		{
-			signed char varIndex = (char)(((unsigned char)op[2] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[3] & 0x0F;
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			strcpy(out, Game.GetPlaceName(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
@@ -541,8 +541,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2D:
 		{
-			signed char varIndex = (char)(((unsigned char)op[2] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[3] & 0x0F;
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3).m_strings + 0x3C)[CMes::m_tempVar[varIndex]]);
 			out += strlen(out);
 			src += 4;
@@ -550,8 +550,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2E:
 		{
-			signed char varIndex = (char)(((unsigned char)op[0] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[1] & 0x0F;
+			char* p = (char*)op;
+			int varIndex = GET_1(&p);
 			strcpy(out, Game.GetLetterSubject(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 2;
@@ -566,8 +566,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x30:
 		{
-			signed char varIndex = (char)(((unsigned char)op[0] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[1] & 0x0F;
+			char* p = (char*)op;
+			int varIndex = GET_1(&p);
 			sprintf(out, "%d", CMes::m_tempVar[varIndex]);
 			out += strlen(out);
 			src += 2;
@@ -575,8 +575,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x41:
 		{
-			signed char modeIndex = (char)(((unsigned char)op[0] & 0x0F) << 4);
-			modeIndex |= (unsigned char)op[1] & 0x0F;
+			char* p = (char*)op;
+			int modeIndex = GET_1(&p);
 			int mode = modeIndex;
 			int newCaseMode;
 			if (mode == 1)
@@ -653,8 +653,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x45:
 		{
 			int newBranchMode = 2;
-			signed char varIndex = (char)(((unsigned char)op[0] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[1] & 0x0F;
+			char* p = (char*)op;
+			int varIndex = GET_1(&p);
 			if (Game.m_caravanWorkArr[CMes::m_tempVar[varIndex]].m_genderFlag == 0)
 			{
 				newBranchMode = 1;

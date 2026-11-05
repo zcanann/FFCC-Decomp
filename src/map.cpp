@@ -1742,11 +1742,12 @@ void CMapMng::Draw()
 
                 int startIndex = 0;
                 do {
+                    GXTevStageID stage;
                     int batchCount = (shadowCount > 8) ? 8 : shadowCount;
 
                     CharaPcs.GetTexShadow(startIndex, batchCount, texObjs, shadowPositions, shadowMatrices);
 
-                    GXTevStageID stage = GX_TEVSTAGE0;
+                    stage = GX_TEVSTAGE0;
                     texMtx = 0x1E;
                     for (int i = 0; i < batchCount; i++) {
                         GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX3x4);

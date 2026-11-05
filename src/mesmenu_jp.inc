@@ -251,8 +251,9 @@ void CMesMenu::onDraw()
         if (foodMaskX != 0) {
             foodOffsetX = 75;
         }
+        float foodX = frameX + shakeX;
         MenuPcs.DrawRect(
-            (foodMaskX != 0) ? 0 : 8, (frameX + shakeX) + (float)foodOffsetX,
+            (foodMaskX != 0) ? 0 : 8, foodX + (float)foodOffsetX,
             (-1.0f) + (frameY + shakeY), 48.0f, 49.0f,
             (float)foodU, (float)foodV, 1.0f, 1.0f,
             0.0f);
@@ -352,8 +353,7 @@ void CMesMenu::onDraw()
             float sinY = sinf(angle);
             float sinX = sinf((-1.5707964f) + angle);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuGbaTexture));
-            float alpha255 = 255.0f * windowScale;
-            MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * alpha255) * stageBlend)).Ref());
+            MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * (255.0f * windowScale)) * stageBlend)).Ref());
             float fadeScale = 1.0f - pulseScale;
             float promptX = (float)(int)(40.0f + drawX);
             float promptY = (float)(int)(32.0f + drawY);
@@ -363,7 +363,7 @@ void CMesMenu::onDraw()
                 3, 8.0f + (promptX + driftX), 8.0f + (promptY - driftY), 80.0f, 48.0f, 0.0f,
                 0.0f, 0.75f * (1.0f + fadeScale), 0.75f * (pulseScale + fadeScale),
                 0.2f * (2.0f * (time - 0.5f)));
-            MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255 * stageBlend)).Ref());
+            MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>((255.0f * windowScale) * stageBlend)).Ref());
             MenuPcs.DrawRect(
                 3, promptX + driftX, promptY - driftY, 80.0f, 48.0f, 0.0f, 0.0f,
                 0.75f * pulseScale, 0.75f * pulseScale, 0.2f * (2.0f * (time - 0.5f)));

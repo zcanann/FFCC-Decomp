@@ -2880,7 +2880,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 				existingCharaType |= 0x80;
 			}
 
-			if (existingCharaType == valueBytes[2]) {
+			if (existingCharaType == static_cast<unsigned char>(valueBytes[2])) {
 				Joybus.SendResult(channel, 1, valueBytes[1], 0);
 				return;
 			}

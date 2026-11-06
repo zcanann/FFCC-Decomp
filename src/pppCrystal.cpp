@@ -233,9 +233,17 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
  */
 void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable* ctrl)
 {
+#ifdef VERSION_GCCJGC
+	u32 yFine;
+	u32 x;
+	u32 xFine;
+	u32 y;
+	u32 yTile;
+#else
 	u32 x;
 	u32 y;
 	u32 yTile;
+#endif
 	CrystalWork* work;
 	HSD_ImageBuffer* textureInfo;
 	u32 textureSize;
@@ -252,7 +260,9 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable
 	CMapMesh* mapMesh;
 	int textureIndex;
 
+#ifndef VERSION_GCCJGC
 	u32 xFine;
+#endif
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
@@ -300,7 +310,11 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable
 
 		for (y = 0; y < (u32)textureInfo->m_height; y++) {
 			yTile = y >> 2;
+#ifdef VERSION_GCCJGC
+			yFine = (y & 3) * 4;
+#else
 			u32 yFine = (y & 3) * 4;
+#endif
 			ySq = yCoord * yCoord;
 			xCoord = -1.0f;
 

@@ -460,8 +460,9 @@ complete:
 int CCharaPcs::correctLoadAnimAmem()
 {
     int i;
-    int animSize;
     unsigned int nextOffset;
+    int animSize;
+    int j;
     unsigned int scanEnd;
     int scanOffset;
     int compactedSize;
@@ -509,8 +510,8 @@ int CCharaPcs::correctLoadAnimAmem()
         nextOffset = 0;
         scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
-        for (i = 0; i < loadAnimCount; i++) {
-            CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
+        for (j = 0; j < loadAnimCount; j++) {
+            CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(j)];
             const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->GetAmemAddress());
             animSize = static_cast<int>(loadAnim->m_anim->GetBankSize());
             if (animOffset < static_cast<unsigned int>(scanOffset)) {

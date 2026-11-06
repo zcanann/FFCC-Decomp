@@ -903,7 +903,37 @@ inline void COctTree::SetOctTreeMapObj(int index)
  */
 void CMapMng::SetBumpLightSource()
 {
-	// TODO
+    for (int i = 0; i < m_mapObjCount; i++) {
+        if (CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(m_mapObjArray[i].m_attribute)) {
+            switch (spotAttr->m_type) {
+            case CMapObjAtr::SPOT_LIGHT: {
+                if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) != 0) {
+                    CLightPcs::CBumpLight light;
+                    light.m_type = 1;
+                    light.m_position.x = m_mapObjArray[i].m_worldMtx[0][3];
+                    light.m_position.y = m_mapObjArray[i].m_worldMtx[1][3];
+                    light.m_position.z = m_mapObjArray[i].m_worldMtx[2][3];
+                    light.m_targetPosition.x = spotAttr->m_target->m_worldMtx[0][3];
+                    light.m_targetPosition.y = spotAttr->m_target->m_worldMtx[1][3];
+                    light.m_targetPosition.z = spotAttr->m_target->m_worldMtx[2][3];
+                    PSVECSubtract(&light.m_targetPosition, &light.m_position, &light.m_direction);
+                    PSVECNormalize(&light.m_direction, &light.m_direction);
+                    *reinterpret_cast<unsigned int*>(light.m_bumpShade) = *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
+                    light.m_offsetX = spotAttr->m_intensity;
+                    light.m_offsetZ = spotAttr->m_falloff;
+                    light.m_specularScale = spotAttr->m_angle;
+                    light.m_targetColor[1] = spotAttr->m_color;
+                    spotAttr->m_light = LightPcs.AddBump(&light, static_cast<CLightPcs::TARGET>(1), m_stage, 1);
+                    for (int j = 0; j < m_mapObjCount; j++) {
+                        if (m_mapObjArray[j].m_bumpObjId == i) {
+                            m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
+                        }
+                    }
+                }
+            }
+            }
+        }
+    }
 }
 
 /*
@@ -1289,62 +1319,7 @@ int CMapMng::ReadOtm(char* mapName)
     PSMTXIdentity(identity);
     m_rootMapObj->CalcMtx(identity, 1);
 
-    for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObjAtr* attr = m_mapObjArray[i].m_attribute;
-        if (attr == 0) {
-            continue;
-        }
-        switch (attr->m_type) {
-        case CMapObjAtr::SPOT_LIGHT: {
-            CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-            if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) == 0) {
-                break;
-            }
-
-            CLightPcs::CBumpLight light;
-            light.m_type = 1;
-            light.m_position.x = m_mapObjArray[i].m_worldMtx[0][3];
-            light.m_position.y = m_mapObjArray[i].m_worldMtx[1][3];
-            light.m_position.z = m_mapObjArray[i].m_worldMtx[2][3];
-
-            CMapObj* targetObj = spotAttr->m_target;
-            light.m_targetPosition.x = targetObj->m_worldMtx[0][3];
-            light.m_targetPosition.y = targetObj->m_worldMtx[1][3];
-            light.m_targetPosition.z = targetObj->m_worldMtx[2][3];
-            PSVECSubtract(
-                reinterpret_cast<Vec*>(&light.m_targetPosition),
-                reinterpret_cast<Vec*>(&light.m_position),
-                reinterpret_cast<Vec*>(&light.m_direction));
-            PSVECNormalize(
-                reinterpret_cast<Vec*>(&light.m_direction),
-                reinterpret_cast<Vec*>(&light.m_direction));
-
-            *reinterpret_cast<unsigned int*>(&light.m_bumpShade) =
-                *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
-            light.m_offsetX = spotAttr->m_intensity;
-            light.m_offsetZ = spotAttr->m_falloff;
-            light.m_specularScale = spotAttr->m_angle;
-            light.m_targetColor[1].r = spotAttr->m_color.r;
-            light.m_targetColor[1].g = spotAttr->m_color.g;
-            light.m_targetColor[1].b = spotAttr->m_color.b;
-            light.m_targetColor[1].a = spotAttr->m_color.a;
-
-            CLightPcs::CBumpLight* bump = LightPcs.AddBump(
-                &light,
-                static_cast<CLightPcs::TARGET>(1),
-                m_stage,
-                1);
-            spotAttr->m_light = bump;
-
-            for (int j = 0; j < m_mapObjCount; j++) {
-                if (m_mapObjArray[j].m_bumpObjId == i) {
-                    m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
-                }
-            }
-            break;
-        }
-        }
-    }
+    SetBumpLightSource();
     return 1;
 }
 

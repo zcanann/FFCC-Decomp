@@ -132,6 +132,13 @@ inline char* CGame::LowerMonName(char* name)
 		caseMode = 0;                        \
 	}
 
+enum MesFlowMode
+{
+	MES_FLOW_NONE,
+	MES_FLOW_ON,
+	MES_FLOW_OFF
+};
+
 static inline CColor& MesColorRef(const CColor& color)
 {
 	return (CColor&)color;
@@ -379,7 +386,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	static char* ELLIPSIS_STR = "...";
 
 	unsigned char caseMode = 0;
-	unsigned char branchMode = 0;
+	unsigned char branchMode = MES_FLOW_NONE;
 
 	char c;
 	while ((c = *src) != 0)
@@ -595,84 +602,51 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 #ifdef VERSION_GCCE01
 		case 0x44:
 		{
-			int newBranchMode = 2;
-			if (Game.m_caravanWorkArr[CMes::m_tempVar[19]].m_genderFlag == 0)
-			{
-				newBranchMode = 1;
-			}
-			branchMode = newBranchMode;
+			branchMode = (Game.m_caravanWorkArr[CMes::m_tempVar[19]].m_genderFlag == 0) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x42:
 		{
-			int newBranchMode = 2;
-			signed char varIndex = (char)(((unsigned char)op[0] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[1] & 0x0F;
-			if (CMes::m_tempVar[varIndex] == 1)
-			{
-				newBranchMode = 1;
-			}
-			branchMode = newBranchMode;
+			char* p = (char*)op;
+			branchMode = (CMes::m_tempVar[GET_1(&p)] == 1) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x45:
 		{
-			int newBranchMode = 2;
-			if (playerIndex == 0)
-			{
-				newBranchMode = 1;
-			}
-			branchMode = newBranchMode;
+			branchMode = (playerIndex == 0) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 #else
 		case 0x44:
 		{
-			int newBranchMode = 2;
-			if (playerIndex == 0)
-			{
-				newBranchMode = 1;
-			}
-			branchMode = newBranchMode;
+			branchMode = (playerIndex == 0) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x42:
 		{
-			int newBranchMode = 2;
-			signed char varIndex = (char)(((unsigned char)op[0] & 0x0F) << 4);
-			varIndex |= (unsigned char)op[1] & 0x0F;
-			if (CMes::m_tempVar[varIndex] == 1)
-			{
-				newBranchMode = 1;
-			}
-			branchMode = newBranchMode;
+			char* p = (char*)op;
+			branchMode = (CMes::m_tempVar[GET_1(&p)] == 1) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x45:
 		{
-			int newBranchMode = 2;
 			char* p = (char*)op;
-			int varIndex = GET_1(&p);
-			if (Game.m_caravanWorkArr[CMes::m_tempVar[varIndex]].m_genderFlag == 0)
-			{
-				newBranchMode = 1;
-			}
-			branchMode = newBranchMode;
+			branchMode = (Game.m_caravanWorkArr[CMes::m_tempVar[GET_1(&p)]].m_genderFlag == 0) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 #endif
 		case 0x46:
-			if (branchMode == 1)
+			if (branchMode == MES_FLOW_ON)
 			{
-				branchMode = 2;
+				branchMode = MES_FLOW_OFF;
 			}
-			else if (branchMode == 2)
+			else if (branchMode == MES_FLOW_OFF)
 			{
-				branchMode = 1;
+				branchMode = MES_FLOW_ON;
 			}
 			break;
 		case 0x47:
-			branchMode = 0;
+			branchMode = MES_FLOW_NONE;
 			break;
 		case 0x54:
 			strcpy(out, ELLIPSIS_STR);
@@ -718,7 +692,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		}
 		}
-		else if (branchMode != 2)
+		else if (branchMode != MES_FLOW_OFF)
 		{
 			*out = c;
 			out++;
@@ -1093,7 +1067,7 @@ void CMes::addString(char** text, int branchMode)
 
 	int running = 1;
 	unsigned char caseMode = 0;
-	unsigned char flowMode = 0;
+	unsigned char flowMode = MES_FLOW_NONE;
 	char nameItem[32];
 	char nameMon[32];
 	char nameTag2B[32];
@@ -1519,42 +1493,22 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x43:
 		{
-			int newFlowMode = 2;
-			if (Game.m_gameWork.m_menuStageMode != 0)
-			{
-				newFlowMode = 1;
-			}
-			flowMode = newFlowMode;
+			flowMode = (Game.m_gameWork.m_menuStageMode != 0) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x44:
 		{
-			int newFlowMode = 2;
-			if (Game.m_caravanWorkArr[mFlagVars[0x13]].m_genderFlag == 0)
-			{
-				newFlowMode = 1;
-			}
-			flowMode = newFlowMode;
+			flowMode = (Game.m_caravanWorkArr[mFlagVars[0x13]].m_genderFlag == 0) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x42:
 		{
-			int newFlowMode = 2;
-			if (mFlagVars[GET_1(text)] == 1)
-			{
-				newFlowMode = 1;
-			}
-			flowMode = newFlowMode;
+			flowMode = (mFlagVars[GET_1(text)] == 1) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x45:
 		{
-			int newFlowMode = 2;
-			if (Game.m_caravanWorkArr[mFlagVars[GET_1(text)]].m_genderFlag == 0)
-			{
-				newFlowMode = 1;
-			}
-			flowMode = newFlowMode;
+			flowMode = (Game.m_caravanWorkArr[mFlagVars[GET_1(text)]].m_genderFlag == 0) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x20:
@@ -1564,11 +1518,11 @@ void CMes::addString(char** text, int branchMode)
 			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
 			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
 			{
-				flowMode = 1;
+				flowMode = MES_FLOW_ON;
 			}
 			else
 			{
-				flowMode = 2;
+				flowMode = MES_FLOW_OFF;
 			}
 			break;
 		}
@@ -1578,46 +1532,36 @@ void CMes::addString(char** text, int branchMode)
 			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
 			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
 			{
-				flowMode = 1;
+				flowMode = MES_FLOW_ON;
 			}
 			else
 			{
-				flowMode = 2;
+				flowMode = MES_FLOW_OFF;
 			}
 			break;
 		}
 		case 0x46:
-			if (flowMode == 1)
+			if (flowMode == MES_FLOW_ON)
 			{
-				flowMode = 2;
+				flowMode = MES_FLOW_OFF;
 			}
-			else if (flowMode == 2)
+			else if (flowMode == MES_FLOW_OFF)
 			{
-				flowMode = 1;
+				flowMode = MES_FLOW_ON;
 			}
 			break;
 		case 0x1B:
 		{
-			int newFlowMode = 2;
-			if ((mFlagVars[GET_1(text)] & 1) == 0)
-			{
-				newFlowMode = 1;
-			}
-			flowMode = newFlowMode;
+			flowMode = ((mFlagVars[GET_1(text)] & 1) == 0) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x1C:
 		{
-			int newFlowMode = 2;
-			if ((mFlagVars[GET_1(text)] & 1) == 1)
-			{
-				newFlowMode = 1;
-			}
-			flowMode = newFlowMode;
+			flowMode = ((mFlagVars[GET_1(text)] & 1) == 1) ? MES_FLOW_ON : MES_FLOW_OFF;
 			break;
 		}
 		case 0x47:
-			flowMode = 0;
+			flowMode = MES_FLOW_NONE;
 			break;
 		case 0x48:
 		case 0x49:
@@ -1644,7 +1588,7 @@ void CMes::addString(char** text, int branchMode)
 
 	renderChar:
 	renderTag:
-		if (flowMode != 2)
+		if (flowMode != MES_FLOW_OFF)
 		{
 			CMesCharCell* glyph = &m_chars[mCounter];
 			glyph->m_color = mColor;

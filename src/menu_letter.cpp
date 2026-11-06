@@ -1340,6 +1340,7 @@ void CMenuPcs::LetterMessDraw()
 
 	int y;
 	int i = 0;
+	int itemSel;
 #ifdef VERSION_GCCJGC
 	y = 0x60;
 #else
@@ -1409,7 +1410,7 @@ void CMenuPcs::LetterMessDraw()
 
 		if ((mode == 2) || (mode == 5)) {
 			x0 = static_cast<float>(m_menuWindowInfo->x + 0x14);
-			int itemSel = m_letterMenuState->choiceCursor;
+			itemSel = m_letterMenuState->choiceCursor;
 			if (mode == 2) {
 				itemSel += 1;
 			} else {
@@ -1422,7 +1423,7 @@ void CMenuPcs::LetterMessDraw()
 			if (mode == 4) {
 				x0 += 8.0f;
 			}
-			int itemSel = m_letterMenuState->choiceCursor;
+			itemSel = m_letterMenuState->choiceCursor;
 			itemSel *= SingWinMessHeight();
 			y0 = static_cast<float>(m_menuWindowInfo->y + 0x20 + itemSel);
 		}

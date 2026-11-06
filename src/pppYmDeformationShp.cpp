@@ -408,11 +408,11 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 
 	texScaleX = 1.0f / (float)width;
 	texScaleY = 1.0f / (float)height;
-	texOffsetX = screenPos[minXIndex].x;
-	texOffsetX -= (float)left;
+	texOffsetX = screenPos[minXIndex].x - (float)left;
 	texOffsetX = texScaleX * texOffsetX;
 	offsetX = texPos[minXIndex].x - texOffsetX;
-	texOffsetY = texScaleY * (screenPos[minYIndex].y - (float)top);
+	texOffsetY = screenPos[minYIndex].y;
+	texOffsetY = texScaleY * (texOffsetY - (float)top);
 	offsetY = texPos[minYIndex].y - texOffsetY;
 
 	if (originalLeft < 0) {

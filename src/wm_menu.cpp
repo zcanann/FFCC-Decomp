@@ -7103,6 +7103,15 @@ void CMenuPcs::DrawCharaName()
 	CFont* font;
 	float xBase;
 #ifdef VERSION_GCCJGC
+	double xOffsetDefault;
+#endif
+	float alphaF;
+	float y;
+#ifndef VERSION_GCCJGC
+	double xOffsetDefault;
+#endif
+	float fade;
+#ifdef VERSION_GCCJGC
 	static const char* STR_TBL[] = {"\x82\xC8\x82\xB5", "\x83\x4C\x83\x83\x83\x89\x83\x81\x83\x43\x83\x4E\x92\x86"};
 #else
 	static const char* STR_TBL_us[] = {"Empty", "Creating..."};
@@ -7138,7 +7147,6 @@ void CMenuPcs::DrawCharaName()
 	}
 #endif
 
-	float fade;
 	if (m_wmWorldState->m_mainState == 1) {
 		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (m_wmWorldState->m_mainState == 2) {
@@ -7169,7 +7177,7 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	DrawInit();
 
-	const float alphaF = FLOAT_80331458 * fade;
+	alphaF = FLOAT_80331458 * fade;
 	GXColor shade;
 	shade.r = 0xFF;
 	shade.g = 0xFF;
@@ -7178,10 +7186,10 @@ void CMenuPcs::DrawCharaName()
 	GXSetChanMatColor(GX_COLOR0A0, shade);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterNamePlateTexture));
 	float plateW = 64.0f;
-	const double xOffsetDefault =
+	xOffsetDefault =
 	    -(2.0 * static_cast<double>(plateW) - 144.0);
 	for (i = 0; i < 2; i++) {
-		float y = 10.0f + static_cast<float>(i * 0xB8);
+		y = 10.0f + static_cast<float>(i * 0xB8);
 		y += 130.0f;
 		if (i != 0) {
 			y += 8.0f;
@@ -7220,7 +7228,7 @@ void CMenuPcs::DrawCharaName()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
 
 	for (i = 0; i < 2; i++) {
-		float y = 10.0f + static_cast<float>(i * 0xB8);
+		y = 10.0f + static_cast<float>(i * 0xB8);
 		y += 134.0f;
 		if (i != 0) {
 			y += 8.0f;

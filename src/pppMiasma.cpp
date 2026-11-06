@@ -343,10 +343,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     slice = 0;
     maskOffset = sceneTexSize;
     do {
-        yPos = (float)slice * height;
-        yOffset = (int)yPos;
-
-        graphicPtr->GetBackBufferRect2(graphicPtr->m_scratchTextureBuffer, &backSceneTex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,
+        graphicPtr->GetBackBufferRect2(graphicPtr->m_scratchTextureBuffer, &backSceneTex, 0, yOffset = (int)(yPos = (float)slice * height), texWidth, texHeight, 0, GX_LINEAR,
                                        GX_TF_RGBA8, 0);
         GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
 

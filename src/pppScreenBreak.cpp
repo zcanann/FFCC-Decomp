@@ -313,7 +313,6 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
 
     for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
         CChara::CMesh* mesh = &meshBase[i];
-        piece = &pieceBase[i];
         ScreenBreakMeshData* meshData = mesh->m_data;
         CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
         node->SetCalcLocal(0);
@@ -341,6 +340,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
             meshMax.z = meshMax.z < meshData->m_vertices[j].z ? meshData->m_vertices[j].z : meshMax.z;
         }
 
+        piece = &pieceBase[i];
         meshMax.x += meshMin.x;
         meshMax.y += meshMin.y;
         meshMax.z += meshMin.z;

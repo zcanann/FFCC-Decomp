@@ -984,7 +984,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
                     {
                         u32 shapeIdx = (particleShapeFrame + workRand) / shapeFrameStep;
                         shapeIdx %= shapeFrameCount;
-                        shape = pppShapeFrame(shapeAnim, shapeIdx);
+                        shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) +
+                                                                 shapeAnim->m_frames[shapeIdx].m_shapeOffset);
                     }
 
                     pppUnitMatrix(drawMtx);

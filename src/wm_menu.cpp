@@ -9535,11 +9535,11 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	for (i = 0; i < 4; i++) {
 		uvFlag = 0;
 		float x;
-		if ((i & 1) != 0) {
+		if ((i & 1) == 0) {
+			x = x0;
+		} else {
 			uvFlag |= 8;
 			x = x1;
-		} else {
-			x = x0;
 		}
 		float y;
 		if ((i & 2) != 0) {

@@ -1273,8 +1273,8 @@ void CMenuPcs::LetterMessDraw()
 	CCaravanWork* caravanWork;
 	s16 mode;
 	SingleFadeEntry* panel;
-	float x1, x0;
-	float y0, y1;
+	float x0, y0;
+	float x1, y1;
 	float u, v;
 	GXColor colors[4];
 

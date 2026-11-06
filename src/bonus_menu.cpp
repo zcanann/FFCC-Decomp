@@ -2095,9 +2095,11 @@ void CMenuPcs::CalcSelectOpenAnim()
 #else
 	enum { kFadeFrames = 10, kArtifactDuration = 40 };
 #endif
+	int partySlot;
+	int idx;
 	int i;
 	CMenuPcs::Sprt2* sprite;
-	int tribeId;
+	int work;
 	CCharaPcs::CHandle* handle;
 	int frame;
 	int doneCount;
@@ -2106,8 +2108,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 	activePartyCount = s_Rinfo->m_partyCount;
 
 	if (this->m_bonusState->m_initialized == 0) {
-		int idx;
-
 		this->m_bonusCursorFlag = 0;
 		Sound.PlaySe(0x4c, 0x40, 0x7f, 0);
 		memset(m_bonusAnim, 0, sizeof(BonusAnimList));
@@ -2168,7 +2168,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		int y = 0x28;
 		for (i = 0; i < activePartyCount; i++) {
-			int partySlot;
 			for (int j = 0; activePartyCount > j; j++) {
 				if (i == s_Rinfo->m_party[j].m_rank) {
 					partySlot = s_Rinfo->m_party[j].m_partySlot;
@@ -2237,11 +2236,11 @@ void CMenuPcs::CalcSelectOpenAnim()
 			}
 		}
 
-		int copyDelta = idx + 4;
 		idx += 8;
 		for (i = 0; i < activePartyCount; i++) {
+			work = idx - 4;
 			sprite = &m_bonusAnim->sprites[idx + i];
-			*sprite = *(sprite - copyDelta);
+			*sprite = *(sprite - work);
 			sprite->y = (short)(sprite->y + 0x20);
 			sprite->w = 0xA8;
 			sprite->h = 0x38;
@@ -2275,25 +2274,24 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		idx += activePartyCount;
-		int nameDelta = idx - 4;
 		for (i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			CMenuPcs::Sprt2* prev = spr - nameDelta;
-			spr->kind = -1;
-			spr->x = (short)(prev->x + 0x50);
-			spr->y = (short)(prev->y + 0x48);
-			spr->w = 0;
-			spr->h = 0;
-			spr->mulX = 0.0f;
-			spr->mulY = 0.0f;
-			spr->startFrame = prev->startFrame;
-			spr->duration = kFadeFrames;
-			spr->depth = 1.0f;
-			spr->motionX = (-240.0f);
-			spr->motionY = 0.0f;
-			spr->targetX = (float)spr->x + spr->motionX;
-			spr->targetY = (float)spr->y + spr->motionY;
-			spr->flags = 1;
+			work = idx - 4;
+			sprite = &m_bonusAnim->sprites[idx + i];
+			sprite->kind = -1;
+			sprite->x = (short)((sprite - work)->x + 0x50);
+			sprite->y = (short)((sprite - work)->y + 0x48);
+			sprite->w = 0;
+			sprite->h = 0;
+			sprite->mulX = 0.0f;
+			sprite->mulY = 0.0f;
+			sprite->startFrame = (sprite - work)->startFrame;
+			sprite->duration = kFadeFrames;
+			sprite->depth = 1.0f;
+			sprite->motionX = (-240.0f);
+			sprite->motionY = 0.0f;
+			sprite->targetX = (float)sprite->x + sprite->motionX;
+			sprite->targetY = (float)sprite->y + sprite->motionY;
+			sprite->flags = 1;
 		}
 
 		idx += activePartyCount;
@@ -2399,13 +2397,13 @@ void CMenuPcs::CalcSelectOpenAnim()
 		for (; i < activePartyCount + 8; i++) {
 			sprite = &m_bonusAnim->sprites[s_PlayerTop + i];
 			if (i < activePartyCount) {
-				tribeId = s_Rinfo->m_party[i].m_tribeId;
+				work = s_Rinfo->m_party[i].m_tribeId;
 				handle = s_Rinfo->m_party[i].m_partyHandle;
-				float modelScale = s_PCScl[tribeId];
+				float modelScale = s_PCScl[work];
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
-				tribeId = activePartyCount * 2 + (i - activePartyCount);
-				handle = m_wm.m_handles[tribeId];
+				work = activePartyCount * 2 + (i - activePartyCount);
+				handle = m_wm.m_handles[work];
 				if (handle == 0) {
 					continue;
 				}
@@ -2413,14 +2411,14 @@ void CMenuPcs::CalcSelectOpenAnim()
 			}
 			if (i < activePartyCount) {
 				scaleMtx[0][3] = 0.0f;
-				scaleMtx[1][3] = s_PCYpos[tribeId];
+				scaleMtx[1][3] = s_PCYpos[work];
 				scaleMtx[2][3] = 0.0f;
 			} else {
 				int duration = sprite->duration;
 				int phase;
 				int fcvIndex = duration / 5;
-				tribeId = 8 - (i - activePartyCount);
-				phase = (int)(((double)duration / 10.0) * (double)(tribeId + 2));
+				work = 8 - (i - activePartyCount);
+				phase = (int)(((double)duration / 10.0) * (double)(work + 2));
 				float rate = (float)(450.0 / (double)(float)duration);
 
 				if (frame == sprite->startFrame && *(signed char*)&this->m_bonusCursorFlag == 0) {
@@ -2434,13 +2432,13 @@ void CMenuPcs::CalcSelectOpenAnim()
 					angle = (-90.0f);
 				} else if (sprite->timer >= phase) {
 					srcVec.x = s_AnimX[0];
-					angle = (float)(45.0 * (double)tribeId);
+					angle = (float)(45.0 * (double)work);
 				} else {
 					int last = sprite->timer - 1;
 					float step;
 					if (last <= fcvIndex) {
 						step = (s_AnimX[2] - s_AnimX[1]) / (float)fcvIndex;
-						srcVec.x = s_AnimX[2] - (float)last * step;
+						srcVec.x = s_AnimX[2] - step * (float)last;
 					} else {
 						step = (s_AnimX[1] - s_AnimX[0]) / ((float)phase - (float)fcvIndex);
 						srcVec.x = s_AnimX[1] - step * (float)(last - fcvIndex);

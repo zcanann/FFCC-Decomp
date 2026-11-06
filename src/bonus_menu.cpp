@@ -1655,8 +1655,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		for (i = 0; i < activePartyCount; i++) {
 			sprite = &m_bonusAnim->sprites[base + i];
 			delta = base - 1;
-			Sprt2* src = sprite - delta;
-			sprite->startFrame = src->startFrame + src->duration;
+			sprite->startFrame = (sprite - delta)->startFrame + (sprite - delta)->duration;
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
@@ -1666,8 +1665,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 		for (i = 0; i < activePartyCount; i++) {
 			sprite = &m_bonusAnim->sprites[base + i];
-			Sprt2* source = sprite - activePartyCount;
-			sprite->startFrame = source->startFrame + source->duration;
+			sprite->startFrame = (sprite - activePartyCount)->startFrame + (sprite - activePartyCount)->duration;
 			sprite->flags = 1;
 		}
 
@@ -1754,10 +1752,11 @@ void CMenuPcs::CalcResultCloseAnim()
 		this->m_bonusState->m_initialized = 1;
 	}
 
+	doneCount = 0;
 	this->m_bonusState->m_frame++;
 	int frame = (int)this->m_bonusState->m_frame;
 
-	for (i = doneCount = 0; i < m_bonusAnim->header.count; i++) {
+	for (i = 0; i < m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];
 
 		if ((sprite->flags & 1) != 0) {
@@ -1817,12 +1816,10 @@ void CMenuPcs::CalcResultCloseAnim()
 	Mtx scaleMtx;
 	{
 		CCharaPcs::CHandle* handle;
-		int total2 = activePartyCount * 2;
 		i = 0;
-		int spriteIndex = total2 + 1;
 
-		for (; i < total2; i++) {
-			sprite = &m_bonusAnim->sprites[spriteIndex];
+		for (; i < activePartyCount * 2; i++) {
+			sprite = &m_bonusAnim->sprites[activePartyCount * 2 + 1 + i];
 			if (i < activePartyCount) {
 				handle = s_Rinfo->m_party[i].m_partyHandle;
 				delta = s_Rinfo->m_party[i].m_tribeId;
@@ -1860,7 +1857,6 @@ void CMenuPcs::CalcResultCloseAnim()
 			} else {
 				handle->m_model->m_lightAlpha = sprite->alpha;
 			}
-			spriteIndex++;
 		}
 	}
 

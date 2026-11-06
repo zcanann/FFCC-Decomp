@@ -3502,24 +3502,24 @@ inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusCheckMarkTexture));
 
+		int i;
 		unsigned int activeMask = 0;
-		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+		for (i = 0; i < s_Rinfo->m_partyCount; i++) {
 			int selection = s_Rinfo->m_party[i].m_selectedSlot;
 			if (selection >= 0) {
 				activeMask |= 1 << selection;
 			}
 		}
 
-		{
-			int i = 0;
-			for (; i < 8; i++) {
-				if ((activeMask & (1 << i)) == 0) {
-					continue;
-				}
-				float x = s_Base->m_artifactPositions[i].x + 28.0f;
-				float y = s_Base->m_artifactPositions[i].y + 20.0f;
-				MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		for (i = 0; i < 8; i++) {
+			if ((activeMask & (1 << i)) == 0) {
+				continue;
 			}
+			float offsetX = 28.0f;
+			float offsetY = 20.0f;
+			float x = s_Base->m_artifactPositions[i].x + offsetX;
+			float y = s_Base->m_artifactPositions[i].y + offsetY;
+			MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 		}
 	}
 }

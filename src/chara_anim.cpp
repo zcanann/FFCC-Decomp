@@ -366,8 +366,9 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	register float* outData = reinterpret_cast<float*>(srt);
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
+		int mode = flags & 3;
+		if (mode != 0) {
+			if (mode == 1) {
 				i2f_5(outData, inData);
 				inData++;
 			} else {
@@ -382,8 +383,9 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	}
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
+		int mode = flags & 3;
+		if (mode != 0) {
+			if (mode == 1) {
 				i2f_6(outData, inData);
 				inData++;
 			} else {
@@ -398,8 +400,9 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	}
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
+		int mode = flags & 3;
+		if (mode != 0) {
+			if (mode == 1) {
 				i2f_7(outData, inData);
 				inData++;
 			} else {

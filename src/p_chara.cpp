@@ -459,15 +459,17 @@ complete:
  */
 int CCharaPcs::correctLoadAnimAmem()
 {
+    int i;
+    int animSize;
+    unsigned int nextOffset;
+    unsigned int scanEnd;
+    int scanOffset;
     int compactedSize;
+    int loadAnimCount;
+    int chunkLoadCount;
     int chunkSize;
     int maxEnd;
-    unsigned int nextOffset;
-    int i;
-    int loadAnimCount;
     int validAnimCount;
-    int scanOffset;
-    int chunkLoadCount;
     unsigned char* tempBuffer;
 
     if (System.GetErrorLevel() >= 3U) {
@@ -506,12 +508,12 @@ int CCharaPcs::correctLoadAnimAmem()
     do {
         chunkLoadCount = 0;
         nextOffset = 0;
-        const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
+        scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
         for (i = 0; i < loadAnimCount; i++) {
             CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
             const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->GetAmemAddress());
-            const int animSize = static_cast<int>(loadAnim->m_anim->GetBankSize());
+            animSize = static_cast<int>(loadAnim->m_anim->GetBankSize());
             if (animOffset < static_cast<unsigned int>(scanOffset)) {
                 continue;
             }

@@ -86,6 +86,9 @@ public:
     float CalcSafePos(int, CGObject*, Vec*);
     int Cross(int, Vec*, float*, Vec*, Vec*, float, int);
     void PutDropItem();
+    float GetModelAlpha();
+    int IsDisp();
+    int IsFirstDraw();
     virtual unsigned int IsDispRader();
     /*
      * --INFO--

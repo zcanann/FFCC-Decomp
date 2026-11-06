@@ -3,6 +3,7 @@
 
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/map.h"
+#include "ffcc/p_map.h"
 #include "ffcc/game.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/memory.h"
@@ -53,11 +54,6 @@ STATIC_ASSERT(offsetof(_pppProgSetDef, m_startFrame) == 0x10);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_stages) == 0x28);
 
 
-static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
-{
-	return pppMngSt->m_owner->m_charaModelHandle->m_model;
-}
-
 _pppMngSt* ppvMng;
 _pppEnvSt* ppvEnv;
 extern "C" {
@@ -97,6 +93,40 @@ float ppvChrScl[3] ATTRIBUTE_ALIGN(8);
 Mtx ppvUnitMatrix ATTRIBUTE_ALIGN(8);
 Vec ppvZeroVector ATTRIBUTE_ALIGN(8);
 CAmemCacheSet ppvAmemCacheSet;
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006640C
+ * EN Size: 56b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
+{
+	g_MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80044720
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMapPcs::CheckHitCylinder(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+{
+	CMapCylinder cylinder;
+
+	cylinder.m_bottom = *cylinderBottom;
+	cylinder.m_axis = *direction;
+	cylinder.m_radius = radius;
+
+	return g_MapMng.CheckHitCylinder(&cylinder, direction, hitMask);
+}
 
 /*
  * --INFO--
@@ -297,7 +327,9 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
  */
 void pppCopyVector(Vec& dest, Vec source)
 {
-	dest = source;
+	dest.x = source.x;
+	dest.y = source.y;
+	dest.z = source.z;
 }
 
 /*
@@ -483,7 +515,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	}
 	while (canRetry);
 
-	ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
+	pppHeapCheckLeak(ppvEnv->m_stagePtr);
 	PartMng.pppDumpMngSt();
 	ppvMemAllocErrorF = 1;
 allocDone:
@@ -567,16 +599,13 @@ unsigned long pppHeapUseRate(CMemory::CStage* stage)
 	unsigned long heapTotal;
 	unsigned long heapUseRate;
 	unsigned long heapUnused;
-	unsigned long result;
 
 	stage->heapInfo(heapTotal, heapUseRate, heapUnused);
 	if (heapTotal == 0) {
-		result = 10000;
-	} else {
-		result = (heapUseRate * 10000) / heapTotal;
+		return 10000;
 	}
 
-	return result;
+	return (heapUseRate * 10000) / heapTotal;
 }
 
 /*
@@ -696,8 +725,7 @@ static inline void callConProg(_pppPObject* object)
  */
 _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 {
-	_pppPDataVal* dataVal = pppPDataVal;
-	_pppProgSetDef* programSet = dataVal->m_programSetDef;
+	_pppProgSetDef* programSet = pppPDataVal->m_programSetDef;
 	_pppPObject* newObject = (_pppPObject*)pppMemAlloc(
 		programSet->m_workBaseOffset + programSet->m_numStages * sizeof(u32),
 		ppvEnv->m_stagePtr, "pppPart.cpp", PPPPART_LINE(0x305, 0x2DC, 0x2DB));
@@ -716,14 +744,14 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	_pppPObjLink* iter = pppMngSt->m_pppPObjLinkHead.m_next;
 	if (iter == 0)
 	{
-		dataVal->m_pppPObjLink = &newObject->m_link;
+		pppPDataVal->m_pppPObjLink = &newObject->m_link;
 		pppMngSt->m_pppPObjLinkHead.m_next = &newObject->m_link;
 		newObject->m_link.m_next = 0;
 	}
-	else if (dataVal->m_pppPObjLink != 0)
+	else if (pppPDataVal->m_pppPObjLink != 0)
 	{
-		newObject->m_link.m_next = dataVal->m_pppPObjLink->m_next;
-		dataVal->m_pppPObjLink->m_next = &newObject->m_link;
+		newObject->m_link.m_next = pppPDataVal->m_pppPObjLink->m_next;
+		pppPDataVal->m_pppPObjLink->m_next = &newObject->m_link;
 	}
 	else
 	{
@@ -734,7 +762,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			_pppProgSetDef* iterSet = iter->m_owner->m_programSetDef;
 			if (iterSet->m_sortKey >= sortKey)
 			{
-				dataVal->m_pppPObjLink = &newObject->m_link;
+				pppPDataVal->m_pppPObjLink = &newObject->m_link;
 				prev->m_next = &newObject->m_link;
 				newObject->m_link.m_next = iter;
 				goto done_insert;
@@ -742,13 +770,13 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			prev = iter;
 			iter = iter->m_next;
 		} while (iter != 0);
-		dataVal->m_pppPObjLink = &newObject->m_link;
+		pppPDataVal->m_pppPObjLink = &newObject->m_link;
 		prev->m_next = &newObject->m_link;
 		newObject->m_link.m_next = 0;
 	}
 
 done_insert:
-	dataVal->m_activeCount++;
+	pppPDataVal->m_activeCount++;
 	callConProg(newObject);
 	return newObject;
 }
@@ -867,6 +895,89 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 
 	Graphic._WaitDrawDone("pppPart.cpp", PPPPART_LINE(0x3A1, 0x378, 0x377));
 	ppvMng = oldMngSt;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 108b
+ * EN Address: 0x80066190
+ * EN Size: 108b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float CGObject::GetModelAlpha()
+{
+	u8 hasModel = 0;
+	if (m_charaModelHandle != 0 && m_charaModelHandle->m_model != 0) {
+		hasModel = 1;
+	}
+	float alpha;
+	if (hasModel != 0) {
+		alpha = m_charaModelHandle->m_model->m_lightAlpha;
+	} else {
+		alpha = m_currentAlpha;
+	}
+	return alpha;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x800661FC
+ * EN Size: 64b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CGObject::IsDisp()
+{
+	return (m_displayFlags & 1) != 0 && (m_displayFlags & 0x400000) == 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006623C
+ * EN Size: 16b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CGObject::IsFirstDraw()
+{
+	return m_weaponNodeFlagBits.m_unk40;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 296b
+ * EN Address: 0x80063494
+ * EN Size: 260b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppSetBindChrSync(_pppMngSt* pppMngSt)
+{
+	if (pppMngSt->m_ownerFacing == 0) {
+		pppMngSt->m_ownerFacing = pppMngSt->m_owner->IsFirstDraw();
+	}
+
+	if (pppMngSt->m_ownerFlagsInitialized == 0) {
+		pppMngSt->m_slotVisible = pppMngSt->m_owner->IsDisp();
+	}
+
+	if (pppMngSt->m_nodeScaleInitialized == 0) {
+		pppMngSt->m_ownerScale = pppMngSt->m_owner->GetModelAlpha();
+		if (0.0 == pppMngSt->m_ownerScale) {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		} else if (1.0 == pppMngSt->m_ownerScale) {
+			pppMngSt->m_useOwnerScaleSign = 0;
+		} else {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		}
+	}
 }
 
 /*
@@ -991,44 +1102,9 @@ MatrixMode3:
 		goto LocalOnly;
 	}
 
-	if (pppMngSt->m_ownerFacing == 0) {
-		u8 ownerWeaponFlagsHi = pppMngSt->m_owner->m_weaponNodeFlagBytes.m_flags0;
-		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
-	}
+	pppSetBindChrSync(pppMngSt);
 
-	if (pppMngSt->m_ownerFlagsInitialized == 0) {
-		u8 visible = 0;
-		u32 flags = pppMngSt->m_owner->m_displayFlags;
-		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-	}
-
-	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
-		u8 hasModelScale = 0;
-		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
-			hasModelScale = 1;
-		}
-		float ownerScale;
-		if (hasModelScale != 0) {
-			ownerScale = ownerHandle->m_model->m_lightAlpha;
-		} else {
-			ownerScale = pppMngSt->m_owner->m_currentAlpha;
-		}
-		pppMngSt->m_ownerScale = ownerScale;
-		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-	}
-
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	goto ApplyRotatedMatrix;
 
@@ -1047,44 +1123,9 @@ MatrixMode5:
 		goto LocalOnly;
 	}
 
-	if (pppMngSt->m_ownerFacing == 0) {
-		u8 ownerWeaponFlagsHi = pppMngSt->m_owner->m_weaponNodeFlagBytes.m_flags0;
-		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
-	}
+	pppSetBindChrSync(pppMngSt);
 
-	if (pppMngSt->m_ownerFlagsInitialized == 0) {
-		u8 visible = 0;
-		u32 flags = pppMngSt->m_owner->m_displayFlags;
-		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-	}
-
-	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
-		u8 hasModelScale = 0;
-		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
-			hasModelScale = 1;
-		}
-		float ownerScale;
-		if (hasModelScale != 0) {
-			ownerScale = ownerHandle->m_model->m_lightAlpha;
-		} else {
-			ownerScale = pppMngSt->m_owner->m_currentAlpha;
-		}
-		pppMngSt->m_ownerScale = ownerScale;
-		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-	}
-
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	goto ApplyTranslatedMatrix;
 
@@ -1093,44 +1134,9 @@ MatrixMode6:
 		goto LocalOnly;
 	}
 
-	if (pppMngSt->m_ownerFacing == 0) {
-		u8 ownerWeaponFlagsHi = pppMngSt->m_owner->m_weaponNodeFlagBytes.m_flags0;
-		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
-	}
+	pppSetBindChrSync(pppMngSt);
 
-	if (pppMngSt->m_ownerFlagsInitialized == 0) {
-		u8 visible = 0;
-		u32 flags = pppMngSt->m_owner->m_displayFlags;
-		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-	}
-
-	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
-		u8 hasModelScale = 0;
-		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
-			hasModelScale = 1;
-		}
-		float ownerScale;
-		if (hasModelScale != 0) {
-			ownerScale = ownerHandle->m_model->m_lightAlpha;
-		} else {
-			ownerScale = pppMngSt->m_owner->m_currentAlpha;
-		}
-		pppMngSt->m_ownerScale = ownerScale;
-		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-	}
-
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
@@ -1142,44 +1148,9 @@ MatrixMode7:
 		goto LocalOnly;
 	}
 
-	if (pppMngSt->m_ownerFacing == 0) {
-		u8 ownerWeaponFlagsHi = pppMngSt->m_owner->m_weaponNodeFlagBytes.m_flags0;
-		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
-	}
+	pppSetBindChrSync(pppMngSt);
 
-	if (pppMngSt->m_ownerFlagsInitialized == 0) {
-		u8 visible = 0;
-		u32 flags = pppMngSt->m_owner->m_displayFlags;
-		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-	}
-
-	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
-		u8 hasModelScale = 0;
-		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
-			hasModelScale = 1;
-		}
-		float ownerScale;
-		if (hasModelScale != 0) {
-			ownerScale = ownerHandle->m_model->m_lightAlpha;
-		} else {
-			ownerScale = pppMngSt->m_owner->m_currentAlpha;
-		}
-		pppMngSt->m_ownerScale = ownerScale;
-		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-	}
-
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSMTXMultVecSR(nodeMtx, &ppvMng->m_position, &tmpPos);
 	ppvMng->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;
@@ -1322,7 +1293,7 @@ inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
  */
 void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 {
-	short shapeCount = *shapeList++;
+	int shapeCount = *shapeList++;
 	for (short i = 0; i < shapeCount; i++)
 	{
 		pppCacheLoadShapeTexture(pppDataHead->m_shapes[*shapeList++], PartMng.m_materialSet);
@@ -1343,10 +1314,9 @@ static inline void callInitProg(_pppMngSt* pppMngSt)
 	for (int i = 0; i < pppMngSt->m_numControlPrograms; i++)
 	{
 		pppProg* prog = ((pppProg**)pppMngSt->m_pppPObjLinkHead.m_owner)[i];
-		pppProgInitCallback fn = prog->m_pppFunctionInit;
-		if (fn != 0)
+		if (prog->m_pppFunctionInit != 0)
 		{
-			fn(pppMngSt);
+			prog->m_pppFunctionInit(pppMngSt);
 		}
 	}
 }
@@ -2165,29 +2135,17 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 
 	if (0.0f != cylScale)
 	{
-		u32 cylinderAttribute = pppMngSt->m_cylinderAttribute;
-		CMapCylinder cylinder;
-		cylinder.m_bottom = *origin;
-		cylinder.m_axis = *vector;
-		cylinder.m_radius = cylScale;
-
-		if (g_MapMng.CheckHitCylinder(&cylinder, vector, cylinderAttribute) != 0)
+		if (MapPcs.CheckHitCylinder(origin, vector, cylScale, pppMngSt->m_cylinderAttribute) != 0)
 		{
 			if (Game.m_currentSceneId == 7)
 			{
 				pppMngSt->m_hitBgFlag = 1;
-				if ((pppMngSt->m_soundEffectData.m_soundEffectSlot >= 0) &&
-					(pppMngSt->m_soundEffectData.m_soundEffectHandle >= 0))
-				{
-					Sound.FadeOutSe3D(pppMngSt->m_soundEffectData.m_soundEffectHandle,
-						pppMngSt->m_soundEffectData.m_soundEffectFadeFrames);
-					pppMngSt->m_soundEffectData.m_soundEffectHandle = -1;
-				}
+				pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
 			}
 			else
 			{
 				Vec hitPos;
-				g_MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
+				MapPcs.CalcHitPosition(&hitPos);
 				s32 partIndex = pppMngSt - PartMng.m_pppMng;
 				Game.HitParticleBG(partIndex, pppMngSt->m_kind, pppMngSt->m_nodeIndex, &hitPos, &pppMngSt->m_hitParams);
 			}

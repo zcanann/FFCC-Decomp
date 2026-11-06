@@ -38,26 +38,6 @@ struct CrystalWork {
 };
 
 STATIC_ASSERT(sizeof(HSD_ImageBuffer) == 0x18);
-STATIC_ASSERT(sizeof(CrystalDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(CrystalDataOffsets, m_colorBlockOffset) == 0x4);
-STATIC_ASSERT(offsetof(CrystalDataOffsets, m_workOffset) == 0x8);
-
-inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
-
-static inline CrystalDataOffsets* GetCrystalDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<CrystalDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<CrystalWork*>(crystal->m_workArea + GetCrystalDataOffsets(ctrl)->m_workOffset);
-}
-
-static inline VColor* GetCrystalColorBlock(pppCrystal* crystal, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VColor*>(crystal->m_workArea + GetCrystalDataOffsets(ctrl)->m_colorBlockOffset);
-}
 
 union CrystalFloatBits {
     float value;
@@ -110,121 +90,134 @@ static inline float CrystalSqrtPositive(float value)
 
 /*
  * --INFO--
- * PAL Address: 0x800dc9a0
- * PAL Size: 1444b
- * EN Address: 0x800DC16C
- * EN Size: 1444b
- * JP Address: 0x800D9D6C
- * JP Size: 1444b
+ * PAL Address: UNUSED
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable* ctrl)
+inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32)
 {
-	float texW;
-	float texH;
-	s32 dataValIndex = step->m_dataValIndex;
-	CrystalWork* work = GetCrystalWork(pppCrystal, ctrl);
-	VColor* colorBlock = GetCrystalColorBlock(pppCrystal, ctrl);
+    u32 yTile = y >> 2;
+    u32 yFine = (y & 3) * 4;
+    u32 xFine = x & 3;
+    u8* pixel = imageBuffer->m_imageData +
+        yTile * ((imageBuffer->m_width & 0x1FFFFFFCU) << 3) +
+        (x & 0x1FFFFFFC) * 8 +
+        (xFine + yFine) * 2;
 
-	if (dataValIndex == 0xFFFF) {
-		return;
+    pixel[0] = (u8)intensity;
+    pixel[1] = (u8)alpha;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
+{
+    u32 y;
+    u32 x;
+    float magnitude;
+    float stepX;
+    float stepY;
+    float yCoord;
+    float xCoord;
+    float ySq;
+    float coordOffset;
+    float coordScale;
+    float modulationScale;
+    float maxMagnitude;
+
+    stepX = 2.0f / (float)(imageBuffer->m_width - 1U);
+    stepY = 2.0f / (float)(imageBuffer->m_height - 1U);
+    yCoord = -1.0f;
+    maxMagnitude = 1.0f;
+    coordOffset = 128.0f;
+    modulationScale = 5.0f;
+    coordScale = 127.0f;
+
+    for (y = 0; y < imageBuffer->m_height; y++) {
+        ySq = yCoord * yCoord;
+        xCoord = -1.0f;
+
+        for (x = 0; x < imageBuffer->m_width; x++) {
+            magnitude = xCoord * xCoord + ySq;
+            if (magnitude > 0.0f) {
+                magnitude = CrystalSqrtPositive(magnitude);
+#ifndef VERSION_GCCJGC
+            } else if ((double)magnitude < 0.0) {
+                magnitude = NAN;
+            } else if (CrystalFpClassify(magnitude) == 1) {
+                magnitude = NAN;
+#endif
+            }
+
+            if (magnitude > maxMagnitude) {
+                magnitude = maxMagnitude;
+            }
+
+            double modulation = fmod(magnitude, 0.2f);
+            magnitude = modulationScale * (magnitude * (float)modulation);
+            ImageBufferSetPixel_IA8(
+                imageBuffer, x, y,
+                __cvt_fp2unsigned((double)(xCoord * magnitude * coordScale + coordOffset)),
+                __cvt_fp2unsigned((double)(yCoord * magnitude * coordScale + coordOffset)), 0, 0);
+            xCoord += stepX;
+        }
+
+        yCoord += stepY;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800dd404
+ * PAL Size: 32b
+ * EN Address: 0x800DCBD0
+ * EN Size: 32b
+ * JP Address: 0x800DA708
+ * JP Size: 32b
+ */
+void pppConstructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* ctrl)
+{
+	CrystalWork* work = (CrystalWork*)(pppCrystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
+
+	work->m_refractionMap = 0;
+	work->m_refractionTexObj = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800dd37c
+ * PAL Size: 136b
+ * EN Address: 0x800DCB48
+ * EN Size: 136b
+ * JP Address: 0x800DA680
+ * JP Size: 136b
+ */
+void pppDestructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* ctrl)
+{
+	CrystalWork* work = (CrystalWork*)(pppCrystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
+	HSD_ImageBuffer* textureInfo = work->m_refractionMap;
+
+	if ((textureInfo != 0) && (textureInfo->m_imageData != 0)) {
+		pppMemFree(textureInfo->m_imageData);
+		textureInfo->m_imageData = 0;
 	}
-
-	pppModelSt* model = (pppModelSt*)ppvEnv->m_mapMeshPtr[dataValIndex];
-	CTexture* indirectTex = 0;
-	int texSlot = 0;
-	CTexture* baseTex = static_cast<CTexture*>(((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, texSlot));
-	if (step->m_crystal.m_refractionMode == 0) {
-		if (step->m_initWOrk == 0xFFFF) {
-			return;
-		}
-		indirectTex =
-			static_cast<CTexture*>(ppvEnv->m_mapMeshPtr[step->m_initWOrk]->GetTexture(ppvEnv->m_materialSetPtr, texSlot));
+	if (textureInfo != 0) {
+		pppMemFree(textureInfo);
 	}
-
-	int x = 0;
-	int y = 0;
-	int w = 0x280;
-	int h = 0x1C0;
-	_GXTexObj* backBufferTex = Graphic.GetBackBufferRect(x, y, w, h, 0);
-	if (backBufferTex == 0) {
-		return;
+	if (work->m_refractionTexObj != 0) {
+		pppMemFree(work->m_refractionTexObj);
+		work->m_refractionTexObj = 0;
 	}
-
-	pppSetBlendMode(step->m_crystal.m_blendMode);
-	pppSetDrawEnv(
-		&colorBlock->m_color, &pppCrystal->m_drawMatrix, step->m_arg3,
-		step->m_crystal.m_drawEnvColor1, step->m_crystal.m_drawEnvColor0, step->m_crystal.m_blendMode, step->m_crystal.m_drawFlag, 1, 1, step->m_crystal.m_zMode);
-
-	Mtx lightMtx;
-	CrystalTexMtx texMtx = s_crystalTexMtxBase;
-
-	if (step->m_crystal.m_refractionMode == 1) {
-		texW = CRYSTAL_REFRACTION_SIZE;
-		texH = CRYSTAL_REFRACTION_SIZE;
-	}
-	else {
-		texW = (float)indirectTex->m_width;
-		texH = (float)indirectTex->m_height;
-	}
-
-	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
-	indMtx.value[0][0] = ((CRYSTAL_HALF_NEGATIVE * texW) / CRYSTAL_SCREEN_WIDTH) * step->m_stepValue;
-	indMtx.value[1][1] = ((CRYSTAL_HALF_NEGATIVE * texH) / CRYSTAL_SCREEN_HEIGHT) * step->m_stepValue;
-
-	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-	GXSetNumTexGens(3);
-	GXSetNumTevStages(3);
-
-	if ((int)Game.m_currentSceneId == 7) {
-		C_MTXLightPerspective(
-			lightMtx, CRYSTAL_SCENE_FOVY, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
-	} else {
-		C_MTXLightPerspective(
-			lightMtx, CameraPcs.m_fov, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
-	}
-
-	GXLoadTexMtxImm(texMtx.value, 0x40, GX_MTX3x4);
-	GXLoadTexMtxImm(lightMtx, 0x43, GX_MTX3x4);
-	GXSetTexCoordGen2((GXTexCoordID)0, GX_TG_MTX3x4, GX_TG_NRM, 0x3C, GX_TRUE, 0x40);
-	GXSetTexCoordGen2((GXTexCoordID)1, GX_TG_MTX3x4, GX_TG_POS, GX_PNMTX0, GX_FALSE, 0x43);
-	GXLoadTexObj(backBufferTex, GX_TEXMAP0);
-	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP0, GX_COLOR_NULL);
-	_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
-	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-	GXLoadTexObj(&baseTex->m_texObj, GX_TEXMAP2);
-	GXSetTexCoordGen2((GXTexCoordID)2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
-	_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR0A0);
-	_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_TEXC, GX_CC_RASA, GX_CC_ZERO);
-	_GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	_GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-	_GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	_GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-	_GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-	_GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_CPREV, GX_CC_RASC, GX_CC_RASA, GX_CC_ZERO);
-	_GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-	_GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	if (step->m_crystal.m_refractionMode == 1) {
-		GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
-	} else {
-		GXLoadTexObj(&indirectTex->m_texObj, GX_TEXMAP1);
-	}
-	GXSetNumIndStages(1);
-	GXSetIndTexOrder((GXIndTexStageID)0, (GXTexCoordID)0, (GXTexMapID)1);
-	GXSetIndTexCoordScale((GXIndTexStageID)0, GX_ITS_1, GX_ITS_1);
-	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx.value, 1);
-	GXSetTevIndirect((GXTevStageID)0, (GXIndTexStageID)0, GX_ITF_8, GX_ITB_ST, GX_ITM_0, GX_ITW_OFF, GX_ITW_OFF, GX_FALSE, GX_FALSE,
-		GX_ITBA_OFF);
-	GXClearVtxDesc();
-	GXSetVtxDesc((GXAttr)9, GX_INDEX16);
-	GXSetVtxDesc((GXAttr)10, GX_INDEX16);
-	GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
-	GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
-	pppDrawMesh(model, pppCrystal->m_drawMatrixPtr, 0);
-	GXSetNumIndStages(0);
-	GXSetTevDirect((GXTevStageID)0);
-	memset(&indMtx, 0, sizeof(indMtx));
-	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx.value, 1);
 }
 
 /*
@@ -367,138 +360,119 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable
 
 /*
  * --INFO--
- * PAL Address: 0x800dd37c
- * PAL Size: 136b
- * EN Address: 0x800DCB48
- * EN Size: 136b
- * JP Address: 0x800DA680
- * JP Size: 136b
+ * PAL Address: 0x800dc9a0
+ * PAL Size: 1444b
+ * EN Address: 0x800DC16C
+ * EN Size: 1444b
+ * JP Address: 0x800D9D6C
+ * JP Size: 1444b
  */
-void pppDestructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* ctrl)
+void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable* ctrl)
 {
-	CrystalWork* work = GetCrystalWork(pppCrystal, ctrl);
-	HSD_ImageBuffer* textureInfo = work->m_refractionMap;
+	float texW;
+	float texH;
+	s32 dataValIndex = step->m_dataValIndex;
+	CrystalWork* work = (CrystalWork*)(pppCrystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
+	VColor* colorBlock = (VColor*)(pppCrystal->m_workArea + ctrl->m_serializedDataOffsets[1]);
 
-	if ((textureInfo != 0) && (textureInfo->m_imageData != 0)) {
-		pppMemFree(textureInfo->m_imageData);
-		textureInfo->m_imageData = 0;
+	if (dataValIndex == 0xFFFF) {
+		return;
 	}
-	if (textureInfo != 0) {
-		pppMemFree(textureInfo);
+
+	pppModelSt* model = (pppModelSt*)ppvEnv->m_mapMeshPtr[dataValIndex];
+	CTexture* indirectTex = 0;
+	int texSlot = 0;
+	CTexture* baseTex = static_cast<CTexture*>(((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, texSlot));
+	if (step->m_crystal.m_refractionMode == 0) {
+		if (step->m_initWOrk == 0xFFFF) {
+			return;
+		}
+		indirectTex =
+			static_cast<CTexture*>(ppvEnv->m_mapMeshPtr[step->m_initWOrk]->GetTexture(ppvEnv->m_materialSetPtr, texSlot));
 	}
-	if (work->m_refractionTexObj != 0) {
-		pppMemFree(work->m_refractionTexObj);
-		work->m_refractionTexObj = 0;
+
+	int x = 0;
+	int y = 0;
+	int w = 0x280;
+	int h = 0x1C0;
+	_GXTexObj* backBufferTex = Graphic.GetBackBufferRect(x, y, w, h, 0);
+	if (backBufferTex == 0) {
+		return;
 	}
-}
 
-/*
- * --INFO--
- * PAL Address: 0x800dd404
- * PAL Size: 32b
- * EN Address: 0x800DCBD0
- * EN Size: 32b
- * JP Address: 0x800DA708
- * JP Size: 32b
- */
-void pppConstructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* ctrl)
-{
-	CrystalWork* work = GetCrystalWork(pppCrystal, ctrl);
+	pppSetBlendMode(step->m_crystal.m_blendMode);
+	pppSetDrawEnv(
+		&colorBlock->m_color, &pppCrystal->m_drawMatrix, step->m_arg3,
+		step->m_crystal.m_drawEnvColor1, step->m_crystal.m_drawEnvColor0, step->m_crystal.m_blendMode, step->m_crystal.m_drawFlag, 1, 1, step->m_crystal.m_zMode);
 
-	work->m_refractionMap = 0;
-	work->m_refractionTexObj = 0;
-}
+	Mtx lightMtx;
+	CrystalTexMtx texMtx = s_crystalTexMtxBase;
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 724b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
-{
-    u32 y;
-    u32 x;
-    float magnitude;
-    float stepX;
-    float stepY;
-    float yCoord;
-    float xCoord;
-    float ySq;
-    float coordOffset;
-    float coordScale;
-    float modulationScale;
-    float maxMagnitude;
+	if (step->m_crystal.m_refractionMode == 1) {
+		texW = CRYSTAL_REFRACTION_SIZE;
+		texH = CRYSTAL_REFRACTION_SIZE;
+	}
+	else {
+		texW = (float)indirectTex->m_width;
+		texH = (float)indirectTex->m_height;
+	}
 
-    imageBuffer->m_format = GX_TF_IA8;
-    imageBuffer->m_width = 0x20;
-    imageBuffer->m_height = 0x20;
-    imageBuffer->m_imageCount = 0x100;
-    imageBuffer->m_bufferSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
+	indMtx.value[0][0] = ((CRYSTAL_HALF_NEGATIVE * texW) / CRYSTAL_SCREEN_WIDTH) * step->m_stepValue;
+	indMtx.value[1][1] = ((CRYSTAL_HALF_NEGATIVE * texH) / CRYSTAL_SCREEN_HEIGHT) * step->m_stepValue;
 
-    stepX = 2.0f / (float)(imageBuffer->m_width - 1U);
-    stepY = 2.0f / (float)(imageBuffer->m_height - 1U);
-    yCoord = -1.0f;
-    maxMagnitude = 1.0f;
-    coordOffset = 128.0f;
-    modulationScale = 5.0f;
-    coordScale = 127.0f;
+	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+	GXSetNumTexGens(3);
+	GXSetNumTevStages(3);
 
-    for (y = 0; y < imageBuffer->m_height; y++) {
-        ySq = yCoord * yCoord;
-        xCoord = -1.0f;
+	if ((int)Game.m_currentSceneId == 7) {
+		C_MTXLightPerspective(
+			lightMtx, CRYSTAL_SCENE_FOVY, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
+	} else {
+		C_MTXLightPerspective(
+			lightMtx, CameraPcs.m_fov, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
+	}
 
-        for (x = 0; x < imageBuffer->m_width; x++) {
-            magnitude = xCoord * xCoord + ySq;
-            if (magnitude > 0.0f) {
-                magnitude = CrystalSqrtPositive(magnitude);
-#ifndef VERSION_GCCJGC
-            } else if ((double)magnitude < 0.0) {
-                magnitude = NAN;
-            } else if (CrystalFpClassify(magnitude) == 1) {
-                magnitude = NAN;
-#endif
-            }
-
-            if (magnitude > maxMagnitude) {
-                magnitude = maxMagnitude;
-            }
-
-            double modulation = fmod(magnitude, 0.2f);
-            magnitude = modulationScale * (magnitude * (float)modulation);
-            ImageBufferSetPixel_IA8(
-                imageBuffer, x, y,
-                __cvt_fp2unsigned((double)(xCoord * magnitude * coordScale + coordOffset)),
-                __cvt_fp2unsigned((double)(yCoord * magnitude * coordScale + coordOffset)), 0, 0);
-            xCoord += stepX;
-        }
-
-        yCoord += stepY;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32)
-{
-    u32 yTile = y >> 2;
-    u32 yFine = (y & 3) * 4;
-    u32 xFine = x & 3;
-    u8* pixel = imageBuffer->m_imageData +
-        yTile * ((imageBuffer->m_width & 0x1FFFFFFCU) << 3) +
-        (x & 0x1FFFFFFC) * 8 +
-        (xFine + yFine) * 2;
-
-    pixel[0] = (u8)intensity;
-    pixel[1] = (u8)alpha;
+	GXLoadTexMtxImm(texMtx.value, 0x40, GX_MTX3x4);
+	GXLoadTexMtxImm(lightMtx, 0x43, GX_MTX3x4);
+	GXSetTexCoordGen2((GXTexCoordID)0, GX_TG_MTX3x4, GX_TG_NRM, 0x3C, GX_TRUE, 0x40);
+	GXSetTexCoordGen2((GXTexCoordID)1, GX_TG_MTX3x4, GX_TG_POS, GX_PNMTX0, GX_FALSE, 0x43);
+	GXLoadTexObj(backBufferTex, GX_TEXMAP0);
+	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP0, GX_COLOR_NULL);
+	_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+	GXLoadTexObj(&baseTex->m_texObj, GX_TEXMAP2);
+	GXSetTexCoordGen2((GXTexCoordID)2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
+	_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR0A0);
+	_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_TEXC, GX_CC_RASA, GX_CC_ZERO);
+	_GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+	_GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+	_GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+	_GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_CPREV, GX_CC_RASC, GX_CC_RASA, GX_CC_ZERO);
+	_GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+	_GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	if (step->m_crystal.m_refractionMode == 1) {
+		GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
+	} else {
+		GXLoadTexObj(&indirectTex->m_texObj, GX_TEXMAP1);
+	}
+	GXSetNumIndStages(1);
+	GXSetIndTexOrder((GXIndTexStageID)0, (GXTexCoordID)0, (GXTexMapID)1);
+	GXSetIndTexCoordScale((GXIndTexStageID)0, GX_ITS_1, GX_ITS_1);
+	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx.value, 1);
+	GXSetTevIndirect((GXTevStageID)0, (GXIndTexStageID)0, GX_ITF_8, GX_ITB_ST, GX_ITM_0, GX_ITW_OFF, GX_ITW_OFF, GX_FALSE, GX_FALSE,
+		GX_ITBA_OFF);
+	GXClearVtxDesc();
+	GXSetVtxDesc((GXAttr)9, GX_INDEX16);
+	GXSetVtxDesc((GXAttr)10, GX_INDEX16);
+	GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
+	GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
+	pppDrawMesh(model, pppCrystal->m_drawMatrixPtr, 0);
+	GXSetNumIndStages(0);
+	GXSetTevDirect((GXTevStageID)0);
+	memset(&indMtx, 0, sizeof(indMtx));
+	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx.value, 1);
 }

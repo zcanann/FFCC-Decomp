@@ -1720,11 +1720,12 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 				for (int stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
 				{
 					_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
-					void** slot = &((void**)((u8*)obj + progSet->m_workBaseOffset))[stageIdx];
-					s32* work = (s32*)((u8*)*slot + stage->m_workOffset);
-					if (*work == ((_pppPObject*)obj)->m_graphId)
+					pppProg* prog = stage->m_prog;
+					s32** slotPtr = &((s32**)((u8*)obj + progSet->m_workBaseOffset))[stageIdx];
+					s32* nextSlot = (s32*)(((u8*)*slotPtr) + stage->m_workOffset);
+					if (*nextSlot == ((_pppPObject*)obj)->m_graphId)
 					{
-						*slot = work;
+						*slotPtr = nextSlot;
 					}
 				}
 

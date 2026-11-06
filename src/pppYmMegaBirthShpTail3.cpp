@@ -841,42 +841,44 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
     pppShapeAnimData* shapeAnim;
     u32 i;
     float colorStepR;
-    float segDz;
-    float nextY;
+    float curX;
+    float curY;
     s32 count;
-    float nextZ;
+    float curZ;
     s32 nextIndex;
     s32 lastIndex;
-    float diffG;
-    float segLen;
+    float nextX;
+    float segDx;
     u8 zEnable;
     _PARTICLE_DATA* particlesBase;
     _PARTICLE_WMAT* wmatsBase;
     float colorStepG;
     u32 particleShapeFrame;
+    float segDy;
+    float segDz;
+    float nextY;
+    float colorStepB;
+    float nextZ;
+    float segLen;
     float baseX;
     float baseY;
-    float diffR;
-    float colorStepB;
-    float alphaMul;
     float baseZ;
     float segCursor;
-    float segRemain;
-    float drawScale;
-    float nextX;
     Vec* history;
-    float diffA;
-    float segDx;
+    float segRemain;
+    float diffR;
     u32 workRand;
     u32 shapeFrameStep;
-    float segDy;
+    float diffA;
     float colorStepA;
-    float diffB;
+    float t;
     u32 shapeFrameCount;
-    float curY;
-    float curZ;
+    float alphaMul;
+    float diffG;
     float scaleStep;
+    float diffB;
     float countMinusOne;
+    float drawScale;
     pppFVECTOR4 colorStart;
     pppFVECTOR4 colorEnd;
     pppFMATRIX drawMtx;
@@ -916,7 +918,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
 
     for (i = 0; i < work->m_maxParticles; i++) {
         if (particle->m_life != 0) {
-            float curX;
             count = step->m_drawCount;
             lastIndex = particle->m_historyCount - 1;
             countMinusOne = (float)(count - 1);
@@ -1038,7 +1039,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
 
                 advance_segment:
                     if (segRemain >= step->m_segmentLength) {
-                        float t = segCursor / segLen;
+                        t = segCursor / segLen;
                         curX = segDx * t;
                         curY = segDy * t;
                         curZ = segDz * t;

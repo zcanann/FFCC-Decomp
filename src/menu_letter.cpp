@@ -138,13 +138,13 @@ inline void CMenuPcs::LetterInit()
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 224b
- * EN Address: 0x80186900
- * EN Size: 216b
+ * PAL Size: 216b
+ * EN Address: 0x80186B9C
+ * EN Size: 200b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::LetterInit0()
+inline void CMenuPcs::LetterInit2()
 {
 	int index = 0;
 	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
@@ -215,13 +215,13 @@ void CMenuPcs::LetterInit1()
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 216b
- * EN Address: 0x80186B9C
- * EN Size: 200b
+ * PAL Size: 224b
+ * EN Address: 0x80186900
+ * EN Size: 216b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::LetterInit2()
+inline void CMenuPcs::LetterInit0()
 {
 	int index = 0;
 	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
@@ -491,7 +491,7 @@ int CMenuPcs::LetterCtrl()
 						m_letterMenuState->mode = 1;
 						m_letterMenuState->step = 2;
 						m_letterMenuState->action = -1;
-						LetterInit0();
+						LetterInit2();
 					} else {
 						st->mode = 5;
 						m_letterMenuState->step = 0;
@@ -513,7 +513,7 @@ int CMenuPcs::LetterCtrl()
 					m_letterMenuState->mode = 1;
 					m_letterMenuState->step = 2;
 					m_letterMenuState->action = -1;
-					LetterInit0();
+					LetterInit2();
 					m_letterMenuState->dialogInitialized = 0;
 				}
 			}
@@ -524,7 +524,7 @@ int CMenuPcs::LetterCtrl()
 		if (s_Attach != 2) {
 			LetterInit4();
 		} else {
-			LetterInit2();
+			LetterInit0();
 		}
 	}
 	return ret;
@@ -664,7 +664,7 @@ inline int CMenuPcs::LetterLstClose()
  */
 inline int CMenuPcs::LetterMessOpen()
 {
-	CCaravanWork* caravanWork = GetLetterCaravanWork();
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	if (!caravanWork->m_letters[s_SelLetter].m_opened) {
 		caravanWork->m_letters[s_SelLetter].m_opened = 1;
 	}
@@ -789,7 +789,7 @@ inline int CMenuPcs::LetterItemWinClose()
  */
 int CMenuPcs::LetterReplyWinOpen()
 {
-	CCaravanWork* caravanWork = GetLetterCaravanWork();
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	char* srcText;
 	char* workText;
 #ifndef VERSION_GCCJGC
@@ -1148,7 +1148,9 @@ void CMenuPcs::LetterDraw()
 void CMenuPcs::LetterListDraw()
 {
 	SingleFadeEntry* panels = m_singleFadeState->entries;
+	CFont* font;
 	CCaravanWork::CLetterWork* letter;
+	CCaravanWork* caravanWork;
 
 	if ((static_cast<char>(s_OpenClose) != 0) && (static_cast<char>(m_singleMenuCtrlResetFlag) == '\0')) {
 		DrawSingleCrescent(1.0f,
@@ -1165,7 +1167,7 @@ void CMenuPcs::LetterListDraw()
 
 	LetterLstBaseDraw(panels[1].alpha);
 
-	CFont* font = m_fonts[0];
+	font = GetFont22();
 	font->SetMargin(1.0f);
 	font->SetShadow(1);
 	font->SetScale(1.0f);
@@ -1183,7 +1185,7 @@ void CMenuPcs::LetterListDraw()
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
-	CCaravanWork* caravanWork = GetLetterCaravanWork();
+	caravanWork = Game.m_scriptFoodBase[0];
 
 	int y = 0x60;
 	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
@@ -1204,7 +1206,7 @@ void CMenuPcs::LetterListDraw()
 
 		font->SetTlut(tlut);
 
-		const char* subject = Game.GetLetterSubject(letter->m_messageType);
+		char* subject = Game.GetLetterSubject(letter->m_messageType);
 		font->SetPosX(64.0f);
 #ifdef VERSION_GCCJGC
 		font->SetPosY(yf);
@@ -1213,7 +1215,7 @@ void CMenuPcs::LetterListDraw()
 #endif
 		font->Draw(subject);
 
-		const char* npcName = Game.m_cFlatDataArr[1].GetTable(2).m_strings[letter->m_senderId];
+		char* npcName = Game.m_cFlatDataArr[1].GetTable(2).m_strings[letter->m_senderId];
 		font->SetPosX(352.0f);
 #ifdef VERSION_GCCJGC
 		font->SetPosY(static_cast<float>(y));
@@ -1247,8 +1249,7 @@ void CMenuPcs::LetterListDraw()
 	int iconLetterIndex;
 	for (int row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
 		if (caravanWork->m_letters[iconLetterIndex].m_attachValue != 0) {
-			const int icon = 0x26 + (caravanWork->m_letters[iconLetterIndex].m_attachmentClaimed ? 1 : 0);
-			DrawSingleIcon(icon, iconX, static_cast<int>(static_cast<float>(iconY)), 1.0f, 1, 1.0f);
+			DrawSingleIcon(caravanWork->m_letters[iconLetterIndex].m_attachmentClaimed ? 0x27 : 0x26, iconX, static_cast<int>(static_cast<float>(iconY)), 1.0f, 1, 1.0f);
 		}
 		iconY += 0x20;
 	}
@@ -1385,12 +1386,8 @@ void CMenuPcs::LetterMessDraw()
 	if (caravanWork->m_letters[s_SelLetter].m_attachValue != 0) {
 		x0 = 472.0f;
 		y0 = 296.0f;
-		int iconX = static_cast<int>(x0);
-		int iconY = static_cast<int>(y0);
-		int icon = 0x26 +
-		           (caravanWork->m_letters[s_SelLetter].m_attachmentClaimed ? 1 : 0);
-		DrawSingleIcon(
-		    icon, iconX, iconY,
+		DrawSingleIcon(caravanWork->m_letters[s_SelLetter].m_attachmentClaimed ? 0x27 : 0x26,
+		    static_cast<int>(x0), static_cast<int>(y0),
 		    animState->entries[0].alpha, 1, 2.0f);
 	}
 
@@ -1456,7 +1453,7 @@ int CMenuPcs::LetterCtrlCur()
 		return 0;
 	}
 
-	CCaravanWork* const caravanWork = GetLetterCaravanWork();
+	CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 	int menuMode = m_letterMenuState->mode;
 	if (menuMode == 0) {
 		letterCount = caravanWork->m_letterCount;
@@ -1480,9 +1477,9 @@ int CMenuPcs::LetterCtrlCur()
 				}
 			}
 		} else if ((hold & 4) != 0) {
-			int cursor = static_cast<int>(m_letterMenuState->listCursor);
+			int cursor = m_letterMenuState->listCursor;
 			if ((cursor < 8) && (cursor < letterCount - 1)) {
-				m_letterMenuState->listCursor = m_letterMenuState->listCursor + 1;
+				m_letterMenuState->listCursor = cursor + 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else if (cursor + m_letterMenuState->topIndex < letterCount - 1) {
 				m_letterMenuState->topIndex = m_letterMenuState->topIndex + 1;
@@ -1509,12 +1506,12 @@ int CMenuPcs::LetterCtrlCur()
 				} else {
 					m_letterMenuState->step = m_letterMenuState->step + 1;
 					s_SelLetter = m_letterMenuState->topIndex + m_letterMenuState->listCursor;
-					CMes::m_tempVar[0] = caravanWork->m_letters[s_SelLetter].m_tempVars[0];
-					CMes::m_tempVar[1] = caravanWork->m_letters[s_SelLetter].m_tempVars[1];
-					CMes::m_tempVar[2] = caravanWork->m_letters[s_SelLetter].m_tempVars[2];
-					CMes::m_tempVar[3] = caravanWork->m_letters[s_SelLetter].m_tempVars[3];
+					CMes::SetTempValue(0, caravanWork->m_letters[s_SelLetter].m_tempVars[0]);
+					CMes::SetTempValue(1, caravanWork->m_letters[s_SelLetter].m_tempVars[1]);
+					CMes::SetTempValue(2, caravanWork->m_letters[s_SelLetter].m_tempVars[2]);
+					CMes::SetTempValue(3, caravanWork->m_letters[s_SelLetter].m_tempVars[3]);
 
-					LetterInit2();
+					LetterInit0();
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
@@ -1535,7 +1532,7 @@ int CMenuPcs::LetterCtrlCur()
 						m_letterMenuState->messageMask |= 2;
 					}
 				} else {
-					if (caravanWork->m_inventoryItemCount + 1 <= 0x40) {
+					if (caravanWork->CanAddItem(1)) {
 						m_letterMenuState->messageMask |= 2;
 					}
 				}
@@ -1558,7 +1555,7 @@ int CMenuPcs::LetterCtrlCur()
 #endif
 			m_letterMenuState->action = -1;
 			m_letterMenuState->step = m_letterMenuState->step + 1;
-			LetterInit0();
+			LetterInit2();
 			Sound.PlaySe(3, 0x40, 0x7F, 0);
 		}
 	} else if (menuMode == 2) {

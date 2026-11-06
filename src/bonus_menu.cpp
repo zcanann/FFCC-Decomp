@@ -650,7 +650,6 @@ void CMenuPcs::CalcResultOpenAnim()
 	CMenuPcs::Sprt2* src;
 	int delta;
 	int k;
-	int n;
 	int frame;
 	int doneCount;
 	CCharaPcs::CHandle* handle;
@@ -728,13 +727,12 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite = &m_bonusAnim->sprites[idx + k];
 				sprite->kind = -2;
 				sprite->x = 0;
-				src = sprite - delta;
 				sprite->y = 0;
 				sprite->w = 0;
 				sprite->h = 0;
 				sprite->mulX = 0.0f;
 				sprite->mulY = 0.0f;
-				sprite->startFrame = src->startFrame + src->duration;
+				sprite->startFrame = (sprite - delta)->startFrame + (sprite - delta)->duration;
 				sprite->duration = kFadeFrames;
 				sprite->depth = 1.0f;
 			}
@@ -765,14 +763,13 @@ void CMenuPcs::CalcResultOpenAnim()
 				delta = idx;
 				sprite = &m_bonusAnim->sprites[idx + i];
 				sprite->kind = -2;
-				src = sprite - delta;
 				sprite->x = 0;
 				sprite->y = 0;
 				sprite->w = 0;
 				sprite->h = 0;
 				sprite->mulX = 0.0f;
 				sprite->mulY = 0.0f;
-				sprite->startFrame = src->startFrame + src->duration;
+				sprite->startFrame = (sprite - delta)->startFrame + (sprite - delta)->duration;
 				if (i != 0) {
 					sprite->startFrame += i * 3;
 				}
@@ -787,8 +784,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			for (i = 0; i < activePartyCount; i++) {
 				delta = idx - (activePartyCount + 1);
 				sprite = &m_bonusAnim->sprites[idx + i];
-				src = sprite - delta;
-				*sprite = *src;
+				*sprite = *(sprite - delta);
 				sprite->y = (short)(sprite->y + 0x20);
 				sprite->w = 0xA8;
 				sprite->h = 0x38;
@@ -809,9 +805,9 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		// zeroed model sprites follow the frame rows
 		for (k = 0; k < activePartyCount; k++) {
+			delta = zeroBase - 1;
 			sprite = &m_bonusAnim->sprites[zeroBase + k];
-			src = sprite - (zeroBase - 1);
-			sprite->startFrame = src->startFrame + src->duration;
+			sprite->startFrame = (sprite - delta)->startFrame + (sprite - delta)->duration;
 		}
 
 		{
@@ -843,13 +839,12 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite = &m_bonusAnim->sprites[idx + k];
 				sprite->kind = kBonusCountTexture;
 				sprite->x = 0x200;
-				src = sprite - delta;
-				sprite->y = (short)(src->y + 0xC);
+				sprite->y = (short)((sprite - delta)->y + 0xC);
 				sprite->w = 0x20;
 				sprite->h = 0x28;
 				sprite->mulX = 0.0f;
 				sprite->mulY = 40.0f;
-				sprite->startFrame = src->startFrame + src->duration;
+				sprite->startFrame = (sprite - delta)->startFrame + (sprite - delta)->duration;
 				sprite->duration = kFadeFrames;
 				sprite->depth = 1.0f;
 			}
@@ -862,14 +857,13 @@ void CMenuPcs::CalcResultOpenAnim()
 				delta = idx - (activePartyCount + 1);
 				sprite = &m_bonusAnim->sprites[idx + k];
 				sprite->kind = -1;
-				src = sprite - delta;
-				sprite->x = (short)(src->x + 0x50);
-				sprite->y = (short)(src->y + 0x48);
+				sprite->x = (short)((sprite - delta)->x + 0x50);
+				sprite->y = (short)((sprite - delta)->y + 0x48);
 				sprite->w = 0;
 				sprite->h = 0;
 				sprite->mulX = 0.0f;
 				sprite->mulY = 0.0f;
-				sprite->startFrame = src->startFrame;
+				sprite->startFrame = (sprite - delta)->startFrame;
 				sprite->duration = kFadeFrames;
 				sprite->depth = 1.0f;
 			}
@@ -883,13 +877,12 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite = &m_bonusAnim->sprites[idx + k];
 				sprite->kind = -1;
 				sprite->x = 0xb8;
-				src = sprite - delta;
-				sprite->y = (short)(src->y + 0x15);
+				sprite->y = (short)((sprite - delta)->y + 0x15);
 				sprite->w = 0;
 				sprite->h = 0;
 				sprite->mulX = 0.0f;
 				sprite->mulY = 0.0f;
-				sprite->startFrame = src->startFrame + src->duration;
+				sprite->startFrame = (sprite - delta)->startFrame + (sprite - delta)->duration;
 				sprite->duration = kFadeFrames;
 				sprite->depth = 1.0f;
 			}
@@ -920,9 +913,9 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite = &m_bonusAnim->sprites[s_CntTop + k];
 				int w3 = sprite->w * 3;
 				int extent = w3 + 0x20;
-				float centerX = w3 * 0.5 + sprite->x;
+				float centerX = w3 / 2.0 + sprite->x;
 				centerX -= 320.0;
-				float centerY = sprite->h * 0.5 + sprite->y;
+				float centerY = sprite->h / 2.0 + sprite->y;
 				centerY -= 224.0;
 				(&m_wm.m_worldObjData[activePartyCount])[k].m_viewportX = (short)centerX;
 				(&m_wm.m_worldObjData[activePartyCount])[k].m_viewportY = (short)centerY;
@@ -940,7 +933,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				float centerX = 0.0f;
 				float centerY = sprite->h / 2.0 + sprite->y;
 				centerY -= 224.0;
-				delta = activePartyCount * 2 + k;
+				delta = (activePartyCount << 1) + k;
 				m_wm.m_worldObjData[delta].m_viewportX = (short)centerX;
 				m_wm.m_worldObjData[delta].m_viewportY = (short)centerY;
 			}
@@ -967,8 +960,9 @@ void CMenuPcs::CalcResultOpenAnim()
 	this->m_bonusState->m_frame++;
 	frame = (int)this->m_bonusState->m_frame;
 
-	for (n = doneCount = 0; n < (int)m_bonusAnim->header.count; n++) {
-		sprite = &m_bonusAnim->sprites[n];
+	doneCount = 0;
+	for (k = 0; k < (int)m_bonusAnim->header.count; k++) {
+		sprite = &m_bonusAnim->sprites[k];
 
 		if (sprite->startFrame <= frame) {
 			if (sprite->startFrame + sprite->duration <= frame) {
@@ -992,19 +986,19 @@ void CMenuPcs::CalcResultOpenAnim()
 
 	Mtx scaleMtx;
 	{
-		n = 0;
-		for (; n < activePartyCount * 3; n++) {
-			sprite = &m_bonusAnim->sprites[activePartyCount * 2 + 1 + n];
-			if (n < activePartyCount) {
-				handle = s_Rinfo->m_party[n].m_partyHandle;
-				work = s_Rinfo->m_party[n].m_tribeId;
+		k = 0;
+		for (; k < activePartyCount * 3; k++) {
+			sprite = &m_bonusAnim->sprites[activePartyCount * 2 + 1 + k];
+			if (k < activePartyCount) {
+				handle = s_Rinfo->m_party[k].m_partyHandle;
+				work = s_Rinfo->m_party[k].m_tribeId;
 			} else {
-				handle = m_wm.m_handles[n - activePartyCount];
+				handle = m_wm.m_handles[k - activePartyCount];
 			}
-			if (n < activePartyCount) {
+			if (k < activePartyCount) {
 				float modelScale = s_PCScl[work];
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-			} else if (n >= activePartyCount * 2) {
+			} else if (k >= activePartyCount * 2) {
 				float modelScale = 0.5f;
 				if (sprite->timer == kBallFadeStart && m_bonusAlpha == 0) {
 					Sound.PlaySe(0x48, 0x40, 0x7f, 0);
@@ -1020,23 +1014,23 @@ void CMenuPcs::CalcResultOpenAnim()
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			}
 
-			if (n / activePartyCount == 1) {
+			if (k / activePartyCount == 1) {
 				Math.MTXRotRadApply(scaleMtx, scaleMtx, 'x', 0.2617993950843811f);
 				Math.MTXRotRadApply(scaleMtx, scaleMtx, 'y', 0.01745329238474369f * this->m_bonusState->m_modelRotation);
 			}
 
-			if (n < activePartyCount) {
+			if (k < activePartyCount) {
 				scaleMtx[0][3] = 0.0f;
 				scaleMtx[2][3] = 0.0f;
 				scaleMtx[1][3] = s_PCYpos[work];
-			} else if (n >= activePartyCount * 2) {
+			} else if (k >= activePartyCount * 2) {
 				float tx = GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
 				scaleMtx[0][3] = tx;
 				if (sprite->timer - 1 == 7) {
 					Sound.PlaySe(0x47, 0x40, 0x7f, 0);
 				}
 				float ty = GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
-				work = n - activePartyCount * 2;
+				work = k - activePartyCount * 2;
 				scaleMtx[1][3] = ty;
 				scaleMtx[2][3] = 0.0f;
 				if (1 <= work && work <= 2) {
@@ -1052,7 +1046,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			handle->m_model->SetMatrix(scaleMtx);
 			handle->m_model->CalcMatrix();
 			handle->m_model->CalcSkin();
-			if (n >= activePartyCount * 2) {
+			if (k >= activePartyCount * 2) {
 				if (sprite->timer >= kBallFadeStart) {
 					work = sprite->timer - kBallFadeStart;
 					sprite->alpha = (float)(1.0 - (double)((float)work / (float)(sprite->duration - kBallFadeStart)));

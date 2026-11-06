@@ -810,9 +810,9 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 
 	objectFrame(object);
 
-	CStack result = pop(object);
+	int result = pop(object).m_int;
 	if (outArg != 0) {
-		*outArg = result;
+		outArg->m_int = result;
 	}
 	return 1;
 }
@@ -919,10 +919,10 @@ inline void CFlatRuntime::callCleanup(CFlatRuntime::CObject* object)
 	CStack returnValue;
 	CStack previousCodePos;
 
-	returnValue = pop(object);
+	returnValue.m_word = pop(object).m_word;
 	int packedFlags = pop(object).m_int;
 	int previousCallFlag = pop(object).m_int;
-	previousCodePos = pop(object);
+	previousCodePos.m_word = pop(object).m_word;
 	unsigned int* previousLocalBase = reinterpret_cast<unsigned int*>(pop(object).m_word);
 
 	object->m_sp = object->m_localBase;

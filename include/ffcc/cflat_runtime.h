@@ -16,14 +16,12 @@ public:
 		int m_codeOffset : 20;
 	};
 
-	struct CStack
+	union CStack
 	{
-		union {
-			u32 m_word;
-			s32 m_int;
-			float m_float;
-			CCodeIndex m_codeIndex;
-		};
+		u32 m_word;
+		s32 m_int;
+		float m_float;
+		CCodeIndex m_codeIndex;
 	};
 
 	class CClass

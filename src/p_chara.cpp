@@ -103,14 +103,6 @@ static inline void AddSharedRef(T* ptr)
     }
 }
 
-static inline void ReleaseHandleAnimSlot(CCharaPcs::CHandle* handle, int slot)
-{
-    CRef* animRef = handle->m_animSlot[slot];
-    if (animRef != 0) {
-        ReleaseShared(handle->m_animSlot[slot]);
-    }
-}
-
 static inline void BuildCharaBasePath(int charaKind, unsigned long charaNo, char* outPath)
 {
     const char** pathParts = CCharaPcs::m_modelTable[charaKind];
@@ -2070,7 +2062,8 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int, int mer
         if (fileHandle != 0) {
             fileHandle->Read();
             fileHandle->SyncCompleted();
-            loadAnimBuffer(File.GetBuffer(), animName, charaKind, charaNo, mergeFileId, mergeFlags);
+            void* buffer = File.GetBuffer();
+            loadAnimBuffer(buffer, animName, charaKind, charaNo, mergeFileId, mergeFlags);
             fileHandle->Close();
 
             if (System.GetErrorLevel() >= 1U) {
@@ -2115,20 +2108,19 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
 {
     if (animIndex == -1) {
         for (int i = 0; i < 64; i++) {
-            ReleaseHandleAnimSlot(this, i);
+            if (m_animSlot[i] != 0) {
+                if (m_animSlot[i] != 0) {
+                    m_animSlot[i]->Release();
+                    m_animSlot[i] = 0;
+                }
+            }
         }
         CharaPcs.releaseUnuseLoadAnim(0, 0);
-        return;
+    } else if (m_animSlot[animIndex] != 0) {
+        m_animSlot[animIndex]->Release();
+        CharaPcs.releaseUnuseLoadAnim(m_animSlot[animIndex], 0);
+        m_animSlot[animIndex] = 0;
     }
-
-    CLoadAnim* previousAnim = m_animSlot[animIndex];
-    if (previousAnim == 0) {
-        return;
-    }
-
-    ReleaseSharedNonNull(m_animSlot[animIndex]);
-    CharaPcs.releaseUnuseLoadAnim(m_animSlot[animIndex], 0);
-    m_animSlot[animIndex] = 0;
 }
 
 /*

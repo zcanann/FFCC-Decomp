@@ -295,7 +295,7 @@ void CSound::Frame()
 
             if (se->m_bits.m_paused) {
                 if (volume != 0) {
-                    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Sound) != 0) {
+                    if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_Sound) != 0) {
                         System.Printf("\x1B[32mEnvSePlay: %06d\n\x1B[0m", se->m_soundId);
                     }
 
@@ -310,7 +310,7 @@ void CSound::Frame()
                     if ((playing != 0) &&
                         (m_redSound.GetSeVolume(se->m_playId, REDSOUND_SE_VOLUME_QUERY_VALUE) == 0) &&
                         (m_redSound.GetSeVolume(se->m_playId, REDSOUND_SE_VOLUME_QUERY_DELTA) == 0)) {
-                        if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Sound) != 0) {
+                        if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_Sound) != 0) {
                             System.Printf("\x1B[32mEnvSeStop: %06d\n\x1B[0m", se->m_soundId);
                         }
                         m_redSound.SeStop(se->m_playId);

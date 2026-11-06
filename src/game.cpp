@@ -70,15 +70,13 @@ CGame Game;
 
 inline int CMapPcs::GetLightHolderSize(CMapLightHolder::TYPE type)
 {
-    return g_MapMng.GetMapLightHolderArray(type).GetSize();
+    return g_MapMng.m_mapLightHolderArrays[type].GetSize();
 }
 
 inline void CMapPcs::GetLightHolder(CMapLightHolder::TYPE type, long index, _GXColor* color, Vec* pos)
 {
-    CPtrArray<CMapLightHolder*>& holders = g_MapMng.GetMapLightHolderArray(type);
-
-    if (static_cast<unsigned long>(index) < static_cast<unsigned long>(holders.GetSize())) {
-        holders[index]->GetLightHolder(color, pos);
+    if (index < g_MapMng.m_mapLightHolderArrays[type].GetSize()) {
+        g_MapMng.m_mapLightHolderArrays[type][index]->GetLightHolder(color, pos);
     }
 }
 
@@ -185,7 +183,7 @@ void CGame::Init()
     memset(m_currentScriptName, 0, sizeof(m_currentScriptName));
     memset(m_startScriptName, 0, sizeof(m_startScriptName));
     m_frameCounterEnable = 1;
-    gCFlatRuntime().CFlatRuntime::Init();
+    CFlat.CFlatRuntime::Init();
     unkFloat_0xca10 = 1000.0f;
 }
 
@@ -200,7 +198,7 @@ void CGame::Init()
  */
 void CGame::Quit()
 {
-	gCFlatRuntime().CFlatRuntime::Quit();
+	CFlat.CFlatRuntime::Quit();
 
 	if (m_debugStage != 0) {
 		Memory.DestroyStage(m_debugStage);
@@ -449,7 +447,7 @@ void CGame::InitNewGame()
     System.Printf("*\n");
 
     Game.m_gameWork.InitNewGame();
-    CFlatRuntime2Storage().ResetNewGame();
+    CFlat.ResetNewGame();
     Chara.InitFurTexBuffer();
 }
 
@@ -466,7 +464,7 @@ void CGame::clearWork()
 {
     int i;
 
-    CFlatRuntime2Storage().CFlatRuntime2::Destroy();
+    CFlat.CFlatRuntime2::Destroy();
 
     for (i = 0; i < 4; i++) {
         m_cFlatDataArr[i].Destroy();
@@ -573,7 +571,7 @@ void CGame::CheckScriptChange()
 
     if (strcmp(m_nextScript.m_name, "ffcc_0") != 0) {
         if (m_cfdLoadedFlag == 0) {
-            CFlatRuntime2Storage().CFlatRuntime2::Destroy();
+            CFlat.CFlatRuntime2::Destroy();
             loadCfd();
             m_cfdLoadedFlag = 1;
 
@@ -585,7 +583,7 @@ void CGame::CheckScriptChange()
         LoadLogoWaitingData();
     }
 
-    int scriptResult = CFlatRuntime2Storage().Load(m_nextScript.m_name);
+    int scriptResult = CFlat.Load(m_nextScript.m_name);
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
     if ((int)m_nextScriptFlags != 0) {
@@ -803,9 +801,9 @@ void CGame::Calc()
     }
 
     Wind.Frame();
-    CFlatRuntime2Storage().Calc();
-    gCFlatRuntime().ResetPerformance();
-    CFlatRuntime2Storage().CFlatRuntime2::Frame(1, 0);
+    CFlat.Calc();
+    CFlat.ResetPerformance();
+    CFlat.CFlatRuntime2::Frame(1, 0);
 
     if ((m_currentMapId == 0x21) && ((mapObjIdx = g_MapMng.GetMapObjIdx(0)) >= 0)) {
         static float a = 0.0f;
@@ -826,7 +824,7 @@ void CGame::Calc()
  */
 void CGame::Calc2()
 {
-	CFlatRuntime2Storage().CFlatRuntime2::Frame(0, 1);
+	CFlat.CFlatRuntime2::Frame(0, 1);
 }
 
 /*
@@ -841,7 +839,7 @@ void CGame::Calc2()
 void CGame::Calc3()
 { 
 	CGPartyObj::CheckMenu();
-	gCFlatRuntime().AfterFrame(0);
+	CFlat.AfterFrame(0);
 }
 
 /*
@@ -855,7 +853,7 @@ void CGame::Calc3()
  */
 void CGame::Draw()
 {
-	gCFlatRuntime().SystemCall(0, 1, 6, 0, 0, 0);
+	CFlat.SystemCall(0, 1, 6, 0, 0, 0);
 }
 
 /*
@@ -869,7 +867,7 @@ void CGame::Draw()
  */
 void CGame::Draw2()
 {
-	CFlatRuntime2Storage().Draw();
+	CFlat.Draw();
 	Wind.Draw();
 }
 
@@ -884,8 +882,8 @@ void CGame::Draw2()
  */
 void CGame::Draw3()
 {
-	CFlatRuntime2Storage().CFlatRuntime2::Frame(0, 2);
-	gCFlatRuntime().SystemCall(0, 1, 5, 0, 0, 0);
+	CFlat.CFlatRuntime2::Frame(0, 2);
+	CFlat.SystemCall(0, 1, 5, 0, 0, 0);
 }
 
 /*
@@ -908,7 +906,7 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
 	stack[5].m_float = pos->z;
 	stack[6].m_word = (u32)hitParam->m_particleIndex;
 	stack[7].m_word = (u32)hitParam->m_classId;
-	gCFlatRuntime().SystemCall(0, 1, 1, 8, stack, 0);
+	CFlat.SystemCall(0, 1, 1, 8, stack, 0);
 }
 
 /*
@@ -1114,7 +1112,7 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
         return 0;
     }
 
-    runtime = &CFlatRuntime2Storage();
+    runtime = &CFlat;
     baseObj = reinterpret_cast<CGBaseObj*>(runtime->CFlatRuntime2::intToClass((int)ifParam.m_classId));
     particleIndex = ifParam.m_particleIndex;
     if (particleIndex == 0) {
@@ -1163,7 +1161,7 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
     if (count > 1) {
         MakeNumItemName(out, itemIndex, count);
     } else {
-        char** itemTable = m_cFlatDataArr[1].GetTable(0);
+        char** itemTable = m_cFlatDataArr[1].GetTable(0).m_strings;
         unsigned char hasSeparator = 0;
         char* prefix = itemTable[itemIndex * 5];
         char* name = itemTable[itemIndex * 5 + 1];
@@ -1193,7 +1191,7 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
  */
 char* CGame::MakeArtsItemNames(char* out, int itemIndex)
 {
-    GameNameRow* itemTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].GetTable(0));
+    GameNameRow* itemTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].GetTable(0).m_strings);
     unsigned char hasSeparator = 0;
     char* prefix = itemTable[itemIndex].m_artPrefix;
     char* itemName = itemTable[itemIndex].m_artName;
@@ -1240,7 +1238,7 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
     if (count > 1) {
         MakeNumMonName(out, monIndex, count);
     } else {
-        char** monTable = m_cFlatDataArr[1].GetTable(1);
+        char** monTable = m_cFlatDataArr[1].GetTable(1).m_strings;
         unsigned char hasSeparator = 0;
         char* prefix = monTable[monIndex * 5];
         char* name = monTable[monIndex * 5 + 1];
@@ -1270,7 +1268,7 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
  */
 char* CGame::MakeArtsMonNames(char* out, int monIndex)
 {
-    GameNameRow* monTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].GetTable(1));
+    GameNameRow* monTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].GetTable(1).m_strings);
     unsigned char hasSeparator = 0;
     char* prefix = monTable[monIndex].m_artPrefix;
     char* monName = monTable[monIndex].m_artName;

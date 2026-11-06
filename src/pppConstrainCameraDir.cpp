@@ -66,9 +66,13 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, pppCo
             PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 
             if (step->m_applyPosition != 0) {
-                float resultZ = cameraDirZ * *value + cameraPosZ;
-                float resultY = cameraDirY * *value + cameraPosY;
-                float resultX = cameraDirX * *value + cameraPosX;
+                float resultX = cameraPosX;
+                float resultY = cameraPosY;
+                float resultZ = cameraPosZ;
+                float v = *value;
+                resultX = cameraDirX * v + resultX;
+                resultY = cameraDirY * v + resultY;
+                resultZ = cameraDirZ * v + resultZ;
                 ppvMng->m_matrix.value[0][3] = resultX;
                 ppvMng->m_matrix.value[1][3] = resultY;
                 ppvMng->m_matrix.value[2][3] = resultZ;

@@ -38,6 +38,7 @@ public:
 
 	CGCharaObj() {}
 	
+	int GetCID() { return 0x2D; }
 	void onCreate();
 	void onDestroy();
 	void ClearAllSta();
@@ -89,7 +90,6 @@ public:
 	static int scCheckItem(CCombi2Set*, CGCharaObj*, int);
 	static int scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int);
 	static int searchCombi(int, CGPartyObj **, int&);
-	int GetCID() { return 0x2D; }
 
 	int m_updateCounter; // 0x54C
 	int m_attackAnimId;

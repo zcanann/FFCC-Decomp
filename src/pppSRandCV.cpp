@@ -19,10 +19,10 @@ static inline float randf(unsigned char flag)
 {
     float value = Math.RandF();
     if (flag != 0) {
-        value = value + Math.RandF();
+        float random = Math.RandF();
+        value += random;
     } else {
-        float scale = 2.0f;
-        value = value * scale;
+        value *= 2.0f;
     }
     return value;
 }

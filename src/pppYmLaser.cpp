@@ -275,8 +275,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	s32 dataValIndex = step->m_dataValIndex;
 	u32 count;
 	s32 i;
-	short alphaStep;
-	char alphaMax;
+	u8 alphaStep;
+	u8 alphaMax;
 	float negHalfWidth;
 	float length;
 	float halfWidth;
@@ -391,25 +391,25 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 		}
 
 		GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
-		alphaMax = step->m_laser.m_trailAlpha;
+		alphaMax = (u8)step->m_laser.m_trailAlpha;
 		color.r = step->m_laser.m_trailColorR;
 		color.g = step->m_laser.m_trailColorG;
-		alphaStep = (u8)((u8)alphaMax / (s32)step->m_laser.m_pointCount);
 		color.b = step->m_laser.m_trailColorB;
 		color.a = alphaMax;
+		alphaStep = (u8)color.a / step->m_laser.m_pointCount;
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
 		for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
 			_GXColor trailStartColor;
 			trailStartColor.r = color.r;
 			trailStartColor.g = color.g;
 			trailStartColor.b = color.b;
-			trailStartColor.a = (u8)alphaMax - alphaStep * j;
+			trailStartColor.a = alphaMax - alphaStep * j;
 
 			_GXColor trailEndColor;
 			trailEndColor.r = color.r;
 			trailEndColor.g = color.g;
 			trailEndColor.b = color.b;
-			trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
+			trailEndColor.a = alphaMax - alphaStep * (j + 1);
 
 			GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
 			GXColor1u32(*(u32*)&trailStartColor);
@@ -426,7 +426,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 		}
 		GXEnd();
 
-		if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
+		if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
 			Util.SetVtxFmt_POS_CLR();
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -469,7 +469,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			GXSetPointSize(8, GX_TO_ZERO);
 			GXSetZMode(1, GX_LEQUAL, 0);
 
-			if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
+			if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
 				float radius = ppvMng->m_hitScale * step->m_laser.m_hitScale;
 				float distance = PSVECDistance(work->m_points, &work->m_origin);
 				debugSource.x = zero;

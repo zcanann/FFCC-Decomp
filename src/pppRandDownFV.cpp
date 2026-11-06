@@ -17,8 +17,7 @@ static inline RandDownFVDataOffsets* GetRandDownFVDataOffsets(_pppCtrlTable* ctr
 
 static inline float randf(float value, float scale)
 {
-    float result = value * scale;
-    return result;
+    return value * scale;
 }
 
 /*

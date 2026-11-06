@@ -1,7 +1,7 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1j for Japan.
-GC/2.0p1j is derived during the build from the bundled GC/2.0p1 (see below).
+The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1k for Japan.
+GC/2.0p1k is derived during the build from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -168,3 +168,60 @@ other function or section moves, and `p_system`, `p_mc` and `p_gba` keep their
 `dsl` scores. Checking only the store's object size distinguishes the cases
 without a BFBB probe; the type-size offset was confirmed by that measurement
 (offsets 4 and 8 lose the `dsl` gains). PAL and USA are unaffected.
+
+## GC/2.0p1k: dsl accepts update-form loads (dslu)
+
+`tools/patch_compiler_ffcc4.py` derives GC/2.0p1k from GC/2.0p1j
+(`c900a720e9981e7e470b0a0c5558b81ac6f1bb43` to
+`abeb8e6e85568dd4e904e26ae3ca55b5b2cc5bcd`) with two edits: a 30-byte stub in
+free `.sbpatch` space and a jump to it replacing one test in `f_dsl`.
+
+This corrects the implementation of `dsl` to its documented behaviour (a later
+access *through a register* to an `@`-named static). `f_dsl` rejected every
+load whose offset operand is symbolic (operand kind 3), treating it as a direct
+operand. That is right for an `@sda21` load, whose base operand is `r0`. After
+register allocation, however, the peephole pass merges `addi rB,rB,@N@l` and
+`lwz rX,0(rB)` into `lwzu rX,@N@l(rB)`. That load goes through the base
+register `rB`, but its offset operand is symbolic. The post-allocation
+scheduler therefore had no edge from the singleton's vtable store (`stw`,
+`@sda21`) to it, and hoisted the PTMF constant load above the store.
+
+- `dslu`: the load test also accepts a symbolic offset operand when the base
+  operand is a register other than `r0`. This covers `@l(rB)` and update-form
+  loads. Direct `r0`-based operands (the `@sda21` form) are still rejected.
+
+Rebuilding every Japanese game unit (268) against GC/2.0p1j, the objects that
+change are `p_game`, `p_system`, `p_mc` and `p_gba`. Every other object is
+byte-identical, including data and exception tables. In each of the four, the
+`__sinit_*` function becomes exact: `__sinit_p_game_cpp` 99.48,
+`__sinit_p_system_cpp` 86.21, `__sinit_p_mc_cpp` 86.21 and `__sinit_p_gba_cpp`
+76.47 to 100. That is +4 / -0 exact functions and +744 exact code bytes, with no
+partial losses. Each was its unit's only Japanese mismatch, so all four units
+now link in Japan. BFBB builds only up to GC/2.0p1g and never uses the FFCC
+steps; `dsl` itself was 0 / 0 on BFBB when it was introduced. PAL and USA are
+unaffected.
+
+### Not adopted: a write-after-read mirror of e3ns
+
+A further candidate predicate orders a whole load of a small named static
+(alias kind 0, size 1 to 8 bytes, not `@`-named) before a later subrange store
+into a frame object whose address escapes. It is the write-after-read mirror of
+`e3ns`. On top of GC/2.0p1j it is +2 / -0 over every Japanese unit
+(`pppConstructYmMoveCircle` 92.29 and `pppParHitSphMat` 96.15 to 100), with no
+partial losses. It is not adopted, for these reasons:
+
+- No neighbouring compiler produces the retail shape. Neither function reaches
+  100 with GC/1.2.5, 1.3, 1.3.2, 2.0, 2.0p1, 2.5, 2.6, 2.7, 3.0a3 to 3.0a5.2 or
+  any derived step from 2.0p1a to 2.0p1k. The best is stock 2.0p1 at 93.01 for
+  `pppConstructYmMoveCircle`; `pppParHitSphMat` never exceeds 96.15. Without
+  that signal, the project decompiles towards likely source instead of adding a
+  clause.
+- The predicate is fitted to these cases rather than derived from a documented
+  BFBB behaviour. Its size limit was added only because the unlimited form
+  broke `pppFrameYmMoveCircle`. It covers named statics, and only for a read
+  before a write. `e3ns` covers only `@` literals for a read after a write, so
+  together they do not form one consistent alias rule. A related widening of
+  `e3ns` to whole-object frame stores loses `makeFurTex`.
+- `pppFrameYmCheckBGHeight` would also need a source reorder that holds only
+  under this predicate (it scores 90 without it). That would tune source to the
+  candidate compiler.

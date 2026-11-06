@@ -1078,27 +1078,22 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
 void CGraphic::makeSphere()
 {
     float vertices[42][3];
-    float (*rowVertex)[3];
-    float (*vertex)[3];
-
     int vertexCount = 0;
-    vertices[0][0] = -1.0f;
-    vertices[0][1] = 0.0f;
+
+    vertices[vertexCount][0] = -1.0f;
+    vertices[vertexCount][1] = 0.0f;
     vertices[vertexCount++][2] = 0.0f;
-    vertex = &vertices[vertexCount];
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (3.1415927f * (float)(ring + 1)) / 6.0f;
         float x = -1.0f * (float)cos(pitch);
         float radius = -1.0f * (float)sin(pitch);
 
-        rowVertex = vertex;
         for (int seg = 0; seg < 8; seg++) {
-            (*rowVertex)[0] = x;
-            (*rowVertex)[1] = radius * (float)sin(0.7853982f * (float)seg);
-            vertices[vertexCount++][2] = radius * (float)cos(0.7853982f * (float)seg);
-            vertex++;
-            rowVertex++;
+            vertices[vertexCount][0] = x;
+            vertices[vertexCount][1] = radius * (float)sin(0.7853982f * (float)seg);
+            float cosine = (float)cos(0.7853982f * (float)seg);
+            vertices[vertexCount++][2] = radius * cosine;
         }
     }
 
@@ -2001,13 +1996,14 @@ void CGraphic::genMapSphere(void* displayListBuffer, unsigned long* outDisplayLi
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGraphic::drawSphereMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
+void CGraphic::drawSphereMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
                              _GXTexObj* blendTexObj)
 {
     const Vec cameraPos = {0.0f, 0.0f, 6.0f};
     const Vec cameraUp = {0.0f, 1.0f, 0.0f};
     const Vec cameraLook = {0.0f, 0.0f, 0.0f};
     const float xAxisAngles[6] = {90.0f, 180.0f, 270.0f, 0.0f, 90.0f, -90.0f};
+    const char xAxisIds[6] = {'y', 'y', 'y', 'y', 'x', 'x'};
     const float yAxisAngles[6] = {0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 180.0f};
     Mtx44 orthoMtx;
     Mtx cameraMtx;
@@ -2065,7 +2061,7 @@ inline void CGraphic::drawSphereMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj,
             PSMTXRotRad(tempMtx, 'y', 0.017453292f * yAxisAngles[i]);
             PSMTXConcat(objectMtx, tempMtx, objectMtx);
         }
-        PSMTXRotRad(tempMtx, (i < 4) ? 'y' : 'x', 0.017453292f * xAxisAngles[i]);
+        PSMTXRotRad(tempMtx, xAxisIds[i], 0.017453292f * xAxisAngles[i]);
         PSMTXConcat(objectMtx, tempMtx, objectMtx);
         PSMTXConcat(lightFrustumMtx, objectMtx, objectMtx);
         GXLoadTexMtxImm(objectMtx, 0x1E, GX_MTX3x4);
@@ -2076,6 +2072,71 @@ inline void CGraphic::drawSphereMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj,
     GetBackBufferRect2(targetData, targetTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_RGB565, 0);
     GXSetScissor(0, 0, 0x280, 0x1C0);
     SetViewport();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 680b
+ * EN Address: UNUSED
+ * EN Size: 836b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphic::DrawBlurScreen(unsigned char alpha, float scale)
+{
+    _GXTexObj texObj;
+    _GXColor color;
+    Vec quadMin;
+    Vec quadMax;
+
+    Util.DisableIndMtx();
+    Util.SetOrthoEnv();
+    Util.SetVtxFmt_POS_CLR_TEX();
+    GXSetZCompLoc(GX_FALSE);
+    _GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetColorUpdate(GX_TRUE);
+    GXSetAlphaUpdate(GX_FALSE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+
+    color.r = 0x80;
+    color.g = 0x80;
+    color.b = 0x80;
+    color.a = alpha;
+    GXSetChanAmbColor(GX_COLOR0A0, color);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+
+    GXInitTexObj(&texObj, m_savedFrameBuffer, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+
+    float border = 1.0f - scale;
+    border *= 0.5f;
+    quadMin.x = border * 640.0f;
+    quadMin.y = border * 448.0f;
+    quadMin.z = 0.0f;
+    quadMax.x = (1.0f - border) * 640.0f;
+    quadMax.y = (1.0f - border) * 448.0f;
+    quadMax.z = 0.0f;
+    Util.RenderQuad(quadMin, quadMax, color, 0, 0);
+
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    GXLoadPosMtxImm(CameraPcs.GetViewMatrix(), 0);
+    GXSetCurrentMtx(0);
+    GXSetProjection(CameraPcs.GetProjectionMatrix(), GX_PERSPECTIVE);
+    GXSetAlphaUpdate(GX_TRUE);
 }
 
 /*

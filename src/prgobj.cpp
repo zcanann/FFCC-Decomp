@@ -256,13 +256,13 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
  */
 void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
 {
-	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
-	CFlatRuntime2Storage().SetParticleWorkScale(scale);
-	CFlatRuntime2Storage().SetParticleWorkPos(*pos, 0.0f);
+	CFlat.ResetParticleWork(no, dataNo);
+	CFlat.SetParticleWorkScale(scale);
+	CFlat.SetParticleWorkPos(*pos, 0.0f);
 	if (seNo != 0) {
-		CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
+		CFlat.SetParticleWorkSe(seNo, 2, 0);
 	}
-	CFlatRuntime2Storage().PutParticleWork();
+	CFlat.PutParticleWork();
 }
 
 /*
@@ -276,13 +276,13 @@ void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
  */
 void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, int seNo)
 {
-	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
-	CFlatRuntime2Storage().SetParticleWorkScale(scale);
-	CFlatRuntime2Storage().SetParticleWorkBind(this);
+	CFlat.ResetParticleWork(no, dataNo);
+	CFlat.SetParticleWorkScale(scale);
+	CFlat.SetParticleWorkBind(this);
 	if (seNo != 0) {
-		CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
+		CFlat.SetParticleWorkSe(seNo, 2, 0);
 	}
-	CFlatRuntime2Storage().PutParticleWork();
+	CFlat.PutParticleWork();
 }
 
 /*
@@ -296,12 +296,12 @@ void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, 
  */
 void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
-	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
-	CFlatRuntime2Storage().SetParticleWorkScale(scale);
-	CFlatRuntime2Storage().SetParticleWorkTrace(this);
-	CFlatRuntime2Storage().PutParticleWork();
+	CFlat.ResetParticleWork(no, dataNo);
+	CFlat.SetParticleWorkScale(scale);
+	CFlat.SetParticleWorkTrace(this);
+	CFlat.PutParticleWork();
 	if (seNo != 0) {
-		CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
+		CFlat.SetParticleWorkSe(seNo, 2, 0);
 	}
 }
 
@@ -316,13 +316,13 @@ void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, 
  */
 void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
-	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
-	CFlatRuntime2Storage().SetParticleWorkScale(scale);
-	CFlatRuntime2Storage().SetParticleWorkBind(this);
-	CFlatRuntime2Storage().SetParticleWorkTrace(obj);
-	CFlatRuntime2Storage().PutParticleWork();
+	CFlat.ResetParticleWork(no, dataNo);
+	CFlat.SetParticleWorkScale(scale);
+	CFlat.SetParticleWorkBind(this);
+	CFlat.SetParticleWorkTrace(obj);
+	CFlat.PutParticleWork();
 	if (seNo != 0) {
-		CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
+		CFlat.SetParticleWorkSe(seNo, 2, 0);
 	}
 }
 

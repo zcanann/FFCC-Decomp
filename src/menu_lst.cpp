@@ -51,13 +51,13 @@ void CMenuPcs::MLstDraw()
 	short menuMode;
 	int i;
 	MenuLstEntry* item;
-	float y;
-	float h;
 	float w;
-	float x;
-	float v;
 	float textX;
 	float textY;
+	float x;
+	float y;
+	float h;
+	float v;
 	GXColor colors[4];
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -109,14 +109,14 @@ void CMenuPcs::MLstDraw()
 	font->DrawInit();
 
 	item = this->m_menuLstList->entries;
-	for (i = 0; i < this->m_menuLstList->count; item++, i++) {
-		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha)));
+	for (i = 0; i < this->m_menuLstList->count; i++) {
+		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * item[i].alpha)));
 
 		const char* text = GetMenuStr(i + 0x2e);
 		font->GetWidth(text);
 
-		textX = (float)(item->x + 0x28);
-		textY = (float)(item->y + 3);
+		textX = (float)(item[i].x + 0x28);
+		textY = (float)(item[i].y + 3);
 		if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 			textX += 20.0;
 		}

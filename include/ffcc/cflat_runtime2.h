@@ -78,6 +78,16 @@ public:
 	unsigned int getNumFreeObject(int);
 	virtual CGObject* getFreeObject(int);
 	virtual void* intToClass(int);
+	CGObject* IntToClass(int classId)
+	{
+		CGObject* object;
+		if (classId != 0) {
+			object = static_cast<CGObject*>(intToClass(classId));
+		} else {
+			object = 0;
+		}
+		return object;
+	}
 
 	virtual int Frame(int, int);
 	int Load(char*);
@@ -158,7 +168,7 @@ public:
 	u32 m_eventFlags;               // 0x12A0
 	u32 m_eventMask;                // 0x12A4
 	u32 m_padInputDisableMask;      // 0x12A8
-	u32 m_centerState;              // 0x12AC
+	int m_centerState;              // 0x12AC
 	float m_centerDistanceScale;    // 0x12B0
 	Mtx m_centerMatrix;             // 0x12B4
 	union {

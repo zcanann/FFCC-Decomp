@@ -32,7 +32,15 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
     int hasScratchTexture = (int)Graphic.m_scratchTextureBuffer;
     hasScratchTexture = hasScratchTexture != 0;
-    int compactLayout = (bool)(hasScratchTexture && usingFallbackFont == 0);
+    bool useScratch = false;
+    if (hasScratchTexture)
+    {
+        if (usingFallbackFont == 0)
+        {
+            useScratch = true;
+        }
+    }
+    int compactLayout = useScratch;
 
     if (compactLayout)
     {
@@ -55,11 +63,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
     font->SetTlut(usingFallbackFont ? -1 : 7);
     font->DrawInit();
 
-    int baseY = 200;
-    if (compactLayout)
-    {
-        baseY = 0x20;
-    }
+    int baseY = compactLayout ? 0x20 : 200;
 
     switch (errorCode)
     {

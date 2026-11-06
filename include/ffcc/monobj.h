@@ -108,6 +108,7 @@ public:
     void mlAttack();
     void aiAddDefault(int&);
     int aiSeq(int, int, int, int, int, int);
+    int aiNotFind(int, int, float, int);
     void statWatch();
     void statAround();
     void statAway();

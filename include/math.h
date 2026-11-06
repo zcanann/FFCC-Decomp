@@ -51,60 +51,45 @@ extern inline float sqrtf(float x)
     return x;
 }
 #else
+inline int __fpclassifyf(float x)
+{
+    switch ((*(unsigned long*)&x) & 0x7f800000) {
+    case 0x7f800000:
+        if ((*(unsigned long*)&x) & 0x007fffff) {
+            return 1;
+        } else {
+            return 2;
+        }
+        break;
+    case 0:
+        if ((*(unsigned long*)&x) & 0x007fffff) {
+            return 5;
+        } else {
+            return 3;
+        }
+        break;
+    }
+    return 4;
+}
+
 extern inline float sqrtf(float x)
 {
     const double _half = .5;
     const double _three = 3.0;
-    union {
-        float f;
-        unsigned long bits;
-    } bits;
-    int fpclass;
-
-    float result;
 
     if (x > 0.0f) {
         double guess = __frsqrte((double)x); // returns an approximation to
         guess = _half * guess * (_three - guess * guess * x); // now have 12 sig bits
         guess = _half * guess * (_three - guess * guess * x); // now have 24 sig bits
         guess = _half * guess * (_three - guess * guess * x); // now have 32 sig bits
-        result = (float)(x * guess);
-        return result;
-    }
-
-    if ((double)x < 0.0) {
-        result = NAN;
-        return result;
-    }
-
-    bits.f = x;
-    switch (bits.bits & 0x7f800000) {
-    case 0x7f800000:
-        if ((bits.bits & 0x7fffff) != 0) {
-            fpclass = 1;
-        } else {
-            fpclass = 2;
-        }
-        break;
-    case 0:
-        if ((bits.bits & 0x7fffff) != 0) {
-            fpclass = 5;
-        } else {
-            fpclass = 3;
-        }
-        break;
-    default:
-        fpclass = 4;
-        break;
-    }
-
-    if (fpclass == 1) {
-        result = NAN;
+        return (float)(x * guess);
+    } else if (x < 0.0) {
+        return NAN;
+    } else if (__fpclassifyf(x) == 1) {
+        return NAN;
     } else {
-        result = x;
+        return x;
     }
-
-    return result;
 }
 #endif
 #else

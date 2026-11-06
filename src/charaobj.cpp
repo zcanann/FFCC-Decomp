@@ -70,7 +70,7 @@ static __inline bool CharaObjSkipComboScript(CGPrgObj* obj)
 		return false;
 	}
 
-	return ((static_cast<unsigned short>(obj->GetCID()) & 0x6D) == 0x6D) &&
+	return obj->IsKindOf(0x6D) &&
 	       (reinterpret_cast<CCaravanWork*>(obj->m_scriptHandle)->m_joybusCaravanId != 0);
 }
 
@@ -147,7 +147,7 @@ static inline unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, u
 // extlwi/srawi/extsb rather than a single rlwinm mask. Returns nonzero if set.
 static inline int CharaObjGameFlagBit5Set()
 {
-	return static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 26 >> 30) << 30 >> 31) != 0;
+	return static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlat.m_gameFlags) << 26 >> 30) << 30 >> 31) != 0;
 }
 
 static inline int CharaObjDecodeHitParticleSe(unsigned short seData)
@@ -186,11 +186,9 @@ static inline int CharaObjResolveParticleBank(CGCharaObj* charaObj, int particle
  * JP Size: TODO
  */
 
-static __inline SCharaItemRow* CharaObjItemRow(int itemId)
+static __inline SCharaItemRow* CharaObjItemTable()
 {
-	SCharaItemRow* row = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-	row += itemId;
-	return row;
+	return reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 }
 
 static __inline float CharaObjGetStatusMultiplier(int offset)
@@ -237,7 +235,7 @@ void CGCharaObj::onCreate()
 	memset(m_unk6AC, 0, sizeof(m_unk6AC));
 
 	for (int i = 0; i < 0x16; i++) {
-		m_particleSlots[i] = CFlatRuntime2Storage().GetFreeParticleSlot();
+		m_particleSlots[i] = CFlat.GetFreeParticleSlot();
 	}
 }
 
@@ -561,7 +559,7 @@ void CGCharaObj::endPSlotBit(int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if ((static_cast<unsigned int>(slotMask) & (1U << i)) != 0) {
-			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+			CFlat.EndParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -579,7 +577,7 @@ void CGCharaObj::deletePSlotBit(int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if (((unsigned int)slotMask & (1U << i)) != 0) {
-			CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
+			CFlat.DeleteParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -888,19 +886,13 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 
 	int particleIndex = hitParam->m_particleIndex;
 	int classId = hitParam->m_classId;
-	CGPrgObj* sourceObj;
-	if (classId != 0) {
-		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(classId));
-	} else {
-		sourceObj = 0;
-	}
+	CGPrgObj* sourceObj = static_cast<CGPrgObj*>(CFlat.IntToClass(classId));
 
-	unsigned short sourceCid = sourceObj->GetCID();
-	if ((sourceCid & 0xD) == 0xD) {
+	if (sourceObj->IsKindOf(0xD)) {
 		onDamage(sourceObj, particleIndex, -1, colliderIndex, hitPos);
 	}
 
-	CFlatRuntime2Storage().IgnoreParticle(effectIndex, this);
+	CFlat.IgnoreParticle(effectIndex, this);
 	SCharaItemRow* items = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 	if ((items[particleIndex].m_particleFlags & 0x100) != 0) {
 		PartMng.pppEndPart(effectIndex);
@@ -960,15 +952,15 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 				particleBank = 3;
 			}
 
-			CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
+			CFlat.ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
 			SCharaItemRow* flagRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			particleFlags = flagRows[itemId].m_particleFlags;
 			if ((particleFlags & 0x200) != 0) {
-				CFlatRuntime2Storage().SetParticleWorkBind(this);
+				CFlat.SetParticleWorkBind(this);
 			} else {
-				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, 0.0f);
+				CFlat.SetParticleWorkPos(*l_pHitCross, 0.0f);
 			}
-			CFlatRuntime2Storage().PutParticleWork();
+			CFlat.PutParticleWork();
 		}
 	}
 
@@ -1408,8 +1400,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 	}
 
-	unsigned int base = 0;
 	int itemType;
+	unsigned int base = 0;
 	switch (staIndex) {
 		case 1:
 			base = Game.m_battleParams[0x7];
@@ -1512,7 +1504,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 
 	if (hpValue != 0 && delta < 0) {
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-		    reinterpret_cast<CharaObjSignedLowBit*>(&CFlatGameFlags())->m_low != 0 &&
+		    reinterpret_cast<CharaObjSignedLowBit*>(&CFlat.m_gameFlags)->m_low != 0 &&
 		    static_cast<int>(hpValue + delta) <= 0) {
 			delta = -(static_cast<int>(hpValue) - 1);
 		}
@@ -1542,7 +1534,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 				int stackArgs[2];
 				stackArgs[0] = -1;
 				stackArgs[1] = 0;
-				gCFlatRuntime().SystemCall(
+				CFlat.SystemCall(
 					reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x14, 2,
 					reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 			}
@@ -1671,7 +1663,6 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  */
 void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
 {
-	int counterType;
 	int damageAmount;
 	CGCharaObj* sourceChara = static_cast<CGCharaObj*>(sourceObj);
 	int staType;
@@ -1720,14 +1711,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			putParticle(0x200, 0, hitPos, 2.0f * (0.1f * m_attackColRadius), 0x1D);
 		}
 	} else if ((resistType > 1 || (resistType == 1 &&
-	           ((CharaObjItemRow(itemId)->m_flags32 & 1) == 0))) &&
+	           ((CharaObjItemTable()[itemId].m_flags32 & 1) == 0))) &&
 	           (static_cast<unsigned int>(staType - 8) <= 1 || staType == 6 || staType == 3)) {
 		putParticle(0x201, 0, hitPos, 2.0f * (0.1f * m_attackColRadius), 0x65);
 	}
 
 	damageClamp = 0;
 	if (m_lastStateId == 8 && m_subState == 1 &&
-	    ((CharaObjItemRow(itemId)->m_flags2C & 8) == 0)) {
+	    ((CharaObjItemTable()[itemId].m_flags2C & 8) == 0)) {
 		CVector frontDelta = CVector(sourceObj->m_worldPosition) - CVector(m_worldPosition);
 		float frontMag = PSVECMag(frontDelta);
 		if (frontMag > 0.0f) {
@@ -1739,7 +1730,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			if (PSVECDotProduct(frontDelta, reinterpret_cast<Vec*>(&facing)) > 0.0f) {
 				playSe3D(0x1D, 0x32, 0x96, 0, 0);
 				putParticle(0x200, 0, hitPos, 0.1f * m_attackColRadius, 0);
-				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {
+				if (sourceObj->IsKindOf(0x6D)) {
 					sourceObj->changeStat(0x13, 0, 0);
 				}
 				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
@@ -1760,8 +1751,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (m_lastStateId == 6 &&
 	    m_weaponNodeFlagAll.m_bits1.m_bit20 != 0) {
 		SCharaItemRow* kindRows1556 = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-		int currentKind = kindRows1556[m_itemId].m_status & 0xFF;
-		if (currentKind == 2) {
+		damageAmount = kindRows1556[m_itemId].m_status & 0xFF;
+		if (damageAmount == 2) {
 #ifndef VERSION_GCCJGC
 			if (staType != 0x66 && staType != 0x67 && staType != 7)
 #endif
@@ -1771,7 +1762,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x1A, 0, 0);
 			}
-		} else if (currentKind == 3) {
+		} else if (damageAmount == 3) {
 			effectResult = 0;
 			allowEffect = 0;
 		}
@@ -1779,7 +1770,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	if (itemEffect == 0x1F8 &&
 	    sourceObj->m_weaponNodeFlagAll.m_bits1.m_bit20 != 0 &&
-	    ((CharaObjItemRow(m_itemId)->m_status & 0xFF) == 3)) {
+	    ((CharaObjItemTable()[m_itemId].m_status & 0xFF) == 3)) {
 		CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
 		moveVectorH(delta, 2.0f, 10);
 		m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
@@ -1827,7 +1818,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			itemKind = 1;
 		}
 
-		if (itemKind == 1 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D)) {
+		if (itemKind == 1 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && sourceObj->IsKindOf(0x6D))) {
 			switch (staType) {
 			case 0x24:
 			case 0x25:
@@ -1836,11 +1827,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 0x6A: {
 				unsigned int basePower;
 				if (itemEffect == 0x1F8) {
-					basePower = CharaObjItemRow(itemId)->m_basePower;
+					basePower = CharaObjItemTable()[itemId].m_basePower;
 				} else {
 					basePower = 0;
 				}
-				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && itemId == 0x206) {
+				if (sourceObj->IsKindOf(0x6D) && itemId == 0x206) {
 					int castCurrent = sourceChara->m_unk68C;
 					int castEnd = sourceChara->m_comboFramePrev;
 					if (castCurrent * 3 <= castEnd) {
@@ -1862,19 +1853,19 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (sourceObj->IsKindOf(0x6D) != 0 && itemEffect == 0x1F8) {
 					hasBonus = 1;
 				}
-				unsigned int bonus = hasBonus ? static_cast<int>(static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[5])) : 0;
+				int bonus = hasBonus ? static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[5]) : 0;
 				damageAmount = clampedDamage + bonus;
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x42));
 				}
 				System.Printf("PC->MON ATTACKダメージ min1((%d + %d) * %f - %d) + %d = %d\n", basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 
-				if (staType != 0x6A && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
+				if (staType != 0x6A && sourceObj->IsKindOf(0x6D) && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 				    (m_scriptHandle->m_romWork[0x7F] & 0x100) != 0 &&
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
 				    sourceObj->m_scriptHandle->m_elementResistances[3] == 0) {
 					unsigned int srcEntryKind =
-						CharaObjItemRow(sourceChara->m_itemId)->m_status & 0xFF;
+						CharaObjItemTable()[sourceChara->m_itemId].m_status & 0xFF;
 					if (sourceObj->m_lastStateId == 6 && srcEntryKind <= 1) {
 						break;
 					}
@@ -1898,9 +1889,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 
 				int clampedDamage = 1;
+				unsigned int defense;
 				unsigned int sourcePower = powerSource->m_scriptHandle->m_magic;
 				float multiplier = CharaObjGetStatusMultiplier(0x2E);
-				unsigned int defense = m_scriptHandle->m_defense;
+				defense = m_scriptHandle->m_defense;
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(static_cast<int>(basePower + sourcePower))) - defense;
 				if (rawDamage >= 1) {
 					clampedDamage = rawDamage;
@@ -1917,24 +1909,20 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				} else {
 					float recoilRate = (static_cast<float>(Game.m_battleParams[0x13 + resistType]) * 0.01f) + 1.0e-07f;
 					int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(m_scriptHandle->m_hp)) * recoilRate);
-					damageAmount = 1;
-					if (raw >= 1) {
-						damageAmount = raw;
-					}
+					damageAmount = (raw >= 1) ? raw : 1;
 					if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 						static_cast<CGMonObj*>(this)->m_unk6C2 = 1;
 					}
 				}
 				System.Printf("PC->MON GRAダメージ %d\n", damageAmount);
-				int nextSta = calcSta(10, itemId, sourceObj);
-				setSta(10, nextSta);
+				setSta(10, calcSta(10, itemId, sourceObj));
 				break;
 			}
 			default:
 				System.Printf("STA_%d 未対応\n", staType);
 				break;
 			}
-		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD)) {
+		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && sourceObj->IsKindOf(0xAD))) {
 			switch (staType) {
 			case 0x24:
 			case 0x25:
@@ -1992,7 +1980,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				break;
 			}
 		} else if (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x2D) == 0x2D &&
-		           ((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD || (static_cast<unsigned short>(sourceObj->GetCID()) & 0x1D) == 0x1D)) {
+		           (sourceObj->IsKindOf(0xAD) || sourceObj->IsKindOf(0x1D))) {
 			switch (staType) {
 			case 0:
 			case 1:
@@ -2006,8 +1994,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					SCharaItemRow* srcPowerRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 					rawSourcePower = srcPowerRows[itemId].m_sourcePower;
 				}
-				unsigned int sourcePower = rawSourcePower;
 				unsigned int defense = m_scriptHandle->m_defense;
+				unsigned int sourcePower = rawSourcePower;
 				float defenseRate;
 				if (sourceObj->IsKindOf(0xAD) != 0) {
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
@@ -2039,7 +2027,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		if (staType != 4 && m_scriptHandle->m_statusTimers[4] != 0) {
 #else
 		if (staType != 4 &&
-		    !((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD && sourceObj->m_scriptHandle->m_baseDataIndex == 6 && staType == 0x6A) &&
+		    !(sourceObj->IsKindOf(0xAD) && sourceObj->m_scriptHandle->m_baseDataIndex == 6 && staType == 0x6A) &&
 		    m_scriptHandle->m_statusTimers[4] != 0) {
 #endif
 			setSta(4, 0);
@@ -2066,7 +2054,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		    staType != 0x1C) {
 			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
-		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x2D) == 0x2D && sourceChara->m_comboItemState >= 0 &&
+		if (sourceObj->IsKindOf(0x2D) && sourceChara->m_comboItemState >= 0 &&
 		    sourceChara->m_comboLinkCount != 0) {
 			System.Printf("魔法剣でダメージを%d倍\n", sourceChara->m_comboLinkCount);
 			damageAmount *= sourceChara->m_comboLinkCount;
@@ -2081,7 +2069,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 			SCharaItemRow* bonusRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((bonusRows[itemId].m_flags32 & 1) != 0 ||
-			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceChara->m_comboItemState >= 0)) {
+			    (sourceObj->IsKindOf(0x6D) && sourceChara->m_comboItemState >= 0)) {
 				bonus(0x15, itemId, sourceObj);
 				sourceObj->bonus(0x11, itemId, this);
 				if (isDead != 0) {
@@ -2118,26 +2106,27 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 		}
 
-		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D &&
+		if (sourceObj->IsKindOf(0x6D) &&
 		    m_scriptHandle->m_hp != 0) {
+			int counterType;
 			int counterItem;
 			int counterSe;
 			int counterState = sourceChara->m_comboItemState;
 			if (counterState >= 0) {
 				switch (counterState) {
 				case 0:
-					counterItem = 0x207;
 					counterType = 1;
+					counterItem = 0x207;
 					counterSe = 0x7E1;
 					break;
 				case 1:
-					counterItem = 0x20B;
 					counterType = 0;
+					counterItem = 0x20B;
 					counterSe = 0x7E2;
 					break;
 				case 2:
-					counterItem = 0x20F;
 					counterType = 4;
+					counterItem = 0x20F;
 					counterSe = 0x7E3;
 					break;
 				}
@@ -2259,12 +2248,12 @@ checkParticle:
 			}
 	}
 	} else {
-		CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
+		CFlat.ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
 		SCharaItemRow* scaleRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-		CFlatRuntime2Storage().SetParticleWorkScale((static_cast<float>(scaleRows[effectId].m_scale) * 0.01f) + 1.0e-07f);
-		CFlatRuntime2Storage().SetParticleWorkParam(effectId, this);
+		CFlat.SetParticleWorkScale((static_cast<float>(scaleRows[effectId].m_scale) * 0.01f) + 1.0e-07f);
+		CFlat.SetParticleWorkParam(effectId, this);
 		SCharaItemRow* speedRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-		CFlatRuntime2Storage().SetParticleWorkSpeed((static_cast<float>(speedRows[effectId].m_speed) * 0.01f) + 1.0e-07f);
+		CFlat.SetParticleWorkSpeed((static_cast<float>(speedRows[effectId].m_speed) * 0.01f) + 1.0e-07f);
 		seNo = 0;
 
 		switch (effectArg0) {
@@ -2274,7 +2263,7 @@ checkParticle:
 			if (decoded != 0) {
 				unsigned short seFlag = seRows[effectId].m_seFlag;
 				if ((seFlag & 0x8000) != 0) {
-					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
+					CFlat.SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
 				} else {
 					seNo = decoded;
 				}
@@ -2287,7 +2276,7 @@ checkParticle:
 			if (decoded != 0) {
 				unsigned short seFlag = seRows[effectId].m_seFlag1;
 				if ((seFlag & 0x8000) != 0) {
-					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
+					CFlat.SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
 				} else {
 					seNo = decoded;
 				}
@@ -2299,7 +2288,7 @@ checkParticle:
 			int decoded = CharaObjDecodeSe(seRows[effectId].m_se2);
 			if (decoded != 0) {
 				if ((seRows[effectId].m_particleFlags & 0x400) != 0) {
-					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, 0);
+					CFlat.SetParticleWorkSe(decoded, 2, 0);
 				} else {
 					seNo = decoded;
 				}
@@ -2328,11 +2317,11 @@ checkParticle:
 				colType = 9;
 				break;
 			}
-			CFlatRuntime2Storage().SetParticleWorkCol(colType, -1, (static_cast<float>(colRows[effectId].m_field04) * 0.01f) + 1.0e-07f);
+			CFlat.SetParticleWorkCol(colType, -1, (static_cast<float>(colRows[effectId].m_field04) * 0.01f) + 1.0e-07f);
 		}
 
 		if ((particleEntry & 0x100) != 0) {
-			CFlatRuntime2Storage().SetParticleWorkBind(this);
+			CFlat.SetParticleWorkBind(this);
 		} else if ((particleEntry & 0x200) != 0) {
 			SCharaItemRow* distRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			float distance = static_cast<float>(distRows[effectId].m_distance) * 1.0f;
@@ -2340,27 +2329,27 @@ checkParticle:
 			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
 			offsetPos.y = m_worldPosition.y;
 			offsetPos.z = m_worldPosition.z + cosf(m_rotTargetY) * distance;
-			CFlatRuntime2Storage().SetParticleWorkPos(offsetPos, m_rotTargetY);
-			CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
+			CFlat.SetParticleWorkPos(offsetPos, m_rotTargetY);
+			CFlat.SetParticleWorkVector(m_rotTargetY, 0.0f);
 			SCharaItemRow* traceRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((traceRows[effectId].m_particleFlags & 0x2000) != 0) {
 				int partyIndex = reinterpret_cast<CGMonObj*>(this)->m_targetPartyIndex;
 				if (partyIndex >= 0 && partyIndex < 4) {
-					CFlatRuntime2Storage().SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
+					CFlat.SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
 				}
 			}
 			SCharaItemRow* targetRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((targetRows[effectId].m_particleFlags & 0x4000) != 0) {
-				CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
-				CFlatRuntime2Storage().SetParticleWorkTarget(m_comboCenter);
-				CFlatRuntime2Storage().SetParticleWorkTrace(this);
+				CFlat.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
+				CFlat.SetParticleWorkTarget(m_comboCenter);
+				CFlat.SetParticleWorkTrace(this);
 			}
 		} else if (pos != 0) {
-			CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
+			CFlat.SetParticleWorkPos(*pos, m_rotTargetY);
 		} else if ((particleEntry & 0x400) != 0) {
-			CFlatRuntime2Storage().SetParticleWorkPos(m_comboCenter, 0.0f);
+			CFlat.SetParticleWorkPos(m_comboCenter, 0.0f);
 		} else {
-			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
+			CFlat.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
 		Vec sideOffset;
@@ -2376,10 +2365,10 @@ checkParticle:
 					angleOffset = -1.5707964f;
 				}
 				float angle = baseAngle + angleOffset;
-				CFlatRuntime2Storage().m_particleWorkPos.x = 18.0f * sinf(angle) + m_worldPosition.x;
-				CFlatRuntime2Storage().m_particleWorkPos.z = 18.0f * cosf(angle) + m_worldPosition.z;
-				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
-				CFlatRuntime2Storage().PutParticleWork();
+				CFlat.m_particleWorkPos.x = 18.0f * sinf(angle) + m_worldPosition.x;
+				CFlat.m_particleWorkPos.z = 18.0f * cosf(angle) + m_worldPosition.z;
+				CFlat.SetParticleWorkVector(m_rotTargetY, 0.0f);
+				CFlat.PutParticleWork();
 				emittedCustom = 1;
 			}
 			break;
@@ -2388,8 +2377,8 @@ checkParticle:
 				if (pos == 0) {
 					return;
 				}
-				CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
-				CFlatRuntime2Storage().PutParticleWork();
+				CFlat.SetParticleWorkPos(*pos, m_rotTargetY);
+				CFlat.PutParticleWork();
 				emittedCustom = 1;
 			}
 			break;
@@ -2401,8 +2390,8 @@ checkParticle:
 		case 0x478:
 			if (effectArg0 == 3) {
 				for (int i = 7; i <= 0x0B; i++) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkNo((particleBank << 8) | i);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
@@ -2411,17 +2400,17 @@ checkParticle:
 		case 0x46E:
 			if (effectArg0 == 2) {
 				if (m_stateFrame >= kLateItemParticleFrame) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
+					CFlat.SetParticleWorkNo((particleBank << 8) | 0x1D);
 					CVector randomPos = CVector(0.0f, 7.0f, 165.0f) + CVector(Math.RandFPM(60.0f), 0.0f, Math.RandFPM(60.0f));
-					CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkPos(randomPos, m_rotTargetY);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
 			if (effectArg0 == 3) {
 				for (int i = 0x0D; i <= 0x1C; i++) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkNo((particleBank << 8) | i);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
@@ -2431,18 +2420,18 @@ checkParticle:
 				int a = m_unk68C;
 				int b = m_comboFramePrev;
 				if (a * 3 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkSe(0x872, 2, 0);
+					CFlat.SetParticleWorkSe(0x872, 2, 0);
 				} else if (a * 2 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkSe(0x871, 2, 0);
+					CFlat.SetParticleWorkSe(0x871, 2, 0);
 				}
 			}
 			if (effectArg0 == 3) {
 				int a = m_unk68C;
 				int b = m_comboFramePrev;
 				if (a * 3 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x75));
+					CFlat.SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x75));
 				} else if (a * 2 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x73));
+					CFlat.SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x73));
 				}
 			}
 			break;
@@ -2450,8 +2439,8 @@ checkParticle:
 		case 0x409:
 			if (effectArg0 == 3) {
 				for (int i = 3; i <= 8; i++) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkNo((particleBank << 8) | i);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
@@ -2465,11 +2454,11 @@ checkParticle:
 					PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 					int side = (i == 0) ? 76 : -76;
 					PSMTXMultVec(rotMtx, CVector(static_cast<float>(side), 0.0f, 60.0f), &sideOffset);
-					CFlatRuntime2Storage().m_particleWorkPos.x = m_worldPosition.x + sideOffset.x;
-					CFlatRuntime2Storage().m_particleWorkPos.y = m_worldPosition.y + sideOffset.y;
-					CFlatRuntime2Storage().m_particleWorkPos.z = m_worldPosition.z + sideOffset.z;
-					CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.m_particleWorkPos.x = m_worldPosition.x + sideOffset.x;
+					CFlat.m_particleWorkPos.y = m_worldPosition.y + sideOffset.y;
+					CFlat.m_particleWorkPos.z = m_worldPosition.z + sideOffset.z;
+					CFlat.SetParticleWorkVector(m_rotTargetY, 0.0f);
+					CFlat.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
@@ -2492,11 +2481,11 @@ checkParticle:
 			int fanCount = fanRows[effectId].m_fanCount;
 			if (effectArg0 == 3 && fanCount > 1) {
 				for (int i = 0; i < fanCount; i++) {
-					CFlatRuntime2Storage().SetParticleWorkVector(6.2831855f * static_cast<float>(i) / static_cast<float>(fanCount), 0.0f);
-					CFlatRuntime2Storage().PutParticleWork();
+					CFlat.SetParticleWorkVector(6.2831855f * static_cast<float>(i) / static_cast<float>(fanCount), 0.0f);
+					CFlat.PutParticleWork();
 				}
 			} else {
-				CFlatRuntime2Storage().PutParticleWork();
+				CFlat.PutParticleWork();
 			}
 		}
 		}
@@ -2760,7 +2749,7 @@ int CGCharaObj::calcCastTime(int itemId)
  */
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
-	if ((m_weaponNodeFlagBits.m_prg && (static_cast<int>(CFlatCenterState()) == 0)) &&
+	if ((m_weaponNodeFlagBits.m_prg && (CFlat.m_centerState == 0)) &&
 	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[0x100];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -2864,7 +2853,7 @@ void CGCharaObj::combi2()
 	int j;
 	int k;
 	int hasNearbyPartner;
-	int playedComboSe;
+	CGPartyObj* party;
 	CGPartyObj* leadParty;
 	CGPartyObj* candidates[5];
 	int candidateCount = 0;
@@ -2969,9 +2958,9 @@ void CGCharaObj::combi2()
 	System.Printf("combi: %d: combi%dに決定\n", System.GetCounter(), comboData->m_command);
 
 	leadParty = candidates[participantCount - 1];
-	playedComboSe = 0;
+	int playedComboSe = 0;
 	for (i = 0; i < participantCount; i++) {
-		CGPartyObj* party = candidates[i];
+		party = candidates[i];
 		unsigned int comboMode = 0xFFFFFFFF;
 
 		if (isShared1F8 != 0) {
@@ -2988,8 +2977,8 @@ void CGCharaObj::combi2()
 			}
 
 			if (party == leadParty) {
-				party->m_comboItemState = static_cast<int>(comboMode);
-				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
+				leadParty->m_comboItemState = static_cast<int>(comboMode);
+				leadParty->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 			} else {
 				party->m_comboCenter = leadParty->m_worldPosition;
 				party->m_itemId = 0;
@@ -2998,7 +2987,7 @@ void CGCharaObj::combi2()
 			party->m_comboCenter = comboCenter;
 			if (playedComboSe == 0 &&
 			    (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF ||
-			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) != 0x6D ||
+			     !party->IsKindOf(0x6D) ||
 			     reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0)) {
 				party->m_itemId = comboData->m_command;
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
@@ -3053,7 +3042,7 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 	while (entry < m_comboLinkCount) {
 		if (m_comboLinks[entry] != 0) {
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			    (static_cast<unsigned short>(m_comboLinks[entry]->GetCID()) & 0x6D) == 0x6D &&
+			    m_comboLinks[entry]->IsKindOf(0x6D) &&
 			    reinterpret_cast<CCaravanWork*>(m_comboLinks[entry]->m_scriptHandle)->m_joybusCaravanId != 0) {
 				goto next_link;
 			} else if (m_comboLinks[entry]->m_lastStateId != 6 && m_comboLinks[entry]->m_lastStateId != 2) {
@@ -3067,7 +3056,7 @@ next_link:
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);
 		stackArgs[1] = scriptArg;
-		gCFlatRuntime().SystemCall(
+		CFlat.SystemCall(
 			reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x17, 2,
 			reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 	}
@@ -3084,10 +3073,9 @@ next_link:
  */
 inline int CGCharaObj::scCheckItem(CCombi2Set* set, CGCharaObj* object, int lastSlot)
 {
-    int item = object->m_itemId;
     SCharaItemRow* items = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-    int kind = items[item].m_effect;
-    if ((lastSlot && kind == 0x1F8 && set->m_item == 0x1F8) || item == set->m_item) {
+    int kind = items[object->m_itemId].m_effect;
+    if ((lastSlot && kind == 0x1F8 && set->m_item == 0x1F8) || object->m_itemId == set->m_item) {
         return 1;
     }
     return 0;
@@ -3133,7 +3121,6 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			break;
 		}
 
-		int reqLast = reqCount - 1;
 		CCombi2Set* slotCursor = combiCursor->m_sets;
 		CGCharaObj* partyObj;
 		int slot = 0;
@@ -3161,7 +3148,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 				break;
 			}
 
-			if (slot == reqLast) {
+			if (slot == reqCount - 1) {
 				found = combiIndex;
 			}
 		}

@@ -195,41 +195,6 @@ STATIC_ASSERT(offsetof(Mc::CharaDat, m_originRandom) == 0x8D0);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_baseDataIndex) == 0x8D4);
 STATIC_ASSERT(sizeof(Mc::SaveDat) == 0x8BD0);
 
-static inline CChara* GetCharaGlobal()
-{
-    return &Chara;
-}
-
-static inline Mc::SaveDat* GetSaveDat(char* saveBuffer)
-{
-    return reinterpret_cast<Mc::SaveDat*>(saveBuffer);
-}
-
-static inline Mc::SaveDat* GetSaveDat(u8* saveBuffer)
-{
-    return reinterpret_cast<Mc::SaveDat*>(saveBuffer);
-}
-
-static inline const Mc::SaveDat* GetSaveDat(const char* saveBuffer)
-{
-    return reinterpret_cast<const Mc::SaveDat*>(saveBuffer);
-}
-
-static inline const Mc::SaveDat* GetSaveDat(const u8* saveBuffer)
-{
-    return reinterpret_cast<const Mc::SaveDat*>(saveBuffer);
-}
-
-static inline u32* GetSaveEncodedWords(Mc::SaveDat* save)
-{
-    return &save->m_random;
-}
-
-static inline u32 LoadSwapped(u32* p)
-{
-    return __lwbrx(p, 0);
-}
-
 /*
  * --INFO--
  * PAL Address: TODO
@@ -239,19 +204,21 @@ static inline u32 LoadSwapped(u32* p)
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline int FindCardFile(char* filename, CARDStat* stat)
+static inline int name2idx(char* filename)
 {
-    int fileNo = 0;
-    while (fileNo < 0x7F)
+    CARDStat stat;
+    int fileNo;
+    s32 result;
+    for (fileNo = 0; fileNo < 0x7F; fileNo++)
     {
-        if (CARDGetStatus(1, fileNo, stat) >= 0)
+        result = CARDGetStatus(1, fileNo, &stat);
+        if (result >= 0)
         {
-            if (strcmp(filename, reinterpret_cast<char*>(stat)) == 0)
+            if (strcmp(filename, stat.fileName) == 0)
             {
                 return fileNo;
             }
         }
-        fileNo++;
     }
     return -1;
 }
@@ -335,7 +302,6 @@ void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, i
     int result;
     unsigned long sectorSize;
     CARDFileInfo fileInfo;
-    CARDStat stat;
 
     result = CARDMount(1, m_mountWorkArea, 0);
     if (((result != 0) && (result != -6)) || (result = CARDCheckAsync(1, 0), result >= 0))
@@ -370,7 +336,7 @@ checkResult:
                     goto readFile;
                 }
 
-                result = FindCardFile(filename, &stat);
+                result = name2idx(filename);
 
                 if ((result >= 0) && (CARDFastOpen(1, result, &fileInfo) >= 0))
                 {
@@ -1062,15 +1028,20 @@ void CMemoryCardMan::MakeSaveData()
         memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }
 
-    Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
+    Mc::SaveDat* saveDat = (Mc::SaveDat*)m_saveBuffer;
+    int len;
 
     const u64 now = OSGetTime();
     memcpy(&saveDat->m_saveTime, &now, sizeof(now));
 
-    memcpy(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER));
-    memcpy(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE));
-    memcpy(saveDat->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE));
-    memcpy(saveDat->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION));
+    len = strlen(CardConst::MCDAT_MAKER);
+    memcpy(saveDat->m_maker, CardConst::MCDAT_MAKER, len);
+    len = strlen(CardConst::MCDAT_TITLE);
+    memcpy(saveDat->m_title, CardConst::MCDAT_TITLE, len);
+    len = strlen(CardConst::MCDAT_MACHINE);
+    memcpy(saveDat->m_machine, CardConst::MCDAT_MACHINE, len);
+    len = strlen(CardConst::MCDAT_VERSION);
+    memcpy(saveDat->m_version, CardConst::MCDAT_VERSION, len);
     saveDat->m_region = kMemoryCardRegion;
     saveDat->m_random = Math.Rand(0x7FFFFFFF);
     saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
@@ -1166,24 +1137,24 @@ void CMemoryCardMan::MakeSaveData()
         savedCharacter.m_letterCount = caravanWork->m_letterCount;
         for (letter = 0; letter < 100; letter++)
         {
-            savedCharacter.m_letters[letter].FlagsBits().m_attachmentIsGil =
-                caravanWork->m_letters[letter].FlagsBits().m_attachmentIsGil;
-            savedCharacter.m_letters[letter].HeaderBitsRef().m_messageType =
-                caravanWork->m_letters[letter].HeaderBitsRef().m_messageType;
-            savedCharacter.m_letters[letter].WordBitsRef().m_senderId =
-                caravanWork->m_letters[letter].WordBitsRef().m_senderId;
-            savedCharacter.m_letters[letter].AttachmentBitsRef().m_value =
-                caravanWork->m_letters[letter].AttachmentBitsRef().m_value;
-            memcpy(savedCharacter.m_letters[letter].m_half.m_tempVars, caravanWork->m_letters[letter].m_half.m_tempVars,
-                   sizeof(savedCharacter.m_letters[letter].m_half.m_tempVars));
-            savedCharacter.m_letters[letter].FlagsBits().m_opened =
-                caravanWork->m_letters[letter].FlagsBits().m_opened;
-            savedCharacter.m_letters[letter].FlagsBits().m_attachmentClaimed =
-                caravanWork->m_letters[letter].FlagsBits().m_attachmentClaimed;
-            savedCharacter.m_letters[letter].FlagsBits().m_replySent =
-                caravanWork->m_letters[letter].FlagsBits().m_replySent;
-            savedCharacter.m_letters[letter].FlagsBits().m_hasReply =
-                caravanWork->m_letters[letter].FlagsBits().m_hasReply;
+            savedCharacter.m_letters[letter].m_attachmentIsGil =
+                caravanWork->m_letters[letter].m_attachmentIsGil;
+            savedCharacter.m_letters[letter].m_messageType =
+                caravanWork->m_letters[letter].m_messageType;
+            savedCharacter.m_letters[letter].m_senderId =
+                caravanWork->m_letters[letter].m_senderId;
+            savedCharacter.m_letters[letter].m_attachValue =
+                caravanWork->m_letters[letter].m_attachValue;
+            memcpy(savedCharacter.m_letters[letter].m_tempVars, caravanWork->m_letters[letter].m_tempVars,
+                   sizeof(savedCharacter.m_letters[letter].m_tempVars));
+            savedCharacter.m_letters[letter].m_opened =
+                caravanWork->m_letters[letter].m_opened;
+            savedCharacter.m_letters[letter].m_attachmentClaimed =
+                caravanWork->m_letters[letter].m_attachmentClaimed;
+            savedCharacter.m_letters[letter].m_replySent =
+                caravanWork->m_letters[letter].m_replySent;
+            savedCharacter.m_letters[letter].m_hasReply =
+                caravanWork->m_letters[letter].m_hasReply;
         }
 
         for (int artifact = 0; artifact < 96; artifact++)
@@ -1216,7 +1187,7 @@ void CMemoryCardMan::MakeSaveData()
     }
 
     Game.SaveScript(saveDat->m_scriptData);
-    GetCharaGlobal()->SaveFurTexBuffer(saveDat->m_furTexels);
+    Chara.SaveFurTexBuffer(saveDat->m_furTexels);
     saveDat->m_crc = CalcCrc(0);
     EncodeData();
 }
@@ -1232,10 +1203,12 @@ void CMemoryCardMan::MakeSaveData()
  */
 void CMemoryCardMan::SetLoadData()
 {
-    Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
+    Mc::SaveDat* saveDat = (Mc::SaveDat*)m_saveBuffer;
     int c;
+    int len;
 
-    if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
+    len = strlen(CardConst::MCDAT_MAKER);
+    if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, len) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1243,7 +1216,8 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
+    len = strlen(CardConst::MCDAT_TITLE);
+    if (memcmp(saveDat->m_title, CardConst::MCDAT_TITLE, len) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1251,7 +1225,8 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
+    len = strlen(CardConst::MCDAT_MACHINE);
+    if (memcmp(saveDat->m_machine, CardConst::MCDAT_MACHINE, len) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1259,7 +1234,8 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
+    len = strlen(CardConst::MCDAT_VERSION);
+    if (memcmp(saveDat->m_version, CardConst::MCDAT_VERSION, len) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1295,15 +1271,16 @@ void CMemoryCardMan::SetLoadData()
     Sound.SetSeMasterVolume(saveDat->m_seVolume);
     Sound.SetStereo(Sound.IsStereo());
 
-    CGame* g = &Game;
-    g->m_gameWork.m_gameInitFlag = saveDat->m_gameInitFlag != 0;
+    Game.m_gameWork.m_gameInitFlag = saveDat->m_gameInitFlag != 0;
     for (int i = 0; i < 4; i++)
     {
-        g->m_gameWork.m_spModeFlags[i] = saveDat->m_spModeFlags[i] != 0;
+        Game.m_gameWork.m_spModeFlags[i] = saveDat->m_spModeFlags[i] ? 1 : 0;
     }
 
     int count;
     int i;
+    int letter;
+    CGame* g = &Game;
     for (c = 0; c < 8; c++)
     {
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
@@ -1358,26 +1335,26 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_gil = savedCharacter.m_gil;
         memcpy(caravanWork->m_name, savedCharacter.m_name, sizeof(savedCharacter.m_name));
         caravanWork->m_letterCount = savedCharacter.m_letterCount;
-        for (count = 0; count < 100; count++)
+        for (letter = 0; letter < 100; letter++)
         {
-            caravanWork->m_letters[count].FlagsBits().m_attachmentIsGil =
-                savedCharacter.m_letters[count].FlagsBits().m_attachmentIsGil;
-            caravanWork->m_letters[count].HeaderBitsRef().m_messageType =
-                savedCharacter.m_letters[count].HeaderBitsRef().m_messageType;
-            caravanWork->m_letters[count].WordBitsRef().m_senderId =
-                savedCharacter.m_letters[count].WordBitsRef().m_senderId;
-            caravanWork->m_letters[count].AttachmentBitsRef().m_value =
-                savedCharacter.m_letters[count].AttachmentBitsRef().m_value;
-            memcpy(caravanWork->m_letters[count].m_half.m_tempVars, savedCharacter.m_letters[count].m_half.m_tempVars,
-                   sizeof(savedCharacter.m_letters[count].m_half.m_tempVars));
-            caravanWork->m_letters[count].FlagsBits().m_opened =
-                savedCharacter.m_letters[count].FlagsBits().m_opened;
-            caravanWork->m_letters[count].FlagsBits().m_attachmentClaimed =
-                savedCharacter.m_letters[count].FlagsBits().m_attachmentClaimed;
-            caravanWork->m_letters[count].FlagsBits().m_replySent =
-                savedCharacter.m_letters[count].FlagsBits().m_replySent;
-            caravanWork->m_letters[count].FlagsBits().m_hasReply =
-                savedCharacter.m_letters[count].FlagsBits().m_hasReply;
+            caravanWork->m_letters[letter].m_attachmentIsGil =
+                savedCharacter.m_letters[letter].m_attachmentIsGil;
+            caravanWork->m_letters[letter].m_messageType =
+                savedCharacter.m_letters[letter].m_messageType;
+            caravanWork->m_letters[letter].m_senderId =
+                savedCharacter.m_letters[letter].m_senderId;
+            caravanWork->m_letters[letter].m_attachValue =
+                savedCharacter.m_letters[letter].m_attachValue;
+            memcpy(caravanWork->m_letters[letter].m_tempVars, savedCharacter.m_letters[letter].m_tempVars,
+                   sizeof(savedCharacter.m_letters[letter].m_tempVars));
+            caravanWork->m_letters[letter].m_opened =
+                savedCharacter.m_letters[letter].m_opened;
+            caravanWork->m_letters[letter].m_attachmentClaimed =
+                savedCharacter.m_letters[letter].m_attachmentClaimed;
+            caravanWork->m_letters[letter].m_replySent =
+                savedCharacter.m_letters[letter].m_replySent;
+            caravanWork->m_letters[letter].m_hasReply =
+                savedCharacter.m_letters[letter].m_hasReply;
         }
 
         for (int artifact = 0; artifact < 96; artifact++)
@@ -1431,7 +1408,7 @@ void CMemoryCardMan::SetLoadData()
     }
 
     Game.LoadScript(saveDat->m_scriptData);
-    GetCharaGlobal()->LoadFurTexBuffer(saveDat->m_furTexels);
+    Chara.LoadFurTexBuffer(saveDat->m_furTexels);
 
 }
 
@@ -1466,7 +1443,7 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
 {
     if (saveData == 0) {
-        saveData = GetSaveDat(m_saveBuffer);
+        saveData = (Mc::SaveDat*)m_saveBuffer;
     }
     if (CalcCrc(saveData) == saveData->m_crc) {
         return 1;
@@ -1945,15 +1922,15 @@ int CMemoryCardMan::McChkConnect(int chan)
  */
 void CMemoryCardMan::EncodeData()
 {
-    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
+    Mc::SaveDat* const save = (Mc::SaveDat*)m_saveBuffer;
     const int rotAmount = save->m_rotateKey % 0x20;
-    u32* ptr = GetSaveEncodedWords(save);
+    u32* ptr = &save->m_random;
 
     const int wordCount = (kMemoryCardSaveBufferSize - offsetof(Mc::SaveDat, m_random)) / sizeof(u32);
     for (int count = 0; count < wordCount; count++)
     {
         u32 rotated = rotlwi(*ptr, rotAmount);
-        *ptr++ = LoadSwapped(&rotated);
+        *ptr++ = __lwbrx(&rotated, 0);
     }
 }
 
@@ -1968,15 +1945,15 @@ void CMemoryCardMan::EncodeData()
  */
 void CMemoryCardMan::DecodeData()
 {
-    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
-    u32* ptr = GetSaveEncodedWords(save);
+    Mc::SaveDat* const save = (Mc::SaveDat*)m_saveBuffer;
+    u32* ptr = &save->m_random;
     const int rotAmount = save->m_rotateKey % 0x20;
 
     const int wordCount = (kMemoryCardSaveBufferSize - offsetof(Mc::SaveDat, m_random)) / sizeof(u32);
     for (int count = 0; count < wordCount; count++)
     {
         u32 word = *ptr;
-        *ptr++ = rotrwi(LoadSwapped(&word), rotAmount);
+        *ptr++ = rotrwi(__lwbrx(&word, 0), rotAmount);
     }
 }
 

@@ -38,7 +38,7 @@ CProcessCallbackTable CSoundPcs::m_table = {
  */
 void CSoundPcs::draw()
 {
-    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Sound) != 0) {
+    if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_Sound) != 0) {
         Sound.Draw();
     }
 }

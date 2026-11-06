@@ -23,7 +23,6 @@ class CGObject : public CGBaseObj
 public:
     CGObject() {}
 
-    virtual int GetCID() { return 5; }     // vtable entry 0x10
 	virtual void onCreate();  // vtable entry 0x1c
 	virtual void onDestroy(); // vtable entry 0x20
     virtual void onDraw();    // vtable entry 0x28
@@ -85,6 +84,7 @@ public:
     void AddAnimPoint(int, int, int);
     void SetAnimSlot(int, int);
     float CalcSafePos(int, CGObject*, Vec*);
+    int Cross(int, Vec*, float*, Vec*, Vec*, float, int);
     void PutDropItem();
     virtual unsigned int IsDispRader();
     /*
@@ -97,6 +97,7 @@ public:
      * JP Size: TODO
      */
     virtual float onAlphaUpdate() { return 1.0f; }
+    virtual int GetCID() { return 5; }
     virtual void onAnimPoint(int, int) {}
     virtual int onHit(int, CGObject*, int, Vec*) { return 0; }
     virtual void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*) {}

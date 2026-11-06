@@ -334,34 +334,33 @@ inline void GbaQueue::ClrSmithFlg(int channel)
 void GbaQueue::LoadAll()
 {
 	int i;
-	char prevMenuStageMode;
-	char spModeBits;
+	char mode;
 	char spModeChangeBits;
 
 	for (i = 0; i < 4; i++) {
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 
-	prevMenuStageMode = m_singleMode;
+	mode = m_singleMode;
 	m_singleMode = static_cast<char>(Game.m_gameWork.m_menuStageMode != 0);
-	if (prevMenuStageMode != m_singleMode) {
+	if (mode != m_singleMode) {
 		m_playModeFlags = 0xF;
 	}
 
-	spModeBits = 0;
+	mode = 0;
 	for (i = 0; i < 4; i++) {
 		if (Game.GetGbaSP(i) != 0) {
-			spModeBits = static_cast<char>(spModeBits | (1 << i));
+			mode = static_cast<char>(mode | (1 << i));
 		}
 	}
 
-	spModeChangeBits = static_cast<char>(spModeBits ^ m_spModeBits);
+	spModeChangeBits = static_cast<char>(mode ^ m_spModeBits);
 	for (i = 0; i < 4; i++) {
 		if ((spModeChangeBits & (1 << i)) != 0) {
 			m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | (1 << i));
 		}
 	}
-	m_spModeBits = spModeBits;
+	m_spModeBits = mode;
 
 	for (i = 0; i < 4; i++) {
 		OSSignalSemaphore(&accessSemaphores[i]);
@@ -2046,10 +2045,10 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 
 		for (j = 0; j < i; j++) {
 			const CCaravanWork::CLetterWork* prev = &scriptFood->m_letters[j];
-			if (cur->SenderId() == prev->SenderId()) {
+			if (cur->m_senderId == prev->m_senderId) {
 				matchedNpc = j;
 			}
-			if (cur->MessageType() == prev->MessageType()) {
+			if (cur->m_messageType == prev->m_messageType) {
 				matchedSubject = j;
 			}
 			if (matchedNpc != -1 && matchedSubject != -1) {
@@ -2066,7 +2065,7 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, Game.GetNPCName((cur->Word0() >> 9) & 0x1FF));
+			strcpy(tempName, Game.GetNPCName(cur->m_senderId));
 			memcpy(npcWrite, tempName, kGbaQueueLetterNpcNameEntryBytes);
 			npcWrite += kGbaQueueLetterNpcNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount++);
@@ -2081,28 +2080,28 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, Game.GetLetterSubject((cur->HeaderWord() >> 2) & 0x1FF));
+			strcpy(tempName, Game.GetLetterSubject(cur->m_messageType));
 			memcpy(subjectWrite, tempName, kGbaQueueLetterSubjectNameEntryBytes);
 			subjectWrite += kGbaQueueLetterSubjectNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount++);
 		}
 
 		unsigned int flags = 0;
-		if (cur->FlagsBits().m_opened) {
+		if (cur->m_opened) {
 			flags |= GbaQueConst::ITEM_USE;
 		}
-		if (cur->FlagsBits().m_attachmentClaimed) {
+		if (cur->m_attachmentClaimed) {
 			flags |= GbaQueConst::ITEM_PUT;
 		}
-		if (cur->FlagsBits().m_replySent) {
+		if (cur->m_replySent) {
 			flags |= GbaQueConst::MONEY_ATTACH;
 		}
-		if (cur->FlagsBits().m_hasReply) {
+		if (cur->m_hasReply) {
 			flags |= GbaQueConst::OPEN_LETTER;
 		}
 
-		if (!cur->AttachmentIsGil() && cur->AttachmentValue() != 0) {
-			const int value = static_cast<int>(cur->AttachmentValue());
+		if (!cur->m_attachmentIsGil && cur->m_attachValue != 0) {
+			const int value = cur->m_attachValue;
 			if (value >= 0x100 && value <= 0x124) {
 				if ((unsigned int)System.m_execParam >= 1) {
 			System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), GBAQUE_LINE(0x810, 0x7FA, 0x7F7), channel, i);
@@ -2111,9 +2110,9 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 				flags |= GbaQueConst::MOVE_ATTACH;
 				entryWrite[0] = SwapU32(value);
 			}
-		} else if (cur->AttachmentIsGil() && cur->AttachmentValue() != 0) {
+		} else if (cur->m_attachmentIsGil && cur->m_attachValue != 0) {
 			flags |= GbaQueConst::REPLY_LETTER;
-			entryWrite[0] = SwapU32(cur->AttachmentValue() * 100);
+			entryWrite[0] = SwapU32(cur->m_attachValue * 100);
 		}
 
 		(reinterpret_cast<unsigned char*>(entryWrite))[6] = static_cast<unsigned char>(flags);
@@ -2188,10 +2187,10 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
     foodBasePtr = foodBaseArr + channel;
     CCaravanWork* caravanWork = (*foodBasePtr);
     for (int i = 0; i < 4; i++) {
-        CMes::m_tempVar[i] = caravanWork->m_letters[letterIndex].TempVar(i);
+        CMes::m_tempVar[i] = caravanWork->m_letters[letterIndex].m_tempVars[i];
     }
 
-    int letterType = caravanWork->m_letters[letterIndex].HeaderBitsRef().m_messageType;
+    int letterType = caravanWork->m_letters[letterIndex].m_messageType;
 
     strcpy(srcText, Game.GetLetter(letterType));
 #ifdef VERSION_GCCJGC
@@ -2303,11 +2302,11 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	int letterIndex = valueBytes[2];
-	unsigned int hasGil = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachmentIsGil;
+	unsigned int hasGil = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_attachmentIsGil;
 	int result;
 
-	if ((hasGil == 0) && (Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue != 0)) {
-		int item = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue;
+	if ((hasGil == 0) && (Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_attachValue != 0)) {
+		int item = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_attachValue;
 		if ((item < 1) || (item > 0x9E)) {
 			if (Game.m_scriptFoodBase[channel]->AddItem(item, 0) == 0) {
 				result = 1;
@@ -2315,8 +2314,8 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 				result = 0;
 			}
 		}
-	} else if ((hasGil != 0) && (Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue != 0)) {
-		int gil = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_bits.m_attachValue * 100;
+	} else if ((hasGil != 0) && (Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_attachValue != 0)) {
+		int gil = Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_attachValue * 100;
 		if (Game.m_scriptFoodBase[channel]->CanAddGil(gil) == 0) {
 			result = 1;
 		} else {
@@ -2334,7 +2333,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		Game.m_scriptFoodBase[channel]->m_letters[letterIndex].FlagsBits().m_attachmentClaimed = 1;
+		Game.m_scriptFoodBase[channel]->m_letters[letterIndex].m_attachmentClaimed = 1;
 	}
 }
 
@@ -2397,30 +2396,25 @@ void GbaQueue::LoadMapObj()
 	int i;
 
 	if (m_scrInitEnd == 0) {
-		i = 0;
-		do {
+		for (i = 0; i < 4; i++) {
 			OSWaitSemaphore(&accessSemaphores[i]);
-			i++;
-		} while (i < 4);
+		}
 
 		if (m_mapObjWork.m_count != 0) {
 			memset(&m_mapObjWork, 0, sizeof(GbaQueueMapObjWork));
 		}
 
-		i = 0;
-		do {
+		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
-			i++;
-		} while (i < 4);
+		}
 	} else {
 		GbaQueueMapObjWork mapObjWork;
 		memset(&mapObjWork, 0, sizeof(mapObjWork));
 
-		CFlatRuntime2::CMapObjectInfo* mapObj = CFlat.m_mapObjectInfo;
-		int j = 0;
-		do {
-			char objType = mapObj->m_type;
-			if (objType != -1) {
+		CFlatRuntime2::CMapObjectInfo* info = CFlat.m_mapObjectInfo;
+		for (int j = 0; j < 0x20; j++) {
+			if (info[j].m_type != -1) {
+				char objType = info[j].m_type;
 				unsigned int count = mapObjWork.m_count;
 				if (objType >= 0x19) {
 					if (static_cast<unsigned int>(System.m_execParam) >= 2) {
@@ -2428,38 +2422,28 @@ void GbaQueue::LoadMapObj()
 					}
 				} else {
 					unsigned int mask = 1U << count;
-					int drawFlag = static_cast<int>(mapObj->m_drawFlag);
-					unsigned int drawMask = drawFlag != 0 ? mask : 0;
+					unsigned int drawMask = info[j].m_drawFlag != 0 ? mask : 0;
 					mask = ~mask;
-					mapObjWork.m_entries[count].m_type = static_cast<unsigned char>(mapObj->m_type);
-					mapObjWork.m_entries[count].m_x = static_cast<short>(mapObj->m_x / 3.0f);
-					mapObjWork.m_entries[count].m_y = static_cast<short>(mapObj->m_y / 3.0f);
-					mapObjWork.m_entries[count].m_z = static_cast<short>(mapObj->m_z / 3.0f);
-					mapObjWork.m_entries[count].m_radius = static_cast<short>(mapObj->m_radius / 3.0f);
-
-					unsigned int flags = mapObjWork.m_drawFlags & mask;
-					mapObjWork.m_drawFlags = flags | drawMask;
-					mapObjWork.m_count = static_cast<unsigned char>(mapObjWork.m_count + 1);
+					mapObjWork.m_entries[count].m_type = objType;
+					mapObjWork.m_entries[count].m_x = static_cast<short>(info[j].m_x / 3.0f);
+					mapObjWork.m_entries[count].m_y = static_cast<short>(info[j].m_y / 3.0f);
+					mapObjWork.m_entries[count].m_z = static_cast<short>(info[j].m_z / 3.0f);
+					mapObjWork.m_entries[count].m_radius = static_cast<short>(info[j].m_radius / 3.0f);
+					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | drawMask;
+					mapObjWork.m_count++;
 				}
 			}
+		}
 
-			j++;
-			mapObj++;
-		} while (j < 0x20);
-
-		i = 0;
-		do {
+		for (i = 0; i < 4; i++) {
 			OSWaitSemaphore(&accessSemaphores[i]);
-			i++;
-		} while (i < 4);
+		}
 
 		memcpy(&m_mapObjWork, &mapObjWork, sizeof(mapObjWork));
 
-		i = 0;
-		do {
+		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
-			i++;
-		} while (i < 4);
+		}
 	}
 }
 
@@ -2896,7 +2880,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 				existingCharaType |= 0x80;
 			}
 
-			if (existingCharaType == valueBytes[2]) {
+			if (existingCharaType == static_cast<unsigned char>(valueBytes[2])) {
 				Joybus.SendResult(channel, 1, valueBytes[1], 0);
 				return;
 			}
@@ -3243,7 +3227,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 		indexBytes = (((indexBytes >> 2) + 1) * 4);
 	}
 
-	outData[4] = equipCount;
+	outData[4] = static_cast<char>(equipCount);
 	outData += 5;
 	memcpy(outData, equipIndices, indexBytes - 1);
 

@@ -6,78 +6,61 @@
 
 #include <string.h>
 
-namespace {
-static inline void i2f_5(float* out, register const unsigned short* in)
+static inline void i2f_5(register float* out, register unsigned short* in)
 {
-	register float value;
-
 	asm {
-		psq_l value, 0(in), 1, 5
+		psq_l f1, 0(in), 1, 5
+		stfs f1, 0(out)
 	}
-
-	*out = value;
 }
 
-static inline void i2f2_5(float* out, register const unsigned short* in, float t)
+static inline void i2f2_5(register float* out, register unsigned short* in, register float t)
 {
-	register float a;
-	register float b;
-
 	asm {
-		psq_l a, 0(in), 1, 5
-		psq_l b, 2(in), 1, 5
+		psq_l f2, 0(in), 1, 5
+		psq_l f3, 2(in), 1, 5
+		fsubs f3, f3, f2
+		fmadds f3, f3, t, f2
+		stfs f3, 0(out)
 	}
-
-	*out = (b - a) * t + a;
 }
 
-static inline void i2f_6(float* out, register const unsigned short* in)
+static inline void i2f_6(register float* out, register unsigned short* in)
 {
-	register float value;
-
 	asm {
-		psq_l value, 0(in), 1, 6
+		psq_l f1, 0(in), 1, 6
+		stfs f1, 0(out)
 	}
-
-	*out = value;
 }
 
-static inline void i2f2_6(float* out, register const unsigned short* in, float t)
+static inline void i2f2_6(register float* out, register unsigned short* in, register float t)
 {
-	register float a;
-	register float b;
-
 	asm {
-		psq_l a, 0(in), 1, 6
-		psq_l b, 2(in), 1, 6
+		psq_l f2, 0(in), 1, 6
+		psq_l f3, 2(in), 1, 6
+		fsubs f3, f3, f2
+		fmadds f3, f3, t, f2
+		stfs f3, 0(out)
 	}
-
-	*out = (b - a) * t + a;
 }
 
-static inline void i2f_7(float* out, register const unsigned short* in)
+static inline void i2f_7(register float* out, register unsigned short* in)
 {
-	register float value;
-
 	asm {
-		psq_l value, 0(in), 1, 7
+		psq_l f1, 0(in), 1, 7
+		stfs f1, 0(out)
 	}
-
-	*out = value;
 }
 
-static inline void i2f2_7(float* out, register const unsigned short* in, float t)
+static inline void i2f2_7(register float* out, register unsigned short* in, register float t)
 {
-	register float a;
-	register float b;
-
 	asm {
-		psq_l a, 0(in), 1, 7
-		psq_l b, 2(in), 1, 7
+		psq_l f2, 0(in), 1, 7
+		psq_l f3, 2(in), 1, 7
+		fsubs f3, f3, f2
+		fmadds f3, f3, t, f2
+		stfs f3, 0(out)
 	}
-
-	*out = (b - a) * t + a;
-}
 }
 
 /*

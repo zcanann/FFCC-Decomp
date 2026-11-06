@@ -136,7 +136,6 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     pppFVECTOR4 colorStart;
     float curY;
     float curZ;
-    float countMinusOne;
     float nextBaseX;
     float segDx;
     float segDy;
@@ -149,6 +148,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     float segBaseY;
     float segBaseZ;
     float segRemain;
+    float countMinusOne;
     float drawScale;
     float scaleStepDelta;
     u8 zEnable;

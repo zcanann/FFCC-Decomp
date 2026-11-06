@@ -491,11 +491,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			CMaterial* shadowMaterials[2] = {0, 0};
 			MtxPtr shadowMatrices[2] = {0, 0};
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, modelPos, 100.0f, 20.0f, 0);
-			int texMtxId = GX_TEXMTX1;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				const int shadowTexMap = shadowIndex + 3;
-				const int shadowTexMtxId = texMtxId;
-				texMtxId += 3;
+				int shadowTexMtxId = GX_TEXMTX1;
+				shadowTexMtxId += shadowIndex * 3;
 				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), shadowMaterials[shadowIndex]->GetTexture(0));
 
 				Mtx shadowTexMtx;
@@ -634,7 +633,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 					int primitive = cursor[0] & 0xF8;
 					unsigned short vertexCount = *reinterpret_cast<const unsigned short*>(cursor + 1);
 					cursor += 3;
-					remaining -= vertexCount * 8 + 3;
+					remaining -= (vertexCount & 0xFFFF) * 8 + 3;
 					int count = vertexCount;
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
@@ -673,6 +672,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	}
 
 	LightPcs.EnableLight(1, 0);
+}
+
+static inline float Min(float a, float b)
+{
+	return (a < b) ? a : b;
 }
 
 /*
@@ -730,8 +734,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 				int reduce = (targetColor.a * (4 - distance)) / 4;
 				a = (a - reduce < 0) ? 0 : a - reduce;
 			} else {
-				float k = (float)(distance / 4) + (float)(7 - targetColor.a) / 7.0f;
-				k = (1.0f < k) ? 1.0f : k;
+				float k = Min((float)(distance / 4) + (float)(7 - targetColor.a) / 7.0f, 1.0f);
 				r = (int)((float)r * k + (float)targetColor.r * (1.0f - k));
 				g = (int)((float)g * k + (float)targetColor.g * (1.0f - k));
 				b = (int)((float)b * k + (float)targetColor.b * (1.0f - k));
@@ -840,7 +843,7 @@ int CChara::CModel::PickFur(
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 					int vertexIndex = 0;
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
-						for (; count--; vertexIndex++, indices += 4) {
+						while (count--) {
 							register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
 							register const S16Vec2d* uvPtr = mesh->m_data->m_uvs;
 							register int uvOff = indices[3] * sizeof(*uvPtr);
@@ -939,9 +942,7 @@ int CChara::CModel::PickFur(
 										CVector planeDelta = CVector(verts[0].m_viewPos) - ray[0];
 										const float rayDot = PSVECDotProduct(normal, rayDir);
 										const float planeDot = PSVECDotProduct(normal, planeDelta);
-										Vec scaledRay;
-										PSVECScale(rayDir, &scaledRay, planeDot / rayDot);
-										PSVECAdd(ray[0], &scaledRay, hitViewPos);
+										VECMultAdd(ray[0], rayDir, hitViewPos, planeDot / rayDot);
 
 										CVector hitTo[3];
 										CVector area[3];
@@ -966,13 +967,16 @@ int CChara::CModel::PickFur(
 											outWorldPos->y = hitViewPos.y;
 											outWorldPos->z = hitViewPos.z;
 										}
-										if (material->IsFurEnabled()) {
-											hitPaintable = paintableMaterial;
-											nearestDepth = depth;
+										if (!material->IsFurEnabled()) {
+											continue;
 										}
+										hitPaintable = paintableMaterial;
+										nearestDepth = depth;
 									}
 								}
 							}
+							vertexIndex++;
+							indices += 4;
 						}
 						cursor = reinterpret_cast<const unsigned char*>(indices);
 					} else if (primitive == 0) {
@@ -1380,9 +1384,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				}
 
 				if (emitParticle != 0) {
-					CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
-					CFlatRuntime2Storage().SetParticleWorkPos(worldPos, 0.0f);
-					const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
+					CFlat.ResetParticleWork(particleNo | 0x100, 0);
+					CFlat.SetParticleWorkPos(worldPos, 0.0f);
+					const int particleIndex = CFlat.PutParticleWork();
 					pppFVECTOR4 color = {0.0f, 0.0f, 0.0f, 0.0f};
 					color.x = static_cast<float>(particleColor.r) / 15.0f;
 					color.y = static_cast<float>(particleColor.g) / 15.0f;
@@ -1439,7 +1443,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		stack[0].m_word = 2;
 		stack[1].m_word = 0;
 		stack[2].m_word = 0;
-		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+		CFlat.SystemCall(0, 1, 9, 3, stack, 0);
 	}
 
 	if (messageId >= 0 && !MenuPcs.GetMesMenu(5)->IsUse()) {

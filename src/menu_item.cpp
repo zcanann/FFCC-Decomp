@@ -279,28 +279,28 @@ int CMenuPcs::ItemCtrlCur()
 void CMenuPcs::ItemDraw()
 {
     s16 listState;
-    int selectedItemId;
-    float x;
-    int mode;
-    MenuItemOpenAnim* entry;
-    CCaravanWork* caravanWork;
-    float itemAlpha;
-    s16 itemId;
-    CFont* helpFont;
+    int i;
+    int texId;
     int drawIndex;
+    int mode;
+    s16 itemId;
+    MenuItemOpenAnim* entry;
     int tex;
-    CFont* listFont;
-    float y;
     int menuIndex;
+    CCaravanWork* caravanWork;
+    int selectedItemId;
+    int foundSelected;
+    float x;
+    float itemAlpha;
+    float y;
     float w;
     float h;
-    int hasLetterAttach;
-    int texId;
-    int i;
-    int foundSelected;
-    GXColor colors[4];
     float u;
     float v;
+    CFont* helpFont;
+    CFont* listFont;
+    int hasLetterAttach;
+    GXColor colors[4];
 
     foundSelected = 0;
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

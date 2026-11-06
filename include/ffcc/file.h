@@ -66,6 +66,8 @@ public:
 	void LockBuffer();
 	void UnlockBuffer();
 	void ReadASync(CHandle* handle);
+	void Write(char* path, void* buffer, unsigned long size);
+	void Write(CHandle* handle, void* buffer, unsigned long size);
 	void Close(CHandle* handle);
 	int IsCompleted(CHandle* handle);
 #ifndef VERSION_GCCJGC

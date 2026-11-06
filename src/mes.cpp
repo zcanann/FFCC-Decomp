@@ -18,13 +18,6 @@ int CMes::m_tempVar[0x10];
 int CMes::m_tempVar[0x14];
 #endif
 
-static inline char GetMesNibbleValue(const char* data)
-{
-	char val = (char)(((unsigned char)data[0] & 0x0F) << 4);
-	val |= (unsigned char)data[1] & 0x0F;
-	return val;
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -61,7 +54,7 @@ inline int CMes::GET_2(char** text)
 	return acc;
 }
 
-inline void CGame::UPPERItemName(char* name)
+inline char* CGame::UPPERItemName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -70,9 +63,10 @@ inline void CGame::UPPERItemName(char* name)
 		toupper_name_conflict(name);
 #endif
 	}
+	return name;
 }
 
-inline void CGame::LowerItemName(char* name)
+inline char* CGame::LowerItemName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -81,9 +75,10 @@ inline void CGame::LowerItemName(char* name)
 		tolower_name_conflict(name);
 #endif
 	}
+	return name;
 }
 
-inline void CGame::UPPERMonName(char* name)
+inline char* CGame::UPPERMonName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -92,9 +87,10 @@ inline void CGame::UPPERMonName(char* name)
 		toupper_name_conflict(name);
 #endif
 	}
+	return name;
 }
 
-inline void CGame::UpperMonName(char* name)
+inline char* CGame::UpperMonName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -103,9 +99,10 @@ inline void CGame::UpperMonName(char* name)
 		name[0] = toupperLatin1(name[0]);
 #endif
 	}
+	return name;
 }
 
-inline void CGame::LowerMonName(char* name)
+inline char* CGame::LowerMonName(char* name)
 {
 	if (name[0] != '\0') {
 #ifdef VERSION_GCCE01
@@ -114,6 +111,7 @@ inline void CGame::LowerMonName(char* name)
 		tolower_name_conflict(name);
 #endif
 	}
+	return name;
 }
 
 #define ApplyCaseMode(kind, text, caseMode) \
@@ -152,7 +150,7 @@ static inline CColor& MesColorRef(const CColor& color)
 #ifdef VERSION_GCCJGC
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-    int lineStartX = (int)font->posX;
+    int lineStartX = (int)font->GetPosX();
     unsigned short ch;
     int width = 0;
     int continueDraw = 1;
@@ -170,8 +168,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
             case 0:
                 if (breakOnLineTag != 0) {
                     font->SetPosX((float)lineStartX);
-                    float lineAdvance = font->GetHeight();
-                    font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
+                    font->SetPosY((float)lineBaseY + (font->GetPosY() + font->GetHeight()));
                 }
                 break;
             case 1:
@@ -192,7 +189,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 #else
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	int lineStartX = (int)font->posX;
+	int lineStartX = (int)font->GetPosX();
 	unsigned short ch;
 	int width = 0;
 	int continueDraw = 1;
@@ -214,8 +211,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 				if (breakOnLineTag != 0)
 				{
 					font->SetPosX((float)lineStartX);
-					float lineAdvance = font->GetHeight();
-					font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
+					font->SetPosY((float)lineBaseY + (font->GetPosY() + font->GetHeight()));
 				}
 				break;
 			case 1:
@@ -279,7 +275,8 @@ void CMes::MakeAgbString(char* out, char* src)
                 break;
             case 8:
             {
-                char varIndex = GetMesNibbleValue(src + 3);
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, reinterpret_cast<char*>(Game.m_caravanWorkArr[m_tempVar[varIndex]].m_name));
                 out += strlen(out);
                 src += 4;
@@ -287,7 +284,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 9:
             {
-                char varIndex = GetMesNibbleValue(src + 3);
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetItemName(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 4;
@@ -295,7 +293,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2A:
             {
-                char varIndex = GetMesNibbleValue(src + 3);
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetMonName(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 4;
@@ -303,7 +302,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2B:
             {
-                char varIndex = GetMesNibbleValue(src + 3);
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetNPCName(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 4;
@@ -311,7 +311,8 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2C:
             {
-                char varIndex = GetMesNibbleValue(src + 3);
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetPlaceName(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 4;
@@ -319,15 +320,17 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x2D:
             {
-                char varIndex = GetMesNibbleValue(src + 3);
-                strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3) + 0x3C)[m_tempVar[varIndex]]);
+                char* p = src + 3;
+                int varIndex = GET_1(&p);
+                strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3).m_strings + 0x3C)[m_tempVar[varIndex]]);
                 out += strlen(out);
                 src += 4;
                 break;
             }
             case 0x2E:
             {
-                char varIndex = GetMesNibbleValue(src + 1);
+                char* p = src + 1;
+                int varIndex = GET_1(&p);
                 strcpy(out, Game.GetLetterSubject(m_tempVar[varIndex]));
                 out += strlen(out);
                 src += 2;
@@ -339,7 +342,8 @@ void CMes::MakeAgbString(char* out, char* src)
                 break;
             case 0x30:
             {
-                char varIndex = GetMesNibbleValue(src + 1);
+                char* p = src + 1;
+                int varIndex = GET_1(&p);
                 sprintf(out, "%d", m_tempVar[varIndex]);
                 out += strlen(out);
                 src += 2;
@@ -382,7 +386,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	{
 		if ((unsigned char)c == 0xFF)
 		{
-		unsigned int tag = ((unsigned int)(unsigned char)src[1] - 0xA0U) & 0xFFU;
+		unsigned int tag = (unsigned char)(src[1] - 0xA0);
 		const unsigned char* op = (const unsigned char*)src + 2;
 		src++;
 
@@ -412,7 +416,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		case 8:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			strcpy(out, (char*)Game.m_caravanWorkArr[CMes::m_tempVar[varIndex]].m_name);
 			out += strlen(out);
 			src += 4;
@@ -426,7 +431,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x3D:
 		case 0x3F:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			int value = CMes::m_tempVar[varIndex];
 			switch (tag)
 			{
@@ -442,15 +448,17 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				break;
 			case 0x3D:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				char* q = (char*)op + 4;
+				int countIdx = GET_1(&q);
+				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeArtItemName(out, value, count);
 				break;
 			}
 			case 0x3F:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				char* q = (char*)op + 4;
+				int countIdx = GET_1(&q);
+				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeNumItemName(out, value, count);
 				break;
 			}
@@ -471,7 +479,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x3E:
 		case 0x40:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			int value = CMes::m_tempVar[varIndex];
 			switch (tag)
 			{
@@ -487,15 +496,17 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				break;
 			case 0x3E:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				char* q = (char*)op + 4;
+				int countIdx = GET_1(&q);
+				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeArtMonName(out, value, count);
 				break;
 			}
 			case 0x40:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				char* q = (char*)op + 4;
+				int countIdx = GET_1(&q);
+				int count = (unsigned short)CMes::m_tempVar[countIdx];
 				Game.MakeNumMonName(out, value, count);
 				break;
 			}
@@ -510,7 +521,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2B:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			strcpy(out, Game.GetNPCName(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
@@ -518,7 +530,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2C:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
 			strcpy(out, Game.GetPlaceName(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
@@ -526,15 +539,17 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2D:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
-			strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3) + 0x3C)[CMes::m_tempVar[varIndex]]);
+			char* p = (char*)op + 2;
+			int varIndex = GET_1(&p);
+			strcpy(out, (Game.m_cFlatDataArr[1].GetTable(3).m_strings + 0x3C)[CMes::m_tempVar[varIndex]]);
 			out += strlen(out);
 			src += 4;
 			break;
 		}
 		case 0x2E:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
+			char* p = (char*)op;
+			int varIndex = GET_1(&p);
 			strcpy(out, Game.GetLetterSubject(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 2;
@@ -549,7 +564,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x30:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
+			char* p = (char*)op;
+			int varIndex = GET_1(&p);
 			sprintf(out, "%d", CMes::m_tempVar[varIndex]);
 			out += strlen(out);
 			src += 2;
@@ -557,7 +573,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x41:
 		{
-			int mode = (signed char)GetMesNibbleValue((const char*)op);
+			char* p = (char*)op;
+			int modeIndex = GET_1(&p);
+			int mode = modeIndex;
 			int newCaseMode;
 			if (mode == 1)
 			{
@@ -587,8 +605,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x42:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			int newBranchMode = 2;
+			signed char varIndex = (char)(((unsigned char)op[0] & 0x0F) << 4);
+			varIndex |= (unsigned char)op[1] & 0x0F;
 			if (CMes::m_tempVar[varIndex] == 1)
 			{
 				newBranchMode = 1;
@@ -619,8 +638,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x42:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			int newBranchMode = 2;
+			signed char varIndex = (char)(((unsigned char)op[0] & 0x0F) << 4);
+			varIndex |= (unsigned char)op[1] & 0x0F;
 			if (CMes::m_tempVar[varIndex] == 1)
 			{
 				newBranchMode = 1;
@@ -630,8 +650,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x45:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			int newBranchMode = 2;
+			char* p = (char*)op;
+			int varIndex = GET_1(&p);
 			if (Game.m_caravanWorkArr[CMes::m_tempVar[varIndex]].m_genderFlag == 0)
 			{
 				newBranchMode = 1;
@@ -793,13 +814,13 @@ inline CFont* CMes::getFont(int fontIndex, int draw)
 	switch (fontIndex)
 	{
 	case 0:
-		font = MenuPcs.m_fonts[0];
+		font = MenuPcs.GetFont22();
 		break;
 	case 2:
-		font = MenuPcs.m_fonts[2];
+		font = MenuPcs.GetExtraFont(0);
 		break;
 	case 3:
-		font = MenuPcs.m_fonts[2];
+		font = MenuPcs.GetExtraFont(0);
 		break;
 	}
 	font->SetShadow(mShadow);
@@ -808,9 +829,7 @@ inline CFont* CMes::getFont(int fontIndex, int draw)
 	font->SetScale(mScaleX);
 #else
 	font->SetMargin(0.0f);
-	float scaleY = mScaleY;
-	font->SetScaleX(mScaleX);
-	font->SetScaleY(scaleY);
+	font->SetScale(mScaleX, mScaleY);
 #endif
 	if (draw)
 	{
@@ -967,9 +986,9 @@ void CMes::Draw()
 					font->SetScaleX(0.01f * (float)glyph->m_scaleX);
 					font->SetScaleY(glyphScaleY);
 #endif
-					font->renderFlags.snapPosition = 1;
+					font->SetAlign(1);
 					font->Draw(glyph->m_char);
-					font->renderFlags.snapPosition = 0;
+					font->SetAlign(0);
 				}
 			}
 		}
@@ -1633,7 +1652,7 @@ void CMes::addString(char** text, int branchMode)
 			glyph->m_x = mCurrentX;
 			glyph->m_y = (short)(int)mCurrentY;
 
-			font->renderFlags.snapPosition = 1;
+			font->SetAlign(1);
 			float width;
 			if (uch < 0x20)
 			{
@@ -1645,7 +1664,7 @@ void CMes::addString(char** text, int branchMode)
 			}
 			glyph->m_width = width;
 			float packedScale = 100.0f;
-			font->renderFlags.snapPosition = 0;
+			font->SetAlign(0);
 
 			glyph->m_reveal = mRevealCursor;
 			glyph->m_fadeFrames = mTextAlign;

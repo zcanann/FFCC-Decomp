@@ -419,7 +419,7 @@ static inline int CheckLineCylinder(const Vec& lineStart, const Vec& lineDirecti
  */
 int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 {
-    unsigned long groupMask = g_MapMng.GetMapIdGrpArray()[g_hit_lpface->m_groupIndex].m_mask;
+    unsigned long groupMask = g_MapMng.m_mapIdGrpArray[g_hit_lpface->m_groupIndex].m_mask;
     if ((groupMask & mask) == 0) {
         return 0;
     }
@@ -562,7 +562,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
 commit:
-    if (static_cast<signed char>(g_MapHitDrawMode) != 0) {
+    if (g_MapHitDrawMode != 0) {
         g_hit_lpface->m_drawFlags = g_MapHitFaceFlag;
     }
     g_hit_t_slide_min = g_hit_t;
@@ -576,7 +576,7 @@ commit:
     return 1;
 
 edge_loop:
-    if (static_cast<signed char>(g_MapHitDrawMode) != 0) {
+    if (g_MapHitDrawMode != 0) {
         g_hit_lpface->m_drawFlags = g_MapHitFaceFlag;
     }
 

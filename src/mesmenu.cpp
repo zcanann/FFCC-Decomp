@@ -64,7 +64,7 @@ inline void CMesMenu::close(int closeReason)
     m_mes.Set(0, 0);
     stack[0].m_word = m_menuIndex;
     stack[1].m_word = m_closeReason;
-    gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
+    CFlat.SystemCall(0, 1, 3, 2, stack, 0);
     m_state = 4;
     m_active = 0;
     if (m_menuIndex < 4) {
@@ -186,9 +186,9 @@ void CMesMenu::onCalc()
 
     unsigned int stageBit = 0;
     if (m_menuIndex < 4) {
-        stageBit = CFlatEnabledEventFlags() & 1;
+        stageBit = (CFlat.m_eventFlags & CFlat.m_eventMask) & 1;
     } else {
-        stageBit = CFlatEnabledEventFlags() & 2;
+        stageBit = (CFlat.m_eventFlags & CFlat.m_eventMask) & 2;
     }
 
     int desiredStageFlag = stageBit ? 1 : 0;
@@ -431,12 +431,11 @@ void CMesMenu::onCalc()
 #else
 void CMesMenu::onDraw()
 {
-    float alpha255;
     float baseX;
     static int tCut[4] = {1, 6, 7, 6};
 
     if ((m_menuIndex == 0) &&
-        (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 30) >> 31) != 0)) {
+        (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlat.m_gameFlags) << 30) >> 31) != 0)) {
         int iconFrame = 0;
         int charaMode = Chara.MogFur().m_commandIndex;
         switch (charaMode) {
@@ -515,34 +514,35 @@ void CMesMenu::onDraw()
 
         float pulse = 32.0f * (1.0f - sinf(1.5707964f * stageBlend));
         MenuPcs.GetRingMenu(m_menuIndex)->GetDispCounter();
-        int maskX = m_menuIndex & 1;
+        int maskX;
+        int maskY;
         float pulseX;
-        if (maskX != 0) {
+        float pulseY;
+        float alphaF;
+        if ((maskX = m_menuIndex & 1) != 0) {
             pulseX = pulse;
         } else {
             pulseX = -pulse;
         }
-        int maskY = m_menuIndex & 2;
 #ifndef VERSION_GCCP01
         float posX = m_baseX;
 #else
         float posX = m_baseX + m_offsetX;
 #endif
         baseX = posX + pulseX;
-        float pulseY;
-        if (maskY != 0) {
+        if ((maskY = m_menuIndex & 2) != 0) {
             pulseY = pulse;
         } else {
             pulseY = -pulse;
         }
 #ifndef VERSION_GCCP01
-        float baseY = (m_baseY) + pulseY;
+        float posY = m_baseY;
 #else
-        float baseY = (m_baseY + m_offsetY) + pulseY;
+        float posY = m_baseY + m_offsetY;
 #endif
+        float baseY = posY + pulseY;
 
         if (0.0f < stateBlend) {
-            float alphaF;
             float width = m_windowWidth * stateBlend;
             float height = m_windowHeight * stateBlend;
             float edgeX;
@@ -691,8 +691,9 @@ void CMesMenu::onDraw()
         if (foodMaskX != 0) {
             foodOffsetX = 75;
         }
+        float foodX = frameX + shakeX;
         MenuPcs.DrawRect(
-            (foodMaskX != 0) ? 0 : 8, (frameX + shakeX) + (float)foodOffsetX,
+            (foodMaskX != 0) ? 0 : 8, foodX + (float)foodOffsetX,
             (-1.0f) + (frameY + shakeY), 48.0f, 49.0f,
             (float)foodU, (float)foodV, 1.0f, 1.0f,
             0.0f);
@@ -790,14 +791,18 @@ void CMesMenu::onDraw()
             float windowScale = stateBlend * stageBlend;
             float pulseScale = 0.25f * (1.0f - windowScale) + 1.0f;
             float timeRaw = fmod(0.05f * (float)m_stateTimer, 2.0);
-            float time = (timeRaw > 1.0f) ? (2.0f - timeRaw) : timeRaw;
+            float time;
+            if (timeRaw > 1.0f) {
+                time = 2.0f - timeRaw;
+            } else {
+                time = timeRaw;
+            }
 
             float angle = 3.1415927f * time;
             float sinY = sinf(angle);
             float sinX = sinf((-1.5707964f) + angle);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuGbaTexture));
-            alpha255 = 255.0f * windowScale;
-            MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * alpha255) * stageBlend)).Ref());
+            MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * (255.0f * windowScale)) * stageBlend)).Ref());
             float fadeScale = 1.0f - pulseScale;
             float promptX = (float)(int)(40.0f + drawX);
             float promptY = (float)(int)(32.0f + drawY);
@@ -807,7 +812,7 @@ void CMesMenu::onDraw()
                 3, 8.0f + (promptX + driftX), 8.0f + (promptY - driftY), 80.0f, 48.0f, 0.0f,
                 0.0f, 0.75f * (1.0f + fadeScale), 0.75f * (pulseScale + fadeScale),
                 0.2f * (2.0f * (time - 0.5f)));
-            MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255 * stageBlend)).Ref());
+            MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>((255.0f * windowScale) * stageBlend)).Ref());
             MenuPcs.DrawRect(
                 3, promptX + driftX, promptY - driftY, 80.0f, 48.0f, 0.0f, 0.0f,
                 0.75f * pulseScale, 0.75f * pulseScale, 0.2f * (2.0f * (time - 0.5f)));
@@ -939,8 +944,8 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 
         for (int heartIndex = 0; heartIndex < (int)((unsigned int)scriptFood->m_maxHp >> 1); heartIndex++) {
             int heartValue = m_heartValue - heartIndex * 0xC;
-            float heartPulse = (float)sin(pulseSinScale * (pulseOne - (float)m_heartGrowTimers[heartIndex] * pulseTimerScale));
-            heartPulse = pulseAmp * heartPulse + pulseOne;
+            float heartSin = (float)sin(pulseSinScale * (pulseOne - (float)m_heartGrowTimers[heartIndex] * pulseTimerScale));
+            float heartPulse = pulseAmp * heartSin + pulseOne;
             heartPulse *= pulseBase;
             int timer = m_heartDropTimers[heartIndex];
             float shakeX = (float)((timer == 0) ? 0 : (timer >> 2) * tXY[(timer + 1) & 3]);

@@ -165,27 +165,27 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
-		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
+		padInput = Pad.m_padInputs[padOffset].buttonDown[0];
 	}
 
 	if ((padInput & 0x100) != 0) {
 		switch (m_selectedMenu->m_id) {
 		case 100:
-			CFlatEventMask() = ~CFlatEventMask();
+			CFlat.m_eventMask = ~CFlat.m_eventMask;
 			break;
 		case 0x65:
 			stackData[0].m_word = 0;
 			stackData[2].m_word = 0;
-			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)CFlatGameFlags() << 0x18) & 0xC0000000) >> 0x1f));
-			unsigned char gameFlags = ((int)(char)(flags >> 5) & 1U) << 7 | (CFlatGameFlags() & ~CFlatGameFlag_Shouki);
-			CFlatGameFlags() = gameFlags;
+			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)CFlat.m_gameFlags << 0x18) & 0xC0000000) >> 0x1f));
+			unsigned char gameFlags = ((int)(char)(flags >> 5) & 1U) << 7 | (CFlat.m_gameFlags & ~CFlatGameFlag_Shouki);
+			CFlat.m_gameFlags = gameFlags;
 			stackData[1].m_word = (s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f;
-			gCFlatRuntime().SystemCall(0, 1, 9, 3, stackData, 0);
+			CFlat.SystemCall(0, 1, 9, 3, stackData, 0);
 			break;
 		case 0x66:
-			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x1d) & 0xC0000000) >> 0x1f));
-			CFlatGameFlags() = (unsigned char)((((int)(char)(flags >> 5) << 2) & CFlatGameFlag_Mark) |
-			                                   (CFlatGameFlags() & ~CFlatGameFlag_Mark));
+			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)(u8)CFlat.m_gameFlags << 0x1d) & 0xC0000000) >> 0x1f));
+			CFlat.m_gameFlags = (unsigned char)((((int)(char)(flags >> 5) << 2) & CFlatGameFlag_Mark) |
+			                                   (CFlat.m_gameFlags & ~CFlatGameFlag_Mark));
 			break;
 		case 0x67:
 			m_dbgFlags ^= 1;
@@ -257,7 +257,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
-		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
+		padInput = Pad.m_padInputs[padOffset].buttonDown[0];
 	}
 	if ((padInput & 4) != 0) {
 		CDM* start = m_selectedMenu;
@@ -275,7 +275,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
-		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
+		padInput = Pad.m_padInputs[padOffset].buttonDown[0];
 	}
 	if ((padInput & 8) != 0) {
 		CDM* start = m_selectedMenu;
@@ -297,7 +297,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
-		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
+		padInput = Pad.m_padInputs[padOffset].buttonDown[0];
 	}
 	if ((padInput & 0x200) != 0) {
 		memset(m_menuPool, 0, sizeof(m_menuPool));
@@ -346,13 +346,13 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 		m_currentMenu = menu;
 		switch (menu->m_id) {
 		case 100:
-			menu->m_state = CFlatEventMask() != 0;
+			menu->m_state = CFlat.m_eventMask != 0;
 			break;
 		case 0x65:
-			menu->m_state = (s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x18) & 0xC0000000) >> 0x1F) != 0;
+			menu->m_state = (s8)((s32)(((u32)(u8)CFlat.m_gameFlags << 0x18) & 0xC0000000) >> 0x1F) != 0;
 			break;
 		case 0x66:
-			menu->m_state = (s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x1C) & 0xC0000000) >> 0x1F) != 0;
+			menu->m_state = (s8)((s32)(((u32)(u8)CFlat.m_gameFlags << 0x1C) & 0xC0000000) >> 0x1F) != 0;
 			break;
 		case 0x67:
 			menu->m_state = (m_dbgFlags >> 0) & 1;

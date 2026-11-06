@@ -128,7 +128,13 @@ public:
         PDT,
     };
 
-    CAmemCache()
+    CAmemCache() { Init(); }
+    ~CAmemCache() {}
+    void Destroy(CMemory::CStage*);
+    int GetData(CMemory::CStage*, char*, int);
+    void SetData(void*, int);
+    int IsEnable();
+    void Init()
     {
         m_cacheData = 0;
         m_workData = 0;
@@ -139,12 +145,6 @@ public:
         m_dmaCopy = 1;
         m_type = 0xFF;
     }
-    ~CAmemCache() {}
-    void Destroy(CMemory::CStage*);
-    int GetData(CMemory::CStage*, char*, int);
-    void SetData(void*, int);
-    int IsEnable();
-    void Init();
 };
 
 class CAmemCacheSet

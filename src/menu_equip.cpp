@@ -356,7 +356,6 @@ int CMenuPcs::EquipCtrlCur()
  */
 void CMenuPcs::EquipDraw()
 {
-	int k;
 	float pos;
 	int chk;
 	CFont* font;
@@ -369,7 +368,7 @@ void CMenuPcs::EquipDraw()
 	float y;
 	int iconY;
 	int texId;
-	CCaravanWork* caravanWork;
+	int listState;
 	float textY;
 	int helpAlpha;
 	float width;
@@ -384,7 +383,7 @@ void CMenuPcs::EquipDraw()
 	int iconX;
 	float helpY;
 	float cy;
-	int listState;
+	CCaravanWork* caravanWork;
 	bool equipped;
 	int markX;
 	int helpItem;
@@ -582,6 +581,10 @@ void CMenuPcs::EquipDraw()
 	}
 
 	if (mode == 1) {
+		int listIdx;
+		int k;
+		int listCount;
+
 		font = GetFontItem();
 		font->SetMargin(1.0f);
 		font->SetShadow(0);
@@ -589,7 +592,7 @@ void CMenuPcs::EquipDraw()
 		font->DrawInit();
 
 		letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		letterCount = letter[0];
+		listCount = letter[0];
 		for (i = m_equipList->count; i < m_equipList->listEnd; i++) {
 			item = &m_equipList->entries[i];
 			if (item->tex == EQUIP_TEX_LIST) {
@@ -598,22 +601,22 @@ void CMenuPcs::EquipDraw()
 		}
 
 		textItem = item;
-		for (k = 0; (k < 8) && ((idx = k + m_equipState->scroll) < letterCount); textItem++, k++) {
+		for (k = 0; (k < 8) && ((listIdx = k + m_equipState->scroll) < listCount); textItem++, k++) {
 			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)));
 
-			if (idx == 0) {
+			if (listIdx == 0) {
 				str = GetMenuStr(0xb);
 			} else {
-				if (idx >= letterCount) {
+				if (listIdx >= listCount) {
 					continue;
 				}
-				entry = letter[idx];
+				entry = letter[listIdx];
 				if (entry < 0) {
 					continue;
 				}
 				itemIdx = caravanWork->m_inventoryItems[entry];
 				str = Game.GetShortItemName(itemIdx);
-				if (idx == static_cast<int>(m_equipState->selected[1]) + static_cast<int>(m_equipState->scroll)) {
+				if (listIdx == static_cast<int>(m_equipState->selected[1]) + static_cast<int>(m_equipState->scroll)) {
 					helpItem = itemIdx;
 					helpFound = 1;
 				}
@@ -633,9 +636,9 @@ void CMenuPcs::EquipDraw()
 		DrawInit();
 
 		iconItem = item;
-		for (j = 0; (j < 8) && ((idx = j + m_equipState->scroll) < letterCount); iconItem++, j++) {
-			if (idx >= 1) {
-				entry = letter[idx];
+		for (j = 0; (j < 8) && ((listIdx = j + m_equipState->scroll) < listCount); iconItem++, j++) {
+			if (listIdx >= 1) {
+				entry = letter[listIdx];
 				if (entry >= 0) {
 					iconY = (int)((float)(iconItem->y + 6) - 1.0f);
 					iconX = (int)(float)(iconItem->x + iconItem->w - 0x10);

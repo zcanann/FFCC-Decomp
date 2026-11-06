@@ -240,7 +240,9 @@ extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 extern u8* volatile p_ZeroData;
 #define RedZeroDataGet() (p_ZeroData)
 #define RedZeroDataSet(data) (p_ZeroData = (data))
-extern RedSoundCONTROL* volatile p_SoundControlBuffer;
+#ifndef FFCC_REDSOUND_REDDRIVER_CPP
+extern RedSoundCONTROL* p_SoundControlBuffer;
+#endif
 #define RedSoundControlGetBegin() (p_SoundControlBuffer)
 #define RedSoundControlSetBegin(control) (p_SoundControlBuffer = (control))
 #define RedSoundControlGet(index) (p_SoundControlBuffer + (index))

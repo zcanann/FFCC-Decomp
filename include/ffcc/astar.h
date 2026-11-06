@@ -35,14 +35,7 @@ public:
 
 		unsigned int GetOthers(int group)
 		{
-			unsigned char others = m_group[0];
-
-			if (others == group)
-			{
-				others = m_group[1];
-			}
-
-			return others;
+			return (m_group[0] == group) ? m_group[1] : m_group[0];
 		}
 
 		int IsExist(int group)

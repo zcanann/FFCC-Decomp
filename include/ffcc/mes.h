@@ -71,8 +71,8 @@ public:
     void Next();
     CFont* getFont(int, int);
     void addString(char**, int);
-    int GET_2(char**);
-    char GET_1(char**);
+    static int GET_2(char**);
+    static char GET_1(char**);
     int GetWait();
 #ifndef VERSION_GCCJGC
     void SetPlayerIndex(int index) { m_playerIndex = index; }

@@ -146,8 +146,8 @@ static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext,
     }
 
     for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
+        ScreenBreakMeshData* meshData = mesh[i].m_data;
         ScreenBreakPiece* piece = &pieceBase[i];
-        ScreenBreakMeshData* meshData = mesh->m_data;
         if (piece->m_active != 0) {
             MtxPtr nodeMtx = model->GetNode(meshData->m_nodeIndex)->GetLocalMatrix();
 
@@ -193,8 +193,6 @@ static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext,
             invTransMtx[2][3] = invTransOffset.z;
             PSMTXConcat(invTransMtx, nodeMtx, nodeMtx);
         }
-
-        mesh++;
     }
 
     return 1;
@@ -304,9 +302,9 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
     ScreenBreakPiece* piece;
     S16Vec globalMax;
 
-    memset(work->m_pieces, 0, ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece));
+    memset(work->m_pieces, 0, model->m_data->m_meshCount * sizeof(ScreenBreakPiece));
     float translationRandLimit = 0.3f;
-    CChara::CMesh* meshBase = model->m_meshes;
+    CChara::CMesh* meshBase = model->GetMesh();
     float negativeRandLimit = -translationRandLimit;
     ScreenBreakPiece* pieceBase = work->m_pieces;
     globalMax.x = -0x7FFF;
@@ -346,7 +344,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         meshMax.x += meshMin.x;
         meshMax.y += meshMin.y;
         meshMax.z += meshMin.z;
-        Util.ConvI2FVector(piece->m_translation, meshMax, ScreenBreakModelRef(model)->m_posQuant);
+        Util.ConvI2FVector(piece->m_translation, meshMax, model->GetRefData()->m_posQuant);
         PSVECScale(&piece->m_translation, &piece->m_translation, -0.5f);
 
         float velocityX = piece->m_translation.x;
@@ -376,7 +374,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         piece->m_active = 0;
     }
 
-    Util.ConvI2FVector(work->m_extent, globalMax, ScreenBreakModelRef(model)->m_posQuant);
+    Util.ConvI2FVector(work->m_extent, globalMax, model->GetRefData()->m_posQuant);
 }
 
 /*

@@ -311,7 +311,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                 g_MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>& mapLightHolderArr = g_MapMng.GetMapLightHolderArray(1);
+        CPtrArray<CMapLightHolder*>& mapLightHolderArr = g_MapMng.m_mapLightHolderArrays[1];
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > mapLightHolderIndex) {
             mapLightHolderArr[mapLightHolderIndex]->GetLightHolder(
@@ -426,7 +426,7 @@ void CMapPcs::calc()
                 g_MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &g_MapMng.GetMapLightHolderArray(1);
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &g_MapMng.m_mapLightHolderArrays[1];
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
             (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
@@ -723,9 +723,9 @@ void CMapPcs::drawAfter()
 
             g_MapMng.DrawAfter();
 
-            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
+            if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBound bound;
-                bound = CameraPcs.m_shadowRectBound;
+                CameraPcs.GetShadowBound(bound);
                 Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF));
             }
         }
@@ -773,9 +773,9 @@ void CMapPcs::drawAfterViewer()
 
             g_MapMng.DrawAfter();
 
-            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
+            if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBound bound;
-                bound = CameraPcs.m_shadowRectBound;
+                CameraPcs.GetShadowBound(bound);
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
                 GXColor color = colorObj.color;
                 Graphic.DrawBound(bound, color);

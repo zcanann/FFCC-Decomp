@@ -387,6 +387,12 @@ void CMenuPcs::CalcSingCMake()
 {
     short down;
     short repeat;
+    int done;
+    CCaravanWork* caravanWork;
+    int slot;
+    int modelNo;
+    int baseDataIndex;
+    short animWait;
     int result;
 
     if (m_cmakeState->m_initialized == 0) {
@@ -451,7 +457,6 @@ void CMenuPcs::CalcSingCMake()
             down = Pad.GetButtonDown(0);
             repeat = Pad.GetButtonRepeat(0);
 
-            int done;
             if (repeat == 0) {
                 done = 0;
             } else {
@@ -465,9 +470,8 @@ void CMenuPcs::CalcSingCMake()
                             m_cmakeState->m_resultDir = 1;
                             m_wmCharaAnimState[m_singleCmakeSlot].m_nextAnimIndex = 3;
 
-                            CCaravanWork* caravanWork;
-                            int slot = static_cast<int>(m_singleCmakeSlot);
-                            int modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
+                            slot = static_cast<int>(m_singleCmakeSlot);
+                            modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
                                 static_cast<int>(s_CmakeInfo.m_gender));
                             m_wm.m_charaModelData[slot].m_modelNo = modelNo;
 
@@ -483,7 +487,7 @@ void CMenuPcs::CalcSingCMake()
                             caravanWork->m_appearanceVariant = static_cast<unsigned short>(s_CmakeInfo.m_hair);
                             caravanWork->m_genderFlag = static_cast<unsigned short>(s_CmakeInfo.m_gender);
                             caravanWork->m_id = static_cast<unsigned short>(modelNo);
-                            int baseDataIndex =
+                            baseDataIndex =
                                 static_cast<int>(caravanWork->m_genderFlag) +
                                 static_cast<int>(caravanWork->m_tribeId) * 2;
                             caravanWork->Init(
@@ -492,10 +496,8 @@ void CMenuPcs::CalcSingCMake()
                                 static_cast<int>(caravanWork->m_appearanceVariant));
                             caravanWork->LoadFinished();
                             CallWorldParam(0, slot, 0);
-                            {
-                                short animWait = static_cast<short>(static_cast<int>(GetMaxAnimWait()));
-                                m_cmakeState->m_stepTimer = animWait;
-                            }
+                            animWait = static_cast<short>(static_cast<int>(GetMaxAnimWait()));
+                            m_cmakeState->m_stepTimer = animWait;
                         } else {
                             m_cmakeState->m_resultDir = -1;
                         }
@@ -1128,8 +1130,17 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 #ifdef VERSION_GCCJGC
 int CMenuPcs::AddNameChara(int add, int column, int row, int table)
 {
+    char* text;
+    char* tail;
+    const char* characters;
+    int index;
+    int group;
+    int pos;
+    char* name;
+    char* last;
+
     if (add == 0) {
-        char* name = s_CmakeInfo.m_name;
+        name = s_CmakeInfo.m_name;
         int count = GetCharaCnt(name);
         if (count == 0) {
             return -1;
@@ -1143,7 +1154,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
     } else {
         char picked[3];
         memset(picked, 0, 3);
-        char* text = const_cast<char*>(s_NameEntryStr[row + table * 5]);
+        text = const_cast<char*>(s_NameEntryStr[row + table * 5]);
         GetChara(text, column, picked);
         int count = GetCharaCnt(s_CmakeInfo.m_name);
         if (count >= 7) {
@@ -1162,9 +1173,7 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
             return -1;
         }
         if (type != 0 && strcmp(picked, "\x81\x4A") == 0) {
-            int group;
-            int pos;
-            char* last = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
+            last = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
             for (group = 0; group < 2; ++group) {
                 text = const_cast<char*>(s_NameEntryVoiced[group]);
                 int length = strlen(text);
@@ -1185,12 +1194,12 @@ int CMenuPcs::AddNameChara(int add, int column, int row, int table)
             }
             return 0;
         } else if (type != 0 && strcmp(picked, "\x81\x4B") == 0) {
-            char* last = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
+            tail = &s_CmakeInfo.m_name[strlen(s_CmakeInfo.m_name) - 2];
             int length = strlen(s_NameEntryVoiced[1]);
-            const char* characters = s_NameEntryVoiced[1];
-            for (int pos = 0; pos < length; pos += 2, characters += 2) {
-                if (memcmp(characters, last, 2) == 0) {
-                    last[1] += 2;
+            characters = s_NameEntryVoiced[1];
+            for (index = 0; index < length; index += 2, characters += 2) {
+                if (memcmp(characters, tail, 2) == 0) {
+                    tail[1] += 2;
                     return 0;
                 }
             }
@@ -1565,7 +1574,7 @@ int CMenuPcs::CmakeNameCtrl()
                     }
                     if (found == 0) {
                         for (i = 0; i < 0x100; i++) {
-                            if (strcmp(Game.m_cFlatDataArr[1].GetTable(2)[i], s_CmakeInfo.m_name) == 0) {
+                            if (strcmp(Game.GetNPCName(i), s_CmakeInfo.m_name) == 0) {
                                 found = 1;
                                 break;
                             }
@@ -2495,6 +2504,10 @@ inline int CMenuPcs::CmakeResultClose()
  */
 void CMenuPcs::CmakeResultDraw()
 {
+    int i;
+    const char* value;
+    float x;
+    float y;
     CmakeMenuState* state = m_cmakeState;
     int frame = static_cast<int>(state->m_frame) - 1;
     float alpha;
@@ -2562,26 +2575,26 @@ void CMenuPcs::CmakeResultDraw()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
-    const char* value;
 #ifndef VERSION_GCCJGC
     char tribeWithComma[0x10];
 #endif
 #ifndef VERSION_GCCJGC
     float labelWidths[4];
 #endif
-    for (int i = 0; i < 4; i++) {
-        const char* txt = GetMenuStr(0x2A + i);
+    for (i = 0; i < 4; i++) {
+        value = GetMenuStr(0x2A + i);
+        y = 0x70 + i * 0x28;
 
 #ifndef VERSION_GCCJGC
-        labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
+        labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(value));
 #endif
         labelFont->SetPosX(232.0f);
 #ifdef VERSION_GCCJGC
-        labelFont->SetPosY(0x70 + i * 0x28);
+        labelFont->SetPosY(y);
 #else
-        labelFont->SetPosY(0x70 + i * 0x28 - 4.0f);
+        labelFont->SetPosY(y - 4.0f);
 #endif
-        labelFont->Draw(txt);
+        labelFont->Draw(value);
     }
 
     CFont* valueFont = GetFont22();
@@ -2592,7 +2605,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
     valueFont->SetTlut(6);
 
-    for (int i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         if (i == 0) {
             value = s_CmakeInfo.m_name;
         } else if (i == 1) {
@@ -2610,11 +2623,11 @@ void CMenuPcs::CmakeResultDraw()
         }
 
 #ifdef VERSION_GCCJGC
-        float x = 336.0f;
+        x = 336.0f;
 #else
-        float x = 8.0f + labelWidths[i];
+        x = 8.0f + labelWidths[i];
 #endif
-        float y = static_cast<float>(0x70 + i * 0x28);
+        y = 0x70 + i * 0x28;
         float valueWidth = valueFont->GetWidth(value);
         valueFont->SetPosX(x);
 #ifdef VERSION_GCCJGC
@@ -2749,6 +2762,10 @@ inline int CMenuPcs::CmakeResultClose1()
  */
 void CMenuPcs::CmakeResultDraw1()
 {
+    int i;
+    const char* value;
+    float x;
+    float y;
     CmakeMenuState* state = m_cmakeState;
     int frame = static_cast<int>(state->m_frame) - 1;
     float alpha;
@@ -2801,26 +2818,26 @@ void CMenuPcs::CmakeResultDraw1()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
-    const char* value;
 #ifndef VERSION_GCCJGC
     char tribeWithComma[0x10];
 #endif
 #ifndef VERSION_GCCJGC
     float labelWidths[4];
 #endif
-    for (int i = 0; i < 4; i++) {
-        const char* txt = GetMenuStr(0x2A + i);
+    for (i = 0; i < 4; i++) {
+        value = GetMenuStr(0x2A + i);
+        y = 0x70 + i * 0x28;
 
 #ifndef VERSION_GCCJGC
-        labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
+        labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(value));
 #endif
         labelFont->SetPosX(232.0f);
 #ifdef VERSION_GCCJGC
-        labelFont->SetPosY(0x70 + i * 0x28);
+        labelFont->SetPosY(y);
 #else
-        labelFont->SetPosY(0x70 + i * 0x28 - 4.0f);
+        labelFont->SetPosY(y - 4.0f);
 #endif
-        labelFont->Draw(txt);
+        labelFont->Draw(value);
     }
 
     CFont* valueFont = GetFont22();
@@ -2831,7 +2848,7 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
     valueFont->SetTlut(6);
 
-    for (int i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         if (i == 0) {
             value = s_CmakeInfo.m_name;
         } else if (i == 1) {
@@ -2849,11 +2866,11 @@ void CMenuPcs::CmakeResultDraw1()
         }
 
 #ifdef VERSION_GCCJGC
-        float x = 336.0f;
+        x = 336.0f;
 #else
-        float x = 8.0f + labelWidths[i];
+        x = 8.0f + labelWidths[i];
 #endif
-        float y = static_cast<float>(0x70 + i * 0x28);
+        y = 0x70 + i * 0x28;
         float valueWidth = static_cast<float>(valueFont->GetWidth(value));
         valueFont->SetPosX(x);
 #ifdef VERSION_GCCJGC
@@ -3400,7 +3417,7 @@ void CMenuPcs::CalcSingleCMakeChara()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::DrawSingleCMakeChara(float alpha)
+void CMenuPcs::DrawSingleCMakeChara(float alpha)
 {
     WmWorldObjInfo* worldObjects = m_wm.m_worldObjData;
     int handleIndex = static_cast<int>(m_singleCmakeSlot) + 0x20;

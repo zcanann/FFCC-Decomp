@@ -201,7 +201,6 @@ void Session_OnPlayerStat(u8 *data)
     s32 n;
     u8 *p;
     u8 *dst;
-    u8 *q;
 
     memset(&gSession, 0, sizeof(gSession));
     memset(gParty, 0, sizeof(gParty));
@@ -234,8 +233,7 @@ void Session_OnPlayerStat(u8 *data)
         p += 2;
     }
 
-    dst = (u8 *)&gSession.appearance;
-    *dst = *p++;
+    gSession.appearance = *p++;
     memcpy(gSession.stats, p, 3);
     p += 3;
     dst = (u8 *)&gSession.memories;
@@ -250,9 +248,13 @@ void Session_OnPlayerStat(u8 *data)
     p += n;
     memcpy(gSession.favorites, p, 8);
     p += 8;
-    q = (u8 *)&gSession.gil;
-    for (i = 4; i != 0; i--)
-        *q++ = *p++;
+    dst = (u8 *)&gSession.gil;
+    i = 4;
+    do {
+        *dst++ = *p++;
+        if (--i == 0)
+            break;
+    } while (1);
 
     n = gSession.appearance & 3;
     if (n != sBackdropTribe) {

@@ -347,8 +347,8 @@ int CCaravanWork::IsOutOfShouki()
 
 	if (ownerObj->m_targetDist > 0.95f * Game.unkFloat_0xca10) {
 		if (m_hp != 0) {
-			if ((CFlatRuntime2Storage().m_gameFlagBits.m_flagBit7 != 0 ||
-				 CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) &&
+			if ((CFlat.m_gameFlagBits.m_flagBit7 != 0 ||
+				 CFlat.m_gameFlagBits.m_flagBit4 != 0) &&
 				ownerObj->m_weaponNodeFlagAll.m_bits1.m_shield != 0) {
 				result = 1;
 			}
@@ -371,28 +371,22 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 							 int itemA, int itemB, int itemC, int itemD)
 {
 	for (int i = 99; i > 0; i--) {
-		m_letters[i].m_split = m_letters[i - 1].m_split;
+		m_letters[i] = m_letters[i - 1];
 	}
 
-	memset(&m_letters[0], 0, sizeof(m_letters[0]));
-	m_letters[0].SetMessageType(letterType);
-	m_letters[0].m_words.m_word0 = (m_letters[0].m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
-	m_letters[0].FlagsBits().m_attachmentIsGil = hasMoneyFlag;
-	int attachmentValue;
-	if (m_letters[0].AttachmentIsGil()) {
-		attachmentValue = moneyValue / 100;
-	} else {
-		attachmentValue = moneyValue;
-	}
-	m_letters[0].SetAttachmentValue(attachmentValue);
-	m_letters[0].FlagsBits().m_opened = 0;
-	m_letters[0].FlagsBits().m_attachmentClaimed = 0;
-	m_letters[0].FlagsBits().m_replySent = 0;
-	m_letters[0].FlagsBits().m_hasReply = hasReplyFlag;
-	m_letters[0].m_half.m_tempVars[0] = static_cast<unsigned short>(itemA);
-	m_letters[0].m_half.m_tempVars[1] = static_cast<unsigned short>(itemB);
-	m_letters[0].m_half.m_tempVars[2] = static_cast<unsigned short>(itemC);
-	m_letters[0].m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
+	memset(&m_letters[0], 0, sizeof(CLetterWork));
+	m_letters[0].m_messageType = letterType;
+	m_letters[0].m_senderId = senderId;
+	m_letters[0].m_attachmentIsGil = hasMoneyFlag;
+	m_letters[0].m_attachValue = m_letters[0].m_attachmentIsGil ? moneyValue / 100 : moneyValue;
+	m_letters[0].m_opened = 0;
+	m_letters[0].m_attachmentClaimed = 0;
+	m_letters[0].m_replySent = 0;
+	m_letters[0].m_hasReply = hasReplyFlag;
+	m_letters[0].m_tempVars[0] = itemA;
+	m_letters[0].m_tempVars[1] = itemB;
+	m_letters[0].m_tempVars[2] = itemC;
+	m_letters[0].m_tempVars[3] = itemD;
 
 	int nextCount = m_letterCount + 1;
 	m_letterCount = (nextCount < 100) ? nextCount : 100;
@@ -413,28 +407,28 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 {
 	CFlatRuntime::CStack stack[2];
 
-	stack[0].m_word = m_letters[letterIdx].m_bits.m_messageType;
-	stack[1].m_word = m_letters[letterIdx].m_bits.m_senderId;
-	gCFlatRuntime().SystemCall(
+	stack[0].m_word = m_letters[letterIdx].m_messageType;
+	stack[1].m_word = m_letters[letterIdx].m_senderId;
+	CFlat.SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
 	for (int i = 0; i < 4; i++) {
-		CMes::m_tempVar[i] = m_letters[letterIdx].m_half.m_tempVars[i];
+		CMes::m_tempVar[i] = m_letters[letterIdx].m_tempVars[i];
 	}
-	CMes::m_tempVar[4] = m_letters[letterIdx].m_bits.m_messageType;
-	CMes::m_tempVar[5] = m_letters[letterIdx].m_bits.m_senderId;
+	CMes::m_tempVar[4] = m_letters[letterIdx].m_messageType;
+	CMes::m_tempVar[5] = m_letters[letterIdx].m_senderId;
 
 	int money;
-	if (m_letters[letterIdx].m_bits.m_attachmentIsGil) {
+	if (m_letters[letterIdx].m_attachmentIsGil) {
 		money = 0;
 	} else {
-		money = m_letters[letterIdx].m_bits.m_attachValue;
+		money = m_letters[letterIdx].m_attachValue;
 	}
 	CMes::m_tempVar[6] = money;
 
 	int gil;
-	if (m_letters[letterIdx].m_bits.m_attachmentIsGil) {
-		gil = m_letters[letterIdx].m_bits.m_attachValue * 100;
+	if (m_letters[letterIdx].m_attachmentIsGil) {
+		gil = m_letters[letterIdx].m_attachValue * 100;
 	} else {
 		gil = 0;
 	}
@@ -442,7 +436,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	CMes::m_tempVar[8] = m_saveSlot;
 
-	m_letters[letterIdx].m_bits.m_opened = 1;
+	m_letters[letterIdx].m_opened = 1;
 }
 
 /*
@@ -457,18 +451,17 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int param5)
 {
 	CFlatRuntime::CStack stack[5];
-	CLetterWork* letter = &m_letters[letterIdx];
 
-	stack[0].m_word = letter->MessageType();
-	stack[1].m_word = letter->SenderId();
+	stack[0].m_word = m_letters[letterIdx].m_messageType;
+	stack[1].m_word = m_letters[letterIdx].m_senderId;
 	stack[2].m_word = param3;
 	stack[3].m_word = param4;
 	stack[4].m_word = param5;
 
-	gCFlatRuntime().SystemCall(
+	CFlat.SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
-	letter->SetReplySent();
+	m_letters[letterIdx].m_replySent = 1;
 }
 
 /*
@@ -534,8 +527,7 @@ void CCaravanWork::FGPutGil(int gilToRemove)
 {
 	int put = static_cast<CGPartyObj*>(m_ownerObj)->putGil(gilToRemove);
 	if (put != 0) {
-		gilToRemove = -gilToRemove;
-		m_gil += gilToRemove;
+		m_gil += (int)(-gilToRemove);
 		if (m_gil > 99999999) {
 			m_gil -= m_gil - 99999999;
 		} else if (m_gil < 0) {
@@ -1400,7 +1392,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					continue;
 				}
 
-				const int sourceIdx = evtRule & 0x7FF;
+				int sourceIdx = evtRule & 0x7FF;
 
 				switch (sourceType) {
 				case 1:
@@ -1598,7 +1590,7 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
 	args[2].m_word = arg1;
 	args[3].m_word = arg2;
 	args[4].m_word = arg3;
-	gCFlatRuntime().SystemCall(
+	CFlat.SystemCall(
 		reinterpret_cast<CFlatRuntime::CObject*>(m_ownerObj), 2, 0x12, 5, args, 0);
 }
 
@@ -2287,30 +2279,29 @@ int CCaravanWork::GetNumCombi(int cmdListIdx)
  */
 int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 {
-	while (true) {
-		short prev = cmdListIdx;
-		cmdListIdx = prev + dir;
+	int idx = cmdListIdx;
 
-		if (cmdListIdx < 0) {
-			cmdListIdx += m_numCmdListSlots;
-		} else if (cmdListIdx > m_numCmdListSlots - 1) {
-			cmdListIdx -= m_numCmdListSlots;
-		}
+	while (true) {
+		int prev = idx;
+		idx += dir;
+		idx = (idx < 0) ? idx + m_numCmdListSlots
+		    : (idx > m_numCmdListSlots - 1) ? idx - m_numCmdListSlots
+		                                    : idx;
 
 		if (Game.m_gameWork.m_menuStageMode != 0) {
-			if (m_commandListExtra[cmdListIdx] == -1) {
+			if (m_commandListExtra[idx] == -1) {
 				continue;
 			}
-			if (dir == -1 && m_commandListExtra[cmdListIdx] == -1) {
+			if (dir == -1 && m_commandListExtra[idx] == -1) {
 				if (0 < m_commandListExtra[prev]) {
 					continue;
 				}
 			}
 		}
 
-		int item = GetCmdListItem(cmdListIdx);
-		if (cmdListIdx < 2 || item > 0) {
-			return cmdListIdx;
+		int item = GetCmdListItem(idx);
+		if (idx < 2 || item > 0) {
+			return idx;
 		}
 	}
 }

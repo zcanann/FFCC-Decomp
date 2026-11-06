@@ -31,28 +31,6 @@ typedef unsigned char u8;
 
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
-static inline void CompaDrawWindow(CompaOpenAnim* entry, float x, float y, float w, float h, float u, float v, GXColor* colors)
-{
-	if (entry->tex == kCompaWindowTexture) {
-		int yStep = static_cast<int>(y);
-		float end = y + h;
-		while (static_cast<float>(yStep) < end) {
-			int tileH;
-			if (end - static_cast<float>(yStep) >= 24.0f) {
-				tileH = 0x18;
-			} else {
-				tileH = static_cast<int>(end - static_cast<float>(yStep));
-			}
-			MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-			                 w, static_cast<float>(tileH), u, v, colors, 1.0f, 1.0f, 0.0f);
-			yStep += 0x18;
-		}
-	} else {
-		MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
-		                 1.0f, 1.0f, 0.0f);
-	}
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80160edc
@@ -67,13 +45,12 @@ void CMenuPcs::CompaDraw()
 	CCaravanWork* caravanWork;
 	GXColor colors[4];
 	int familyCount;
-	float fillW;
 	int tex;
 	float x;
 	float y;
 	int shown;
-	int i;
 	const u8* foodPtr;
+	int i;
 	int drawIndex;
 	CompaOpenAnimList* compaList;
 	float w;
@@ -90,13 +67,14 @@ void CMenuPcs::CompaDraw()
 	const char* name;
 	const char* value;
 	float jobY;
+	int yStep;
 
-	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+	AlphaNormal();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	entry = this->m_compaList->entries;
-	for (int i = 0; i < this->m_compaList->count; i++, entry++) {
+	for (i = 0; i < this->m_compaList->count; i++, entry++) {
 		tex = entry->tex;
 		if (tex >= 0) {
 			x = static_cast<float>(entry->x);
@@ -110,23 +88,47 @@ void CMenuPcs::CompaDraw()
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
-				for (int j = 0; j < 4; j++) {
-					colors[j].r = 0xFF;
-					colors[j].g = 0xFF;
-					colors[j].b = 0xFF;
-					colors[j].a = 0xFF;
-				}
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = 0xFF;
+				colors[1].r = 0xFF;
+				colors[1].g = 0xFF;
+				colors[1].b = 0xFF;
+				colors[1].a = 0xFF;
+				colors[2].r = 0xFF;
+				colors[2].g = 0xFF;
+				colors[2].b = 0xFF;
+				colors[2].a = 0xFF;
+				colors[3].r = 0xFF;
+				colors[3].g = 0xFF;
+				colors[3].b = 0xFF;
+				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				fillW = entry->alpha * w;
-				if (fillW > 0.0f) {
-					CompaDrawWindow(entry, x, y, fillW, h, u, v, colors);
+				w = entry->alpha * w;
+				if (w > 0.0f) {
+					if (entry->tex == kCompaWindowTexture) {
+						for (yStep = static_cast<int>(y); static_cast<float>(yStep) < y + h; yStep += 0x18) {
+							int tileH;
+							if (y + h - static_cast<float>(yStep) >= 24.0f) {
+								tileH = 0x18;
+							} else {
+								tileH = static_cast<int>(y + h - static_cast<float>(yStep));
+							}
+							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+							                 w, static_cast<float>(tileH), u, v, colors, 1.0f, 1.0f, 0.0f);
+						}
+					} else {
+						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
+						                 1.0f, 1.0f, 0.0f);
+					}
 
-					u += fillW;
-					x += fillW * entry->uvScale;
+					u += w;
+					x += w * entry->uvScale;
 				}
 
-				if (fillW > 0.0f && fillW < static_cast<float>(entry->w)) {
+				if (w > 0.0f && w < static_cast<float>(entry->w)) {
 					colors[1].r = 0xFF;
 					colors[1].g = 0xFF;
 					colors[1].b = 0xFF;
@@ -135,9 +137,23 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					fillW = 1.0 / entry->duration;
-					fillW = fillW * entry->w;
-					CompaDrawWindow(entry, x, y, fillW, h, u, v, colors);
+					w = 1.0 / entry->duration;
+					w = w * entry->w;
+					if (entry->tex == kCompaWindowTexture) {
+						for (yStep = static_cast<int>(y); static_cast<float>(yStep) < y + h; yStep += 0x18) {
+							int tileH;
+							if (y + h - static_cast<float>(yStep) >= 24.0f) {
+								tileH = 0x18;
+							} else {
+								tileH = static_cast<int>(y + h - static_cast<float>(yStep));
+							}
+							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+							                 w, static_cast<float>(tileH), u, v, colors, 1.0f, 1.0f, 0.0f);
+						}
+					} else {
+						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
+						                 1.0f, 1.0f, 0.0f);
+					}
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -161,9 +177,9 @@ void CMenuPcs::CompaDraw()
 	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCompaFoodTexture));
 
-	compaList = this->m_compaList;
-	for (i = familyCount = 2; i < 7; i++) {
-		if (caravanWork->m_evtWordArr[19 + i] > 0) {
+	entry = this->m_compaList->entries;
+	for (shown = familyCount = 2; shown < 7; shown++) {
+		if (caravanWork->GetEvtWord(19 + shown) > 0) {
 			familyCount++;
 		}
 	}
@@ -176,27 +192,26 @@ void CMenuPcs::CompaDraw()
 	}
 
 	for (i = 0; i < familyCount; i++) {
-		y = static_cast<float>(compaList->entries[0].y + 0x40);
+		y = static_cast<float>(entry->y + 0x40);
 		y += static_cast<float>(i * 0x28);
 		MenuPcs.DrawRect(
 			0,
-			static_cast<float>(compaList->entries[0].x + 0x10),
+			static_cast<float>(entry->x + 0x10),
 			y,
 			328.0f, 40.0f, 0.0f, 0.0f, 1.0f,
 			1.0f, 0.0f);
 	}
 
-	drawIndex = 0;
-	shown = 0;
-	for (i = shown; i < 8 && shown < familyCount; i++) {
-		iconX = static_cast<float>(compaList->entries[0].x + 0x128);
-		iconY = static_cast<float>(compaList->entries[0].y + 0x40);
+	shown = drawIndex = 0;
+	for (i = shown; i < 8 && shown < familyCount; i++, shown++, drawIndex++) {
+		iconX = static_cast<float>(entry->x + 0x128);
+		iconY = static_cast<float>(entry->y + 0x40);
 		iconY += static_cast<float>(shown * 0x28);
 
 		if (i >= 2) {
 			scan = drawIndex;
 			for (; scan < 7; scan++) {
-				if (caravanWork->m_evtWordArr[19 + scan] != 0) {
+				if (caravanWork->GetEvtWord(19 + scan) != 0) {
 					drawIndex = scan;
 					break;
 				}
@@ -230,14 +245,12 @@ void CMenuPcs::CompaDraw()
 			icon,
 			static_cast<int>(iconX),
 			static_cast<int>(iconY),
-			compaList->entries[0].alpha, 1, 1.0f);
+			entry->alpha, 1, 1.0f);
 
-		shown++;
-		drawIndex++;
 	}
 
 	font = GetFontItem();
-	compaList = this->m_compaList;
+	entry = this->m_compaList->entries;
 	font->SetMargin(1.0f);
 	font->SetShadow(0);
 #ifdef VERSION_GCCP01
@@ -248,7 +261,7 @@ void CMenuPcs::CompaDraw()
 #endif
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)));
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry->alpha)));
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	shown = drawIndex = 0;
@@ -256,7 +269,7 @@ void CMenuPcs::CompaDraw()
 		if (i >= 2) {
 			scan = drawIndex;
 			for (; scan < 7; scan++) {
-				if (caravanWork->m_evtWordArr[19 + scan] > 0) {
+				if (caravanWork->GetEvtWord(19 + scan) > 0) {
 					drawIndex = scan;
 					break;
 				}
@@ -269,8 +282,8 @@ void CMenuPcs::CompaDraw()
 		}
 
 		name = GetMenuStr(drawIndex + 0x16);
-		x = static_cast<float>(compaList->entries[0].x + 0x18);
-		y = static_cast<float>(compaList->entries[0].y + 0x45);
+		x = static_cast<float>(entry->x + 0x18);
+		y = static_cast<float>(entry->y + 0x45);
 		y += static_cast<float>(shown * 0x28);
 		font->SetPosX(x);
 #ifdef VERSION_GCCJGC
@@ -280,11 +293,11 @@ void CMenuPcs::CompaDraw()
 #endif
 		font->Draw(name);
 
-		value = Game.GetNPCName(caravanWork->m_evtWordArr[19 + drawIndex]);
+		value = Game.GetNPCName(caravanWork->GetEvtWord(19 + drawIndex));
 #ifdef VERSION_GCCP01
-		x = static_cast<float>(compaList->entries[0].x + 0x90);
+		x = static_cast<float>(entry->x + 0x90);
 #else
-		x = static_cast<float>(compaList->entries[0].x + 0x80);
+		x = static_cast<float>(entry->x + 0x80);
 #endif
 		font->SetPosX(x);
 #ifdef VERSION_GCCJGC

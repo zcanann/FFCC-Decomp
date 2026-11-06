@@ -175,8 +175,7 @@ public:
     void SetMime(int, int, int);
     void SetCalcMtx()
     {
-        m_localMtxDirty = 1;
-        m_calcMtxPending = 1;
+        m_calcMtxPending = m_localMtxDirty = 1;
     }
     void SetCameraSemiTransAlpha(int alpha, int frameCount)
     {

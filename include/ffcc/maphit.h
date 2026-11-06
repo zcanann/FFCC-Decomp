@@ -120,8 +120,8 @@ public:
     CMapHitFace* m_faces;         // 0x20
 };
 
-extern unsigned char g_MapHitDrawMode;
-extern unsigned char g_MapHitFaceFlag;
+extern char g_MapHitDrawMode;
+extern char g_MapHitFaceFlag;
 extern int g_hit_edge_idx_min;
 extern float g_hit_t;
 extern float g_hit_t_min;

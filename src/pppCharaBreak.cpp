@@ -404,6 +404,7 @@ static void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_
  */
 static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* model)
 {
+    S16Vec* dst;
     POLYGON_DATA* polygon;
     CharaBreakStep* stepData = (CharaBreakStep*)step;
     CChara::CMesh* mesh = model->GetMesh();
@@ -425,28 +426,30 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
         for (int dl = mesh->GetRefData()->m_displayListCount - 1; dl >= 0; dl--) {
             CharaBreakDisplayListPair** displayListPairs =
                 work->m_meshBuffers[meshIndex];
-            polygon = displayListPairs[dl]->m_polygonData;
+            POLYGON_DATA* polygons = displayListPairs[dl]->m_polygonData;
 
             for (int polyIndex = 0; polyIndex < displayListPairs[dl]->m_polygonCount; polyIndex++) {
                 S16Vec transformed[3];
+                polygon = &polygons[polyIndex];
 
                 if (polygon->m_enabled == 0) {
                     int flags[3] = {0, 0, 0};
 
+                    dst = transformed;
                     for (int i = 0; i < 3; i++) {
                         if (needsMtxUpdate) {
                             S16Vec* srcPos = mesh->GetVertex() + polygon->m_posIndices[i];
                             Vec transformedPos;
                             Util.ConvI2FVector(transformedPos, *srcPos, model->GetRefData()->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
-                            Util.ConvF2IVector(transformed[i], transformedPos, model->GetRefData()->m_posQuant);
+                            Util.ConvF2IVector(*dst, transformedPos, model->GetRefData()->m_posQuant);
                         } else {
-                            transformed[i] = mesh->GetVertex()[polygon->m_posIndices[i]];
+                            *dst = mesh->GetVertex()[polygon->m_posIndices[i]];
                         }
 
                         if (stepData->m_clipMode == 0) {
                             if (stepData->m_worldSpaceMode == 1) {
-                                if (transformed[i].y < threshold) {
+                                if (dst->y < threshold) {
                                     flags[i] = 1;
                                 }
                             } else if (polygon->m_pos[i].y < threshold) {
@@ -454,13 +457,14 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
                             }
                         } else if (stepData->m_clipMode == 1) {
                             if (stepData->m_worldSpaceMode == 1) {
-                                if (transformed[i].y > threshold) {
+                                if (dst->y > threshold) {
                                     flags[i] = 1;
                                 }
                             } else if (polygon->m_pos[i].y > threshold) {
                                 flags[i] = 1;
                             }
                         }
+                        dst++;
                     }
 
                     for (int i = 0; i < 3; i++) {
@@ -577,8 +581,6 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
                         polygon->m_fallFrames++;
                     }
                 }
-
-                polygon++;
             }
         }
 
@@ -634,14 +636,14 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    u32 dlIndex;
-    CharaBreakDisplayListPair** dlEntries;
     CharaBreakMeshData* meshData;
+    CharaBreakDisplayListPair** dlEntries;
     CharaBreakDisplayListPair*** meshBufferSlot;
     CChara::CModel* model;
     CChara::CMesh* mesh;
     CharaBreakDisplayListPair*** perMeshBuffers;
     u32 meshIndex;
+    u32 dlIndex;
     CharaBreakWork* work;
     CharaBreakDisplayListPair** dlEntryBase;
 
@@ -656,8 +658,13 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 
     ClearCharaBreakModelCallbacks(model);
 
+#if defined(VERSION_GCCP01)
     meshBufferSlot = work->m_meshBuffers;
     perMeshBuffers = meshBufferSlot;
+#else
+    perMeshBuffers = work->m_meshBuffers;
+    meshBufferSlot = perMeshBuffers;
+#endif
     mesh = model->GetMesh();
 
 #if defined(VERSION_GCCP01)
@@ -666,7 +673,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     {
         for (meshIndex = 0; meshIndex < model->GetRefData()->m_meshCount; meshIndex++, mesh++) {
             dlEntryBase = *meshBufferSlot;
-            meshData = mesh->GetRefData();
+            meshData = mesh->m_data;
 #if defined(VERSION_GCCP01)
             if (dlEntryBase != NULL)
 #endif
@@ -718,12 +725,14 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtrlTable* data)
 {
-    CharaBreakDisplayListPair** dlEntries;
     CGObject* handle;
     CharaBreakWork* work;
     CChara::CModel* model;
     CChara::CMesh* mesh;
     CharaBreakDisplayList* displayList;
+#if !defined(VERSION_GCCP01)
+    u32 totalPolygonCount;
+#endif
     u32 i;
     int dl;
 
@@ -779,7 +788,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
 
     if (work->m_meshBuffers == NULL) {
 #if !defined(VERSION_GCCP01)
-        u32 totalPolygonCount = 0;
+        totalPolygonCount = 0;
 #endif
         work->m_miscValue = -10000.0f;
 #if defined(VERSION_GCCP01)
@@ -840,67 +849,64 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                 int displayListCount = mesh->GetRefData()->m_displayListCount;
                 displayList = mesh->GetRefData()->m_displayLists;
                 dl = displayListCount - 1;
-                dlEntries = meshBuffer + dl;
                 for (; dl >= 0; dl--, displayList++) {
 #if defined(VERSION_GCCP01)
-                    *dlEntries = (CharaBreakDisplayListPair*)pppMemAllocNoReport(
+                    meshBuffer[dl] = (CharaBreakDisplayListPair*)pppMemAllocNoReport(
                         0x10, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3FC);
 #else
-                    *dlEntries = (CharaBreakDisplayListPair*)pppMemAlloc(
+                    meshBuffer[dl] = (CharaBreakDisplayListPair*)pppMemAlloc(
                         0x10, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3CE);
 #endif
 #if defined(VERSION_GCCP01)
-                    if (*dlEntries == NULL) {
+                    if (meshBuffer[dl] == NULL) {
                         goto fail;
                     }
 #endif
 
 #if defined(VERSION_GCCP01)
-                    (*dlEntries)->m_rewrittenDisplayList = NULL;
-                    (*dlEntries)->m_displayListSize = 0;
-                    (*dlEntries)->m_polygonData = 0;
+                    meshBuffer[dl]->m_rewrittenDisplayList = NULL;
+                    meshBuffer[dl]->m_displayListSize = 0;
+                    meshBuffer[dl]->m_polygonData = 0;
 #endif
-                    (*dlEntries)->m_displayListSize = displayList->m_size;
+                    meshBuffer[dl]->m_displayListSize = displayList->m_size;
 #if defined(VERSION_GCCP01)
-                    (*dlEntries)->m_rewrittenDisplayList = pppMemAllocNoReport(
+                    meshBuffer[dl]->m_rewrittenDisplayList = pppMemAllocNoReport(
                         displayList->m_size, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x40B);
 #else
-                    (*dlEntries)->m_rewrittenDisplayList = pppMemAlloc(
+                    meshBuffer[dl]->m_rewrittenDisplayList = pppMemAlloc(
                         displayList->m_size, ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3D0);
 #endif
 #if defined(VERSION_GCCP01)
-                    if ((*dlEntries)->m_rewrittenDisplayList == NULL) {
+                    if (meshBuffer[dl]->m_rewrittenDisplayList == NULL) {
                         goto fail;
                     }
 #endif
 
-                    memcpy((*dlEntries)->m_rewrittenDisplayList, displayList->m_data, displayList->m_size);
-                    Util.ReWriteDisplayList((*dlEntries)->m_rewrittenDisplayList, displayList->m_size, 1);
+                    memcpy(meshBuffer[dl]->m_rewrittenDisplayList, displayList->m_data, displayList->m_size);
+                    Util.ReWriteDisplayList(meshBuffer[dl]->m_rewrittenDisplayList, displayList->m_size, 1);
 
-                    u32 polygonCount = Util.GetNumPolygonFromDL((*dlEntries)->m_rewrittenDisplayList, displayList->m_size);
+                    u32 polygonCount = Util.GetNumPolygonFromDL(meshBuffer[dl]->m_rewrittenDisplayList, displayList->m_size);
 #if !defined(VERSION_GCCP01)
                     totalPolygonCount += polygonCount;
 #endif
 #if defined(VERSION_GCCP01)
-                    (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemAllocNoReport(
+                    meshBuffer[dl]->m_polygonData = (POLYGON_DATA*)pppMemAllocNoReport(
                         polygonCount * sizeof(POLYGON_DATA), ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x423);
 #else
-                    (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemAlloc(
+                    meshBuffer[dl]->m_polygonData = (POLYGON_DATA*)pppMemAlloc(
                         polygonCount * sizeof(POLYGON_DATA), ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3DF);
 #endif
 #if defined(VERSION_GCCP01)
-                    if ((*dlEntries)->m_polygonData == NULL) {
+                    if (meshBuffer[dl]->m_polygonData == NULL) {
                         goto fail;
                     }
 #endif
-                    (*dlEntries)->m_polygonCount = (u16)polygonCount;
+                    meshBuffer[dl]->m_polygonCount = (u16)polygonCount;
 
-                    CreatePolygon((*dlEntries)->m_polygonData, displayList->m_data, displayList->m_size,
+                    CreatePolygon(meshBuffer[dl]->m_polygonData, displayList->m_data, displayList->m_size,
                                   model, mesh);
-                    InitPolygonParameter((PCharaBreak*)step, work, (*dlEntries)->m_polygonData,
-                                         (*dlEntries)->m_polygonCount, model, mesh);
-
-                    dlEntries--;
+                    InitPolygonParameter((PCharaBreak*)step, work, meshBuffer[dl]->m_polygonData,
+                                         meshBuffer[dl]->m_polygonCount, model, mesh);
                 }
             }
 

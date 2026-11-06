@@ -45,7 +45,6 @@ static const float kGraphicScreenHeight = 448.0f;
 static const float kGraphicScreenWidth = 640.0f;
 static const float kGraphicScreenCenterX = 320.0f;
 static const float kGraphicScreenCenterY = 224.0f;
-static const float kGraphicHalf = 0.5f;
 static const float kDebugBarLeft = 16.0f;
 static const float kDebugBarTop = 440.0f;
 static const float kDebugBarRight = 336.0f;
@@ -318,6 +317,15 @@ void CGraphicPcs::drawEnd()
 	Graphic.EndFrame();
 }
 
+static inline bool isDrawDebugText()
+{
+    bool drawText = false;
+    if (Pad.IsDebug(0) != 0 && Joybus.GetPadType(0) != 0x40000) {
+        drawText = true;
+    }
+    return drawText;
+}
+
 static inline void setBarColor(GXColor& dst, const u32& colorWord)
 {
     const GXColor* src = (const GXColor*)&colorWord;
@@ -331,10 +339,10 @@ static inline void setBarColor(GXColor& dst, const u32& colorWord)
  * --INFO--
  * PAL Address: 0x8004674C
  * PAL Size: 2812b
- * EN Address: 0x800514DC
- * EN Size: 2500b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80046540
+ * EN Size: 2812b
+ * JP Address: 0x80046040
+ * JP Size: 2900b
  */
 void CGraphicPcs::drawBar()
 {
@@ -369,12 +377,7 @@ void CGraphicPcs::drawBar()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-    int drawText = 0;
-    int padState = Pad.IsDebug(0);
-    if ((padState != 0) && (Joybus.GetPadType(0) != 0x40000)) {
-        drawText = 1;
-    }
-    const int textFlag = (u8)drawText;
+    const int textFlag = isDrawDebugText();
 
     float x = kDebugBarLeft;
     GXColor barColor = {0x80, 0x80, 0x80, 0xFF};
@@ -431,18 +434,19 @@ void CGraphicPcs::drawBar()
         y = 0x10;
         for (; i < orderCount; i++) {
             const int priority = textOrder->m_priority;
-            const float width = (kGraphicScreenCenterX * textOrder->m_lastTime) / 100.0f;
+            const float lastTime = textOrder->m_lastTime;
+            const float width = (kGraphicScreenCenterX * lastTime) / 100.0f;
 
             if (priority != 0x27) {
                 char debugString[260];
-                sprintf(debugString, "%s(%d) %.3f%%", textOrder->m_debugName, textOrder->m_insertIndex, textOrder->m_lastTime);
+                sprintf(debugString, "%s(%d) %.3f%%", textOrder->m_debugName, textOrder->m_insertIndex, lastTime);
 
                 if (priority == 0x17) {
                     char extraString[256];
                     sprintf(extraString, " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%",
-                            CFlatMoveTime(), CFlatBgCollisionTime(),
-                            CFlatObjectCollisionTime(), CFlatUpdateTime(),
-                            CFlatHitTime(), CFlatPerformanceTotalTime());
+                            CFlat.m_moveTime, CFlat.m_bgCollisionTime,
+                            CFlat.m_objectCollisionTime, CFlat.m_updateTime,
+                            CFlat.m_hitTime, CFlat.m_performance.m_totalTime);
                     strcat(debugString, extraString);
                 }
 
@@ -649,10 +653,10 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
  * --INFO--
  * PAL Address: 0x80045178
  * PAL Size: 4256b
- * EN Address: 0x80052678
- * EN Size: 4836b
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x80044F6C
+ * EN Size: 4256b
+ * JP Address: 0x80044978
+ * JP Size: 4508b
  */
 void CGraphicPcs::drawScreenFade()
 {
@@ -755,18 +759,10 @@ void CGraphicPcs::drawScreenFade()
                 pos.y += slotData->m_targetYOffs;
                 PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
-                const float sx = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
-                pos.x = sx;
-                const float sy = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
-                pos.y = sy;
-                float clampedX = 0.0f;
-                clampedX = (sx < clampedX) ? clampedX : ((kGraphicScreenWidth < sx) ? kGraphicScreenWidth : sx);
-                pos.x = clampedX;
-                {
-                    float clampedY = 0.0f;
-                    clampedY = (pos.y < clampedY) ? clampedY : ((kGraphicScreenHeight < pos.y) ? kGraphicScreenHeight : pos.y);
-                    pos.y = clampedY;
-                }
+                pos.x = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
+                pos.y = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
+                pos.x = (pos.x < 0.0f) ? 0.0f : ((kGraphicScreenWidth < pos.x) ? kGraphicScreenWidth : pos.x);
+                pos.y = (pos.y < 0.0f) ? 0.0f : ((kGraphicScreenHeight < pos.y) ? kGraphicScreenHeight : pos.y);
 
                 radius = (int)(1280.0f * (1.0f - fadeWave));
                 drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor, baseColor);
@@ -784,8 +780,12 @@ void CGraphicPcs::drawScreenFade()
                 GXLoadTexObj(&Graphic.m_smallBackTexObj, GX_TEXMAP0);
 
                 t = slotData->m_amplitude * (1.0f - t);
-                const float offX = slotData->m_stretch * ((kGraphicScreenCenterX * t) * (float)sin((double)slotData->m_phase));
-                const float offY = slotData->m_stretch * ((kGraphicScreenCenterY * t) * (float)cos((double)slotData->m_phase));
+                float wave = (float)sin((double)slotData->m_phase);
+                float extent = kGraphicScreenCenterX * t;
+                const float offX = slotData->m_stretch * (extent * wave);
+                wave = (float)cos((double)slotData->m_phase);
+                extent = kGraphicScreenCenterY * t;
+                const float offY = slotData->m_stretch * (extent * wave);
                 t += 1.0f;
 
                 drawSFRect((kGraphicScreenCenterX + offX) - kGraphicScreenCenterX * t,
@@ -833,8 +833,8 @@ void CGraphicPcs::drawScreenFade()
                     baseColor2.b = slotData->m_colorB.b;
                     baseColor2.a = slotData->m_colorB.a;
 
-                    const float t0 = (float)row * kGraphicHalf;
-                    const float t1 = (float)(row + 1) * kGraphicHalf;
+                    const float t0 = (float)row / 2.0f;
+                    const float t1 = (float)(row + 1) / 2.0f;
                     gradColor[0].color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
                     gradColor[0].color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
                     gradColor[0].color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
@@ -903,20 +903,34 @@ inline void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int cent
  */
 inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor topColor, _GXColor bottomColor)
 {
+    PPCWGPipe* fifo = (PPCWGPipe*)GXFIFO_ADDR;
     float z = 0.0f;
+
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(x0, y0, z);
-    GXColor1u32(*(u32*)&topColor);
-    GXTexCoord2u16(0, 0);
-    GXPosition3f32(x1, y0, z);
-    GXColor1u32(*(u32*)&topColor);
-    GXTexCoord2u16(2, 0);
-    GXPosition3f32(x1, y1, z);
-    GXColor1u32(*(u32*)&bottomColor);
-    GXTexCoord2u16(2, 2);
-    GXPosition3f32(x0, y1, z);
-    GXColor1u32(*(u32*)&bottomColor);
-    GXTexCoord2u16(0, 2);
+    fifo->f32 = x0;
+    fifo->f32 = y0;
+    fifo->f32 = z;
+    fifo->u32 = *(u32*)&topColor;
+    fifo->u16 = 0;
+    fifo->u16 = 0;
+    fifo->f32 = x1;
+    fifo->f32 = y0;
+    fifo->f32 = z;
+    fifo->u32 = *(u32*)&topColor;
+    fifo->u16 = 2;
+    fifo->u16 = 0;
+    fifo->f32 = x1;
+    fifo->f32 = y1;
+    fifo->f32 = z;
+    fifo->u32 = *(u32*)&bottomColor;
+    fifo->u16 = 2;
+    fifo->u16 = 2;
+    fifo->f32 = x0;
+    fifo->f32 = y1;
+    fifo->f32 = z;
+    fifo->u32 = *(u32*)&bottomColor;
+    fifo->u16 = 0;
+    fifo->u16 = 2;
 }
 
 /*

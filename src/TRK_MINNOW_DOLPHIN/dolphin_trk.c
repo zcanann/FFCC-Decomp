@@ -40,33 +40,7 @@ static u32 TRK_ISR_OFFSETS[15] = { PPC_SystemReset,
  * JP Size: 292b
  */
 #ifdef VERSION_GCCJGC
-__declspec(section ".init") void __TRK_reset(void)
-{
-	u32 maskAddress = lc_base;
-	u32* isrOffsetPtr;
-	int i;
-	u32 mask;
-
-	if (maskAddress <= 0x44 && maskAddress + 0x4000 > 0x44 && gTRKCPUState.Extended1.DBAT3U & 3) {
-		maskAddress = 0x44;
-	} else {
-		maskAddress = EXCEPTIONMASK_ADDR;
-	}
-
-	i            = 0;
-	mask          = *(u32*)maskAddress;
-	isrOffsetPtr = TRK_ISR_OFFSETS;
-
-	do {
-		if (mask & (1 << i)) {
-			void* destPtr = (void*)TRKTargetTranslate(isrOffsetPtr[i]);
-			TRK_memcpy(destPtr, gTRKInterruptVectorTable + isrOffsetPtr[i], 0x100);
-			TRK_flush_cache(destPtr, 0x100);
-		}
-
-		i++;
-	} while (i <= 14);
-}
+__declspec(section ".init") void __TRK_reset(void) { __TRK_copy_vectors(); }
 #else
 __declspec(section ".init") void __TRK_reset(void) { OSResetSystem(0, 0, 0); }
 #endif
@@ -239,6 +213,28 @@ u32 TRKTargetTranslate(u32 param_0)
 	return param_0 & 0x3FFFFFFF | 0x80000000;
 }
 
+#ifdef VERSION_GCCJGC
+void TRK_copy_vector(u32 offset)
+{
+	void* destPtr = (void*)TRKTargetTranslate(offset);
+	TRK_memcpy(destPtr, gTRKInterruptVectorTable + offset, 0x100);
+	TRK_flush_cache(destPtr, 0x100);
+}
+
+void __TRK_copy_vectors(void)
+{
+	int i;
+	u32 mask;
+
+	mask = *(u32*)TRKTargetTranslate(0x44);
+
+	for (i = 0; i <= 14; ++i) {
+		if (mask & (1 << i)) {
+			TRK_copy_vector(TRK_ISR_OFFSETS[i]);
+		}
+	}
+}
+#else
 void __TRK_copy_vectors(void)
 {
 	u32 r3 = lc_base;
@@ -266,6 +262,7 @@ void __TRK_copy_vectors(void)
 		i++;
 	} while (i <= 14);
 }
+#endif
 
 DSError TRKInitializeTarget()
 {

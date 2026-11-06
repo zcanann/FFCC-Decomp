@@ -41,6 +41,10 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     unsigned short height = GXGetTexObjHeight(targetTexObj);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
+    Vec cameraPos = {0.0f, 0.0f, 6.0f};
+    Vec cameraUp = {0.0f, 1.0f, 0.0f};
+    Vec cameraLook = {0.0f, 0.0f, 0.0f};
+
     unsigned int originalWidth = width;
     unsigned int originalHeight = height;
     const unsigned int modeOffset = mode * 5;
@@ -55,10 +59,6 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     Mtx objectMtx;
     Mtx lightFrustumMtx;
     Mtx tempMtx;
-
-    const Vec s_cameraPos = {0.0f, 0.0f, 6.0f};
-    const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
-    const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
     color.r = 0;
     color.g = 0;
@@ -75,7 +75,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     C_MTXOrtho(orthoMtx, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 100.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
-    C_MTXLookAt(cameraMtx, &s_cameraPos, &s_cameraUp, &s_cameraLook);
+    C_MTXLookAt(cameraMtx, &cameraPos, &cameraUp, &cameraLook);
     GXLoadPosMtxImm(cameraMtx, 0);
 
     GXSetCullMode(GX_CULL_BACK);
@@ -225,6 +225,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     float upperLat;
     float z;
     float ringLat;
+    float stripLon;
     float lx;
     float ly;
     float upperSin;
@@ -288,22 +289,22 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, ringVertexCount * 2);
         i = 0;
-        lon = zero;
+        stripLon = zero;
         while (i <= (int)detail) {
-            lx = ringSin * (float)cos(lon);
-            ly = ringSin * (float)sin(lon);
+            lx = ringSin * (float)cos(stripLon);
+            ly = ringSin * (float)sin(stripLon);
             GXPosition3f32(lx, ly, ringCos);
             GXNormal3f32(-2.0f * lx * ringCos,
                          -2.0f * ly * ringCos, ringNormalZ);
 
-            ux = upperSin * (float)cos(lon);
-            uy = upperSin * (float)sin(lon);
+            ux = upperSin * (float)cos(stripLon);
+            uy = upperSin * (float)sin(stripLon);
             GXPosition3f32(ux, uy, upperCos);
             GXNormal3f32(-2.0f * ux * upperCos,
                          -2.0f * uy * upperCos, upperNormalZ);
 
             i++;
-            lon = (6.2831855f * (float)i) / (float)detail;
+            stripLon = (6.2831855f * (float)i) / (float)detail;
         }
     }
 

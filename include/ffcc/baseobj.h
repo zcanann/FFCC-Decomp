@@ -14,7 +14,7 @@ public:
 	virtual void onTalk(CGBaseObj* other, int); // vtable entry 0x18
 	virtual void onCreate();                    // vtable entry 0x1c
 	virtual void onDestroy();                   // vtable entry 0x20
-	virtual void onFrame();                     // vtable entry 0x24
+	inline virtual void onFrame();              // vtable entry 0x24
 	virtual void onDraw();                      // vtable entry 0x28
 
 	/*
@@ -26,7 +26,7 @@ public:
 	 * JP Address: TODO
 	 * JP Size: TODO
 	 */
-	bool IsKindOf(unsigned short cid)
+	int IsKindOf(unsigned short cid)
 	{
 		return (static_cast<unsigned short>(GetCID()) & cid) == cid;
 	}

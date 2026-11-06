@@ -240,8 +240,8 @@ void pppConstructMiasma(pppMiasma* pppMiasma, _pppCtrlTable* ctrl)
 void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTable* ctrl)
 {
     pppCVECTOR drawColor;
-    int texGenCount;
-    int yOffset;
+    int texHeight;
+    int texWidth;
     Vec quadA;
     MiasmaRadiusWork* radiusWork;
     float width;
@@ -249,12 +249,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     Mtx44 screenMtx;
     Vec quadB;
     float yPos;
-    int tevSwapChannel;
-    int texWidth;
     u32 scissorWidth;
-    int texHeight;
+    CGraphic* graphicPtr;
+    int maskOffset;
+    int secondaryOffset;
     int textureIndex;
-    u32 sceneTexSize;
+    pppModelSt* model;
     Vec cameraPos;
     PackedMiasmaColor packedColor;
     float height;
@@ -263,22 +263,22 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     GXTexObj backSceneTex;
     VColor* colorWork;
     u32 maskTexSize;
-    int maskOffset;
-    int secondaryOffset;
-    Vec managerPos;
-    pppModelSt* model;
-    int tevStageCount;
-    int tevStage;
     int tevAlphaScale;
+    int tevStage;
+    Vec managerPos;
     int isCameraInside;
+    int slice;
+    int tevSwapChannel;
+    int tevStageCount;
+    u32 sceneTexSize;
     GXTexObj miasmaMaskTex;
     float secondaryScale;
     GXTexObj secondaryMaskTex;
     GXColor stepColor;
     u32 scissorHeight;
     MiasmaFrameWork* work;
-    int slice;
-    CGraphic* graphicPtr;
+    int texGenCount;
+    int yOffset;
 
 #if defined(VERSION_GCCP01)
     Graphic.SetDrawDoneDebugData(0x31);

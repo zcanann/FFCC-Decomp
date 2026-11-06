@@ -759,9 +759,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), this - mng.m_mapObjArray);
             }
-            CMapObjAtrMime* mimeAttr =
+            CMapObjAtrMime* mime =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
-            CMapObjAtrMime* mime = mimeAttr;
 
             chunkFile.PushChunk();
             CChunkFile::CChunk mimeChunk;
@@ -779,17 +778,15 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     while (chunkFile.GetNextChunk(vtxChunk) != 0) {
                         switch (vtxChunk.m_id) {
                         case CHUNK_VTX: {
-                            float* vtx;
-                            mime->m_vertexLists[vtxTableIndex++] = vtx = reinterpret_cast<float*>(operator new[](
+                            float* vtx = mime->m_vertexLists[vtxTableIndex++] = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
                                 g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
                             mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
                             for (i = 0; i < mime->m_vertexCount; i++) {
-                                vtx[0] = chunkFile.GetF4();
-                                vtx[1] = chunkFile.GetF4();
-                                vtx[2] = chunkFile.GetF4();
-                                vtx += 3;
+                                vtx[i * 3 + 0] = chunkFile.GetF4();
+                                vtx[i * 3 + 1] = chunkFile.GetF4();
+                                vtx[i * 3 + 2] = chunkFile.GetF4();
                             }
                             break;
                         }
@@ -799,7 +796,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     break;
                 }
                 case CHUNK_JUN:
-                    mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                    mime->m_keyFrame.ReadJun(chunkFile, mimeChunk.m_arg0);
                     break;
                 case CHUNK_FRAM:
                     mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
@@ -810,7 +807,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
             }
             chunkFile.PopChunk();
-            m_attribute = mimeAttr;
+            m_attribute = mime;
             break;
         }
         case CHUNK_TRNS: {

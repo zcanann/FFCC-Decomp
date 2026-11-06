@@ -12,8 +12,8 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
     if (msgNo < 0) {
         return;
     }
-    int lineBaseY[3] = {352, 340, 326};
     const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
+    int lineBaseY[3] = {352, 340, 326};
     char scratch[0x100];
     font->SetMargin(margin);
     font->SetShadow(1);
@@ -34,7 +34,7 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
             font->SetPosX(static_cast<float>(320 - maxWidth / 2));
             font->SetPosY(static_cast<float>(y));
             CMes::drawTagString(font, msg, 1, 0, 0);
-            y = static_cast<int>(static_cast<float>(y) + 25.0f);
+            y += 25.0f;
         }
         const SItemFlatRow* item = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable) + msgNo;
         u16 flags = item->m_equipFlags;
@@ -164,7 +164,7 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
             font->SetPosX(static_cast<float>(x));
             font->SetPosY(static_cast<float>(y));
             CMes::drawTagString(font, msg, 1, 0, 0);
-            y = static_cast<int>(static_cast<float>(y) + 25.0f);
+            y += 25.0f;
         }
     }
 }

@@ -3236,10 +3236,10 @@ inline void JoyBus::CleanQueue(ThreadParam* threadParam)
     for (i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
     {
         unsigned char* cmd = (unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i];
+        unsigned char op = cmd[0];
+        op &= kJoyBusCmdOpMask;
 
-        if ((unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x0A || (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x10 ||
-            (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x14 || (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x1B ||
-            (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x13 || (unsigned char)(cmd[0] & kJoyBusCmdOpMask) == 0x09)
+        if ((unsigned char)(op & 0xFF) == 0x0A || (unsigned char)(op & 0xFF) == 0x10 || (unsigned char)(op & 0xFF) == 0x14 || (unsigned char)(op & 0xFF) == 0x1B || (unsigned char)(op & 0xFF) == 0x13 || (unsigned char)(op & 0xFF) == 0x09)
         {
             m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
         }

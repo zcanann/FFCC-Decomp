@@ -139,7 +139,6 @@ public:
 
     COctTree* GetOctTreeArray() { return m_octTreeArray; }
     CMapHit* GetMapHitArray() { return m_mapHitArray; }
-    CMapObj* GetMapObjArray() { return m_mapObjArray; }
     CMapObj* GetMapObj(int index)
     {
         return &m_mapObjArray[index];
@@ -160,18 +159,6 @@ public:
     CPtrArray<CMapShadow*>& GetMapShadowArray()
     {
         return m_mapShadowArray;
-    }
-    CPtrArray<CMapLightHolder*>& GetMapLightHolderArray(int index)
-    {
-        return m_mapLightHolderArrays[index];
-    }
-    CPtrArray<CMapLightHolder*>* GetMapLightHolderArrays()
-    {
-        return m_mapLightHolderArrays;
-    }
-    CMapIdGrp* GetMapIdGrpArray()
-    {
-        return m_mapIdGrpArray;
     }
 
     ~CMapMng();

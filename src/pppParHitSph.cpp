@@ -45,7 +45,7 @@ void pppParHitSph(_pppPObject* pObject, ParHitSphParams* params)
         pppHitCylinderSendSystem(pppMngSt, &origin, &hitVector, radius, params->m_cylinderScale);
     }
 
-    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
+    if ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
         debugColor.r = 0xFF;
         debugColor.g = 0xFF;
         debugColor.b = 0xFF;

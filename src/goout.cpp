@@ -90,17 +90,6 @@ static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
     return *reinterpret_cast<CGoOutSaveDatLayout*>(saveData);
 }
 
-static inline int FindFreeCaravanIdx(Mc::SaveDat* saveData)
-{
-    for (int i = 0; i < 8; i++) {
-        if (GoOutSaveDat(saveData).m_caravan[i].m_dataPresent == 0) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -110,10 +99,15 @@ static inline int FindFreeCaravanIdx(Mc::SaveDat* saveData)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int getFreeCaravanIdx(Mc::SaveDat* saveData)
+static int getFreeCaravanIdx(Mc::SaveDat* saveData)
 {
-    g_freeCaravanIdx = FindFreeCaravanIdx(saveData);
-    return g_freeCaravanIdx;
+    for (int i = 0; i < 8; i++) {
+        if (saveData->m_characters[i].m_exists == 0) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 
@@ -965,7 +959,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         int freeCaravanIdx;
 
         if (GoOutSaveDat(static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)).m_caravan[selectedChara].m_odekakeReturnFlag == 0) {
-            freeCaravanIdx = FindFreeCaravanIdx(MenuPcs.m_goOutTransferSaveData);
+            freeCaravanIdx = getFreeCaravanIdx(MenuPcs.m_goOutTransferSaveData);
             MemoryCardMan.Odekake(1, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), selectedChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         } else {
             freeCaravanIdx = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), selectedChara, 0);
@@ -1410,7 +1404,7 @@ card_connected:;
                         break;
                     }
 
-                    g_freeCaravanIdx = FindFreeCaravanIdx(MenuPcs.m_goOutTransferSaveData);
+                    g_freeCaravanIdx = getFreeCaravanIdx(MenuPcs.m_goOutTransferSaveData);
                     if (g_freeCaravanIdx < 0) {
                         m_returnGoOutMode = 0xF;
                         m_goOutMode = 0;

@@ -535,7 +535,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 			object->move();
 		}
 		watch.Stop();
-		CFlatMoveTime() += watch.Get();
+		CFlat.m_moveTime += watch.Get();
 
 		watch.Reset();
 		watch.Start();
@@ -543,7 +543,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 			object->objectCollision();
 		}
 		watch.Stop();
-		CFlatObjectCollisionTime() += watch.Get();
+		CFlat.m_objectCollisionTime += watch.Get();
 
 		watch.Reset();
 		watch.Start();
@@ -551,7 +551,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 			object->bgCollision();
 		}
 		watch.Stop();
-		CFlatBgCollisionTime() += watch.Get();
+		CFlat.m_bgCollisionTime += watch.Get();
 
 		watch.Reset();
 		watch.Start();
@@ -559,7 +559,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 			object->update();
 		}
 		watch.Stop();
-		CFlatUpdateTime() += watch.Get();
+		CFlat.m_updateTime += watch.Get();
 
 		watch.Reset();
 		watch.Start();
@@ -567,7 +567,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 			object->hit();
 		}
 		watch.Stop();
-		CFlatHitTime() += watch.Get();
+		CFlat.m_hitTime += watch.Get();
 
 		for (object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->copy();
@@ -1167,7 +1167,9 @@ void CFlatRuntime2::Draw()
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
 				if (entry->m_flagBits.m_bit7 != 0) {
-					GXPosition3f32(vtx[0], vtx[1], z);
+					GXWGFifo.f32 = vtx[0];
+					GXWGFifo.f32 = vtx[1];
+					GXWGFifo.f32 = z;
 				} else {
 					GXPosition3f32(z, z, z);
 				}

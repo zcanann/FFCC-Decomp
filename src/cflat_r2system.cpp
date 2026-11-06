@@ -48,10 +48,7 @@ float atan2(float y, float x);
 float fmodf(float x, float y);
 }
 
-static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
-{
-    return &self->m_usbStreamState;
-}
+
 
 extern const float kCFlatPadStickZero = 0.0f;
 
@@ -202,9 +199,9 @@ static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* run
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartPcs::pppSetDebugHide(unsigned char hide)
+inline void CPartPcs::pppSetDebugHide(unsigned char hide)
 {
-    UsbStream(this)->m_disableShokiDraw = hide;
+    m_usbStreamState.m_disableShokiDraw = hide;
 }
 
 /*
@@ -371,7 +368,7 @@ inline void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::IsHitDrawMode(char drawMode)
+inline void CMapPcs::IsHitDrawMode(char drawMode)
 {
     g_MapHitDrawMode = drawMode;
 }
@@ -420,7 +417,7 @@ inline float std::fmodf(float x, float y)
  */
 inline float std::atan2(float y, float x)
 {
-    return (float)::atan2((double)y, (double)x);
+    return atan2f(y, x);
 }
 
 /*
@@ -581,9 +578,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 }
 
                 {
-                    char* scan = spec + 1;
+                    int scan = 1;
                     char c;
-                    while ((c = *scan) != '\0') {
+                    while ((c = spec[scan]) != '\0') {
                         switch (c) {
                         case 'd':
                         case 'x':
@@ -792,9 +789,11 @@ renderedDone:
 
         if ((mode & 4) != 0) {
             int pointCount = m_pathPointCount < 3 ? m_pathPointCount : m_pathPointCount;
-            u32 lowBit = modeBits & 1;
+            int lowBit = modeBits & 1;
             int highBit = modeBits & 2;
-            int segmentCount = pointCount + 1 - (lowBit + ((modeBits >> 1) & 1));
+            int skipCount = lowBit;
+            skipCount += (modeBits >> 1) & 1;
+            int segmentCount = pointCount + 1 - skipCount;
             int first = (modeBits & 1) ? 1 : 0;
             float scaled = t * static_cast<float>(segmentCount);
             int baseIndex = first + static_cast<int>(scaled);

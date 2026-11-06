@@ -320,8 +320,8 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_artifacts[BonusSummaryData::kTemporaryArtifactCount + k] = bossArtifact->m_values[k];
 		}
 
-		s_Rinfo->m_missingArtifactMask = 0;
-		for (k = 0; k < BonusSummaryData::kArtifactCount; k++) {
+		s_Rinfo->m_missingArtifactMask = k = 0;
+		for (; k < BonusSummaryData::kArtifactCount; k++) {
 			if (s_Rinfo->m_artifacts[k] < 0) {
 				s_Rinfo->m_missingArtifactMask =
 				    (unsigned char)(s_Rinfo->m_missingArtifactMask | (1 << k));
@@ -416,7 +416,7 @@ void CMenuPcs::createBonus()
 			slotIdx++;
 		}
 
-		for (j = 0; j < BonusSummaryData::kArtifactCount; j++, k++) {
+		for (j = 0; j < BonusSummaryData::kArtifactCount; k++, j++) {
 			int itemId = s_Rinfo->m_artifacts[j];
 			if (itemId <= 0) {
 				m_wm.m_handles[k] = 0;
@@ -723,9 +723,9 @@ void CMenuPcs::CalcResultOpenAnim()
 		// model sprites: startFrame chained from icons
 		idx += activePartyCount;
 		{
-			for (i = 0; i < activePartyCount; i++) {
+			for (k = 0; k < activePartyCount; k++) {
 				delta = idx - (activePartyCount + 1);
-				sprite = &m_bonusAnim->sprites[idx + i];
+				sprite = &m_bonusAnim->sprites[idx + k];
 				sprite->kind = -2;
 				sprite->x = 0;
 				src = sprite - delta;
@@ -803,8 +803,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		{
 			for (i = 0; i < activePartyCount; i++) {
 				sprite = &m_bonusAnim->sprites[i + 1];
-				src = sprite + activePartyCount;
-				sprite->startFrame = src->startFrame + src->duration;
+				sprite->startFrame = sprite[activePartyCount].startFrame + sprite[activePartyCount].duration;
 			}
 		}
 
@@ -902,8 +901,10 @@ void CMenuPcs::CalcResultOpenAnim()
 			k = 0;
 			for (; k < activePartyCount; k++) {
 				sprite = &m_bonusAnim->sprites[activePartyCount + 1 + k];
-				int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)sprite->x)) - 320.0);
-				int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)sprite->y) - 224.0);
+				float centerX = 4.0 + (sprite->w / 2.0 + sprite->x);
+				centerX -= 320.0;
+				float centerY = sprite->h / 2.0 + sprite->y;
+				centerY -= 224.0;
 				m_wm.m_worldObjData[k].m_viewportX = (short)centerX;
 				m_wm.m_worldObjData[k].m_viewportY = (short)centerY;
 				m_wm.m_worldObjData[k].m_scissorX = sprite->x + 0xC;
@@ -919,8 +920,10 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite = &m_bonusAnim->sprites[s_CntTop + k];
 				int w3 = sprite->w * 3;
 				int extent = w3 + 0x20;
-				int centerX = (int)(float)((double)(float)((double)w3 * 0.5 + (double)sprite->x) - 320.0);
-				int centerY = (int)(float)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 224.0);
+				float centerX = w3 * 0.5 + sprite->x;
+				centerX -= 320.0;
+				float centerY = sprite->h * 0.5 + sprite->y;
+				centerY -= 224.0;
 				(&m_wm.m_worldObjData[activePartyCount])[k].m_viewportX = (short)centerX;
 				(&m_wm.m_worldObjData[activePartyCount])[k].m_viewportY = (short)centerY;
 				(&m_wm.m_worldObjData[activePartyCount])[k].m_scissorX = sprite->x - 0x10;
@@ -935,7 +938,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			for (; k < activePartyCount; k++) {
 				sprite = &m_bonusAnim->sprites[k + 1];
 				float centerX = 0.0f;
-				float centerY = (float)((double)(float)((double)sprite->h / 2.0 + (double)sprite->y) - 224.0);
+				float centerY = sprite->h / 2.0 + sprite->y;
+				centerY -= 224.0;
 				delta = activePartyCount * 2 + k;
 				m_wm.m_worldObjData[delta].m_viewportX = (short)centerX;
 				m_wm.m_worldObjData[delta].m_viewportY = (short)centerY;
@@ -962,10 +966,8 @@ void CMenuPcs::CalcResultOpenAnim()
 
 	this->m_bonusState->m_frame++;
 	frame = (int)this->m_bonusState->m_frame;
-	n = 0;
-	doneCount = 0;
 
-	for (; n < (int)m_bonusAnim->header.count; n++) {
+	for (n = doneCount = 0; n < (int)m_bonusAnim->header.count; n++) {
 		sprite = &m_bonusAnim->sprites[n];
 
 		if (sprite->startFrame <= frame) {
@@ -1179,8 +1181,8 @@ void CMenuPcs::DrawResultOpenAnim()
 							mulX = fillWidth;
 						}
 						if (fillWidth > 0.0f) {
-							int w = sprite->w;
-							if (fillWidth < (float)w) {
+							float fw = (float)sprite->w;
+							if (fillWidth < fw) {
 								colors[1].r = 0xFF;
 								colors[1].g = 0xFF;
 								colors[1].b = 0xFF;
@@ -1189,7 +1191,7 @@ void CMenuPcs::DrawResultOpenAnim()
 								colors[3].g = 0xFF;
 								colors[3].b = 0xFF;
 								colors[3].a = 0;
-								MenuPcs.DrawRect(0, x, y, (float)w * (float)(1.0 / (double)sprite->duration), (float)sprite->h,
+								MenuPcs.DrawRect(0, x, y, fw * (float)(1.0 / (double)sprite->duration), (float)sprite->h,
 								    mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 							}
 						}
@@ -1455,6 +1457,7 @@ void CMenuPcs::DrawResultCountAnim()
 {
 	int doubleCount;
 	int i;
+	int textIndex;
 	int lastKind;
 	int modelIndex;
 	int activePartyCount;
@@ -1551,7 +1554,6 @@ void CMenuPcs::DrawResultCountAnim()
 	font->SetTlut(7);
 	font->DrawInit();
 
-	int textIndex;
 	char text[128];
 	for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];
@@ -1659,7 +1661,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			sprite->x -= sprite->motionX;
 		}
 
 		base += activePartyCount;
@@ -1691,7 +1693,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
-			sprite->x = (unsigned short)(int)((float)sprite->x - sprite->motionX);
+			sprite->x -= sprite->motionX;
 		}
 
 		base += activePartyCount;
@@ -1716,7 +1718,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
-			sprite->x = (unsigned short)(int)((float)sprite->x - sprite->motionX);
+			sprite->x -= sprite->motionX;
 		}
 
 		base += activePartyCount;
@@ -1733,7 +1735,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->flags = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 240.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			sprite->x -= sprite->motionX;
 		}
 
 		{
@@ -1753,11 +1755,10 @@ void CMenuPcs::CalcResultCloseAnim()
 		this->m_bonusState->m_initialized = 1;
 	}
 
-	doneCount = 0;
 	this->m_bonusState->m_frame++;
 	int frame = (int)this->m_bonusState->m_frame;
 
-	for (i = 0; i < m_bonusAnim->header.count; i++) {
+	for (i = doneCount = 0; i < m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];
 
 		if ((sprite->flags & 1) != 0) {
@@ -1778,11 +1779,11 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
-			float ty = sprite->targetY;
-			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
-			float fy = (float)sprite->y;
-			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (ty - fy) * progress;
+			float progress = 1.0 - (1.0 / sprite->duration) * sprite->timer;
+			float dx = sprite->targetX - sprite->x;
+			float dy = sprite->targetY - sprite->y;
+			sprite->motionX = dx * progress;
+			sprite->motionY = dy * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -1796,12 +1797,14 @@ void CMenuPcs::CalcResultCloseAnim()
 		for (; i < activePartyCount; i++) {
 			delta = activePartyCount + 1;
 			sprite = &m_bonusAnim->sprites[delta + i];
-			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
-			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
+			float centerX = 4.0 + (sprite->w / 2.0 + ((float)sprite->x + sprite->motionX));
+			centerX -= 320.0;
+			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
+			centerY -= 224.0;
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
-			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
 			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
+			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
 			if ((double)m_wm.m_worldObjData[i].m_scissorX < 0.0) {
 				m_wm.m_worldObjData[i].m_scissorX = 0;
 			}
@@ -1814,13 +1817,13 @@ void CMenuPcs::CalcResultCloseAnim()
 	}
 	Mtx scaleMtx;
 	{
+		CCharaPcs::CHandle* handle;
 		int total2 = activePartyCount * 2;
 		i = 0;
 		int spriteIndex = total2 + 1;
 
-		for (; i < total2; i++, spriteIndex++) {
+		for (; i < total2; i++) {
 			sprite = &m_bonusAnim->sprites[spriteIndex];
-			CCharaPcs::CHandle* handle;
 			if (i < activePartyCount) {
 				handle = s_Rinfo->m_party[i].m_partyHandle;
 				delta = s_Rinfo->m_party[i].m_tribeId;
@@ -1858,7 +1861,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			} else {
 				handle->m_model->m_lightAlpha = sprite->alpha;
 			}
-
+			spriteIndex++;
 		}
 	}
 
@@ -1990,8 +1993,8 @@ void CMenuPcs::DrawResultCloseAnim()
 							x += fillWidth;
 							mulX = fillWidth;
 						}
-						int w = sprite->w;
-						if (fillWidth < (float)w) {
+						float fw = (float)sprite->w;
+						if (fillWidth < fw) {
 							colors[1].r = 0xFF;
 							colors[1].g = 0xFF;
 							colors[1].b = 0xFF;
@@ -2000,7 +2003,7 @@ void CMenuPcs::DrawResultCloseAnim()
 							colors[3].g = 0xFF;
 							colors[3].b = 0xFF;
 							colors[3].a = 0;
-							MenuPcs.DrawRect(0, x, y, (float)(1.0 / (double)sprite->duration) * (float)w, (float)sprite->h,
+							MenuPcs.DrawRect(0, x, y, (float)(1.0 / (double)sprite->duration) * fw, (float)sprite->h,
 							    mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 						}
 					}
@@ -2124,8 +2127,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			sprite = &m_bonusAnim->sprites[idx++];
 			sprite->kind = kBonusBackgroundTexture;
 			sprite->y = 0;
-			sprite->x = 0;
 			sprite->w = 0x280;
+			sprite->x = 0;
 			sprite->h = 0x1c0;
 			sprite->mulX = sprite->mulY = 0.0f;
 			sprite->startFrame = 0;
@@ -2314,10 +2317,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_transform.Identity();
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_active = 0;
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_frameCounter = 0;
-				int centerX = (int)((double)(float)((double)frameSprite->w / 2.0 + (double)frameSprite->x) - 320.0);
-				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportX = (short)centerX;
-				int centerY = (int)((double)(float)((double)frameSprite->h / 2.0 + (double)frameSprite->y) - 224.0);
-				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportY = (short)centerY;
+				float centerX = frameSprite->w / 2.0 + frameSprite->x;
+				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportX = (short)(centerX - 320.0);
+				float centerY = frameSprite->h / 2.0 + frameSprite->y;
+				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportY = (short)(centerY - 224.0);
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportWidth = 0x280;
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_viewportHeight = 0x1C0;
 				m_wm.m_worldObjData[activePartyCount * 2 + i].m_cameraPosition.x = 0.0f;
@@ -2362,11 +2365,11 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
-			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
-			float fy = (float)sprite->y;
-			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			float ty = sprite->targetY;
-			sprite->motionY = (ty - fy) * progress;
+			float progress = 1.0 - (1.0 / sprite->duration) * sprite->timer;
+			float dx = sprite->targetX - sprite->x;
+			float dy = sprite->targetY - sprite->y;
+			sprite->motionX = dx * progress;
+			sprite->motionY = dy * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -2378,12 +2381,14 @@ void CMenuPcs::CalcSelectOpenAnim()
 		i = 0;
 		for (; i < activePartyCount; i++) {
 			sprite = &m_bonusAnim->sprites[4 + i];
-			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
-			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
+			float centerX = 4.0 + (sprite->w / 2.0 + ((float)sprite->x + sprite->motionX));
+			centerX -= 320.0;
+			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
+			centerY -= 224.0;
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
-			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
 			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
+			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
 			if ((double)m_wm.m_worldObjData[i].m_scissorX < 0.0) {
 				m_wm.m_worldObjData[i].m_scissorX = 0;
 			}
@@ -2509,6 +2514,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	int activePartyCount;
 	int doubleCount;
 	int modelIndex;
+	int textIndex;
 	int i;
 	int kind;
 	int lastKind;
@@ -2606,7 +2612,6 @@ void CMenuPcs::DrawSelectOpenAnim()
 	font->SetTlut(7);
 	font->DrawInit();
 
-	int textIndex;
 	char text[256];
 	{
 		int i;
@@ -2734,7 +2739,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 		DrawMcWinMess(0x18, 1);
 		DrawInit();
 #ifdef VERSION_GCCJGC
-		float cursorX = (float)(this->m_menuWindowInfo->x + 32) + (float)(this->m_bonusState->m_confirmSelection * 80);
+		float cursorX = (float)(this->m_menuWindowInfo->x + 32);
+		cursorX += (float)(this->m_bonusState->m_confirmSelection * 80);
 		float cursorY = (float)(this->m_menuWindowInfo->y + 76);
 #else
 		float cursorY = (float)(this->m_menuWindowInfo->y + this->m_menuWindowInfo->height - 0x3e);
@@ -3199,11 +3205,11 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 
 		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
-			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
-			float fy = (float)sprite->y;
-			float ty = sprite->targetY;
-			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (ty - fy) * progress;
+			float progress = 1.0 - (1.0 / sprite->duration) * sprite->timer;
+			float dx = sprite->targetX - sprite->x;
+			float dy = sprite->targetY - sprite->y;
+			sprite->motionX = dx * progress;
+			sprite->motionY = dy * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -3215,12 +3221,14 @@ void CMenuPcs::CalcSelectCloseAnim()
 		i = 0;
 		for (; i < activePartyCount; i++) {
 			sprite = &m_bonusAnim->sprites[4 + i];
-			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
-			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
+			float centerX = 4.0 + (sprite->w / 2.0 + ((float)sprite->x + sprite->motionX));
+			centerX -= 320.0;
+			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
+			centerY -= 224.0;
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
-			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
 			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
+			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
 			if ((double)m_wm.m_worldObjData[i].m_scissorX < 0.0) {
 				m_wm.m_worldObjData[i].m_scissorX = 0;
 			}
@@ -3379,7 +3387,6 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameCornerTexture));
-	const float right = (x + w) - corner;
 	for (int i = 0; i < 4; i++) {
 		float drawX;
 		float drawY;
@@ -3391,7 +3398,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 			texU = 0.0f;
 			texV = 0.0f;
 		} else if (i == 1) {
-			drawX = right;
+			drawX = (x + w) - corner;
 			drawY = y;
 			texU = corner;
 			texV = 0.0f;
@@ -3401,7 +3408,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 			texU = 0.0f;
 			texV = corner;
 		} else {
-			drawX = right;
+			drawX = (x + w) - corner;
 			drawY = (y + h) - corner;
 			texU = corner;
 			texV = corner;
@@ -3420,7 +3427,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	float yCorner = corner + y;
 	MenuPcs.DrawRect(0, x, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameRightTexture));
-	MenuPcs.DrawRect(0, right, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, (x + w) - corner, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameFillTexture));
 	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - 64.0), (float)((double)h - 64.0), 0.0f, 0.0f, texScale, texScale, 0.0f);
 }

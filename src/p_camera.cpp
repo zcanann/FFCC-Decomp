@@ -39,7 +39,7 @@ inline void* operator new(unsigned long, void* ptr)
 
 static inline CPad::PadInput& CameraPadInput(int port)
 {
-    return Pad.GetPadInputs()[(Pad.m_debugPadPort == port) ? 0 : port];
+    return Pad.m_padInputs[(Pad.m_debugPadPort == port) ? 0 : port];
 }
 
 namespace {
@@ -467,6 +467,12 @@ void CCameraPcs::calc()
     }
 
     if (m_isAbsolute == 0) {
+        float cosPitch;
+        float sinYaw;
+        float sinY;
+        float cosPitchZ;
+        float cosYaw;
+
         float stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                            ? 0.0f
                            : CameraPadInput(0).substickXF;
@@ -490,11 +496,13 @@ void CCameraPcs::calc()
 
         float yaw = m_yaw;
         float pitch = m_pitch;
-        float cosPitch = static_cast<float>(cos(pitch));
-        float sinYaw = static_cast<float>(sin(yaw));
+        cosPitch = static_cast<float>(cos(pitch));
+        sinYaw = static_cast<float>(sin(yaw));
         const float sinXCosY = sinYaw * cosPitch;
-        float sinY = static_cast<float>(sin(pitch));
-        const float cosXCosY = static_cast<float>(cos(yaw)) * static_cast<float>(cos(pitch));
+        sinY = static_cast<float>(sin(pitch));
+        cosPitchZ = static_cast<float>(cos(pitch));
+        cosYaw = static_cast<float>(cos(yaw));
+        const float cosXCosY = cosYaw * cosPitchZ;
 
         float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                            ? 0.0f
@@ -582,7 +590,7 @@ void CCameraPcs::SetStdProjectionMatrix()
 void CCameraPcs::draw()
 {
     if ((m_isAbsolute == 0) ||
-        ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
+        ((CFlat.m_debugFlags & CFlatRuntimeDebugFlag_Camera) != 0)) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -1104,8 +1112,8 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
                     1.0f);
     CBound::SetFrustum(eyePos, frustumMtx);
 
-    for (gObject = CFlatRuntime2Storage().FindGObjFirst(); gObject != 0;
-         gObject = CFlatRuntime2Storage().FindGObjNext(gObject))
+    for (gObject = CFlat.FindGObjFirst(); gObject != 0;
+         gObject = CFlat.FindGObjNext(gObject))
     {
         unsigned int displayFlags;
         bool include = false;
@@ -1767,7 +1775,7 @@ void CCameraPcs::SetOffsetZBuff(float offset)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CCameraPcs::addWorldMap()
+void CCameraPcs::addWorldMap()
 {
     Mtx worldMapMtx;
     Mtx tempMtx;

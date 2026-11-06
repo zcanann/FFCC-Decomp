@@ -172,8 +172,7 @@ public:
     void SetWorldZoomCam(int paused, unsigned short frames, float rotX, float rotY, float scale)
     {
         m_worldMapEffect.m_paused = paused;
-        m_worldMapEffect.m_timer = frames;
-        m_worldMapEffect.m_duration = frames;
+        m_worldMapEffect.m_duration = m_worldMapEffect.m_timer = frames;
         m_worldMapEffect.m_rotX = rotX;
         m_worldMapEffect.m_rotY = rotY;
         m_worldMapEffect.m_scale = scale;
@@ -207,6 +206,20 @@ public:
     void GetProjectionMatrix(Mtx44 out)
     {
         PSMTX44Copy(m_screenMatrix, out);
+    }
+
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: TODO
+     * EN Size: TODO
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void GetShadowBound(CBound& bound)
+    {
+        bound = m_shadowRectBound;
     }
 
     /*
@@ -272,9 +285,7 @@ public:
     }
     void SetFullScreenShadowPos(Vec* position, float len)
     {
-        m_fullScreenShadowPosition.x = position->x;
-        m_fullScreenShadowPosition.y = position->y;
-        m_fullScreenShadowPosition.z = position->z;
+        m_fullScreenShadowPosition = *position;
         m_fullScreenShadow.m_scale = len;
     }
     void SetFullScreenShadowEnable(unsigned char enable) { m_fullScreenShadowEnabled = enable; }

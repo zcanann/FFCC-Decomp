@@ -315,9 +315,9 @@ void CMes::addString(char** text, int branchMode)
             glyph->m_char = uch;
             glyph->m_x = mCurrentX;
             glyph->m_y = mCurrentY;
-            font->renderFlags.snapPosition = 1;
+            font->SetAlign(1);
             glyph->m_width = font->GetWidth(uch);
-            font->renderFlags.snapPosition = 0;
+            font->SetAlign(0);
             glyph->m_reveal = mRevealCursor;
             glyph->m_fadeFrames = mTextAlign;
             glyph->m_fadeCursor = 0;

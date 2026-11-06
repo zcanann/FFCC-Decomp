@@ -148,7 +148,7 @@ void CRingMenu::onCalc()
 {
 	if ((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1)) {
 		const unsigned int targetAnimDirection =
-			(CFlatEnabledEventFlags() >> 2) & 1;
+			((CFlat.m_eventFlags & CFlat.m_eventMask) >> 2) & 1;
 		if (m_displayDirection != static_cast<int>(targetAnimDirection)) {
 #ifdef VERSION_GCCP01
 			System.Printf("ringMenu表示on/offが変更されました。%d-%d\n", m_menuIndex, targetAnimDirection);
@@ -205,7 +205,7 @@ void CRingMenu::onCalc()
 			                     ? Chara.MogFur().m_commandIndex
 			                     : caravanWork->GetIdxCmdList();
 
-			int* trackedCmd = (Game.m_gameWork.IsMogStage() & 1)
+			int* trackedCmd = (Game.m_gameWork.IsMogStage() & 0xFF)
 			                      ? &Chara.MogFur().m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 
@@ -397,13 +397,15 @@ void CRingMenu::onDraw()
 	sin(static_cast<double>((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f));
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	float cycle = static_cast<float>(fmod(static_cast<double>(0.05f * static_cast<float>(m_commonFrameCounter)),
-	                                      2.0));
-	float cycleAngle = 3.1415927410125732f;
-	if (cycle > 1.0f) {
-		cycle = 2.0f - cycle;
+	float cycleRaw = 0.05f * static_cast<float>(m_commonFrameCounter);
+	cycleRaw = static_cast<float>(fmod(static_cast<double>(cycleRaw), 2.0));
+	float cycle;
+	if (cycleRaw > 1.0f) {
+		cycle = 2.0f - cycleRaw;
+	} else {
+		cycle = cycleRaw;
 	}
-	cycleAngle = cycleAngle * cycle;
+	float cycleAngle = 3.1415927410125732f * cycle;
 	sin(static_cast<double>(cycleAngle));
 	sin(static_cast<double>(-1.5707963705062866f + cycleAngle));
 
@@ -568,13 +570,13 @@ void CRingMenu::onDraw()
 		}
 
 		textX2 = 64.0f + drawX;
-#ifdef VERSION_GCCJGC
 		textX0 = textX2;
+#ifdef VERSION_GCCJGC
 		textY0 = 5.0f + drawY;
 		textX1 = 56.0f + drawX;
 		textY1 = 3.0f + drawY;
 #else
-		textX0 = textX2 + 20.0f;
+		textX0 += 20.0f;
 		textY0 = (5.0f + drawY) - 4.0f;
 		textX1 = (56.0f + drawX) + 20.0f;
 		textY1 = (3.0f + drawY) - 4.0f;
@@ -670,7 +672,7 @@ void CRingMenu::onDraw()
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 					if ((caravanWork != 0)
 					    && (static_cast<signed char>(
-					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
+					            static_cast<int>((static_cast<unsigned int>(CFlat.m_gameFlags) << 30) & 0xC0000000) >> 31)
 					        == 0)) {
 						fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
@@ -728,7 +730,6 @@ void CRingMenu::drawGBA()
 	float sinA;
 	float sinB;
 	float angle;
-	float alphaBase;
 	float showScale;
 	float posX;
 	float posY;
@@ -760,8 +761,7 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE));
 
-	gbaAnimRaw = static_cast<float>(
-	    sin(static_cast<double>((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f)));
+	gbaAnimRaw = sinf((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f);
 	gbaAnim = gbaAnimRaw;
 	if (m_gbaConnectedFlag == 1) {
 		gbaAnim = 1.0f - gbaAnimRaw;
@@ -791,13 +791,12 @@ void CRingMenu::drawGBA()
 	}
 
 	angle = 3.1415927410125732f * cycle;
-	sinA = static_cast<float>(sin(static_cast<double>(angle)));
-	sinB = static_cast<float>(sin(static_cast<double>(-1.5707963705062866f + angle)));
+	sinA = sinf(angle);
+	sinB = sinf(-1.5707963705062866f + angle);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_GBA));
 
-	alphaBase = 255.0f * gbaAnim;
-	MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>(0.5f * alphaBase * showScale)));
+	MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>(0.5f * (255.0f * gbaAnim) * showScale)));
 
 	invSize = 1.0f - sizePulse;
 	orbitX = 5.0f * (sizePulse * sinB);
@@ -806,16 +805,16 @@ void CRingMenu::drawGBA()
 	                                 0.0f, static_cast<float>(m_menuIndex * 0x30), 0.75f * (1.0f + invSize),
 	                                 0.75f * (sizePulse + invSize), 0.2f * (2.0f * (cycle - 0.5f)));
 
-	alphaLit = alphaBase * showScale;
+	alphaLit = (255.0f * gbaAnim) * showScale;
 	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaLit)));
 	MenuPcs.DrawRect(3, posX + orbitX, posY - orbitY, 80.0f, 48.0f, 0.0f, static_cast<float>(m_menuIndex * 0x30),
 	                                 0.75f * sizePulse, 0.75f * sizePulse, 0.2f * (2.0f * (cycle - 0.5f)));
 
-	const unsigned int flatFlags = CFlatEnabledEventFlags();
+	const unsigned int flatFlags = (CFlat.m_eventFlags & CFlat.m_eventMask);
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
 		if (static_cast<unsigned char>(Joybus.IsInitSend(m_menuIndex)) == 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_SUNA));
-			const float blink = static_cast<float>(sin(static_cast<double>(0.1f * static_cast<float>(m_commonFrameCounter))));
+			const float blink = sinf(0.1f * static_cast<float>(m_commonFrameCounter));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(0.5f * (alphaLit * (1.0f + blink))));
 			MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha)));
@@ -954,7 +953,7 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	const unsigned int flatFlags = CFlatEnabledEventFlags();
+	const unsigned int flatFlags = (CFlat.m_eventFlags & CFlat.m_eventMask);
 	if ((flatFlags & 1) == 0) {
 		return;
 	}

@@ -381,7 +381,16 @@ public:
         int m_slotNo;
         CGObject m_object;
 
-        EffectInfo();
+        /*
+         * --INFO--
+         * PAL Address: 0x80102e9c
+         * PAL Size: 56b
+         * EN Address: TODO
+         * EN Size: TODO
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        EffectInfo() {}
     };
     struct EffectEntry
     {
@@ -595,7 +604,7 @@ public:
     void SetProjection(int);
     void RestoreProjection();
     void DrawObj(int);
-    void loadTextureAsync(char**, int, int, CTmp*, int, int, int);
+    int loadTextureAsync(char**, int, int, CTmp*, int, int, int);
     void CalcPitcher();
     void CalcFukidashi();
     void SetCrystalCageAttr();
@@ -632,7 +641,7 @@ public:
     void WMChgMenu();
     void GetOptionData();
     void InitOptionMenuParam();
-    const char* GetSkillStr(int);
+    char* GetSkillStr(int);
 #ifndef VERSION_GCCJGC
     char* GetTribeStr(int);
     char* GetJobStr(int);
@@ -880,6 +889,7 @@ public:
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
     CFont* GetFont22() { return m_fonts[0]; }
     CFont* GetFont23() { return m_fonts[1]; }
+    CFont* GetExtraFont(int index) { return m_fonts[index + 2]; }
     CRingMenu* GetRingMenu(int index) { return m_battleRingMenus[index]; }
     CMesMenu* GetMesMenu(int index) { return m_battleMesMenus[index]; }
     void CopyNowCaravanDat(Mc::SaveDat*);

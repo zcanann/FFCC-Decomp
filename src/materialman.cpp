@@ -111,7 +111,9 @@ inline CMaterialMan::CMaterialMan()
  */
 inline void CMaterialMan::IncNumTevStage()
 {
-    m_numTevStage = ((m_numTevStage & 0xFF) + 1) & 0xFF;
+    unsigned char numTevStage = m_numTevStage;
+    numTevStage++;
+    m_numTevStage = numTevStage;
 }
 
 /*
@@ -125,16 +127,9 @@ inline void CMaterialMan::IncNumTevStage()
  */
 inline void CMaterialMan::SetStdEnv()
 {
-    int stdValue = m_stdTexMapId;
-
-    m_texMapIdCur = stdValue;
-    m_texMapIdCurShadow = stdValue;
-    stdValue = m_stdTexMtx;
-    m_texMtxCur = stdValue;
-    m_texMtxCurShadow = stdValue;
-    stdValue = m_stdTexCoordId;
-    m_texCoordIdCur = stdValue;
-    m_texCoordIdCurShadow = stdValue;
+    m_texMapIdCurShadow = m_texMapIdCur = m_stdTexMapId;
+    m_texMtxCurShadow = m_texMtxCur = m_stdTexMtx;
+    m_texCoordIdCurShadow = m_texCoordIdCur = m_stdTexCoordId;
     m_curEnvTevBit = m_stdEnvTevBit;
 }
 
@@ -881,6 +876,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
 {
     CMaterial* material;
     unsigned int tevBit;
+    unsigned int waterTevBit;
+    unsigned int stdTevBit;
     int isStd1000 = 0;
     int texCoordId;
     SetStdEnv();
@@ -1114,10 +1111,10 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             }
             GXSetArray(GX_VA_NRM, m_normals, 6);
             material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
-            unsigned int tevBit = m_curEnvTevBit;
-            tevBit &= material->m_tevBit;
-            if (m_activeEnvTevBit != tevBit) {
-                m_activeEnvTevBit = tevBit;
+            waterTevBit = m_curEnvTevBit;
+            waterTevBit &= material->m_tevBit;
+            if (m_activeEnvTevBit != waterTevBit) {
+                m_activeEnvTevBit = waterTevBit;
                 m_bumpTexMapIds[0] = m_texMapIdCur + 1;
                 m_bumpTexMapIds[1] = m_texMapIdCur + 2;
                 m_bumpTexMapIds[2] = m_texMapIdCur + 3;
@@ -1140,7 +1137,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXLoadTexMtxImm(LightPcs.m_bumpTexMtx2, m_bumpTexMtxIds[3], GX_MTX2x4);
                 GXLoadTexMtxImm(m_underWaterTexMtx, m_bumpTexMtxIds[4], GX_MTX3x4);
 
-                if ((tevBit & 0x20) != 0) {
+                if ((waterTevBit & 0x20) != 0) {
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll0TexMtx, GX_FALSE, 0x7D);
                 } else {
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
@@ -1151,7 +1148,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[5]), GX_TG_MTX3x4, GX_TG_POS, m_bumpTexMtxIds[4], GX_FALSE, 0x7D);
                 m_numTevStage = 0;
 
-                if ((tevBit & 0x80000) != 0) {
+                if ((waterTevBit & 0x80000) != 0) {
                     if (material->m_unkA5 != 0) {
                         GXColor tevColor = material->m_bumpLight->m_targetColor[1];
                         GXSetTevColor(GX_TEVREG1, tevColor);
@@ -1163,7 +1160,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 } else {
                     addtev_bump_water(tevScale);
                 }
-                addtev_stdShadow(tevBit);
+                addtev_stdShadow(waterTevBit);
                 GXSetNumTexGens(m_texCoordIdCur & 0xFF);
                 GXSetNumTevStages(m_numTevStage & 0xFF);
                 return;
@@ -1187,11 +1184,11 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             }
             GXSetArray(GX_VA_NRM, m_normals, 0x12);
             material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
-            unsigned int tevBit = m_curEnvTevBit;
-            tevBit &= material->m_tevBit;
-            if (m_activeEnvTevBit != tevBit) {
-                unsigned int scrollSel = tevBit & 0x60;
-                m_activeEnvTevBit = tevBit;
+            stdTevBit = m_curEnvTevBit;
+            stdTevBit &= material->m_tevBit;
+            if (m_activeEnvTevBit != stdTevBit) {
+                unsigned int scrollSel = stdTevBit & 0x60;
+                m_activeEnvTevBit = stdTevBit;
                 switch (scrollSel) {
                 case 0:
                     IncTexCoordIdCur();
@@ -1233,11 +1230,11 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXSetCurrentMtx(0);
                 m_numTevStage = 0;
                 addtev_bump_st(setVtxDesc, tevScale);
-                addtev_stdShadow(tevBit);
+                addtev_stdShadow(stdTevBit);
                 GXSetNumTexGens(m_texCoordIdCur & 0xFF);
                 GXSetNumTevStages(m_numTevStage & 0xFF);
             }
-            unsigned int scrollSel = tevBit & 0x60;
+            unsigned int scrollSel = stdTevBit & 0x60;
             switch (scrollSel) {
             case 0x20:
                 m_texCoordIdCurShadow = m_texScroll0TexCoord;
@@ -2431,16 +2428,12 @@ void CMaterialMan::SetPosition(
 {
     CBound searchBound(position, rangeXZ, rangeY);
 
-    ShadowCandidate* candidateWrite;
-    CPtrArray<CMapShadow*>* mapShadowArray;
     if (target == static_cast<CMapShadow::TARGET>(0)) {
         ShadowCandidate shadowCandidates[128];
-        candidateWrite = shadowCandidates;
-        mapShadowArray = &g_MapMng.GetMapShadowArray();
         int candidateCount = 0;
 
-        for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-            CMapShadow* shadow = (*mapShadowArray)[i];
+        for (long i = 0; i < static_cast<unsigned int>(g_MapMng.GetMapShadowArray().GetSize()); i++) {
+            CMapShadow* shadow = g_MapMng.GetMapShadowArray()[i];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2471,10 +2464,9 @@ void CMaterialMan::SetPosition(
 
         writeCandidate:
             PSVECSubtract(&shadowPos, position, &delta);
-            candidateWrite->distance = PSVECSquareMag(&delta);
-            candidateWrite->shadow = shadow;
-            candidateWrite->index = i;
-            candidateWrite++;
+            shadowCandidates[candidateCount].distance = PSVECSquareMag(&delta);
+            shadowCandidates[candidateCount].shadow = shadow;
+            shadowCandidates[candidateCount].index = i;
             candidateCount++;
             continue;
 
@@ -2509,9 +2501,8 @@ void CMaterialMan::SetPosition(
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
-        mapShadowArray = &g_MapMng.GetMapShadowArray();
-        for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-            CMapShadow* shadow = (*mapShadowArray)[i];
+        for (long i = 0; i < static_cast<unsigned int>(g_MapMng.GetMapShadowArray().GetSize()); i++) {
+            CMapShadow* shadow = g_MapMng.GetMapShadowArray()[i];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2558,16 +2549,13 @@ int CMaterialMan::GetCharaShadow(
 {
     CBound searchBound(position, rangeXZ, rangeY);
 
-    CPtrArray<CMapShadow*>* mapShadowArray = &g_MapMng.GetMapShadowArray();
-
     ShadowCandidate shadowCandidates[128];
-    ShadowCandidate* candidateWrite = shadowCandidates;
     int outputCount = 0;
     int candidateCount = 0;
 
     int idx;
-    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* shadow = (*mapShadowArray)[idx];
+    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(g_MapMng.GetMapShadowArray().GetSize()); i++) {
+        CMapShadow* shadow = g_MapMng.GetMapShadowArray()[idx];
         if (shadow->m_targetEnabled[0] == 0) {
             continue;
         }
@@ -2601,10 +2589,9 @@ int CMaterialMan::GetCharaShadow(
         {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
-            candidateWrite->distance = PSVECSquareMag(&delta);
-            candidateWrite->shadow = shadow;
-            candidateWrite->index = i;
-            candidateWrite++;
+            shadowCandidates[candidateCount].distance = PSVECSquareMag(&delta);
+            shadowCandidates[candidateCount].shadow = shadow;
+            shadowCandidates[candidateCount].index = i;
             candidateCount++;
         }
         continue;
@@ -2922,8 +2909,7 @@ inline CTexScroll::CTexScroll()
 {
     m_u0 = m_v0 = 0.0f;
     m_u1 = m_v1 = 0.0f;
-    m_type1 = 0;
-    m_type0 = 0;
+    m_type0 = m_type1 = 0;
 }
 
 /*
@@ -3491,6 +3477,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
 {
     register long materialIndex = 0;
+    bool isIntensity;
 
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];
@@ -3512,9 +3499,10 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                         (textureIndex < static_cast<unsigned long>(textureSet->GetNumTexture()))) {
                         material->m_textureData.m_textures[i] =
                             textureSet->GetTexture(textureIndex);
-                        if (material->m_textureData.m_textures[i] != 0) {
-                            bool isIntensity = true;
-                            material->m_textureData.m_textures[i]->AddRef();
+                        CTexture* texture = material->m_textureData.m_textures[i];
+                        if (texture != 0) {
+                            isIntensity = true;
+                            texture->AddRef();
                             unsigned int format = material->m_textureData.m_textures[i]->m_format;
                             if ((format != 9) && (format != 8)) {
                                 isIntensity = false;
@@ -3800,7 +3788,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
  */
 inline void CMaterial::IncNumTexture()
 {
-    m_textureCount++;
+    m_textureCount = m_textureCount + 1;
 }
 
 /*

@@ -30,8 +30,8 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 CMapMng g_MapMng;
-unsigned char g_MapHitDrawMode;
-unsigned char g_MapHitFaceFlag;
+char g_MapHitDrawMode;
+char g_MapHitFaceFlag;
 char g_StrTmp[0x400];
 
 
@@ -303,7 +303,7 @@ void CMapMng::Create()
     GetMapShadowArray().SetStage(m_stage);
 
     for (int i = 0; i < 2; i++) {
-        GetMapLightHolderArray(i).SetStage(m_stage);
+        m_mapLightHolderArrays[i].SetStage(m_stage);
     }
 
     g_MapHitFaceFlag = 0;
@@ -492,12 +492,12 @@ void CMapMng::DestroyMapShadow()
 void CMapMng::DestroyMapLightHolder()
 {
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < GetMapLightHolderArray(i).GetSize(); j++) {
-            if (GetMapLightHolderArray(i)[j] != 0) {
-                delete GetMapLightHolderArray(i)[j];
+        for (int j = 0; j < m_mapLightHolderArrays[i].GetSize(); j++) {
+            if (m_mapLightHolderArrays[i][j] != 0) {
+                delete m_mapLightHolderArrays[i][j];
             }
         }
-        GetMapLightHolderArray(i).RemoveAll();
+        m_mapLightHolderArrays[i].RemoveAll();
     }
 }
 
@@ -705,7 +705,7 @@ CMapObj* CMapMng::SearchAtribMapObj(CMapObj* mapObj, CMapObjAtr::TYPE type)
  */
 void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
-    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObj = m_mapObjArray;
 
     goto search;
     while (true) {
@@ -741,7 +741,7 @@ search:
  */
 int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 {
-    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObj = m_mapObjArray;
 
     goto search;
     while (true) {
@@ -776,7 +776,7 @@ void CMapMng::SetLightSource()
 {
     CMapObjAtr* attr;
     const short mapObjCount = m_mapObjCount;
-    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObj = m_mapObjArray;
     CMapObj* mapObjEnd = m_mapObjArray + mapObjCount;
     int mapLightIndex = 0;
 
@@ -903,7 +903,37 @@ inline void COctTree::SetOctTreeMapObj(int index)
  */
 void CMapMng::SetBumpLightSource()
 {
-	// TODO
+    for (int i = 0; i < m_mapObjCount; i++) {
+        if (CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(m_mapObjArray[i].m_attribute)) {
+            switch (spotAttr->m_type) {
+            case CMapObjAtr::SPOT_LIGHT: {
+                if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) != 0) {
+                    CLightPcs::CBumpLight light;
+                    light.m_type = 1;
+                    light.m_position.x = m_mapObjArray[i].m_worldMtx[0][3];
+                    light.m_position.y = m_mapObjArray[i].m_worldMtx[1][3];
+                    light.m_position.z = m_mapObjArray[i].m_worldMtx[2][3];
+                    light.m_targetPosition.x = spotAttr->m_target->m_worldMtx[0][3];
+                    light.m_targetPosition.y = spotAttr->m_target->m_worldMtx[1][3];
+                    light.m_targetPosition.z = spotAttr->m_target->m_worldMtx[2][3];
+                    PSVECSubtract(&light.m_targetPosition, &light.m_position, &light.m_direction);
+                    PSVECNormalize(&light.m_direction, &light.m_direction);
+                    *reinterpret_cast<unsigned int*>(light.m_bumpShade) = *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
+                    light.m_offsetX = spotAttr->m_intensity;
+                    light.m_offsetZ = spotAttr->m_falloff;
+                    light.m_specularScale = spotAttr->m_angle;
+                    light.m_targetColor[1] = spotAttr->m_color;
+                    spotAttr->m_light = LightPcs.AddBump(&light, static_cast<CLightPcs::TARGET>(1), m_stage, 1);
+                    for (int j = 0; j < m_mapObjCount; j++) {
+                        if (m_mapObjArray[j].m_bumpObjId == i) {
+                            m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
+                        }
+                    }
+                }
+            }
+            }
+        }
+    }
 }
 
 /*
@@ -1263,7 +1293,7 @@ int CMapMng::ReadOtm(char* mapName)
             *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
             *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
 
-            GetMapLightHolderArray(chunk.m_arg0).Add(light);
+            m_mapLightHolderArrays[chunk.m_arg0].Add(light);
             continue;
         }
         }
@@ -1277,7 +1307,7 @@ int CMapMng::ReadOtm(char* mapName)
 
     InitMapShadow();
 
-    m_rootMapObj = SearchChildMapObj(GetMapObjArray(), 0);
+    m_rootMapObj = SearchChildMapObj(m_mapObjArray, 0);
     if (m_rootMapObj == 0) {
         System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
         return 0;
@@ -1289,62 +1319,7 @@ int CMapMng::ReadOtm(char* mapName)
     PSMTXIdentity(identity);
     m_rootMapObj->CalcMtx(identity, 1);
 
-    for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObjAtr* attr = m_mapObjArray[i].m_attribute;
-        if (attr == 0) {
-            continue;
-        }
-        switch (attr->m_type) {
-        case CMapObjAtr::SPOT_LIGHT: {
-            CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-            if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) == 0) {
-                break;
-            }
-
-            CLightPcs::CBumpLight light;
-            light.m_type = 1;
-            light.m_position.x = m_mapObjArray[i].m_worldMtx[0][3];
-            light.m_position.y = m_mapObjArray[i].m_worldMtx[1][3];
-            light.m_position.z = m_mapObjArray[i].m_worldMtx[2][3];
-
-            CMapObj* targetObj = spotAttr->m_target;
-            light.m_targetPosition.x = targetObj->m_worldMtx[0][3];
-            light.m_targetPosition.y = targetObj->m_worldMtx[1][3];
-            light.m_targetPosition.z = targetObj->m_worldMtx[2][3];
-            PSVECSubtract(
-                reinterpret_cast<Vec*>(&light.m_targetPosition),
-                reinterpret_cast<Vec*>(&light.m_position),
-                reinterpret_cast<Vec*>(&light.m_direction));
-            PSVECNormalize(
-                reinterpret_cast<Vec*>(&light.m_direction),
-                reinterpret_cast<Vec*>(&light.m_direction));
-
-            *reinterpret_cast<unsigned int*>(&light.m_bumpShade) =
-                *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
-            light.m_offsetX = spotAttr->m_intensity;
-            light.m_offsetZ = spotAttr->m_falloff;
-            light.m_specularScale = spotAttr->m_angle;
-            light.m_targetColor[1].r = spotAttr->m_color.r;
-            light.m_targetColor[1].g = spotAttr->m_color.g;
-            light.m_targetColor[1].b = spotAttr->m_color.b;
-            light.m_targetColor[1].a = spotAttr->m_color.a;
-
-            CLightPcs::CBumpLight* bump = LightPcs.AddBump(
-                &light,
-                static_cast<CLightPcs::TARGET>(1),
-                m_stage,
-                1);
-            spotAttr->m_light = bump;
-
-            for (int j = 0; j < m_mapObjCount; j++) {
-                if (m_mapObjArray[j].m_bumpObjId == i) {
-                    m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
-                }
-            }
-            break;
-        }
-        }
-    }
+    SetBumpLightSource();
     return 1;
 }
 
@@ -1388,7 +1363,7 @@ int CMapMng::ReadMid(char* mapName)
     CChunkFile chunkFile;
     chunkFile.SetBuf(filePtr);
 
-    CMapObj* nextMapObj = GetMapObjArray();
+    CMapObj* nextMapObj = m_mapObjArray;
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
@@ -1446,10 +1421,10 @@ int CMapMng::ReadMid(char* mapName)
                 return 0;
             }
             m_octTreeArray[m_octTreeCount].ReadOtmOctTree(chunkFile);
-            m_octTreeArray[m_octTreeCount].SetMapObject(nextMapObj);
+            m_octTreeArray[m_octTreeCount].m_mapObject = nextMapObj;
             nextMapObj++;
             {
-                CMapObj* check = m_octTreeArray[m_octTreeCount].GetMapObject();
+                CMapObj* check = m_octTreeArray[m_octTreeCount].m_mapObject;
                 if (check->m_mapData != 0) {
                     goto octtreeMeshCheck;
                 }
@@ -1673,7 +1648,8 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-    int shadowCount;
+    int texMtx;
+    int i;
     if (m_mapReadReady == 0) {
         return;
     }
@@ -1742,8 +1718,7 @@ void CMapMng::Draw()
             GXSetZMode(1, GX_LEQUAL, 1);
             LightPcs.SetNumDiffuse(0);
 
-            int texMtx;
-            shadowCount = CharaPcs.GetNumTexShadow();
+            int shadowCount = CharaPcs.GetNumTexShadow();
             if (shadowCount != 0) {
                 _GXTexObj texObjs[8];
                 Vec shadowPositions[8];
@@ -1900,7 +1875,7 @@ void CMapMng::Draw()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-        for (int i = 0; i < m_mapObjCount; i++) {
+        for (i = 0; i < m_mapObjCount; i++) {
             g_MapMng.m_mapObjArray[i].DrawHit();
         }
 
@@ -1928,11 +1903,11 @@ void CMapMng::Draw()
 
         CameraPcs.SetOffsetZBuff(-0.1f);
 
-        for (int i = 0; i < m_mapObjCount; i++) {
+        for (i = 0; i < m_mapObjCount; i++) {
             g_MapMng.m_mapObjArray[i].DrawHitWire();
         }
 
-        for (int i = 0; i < m_mapObjCount; i++) {
+        for (i = 0; i < m_mapObjCount; i++) {
             g_MapMng.m_mapObjArray[i].DrawHitNormal();
         }
 
@@ -1962,7 +1937,7 @@ void CMapMng::DrawAfter()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        if (static_cast<signed char>(g_MapHitDrawMode) == 0) {
+        if (g_MapHitDrawMode == 0) {
             for (int i = 0; i < m_octTreeCount; i++) {
                 m_octTreeArray[i].Draw(2);
             }
@@ -2011,7 +1986,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
 
     for (int i = 0; i < m_octTreeCount; i++) {
         if (m_octTreeArray[i].CheckHitCylinder(cylinder, move, mask) != 0) {
-            m_hitMapObj = m_octTreeArray[i].GetMapObject();
+            m_hitMapObj = m_octTreeArray[i].m_mapObject;
             return 1;
         }
     }
@@ -2066,7 +2041,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         m_octTreeArray[i].CheckHitCylinderNear(cylinder, move, mask);
         if (gMapHitFaceFlag != 0) {
             hit = 1;
-            m_hitMapObj = m_octTreeArray[i].GetMapObject();
+            m_hitMapObj = m_octTreeArray[i].m_mapObject;
         }
     }
 
@@ -2159,7 +2134,7 @@ void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
  */
 void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
 {
-    GetMapIdGrpArray()[mapIdGrpIndex].m_mask = mask;
+    m_mapIdGrpArray[mapIdGrpIndex].m_mask = mask;
 }
 
 /*

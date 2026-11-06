@@ -53,7 +53,7 @@ public:
 #endif
     void _WaitDrawDone(char*, int);
     void* GetFrameBuffer() { return m_frameBuffer; }
-    int IsAvailableTempBuffer() { return m_scratchTextureBuffer != 0; }
+    int IsAvailableTempBuffer() { return m_scratchTextureBuffer != 0 ? 1 : 0; }
     void Thread();
     int IsFifoOver();
     int IsFrameRateOver();
@@ -98,6 +98,7 @@ public:
     void RenderBlur(int, unsigned char, unsigned char, unsigned char, unsigned char, short);
     void genMapSphere(void*, unsigned long*, unsigned short, _GXVtxFmt);
     void drawSphereMap(_GXTexObj*, _GXTexObj*, void*, unsigned long, _GXTexObj*);
+    void DrawBlurScreen(unsigned char, float);
 
     void CreateTempBuffer();
     void DestroyTempBuffer();
@@ -144,8 +145,8 @@ public:
     _GXColor m_defaultCopyClearColor;
     u8 _pad_0x7363[0x1];
     s32 m_drawDoneWaiting;
-    char* m_drawDoneFile;
-    s32 m_drawDoneLine;
+    char* volatile m_drawDoneFile;
+    volatile s32 m_drawDoneLine;
     volatile s32 m_drawDoneCounter;
 };
 

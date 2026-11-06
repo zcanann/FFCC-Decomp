@@ -1634,7 +1634,7 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		int base = 0;
 		{
-			sprite = &m_bonusAnim->sprites[base++];
+			Sprt2* sprite = &m_bonusAnim->sprites[base++];
 			sprite->startFrame = 9999;
 			sprite->flags = 3;
 		}
@@ -1647,7 +1647,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 
 		for (i = 0; i < activePartyCount; i++) {
-			sprite = &m_bonusAnim->sprites[base + i];
+			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
 			delta = base - 1;
 			sprite->startFrame = (sprite - delta)->startFrame + (sprite - delta)->duration;
 			sprite->flags = 1;

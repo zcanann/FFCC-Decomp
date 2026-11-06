@@ -301,7 +301,8 @@ void CMes::MakeAgbString(char* out, char* src)
             {
                 char* p = src + 3;
                 int varIndex = GET_1(&p);
-                strcpy(out, Game.GetItemName(m_tempVar[varIndex]));
+                varIndex = m_tempVar[varIndex];
+                strcpy(out, Game.GetItemName(varIndex));
                 out += strlen(out);
                 src += 4;
                 break;
@@ -310,7 +311,8 @@ void CMes::MakeAgbString(char* out, char* src)
             {
                 char* p = src + 3;
                 int varIndex = GET_1(&p);
-                strcpy(out, Game.GetMonName(m_tempVar[varIndex]));
+                varIndex = m_tempVar[varIndex];
+                strcpy(out, Game.GetMonName(varIndex));
                 out += strlen(out);
                 src += 4;
                 break;
@@ -319,7 +321,8 @@ void CMes::MakeAgbString(char* out, char* src)
             {
                 char* p = src + 3;
                 int varIndex = GET_1(&p);
-                strcpy(out, Game.GetNPCName(m_tempVar[varIndex]));
+                varIndex = m_tempVar[varIndex];
+                strcpy(out, Game.GetNPCName(varIndex));
                 out += strlen(out);
                 src += 4;
                 break;
@@ -328,7 +331,8 @@ void CMes::MakeAgbString(char* out, char* src)
             {
                 char* p = src + 3;
                 int varIndex = GET_1(&p);
-                strcpy(out, Game.GetPlaceName(m_tempVar[varIndex]));
+                varIndex = m_tempVar[varIndex];
+                strcpy(out, Game.GetPlaceName(varIndex));
                 out += strlen(out);
                 src += 4;
                 break;
@@ -346,7 +350,8 @@ void CMes::MakeAgbString(char* out, char* src)
             {
                 char* p = src + 1;
                 int varIndex = GET_1(&p);
-                strcpy(out, Game.GetLetterSubject(m_tempVar[varIndex]));
+                varIndex = m_tempVar[varIndex];
+                strcpy(out, Game.GetLetterSubject(varIndex));
                 out += strlen(out);
                 src += 2;
                 break;
@@ -538,7 +543,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		{
 			char* p = (char*)op + 2;
 			int varIndex = GET_1(&p);
-			strcpy(out, Game.GetNPCName(CMes::m_tempVar[varIndex]));
+			varIndex = CMes::m_tempVar[varIndex];
+			strcpy(out, Game.GetNPCName(varIndex));
 			out += strlen(out);
 			src += 4;
 			break;
@@ -547,7 +553,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		{
 			char* p = (char*)op + 2;
 			int varIndex = GET_1(&p);
-			strcpy(out, Game.GetPlaceName(CMes::m_tempVar[varIndex]));
+			varIndex = CMes::m_tempVar[varIndex];
+			strcpy(out, Game.GetPlaceName(varIndex));
 			out += strlen(out);
 			src += 4;
 			break;
@@ -565,7 +572,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		{
 			char* p = (char*)op;
 			int varIndex = GET_1(&p);
-			strcpy(out, Game.GetLetterSubject(CMes::m_tempVar[varIndex]));
+			varIndex = CMes::m_tempVar[varIndex];
+			strcpy(out, Game.GetLetterSubject(varIndex));
 			out += strlen(out);
 			src += 2;
 			break;

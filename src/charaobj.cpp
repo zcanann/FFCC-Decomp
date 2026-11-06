@@ -70,7 +70,7 @@ static __inline bool CharaObjSkipComboScript(CGPrgObj* obj)
 		return false;
 	}
 
-	return ((static_cast<unsigned short>(obj->GetCID()) & 0x6D) == 0x6D) &&
+	return obj->IsKindOf(0x6D) &&
 	       (reinterpret_cast<CCaravanWork*>(obj->m_scriptHandle)->m_joybusCaravanId != 0);
 }
 
@@ -888,8 +888,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 	int classId = hitParam->m_classId;
 	CGPrgObj* sourceObj = static_cast<CGPrgObj*>(CFlat.IntToClass(classId));
 
-	unsigned short sourceCid = sourceObj->GetCID();
-	if ((sourceCid & 0xD) == 0xD) {
+	if (sourceObj->IsKindOf(0xD)) {
 		onDamage(sourceObj, particleIndex, -1, colliderIndex, hitPos);
 	}
 
@@ -1731,7 +1730,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			if (PSVECDotProduct(frontDelta, reinterpret_cast<Vec*>(&facing)) > 0.0f) {
 				playSe3D(0x1D, 0x32, 0x96, 0, 0);
 				putParticle(0x200, 0, hitPos, 0.1f * m_attackColRadius, 0);
-				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {
+				if (sourceObj->IsKindOf(0x6D)) {
 					sourceObj->changeStat(0x13, 0, 0);
 				}
 				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
@@ -1752,8 +1751,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (m_lastStateId == 6 &&
 	    m_weaponNodeFlagAll.m_bits1.m_bit20 != 0) {
 		SCharaItemRow* kindRows1556 = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-		int currentKind = kindRows1556[m_itemId].m_status & 0xFF;
-		if (currentKind == 2) {
+		damageAmount = kindRows1556[m_itemId].m_status & 0xFF;
+		if (damageAmount == 2) {
 #ifndef VERSION_GCCJGC
 			if (staType != 0x66 && staType != 0x67 && staType != 7)
 #endif
@@ -1763,7 +1762,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x1A, 0, 0);
 			}
-		} else if (currentKind == 3) {
+		} else if (damageAmount == 3) {
 			effectResult = 0;
 			allowEffect = 0;
 		}
@@ -1819,7 +1818,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			itemKind = 1;
 		}
 
-		if (itemKind == 1 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D)) {
+		if (itemKind == 1 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && sourceObj->IsKindOf(0x6D))) {
 			switch (staType) {
 			case 0x24:
 			case 0x25:
@@ -1832,7 +1831,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				} else {
 					basePower = 0;
 				}
-				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && itemId == 0x206) {
+				if (sourceObj->IsKindOf(0x6D) && itemId == 0x206) {
 					int castCurrent = sourceChara->m_unk68C;
 					int castEnd = sourceChara->m_comboFramePrev;
 					if (castCurrent * 3 <= castEnd) {
@@ -1861,7 +1860,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 				System.Printf("PC->MON ATTACKダメージ min1((%d + %d) * %f - %d) + %d = %d\n", basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 
-				if (staType != 0x6A && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
+				if (staType != 0x6A && sourceObj->IsKindOf(0x6D) && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 				    (m_scriptHandle->m_romWork[0x7F] & 0x100) != 0 &&
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
 				    sourceObj->m_scriptHandle->m_elementResistances[3] == 0) {
@@ -1910,10 +1909,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				} else {
 					float recoilRate = (static_cast<float>(Game.m_battleParams[0x13 + resistType]) * 0.01f) + 1.0e-07f;
 					int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(m_scriptHandle->m_hp)) * recoilRate);
-					damageAmount = 1;
-					if (raw >= 1) {
-						damageAmount = raw;
-					}
+					damageAmount = (raw >= 1) ? raw : 1;
 					if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 						static_cast<CGMonObj*>(this)->m_unk6C2 = 1;
 					}
@@ -1926,7 +1922,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				System.Printf("STA_%d 未対応\n", staType);
 				break;
 			}
-		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD)) {
+		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && sourceObj->IsKindOf(0xAD))) {
 			switch (staType) {
 			case 0x24:
 			case 0x25:
@@ -1984,7 +1980,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				break;
 			}
 		} else if (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x2D) == 0x2D &&
-		           ((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD || (static_cast<unsigned short>(sourceObj->GetCID()) & 0x1D) == 0x1D)) {
+		           (sourceObj->IsKindOf(0xAD) || sourceObj->IsKindOf(0x1D))) {
 			switch (staType) {
 			case 0:
 			case 1:
@@ -2031,7 +2027,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		if (staType != 4 && m_scriptHandle->m_statusTimers[4] != 0) {
 #else
 		if (staType != 4 &&
-		    !((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD && sourceObj->m_scriptHandle->m_baseDataIndex == 6 && staType == 0x6A) &&
+		    !(sourceObj->IsKindOf(0xAD) && sourceObj->m_scriptHandle->m_baseDataIndex == 6 && staType == 0x6A) &&
 		    m_scriptHandle->m_statusTimers[4] != 0) {
 #endif
 			setSta(4, 0);
@@ -2058,7 +2054,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		    staType != 0x1C) {
 			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
-		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x2D) == 0x2D && sourceChara->m_comboItemState >= 0 &&
+		if (sourceObj->IsKindOf(0x2D) && sourceChara->m_comboItemState >= 0 &&
 		    sourceChara->m_comboLinkCount != 0) {
 			System.Printf("魔法剣でダメージを%d倍\n", sourceChara->m_comboLinkCount);
 			damageAmount *= sourceChara->m_comboLinkCount;
@@ -2073,7 +2069,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 			SCharaItemRow* bonusRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((bonusRows[itemId].m_flags32 & 1) != 0 ||
-			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceChara->m_comboItemState >= 0)) {
+			    (sourceObj->IsKindOf(0x6D) && sourceChara->m_comboItemState >= 0)) {
 				bonus(0x15, itemId, sourceObj);
 				sourceObj->bonus(0x11, itemId, this);
 				if (isDead != 0) {
@@ -2110,7 +2106,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 		}
 
-		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D &&
+		if (sourceObj->IsKindOf(0x6D) &&
 		    m_scriptHandle->m_hp != 0) {
 			int counterType;
 			int counterItem;
@@ -2991,7 +2987,7 @@ void CGCharaObj::combi2()
 			party->m_comboCenter = comboCenter;
 			if (playedComboSe == 0 &&
 			    (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF ||
-			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) != 0x6D ||
+			     !party->IsKindOf(0x6D) ||
 			     reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0)) {
 				party->m_itemId = comboData->m_command;
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
@@ -3046,7 +3042,7 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 	while (entry < m_comboLinkCount) {
 		if (m_comboLinks[entry] != 0) {
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			    (static_cast<unsigned short>(m_comboLinks[entry]->GetCID()) & 0x6D) == 0x6D &&
+			    m_comboLinks[entry]->IsKindOf(0x6D) &&
 			    reinterpret_cast<CCaravanWork*>(m_comboLinks[entry]->m_scriptHandle)->m_joybusCaravanId != 0) {
 				goto next_link;
 			} else if (m_comboLinks[entry]->m_lastStateId != 6 && m_comboLinks[entry]->m_lastStateId != 2) {

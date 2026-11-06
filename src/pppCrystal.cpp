@@ -100,7 +100,12 @@ static inline float CrystalSqrtPositive(float value)
     guess = 0.5 * guess * (3.0 - guess * guess * value);
     guess = 0.5 * guess * (3.0 - guess * guess * value);
 
+#ifdef VERSION_GCCJGC
+    volatile float result = (float)(value * guess);
+    return result;
+#else
     return (float)(value * guess);
+#endif
 }
 
 /*
@@ -319,18 +324,16 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable
 			xCoord = -1.0f;
 
 			for (x = 0; x < (u32)textureInfo->m_width; x++) {
-#ifdef VERSION_GCCJGC
-				magnitude = sqrtf(xCoord * xCoord + ySq);
-#else
 				magnitude = xCoord * xCoord + ySq;
 				if (magnitude > 0.0f) {
 					magnitude = CrystalSqrtPositive(magnitude);
+#ifndef VERSION_GCCJGC
 				} else if ((double)magnitude < 0.0) {
 					magnitude = NAN;
 				} else if (CrystalFpClassify(magnitude) == 1) {
 					magnitude = NAN;
-				}
 #endif
+				}
 
 				xFine = x & 3;
 				if (magnitude > maxMagnitude) {
@@ -449,18 +452,16 @@ inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
         xCoord = -1.0f;
 
         for (x = 0; x < imageBuffer->m_width; x++) {
-#ifdef VERSION_GCCJGC
-            magnitude = sqrtf(xCoord * xCoord + ySq);
-#else
             magnitude = xCoord * xCoord + ySq;
             if (magnitude > 0.0f) {
                 magnitude = CrystalSqrtPositive(magnitude);
+#ifndef VERSION_GCCJGC
             } else if ((double)magnitude < 0.0) {
                 magnitude = NAN;
             } else if (CrystalFpClassify(magnitude) == 1) {
                 magnitude = NAN;
-            }
 #endif
+            }
 
             if (magnitude > maxMagnitude) {
                 magnitude = maxMagnitude;

@@ -85,7 +85,12 @@ static inline float Crystal2SqrtPositive(float value)
     guess = 0.5 * guess * (3.0 - guess * guess * value);
     guess = 0.5 * guess * (3.0 - guess * guess * value);
 
+#ifdef VERSION_GCCJGC
+    volatile float result = (float)(value * guess);
+    return result;
+#else
     return (float)(value * guess);
+#endif
 }
 
 /*
@@ -264,19 +269,17 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
             xCoord = -1.0f;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
-#ifdef VERSION_GCCJGC
-                magnitude = sqrtf(xCoord * xCoord + ySq);
-#else
                 magnitude = xCoord * xCoord + ySq;
 
                 if (magnitude > 0.0f) {
                     magnitude = Crystal2SqrtPositive(magnitude);
+#ifndef VERSION_GCCJGC
                 } else if ((double)magnitude < 0.0) {
                     magnitude = NAN;
                 } else if (Crystal2FpClassify(magnitude) == 1) {
                     magnitude = NAN;
-                }
 #endif
+                }
 
                 xFine = x & 3;
                 if (magnitude > 1.0f) {

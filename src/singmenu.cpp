@@ -85,11 +85,6 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuInitialized) == 0x85A);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadIndex) == 0x85C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadState) == 0x860);
 
-static inline CCaravanWork* SingleCaravanWork()
-{
-    return Game.m_scriptFoodBase[0];
-}
-
 struct SingMenuStaticMessageInfo
 {
     int lineCount;
@@ -115,10 +110,6 @@ struct SingMenuSoloNameTable
 #define SINGMENU_TEX_ID(id) (id)
 #endif
 
-static inline CMenuPcs::TEX SingMenuTex(int id)
-{
-    return static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(id));
-}
 extern "C" {
 int s_DynamicMess[5];
 }
@@ -335,7 +326,7 @@ void CMenuPcs::SingMenuInit()
 
     CCharaPcs::CHandle** handlePtr = &m_wm.m_handles[0];
     (*handlePtr)->Add();
-    CCaravanWork* caravanWork = SingleCaravanWork();
+    CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
     int modelNo = GetModelNo(
         static_cast<int>(caravanWork->m_tribeId),
         static_cast<int>(caravanWork->m_appearanceVariant),
@@ -405,12 +396,49 @@ void CMenuPcs::SingMenuInit()
  * Address:	TODO
  * Size:	TODO
  */
-inline void CMenuPcs::SingMenuEnd()
+void CMenuPcs::SingMenuEnd()
 {
     Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-    gSingMenuHasScriptFoodBase = 0;
-    gSingMenuAsyncLoadCompleted = 0;
-    destroySingleMenu();
+    Graphic._WaitDrawDone("singmenu.cpp", SINGMENU_LINE(0x62B, 0x626, 0x5CC));
+    m_singleMenuInitialized = 0;
+
+    if (gSingMenuAsyncFileHandle != 0) {
+        File.Close(gSingMenuAsyncFileHandle);
+        gSingMenuAsyncFileHandle = 0;
+    }
+
+    freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
+
+    if (m_wm.m_handles[0] != 0) {
+        delete m_wm.m_handles[0];
+        m_wm.m_handles[0] = 0;
+    }
+
+    if (m_wm.m_worldObjData != 0) {
+        delete[] m_wm.m_worldObjData;
+        m_wm.m_worldObjData = 0;
+    }
+
+    if (m_singMenuState != 0) {
+        delete[] reinterpret_cast<u8*>(m_singMenuState);
+        m_singMenuState = 0;
+    }
+
+    if (m_singleFadeState != 0) {
+        delete m_singleFadeState;
+        m_singleFadeState = 0;
+    }
+
+    if (m_menuWindowInfo != 0) {
+        delete m_menuWindowInfo;
+        m_menuWindowInfo = 0;
+    }
+
+    m_stageF4->heapWalker(-1, 0, 0xFFFFFFFF);
+    Graphic.CreateTempBuffer();
+    m_stageF4 = 0;
+    m_singleMenuCtrlResetFlag = 0;
+    Joybus.SetCtrlMode(0, 0);
 }
 
 /*
@@ -424,7 +452,7 @@ inline void CMenuPcs::SingMenuEnd()
  */
 void CMenuPcs::calcSingleMenu()
 {
-    gSingMenuHasScriptFoodBase = static_cast<int>(SingleCaravanWork()->m_shopRequestState != 0);
+    gSingMenuHasScriptFoodBase = static_cast<int>(Game.m_scriptFoodBase[0]->m_shopRequestState != 0);
     if (Game.m_gameWork.m_menuStageMode == 0) {
         if (m_singleMenuStageActive == 0) {
             return;
@@ -446,7 +474,7 @@ void CMenuPcs::calcSingleMenu()
         SingMenuInit();
     }
 
-    if (SingleCaravanWork()->m_shopRequestState == 0) {
+    if (Game.m_scriptFoodBase[0]->m_shopRequestState == 0) {
         gSingMenuAsyncLoadCompleted = loadTextureAsync(PTR_s_solo1.entries, 5, 2, s_singleMenuModelTextureTable, SINGMENU_TEX_ID(45), 0x33, 0);
     }
     if (m_singleFadeState->done != 0) {
@@ -459,7 +487,7 @@ void CMenuPcs::calcSingleMenu()
         m_singMenuState->frame = 0;
     }
 
-    char menuKind = SingleCaravanWork()->m_shopRequestState;
+    char menuKind = Game.m_scriptFoodBase[0]->m_shopRequestState;
     if (menuKind == 1) {
         if (m_shopMenu == 0) {
             CreateShopMenu();
@@ -489,52 +517,6 @@ void CMenuPcs::calcSingleMenu()
     }
 }
 
-static inline void DrawSingleBack(CMenuPcs* menu, float alpha)
-{
-    menu->DrawInit();
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    _GXColor color;
-    color.r = 0xFF;
-    color.g = 0xFF;
-    color.b = 0xFF;
-    color.a = static_cast<u8>(255.0f * alpha);
-    GXSetChanMatColor(GX_COLOR0A0, color);
-
-    MenuPcs.SetTexture(SingMenuTex(0x20));
-    MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(SingMenuTex(0x28));
-    int y;
-    int step = 0x20;
-    for (y = 0x40; y < 0x180; y += step) {
-        if ((0x180 - y) < step) {
-            step = 0x180 - y;
-        }
-        MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y), 640.0f, static_cast<float>(step),
-                         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    }
-}
-
-static inline void DrawSingleFrame(CMenuPcs* menu, float alpha)
-{
-    menu->DrawInit();
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    _GXColor color;
-    color.r = 0xFF;
-    color.g = 0xFF;
-    color.b = 0xFF;
-    color.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(SingMenuTex(0x21));
-    MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f), 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, 224.0f, 24.0f, 176.0f, 288.0f, 0.0f, 0.0f, alpha, 1.0f, 0.0f);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80149534
@@ -553,7 +535,7 @@ void CMenuPcs::drawSingleMenu()
         Util.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
         DrawInit();
 
-        char menuType = SingleCaravanWork()->m_shopRequestState;
+        char menuType = Game.m_scriptFoodBase[0]->m_shopRequestState;
         if (menuType == 1) {
             if (m_shopMenu != 0) {
                 m_shopMenu->Draw();
@@ -563,144 +545,26 @@ void CMenuPcs::drawSingleMenu()
         }
 
         if ((gSingMenuHasScriptFoodBase != 0) && (m_singleFadeState->done != 0)) {
-            Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-            Graphic._WaitDrawDone("singmenu.cpp", SINGMENU_LINE(0x62B, 0x626, 0x5CC));
-            m_singleMenuInitialized = 0;
-
-            if (gSingMenuAsyncFileHandle != 0) {
-                File.Close(gSingMenuAsyncFileHandle);
-                gSingMenuAsyncFileHandle = 0;
-            }
-
-            freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
-
-            if (m_wm.m_handles[0] != 0) {
-                delete m_wm.m_handles[0];
-                m_wm.m_handles[0] = 0;
-            }
-
-            if (m_wm.m_worldObjData != 0) {
-                delete[] m_wm.m_worldObjData;
-                m_wm.m_worldObjData = 0;
-            }
-
-            if (m_singMenuState != 0) {
-                delete[] reinterpret_cast<u8*>(m_singMenuState);
-                m_singMenuState = 0;
-            }
-
-            if (m_singleFadeState != 0) {
-                delete m_singleFadeState;
-                m_singleFadeState = 0;
-            }
-
-            if (m_menuWindowInfo != 0) {
-                delete m_menuWindowInfo;
-                m_menuWindowInfo = 0;
-            }
-
-            m_stageF4->heapWalker(-1, 0, 0xFFFFFFFF);
-            Graphic.CreateTempBuffer();
-            m_stageF4 = 0;
-            m_singleMenuCtrlResetFlag = 0;
-            Joybus.SetCtrlMode(0, 0);
+            SingMenuEnd();
         }
 
         if (gSingMenuHasScriptFoodBase != 0) {
             return;
         }
 
-        s16 mode = m_singleMenuPhase;
-        switch (mode) {
+        switch (m_singleMenuPhase) {
         case 0:
-        {
-            SingleFadeState* fadeState = m_singleFadeState;
-            int count = fadeState->count;
-            int i = 0;
-            SingleFadeEntry* entry = fadeState->entries;
-            for (; i < count; i++, entry++) {
-                if ((i == 0) || (m_singleMenuMode != 8)) {
-                    if (i == 0) {
-                        DrawSingleBack(this, entry->alpha);
-                    } else if (i == 1) {
-                        DrawSingleFrame(this, entry->alpha);
-                    } else if (i == 2) {
-                        DrawSingleStat(entry->alpha);
-                    } else {
-                        DrawSingleHelpWim(entry->alpha);
-                    }
-                }
-            }
-            return;
-        }
+            SingleDrawFadeIn();
+            break;
         case 1:
             SingleDrawCtrl();
-            return;
+            break;
         case 2:
-        {
-            SingleFadeState* fadeState = m_singleFadeState;
-            int count = fadeState->count;
-            int i = 0;
-            SingleFadeEntry* entry = fadeState->entries;
-            for (; i < count; i++, entry++) {
-                if ((i == 0) || (m_singleMenuMode != 8)) {
-                    if (i == 0) {
-                        DrawSingleBack(this, entry->alpha);
-                    } else if (i == 1) {
-                        DrawSingleFrame(this, entry->alpha);
-                    } else if (i == 2) {
-                        DrawSingleStat(entry->alpha);
-                    } else {
-                        DrawSingleHelpWim(entry->alpha);
-                    }
-                }
-            }
-
+            SingleDrawFadeOut();
             if (m_singleFadeState->done != 0) {
-                Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-                Graphic._WaitDrawDone("singmenu.cpp", SINGMENU_LINE(0x62B, 0x626, 0x5CC));
-                m_singleMenuInitialized = 0;
-
-                if (gSingMenuAsyncFileHandle != 0) {
-                    File.Close(gSingMenuAsyncFileHandle);
-                    gSingMenuAsyncFileHandle = 0;
-                }
-
-                freeTexture(5, 2, SINGMENU_TEX_ID(0x2D), 0x33);
-
-                if (m_wm.m_handles[0] != 0) {
-                    delete m_wm.m_handles[0];
-                    m_wm.m_handles[0] = 0;
-                }
-
-                if (m_wm.m_worldObjData != 0) {
-                    delete[] m_wm.m_worldObjData;
-                    m_wm.m_worldObjData = 0;
-                }
-
-                if (m_singMenuState != 0) {
-                    delete[] reinterpret_cast<u8*>(m_singMenuState);
-                    m_singMenuState = 0;
-                }
-
-                if (m_singleFadeState != 0) {
-                    delete m_singleFadeState;
-                    m_singleFadeState = 0;
-                }
-
-                if (m_menuWindowInfo != 0) {
-                    delete m_menuWindowInfo;
-                    m_menuWindowInfo = 0;
-                }
-
-                m_stageF4->heapWalker(-1, 0, 0xFFFFFFFF);
-                Graphic.CreateTempBuffer();
-                m_stageF4 = 0;
-                m_singleMenuCtrlResetFlag = 0;
-                Joybus.SetCtrlMode(0, 0);
+                SingMenuEnd();
             }
-            return;
-        }
+            break;
         }
     }
 }
@@ -769,7 +633,7 @@ inline void CMenuPcs::SingCalcChara(float frameStep)
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
-    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
+    unsigned short modelScaleIndex = Game.m_scriptFoodBase[0]->m_tribeId;
     float modelScale = s_PCScl[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -805,13 +669,13 @@ void CMenuPcs::DrawSingleBase(float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(SingMenuTex(0x20));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x20)));
     MenuPcs.DrawRect(0, 0.0f, 0.0f, 640.0f, 64.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 0.0f, 384.0f, 640.0f, 64.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(SingMenuTex(0x28));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x28)));
     int y;
     int sliceHeight = 32;
     y = 64;
@@ -895,7 +759,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kStatTexPortrait));
 
-    int charaNo = SingleCaravanWork()->m_tribeId;
+    int charaNo = Game.m_scriptFoodBase[0]->m_tribeId;
     float iconStep = 216.0f;
     int texU = static_cast<int>(static_cast<float>(charaNo & 1) * iconStep);
     int texV = static_cast<int>(static_cast<float>(charaNo / 2) * iconStep);
@@ -944,7 +808,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(a255)).color);
     font->DrawInit();
 
-    char* charaName = reinterpret_cast<char*>(SingleCaravanWork()->m_name);
+    char* charaName = reinterpret_cast<char*>(Game.m_scriptFoodBase[0]->m_name);
     float titleWidth = static_cast<float>(font->GetWidth(charaName));
     DrawShadowFont(font, charaName, 440.0f + static_cast<float>((152.0f - titleWidth) / 2.0), 56.0f, 0x17, 0x12);
 
@@ -1010,13 +874,13 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
         int stat;
         if (i == 0) {
-            stat = SingleCaravanWork()->m_strength;
+            stat = Game.m_scriptFoodBase[0]->m_strength;
         } else if (i == 1) {
-            stat = SingleCaravanWork()->m_defense;
+            stat = Game.m_scriptFoodBase[0]->m_defense;
         } else if (i == 2) {
-            stat = SingleCaravanWork()->m_magic;
+            stat = Game.m_scriptFoodBase[0]->m_magic;
         } else {
-            stat = SingleCaravanWork()->m_progressValue;
+            stat = Game.m_scriptFoodBase[0]->m_progressValue;
         }
 
         char valueText[36];
@@ -1062,7 +926,7 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(SingMenuTex(0x23));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x23)));
     posX = 32;
     posY = 312;
     width = 32;
@@ -1076,7 +940,7 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
     posX = 576;
     MenuPcs.DrawRect(0xC, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(SingMenuTex(0x27));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x27)));
     posX = 64;
     posY = 312;
     width = 512;
@@ -1084,7 +948,7 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
     posY = 384;
     MenuPcs.DrawRect(4, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(SingMenuTex(0x24));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x24)));
     posX = 32;
     posY = 344;
     width = 32;
@@ -1093,7 +957,7 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
     posX = 576;
     MenuPcs.DrawRect(8, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(SingMenuTex(0x2B));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x2B)));
     posX = 64;
     width = 512;
     MenuPcs.DrawRect(8, posX, posY, width, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1117,7 +981,7 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(SingMenuTex(0x21));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x21)));
     MenuPcs.DrawRect(0,
                                     -(176.0f * scaleX - 208.0f), 24.0f,
                                     176.0f, 288.0f,
@@ -1197,21 +1061,27 @@ void CMenuPcs::SingleCalcFadeIn()
  * Address:	TODO
  * Size:	TODO
  */
-inline void CMenuPcs::SingleDrawFadeIn()
+void CMenuPcs::SingleDrawFadeIn()
 {
-    SingleFadeState* fadeState = m_singleFadeState;
-    if (fadeState == 0) {
-        return;
-    }
+    SingleFadeEntry* entry;
+    int i;
+    int count;
 
-    DrawSingleBase(fadeState->entries[0].alpha);
-    if (m_singleMenuMode == 8) {
-        return;
+    count = m_singleFadeState->count;
+    entry = m_singleFadeState->entries;
+    for (i = 0; i < count; i++, entry++) {
+        if ((i == 0) || (m_singleMenuMode != 8)) {
+            if (i == 0) {
+                DrawSingleBase(entry->alpha);
+            } else if (i == 1) {
+                DrawSingleCrescent(entry->alpha, 1.0f);
+            } else if (i == 2) {
+                DrawSingleStat(entry->alpha);
+            } else {
+                DrawSingleHelpWim(entry->alpha);
+            }
+        }
     }
-
-    DrawSingleCrescent(fadeState->entries[1].alpha, fadeState->entries[1].alpha);
-    DrawSingleStat(fadeState->entries[2].alpha);
-    DrawSingleHelpWim(fadeState->entries[3].alpha);
 }
 
 /*
@@ -1282,21 +1152,9 @@ void CMenuPcs::SingleCalcFadeOut()
  * Address:	TODO
  * Size:	TODO
  */
-inline void CMenuPcs::SingleDrawFadeOut()
+void CMenuPcs::SingleDrawFadeOut()
 {
-    SingleFadeState* fadeState = m_singleFadeState;
-    if (fadeState == 0) {
-        return;
-    }
-
-    DrawSingleBase(fadeState->entries[0].alpha);
-    if (m_singleMenuMode == 8) {
-        return;
-    }
-
-    DrawSingleCrescent(fadeState->entries[1].alpha, fadeState->entries[1].alpha);
-    DrawSingleStat(fadeState->entries[2].alpha);
-    DrawSingleHelpWim(fadeState->entries[3].alpha);
+    SingleDrawFadeIn();
 }
 
 /*
@@ -1456,10 +1314,10 @@ void CMenuPcs::SingleCalcCtrl()
  */
 void CMenuPcs::SingleDrawCtrl()
 {
-    DrawSingleBack(this, 1.0f);
+    DrawSingleBase(1.0f);
 
     if (m_singleMenuMode != 8) {
-        DrawSingleFrame(this, 1.0f);
+        DrawSingleCrescent(1.0f, 1.0f);
         DrawSingleStat(1.0f);
         DrawSingleHelpWim(1.0f);
     }
@@ -1571,7 +1429,7 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
     color.a = static_cast<u8>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(SingMenuTex(0x25));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x25)));
     int icon;
     if (rawIcon != 0) {
         icon = iconNo;
@@ -1644,7 +1502,7 @@ void CMenuPcs::DrawNoShadowFont(CFont* font, char* text, float x, float y, int t
  */
 int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 {
-    const CCaravanWork* caravanWork = SingleCaravanWork();
+    const CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
     itemId = useRawItemId != 0 ? itemId : static_cast<int>(caravanWork->m_inventoryItems[itemId]);
     int type;
 
@@ -1718,7 +1576,7 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
     color.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(SingMenuTex(0x2E));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x2E)));
     MenuPcs.DrawRect(0, 10.0f + x, y + z, 8.0f, 8.0f, 128.0f,
         280.0f, 1.0f, 1.0f, 0.0f);
 }
@@ -1734,7 +1592,7 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  */
 bool CMenuPcs::EquipChk(int itemNo)
 {
-    CCaravanWork* w = SingleCaravanWork();
+    CCaravanWork* w = Game.m_scriptFoodBase[0];
     int item;
     int slot;
     for (slot = 2; slot < 8; slot++) {
@@ -1787,7 +1645,7 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
     color.b = 0xFF;
     color.a = static_cast<u8>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, color);
-    MenuPcs.SetTexture(SingMenuTex(0x2C));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x2C)));
 
     MenuPcs.DrawRect(0, static_cast<float>(x),
         static_cast<float>(y), 24.0f, 24.0f, 0.0f, 0.0f,
@@ -1861,7 +1719,7 @@ void CMenuPcs::DrawSingWin(short mode)
     white.b = 0xFF;
     white.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, white);
-    MenuPcs.SetTexture(SingMenuTex(0x3F));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x3F)));
     float x1 = x0 + w - 32.0f;
     float y1 = y0 + h - 32.0f;
     unsigned long uvFlag;
@@ -1884,7 +1742,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, x, y, 32.0f, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(SingMenuTex(0x41));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x41)));
     float innerX = 32.0f + x0;
     innerW = static_cast<double>(w) - 64.0;
     float yy = y0;
@@ -1898,7 +1756,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, innerX, yy, innerWf, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(SingMenuTex(0x40));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x40)));
     float innerY = 32.0f + y0;
     double innerH = static_cast<double>(h) - 64.0;
     float innerHf = static_cast<float>(innerH);
@@ -1912,7 +1770,7 @@ void CMenuPcs::DrawSingWin(short mode)
         MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, innerHf, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
-    MenuPcs.SetTexture(SingMenuTex(0x42));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x42)));
     MenuPcs.DrawRect(uvFlag, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH), 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuWindowInfo* win = m_menuWindowInfo;
@@ -2243,7 +2101,7 @@ int CMenuPcs::SingWinMessHeight()
 bool CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask;
-    CCaravanWork* caravanWork = SingleCaravanWork();
+    CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
     int flags = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[itemNo].m_equipFlags;
     int raceBits = flags & 0xF;
     int genderBits = flags & 0x30;
@@ -2467,7 +2325,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
     color.a = static_cast<unsigned char>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    MenuPcs.SetTexture(SingMenuTex(0x53));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x53)));
     MenuPcs.DrawRect(0, static_cast<float>(x), static_cast<float>(y), 16.0f,
                                     24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
@@ -2475,7 +2333,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
                                     24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
 
-    MenuPcs.SetTexture(SingMenuTex(0x54));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x54)));
     MenuPcs.DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(y),
                                     80.0f, 24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
@@ -2545,11 +2403,10 @@ int CMenuPcs::SingGetLetterAttachflg()
  */
 inline void CMenuPcs::CalcSingLife()
 {
-    int* lifeTimer = &m_singleLifeTimer;
-    if (*lifeTimer >= 0) {
-        ++(*lifeTimer);
-        if (*lifeTimer > 0x31) {
-            *lifeTimer = -1;
+    if (m_singleLifeTimer >= 0) {
+        m_singleLifeTimer++;
+        if (m_singleLifeTimer > 0x31) {
+            m_singleLifeTimer = -1;
         }
     }
 }
@@ -2568,7 +2425,7 @@ void CMenuPcs::DrawSingLife()
     int lifeTimer = m_singleLifeTimer;
     float xBase = 366.0f;
     float y = (-32.0f);
-    const CCaravanWork* const caravanWork = SingleCaravanWork();
+    const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
     if (lifeTimer < 0) {
         return;
     }

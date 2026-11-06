@@ -453,8 +453,8 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 
 	PSMTXConcat(texMtx, object->m_drawMatrix.value, texMtx);
 	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX3x4);
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0);
+	GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
 	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 	GXLoadTexObj(state->m_backBuffer, GX_TEXMAP0);
 
@@ -464,6 +464,7 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 		GXTexCoord2f32(uvs[i].x, uvs[i].y);
 		GXTexCoord2f32(uvs[i].x, uvs[i].y);
 	}
+	GXEnd();
 
 	return 1;
 }

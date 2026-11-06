@@ -438,8 +438,8 @@ static int RenderWaterMesh(VYmMana* mana)
     GXSetArray((GXAttr)0xD, texCoord0, 8);
     GXSetArray((GXAttr)0xE, texCoord1, 8);
     envTexture1 = mana->m_envTexture1;
-    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-    GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3C, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+    GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
     u8 alpha = mana->m_manaAlpha;
     blendColor.r = 0x80;
     blendColor.g = 0x80;
@@ -512,6 +512,7 @@ static int RenderWaterMesh(VYmMana* mana)
         GXTexCoord1x16(indexIt[3]);
         indexIt += 4;
     }
+    GXEnd();
 
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -697,7 +698,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
     CameraPcs.GetViewMatrix(savedCameraMtx);
     CameraPcs.GetProjectionMatrix(savedScreenMtx);
     float rectOrigin = 0.0f;
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, rectOrigin,
+    Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &sceneTexObj, rectOrigin,
                                rectOrigin, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = mana->m_object;
@@ -806,7 +807,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
                 owner->m_model->SetDrawShadowMeshDLCallback(0);
             }
 
-            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, captureIter, rectOrigin, rectOrigin, 0x80, 0x80,
+            Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), captureIter, rectOrigin, rectOrigin, 0x80, 0x80,
                                        captureBufferOffset, GX_LINEAR, GX_TF_RGB565, 0);
             captureBufferOffset += captureBufferStride;
             sourceIter++;
@@ -864,8 +865,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
     model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 
     if (Game.IsWorldMap()) {
-        GXSetViewport(savedViewport[0], savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4],
-                      savedViewport[5]);
+        GXSetViewportv(savedViewport);
     }
 }
 

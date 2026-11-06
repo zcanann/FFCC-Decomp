@@ -26,6 +26,11 @@ void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
 void GXLoadTexMtxIndx(u16 mtx_indx, u32 id, GXTexMtxType type);
 void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field);
 void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
+
+static inline void GXSetViewportv(const f32* vp)
+{
+    GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
+}
 void GXSetScissorBoxOffset(s32 x_off, s32 y_off);
 void GXSetClipMode(GXClipMode mode);
 void GXSetZScaleOffset(f32 scale, f32 offset);

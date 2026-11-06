@@ -2119,8 +2119,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			sprite = &m_bonusAnim->sprites[idx++];
 			sprite->kind = kBonusBackgroundTexture;
 			sprite->y = 0;
-			sprite->w = 0x280;
 			sprite->x = 0;
+			sprite->w = 0x280;
 			sprite->h = 0x1c0;
 			sprite->mulX = sprite->mulY = 0.0f;
 			sprite->startFrame = 0;

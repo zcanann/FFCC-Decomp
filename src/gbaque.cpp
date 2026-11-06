@@ -2396,30 +2396,25 @@ void GbaQueue::LoadMapObj()
 	int i;
 
 	if (m_scrInitEnd == 0) {
-		i = 0;
-		do {
+		for (i = 0; i < 4; i++) {
 			OSWaitSemaphore(&accessSemaphores[i]);
-			i++;
-		} while (i < 4);
+		}
 
 		if (m_mapObjWork.m_count != 0) {
 			memset(&m_mapObjWork, 0, sizeof(GbaQueueMapObjWork));
 		}
 
-		i = 0;
-		do {
+		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
-			i++;
-		} while (i < 4);
+		}
 	} else {
 		GbaQueueMapObjWork mapObjWork;
 		memset(&mapObjWork, 0, sizeof(mapObjWork));
 
-		CFlatRuntime2::CMapObjectInfo* mapObj = CFlat.m_mapObjectInfo;
-		int j = 0;
-		do {
-			char objType = mapObj->m_type;
-			if (objType != -1) {
+		CFlatRuntime2::CMapObjectInfo* info = CFlat.m_mapObjectInfo;
+		for (int j = 0; j < 0x20; j++) {
+			if (info[j].m_type != -1) {
+				char objType = info[j].m_type;
 				unsigned int count = mapObjWork.m_count;
 				if (objType >= 0x19) {
 					if (static_cast<unsigned int>(System.m_execParam) >= 2) {
@@ -2427,38 +2422,28 @@ void GbaQueue::LoadMapObj()
 					}
 				} else {
 					unsigned int mask = 1U << count;
-					int drawFlag = static_cast<int>(mapObj->m_drawFlag);
-					unsigned int drawMask = drawFlag != 0 ? mask : 0;
+					unsigned int drawMask = info[j].m_drawFlag != 0 ? mask : 0;
 					mask = ~mask;
-					mapObjWork.m_entries[count].m_type = static_cast<unsigned char>(mapObj->m_type);
-					mapObjWork.m_entries[count].m_x = static_cast<short>(mapObj->m_x / 3.0f);
-					mapObjWork.m_entries[count].m_y = static_cast<short>(mapObj->m_y / 3.0f);
-					mapObjWork.m_entries[count].m_z = static_cast<short>(mapObj->m_z / 3.0f);
-					mapObjWork.m_entries[count].m_radius = static_cast<short>(mapObj->m_radius / 3.0f);
-
-					unsigned int flags = mapObjWork.m_drawFlags & mask;
-					mapObjWork.m_drawFlags = flags | drawMask;
-					mapObjWork.m_count = static_cast<unsigned char>(mapObjWork.m_count + 1);
+					mapObjWork.m_entries[count].m_type = objType;
+					mapObjWork.m_entries[count].m_x = static_cast<short>(info[j].m_x / 3.0f);
+					mapObjWork.m_entries[count].m_y = static_cast<short>(info[j].m_y / 3.0f);
+					mapObjWork.m_entries[count].m_z = static_cast<short>(info[j].m_z / 3.0f);
+					mapObjWork.m_entries[count].m_radius = static_cast<short>(info[j].m_radius / 3.0f);
+					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | drawMask;
+					mapObjWork.m_count++;
 				}
 			}
+		}
 
-			j++;
-			mapObj++;
-		} while (j < 0x20);
-
-		i = 0;
-		do {
+		for (i = 0; i < 4; i++) {
 			OSWaitSemaphore(&accessSemaphores[i]);
-			i++;
-		} while (i < 4);
+		}
 
 		memcpy(&m_mapObjWork, &mapObjWork, sizeof(mapObjWork));
 
-		i = 0;
-		do {
+		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
-			i++;
-		} while (i < 4);
+		}
 	}
 }
 
@@ -2895,7 +2880,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 				existingCharaType |= 0x80;
 			}
 
-			if (existingCharaType == valueBytes[2]) {
+			if (existingCharaType == static_cast<unsigned char>(valueBytes[2])) {
 				Joybus.SendResult(channel, 1, valueBytes[1], 0);
 				return;
 			}

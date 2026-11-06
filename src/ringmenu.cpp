@@ -694,10 +694,9 @@ void CRingMenu::onDraw()
 								blink = 0.0f;
 							}
 
+							float barX = textX2 - static_cast<float>((caravanWork->GetNumCmdList() * 8) / 2);
 							MenuPcs.DrawRect(3,
-								4.0f +
-									((textX2 - static_cast<float>((caravanWork->GetNumCmdList() * 8) / 2)) +
-									 static_cast<float>(i * 8)),
+								4.0f + (barX + static_cast<float>(i * 8)),
 								barY, 8.0f, 8.0f,
 #ifdef VERSION_GCCJGC
 								8.0f * (13.0f + blink), 0.0f,

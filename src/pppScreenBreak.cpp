@@ -313,8 +313,8 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
 
     for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
         CChara::CMesh* mesh = &meshBase[i];
-        piece = &pieceBase[i];
         ScreenBreakMeshData* meshData = mesh->m_data;
+        piece = &pieceBase[i];
         CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
         node->SetCalcLocal(0);
         PSMTXIdentity(node->m_localRuntimeMtx);

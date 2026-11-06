@@ -240,16 +240,14 @@ extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 extern u8* volatile p_ZeroData;
 #define RedZeroDataGet() (p_ZeroData)
 #define RedZeroDataSet(data) (p_ZeroData = (data))
-#ifndef FFCC_REDSOUND_REDDRIVER_CPP
 extern RedSoundCONTROL* p_SoundControlBuffer;
-#endif
 #define RedSoundControlGetBegin() (p_SoundControlBuffer)
 #define RedSoundControlSetBegin(control) (p_SoundControlBuffer = (control))
 #define RedSoundControlGet(index) (p_SoundControlBuffer + (index))
 #define RedSoundControlGetMusicPlayEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PLAY_END)
 #define RedSoundControlGetMusicAllEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_ALL_END)
 #define RedSoundControlIsMusic(control) ((control) < RedSoundControlGetMusicAllEnd())
-extern RedSoundCONTROL* volatile p_SoundControl;
+extern RedSoundCONTROL* p_SoundControl;
 #define RedCurrentSoundControlGet() (p_SoundControl)
 #define RedCurrentSoundControlSet(control) (p_SoundControl = (control))
 extern volatile int m_KeyOnEntry;

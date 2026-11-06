@@ -2590,9 +2590,9 @@ static void _MusicNoteExecute()
         memcpy(&RedCurrentSoundControlGet()->m_measure, &RedCurrentSoundControlGet()->m_savedPosition, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
         memcpy(&RedCurrentSoundControlGet()->m_tempo, &RedCurrentSoundControlGet()->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
 
+        savedTrackData = &RedCurrentSoundControlGet()->m_savedTracks;
         track = RedCurrentSoundControlGet()->m_tracks;
         trackCount = RedCurrentSoundControlGet()->m_trackCount;
-        savedTrackData = &RedCurrentSoundControlGet()->m_savedTracks;
         trackIndex = 0;
         do {
             track->m_command = savedTrackData->m_command[trackIndex];

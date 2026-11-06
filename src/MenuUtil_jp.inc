@@ -12,8 +12,8 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
     if (msgNo < 0) {
         return;
     }
-    int lineBaseY[3] = {352, 340, 326};
     const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
+    int lineBaseY[3] = {352, 340, 326};
     char scratch[0x100];
     font->SetMargin(margin);
     font->SetShadow(1);

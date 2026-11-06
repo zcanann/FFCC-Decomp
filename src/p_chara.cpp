@@ -486,15 +486,14 @@ int CCharaPcs::correctLoadAnimAmem()
     }
 
     loadAnimCount = m_loadAnims.GetSize();
-    validAnimCount = 0;
-    maxEnd = 0;
-    compactedSize = 0;
     scanOffset = 0;
+    compactedSize = 0;
     chunkSize = 0;
+    maxEnd = 0;
+    validAnimCount = 0;
     for (i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
-        CChara::CAnim* anim = loadAnim->m_anim;
-        const int animEnd = static_cast<int>(anim->GetBankSize()) + anim->GetAmemAddress();
+        const int animEnd = loadAnim->m_anim->GetAmemAddress() + static_cast<int>(loadAnim->m_anim->GetBankSize());
         if (maxEnd < animEnd) {
             maxEnd = animEnd;
         }

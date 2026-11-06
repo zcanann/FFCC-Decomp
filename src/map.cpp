@@ -1648,7 +1648,7 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-    int shadowCount;
+    int texMtx;
     int i;
     if (m_mapReadReady == 0) {
         return;
@@ -1718,8 +1718,7 @@ void CMapMng::Draw()
             GXSetZMode(1, GX_LEQUAL, 1);
             LightPcs.SetNumDiffuse(0);
 
-            int texMtx;
-            shadowCount = CharaPcs.GetNumTexShadow();
+            int shadowCount = CharaPcs.GetNumTexShadow();
             if (shadowCount != 0) {
                 _GXTexObj texObjs[8];
                 Vec shadowPositions[8];

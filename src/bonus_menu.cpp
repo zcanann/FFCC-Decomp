@@ -1457,6 +1457,7 @@ void CMenuPcs::DrawResultCountAnim()
 {
 	int doubleCount;
 	int i;
+	int textIndex;
 	int lastKind;
 	int modelIndex;
 	int activePartyCount;
@@ -1553,7 +1554,6 @@ void CMenuPcs::DrawResultCountAnim()
 	font->SetTlut(7);
 	font->DrawInit();
 
-	int textIndex;
 	char text[128];
 	for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];

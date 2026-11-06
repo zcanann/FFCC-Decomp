@@ -293,10 +293,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
-            s32 x0 = Div16Floor(S16At(entry, 0x10));
-            s32 y0 = Div16Floor(S16At(entry, 0x12));
-            s32 w = Div16Floor(S16At(entry, 0x14));
             s32 h = Div16Floor(S16At(entry, 0x16));
+            s32 w = Div16Floor(S16At(entry, 0x14));
+            s32 y0 = Div16Floor(S16At(entry, 0x12));
+            s32 x0 = Div16Floor(S16At(entry, 0x10));
             w -= x0;
             h -= y0;
             GXSetViewport(offset.x + static_cast<float>(x0 * 2), offset.y + static_cast<float>(y0 * 2),

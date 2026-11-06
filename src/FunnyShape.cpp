@@ -294,14 +294,16 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             s32 h = Div16Floor(S16At(entry, 0x16));
-            s32 w = Div16Floor(S16At(entry, 0x14));
             s32 y0 = Div16Floor(S16At(entry, 0x12));
+            s32 w = Div16Floor(S16At(entry, 0x14));
             s32 x0 = Div16Floor(S16At(entry, 0x10));
             w -= x0;
             h -= y0;
-            GXSetViewport(offset.x + static_cast<float>(x0 * 2), offset.y + static_cast<float>(y0 * 2),
-                          static_cast<float>(w * 2), static_cast<float>(h * 2),
-                          0.0f, 1.0f);
+            v1 = static_cast<float>(h * 2);
+            u1 = static_cast<float>(w * 2);
+            u0 = static_cast<float>(x0 * 2);
+            v0 = static_cast<float>(y0 * 2);
+            GXSetViewport(offset.x + u0, offset.y + v0, u1, v1, 0.0f, 1.0f);
 
             const s16 texX = S16At(entry, 0x18);
             const s16 texY = S16At(entry, 0x1A);

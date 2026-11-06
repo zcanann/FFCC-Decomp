@@ -1780,7 +1780,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
     int currentSize = size;
     int i;
 
-    while (true) {
+    for (;;) {
         CAmemCache* bestEntry = 0;
 
         for (i = 0; i < m_cacheCount; i++) {
@@ -1811,23 +1811,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 }
 
                 m_releaseCheck(m_releaseCheckArg);
-                if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-                    System.Printf(const_cast<char*>("\n\n=================================================\n                    AMEM CACHE DUMP\n=================================================\n"));
-                }
-
-                for (i = 0; i < m_cacheCount; i++) {
-                    CAmemCache& entry = cacheEntryAt(this, i);
-                    if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
-                        System.Printf(
-                            const_cast<char*>("%03d %s  type=%s  RefCnt=%d  prio=%d  rmem=%08x\n"), i, amem_stateName[entry.m_inUse ? 0 : 1],
-                            amem_typeName[entry.m_type], entry.m_refCount, entry.m_priority,
-                            reinterpret_cast<int>(entry.m_cacheData));
-                    }
-                }
-
-                if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-                    System.Printf(const_cast<char*>("\n\n"));
-                }
+                DumpCache();
                 m_rStage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
             }
             bestPriority = 0xFFFFFFFF;

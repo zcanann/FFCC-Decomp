@@ -705,7 +705,7 @@ CMapObj* CMapMng::SearchAtribMapObj(CMapObj* mapObj, CMapObjAtr::TYPE type)
  */
 void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
-    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObj = m_mapObjArray;
 
     goto search;
     while (true) {
@@ -741,7 +741,7 @@ search:
  */
 int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 {
-    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObj = m_mapObjArray;
 
     goto search;
     while (true) {
@@ -776,7 +776,7 @@ void CMapMng::SetLightSource()
 {
     CMapObjAtr* attr;
     const short mapObjCount = m_mapObjCount;
-    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObj = m_mapObjArray;
     CMapObj* mapObjEnd = m_mapObjArray + mapObjCount;
     int mapLightIndex = 0;
 
@@ -1277,7 +1277,7 @@ int CMapMng::ReadOtm(char* mapName)
 
     InitMapShadow();
 
-    m_rootMapObj = SearchChildMapObj(GetMapObjArray(), 0);
+    m_rootMapObj = SearchChildMapObj(m_mapObjArray, 0);
     if (m_rootMapObj == 0) {
         System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
         return 0;
@@ -1388,7 +1388,7 @@ int CMapMng::ReadMid(char* mapName)
     CChunkFile chunkFile;
     chunkFile.SetBuf(filePtr);
 
-    CMapObj* nextMapObj = GetMapObjArray();
+    CMapObj* nextMapObj = m_mapObjArray;
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
@@ -1446,10 +1446,10 @@ int CMapMng::ReadMid(char* mapName)
                 return 0;
             }
             m_octTreeArray[m_octTreeCount].ReadOtmOctTree(chunkFile);
-            m_octTreeArray[m_octTreeCount].SetMapObject(nextMapObj);
+            m_octTreeArray[m_octTreeCount].m_mapObject = nextMapObj;
             nextMapObj++;
             {
-                CMapObj* check = m_octTreeArray[m_octTreeCount].GetMapObject();
+                CMapObj* check = m_octTreeArray[m_octTreeCount].m_mapObject;
                 if (check->m_mapData != 0) {
                     goto octtreeMeshCheck;
                 }
@@ -1674,6 +1674,7 @@ void CMapMng::DrawBefore()
 void CMapMng::Draw()
 {
     int shadowCount;
+    int i;
     if (m_mapReadReady == 0) {
         return;
     }
@@ -1900,7 +1901,7 @@ void CMapMng::Draw()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-        for (int i = 0; i < m_mapObjCount; i++) {
+        for (i = 0; i < m_mapObjCount; i++) {
             g_MapMng.m_mapObjArray[i].DrawHit();
         }
 
@@ -1928,11 +1929,11 @@ void CMapMng::Draw()
 
         CameraPcs.SetOffsetZBuff(-0.1f);
 
-        for (int i = 0; i < m_mapObjCount; i++) {
+        for (i = 0; i < m_mapObjCount; i++) {
             g_MapMng.m_mapObjArray[i].DrawHitWire();
         }
 
-        for (int i = 0; i < m_mapObjCount; i++) {
+        for (i = 0; i < m_mapObjCount; i++) {
             g_MapMng.m_mapObjArray[i].DrawHitNormal();
         }
 
@@ -2011,7 +2012,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
 
     for (int i = 0; i < m_octTreeCount; i++) {
         if (m_octTreeArray[i].CheckHitCylinder(cylinder, move, mask) != 0) {
-            m_hitMapObj = m_octTreeArray[i].GetMapObject();
+            m_hitMapObj = m_octTreeArray[i].m_mapObject;
             return 1;
         }
     }
@@ -2066,7 +2067,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         m_octTreeArray[i].CheckHitCylinderNear(cylinder, move, mask);
         if (gMapHitFaceFlag != 0) {
             hit = 1;
-            m_hitMapObj = m_octTreeArray[i].GetMapObject();
+            m_hitMapObj = m_octTreeArray[i].m_mapObject;
         }
     }
 

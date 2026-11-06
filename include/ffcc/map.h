@@ -139,7 +139,6 @@ public:
 
     COctTree* GetOctTreeArray() { return m_octTreeArray; }
     CMapHit* GetMapHitArray() { return m_mapHitArray; }
-    CMapObj* GetMapObjArray() { return m_mapObjArray; }
     CMapObj* GetMapObj(int index)
     {
         return &m_mapObjArray[index];

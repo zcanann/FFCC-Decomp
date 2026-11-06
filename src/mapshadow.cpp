@@ -26,9 +26,9 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET target, COctTree& octTree)
 	Vec pos;
 
 	octTree.ClearShadow();
-	if (octTree.GetMapObject()->m_shadowTarget != 0) {
+	if (octTree.m_mapObject->m_shadowTarget != 0) {
 		for (i = 0; i < (u32)g_MapMng.m_mapShadowArray.GetSize(); i++) {
-			octTreeMask = octTree.GetMapObject()->m_shadowTarget;
+			octTreeMask = octTree.m_mapObject->m_shadowTarget;
 			if (((octTreeMask & (1U << i)) != 0) &&
 			    ((shadow = g_MapMng.m_mapShadowArray[i])->m_targetEnabled[target] != 0) &&
 			    (shadow->m_materialMode == 0)) {

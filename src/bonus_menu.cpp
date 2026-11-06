@@ -3047,7 +3047,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	CMenuPcs::Sprt2* alphaSprite;
 	int doneCount;
 	CCharaPcs::CHandle* handle;
-	int tribeId;
+	int work;
 	int activePartyCount;
 
 	activePartyCount = s_Rinfo->m_partyCount;
@@ -3158,10 +3158,11 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 		idx += activePartyCount;
 		{
-			int delta = idx - 4;
 			for (i = 0; i < activePartyCount; i++) {
-				sprite = &m_bonusAnim->sprites[idx + i];
-				CMenuPcs::Sprt2* src = sprite - delta;
+				CMenuPcs::Sprt2* src;
+				work = idx - 4;
+				CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[idx + i];
+				src = sprite - work;
 				sprite->kind = -1;
 				sprite->x = (short)(src->x + 0x50);
 				sprite->y = (short)(src->y + 0x48);
@@ -3249,13 +3250,13 @@ void CMenuPcs::CalcSelectCloseAnim()
 		for (; i < activePartyCount + 8; i++) {
 			alphaSprite = &m_bonusAnim->sprites[s_PlayerTop + i];
 			if (i < activePartyCount) {
-				tribeId = s_Rinfo->m_party[i].m_tribeId;
+				work = s_Rinfo->m_party[i].m_tribeId;
 				handle = s_Rinfo->m_party[i].m_partyHandle;
-				float modelScale = s_PCScl[tribeId];
+				float modelScale = s_PCScl[work];
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
-				tribeId = activePartyCount * 2 + (i - activePartyCount);
-				handle = m_wm.m_handles[tribeId];
+				work = activePartyCount * 2 + (i - activePartyCount);
+				handle = m_wm.m_handles[work];
 				if (handle == 0) {
 					continue;
 				}
@@ -3264,7 +3265,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 			}
 			if (i < activePartyCount) {
 				scaleMtx[0][3] = 0.0f;
-				scaleMtx[1][3] = s_PCYpos[tribeId];
+				scaleMtx[1][3] = s_PCYpos[work];
 				scaleMtx[2][3] = 0.0f;
 			} else {
 				int rotIndex = i - activePartyCount;

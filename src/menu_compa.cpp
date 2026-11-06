@@ -49,10 +49,8 @@ void CMenuPcs::CompaDraw()
 	float x;
 	float y;
 	int shown;
-	const u8* foodPtr;
 	int i;
 	int drawIndex;
-	CompaOpenAnimList* compaList;
 	float w;
 	float h;
 	float u;
@@ -73,6 +71,7 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	caravanWork = Game.m_scriptFoodBase[0];
+	shown = 0;
 	entry = this->m_compaList->entries;
 	for (i = 0; i < this->m_compaList->count; i++, entry++) {
 		tex = entry->tex;
@@ -206,7 +205,7 @@ void CMenuPcs::CompaDraw()
 	for (i = shown; i < 8 && shown < familyCount; i++, shown++, drawIndex++) {
 		iconX = static_cast<float>(entry->x + 0x128);
 		iconY = static_cast<float>(entry->y + 0x40);
-		iconY += static_cast<float>(shown * 0x28);
+		iconY += static_cast<float>(i * 0x28);
 
 		if (i >= 2) {
 			scan = drawIndex;
@@ -223,12 +222,12 @@ void CMenuPcs::CompaDraw()
 			drawIndex = i;
 		}
 
-		foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][1] + drawIndex;
-		if (*foodPtr == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
+		int slot = caravanWork->m_saveSlot;
+		if (Game.m_gameWork.m_linkTable[slot][0][slot][drawIndex + 1] == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf("%s(%d):family cnt error!!(%d)\n", "menu_compa.cpp", 0x1E0,
 			              shown);
 		}
-		unsigned int food = *foodPtr;
+		unsigned int food = Game.m_gameWork.m_linkTable[slot][0][slot][drawIndex + 1];
 		if (food <= 0x14) {
 			icon = 0x21;
 		} else if (food <= 0x28) {
@@ -265,7 +264,7 @@ void CMenuPcs::CompaDraw()
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	shown = drawIndex = 0;
-	for (i = shown; i < 8 && shown < familyCount; i++) {
+	for (i = shown; i < 8 && shown < familyCount; i++, shown++, drawIndex++) {
 		if (i >= 2) {
 			scan = drawIndex;
 			for (; scan < 7; scan++) {
@@ -284,7 +283,7 @@ void CMenuPcs::CompaDraw()
 		name = GetMenuStr(drawIndex + 0x16);
 		x = static_cast<float>(entry->x + 0x18);
 		y = static_cast<float>(entry->y + 0x45);
-		y += static_cast<float>(shown * 0x28);
+		y += static_cast<float>(i * 0x28);
 		font->SetPosX(x);
 #ifdef VERSION_GCCJGC
 		font->SetPosY(y);
@@ -306,12 +305,9 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y - 4.0f);
 #endif
 		font->Draw(value);
-
-		shown++;
-		drawIndex++;
 	}
 
-	font = m_fonts[4];
+	font = GetFontItem();
 	font->SetMargin(1.0f);
 #ifdef VERSION_GCCJGC
 	font->SetShadow(1);
@@ -321,13 +317,13 @@ void CMenuPcs::CompaDraw()
 	font->SetScale(1.2f);
 #endif
 	font->DrawInit();
-	CompaOpenAnimList* anim = this->m_compaList;
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * anim->entries[0].alpha)));
+	entry = this->m_compaList->entries;
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry->alpha)));
 
 	name = GetJobStr(caravanWork->m_jobType);
 	font->GetWidth(name);
-	jobY = static_cast<float>(anim->entries[0].y + 0x20);
-	font->SetPosX(static_cast<float>(anim->entries[0].x + 0x18));
+	jobY = static_cast<float>(entry->y + 0x20);
+	font->SetPosX(static_cast<float>(entry->x + 0x18));
 #ifdef VERSION_GCCJGC
 	font->SetPosY(jobY);
 #else

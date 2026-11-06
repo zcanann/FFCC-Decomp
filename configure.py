@@ -578,7 +578,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_arti.cpp"),
             Object(NonMatching, "menu_cmd.cpp", extra_cflags=["-str reuse,nopool,readonly", "-pool off", "-inline auto,deferred"]),
-            Object(NonMatching, "menu_compa.cpp", cflags=cflags_game_cpp_exceptions, extra_cflags=["-str reuse,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_compa.cpp", cflags=cflags_game_cpp_exceptions, extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_equip.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_favo.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_item.cpp"),

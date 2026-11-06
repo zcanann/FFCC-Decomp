@@ -8,7 +8,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-
 STATIC_ASSERT(offsetof(struct pppKeShpTail3X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail3XWork {
@@ -130,60 +129,61 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
  */
 void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* ctrlTable)
 {
+    KeShpTail3XWork* work;
     s32 currentIndex;
     Vec* history;
     pppShapeAnimData* shapeAnim;
-    KeShpTail3XWork* work;
     int count;
     s32 nextIndex;
     u16 rng;
     s32 shapeFrameCount;
-    float xDiff;
     tagOAN3_SHAPE* shapeEntry;
-    float zDiff;
     float alphaMul;
+    float xDiff;
     float yDiff;
+    float zDiff;
     float wDiff;
     float shapeScale;
-    float segRemain;
-    float segCursor = 0.0f;
     pppFVECTOR4 colorStart;
     pppFVECTOR4 colorEnd;
-    float colorStepX;
-    float posY;
+    float segRemain;
+    float segCursor = 0.0f;
     float posX;
+    float posY;
+    float colorStepX;
     float colorStepY;
     float colorStepZ;
     float colorStepW;
     float trailStepDelta;
-    pppFMATRIX localBase;
     float shapeScaleStep;
+    pppFMATRIX localBase;
     pppFMATRIX unitScratch;
     pppFMATRIX drawMtx;
     pppFMATRIX rotMtxA;
     pppFMATRIX rotMtxB ATTRIBUTE_ALIGN(8);
     Vec zeroVecA;
-    float nextBaseX;
     Vec initialSeg;
     Vec pos;
-    float segDx;
     Vec zeroVecB;
     Vec seg;
+    float nextBaseX;
+    float segDx;
     float segDy;
     float segDz;
     float invCountMinusOne;
+    float drawScale;
     float posZ;
-    float nextBaseY;
-    s32 shapeFrameDuration;
     int life;
+    s32 shapeFrameDuration;
+    float nextBaseY;
     float nextBaseZ;
     float segLen;
     float trailStep;
     float startX;
     float startY;
     float startZ;
-    s32 dataValIndex;
     u8 zEnable;
+    s32 dataValIndex;
 
     work = GetKeShpTail3XWork(obj, ctrlTable);
     dataValIndex = step->m_dataValIndex;
@@ -242,11 +242,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
         nextIndex = 0;
     }
     nextBaseX = history[nextIndex].x;
-    nextBaseY = history[nextIndex].y;
     nextBaseZ = history[nextIndex].z;
     segDx = nextBaseX - posX;
-    segDy = nextBaseY - posY;
+    nextBaseY = history[nextIndex].y;
     segDz = nextBaseZ - posZ;
+    segDy = nextBaseY - posY;
     zeroVecA.z = 0.0f;
     zeroVecA.y = 0.0f;
     zeroVecA.x = 0.0f;
@@ -265,11 +265,13 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     }
 
 draw_loop:
+    drawScale = shapeScale;
+
     {
         u32 lcg = (u32)rng * 0x80du + 7u;
         rng = (u16)lcg;
         float random = (float)rng / 65535.0f;
-        shapeScale *= -(random * step->m_randomScale - 1.0f);
+        drawScale *= -(random * step->m_randomScale - 1.0f);
         {
             u32 shapeIdx = (u32)(life + rng) / shapeFrameDuration;
             shapeIdx %= (u32)shapeFrameCount;
@@ -283,9 +285,9 @@ draw_loop:
 
     if (step->m_worldSpaceMode == 0) {
         PSMTXScaleApply(obj->m_object.m_localMatrix.value, obj->m_object.m_drawMatrix.value,
-                        localBase.value[0][0] * (shapeScale * ppvMng->m_scale.x),
-                        localBase.value[1][1] * (shapeScale * ppvMng->m_scale.y),
-                        localBase.value[2][2] * (shapeScale * ppvMng->m_scale.z));
+                        localBase.value[0][0] * (drawScale * ppvMng->m_scale.x),
+                        localBase.value[1][1] * (drawScale * ppvMng->m_scale.y),
+                        localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtxA.value, 'z', 0.017453292f * (float)work->m_angles[count]);
             pppMulMatrix(obj->m_object.m_drawMatrix, rotMtxA, obj->m_object.m_drawMatrix);
@@ -294,9 +296,9 @@ draw_loop:
         PSMTXCopy(obj->m_object.m_drawMatrix.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
-        drawMtx.value[0][0] = shapeScale * (localBase.value[0][0] * ppvMng->m_scale.x);
-        drawMtx.value[1][1] = shapeScale * (localBase.value[1][1] * ppvMng->m_scale.y);
-        drawMtx.value[2][2] = shapeScale * (localBase.value[2][2] * ppvMng->m_scale.z);
+        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * ppvMng->m_scale.x);
+        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * ppvMng->m_scale.y);
+        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * ppvMng->m_scale.z);
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtxB.value, 'z', 0.017453292f * (float)work->m_angles[count]);
             pppMulMatrix(drawMtx, rotMtxB, drawMtx);
@@ -350,10 +352,10 @@ update_step:
 advance_segment:
     if (segRemain >= trailStep) {
         float ratio = segCursor / segLen;
-        posZ = segDz * ratio + startZ;
-        posY = segDy * ratio + startY;
         posX = segDx * ratio + startX;
+        posZ = segDz * ratio + startZ;
         segCursor += trailStep;
+        posY = segDy * ratio + startY;
         segRemain -= trailStep;
         goto draw_loop;
     }

@@ -83,9 +83,16 @@ Rebuilding all Japanese source with each derived compiler, otherwise unchanged:
 Each BFBB step moves FFCC Japan in the same direction it moved BFBB; the
 GC/2.5-derived clauses in 2.0p1d recover every function 2.0p1a lost. As a
 control, building PAL with GC/2.0p1g instead of GC/2.5 loses 505 exact
-functions, so these behaviours are specific to the 2003 Japanese build. RedSound
-still uses stock GC/2.0p1 in all regions. Japanese source previously tuned
-against stock GC/2.0p1 should be re-audited.
+functions, so these behaviours are specific to the 2003 Japanese build.
+Japanese source previously tuned against stock GC/2.0p1 should be re-audited.
+
+The RedSound library, which is byte-identical in all three regions, also builds
+with GC/2.0p1g. Against stock GC/2.0p1 it is +1 / -0 exact functions over all
+eight RedSound units: `GetRandomData` schedules its `t_RandomData` load before
+the `m_RandomIndex` increment only when the table is declared without a bound and
+defined after the function, and stock GC/2.0p1 never orders the two accesses.
+GC/2.0p1a alone loses six RedCommand, RedMemory and RedMidiCtrl functions that
+2.0p1g recovers.
 
 ## GC/2.0p1h: two further corrections from FFCC Japan
 

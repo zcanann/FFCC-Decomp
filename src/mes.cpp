@@ -114,23 +114,13 @@ inline char* CGame::LowerMonName(char* name)
 	return name;
 }
 
-#define ApplyCaseMode(kind, text, caseMode) \
-	if (caseMode != 0)                       \
-	{                                        \
-		if (caseMode == 1)                   \
-		{                                    \
-			Game.UPPER##kind##Name(text);    \
-		}                                    \
-		else if (caseMode == 2)              \
-		{                                    \
-			Game.Upper##kind##Name(text);    \
-		}                                    \
-		else                                 \
-		{                                    \
-			Game.Lower##kind##Name(text);    \
-		}                                    \
-		caseMode = 0;                        \
-	}
+enum MesCaseMode
+{
+	MES_CASE_NONE,
+	MES_CASE_UPPER,
+	MES_CASE_CAPITAL,
+	MES_CASE_LOWER
+};
 
 enum MesFlowMode
 {
@@ -138,6 +128,24 @@ enum MesFlowMode
 	MES_FLOW_ON,
 	MES_FLOW_OFF
 };
+
+#define ApplyCaseMode(kind, text, caseMode) \
+	if (caseMode != MES_CASE_NONE)           \
+	{                                        \
+		if (caseMode == MES_CASE_UPPER)      \
+		{                                    \
+			Game.UPPER##kind##Name(text);    \
+		}                                    \
+		else if (caseMode == MES_CASE_CAPITAL) \
+		{                                    \
+			Game.Upper##kind##Name(text);    \
+		}                                    \
+		else                                 \
+		{                                    \
+			Game.Lower##kind##Name(text);    \
+		}                                    \
+		caseMode = MES_CASE_NONE;            \
+	}
 
 static inline CColor& MesColorRef(const CColor& color)
 {
@@ -385,7 +393,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 {
 	static char* ELLIPSIS_STR = "...";
 
-	unsigned char caseMode = 0;
+	unsigned char caseMode = MES_CASE_NONE;
 	unsigned char branchMode = MES_FLOW_NONE;
 
 	char c;
@@ -581,22 +589,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x41:
 		{
 			char* p = (char*)op;
-			int modeIndex = GET_1(&p);
-			int mode = modeIndex;
-			int newCaseMode;
-			if (mode == 1)
-			{
-				newCaseMode = 1;
-			}
-			else
-			{
-				newCaseMode = 2;
-				if (mode == 0)
-				{
-					newCaseMode = 3;
-				}
-			}
-			caseMode = newCaseMode;
+			int mode = GET_1(&p);
+			caseMode = (mode == 1) ? MES_CASE_UPPER : ((mode == 0) ? MES_CASE_LOWER : MES_CASE_CAPITAL);
 			break;
 		}
 #ifdef VERSION_GCCE01
@@ -1066,7 +1060,7 @@ void CMes::addString(char** text, int branchMode)
 	CFont* font = getFont(mFontIndex, 0);
 
 	int running = 1;
-	unsigned char caseMode = 0;
+	unsigned char caseMode = MES_CASE_NONE;
 	unsigned char flowMode = MES_FLOW_NONE;
 	char nameItem[32];
 	char nameMon[32];
@@ -1475,20 +1469,7 @@ void CMes::addString(char** text, int branchMode)
 		case 0x41:
 		{
 			int mode = GET_1(text);
-			int newCaseMode;
-			if (mode == 1)
-			{
-				newCaseMode = 1;
-			}
-			else
-			{
-				newCaseMode = 2;
-				if (mode == 0)
-				{
-					newCaseMode = 3;
-				}
-			}
-			caseMode = newCaseMode;
+			caseMode = (mode == 1) ? MES_CASE_UPPER : ((mode == 0) ? MES_CASE_LOWER : MES_CASE_CAPITAL);
 			break;
 		}
 		case 0x43:

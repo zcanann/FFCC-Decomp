@@ -3580,14 +3580,14 @@ void CMenuPcs::DrawCMakeMenu()
 			int mesNo = 5;
 			char* textList[3] = {0};
 			char** mes = g_strWMMenuMes[Game.m_gameWork.GetLanguage() - 1];
+			for (int i = 0; i < 3; i++) {
+				textList[i] = mes[mesNo++];
+			}
 #ifdef VERSION_GCCP01
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x4B);
 #else
 			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x5A);
 #endif
-			for (int i = 0; i < 3; i++) {
-				textList[i] = mes[mesNo++];
-			}
 			const float* pY = &FLOAT_803317D0;
 			DrawFont2(static_cast<int>(CalcCenteringPos2(textList[textIndex], 0.800000011920929f, FLOAT_803313e8)),
 			          static_cast<int>(*pY),
@@ -5374,7 +5374,9 @@ void CMenuPcs::CalcFukidashi()
  */
 void CMenuPcs::DrawFukidashi()
 {
+	int viewportSetup;
 	int bitIndex;
+	int drawnIcons;
 #ifdef VERSION_GCCJGC
 	const int kBubbleIconTextureBase = 24;
 #else
@@ -5420,8 +5422,8 @@ void CMenuPcs::DrawFukidashi()
 	unsigned int iconFlags = (unsigned int)m_wmIconFlags;
 	if ((iconFlags & 0x3F0) != 0 && (iconFlags & 0x1FF) != 0) {
 		if ((iconFlags & 0xF) != 0) {
+			drawnIcons = 0;
 			bitIndex = 0;
-			int drawnIcons = 0;
 			while (bitIndex < 4 && drawnIcons < 2) {
 				if ((m_wmIconFlags & (1 << bitIndex)) != 0) {
 					MenuPcs.SetTexture((TEX)(bitIndex + kBubbleIconTextureBase));
@@ -5537,7 +5539,7 @@ void CMenuPcs::DrawFukidashi()
 	DrawInit();
 
 	// 3D viewport rendering
-	int viewportSetup = 0;
+	viewportSetup = 0;
 	if ((m_wmIconFlags & 0x3F0) != 0) {
 		for (int slot = 6; slot <= 0x10; slot++) {
 			WmWorldObjInfo* view = &m_wm.m_worldObjData[slot];

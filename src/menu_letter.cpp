@@ -1938,11 +1938,15 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 
 	if (!(openRatio < 1.0)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x1));
+		x = x0 - 32.0f;
+		y = y0 - 16.0f;
 		MenuPcs.DrawRect(
-		    0, x0 - 32.0f, y0 - 16.0f,
+		    0, x, y,
 		    56.0f, 88.0f, 184.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		x = xw - 152.0f;
+		y = yh - 112.0f;
 		MenuPcs.DrawRect(
-		    0, xw - 152.0f, yh - 112.0f,
+		    0, x, y,
 		    184.0f, 144.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }

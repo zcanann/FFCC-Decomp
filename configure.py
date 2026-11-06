@@ -769,7 +769,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmLaser.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmLookOn.cpp"),
             Object(NonMatching, "pppYmMana.cpp", extra_cflags=["-str reuse,readonly"]),
-            Object(NonMatching, "pppYmMegaBirthShpTail2.cpp", extra_cflags=["-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01"), "pppYmMegaBirthShpTail2.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "pppYmMegaBirthShpTail3.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMelt.cpp", cflags=cflags_game),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMiasma.cpp", cflags=cflags_game),

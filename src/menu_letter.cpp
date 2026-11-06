@@ -1187,11 +1187,12 @@ void CMenuPcs::LetterListDraw()
 
 	caravanWork = Game.m_scriptFoodBase[0];
 
+	int row = 0;
 	int y = 0x60;
 	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
 	int letterIndex;
 	float yf;
-	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
+	for (; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
 		letter = &caravanWork->m_letters[letterIndex];
 		yf = static_cast<float>(y);
 

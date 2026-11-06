@@ -1856,11 +1856,9 @@ void CMenuPcs::DrawOptionMenu()
 			CTexture* modePanel = m_wmOptionTextureSet->GetTexture(7);
 			w = static_cast<float>(modePanel->GetWidth());
 			h = static_cast<float>(modePanel->GetHeight());
-			unsigned int modeHeight = static_cast<unsigned int>(h);
-			unsigned int modeWidth = static_cast<unsigned int>(w);
 			Util.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(w - 48.0f),
-			             i * 0x20, modeWidth, modeHeight);
-			Util.CalcUV(uv1.x, uv1.y, modeWidth, i * 0x20 + 0x18, modeWidth, modeHeight);
+			             i * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
+			Util.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(w), i * 0x20 + 0x18, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 			const Vec2d* pp2 = &pts[leftXi + 2];
 			int modeXi = static_cast<int>(static_cast<float>(i * 0x40 + 0x280) - pp2->x);
 			Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(modeXi) *
@@ -1872,8 +1870,8 @@ void CMenuPcs::DrawOptionMenu()
 			int step1 = static_cast<int>(24.0f + (static_cast<float>(i * 0x40 + 0x280) - pp3->x));
 			int textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
 			if (m_specialModeFlags[i] == 0) {
-				Util.CalcUV(uv0.x, uv0.y, 0, i * 0x20, modeWidth, modeHeight);
-				Util.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, modeWidth, modeHeight);
+				Util.CalcUV(uv0.x, uv0.y, 0, i * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
+				Util.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 				Util.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(i * 0x28),
 				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
@@ -1918,8 +1916,8 @@ void CMenuPcs::DrawOptionMenu()
 #endif
 				const Vec2d* pp4e = &pts[leftXi + 4];
 				int panelXi = static_cast<int>(pp4e->x + static_cast<float>(step1) * specialRowCos);
-				Util.CalcUV(uv0.x, uv0.y, 0x78, i * 0x20, modeWidth, modeHeight);
-				Util.CalcUV(uv1.x, uv1.y, 0xE0, (i + 1) * 0x20, modeWidth, modeHeight);
+				Util.CalcUV(uv0.x, uv0.y, 0x78, i * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
+				Util.CalcUV(uv1.x, uv1.y, 0xE0, (i + 1) * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 				Util.RenderTextureQuad(static_cast<float>(panelXi),
 				                        pp4e->y + static_cast<float>(i * 0x28), 112.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

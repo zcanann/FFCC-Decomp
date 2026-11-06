@@ -2514,6 +2514,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	int activePartyCount;
 	int doubleCount;
 	int modelIndex;
+	int textIndex;
 	int i;
 	int kind;
 	int lastKind;
@@ -2611,7 +2612,6 @@ void CMenuPcs::DrawSelectOpenAnim()
 	font->SetTlut(7);
 	font->DrawInit();
 
-	int textIndex;
 	char text[256];
 	{
 		int i;

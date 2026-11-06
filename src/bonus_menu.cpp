@@ -723,9 +723,9 @@ void CMenuPcs::CalcResultOpenAnim()
 		// model sprites: startFrame chained from icons
 		idx += activePartyCount;
 		{
-			for (i = 0; i < activePartyCount; i++) {
+			for (k = 0; k < activePartyCount; k++) {
 				delta = idx - (activePartyCount + 1);
-				sprite = &m_bonusAnim->sprites[idx + i];
+				sprite = &m_bonusAnim->sprites[idx + k];
 				sprite->kind = -2;
 				sprite->x = 0;
 				src = sprite - delta;
@@ -902,8 +902,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			for (; k < activePartyCount; k++) {
 				sprite = &m_bonusAnim->sprites[activePartyCount + 1 + k];
 				float centerX = 4.0 + (sprite->w / 2.0 + sprite->x);
-				float centerY = sprite->h / 2.0 + sprite->y;
 				centerX -= 320.0;
+				float centerY = sprite->h / 2.0 + sprite->y;
 				centerY -= 224.0;
 				m_wm.m_worldObjData[k].m_viewportX = (short)centerX;
 				m_wm.m_worldObjData[k].m_viewportY = (short)centerY;
@@ -921,8 +921,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				int w3 = sprite->w * 3;
 				int extent = w3 + 0x20;
 				float centerX = w3 * 0.5 + sprite->x;
-				float centerY = sprite->h * 0.5 + sprite->y;
 				centerX -= 320.0;
+				float centerY = sprite->h * 0.5 + sprite->y;
 				centerY -= 224.0;
 				(&m_wm.m_worldObjData[activePartyCount])[k].m_viewportX = (short)centerX;
 				(&m_wm.m_worldObjData[activePartyCount])[k].m_viewportY = (short)centerY;
@@ -1798,8 +1798,8 @@ void CMenuPcs::CalcResultCloseAnim()
 			delta = activePartyCount + 1;
 			sprite = &m_bonusAnim->sprites[delta + i];
 			float centerX = 4.0 + (sprite->w / 2.0 + ((float)sprite->x + sprite->motionX));
-			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
 			centerX -= 320.0;
+			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
 			centerY -= 224.0;
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
@@ -2127,8 +2127,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			sprite = &m_bonusAnim->sprites[idx++];
 			sprite->kind = kBonusBackgroundTexture;
 			sprite->y = 0;
-			sprite->x = 0;
 			sprite->w = 0x280;
+			sprite->x = 0;
 			sprite->h = 0x1c0;
 			sprite->mulX = sprite->mulY = 0.0f;
 			sprite->startFrame = 0;
@@ -2382,8 +2382,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 		for (; i < activePartyCount; i++) {
 			sprite = &m_bonusAnim->sprites[4 + i];
 			float centerX = 4.0 + (sprite->w / 2.0 + ((float)sprite->x + sprite->motionX));
-			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
 			centerX -= 320.0;
+			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
 			centerY -= 224.0;
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
@@ -3222,8 +3222,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 		for (; i < activePartyCount; i++) {
 			sprite = &m_bonusAnim->sprites[4 + i];
 			float centerX = 4.0 + (sprite->w / 2.0 + ((float)sprite->x + sprite->motionX));
-			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
 			centerX -= 320.0;
+			float centerY = sprite->h / 2.0 + ((float)sprite->y + sprite->motionY);
 			centerY -= 224.0;
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;

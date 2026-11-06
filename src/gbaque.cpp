@@ -4454,9 +4454,9 @@ int GbaQueue::GetHitEInfo(int channel)
  */
 bool GbaQueue::IsSingleMode(int channel)
 {
-	OSWaitSemaphore(accessSemaphores + channel);
+	BlockSem(channel);
 	bool isSingle = m_singleMode == 1;
-	OSSignalSemaphore(accessSemaphores + channel);
+	ReleaseSem(channel);
 	return isSingle;
 }
 

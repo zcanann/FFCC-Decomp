@@ -1454,9 +1454,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			CFunc* func = m_funcs + (arg & 0xFFFF);
 
 			if ((static_cast<int>(arg) >> 16) >= 0) {
-				CClass* cls = m_classes;
-				cls += object->m_classIndex;
-				const int funcIndex = cls->m_functionTable[func->m_systemIndex];
+				const int funcIndex = m_classes[object->m_classIndex].m_functionTable[func->m_systemIndex];
 				if (funcIndex < 0) {
 					continue;
 				}

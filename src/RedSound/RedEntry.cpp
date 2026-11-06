@@ -634,7 +634,11 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 
 		if ((allocatedWaveBank < RedEntryWaveBankGetEnd(this)) &&
 		    ((aramAddress = RedNewA(waveHead->m_loadSize, aramRangeStart, aramRangeEnd)) != 0)) {
-			int waveCopySize = RedWaveHeadGetTableSize(waveHead) + RedWaveHeadGetToneSize(waveHead);
+			int waveCopySize = waveHead->m_tableCount;
+			waveCopySize *= REDSOUND_WAVE_TABLE_ENTRY_SIZE;
+			waveCopySize += REDSOUND_WAVE_TABLE_ALIGN - 1;
+			waveCopySize &= REDSOUND_WAVE_TABLE_ALIGN_MASK;
+			waveCopySize += RedWaveHeadGetToneSize(waveHead);
 			waveCopySize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			RedWaveHeadWD* copiedWaveHead = (RedWaveHeadWD*)RedNew(waveCopySize);
 			if (copiedWaveHead != 0) {

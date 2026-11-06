@@ -1546,14 +1546,12 @@ unsigned int CMenuPcs::CmdClose0()
 void CMenuPcs::GetCmdItem()
 {
 	s32 count;
-	s16* write;
 	s32 i;
 	s16* list;
 	CCaravanWork* caravanWork;
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-	write = list;
 	for (i = count = 0; i < CCaravanWork::kInventoryCapacity; i++) {
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
@@ -1564,30 +1562,26 @@ void CMenuPcs::GetCmdItem()
 					continue;
 				}
 			}
-			write++;
-			*write = static_cast<s16>(i);
 			count++;
+			list[count] = static_cast<s16>(i);
 		}
 	}
 
-	write = list + count;
 	for (i = 0; i < 0x49; i++) {
 		s32 arti = i + 0x9f;
 		if (caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + i] == arti) {
 			if (IsMagicArti(arti)) {
 				count++;
-				write++;
-				*write = static_cast<s16>(i + CCaravanWork::kPermanentArtifactStart);
+				list[count] = static_cast<s16>(i + CCaravanWork::kPermanentArtifactStart);
 			}
 		}
 	}
 
-	write = list + count;
 	for (i = 0; i < CCaravanWork::kTemporaryArtifactCount; i++) {
-		if (IsMagicArti(caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i])) {
+		s16 item = caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i];
+		if (IsMagicArti(item)) {
 			count++;
-			write++;
-			*write = static_cast<s16>(CCaravanWork::kTemporaryArtifactStart + i);
+			list[count] = static_cast<s16>(CCaravanWork::kTemporaryArtifactStart + i);
 		}
 	}
 

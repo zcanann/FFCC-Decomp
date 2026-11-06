@@ -1254,9 +1254,9 @@ void CMenuPcs::LetterListDraw()
 		iconY += 0x20;
 	}
 
-	const int cursorX = static_cast<int>(32.0f + static_cast<float>(static_cast<int>(System.GetCounter()) % 8));
-	const int cursorY = static_cast<int>(static_cast<float>(m_letterMenuState->listCursor * 0x20 + 0x60));
-	DrawCursor(cursorX, cursorY, 1.0f);
+	float cursorX = 32.0f;
+	cursorX += static_cast<float>(static_cast<int>(System.GetCounter()) % 8);
+	DrawCursor(static_cast<int>(cursorX), static_cast<int>(static_cast<float>(m_letterMenuState->listCursor * 0x20 + 0x60)), 1.0f);
 }
 
 /*

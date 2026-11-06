@@ -1231,7 +1231,8 @@ void CMenuPcs::DrawResultOpenAnim()
 						strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 					} else {
 						CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
-						int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+						int strIdx = caravanWork->m_bonusCondition;
+						strIdx = strIdx * 2 + 1;
 #ifdef VERSION_GCCJGC
 						strcpy(text, "\x81\x9A");
 						strcat(text, Game.GetBonusName(strIdx));
@@ -1455,9 +1456,7 @@ void CMenuPcs::CalcResultCountAnim()
  */
 void CMenuPcs::DrawResultCountAnim()
 {
-	int doubleCount;
 	int i;
-	int textIndex;
 	int lastKind;
 	int modelIndex;
 	int activePartyCount;
@@ -1474,7 +1473,6 @@ void CMenuPcs::DrawResultCountAnim()
 
 	lastKind = 0;
 
-	doubleCount = activePartyCount * 2;
 	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];
 
@@ -1483,7 +1481,7 @@ void CMenuPcs::DrawResultCountAnim()
 				CCharaPcs::CHandle* handle = 0;
 				if (modelIndex < activePartyCount) {
 					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
-				} else if (modelIndex < doubleCount) {
+				} else if (modelIndex < activePartyCount * 2) {
 					handle = m_wm.m_handles[modelIndex - activePartyCount];
 				} else {
 					continue;
@@ -1555,19 +1553,20 @@ void CMenuPcs::DrawResultCountAnim()
 	font->DrawInit();
 
 	char text[128];
-	for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
+	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];
 		if (sprite->kind == -1) {
 			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
-			int partyIndex = textIndex % activePartyCount;
+			int partyIndex = modelIndex % activePartyCount;
 			int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
-			if (textIndex < activePartyCount) {
+			if (modelIndex < activePartyCount) {
 				CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 				strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 			} else {
 				CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
-				int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+				int strIdx = caravanWork->m_bonusCondition;
+				strIdx = strIdx * 2 + 1;
 #ifdef VERSION_GCCJGC
 				strcpy(text, "\x81\x9A");
 				strcat(text, Game.GetBonusName(strIdx));
@@ -1579,7 +1578,7 @@ void CMenuPcs::DrawResultCountAnim()
 			float x = (float)sprite->x + sprite->motionX;
 			float y = (float)sprite->y + sprite->motionY;
 #ifndef VERSION_GCCJGC
-			if (textIndex < activePartyCount) {
+			if (modelIndex < activePartyCount) {
 				y -= 4.0f;
 			}
 #endif
@@ -1591,8 +1590,8 @@ void CMenuPcs::DrawResultCountAnim()
 #endif
 			font->Draw(text);
 
-			textIndex++;
-			if (textIndex == activePartyCount) {
+			modelIndex++;
+			if (modelIndex == activePartyCount) {
 				font = this->m_fonts[1];
 				font->SetMargin(1.0f);
 #ifdef VERSION_GCCJGC
@@ -2045,12 +2044,13 @@ void CMenuPcs::DrawResultCloseAnim()
 					strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 				} else {
 					CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
+					int strIdx = caravanWork->m_bonusCondition;
+					strIdx = strIdx * 2 + 1;
 #ifdef VERSION_GCCJGC
-					int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
 					strcpy(text, "\x81\x9A");
 					strcat(text, Game.GetBonusName(strIdx));
 #else
-					strcpy(text, Game.GetBonusName((int)caravanWork->m_bonusCondition * 2 + 1));
+					strcpy(text, Game.GetBonusName(strIdx));
 #endif
 				}
 

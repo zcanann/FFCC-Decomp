@@ -85,6 +85,27 @@ static inline const char* GetGoOutMessageLine(int languageId, int line)
 
 #endif
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x8018FABC
+ * EN Size: 80b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void McCtrl::SetMcAccessPos(int cardChannel, int saveIndex)
+{
+    m_previousState = 0;
+    m_state = 0;
+    m_lastResult = 0;
+    m_iteration = 0;
+    m_userBuffer = 0;
+    m_createFlag = 0;
+    m_cardChannel = cardChannel;
+    m_saveIndex = saveIndex;
+}
+
 static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
 {
     return *reinterpret_cast<CGoOutSaveDatLayout*>(saveData);
@@ -142,9 +163,13 @@ inline void CGoOutMenu::SetMemCardSlot(int cardChannel, int saveIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void CGoOutMenu::SetMemCardProc(unsigned char)
+inline void CGoOutMenu::SetMemCardProc(unsigned char proc)
 {
-	// TODO
+    m_memCardResult = MenuPcs.m_mcCtrl.ChkConnect(static_cast<unsigned char>(m_cardChannel));
+    if (m_memCardResult == 1) {
+        MenuPcs.m_mcCtrl.SetMcAccessPos(static_cast<unsigned char>(m_cardChannel), static_cast<unsigned char>(m_saveIndex));
+        m_memCardProc = proc;
+    }
 }
 
 /*
@@ -846,28 +871,9 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_pendingMessageTimer = 0;
         MenuPcs.GetMcAccessPos(&m_accessCardChannel, &m_accessSaveIndex);
         m_accessCardChannel = 0;
-        {
-        const int cardChannel = m_accessCardChannel;
-        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
-        const int saveIndex = m_accessSaveIndex;
-        m_cardChannel = static_cast<char>(cardChannel);
-        m_saveIndex = static_cast<char>(saveIndex);
-        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
-        }
-        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
-        if (m_memCardResult == 1) {
-            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
-            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
-            MenuPcs.m_mcCtrl.m_previousState = 0;
-            MenuPcs.m_mcCtrl.m_state = 0;
-            MenuPcs.m_mcCtrl.m_lastResult = 0;
-            MenuPcs.m_mcCtrl.m_iteration = 0;
-            MenuPcs.m_mcCtrl.m_userBuffer = 0;
-            MenuPcs.m_mcCtrl.m_createFlag = 0;
-            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
-            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
-            m_memCardProc = 1;
-        }
+        MenuPcs.m_mcCtrl.SetSlot(m_accessCardChannel);
+        SetMemCardSlot(m_accessCardChannel, m_accessSaveIndex);
+        SetMemCardProc(1);
         break;
     case 0xE:
         MenuPcs.InitSaveLoadMenu();
@@ -968,20 +974,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 
         SetMemCardSlot(m_accessCardChannel, m_accessSaveIndex);
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
-        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
-        if (m_memCardResult == 1) {
-            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
-            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
-            MenuPcs.m_mcCtrl.m_previousState = 0;
-            MenuPcs.m_mcCtrl.m_state = 0;
-            MenuPcs.m_mcCtrl.m_lastResult = 0;
-            MenuPcs.m_mcCtrl.m_iteration = 0;
-            MenuPcs.m_mcCtrl.m_userBuffer = 0;
-            MenuPcs.m_mcCtrl.m_createFlag = 0;
-            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
-            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
-            m_memCardProc = 2;
-        }
+        SetMemCardProc(2);
         {
 #ifdef VERSION_GCCJGC
             SetMenuStr(0, 4,
@@ -1009,20 +1002,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         MenuPcs.m_mcCtrl.m_cardChannel = odekakeCardChannel;
     }
         m_memCardBuffer = MenuPcs.m_goOutTransferWork;
-        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
-        if (m_memCardResult == 1) {
-            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
-            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
-            MenuPcs.m_mcCtrl.m_previousState = 0;
-            MenuPcs.m_mcCtrl.m_state = 0;
-            MenuPcs.m_mcCtrl.m_lastResult = 0;
-            MenuPcs.m_mcCtrl.m_iteration = 0;
-            MenuPcs.m_mcCtrl.m_userBuffer = 0;
-            MenuPcs.m_mcCtrl.m_createFlag = 0;
-            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
-            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
-            m_memCardProc = 2;
-        }
+        SetMemCardProc(2);
         {
 #ifdef VERSION_GCCJGC
             SetMenuStr(0, 4,
@@ -1073,20 +1053,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 		m_cursorChoice = kConfirmationDefault;
 		break;
     case 5:
-        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
-        if (m_memCardResult == 1) {
-            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
-            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
-            MenuPcs.m_mcCtrl.m_previousState = 0;
-            MenuPcs.m_mcCtrl.m_state = 0;
-            MenuPcs.m_mcCtrl.m_lastResult = 0;
-            MenuPcs.m_mcCtrl.m_iteration = 0;
-            MenuPcs.m_mcCtrl.m_userBuffer = 0;
-            MenuPcs.m_mcCtrl.m_createFlag = 0;
-            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
-            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
-            m_memCardProc = 3;
-        }
+        SetMemCardProc(3);
         if (m_currentMessage >= 0) {
             MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState().m_animFrame = 0;

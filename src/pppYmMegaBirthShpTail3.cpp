@@ -837,7 +837,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
     _PARTICLE_DATA* particle;
     _PARTICLE_WMAT* wmats;
     _PARTICLE_COLOR* colors;
-    tagOAN3_SHAPE* shape;
+    void* shape;
     pppShapeAnimData* shapeAnim;
     u32 i;
     float colorStepR;
@@ -1025,7 +1025,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
                         amb.a = 0x7F;
                     }
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
-                    pppDrawShp(shape, ppvEnv->m_materialSetPtr, step->m_blendMode);
+                    pppDrawShp((tagOAN3_SHAPE*)shape, ppvEnv->m_materialSetPtr, step->m_blendMode);
 
                 update_step:
                     colorStart.x -= colorStepR;

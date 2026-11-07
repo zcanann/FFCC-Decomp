@@ -39,8 +39,8 @@ public:
         char m_allocationSourceStr[0xF8];
         unsigned long m_unknown108;
         int m_unknown10C;
-        int m_heapHead;
-        int m_heapTail;
+        CBlock* m_heapHead;
+        CBlock* m_heapTail;
         int m_unknown118;
         int m_allocationMode;
         int m_blockCount;

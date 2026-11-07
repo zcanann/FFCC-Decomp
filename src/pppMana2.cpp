@@ -51,28 +51,19 @@ struct Mana2SetupBlock
     pppCVECTOR m_color;
 };
 
-STATIC_ASSERT(sizeof(Mana2DataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(Mana2DataOffsets, m_setupOffset) == 0x4);
-STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
-
 static void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
-
-static inline Mana2DataOffsets* GetMana2DataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<Mana2DataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline VMana2* GetMana2Work(pppMana2* mana, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<VMana2*>(
-        reinterpret_cast<_pppPObject*>(mana)->m_workArea + GetMana2DataOffsets(ctrl)->m_workOffset);
+        reinterpret_cast<_pppPObject*>(mana)->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline Mana2SetupBlock* GetMana2SetupBlock(pppMana2* mana, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<Mana2SetupBlock*>(
-        reinterpret_cast<_pppPObject*>(mana)->m_workArea + GetMana2DataOffsets(ctrl)->m_setupOffset);
+        reinterpret_cast<_pppPObject*>(mana)->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)

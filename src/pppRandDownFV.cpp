@@ -7,14 +7,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-STATIC_ASSERT(sizeof(RandDownFVDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(RandDownFVDataOffsets, m_valueOffset) == 0x0);
-
-static inline RandDownFVDataOffsets* GetRandDownFVDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<RandDownFVDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline float randf(float value, float scale)
 {
     return value * scale;
@@ -46,14 +38,14 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownFVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         *valuePtr = value;
     } else {
         if (in->targetId != baseState) {
             return;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownFVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     s32 sourceOffset = in->sourceOffset;

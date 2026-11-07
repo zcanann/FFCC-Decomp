@@ -11,11 +11,6 @@ struct _pppPObject;
 typedef _pppPObject pppLocationTitle;
 typedef _pppCtrlTable pppLocationTitleOffsets;
 
-struct LocationTitleDataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
 struct LocationTitleParticle {
     Vec m_pos;
     GXColor m_color;

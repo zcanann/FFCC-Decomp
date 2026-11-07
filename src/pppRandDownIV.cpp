@@ -7,14 +7,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-STATIC_ASSERT(sizeof(RandDownIVDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(RandDownIVDataOffsets, m_valueOffset) == 0x0);
-
-static inline RandDownIVDataOffsets* GetRandDownIVDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<RandDownIVDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -55,13 +47,13 @@ void pppRandDownIV(_pppPObject* basePtr, RandDownIVParams* in, _pppCtrlTable* ct
             value = randValue * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownIVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         *valuePtr = value;
     } else {
         if (in->targetId != basePtr->m_graphId) {
             return;
         }
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownIVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(basePtr->m_workArea + in->sourceOffset);

@@ -15,18 +15,10 @@ struct pppYmMoveParabolaWork {
     Vec m_basePosition;
 };
 
-STATIC_ASSERT(sizeof(YmMoveParabolaDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(YmMoveParabolaDataOffsets, m_workOffset) == 0x0);
-
-static inline YmMoveParabolaDataOffsets* GetYmMoveParabolaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<YmMoveParabolaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_workArea +
-                                                   GetYmMoveParabolaDataOffsets(ctrl)->m_workOffset);
+                                                   ctrl->m_serializedDataOffsets[0]);
 }
 
 static inline Vec* ParabolaPreviousPosition(_pppMngSt* mng)

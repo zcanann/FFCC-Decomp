@@ -3,15 +3,6 @@
 #include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
-STATIC_ASSERT(sizeof(MatrixSclDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(MatrixSclDataOffsets, m_translationOffset) == 0x0);
-STATIC_ASSERT(offsetof(MatrixSclDataOffsets, m_scaleOffset) == 0x4);
-
-static inline MatrixSclDataOffsets* GetMatrixSclDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<MatrixSclDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8006530c
@@ -25,9 +16,9 @@ void pppMatrixScl(_pppPObject* target, pppNoStep* stepData, _pppCtrlTable* param
 {
     (void)stepData;
 
-    MatrixSclDataOffsets* dataPtr = GetMatrixSclDataOffsets(param);
-    u32 index1 = dataPtr->m_translationOffset;
-    u32 index2 = dataPtr->m_scaleOffset;
+    int* dataPtr = param->m_serializedDataOffsets;
+    u32 index1 = dataPtr[0];
+    u32 index2 = dataPtr[1];
 
     f32* scale1 = (f32*)(target->m_workArea + index1);
     f32* scale2 = (f32*)(target->m_workArea + index2);

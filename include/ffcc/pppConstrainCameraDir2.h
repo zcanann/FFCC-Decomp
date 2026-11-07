@@ -3,10 +3,6 @@
 
 #include "ffcc/pppConstrainCameraDir.h"
 
-struct ConstrainCameraDir2DataOffsets {
-    s32 m_valueOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

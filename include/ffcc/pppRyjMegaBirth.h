@@ -86,12 +86,6 @@ struct PRyjMegaBirthOffsets
     s32* m_serializedDataOffsets;
 };
 
-struct RyjMegaBirthDataOffsets {
-	s32 m_unusedOffset;
-	s32 m_colorOffset;
-	s32 m_workOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

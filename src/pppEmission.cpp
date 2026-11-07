@@ -63,25 +63,17 @@ STATIC_ASSERT(offsetof(EmissionState, m_scaleValue) == 0xC);
 STATIC_ASSERT(offsetof(EmissionState, m_fadeOutAlphaStep) == 0x1C);
 STATIC_ASSERT(sizeof(EmissionState) == 0x20);
 STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
-STATIC_ASSERT(sizeof(EmissionDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(EmissionDataOffsets, m_colorDataOffset) == 0x4);
-STATIC_ASSERT(offsetof(EmissionDataOffsets, m_stateOffset) == 0x8);
-
-static inline EmissionDataOffsets* GetEmissionDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<EmissionDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline EmissionState* GetEmissionState(pppEmission* emission, _pppCtrlTable* ctrl)
 {
-    EmissionDataOffsets* offsets = GetEmissionDataOffsets(ctrl);
-    return reinterpret_cast<EmissionState*>(emission->m_workArea + offsets->m_stateOffset);
+    int* offsets = ctrl->m_serializedDataOffsets;
+    return reinterpret_cast<EmissionState*>(emission->m_workArea + offsets[2]);
 }
 
 static inline VColor* GetEmissionColorData(pppEmission* emission, _pppCtrlTable* ctrl)
 {
-    EmissionDataOffsets* offsets = GetEmissionDataOffsets(ctrl);
-    return reinterpret_cast<VColor*>(emission->m_workArea + offsets->m_colorDataOffset);
+    int* offsets = ctrl->m_serializedDataOffsets;
+    return reinterpret_cast<VColor*>(emission->m_workArea + offsets[1]);
 }
 
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)

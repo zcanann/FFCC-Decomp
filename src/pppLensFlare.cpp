@@ -15,23 +15,15 @@ STATIC_ASSERT(offsetof(LensFlareWork, m_viewPosition) == 0x20);
 STATIC_ASSERT(offsetof(LensFlareWork, m_shapeFrame1) == 0x2E);
 STATIC_ASSERT(offsetof(LensFlareWork, m_alpha) == 0x32);
 STATIC_ASSERT(offsetof(LensFlareWork, m_dot) == 0x34);
-STATIC_ASSERT(sizeof(LensFlareDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(LensFlareDataOffsets, m_colorWorkOffset) == 0x4);
-STATIC_ASSERT(offsetof(LensFlareDataOffsets, m_workOffset) == 0x8);
-
-static inline LensFlareDataOffsets* GetLensFlareDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<LensFlareDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
 
 static inline LensFlareWork* GetLensFlareWork(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<LensFlareWork*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_workOffset);
+	return reinterpret_cast<LensFlareWork*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 }
 
 static inline VColor* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<VColor*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_colorWorkOffset);
+	return reinterpret_cast<VColor*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
 }
 
 /*

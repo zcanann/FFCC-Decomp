@@ -8,14 +8,6 @@ struct PppMoveObj {
     f32 z;           // 0x8
 };
 
-STATIC_ASSERT(offsetof(PppMoveOffsets, m_positionOffset) == 0x0);
-STATIC_ASSERT(offsetof(PppMoveOffsets, m_velocityOffset) == 0x4);
-
-static inline PppMoveOffsets* GetPppMoveOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<PppMoveOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80065b18
@@ -27,8 +19,8 @@ static inline PppMoveOffsets* GetPppMoveOffsets(_pppCtrlTable* ctrlTable)
  */
 void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
 {
-    PppMoveOffsets* offsets = GetPppMoveOffsets(ctrlTable);
-    PppMoveObj* moveObj = (PppMoveObj*)(basePtr->m_workArea + offsets->m_velocityOffset);
+    int* offsets = ctrlTable->m_serializedDataOffsets;
+    PppMoveObj* moveObj = (PppMoveObj*)(basePtr->m_workArea + offsets[1]);
 
     moveObj->x = moveObj->y = moveObj->z = 0.0f;
 }
@@ -44,9 +36,9 @@ void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
  */
 void pppMove(_pppPObject* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable)
 {
-    PppMoveOffsets* offsets = GetPppMoveOffsets(ctrlTable);
-    PppMoveObj* a = (PppMoveObj*)(basePtr->m_workArea + offsets->m_positionOffset);
-    PppMoveObj* b = (PppMoveObj*)(basePtr->m_workArea + offsets->m_velocityOffset);
+    int* offsets = ctrlTable->m_serializedDataOffsets;
+    PppMoveObj* a = (PppMoveObj*)(basePtr->m_workArea + offsets[0]);
+    PppMoveObj* b = (PppMoveObj*)(basePtr->m_workArea + offsets[1]);
 
     if (ppvUserStopPartF != 0) {
         return;

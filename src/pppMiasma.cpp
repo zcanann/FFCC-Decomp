@@ -33,29 +33,19 @@ STATIC_ASSERT(sizeof(MiasmaFrameWork) == 0x18);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 STATIC_ASSERT(sizeof(MiasmaRadiusWork) == 0x04);
 
-STATIC_ASSERT(sizeof(MiasmaDataOffsets) == 0x10);
-STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_colorWorkOffset) == 0x4);
-STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_frameWorkOffset) == 0x8);
-STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_radiusWorkOffset) == 0xC);
-
-static inline MiasmaDataOffsets* GetMiasmaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<MiasmaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline MiasmaFrameWork* GetMiasmaFrameWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_frameWorkOffset);
+    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline VColor* GetMiasmaColorWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<VColor*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_colorWorkOffset);
+    return reinterpret_cast<VColor*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
 static inline MiasmaRadiusWork* GetMiasmaRadiusWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_radiusWorkOffset);
+    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[3]);
 }
 
 static inline float CalcSphereRadius(Vec* vertices, u16 count)

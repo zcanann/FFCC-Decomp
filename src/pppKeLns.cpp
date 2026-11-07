@@ -4,17 +4,9 @@
 #include "ffcc/partMng.h"
 #include "dolphin/types.h"
 
-STATIC_ASSERT(sizeof(KeLnsDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(KeLnsDataOffsets, m_workOffset) == 0x0);
-
-static inline KeLnsDataOffsets* GetKeLnsDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<KeLnsDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 static inline _KeLnsLp* GetKeLnsLoopWork(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<_KeLnsLp*>(object->m_workArea + GetKeLnsDataOffsets(ctrlTable)->m_workOffset);
+	return reinterpret_cast<_KeLnsLp*>(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 }
 
 /*

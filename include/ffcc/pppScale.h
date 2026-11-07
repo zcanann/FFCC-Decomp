@@ -6,10 +6,6 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
-struct PppScaleDataOffsets {
-    s32 m_scaleOffset;
-};
-
 struct PppScaleInput {
     s32 m_graphId;
     s32 m_padding;

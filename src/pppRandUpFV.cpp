@@ -7,14 +7,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-STATIC_ASSERT(sizeof(RandUpFVDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(RandUpFVDataOffsets, m_valueOffset) == 0x0);
-
-static inline RandUpFVDataOffsets* GetRandUpFVDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<RandUpFVDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline float randf(float value, float scale)
 {
     return value * scale;
@@ -45,13 +37,13 @@ void pppRandUpFV(_pppPObject* basePtr, RandUpFVParams* in, _pppCtrlTable* ctrl)
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpFVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         *valuePtr = value;
     } else {
         if (in->targetId != currentIndex) {
             return;
         }
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpFVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + in->sourceOffset);

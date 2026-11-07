@@ -25,21 +25,13 @@ STATIC_ASSERT(offsetof(LocationTitle2Particle, m_scaleX) == 0x10);
 STATIC_ASSERT(offsetof(LocationTitle2Particle, m_frame) == 0x1C);
 STATIC_ASSERT(offsetof(LocationTitle2Particle, m_shape) == 0x22);
 STATIC_ASSERT(offsetof(LocationTitle2ColorBlock, m_color) == 0x08);
-STATIC_ASSERT(sizeof(LocationTitle2DataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_workOffset) == 0x00);
-STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_colorOffset) == 0x04);
 
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
-
-static inline LocationTitle2DataOffsets* GetLocationTitle2DataOffsets(pppLocationTitle2Offsets* offsets)
-{
-    return reinterpret_cast<LocationTitle2DataOffsets*>(offsets->m_serializedDataOffsets);
-}
 
 static inline LocationTitle2Work* GetLocationTitle2Work(pppLocationTitle2* locationTitle, pppLocationTitle2Offsets* offsets)
 {
     return reinterpret_cast<LocationTitle2Work*>(
-        locationTitle->m_workArea + GetLocationTitle2DataOffsets(offsets)->m_workOffset);
+        locationTitle->m_workArea + offsets->m_serializedDataOffsets[0]);
 }
 
 /*
@@ -220,9 +212,9 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
     }
 
     work = reinterpret_cast<LocationTitle2Work*>(
-        locationTitle->m_workArea + GetLocationTitle2DataOffsets(unkC)->m_workOffset);
+        locationTitle->m_workArea + unkC->m_serializedDataOffsets[0]);
     colorData = reinterpret_cast<LocationTitle2ColorBlock*>(
-        locationTitle->m_workArea + GetLocationTitle2DataOffsets(unkC)->m_colorOffset);
+        locationTitle->m_workArea + unkC->m_serializedDataOffsets[1]);
     rand();
 
     if (unkB->m_dataValIndex == 0xFFFF) {

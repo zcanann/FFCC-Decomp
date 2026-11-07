@@ -10,14 +10,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(ConstrainCameraDir2DataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(ConstrainCameraDir2DataOffsets, m_valueOffset) == 0x0);
-
-static inline ConstrainCameraDir2DataOffsets* GetConstrainCameraDir2DataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<ConstrainCameraDir2DataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8016ca80
@@ -33,7 +25,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* constrainCameraDir, pppC
     if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
         float* value =
-            (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDir2DataOffsets(ctrl)->m_valueOffset);
+            (float*)(constrainCameraDir->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
         CalcGraphValue(constrainCameraDir, step->m_graphId, value[0], value[1], value[2], step->m_dataValIndex,
                        step->m_initWOrk, step->m_stepValue);

@@ -7,10 +7,6 @@ struct _pppCtrlTable;
 struct _pppPObject;
 struct pppNoStep;
 
-struct SpMatrixDataOffsets {
-    s32 m_matrixOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -4,17 +4,9 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
 
-STATIC_ASSERT(sizeof(ScreenQuakeDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(ScreenQuakeDataOffsets, m_workOffset) == 0x0);
-
-static inline ScreenQuakeDataOffsets* GetScreenQuakeDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<ScreenQuakeDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline float* GetScreenQuakeWork(pppScreenQuake* quake, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<float*>(quake->m_workArea + GetScreenQuakeDataOffsets(ctrl)->m_workOffset);
+    return reinterpret_cast<float*>(quake->m_workArea + ctrl->m_serializedDataOffsets[0]);
 }
 
 /*

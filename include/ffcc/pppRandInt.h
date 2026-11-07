@@ -6,10 +6,6 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
-struct RandIntDataOffsets {
-    s32 m_valueOffset;
-};
-
 struct RandIntParams {
     s32 targetId;
     s32 sourceOffset;

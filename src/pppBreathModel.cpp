@@ -57,14 +57,6 @@ STATIC_ASSERT(sizeof(PARTICLE_DATA) == 0x98);
 STATIC_ASSERT(offsetof(PARTICLE_DATA, m_life) == 0x50);
 STATIC_ASSERT(offsetof(PARTICLE_DATA, m_alpha) == 0x88);
 STATIC_ASSERT(sizeof(BreathParticleGroup) == 0x5C);
-STATIC_ASSERT(sizeof(BreathModelDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(BreathModelDataOffsets, m_workOffset) == 0x0);
-STATIC_ASSERT(offsetof(BreathModelDataOffsets, m_colorOffset) == 0x4);
-
-static inline BreathModelDataOffsets* GetBreathModelDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<BreathModelDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline VBreathModel* GetBreathModelWork(pppBreathModel* breathModel, s32 offset)
 {
@@ -201,7 +193,7 @@ extern "C" void pppDestructBreathModel(pppBreathModel* breathModel, _pppCtrlTabl
 {
     BreathParticleGroup* group;
     VBreathModel* state =
-        reinterpret_cast<VBreathModel*>(breathModel->m_workArea + GetBreathModelDataOffsets(ctrl)->m_workOffset);
+        reinterpret_cast<VBreathModel*>(breathModel->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
     if (state->m_particleData != NULL) {
         pppMemFree(state->m_particleData);
@@ -248,7 +240,7 @@ extern "C" void pppDestructBreathModel(pppBreathModel* breathModel, _pppCtrlTabl
  */
 extern "C" void pppConstructBreathModel(pppBreathModel* breathModel, _pppCtrlTable* ctrl)
 {
-    VBreathModel* state = GetBreathModelWork(breathModel, GetBreathModelDataOffsets(ctrl)->m_workOffset);
+    VBreathModel* state = GetBreathModelWork(breathModel, ctrl->m_serializedDataOffsets[0]);
     PSMTXIdentity(state->m_matrix);
     state->m_direction.x = state->m_direction.y = state->m_direction.z = 0.0f;
 
@@ -302,8 +294,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     Mtx drawMtx;
     Mtx tempMtx;
 
-    workOffset = GetBreathModelDataOffsets(ctrl)->m_workOffset;
-    colorOffset = GetBreathModelDataOffsets(ctrl)->m_colorOffset;
+    workOffset = ctrl->m_serializedDataOffsets[0];
+    colorOffset = ctrl->m_serializedDataOffsets[1];
     work = reinterpret_cast<VBreathModel*>(breathModel->m_workArea + workOffset);
     color = reinterpret_cast<VColor*>(breathModel->m_workArea + colorOffset);
     particleData = work->m_particleData;
@@ -480,7 +472,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* s
     BreathParticleGroup* groupData;
     PARTICLE_WMAT* particleMtx;
     int colorOffset;
-    BreathModelDataOffsets* dataOffsets;
+    int* dataOffsets;
     VColor* color;
     VBreathModel* work;
     _pppMngSt* mngSt;
@@ -503,10 +495,10 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* s
 
     _pppPObject* object = breathModel;
 
-    dataOffsets = GetBreathModelDataOffsets(ctrl);
+    dataOffsets = ctrl->m_serializedDataOffsets;
     mngSt = ppvMng;
-    colorOffset = dataOffsets->m_colorOffset;
-    work = reinterpret_cast<VBreathModel*>(object->m_workArea + dataOffsets->m_workOffset);
+    colorOffset = dataOffsets[1];
+    work = reinterpret_cast<VBreathModel*>(object->m_workArea + dataOffsets[0]);
     color = (VColor*)(object->m_workArea + colorOffset);
 
     if (work->m_particleData == NULL) {

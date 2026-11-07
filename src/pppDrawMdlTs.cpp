@@ -21,24 +21,15 @@ STATIC_ASSERT(offsetof(PDrawMdlTs, m_texCoordAdd) == 0x14);
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_lightTarget) == 0x2C);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 
-STATIC_ASSERT(sizeof(DrawMdlTsDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(DrawMdlTsDataOffsets, m_colorWorkOffset) == 0x0);
-STATIC_ASSERT(offsetof(DrawMdlTsDataOffsets, m_texCoordOffset) == 0x8);
-
-static inline DrawMdlTsDataOffsets* PppDrawMdlTsDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<DrawMdlTsDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline f32* PppDrawMdlTsTexCoords(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<f32*>(obj->m_workArea + PppDrawMdlTsDataOffsets(ctrl)->m_texCoordOffset);
+    return reinterpret_cast<f32*>(obj->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline pppCVECTOR* PppDrawMdlTsColor(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     VColor* colorWork =
-        reinterpret_cast<VColor*>(obj->m_workArea + PppDrawMdlTsDataOffsets(ctrl)->m_colorWorkOffset);
+        reinterpret_cast<VColor*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
     return &colorWork->m_color;
 }

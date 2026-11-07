@@ -16,12 +16,6 @@ struct pppConstrainCameraForLocParams {
 
 typedef _pppPObject pppConstrainCameraForLoc;
 
-struct pppConstrainCameraForLocDataOffsets {
-    s32 _unused0;
-    s32 _unused1;
-    s32 m_workOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

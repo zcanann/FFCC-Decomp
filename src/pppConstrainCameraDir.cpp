@@ -10,14 +10,6 @@
 
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 
-STATIC_ASSERT(sizeof(ConstrainCameraDirDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(ConstrainCameraDirDataOffsets, m_workOffset) == 0x0);
-
-static inline ConstrainCameraDirDataOffsets* GetConstrainCameraDirDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<ConstrainCameraDirDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 80143098
@@ -32,7 +24,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, pppCo
 {
     if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
-        float* value = (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(ctrl)->m_workOffset);
+        float* value = (float*)(constrainCameraDir->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
         CalcGraphValue(constrainCameraDir, step->m_graphId, value[0], value[1], value[2], step->m_dataValIndex,
                        step->m_initWOrk, step->m_stepValue);
@@ -108,7 +100,7 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, _pppCtrlTable* ctrl)
 {
-    float* value = (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(ctrl)->m_workOffset);
+    float* value = (float*)(constrainCameraDir->m_workArea + ctrl->m_serializedDataOffsets[0]);
     value[0] = value[1] = value[2] = 0.0f;
 }
 
@@ -123,6 +115,6 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, 
  */
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, _pppCtrlTable* ctrl)
 {
-    float* value = (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(ctrl)->m_workOffset);
+    float* value = (float*)(constrainCameraDir->m_workArea + ctrl->m_serializedDataOffsets[0]);
     value[0] = value[1] = value[2] = 0.0f;
 }

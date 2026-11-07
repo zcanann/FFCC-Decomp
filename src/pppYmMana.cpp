@@ -15,9 +15,6 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(YmManaDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(YmManaDataOffsets, m_setupOffset) == 0x4);
-STATIC_ASSERT(offsetof(YmManaDataOffsets, m_workOffset) == 0x8);
 STATIC_ASSERT(offsetof(VYmMana, m_runtimeColor) == 0x38);
 STATIC_ASSERT(offsetof(VYmMana, m_displayListCopies) == 0x60);
 STATIC_ASSERT(offsetof(VYmMana, m_meshReflectionVec) == 0x64);
@@ -49,11 +46,6 @@ static void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, 
 static void Chara_DrawShadowMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
-
-static inline YmManaDataOffsets* GetYmManaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<YmManaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline void ClearManaModelCallbacks(CChara::CModel* model)
 {
@@ -914,9 +906,9 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
     }
 
     gObject = ppvMng->m_owner;
-    YmManaDataOffsets* serializedOffsets = GetYmManaDataOffsets(ctrl);
-    mana = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + serializedOffsets->m_workOffset);
-    setupArea = reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + serializedOffsets->m_setupOffset;
+    int* serializedOffsets = ctrl->m_serializedDataOffsets;
+    mana = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + serializedOffsets[2]);
+    setupArea = reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + serializedOffsets[1];
     if (gObject == NULL) {
         return;
     }
@@ -1152,7 +1144,7 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
 void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
 {
     VYmMana* work =
-        reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + GetYmManaDataOffsets(ctrl)->m_workOffset);
+        reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + ctrl->m_serializedDataOffsets[2]);
     CGObject* gObject = work->m_object;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
@@ -1307,8 +1299,8 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
  */
 void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
 {
-    YmManaDataOffsets* offsets = GetYmManaDataOffsets(ctrl);
-    s32 workOffset = offsets->m_workOffset;
+    int* offsets = ctrl->m_serializedDataOffsets;
+    s32 workOffset = offsets[2];
     VYmMana* work = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + workOffset);
     CGObject* gObject = ppvMng->m_owner;
     CCharaPcs::CHandle* handle;

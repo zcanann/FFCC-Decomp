@@ -5,10 +5,6 @@
 
 struct pppKeShpTailStep;
 
-struct KeShpTailDataOffsets {
-    s32 m_workOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

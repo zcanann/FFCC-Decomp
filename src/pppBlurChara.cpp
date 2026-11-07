@@ -31,23 +31,15 @@ STATIC_ASSERT(offsetof(pppBlurCharaWork, m_ownerObj) == 0x04);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_smallTexObj) == 0x08);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_savedLightAlpha) == 0x0C);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
-STATIC_ASSERT(sizeof(BlurCharaDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(BlurCharaDataOffsets, m_colorDataOffset) == 0x4);
-STATIC_ASSERT(offsetof(BlurCharaDataOffsets, m_texDataOffset) == 0x8);
-
-static inline BlurCharaDataOffsets* GetBlurCharaDataOffsets(const _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<BlurCharaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const _pppCtrlTable* ctrl) {
-    return (pppBlurCharaWork*)(blurChara->m_workArea + GetBlurCharaDataOffsets(ctrl)->m_texDataOffset);
+    return (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline VColor* GetBlurColorData(pppBlurChara* blurChara, const _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<VColor*>(
-        blurChara->m_workArea + GetBlurCharaDataOffsets(ctrl)->m_colorDataOffset);
+        blurChara->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
 static void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);

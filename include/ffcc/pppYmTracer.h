@@ -35,11 +35,6 @@ typedef PYmTracer pppYmTracerStep;
 typedef _pppCtrlTable pppYmTracerCtrl;
 typedef _pppPObject pppYmTracer;
 
-struct YmTracerDataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
 struct TRACE_POLYGON {
     Vec from;
     f32 _pad0;

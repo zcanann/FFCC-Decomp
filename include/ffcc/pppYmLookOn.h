@@ -13,10 +13,6 @@ struct pppYmLookOnStep {
 
 typedef _pppPObject pppYmLookOn;
 
-struct YmLookOnDataOffsets {
-    s32 m_workOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

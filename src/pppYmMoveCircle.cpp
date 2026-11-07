@@ -19,9 +19,6 @@ struct pppYmMoveCircleWork {
     u8 m_hasInit;
 };
 
-STATIC_ASSERT(sizeof(pppYmMoveCircleDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(pppYmMoveCircleDataOffsets, m_workOffset) == 0x0);
-
 static inline Vec* MoveCirclePreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -37,15 +34,10 @@ static inline Vec* MoveCircleTargetPosition(_pppMngSt* mng)
     return &mng->m_paramVec0;
 }
 
-static inline pppYmMoveCircleDataOffsets* GetMoveCircleDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<pppYmMoveCircleDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline pppYmMoveCircleWork* GetMoveCircleWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    pppYmMoveCircleDataOffsets* offsets = GetMoveCircleDataOffsets(ctrl);
-    return reinterpret_cast<pppYmMoveCircleWork*>(object->m_workArea + offsets->m_workOffset);
+    int* offsets = ctrl->m_serializedDataOffsets;
+    return reinterpret_cast<pppYmMoveCircleWork*>(object->m_workArea + offsets[0]);
 }
 
 /*
@@ -137,7 +129,7 @@ extern "C" void pppConstructYmMoveCircle(_pppPObject* basePtr, _pppCtrlTable* of
     pppYmMoveCircleWork* work;
 
     pppMngSt = ppvMng;
-    offset = GetMoveCircleDataOffsets(offsetData)->m_workOffset;
+    offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)(basePtr->m_workArea + offset);
 
     tempUp.x = 1.0f;

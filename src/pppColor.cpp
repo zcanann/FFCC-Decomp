@@ -11,17 +11,9 @@ STATIC_ASSERT(offsetof(VColor, m_blue) == 0x4);
 STATIC_ASSERT(offsetof(VColor, m_alpha) == 0x6);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
 
-STATIC_ASSERT(sizeof(PppColorDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(PppColorDataOffsets, m_workOffset) == 0x0);
-
-static inline PppColorDataOffsets* GetPppColorDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<PppColorDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline VColor* GetPppColorWork(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<VColor*>(obj->m_workArea + GetPppColorDataOffsets(ctrl)->m_workOffset);
+    return reinterpret_cast<VColor*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
 }
 
 /*

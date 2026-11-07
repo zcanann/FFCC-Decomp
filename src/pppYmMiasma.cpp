@@ -66,17 +66,9 @@ void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);
 void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 
-STATIC_ASSERT(sizeof(YmMiasmaDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(YmMiasmaDataOffsets, m_workOffset) == 0x8);
-
-static inline YmMiasmaDataOffsets* GetYmMiasmaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<YmMiasmaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline VYmMiasma* YmMiasmaWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<VYmMiasma*>(object->m_workArea + GetYmMiasmaDataOffsets(ctrl)->m_workOffset);
+    return reinterpret_cast<VYmMiasma*>(object->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline void RenderParticleInline(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)

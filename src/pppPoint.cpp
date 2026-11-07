@@ -2,18 +2,9 @@
 #include "ffcc/pppPoint.h"
 #include "ffcc/partMng.h"
 
-
-STATIC_ASSERT(sizeof(PppPointDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(PppPointDataOffsets, m_pointOffset) == 0x0);
-
-static inline PppPointDataOffsets* GetPppPointDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<PppPointDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 static inline float* GetPppPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<float*>(pObject->m_workArea + GetPppPointDataOffsets(ctrlTable)->m_pointOffset);
+	return reinterpret_cast<float*>(pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 }
 
 /*

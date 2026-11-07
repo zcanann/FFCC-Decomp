@@ -14,18 +14,10 @@ struct pppPObjPointWork {
     Vec* m_source;     // 0x10
 };
 
-STATIC_ASSERT(sizeof(PObjPointDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(PObjPointDataOffsets, m_workOffset) == 0x0);
-
-static inline PObjPointDataOffsets* GetPObjPointDataOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<PObjPointDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 static inline pppPObjPointWork* GetPObjPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
     return reinterpret_cast<pppPObjPointWork*>(
-        pObject->m_workArea + GetPObjPointDataOffsets(ctrlTable)->m_workOffset);
+        pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 }
 
 /*

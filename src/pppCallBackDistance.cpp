@@ -5,14 +5,6 @@
 #include "ffcc/gobject.h"
 #include <dolphin/mtx.h>
 
-STATIC_ASSERT(sizeof(CallBackDistanceDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(CallBackDistanceDataOffsets, m_distanceOffset) == 0x0);
-
-static inline CallBackDistanceDataOffsets* GetCallBackDistanceDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<CallBackDistanceDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80141204
@@ -25,7 +17,7 @@ static inline CallBackDistanceDataOffsets* GetCallBackDistanceDataOffsets(_pppCt
 void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceStep* step, _pppCtrlTable* ctrlTable)
 {
     _pppMngSt* pppMngSt = ppvMng;
-    s32 distanceOffset = GetCallBackDistanceDataOffsets(ctrlTable)->m_distanceOffset;
+    s32 distanceOffset = ctrlTable->m_serializedDataOffsets[0];
     f32* distancePtr = (f32*)(object->m_workArea + distanceOffset);
     f32 distance;
     Vec particlePos;
@@ -91,7 +83,7 @@ void pppConstructCallBackDistance(_pppPObject* object, _pppCtrlTable* ctrlTable)
     f32* distancePtr;
 
     pppMngSt = ppvMng;
-    distanceOffset = GetCallBackDistanceDataOffsets(ctrlTable)->m_distanceOffset;
+    distanceOffset = ctrlTable->m_serializedDataOffsets[0];
     distancePtr = (f32*)(object->m_workArea + distanceOffset);
     lookTarget = pppMngSt->m_lookTarget;
     targetPos = lookTarget->m_worldPosition;

@@ -33,25 +33,17 @@ STATIC_ASSERT(offsetof(CoronaWork, m_alphaScale) == 0x8);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_projected) == 0x10);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_viewPosition) == 0x20);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_alpha) == 0x32);
-STATIC_ASSERT(sizeof(CoronaDataOffsets) == 0x10);
-STATIC_ASSERT(offsetof(CoronaDataOffsets, m_vecWorkOffset) == 0x8);
-STATIC_ASSERT(offsetof(CoronaDataOffsets, m_workOffset) == 0xC);
-
-static inline CoronaDataOffsets* GetCoronaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<CoronaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline CoronaWork* GetCoronaWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    CoronaDataOffsets* offsets = GetCoronaDataOffsets(ctrl);
-    return reinterpret_cast<CoronaWork*>(object->m_workArea + offsets->m_workOffset);
+    int* offsets = ctrl->m_serializedDataOffsets;
+    return reinterpret_cast<CoronaWork*>(object->m_workArea + offsets[3]);
 }
 
 static inline CoronaVecWork* GetCoronaVecWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    CoronaDataOffsets* offsets = GetCoronaDataOffsets(ctrl);
-    return reinterpret_cast<CoronaVecWork*>(object->m_workArea + offsets->m_vecWorkOffset);
+    int* offsets = ctrl->m_serializedDataOffsets;
+    return reinterpret_cast<CoronaVecWork*>(object->m_workArea + offsets[2]);
 }
 
 /*

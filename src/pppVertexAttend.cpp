@@ -4,12 +4,6 @@
 #include "dolphin/mtx.h"
 #include <stddef.h>
 
-struct VertexAttendStream
-{
-    s32 m_sourceOffset;
-    s32 m_destOffset;
-};
-
 struct VertexSetEntry
 {
     s16 modelIndex;
@@ -32,13 +26,6 @@ struct VertexAttendEnv
 };
 
 STATIC_ASSERT(offsetof(pppVertexAttendStep, m_entryIndex) == 0xC);
-STATIC_ASSERT(offsetof(VertexAttendStream, m_sourceOffset) == 0x0);
-STATIC_ASSERT(offsetof(VertexAttendStream, m_destOffset) == 0x4);
-
-static inline VertexAttendStream* GetVertexAttendStream(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VertexAttendStream*>(ctrl->m_serializedDataOffsets);
-}
 
 /*
  * --INFO--
@@ -52,7 +39,7 @@ static inline VertexAttendStream* GetVertexAttendStream(_pppCtrlTable* ctrl)
 void pppVertexAttend(_pppPObject* object, pppVertexAttendStep* step, _pppCtrlTable* ctrl)
 {
     s16 entryIndex = step->m_entryIndex;
-    VertexAttendStream* stream;
+    int* stream;
     VertexAttendEnv* env;
     VertexSetEntry* setEntry;
     u16 sourceIndex;
@@ -66,11 +53,11 @@ void pppVertexAttend(_pppPObject* object, pppVertexAttendStep* step, _pppCtrlTab
         return;
     }
 
-    stream = GetVertexAttendStream(ctrl);
+    stream = ctrl->m_serializedDataOffsets;
     env = (VertexAttendEnv*)ppvEnv;
     setEntry = (VertexSetEntry*)((u8*)env->vertexSetTable + (entryIndex * sizeof(VertexSetEntry)));
-    sourceIndex = *(u16*)(object->m_workArea + stream->m_sourceOffset);
-    output = (f32*)(object->m_workArea + stream->m_destOffset);
+    sourceIndex = *(u16*)(object->m_workArea + stream[0]);
+    output = (f32*)(object->m_workArea + stream[1]);
     model = env->modelTable[setEntry->modelIndex];
     sourceVertex = &model->vertexData[setEntry->vertexRemap[sourceIndex]];
     matrix = reinterpret_cast<_pppPObject*>(object->m_link.m_previous)->m_localMatrix.value;

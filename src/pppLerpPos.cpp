@@ -9,17 +9,9 @@
 
 STATIC_ASSERT(offsetof(pppLerpPosStep, m_dataValIndex) == 0x4);
 
-STATIC_ASSERT(sizeof(LerpPosDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(LerpPosDataOffsets, m_historyOffset) == 0x0);
-
-static inline LerpPosDataOffsets* GetLerpPosDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<LerpPosDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline Vec** GetLerpPosHistory(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<Vec**>(object->m_workArea + GetLerpPosDataOffsets(ctrl)->m_historyOffset);
+    return reinterpret_cast<Vec**>(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
 }
 
 static const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";

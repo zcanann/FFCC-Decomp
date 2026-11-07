@@ -7,12 +7,6 @@ struct _pppPObject;
 
 typedef _pppPObject pppYmMegaBirthShpTail2;
 
-struct YmMegaBirthShpTail2DataOffsets {
-    s32 m_unusedOffset;
-    s32 m_colorOffset;
-    s32 m_workOffset;
-};
-
 struct PYmMegaBirthShpTail2
 {
     s32 m_graphId;                    // 0x00

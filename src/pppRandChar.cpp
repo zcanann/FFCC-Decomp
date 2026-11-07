@@ -7,14 +7,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(RandCharDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(RandCharDataOffsets, m_valueOffset) == 0x0);
-
-static inline RandCharDataOffsets* GetRandCharDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<RandCharDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80060efc
@@ -42,13 +34,13 @@ void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
             value *= 2.0f;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandCharDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandCharDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     s32 colorOffset = in->sourceOffset;

@@ -8,12 +8,6 @@ struct _pppCtrlTable;
 
 typedef _pppPObject pppRain;
 
-struct RainDataOffsets {
-    s32 _unused0;
-    s32 m_colorDataOffset;
-    s32 m_workOffset;
-};
-
 struct PRain {
     s32 m_graphId;
     u16 m_dropCount;

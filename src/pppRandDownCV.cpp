@@ -7,14 +7,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(RandDownCVDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(RandDownCVDataOffsets, m_valueOffset) == 0x0);
-
-static inline RandDownCVDataOffsets* GetRandDownCVDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<RandDownCVDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -56,12 +48,12 @@ void pppRandDownCV(_pppPObject* basePtr, RandDownCVParams* in, _pppCtrlTable* ct
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownCVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         *valuePtr = value;
     } else if (in->targetId != basePtr->m_graphId) {
         return;
     } else {
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownCVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(basePtr->m_workArea + in->sourceOffset);

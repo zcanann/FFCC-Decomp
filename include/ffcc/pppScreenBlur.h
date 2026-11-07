@@ -12,11 +12,6 @@ struct pppScreenBlurStep {
     s16 m_initWOrk;
 };
 
-struct ScreenBlurDataOffsets {
-    s32 m_valueOffset;
-    s32 m_activeOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

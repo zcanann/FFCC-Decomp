@@ -21,17 +21,10 @@ STATIC_ASSERT(offsetof(KeShpTailWork, m_frameAcc) == 0x02);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_shapeFrame) == 0x04);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_shapePrevFrame) == 0x06);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_posHistory) == 0x08);
-STATIC_ASSERT(sizeof(KeShpTailDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(KeShpTailDataOffsets, m_workOffset) == 0x0);
-
-static inline KeShpTailDataOffsets* GetKeShpTailDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<KeShpTailDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
 
 static inline KeShpTailWork* GetKeShpTailWork(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<KeShpTailWork*>(obj->m_workArea + GetKeShpTailDataOffsets(ctrlTable)->m_workOffset);
+	return reinterpret_cast<KeShpTailWork*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 }
 
 /*

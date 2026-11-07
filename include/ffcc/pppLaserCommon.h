@@ -30,12 +30,6 @@ struct pppLaserWork : pppLaserWorkBase {
     u8 m_spawnEnabled;
 };
 
-struct pppLaserDataOffsets {
-    s32 m_unused0;
-    s32 m_colorBlockOffset;
-    s32 m_workOffset;
-};
-
 struct pppLaserStep {
     s32 m_graphId;
     s32 m_dataValIndex;

@@ -38,24 +38,15 @@ STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmStep, m_tilesV) == 0x1c);
 STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmStep, m_lightTarget) == 0x20);
 STATIC_ASSERT(sizeof(pppYmDrawMdlTexAnmWork) == 0x18);
 
-STATIC_ASSERT(sizeof(pppYmDrawMdlTexAnmDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmDataOffsets, m_colorBlockOffset) == 0x0);
-STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmDataOffsets, m_workOffset) == 0x8);
-
 static inline CMapMesh** GetMapMeshTable()
 {
     return ppvEnv->m_mapMeshPtr;
 }
 
-static inline pppYmDrawMdlTexAnmDataOffsets* GetYmDrawMdlTexAnmDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<pppYmDrawMdlTexAnmDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    pppYmDrawMdlTexAnmDataOffsets* offsets = GetYmDrawMdlTexAnmDataOffsets(ctrl);
-    return reinterpret_cast<pppYmDrawMdlTexAnmWork*>(object->m_workArea + offsets->m_workOffset);
+    int* offsets = ctrl->m_serializedDataOffsets;
+    return reinterpret_cast<pppYmDrawMdlTexAnmWork*>(object->m_workArea + offsets[2]);
 }
 
 static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObjLink* object, _pppCtrlTable* ctrl)
@@ -104,7 +95,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 {
     pppModelSt* model;
     VColor* color;
-    pppYmDrawMdlTexAnmDataOffsets* offsets;
+    int* offsets;
     pppFMATRIX matrix;
 
     model = (pppModelSt*)GetMapMeshTable()[step->m_dataValIndex];
@@ -112,8 +103,8 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
         return;
     }
 
-    offsets = GetYmDrawMdlTexAnmDataOffsets(ctrl);
-    color = (VColor*)(object->m_workArea + offsets->m_colorBlockOffset);
+    offsets = ctrl->m_serializedDataOffsets;
+    color = (VColor*)(object->m_workArea + offsets[0]);
 
     pppUnitMatrix(matrix);
     matrix.value[2][2] *= -1.0f;

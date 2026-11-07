@@ -8,14 +8,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-STATIC_ASSERT(sizeof(ParHitSphMatDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(ParHitSphMatDataOffsets, m_positionOffset) == 0x4);
-
-static inline ParHitSphMatDataOffsets* GetParHitSphMatDataOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<ParHitSphMatDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 static inline Vec* ParHitSphMatPreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -46,15 +38,15 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
     hitVector.x = 0.0f;
 
     if (step->m_useWorkPosition != 0) {
-        ParHitSphMatDataOffsets* offsets = GetParHitSphMatDataOffsets(ctrlTable);
-        Vec* workPos = (Vec*)(pObject->m_workArea + offsets->m_positionOffset);
+        int* offsets = ctrlTable->m_serializedDataOffsets;
+        Vec* workPos = (Vec*)(pObject->m_workArea + offsets[1]);
         PSMTXMultVec(pppMngSt->m_matrix.value, workPos, &origin);
     } else {
         origin.x = ppvMng->m_matrix.value[0][3];
         origin.y = ppvMng->m_matrix.value[1][3];
         origin.z = ppvMng->m_matrix.value[2][3];
-        ParHitSphMatDataOffsets* offsets = GetParHitSphMatDataOffsets(ctrlTable);
-        Vec* workPos = (Vec*)(pObject->m_workArea + offsets->m_positionOffset);
+        int* offsets = ctrlTable->m_serializedDataOffsets;
+        Vec* workPos = (Vec*)(pObject->m_workArea + offsets[1]);
         origin.x += workPos->x;
         origin.y += workPos->y;
         origin.z += workPos->z;

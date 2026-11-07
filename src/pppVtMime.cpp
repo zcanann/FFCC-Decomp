@@ -34,19 +34,11 @@ struct VtMimeEnv
     void** sourceTable;
 };
 
-STATIC_ASSERT(sizeof(VtMimeDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(VtMimeDataOffsets, m_stateOffset) == 0x0);
-
 static const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
-
-static inline VtMimeDataOffsets* GetVtMimeDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VtMimeDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline VtMimeState* GetVtMimeState(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<VtMimeState*>(object->m_workArea + GetVtMimeDataOffsets(ctrl)->m_stateOffset);
+    return reinterpret_cast<VtMimeState*>(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
 }
 
 static inline VtMimeState* GetVtMimeState(_pppPObjLink* object, _pppCtrlTable* ctrl)

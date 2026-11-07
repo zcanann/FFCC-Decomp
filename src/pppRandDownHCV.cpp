@@ -7,14 +7,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-STATIC_ASSERT(sizeof(RandDownHCVDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(RandDownHCVDataOffsets, m_valueOffset) == 0x0);
-
-static inline RandDownHCVDataOffsets* GetRandDownHCVDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<RandDownHCVDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline short randshort(short value, float scale)
 {
     return (short)((f32)value * scale);
@@ -47,12 +39,12 @@ void pppRandDownHCV(_pppPObject* basePtr, RandDownHCVParams* in, _pppCtrlTable* 
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownHCVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         *valuePtr = value;
     } else if (in->targetId != basePtr->m_graphId) {
         return;
     } else {
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownHCVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(basePtr->m_workArea + in->sourceOffset);

@@ -11,18 +11,10 @@ STATIC_ASSERT(offsetof(PDrawMdl, m_texScale) == 0x10);
 STATIC_ASSERT(offsetof(PDrawMdl, m_drawA) == 0x14);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 
-STATIC_ASSERT(sizeof(DrawMdlDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(DrawMdlDataOffsets, m_colorWorkOffset) == 0x0);
-
-static inline DrawMdlDataOffsets* PppDrawMdlDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<DrawMdlDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline pppCVECTOR* PppDrawMdlColor(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     VColor* colorWork =
-        reinterpret_cast<VColor*>(obj->m_workArea + PppDrawMdlDataOffsets(ctrl)->m_colorWorkOffset);
+        reinterpret_cast<VColor*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
     return &colorWork->m_color;
 }

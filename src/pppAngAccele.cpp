@@ -3,23 +3,14 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(PppAngAcceleDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(PppAngAcceleDataOffsets, m_velocityOffset) == 0x0);
-STATIC_ASSERT(offsetof(PppAngAcceleDataOffsets, m_accelOffset) == 0x4);
-
-static inline PppAngAcceleDataOffsets* GetPppAngAcceleDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<PppAngAcceleDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline int* GetPppAngAcceleVelocity(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<int*>(obj->m_workArea + GetPppAngAcceleDataOffsets(ctrl)->m_velocityOffset);
+    return reinterpret_cast<int*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
 }
 
 static inline int* GetPppAngAcceleAccel(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<int*>(obj->m_workArea + GetPppAngAcceleDataOffsets(ctrl)->m_accelOffset);
+    return reinterpret_cast<int*>(obj->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
 /*

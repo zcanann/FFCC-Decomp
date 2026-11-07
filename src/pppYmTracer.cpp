@@ -15,9 +15,6 @@ extern f32 gPppDefaultValueBuffer[];
 
 static const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
 
-STATIC_ASSERT(sizeof(YmTracerDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_workOffset) == 0x0);
-STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(sizeof(TRACE_POLYGON) == 0x28);
 STATIC_ASSERT(offsetof(TRACE_POLYGON, from) == 0x0);
 STATIC_ASSERT(offsetof(TRACE_POLYGON, to) == 0x10);
@@ -29,11 +26,6 @@ STATIC_ASSERT(offsetof(YmTracerWork, initWork) == 0x20);
 STATIC_ASSERT(offsetof(YmTracerWork, entries) == 0x28);
 STATIC_ASSERT(offsetof(YmTracerWork, count) == 0x2c);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
-
-static inline YmTracerDataOffsets* GetYmTracerDataOffsets(pppYmTracerCtrl* ctrl)
-{
-    return reinterpret_cast<YmTracerDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 /*
  * --INFO--
@@ -100,8 +92,8 @@ void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCt
     int textureIndex[2];
 
     dataValIndex = step->m_dataValIndex;
-    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
-    colorOffset = GetYmTracerDataOffsets(ctrl)->m_colorOffset;
+    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + ctrl->m_serializedDataOffsets[0]);
+    colorOffset = ctrl->m_serializedDataOffsets[1];
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
     colorData = reinterpret_cast<VColor*>(tracer->m_workArea + colorOffset);
@@ -197,7 +189,7 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
         return;
     }
 
-    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
+    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + ctrl->m_serializedDataOffsets[0]);
     entriesPtr = work->entries;
     entries = entriesPtr;
     if (entriesPtr == 0) {
@@ -325,7 +317,7 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
  */
 void pppDestructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
-    YmTracerWork* work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
+    YmTracerWork* work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + ctrl->m_serializedDataOffsets[0]);
     if (work->entries != 0) {
         pppMemFree(work->entries);
     }
@@ -344,7 +336,7 @@ void pppConstruct2YmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
     YmTracerWork* work;
 
-    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
+    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + ctrl->m_serializedDataOffsets[0]);
     work->_pad2e = 0;
     work->count = 0;
 }
@@ -364,7 +356,7 @@ void pppConstructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
     YmTracerWork* work;
 
     zero = 0.0f;
-    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
+    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
     work->entries = 0;
     work->arg3Work = 0;

@@ -3,18 +3,10 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 
-STATIC_ASSERT(sizeof(KeDMatDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(KeDMatDataOffsets, m_targetMatrixOffset) == 0x4);
-
-static inline KeDMatDataOffsets* GetKeDMatDataOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<KeDMatDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 static inline pppFMATRIX* GetKeDMatTargetMatrix(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
     return reinterpret_cast<pppFMATRIX*>(
-        pObject->m_workArea + GetKeDMatDataOffsets(ctrlTable)->m_targetMatrixOffset);
+        pObject->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
 }
 
 /*

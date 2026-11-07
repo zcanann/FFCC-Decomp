@@ -50,19 +50,10 @@ static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, in
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
-STATIC_ASSERT(sizeof(CharaBreakDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(CharaBreakDataOffsets, m_colorWorkOffset) == 0x0);
-STATIC_ASSERT(offsetof(CharaBreakDataOffsets, m_workOffset) == 0x8);
-
-static inline CharaBreakDataOffsets* GetCharaBreakDataOffsets(_pppCtrlTable* data)
-{
-    return reinterpret_cast<CharaBreakDataOffsets*>(data->m_serializedDataOffsets);
-}
-
 static inline CharaBreakWork* GetCharaBreakWork(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
     return reinterpret_cast<CharaBreakWork*>(
-        charaBreak->m_workArea + GetCharaBreakDataOffsets(data)->m_workOffset);
+        charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
 }
 
 static inline void SetCharaBreakModelCallbacks(CChara::CModel* model, CharaBreakWork* work, CharaBreakStep* step)
@@ -942,7 +933,7 @@ fail:
  */
 void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTable* data)
 {
-    int colorOffset = GetCharaBreakDataOffsets(data)->m_colorWorkOffset;
+    int colorOffset = data->m_serializedDataOffsets[0];
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
     VColor* colorWork = reinterpret_cast<VColor*>(charaBreak->m_workArea + colorOffset);
 

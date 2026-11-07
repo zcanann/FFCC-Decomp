@@ -3,15 +3,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
-
-STATIC_ASSERT(sizeof(PppScaleDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(PppScaleDataOffsets, m_scaleOffset) == 0x0);
-
-static inline PppScaleDataOffsets* GetPppScaleDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<PppScaleDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800630cc
@@ -23,8 +14,8 @@ static inline PppScaleDataOffsets* GetPppScaleDataOffsets(_pppCtrlTable* ctrlTab
  */
 void pppScaleCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-	PppScaleDataOffsets* data = GetPppScaleDataOffsets(ctrlTable);
-	float* value = (float*)(obj->m_workArea + data->m_scaleOffset);
+	int* data = ctrlTable->m_serializedDataOffsets;
+	float* value = (float*)(obj->m_workArea + data[0]);
 
 	value[0] = value[1] = value[2] = 0.0f;
 }
@@ -48,8 +39,8 @@ void pppScale(_pppPObject* obj, PppScaleInput* input, _pppCtrlTable* ctrlTable)
 		return;
 	}
 
-	PppScaleDataOffsets* data = GetPppScaleDataOffsets(ctrlTable);
-	float* scale = (float*)(obj->m_workArea + data->m_scaleOffset);
+	int* data = ctrlTable->m_serializedDataOffsets;
+	float* scale = (float*)(obj->m_workArea + data[0]);
 
 	scale[0] += input->m_scale[0];
 	scale[1] += input->m_scale[1];

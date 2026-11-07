@@ -18,17 +18,9 @@ struct pppScaleLoopAutoWork {
     float m_delta;
 };
 
-STATIC_ASSERT(sizeof(pppScaleLoopAutoDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(pppScaleLoopAutoDataOffsets, m_workOffset) == 0x0);
-
-static inline pppScaleLoopAutoDataOffsets* GetScaleLoopAutoDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<pppScaleLoopAutoDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline pppScaleLoopAutoWork* GetScaleLoopAutoWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppScaleLoopAutoWork*>(object->m_workArea + GetScaleLoopAutoDataOffsets(ctrl)->m_workOffset);
+    return reinterpret_cast<pppScaleLoopAutoWork*>(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
 }
 
 /*

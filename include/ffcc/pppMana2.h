@@ -14,12 +14,6 @@ struct pppMana2;
 struct CTexture;
 struct CGObject;
 
-struct Mana2DataOffsets {
-    s32 m_unusedOffset;
-    s32 m_setupOffset;
-    s32 m_workOffset;
-};
-
 struct pppMana2Step {
     u8 m_pad00[0x4];
     s32 m_sourceTextureIds[6];

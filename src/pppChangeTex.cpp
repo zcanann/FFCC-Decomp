@@ -19,8 +19,6 @@ STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_workPositions) == 0xC);
-STATIC_ASSERT(offsetof(ChangeTexDataOffsets, m_colorBlockOffset) == 0x4);
-STATIC_ASSERT(offsetof(ChangeTexDataOffsets, m_workOffset) == 0x8);
 STATIC_ASSERT(sizeof(ChangeTexWork) == 0x48);
 STATIC_ASSERT(offsetof(ChangeTexWork, m_meshColorArrays) == 0x0C);
 STATIC_ASSERT(offsetof(ChangeTexWork, m_displayListArrays) == 0x10);
@@ -35,11 +33,6 @@ STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
-static inline ChangeTexDataOffsets* GetChangeTexDataOffsets(_pppCtrlTable* data)
-{
-	return reinterpret_cast<ChangeTexDataOffsets*>(data->m_serializedDataOffsets);
-}
-
 static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWork* work, ChangeTexStep* step)
 {
 	model->SetCallbackContext(work, step);
@@ -49,13 +42,13 @@ static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWo
 
 static inline ChangeTexWork* GetChangeTexWork(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
-	return reinterpret_cast<ChangeTexWork*>(changeTex->m_workArea + GetChangeTexDataOffsets(data)->m_workOffset);
+	return reinterpret_cast<ChangeTexWork*>(changeTex->m_workArea + data->m_serializedDataOffsets[2]);
 }
 
 static inline VColor* GetChangeTexColorBlock(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	return reinterpret_cast<VColor*>(
-	    changeTex->m_workArea + GetChangeTexDataOffsets(data)->m_colorBlockOffset);
+	    changeTex->m_workArea + data->m_serializedDataOffsets[1]);
 }
 
 /*

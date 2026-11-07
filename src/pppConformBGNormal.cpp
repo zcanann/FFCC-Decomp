@@ -27,14 +27,6 @@ struct ConformBgNormalCylinder {
     Vec m_boundsMax;
 };
 
-STATIC_ASSERT(sizeof(ConformBgNormalDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(ConformBgNormalDataOffsets, m_stateOffset) == 0x0);
-
-static inline ConformBgNormalDataOffsets* GetConformBgNormalDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<ConformBgNormalDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
 {
     return &owner->HitFaceNormal();
@@ -94,7 +86,7 @@ void pppFrameConformBGNormal(pppConformBGNormal* conformBG, pppConformBGNormalSt
     matrixX = pppMngSt->m_matrix.value[0][3];
     matrixY = pppMngSt->m_matrix.value[1][3];
     matrixZ = pppMngSt->m_matrix.value[2][3];
-    dataOffset = GetConformBgNormalDataOffsets(ctrl)->m_stateOffset;
+    dataOffset = ctrl->m_serializedDataOffsets[0];
     state = (ConformBgNormalState*)(conformBG->m_workArea + dataOffset);
 
     if (((s32)Game.m_currentSceneId != 7) || (step->m_stepValue == 2)) {
@@ -289,7 +281,7 @@ void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlT
     ConformBgNormalState* state;
     f32 scale;
 
-    state = (ConformBgNormalState*)(conformBG->m_workArea + GetConformBgNormalDataOffsets(ctrl)->m_stateOffset);
+    state = (ConformBgNormalState*)(conformBG->m_workArea + ctrl->m_serializedDataOffsets[0]);
     scale = 0.0f;
     state->m_normal.x = state->m_normal.y = state->m_normal.z = scale;
     state->m_initialized = 0;

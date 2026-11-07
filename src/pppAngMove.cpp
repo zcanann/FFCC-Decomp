@@ -9,14 +9,6 @@ struct PppAngMoveObj {
     int z;
 };
 
-STATIC_ASSERT(offsetof(PppAngMoveOffsets, m_angleOffset) == 0x0);
-STATIC_ASSERT(offsetof(PppAngMoveOffsets, m_velocityOffset) == 0x4);
-
-static inline PppAngMoveOffsets* GetPppAngMoveOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<PppAngMoveOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80064e5c
@@ -28,8 +20,8 @@ static inline PppAngMoveOffsets* GetPppAngMoveOffsets(_pppCtrlTable* ctrlTable)
  */
 void pppAngMoveCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
 {
-    PppAngMoveOffsets* offsets = GetPppAngMoveOffsets(ctrlTable);
-    PppAngMoveObj* work = (PppAngMoveObj*)(dest->m_workArea + offsets->m_velocityOffset);
+    int* offsets = ctrlTable->m_serializedDataOffsets;
+    PppAngMoveObj* work = (PppAngMoveObj*)(dest->m_workArea + offsets[1]);
     work->z = 0;
     work->y = 0;
     work->x = 0;
@@ -46,9 +38,9 @@ void pppAngMoveCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
  */
 void pppAngMove(_pppPObject* basePtr, PppAngMoveInput* inputData, _pppCtrlTable* ctrlTable)
 {
-    PppAngMoveOffsets* offsets = GetPppAngMoveOffsets(ctrlTable);
-    PppAngMoveObj* a = (PppAngMoveObj*)(basePtr->m_workArea + offsets->m_angleOffset);
-    PppAngMoveObj* b = (PppAngMoveObj*)(basePtr->m_workArea + offsets->m_velocityOffset);
+    int* offsets = ctrlTable->m_serializedDataOffsets;
+    PppAngMoveObj* a = (PppAngMoveObj*)(basePtr->m_workArea + offsets[0]);
+    PppAngMoveObj* b = (PppAngMoveObj*)(basePtr->m_workArea + offsets[1]);
 
     if (ppvUserStopPartF != 0) {
         return;

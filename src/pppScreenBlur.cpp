@@ -5,23 +5,14 @@
 #include <dolphin/gx.h>
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(ScreenBlurDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(ScreenBlurDataOffsets, m_valueOffset) == 0x0);
-STATIC_ASSERT(offsetof(ScreenBlurDataOffsets, m_activeOffset) == 0x4);
-
-static inline ScreenBlurDataOffsets* GetScreenBlurDataOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<ScreenBlurDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 static inline u8* GetScreenBlurValue(_pppPObject* blur, _pppCtrlTable* ctrlTable)
 {
-    return blur->m_workArea + GetScreenBlurDataOffsets(ctrlTable)->m_valueOffset;
+    return blur->m_workArea + ctrlTable->m_serializedDataOffsets[0];
 }
 
 static inline u8* GetScreenBlurActive(_pppPObject* blur, _pppCtrlTable* ctrlTable)
 {
-    return blur->m_workArea + GetScreenBlurDataOffsets(ctrlTable)->m_activeOffset;
+    return blur->m_workArea + ctrlTable->m_serializedDataOffsets[1];
 }
 
 /*

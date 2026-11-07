@@ -9,14 +9,7 @@
 
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frameCount) == 0x6);
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frames) == 0x10);
-STATIC_ASSERT(offsetof(ShapeRuntimeData, shapeDataOffset) == 0x0);
-STATIC_ASSERT(offsetof(ShapeRuntimeData, posDataOffset) == 0x4);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
-
-static inline ShapeRuntimeData* GetDrawShape2RuntimeData(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<ShapeRuntimeData*>(ctrlTable->m_serializedDataOffsets);
-}
 
 /*
  * --INFO--
@@ -28,9 +21,9 @@ static inline ShapeRuntimeData* GetDrawShape2RuntimeData(_pppCtrlTable* ctrlTabl
  * JP Size: TODO
  */
 void pppDrawShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrlTable* ctrlTable){
-    ShapeRuntimeData* runtimeData = GetDrawShape2RuntimeData(ctrlTable);
-    ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
-    VColor* posData = (VColor*)(object->m_workArea + runtimeData->posDataOffset);
+    int* runtimeData = ctrlTable->m_serializedDataOffsets;
+    ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData[0]);
+    VColor* posData = (VColor*)(object->m_workArea + runtimeData[1]);
     s32 type = controlData->type;
 
     if (type == 0xFFFF) {
@@ -74,8 +67,8 @@ void pppCalcShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrl
         return;
     }
 
-    ShapeRuntimeData* runtimeData = GetDrawShape2RuntimeData(ctrlTable);
-    ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
+    int* runtimeData = ctrlTable->m_serializedDataOffsets;
+    ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData[0]);
     s32 type = controlData->type;
 
     if (type == 0xFFFF) {
@@ -122,8 +115,8 @@ void pppCalcShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrl
  */
 void pppDrawShape2Construct(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-    ShapeRuntimeData* data = GetDrawShape2RuntimeData(ctrlTable);
-    ShapeState* shapeData = (ShapeState*)(object->m_workArea + data->shapeDataOffset);
+    int* data = ctrlTable->m_serializedDataOffsets;
+    ShapeState* shapeData = (ShapeState*)(object->m_workArea + data[0]);
 
     shapeData->currentId = 0;
     shapeData->counter = 0;

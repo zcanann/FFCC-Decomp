@@ -112,11 +112,6 @@ STATIC_ASSERT(offsetof(CmakeMenuState, m_subSelect) == 0x2C);
 STATIC_ASSERT(offsetof(CmakeMenuState, m_resultFlag) == 0x2E);
 STATIC_ASSERT(offsetof(CmakeMenuState, m_fieldSelect) == 0x30);
 
-static inline unsigned char& MenuU8(CMenuPcs* menu, int offset)
-{
-    return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(menu) + offset);
-}
-
 static inline CCharaPcs::CHandle* GetCmakeCharaHandle(CMenuPcs* menu, int slot)
 {
     int index = slot + 0x20;
@@ -2919,7 +2914,7 @@ void CMenuPcs::CmakeResultDraw1()
 #ifndef VERSION_GCCP01
 inline void CMenuPcs::CmakeVillageOpen()
 {
-    MenuU8(this, 0x16) = 1;
+    m_wmResetRequest = 1;
     createVillageMenu();
 }
 #endif
@@ -3073,7 +3068,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
  */
 inline void CMenuPcs::CmakeVillageClose()
 {
-    MenuU8(this, 0x16) = 0;
+    m_wmResetRequest = 0;
     destroyVillageMenu();
 }
 
@@ -3199,7 +3194,7 @@ inline void CMenuPcs::SetSingMakeChara()
 inline void CMenuPcs::createVillageMenu()
 {
     if (m_menuResultCode == 0) {
-        MenuU8(this, 0x16) = 1;
+        m_wmResetRequest = 1;
         calcVillageMenu();
     }
 }
@@ -3248,8 +3243,8 @@ void CMenuPcs::destroyVillageMenu()
  */
 void CMenuPcs::calcVillageMenu()
 {
-    if (MenuU8(this, 0x16) != 0 && m_menuResultCode == 0) {
-        if (m_menuResultCode == 0 && MenuU8(this, 0x16) != 0) {
+    if (m_wmResetRequest != 0 && m_menuResultCode == 0) {
+        if (m_menuResultCode == 0 && m_wmResetRequest != 0) {
             if (Game.m_gameWork.m_menuStageMode == 0) {
 #ifdef VERSION_GCCJGC
                 loadFont(2, const_cast<char*>(s_cmakeSubfontPath), 4, -1);
@@ -3280,7 +3275,7 @@ void CMenuPcs::calcVillageMenu()
 
     short active = m_menuResultCode;
     if (active != 0) {
-        if (MenuU8(this, 0x16) == 0 && active != 0) {
+        if (m_wmResetRequest == 0 && active != 0) {
             if (active != 0) {
                 if (Game.m_gameWork.m_menuStageMode == 0) {
                     CFont*& font = m_fonts[CMAKE_FONT_VILLAGE];
@@ -3344,7 +3339,7 @@ void CMenuPcs::drawVillageMenu()
             if (mode < 2) {
                 mode = mode + 1;
             } else {
-                MenuU8(this, 0x16) = 0;
+                m_wmResetRequest = 0;
                 CallWorldParam(10, 0, 0);
             }
             villageWork->m_frame = 0;

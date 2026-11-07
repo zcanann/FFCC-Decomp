@@ -37,11 +37,6 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-static inline CPad::PadInput& CameraPadInput(int port)
-{
-    return Pad.m_padInputs[(Pad.m_debugPadPort == port) ? 0 : port];
-}
-
 namespace {
 
 STATIC_ASSERT(offsetof(CCameraPcs, m_cameraMatrix) == 0x04);
@@ -473,19 +468,13 @@ void CCameraPcs::calc()
         float cosPitchZ;
         float cosYaw;
 
-        float stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                           ? 0.0f
-                           : CameraPadInput(0).substickXF;
+        float stickH = Pad.GetRightStickX(0);
         m_yaw += 0.017453292f * (10.0f * stickH);
 
-        float stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                           ? 0.0f
-                           : CameraPadInput(0).substickYF;
+        float stickV = Pad.GetRightStickY(0);
         m_pitch += 0.017453292f * (5.0f * stickV);
 
-        float triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                           ? 0.0f
-                           : CameraPadInput(0).stickXF;
+        float triggerL = Pad.GetLeftStickX(0);
         m_distance += 5.0f * triggerL;
 
         float triggerR = Pad.GetTriggerLeft(0);
@@ -504,9 +493,7 @@ void CCameraPcs::calc()
         cosYaw = static_cast<float>(cos(yaw));
         const float cosXCosY = cosYaw * cosPitchZ;
 
-        float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                           ? 0.0f
-                           : CameraPadInput(0).stickYF;
+        float panStick = Pad.GetLeftStickY(0);
         const float camMove = 10.0f * panStick;
 
         m_targetX = sinXCosY * camMove + m_targetX;
@@ -781,11 +768,7 @@ void CCameraPcs::calcChara()
     if (m_viewerOverride != 0) {
         m_viewerOverride = 0;
     } else {
-        if (Pad.m_debugPadLock != 0) {
-            padButtons = 0;
-        } else {
-            padButtons = CameraPadInput(4).button[0];
-        }
+        padButtons = Pad.GetButton(4);
 
         stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
         m_viewer.m_position.y += stick;
@@ -793,10 +776,10 @@ void CCameraPcs::calcChara()
         stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
         m_viewer.m_position.y -= stick;
 
-        stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickXF;
+        stick = Pad.GetLeftStickX(4);
         m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
 
-        stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickYF;
+        stick = Pad.GetLeftStickY(4);
         m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
 
         stick = Pad.GetTriggerLeft(4);
@@ -903,15 +886,15 @@ void CCameraPcs::calcMap()
     Vec upVec;
     int i;
 
-    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraPadInput(0).button[0];
+    buttons = Pad.GetButton(0);
 
-    stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0.0f : CameraPadInput(0).substickXF;
+    stickH = Pad.GetRightStickX(0);
     stickH = 0.017453292519943295f * (stickH / 0.125f);
 
-    stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0.0f : CameraPadInput(0).substickYF;
+    stickV = Pad.GetRightStickY(0);
     stickV = -(0.017453292519943295f * (stickV / 0.125f));
 
-    triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0.0f : CameraPadInput(0).stickXF;
+    triggerL = Pad.GetLeftStickX(0);
 
     m_fov += triggerL;
     m_mapRotX += stickV;
@@ -1191,10 +1174,10 @@ void CCameraPcs::drawShadowBegin()
     m_shadowCamera = cur;
 
     if (Game.m_currentSceneId == 3) {
-        float stickX = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(1).stickXF;
+        float stickX = Pad.GetLeftStickX(1);
         m_fullScreenShadow.m_rotY += 0.017453292f * (4.0f * stickX);
 
-        float stickY = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(1).stickYF;
+        float stickY = Pad.GetLeftStickY(1);
         m_fullScreenShadow.m_rotX += 0.017453292f * (2.0f * stickY);
     }
 
@@ -1539,11 +1522,7 @@ void CCameraPcs::calcMaterialEditor()
     C_MTXPerspective(m_screenMatrix, 33.3f, 1.3333334f, 0.125f, 375.0f);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (Pad.m_debugPadLock != 0) {
-        padButtons = 0;
-    } else {
-        padButtons = CameraPadInput(4).button[0];
-    }
+    padButtons = Pad.GetButton(4);
 
     stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
     m_viewer.m_position.y += stick;
@@ -1551,10 +1530,10 @@ void CCameraPcs::calcMaterialEditor()
     stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
     m_viewer.m_position.y -= stick;
 
-    stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickXF;
+    stick = Pad.GetLeftStickX(4);
     m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
 
-    stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickYF;
+    stick = Pad.GetLeftStickY(4);
     m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
 
     stick = Pad.GetTriggerLeft(4);
@@ -1634,11 +1613,7 @@ void CCameraPcs::calcFunnyShape()
     C_MTXPerspective(m_screenMatrix, 33.3f, 1.3333334f, 0.125f, 3000.0f);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (Pad.m_debugPadLock != 0) {
-        padButtons = 0;
-    } else {
-        padButtons = CameraPadInput(4).button[0];
-    }
+    padButtons = Pad.GetButton(4);
 
     stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
     m_viewer.m_position.y += stick;
@@ -1646,10 +1621,10 @@ void CCameraPcs::calcFunnyShape()
     stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
     m_viewer.m_position.y -= stick;
 
-    stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickXF;
+    stick = Pad.GetLeftStickX(4);
     m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
 
-    stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickYF;
+    stick = Pad.GetLeftStickY(4);
     m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
 
     stick = Pad.GetTriggerLeft(4);

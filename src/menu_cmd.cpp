@@ -1629,6 +1629,7 @@ inline int CMenuPcs::ChkCmdActive(int itemIndex)
  */
 int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
+	int j;
 	int slot;
 	int matchCount;
 	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
@@ -1637,10 +1638,11 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	int candidates[10];
 	int k;
 	int ok;
-	int start;
+	int i;
+	int len;
 
 	if (comboOut != nullptr) {
-		for (int i = 0; i < 5; i++) {
+		for (i = 0; i < 5; i++) {
 			comboOut[i][0] = -1;
 			comboOut[i][1] = -1;
 		}
@@ -1683,22 +1685,22 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		if (caravan->m_numCmdListSlots <= slot) {
 			break;
 		}
-		const int itemRef = caravan->m_commandListInventorySlotRef[slot];
-		if (itemRef < 0) {
+		j = caravan->m_commandListInventorySlotRef[slot];
+		if (j < 0) {
 			continue;
 		}
 
-		const int itemId = caravan->m_inventoryItems[itemRef];
-		const int icon = GetItemIcon(itemId);
+		i = caravan->m_inventoryItems[j];
+		const int icon = GetItemIcon(i);
 
-		if (IsMagicArti(itemId)) {
-			if (itemId == 0xdf) {
+		if (IsMagicArti(i)) {
+			if (i == 0xdf) {
 				itemKinds[slot] = 0x100;
-			} else if (itemId == 0xe0) {
+			} else if (i == 0xe0) {
 				itemKinds[slot] = 0x101;
-			} else if (itemId == 0xe1) {
+			} else if (i == 0xe1) {
 				itemKinds[slot] = 0x102;
-			} else if (itemId == 0xe2) {
+			} else if (i == 0xe2) {
 				itemKinds[slot] = 0x105;
 			} else {
 				itemKinds[slot] = 0x107;
@@ -1706,7 +1708,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		} else if ((icon == kIconClavatWeapon) || (icon == kIconLiltyWeapon) || (icon == kIconYukeWeapon) || (icon == kIconSelkieWeapon)) {
 			itemKinds[slot] = 999;
 		} else if ((icon == 0x10) || (icon == 0x11)) {
-			itemKinds[slot] = itemId;
+			itemKinds[slot] = i;
 		} else {
 			itemKinds[slot] = -1;
 		}
@@ -1725,13 +1727,13 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			if (pat->food == 0) {
 				continue;
 			}
-			const int len1 = pat->count;
-			if ((len1 == 2) && (selectedFlag != 0)) {
+			len = pat->count;
+			if ((len == 2) && (selectedFlag != 0)) {
 				continue;
 			}
 			k = ok = 0;
-			for (; k < len1 - 1; k++) {
-				slot = selected - (len1 - 1 - k);
+			for (; k < len - 1; k++) {
+				slot = selected - (len - 1 - k);
 				if (candidates[slot] != 0) {
 					break;
 				}
@@ -1739,18 +1741,18 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 					ok++;
 				}
 			}
-			if (ok == len1 - 1) {
+			if (ok == len - 1) {
 				matches[matchCount][0] = patIdx;
-				matches[matchCount++][1] = selected - (len1 - 1);
+				matches[matchCount++][1] = selected - (len - 1);
 			}
 		}
 	} else if (selectedFlag == 0) {
-		const int baseLen = static_cast<int>(s_Unite[0].count);
-		start = selected - (baseLen - 1);
-		for (int i = 0; i < baseLen; i++, start++) {
+		len = static_cast<int>(s_Unite[0].count);
+		i = selected - (len - 1);
+		for (j = 0; j < len; j++, i++) {
 			k = ok = 0;
-			for (; k < baseLen; k++) {
-				slot = i + (selected - ((baseLen - 1) - k));
+			for (; k < len; k++) {
+				slot = j + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
@@ -1758,9 +1760,9 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 					ok++;
 				}
 			}
-			if (ok == baseLen) {
+			if (ok == len) {
 				matches[matchCount][0] = 0;
-				matches[matchCount++][1] = start;
+				matches[matchCount++][1] = i;
 			}
 		}
 	}
@@ -1772,15 +1774,15 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			continue;
 		}
 
-		const int len = pat->count;
-		for (start = 0; start < len; start++) {
-			if ((start == 0) && (selectedFlag != 0)) {
-				start++;
+		len = pat->count;
+		for (i = 0; i < len; i++) {
+			if ((i == 0) && (selectedFlag != 0)) {
+				i++;
 			}
 
 			k = ok = 0;
 			for (; k < len; k++) {
-				slot = start + (selected - ((len - 1) - k));
+				slot = i + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
@@ -1791,14 +1793,14 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 			if (ok == len) {
 				matches[matchCount][0] = group;
-				matches[matchCount++][1] = start + (selected - (len - 1));
+				matches[matchCount++][1] = i + (selected - (len - 1));
 			}
 		}
 	}
 
 	int n = 0;
 	for (int rank = 0; rank < 2; rank++) {
-		for (int i = 0; i < matchCount; i++) {
+		for (i = 0; i < matchCount; i++) {
 			if (rank + 2 == s_Unite[matches[i][0]].count) {
 				comboOut[n][0] = matches[i][0];
 				comboOut[n][1] = matches[i][1];

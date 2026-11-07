@@ -9225,6 +9225,7 @@ s_AnimX = .rodata:0x801D8CD4; // type:object size:0xC scope:local
 @2477 = .rodata:0x801D8CE0; // type:object size:0xF scope:local data:string
 @2478 = .rodata:0x801D8CF0; // type:object size:0x28 scope:local data:string
 @4170 = .rodata:0x801D8D18; // type:object size:0x15 scope:local data:string
+@5108 = .rodata:0x801D8D30; // type:object size:0x16 scope:local data:string
 @849 = .rodata:0x801D8D48; // type:object size:0x18 data:4byte scope:local
 @850 = .rodata:0x801D8D60; // type:object size:0x30 data:4byte scope:local
 @909 = .rodata:0x801D8D90; // type:object size:0x10 data:string scope:local

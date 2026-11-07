@@ -118,12 +118,6 @@ static inline CCharaPcs::CHandle* GetCmakeCharaHandle(CMenuPcs* menu, int slot)
     return menu->m_wm.m_handles[index];
 }
 
-static inline void ReleaseRefObject(void* object)
-{
-    CRef* ref = reinterpret_cast<CRef*>(object);
-    ref->Release();
-}
-
 static inline void SetCmakeBlendMatColor(float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -198,11 +192,6 @@ CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
 
 static CmakeInfo s_CmakeInfo;
 static char s_CmakeVillageName[0x11];
-
-static inline void LoadCmakeVillageName()
-{
-    strcpy(s_CmakeInfo.m_name, Game.m_gameWork.m_townName);
-}
 
 /*
  * --INFO--
@@ -3215,7 +3204,7 @@ void CMenuPcs::destroyVillageMenu()
         if (Game.m_gameWork.m_menuStageMode == 0) {
             CFont*& font = m_fonts[CMAKE_FONT_VILLAGE];
             if (font != 0) {
-                ReleaseRefObject(font);
+                font->Release();
                 font = 0;
             }
         }
@@ -3268,7 +3257,7 @@ void CMenuPcs::calcVillageMenu()
 #endif
             villageWork = operator new(0x48, stage, const_cast<char*>(CMAKE_SOURCE_NAME), allocationLine);
             memset(villageWork, 0, 0x48);
-            LoadCmakeVillageName();
+            strcpy(s_CmakeInfo.m_name, Game.m_gameWork.m_townName);
             m_menuResultCode = 1;
         }
     }
@@ -3280,7 +3269,7 @@ void CMenuPcs::calcVillageMenu()
                 if (Game.m_gameWork.m_menuStageMode == 0) {
                     CFont*& font = m_fonts[CMAKE_FONT_VILLAGE];
                     if (font != 0) {
-                        ReleaseRefObject(font);
+                        font->Release();
                         font = 0;
                     }
                 }

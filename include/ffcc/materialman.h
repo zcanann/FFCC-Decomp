@@ -316,7 +316,7 @@ public:
         return m_textureData.m_textures[index + 2];
     }
     void SetTag(int);
-    void AddTextureIdx(CChunkFile&);
+    void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
     {
         m_materialColor = *reinterpret_cast<GXColor*>(&rgba);

@@ -57,7 +57,9 @@ static inline CMaterial* AllocMaterial()
 
 static inline void AddTextureIndex(CMaterial* material, CChunkFile& chunkFile)
 {
-    material->AddTextureIdx(chunkFile);
+    int index = material->GetNumTexture();
+    material->IncNumTexture();
+    material->AddTextureIdx(index, chunkFile.Get2());
 }
 
 static inline CMapKeyFrame* AllocMapKeyFrame(int line)
@@ -120,14 +122,16 @@ inline void CMaterialMan::SetStdEnv()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x8004EE98
+ * EN Size: 20b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline void CMaterial::AddTextureIdx(CChunkFile& chunkFile)
+inline void CMaterial::AddTextureIdx(int index, int textureIndex)
 {
-    int index = GetNumTexture();
-    IncNumTexture();
-    m_textureIndices[index] = static_cast<short>(chunkFile.Get2());
+    m_textureIndices[index] = static_cast<short>(textureIndex);
 }
 
 /*
@@ -3715,8 +3719,8 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
                 new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xEE4) CMaterial;
 
             newMaterial->Create(1, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-            newMaterial->m_textureIndices[0] = static_cast<short>(textureIndex);
-            newMaterial->m_pdtSlotIndex = pdtSlotIndex;
+            newMaterial->AddTextureIdx(0, textureIndex);
+            newMaterial->SetTag(pdtSlotIndex);
 
             AddMaterial(newMaterial, materialIndex);
         }
@@ -3785,6 +3789,7 @@ inline void CMaterial::IncNumTexture()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMaterial::SetTag(int)
+inline void CMaterial::SetTag(int tag)
 {
+    m_pdtSlotIndex = tag;
 }

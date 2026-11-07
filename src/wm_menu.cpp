@@ -8646,20 +8646,20 @@ nextListEntry:
 			MenuPcs.DrawRect(0, FLOAT_80331468, rowY, 24.0f, 40.0f,
 			         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-			int totalWidth = 0;
+			int n = 0;
 			if (slotData->m_characterIds[0] >= 0) {
-				totalWidth = 1;
+				n = 1;
 			}
 			if (slotData->m_characterIds[1] >= 0) {
-				totalWidth++;
+				n++;
 			}
 			if (slotData->m_characterIds[2] >= 0) {
-				totalWidth++;
+				n++;
 			}
 			if (slotData->m_characterIds[3] >= 0) {
-				totalWidth++;
+				n++;
 			}
-			const int panelWidth = totalWidth * 0x30 + 0x40;
+			const int panelWidth = n * 0x30 + 0x40;
 			capX += 24.0f + static_cast<float>(panelWidth);
 			MenuPcs.DrawRect(8, capX, rowY, 24.0f, 40.0f,
 			         FLOAT_803313dc, FLOAT_803313dc,
@@ -8688,15 +8688,15 @@ nextListEntry:
 			} else {
 				for (digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 					if (digitCount == 1) {
-						totalWidth = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
+						n = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
 					} else if (digitIdx == 0) {
-						totalWidth = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) / 10];
+						n = s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) / 10];
 					} else {
-						totalWidth += s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
+						n += s_YearWTbl[static_cast<int>(slotData->m_scriptSysVal0) % 10];
 					}
 				}
 #ifdef VERSION_GCCJGC
-				digitX += (float)((32 - totalWidth) / 2);
+				digitX += (float)((32 - n) / 2);
 #else
 				double digitScaleD;
 				if (language != 5) {
@@ -8706,28 +8706,27 @@ nextListEntry:
 				}
 				float digitScale = static_cast<float>(digitScaleD);
 				if (language == 2) {
-					totalWidth += 8;
+					n += 8;
 				} else if (language == 3) {
-					totalWidth += 0xB;
+					n += 0xB;
 				} else if (language != 5) {
-					totalWidth += 0x20;
+					n += 0x20;
 				}
-				digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
+				digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(n) * digitScale)) / 2);
 #endif
 				for (digitIdx = 0; digitIdx < digitCount; digitIdx++) {
-					int digit;
 					if (digitCount == 1) {
-						digit = static_cast<int>(slotData->m_scriptSysVal0) % 10;
+						n = static_cast<int>(slotData->m_scriptSysVal0) % 10;
 					} else if (digitIdx == 0) {
-						digit = static_cast<int>(slotData->m_scriptSysVal0) / 10;
+						n = static_cast<int>(slotData->m_scriptSysVal0) / 10;
 					} else {
-						digit = static_cast<int>(slotData->m_scriptSysVal0) % 10;
+						n = static_cast<int>(slotData->m_scriptSysVal0) % 10;
 					}
-					const int digitWidth = s_YearWTbl[digit];
+					const int digitWidth = s_YearWTbl[n];
 					const float digitWidthF = static_cast<float>(digitWidth);
 					MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, 32.0f,
-					         static_cast<float>(24.0 * static_cast<float>(digit % 5)),
-					         static_cast<float>(32.0 * static_cast<float>(digit / 5) + 360.0),
+					         static_cast<float>(24.0 * static_cast<float>(n % 5)),
+					         static_cast<float>(32.0 * static_cast<float>(n / 5) + 360.0),
 #ifdef VERSION_GCCJGC
 					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					digitX += digitWidthF;
@@ -8863,16 +8862,14 @@ nextListEntry:
 				if (playDigits[digitIdx] >= 0) {
 					if (digitIdx == 3) {
 						const float colonW = static_cast<float>(s_TimeWTbl[10]);
-						const float* pOe5 = &FLOAT_803313e8;
 						MenuPcs.DrawRect(0, playX, rowY, colonW, 24.0f,
-						         296.0f, FLOAT_803313dc, *pOe5, *pOe5, FLOAT_803313dc);
+						         296.0f, FLOAT_803313dc, 1.0f, 1.0f, FLOAT_803313dc);
 						playX += colonW;
 					}
 					const float digitW = static_cast<float>(s_TimeWTbl[playDigits[digitIdx]]);
-					const float* pOe6 = &FLOAT_803313e8;
 					MenuPcs.DrawRect(0, playX, rowY, digitW, 24.0f,
 					         static_cast<float>(24.0 * static_cast<double>(playDigits[digitIdx]) + 56.0),
-					         FLOAT_803313dc, *pOe6, *pOe6, FLOAT_803313dc);
+					         FLOAT_803313dc, 1.0f, 1.0f, FLOAT_803313dc);
 					playX += digitW;
 				}
 			}

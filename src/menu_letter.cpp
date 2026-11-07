@@ -1147,6 +1147,7 @@ void CMenuPcs::LetterDraw()
  */
 void CMenuPcs::LetterListDraw()
 {
+	int row;
 	SingleFadeEntry* panels = m_singleFadeState->entries;
 	CFont* font;
 	CCaravanWork::CLetterWork* letter;
@@ -1191,7 +1192,7 @@ void CMenuPcs::LetterListDraw()
 	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
 	int letterIndex;
 	float yf;
-	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
+	for (row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
 		letter = &caravanWork->m_letters[letterIndex];
 		yf = static_cast<float>(y);
 
@@ -1247,7 +1248,7 @@ void CMenuPcs::LetterListDraw()
 	const int iconX = static_cast<int>(iconXf);
 	const int iconTopRow = static_cast<int>(m_letterMenuState->topIndex);
 	int iconLetterIndex;
-	for (int row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
+	for (row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
 		if (caravanWork->m_letters[iconLetterIndex].m_attachValue != 0) {
 			DrawSingleIcon(caravanWork->m_letters[iconLetterIndex].m_attachmentClaimed ? 0x27 : 0x26, iconX, static_cast<int>(static_cast<float>(iconY)), 1.0f, 1, 1.0f);
 		}

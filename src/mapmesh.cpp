@@ -17,69 +17,6 @@ static const float kMapMeshInitialMaxBound = -10000000000.0f;
 
 static CMemory::CStage* g_pStage;
 
-namespace {
-static inline void AddMeshDataBase(void*& ptr, void* base)
-{
-    ptr = reinterpret_cast<void*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(Vec*& ptr, void* base)
-{
-    ptr = reinterpret_cast<Vec*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(S16Vec*& ptr, void* base)
-{
-    ptr = reinterpret_cast<S16Vec*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(CMapMeshUvPair*& ptr, void* base)
-{
-    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(GXColor*& ptr, void* base)
-{
-    ptr = reinterpret_cast<GXColor*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
-{
-    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void SubMeshDataBase(void*& ptr, void* base)
-{
-    ptr = reinterpret_cast<void*>(static_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(Vec*& ptr, void* base)
-{
-    ptr = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(S16Vec*& ptr, void* base)
-{
-    ptr = reinterpret_cast<S16Vec*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(CMapMeshUvPair*& ptr, void* base)
-{
-    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(GXColor*& ptr, void* base)
-{
-    ptr = reinterpret_cast<GXColor*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
-{
-    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-}
-
 /*
  * --INFO--
  * PAL Address: TODO
@@ -561,12 +498,12 @@ void CMapMesh::Off2Ptr()
     int i = 0;
     offset = 0;
 
-    AddMeshDataBase(m_vertices, m_meshData);
-    AddMeshDataBase(m_normals, m_meshData);
-    AddMeshDataBase(m_nbt, m_meshData);
-    AddMeshDataBase(m_uvPairs, m_meshData);
-    AddMeshDataBase(m_colors, m_meshData);
-    AddMeshDataBase(m_drawEntries, m_meshData);
+    m_vertices = (Vec*)((u32)m_vertices + (u32)m_meshData);
+    m_normals = (S16Vec*)((u32)m_normals + (u32)m_meshData);
+    m_nbt = (void*)((u32)m_nbt + (u32)m_meshData);
+    m_uvPairs = (CMapMeshUvPair*)((u32)m_uvPairs + (u32)m_meshData);
+    m_colors = (GXColor*)((u32)m_colors + (u32)m_meshData);
+    m_drawEntries = (CMapMeshDrawEntry*)((u32)m_drawEntries + (u32)m_meshData);
 
     for (; i < static_cast<int>(static_cast<unsigned short>(m_displayListCount)); i++) {
         entry = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset);
@@ -590,12 +527,12 @@ void CMapMesh::Ptr2Off()
         return;
     }
 
-    SubMeshDataBase(m_vertices, m_meshData);
-    SubMeshDataBase(m_normals, m_meshData);
-    SubMeshDataBase(m_nbt, m_meshData);
-    SubMeshDataBase(m_uvPairs, m_meshData);
-    SubMeshDataBase(m_colors, m_meshData);
-    SubMeshDataBase(m_drawEntries, m_meshData);
+    m_vertices = (Vec*)((u32)m_vertices - (u32)m_meshData);
+    m_normals = (S16Vec*)((u32)m_normals - (u32)m_meshData);
+    m_nbt = (void*)((u32)m_nbt - (u32)m_meshData);
+    m_uvPairs = (CMapMeshUvPair*)((u32)m_uvPairs - (u32)m_meshData);
+    m_colors = (GXColor*)((u32)m_colors - (u32)m_meshData);
+    m_drawEntries = (CMapMeshDrawEntry*)((u32)m_drawEntries - (u32)m_meshData);
 }
 
 /*

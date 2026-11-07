@@ -42,11 +42,6 @@ static int l_idxAttackCol = 0;
 extern "C" {
 }
 
-static inline float& CharaObjTargetAngle(CGCharaObj* charaObj)
-{
-	return charaObj->m_targetAngle;
-}
-
 static __inline float CharaObjGetRotateY(const Vec& vector)
 {
 	if (vector.x == 0.0f && vector.z == 0.0f) {
@@ -135,19 +130,6 @@ static inline unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, u
 	}
 
 	return particleBank;
-}
-
-static inline int CharaObjDecodeHitParticleSe(unsigned short seData)
-{
-	return (seData == 0xFFFF) ? 0 : (seData & 0xFF) + static_cast<int>(seData >> 8) * 1000;
-}
-
-static inline int CharaObjDecodeSe(unsigned short encodedSe)
-{
-	if (encodedSe == 0xFFFF) {
-		return 0;
-	}
-	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);
 }
 
 static inline int CharaObjResolveParticleBank(CGCharaObj* charaObj, int particleClass)
@@ -402,7 +384,7 @@ void CGCharaObj::onFramePreCalc()
 		PSVECSubtract(&Game.m_chaliceObject->m_worldPosition, &m_worldPosition,
 			&m_targetDelta);
 		m_targetDist = PSVECMag(&m_targetDelta);
-		CharaObjTargetAngle(this) = reinterpret_cast<CVector*>(&m_targetDelta)->GetRotateY();
+		m_targetAngle = reinterpret_cast<CVector*>(&m_targetDelta)->GetRotateY();
 	}
 
 	for (int i = 0; i < 4; i++) {
@@ -945,7 +927,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 
 	SCharaItemRow* seRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 	seSpec = seRows[itemId].m_seSpec;
-	int seNo = CharaObjDecodeHitParticleSe(seSpec);
+	int seNo = (seSpec == 0xFFFF) ? 0 : (seSpec & 0xFF) + static_cast<int>(seSpec >> 8) * 1000;
 	if (seNo != 0) {
 		playSe3D(seNo + particleOffset, 0x32, 0x96, 0, 0);
 	}
@@ -2238,7 +2220,7 @@ checkParticle:
 		switch (effectArg0) {
 		case 0: {
 			SCharaItemRow* seRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-			int decoded = CharaObjDecodeSe(seRows[effectId].m_se);
+			int decoded = (seRows[effectId].m_se == 0xFFFF) ? 0 : (seRows[effectId].m_se & 0xFF) + ((seRows[effectId].m_se >> 8) * 1000);
 			if (decoded != 0) {
 				unsigned short seFlag = seRows[effectId].m_seFlag;
 				if ((seFlag & 0x8000) != 0) {
@@ -2251,7 +2233,7 @@ checkParticle:
 		}
 		case 1: {
 			SCharaItemRow* seRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-			int decoded = CharaObjDecodeSe(seRows[effectId].m_se1);
+			int decoded = (seRows[effectId].m_se1 == 0xFFFF) ? 0 : (seRows[effectId].m_se1 & 0xFF) + ((seRows[effectId].m_se1 >> 8) * 1000);
 			if (decoded != 0) {
 				unsigned short seFlag = seRows[effectId].m_seFlag1;
 				if ((seFlag & 0x8000) != 0) {
@@ -2264,7 +2246,7 @@ checkParticle:
 		}
 		case 2: {
 			SCharaItemRow* seRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-			int decoded = CharaObjDecodeSe(seRows[effectId].m_se2);
+			int decoded = (seRows[effectId].m_se2 == 0xFFFF) ? 0 : (seRows[effectId].m_se2 & 0xFF) + ((seRows[effectId].m_se2 >> 8) * 1000);
 			if (decoded != 0) {
 				if ((seRows[effectId].m_particleFlags & 0x400) != 0) {
 					CFlat.SetParticleWorkSe(decoded, 2, 0);

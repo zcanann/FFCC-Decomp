@@ -9371,23 +9371,25 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		return;
 	}
 
-	float v1;
 	float u1;
+	float v1;
+	float u0 = tx;
+	float v0 = ty;
 
 	if ((flags & 8) != 0) {
-		u1 = tx + FLOAT_80331434;
-		tx = (tx + w) - FLOAT_80331434;
+		u1 = u0 + FLOAT_80331434;
+		u0 = (u0 + w) - FLOAT_80331434;
 	} else {
-		u1 = (tx + w) - FLOAT_80331434;
-		tx += FLOAT_80331434;
+		u1 = (u0 + w) - FLOAT_80331434;
+		u0 += FLOAT_80331434;
 	}
 
 	if ((flags & 4) != 0) {
-		v1 = ty + FLOAT_80331434;
-		ty = (v1 + h) - FLOAT_80331434;
+		v1 = v0 + FLOAT_80331434;
+		v0 = (v1 + h) - FLOAT_80331434;
 	} else {
-		v1 = (ty + h) - FLOAT_80331434;
-		ty += FLOAT_80331434;
+		v1 = (v0 + h) - FLOAT_80331434;
+		v0 += FLOAT_80331434;
 	}
 
 	float wS = w * scaleX;
@@ -9425,13 +9427,13 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		if ((i & 1) != 0) {
 			uu = u1;
 		} else {
-			uu = tx;
+			uu = u0;
 		}
 		float vv;
 		if (i < 2) {
 			vv = v1;
 		} else {
-			vv = ty;
+			vv = v0;
 		}
 		GXTexCoord2f32(uu, vv);
 	}

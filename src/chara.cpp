@@ -1020,11 +1020,10 @@ void CChara::CModel::calcMatrix()
 		if (node->m_animNodes[0] != 0 || node->m_animNodes[1] != 0) {
 			if (parentNode != 0 && parentNode->m_animNodes[0] != 0 && parentNode->m_animNodes[0]->IsScale()) {
 				if (node->m_flagsBits.m_flag_80) {
-					float* parentScale = (float*)(reinterpret_cast<u8*>(parentNode) + 0x8);
 					PSMTXScale(node->m_localRuntimeMtx,
-					           1.0f / parentScale[0],
-					           1.0f / parentScale[1],
-					           1.0f / parentScale[2]);
+					           1.0f / parentNode->m_scale.x,
+					           1.0f / parentNode->m_scale.y,
+					           1.0f / parentNode->m_scale.z);
 				}
 			} else if (node->m_flagsBits.m_flag_80) {
 				float baseScale;
@@ -1079,13 +1078,11 @@ void CChara::CModel::calcMatrix()
 				if (node->m_flagsBits.m_flag_80) {
 					PSMTXConcat(node->m_localRuntimeMtx, animMtx, node->m_localRuntimeMtx);
 				}
-				float* runtimeScale = (float*)(reinterpret_cast<u8*>(node) + 0x8);
-				runtimeScale[0] = srt.m_scale.x;
-				runtimeScale[1] = srt.m_scale.y;
-				runtimeScale[2] = srt.m_scale.z;
+				node->m_scale.x = srt.m_scale.x;
+				node->m_scale.y = srt.m_scale.y;
+				node->m_scale.z = srt.m_scale.z;
 			} else {
-				float* runtimeScale = (float*)(reinterpret_cast<u8*>(node) + 0x8);
-				runtimeScale[0] = runtimeScale[1] = runtimeScale[2] = 0.0f;
+				node->m_scale.x = node->m_scale.y = node->m_scale.z = 0.0f;
 			}
 		} else {
 			if (node->m_flagsBits.m_flag_80) {

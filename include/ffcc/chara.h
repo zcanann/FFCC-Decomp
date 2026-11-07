@@ -223,7 +223,7 @@ public:
 
 		CRefData* m_refData;
 		CMesh* m_displayMesh;
-		u8 _pad08[0x0C];
+		Vec m_scale;
 		Mtx m_localRuntimeMtx;
 		Quaternion m_previousQuat;
 		Vec m_previousPosition;

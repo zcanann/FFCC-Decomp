@@ -1493,7 +1493,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 
 skip_target_update:
 		int teamNo = m_scriptHandle->m_saveSlot;
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(prgObj) + 0x6C0) = teamNo;
+		static_cast<CGPartyObj*>(prgObj)->m_partyData.unk6C0 = teamNo;
 		GbaQue.SetHitEnemy(SAFE_CAST_CARAVAN_WORK(prgObj->m_scriptHandle)->m_joybusCaravanId, teamNo);
 
 		unsigned short groupTag = m_groupTag;
@@ -1634,14 +1634,8 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	if ((m_bind != 0) &&
 		(((m_chaseState == 4) && ((aiFlags & 8) == 0)) ||
 		 ((m_chaseState != 4) && ((aiFlags & 4) == 0)))) {
-		unsigned char* bind = m_bind;
-		unsigned char* modelData = *reinterpret_cast<unsigned char**>(
-			reinterpret_cast<unsigned char*>(m_charaModelHandle) + 0x168);
 		Mtx bindMtx;
-		PSMTXCopy(*reinterpret_cast<Mtx*>(bind + 0x6C), bindMtx);
-		bindMtx[0][3] = bindMtx[0][3] + *reinterpret_cast<float*>(modelData + 0x74);
-		bindMtx[1][3] = bindMtx[1][3] + *reinterpret_cast<float*>(modelData + 0x84);
-		bindMtx[2][3] = bindMtx[2][3] + *reinterpret_cast<float*>(modelData + 0x94);
+		m_charaModelHandle->m_model->CalcNodeWorldMatrix(bindMtx, m_bind);
 		startPos.x = bindMtx[0][3];
 		startPos.y = bindMtx[1][3];
 		startPos.z = bindMtx[2][3];
@@ -3068,7 +3062,7 @@ void CGMonObj::initFinishedFuncDefault()
 		if (model != NULL) {
 			int nodeIdx = model->SearchNode("head");
 			if (nodeIdx >= 0) {
-				m_bind = reinterpret_cast<unsigned char*>(m_charaModelHandle->m_model->m_nodes + nodeIdx);
+				m_bind = m_charaModelHandle->m_model->m_nodes + nodeIdx;
 			}
 		}
 	}

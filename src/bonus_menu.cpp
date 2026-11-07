@@ -164,7 +164,6 @@ void CMenuPcs::createBonus()
 {
 	int i;
 	int j;
-	CCaravanWork** slot;
 	int k;
 	int pc;
 #ifndef VERSION_GCCJGC
@@ -304,9 +303,8 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)Game.m_scriptFoodBase[i]->m_tribeId;
 			activeCount++;
 
-			slot = &Game.m_scriptFoodBase[i];
 			for (j = 0; j < BonusSummaryData::kTemporaryArtifactCount; j++) {
-				int itemId = (*slot)->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + j];
+				int itemId = Game.m_scriptFoodBase[i]->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + j];
 				if (itemId > 0) {
 					s_Rinfo->m_artifacts[tempArtifactCount++] = (short)itemId;
 				}
@@ -332,7 +330,7 @@ void CMenuPcs::createBonus()
 			k = 0;
 
 			for (; k < s_Rinfo->m_partyCount; k++) {
-				CCaravanWork** partyWork = &Game.m_scriptFoodBase[s_Rinfo->m_party[k].m_partySlot];
+				int partySlot = s_Rinfo->m_party[k].m_partySlot;
 
 				for (j = 0; j < BonusSummaryData::kArtifactCount; j++) {
 					short itemId = s_Rinfo->m_artifacts[j];
@@ -342,10 +340,10 @@ void CMenuPcs::createBonus()
 
 					if (GetItemType(itemId, 1) == 2) {
 						int artifactSlot = s_Rinfo->m_artifacts[j] - 0x9F;
-						if ((*partyWork)->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[j]) {
+						if (Game.m_scriptFoodBase[partySlot]->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[j]) {
 							s_Rinfo->m_party[k].m_ownedArtifactMask |= (1u << j);
 						}
-					} else if (!(*partyWork)->CanAddItem(1)) {
+					} else if (!Game.m_scriptFoodBase[partySlot]->CanAddItem(1)) {
 						s_Rinfo->m_party[k].m_ownedArtifactMask |= (1u << j);
 					}
 				}

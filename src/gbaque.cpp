@@ -543,8 +543,10 @@ inline void GbaQueue::ChgMoneyData(int channel, unsigned int data)
 inline void GbaQueue::ChgEquipPosData(int channel, unsigned int data)
 {
 	char* dataBytes = reinterpret_cast<char*>(&data);
+	int equipKind = dataBytes[1];
+	int equipPos = dataBytes[2];
 
-	Game.m_scriptFoodBase[channel]->ChgEquipPos(dataBytes[1], dataBytes[2]);
+	Game.m_scriptFoodBase[channel]->ChgEquipPos(equipKind, equipPos);
 }
 
 /*
@@ -556,8 +558,10 @@ inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
 {
 	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
 	short value = *reinterpret_cast<short*>(dataBytes + 2);
+	int cmdIndex = dataBytes[1];
+	short swapped = __lhbrx(&value, 0);
 
-	Game.m_scriptFoodBase[channel]->ChgCmdLst(dataBytes[1], static_cast<short>(__lhbrx(&value, 0)));
+	Game.m_scriptFoodBase[channel]->ChgCmdLst(cmdIndex, swapped);
 }
 
 /*

@@ -1966,13 +1966,13 @@ int CCharaPcs::CHandle::LoadAnim(
 {
     FreeAnim(animIndex);
 
-    if (CharaPcs.LoadAnim(static_cast<int>(charaKind == -1 ? m_charaKind : charaKind),
+    if (CharaPcs.LoadAnim(charaKind == -1 ? m_charaKind : charaKind,
                          static_cast<int>(charaNo == -1 ? m_charaNo : charaNo),
                          animName, 0, mergeFileId, mergeFlags) == 0) {
         return 0;
     }
 
-    CLoadAnim* loadAnim = CharaPcs.searchAnim(static_cast<int>(charaKind == -1 ? m_charaKind : charaKind),
+    CLoadAnim* loadAnim = CharaPcs.searchAnim(charaKind == -1 ? m_charaKind : charaKind,
                                        static_cast<int>(charaNo == -1 ? m_charaNo : charaNo), animName);
 
     m_animSlot[animIndex] = loadAnim;

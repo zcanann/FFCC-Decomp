@@ -138,19 +138,15 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     u16 rng;
     s32 shapeFrameCount;
     tagOAN3_SHAPE* shapeEntry;
+    float colorStepX;
+    float posY;
     float alphaMul;
     float xDiff;
     float yDiff;
     float zDiff;
     float wDiff;
-    float shapeScale;
     pppFVECTOR4 colorStart;
     pppFVECTOR4 colorEnd;
-    float segRemain;
-    float segCursor = 0.0f;
-    float posX;
-    float posY;
-    float colorStepX;
     float colorStepY;
     float colorStepZ;
     float colorStepW;
@@ -171,8 +167,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float segDy;
     float segDz;
     float invCountMinusOne;
-    float drawScale;
     float posZ;
+    float drawScale;
     int life;
     s32 shapeFrameDuration;
     float nextBaseY;
@@ -182,6 +178,10 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float startX;
     float startY;
     float startZ;
+    float segRemain;
+    float segCursor = 0.0f;
+    float shapeScale;
+    float posX;
     u8 zEnable;
     s32 dataValIndex;
 
@@ -332,6 +332,7 @@ draw_loop:
 
     pppSetBlendMode(step->m_blendMode);
     pppDrawShp(shapeEntry, ppvEnv->m_materialSetPtr, step->m_blendMode);
+    shapeScale = drawScale;
 
 update_step:
     count--;

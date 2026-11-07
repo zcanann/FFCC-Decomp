@@ -11,7 +11,7 @@
 #ifdef VERSION_GCCJGC
 typedef DSError (*TRKDispatchFunc)(TRKBuffer*);
 
-static TRKDispatchFunc gTRKDispatchTable[] = {
+static TRKDispatchFunc gTRKDispatchTable[33] = {
     TRKDoUnsupported,
     TRKDoConnect,
     TRKDoDisconnect,
@@ -59,7 +59,7 @@ static u32 gTRKDispatchTableSize;
  */
 DSError TRKInitializeDispatcher() {
 #ifdef VERSION_GCCJGC
-    gTRKDispatchTableSize = sizeof(gTRKDispatchTable) / sizeof(gTRKDispatchTable[0]);
+    gTRKDispatchTableSize = 32;
 #endif
     return DS_NoError;
 }

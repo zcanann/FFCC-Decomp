@@ -1292,11 +1292,8 @@ itemobj.cpp:
 
 TRK_MINNOW_DOLPHIN/dispatch.c:
     .text start:0x801A4BE0 end:0x801A4C7C
-    .data start:0x80238820 end:0x802388A0
+    .data start:0x80238820 end:0x802388A8
     .bss start:0x80345A18 end:0x80345A1C
-
-auto_07_802388A0_data:
-    .data start:0x802388A0 end:0x802388A8 align:4
 
 pppPart.cpp:
 	.text start:0x80053458 end:0x80056BF0

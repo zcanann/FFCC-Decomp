@@ -3540,16 +3540,16 @@ int CGMonObj::calcBranchFuncDefault(int branchType)
 	int result = 0;
 
 	if (branchType == 1) {
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
-		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
+		CGObjWork* script = m_scriptHandle;
+		unsigned short max = script->m_maxHp;
+		unsigned short current = script->m_hp;
 		if (static_cast<int>(current) < static_cast<int>(static_cast<unsigned int>(max) >> 1)) {
 			result = 1;
 		}
 	} else if (branchType == 2) {
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
-		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
+		CGObjWork* script = m_scriptHandle;
+		unsigned short max = script->m_maxHp;
+		unsigned short current = script->m_hp;
 		if (current < (max / 3)) {
 			result = 2;
 		} else if (current < ((max * 2) / 3)) {

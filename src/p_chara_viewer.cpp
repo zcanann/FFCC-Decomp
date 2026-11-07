@@ -34,24 +34,6 @@ struct coord {
 
 typedef char CharaViewerCoord_size_check[(sizeof(coord) == 0x14) ? 1 : -1];
 
-template <class T>
-static inline void ReleaseShared(T*& ptr)
-{
-    if (ptr != 0) {
-        CRef* ref = reinterpret_cast<CRef*>(ptr);
-        ref->Release();
-        ptr = 0;
-    }
-}
-
-template <class T>
-static inline void AddSharedRef(T* ptr)
-{
-    if (ptr != 0) {
-        reinterpret_cast<CRef*>(ptr)->AddRef();
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -279,9 +261,14 @@ void CCharaPcs::calcViewer()
     char pathBuf[256];
 
     if (self->m_viewerStoreSavedAnim != 0) {
-        ReleaseShared(self->m_viewerSavedAnim);
+        if (self->m_viewerSavedAnim != 0) {
+            self->m_viewerSavedAnim->Release();
+            self->m_viewerSavedAnim = 0;
+        }
         self->m_viewerSavedAnim = self->m_viewerAnim[0];
-        AddSharedRef(self->m_viewerSavedAnim);
+        if (self->m_viewerSavedAnim != 0) {
+            self->m_viewerSavedAnim->AddRef();
+        }
         self->m_viewerStoreSavedAnim = 0;
     }
 
@@ -292,9 +279,18 @@ void CCharaPcs::calcViewer()
             System.Printf("CCharaPcs.calcViewer: %s\n", self->m_viewerModelPath);
             CFile::CHandle* fileHandle = File.Open(self->m_viewerModelPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
-                ReleaseShared(self->m_viewerModel[1]);
-                ReleaseShared(self->m_viewerAnim[1]);
-                ReleaseShared(self->m_viewerTextureSet[1]);
+                if (self->m_viewerModel[1] != 0) {
+                    self->m_viewerModel[1]->Release();
+                    self->m_viewerModel[1] = 0;
+                }
+                if (self->m_viewerAnim[1] != 0) {
+                    self->m_viewerAnim[1]->Release();
+                    self->m_viewerAnim[1] = 0;
+                }
+                if (self->m_viewerTextureSet[1] != 0) {
+                    self->m_viewerTextureSet[1]->Release();
+                    self->m_viewerTextureSet[1] = 0;
+                }
 
                 self->m_viewerModel[1] = self->m_viewerModel[0];
                 self->m_viewerAnim[1] = self->m_viewerAnim[0];
@@ -329,9 +325,15 @@ void CCharaPcs::calcViewer()
 
         if ((self->m_viewerLoadAnim != 0) || (self->m_viewerLoadAnimContinuous != 0)) {
             unsigned int i;
-            ReleaseShared(self->m_viewerAnim[0]);
+            if (self->m_viewerAnim[0] != 0) {
+                self->m_viewerAnim[0]->Release();
+                self->m_viewerAnim[0] = 0;
+            }
             for (i = 0; i < 0x40; i++) {
-                ReleaseShared(self->m_viewerAnimBank[i]);
+                if (self->m_viewerAnimBank[i] != 0) {
+                    self->m_viewerAnimBank[i]->Release();
+                    self->m_viewerAnimBank[i] = 0;
+                }
             }
             self->m_viewerAnimLoopIndex = 0;
             self->m_viewerAnimLoadedCount = 0;
@@ -384,7 +386,10 @@ void CCharaPcs::calcViewer()
             System.Printf("CCharaPcs.calcViewer: %s\n", self->m_viewerTexturePath);
             CFile::CHandle* fileHandle = File.Open(self->m_viewerTexturePath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
-                ReleaseShared(self->m_viewerTextureSet[0]);
+                if (self->m_viewerTextureSet[0] != 0) {
+                    self->m_viewerTextureSet[0]->Release();
+                    self->m_viewerTextureSet[0] = 0;
+                }
                 fileHandle->Read();
                 fileHandle->SyncCompleted();
                 self->m_viewerTextureSet[0] = createTextureSet(File.GetBuffer(), 0);
@@ -478,7 +483,10 @@ void CCharaPcs::calcViewer()
                     self->m_viewerAnimLoopIndex =
                         (self->m_viewerAnimLoopIndex + 1) % self->m_viewerAnimLoadedCount;
                     self->m_viewerModel[0]->AttachAnim(self->m_viewerAnimBank[self->m_viewerAnimLoopIndex], -1, -1, 0);
-                    ReleaseShared(self->m_viewerAnim[0]);
+                    if (self->m_viewerAnim[0] != 0) {
+                        self->m_viewerAnim[0]->Release();
+                        self->m_viewerAnim[0] = 0;
+                    }
                     self->m_viewerAnim[0] = self->m_viewerAnimBank[self->m_viewerAnimLoopIndex];
                     reinterpret_cast<CRef*>(self->m_viewerAnim[0])->AddRef();
                 }
@@ -576,21 +584,39 @@ void CCharaPcs::destroyViewer()
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
     g_pLight = 0;
 
-    ReleaseShared(m_viewerSavedAnim);
+    if (m_viewerSavedAnim != 0) {
+        m_viewerSavedAnim->Release();
+        m_viewerSavedAnim = 0;
+    }
 
     i = 0;
     do {
-        ReleaseShared(m_viewerModel[i]);
-        ReleaseShared(m_viewerAnim[i]);
-        ReleaseShared(m_viewerTextureSet[i]);
+        if (m_viewerModel[i] != 0) {
+            m_viewerModel[i]->Release();
+            m_viewerModel[i] = 0;
+        }
+        if (m_viewerAnim[i] != 0) {
+            m_viewerAnim[i]->Release();
+            m_viewerAnim[i] = 0;
+        }
+        if (m_viewerTextureSet[i] != 0) {
+            m_viewerTextureSet[i]->Release();
+            m_viewerTextureSet[i] = 0;
+        }
         i++;
     } while (i < 2);
 
-    ReleaseShared(m_viewerBackTextureSet);
+    if (m_viewerBackTextureSet != 0) {
+        m_viewerBackTextureSet->Release();
+        m_viewerBackTextureSet = 0;
+    }
 
     j = 0;
     do {
-        ReleaseShared(m_viewerAnimBank[j]);
+        if (m_viewerAnimBank[j] != 0) {
+            m_viewerAnimBank[j]->Release();
+            m_viewerAnimBank[j] = 0;
+        }
         j++;
     } while (j < 0x40);
 

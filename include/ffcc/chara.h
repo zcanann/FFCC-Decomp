@@ -528,18 +528,11 @@ public:
 	void gqrInit(unsigned long, unsigned long, unsigned long);
     void SetAmemStage(CMemory::CStage* stage) { m_amemLoadStage = stage; }
     CMemory::CStage* GetMemoryStage() { return m_amemStage; }
-    u32 GetAmemBaseAddress() const { return reinterpret_cast<u32>(m_amemLoadStage->GetTop()); }
-    u32& AmemSize() { return m_amemSize; }
-    int GetDrawBufferIndex() const { return m_drawBufferIndex; }
-    u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
-    u8* GetDrawBufferBase(int index) { return m_drawBuffers[index].m_base; }
     struct CDrawBuffer
     {
         u32 m_cursor;
         u8* m_base;
     };
-    CDrawBuffer& GetDrawBuffer(int index) { return m_drawBuffers[index]; }
-    u32& AmemAnimSize() { return m_amemAnimSize; }
     u32 GetAmemOffset() { return m_amemAnimSize; }
     void ResetAmem(int size) { m_amemAnimSize = size; }
     void TimeMogFur();
@@ -591,11 +584,7 @@ public:
 
     CSharedState m_sharedState;               // 0x004
     CMemory::CStage* m_amemStage;             // 0x2058
-    union
-    {
-        CMemory::CStage* m_amemLoadStage;     // 0x205C
-        u32 m_amemSize;                       // 0x205C
-    };
+    CMemory::CStage* m_amemLoadStage;         // 0x205C
     int m_drawBufferIndex;                    // 0x2060
     CDrawBuffer m_drawBuffers[2];             // 0x2064
     u32 m_amemAnimSize;                       // 0x2074

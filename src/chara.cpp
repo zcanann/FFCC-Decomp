@@ -110,61 +110,6 @@ STATIC_ASSERT(offsetof(CChara::CModel, m_drawShadowMeshDLCallback) == 0x100);
 STATIC_ASSERT(offsetof(CChara::CModel, m_afterDrawMeshCallback) == 0x104);
 STATIC_ASSERT(offsetof(CChara::CModel, m_afterDrawModelCallback) == 0x108);
 
-static inline u32 ModelMeshCount(CChara::CModel* model)
-{
-	return model->m_data->m_meshCount;
-}
-
-static inline void* ModelBank(CChara::CModel* model)
-{
-	return model->m_data->m_bank;
-}
-
-static inline float (*ModelDrawMtx(CChara::CModel* model))[4]
-{
-	return model->m_drawMtx;
-}
-
-static inline float (*ModelWorldBaseMtx(CChara::CModel* model))[4]
-{
-	return model->m_worldBaseMtx;
-}
-
-static inline u8& ModelFlags10C(CChara::CModel* model)
-{
-	return model->m_flags10C;
-}
-
-static inline u32& CharaDrawBufferCursor(int bufferIndex)
-{
-	return Chara.GetDrawBufferCursor(bufferIndex);
-}
-
-static inline u8* CharaDrawBufferBase(int bufferIndex)
-{
-	return Chara.GetDrawBufferBase(bufferIndex);
-}
-
-static inline char* NodeRefAltName(CChara::CNode* node)
-{
-	return node->m_refData->m_names[1];
-}
-
-static inline u16 NodeRefIndex(CChara::CNode* node)
-{
-	return node->m_refData->m_index;
-}
-
-static inline u8 NodeUsesParentLenX(CChara::CNode* node)
-{
-	return node->m_refData->m_usesParentLenX;
-}
-
-static inline u8& NodeRuntimeFlags(CChara::CNode* node)
-{
-	return node->m_flags;
-}
-
 struct CDynParam
 {
 	float m_velScale;
@@ -1113,7 +1058,7 @@ void CChara::CModel::calcMatrix()
 		if (parentNode != 0) {
 			PSMTXConcat(parentNode->m_mtx, node->m_localRuntimeMtx, node->m_mtx);
 		} else {
-			PSMTXConcat(ModelWorldBaseMtx(this), node->m_localRuntimeMtx, node->m_mtx);
+			PSMTXConcat(m_worldBaseMtx, node->m_localRuntimeMtx, node->m_mtx);
 		}
 
 		if (ref->m_dynParamIndex >= 0) {
@@ -1123,7 +1068,7 @@ void CChara::CModel::calcMatrix()
 		if (ref->m_index == m_data->m_headNodeIndex && m_twistAngle != 0.0f) {
 			Vec twistAxis = {1.0f, 0.0f, 0.0f};
 			Mtx twistRotate;
-			PSMTXMultVecSR(ModelWorldBaseMtx(this), &twistAxis, &twistAxis);
+			PSMTXMultVecSR(m_worldBaseMtx, &twistAxis, &twistAxis);
 			PSMTXRotAxisRad(twistRotate, &twistAxis, m_twistAngle);
 			D3DXMatrixMultiplyRotate(node->m_mtx, node->m_mtx, twistRotate);
 		}
@@ -1596,9 +1541,9 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount != 0) {
-			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+			PSMTXCopy(m_drawMtx, meshMtx);
 		} else {
-			PSMTXConcat(ModelDrawMtx(this), m_nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
+			PSMTXConcat(m_drawMtx, m_nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		if (m_beforeDrawShadowLockEnvCallback != 0) {
@@ -2437,8 +2382,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 		return;
 	}
 
-	int bufferIndex = Chara.GetDrawBufferIndex();
-	CChara::CDrawBuffer& drawBuffer = Chara.GetDrawBuffer(bufferIndex);
+	CChara::CDrawBuffer& drawBuffer = Chara.m_drawBuffers[Chara.m_drawBufferIndex];
 	u32& cursor = drawBuffer.m_cursor;
 	u32 needed = (meshRef->m_vertexCount + meshRef->m_normalCount) * 6 + 0x40;
 	if (0x58000u - cursor < needed) {

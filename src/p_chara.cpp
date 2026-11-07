@@ -77,79 +77,6 @@ STATIC_ASSERT(offsetof(CCharaPcs, m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_MODE
 STATIC_ASSERT(offsetof(CCharaPcs, m_loadStages[CCharaPcs::LOAD_STAGE_FAMILY_MODEL]) == 0xE0);
 STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
-
-namespace {
-template <typename T>
-static inline void ReleaseSharedNonNull(T* ptr)
-{
-    CRef* ref = ptr;
-    ref->Release();
-}
-
-template <typename T>
-static inline void ReleaseShared(T*& ptr)
-{
-    if (ptr != 0) {
-        ReleaseSharedNonNull(ptr);
-        ptr = 0;
-    }
-}
-
-template <typename T>
-static inline void AddSharedRef(T* ptr)
-{
-    if (ptr != 0) {
-        ptr->AddRef();
-    }
-}
-
-static inline void BuildCharaBasePath(int charaKind, unsigned long charaNo, char* outPath)
-{
-    const char** pathParts = CCharaPcs::m_modelTable[charaKind];
-    sprintf(outPath, "dvd/char/%s/%s%03d/%s%03d%s", pathParts[0], pathParts[1], static_cast<int>(charaNo), pathParts[1],
-            static_cast<int>(charaNo), pathParts[2]);
-}
-
-static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelStage)
-{
-    CMemory::CStage* stage = CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_MODEL];
-    if (specialModelStage != 0) {
-        stage = charaKind == 3 ? CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_FAMILY_MODEL]
-                              : CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_MODEL];
-    }
-    return GET_CHARA_ALLOC_STAGE_S(CharaPcs.GetCharaAllocStage(), stage);
-}
-
-static inline _GXColor BlendColor(const _GXColor& a, const _GXColor& b, float t)
-{
-    _GXColor out;
-    out.r = static_cast<unsigned char>(a.r + static_cast<int>((b.r - a.r) * t));
-    out.g = static_cast<unsigned char>(a.g + static_cast<int>((b.g - a.g) * t));
-    out.b = static_cast<unsigned char>(a.b + static_cast<int>((b.b - a.b) * t));
-    out.a = static_cast<unsigned char>(a.a + static_cast<int>((b.a - a.a) * t));
-    return out;
-}
-
-static inline void CopyColor(_GXColor* dst, _GXColor src)
-{
-    dst->r = src.r;
-    dst->g = src.g;
-    dst->b = src.b;
-    dst->a = src.a;
-}
-
-static inline _GXColor ModulateColor(const _GXColor& src, const _GXColor& shade)
-{
-    _GXColor out;
-    out.r = static_cast<unsigned char>((static_cast<unsigned int>(src.r) * shade.r) / 255);
-    out.g = static_cast<unsigned char>((static_cast<unsigned int>(src.g) * shade.g) / 255);
-    out.b = static_cast<unsigned char>((static_cast<unsigned int>(src.b) * shade.b) / 255);
-    out.a = src.a;
-    return out;
-}
-
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8007a51c
@@ -210,7 +137,7 @@ void CCharaPcs::Init()
 
     m_charaAllocStage = 0;
     m_overlapEnabled = 0;
-    CopyColor(&m_texShadowColor, CColor(0x00, 0x00, 0x40, 0x40));
+    m_texShadowColor = CColor(0x00, 0x00, 0x40, 0x40);
     m_texShadowPos = CVector(0.0f, 100.0f, 0.0f);
     m_texShadowRadius = 500.0f;
     m_texShadowSize = 0x80;
@@ -224,7 +151,7 @@ void CCharaPcs::Init()
  */
 void CCharaPcs::Quit()
 {
-    Chara.AmemSize() = 0;
+    Chara.SetAmemStage(0);
     Memory.DestroyStage(m_amemWorkStage);
     Memory.DestroyStage(m_amemStage);
     Memory.DestroyStage(m_stage);
@@ -954,10 +881,12 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
         if ((((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
             (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0)) {
             if (loadModel->m_streamMode != 0 && loadModel->GetRef() == 1) {
-                ReleaseShared(loadModel->m_model);
+                if (loadModel->m_model != 0) {
+                    loadModel->m_model->Release();
+                    loadModel->m_model = 0;
+                }
             } else {
-                CLoadModel* releasedModel = loadModel;
-                ReleaseSharedNonNull(releasedModel);
+                loadModel->Release();
                 m_loadModels.RemoveAt(static_cast<unsigned long>(i));
             }
         } else {
@@ -970,10 +899,12 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
         if ((((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
             (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0)) {
             if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
-                ReleaseShared(loadTexture->m_textureSet);
+                if (loadTexture->m_textureSet != 0) {
+                    loadTexture->m_textureSet->Release();
+                    loadTexture->m_textureSet = 0;
+                }
             } else {
-                CLoadTexture* releasedTexture = loadTexture;
-                ReleaseSharedNonNull(releasedTexture);
+                loadTexture->Release();
                 m_loadTextures.RemoveAt(static_cast<unsigned long>(i));
             }
         } else {
@@ -985,8 +916,7 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
         CLoadPdt* loadPdt = m_loadPdts[static_cast<unsigned long>(i)];
         if ((loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
             (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0)) {
-            CLoadPdt* releasedPdt = loadPdt;
-            ReleaseSharedNonNull(releasedPdt);
+            loadPdt->Release();
             m_loadPdts.RemoveAt(static_cast<unsigned long>(i));
         } else {
             activeCount++;
@@ -1796,12 +1726,22 @@ void CCharaPcs::CHandle::ChangeTexture(
     Graphic._WaitDrawDone("p_chara.cpp", 0x749);
     m_model->AttachTextureSet(0);
 
-    ReleaseShared(m_textureSet);
-    ReleaseShared(m_texLoadRef);
+    if (m_textureSet != 0) {
+
+        m_textureSet->Release();
+
+        m_textureSet = 0;
+
+    }
+    if (m_texLoadRef != 0) {
+        m_texLoadRef->Release();
+        m_texLoadRef = 0;
+    }
 
     char basePath[0x100];
     char path[0x100];
-    BuildCharaBasePath(charaKind, charaNo, basePath);
+    const char** modelPath = CCharaPcs::m_modelTable[charaKind];
+    sprintf(basePath, "dvd/char/%s/%s%03d/%s%03d%s", modelPath[0], modelPath[1], static_cast<int>(charaNo), modelPath[1], static_cast<int>(charaNo), modelPath[2]);
 
     CLoadTexture* loadTexture;
     for (unsigned int i = 0; i < static_cast<unsigned int>(CharaPcs.m_loadTextures.GetSize()); i++) {
@@ -1897,7 +1837,8 @@ int CCharaPcs::CHandle::LoadModel(
 
     char basePath[0x100];
     char path[0x100];
-    BuildCharaBasePath(charaKind, charaNo, basePath);
+    const char** modelPath = CCharaPcs::m_modelTable[charaKind];
+    sprintf(basePath, "dvd/char/%s/%s%03d/%s%03d%s", modelPath[0], modelPath[1], static_cast<int>(charaNo), modelPath[1], static_cast<int>(charaNo), modelPath[2]);
 
     CLoadModel* loadModel = CharaPcs.searchModel(charaKind, static_cast<int>(charaNo));
 
@@ -1968,7 +1909,7 @@ int CCharaPcs::CHandle::LoadModel(
             if (fileHandle != 0) {
                 fileHandle->Read();
                 fileHandle->SyncCompleted();
-                m_model->CreateDynamics(File.GetBuffer(), HandleModelStage(charaKind, 0));
+                m_model->CreateDynamics(File.GetBuffer(), GET_CHARA_ALLOC_STAGE_S(CharaPcs.GetCharaAllocStage(), CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]));
                 fileHandle->Close();
                 if (System.GetErrorLevel() >= 1U) {
                     System.Printf("\x1b[31mMerge: ダイナミクスをDVDから読み込みました。type = %d number = %d\n", charaKind, static_cast<int>(charaNo));
@@ -2087,11 +2028,29 @@ void CCharaPcs::CHandle::FreeModel()
     Graphic._WaitDrawDone("p_chara.cpp", 0x8C9);
     PartMng.pppDeleteCHandle(this);
 
-    ReleaseShared(m_model);
-    ReleaseShared(m_textureSet);
-    ReleaseShared(m_modelLoadRef);
-    ReleaseShared(m_texLoadRef);
-    ReleaseShared(m_pdtLoadRef);
+    if (m_model != 0) {
+
+        m_model->Release();
+
+        m_model = 0;
+
+    }
+    if (m_textureSet != 0) {
+        m_textureSet->Release();
+        m_textureSet = 0;
+    }
+    if (m_modelLoadRef != 0) {
+        m_modelLoadRef->Release();
+        m_modelLoadRef = 0;
+    }
+    if (m_texLoadRef != 0) {
+        m_texLoadRef->Release();
+        m_texLoadRef = 0;
+    }
+    if (m_pdtLoadRef != 0) {
+        m_pdtLoadRef->Release();
+        m_pdtLoadRef = 0;
+    }
 
     CharaPcs.releaseUnuseLoadModel(0);
 }
@@ -2421,7 +2380,8 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     const int asyncState = m_asyncState;
 
     if (asyncState == 1 || asyncState == 3 || asyncState == 5) {
-        BuildCharaBasePath(m_asyncCharaKind, static_cast<unsigned long>(m_asyncCharaNo), basePath);
+        const char** modelPath = CCharaPcs::m_modelTable[m_asyncCharaKind];
+        sprintf(basePath, "dvd/char/%s/%s%03d/%s%03d%s", modelPath[0], modelPath[1], static_cast<unsigned long>(m_asyncCharaNo), modelPath[1], static_cast<unsigned long>(m_asyncCharaNo), modelPath[2]);
         if (m_asyncState == 1) {
             strcpy(path, basePath);
             strcat(path, ".chm");
@@ -2463,7 +2423,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         m_charaKind = m_asyncCharaKind;
         m_charaNo = m_asyncCharaNo;
     } else if (m_asyncState == 4) {
-        m_model->CreateDynamics(File.GetBuffer(), HandleModelStage(m_asyncCharaKind, 0));
+        m_model->CreateDynamics(File.GetBuffer(), GET_CHARA_ALLOC_STAGE_S(CharaPcs.GetCharaAllocStage(), CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]));
     } else {
         m_texLoadRef = CharaPcs.loadTexture(File.GetBuffer(), m_asyncCharaKind, m_asyncCharaNo, m_asyncTextureVariant, -1, 0, 0, 0);
         m_texLoadRef->AddRef();
@@ -2548,7 +2508,10 @@ int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
  */
 CCharaPcs::CLoadModel::~CLoadModel()
 {
-    ReleaseShared(m_model);
+    if (m_model != 0) {
+        m_model->Release();
+        m_model = 0;
+    }
 }
 
 /*
@@ -2558,7 +2521,10 @@ CCharaPcs::CLoadModel::~CLoadModel()
  */
 CCharaPcs::CLoadAnim::~CLoadAnim()
 {
-    ReleaseShared(m_anim);
+    if (m_anim != 0) {
+        m_anim->Release();
+        m_anim = 0;
+    }
 }
 
 /*
@@ -2568,7 +2534,10 @@ CCharaPcs::CLoadAnim::~CLoadAnim()
  */
 CCharaPcs::CLoadTexture::~CLoadTexture()
 {
-    ReleaseShared(m_textureSet);
+    if (m_textureSet != 0) {
+        m_textureSet->Release();
+        m_textureSet = 0;
+    }
 }
 
 /*

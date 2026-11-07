@@ -8525,7 +8525,9 @@ void CMenuPcs::DrawMCList()
 					yPos = 24.0f;
 					alpha = FLOAT_803313e8;
 				} else {
-					yPos = -260.0f + static_cast<float>(animFrames) * 28.399999618530273f;
+					float step = 28.399999618530273f;
+					yPos = -260.0f;
+					yPos += static_cast<float>(animFrames) * step;
 					alpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(animFrames));
 				}
 			} else {
@@ -8802,7 +8804,7 @@ nextListEntry:
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcFaceTexture));
 			iconX = 144.0f;
-			const float iconY = 24.0f + slotY;
+			rowY = 24.0f + slotY;
 			for (int member = 0; member < 4; member++) {
 				const int modelNo = slotData->m_characterIds[member];
 				if (modelNo >= 0) {
@@ -8812,7 +8814,7 @@ nextListEntry:
 					float texU = ((faceNo / 100 & 1) != 0) ? altU : DOUBLE_803314F0;
 					float texOff = static_cast<float>(faceNo % 100) * faceSize;
 					texU += texOff;
-					MenuPcs.DrawRect(0, iconX, iconY, faceSize, faceSize,
+					MenuPcs.DrawRect(0, iconX, rowY, faceSize, faceSize,
 					         texU,
 					         static_cast<float>(faceNo / 100 / 2) * faceSize,
 					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);

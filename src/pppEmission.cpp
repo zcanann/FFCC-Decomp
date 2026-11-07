@@ -75,20 +75,6 @@ static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIn
 static void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
-static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, PEmission* step)
-{
-    model->SetCallbackContext(state, step);
-    model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
-    model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);
-}
-
-static inline void ClearEmissionModelCallbacks(CChara::CModel* model)
-{
-    model->SetCallbackContext(0, 0);
-    model->SetDrawMeshDLCallback(0);
-    model->SetAfterDrawMeshCallback(0);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800E6060
@@ -120,7 +106,9 @@ void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctr
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
-    SetEmissionModelCallbacks(model, state, step);
+    model->SetCallbackContext(state, step);
+    model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
+    model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);
 
     float alphaScale = (float)color->m_color.rgba[3] / 255.0f;
     state->m_colorR = color->m_color.rgba[0];
@@ -230,7 +218,9 @@ void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
-    ClearEmissionModelCallbacks(model);
+    model->SetCallbackContext(0, 0);
+    model->SetDrawMeshDLCallback(0);
+    model->SetAfterDrawMeshCallback(0);
 
     Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp), 0x118);
     EmissionParticle* particles = state->m_particles;

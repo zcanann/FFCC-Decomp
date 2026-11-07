@@ -33,13 +33,6 @@ STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
-static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWork* work, ChangeTexStep* step)
-{
-	model->SetCallbackContext(work, step);
-	model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
-	model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
-}
-
 static inline VColor* GetChangeTexColorBlock(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	return reinterpret_cast<VColor*>(
@@ -117,7 +110,9 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 
 	work->m_charaObj = ppvMng->m_owner;
 	work->m_context = ppvEnv;
-	SetChangeTexModelCallbacks(model0, work, step);
+	model0->SetCallbackContext(work, step);
+	model0->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
+	model0->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 
 	work->m_texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 
@@ -127,14 +122,18 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 	if (handle1 != 0) {
 		model1 = GetCharaModelPtr(handle1);
 		if (model1 != 0) {
-			SetChangeTexModelCallbacks(model1, work, step);
+			model1->SetCallbackContext(work, step);
+			model1->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
+			model1->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 		}
 	}
 
 	if (handle2 != 0) {
 		model2 = GetCharaModelPtr(handle2);
 		if (model2 != 0) {
-			SetChangeTexModelCallbacks(model2, work, step);
+			model2->SetCallbackContext(work, step);
+			model2->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
+			model2->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 		}
 	}
 
@@ -267,18 +266,27 @@ void pppDestructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 
 	if (handle0 != 0) {
 		model = GetCharaModelPtr(handle0);
-		ClearChangeTexModelCallbacks(model);
+		model->SetCallbackContext(0, 0);
+		model->SetBeforeMeshLockEnvCallback(0);
+		model->SetDrawMeshDLCallback(0);
+		model->SetAfterDrawMeshCallback(0);
 	}
 	if (handle1 != 0) {
 		model1 = GetCharaModelPtr(handle1);
 		if (model1 != 0) {
-			ClearChangeTexModelCallbacks(model1);
+			model1->SetCallbackContext(0, 0);
+			model1->SetBeforeMeshLockEnvCallback(0);
+			model1->SetDrawMeshDLCallback(0);
+			model1->SetAfterDrawMeshCallback(0);
 		}
 	}
 	if (handle2 != 0) {
 		model2 = GetCharaModelPtr(handle2);
 		if (model2 != 0) {
-			ClearChangeTexModelCallbacks(model2);
+			model2->SetCallbackContext(0, 0);
+			model2->SetBeforeMeshLockEnvCallback(0);
+			model2->SetDrawMeshDLCallback(0);
+			model2->SetAfterDrawMeshCallback(0);
 		}
 	}
 

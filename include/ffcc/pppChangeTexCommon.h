@@ -30,12 +30,4 @@ struct ChangeTexStep {
     u8 _pad1[1];
 };
 
-static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
-{
-	model->SetCallbackContext(0, 0);
-	model->SetBeforeMeshLockEnvCallback(0);
-	model->SetDrawMeshDLCallback(0);
-	model->SetAfterDrawMeshCallback(0);
-}
-
 #endif // _FFCC_PPPCHANGETEXCOMMON_H_

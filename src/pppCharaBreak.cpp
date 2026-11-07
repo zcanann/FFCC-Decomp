@@ -45,24 +45,6 @@ static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, in
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
-static inline void SetCharaBreakModelCallbacks(CChara::CModel* model, CharaBreakWork* work, CharaBreakStep* step)
-{
-    model->SetCallbackContext(work, step);
-    model->SetBeforeMeshLockEnvCallback(CharaBreak_BeforeMeshLockEnvCallback);
-    model->SetDrawMeshDLCallback(CharaBreak_DrawMeshDLCallback);
-    model->SetAfterDrawMeshCallback(CharaBreak_AfterDrawMeshCallback);
-    model->SetBeforeCalcMatrixCallback(CharaBreak_BeforeCalcMatrixCallback);
-}
-
-static inline void ClearCharaBreakModelCallbacks(CChara::CModel* model)
-{
-    model->SetCallbackContext(0, 0);
-    model->SetBeforeMeshLockEnvCallback(0);
-    model->SetDrawMeshDLCallback(0);
-    model->SetAfterDrawMeshCallback(0);
-    model->SetBeforeCalcMatrixCallback(0);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801411E4
@@ -639,7 +621,11 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
         charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     model = work->m_model;
 
-    ClearCharaBreakModelCallbacks(model);
+    model->SetCallbackContext(0, 0);
+    model->SetBeforeMeshLockEnvCallback(0);
+    model->SetDrawMeshDLCallback(0);
+    model->SetAfterDrawMeshCallback(0);
+    model->SetBeforeCalcMatrixCallback(0);
 
 #if defined(VERSION_GCCP01)
     meshBufferSlot = work->m_meshBuffers;
@@ -753,7 +739,11 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                    step->m_payloadGraphStep,
                    step->m_payloadGraphStepStep);
 
-    SetCharaBreakModelCallbacks(model, work, step);
+    model->SetCallbackContext(work, step);
+    model->SetBeforeMeshLockEnvCallback(CharaBreak_BeforeMeshLockEnvCallback);
+    model->SetDrawMeshDLCallback(CharaBreak_DrawMeshDLCallback);
+    model->SetAfterDrawMeshCallback(CharaBreak_AfterDrawMeshCallback);
+    model->SetBeforeCalcMatrixCallback(CharaBreak_BeforeCalcMatrixCallback);
 
     if (step->m_graphId == charaBreak->m_graphId) {
         f32 zero = 0.0f;
@@ -910,7 +900,11 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
 #if defined(VERSION_GCCP01)
 fail:
     work->m_enabled = 0;
-    ClearCharaBreakModelCallbacks(model);
+    model->SetCallbackContext(0, 0);
+    model->SetBeforeMeshLockEnvCallback(0);
+    model->SetDrawMeshDLCallback(0);
+    model->SetAfterDrawMeshCallback(0);
+    model->SetBeforeCalcMatrixCallback(0);
 #endif
 }
 

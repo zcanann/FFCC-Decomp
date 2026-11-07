@@ -47,20 +47,6 @@ static void Chara_DrawShadowMeshDLCallback(CChara::CModel*, void*, void*, int, i
 static void Mana_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
 
-static inline void ClearManaModelCallbacks(CChara::CModel* model)
-{
-    model->SetCallbackContext(0, 0);
-    model->SetBeforeDrawCallback(0);
-    model->SetDrawMeshDLCallback(0);
-}
-
-static inline void SetManaModelCallbacks(CChara::CModel* model, void* work, pppYmManaStep* step)
-{
-    model->SetCallbackContext(work, step);
-    model->SetBeforeDrawCallback(Mana_BeforeDrawCallback);
-    model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800d4c7c
@@ -924,7 +910,9 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
         mana->m_attachedObject = gObject->m_attachOwner;
     }
 
-    SetManaModelCallbacks(model, mana, step);
+    model->SetCallbackContext(mana, step);
+    model->SetBeforeDrawCallback(Mana_BeforeDrawCallback);
+    model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 
     u8 manaAlpha = (u8)((float)setupArea[0xB] * gObject->m_currentAlpha);
     if (Game.IsWorldMap()) {
@@ -935,7 +923,9 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
 
     if (reinterpret_cast<_pppPObject*>(ymMana)->m_graphId == 0) {
         mana->m_object = gObject;
-        SetManaModelCallbacks(model, mana, step);
+        model->SetCallbackContext(mana, step);
+        model->SetBeforeDrawCallback(Mana_BeforeDrawCallback);
+        model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
         mana->m_sourceTextures[0] = GetTextureFromRSD(step->m_sourceTextureId0, ppvEnv);
         mana->m_sourceTextures[1] = GetTextureFromRSD(step->m_sourceTextureId1, ppvEnv);
         mana->m_sourceTextures[2] = GetTextureFromRSD(step->m_sourceTextureId2, ppvEnv);
@@ -1155,7 +1145,9 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
     gObject->DispCharaParts(1);
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    ClearManaModelCallbacks(model);
+    model->SetCallbackContext(0, 0);
+    model->SetBeforeDrawCallback(0);
+    model->SetDrawMeshDLCallback(0);
     Graphic._WaitDrawDone("pppYmMana.cpp", 0x2CE);
     MaterialMan.SetStoneTexObj(0);
     MaterialMan.SetEnvTexObj(0);

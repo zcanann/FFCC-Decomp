@@ -54,20 +54,6 @@ struct Mana2SetupBlock
 static void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
 
-static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
-{
-    model->SetCallbackContext(0, 0);
-    model->SetBeforeDrawCallback(0);
-    model->SetDrawMeshDLCallback(0);
-}
-
-static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2Step* step)
-{
-    model->SetCallbackContext(work, step);
-    model->SetBeforeDrawCallback(Mana2_BeforeDrawCallback);
-    model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
-}
-
 static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsigned short* indices, float waterScale);
 static int UpdateWaterMesh(VMana2* mana2);
 static int RenderWaterMesh(VMana2* mana2);
@@ -977,7 +963,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
         step->m_rippleLevel = 0;
     }
 
-    SetMana2ModelCallbacks(model, mana2Work, step);
+    model->SetCallbackContext(mana2Work, step);
+    model->SetBeforeDrawCallback(Mana2_BeforeDrawCallback);
+    model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 
     unsigned char reflectionAlpha = setupBlock->m_color.rgba[3];
     MaterialMan.SetReflectionAlpha(reflectionAlpha);
@@ -985,7 +973,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
 
     if (reinterpret_cast<_pppPObject*>(pppMana2)->m_graphId == 0) {
         mana2Work->m_object = gObject;
-        SetMana2ModelCallbacks(model, mana2Work, step);
+        model->SetCallbackContext(mana2Work, step);
+        model->SetBeforeDrawCallback(Mana2_BeforeDrawCallback);
+        model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
         mana2Work->m_sourceTextures[0] = GetTextureFromRSD(step->m_sourceTextureIds[0], ppvEnv);
         mana2Work->m_sourceTextures[1] = GetTextureFromRSD(step->m_sourceTextureIds[1], ppvEnv);
         mana2Work->m_sourceTextures[2] = GetTextureFromRSD(step->m_sourceTextureIds[2], ppvEnv);

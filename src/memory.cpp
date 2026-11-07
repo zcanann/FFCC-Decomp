@@ -60,34 +60,6 @@ static inline void* payloadFromBlock(CMemory::CStage::CBlock* block)
     return reinterpret_cast<void*>(reinterpret_cast<unsigned char*>(block) + sizeof(CMemory::CStage::CBlock));
 }
 
-static inline void freeStageBlock(void* ptr)
-{
-    if (ptr != (void*)nullptr) {
-        CMemory::CStage::CBlock* block = blockFromPayload(ptr);
-        if ((block->m_magicStart != kMemoryBlockStartMagic) ||
-            (block->m_magicEnd != kMemoryBlockEndMagic)) {
-            System.Printf(const_cast<char*>("CMemory.CStage.free: \211\363\202\352\202\304\202\242\202\334\202\267\201Baddress = %08x file = %s line = %d\n"), ptr, block->m_source, block->m_line);
-        }
-
-        block->m_flags = static_cast<unsigned char>(block->m_flags & ~kMemoryBlockUsedFlag);
-
-        if ((block->m_next->m_flags & kMemoryBlockUsedFlag) == 0) {
-            block->m_size += block->m_next->m_size + sizeof(CMemory::CStage::CBlock);
-            block->m_next->m_next->m_prev = block;
-            block->m_next = block->m_next->m_next;
-        }
-
-        CMemory::CStage::CBlock* prevBlock = block->m_prev;
-        if ((prevBlock->m_flags & kMemoryBlockUsedFlag) == 0) {
-            prevBlock->m_size += block->m_size + sizeof(CMemory::CStage::CBlock);
-            block->m_prev->m_next = block->m_next;
-            block->m_next->m_prev = block->m_prev;
-        }
-
-        block->m_stage->m_allocCount -= 1;
-    }
-}
-
 static inline CAmemCache& cacheEntryAt(CAmemCacheSet* cacheSet, int index)
 {
     return cacheSet->m_cacheTable[index];
@@ -188,7 +160,7 @@ void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int
  */
 void operator delete(void* ptr)
 {
-    freeStageBlock(ptr);
+    Memory.Free(ptr);
 }
 
 /*
@@ -202,7 +174,7 @@ void operator delete(void* ptr)
  */
 void operator delete[](void* ptr)
 {
-    freeStageBlock(ptr);
+    Memory.Free(ptr);
 }
 
 /*
@@ -671,7 +643,7 @@ void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, 
  */
 void CMemory::Free(void* ptr)
 {
-    freeStageBlock(ptr);
+    reinterpret_cast<CStage::CBlock*>(reinterpret_cast<unsigned char*>(ptr) - sizeof(CStage::CBlock))->m_stage->free(ptr);
 }
 
 /*
@@ -960,12 +932,39 @@ void CMemory::CStage::freeAMemory(void* ptr)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 284b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CStage::free(void*)
+void CMemory::CStage::free(void* ptr)
 {
-	// TODO
+    if (ptr != (void*)nullptr) {
+        CBlock* block = blockFromPayload(ptr);
+        if ((block->m_magicStart != kMemoryBlockStartMagic) ||
+            (block->m_magicEnd != kMemoryBlockEndMagic)) {
+            System.Printf(const_cast<char*>("CMemory.CStage.free: \211\363\202\352\202\304\202\242\202\334\202\267\201Baddress = %08x file = %s line = %d\n"), ptr, block->m_source, block->m_line);
+        }
+
+        block->m_flags = static_cast<unsigned char>(block->m_flags & ~kMemoryBlockUsedFlag);
+
+        if ((block->m_next->m_flags & kMemoryBlockUsedFlag) == 0) {
+            block->m_size += block->m_next->m_size + sizeof(CBlock);
+            block->m_next->m_next->m_prev = block;
+            block->m_next = block->m_next->m_next;
+        }
+
+        CBlock* prevBlock = block->m_prev;
+        if ((prevBlock->m_flags & kMemoryBlockUsedFlag) == 0) {
+            prevBlock->m_size += block->m_size + sizeof(CBlock);
+            block->m_prev->m_next = block->m_next;
+            block->m_next->m_prev = block->m_prev;
+        }
+
+        block->m_stage->m_allocCount -= 1;
+    }
 }
 
 /*
@@ -1281,12 +1280,30 @@ int CMemory::CStage::GetHeapUnuse()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 656b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCache::Destroy(CMemory::CStage*)
+void CAmemCache::Destroy(CMemory::CStage* stage)
 {
-	// TODO
+    if (m_dmaCopy != 0) {
+        if (m_cacheData != 0) {
+            stage->free(m_cacheData);
+            m_cacheData = 0;
+        }
+        if (m_workData != 0) {
+            m_workData = 0;
+        }
+    } else {
+        if (m_workData != 0) {
+            stage->free(m_workData);
+            m_cacheData = 0;
+            m_workData = 0;
+        }
+    }
 }
 
 /*
@@ -1387,25 +1404,7 @@ void CAmemCacheSet::DestroyCache(int index)
 {
     CAmemCache& entry = cacheEntryAt(this, index);
 
-    if (entry.m_dmaCopy != 0) {
-        unsigned long cacheData = reinterpret_cast<unsigned long>(entry.m_cacheData);
-        if (cacheData != 0) {
-            freeStageBlock(reinterpret_cast<void*>(cacheData));
-            entry.m_cacheData = 0;
-        }
-        unsigned long workData = reinterpret_cast<unsigned long>(entry.m_workData);
-        if (workData != 0) {
-            entry.m_workData = 0;
-        }
-    } else {
-        unsigned long workData = reinterpret_cast<unsigned long>(entry.m_workData);
-        if (workData != 0) {
-            freeStageBlock(reinterpret_cast<void*>(workData));
-            entry.m_cacheData = 0;
-            entry.m_workData = 0;
-        }
-    }
-
+    entry.Destroy(m_stage);
     entry.m_refCnt0 = 0;
     entry.m_refCount = 0;
     entry.m_inUse = 0;
@@ -1808,7 +1807,7 @@ void CAmemCacheSet::CacheClear()
         if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
             void* data = entry.m_cacheData;
             if (data != 0) {
-                freeStageBlock(reinterpret_cast<void*>(data));
+                m_stage->free(data);
                 entry.m_cacheData = 0;
             }
         }

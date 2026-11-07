@@ -1273,15 +1273,21 @@ void CMenuPcs::DrawOptionMenu()
 		"\x82\x66\x82\x61\x82\x60\x82\xCC\x83\x4A\x83\x89\x81\x5B\x83\x6F\x83\x89\x83\x93\x83\x58\x82\xF0\x95\xCF\x8D\x58\x82\xB5\x82\xDC\x82\xB7"
 	};
 #else
-	char* optionText[5] = { 0, 0, 0, 0, 0 };
 	int idx = 2;
-	for (int n = 0; n < 5; n++) {
-		optionText[n] = g_strMenuUtilMes[langRow][idx++];
-	}
-	char* helpText[5] = { 0, 0, 0, 0, 0 };
-	for (int n = 0; n < 5; n++) {
-		helpText[n] = g_strMenuUtilMes[langRow][idx++];
-	}
+	char* optionText[5] = {
+		g_strMenuUtilMes[langRow][idx++],
+		g_strMenuUtilMes[langRow][idx++],
+		g_strMenuUtilMes[langRow][idx++],
+		g_strMenuUtilMes[langRow][idx++],
+		g_strMenuUtilMes[langRow][idx++]
+	};
+	char* helpText[5] = {
+		g_strMenuUtilMes[langRow][idx++],
+		g_strMenuUtilMes[langRow][idx++],
+		g_strMenuUtilMes[langRow][idx++],
+		g_strMenuUtilMes[langRow][idx++],
+		g_strMenuUtilMes[langRow][idx++]
+	};
 
 #endif
 

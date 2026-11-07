@@ -5647,6 +5647,7 @@ void CMenuPcs::CalcWMFrame()
 {
 	int i;
 	int digitW;
+	int totalWidth;
 	short mainState = m_wmWorldState->m_mainState;
 	float scaledSize;
 	if (mainState == 0) {
@@ -5700,7 +5701,7 @@ void CMenuPcs::CalcWMFrame()
 		m_wmChgFlags &= ~WMDATA_CHG_YEAR;
 	}
 
-	unsigned int yearValue;
+	int yearValue;
 	if ((m_wmChgFlags & WMDATA_CHG_YEAR) != 0) {
 		yearValue = Game.m_gameWork.m_scriptSysVal0 + m_wmPrevYear;
 	} else {
@@ -5708,13 +5709,13 @@ void CMenuPcs::CalcWMFrame()
 	}
 #ifndef VERSION_GCCJGC
 	s_NowDispYear = (unsigned char)yearValue;
-	if ((int)yearValue > 99) {
+	if (yearValue > 99) {
 		s_NowDispYear = 100;
 	}
 #endif
 
-	int digitCount = ((int)yearValue > 9) ? 2 : 1;
-	if ((int)yearValue > 99) {
+	int digitCount = (yearValue > 9) ? 2 : 1;
+	if (yearValue > 99) {
 		digitCount = 3;
 	}
 
@@ -5723,7 +5724,7 @@ void CMenuPcs::CalcWMFrame()
 	m_wm.m_frameData->m_yearSprites[1].m_scale = fE8;
 
 	if (digitCount == 3) {
-		int totalWidth = s_YearWTbl[10];
+		totalWidth = s_YearWTbl[10];
 		const float fV1 = 120.0f;
 		const float fV4 = 360.0f;
 		m_wm.m_frameData->m_yearSprites[0].m_x = (0x2B - totalWidth) / 2 + 0x2C;
@@ -5734,13 +5735,13 @@ void CMenuPcs::CalcWMFrame()
 		m_wm.m_frameData->m_yearSprites[0].m_v = fV4;
 	} else {
 		int digits[2];
-		digits[0] = (int)yearValue % 10;
+		digits[0] = yearValue % 10;
 		if (1 < digitCount) {
-			digits[1] = (int)yearValue / 10;
+			digits[1] = yearValue / 10;
 		}
-		int totalWidth = s_YearWTbl[(int)yearValue % 10];
+		totalWidth = s_YearWTbl[yearValue % 10];
 		if (1 < digitCount) {
-			totalWidth = totalWidth + s_YearWTbl[(int)yearValue / 10];
+			totalWidth = totalWidth + s_YearWTbl[yearValue / 10];
 		}
 		int topDigitIdx = digitCount - 1;
 		int digitX = (0x2B - totalWidth) / 2 + 0x2C;

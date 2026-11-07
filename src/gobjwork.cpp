@@ -23,11 +23,6 @@ inline int CSystem::GetErrorLevel()
 }
 
 namespace {
-static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
-{
-	return &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemIdx];
-}
-
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)((unsigned char*)Game.m_battleParams + offset)) * 0.01f) +
@@ -1692,7 +1687,7 @@ inline void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int&
 		if (artifactIndex < kPermanentArtifactCount || includeTemp != 0) {
 			int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex];
 			if (artifactId > 0) {
-				SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
+				SItemFlatRow* artifactData = &((SItemFlatRow*)Game.m_itemTable)[artifactId];
 				unsigned short value = artifactData->m_value;
 				switch (artifactData->m_kind) {
 				case 0x9F:
@@ -1811,7 +1806,7 @@ void CCaravanWork::CalcStatus()
 		int equipSlot = m_equipment[equipIdx];
 		if (equipSlot >= 0) {
 			itemIdx = m_inventoryItems[equipSlot];
-			itemType = GetItemDataPtr(itemIdx)->m_kind;
+			itemType = ((SItemFlatRow*)Game.m_itemTable)[itemIdx].m_kind;
 
 			if (itemType == 1) {
 				int weaponRef;
@@ -1822,7 +1817,7 @@ void CCaravanWork::CalcStatus()
 				}
 			}
 
-			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)->m_value;
+			unsigned short itemValue = (short)((SItemFlatRow*)Game.m_itemTable)[itemIdx].m_value;
 			if (itemType != 0x45) {
 				if (itemType < 0x45) {
 					if (itemType == 1) {
@@ -1843,7 +1838,7 @@ void CCaravanWork::CalcStatus()
 			m_defense += itemValue;
 			m_baseDefense += itemValue;
 		apply_effect:
-			int itemEffect = GetItemDataPtr(itemIdx)->m_attribute;
+			int itemEffect = ((SItemFlatRow*)Game.m_itemTable)[itemIdx].m_attribute;
 			unsigned short effectValue = itemValue;
 			switch (itemEffect) {
 			case 1:
@@ -2371,7 +2366,7 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 {
 	int reset = 0;
 	int weaponItem = GetCmdListItem(weaponIdx);
-	if ((0 < weaponItem) && (GetItemDataPtr(weaponItem)->m_kind == 1)) {
+	if ((0 < weaponItem) && (((SItemFlatRow*)Game.m_itemTable)[weaponItem].m_kind == 1)) {
 		return;
 	}
 

@@ -49,11 +49,6 @@ STATIC_ASSERT(sizeof(CFontGlyphEntry::Metrics) == 2);
 STATIC_ASSERT(offsetof(CFontGlyphEntry, m_metrics) == 3);
 
 namespace {
-static inline CFontGlyphEntry* FirstGlyph(unsigned short* bucket)
-{
-	return reinterpret_cast<CFontGlyphEntry*>(bucket + 1);
-}
-
 static inline float FloorF(float value)
 {
 	return static_cast<float>(floor(value));
@@ -111,7 +106,7 @@ inline CFontGlyphEntry* CFont::searchChar(unsigned short ch)
     }
 #endif
 	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
-	CFontGlyphEntry* glyph = FirstGlyph(glyphBucket);
+	CFontGlyphEntry* glyph = (CFontGlyphEntry*)(glyphBucket + 1);
 	int count = static_cast<int>(*glyphBucket);
 	unsigned short code = ch >> 8;
 

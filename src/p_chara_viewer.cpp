@@ -57,31 +57,6 @@ static inline float& ViewerModelTime(CChara::CModel* model)
     return model->m_time;
 }
 
-static inline CChara::CAnim*& ViewerModelAnim(CChara::CModel* model)
-{
-    return model->m_anim;
-}
-
-static inline CTexAnimSet*& ViewerModelTexAnimSet(CChara::CModel* model)
-{
-    return model->m_texAnimSet;
-}
-
-static inline CTextureSet*& ViewerModelTextureSet(CChara::CModel* model)
-{
-    return model->m_texSet;
-}
-
-static inline int ViewerModelNodeCount(CChara::CModel* model)
-{
-    return model->m_data->m_nodeCount;
-}
-
-static inline int ViewerModelPosQuant(CChara::CModel* model)
-{
-    return model->m_data->m_posQuant;
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -241,7 +216,7 @@ void CCharaPcs::drawViewer()
     for (unsigned int i = 0; i < 2; i++) {
         CChara::CModel* model = self->m_viewerModel[i];
         if (model != 0) {
-            if (ViewerModelTextureSet(model) == 0) {
+            if (model->m_texSet == 0) {
                 Graphic.Printf("no texture...");
             } else {
                 CStopWatch watch;
@@ -481,13 +456,13 @@ void CCharaPcs::calcViewer()
 
         float translateX = 0.0f;
         if ((i != 0) && (self->m_viewerModel[i - 1] != 0)) {
-            int posQuant = ViewerModelPosQuant(self->m_viewerModel[i - 1]);
+            int posQuant = (self->m_viewerModel[i - 1])->m_data->m_posQuant;
             translateX = static_cast<float>((1 << (15 - posQuant)) / 8);
         }
 
         if ((i == 0) && (self->m_viewerTexAnimDirty != 0)) {
             self->m_viewerTexAnimDirty = 0;
-            CTexAnimSet* texAnimSet = ViewerModelTexAnimSet(self->m_viewerModel[i]);
+            CTexAnimSet* texAnimSet = self->m_viewerModel[i]->m_texAnimSet;
             if (texAnimSet != 0) {
                 int texAnimFrame = self->m_viewerTexAnimFrame;
                 int animType = -2;
@@ -567,7 +542,7 @@ void CCharaPcs::calcViewer()
         float skinTime = matrixWatch.Get();
 
         if (i == 0) {
-            CChara::CAnim* modelAnim = ViewerModelAnim(self->m_viewerModel[i]);
+            CChara::CAnim* modelAnim = self->m_viewerModel[i]->m_anim;
             if (modelAnim != 0) {
                 float animFrames = static_cast<float>(modelAnim->m_frameCount);
                 float frame = (float)fmod((double)ViewerModelTime(self->m_viewerModel[i]), (double)(frameAdvance + animFrames));
@@ -583,7 +558,7 @@ void CCharaPcs::calcViewer()
                 Graphic.Printf("CONT = %d", self->m_viewerAnimLoopIndex);
             }
             Graphic.Printf("CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES", matrixTime + skinTime, matrixTime, skinTime,
-                           ViewerModelNodeCount(self->m_viewerModel[i]));
+                           self->m_viewerModel[i]->m_data->m_nodeCount);
         }
     }
 }

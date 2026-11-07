@@ -33,11 +33,6 @@ static inline f32 SwapFloat(f32 value)
     return *reinterpret_cast<f32*>(&swapped);
 }
 
-static inline CMemory::CStage* MaterialEditorStage()
-{
-    return MaterialEditorPcs.m_stage;
-}
-
 static inline u32 LoadSwap32(u32 value)
 {
     return __lwbrx(&value, 0);
@@ -92,7 +87,7 @@ void CMaterialEditorPcs::SetUSBData()
         rsdItem->countA = usb.m_sizeBytes;
         u32 allocSize = usb.m_sizeBytes * 0xC;
         void* allocData = Memory._Alloc(
-            allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+            allocSize, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
         if (allocData == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
         }
@@ -130,7 +125,7 @@ void CMaterialEditorPcs::SetUSBData()
         rsdItem->countC = usb.m_sizeBytes;
         u32 allocSize = usb.m_sizeBytes * 0x70;
         void* allocData = Memory._Alloc(
-            allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+            allocSize, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
         if (allocData == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
         }
@@ -188,7 +183,7 @@ void CMaterialEditorPcs::SetUSBData()
         rsdItem->countB = usb.m_sizeBytes;
         u32 allocSize = usb.m_sizeBytes * 0xC;
         void* allocData = Memory._Alloc(
-            allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+            allocSize, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
         if (allocData == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
         }
@@ -245,7 +240,7 @@ void CMaterialEditorPcs::SetUSBData()
     case 0x31: {
         u32 allocSize = usb.m_sizeBytes;
         u8* dstBuffer = static_cast<u8*>(
-            Memory._Alloc(allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0));
+            Memory._Alloc(allocSize, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0));
 
         if (dstBuffer == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
@@ -266,7 +261,7 @@ void CMaterialEditorPcs::SetUSBData()
     }
     case 0x20: {
         u32 allocSize = usb.m_sizeBytes;
-        void* mem = Memory._Alloc(allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+        void* mem = Memory._Alloc(allocSize, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
 
         if (mem == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
@@ -274,7 +269,7 @@ void CMaterialEditorPcs::SetUSBData()
 
         s16* headerBuffer = static_cast<s16*>(mem);
         void* headerDst =
-            Memory._Alloc(0x10, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+            Memory._Alloc(0x10, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
         if (headerDst == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", 0x10);
         }
@@ -295,7 +290,7 @@ void CMaterialEditorPcs::SetUSBData()
         if (headerBuffer[1] == 0x20) {
             u32 dataBytes = usb.m_sizeBytes;
             void* texData = Memory._Alloc(
-                dataBytes - 0x10, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+                dataBytes - 0x10, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
             if (texData == 0) {
                 System.Printf("MemAlloc Error!!! size=%d\n", dataBytes - 0x10);
             }
@@ -308,7 +303,7 @@ void CMaterialEditorPcs::SetUSBData()
             int tlutDataSize = tlutEntries * 4;
             int imageDataSize = static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize;
             void* texData = memory._Alloc(
-                imageDataSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+                imageDataSize, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
 
             if (texData == 0) {
                 System.Printf("MemAlloc Error!!! size=%d\n", imageDataSize);
@@ -320,7 +315,7 @@ void CMaterialEditorPcs::SetUSBData()
                 static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize);
 
             void* tlutData = Memory._Alloc(
-                tlutDataSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+                tlutDataSize, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
             if (tlutData == 0) {
                 System.Printf("MemAlloc Error!!! size=%d\n", tlutDataSize);
             }
@@ -337,21 +332,21 @@ void CMaterialEditorPcs::SetUSBData()
         }
 
         void* texObj =
-            Memory._Alloc(0x20, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+            Memory._Alloc(0x20, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
         if (texObj == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", 0x20);
         }
         this->m_texObj[this->m_loadedTextureCount] = static_cast<GXTexObj*>(texObj);
 
         void* tlutObj0 =
-            Memory._Alloc(0xC, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+            Memory._Alloc(0xC, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
         if (tlutObj0 == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", 0xC);
         }
         this->m_tlutObj0[this->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj0);
 
         void* tlutObj1 =
-            Memory._Alloc(0xC, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
+            Memory._Alloc(0xC, MaterialEditorPcs.m_stage, "ME_USB_process.cpp", 0x31, 0);
         if (tlutObj1 == 0) {
             System.Printf("MemAlloc Error!!! size=%d\n", 0xC);
         }

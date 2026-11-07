@@ -38,21 +38,6 @@ static inline s32 Div16Floor(s16 x)
     return x / 16;
 }
 
-static inline FS_Animation* AnimData(CFunnyShape* self)
-{
-    return static_cast<FS_Animation*>(self->m_anm.anmData);
-}
-
-static inline u32 ShapeFlags(CFunnyShape* self)
-{
-    return self->m_displayCurrent.flags;
-}
-
-static inline s16 ShapeCount(CFunnyShape* self)
-{
-    return self->m_displayCurrent.unk28;
-}
-
 static inline s16 ShapeRange(CFunnyShape* self)
 {
     return self->m_displayCurrent.unk2A;
@@ -164,7 +149,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
-            if ((ShapeFlags(this) & 0x100) == 0) {
+            if ((m_displayCurrent.flags & 0x100) == 0) {
                 angle = 0.0f;
             }
 
@@ -537,7 +522,7 @@ void CFunnyShape::RenderTexture()
  */
 void CFunnyShape::Render()
 {
-    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
+    if ((m_textureCount == 0) || (static_cast<FS_Animation*>(m_anm.anmData) == 0)) {
         return;
     }
 
@@ -545,8 +530,8 @@ void CFunnyShape::Render()
 
     CFunnyShapeAnmWork* work;
     s32 count;
-    if ((ShapeFlags(this) & 0x80) != 0) {
-        count = ShapeCount(this);
+    if ((m_displayCurrent.flags & 0x80) != 0) {
+        count = m_displayCurrent.unk28;
     } else {
         count = 1;
     }
@@ -560,7 +545,7 @@ void CFunnyShape::Render()
         posCopy.x += work->x;
         posCopy.y += work->y;
 
-        FS_Animation* animData = AnimData(this);
+        FS_Animation* animData = static_cast<FS_Animation*>(m_anm.anmData);
         const FS_Animation::Frame* frameData = reinterpret_cast<const FS_Animation::Frame*>(animData + 1);
         s16 frame = work->frame;
         frameData += frame;
@@ -582,17 +567,17 @@ void CFunnyShape::Render()
  */
 void CFunnyShape::Update()
 {
-    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
+    if ((m_textureCount == 0) || (static_cast<FS_Animation*>(m_anm.anmData) == 0)) {
         return;
     }
 
     CFunnyShapeAnmWork* work = m_anmWork;
-    const bool noSpread = ((ShapeFlags(this) & 0x80) == 0);
-    for (s32 i = 0; i < ShapeCount(this); i++) {
+    const bool noSpread = (m_displayCurrent.flags & 0x80) == 0;
+    for (s32 i = 0; i < m_displayCurrent.unk28; i++) {
         work->delay = static_cast<s16>(work->delay - 0x200);
         if (work->delay <= 0) {
             work->frame = static_cast<s16>(work->frame + 1);
-            if (work->frame >= AnimData(this)->frameCount) {
+            if (work->frame >= (static_cast<FS_Animation*>(m_anm.anmData))->frameCount) {
                 work->frame = 0;
 
                 s32 r = rand();
@@ -624,7 +609,7 @@ void CFunnyShape::Update()
                 }
             }
 
-            const FS_Animation::Frame* frameData = reinterpret_cast<const FS_Animation::Frame*>(AnimData(this) + 1);
+            const FS_Animation::Frame* frameData = reinterpret_cast<const FS_Animation::Frame*>((static_cast<FS_Animation*>(m_anm.anmData)) + 1);
             s16 frame = work->frame;
             frameData += frame;
             work->delay = frameData->delay;
@@ -649,12 +634,12 @@ void CFunnyShape::Update()
  */
 void CFunnyShape::InitAnmWork()
 {
-    const bool noSpread = (ShapeFlags(this) & 0x80) == 0;
+    const bool noSpread = (m_displayCurrent.flags & 0x80) == 0;
     CFunnyShapeAnmWork* work = m_anmWork;
 
     for (s32 i = 0; i < 0x200; i++) {
         work->index = i;
-        work->animData = AnimData(this);
+        work->animData = static_cast<FS_Animation*>(m_anm.anmData);
 
         s32 r = rand();
         work->x = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
@@ -664,7 +649,7 @@ void CFunnyShape::InitAnmWork()
         work->z = 0.0f;
 
         r = rand();
-        const s16 shapeCount = AnimData(this)->frameCount;
+        const s16 shapeCount = (static_cast<FS_Animation*>(m_anm.anmData))->frameCount;
         const s32 shapeDiv = r / shapeCount;
         work->frame = static_cast<s16>(r - shapeDiv * shapeCount);
         work->delay = 0x200;

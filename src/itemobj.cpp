@@ -39,21 +39,6 @@ static const int kItemObjCapsuleUseFrame = 16;
 u32 g_tempFlag;
 extern char SoundBuffer[];
 
-static inline bool ItemIsMultiBossStage()
-{
-	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF;
-}
-
-static inline bool ItemIsMultiBossCaravan(CGObject* const& obj)
-{
-	return ItemIsMultiBossStage() && obj->IsKindOf(0x6D);
-}
-
-static inline bool ItemIsGbaCaravan(CGObject* const& obj)
-{
-	return ItemIsMultiBossCaravan(obj) && reinterpret_cast<CCaravanWork*>(obj->m_scriptHandle)->m_joybusCaravanId != 0;
-}
-
 STATIC_ASSERT(offsetof(LastBossWork, m_capsules) == 0x08);
 STATIC_ASSERT(offsetof(LastBossWork, m_targetPosition) == 0x18);
 STATIC_ASSERT(offsetof(LastBossWork, m_phaseTimer) == 0x24);
@@ -275,7 +260,7 @@ void CGItemObj::onFrameStat()
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
 			Vec* attachOffsetPtr = CVector(0.0f, 0.0f, 0.0f);
-			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(m_owner);
+			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && (((Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) && m_owner->IsKindOf(0x6D)) && ((CCaravanWork*)m_owner->m_scriptHandle)->m_joybusCaravanId != 0);
 			Attach(m_owner, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = 0.0f;
@@ -726,14 +711,14 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 	int canSystemCall;
 
 	if (carryState == 0) {
-		canSystemCall = ItemIsGbaCaravan(partyObj);
+		canSystemCall = ((Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) && partyObj->IsKindOf(0x6D)) && ((CCaravanWork*)partyObj->m_scriptHandle)->m_joybusCaravanId != 0;
 
 		m_owner = partyObj;
 		m_carryFrame = carryMode;
 
 		if (carryMode == 0) {
 			Vec* attachOffsetPtr = CVector(0.0f, 0.0f, 0.0f);
-			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(partyObj);
+			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && (((Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) && partyObj->IsKindOf(0x6D)) && ((CCaravanWork*)partyObj->m_scriptHandle)->m_joybusCaravanId != 0);
 
 			Attach(partyObj, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
 			changeStat(0, 0, 0);
@@ -742,7 +727,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			changeStat(0xB, 0, 0);
 		}
 	} else if (carryState == 1 || carryState == 2) {
-		canSystemCall = ItemIsGbaCaravan(m_owner);
+		canSystemCall = ((Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) && m_owner->IsKindOf(0x6D)) && ((CCaravanWork*)m_owner->m_scriptHandle)->m_joybusCaravanId != 0;
 
 		m_carryFrame = carryMode;
 

@@ -49,11 +49,6 @@ static const char sMapOctTreeNodeMeshTypeFmt[] =
 static const char s_mapocttree_cpp[] = "mapocttree.cpp";
 
 namespace {
-static inline CMapObj* GetMapObjByIndex(unsigned short index)
-{
-    return &g_MapMng.m_mapObjArray[index];
-}
-
 }
 
 /*
@@ -856,7 +851,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
         case 'OBJN': {
             unsigned short objIndex = chunkFile.Get2();
 
-            m_mapObject = GetMapObjByIndex(objIndex);
+            m_mapObject = &g_MapMng.m_mapObjArray[objIndex];
             signed char meshType = m_mapObject->m_meshType;
             if (meshType == 4) {
                 m_mapObject->m_drawPriority = 0xFF;

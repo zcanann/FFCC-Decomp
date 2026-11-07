@@ -98,16 +98,6 @@ static inline u8* MiniGamePcsRaw()
 	return reinterpret_cast<u8*>(&MiniGamePcs);
 }
 
-static inline u32& RuntimeDebugFlags(u8* runtime)
-{
-	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugFlags;
-}
-
-static inline int& DebugDrawCCCount(u8* runtime)
-{
-	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCCount;
-}
-
 static inline CFlatRuntime2::CDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 {
 	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries;
@@ -158,7 +148,7 @@ CFlatRuntime2::CFlatRuntime2()
 	u8* runtime = reinterpret_cast<u8*>(this);
 
 	m_saveSceneEnabled = 0;
-	RuntimeDebugFlags(runtime) = 0;
+	((CFlatRuntime2*)runtime)->m_debugFlags = 0;
 	m_eventFlags = 0;
 	m_eventMask = -1;
 	m_gameFlagBits.m_flagBit2 = 1;
@@ -1011,7 +1001,7 @@ void CFlatRuntime2::Calc()
 		delete[] saveData;
 	}
 
-	DebugDrawCCCount(runtime) = 0;
+	((CFlatRuntime2*)runtime)->m_debugDrawCCCount = 0;
 	memset(&m_moveTime, 0, sizeof(m_moveTime) + sizeof(m_bgCollisionTime) + sizeof(m_objectCollisionTime) +
 		sizeof(m_updateTime) + sizeof(m_hitTime));
 }

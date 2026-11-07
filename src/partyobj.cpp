@@ -163,11 +163,6 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 	}
 }
 
-static inline bool isMenuPcsCommandBusy()
-{
-	return MenuPcs.m_mode != 0;
-}
-
 static inline bool isFrameInterval(int frame, int interval)
 {
 	return frame % interval == 0;
@@ -829,7 +824,7 @@ void CGPartyObj::onFramePostCalc()
  */
 void CGPartyObj::command()
 {
-	if (isMenuPcsCommandBusy()) {
+	if (MenuPcs.m_mode != 0) {
 		return;
 	}
 

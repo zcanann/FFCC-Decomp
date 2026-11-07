@@ -50,21 +50,11 @@ static inline int getHsb(unsigned int value)
     return -1;
 }
 
-static inline CMaterial* AllocMaterial()
-{
-    return new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xCFF) CMaterial;
-}
-
 static inline void AddTextureIndex(CMaterial* material, CChunkFile& chunkFile)
 {
     int index = material->GetNumTexture();
     material->IncNumTexture();
     material->AddTextureIdx(index, chunkFile.Get2());
-}
-
-static inline CMapKeyFrame* AllocMapKeyFrame(int line)
-{
-    return new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", line) CMapKeyFrame();
 }
 
 static inline void SetMaterialColor(CMaterial* material, unsigned int rgba)
@@ -3251,7 +3241,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             case CHUNK_TIDX: {
                 materialIndex = GetFreeMaterielIdx();
 
-                material = AllocMaterial();
+                material = new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xCFF) CMaterial;
                 material->Create(chunk.m_arg0, tevBit);
 
                 if (static_cast<int>(material->m_textureCount) == 0) {
@@ -3417,14 +3407,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                             }
                         } break;
                         case CHUNK_UFRM:
-                            keyFrameU = AllocMapKeyFrame(0xDD3);
+                            keyFrameU = new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xDD3) CMapKeyFrame();
                             keyFrameU->ReadFrame(chunkFile, chunk.m_arg0);
                             break;
                         case CHUNK_UKEY:
                             keyFrameU->ReadKey(chunkFile, chunk.m_arg0);
                             break;
                         case CHUNK_VFRM:
-                            keyFrameV = AllocMapKeyFrame(0xDDD);
+                            keyFrameV = new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xDDD) CMapKeyFrame();
                             keyFrameV->ReadFrame(chunkFile, chunk.m_arg0);
                             break;
                         case CHUNK_VKEY:

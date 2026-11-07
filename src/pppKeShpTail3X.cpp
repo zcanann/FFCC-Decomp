@@ -147,6 +147,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float segDz;
     float invCountMinusOne;
     float posZ;
+    float posX;
     float drawScale;
     int life;
     s32 shapeFrameDuration;
@@ -160,7 +161,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float segRemain;
     float segCursor = 0.0f;
     float shapeScale;
-    float posX;
     u8 zEnable;
     s32 dataValIndex;
 
@@ -212,12 +212,12 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
 
     history = work->m_posHistory;
     currentIndex = work->m_head;
-    posX = history[currentIndex].x;
-    posZ = history[currentIndex].z;
     posY = history[currentIndex].y;
-    startZ = posZ;
-    startX = posX;
+    posZ = history[currentIndex].z;
+    posX = history[currentIndex].x;
     startY = posY;
+    startX = posX;
+    startZ = posZ;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {
         nextIndex = 0;

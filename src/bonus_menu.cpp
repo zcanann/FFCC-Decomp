@@ -170,10 +170,10 @@ void CMenuPcs::createBonus()
 #endif
 
 	Pad.SetAnalogDepth(0x28);
-	for (i = 0; i < 4; i++) {
-		GbaQue.OpenMenu(i, 0, 0);
+	for (k = 0; k < 4; k++) {
+		GbaQue.OpenMenu(k, 0, 0);
 #ifndef VERSION_GCCJGC
-		GbaQue.SetRadarMode(i, 0);
+		GbaQue.SetRadarMode(k, 0);
 #endif
 	}
 
@@ -325,22 +325,22 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		for (j = 0; j < s_Rinfo->m_partyCount; j++) {
-			int partySlot = s_Rinfo->m_party[j].m_partySlot;
+		for (k = 0; k < s_Rinfo->m_partyCount; k++) {
+			int partySlot = s_Rinfo->m_party[k].m_partySlot;
 
-			for (k = 0; k < BonusSummaryData::kArtifactCount; k++) {
-				short itemId = s_Rinfo->m_artifacts[k];
+			for (j = 0; j < BonusSummaryData::kArtifactCount; j++) {
+				short itemId = s_Rinfo->m_artifacts[j];
 				if (itemId <= 0) {
 					continue;
 				}
 
 				if (GetItemType(itemId, 1) == 2) {
-					int artifactSlot = s_Rinfo->m_artifacts[k] - 0x9F;
-					if (Game.m_scriptFoodBase[partySlot]->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[k]) {
-						s_Rinfo->m_party[j].m_ownedArtifactMask |= (1u << k);
+					int artifactSlot = s_Rinfo->m_artifacts[j] - 0x9F;
+					if (Game.m_scriptFoodBase[partySlot]->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[j]) {
+						s_Rinfo->m_party[k].m_ownedArtifactMask |= (1u << j);
 					}
 				} else if (!Game.m_scriptFoodBase[partySlot]->CanAddItem(1)) {
-					s_Rinfo->m_party[j].m_ownedArtifactMask |= (1u << k);
+					s_Rinfo->m_party[k].m_ownedArtifactMask |= (1u << j);
 				}
 			}
 		}

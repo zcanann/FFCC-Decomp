@@ -297,10 +297,10 @@ void CMapMng::Create()
     CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label), 0);
     m_stage = stage;
 
-    GetMapAnimRunArray().SetStage(m_stage);
-    GetMapAnimArray().SetStage(m_stage);
-    GetMapAnimKeyDtArray().SetStage(m_stage);
-    GetMapShadowArray().SetStage(m_stage);
+    m_mapAnimRunArray.SetStage(m_stage);
+    m_mapAnimArray.SetStage(m_stage);
+    m_mapAnimKeyDtArray.SetStage(m_stage);
+    m_mapShadowArray.SetStage(m_stage);
 
     for (int i = 0; i < 2; i++) {
         m_mapLightHolderArrays[i].SetStage(m_stage);
@@ -439,26 +439,26 @@ void CMapMng::DestroyMapTexAnimSet()
  */
 void CMapMng::DestroyAnimation()
 {
-    for (int i = 0; i < GetMapAnimArray().GetSize(); i++) {
-        if (GetMapAnimArray()[i] != 0) {
-            delete GetMapAnimArray()[i];
+    for (int i = 0; i < m_mapAnimArray.GetSize(); i++) {
+        if (m_mapAnimArray[i] != 0) {
+            delete m_mapAnimArray[i];
         }
     }
-    GetMapAnimArray().RemoveAll();
+    m_mapAnimArray.RemoveAll();
 
-    for (int i = 0; i < GetMapAnimKeyDtArray().GetSize(); i++) {
-        if (GetMapAnimKeyDtArray()[i] != 0) {
-            delete GetMapAnimKeyDtArray()[i];
+    for (int i = 0; i < m_mapAnimKeyDtArray.GetSize(); i++) {
+        if (m_mapAnimKeyDtArray[i] != 0) {
+            delete m_mapAnimKeyDtArray[i];
         }
     }
-    GetMapAnimKeyDtArray().RemoveAll();
+    m_mapAnimKeyDtArray.RemoveAll();
 
-    for (int i = 0; i < GetMapAnimRunArray().GetSize(); i++) {
-        if (GetMapAnimRunArray()[i] != 0) {
-            delete GetMapAnimRunArray()[i];
+    for (int i = 0; i < m_mapAnimRunArray.GetSize(); i++) {
+        if (m_mapAnimRunArray[i] != 0) {
+            delete m_mapAnimRunArray[i];
         }
     }
-    GetMapAnimRunArray().RemoveAll();
+    m_mapAnimRunArray.RemoveAll();
 }
 
 /*
@@ -472,12 +472,12 @@ void CMapMng::DestroyAnimation()
  */
 void CMapMng::DestroyMapShadow()
 {
-    for (int i = 0; i < GetMapShadowArray().GetSize(); i++) {
-        if (GetMapShadowArray()[i] != 0) {
-            delete GetMapShadowArray()[i];
+    for (int i = 0; i < m_mapShadowArray.GetSize(); i++) {
+        if (m_mapShadowArray[i] != 0) {
+            delete m_mapShadowArray[i];
         }
     }
-    GetMapShadowArray().RemoveAll();
+    m_mapShadowArray.RemoveAll();
 }
 
 /*
@@ -948,8 +948,8 @@ void CMapMng::SetBumpLightSource()
 void CMapMng::InitMapShadow()
 {
     int shadowIdx;
-    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
-        GetMapShadowArray()[shadowIdx]->Init();
+    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(m_mapShadowArray.GetSize()); i++) {
+        m_mapShadowArray[shadowIdx]->Init();
     }
 }
 
@@ -1262,7 +1262,7 @@ int CMapMng::ReadOtm(char* mapName)
                 case 0x414E494D: {
                     CMapAnim* mapAnim = new (g_MapMng.m_stage, "map.cpp", 0x4BF) CMapAnim();
                     mapAnim->ReadOtmAnim(chunkFile);
-                    GetMapAnimArray().Add(mapAnim);
+                    m_mapAnimArray.Add(mapAnim);
                     break;
                 }
                 }
@@ -1501,9 +1501,9 @@ void CMapMng::Calc()
         return;
     }
 
-    const int mapAnimRunCount = GetMapAnimRunArray().GetSize();
+    const int mapAnimRunCount = m_mapAnimRunArray.GetSize();
     for (unsigned int i = 0; static_cast<int>(i) < mapAnimRunCount; i++) {
-        CMapAnimRun* mapAnimRun = GetMapAnimRunArray()[i];
+        CMapAnimRun* mapAnimRun = m_mapAnimRunArray[i];
         mapAnimRun->Calc(m_mapAnimFrame);
     }
 
@@ -1523,8 +1523,8 @@ void CMapMng::Calc()
     SetLightSource();
 
     unsigned long shadowIdx;
-    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
-        CMapShadow* mapShadow = GetMapShadowArray()[shadowIdx];
+    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(m_mapShadowArray.GetSize()); i++) {
+        CMapShadow* mapShadow = m_mapShadowArray[shadowIdx];
         mapShadow->Calc();
     }
 
@@ -1626,7 +1626,7 @@ void CMapMng::DrawBefore()
 
         if ((g_MapHitDrawMode & 8) == 0) {
             for (int i = 0; i < m_mapObjCount; i++) {
-                CMapObj* mapObj = g_MapMng.GetMapObj(i);
+                CMapObj* mapObj = &g_MapMng.m_mapObjArray[i];
                 mapObj->Draw(0xFE);
             }
 
@@ -1943,7 +1943,7 @@ void CMapMng::DrawAfter()
             }
 
             for (int i = 0; i < m_mapObjCount; i++) {
-                CMapObj* mapObj = g_MapMng.GetMapObj(i);
+                CMapObj* mapObj = &g_MapMng.m_mapObjArray[i];
                 mapObj->Draw(2);
             }
         }

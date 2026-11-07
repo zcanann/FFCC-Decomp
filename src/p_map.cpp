@@ -226,11 +226,11 @@ static inline void SetViewerStartPos(int viewerMode, char* mapName)
     if ((viewerMode != 0) && (strcmp(oldMapFileName, mapName) != 0)) {
         strcpy(oldMapFileName, mapName);
         if (g_MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-            COctNode* rootNode = g_MapMng.GetOctTreeArray()->GetRootNode();
+            COctNode* rootNode = g_MapMng.m_octTreeArray[0].m_nodePool;
             if (rootNode != 0) {
                 rootNode->m_bound.GetCenter(&cameraPos);
             } else {
-                CMapObj* mapObj = g_MapMng.GetMapObj(1);
+                CMapObj* mapObj = &g_MapMng.m_mapObjArray[1];
                 cameraPos.x = mapObj->m_localPosition.x;
                 cameraPos.y = mapObj->m_localPosition.y;
                 cameraPos.z = mapObj->m_localPosition.z;

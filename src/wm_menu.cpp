@@ -1641,7 +1641,7 @@ void CMenuPcs::CalcMCardMenu()
 			m_wmWorldState->m_flag09 = 1;
 		} else if (m_menuWindowInfo->state == 1
 		           && m_wmWorldState->m_counter1A == 0) {
-			short chkResult = (short)GetMcCtrl()->ChkEmpty(0);
+			short chkResult = (short)m_mcCtrl.ChkEmpty(0);
 			int chkResultInt = chkResult;
 			m_wmWorldState->m_mcResult = chkResultInt;
 			if (m_wmWorldState->m_mcResult < 0) {
@@ -1764,7 +1764,7 @@ void CMenuPcs::CalcMCardMenu()
 		} else if (m_menuWindowInfo->state == 1
 		           && m_wmWorldState->m_counter1A == 0) {
 			if (subState == 0xD) {
-				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->Format(1);
+				m_wmWorldState->m_mcResult = (short)m_mcCtrl.Format(1);
 #if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
@@ -1772,7 +1772,7 @@ void CMenuPcs::CalcMCardMenu()
 				}
 #endif
 			} else if (subState == 0x1A) {
-				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->EraseDat();
+				m_wmWorldState->m_mcResult = (short)m_mcCtrl.EraseDat();
 #if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
@@ -1780,7 +1780,7 @@ void CMenuPcs::CalcMCardMenu()
 				}
 #endif
 			} else {
-				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->SaveDat();
+				m_wmWorldState->m_mcResult = (short)m_mcCtrl.SaveDat();
 #if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
@@ -1818,7 +1818,7 @@ void CMenuPcs::CalcMCardMenu()
 		}
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A == 0) {
-			short listRes = (short)GetMcCtrl()->LoadMcList();
+			short listRes = (short)m_mcCtrl.LoadMcList();
 			int listResInt = listRes;
 			m_wmWorldState->m_mcResult = listResInt;
 			if (m_wmWorldState->m_mcResult == 0) {
@@ -2214,7 +2214,7 @@ void CMenuPcs::CalcLoadMenu()
 			m_wmWorldState->m_flag09 = 1;
 		} else if (m_menuWindowInfo->state == 1
 		           && m_wmWorldState->m_counter1A == 0) {
-			short chkResult = (short)GetMcCtrl()->ChkEmpty(1);
+			short chkResult = (short)m_mcCtrl.ChkEmpty(1);
 			m_wmWorldState->m_mcResult = chkResult;
 			if (m_wmWorldState->m_mcResult < 0) {
 #if defined(VERSION_GCCP01)
@@ -2340,7 +2340,7 @@ void CMenuPcs::CalcLoadMenu()
 		           && m_wmWorldState->m_counter1A == 0) {
 			subState = (int)m_wmWorldState->m_subState;
 			if (subState == 0xD) {
-				short fmtRes = (short)GetMcCtrl()->Format(1);
+				short fmtRes = (short)m_mcCtrl.Format(1);
 				m_wmWorldState->m_mcResult = fmtRes;
 #if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
@@ -2349,7 +2349,7 @@ void CMenuPcs::CalcLoadMenu()
 				}
 #endif
 			} else if (subState == 0x1A) {
-				short erRes = (short)GetMcCtrl()->EraseDat();
+				short erRes = (short)m_mcCtrl.EraseDat();
 				m_wmWorldState->m_mcResult = erRes;
 #if defined(VERSION_GCCP01)
 				if (m_wmWorldState->m_mcResult < 0) {
@@ -2358,7 +2358,7 @@ void CMenuPcs::CalcLoadMenu()
 				}
 #endif
 			} else {
-				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->LoadDat();
+				m_wmWorldState->m_mcResult = (short)m_mcCtrl.LoadDat();
 			}
 
 			if (m_wmWorldState->m_mcResult == 0) {
@@ -2442,7 +2442,7 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A == 0) {
-			short listRes = (short)GetMcCtrl()->LoadMcList();
+			short listRes = (short)m_mcCtrl.LoadMcList();
 			m_wmWorldState->m_mcResult = listRes;
 			if (m_wmWorldState->m_mcResult == 0) {
 #if defined(VERSION_GCCP01)
@@ -3784,7 +3784,7 @@ void CMenuPcs::DrawMoveMenu()
  */
 void CMenuPcs::DrawLoadMenu()
 {
-	McCtrl& mcCtrl = *GetMcCtrl();
+	McCtrl& mcCtrl = m_mcCtrl;
 	if ((signed char)m_wmWorldState->m_worldReady == 0) {
 		return;
 	}
@@ -4562,14 +4562,14 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		m_mcSlot = static_cast<unsigned char>(value);
 		break;
 	case 0x12: {
-		McCtrl* mc = GetMcCtrl();
+		McCtrl* mc = &m_mcCtrl;
 		mc->Init();
 		mc->SetSlot(m_mcSlot);
 		m_mcRequest = 0x12;
 		break;
 	}
 	case 0x13: {
-		McCtrl* mc = GetMcCtrl();
+		McCtrl* mc = &m_mcCtrl;
 		mc->Init();
 		mc->SetSlot(m_mcSlot);
 		m_mcRequest = 0x13;
@@ -9712,20 +9712,20 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			if (messType == 0) {
 				if (msgId == 3 || msgId == 5 || msgId == 7 || msgId == 15 ||
 				    msgId == 19 || msgId == 22 || msgId == 32) {
-					textBuf[9] += GetMcCtrl()->m_cardChannel;
+					textBuf[9] += m_mcCtrl.m_cardChannel;
 				} else if (msgId == 27) {
 					textBuf[1] += 2;
 					textBuf[3] += 2;
 				}
 			} else if (memcmp(textBuf, "\x83\x66\x81\x5B\x83\x5E\x82\x50", 8) == 0) {
-				textBuf[7] += GetMcCtrl()->m_saveIndex;
+				textBuf[7] += m_mcCtrl.m_saveIndex;
 			}
 #else
 			if (messType == 0) {
 				char* slotText;
 				if (winType != 0 && (slotText = strstr(textBuf, s_SlotStr[languageIndex])) != 0) {
 					int len = strlen(s_SlotStr[languageIndex]);
-					slotText[len - 1] += GetMcCtrl()->m_cardChannel;
+					slotText[len - 1] += m_mcCtrl.m_cardChannel;
 				} else {
 					char* marker = strstr(textBuf, lbl_80331400);
 					if (marker != 0) {
@@ -9737,7 +9737,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 				char* dataText = strstr(textBuf, s_DataStr[languageIndex]);
 				if (dataText != 0) {
 					int len = strlen(s_DataStr[languageIndex]);
-					dataText[len - 1] += GetMcCtrl()->m_saveIndex;
+					dataText[len - 1] += m_mcCtrl.m_saveIndex;
 				}
 			}
 #endif

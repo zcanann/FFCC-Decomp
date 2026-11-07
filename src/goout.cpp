@@ -2314,7 +2314,7 @@ inline void CGoOutMenu::Draw()
  */
 inline void CGoOutMenu::InitMemCardProc()
 {
-    McCtrl& mcCtrl = *MenuPcs.GetMcCtrl();
+    McCtrl& mcCtrl = MenuPcs.m_mcCtrl;
 
     mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
     mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);

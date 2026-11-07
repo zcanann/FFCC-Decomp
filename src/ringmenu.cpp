@@ -202,11 +202,11 @@ void CRingMenu::onCalc()
 		if (partyObj != 0) {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 			int currentCmd = (Game.m_gameWork.IsMogStage())
-			                     ? Chara.MogFur().m_commandIndex
+			                     ? Chara.m_sharedState.m_mogFur.m_commandIndex
 			                     : caravanWork->GetIdxCmdList();
 
 			int* trackedCmd = (Game.m_gameWork.IsMogStage() & 0xFF)
-			                      ? &Chara.MogFur().m_trackedCommandIndex
+			                      ? &Chara.m_sharedState.m_mogFur.m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 
 			int next;
@@ -509,7 +509,7 @@ void CRingMenu::onDraw()
 			if (partyObj != 0) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 				int cmdIndex = (Game.m_gameWork.IsMogStage())
-				                   ? Chara.MogFur().m_commandIndex
+				                   ? Chara.m_sharedState.m_mogFur.m_commandIndex
 				                   : caravanWork->GetIdxCmdList();
 
 				CFont* font = MenuPcs.GetFont23();

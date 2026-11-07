@@ -437,7 +437,7 @@ void CMesMenu::onDraw()
     if ((m_menuIndex == 0) &&
         (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlat.m_gameFlags) << 30) >> 31) != 0)) {
         int iconFrame = 0;
-        int charaMode = Chara.MogFur().m_commandIndex;
+        int charaMode = Chara.m_sharedState.m_mogFur.m_commandIndex;
         switch (charaMode) {
         case 0:
             iconFrame = 3;
@@ -466,7 +466,7 @@ void CMesMenu::onDraw()
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).Ref());
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
         MenuPcs.DrawRect(
-            0, (float)(int)(Chara.MogFur().m_cursorX - 0x20), (float)(int)Chara.MogFur().m_cursorY,
+            0, (float)(int)(Chara.m_sharedState.m_mogFur.m_cursorX - 0x20), (float)(int)Chara.m_sharedState.m_mogFur.m_cursorY,
             32.0f, 32.0f, 0.0f, (float)(iconFrame << 5), 1.0f, 1.0f,
             0.0f);
     }

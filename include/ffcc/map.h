@@ -137,29 +137,8 @@ public:
     float m_octTreeFrustumRange;       // 0x22A74
     CMapObj* m_hitMapObj;              // 0x22A78
 
-    COctTree* GetOctTreeArray() { return m_octTreeArray; }
     CMapHit* GetMapHitArray() { return m_mapHitArray; }
-    CMapObj* GetMapObj(int index)
-    {
-        return &m_mapObjArray[index];
-    }
     CMapMesh* GetMapMeshArray() { return m_mapMeshArray; }
-    CPtrArray<CMapAnimRun*>& GetMapAnimRunArray()
-    {
-        return m_mapAnimRunArray;
-    }
-    CPtrArray<CMapAnim*>& GetMapAnimArray()
-    {
-        return m_mapAnimArray;
-    }
-    CPtrArray<CMapAnimKeyDt*>& GetMapAnimKeyDtArray()
-    {
-        return m_mapAnimKeyDtArray;
-    }
-    CPtrArray<CMapShadow*>& GetMapShadowArray()
-    {
-        return m_mapShadowArray;
-    }
 
     ~CMapMng();
 	

@@ -51,7 +51,7 @@ static const char s_mapocttree_cpp[] = "mapocttree.cpp";
 namespace {
 static inline CMapObj* GetMapObjByIndex(unsigned short index)
 {
-    return g_MapMng.GetMapObj(index);
+    return &g_MapMng.m_mapObjArray[index];
 }
 
 }

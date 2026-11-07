@@ -624,7 +624,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             } else {
                 animRun->m_animId = 0;
             }
-            g_MapMng.GetMapAnimRunArray().Add(animRun);
+            g_MapMng.m_mapAnimRunArray.Add(animRun);
             break;
         }
         case CHUNK_AMBI: {
@@ -692,7 +692,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             shadow->CalcBound();
 
-            g_MapMng.GetMapShadowArray().Add(shadow);
+            g_MapMng.m_mapShadowArray.Add(shadow);
             break;
         }
         case CHUNK_PRIO: {

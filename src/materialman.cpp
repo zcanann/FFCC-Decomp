@@ -2385,8 +2385,8 @@ inline int chkbit32(unsigned long* bits, unsigned long index)
  */
 void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shadowBit32, float (*viewMtx) [4])
 {
-    for (long i = 0; i < static_cast<unsigned int>(g_MapMng.GetMapShadowArray().GetSize()); i++) {
-        CMapShadow* shadow = g_MapMng.GetMapShadowArray()[i];
+    for (long i = 0; i < static_cast<unsigned int>(g_MapMng.m_mapShadowArray.GetSize()); i++) {
+        CMapShadow* shadow = g_MapMng.m_mapShadowArray[i];
 
         if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
             continue;
@@ -2421,8 +2421,8 @@ void CMaterialMan::SetPosition(
         ShadowCandidate shadowCandidates[128];
         int candidateCount = 0;
 
-        for (long i = 0; i < static_cast<unsigned int>(g_MapMng.GetMapShadowArray().GetSize()); i++) {
-            CMapShadow* shadow = g_MapMng.GetMapShadowArray()[i];
+        for (long i = 0; i < static_cast<unsigned int>(g_MapMng.m_mapShadowArray.GetSize()); i++) {
+            CMapShadow* shadow = g_MapMng.m_mapShadowArray[i];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2490,8 +2490,8 @@ void CMaterialMan::SetPosition(
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
-        for (long i = 0; i < static_cast<unsigned int>(g_MapMng.GetMapShadowArray().GetSize()); i++) {
-            CMapShadow* shadow = g_MapMng.GetMapShadowArray()[i];
+        for (long i = 0; i < static_cast<unsigned int>(g_MapMng.m_mapShadowArray.GetSize()); i++) {
+            CMapShadow* shadow = g_MapMng.m_mapShadowArray[i];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2543,8 +2543,8 @@ int CMaterialMan::GetCharaShadow(
     int candidateCount = 0;
 
     int idx;
-    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(g_MapMng.GetMapShadowArray().GetSize()); i++) {
-        CMapShadow* shadow = g_MapMng.GetMapShadowArray()[idx];
+    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(g_MapMng.m_mapShadowArray.GetSize()); i++) {
+        CMapShadow* shadow = g_MapMng.m_mapShadowArray[idx];
         if (shadow->m_targetEnabled[0] == 0) {
             continue;
         }
@@ -2633,7 +2633,7 @@ int CMaterialMan::GetCharaShadow(
  */
 void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, float (*viewMtx) [4])
 {
-    CPtrArray<CMapShadow*>* mapShadowArray = &g_MapMng.GetMapShadowArray();
+    CPtrArray<CMapShadow*>* mapShadowArray = &g_MapMng.m_mapShadowArray;
 
     for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];

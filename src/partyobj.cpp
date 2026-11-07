@@ -157,9 +157,9 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 		CGPartyObj::m_ghostWork.counters[1]++;
 		CGPartyObj::m_ghostWork.counters[2]++;
 		System.Printf("\x90\xD4=%d/%d \x97\xCE=%d/%d \x90\xC2=%d/%d\n",
-		    CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
-		    CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
-		    CGPartyObj::m_ghostWork.counters[2], Chara.MogFur().m_radarLevel[2]);
+		    CGPartyObj::m_ghostWork.counters[0], Chara.m_sharedState.m_mogFur.m_radarLevel[0],
+		    CGPartyObj::m_ghostWork.counters[1], Chara.m_sharedState.m_mogFur.m_radarLevel[1],
+		    CGPartyObj::m_ghostWork.counters[2], Chara.m_sharedState.m_mogFur.m_radarLevel[2]);
 	}
 }
 
@@ -1011,7 +1011,7 @@ void CGPartyObj::command()
 			}
 			if (cmdDir != 0) {
 				Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
-				int& charaCommand = Chara.MogFur().m_commandIndex;
+				int& charaCommand = Chara.m_sharedState.m_mogFur.m_commandIndex;
 				int adjusted = charaCommand + cmdDir;
 				charaCommand = adjusted;
 				if (adjusted < 0) {
@@ -1021,7 +1021,7 @@ void CGPartyObj::command()
 				}
 				charaCommand = adjusted;
 			}
-			const int charaCommand = Chara.MogFur().m_commandIndex;
+			const int charaCommand = Chara.m_sharedState.m_mogFur.m_commandIndex;
 			ringCommand = charaCommand + 0x1E;
 			ringCommandArg = charaCommand;
 		}
@@ -3700,9 +3700,9 @@ static inline int stageWeather()
  */
 static inline int magicReady()
 {
-	if (CGPartyObj::m_ghostWork.counters[0] >= Chara.MogFur().m_radarLevel[0] ||
-	    CGPartyObj::m_ghostWork.counters[1] >= Chara.MogFur().m_radarLevel[1] ||
-	    CGPartyObj::m_ghostWork.counters[2] >= Chara.MogFur().m_radarLevel[2]) {
+	if (CGPartyObj::m_ghostWork.counters[0] >= Chara.m_sharedState.m_mogFur.m_radarLevel[0] ||
+	    CGPartyObj::m_ghostWork.counters[1] >= Chara.m_sharedState.m_mogFur.m_radarLevel[1] ||
+	    CGPartyObj::m_ghostWork.counters[2] >= Chara.m_sharedState.m_mogFur.m_radarLevel[2]) {
 		return 1;
 	}
 	return 0;
@@ -3722,7 +3722,7 @@ static inline int chooseMagic()
 	int count = 0;
 	int i;
 	for (i = 0; i < 3; i++) {
-		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
+		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.m_sharedState.m_mogFur.m_radarLevel[i]) {
 			count++;
 		}
 	}
@@ -3730,7 +3730,7 @@ static inline int chooseMagic()
 	int pick = Math.Rand(count);
 	count = 0;
 	for (i = 0; i < 3; i++) {
-		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
+		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.m_sharedState.m_mogFur.m_radarLevel[i]) {
 			if (count == pick) {
 				return i;
 			}
@@ -3772,7 +3772,7 @@ static inline void decMagic(int slotSel)
 static inline int calcWeightMax()
 {
 	int weather = stageWeather();
-	float rate = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
+	float rate = static_cast<float>(Chara.m_sharedState.m_mogFur.m_alphaScore) / 100.0f;
 	float scale;
 	switch (weather) {
 	default:
@@ -3923,9 +3923,9 @@ void CGPartyObj::ghostPartyMog()
 		CGPartyObj::m_ghostWork.state = 1;
 	} else {
 		int exceeded;
-		if (static_cast<int>(CGPartyObj::m_ghostWork.counters[0]) >= Chara.MogFur().m_radarLevel[0] ||
-		    static_cast<int>(CGPartyObj::m_ghostWork.counters[1]) >= Chara.MogFur().m_radarLevel[1] ||
-		    static_cast<int>(CGPartyObj::m_ghostWork.counters[2]) >= Chara.MogFur().m_radarLevel[2]) {
+		if (static_cast<int>(CGPartyObj::m_ghostWork.counters[0]) >= Chara.m_sharedState.m_mogFur.m_radarLevel[0] ||
+		    static_cast<int>(CGPartyObj::m_ghostWork.counters[1]) >= Chara.m_sharedState.m_mogFur.m_radarLevel[1] ||
+		    static_cast<int>(CGPartyObj::m_ghostWork.counters[2]) >= Chara.m_sharedState.m_mogFur.m_radarLevel[2]) {
 			exceeded = 1;
 		} else {
 			exceeded = 0;
@@ -3963,14 +3963,14 @@ void CGPartyObj::ghostPartyMog()
 			case 0:
 				break;
 			case 1:
-				if (Chara.MogFur().m_alphaScore < 0x32) {
+				if (Chara.m_sharedState.m_mogFur.m_alphaScore < 0x32) {
 					CGPartyObj::m_ghostWork.state = 5;
-				} else if (Chara.MogFur().m_alphaScore >= 0x5F) {
+				} else if (Chara.m_sharedState.m_mogFur.m_alphaScore >= 0x5F) {
 					CGPartyObj::m_ghostWork.state = 4;
 				}
 				break;
 			case 2:
-				if (Chara.MogFur().m_alphaScore < 0x32) {
+				if (Chara.m_sharedState.m_mogFur.m_alphaScore < 0x32) {
 					CGPartyObj::m_ghostWork.state = 6;
 				}
 				break;
@@ -4286,9 +4286,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		    IsKindOf(0x6D) && (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 			int weightMax = calcWeightMax();
 
-			sprintf(text, "%d/%d %d/%d %d/%d", CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
-			        CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
-			        CGPartyObj::m_ghostWork.counters[2], Chara.MogFur().m_radarLevel[2]);
+			sprintf(text, "%d/%d %d/%d %d/%d", CGPartyObj::m_ghostWork.counters[0], Chara.m_sharedState.m_mogFur.m_radarLevel[0],
+			        CGPartyObj::m_ghostWork.counters[1], Chara.m_sharedState.m_mogFur.m_radarLevel[1],
+			        CGPartyObj::m_ghostWork.counters[2], Chara.m_sharedState.m_mogFur.m_radarLevel[2]);
 
 			float curY = y;
 			float width = static_cast<float>(font->GetWidth(text));
@@ -4300,7 +4300,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			y = y - lineH;
 
 			sprintf(text, "%d/%d a=%d", CGPartyObj::m_ghostWork.pressure,
-			        weightMax, Chara.MogFur().m_alphaScore);
+			        weightMax, Chara.m_sharedState.m_mogFur.m_alphaScore);
 
 			float curY2 = y;
 			width = static_cast<float>(font->GetWidth(text));

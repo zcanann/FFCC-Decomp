@@ -47,7 +47,7 @@ void CMcPcs::calc()
     {
         if (MenuPcs.m_mcRequest == 0x13)
         {
-            result = MenuPcs.GetMcCtrl()->Format(1);
+            result = MenuPcs.m_mcCtrl.Format(1);
             if (result != 0)
             {
                 if (result == 1)
@@ -68,7 +68,7 @@ void CMcPcs::calc()
             }
         }
         else if (MenuPcs.m_mcRequest == 0x12 &&
-                 (result = MenuPcs.GetMcCtrl()->ChkEmpty(0), result != 0))
+                 (result = MenuPcs.m_mcCtrl.ChkEmpty(0), result != 0))
         {
             if (result == 1)
             {

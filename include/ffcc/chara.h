@@ -576,9 +576,8 @@ public:
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);
     Mtx& FlatPosMtx() { return m_sharedState.m_flat.m_posMtx; }
-    MogFurState& MogFur() { return m_sharedState.m_mogFur; }
 
-private:
+public:
     union CSharedState
     {
         MogFurState m_mogFur;

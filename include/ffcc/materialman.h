@@ -299,22 +299,6 @@ public:
     {
         return m_unkA6;
     }
-    short GetTextureIndex(int index) const
-    {
-        return m_textureIndices[index];
-    }
-    int IsFurEnabled() const
-    {
-        return m_singleTextureFlag != 0;
-    }
-    CTexture* GetFurPickTexture()
-    {
-        return m_textureData.m_textures[1];
-    }
-    CTexture* GetFurTexture(int index)
-    {
-        return m_textureData.m_textures[index + 2];
-    }
     void SetTag(int);
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
@@ -334,7 +318,7 @@ public:
         return &m_textureData.m_texScroll[index];
     }
 
-private:
+public:
     friend class CTexAnimSet;
 
     char m_name[0x10];                    // 0x008

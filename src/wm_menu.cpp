@@ -5622,7 +5622,7 @@ inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFo
 		if (space == 0) {
 			break;
 		}
-		const int firstLen = space - text;
+		const int firstLen = (int)space - (int)text;
 		memcpy(part, text, firstLen);
 		part[firstLen] = '\0';
 		if (static_cast<int>(font->GetWidth(part)) > width) {

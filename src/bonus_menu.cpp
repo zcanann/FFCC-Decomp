@@ -164,7 +164,6 @@ void CMenuPcs::createBonus()
 {
 	int i;
 	int j;
-	CCaravanWork** slot;
 	int k;
 	int pc;
 #ifndef VERSION_GCCJGC
@@ -304,9 +303,8 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)Game.m_scriptFoodBase[i]->m_tribeId;
 			activeCount++;
 
-			slot = &Game.m_scriptFoodBase[i];
 			for (j = 0; j < BonusSummaryData::kTemporaryArtifactCount; j++) {
-				int itemId = (*slot)->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + j];
+				int itemId = Game.m_scriptFoodBase[i]->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + j];
 				if (itemId > 0) {
 					s_Rinfo->m_artifacts[tempArtifactCount++] = (short)itemId;
 				}

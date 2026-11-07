@@ -1237,7 +1237,7 @@ config.libs = [
                 ],
             ),
             Object(
-                MatchingFor("GCCP01", "GCCE01"),
+                MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "TRK_MINNOW_DOLPHIN/support.c",
                 mw_version="GC/2.6",
             ),

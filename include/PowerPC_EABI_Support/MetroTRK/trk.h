@@ -45,6 +45,7 @@ void TRKResetBuffer(TRKBuffer* msg, BOOL keepData);
 
 DSError TRKReadBuffer1_ui64(TRKBuffer* buffer, u64* data);
 DSError TRKAppendBuffer1_ui16(TRKBuffer* buffer, const u16 data);
+DSError TRKAppendBuffer1_ui32(TRKBuffer* buffer, const u32 data);
 DSError TRKAppendBuffer1_ui64(TRKBuffer* buffer, const u64 data);
 
 void TRKLoadContext(OSContext* ctx, u32);

@@ -1284,14 +1284,13 @@ int CMapMng::ReadOtm(char* mapName)
         lithCase: {
             CMapLightHolder* light = static_cast<CMapLightHolder*>(
                 operator new(0x10, g_MapMng.m_stage, "map.cpp", 0x4D3));
-            unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
-            lightRaw[0] = chunkFile.Get1();
-            lightRaw[1] = chunkFile.Get1();
-            lightRaw[2] = chunkFile.Get1();
-            lightRaw[3] = chunkFile.Get1();
-            *reinterpret_cast<float*>(lightRaw + 4) = chunkFile.GetF4();
-            *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
-            *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
+            light->mColor.r = chunkFile.Get1();
+            light->mColor.g = chunkFile.Get1();
+            light->mColor.b = chunkFile.Get1();
+            light->mColor.a = chunkFile.Get1();
+            light->mVec.x = chunkFile.GetF4();
+            light->mVec.y = chunkFile.GetF4();
+            light->mVec.z = chunkFile.GetF4();
 
             m_mapLightHolderArrays[chunk.m_arg0].Add(light);
             continue;

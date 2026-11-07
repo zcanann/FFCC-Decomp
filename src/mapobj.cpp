@@ -1098,7 +1098,7 @@ void CMapObj::Calc()
                 float blend;
                 int key0;
                 int key1;
-                Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
+                Vec* outVerts = static_cast<CMapMesh*>(m_mapData)->m_vertices;
 
                 if (mime->m_keyFrame.Get(key0, key1, blend) != 0) {
                     Vec* src0 = reinterpret_cast<Vec*>(mime->m_vertexLists[key0]);

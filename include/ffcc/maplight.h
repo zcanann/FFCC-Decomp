@@ -17,7 +17,6 @@ public:
 
     void GetLightHolder(_GXColor*, Vec*);
 
-private:
     _GXColor mColor;
     Vec mVec;
 };

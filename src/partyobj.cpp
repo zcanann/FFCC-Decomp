@@ -621,7 +621,7 @@ void CGPartyObj::onFrameAlways()
 
 	PartyObjOverlay& party = m_partyData;
 	if (party.target != nullptr &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(party.target) + 0x38)) << 24) & 0xC0000000) >> 31) != 0)) {
+	    (party.target->m_flagBits.m_deleteFlag != 0)) {
 		party.target = 0;
 	}
 
@@ -4304,10 +4304,10 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			font->SetPosZ(z);
 			font->Draw(text);
 		} else {
-			unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-			sprintf(text, "%d %d %d %d %d %d", work[0xBA4], *reinterpret_cast<unsigned short*>(work + 0xBC4),
-			        *reinterpret_cast<unsigned short*>(work + 0xBC6), *reinterpret_cast<unsigned short*>(work + 0xBC8),
-			        *reinterpret_cast<unsigned short*>(work + 0xBCA), *reinterpret_cast<unsigned short*>(work + 0xBCC));
+			CCaravanWork* work = SAFE_CAST_CARAVAN_WORK(m_scriptHandle);
+			sprintf(text, "%d %d %d %d %d %d", work->m_bonusCondition, work->m_artifactRelated[0],
+			        work->m_artifactRelated[1], work->m_artifactRelated[2],
+			        work->m_artifactRelated[3], work->m_artifactRelated[4]);
 
 			float curY3 = y;
 			float width = static_cast<float>(font->GetWidth(text));

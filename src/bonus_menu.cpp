@@ -165,7 +165,6 @@ void CMenuPcs::createBonus()
 	int i;
 	int j;
 	int k;
-	int pc;
 #ifndef VERSION_GCCJGC
 	char fontPath[128];
 #endif
@@ -326,26 +325,22 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		{
-			k = 0;
+		for (j = 0; j < s_Rinfo->m_partyCount; j++) {
+			int partySlot = s_Rinfo->m_party[j].m_partySlot;
 
-			for (; k < s_Rinfo->m_partyCount; k++) {
-				int partySlot = s_Rinfo->m_party[k].m_partySlot;
+			for (k = 0; k < BonusSummaryData::kArtifactCount; k++) {
+				short itemId = s_Rinfo->m_artifacts[k];
+				if (itemId <= 0) {
+					continue;
+				}
 
-				for (j = 0; j < BonusSummaryData::kArtifactCount; j++) {
-					short itemId = s_Rinfo->m_artifacts[j];
-					if (itemId <= 0) {
-						continue;
+				if (GetItemType(itemId, 1) == 2) {
+					int artifactSlot = s_Rinfo->m_artifacts[k] - 0x9F;
+					if (Game.m_scriptFoodBase[partySlot]->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[k]) {
+						s_Rinfo->m_party[j].m_ownedArtifactMask |= (1u << k);
 					}
-
-					if (GetItemType(itemId, 1) == 2) {
-						int artifactSlot = s_Rinfo->m_artifacts[j] - 0x9F;
-						if (Game.m_scriptFoodBase[partySlot]->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[j]) {
-							s_Rinfo->m_party[k].m_ownedArtifactMask |= (1u << j);
-						}
-					} else if (!Game.m_scriptFoodBase[partySlot]->CanAddItem(1)) {
-						s_Rinfo->m_party[k].m_ownedArtifactMask |= (1u << j);
-					}
+				} else if (!Game.m_scriptFoodBase[partySlot]->CanAddItem(1)) {
+					s_Rinfo->m_party[j].m_ownedArtifactMask |= (1u << k);
 				}
 			}
 		}
@@ -385,9 +380,10 @@ void CMenuPcs::createBonus()
 		}
 
 		for (k = 0; k < s_Rinfo->m_partyCount; k++) {
-			s_Rinfo->m_party[order[k]].m_rank = k;
+			int partyNo = order[k];
+			s_Rinfo->m_party[partyNo].m_rank = k;
 			if (k == 0) {
-				s_Rinfo->m_winnerTotalValue = s_Rinfo->m_party[order[k]].m_totalValue;
+				s_Rinfo->m_winnerTotalValue = s_Rinfo->m_party[partyNo].m_totalValue;
 			}
 		}
 
@@ -396,19 +392,17 @@ void CMenuPcs::createBonus()
 		}
 
 		int slotIdx = 0;
-		pc = s_Rinfo->m_partyCount;
+		activeCount = s_Rinfo->m_partyCount;
 		for (k = 0; k < 0x18; k++) {
-			if (pc * 2 <= k) {
+			if (activeCount * 2 <= k) {
 				break;
 			}
 			CCharaPcs::CHandle* handle =
 			    new (MenuPcs.m_menuStage, "bonus_menu.cpp", BONUS_LINE(0x183, 0x183, 0x179)) CCharaPcs::CHandle;
 			this->m_wm.m_handles[slotIdx] = handle;
 			this->m_wm.m_handles[slotIdx]->Add();
-			unsigned long modelCode = s_Rinfo->m_party[k % pc].m_partySlot + 0x83;
-			if (k < pc) {
-				modelCode = s_Rinfo->m_party[k % pc].m_partySlot + 0x87;
-			}
+			int partySlot = s_Rinfo->m_party[k % activeCount].m_partySlot;
+			unsigned long modelCode = (k < activeCount) ? partySlot + 0x87 : partySlot + 0x83;
 			this->m_wm.m_handles[slotIdx]->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
 			this->m_wm.m_handles[slotIdx]->m_flags = 0x300543;
 			slotIdx++;

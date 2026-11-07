@@ -9,6 +9,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/monobj.h"
+#include "ffcc/monobj_boss.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/game.h"
@@ -90,12 +91,6 @@ static inline bool CharaObjIsBreakStatus(int staType)
 	return static_cast<unsigned int>(staType - 0x24) <= 1 || staType == 0x69 || staType == 0x6A;
 }
 
-struct CharaObjSignedLowBit
-{
-	signed char m_pad : 7;
-	signed char m_low : 1;
-};
-
 static __inline bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 {
 	CVector selfPos(self->m_worldPosition);
@@ -142,14 +137,6 @@ static inline unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, u
 	return particleBank;
 }
 
-// Tests CFlatGameFlag_Bit5 (0x20) the way the original source did: the flag
-// byte is sign-extracted through a signed char, which the compiler lowers to
-// extlwi/srawi/extsb rather than a single rlwinm mask. Returns nonzero if set.
-static inline int CharaObjGameFlagBit5Set()
-{
-	return static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlat.m_gameFlags) << 26 >> 30) << 30 >> 31) != 0;
-}
-
 static inline int CharaObjDecodeHitParticleSe(unsigned short seData)
 {
 	return (seData == 0xFFFF) ? 0 : (seData & 0xFF) + static_cast<int>(seData >> 8) * 1000;
@@ -191,17 +178,9 @@ static __inline SCharaItemRow* CharaObjItemTable()
 	return reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 }
 
-static __inline float CharaObjGetStatusMultiplier(int offset)
+static __inline float CharaObjGetStatusMultiplier(int index)
 {
-	return (static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.m_battleParams) + offset)) * 0.01f) + 1.0e-07f;
-}
-
-static __inline float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
-{
-	if (!isMon || script9 == 0) {
-		return 1.0f;
-	}
-	return static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0x1B4)) * 0.01f;
+	return (static_cast<float>(Game.m_battleParams[index]) * 0.01f) + 1.0e-07f;
 }
 
 /*
@@ -366,7 +345,7 @@ void CGCharaObj::onFramePostCalc()
 		if (m_stateTick != 0 &&
 		    (m_stateTick % static_cast<int>(Game.m_battleParams[0x1D])) == 0) {
 			if (m_scriptHandle->m_hp > 1 &&
-			    !CharaObjGameFlagBit5Set()) {
+			    CFlat.m_gameFlagBits.m_flagBit5 == 0) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
 				addHp(-1, 0);
 			}
@@ -1504,7 +1483,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 
 	if (hpValue != 0 && delta < 0) {
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-		    reinterpret_cast<CharaObjSignedLowBit*>(&CFlat.m_gameFlags)->m_low != 0 &&
+		    CFlat.m_gameFlagBits.m_flagBit0 != 0 &&
 		    static_cast<int>(hpValue + delta) <= 0) {
 			delta = -(static_cast<int>(hpValue) - 1);
 		}
@@ -1512,11 +1491,11 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 			if (m_scriptHandle->m_baseDataIndex == 0x9A &&
 			    static_cast<CGMonObj*>(this)->m_actionBranch == 0) {
-				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x24) -= delta;
+				reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_phaseTimer -= delta;
 				delta = 0;
 			}
 			if (m_scriptHandle->m_baseDataIndex == 0x88) {
-				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) -= delta;
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreDamage -= delta;
 			}
 			if (m_scriptHandle->m_baseDataIndex == 0x70 &&
 			    static_cast<int>(hpValue + delta) <= 0) {
@@ -1628,7 +1607,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	}
 
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && m_scriptHandle->m_baseDataIndex == 0x7F &&
-	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CGMonObj::m_boss[0x10]) << 24 >> 30) << 30 >> 31) != 0) {
+	    reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0) {
 		outA = 3;
 	}
 
@@ -1692,7 +1671,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	SCharaItemRow* itemRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 	staType = itemRows[itemId].m_staType;
-	if (staType != 0x67 && staType != 0x65 && staType != 0x66 && CharaObjGameFlagBit5Set()) {
+	if (staType != 0x67 && staType != 0x65 && staType != 0x66 && CFlat.m_gameFlagBits.m_flagBit5 != 0) {
 		System.Printf("スクリプトから攻撃ダメージOFF中\n");
 		return;
 	}
@@ -1843,7 +1822,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 				unsigned int sourcePower = sourceObj->m_scriptHandle->m_strength;
 				int clampedDamage = 1;
-				float multiplier = CharaObjGetStatusMultiplier(0x2C);
+				float multiplier = CharaObjGetStatusMultiplier(0x16);
 				unsigned int defense = m_scriptHandle->m_defense;
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(static_cast<int>(basePower + sourcePower))) - defense;
 				if (rawDamage >= 1) {
@@ -1856,7 +1835,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int bonus = hasBonus ? static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[5]) : 0;
 				damageAmount = clampedDamage + bonus;
 				if (scriptDefense != 0) {
-					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x42));
+					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x21));
 				}
 				System.Printf("PC->MON ATTACKダメージ min1((%d + %d) * %f - %d) + %d = %d\n", basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 
@@ -1891,7 +1870,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int clampedDamage = 1;
 				unsigned int defense;
 				unsigned int sourcePower = powerSource->m_scriptHandle->m_magic;
-				float multiplier = CharaObjGetStatusMultiplier(0x2E);
+				float multiplier = CharaObjGetStatusMultiplier(0x17);
 				defense = m_scriptHandle->m_defense;
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(static_cast<int>(basePower + sourcePower))) - defense;
 				if (rawDamage >= 1) {
@@ -1933,7 +1912,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 				unsigned int basePower = powerRows[itemId].m_basePower;
 				unsigned int sourcePower = sourceObj->m_scriptHandle->m_strength;
-				float multiplier = CharaObjGetStatusMultiplier(0x30);
+				float multiplier = CharaObjGetStatusMultiplier(0x18);
 				int guardValue = static_cast<int>(defense * multiplier);
 				int computed30 = static_cast<int>(basePower + sourcePower) - guardValue;
 				damageAmount = 1;
@@ -1941,7 +1920,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					damageAmount = computed30;
 				}
 				if (scriptDefense != 0) {
-					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
+					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x21));
 				}
 				System.Printf("MON->PC ATTACKダメージ (%d + %d) - %d * %f = %d\n", basePower, sourcePower, defense, multiplier, damageAmount);
 				break;
@@ -1955,7 +1934,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 				unsigned int basePower = powerRows[itemId].m_basePower;
 				unsigned int sourcePower = sourceObj->m_scriptHandle->m_magic;
-				float multiplier = CharaObjGetStatusMultiplier(0x32);
+				float multiplier = CharaObjGetStatusMultiplier(0x19);
 				int guardValue = static_cast<int>(defense * multiplier);
 				int computed32 = static_cast<int>(basePower + sourcePower) - guardValue;
 				damageAmount = 1;
@@ -1998,7 +1977,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int sourcePower = rawSourcePower;
 				float defenseRate;
 				if (sourceObj->IsKindOf(0xAD) != 0) {
-					defenseRate = CharaObjGetStatusMultiplier(0x32);
+					defenseRate = CharaObjGetStatusMultiplier(0x19);
 				} else {
 					defenseRate = 1.0f;
 				}
@@ -2685,7 +2664,7 @@ int CGCharaObj::calcCastTime(int itemId)
 	if (m_scriptHandle->m_statusTimers[8] != 0) {
 		castScale = CharaObjGetStatusMultiplier(0x0);
 	} else if (m_scriptHandle->m_statusTimers[7] != 0) {
-		castScale = CharaObjGetStatusMultiplier(0x2);
+		castScale = CharaObjGetStatusMultiplier(0x1);
 	} else {
 		castScale = 1.0f;
 	}
@@ -2752,15 +2731,10 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 	if ((m_weaponNodeFlagBits.m_prg && (CFlat.m_centerState == 0)) &&
 	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[0x100];
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		CGObjWork* script = m_scriptHandle;
 		double posYDouble;
 
-		sprintf(text, "%d/%d %d %d %d",
-		        *reinterpret_cast<unsigned short*>(script + 0x1C),
-		        *reinterpret_cast<unsigned short*>(script + 0x1A),
-		        *reinterpret_cast<unsigned short*>(script + 0x1E),
-		        *reinterpret_cast<unsigned short*>(script + 0x20),
-		        *reinterpret_cast<unsigned short*>(script + 0x22));
+		sprintf(text, "%d/%d %d %d %d", script->m_hp, script->m_maxHp, script->m_strength, script->m_magic, script->m_defense);
 
 		posYDouble = (double)posY;
 		font->SetPosX(-(0.5f * (float)font->GetWidth(text) - posX));
@@ -2819,9 +2793,9 @@ void CGCharaObj::StaticFrame()
 
 		if (partyObj->m_weaponNodeFlagBits.m_prg &&
 		    partyObj->m_weaponNodeFlagAll.m_bits1.m_shield) {
-			unsigned char* script = reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle);
-			unsigned short hp = *reinterpret_cast<unsigned short*>(script + 0x1C);
-			if (hp != 0 && static_cast<int>(hp) <= static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(script + 0x1A)) >> 2)) {
+			CGObjWork* script = partyObj->m_scriptHandle;
+			unsigned short hp = script->m_hp;
+			if (hp != 0 && static_cast<int>(hp) <= static_cast<int>(static_cast<unsigned int>(script->m_maxHp) >> 2)) {
 				if ((static_cast<int>(System.GetCounter()) % 0x1E) == 0) {
 					Sound.PlaySe(0x53, 0x40, 0x7F, 0);
 				}

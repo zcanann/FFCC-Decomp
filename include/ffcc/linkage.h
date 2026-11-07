@@ -61,14 +61,6 @@ enum CFlatRuntimeDebugFlag {
     CFlatRuntimeDebugFlag_MapBounds = 0x02000000,
 };
 
-enum CFlatGameFlag {
-    CFlatGameFlag_Bit0 = 0x01,
-    CFlatGameFlag_Bit1 = 0x02,
-    CFlatGameFlag_Mark = 0x04,
-    CFlatGameFlag_Bit5 = 0x20,
-    CFlatGameFlag_Shouki = 0x80,
-};
-
 enum CFlatEventFlagByte {
     CFlatEventFlagByte_GbaSound = 0x08,
 };

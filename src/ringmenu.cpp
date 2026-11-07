@@ -672,9 +672,7 @@ void CRingMenu::onDraw()
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 					if ((caravanWork != 0)
-					    && (static_cast<signed char>(
-					            static_cast<int>((static_cast<unsigned int>(CFlat.m_gameFlags) << 30) & 0xC0000000) >> 31)
-					        == 0)) {
+					    && (CFlat.m_gameFlagBits.m_flagBit1 == 0)) {
 						fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
 						const float barY = 20.0f + textY;

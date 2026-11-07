@@ -433,17 +433,17 @@ void CRingMenu::onDraw()
 	posMainY = 192.0f + glowOffset;
 
 	for (int group = 2; group >= 0; group--) {
-		float posY;
-		float posX;
-		float buttonAlpha;
 		float textX0;
 		float textY0;
-		float drawX;
-		float drawY;
+		float textX1;
 		float textY1;
 		float textY2;
+		float buttonAlpha;
+		float drawY;
 		float textX2;
-		float textX1;
+		float drawX;
+		float posX;
+		float posY;
 
 		if (group == 2) {
 			posX = 16.0f + (((m_menuIndex & 1) != 0) ? posAltX : posLeft);

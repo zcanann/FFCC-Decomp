@@ -43,11 +43,6 @@ STATIC_ASSERT(offsetof(CMapCylinder, m_axis) == 0x18);
 STATIC_ASSERT(offsetof(CMapCylinder, m_radius) == 0x24);
 STATIC_ASSERT(offsetof(CMapCylinder, m_bound) == 0x28);
 
-static inline YmMeltWork* GetYmMeltWork(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
-{
-    return reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + offsets->m_serializedDataOffsets[0]);
-}
-
 void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
 
 /*
@@ -379,7 +374,7 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
  */
 void pppDestructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
+    YmMeltWork* work = (YmMeltWork*)(ymMelt->m_workArea + offsets->m_serializedDataOffsets[0]);
 
     if (work->m_vertexData != nullptr) {
         pppMemFree(work->m_vertexData);
@@ -398,7 +393,7 @@ void pppDestructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 void pppConstructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
     f32 value = 0.0f;
-    YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
+    YmMeltWork* work = (YmMeltWork*)(ymMelt->m_workArea + offsets->m_serializedDataOffsets[0]);
 
     work->m_vertexData = 0;
     work->m_phaseOffset = 0;

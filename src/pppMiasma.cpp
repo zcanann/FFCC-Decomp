@@ -43,11 +43,6 @@ static inline VColor* GetMiasmaColorWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
     return reinterpret_cast<VColor*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
-static inline MiasmaRadiusWork* GetMiasmaRadiusWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[3]);
-}
-
 static inline float CalcSphereRadius(Vec* vertices, u16 count)
 {
     float radius = -1000.0f;
@@ -236,7 +231,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
     work = GetMiasmaFrameWork(pppMiasma, ctrl);
     colorWork = GetMiasmaColorWork(pppMiasma, ctrl);
-    radiusWork = GetMiasmaRadiusWork(pppMiasma, ctrl);
+    radiusWork = (MiasmaRadiusWork*)(pppMiasma->m_workArea + ctrl->m_serializedDataOffsets[3]);
     tevStage = 0;
     textureIndex = 0;
     model = (pppModelSt*)ppvEnv->m_mapMeshPtr[step->m_dataValIndex];

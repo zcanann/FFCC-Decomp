@@ -14,12 +14,6 @@ struct pppPObjPointWork {
     Vec* m_source;     // 0x10
 };
 
-static inline pppPObjPointWork* GetPObjPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<pppPObjPointWork*>(
-        pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80060AEC
@@ -35,7 +29,8 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
         return;
     }
 
-    pppPObjPointWork* objPtr = GetPObjPointWork(pObject, ctrlTable);
+    pppPObjPointWork* objPtr = (pppPObjPointWork*)(
+        pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     if (step->m_graphId == pObject->m_graphId) {
         Vec* source = (step->m_createProgramIndex == -1)

@@ -11,11 +11,6 @@ STATIC_ASSERT(offsetof(VColor, m_blue) == 0x4);
 STATIC_ASSERT(offsetof(VColor, m_alpha) == 0x6);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
 
-static inline VColor* GetPppColorWork(_pppPObject* obj, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VColor*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8005FF8C
@@ -27,7 +22,7 @@ static inline VColor* GetPppColorWork(_pppPObject* obj, _pppCtrlTable* ctrl)
  */
 void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2)
 {
-    VColor* work = GetPppColorWork(param1, param2);
+    VColor* work = (VColor*)(param1->m_workArea + param2->m_serializedDataOffsets[0]);
 
     work->m_alpha = 0;
     work->m_blue = 0;
@@ -46,7 +41,7 @@ void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2)
  */
 void pppColor(_pppPObject* param1, pppColorStep* step, _pppCtrlTable* param3)
 {
-    VColor* work = GetPppColorWork(param1, param3);
+    VColor* work = (VColor*)(param1->m_workArea + param3->m_serializedDataOffsets[0]);
 
     if (ppvUserStopPartF != 0) {
         return;

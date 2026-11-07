@@ -4,16 +4,6 @@
 
 #include <dolphin/mtx.h>
 
-static inline Vec* MoveLineCurrentPosition(_pppMngSt* mng)
-{
-    return &mng->UserPosition();
-}
-
-static inline Vec* MoveLinePreviousPosition(_pppMngSt* mng)
-{
-    return &mng->BasePosition();
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800906dc
@@ -34,13 +24,13 @@ void pppParMoveLine(_pppPObject* obj, ParMoveLineParams* params)
 
     pppMngSt = ppvMng;
     // Line direction: from the base position toward m_paramVec0.
-    PSVECSubtract(&ppvMng->m_paramVec0, MoveLinePreviousPosition(ppvMng), &moveDelta);
+    PSVECSubtract(&ppvMng->m_paramVec0, &ppvMng->m_basePosition, &moveDelta);
 
     positionX = pppMngSt->m_position.x;
     zero = 0.0f;
-    MoveLineCurrentPosition(pppMngSt)->x = positionX;
-    MoveLineCurrentPosition(pppMngSt)->y = pppMngSt->m_position.y;
-    MoveLineCurrentPosition(pppMngSt)->z = pppMngSt->m_position.z;
+    pppMngSt->m_userPosition.x = positionX;
+    pppMngSt->m_userPosition.y = pppMngSt->m_position.y;
+    pppMngSt->m_userPosition.z = pppMngSt->m_position.z;
 
     if ((zero != moveDelta.x) || (zero != moveDelta.y) || (zero != moveDelta.z)) {
         // Step along the line by speed * movement scale.

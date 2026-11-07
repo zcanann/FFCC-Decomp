@@ -58,11 +58,6 @@ STATIC_ASSERT(offsetof(PARTICLE_DATA, m_life) == 0x50);
 STATIC_ASSERT(offsetof(PARTICLE_DATA, m_alpha) == 0x88);
 STATIC_ASSERT(sizeof(BreathParticleGroup) == 0x5C);
 
-static inline VBreathModel* GetBreathModelWork(pppBreathModel* breathModel, s32 offset)
-{
-    return reinterpret_cast<VBreathModel*>(breathModel->m_workArea + offset);
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -240,7 +235,7 @@ extern "C" void pppDestructBreathModel(pppBreathModel* breathModel, _pppCtrlTabl
  */
 extern "C" void pppConstructBreathModel(pppBreathModel* breathModel, _pppCtrlTable* ctrl)
 {
-    VBreathModel* state = GetBreathModelWork(breathModel, ctrl->m_serializedDataOffsets[0]);
+    VBreathModel* state = (VBreathModel*)(breathModel->m_workArea + ctrl->m_serializedDataOffsets[0]);
     PSMTXIdentity(state->m_matrix);
     state->m_direction.x = state->m_direction.y = state->m_direction.z = 0.0f;
 

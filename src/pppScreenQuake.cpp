@@ -4,11 +4,6 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
 
-static inline float* GetScreenQuakeWork(pppScreenQuake* quake, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<float*>(quake->m_workArea + ctrl->m_serializedDataOffsets[0]);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8013e3bc
@@ -34,7 +29,7 @@ void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeStep*, _pppCtrlTable*)
 void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, _pppCtrlTable *param3)
 {
     if (ppvUserStopPartF == 0) {
-        float *value = GetScreenQuakeWork(quake, param3);
+        float *value = (float*)(quake->m_workArea + param3->m_serializedDataOffsets[0]);
 
         CalcGraphValue(quake, param2->m_graphId, value[0], value[1], value[2], param2->m_dataValIndex, param2->m_initWOrk, param2->m_stepValue);
         CalcGraphValue(quake, param2->m_graphId, value[3], value[4], value[5], param2->m_arg3, param2->m_initWOrk2, param2->m_stepValue2);
@@ -93,7 +88,7 @@ void pppDesScreenQuake(pppScreenQuake*, _pppCtrlTable*)
  */
 void pppCon2ScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
 {
-    float *data = GetScreenQuakeWork(quake, param2);
+    float *data = (float*)(quake->m_workArea + param2->m_serializedDataOffsets[0]);
 
     data[0] = data[1] = data[2] = 0.0f;
     data[3] = data[4] = data[5] = 0.0f;
@@ -111,7 +106,7 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
  */
 void pppConScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
 {
-    float *data = GetScreenQuakeWork(quake, param2);
+    float *data = (float*)(quake->m_workArea + param2->m_serializedDataOffsets[0]);
 
     data[0] = data[1] = data[2] = 0.0f;
     data[3] = data[4] = data[5] = 0.0f;

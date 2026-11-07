@@ -9,11 +9,6 @@
 
 STATIC_ASSERT(offsetof(pppLerpPosStep, m_dataValIndex) == 0x4);
 
-static inline Vec** GetLerpPosHistory(_pppPObject* object, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<Vec**>(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
-}
-
 static const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
 
 /*
@@ -35,7 +30,7 @@ void pppFrameLerpPos(_pppPObject* object, pppLerpPosStep* step, _pppCtrlTable* c
 
     if (ppvUserStopPartF == 0) {
         mng = ppvMng;
-        historyPtr = GetLerpPosHistory(object, ctrl);
+        historyPtr = (Vec**)(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
         if (*historyPtr == 0) {
             *historyPtr = (Vec*)pppMemAlloc(
                 (u32)(u8)step->m_dataValIndex * sizeof(Vec), ppvEnv->m_stagePtr,
@@ -85,7 +80,7 @@ void pppFrameLerpPos(_pppPObject* object, pppLerpPosStep* step, _pppCtrlTable* c
  */
 void pppDestructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    Vec** historyPtr = GetLerpPosHistory(object, ctrl);
+    Vec** historyPtr = (Vec**)(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
     if (*historyPtr != 0) {
         pppMemFree(*historyPtr);
@@ -104,6 +99,6 @@ void pppDestructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
  */
 void pppConstructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    Vec** historyPtr = GetLerpPosHistory(object, ctrl);
+    Vec** historyPtr = (Vec**)(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
     *historyPtr = 0;
 }

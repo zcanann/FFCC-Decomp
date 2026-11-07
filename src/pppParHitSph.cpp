@@ -7,11 +7,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static inline Vec* ParHitSphPreviousPosition(_pppMngSt* mng)
-{
-    return &mng->UserPosition();
-}
-
 /*
  * --INFO--
  * PAL Address: 80093d04
@@ -32,7 +27,7 @@ void pppParHitSph(_pppPObject* pObject, ParHitSphParams* params)
     _pppMngSt* pppMngSt = (_pppMngSt*)ppvMng;
     float radius;
 
-    PSVECSubtract(&ppvMng->m_position, ParHitSphPreviousPosition(ppvMng), &hitVector);
+    PSVECSubtract(&ppvMng->m_position, &ppvMng->m_userPosition, &hitVector);
     origin.x = ppvMng->m_matrix.value[0][3];
     origin.y = ppvMng->m_matrix.value[1][3];
     origin.z = ppvMng->m_matrix.value[2][3];

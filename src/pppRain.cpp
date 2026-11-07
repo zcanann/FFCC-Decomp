@@ -36,11 +36,6 @@ STATIC_ASSERT(sizeof(RAIN_DATA) == 0x20);
 STATIC_ASSERT(sizeof(_pppCtrlTable) == 0x10);
 STATIC_ASSERT(offsetof(_pppCtrlTable, m_serializedDataOffsets) == 0xC);
 
-static inline VRain* GetRainWork(pppRain* rain, _pppCtrlTable* data)
-{
-    return reinterpret_cast<VRain*>(rain->m_workArea + data->m_serializedDataOffsets[2]);
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -269,7 +264,7 @@ void pppDestructRain(pppRain* rain, _pppCtrlTable* data)
 {
     VRain* work;
 
-    work = GetRainWork(rain, data);
+    work = (VRain*)(rain->m_workArea + data->m_serializedDataOffsets[2]);
     if (work->drops != 0) {
         pppMemFree(work->drops);
         work->drops = 0;
@@ -291,7 +286,7 @@ void pppConstructRain(pppRain* rain, _pppCtrlTable* data)
     VRain* work;
 
     zero = 0.0f;
-    work = GetRainWork(rain, data);
+    work = (VRain*)(rain->m_workArea + data->m_serializedDataOffsets[2]);
     work->drops = 0;
     work->moveY = work->accelY = work->accelZ = zero;
 }

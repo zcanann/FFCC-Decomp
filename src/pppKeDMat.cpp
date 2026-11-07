@@ -3,12 +3,6 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 
-static inline pppFMATRIX* GetKeDMatTargetMatrix(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<pppFMATRIX*>(
-        pObject->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8008ed4c
@@ -20,7 +14,8 @@ static inline pppFMATRIX* GetKeDMatTargetMatrix(_pppPObject* pObject, _pppCtrlTa
  */
 void pppKeDMatDraw(_pppPObject* pObject, pppNoStep*, _pppCtrlTable* ctrlTable)
 {
-    pppFMATRIX* targetMatrix = GetKeDMatTargetMatrix(pObject, ctrlTable);
+    pppFMATRIX* targetMatrix = (pppFMATRIX*)(
+        pObject->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
 
     pppMulMatrix(pObject->m_drawMatrix, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
     pppCopyMatrix(*targetMatrix, pObject->m_drawMatrix);

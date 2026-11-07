@@ -52,12 +52,6 @@ STATIC_ASSERT(offsetof(_pppProgSetDef, m_drawFlags) == 0xC);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_startFrame) == 0x10);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_stages) == 0x28);
 
-
-static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
-{
-	return pppMngSt->m_owner->m_charaModelHandle->m_model;
-}
-
 _pppMngSt* ppvMng;
 _pppEnvSt* ppvEnv;
 extern "C" {
@@ -1028,7 +1022,7 @@ MatrixMode3:
 		}
 	}
 
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	goto ApplyRotatedMatrix;
 
@@ -1084,7 +1078,7 @@ MatrixMode5:
 		}
 	}
 
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	goto ApplyTranslatedMatrix;
 
@@ -1130,7 +1124,7 @@ MatrixMode6:
 		}
 	}
 
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
@@ -1179,7 +1173,7 @@ MatrixMode7:
 		}
 	}
 
-	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
+	pppMngSt->m_owner->m_charaModelHandle->m_model->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSMTXMultVecSR(nodeMtx, &ppvMng->m_position, &tmpPos);
 	ppvMng->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;

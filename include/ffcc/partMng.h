@@ -414,11 +414,6 @@ struct _pppMngSt
     short m_mapObjIndex;               // 0x11A
     PPPSEST m_soundEffectData;         // 0x11C
     PPPIFPARAM m_hitParams;            // 0x130
-
-    Vec& UserPosition() { return m_userPosition; }
-    Vec& BasePosition() { return m_basePosition; }
-    const Vec& UserPosition() const { return m_userPosition; }
-    const Vec& BasePosition() const { return m_basePosition; }
 }; // Size: 0x158
 
 void pppEditGetViewPos(Vec*);

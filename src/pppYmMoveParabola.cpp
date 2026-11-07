@@ -23,12 +23,12 @@ static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, _pp
 
 static inline Vec* ParabolaPreviousPosition(_pppMngSt* mng)
 {
-    return &mng->UserPosition();
+    return &mng->m_userPosition;
 }
 
 static inline Vec* ParabolaBasePosition(_pppMngSt* mng)
 {
-    return &mng->BasePosition();
+    return &mng->m_basePosition;
 }
 
 /*

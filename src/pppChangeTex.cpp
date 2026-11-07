@@ -40,11 +40,6 @@ static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWo
 	model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 }
 
-static inline ChangeTexWork* GetChangeTexWork(pppChangeTex* changeTex, _pppCtrlTable* data)
-{
-	return reinterpret_cast<ChangeTexWork*>(changeTex->m_workArea + data->m_serializedDataOffsets[2]);
-}
-
 static inline VColor* GetChangeTexColorBlock(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	return reinterpret_cast<VColor*>(
@@ -347,7 +342,7 @@ freeArrays:
  */
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
-	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
+	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_workArea + data->m_serializedDataOffsets[2]);
 	float init = 0.0f;
 
 	work->m_value0 = init;
@@ -366,7 +361,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	float init = 0.0f;
-	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
+	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_workArea + data->m_serializedDataOffsets[2]);
 
 	work->m_value0 = init;
 	work->m_value1 = work->m_value2 = init;

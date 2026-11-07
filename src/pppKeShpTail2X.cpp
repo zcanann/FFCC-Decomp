@@ -33,17 +33,6 @@ inline void U8ToF32(pppFVECTOR4* dest, u8* src)
     dest->w = src[3];
 }
 
-static inline KeShpTail2XWork* GetKeShpTail2XWork(_pppPObject* obj, _pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
-}
-
-static inline KeShpTail2XAlphaWork* GetKeShpTail2XAlphaWork(_pppPObject* obj, _pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<KeShpTail2XAlphaWork*>(
-        obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80088698
@@ -55,7 +44,7 @@ static inline KeShpTail2XAlphaWork* GetKeShpTail2XAlphaWork(_pppPObject* obj, _p
  */
 void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-    KeShpTail2XWork* work = GetKeShpTail2XWork(obj, ctrlTable);
+    KeShpTail2XWork* work = (KeShpTail2XWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -76,7 +65,7 @@ void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  */
 void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-    KeShpTail2XWork* work = GetKeShpTail2XWork(obj, ctrlTable);
+    KeShpTail2XWork* work = (KeShpTail2XWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -153,7 +142,8 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
 
     count = step->m_drawCount;
     countMinusOne = (float)(count - 1);
-    alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, ctrlTable)->m_alpha / 16384.0f;
+    alphaMul = (float)((KeShpTail2XAlphaWork*)(
+        obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[1]))->m_alpha / 16384.0f;
     U8ToF32(&colorStart, &step->m_colorStartR);
     U8ToF32(&colorEnd, &step->m_colorEndR);
     colorStart.w *= alphaMul;
@@ -344,7 +334,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCt
         return;
     }
 
-    work = GetKeShpTail2XWork(&obj->m_object, ctrlTable);
+    work = (KeShpTail2XWork*)(obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     if (obj->m_object.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {

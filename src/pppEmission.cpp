@@ -19,8 +19,6 @@
 
 static const char s_pppEmission_cpp[] = "pppEmission.cpp";
 
-static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
-
 typedef CChara::CMesh::CDisplayList EmissionDisplayList;
 typedef CChara::CMesh::CRefData EmissionMeshData;
 typedef CChara::CMesh EmissionMeshRef;
@@ -66,14 +64,7 @@ STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
 
 static inline EmissionState* GetEmissionState(pppEmission* emission, _pppCtrlTable* ctrl)
 {
-    int* offsets = ctrl->m_serializedDataOffsets;
-    return reinterpret_cast<EmissionState*>(emission->m_workArea + offsets[2]);
-}
-
-static inline VColor* GetEmissionColorData(pppEmission* emission, _pppCtrlTable* ctrl)
-{
-    int* offsets = ctrl->m_serializedDataOffsets;
-    return reinterpret_cast<VColor*>(emission->m_workArea + offsets[1]);
+    return reinterpret_cast<EmissionState*>(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
@@ -125,7 +116,7 @@ void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctr
     }
 
     EmissionState* state = GetEmissionState(emission, ctrl);
-    VColor* color = GetEmissionColorData(emission, ctrl);
+    VColor* color = (VColor*)(emission->m_workArea + ctrl->m_serializedDataOffsets[1]);
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
@@ -332,7 +323,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* stateContext, v
                 scale += (float)i * state->m_scaleValue;
                 PSMTXScale(objMtx0, scale, scale, scale);
                 PSMTXConcat(meshMtx, objMtx0, objMtx0);
-                PSMTXCopy(CameraMatrix(), viewMtx0);
+                PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx0);
                 MaterialMan.SetObjMatrix(viewMtx0, objMtx0);
 
                 displayList = meshData->m_displayLists;
@@ -368,7 +359,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* stateContext, v
                 float scale = particle->m_scale;
                 PSMTXScale(objMtx1, scale, scale, scale);
                 PSMTXConcat(meshMtx, objMtx1, objMtx1);
-                PSMTXCopy(CameraMatrix(), viewMtx1);
+                PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx1);
                 PSMTXConcat(viewMtx1, objMtx1, objMtx1);
                 GXLoadPosMtxImm(objMtx1, 0);
 

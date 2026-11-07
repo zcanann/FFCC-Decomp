@@ -22,11 +22,6 @@ STATIC_ASSERT(offsetof(KeShpTailWork, m_shapeFrame) == 0x04);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_shapePrevFrame) == 0x06);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_posHistory) == 0x08);
 
-static inline KeShpTailWork* GetKeShpTailWork(_pppPObject* obj, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<KeShpTailWork*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800880f0
@@ -51,7 +46,7 @@ void pppKeShpTailDraw(_pppPObject*, pppKeShpTailStep*, _pppCtrlTable*)
  */
 void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-	KeShpTailWork* work = GetKeShpTailWork(obj, ctrlTable);
+	KeShpTailWork* work = (KeShpTailWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 	work->m_frameAcc = 0;
 	work->m_shapeFrame = 0;
 	work->m_shapePrevFrame = 0;
@@ -75,7 +70,7 @@ void pppKeShpTail(_pppPObject* obj, pppKeShpTailStep*, _pppCtrlTable* ctrlTable)
 		return;
 	}
 
-	work = GetKeShpTailWork(obj, ctrlTable);
+	work = (KeShpTailWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 	if (obj->m_graphId == 0) {
 		Vec historyPos ATTRIBUTE_ALIGN(8);
 		Vec initPos;

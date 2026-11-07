@@ -25,9 +25,8 @@ static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 static inline pppConstrainCameraForLocWork* GetConstrainCameraWork(
     pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* ctrl)
 {
-    int* offsets = ctrl->m_serializedDataOffsets;
     return reinterpret_cast<pppConstrainCameraForLocWork*>(
-        constrainCameraForLoc->m_workArea + offsets[2]);
+        constrainCameraForLoc->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* context, void*);

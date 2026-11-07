@@ -81,11 +81,6 @@ static void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*);
 
 static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 
-static inline VYmBreath* GetYmBreathWork(pppYmBreath* ymBreath, s32 offset)
-{
-    return reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + offset);
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -235,7 +230,7 @@ void pppConstruct2YmBreath(_pppPObject* obj)
  */
 extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOffsets)
 {
-    VYmBreath* state = GetYmBreathWork(ymBreath, dataOffsets->m_serializedDataOffsets[0]);
+    VYmBreath* state = (VYmBreath*)(ymBreath->m_workArea + dataOffsets->m_serializedDataOffsets[0]);
     PSMTXIdentity(state->m_matrix);
     state->m_direction.x = state->m_direction.y = state->m_direction.z = 0.0f;
 

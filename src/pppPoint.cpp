@@ -2,11 +2,6 @@
 #include "ffcc/pppPoint.h"
 #include "ffcc/partMng.h"
 
-static inline float* GetPppPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<float*>(pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80065cd8
@@ -18,7 +13,7 @@ static inline float* GetPppPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTa
  */
 void pppPointCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-	float* dst = GetPppPointWork(pObject, ctrlTable);
+	float* dst = (float*)(pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
 	dst[0] = dst[1] = dst[2] = 0.0f;
 }
@@ -42,7 +37,7 @@ void pppPoint(_pppPObject* pObject, pppPointStep* step, _pppCtrlTable* ctrlTable
 		return;
 	}
 
-	float* dst = GetPppPointWork(pObject, ctrlTable);
+	float* dst = (float*)(pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
 	dst[0] += step->m_x;
 	dst[1] += step->m_y;

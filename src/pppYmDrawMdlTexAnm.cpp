@@ -45,8 +45,7 @@ static inline CMapMesh** GetMapMeshTable()
 
 static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    int* offsets = ctrl->m_serializedDataOffsets;
-    return reinterpret_cast<pppYmDrawMdlTexAnmWork*>(object->m_workArea + offsets[2]);
+    return reinterpret_cast<pppYmDrawMdlTexAnmWork*>(object->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObjLink* object, _pppCtrlTable* ctrl)

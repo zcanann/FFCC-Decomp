@@ -8,11 +8,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static inline Vec* ParHitSphMatPreviousPosition(_pppMngSt* mng)
-{
-    return &mng->UserPosition();
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8014139c
@@ -53,7 +48,7 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
     }
 
     if (step->m_height) {
-        PSVECSubtract(&pppMngSt->m_position, ParHitSphMatPreviousPosition(pppMngSt), &hitVector);
+        PSVECSubtract(&pppMngSt->m_position, &pppMngSt->m_userPosition, &hitVector);
     }
 
     radius = pppMngSt->m_hitScale * step->m_radiusScale;

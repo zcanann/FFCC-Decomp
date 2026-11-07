@@ -60,11 +60,6 @@ STATIC_ASSERT(offsetof(PppLightStep, m_targetIndex) == 0x44);
 STATIC_ASSERT(offsetof(PppLightStep, m_specularScale) == 0x4C);
 STATIC_ASSERT(offsetof(PppLightStep, m_type) == 0x58);
 
-static inline PppLightWork* GetPppLightWork(_pppPObject* object, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<PppLightWork*>(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800dab00
@@ -76,7 +71,7 @@ static inline PppLightWork* GetPppLightWork(_pppPObject* object, _pppCtrlTable* 
  */
 void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	PppLightWork* work = GetPppLightWork(object, ctrlTable);
+	PppLightWork* work = (PppLightWork*)(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 	float zero = 0.0f;
 	
 	*(int*)&work->color2R = 0;
@@ -99,7 +94,7 @@ void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
  */
 void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	PppLightWork* work = GetPppLightWork(object, ctrlTable);
+	PppLightWork* work = (PppLightWork*)(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 	float zero = 0.0f;
 	
 	*(int*)&work->color0R = 0;

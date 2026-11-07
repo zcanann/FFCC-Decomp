@@ -36,14 +36,7 @@ STATIC_ASSERT(offsetof(CoronaVecWork, m_alpha) == 0x32);
 
 static inline CoronaWork* GetCoronaWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    int* offsets = ctrl->m_serializedDataOffsets;
-    return reinterpret_cast<CoronaWork*>(object->m_workArea + offsets[3]);
-}
-
-static inline CoronaVecWork* GetCoronaVecWork(_pppPObject* object, _pppCtrlTable* ctrl)
-{
-    int* offsets = ctrl->m_serializedDataOffsets;
-    return reinterpret_cast<CoronaVecWork*>(object->m_workArea + offsets[2]);
+    return reinterpret_cast<CoronaWork*>(object->m_workArea + ctrl->m_serializedDataOffsets[3]);
 }
 
 /*
@@ -70,7 +63,7 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
     float distScale;
 
     work = GetCoronaWork(object, ctrl);
-    vecWork = GetCoronaVecWork(object, ctrl);
+    vecWork = (CoronaVecWork*)(object->m_workArea + ctrl->m_serializedDataOffsets[2]);
 
     shapeId = data->m_dataValIndex;
     if (shapeId == 0xFFFF) {

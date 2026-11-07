@@ -40,21 +40,10 @@ STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_posQuant) == 0x34);
 STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_normQuant) == 0x38);
 STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
-static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
-{
-    return model->m_matrix;
-}
-
 static void CharaBreak_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
-
-static inline CharaBreakWork* GetCharaBreakWork(pppCharaBreak* charaBreak, _pppCtrlTable* data)
-{
-    return reinterpret_cast<CharaBreakWork*>(
-        charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
-}
 
 static inline void SetCharaBreakModelCallbacks(CChara::CModel* model, CharaBreakWork* work, CharaBreakStep* step)
 {
@@ -226,7 +215,7 @@ static void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned
 
     if (meshData->m_skinCount == 0) {
         isRigid = 1;
-        PSMTXConcat(ModelDrawMtx(model), model->GetNode(meshData->m_nodeIndex)->GetWorldMatrix(), meshMtx);
+        PSMTXConcat(model->m_matrix, model->GetNode(meshData->m_nodeIndex)->GetWorldMatrix(), meshMtx);
     }
     workPositions = mesh->GetVertex();
     u16* stream = (u16*)displayList;
@@ -589,7 +578,8 @@ static void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CMod
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
+    CharaBreakWork* work = (CharaBreakWork*)(
+        charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
 
     work->m_meshBuffers = 0;
     work->m_graphValue0 = work->m_graphValue1 = work->m_graphValue2 = 0.0f;
@@ -610,7 +600,8 @@ void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
+    CharaBreakWork* work = (CharaBreakWork*)(
+        charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
 
     work->m_graphValue0 = work->m_graphValue1 = work->m_graphValue2 = 0.0f;
     work->m_payloadGraphValue0 = work->m_payloadGraphValue1 = work->m_payloadGraphValue2 = 0.0f;
@@ -644,7 +635,8 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     Graphic._WaitDrawDone("pppCharaBreak.cpp", 0x30D);
 #endif
 
-    work = GetCharaBreakWork(charaBreak, data);
+    work = (CharaBreakWork*)(
+        charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     model = work->m_model;
 
     ClearCharaBreakModelCallbacks(model);
@@ -934,7 +926,8 @@ fail:
 void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTable* data)
 {
     int colorOffset = data->m_serializedDataOffsets[0];
-    CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
+    CharaBreakWork* work = (CharaBreakWork*)(
+        charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     VColor* colorWork = reinterpret_cast<VColor*>(charaBreak->m_workArea + colorOffset);
 
 #if defined(VERSION_GCCP01)

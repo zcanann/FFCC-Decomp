@@ -212,11 +212,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
 
     history = work->m_posHistory;
     currentIndex = work->m_head;
+    posX = history[currentIndex].x;
     posY = history[currentIndex].y;
     posZ = history[currentIndex].z;
-    posX = history[currentIndex].x;
-    startY = posY;
     startX = posX;
+    startY = posY;
     startZ = posZ;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {

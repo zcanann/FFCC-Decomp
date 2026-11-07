@@ -5648,7 +5648,7 @@ void CMenuPcs::CalcWMFrame()
 	int i;
 	int digitW;
 	short mainState = m_wmWorldState->m_mainState;
-	float scaledWidth;
+	float scaledSize;
 	if (mainState == 0) {
 		return;
 	}
@@ -5774,27 +5774,27 @@ void CMenuPcs::CalcWMFrame()
 			m_wm.m_frameData->m_yearSprites[i].m_scale =
 			    static_cast<float>(DOUBLE_803313F8 * static_cast<double>(fadeAlpha) + DOUBLE_803313F8);
 
-			float scaledHeight = static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_height) *
+			scaledSize = static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_height) *
 			                     m_wm.m_frameData->m_yearSprites[i].m_scale;
 			m_wm.m_frameData->m_yearSprites[i].m_y = static_cast<short>(
 			    m_wm.m_frameData->m_yearSprites[i].m_y +
-			    static_cast<int>(static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_height) - scaledHeight));
+			    static_cast<int>(static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_height) - scaledSize));
 
 			if (i == 0 && (digitCount == 1 || digitCount == 3)) {
-				scaledWidth = static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) *
+				scaledSize = static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) *
 				                    m_wm.m_frameData->m_yearSprites[i].m_scale;
 				m_wm.m_frameData->m_yearSprites[i].m_x = static_cast<short>(
 				    m_wm.m_frameData->m_yearSprites[i].m_x +
 				    static_cast<int>((DOUBLE_80331420 +
 				                      static_cast<double>(static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) -
-				                                          scaledWidth)) /
+				                                          scaledSize)) /
 				                     2.0));
 			} else if (i != 0) {
-				scaledWidth = static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) *
+				scaledSize = static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) *
 				                    m_wm.m_frameData->m_yearSprites[i].m_scale;
 				m_wm.m_frameData->m_yearSprites[i].m_x = static_cast<short>(
 				    m_wm.m_frameData->m_yearSprites[i].m_x +
-				    static_cast<int>(static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) - scaledWidth));
+				    static_cast<int>(static_cast<float>(m_wm.m_frameData->m_yearSprites[i].m_width) - scaledSize));
 			}
 		}
 		WmFrameData* wmEnd = m_wm.m_frameData;

@@ -35,12 +35,7 @@ struct ShadowCandidate
     int index;
 };
 
-static inline void ReleaseRefNonNull(CRef* object)
-{
-    object->Release();
-}
-
-static inline int getHsb(unsigned int value)
+inline int getHsb(unsigned long value)
 {
     for (int bit = 31; bit >= 0; bit--) {
         if ((value & (1u << bit)) != 0) {
@@ -57,10 +52,6 @@ static inline void AddTextureIndex(CMaterial* material, CChunkFile& chunkFile)
     material->AddTextureIdx(index, chunkFile.Get2());
 }
 
-static inline void SetMaterialColor(CMaterial* material, unsigned int rgba)
-{
-    material->SetMaterialColor(rgba);
-}
 }
 
 /*
@@ -379,7 +370,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
 {
     float warpMtx[6];
 
-    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
+    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.m_bumpIndTexMtx, 0);
     warpMtx[0] = 0.1f;
     warpMtx[1] = 0.0f;
     warpMtx[2] = 0.0f;
@@ -462,7 +453,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
 {
     float warpMtx[6];
 
-    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
+    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.m_bumpIndTexMtx, 0);
     warpMtx[0] = 0.1f;
     warpMtx[1] = 0.0f;
     warpMtx[2] = 0.0f;
@@ -531,7 +522,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
  */
 void CMaterialMan::addtev_bump_jimen(_GXTevScale)
 {
-    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
+    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.m_bumpIndTexMtx, 0);
     GXSetNumIndStages(1);
     GXSetIndTexOrder(static_cast<GXIndTexStageID>(0),
                      static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]),
@@ -2932,7 +2923,7 @@ CMaterial::~CMaterial()
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
         CTexture* texture = m_textureData.m_textures[i];
         if (texture != 0) {
-            ReleaseRefNonNull(texture);
+            texture->Release();
             m_textureData.m_textures[i] = 0;
         }
     }
@@ -2974,10 +2965,10 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
     int hasDualScroll = 0;
     if ((m_textureCount == 2) &&
-        (0.0f == GetTexScroll(0)->m_u0) &&
-        (0.0f == GetTexScroll(0)->m_v0) &&
-        ((0.0f != GetTexScroll(1)->m_u0) ||
-         (0.0f != GetTexScroll(1)->m_v0))) {
+        (0.0f == m_textureData.m_texScroll[0].m_u0) &&
+        (0.0f == m_textureData.m_texScroll[0].m_v0) &&
+        ((0.0f != m_textureData.m_texScroll[1].m_u0) ||
+         (0.0f != m_textureData.m_texScroll[1].m_v0))) {
         hasDualScroll = 1;
     }
 
@@ -2987,14 +2978,14 @@ int CMaterial::Set(_GXTexMapID texMapId)
             TextureMan.SetTexture(static_cast<_GXTexMapID>(curTexMap), m_textureData.m_textures[i]);
             curTexMap++;
 
-            if ((GetTexScroll(i)->m_u0 != 0.0f) ||
-                ((GetTexScroll(i)->m_v0 != 0.0f) || hasDualScroll)) {
+            if ((m_textureData.m_texScroll[i].m_u0 != 0.0f) ||
+                ((m_textureData.m_texScroll[i].m_v0 != 0.0f) || hasDualScroll)) {
                 if (i == 0) {
                     MaterialMan.m_curEnvTevBit |= 0x20;
                     MaterialMan.m_texScroll0TexMtx = MaterialMan.m_texMtxCur;
                     MaterialMan.m_texScroll0TexCoord = MaterialMan.m_texCoordIdCur;
-                    texMtx[0][3] = GetTexScroll(i)->m_u0;
-                    texMtx[1][3] = GetTexScroll(i)->m_v0;
+                    texMtx[0][3] = m_textureData.m_texScroll[i].m_u0;
+                    texMtx[1][3] = m_textureData.m_texScroll[i].m_v0;
                     GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
                     int texMtx0 = MaterialMan.m_texMtxCur;
                     int texCoord0 = MaterialMan.m_texCoordIdCur;
@@ -3011,8 +3002,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
                     MaterialMan.m_curEnvTevBit |= 0x40;
                     MaterialMan.m_texScroll1TexMtx = MaterialMan.m_texMtxCur;
                     MaterialMan.m_texScroll1TexCoord = MaterialMan.m_texCoordIdCur;
-                    texMtx[0][3] = GetTexScroll(i)->m_u0;
-                    texMtx[1][3] = GetTexScroll(i)->m_v0;
+                    texMtx[0][3] = m_textureData.m_texScroll[i].m_u0;
+                    texMtx[1][3] = m_textureData.m_texScroll[i].m_v0;
                     GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
                     int texMtx1 = MaterialMan.m_texMtxCur;
                     int texCoord1 = MaterialMan.m_texCoordIdCur;
@@ -3302,7 +3293,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_scaleU = 1.0f / chunkFile.GetF4();
                 material->m_scaleV = 1.0f / chunkFile.GetF4();
                 material->m_unk36 = static_cast<unsigned char>(chunkFile.Get4());
-                SetMaterialColor(material, chunkFile.Get4());
+                material->SetMaterialColor(chunkFile.Get4());
                 material->m_materialType = 1;
 
                 if (bumpLights != 0) {
@@ -3335,7 +3326,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_blendMode = 4;
                 chunkFile.Get4();
-                SetMaterialColor(material, chunkFile.Get4());
+                material->SetMaterialColor(chunkFile.Get4());
 
                 if ((waterMode != 0) || (material->m_unkA5 != 0)) {
                     material->m_tevBit |= 0x80000;
@@ -3360,7 +3351,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_tevBit |= 0x4000;
                 chunkFile.Get4();
-                SetMaterialColor(material, chunkFile.Get4());
+                material->SetMaterialColor(chunkFile.Get4());
                 material->m_bumpLightDirect = 1;
             } break;
             case CHUNK_FUR: {
@@ -3382,27 +3373,27 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
                             if (keyFrameU != 0) {
                                 chunkFile.GetF4();
-                                material->GetTexScroll(slot)->m_uKeyFrame = keyFrameU;
-                                material->GetTexScroll(slot)->m_type0 = 2;
+                                material->m_textureData.m_texScroll[slot].m_uKeyFrame = keyFrameU;
+                                material->m_textureData.m_texScroll[slot].m_type0 = 2;
                             } else {
-                                material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
-                                if (material->GetTexScroll(slot)->m_u1 == 0.0f) {
-                                    material->GetTexScroll(slot)->m_type0 = 0;
+                                material->m_textureData.m_texScroll[slot].m_u1 = chunkFile.GetF4();
+                                if (material->m_textureData.m_texScroll[slot].m_u1 == 0.0f) {
+                                    material->m_textureData.m_texScroll[slot].m_type0 = 0;
                                 } else {
-                                    material->GetTexScroll(slot)->m_type0 = 1;
+                                    material->m_textureData.m_texScroll[slot].m_type0 = 1;
                                 }
                             }
 
                             if (keyFrameV != 0) {
                                 chunkFile.GetF4();
-                                material->GetTexScroll(slot)->m_vKeyFrame = keyFrameV;
-                                material->GetTexScroll(slot)->m_type1 = 2;
+                                material->m_textureData.m_texScroll[slot].m_vKeyFrame = keyFrameV;
+                                material->m_textureData.m_texScroll[slot].m_type1 = 2;
                             } else {
-                                material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
-                                if (material->GetTexScroll(slot)->m_v1 == 0.0f) {
-                                    material->GetTexScroll(slot)->m_type1 = 0;
+                                material->m_textureData.m_texScroll[slot].m_v1 = chunkFile.GetF4();
+                                if (material->m_textureData.m_texScroll[slot].m_v1 == 0.0f) {
+                                    material->m_textureData.m_texScroll[slot].m_type1 = 0;
                                 } else {
-                                    material->GetTexScroll(slot)->m_type1 = 1;
+                                    material->m_textureData.m_texScroll[slot].m_type1 = 1;
                                 }
                             }
                         } break;
@@ -3426,13 +3417,13 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 } else {
                     int slot = chunkFile.Get2();
                     chunkFile.Get2();
-                    material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
-                    material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
-                    if (0.0f != material->GetTexScroll(slot)->m_u1) {
-                        material->GetTexScroll(slot)->m_type0 = 1;
+                    material->m_textureData.m_texScroll[slot].m_u1 = chunkFile.GetF4();
+                    material->m_textureData.m_texScroll[slot].m_v1 = chunkFile.GetF4();
+                    if (0.0f != material->m_textureData.m_texScroll[slot].m_u1) {
+                        material->m_textureData.m_texScroll[slot].m_type0 = 1;
                     }
-                    if (0.0f != material->GetTexScroll(slot)->m_v1) {
-                        material->GetTexScroll(slot)->m_type1 = 1;
+                    if (0.0f != material->m_textureData.m_texScroll[slot].m_v1) {
+                        material->m_textureData.m_texScroll[slot].m_type1 = 1;
                     }
                 }
             } break;
@@ -3466,7 +3457,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
             } else {
                 for (int i = 0; i < material->GetNumTexture(); i++) {
                     if (material->m_textureData.m_textures[i] != 0) {
-                        ReleaseRefNonNull(material->m_textureData.m_textures[i]);
+                        material->m_textureData.m_textures[i]->Release();
                         material->m_textureData.m_textures[i] = 0;
                     }
 
@@ -3543,7 +3534,7 @@ void CMaterialSet::Calc()
         if (material != 0) {
             int i = 0;
             do {
-                CTexScroll* texScroll = material->GetTexScroll(i);
+                CTexScroll* texScroll = &material->m_textureData.m_texScroll[i];
                 if (texScroll->m_type0 == 1) {
                     texScroll->m_u0 = texScroll->m_u0 + texScroll->m_u1;
                     if (texScroll->m_u0 > 1.0f) {
@@ -3738,7 +3729,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
             for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {
                 CTexture* object = material->m_textureData.m_textures[i];
                 if (object != 0) {
-                    ReleaseRefNonNull(object);
+                    object->Release();
                     material->m_textureData.m_textures[i] = 0;
                 }
 
@@ -3747,7 +3738,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
             }
 
             if (material != 0) {
-                ReleaseRefNonNull(material);
+                material->Release();
             }
             m_materials.SetAt(index, 0);
         }

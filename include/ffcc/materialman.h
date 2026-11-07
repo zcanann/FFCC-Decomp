@@ -313,10 +313,6 @@ public:
     {
         return m_textureData.m_textures[index];
     }
-    CTexScroll* GetTexScroll(int index)
-    {
-        return &m_textureData.m_texScroll[index];
-    }
 
 public:
     friend class CTexAnimSet;
@@ -368,6 +364,7 @@ public:
     unsigned long GetFreeMaterielIdx();
     void Create(CChunkFile&, CTextureSet*, CMaterialMan::TEV_BIT, CLightPcs::CBumpLight*);
     void SetTextureSet(CTextureSet*);
+    void SetTexture(unsigned long, unsigned long, CTexture*);
     void Calc();
     unsigned int FindTexName(char*, long*);
     void CacheLoadTexture(int, CAmemCacheSet*);

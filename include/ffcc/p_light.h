@@ -93,7 +93,6 @@ public:
     void InsertOctTree(CLightPcs::TARGET, COctTree&);
     void MakeLightMap();
     void SetBumpTexMatirx(float (*)[4], CLightPcs::CBumpLight*, Vec*, unsigned char);
-    float (*GetBumpIndTexMtx())[3] { return m_bumpIndTexMtx; }
     CBumpLight* GetBumpLight(long index, CLightPcs::TARGET target) { return &m_bumpLights[target][index]; }
 
     Mtx m_bumpTexMtx0;               // 0x04

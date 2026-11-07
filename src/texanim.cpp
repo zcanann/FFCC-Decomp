@@ -426,7 +426,7 @@ void CTexAnim::SetTexGen()
     CMaterial* material = m_refData->m_material;
 
     if (material != 0) {
-        CTexScroll* texScroll = material->GetTexScroll(m_refData->m_texSrtIndex);
+        CTexScroll* texScroll = &material->m_textureData.m_texScroll[m_refData->m_texSrtIndex];
         texScroll->m_u0 = m_texGen.x;
         texScroll->m_v0 = m_texGen.y;
         texScroll->m_u1 = zero;

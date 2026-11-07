@@ -1799,7 +1799,8 @@ void CMenuPcs::DrawOptionMenu()
 		int rowAnimFrame;
 #ifdef VERSION_GCCJGC
 		rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);
-		specialRowCos = std::cosf(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f));
+		float frameAngle = 5.625f;
+		specialRowCos = std::cosf(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle));
 #elif defined(VERSION_GCCE01)
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
 			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.0625f);

@@ -157,8 +157,8 @@ private:
 	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 
-	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
-	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
+	virtual CFlatRuntime::CStack* onSystemVal(CFlatRuntime::CObject*, int);
+	virtual CFlatRuntime::CStack* onClassSystemVal(CFlatRuntime::CObject*, int);
 
 	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int);
 	virtual void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);

@@ -24,19 +24,10 @@ namespace {
 
 typedef unsigned char u8;
 
-static inline unsigned int& LastResult(CFlatRuntime2* runtime)
-{
-	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x96C);
-}
-
 static inline unsigned short EngineClassId(void* engineObject)
 {
 	return static_cast<unsigned short>(reinterpret_cast<CGObject*>(engineObject)->GetCID());
 }
-
-#define RuntimeString(runtime, index)                                                                         \
-	(*reinterpret_cast<char**>(reinterpret_cast<u8*>(runtime) + 0x28) +                                        \
-	 (*reinterpret_cast<unsigned short**>(reinterpret_cast<u8*>(runtime) + 0x2C))[index])
 
 static inline void StoreU16Value(CFlatRuntime::CStack* stack, unsigned short& value, int setMode)
 {
@@ -53,18 +44,6 @@ static inline void StoreU16Value(CFlatRuntime::CStack* stack, unsigned short& va
 		value = value + stack->m_word;
 		break;
 	}
-}
-
-static inline void StoreU16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
-{
-	StoreU16Value(stack, *reinterpret_cast<unsigned short*>(base + offset), setMode);
-}
-
-template <int disp>
-static inline void StoreU16Idx(CFlatRuntime::CStack* stack, u8* base, int index, int setMode)
-{
-	base = base + index;
-	StoreU16Value(stack, *reinterpret_cast<unsigned short*>(base + disp), setMode);
 }
 
 static inline void StoreS16Value(CFlatRuntime::CStack* stack, short& value, int setMode)
@@ -84,18 +63,6 @@ static inline void StoreS16Value(CFlatRuntime::CStack* stack, short& value, int 
 	}
 }
 
-static inline void StoreS16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
-{
-	StoreS16Value(stack, *reinterpret_cast<short*>(base + offset), setMode);
-}
-
-template <int disp>
-static inline void StoreS16Idx(CFlatRuntime::CStack* stack, u8* base, int index, int setMode)
-{
-	base = base + index;
-	StoreS16Value(stack, *reinterpret_cast<short*>(base + disp), setMode);
-}
-
 static inline void StoreU32Value(CFlatRuntime::CStack* stack, unsigned int& value, int setMode)
 {
 	stack[-1].m_word = value;
@@ -113,56 +80,38 @@ static inline void StoreU32Value(CFlatRuntime::CStack* stack, unsigned int& valu
 	}
 }
 
-static inline void StoreU32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
+static inline void StoreS32Value(CFlatRuntime::CStack* stack, int& value, int setMode)
 {
-	StoreU32Value(stack, *reinterpret_cast<unsigned int*>(base + offset), setMode);
-}
-
-static inline void StoreF32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
-{
-	float* value = reinterpret_cast<float*>(base + offset);
-	stack[-1].m_float = *value;
+	stack[-1].m_word = value;
 
 	switch (setMode) {
 	case -1:
-		*value -= stack->m_float;
+		value -= stack->m_word;
 		break;
 	case 0:
-		*value = stack->m_float;
+		value = stack->m_word;
 		break;
 	case 1:
-		*value += stack->m_float;
+		value += stack->m_word;
 		break;
 	}
 }
 
-static inline unsigned int LoadU16(u8* base, int offset)
+static inline void StoreF32Value(CFlatRuntime::CStack* stack, float& value, int setMode)
 {
-	return *reinterpret_cast<unsigned short*>(base + offset);
-}
+	stack[-1].m_float = value;
 
-template <int disp>
-static inline unsigned int LoadU16Idx(u8* base, int index)
-{
-	base = base + index;
-	return *reinterpret_cast<unsigned short*>(base + disp);
-}
-
-static inline unsigned int LoadS16(u8* base, int offset)
-{
-	return static_cast<unsigned int>(*reinterpret_cast<short*>(base + offset));
-}
-
-template <int disp>
-static inline unsigned int LoadS16Idx(u8* base, int index)
-{
-	base = base + index;
-	return static_cast<unsigned int>(*reinterpret_cast<short*>(base + disp));
-}
-
-static inline unsigned int LoadU32(u8* base, int offset)
-{
-	return *reinterpret_cast<unsigned int*>(base + offset);
+	switch (setMode) {
+	case -1:
+		value -= stack->m_float;
+		break;
+	case 0:
+		value = stack->m_float;
+		break;
+	case 1:
+		value += stack->m_float;
+		break;
+	}
 }
 
 } // namespace
@@ -192,7 +141,7 @@ inline int CGObject::IsFall(int, int)
  */
 void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* object, CFlatRuntime::CStack* stack, int setMode)
 {
-	u8* const engineObject = reinterpret_cast<u8*>(object);
+	CGObject* const engineObject = static_cast<CGObject*>(object);
 	const unsigned short engineFlags = EngineClassId(engineObject);
 
 	if ((engineFlags & 5) != 5 && systemVal == -0x1B) {
@@ -206,9 +155,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 
 	{
 		if (systemVal <= -0x40) {
-			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
+			CGObjWork* const work = engineObject->m_scriptHandle;
 
 			if (systemVal <= -0xD80) {
+				CMonWork* const monWork = static_cast<CMonWork*>(work);
 				switch (systemVal) {
 				case -0xDA7:
 				case -0xDA6:
@@ -225,9 +175,11 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				case -0xD9B:
 				case -0xD9A:
 				case -0xD99:
-				case -0xD98:
-					StoreU16Idx<0xD0>(stack, classData, (systemVal + 0xDA7) * 2, setMode);
+				case -0xD98: {
+					int index = systemVal + 0xDA7;
+					StoreU16Value(stack, monWork->m_actionItems[index], setMode);
 					break;
+				}
 				case -0xDB7:
 				case -0xDB6:
 				case -0xDB5:
@@ -243,26 +195,28 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				case -0xDAB:
 				case -0xDAA:
 				case -0xDA9:
-				case -0xDA8:
-					StoreU16Idx<0xF0>(stack, classData, (systemVal + 0xDB7) * 2, setMode);
+				case -0xDA8: {
+					int index = systemVal + 0xDB7;
+					StoreU16Value(stack, monWork->m_actionAnimations[index], setMode);
 					break;
+				}
 				case -0xDB8:
-					StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_groupTag, setMode);
+					StoreU16Value(stack, static_cast<CGMonObj*>(engineObject)->m_groupTag, setMode);
 					break;
 				case -0xDB9:
-					StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_repop.delay, setMode);
+					StoreU16Value(stack, static_cast<CGMonObj*>(engineObject)->m_repop.delay, setMode);
 					break;
 				case -0xDBA:
-					StoreU32Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask, setMode);
+					StoreU32Value(stack, static_cast<CGMonObj*>(engineObject)->m_controlMask, setMode);
 					break;
 				default:
 					break;
 				}
 			} else if (systemVal <= -0x190) {
+				CCaravanWork* const caravanWork = static_cast<CCaravanWork*>(work);
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const int bit = systemVal + 0xBE7;
-					CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(classData);
-					const int oldValue = caravan->GetEvtFlag(bit);
+					const int oldValue = caravanWork->GetEvtFlag(bit);
 
 					stack[-1].m_word = oldValue;
 					int newValue = oldValue;
@@ -279,9 +233,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						break;
 					}
 
-					caravan->SetEvtFlag(bit, newValue);
+					caravanWork->SetEvtFlag(bit, newValue);
 				} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
-					StoreS16Idx<0x9A4>(stack, classData, (systemVal + 0x2F3) * 2, setMode);
+					int index = systemVal + 0x2F3;
+					StoreS16Value(stack, caravanWork->m_evtWordArr[index], setMode);
 				} else {
 					switch (systemVal) {
 					case -0x199:
@@ -291,23 +246,27 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					case -0x195:
 					case -0x194:
 					case -0x193:
-					case -0x192:
-						StoreU16Idx<0x3B8>(stack, classData, (systemVal + 0x199) * 2, setMode);
+					case -0x192: {
+						int index = systemVal + 0x199;
+						StoreU16Value(stack, caravanWork->m_letterMeta[index], setMode);
 						break;
+					}
 					case -0x19C:
-						StoreU32(stack, classData, 0x200, setMode);
+						StoreS32Value(stack, caravanWork->m_gil, setMode);
 						break;
 					case -0x19D:
-						StoreU16(stack, classData, 0x3C8, setMode);
+						StoreU16Value(stack, caravanWork->unk_0x3c8, setMode);
 						break;
 					case -0x1A9:
 					case -0x1A8:
 					case -0x1A7:
-					case -0x1A6:
-						StoreS16Idx<0xAC>(stack, classData, (systemVal + 0x1A9) * 2, setMode);
+					case -0x1A6: {
+						int index = systemVal + 0x1A9;
+						StoreS16Value(stack, caravanWork->m_equipment[index], setMode);
 						break;
+					}
 					case -0x1B6:
-						StoreU16(stack, classData, 0x3DE, setMode);
+						StoreU16Value(stack, caravanWork->m_progressValue, setMode);
 						break;
 					default:
 						break;
@@ -315,30 +274,26 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				}
 			} else {
 				if (systemVal <= -0x96 && systemVal >= -0x175) {
-					const int itemOffset = (systemVal + 0x175) * 2;
-					stack[-1].m_word =
-					    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset);
+					const int index = systemVal + 0x175;
+					stack[-1].m_word = work->m_romWork[index];
 					switch (setMode) {
 					case -1:
-						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) -=
-						    stack->m_word;
+						work->m_romWork[index] -= stack->m_word;
 						break;
 					case 0:
-						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
-						    stack->m_word;
+						work->m_romWork[index] = stack->m_word;
 						break;
 					case 1:
-						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) +=
-						    stack->m_word;
+						work->m_romWork[index] += stack->m_word;
 						break;
 					}
 				} else {
 					switch (systemVal) {
 					case -0x40:
-						StoreU16(stack, classData, 0x1A, setMode);
+						StoreU16Value(stack, work->m_maxHp, setMode);
 						break;
 					case -0x41:
-						StoreU16(stack, classData, 0x1C, setMode);
+						StoreU16Value(stack, work->m_hp, setMode);
 						break;
 					case -0x79:
 					case -0x78:
@@ -378,9 +333,11 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					case -0x56:
 					case -0x55:
 					case -0x54:
-					case -0x53:
-						StoreU16Idx<0x3E>(stack, classData, (-0x53 - systemVal) * 2, setMode);
+					case -0x53: {
+						int index = -0x53 - systemVal;
+						StoreU16Value(stack, work->m_statusTimers[index], setMode);
 						break;
+					}
 					case -0x94:
 					case -0x93:
 					case -0x92:
@@ -396,44 +353,45 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					case -0x88:
 					case -0x87:
 					case -0x86:
-					case -0x85:
-						StoreU16Idx<0x8C>(stack, classData, (systemVal + 0x94) * 2, setMode);
+					case -0x85: {
+						int index = systemVal + 0x94;
+						StoreU16Value(stack, work->m_statusValues[index], setMode);
 						break;
+					}
 					default:
 						break;
 					}
 				}
 			}
 
-			LastResult(this) = 0;
+			m_nullVal.m_word = 0;
 		} else {
 			switch (systemVal) {
 				case -5:
-					StoreF32(stack, engineObject, 0x184, setMode);
+					StoreF32Value(stack, engineObject->unk_0x184, setMode);
 					break;
 				case -9:
-					StoreU32(stack, engineObject, 0x94, setMode);
+					StoreS32Value(stack, engineObject->m_lifeTimer, setMode);
 					break;
 				case -0xA: {
-					CGObject* obj = reinterpret_cast<CGObject*>(engineObject);
-					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(obj->m_stateFlags0Bits.unk4));
+					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(engineObject->m_stateFlags0Bits.unk4));
 					switch (setMode) {
 					case -1:
-						obj->m_stateFlags0Bits.unk4 = static_cast<signed char>(
-						    obj->m_stateFlags0Bits.unk4 - static_cast<int>(stack->m_word));
+						engineObject->m_stateFlags0Bits.unk4 = static_cast<signed char>(
+						    engineObject->m_stateFlags0Bits.unk4 - static_cast<int>(stack->m_word));
 						break;
 					case 0:
-						obj->m_stateFlags0Bits.unk4 = static_cast<signed char>(static_cast<signed char>(stack->m_word));
+						engineObject->m_stateFlags0Bits.unk4 = static_cast<signed char>(static_cast<signed char>(stack->m_word));
 						break;
 					case 1:
-						obj->m_stateFlags0Bits.unk4 = static_cast<signed char>(
-						    obj->m_stateFlags0Bits.unk4 + static_cast<int>(stack->m_word));
+						engineObject->m_stateFlags0Bits.unk4 = static_cast<signed char>(
+						    engineObject->m_stateFlags0Bits.unk4 + static_cast<int>(stack->m_word));
 						break;
 					}
 					break;
 				}
 				case -0xB: {
-					signed char* value = reinterpret_cast<signed char*>(engineObject + 0x53);
+					signed char* value = &engineObject->m_ownerSlot;
 					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
 					switch (setMode) {
 					case -1:
@@ -449,31 +407,33 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					break;
 				}
 				case -0xD:
-					StoreF32(stack, engineObject, 0x188, setMode);
+					StoreF32Value(stack, engineObject->unk_0x188, setMode);
 					break;
 				case -0xF:
-					StoreU32(stack, engineObject, 0x500, setMode);
+					StoreS32Value(stack, engineObject->m_worldParamA, setMode);
 					break;
 				case -0x10:
-					StoreU32(stack, engineObject, 0x504, setMode);
+					StoreS32Value(stack, engineObject->m_worldParamB, setMode);
 					break;
 				case -0x14:
 				case -0x13:
 				case -0x12:
-				case -0x11:
-					StoreS16Idx<0x510>(stack, engineObject, (systemVal + 0x14) * 2, setMode);
+				case -0x11: {
+					int index = systemVal + 0x14;
+					StoreS16Value(stack, engineObject->m_dropItemCodes[index], setMode);
 					break;
+				}
 				case -0x15:
-					StoreF32(stack, engineObject, 0x168, setMode);
+					StoreF32Value(stack, engineObject->unk_0x168, setMode);
 					break;
 				case -0x16:
-					StoreF32(stack, engineObject, 0x16C, setMode);
+					StoreF32Value(stack, engineObject->unk_0x16C, setMode);
 					break;
 				case -0x17:
-					StoreF32(stack, engineObject, 0x170, setMode);
+					StoreF32Value(stack, engineObject->unk_0x170, setMode);
 					break;
 				case -0x18:
-					StoreF32(stack, engineObject, 0x1BC, setMode);
+					StoreF32Value(stack, engineObject->m_homeRotY, setMode);
 					break;
 				case -0x1A: {
 					int value = 0;
@@ -489,12 +449,12 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						value += stack->m_float;
 						break;
 					}
-					reinterpret_cast<CGObject*>(engineObject)->m_field_0x56 =
+					engineObject->m_field_0x56 =
 					    static_cast<u8>(static_cast<int>(1000.0f * static_cast<float>(value)));
 					break;
 				}
 				case -0x1B:
-					StoreU32(stack, engineObject, 0x60, setMode);
+					StoreU32Value(stack, engineObject->m_displayFlags, setMode);
 					break;
 				default:
 					break;
@@ -512,9 +472,9 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
  * JP Address: TODO
  * JP Size: TODO
  */
-CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* object, int systemVal)
+CFlatRuntime::CStack* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* object, int systemVal)
 {
-	u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
+	CGObject* const engineObject = reinterpret_cast<CGObject*>(object->m_engineObject);
 	const unsigned short engineFlags = EngineClassId(engineObject);
 
 	if (((engineFlags & 5) != 5) && (systemVal == -0x1B)) {
@@ -523,21 +483,24 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					"\202\252\203x\201[\203X\203N\203\211\203X\202\310\202\307\202\305\216g\227p\202\263\202\352\202\304\202\334\202\267\201B"
 					"!!!!!!!!!!!!!!!!!!!!\n");
 		}
-		LastResult(this) = 0;
-		return reinterpret_cast<CFlatRuntime::CVal*>(&LastResult(this));
+		m_nullVal.m_word = 0;
+		return &m_nullVal;
 	} else {
 		if (systemVal <= -0x40) {
-			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
+			CGObjWork* const work = engineObject->m_scriptHandle;
 			unsigned int value = 0;
 
 			if (systemVal <= -0xD80) {
+				CMonWork* const monWork = static_cast<CMonWork*>(work);
 				switch (systemVal) {
 				case -0xD83:
 				case -0xD82:
 				case -0xD81:
-				case -0xD80:
-					value = LoadU16Idx<0xAC>(classData, (systemVal + 0xD83) * 2);
+				case -0xD80: {
+					int index = systemVal + 0xD83;
+					value = monWork->unk_0xac[index];
 					break;
+				}
 				case -0xD91:
 				case -0xD90:
 				case -0xD8F:
@@ -551,15 +514,17 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				case -0xD87:
 				case -0xD86:
 				case -0xD85:
-				case -0xD84:
-					value = LoadU16Idx<0xB4>(classData, (systemVal + 0xD91) * 2);
+				case -0xD84: {
+					int index = systemVal + 0xD91;
+					value = monWork->unk_0xb4[index];
 					break;
+				}
 				case -0xD92: {
-					u8* p = *reinterpret_cast<u8**>(engineObject + 0xF8);
-					if (p != 0) {
-						p = *reinterpret_cast<u8**>(p + 0x178);
-						if (p != 0) {
-							value = *reinterpret_cast<unsigned int*>(p + 0x14);
+					CCharaPcs::CHandle* handle = engineObject->m_charaModelHandle;
+					if (handle != 0) {
+						CCharaPcs::CLoadPdt* pdt = handle->m_pdtLoadRef;
+						if (pdt != 0) {
+							value = pdt->m_pdtSlot;
 						} else {
 							value = static_cast<unsigned int>(-1);
 						}
@@ -583,9 +548,11 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				case -0xD9B:
 				case -0xD9A:
 				case -0xD99:
-				case -0xD98:
-					value = LoadU16Idx<0xD0>(classData, (systemVal + 0xDA7) * 2);
+				case -0xD98: {
+					int index = systemVal + 0xDA7;
+					value = monWork->m_actionItems[index];
 					break;
+				}
 				case -0xDB7:
 				case -0xDB6:
 				case -0xDB5:
@@ -601,23 +568,27 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				case -0xDAB:
 				case -0xDAA:
 				case -0xDA9:
-				case -0xDA8:
-					value = LoadU16Idx<0xF0>(classData, (systemVal + 0xDB7) * 2);
+				case -0xDA8: {
+					int index = systemVal + 0xDB7;
+					value = monWork->m_actionAnimations[index];
 					break;
+				}
 				case -0xDBA:
-					value = reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask;
+					value = static_cast<CGMonObj*>(engineObject)->m_controlMask;
 					break;
 				default:
 					break;
 				}
 			} else if (systemVal <= -0x190) {
+				CCaravanWork* const caravanWork = static_cast<CCaravanWork*>(work);
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const int bit = systemVal + 0xBE7;
-					const u8 byteValue = *(classData + (bit / 8) + 0x8A4);
+					const u8 byteValue = caravanWork->m_evtFlags[bit / 8];
 					const unsigned int mask = 1U << (bit % 8);
 					value = static_cast<unsigned int>((byteValue & mask) != 0);
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
-					value = LoadS16Idx<0x9A4>(classData, (systemVal + 0x2F3) * 2);
+					int index = systemVal + 0x2F3;
+					value = caravanWork->m_evtWordArr[index];
 				} else {
 					switch (systemVal) {
 					case -0x199:
@@ -627,38 +598,42 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					case -0x195:
 					case -0x194:
 					case -0x193:
-					case -0x192:
-						value = LoadU16Idx<0x3B8>(classData, (systemVal + 0x199) * 2);
+					case -0x192: {
+						int index = systemVal + 0x199;
+						value = caravanWork->m_letterMeta[index];
 						break;
+					}
 					case -0x19C:
-						value = LoadU32(classData, 0x200);
+						value = caravanWork->m_gil;
 						break;
 					case -0x19D:
-						value = LoadU16(classData, 0x3C8);
+						value = caravanWork->unk_0x3c8;
 						break;
 					case -0x1A9:
 					case -0x1A8:
 					case -0x1A7:
-					case -0x1A6:
-						value = LoadS16Idx<0xAC>(classData, (systemVal + 0x1A9) * 2);
+					case -0x1A6: {
+						int index = systemVal + 0x1A9;
+						value = caravanWork->m_equipment[index];
 						break;
+					}
 					case -0x1AA:
-						value = LoadU16(classData, 0xB4);
+						value = caravanWork->m_inventoryItemCount;
 						break;
 					case -0x1B6:
-						value = LoadU16(classData, 0x3DE);
+						value = caravanWork->m_progressValue;
 						break;
 					case -0x1C8: {
-						CGObject* const carryObject = reinterpret_cast<CGPartyObj*>(engineObject)->m_partyData.carryObject;
+						CGObject* const carryObject = static_cast<CGPartyObj*>(engineObject)->m_partyData.carryObject;
 						if (carryObject != 0) {
-							value = static_cast<unsigned int>(*reinterpret_cast<short*>(reinterpret_cast<u8*>(carryObject) + 0x30));
+							value = static_cast<unsigned int>(carryObject->m_particleId);
 						} else {
 							value = 0;
 						}
 						break;
 					}
 					case -0x1C9:
-						value = LoadU16(classData, 0xBC8);
+						value = caravanWork->m_artifactRelated[2];
 						break;
 					default:
 						break;
@@ -666,33 +641,33 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				}
 			} else {
 				if (systemVal <= -0x96 && systemVal >= -0x175) {
-					u8* itemTable = *reinterpret_cast<u8**>(classData + 0x24);
-					value = LoadU16(itemTable, (systemVal + 0x175) * 2);
+					int index = systemVal + 0x175;
+					value = work->m_romWork[index];
 				} else {
 					switch (systemVal) {
 					case -0x82:
-						value = LoadU16(classData, 0x14);
+						value = work->m_id;
 						break;
 					case -0x83:
-						value = LoadU16(classData, 0x16);
+						value = work->m_param1;
 						break;
 					case -0x84:
-						value = LoadU16(classData, 0x18);
+						value = work->m_param2;
 						break;
 					case -0x40:
-						value = LoadU16(classData, 0x1A);
+						value = work->m_maxHp;
 						break;
 					case -0x41:
-						value = LoadU16(classData, 0x1C);
+						value = work->m_hp;
 						break;
 					case -0x43:
-						value = LoadU16(classData, 0x1E);
+						value = work->m_strength;
 						break;
 					case -0x44:
-						value = LoadU16(classData, 0x20);
+						value = work->m_magic;
 						break;
 					case -0x45:
-						value = LoadU16(classData, 0x22);
+						value = work->m_defense;
 						break;
 					case -0x79:
 					case -0x78:
@@ -732,9 +707,11 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					case -0x56:
 					case -0x55:
 					case -0x54:
-					case -0x53:
-						value = LoadU16Idx<0x3E>(classData, (-0x53 - systemVal) * 2);
+					case -0x53: {
+						int index = -0x53 - systemVal;
+						value = work->m_statusTimers[index];
 						break;
+					}
 					case -0x94:
 					case -0x93:
 					case -0x92:
@@ -750,92 +727,90 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					case -0x88:
 					case -0x87:
 					case -0x86:
-					case -0x85:
-						value = LoadU16Idx<0x8C>(classData, (systemVal + 0x94) * 2);
+					case -0x85: {
+						int index = systemVal + 0x94;
+						value = work->m_statusValues[index];
 						break;
+					}
 					default:
 						break;
 					}
 				}
 			}
 
-			LastResult(this) = value;
+			m_nullVal.m_word = value;
 		} else {
 			switch (systemVal) {
 				case -1:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x15C);
+					m_nullVal.m_float = engineObject->m_worldPosition.x;
 					break;
 				case -2:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x160);
+					m_nullVal.m_float = engineObject->m_worldPosition.y;
 					break;
 				case -3:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x164);
+					m_nullVal.m_float = engineObject->m_worldPosition.z;
 					break;
 				case -4:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x1B4);
+					m_nullVal.m_float = engineObject->m_rotTargetY;
 					break;
 				case -5:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x184);
+					m_nullVal.m_float = engineObject->unk_0x184;
 					break;
 				case -6:
-					LastResult(this) = static_cast<unsigned int>(*reinterpret_cast<short*>(engineObject + 0x30));
+					m_nullVal.m_word = static_cast<unsigned int>(engineObject->m_particleId);
 					break;
 				case -7:
-					LastResult(this) =
-					    static_cast<unsigned int>(static_cast<int>((*(engineObject + 0x50) & 0xC0) << 0x18) >> 0x1F);
+					m_nullVal.m_word = engineObject->m_stateFlags0Bits.unk0;
 					break;
 				case -8:
-					LastResult(this) = (reinterpret_cast<CGObject*>(engineObject)->m_bgGroupMask >> 0x17) & 0xF;
+					m_nullVal.m_word = (engineObject->m_bgGroupMask >> 0x17) & 0xF;
 					break;
 				case -9:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x94);
+					m_nullVal.m_word = engineObject->m_lifeTimer;
 					break;
-				case -0xA: {
-					u8 bits = *(engineObject + 0x50);
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>((bits & 0xC) << 0x1C) >> 0x1F);
+				case -0xA:
+					m_nullVal.m_word = engineObject->m_stateFlags0Bits.unk4;
 					break;
-				}
 				case -0xB:
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<signed char*>(engineObject + 0x53)));
+					m_nullVal.m_word = engineObject->m_ownerSlot;
 					break;
-				case -0xC: {
-					u8 bits = *(engineObject + 0x50);
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>((bits & 0x60) << 0x19) >> 0x1F);
+				case -0xC:
+					m_nullVal.m_word = engineObject->m_stateFlags0Bits.unk1;
 					break;
-				}
 				case -0xD:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x188);
+					m_nullVal.m_float = engineObject->unk_0x188;
 					break;
 				case -0xF:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x500);
+					m_nullVal.m_word = engineObject->m_worldParamA;
 					break;
 				case -0x10:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x504);
+					m_nullVal.m_word = engineObject->m_worldParamB;
 					break;
 				case -0x14:
 				case -0x13:
 				case -0x12:
 				case -0x11: {
-					LastResult(this) = LoadS16Idx<0x510>(engineObject, (systemVal + 0x14) * 2);
+					int index = systemVal + 0x14;
+					m_nullVal.m_word = engineObject->m_dropItemCodes[index];
 					break;
 				}
 				case -0x15:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x168);
+					m_nullVal.m_float = engineObject->unk_0x168;
 					break;
 				case -0x16:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x16C);
+					m_nullVal.m_float = engineObject->unk_0x16C;
 					break;
 				case -0x17:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x170);
+					m_nullVal.m_float = engineObject->unk_0x170;
 					break;
 				case -0x18:
-					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x1BC);
+					m_nullVal.m_float = engineObject->m_homeRotY;
 					break;
 				case -0x19:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x520);
+					m_nullVal.m_word = static_cast<CGPrgObj*>(engineObject)->m_lastStateId;
 					break;
 				case -0x1B:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x60);
+					m_nullVal.m_word = engineObject->m_displayFlags;
 					break;
 				default:
 					break;
@@ -843,7 +818,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 		}
 	}
 
-	return reinterpret_cast<CFlatRuntime::CVal*>(&LastResult(this));
+	return &m_nullVal;
 }
 
 /*
@@ -937,7 +912,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0xE:
 			engineObject->LoadAnim(
-			    RuntimeString(this, object->m_localBase[0]),
+			    m_strBlob + m_strOffsets[object->m_localBase[0]],
 			    static_cast<int>(object->m_localBase[1]),
 			    static_cast<int>(object->m_localBase[2]),
 			    static_cast<int>(object->m_localBase[3]),
@@ -1037,7 +1012,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			    static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]), params[2], &target, params[6]);
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[7]) =
-				    *reinterpret_cast<short*>(reinterpret_cast<u8*>(hit) + 0x30);
+				    hit->m_particleId;
 			}
 			push(object, hit != 0);
 			outResult = 0;
@@ -1077,7 +1052,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			    params[4], params[5]);
 			if (result != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[6]) =
-				    *reinterpret_cast<short*>(reinterpret_cast<u8*>(result) + 0x30);
+				    result->m_particleId;
 			}
 			push(object, result != 0);
 			outResult = 0;
@@ -1131,7 +1106,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 				attachPos.x = params[2];
 				attachPos.y = params[3];
 				attachPos.z = params[4];
-				engineObject->Attach(target, RuntimeString(this, object->m_localBase[1]), &attachPos);
+				engineObject->Attach(target, m_strBlob + m_strOffsets[object->m_localBase[1]], &attachPos);
 			}
 			push(object, 0);
 			outResult = 0;
@@ -1180,7 +1155,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x2D: {
 			engineObject->SetAttackCol(
 			    static_cast<int>(object->m_localBase[0]),
-			    RuntimeString(this, object->m_localBase[1]),
+			    m_strBlob + m_strOffsets[object->m_localBase[1]],
 			    reinterpret_cast<float*>(object->m_localBase)[2],
 			    CVector(reinterpret_cast<float*>(object->m_localBase)[3], reinterpret_cast<float*>(object->m_localBase)[4],
 			            reinterpret_cast<float*>(object->m_localBase)[5]));
@@ -1197,7 +1172,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x2F: {
 			engineObject->SetDamageCol(
 			    static_cast<int>(object->m_localBase[0]),
-			    RuntimeString(this, object->m_localBase[1]),
+			    m_strBlob + m_strOffsets[object->m_localBase[1]],
 			    reinterpret_cast<float*>(object->m_localBase)[2],
 			    reinterpret_cast<float*>(object->m_localBase)[3],
 			    CVector(reinterpret_cast<float*>(object->m_localBase)[4], reinterpret_cast<float*>(object->m_localBase)[5],
@@ -1333,7 +1308,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x45:
-			engineObject->SetTexAnim(RuntimeString(this, object->m_localBase[0]));
+			engineObject->SetTexAnim(m_strBlob + m_strOffsets[object->m_localBase[0]]);
 			push(object, 0);
 			outResult = 0;
 			break;
@@ -1352,7 +1327,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			if (static_cast<int>(object->m_localBase[0]) != 0) {
 				target = static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0])));
 			}
-			engineObject->LookAt(target, RuntimeString(this, object->m_localBase[1]));
+			engineObject->LookAt(target, m_strBlob + m_strOffsets[object->m_localBase[1]]);
 			push(object, 0);
 			outResult = 0;
 			break;
@@ -1409,7 +1384,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x5A: {
-			CGObjWork* work = engineObject->m_scriptHandle;
+			CGObjWork* const work = engineObject->m_scriptHandle;
 			work->m_statusValues[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			push(object, 0);
 			outResult = 0;
@@ -1789,7 +1764,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x95:
 			reinterpret_cast<CGPartyObj*>(engineObject)->PutMemoryCapsule(
 			    static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]),
-			    static_cast<int>(object->m_localBase[3]), RuntimeString(this, object->m_localBase[4]));
+			    static_cast<int>(object->m_localBase[3]), m_strBlob + m_strOffsets[object->m_localBase[4]]);
 			push(object, 0);
 			outResult = 0;
 			break;

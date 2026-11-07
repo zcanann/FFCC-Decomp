@@ -138,7 +138,7 @@ public:
     };
     char m_ownerType;                 // 0x51
     unsigned char m_classWorkIndex;   // 0x52
-    unsigned char m_ownerSlot;        // 0x53
+    signed char m_ownerSlot;          // 0x53
     signed char m_moveMode;           // 0x54
     signed char m_moveModePrevious;   // 0x55
     unsigned char m_field_0x56;       // 0x56

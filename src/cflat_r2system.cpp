@@ -142,11 +142,6 @@ static inline const unsigned int* GetGameWorkScriptSysVals(const CGame::CGameWor
     return &gameWork.m_scriptSysVal0;
 }
 
-static inline unsigned int& FlatLastResult(CFlatRuntime2* self)
-{
-    return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(self) + 0x96C);
-}
-
 static inline u32& RuntimeDebugFlags(CFlatRuntime2* self)
 {
     return self->m_debugFlags;
@@ -172,22 +167,6 @@ static inline unsigned int ReadGameCFlatSystemValue(int systemValue)
     }
 
     return rows[rowIndex * 0x24 + valueGroup];
-}
-
-static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* runtime, int objectId)
-{
-    CFlatRuntime::CObject* const root =
-        reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(runtime) + 0x1204);
-    CFlatRuntime::CObject* object = root->m_next;
-
-    while (object != root) {
-        if (static_cast<int>(object->m_id) == objectId) {
-            return object;
-        }
-        object = object->m_next;
-    }
-
-    return 0;
 }
 
 /*
@@ -1850,7 +1829,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x6F:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Game.m_gameWork) + 8) = *object->m_localBase;
+        Game.m_gameWork.m_scriptSysVal0 = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
         break;
@@ -1889,7 +1868,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x76:
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1298) = *object->m_localBase;
+        m_0x1298 = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2884,10 +2863,9 @@ renderedDone:
  * JP Address: TODO
  * JP Size: TODO
  */
-CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int systemValue)
+CFlatRuntime::CStack* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int systemValue)
 {
     CGame::CGameWork& gameWork = Game.m_gameWork;
-    u8* game = reinterpret_cast<u8*>(&Game);
 
     if (systemValue <= -0x1000) {
         int valueIndex = -0x1000 - systemValue;
@@ -2936,26 +2914,26 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         default:
             break;
         }
-        FlatLastResult(this) = result;
+        m_nullVal.m_word = result;
     } else if (systemValue <= -500) {
-        FlatLastResult(this) = Game.GetEvtFlag(systemValue + 0x9F3);
+        m_nullVal.m_word = Game.GetEvtFlag(systemValue + 0x9F3);
 
     } else if (systemValue <= -200) {
         int workIndex = systemValue + 0x1C7;
-        FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(gameWork.m_eventWork[workIndex]));
+        m_nullVal.m_word = static_cast<unsigned int>(static_cast<int>(gameWork.m_eventWork[workIndex]));
     } else {
         switch (systemValue) {
         case -0x40:
-            FlatLastResult(this) = gameWork.m_scriptSysVal0;
+            m_nullVal.m_word = gameWork.m_scriptSysVal0;
             break;
         case -0x41:
-            FlatLastResult(this) = gameWork.m_timerA;
+            m_nullVal.m_word = gameWork.m_timerA;
             break;
         case -0x42:
-            FlatLastResult(this) = gameWork.m_scriptGlobalTime;
+            m_nullVal.m_word = gameWork.m_scriptGlobalTime;
             break;
         case -0x43:
-            FlatLastResult(this) = gameWork.m_frameCounter;
+            m_nullVal.m_word = gameWork.m_frameCounter;
             break;
         case -0x47:
         case -0x46:
@@ -2963,7 +2941,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x44:
             {
                 int index = systemValue + 0x47;
-                FlatLastResult(this) = gameWork.m_wmBackupParams[index];
+                m_nullVal.m_word = gameWork.m_wmBackupParams[index];
             }
             break;
         case -0x56:
@@ -2983,7 +2961,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x48:
             {
                 int index = systemValue + 0x56;
-                FlatLastResult(this) = gameWork.m_bossArtifactStageTable[index];
+                m_nullVal.m_word = gameWork.m_bossArtifactStageTable[index];
             }
             break;
         case -0x65:
@@ -3003,11 +2981,11 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x57:
             {
                 int index = systemValue + 0x65;
-                FlatLastResult(this) = gameWork.m_unkStageTable[index];
+                m_nullVal.m_word = gameWork.m_unkStageTable[index];
             }
             break;
         case -0x66:
-            FlatLastResult(this) = gameWork.m_chaliceElement;
+            m_nullVal.m_word = gameWork.m_chaliceElement;
             break;
         case -0x6B:
         case -0x6A:
@@ -3016,7 +2994,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x67:
             {
                 int index = systemValue + 0x6B;
-                FlatLastResult(this) = gameWork.m_eventHeader[index];
+                m_nullVal.m_word = gameWork.m_eventHeader[index];
             }
             break;
         case -0x73:
@@ -3027,21 +3005,21 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x6E:
         case -0x6D:
         case -0x6C: {
-            u8* usbEdit = reinterpret_cast<u8*>(&Game) + (systemValue + 0x73) * 0xC30;
+            int index = systemValue + 0x73;
             unsigned int charaValue;
-            if (*(int*)(usbEdit + 0x1794) != 0) {
-                charaValue = *(unsigned short*)(usbEdit + 0x1404);
+            if (Game.m_caravanWorkArr[index].m_shopState != 0) {
+                charaValue = Game.m_caravanWorkArr[index].m_id;
             } else {
                 charaValue = 0;
             }
-            FlatLastResult(this) = charaValue;
+            m_nullVal.m_word = charaValue;
             break;
         }
         case -0x76:
-            FlatLastResult(this) = gameWork.m_menuStageMode;
+            m_nullVal.m_word = gameWork.m_menuStageMode;
             break;
         case -0x78:
-            FlatLastResult(this) = gameWork.m_gameOverFlag;
+            m_nullVal.m_word = gameWork.m_gameOverFlag;
             break;
 #ifdef VERSION_GCCJGC
         case -0x74:
@@ -3075,7 +3053,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             default:
                 break;
             }
-            FlatLastResult(this) = languageValue;
+            m_nullVal.m_word = languageValue;
             break;
         }
 #endif
@@ -3084,7 +3062,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         }
     }
 
-    return reinterpret_cast<CFlatRuntime::CVal*>(&FlatLastResult(this));
+    return &m_nullVal;
 }
 
 /*

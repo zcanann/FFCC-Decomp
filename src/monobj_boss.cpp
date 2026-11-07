@@ -2388,7 +2388,7 @@ void CGMonObj::frameStatFuncGolem()
 				reinterpret_cast<GolemBossWork*>(m_boss)->m_moveAngle = m_rotTargetY + turnOffset;
 			}
 			unsigned short scriptScale =
-			    m_scriptHandle->m_romWork[0x6A];
+			    m_scriptHandle->m_romWork->m_moveSpeed;
 			float moveSpeed =
 			    m_pushScale *
 			    (0.01f * static_cast<float>(scriptScale) + 1.0e-7f);
@@ -2569,7 +2569,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 			reqAnim(animId, 0, 0);
 			u16 scriptScale =
-			    m_scriptHandle->m_romWork[0x6A];
+			    m_scriptHandle->m_romWork->m_moveSpeed;
 			float moveMagnitude =
 			    m_pushScale *
 			    (0.01f * (float)scriptScale + 1.0e-7f);

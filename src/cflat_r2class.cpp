@@ -275,16 +275,16 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 			} else {
 				if (systemVal <= -0x96 && systemVal >= -0x175) {
 					const int index = systemVal + 0x175;
-					stack[-1].m_word = work->m_romWork[index];
+					stack[-1].m_word = reinterpret_cast<unsigned short*>(work->m_romWork)[index];
 					switch (setMode) {
 					case -1:
-						work->m_romWork[index] -= stack->m_word;
+						reinterpret_cast<unsigned short*>(work->m_romWork)[index] -= stack->m_word;
 						break;
 					case 0:
-						work->m_romWork[index] = stack->m_word;
+						reinterpret_cast<unsigned short*>(work->m_romWork)[index] = stack->m_word;
 						break;
 					case 1:
-						work->m_romWork[index] += stack->m_word;
+						reinterpret_cast<unsigned short*>(work->m_romWork)[index] += stack->m_word;
 						break;
 					}
 				} else {
@@ -642,7 +642,7 @@ CFlatRuntime::CStack* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* obj
 			} else {
 				if (systemVal <= -0x96 && systemVal >= -0x175) {
 					int index = systemVal + 0x175;
-					value = work->m_romWork[index];
+					value = reinterpret_cast<unsigned short*>(work->m_romWork)[index];
 				} else {
 					switch (systemVal) {
 					case -0x82:

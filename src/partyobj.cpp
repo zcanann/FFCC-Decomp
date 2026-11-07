@@ -1292,7 +1292,7 @@ void CGPartyObj::shouki()
 				addHp(healCount, static_cast<CGPrgObj*>(0));
 			}
 		} else if (m_unk688 == 2) {
-			unsigned int damageInterval = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_romWork[CRomWork::ShoukiDamageIntervalOffset];
+			unsigned int damageInterval = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_romWork->m_shoukiDamageInterval;
 			if ((reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectFlags & 0x2000) != 0) {
 				damageInterval += Game.m_battleParams[4];
 			}
@@ -2138,7 +2138,7 @@ void CGPartyObj::checkTargetParticle()
 		maxRange = 0.0f;
 		if (m_lastStateId == 2) {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-			unsigned int vNode = work->m_romWork[0xCD];
+			unsigned int vNode = work->m_romWork->m_combatParam0;
 			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			unsigned int vItem = rows[m_itemId].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
@@ -2151,7 +2151,7 @@ void CGPartyObj::checkTargetParticle()
 			maxRange += base + static_cast<float>(vFlag);
 		} else {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-			unsigned int vNode = work->m_romWork[0xCE];
+			unsigned int vNode = work->m_romWork->m_combatParam1;
 			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			unsigned int vItem = rows[m_itemId].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
@@ -2841,7 +2841,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		break;
 	case 0x17:
 		if (kind == 1 &&
-		    (source->m_scriptHandle->m_romWork[0x7F] & 4) != 0) {
+		    (source->m_scriptHandle->m_romWork->m_flags & 4) != 0) {
 			addValue = stageAdd;
 		}
 		break;

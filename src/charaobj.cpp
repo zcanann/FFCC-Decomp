@@ -504,7 +504,7 @@ float CGCharaObj::onAlphaUpdate()
 		if (((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		     m_scriptHandle->m_hp == 0) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		     (m_scriptHandle->m_romWork[0x7F] & 1) != 0 &&
+		     (m_scriptHandle->m_romWork->m_flags & 1) != 0 &&
 		     static_cast<CGMonObj*>(this)->m_unk6BA == 0)) {
 			int createSerial = m_updateCounter;
 			float alphaWave = static_cast<float>(sin(static_cast<double>(0.05f * static_cast<float>(createSerial))));
@@ -967,7 +967,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 	int isMon = 0;
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 		isMon = 1;
-		if (m_scriptHandle->m_romWork[0x7E] == 0xB) {
+		if (m_scriptHandle->m_romWork->m_kind == 0xB) {
 			isIceJ = 1;
 		}
 	}
@@ -1001,13 +1001,13 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x80);
 				break;
 			case 10:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork[0x7F] & 4) != 0 &&
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork->m_flags & 4) != 0 &&
 					m_scriptHandle->m_hp != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyUp();
 				}
 				break;
 			case 0x1C:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork[0x7F] & 1) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork->m_flags & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOn();
 				}
 				break;
@@ -1015,7 +1015,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x4000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					monsterScale = static_cast<float>(m_scriptHandle->m_romWork[0xDA]) * 0.01f;
+					monsterScale = static_cast<float>(m_scriptHandle->m_romWork->m_scale) * 0.01f;
 				} else {
 					monsterScale = 1.0f;
 				}
@@ -1028,7 +1028,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x2000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					monsterScale = static_cast<float>(m_scriptHandle->m_romWork[0xDA]) * 0.01f;
+					monsterScale = static_cast<float>(m_scriptHandle->m_romWork->m_scale) * 0.01f;
 				} else {
 					monsterScale = 1.0f;
 				}
@@ -1095,12 +1095,12 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 10:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork[0x7F] & 4) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork->m_flags & 4) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyDown();
 				}
 				break;
 			case 0x1C:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork[0x7F] & 1) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (m_scriptHandle->m_romWork->m_flags & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOff();
 				}
 				break;
@@ -1108,7 +1108,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x4000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					monsterScale = static_cast<float>(m_scriptHandle->m_romWork[0xDA]) * 0.01f;
+					monsterScale = static_cast<float>(m_scriptHandle->m_romWork->m_scale) * 0.01f;
 				} else {
 					monsterScale = 1.0f;
 				}
@@ -1121,7 +1121,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				endPSlotBit(0x2000);
 				float monsterScale;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					monsterScale = static_cast<float>(m_scriptHandle->m_romWork[0xDA]) * 0.01f;
+					monsterScale = static_cast<float>(m_scriptHandle->m_romWork->m_scale) * 0.01f;
 				} else {
 					monsterScale = 1.0f;
 				}
@@ -1188,7 +1188,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				setSta(0, 0);
 			}
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) != 0xAD ||
-				(m_scriptHandle->m_romWork[0x7F] & 8) == 0) {
+				(m_scriptHandle->m_romWork->m_flags & 8) == 0) {
 				CVector delta = CVector(m_worldPosition) - CVector(sourceObj->m_worldPosition);
 				moveVectorH(delta, 2.0f, 8);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
@@ -1362,7 +1362,7 @@ static inline unsigned short CharaObjGetPower(CGObject* source, int amount)
 		} else {
 			powerSource = static_cast<CGPrgObj*>(source);
 		}
-		return powerSource->m_scriptHandle->m_romWork[0xCC];
+		return powerSource->m_scriptHandle->m_romWork->m_power;
 	}
 	SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 	return powerRows[amount].m_power;
@@ -1596,12 +1596,12 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	}
 
 	if (m_scriptHandle->m_statusTimers[28] == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		(m_scriptHandle->m_romWork[0x7F] & 1) != 0 &&
+		(m_scriptHandle->m_romWork->m_flags & 1) != 0 &&
 		staIndex != 0x1C) {
 		outA = outA < 2 ? 2 : outA;
 	}
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		(m_scriptHandle->m_romWork[0x7F] & 4) != 0 &&
+		(m_scriptHandle->m_romWork->m_flags & 4) != 0 &&
 		m_scriptHandle->m_statusTimers[10] == 0) {
 		outA = outA < 2 ? 2 : outA;
 	}
@@ -1840,7 +1840,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				System.Printf("PC->MON ATTACKダメージ min1((%d + %d) * %f - %d) + %d = %d\n", basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 
 				if (staType != 0x6A && sourceObj->IsKindOf(0x6D) && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-				    (m_scriptHandle->m_romWork[0x7F] & 0x100) != 0 &&
+				    (m_scriptHandle->m_romWork->m_flags & 0x100) != 0 &&
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
 				    sourceObj->m_scriptHandle->m_elementResistances[3] == 0) {
 					unsigned int srcEntryKind =
@@ -2024,12 +2024,12 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		    (m_scriptHandle->m_romWork[0x7F] & 4) != 0 &&
+		    (m_scriptHandle->m_romWork->m_flags & 4) != 0 &&
 		    m_scriptHandle->m_statusTimers[10] == 0) {
 			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
 		if (m_scriptHandle->m_statusTimers[28] == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
-		    (m_scriptHandle->m_romWork[0x7F] & 1) != 0 &&
+		    (m_scriptHandle->m_romWork->m_flags & 1) != 0 &&
 		    staType != 0x1C) {
 			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
@@ -2080,7 +2080,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			putHitParticleFromItem(sourceObj, itemId);
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 				CGObjWork* work = m_scriptHandle;
-				playSe3D(work->m_romWork[0xC9] + (work->m_romWork[0xC8] * 1000) + 6 + Math.Rand(3),
+				playSe3D(work->m_romWork->m_seBase + (work->m_romWork->m_seBank * 1000) + 6 + Math.Rand(3),
 				         0x32, 0x96, 0, 0);
 			}
 		}
@@ -2122,7 +2122,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (((DbgMenuPcs.GetDbgFlag() & 0x20) != 0 ||
 				     static_cast<CGPartyObj*>(sourceObj)->m_partyData.unk6CC == 2) &&
 				    (calcRegist(0x69, itemId, resistType, allowEffect, effectResult, 0), allowEffect != 0)) {
-					int chance = IsKindOf(0xAD) ? m_scriptHandle->m_romWork[0xCD] : 0x32;
+					int chance = IsKindOf(0xAD) ? m_scriptHandle->m_romWork->m_combatParam0 : 0x32;
 					if (chance != 0 && (DbgMenuPcs.GetDbgFlag() & 0x20) != 0) {
 						chance = 100;
 					}
@@ -2674,7 +2674,7 @@ int CGCharaObj::calcCastTime(int itemId)
 	int itemNo = typeRows[itemId].m_effect;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
-		int castBonus = m_scriptHandle->m_romWork[0xCA];
+		int castBonus = m_scriptHandle->m_romWork->m_magicCastBonus;
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 			int stageLevel;
 			if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
@@ -2705,7 +2705,7 @@ int CGCharaObj::calcCastTime(int itemId)
 		result = static_cast<int>(baseCast);
 		System.Printf("防御キャスト: %d\n", baseCast);
 	} else if (itemNo == 0x1F8) {
-		int castBonus = m_scriptHandle->m_romWork[0xCB];
+		int castBonus = m_scriptHandle->m_romWork->m_chargeCastBonus;
 		unsigned int playerCid = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D;
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectParams[1]) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);

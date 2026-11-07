@@ -1333,9 +1333,10 @@ void CMenuPcs::DrawOptionMenu()
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* marker = m_wmOptionTextures[2];
+	h = static_cast<float>(marker->GetHeight());
 	w = static_cast<float>(marker->GetWidth());
 	Util.RenderTextureQuad(64.0f, static_cast<float>(m_optionIndex * 0x28 + 0x70),
-	                        w, static_cast<float>(marker->GetHeight()), marker, 0, 0,
+	                        w, h, marker, 0, 0,
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 #ifdef VERSION_GCCJGC

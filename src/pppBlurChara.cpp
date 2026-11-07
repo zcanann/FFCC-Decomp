@@ -32,16 +32,6 @@ STATIC_ASSERT(offsetof(pppBlurCharaWork, m_smallTexObj) == 0x08);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_savedLightAlpha) == 0x0C);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 
-static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const _pppCtrlTable* ctrl) {
-    return (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
-}
-
-static inline VColor* GetBlurColorData(pppBlurChara* blurChara, const _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VColor*>(
-        blurChara->m_workArea + ctrl->m_serializedDataOffsets[1]);
-}
-
 static void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
 
@@ -56,8 +46,8 @@ static void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrlTable* ctrl)
 {
-    pppBlurCharaWork* work = GetBlurWork(blurChara, ctrl);
-    VColor* colorData = GetBlurColorData(blurChara, ctrl);
+    pppBlurCharaWork* work = (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    VColor* colorData = (VColor*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[1]);
     CTexture* texture = 0;
     CGObject* ownerObj;
     _GXTexObj smallBackTex;
@@ -222,7 +212,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrl
         return;
     }
 
-    work = GetBlurWork(blurChara, ctrl);
+    work = (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
     handle = GetCharaHandlePtr(ppvMng->m_lookTarget, 0);
     model = GetCharaModelPtr(handle);
 
@@ -254,7 +244,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrl
  */
 void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
 {
-    pppBlurCharaWork* work = GetBlurWork(blurChara, ctrl);
+    pppBlurCharaWork* work = (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(work->m_ownerObj, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
@@ -286,7 +276,7 @@ void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
  */
 void pppConstructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
 {
-    pppBlurCharaWork* work = GetBlurWork(blurChara, ctrl);
+    pppBlurCharaWork* work = (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
     CGObject* ownerObj = ppvMng->m_lookTarget;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;

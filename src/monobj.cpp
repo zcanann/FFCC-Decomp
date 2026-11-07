@@ -68,13 +68,9 @@ inline int CGame::CGameWork::GetArtifactStageLevel()
 	return 0;
 }
 
-static inline CRomData* CGMonObj_GetAiData(CGMonObj* monObj)
-{
-	if (monObj->m_aiState == 0) {
-		return monObj->m_scriptHandle->m_romWork;
-	}
-	return &Game.m_enemyRomTable[monObj->m_aiState + monObj->m_scriptHandle->m_romWork->m_aiRomBase].m_data;
-}
+#define MON_AI_DATA(monObj)                                               \
+	((monObj)->m_aiState == 0 ? (monObj)->m_scriptHandle->m_romWork \
+	                          : &Game.m_enemyRomTable[(monObj)->m_aiState + (monObj)->m_scriptHandle->m_romWork->m_aiRomBase].m_data)
 
 static inline void CGMonObj_SetChaseMove(CGMonObj* monObj, CGPartyObj* target, unsigned int flags)
 {
@@ -84,7 +80,7 @@ static inline void CGMonObj_SetChaseMove(CGMonObj* monObj, CGPartyObj* target, u
 		if ((monObj->m_scriptHandle->m_romWork->m_flags & 4) != 0) {
 			monObj->m_moveWork.m_flags |= 0x400;
 		}
-		if ((CGMonObj_GetAiData(monObj)->m_aiFlags & 0x80) != 0) {
+		if ((MON_AI_DATA(monObj)->m_aiFlags & 0x80) != 0) {
 			monObj->m_moveWork.m_flags |= 0x20000;
 		}
 		monObj->m_moveWork.SetFlags(flags, 0);
@@ -762,7 +758,7 @@ void CGMonObj::onFrameStat()
 			reqAnim(-1, 0, 0);
 		}
 
-		CRomData* aiData = CGMonObj_GetAiData(this);
+		CRomData* aiData = MON_AI_DATA(this);
 		float range = static_cast<float>(m_scriptHandle->m_romWork->m_attackRange);
 
 		int aiActionKind = aiData->m_actionKind;
@@ -1613,7 +1609,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	forward = CVector(sinY, 0.0f, cosY);
 	move = forward * distance;
 
-	unsigned short aiFlags = CGMonObj_GetAiData(this)->m_aiFlags;
+	unsigned short aiFlags = MON_AI_DATA(this)->m_aiFlags;
 	if ((m_bind != 0) &&
 		(((m_chaseState == 4) && ((aiFlags & 8) == 0)) ||
 		 ((m_chaseState != 4) && ((aiFlags & 4) == 0)))) {
@@ -2001,7 +1997,7 @@ body:
 					actionState = nextAction;
 				} else {
 					short aiState = m_aiState;
-					if ((CGMonObj_GetAiData(this)->m_actions[nextAction].m_flags & 0x20) != 0) {
+					if ((MON_AI_DATA(this)->m_actions[nextAction].m_flags & 0x20) != 0) {
 						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 						moveChase(target);
 						mlSet(5);
@@ -2126,7 +2122,7 @@ inline void CGMonObj::mlWaiting()
 		mlSet(2);
 		seKiduki();
 	} else {
-		unsigned short alertMode = CGMonObj_GetAiData(this)->m_alertMode;
+		unsigned short alertMode = MON_AI_DATA(this)->m_alertMode;
 		switch (alertMode) {
 		case 0:
 			CGMonObj::m_aiWork.m_state = 0;
@@ -2221,7 +2217,7 @@ inline void CGMonObj::moveChase(CGCharaObj* target)
 		if ((SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_flags & 4) != 0) {
 			m_moveWork.m_flags |= 0x400;
 		}
-		if ((CGMonObj_GetAiData(this)->m_aiFlags & 0x80) != 0) {
+		if ((MON_AI_DATA(this)->m_aiFlags & 0x80) != 0) {
 			m_moveWork.m_flags |= 0x20000;
 		}
 		m_moveWork.SetFlags(0, 0);
@@ -2267,7 +2263,7 @@ inline void CGMonObj::moveChaseAndStat(CGCharaObj* target, int on, float range, 
 	if (m_moveWork.m_mode != 2) {
 		m_moveWork.Clear();
 		m_moveWork.m_flags = 0x325;
-		if ((CGMonObj_GetAiData(this)->m_aiFlags & 0x40) != 0) {
+		if ((MON_AI_DATA(this)->m_aiFlags & 0x40) != 0) {
 			m_moveWork.m_flags |= 0x10000;
 		}
 		m_moveWork.SetFlags(on, off);
@@ -2300,8 +2296,6 @@ inline void CGMonObj::moveChaseAndStat(CGCharaObj* target, int on, float range, 
 
 int CGMonObj::mlAttackCheck(int partyIndex)
 {
-#define baseScript (m_scriptHandle->m_romWork)
-#define aiScript (m_aiState == 0 ? baseScript : &Game.m_enemyRomTable[m_aiState + m_scriptHandle->m_romWork->m_aiRomBase].m_data)
 #define aiScriptW (m_aiState == 0 ? SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork : &Game.m_enemyRomTable[m_aiState + SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_aiRomBase].m_data)
 	int selectedAction = -1;
 	if (m_funcs->attackCheck != 0) {
@@ -2316,7 +2310,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 
 	float targetDist = m_partyDistance[partyIndex];
 
-	int selectorType = aiScript->m_actionSelect;
+	int selectorType = MON_AI_DATA(this)->m_actionSelect;
 	if (selectorType == 0xFFFF) {
 		return -1;
 	}
@@ -2325,7 +2319,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	int groupCount[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
-		int actionFlags = aiScript->m_actions[actionIndex].m_flags;
+		int actionFlags = MON_AI_DATA(this)->m_actions[actionIndex].m_flags;
 		if (actionFlags == 0xFFFF) {
 			if (actionIndex == 0) {
 				return -2;
@@ -2337,7 +2331,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		if (m_scriptHandle->m_romWork->m_aiType == 1) {
 			actionType = actionFlags & 3;
 		} else {
-			actionType = aiScript->m_actions[actionIndex].m_type;
+			actionType = MON_AI_DATA(this)->m_actions[actionIndex].m_type;
 		}
 
 		if ((actionType == 3) && (Game.m_gameWork.m_menuStageMode != 0)) {
@@ -2358,7 +2352,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			float angleDelta = (float)__fabs(Math.DstRot(m_partyAngle[partyIndex], baseRot));
 			System.Printf("ACT_FLAG_ROT_CHECK 差分=%f度。\n", 57.29578f * angleDelta);
 			float angleLimit =
-				0.017453292f * static_cast<float>(aiScript->m_actions[actionIndex].m_group);
+				0.017453292f * static_cast<float>(MON_AI_DATA(this)->m_actions[actionIndex].m_group);
 			if (!(angleDelta < angleLimit)) {
 				continue;
 			}
@@ -2366,9 +2360,9 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		if (selectorType == 0) {
-			int maxDistRaw = aiScript->m_actions[actionIndex].m_maxDist;
-			float minDist = static_cast<float>(static_cast<unsigned int>(aiScript->m_actions[actionIndex].m_minDist));
-			unsigned int chance = aiScript->m_actions[actionIndex].m_chance;
+			int maxDistRaw = MON_AI_DATA(this)->m_actions[actionIndex].m_maxDist;
+			float minDist = static_cast<float>(static_cast<unsigned int>(MON_AI_DATA(this)->m_actions[actionIndex].m_minDist));
+			unsigned int chance = MON_AI_DATA(this)->m_actions[actionIndex].m_chance;
 
 			if ((targetDist < static_cast<float>(maxDistRaw)) && (minDist < targetDist)) {
 
@@ -2438,9 +2432,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	return selectedAction;
-#undef aiScript
 #undef aiScriptW
-#undef baseScript
 }
 
 /*
@@ -2471,7 +2463,7 @@ void CGMonObj::mlAttack()
 			return;
 		}
 
-		int targetMode = CGMonObj_GetAiData(this)->m_targetMode;
+		int targetMode = MON_AI_DATA(this)->m_targetMode;
 		if (targetMode == 0xFFFF) {
 			chaseState = 0;
 			chaseTimer = 0;
@@ -2560,7 +2552,7 @@ void CGMonObj::mlAttack()
 		if (selectedTarget >= 0) {
 
 		targetPartyIndex = selectedTarget;
-		switch (CGMonObj_GetAiData(this)->m_actionKind) {
+		switch (MON_AI_DATA(this)->m_actionKind) {
 		case 1:
 			if (m_unk6BC == 0) {
 				if (m_partyDistance[targetPartyIndex] <
@@ -2600,7 +2592,7 @@ void CGMonObj::mlAttack()
 					actionState = attackResult;
 				} else {
 					short aiState = m_aiState;
-					if ((CGMonObj_GetAiData(this)->m_actions[attackResult].m_flags & 0x20) != 0) {
+					if ((MON_AI_DATA(this)->m_actions[attackResult].m_flags & 0x20) != 0) {
 						moveChase(Game.m_partyObjArr[selectedTarget]);
 						chaseState = 5;
 						chaseTimer = 0;

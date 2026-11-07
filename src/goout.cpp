@@ -56,22 +56,6 @@ struct GoOutMenuState
     signed short m_animFrame;
 };
 
-struct CGoOutSaveCaravan
-{
-    int m_dataPresent;
-    unsigned char unk4[0x308];
-    unsigned char m_odekakeOutFlag;
-    unsigned char m_odekakeReturnFlag;
-    unsigned char unk30E[0x6B2];
-};
-
-struct CGoOutSaveDatLayout
-{
-    unsigned char unk0[0x1A84];
-    CGoOutSaveCaravan m_caravan[8];
-};
-
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -91,11 +75,6 @@ inline void McCtrl::SetMcAccessPos(int cardChannel, int saveIndex)
     m_createFlag = 0;
     m_cardChannel = cardChannel;
     m_saveIndex = saveIndex;
-}
-
-static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
-{
-    return *reinterpret_cast<CGoOutSaveDatLayout*>(saveData);
 }
 
 /*
@@ -655,10 +634,9 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
 void dumpOdekake(Mc::SaveDat* saveData)
 {
     for (int i = 0; i < 8; i++) {
-        const CGoOutSaveCaravan& caravan = GoOutSaveDat(saveData).m_caravan[i];
         System.Printf("pc=%d  use=%d:  odekake=%d  Guest=%d\n", i,
-                      caravan.m_dataPresent, caravan.m_odekakeOutFlag,
-                      caravan.m_odekakeReturnFlag);
+                      saveData->m_characters[i].m_exists, saveData->m_characters[i].m_isAway,
+                      saveData->m_characters[i].m_isGuest);
     }
 }
 #endif
@@ -785,7 +763,7 @@ inline void CGoOutMenu::Destroy()
         MenuPcs.m_goOutTransferSaveData = 0;
     }
     if (MenuPcs.m_goOutTransferWork != 0) {
-        delete static_cast<unsigned char*>(MenuPcs.m_goOutTransferWork);
+        delete reinterpret_cast<unsigned char*>(MenuPcs.m_goOutTransferWork);
         MenuPcs.m_goOutTransferWork = 0;
     }
 
@@ -951,12 +929,12 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         const int selectedChara = m_selectedTransferChara;
         int freeCaravanIdx;
 
-        if (GoOutSaveDat(static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)).m_caravan[selectedChara].m_odekakeReturnFlag == 0) {
+        if (MenuPcs.m_goOutTransferWork->m_characters[selectedChara].m_isGuest == 0) {
             freeCaravanIdx = getFreeCaravanIdx(MenuPcs.m_goOutTransferSaveData);
-            MemoryCardMan.Odekake(1, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), selectedChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
+            MemoryCardMan.Odekake(1, *MenuPcs.m_goOutTransferWork, selectedChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         } else {
-            freeCaravanIdx = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), selectedChara, 0);
-            MemoryCardMan.Odekake(0, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), m_selectedTransferChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
+            freeCaravanIdx = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, MenuPcs.m_goOutTransferWork, selectedChara, 0);
+            MemoryCardMan.Odekake(0, *MenuPcs.m_goOutTransferWork, m_selectedTransferChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         }
 
         SetMemCardSlot(m_accessCardChannel, m_accessSaveIndex);
@@ -1258,7 +1236,7 @@ card_connected:;
                 MenuPcs.InitSaveLoadMenu();
                 MenuPcs.CalcGoOutSelCharInit();
                 if (MenuPcs.CheckSameMcFormatID(MenuPcs.m_goOutTransferSaveData,
-                                                static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)) != 0) {
+                                                MenuPcs.m_goOutTransferWork) != 0) {
 #ifdef VERSION_GCCJGC
                     SetMenuStr(0, 2,
                                "\202\261\202\314\203\146\201\133\203\136\202\315\201\101\214\273\215\335\203\166\203\214\203\103\222\206\202\314\203\146\201\133\203\136\202\251\202\347",
@@ -1322,7 +1300,7 @@ card_connected:;
             return;
         }
         if (m_selectedTransferChara != -1) {
-            if (GoOutSaveDat(static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)).m_caravan[m_selectedTransferChara].m_odekakeOutFlag != 0) {
+            if (MenuPcs.m_goOutTransferWork->m_characters[m_selectedTransferChara].m_isAway != 0) {
 #ifdef VERSION_GCCJGC
                 SetMenuStr(0, 2,
                            "\201\165\202\250\202\305\202\251\202\257\222\206\201\166\202\314\203\114\203\203\203\211\203\116\203\136\201\133\202\315",
@@ -1337,8 +1315,8 @@ card_connected:;
                 SetGoOutMode(0);
             } else {
                 m_returnTransfer = 0;
-                Mc::SaveDat* transferWork = static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork);
-                if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeReturnFlag == 0) {
+                Mc::SaveDat* transferWork = MenuPcs.m_goOutTransferWork;
+                if (transferWork->m_characters[m_selectedTransferChara].m_isGuest == 0) {
                     int sameChara = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, transferWork, m_selectedTransferChara, 1);
                     if (sameChara == -3) {
                         m_returnGoOutMode = 0xF;
@@ -1986,7 +1964,8 @@ void CGoOutMenu::Calc()
         SetMainMode(1);
         MenuPcs.m_goOutTransferSaveData =
             static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferSaveAllocLine));
-        MenuPcs.m_goOutTransferWork = operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferWorkAllocLine);
+        MenuPcs.m_goOutTransferWork =
+            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferWorkAllocLine));
         MenuPcs.m_goOutTransferWorkActive = 0;
         MenuPcs.m_goOutUnknown888 = 0;
         MenuPcs.m_goOutSaveLoadMode = 0;
@@ -2030,7 +2009,7 @@ void CGoOutMenu::Calc()
                         MenuPcs.m_goOutTransferSaveData = 0;
                     }
                     if (MenuPcs.m_goOutTransferWork != 0) {
-                        delete static_cast<unsigned char*>(MenuPcs.m_goOutTransferWork);
+                        delete reinterpret_cast<unsigned char*>(MenuPcs.m_goOutTransferWork);
                         MenuPcs.m_goOutTransferWork = 0;
                     }
 

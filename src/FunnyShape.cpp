@@ -32,11 +32,6 @@ static inline s32 Div16Floor(s16 x)
 {
     return x / 16;
 }
-
-static inline s16 ShapeRange(CFunnyShape* self)
-{
-    return self->m_displayCurrent.unk2A;
-}
 }
 
 #define FS_ROTATE_SHAPE_X(dst, index)                                              \
@@ -576,16 +571,16 @@ void CFunnyShape::Update()
                 work->frame = 0;
 
                 s32 r = rand();
-                work->x = static_cast<float>(r % ShapeRange(this));
+                work->x = static_cast<float>(r % m_displayCurrent.unk2A);
 
                 r = rand();
-                work->y = static_cast<float>(r % ShapeRange(this));
+                work->y = static_cast<float>(r % m_displayCurrent.unk2A);
                 work->z = 0.0f;
                 work->delay = 0x200;
                 work->viewportX = work->viewportY = 0.0f;
 
                 r = rand();
-                work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
+                work->angle = static_cast<float>(r % 360);
                 work->angle = (3.14f * work->angle) / 180.0f;
 
                 r = rand();
@@ -637,16 +632,14 @@ void CFunnyShape::InitAnmWork()
         work->animData = static_cast<FS_Animation*>(m_anm.anmData);
 
         s32 r = rand();
-        work->x = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
+        work->x = static_cast<float>(r % m_displayCurrent.unk2A);
 
         r = rand();
-        work->y = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
+        work->y = static_cast<float>(r % m_displayCurrent.unk2A);
         work->z = 0.0f;
 
         r = rand();
-        const s16 shapeCount = (static_cast<FS_Animation*>(m_anm.anmData))->frameCount;
-        const s32 shapeDiv = r / shapeCount;
-        work->frame = static_cast<s16>(r - shapeDiv * shapeCount);
+        work->frame = static_cast<s16>(r % (static_cast<FS_Animation*>(m_anm.anmData))->frameCount);
         work->delay = 0x200;
         work->viewportX = work->viewportY = 0.0f;
 

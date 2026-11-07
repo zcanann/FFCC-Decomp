@@ -62,11 +62,6 @@ STATIC_ASSERT(offsetof(EmissionState, m_fadeOutAlphaStep) == 0x1C);
 STATIC_ASSERT(sizeof(EmissionState) == 0x20);
 STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
 
-static inline EmissionState* GetEmissionState(pppEmission* emission, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<EmissionState*>(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
-}
-
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
 {
     return model->m_meshes[meshIndex].m_data;
@@ -101,7 +96,7 @@ void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctr
         return;
     }
 
-    EmissionState* state = GetEmissionState(emission, ctrl);
+    EmissionState* state = (EmissionState*)(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
     VColor* color = (VColor*)(emission->m_workArea + ctrl->m_serializedDataOffsets[1]);
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
@@ -214,7 +209,7 @@ void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctr
  */
 void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale;
-    EmissionState* state = GetEmissionState(emission, ctrl);
+    EmissionState* state = (EmissionState*)(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
@@ -244,7 +239,7 @@ void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
  */
 void pppConstruct2Emission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
-    EmissionState* state = GetEmissionState(emission, ctrl);
+    EmissionState* state = (EmissionState*)(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
     state->m_scaleValue = state->m_scaleVelocity = state->m_scaleAccel = baseScale;
 }
 
@@ -259,7 +254,7 @@ void pppConstruct2Emission(pppEmission* emission, _pppCtrlTable* ctrl) {
  */
 void pppConstructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
-    EmissionState* state = GetEmissionState(emission, ctrl);
+    EmissionState* state = (EmissionState*)(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
 
     state->m_texture = 0;
     state->m_colorR = 0x80;

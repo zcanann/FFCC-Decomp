@@ -1077,7 +1077,7 @@ public:
     };
     union {
         int m_pad884;
-        void* m_goOutTransferWork;
+        Mc::SaveDat* m_goOutTransferWork;
     };
     union {
         unsigned char m_cmakeWorkActive;

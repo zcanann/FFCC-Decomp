@@ -240,9 +240,9 @@ void pppFrameRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
             posY = ppvCameraMatrix[1][3];
             posZ = ppvCameraMatrix[2][3];
         } else {
-            posX = CameraPcs.m_targetX;
-            posY = CameraPcs.m_targetY;
-            posZ = CameraPcs.m_targetZ;
+            posX = CameraPcs.m_target.x;
+            posY = CameraPcs.m_target.y;
+            posZ = CameraPcs.m_target.z;
         }
         ppvMng->m_matrix.value[0][3] = posX;
         ppvMng->m_matrix.value[1][3] = posY;

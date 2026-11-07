@@ -254,9 +254,9 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationSc
 				cameraY = ppvCameraMatrix[1][3];
 				cameraZ = ppvCameraMatrix[2][3];
 			} else {
-				cameraX = CameraPcs.m_targetX;
-				cameraY = CameraPcs.m_targetY;
-				cameraZ = CameraPcs.m_targetZ;
+				cameraX = CameraPcs.m_target.x;
+				cameraY = CameraPcs.m_target.y;
+				cameraZ = CameraPcs.m_target.z;
 			}
 			ppvMng->m_matrix.value[0][3] = cameraX;
 			ppvMng->m_matrix.value[1][3] = cameraY;

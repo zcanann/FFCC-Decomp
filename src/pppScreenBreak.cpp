@@ -95,12 +95,12 @@ static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext,
     Mtx invTransMtx;
     ScreenBreakMeshRef* mesh;
 
-    cameraForward.x = CameraPcs.m_directionX;
-    cameraForward.y = CameraPcs.m_directionY;
-    cameraForward.z = CameraPcs.m_directionZ;
-    cameraPos.x = CameraPcs.m_positionX;
-    cameraPos.y = CameraPcs.m_positionY;
-    cameraPos.z = CameraPcs.m_positionZ;
+    cameraForward.x = CameraPcs.m_direction.x;
+    cameraForward.y = CameraPcs.m_direction.y;
+    cameraForward.z = CameraPcs.m_direction.z;
+    cameraPos.x = CameraPcs.m_position.x;
+    cameraPos.y = CameraPcs.m_position.y;
+    cameraPos.z = CameraPcs.m_position.z;
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -200,9 +200,9 @@ static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], 
     GXLightObj lightObj;
     float zero = 0.0f;
 
-    lightDir.x = CameraPcs.m_directionX - (30.0f + CameraPcs.m_positionX);
-    lightDir.y = CameraPcs.m_directionY - (30.0f + CameraPcs.m_positionY);
-    lightDir.z = CameraPcs.m_directionZ - (30.0f + CameraPcs.m_positionZ);
+    lightDir.x = CameraPcs.m_direction.x - (30.0f + CameraPcs.m_position.x);
+    lightDir.y = CameraPcs.m_direction.y - (30.0f + CameraPcs.m_position.y);
+    lightDir.z = CameraPcs.m_direction.z - (30.0f + CameraPcs.m_position.z);
     PSVECNormalize(&lightDir, &lightDir);
 
     GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, 1.0f, zero);

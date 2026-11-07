@@ -90,12 +90,12 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
 
     PSMTXIdentity(identityMtx);
 
-    cameraPos.x = CameraPcs.m_positionX;
-    cameraPos.y = CameraPcs.m_positionY;
-    cameraPos.z = CameraPcs.m_positionZ;
-    cameraTarget.x = CameraPcs.m_targetX;
-    cameraTarget.y = CameraPcs.m_targetY;
-    cameraTarget.z = CameraPcs.m_targetZ;
+    cameraPos.x = CameraPcs.m_position.x;
+    cameraPos.y = CameraPcs.m_position.y;
+    cameraPos.z = CameraPcs.m_position.z;
+    cameraTarget.x = CameraPcs.m_target.x;
+    cameraTarget.y = CameraPcs.m_target.y;
+    cameraTarget.z = CameraPcs.m_target.z;
     cameraTarget.y = cameraPos.y = 0.0f;
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
     cameraDir.y = 0.0f;

@@ -237,9 +237,9 @@ static inline void SetViewerStartPos(int viewerMode, char* mapName)
             }
         }
         cameraPos.y += 1.0f;
-        CameraPcs.m_positionX = cameraPos.x;
-        CameraPcs.m_positionY = cameraPos.y;
-        CameraPcs.m_positionZ = cameraPos.z;
+        CameraPcs.m_position.x = cameraPos.x;
+        CameraPcs.m_position.y = cameraPos.y;
+        CameraPcs.m_position.z = cameraPos.z;
     }
 }
 
@@ -382,9 +382,9 @@ void CMapPcs::calc()
     Mtx44 screenMtx;
 
     g_MapMng.LoadMapNoSyncCalc();
-    g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-    g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-    g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+    g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
+    g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
+    g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
 
     if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
@@ -490,9 +490,9 @@ void CMapPcs::drawBefore()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+        g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
+        g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
+        g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
 
         CameraPcs.GetViewMatrix(cameraMtx);
         CameraPcs.GetProjectionMatrix(screenMtx);
@@ -543,9 +543,9 @@ void CMapPcs::draw()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+        g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
+        g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
+        g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
 
         CameraPcs.GetViewMatrix(cameraMtx);
         CameraPcs.GetProjectionMatrix(screenMtx);
@@ -597,9 +597,9 @@ void CMapPcs::drawBeforeViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+        g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
+        g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
+        g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
 
         CameraPcs.GetViewMatrix(cameraMtx);
         CameraPcs.GetProjectionMatrix(screenMtx);
@@ -651,9 +651,9 @@ void CMapPcs::drawViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-        g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-        g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+        g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
+        g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
+        g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
 
         CameraPcs.GetViewMatrix(cameraMtx);
         CameraPcs.GetProjectionMatrix(screenMtx);
@@ -700,9 +700,9 @@ void CMapPcs::drawAfter()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-            g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-            g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+            g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
+            g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
+            g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
 
             CameraPcs.GetViewMatrix(cameraMtx);
             CameraPcs.GetProjectionMatrix(screenMtx);
@@ -750,9 +750,9 @@ void CMapPcs::drawAfterViewer()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            g_MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
-            g_MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
-            g_MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
+            g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
+            g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
+            g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
 
             CameraPcs.GetViewMatrix(cameraMtx);
             CameraPcs.GetProjectionMatrix(screenMtx);

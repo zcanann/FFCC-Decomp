@@ -1235,7 +1235,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 		worldPos.y = mngMatrix[1][3];
 		worldPos.z = mngMatrix[2][3];
 		PSMTXMultVecSR(ppvCameraMatrix, &worldPos, &worldPos);
-		worldPos.y += CameraPcs.m_positionY;
+		worldPos.y += CameraPcs.m_position.y;
 		ppvWorldMatrix[0][3] = worldPos.x;
 		ppvWorldMatrix[1][3] = worldPos.y;
 		ppvWorldMatrix[2][3] = worldPos.z;

@@ -925,12 +925,12 @@ void CFlatRuntime2::Calc()
 		u32* saveData = new (getStage(), "cflat_runtime2.cpp", 0x36F) u32[0x3FF];
 
 		u32 header[8];
-		reinterpret_cast<float*>(header)[0] = Util.ConvertEndianF4(CameraPcs.m_positionX);
-		reinterpret_cast<float*>(header)[1] = Util.ConvertEndianF4(CameraPcs.m_positionY);
-		reinterpret_cast<float*>(header)[2] = Util.ConvertEndianF4(CameraPcs.m_positionZ);
-		reinterpret_cast<float*>(header)[3] = Util.ConvertEndianF4(CameraPcs.m_targetX);
-		reinterpret_cast<float*>(header)[4] = Util.ConvertEndianF4(CameraPcs.m_targetY);
-		reinterpret_cast<float*>(header)[5] = Util.ConvertEndianF4(CameraPcs.m_targetZ);
+		reinterpret_cast<float*>(header)[0] = Util.ConvertEndianF4(CameraPcs.m_position.x);
+		reinterpret_cast<float*>(header)[1] = Util.ConvertEndianF4(CameraPcs.m_position.y);
+		reinterpret_cast<float*>(header)[2] = Util.ConvertEndianF4(CameraPcs.m_position.z);
+		reinterpret_cast<float*>(header)[3] = Util.ConvertEndianF4(CameraPcs.m_target.x);
+		reinterpret_cast<float*>(header)[4] = Util.ConvertEndianF4(CameraPcs.m_target.y);
+		reinterpret_cast<float*>(header)[5] = Util.ConvertEndianF4(CameraPcs.m_target.z);
 		reinterpret_cast<float*>(header)[6] = Util.ConvertEndianF4(CameraPcs.m_fov);
 		reinterpret_cast<float*>(header)[7] = Util.ConvertEndianF4((180.0f * CameraPcs.m_zRotate) / 3.1415927f);
 

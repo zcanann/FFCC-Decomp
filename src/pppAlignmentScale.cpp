@@ -24,9 +24,9 @@ void pppFrameAlignmentScale(struct pppAlignmentScale*, struct pppAlignmentScaleD
 
     if (ppvUserStopPartF == 0) {
         pppMngSt = ppvMng;
-        cameraPos.x = CameraPcs.m_positionX;
-        cameraPos.y = CameraPcs.m_positionY;
-        cameraPos.z = CameraPcs.m_positionZ;
+        cameraPos.x = CameraPcs.m_position.x;
+        cameraPos.y = CameraPcs.m_position.y;
+        cameraPos.z = CameraPcs.m_position.z;
 
         objPos.x = ppvMng->m_matrix.value[0][3];
         objPos.y = ppvMng->m_matrix.value[1][3];

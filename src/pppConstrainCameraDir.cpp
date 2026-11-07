@@ -30,16 +30,16 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, pppCo
                        step->m_initWOrk, step->m_stepValue);
 
         if ((ppvIsLoopCalc != 1) && ((step->m_applyCameraInverse != 0 || step->m_applyPosition != 0))) {
-            float cameraDirX = CameraPcs.m_directionX;
-            float cameraDirY = CameraPcs.m_directionY;
-            float cameraDirZ = CameraPcs.m_directionZ;
+            float cameraDirX = CameraPcs.m_direction.x;
+            float cameraDirY = CameraPcs.m_direction.y;
+            float cameraDirZ = CameraPcs.m_direction.z;
 
             Mtx cameraMtx;
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
-            float cameraPosX = CameraPcs.m_positionX;
-            float cameraPosY = CameraPcs.m_positionY;
-            float cameraPosZ = CameraPcs.m_positionZ;
+            float cameraPosX = CameraPcs.m_position.x;
+            float cameraPosY = CameraPcs.m_position.y;
+            float cameraPosZ = CameraPcs.m_position.z;
             float scale = 1.0f + (CameraPcs.m_fov - 25.0f) / 25.0f;
 
             PSMTXIdentity(ppvMng->m_matrix.value);

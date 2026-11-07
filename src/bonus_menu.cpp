@@ -2093,6 +2093,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 	int idx;
 	int i;
 	CMenuPcs::Sprt2* sprite;
+	CMenuPcs::Sprt2* artiBase;
+	CMenuPcs::Sprt2* artiFrame;
+	CMenuPcs::Sprt2* framePanel;
 	int work;
 	CCharaPcs::CHandle* handle;
 	int frame;
@@ -2121,43 +2124,43 @@ void CMenuPcs::CalcSelectOpenAnim()
 			sprite->flags = 3;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = -3;
-			spr->x = 0xf0;
-			spr->y = 0x38;
-			spr->w = 0x168;
-			spr->h = 0x148;
-			spr->mulX = spr->mulY = 0.0f;
-			spr->startFrame = 0;
-			spr->duration = kFadeFrames;
-			spr->depth = 1.0f;
+			framePanel = &m_bonusAnim->sprites[idx++];
+			framePanel->kind = -3;
+			framePanel->x = 0xf0;
+			framePanel->y = 0x38;
+			framePanel->w = 0x168;
+			framePanel->h = 0x148;
+			framePanel->mulX = framePanel->mulY = 0.0f;
+			framePanel->startFrame = 0;
+			framePanel->duration = kFadeFrames;
+			framePanel->depth = 1.0f;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = kBonusArtifactFrameTexture;
-			spr->x = 0;
-			spr->y = 0;
-			spr->w = 0x80;
-			spr->h = 0x78;
-			spr->mulX = spr->mulY = 0.0f;
-			spr->startFrame = 9999;
-			spr->duration = kFadeFrames;
-			spr->depth = 1.0f;
-			spr->motionX = (-8.0f);
-			spr->motionY = (-8.0f);
-			spr->flags = 2;
+			artiFrame = &m_bonusAnim->sprites[idx++];
+			artiFrame->kind = kBonusArtifactFrameTexture;
+			artiFrame->x = 0;
+			artiFrame->y = 0;
+			artiFrame->w = 0x80;
+			artiFrame->h = 0x78;
+			artiFrame->mulX = artiFrame->mulY = 0.0f;
+			artiFrame->startFrame = 9999;
+			artiFrame->duration = kFadeFrames;
+			artiFrame->depth = 1.0f;
+			artiFrame->motionX = (-8.0f);
+			artiFrame->motionY = (-8.0f);
+			artiFrame->flags = 2;
 		}
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = -4;
-			spr->x = 0;
-			spr->y = 0;
-			spr->w = 0x70;
-			spr->h = 0x68;
-			spr->mulX = spr->mulY = 0.0f;
-			spr->startFrame = 0;
-			spr->duration = kFadeFrames;
-			spr->depth = 1.0f;
+			artiBase = &m_bonusAnim->sprites[idx++];
+			artiBase->kind = -4;
+			artiBase->x = 0;
+			artiBase->y = 0;
+			artiBase->w = 0x70;
+			artiBase->h = 0x68;
+			artiBase->mulX = artiBase->mulY = 0.0f;
+			artiBase->startFrame = 0;
+			artiBase->duration = kFadeFrames;
+			artiBase->depth = 1.0f;
 		}
 
 		int y = 0x28;

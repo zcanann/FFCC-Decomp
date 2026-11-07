@@ -8807,17 +8807,13 @@ nextListEntry:
 				const int modelNo = slotData->m_characterIds[member];
 				if (modelNo >= 0) {
 					const int faceNo = modelNo - 100;
-					float texU;
-					if ((faceNo / 100 & 1) != 0) {
-						texU = 192.0f;
-					} else {
-						texU = static_cast<float>(DOUBLE_803314F0);
-					}
-					texU += static_cast<float>(faceNo % 100) * FLOAT_80331468;
-					const float* pW68f = &FLOAT_80331468;
-					MenuPcs.DrawRect(0, iconX, iconY, *pW68f, *pW68f,
+					float altU = 192.0f;
+					float texU = ((faceNo / 100 & 1) != 0) ? altU : DOUBLE_803314F0;
+					float texOff = static_cast<float>(faceNo % 100) * 48.0f;
+					texU += texOff;
+					MenuPcs.DrawRect(0, iconX, iconY, 48.0f, 48.0f,
 					         texU,
-					         static_cast<float>(faceNo / 100 / 2) * *pW68f,
+					         static_cast<float>(faceNo / 100 / 2) * 48.0f,
 					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					iconX += FLOAT_80331468;
 				}

@@ -1629,17 +1629,17 @@ inline int CMenuPcs::ChkCmdActive(int itemIndex)
  */
 int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
-	int j;
-	int slot;
-	int matchCount;
-	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
 	int itemKinds[10];
+	int matchCount;
 	int matches[5][2];
 	int candidates[10];
-	int k;
+	int len;
+	int j;
 	int ok;
 	int i;
-	int len;
+	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
+	int slot;
+	int k;
 
 	if (comboOut != nullptr) {
 		for (i = 0; i < 5; i++) {

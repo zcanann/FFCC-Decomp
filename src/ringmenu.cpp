@@ -576,9 +576,10 @@ void CRingMenu::onDraw()
 		textX1 = 56.0f + drawX;
 		textY1 = 3.0f + drawY;
 #else
-		textX0 += 20.0f;
+		float offsetX = 20.0f;
+		textX0 += offsetX;
 		textY0 = (5.0f + drawY) - 4.0f;
-		textX1 = (56.0f + drawX) + 20.0f;
+		textX1 = (56.0f + drawX) + offsetX;
 		textY1 = (3.0f + drawY) - 4.0f;
 #endif
 		textY2 = 6.0f + drawY;

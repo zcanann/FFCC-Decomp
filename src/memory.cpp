@@ -12,10 +12,6 @@
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
-inline void* operator new[](unsigned long size, CMemory::CStage* stage, const char* file, int line)
-{
-    return stage->alloc(size, const_cast<char*>(file), line, 0);
-}
 
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
@@ -164,7 +160,7 @@ unsigned int CheckSum(void* data, int size)
  */
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    return stage->alloc(size, file != (char*)nullptr ? file : const_cast<char*>(""), line, 0);
+    return Memory._Alloc(size, stage, file, line, 0);
 }
 
 /*
@@ -178,7 +174,7 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
  */
 void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    return stage->alloc(size, file != (char*)nullptr ? file : const_cast<char*>(""), line, 0);
+    return Memory._Alloc(size, stage, file, line, 0);
 }
 
 /*
@@ -661,7 +657,7 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
  */
 void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, int line, int noError)
 {
-    return stage->alloc(size, source != (char*)nullptr ? source : const_cast<char*>(""), line, noError);
+    return stage->alloc(size, source ? source : const_cast<char*>(""), line, noError);
 }
 
 /*

@@ -3,6 +3,7 @@
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/USBStreamData.h"
 #include "ffcc/p_usb.h"
+#include "ffcc/util.h"
 #include "dolphin/gx/GXFrameBuffer.h"
 #include "dolphin/gx/GXTexture.h"
 #include "dolphin/os/OSCache.h"
@@ -15,31 +16,6 @@ namespace {
 
 static inline u8* AnmData(CFunnyShapePcs* self) {
     return static_cast<u8*>(self->m_funnyShape.m_anm.anmData);
-}
-
-static inline u32 LoadSwap32(u32 value) {
-    return __lwbrx(&value, 0);
-}
-
-static inline void StoreSwap32(u32* value) {
-    u32 raw = *value;
-
-    *value = __lwbrx(&raw, 0);
-}
-
-static inline void StoreSwap32(f32* value) {
-    f32 raw = *value;
-    u32 swapped = __lwbrx(&raw, 0);
-
-    *value = *reinterpret_cast<f32*>(&swapped);
-}
-
-static inline s16 LoadSwap16(s16 value) {
-    return __lhbrx(&value, 0);
-}
-
-static inline u16 LoadSwapU16(u16 value) {
-    return __lhbrx(&value, 0);
 }
 }
 
@@ -66,19 +42,19 @@ void CFunnyShapePcs::SetUSBData()
         break;
     case 12: {
         memcpy(&m_displayPending, usb->m_data, sizeof(FS_DISPLAY_STATUS));
-        StoreSwap32(&m_displayPending.flags);
-        StoreSwap32(&m_displayPending.unk08);
-        StoreSwap32(&m_displayPending.unk0C);
-        StoreSwap32(&m_displayPending.unk10);
-        StoreSwap32(&m_displayPending.unk14);
-        StoreSwap32(&m_displayPending.unk18);
-        StoreSwap32(&m_displayPending.unk1C);
-        StoreSwap32(&m_displayPending.unk20);
-        StoreSwap32(&m_displayPending.unk24);
-        m_displayPending.unk28 = LoadSwap16(m_displayPending.unk28);
-        m_displayPending.unk2A = LoadSwap16(m_displayPending.unk2A);
-        StoreSwap32(&m_displayPending.unk2C);
-        StoreSwap32(&m_displayPending.unk30);
+        m_displayPending.flags = Util.ConvertEndian4(m_displayPending.flags);
+        m_displayPending.unk08 = Util.ConvertEndianF4(m_displayPending.unk08);
+        m_displayPending.unk0C = Util.ConvertEndianF4(m_displayPending.unk0C);
+        m_displayPending.unk10 = Util.ConvertEndianF4(m_displayPending.unk10);
+        m_displayPending.unk14 = Util.ConvertEndianF4(m_displayPending.unk14);
+        m_displayPending.unk18 = Util.ConvertEndianF4(m_displayPending.unk18);
+        m_displayPending.unk1C = Util.ConvertEndianF4(m_displayPending.unk1C);
+        m_displayPending.unk20 = Util.ConvertEndianF4(m_displayPending.unk20);
+        m_displayPending.unk24 = Util.ConvertEndianF4(m_displayPending.unk24);
+        m_displayPending.unk28 = Util.ConvertEndian2(m_displayPending.unk28);
+        m_displayPending.unk2A = Util.ConvertEndian2(m_displayPending.unk2A);
+        m_displayPending.unk2C = Util.ConvertEndianF4(m_displayPending.unk2C);
+        m_displayPending.unk30 = Util.ConvertEndianF4(m_displayPending.unk30);
         DCStoreRange(&m_displayPending, sizeof(FS_DISPLAY_STATUS));
 
         GXColor clear;
@@ -99,16 +75,16 @@ void CFunnyShapePcs::SetUSBData()
                 OSFS_TEXTURE_ST;
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
-        tmp->unk00 = LoadSwap16(tmp->unk00);
-        tmp->unk02 = LoadSwap16(tmp->unk02);
-        tmp->width = LoadSwap16(tmp->width);
-        tmp->height = LoadSwap16(tmp->height);
-        tmp->unk08 = LoadSwap16(tmp->unk08);
-        tmp->unk0A = LoadSwap16(tmp->unk0A);
-        tmp->unk0C = LoadSwap16(tmp->unk0C);
-        tmp->unk0E = LoadSwap16(tmp->unk0E);
-        reinterpret_cast<u16*>(tmp->unk10)[0x8] = LoadSwapU16(reinterpret_cast<u16*>(tmp->unk10)[0x8]);
-        reinterpret_cast<u16*>(tmp->unk10)[0x9] = LoadSwapU16(reinterpret_cast<u16*>(tmp->unk10)[0x9]);
+        tmp->unk00 = Util.ConvertEndian2(tmp->unk00);
+        tmp->unk02 = Util.ConvertEndian2(tmp->unk02);
+        tmp->width = Util.ConvertEndian2(tmp->width);
+        tmp->height = Util.ConvertEndian2(tmp->height);
+        tmp->unk08 = Util.ConvertEndian2(tmp->unk08);
+        tmp->unk0A = Util.ConvertEndian2(tmp->unk0A);
+        tmp->unk0C = Util.ConvertEndian2(tmp->unk0C);
+        tmp->unk0E = Util.ConvertEndian2(tmp->unk0E);
+        reinterpret_cast<u16*>(tmp->unk10)[0x8] = Util.ConvertEndian2(reinterpret_cast<u16*>(tmp->unk10)[0x8]);
+        reinterpret_cast<u16*>(tmp->unk10)[0x9] = Util.ConvertEndian2(reinterpret_cast<u16*>(tmp->unk10)[0x9]);
 
         DCFlushRange(tmp, sizeof(OSFS_TEXTURE_ST));
         memcpy(m_funnyShape.m_textureHeaders[m_funnyShape.m_textureCount], tmp, sizeof(OSFS_TEXTURE_ST));
@@ -139,11 +115,11 @@ void CFunnyShapePcs::SetUSBData()
         }
         memset(&m_funnyShape, 0, sizeof(CFunnyShapeAnmWork));
         memcpy(&m_funnyShape.m_anm, usb->m_data, sizeof(OSFS_ANM_ST));
-        StoreSwap32(&m_funnyShape.m_anm.unk00);
-        m_funnyShape.m_anm.unk04 = LoadSwap16(m_funnyShape.m_anm.unk04);
-        m_funnyShape.m_anm.unk06 = LoadSwap16(m_funnyShape.m_anm.unk06);
-        m_funnyShape.m_anm.unk08 = LoadSwap16(m_funnyShape.m_anm.unk08);
-        m_funnyShape.m_anm.unk0A = LoadSwap16(m_funnyShape.m_anm.unk0A);
+        m_funnyShape.m_anm.unk00 = Util.ConvertEndian4(m_funnyShape.m_anm.unk00);
+        m_funnyShape.m_anm.unk04 = Util.ConvertEndian2(m_funnyShape.m_anm.unk04);
+        m_funnyShape.m_anm.unk06 = Util.ConvertEndian2(m_funnyShape.m_anm.unk06);
+        m_funnyShape.m_anm.unk08 = Util.ConvertEndian2(m_funnyShape.m_anm.unk08);
+        m_funnyShape.m_anm.unk0A = Util.ConvertEndian2(m_funnyShape.m_anm.unk0A);
         m_funnyShape.m_anm.anmData = 0;
         DCStoreRange(&m_funnyShape.m_anm, usb->m_sizeBytes);
         break;
@@ -152,47 +128,47 @@ void CFunnyShapePcs::SetUSBData()
             u8[usb->m_sizeBytes];
 
         memcpy(AnmData(this), usb->m_data, usb->m_sizeBytes);
-        *reinterpret_cast<s16*>(AnmData(this) + 2) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 2));
-        *reinterpret_cast<s16*>(AnmData(this) + 4) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 4));
-        *reinterpret_cast<s16*>(AnmData(this) + 6) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 6));
-        *reinterpret_cast<s16*>(AnmData(this) + 8) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 8));
-        *reinterpret_cast<s16*>(AnmData(this) + 10) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 10));
-        *reinterpret_cast<u16*>(AnmData(this) + 14) = LoadSwapU16(*reinterpret_cast<u16*>(AnmData(this) + 14));
-        *reinterpret_cast<s16*>(AnmData(this) + 16) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 16));
-        *reinterpret_cast<s16*>(AnmData(this) + 18) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 18));
+        *reinterpret_cast<s16*>(AnmData(this) + 2) = Util.ConvertEndian2(*reinterpret_cast<s16*>(AnmData(this) + 2));
+        *reinterpret_cast<s16*>(AnmData(this) + 4) = Util.ConvertEndian2(*reinterpret_cast<s16*>(AnmData(this) + 4));
+        *reinterpret_cast<s16*>(AnmData(this) + 6) = Util.ConvertEndian2(*reinterpret_cast<s16*>(AnmData(this) + 6));
+        *reinterpret_cast<s16*>(AnmData(this) + 8) = Util.ConvertEndian2(*reinterpret_cast<s16*>(AnmData(this) + 8));
+        *reinterpret_cast<s16*>(AnmData(this) + 10) = Util.ConvertEndian2(*reinterpret_cast<s16*>(AnmData(this) + 10));
+        *reinterpret_cast<u16*>(AnmData(this) + 14) = Util.ConvertEndian2(*reinterpret_cast<u16*>(AnmData(this) + 14));
+        *reinterpret_cast<s16*>(AnmData(this) + 16) = Util.ConvertEndian2(*reinterpret_cast<s16*>(AnmData(this) + 16));
+        *reinterpret_cast<s16*>(AnmData(this) + 18) = Util.ConvertEndian2(*reinterpret_cast<s16*>(AnmData(this) + 18));
 
         int i = 0;
         for (; i < *reinterpret_cast<s16*>(AnmData(this) + 6); i++) {
             u8* group = AnmData(this) + i * 8;
             if (i != 0) {
-                *reinterpret_cast<s16*>(group + 0x10) = LoadSwap16(*reinterpret_cast<s16*>(group + 0x10));
-                *reinterpret_cast<s16*>(group + 0x12) = LoadSwap16(*reinterpret_cast<s16*>(group + 0x12));
+                *reinterpret_cast<s16*>(group + 0x10) = Util.ConvertEndian2(*reinterpret_cast<s16*>(group + 0x10));
+                *reinterpret_cast<s16*>(group + 0x12) = Util.ConvertEndian2(*reinterpret_cast<s16*>(group + 0x12));
             }
 
             s16* list = reinterpret_cast<s16*>(AnmData(this) + *reinterpret_cast<s16*>(group + 0x10));
             u8* listData = reinterpret_cast<u8*>(list);
-            list[0] = LoadSwap16(list[0]);
-            list[1] = LoadSwap16(list[1]);
+            list[0] = Util.ConvertEndian2(list[0]);
+            list[1] = Util.ConvertEndian2(list[1]);
 
             for (int j = 0; j < static_cast<s16>(list[1]); j++) {
                 if ((list[0] & 8) != 0) {
                     u8* src = listData + 0x10;
                     src += j * 0x2C;
                     u32* p32 = reinterpret_cast<u32*>(src);
-                    StoreSwap32(&p32[0]);
-                    StoreSwap32(&p32[1]);
-                    *reinterpret_cast<s16*>(src + 0x10) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x10));
-                    *reinterpret_cast<s16*>(src + 0x12) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x12));
-                    *reinterpret_cast<s16*>(src + 0x14) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x14));
-                    *reinterpret_cast<s16*>(src + 0x16) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x16));
-                    *reinterpret_cast<s16*>(src + 0x18) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x18));
-                    *reinterpret_cast<s16*>(src + 0x1A) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1A));
-                    *reinterpret_cast<s16*>(src + 0x1C) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1C));
-                    *reinterpret_cast<s16*>(src + 0x1E) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1E));
-                    *reinterpret_cast<s16*>(src + 0x20) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x20));
-                    *reinterpret_cast<s16*>(src + 0x22) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x22));
-                    *reinterpret_cast<s16*>(src + 0x24) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x24));
-                    *reinterpret_cast<s16*>(src + 0x26) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x26));
+                    p32[0] = Util.ConvertEndian4(p32[0]);
+                    p32[1] = Util.ConvertEndian4(p32[1]);
+                    *reinterpret_cast<s16*>(src + 0x10) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x10));
+                    *reinterpret_cast<s16*>(src + 0x12) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x12));
+                    *reinterpret_cast<s16*>(src + 0x14) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x14));
+                    *reinterpret_cast<s16*>(src + 0x16) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x16));
+                    *reinterpret_cast<s16*>(src + 0x18) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x18));
+                    *reinterpret_cast<s16*>(src + 0x1A) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1A));
+                    *reinterpret_cast<s16*>(src + 0x1C) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1C));
+                    *reinterpret_cast<s16*>(src + 0x1E) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1E));
+                    *reinterpret_cast<s16*>(src + 0x20) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x20));
+                    *reinterpret_cast<s16*>(src + 0x22) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x22));
+                    *reinterpret_cast<s16*>(src + 0x24) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x24));
+                    *reinterpret_cast<s16*>(src + 0x26) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x26));
 
                     u8* dst = listData + 0x10;
                     dst += static_cast<size_t>(j) * 0x2C;
@@ -202,16 +178,16 @@ void CFunnyShapePcs::SetUSBData()
                     u8* src = listData + 0x10;
                     src += j * 0x24;
                     u32* p32 = reinterpret_cast<u32*>(src);
-                    StoreSwap32(&p32[0]);
-                    StoreSwap32(&p32[1]);
-                    *reinterpret_cast<s16*>(src + 0x10) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x10));
-                    *reinterpret_cast<s16*>(src + 0x12) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x12));
-                    *reinterpret_cast<s16*>(src + 0x14) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x14));
-                    *reinterpret_cast<s16*>(src + 0x16) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x16));
-                    *reinterpret_cast<s16*>(src + 0x18) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x18));
-                    *reinterpret_cast<s16*>(src + 0x1A) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1A));
-                    *reinterpret_cast<s16*>(src + 0x1C) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1C));
-                    *reinterpret_cast<s16*>(src + 0x1E) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1E));
+                    p32[0] = Util.ConvertEndian4(p32[0]);
+                    p32[1] = Util.ConvertEndian4(p32[1]);
+                    *reinterpret_cast<s16*>(src + 0x10) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x10));
+                    *reinterpret_cast<s16*>(src + 0x12) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x12));
+                    *reinterpret_cast<s16*>(src + 0x14) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x14));
+                    *reinterpret_cast<s16*>(src + 0x16) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x16));
+                    *reinterpret_cast<s16*>(src + 0x18) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x18));
+                    *reinterpret_cast<s16*>(src + 0x1A) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1A));
+                    *reinterpret_cast<s16*>(src + 0x1C) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1C));
+                    *reinterpret_cast<s16*>(src + 0x1E) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1E));
 
                     u8* dst = listData + 0x10;
                     dst += static_cast<size_t>(j) * 0x24;
@@ -228,9 +204,9 @@ void CFunnyShapePcs::SetUSBData()
         OSFS_SHAPE_ST shape;
         memcpy(&shape, usb->m_data, sizeof(shape));
 
-        shape.flags = LoadSwap16(shape.flags);
-        shape.count = LoadSwap16(shape.count);
-        shape.unk08 = LoadSwap16(shape.unk08);
+        shape.flags = Util.ConvertEndian2(shape.flags);
+        shape.count = Util.ConvertEndian2(shape.count);
+        shape.unk08 = Util.ConvertEndian2(shape.unk08);
         m_funnyShape.m_shape = shape;
         break;
     }
@@ -244,28 +220,28 @@ void CFunnyShapePcs::SetUSBData()
             u8[usb->m_sizeBytes];
         memcpy(meshData, usb->m_data, usb->m_sizeBytes);
         OSFS_SHAPE_ST* mesh = reinterpret_cast<OSFS_SHAPE_ST*>(meshData);
-        mesh->flags = LoadSwap16(mesh->flags);
-        mesh->count = LoadSwap16(mesh->count);
+        mesh->flags = Util.ConvertEndian2(mesh->flags);
+        mesh->count = Util.ConvertEndian2(mesh->count);
 
         for (int i = 0; i < m_funnyShape.m_shape.count; i++) {
             if ((m_funnyShape.m_shape.flags & 8) != 0) {
                 u8* src = meshData + 0x10;
                 src += i * 0x2C;
                 u32* p32 = reinterpret_cast<u32*>(src);
-                StoreSwap32(&p32[0]);
-                StoreSwap32(&p32[1]);
-                *reinterpret_cast<s16*>(src + 0x10) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x10));
-                *reinterpret_cast<s16*>(src + 0x12) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x12));
-                *reinterpret_cast<s16*>(src + 0x14) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x14));
-                *reinterpret_cast<s16*>(src + 0x16) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x16));
-                *reinterpret_cast<s16*>(src + 0x18) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x18));
-                *reinterpret_cast<s16*>(src + 0x1A) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1A));
-                *reinterpret_cast<s16*>(src + 0x1C) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1C));
-                *reinterpret_cast<s16*>(src + 0x1E) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1E));
-                *reinterpret_cast<s16*>(src + 0x20) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x20));
-                *reinterpret_cast<s16*>(src + 0x22) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x22));
-                *reinterpret_cast<s16*>(src + 0x24) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x24));
-                *reinterpret_cast<s16*>(src + 0x26) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x26));
+                p32[0] = Util.ConvertEndian4(p32[0]);
+                p32[1] = Util.ConvertEndian4(p32[1]);
+                *reinterpret_cast<s16*>(src + 0x10) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x10));
+                *reinterpret_cast<s16*>(src + 0x12) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x12));
+                *reinterpret_cast<s16*>(src + 0x14) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x14));
+                *reinterpret_cast<s16*>(src + 0x16) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x16));
+                *reinterpret_cast<s16*>(src + 0x18) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x18));
+                *reinterpret_cast<s16*>(src + 0x1A) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1A));
+                *reinterpret_cast<s16*>(src + 0x1C) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1C));
+                *reinterpret_cast<s16*>(src + 0x1E) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1E));
+                *reinterpret_cast<s16*>(src + 0x20) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x20));
+                *reinterpret_cast<s16*>(src + 0x22) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x22));
+                *reinterpret_cast<s16*>(src + 0x24) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x24));
+                *reinterpret_cast<s16*>(src + 0x26) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x26));
 
                 u8* dst = meshData + 0x10;
                 dst += static_cast<size_t>(i) * 0x2C;
@@ -275,16 +251,16 @@ void CFunnyShapePcs::SetUSBData()
                 u8* src = meshData + 0x10;
                 src += i * 0x24;
                 u32* p32 = reinterpret_cast<u32*>(src);
-                StoreSwap32(&p32[0]);
-                StoreSwap32(&p32[1]);
-                *reinterpret_cast<s16*>(src + 0x10) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x10));
-                *reinterpret_cast<s16*>(src + 0x12) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x12));
-                *reinterpret_cast<s16*>(src + 0x14) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x14));
-                *reinterpret_cast<s16*>(src + 0x16) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x16));
-                *reinterpret_cast<s16*>(src + 0x18) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x18));
-                *reinterpret_cast<s16*>(src + 0x1A) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1A));
-                *reinterpret_cast<s16*>(src + 0x1C) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1C));
-                *reinterpret_cast<s16*>(src + 0x1E) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1E));
+                p32[0] = Util.ConvertEndian4(p32[0]);
+                p32[1] = Util.ConvertEndian4(p32[1]);
+                *reinterpret_cast<s16*>(src + 0x10) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x10));
+                *reinterpret_cast<s16*>(src + 0x12) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x12));
+                *reinterpret_cast<s16*>(src + 0x14) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x14));
+                *reinterpret_cast<s16*>(src + 0x16) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x16));
+                *reinterpret_cast<s16*>(src + 0x18) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x18));
+                *reinterpret_cast<s16*>(src + 0x1A) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1A));
+                *reinterpret_cast<s16*>(src + 0x1C) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1C));
+                *reinterpret_cast<s16*>(src + 0x1E) = Util.ConvertEndian2(*reinterpret_cast<s16*>(src + 0x1E));
 
                 u8* dst = meshData + 0x10;
                 dst += static_cast<size_t>(i) * 0x24;

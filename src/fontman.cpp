@@ -48,12 +48,6 @@ STATIC_ASSERT(sizeof(CFontGlyphEntry) == 8);
 STATIC_ASSERT(sizeof(CFontGlyphEntry::Metrics) == 2);
 STATIC_ASSERT(offsetof(CFontGlyphEntry, m_metrics) == 3);
 
-namespace {
-static inline float FloorF(float value)
-{
-	return static_cast<float>(floor(value));
-}
-}
 
 /*
  * --INFO--
@@ -654,8 +648,8 @@ void CFont::Draw(unsigned short ch)
 	float x0 = posX;
 	float y0 = posY;
 	if (renderFlagBits.snapPosition != 0) {
-		x0 = FloorF(x0);
-		y0 = FloorF(y0);
+		x0 = std::floor(x0);
+		y0 = std::floor(y0);
 	}
 
 	float u1 = u0 + static_cast<float>(drawWidth * 2);
@@ -665,7 +659,7 @@ void CFont::Draw(unsigned short ch)
 	float advance = scaleX * (static_cast<float>(drawWidth) + margin);
 
 	if (renderFlagBits.snapPosition != 0) {
-		advance = FloorF(advance);
+		advance = std::floor(advance);
 	}
 	posX += advance;
 
@@ -746,7 +740,7 @@ found_fallback:
 
 	float width = scaleX * (margin + static_cast<float>(drawWidth));
 	if (renderFlagBits.snapPosition != 0) {
-		width = static_cast<float>(floor(width));
+		width = std::floor(width);
 	}
 
 	return width;

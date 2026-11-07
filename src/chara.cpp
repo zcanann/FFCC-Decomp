@@ -145,11 +145,6 @@ static inline u8* CharaDrawBufferBase(int bufferIndex)
 	return Chara.GetDrawBufferBase(bufferIndex);
 }
 
-static inline u32 CharaFourCC(char a, char b, char c, char d)
-{
-	return (static_cast<u32>(a) << 24) | (static_cast<u32>(b) << 16) | (static_cast<u32>(c) << 8) | static_cast<u32>(d);
-}
-
 static inline char* NodeRefAltName(CChara::CNode* node)
 {
 	return node->m_refData->m_names[1];
@@ -168,11 +163,6 @@ static inline u8 NodeUsesParentLenX(CChara::CNode* node)
 static inline u8& NodeRuntimeFlags(CChara::CNode* node)
 {
 	return node->m_flags;
-}
-
-static inline void* AnimBank(CChara::CAnim* anim)
-{
-	return anim->m_bank;
 }
 
 struct CDynParam
@@ -540,7 +530,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 	CChunkFile::CChunk chunk;
 
 	while (chunkFile.GetNextChunk(chunk)) {
-		if (chunk.m_id != CharaFourCC('C', 'H', 'M', ' ')) {
+		if (chunk.m_id != 'CHM ') {
 			continue;
 		}
 		if (chunk.m_version < 5) {
@@ -648,7 +638,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 	CChunkFile chunkFile(dynData);
 	CChunkFile::CChunk chunk;
 	while (chunkFile.GetNextChunk(chunk)) {
-		if (chunk.m_id != CharaFourCC('C', 'H', 'D', ' ')) {
+		if (chunk.m_id != 'CHD ') {
 			continue;
 		}
 
@@ -665,7 +655,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
-			if (chunk.m_id == CharaFourCC('D', 'G', 'R', 'P')) {
+			if (chunk.m_id == 'DGRP') {
 				if (chunk.m_arg0 == 0) {
 					continue;
 				}
@@ -676,10 +666,10 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id == CharaFourCC('D', 'Y', 'N', ' ')) {
+					if (chunk.m_id == 'DYN ') {
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
-							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M')) {
+							if (chunk.m_id == 'PARM') {
 								float v0 = chunkFile.GetF4();
 								*(float*)(reinterpret_cast<u8*>(m_data->m_dynParams) + m_data->m_dynCount * 0x24) = v0;
 								float v1 = chunkFile.GetF4();
@@ -705,17 +695,17 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 					m_data->m_dynCount++;
 				}
 				chunkFile.PopChunk();
-			} else if (chunk.m_id == CharaFourCC('N', 'S', 'E', 'T')) {
+			} else if (chunk.m_id == 'NSET') {
 				chunkFile.PushChunk();
 				u32 currentNode = 0;
 				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id == CharaFourCC('N', 'A', 'M', 'E')) {
+					if (chunk.m_id == 'NAME') {
 						char* name = chunkFile.GetString();
 						currentNode = SearchNode(name);
-					} else if (chunk.m_id == CharaFourCC('D', 'Y', 'N', ' ')) {
+					} else if (chunk.m_id == 'DYN ') {
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
-							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M')) {
+							if (chunk.m_id == 'PARM') {
 								s8 paramIndex = static_cast<s8>(chunkFile.Get4());
 								m_nodes[currentNode].m_refData->m_dynParamIndex = paramIndex;
 							}
@@ -1648,13 +1638,13 @@ inline int CChara::CModel::CalcInterpFrame()
 {
 	CAnim* currentAnim = m_anim;
 	int resolvedBlend;
-	if (currentAnim != 0 && (((u8*)currentAnim)[0x9]) != 0 && AnimBank(currentAnim) != 0) {
+	if (currentAnim != 0 && (((u8*)currentAnim)[0x9]) != 0 && currentAnim->m_bank != 0) {
 		u8 interpCount = ((u8*)currentAnim)[0x9];
 		resolvedBlend = 4;
 
 		int frame = static_cast<int>(m_curFrame);
 		int i;
-		u16* interpTable = (u16*)(currentAnim->m_interpOffset + reinterpret_cast<u32>(AnimBank(currentAnim)));
+		u16* interpTable = (u16*)(currentAnim->m_interpOffset + reinterpret_cast<u32>(currentAnim->m_bank));
 
 		for (i = 0; i < static_cast<int>(interpCount); i++) {
 			int start = (i == 0) ? 0 : interpTable[i * 2];

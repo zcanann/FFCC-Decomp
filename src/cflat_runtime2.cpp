@@ -24,6 +24,7 @@
 #include "ffcc/quadobj.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/textureman.h"
+#include "ffcc/util.h"
 #include <math.h>
 #include <string.h>
 #include "ffcc/fontman.h"
@@ -101,22 +102,6 @@ static inline u8* MiniGamePcsRaw()
 static inline CFlatRuntime2::CDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 {
 	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries;
-}
-
-static inline u32 Swap32(u32 value)
-{
-	return __lwbrx(&value, 0);
-}
-
-static inline u32 SwapF32(float value)
-{
-	return __lwbrx(&value, 0);
-}
-
-static inline float SwapToF32(float value)
-{
-	u32 swapped = __lwbrx(&value, 0);
-	return *reinterpret_cast<float*>(&swapped);
 }
 
 } // namespace
@@ -940,14 +925,14 @@ void CFlatRuntime2::Calc()
 		u32* saveData = new (getStage(), "cflat_runtime2.cpp", 0x36F) u32[0x3FF];
 
 		u32 header[8];
-		reinterpret_cast<float*>(header)[0] = SwapToF32(CameraPcs.m_positionX);
-		reinterpret_cast<float*>(header)[1] = SwapToF32(CameraPcs.m_positionY);
-		reinterpret_cast<float*>(header)[2] = SwapToF32(CameraPcs.m_positionZ);
-		reinterpret_cast<float*>(header)[3] = SwapToF32(CameraPcs.m_targetX);
-		reinterpret_cast<float*>(header)[4] = SwapToF32(CameraPcs.m_targetY);
-		reinterpret_cast<float*>(header)[5] = SwapToF32(CameraPcs.m_targetZ);
-		reinterpret_cast<float*>(header)[6] = SwapToF32(CameraPcs.m_fov);
-		reinterpret_cast<float*>(header)[7] = SwapToF32((180.0f * CameraPcs.m_zRotate) / 3.1415927f);
+		reinterpret_cast<float*>(header)[0] = Util.ConvertEndianF4(CameraPcs.m_positionX);
+		reinterpret_cast<float*>(header)[1] = Util.ConvertEndianF4(CameraPcs.m_positionY);
+		reinterpret_cast<float*>(header)[2] = Util.ConvertEndianF4(CameraPcs.m_positionZ);
+		reinterpret_cast<float*>(header)[3] = Util.ConvertEndianF4(CameraPcs.m_targetX);
+		reinterpret_cast<float*>(header)[4] = Util.ConvertEndianF4(CameraPcs.m_targetY);
+		reinterpret_cast<float*>(header)[5] = Util.ConvertEndianF4(CameraPcs.m_targetZ);
+		reinterpret_cast<float*>(header)[6] = Util.ConvertEndianF4(CameraPcs.m_fov);
+		reinterpret_cast<float*>(header)[7] = Util.ConvertEndianF4((180.0f * CameraPcs.m_zRotate) / 3.1415927f);
 
 		u32* objectData = saveData + 8;
 
@@ -967,19 +952,19 @@ void CFlatRuntime2::Calc()
 				continue;
 			}
 
-			record[0] = Swap32(static_cast<u32>(static_cast<int>(object->m_particleId)));
+			record[0] = Util.ConvertEndian4(object->m_particleId);
 
 			Vec pos = object->m_worldPosition;
 			if (object->m_weaponNodeFlagBits.m_attached != 0) {
 				PSVECAdd(&pos, &object->m_attachOwner->m_worldPosition, &pos);
 			}
 
-			reinterpret_cast<float*>(record)[1] = SwapToF32(pos.x);
-			reinterpret_cast<float*>(record)[2] = SwapToF32(pos.y);
-			reinterpret_cast<float*>(record)[3] = SwapToF32(pos.z);
-			reinterpret_cast<float*>(record)[4] = SwapToF32(object->m_rotBaseY);
-			reinterpret_cast<float*>(record)[5] = SwapToF32(object->unk_0x188);
-			reinterpret_cast<float*>(record)[6] = SwapToF32(object->m_bodyEllipsoidRadius);
+			reinterpret_cast<float*>(record)[1] = Util.ConvertEndianF4(pos.x);
+			reinterpret_cast<float*>(record)[2] = Util.ConvertEndianF4(pos.y);
+			reinterpret_cast<float*>(record)[3] = Util.ConvertEndianF4(pos.z);
+			reinterpret_cast<float*>(record)[4] = Util.ConvertEndianF4(object->m_rotBaseY);
+			reinterpret_cast<float*>(record)[5] = Util.ConvertEndianF4(object->unk_0x188);
+			reinterpret_cast<float*>(record)[6] = Util.ConvertEndianF4(object->m_bodyEllipsoidRadius);
 			objectData[0] = record[0];
 			objectData[1] = record[1];
 			objectData[2] = record[2];
@@ -990,7 +975,7 @@ void CFlatRuntime2::Calc()
 			objectData += 7;
 		}
 
-		record[0] = Swap32(0xFFFFFFFF);
+		record[0] = Util.ConvertEndian4(0xFFFFFFFF);
 		objectData[0] = record[0];
 		objectData[1] = record[1];
 		objectData[2] = record[2];

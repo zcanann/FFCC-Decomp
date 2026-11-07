@@ -52,11 +52,6 @@ static inline void AddSharedRef(T* ptr)
     }
 }
 
-static inline float& ViewerModelTime(CChara::CModel* model)
-{
-    return model->m_time;
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -420,7 +415,7 @@ void CCharaPcs::calcViewer()
             self->m_viewerModel[0]->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
         } else {
             self->m_viewerSavedAnimState = 0;
-            float frame = ViewerModelTime(self->m_viewerModel[0]);
+            float frame = self->m_viewerModel[0]->GetNowFrame();
             float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
             self->m_viewerSavedFrame = static_cast<float>(fmod(static_cast<double>(frame), static_cast<double>(animFrames)));
             self->m_viewerModel[0]->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
@@ -477,9 +472,9 @@ void CCharaPcs::calcViewer()
 
         if (self->m_viewerAnim[i] != 0) {
             if ((i == 0) && (self->m_viewerAnimLoadedCount != 0)) {
-                self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
+                self->m_viewerModel[i]->SetFrame(self->m_viewerModel[i]->GetNowFrame() + frameAdvance);
                 float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
-                if (animFrames <= ViewerModelTime(self->m_viewerModel[0])) {
+                if (animFrames <= self->m_viewerModel[0]->GetNowFrame()) {
                     self->m_viewerAnimLoopIndex =
                         (self->m_viewerAnimLoopIndex + 1) % self->m_viewerAnimLoadedCount;
                     self->m_viewerModel[0]->AttachAnim(self->m_viewerAnimBank[self->m_viewerAnimLoopIndex], -1, -1, 0);
@@ -490,20 +485,20 @@ void CCharaPcs::calcViewer()
             } else if ((i == 0) && (self->m_viewerIFrameEnabled != 0)) {
                 if (self->m_viewerSavedAnimState == 0) {
                     float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
-                    if (self->m_viewerSavedFrame + animFrames <= ViewerModelTime(self->m_viewerModel[i])) {
+                    if (self->m_viewerSavedFrame + animFrames <= self->m_viewerModel[i]->GetNowFrame()) {
                         self->m_viewerSavedAnimState = 1;
                         self->m_viewerModel[i]->AttachAnim(self->m_viewerSavedAnim, -1, -1, -1);
                     }
                 } else {
                     float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
-                    if (animFrames <= ViewerModelTime(self->m_viewerModel[i])) {
+                    if (animFrames <= self->m_viewerModel[i]->GetNowFrame()) {
                         self->m_viewerSavedAnimState = 0;
                         self->m_viewerModel[i]->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
                     }
                 }
-                self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
+                self->m_viewerModel[i]->SetFrame(self->m_viewerModel[i]->GetNowFrame() + frameAdvance);
             } else {
-                self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
+                self->m_viewerModel[i]->SetFrame(self->m_viewerModel[i]->GetNowFrame() + frameAdvance);
             }
         }
 
@@ -545,7 +540,7 @@ void CCharaPcs::calcViewer()
             CChara::CAnim* modelAnim = self->m_viewerModel[i]->m_anim;
             if (modelAnim != 0) {
                 float animFrames = static_cast<float>(modelAnim->m_frameCount);
-                float frame = (float)fmod((double)ViewerModelTime(self->m_viewerModel[i]), (double)(frameAdvance + animFrames));
+                float frame = (float)fmod((double)self->m_viewerModel[i]->GetNowFrame(), (double)(frameAdvance + animFrames));
                 Graphic.Printf("FRAME = %.2f SPEED=%.2f", frame, frameAdvance);
             }
             if (self->m_viewerSavedAnim != 0) {

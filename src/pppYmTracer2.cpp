@@ -41,12 +41,6 @@ static inline void copyPolygonData(YmTracer2Polygon* dst, YmTracer2Polygon* src)
     dst->alpha = src->alpha;
 }
 
-static inline float* GetTracerWorkValue(int dataValueIndex, int offset)
-{
-    _pppPObject* object = reinterpret_cast<_pppPObject*>(ppvMng->m_pppPDataVals[dataValueIndex].m_pppPObjLink);
-    return reinterpret_cast<float*>(object->m_workArea + offset);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801035dc
@@ -209,11 +203,11 @@ void pppFrameYmTracer2(pppYmTracer2* tracer, pppYmTracer2Step* step, _pppCtrlTab
 
     work->initWork = (step->m_initWork == 0xffffffff)
                          ? gPppDefaultValueBuffer
-                         : GetTracerWorkValue(step->m_initWork, step->m_stepValue);
+                         : (float*)(((_pppPObject*)ppvMng->m_pppPDataVals[step->m_initWork].m_pppPObjLink)->m_workArea + step->m_stepValue);
 
     work->arg3Work = (step->m_arg3 == 0xffffffff)
                          ? gPppDefaultValueBuffer
-                         : GetTracerWorkValue(step->m_arg3, step->m_tracer.m_arg3WorkOffset);
+                         : (float*)(((_pppPObject*)ppvMng->m_pppPDataVals[step->m_arg3].m_pppPObjLink)->m_workArea + step->m_tracer.m_arg3WorkOffset);
 
     if (work->entries == nullptr) {
         useFallback = 1;

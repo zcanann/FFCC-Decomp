@@ -57,13 +57,6 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
     dst->alpha = src->alpha;
 }
 
-static inline float* GetYmTracerDataValueWork(int dataValueIndex, int offset)
-{
-    return reinterpret_cast<float*>(
-        reinterpret_cast<_pppPObject*>(ppvMng->m_pppPDataVals[dataValueIndex].m_pppPObjLink)->m_workArea +
-        offset);
-}
-
 
 /*
  * --INFO--
@@ -208,12 +201,12 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
         work->initWork =
             (step->m_initWOrk == -1)
                 ? reinterpret_cast<float*>(gPppDefaultValueBuffer)
-                : GetYmTracerDataValueWork(step->m_initWOrk, step->m_stepValue);
+                : (float*)(((_pppPObject*)ppvMng->m_pppPDataVals[step->m_initWOrk].m_pppPObjLink)->m_workArea + step->m_stepValue);
 
         work->arg3Work =
             (step->m_arg3 == -1)
                 ? reinterpret_cast<float*>(gPppDefaultValueBuffer)
-                : GetYmTracerDataValueWork(step->m_arg3, step->m_tracer.m_arg3WorkOffset);
+                : (float*)(((_pppPObject*)ppvMng->m_pppPDataVals[step->m_arg3].m_pppPObjLink)->m_workArea + step->m_tracer.m_arg3WorkOffset);
     }
 
     if (work->count + 1 < step->m_tracer.m_entryCount) {

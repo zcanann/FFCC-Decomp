@@ -256,7 +256,7 @@ draw_loop:
         {
             u32 shapeIdx = (u32)(life + rng) / shapeFrameDuration;
             shapeIdx %= (u32)shapeFrameCount;
-            shapeEntry = pppShapeFrame(shapeAnim, shapeIdx);
+            shapeEntry = (tagOAN3_SHAPE*)((u8*)shapeAnim + shapeAnim->m_frames[shapeIdx].m_shapeOffset);
         }
     }
 

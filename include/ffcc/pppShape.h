@@ -51,25 +51,6 @@ typedef char tagOAN3_SHAPE_ENTRY_displayList_check[(offsetof(tagOAN3_SHAPE_ENTRY
 typedef char tagOAN3_SHAPE_count_check[(offsetof(tagOAN3_SHAPE, m_shapeCount) == 2) ? 1 : -1];
 typedef char tagOAN3_SHAPE_entries_check[(offsetof(tagOAN3_SHAPE, m_entries) == 8) ? 1 : -1];
 
-static inline pppShapeAnimData* pppShapeAnim(long* animData)
-{
-    return reinterpret_cast<pppShapeAnimData*>(animData);
-}
-
-static inline tagOAN3_SHAPE* pppShapeFrame(pppShapeAnimData* animData, int frameIndex)
-{
-    short shapeOffset = animData->m_frames[frameIndex].m_shapeOffset;
-    return reinterpret_cast<tagOAN3_SHAPE*>(
-        reinterpret_cast<unsigned char*>(animData) + shapeOffset);
-}
-
-static inline tagOAN3_SHAPE* pppShapeFrame(long* animData, short frameIndex)
-{
-    pppShapeAnimFrame* frame = &pppShapeAnim(animData)->m_frames[frameIndex];
-    return reinterpret_cast<tagOAN3_SHAPE*>(
-        reinterpret_cast<unsigned char*>(animData) + frame->m_shapeOffset);
-}
-
 void pppDrawShp(long*, short, CMaterialSet*, unsigned char);
 void pppDrawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);
 void pppSetShapeMaterial(pppShapeSt*, CMaterialSet*, char **);

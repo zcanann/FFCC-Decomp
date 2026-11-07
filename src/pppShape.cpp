@@ -19,7 +19,7 @@
 void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, short& frameTime,
                        short deltaTime)
 {
-    pppShapeAnimData* shapeAnim = pppShapeAnim(animData);
+    pppShapeAnimData* shapeAnim = (pppShapeAnimData*)animData;
     pppShapeAnimFrame* frameData = &shapeAnim->m_frames[currentFrame];
 
     drawFrame = currentFrame;
@@ -47,7 +47,7 @@ void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, sh
  */
 void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv, int shapeIndex)
 {
-    tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
+    tagOAN3_SHAPE* shape = (tagOAN3_SHAPE*)((u8*)animData + ((pppShapeAnimData*)animData)->m_frames[frameIndex].m_shapeOffset);
     unsigned char* displayList = shape->m_entries[shapeIndex].m_displayList;
 
     minUv.x = (float)*(short*)(displayList + 0x13) / 1024.0f;
@@ -67,7 +67,7 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
  */
 void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, int shapeIndex)
 {
-    tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
+    tagOAN3_SHAPE* shape = (tagOAN3_SHAPE*)((u8*)animData + ((pppShapeAnimData*)animData)->m_frames[frameIndex].m_shapeOffset);
     unsigned char* minSrc = shape->m_entries[shapeIndex].m_displayList + 3;
 
     memcpy(&minPos, minSrc, 0xc);
@@ -211,7 +211,7 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
  */
 void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, unsigned char blendMode)
 {
-    pppShapeAnimFrame* frame = &pppShapeAnim(animData)->m_frames[frameIndex];
+    pppShapeAnimFrame* frame = &((pppShapeAnimData*)animData)->m_frames[frameIndex];
     short shapeOffset = frame->m_shapeOffset;
     tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<unsigned char*>(animData) + shapeOffset);
 
@@ -229,7 +229,7 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
  */
 CTexture* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
 {
-    tagOAN3_SHAPE_ENTRY* shapeEntry = pppShapeFrame(animData, 0)->m_entries;
+    tagOAN3_SHAPE_ENTRY* shapeEntry = ((tagOAN3_SHAPE*)((u8*)animData + ((pppShapeAnimData*)animData)->m_frames[0].m_shapeOffset))->m_entries;
 
     textureIndex = shapeEntry->m_textureIndex;
     CMaterial* material = materialSet->GetMaterial(shapeEntry->m_textureIndex);

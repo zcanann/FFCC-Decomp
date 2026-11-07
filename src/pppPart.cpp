@@ -756,7 +756,7 @@ done_insert:
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void pppCacheUnLoadModel(short* modelList, _pppDataHead* head)
+inline void pppCacheUnLoadModel(_pppDataHead* head, short* modelList)
 {
 	short i = 0;
 	short modelCount = *modelList;
@@ -850,7 +850,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				long* pdt = chunk->m_pdt;
 				short* modelIndices = (short*)((u8*)pdt + pdt[4]);
 				short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
-				pppCacheUnLoadModel(modelIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
+				pppCacheUnLoadModel(((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead, modelIndices);
 				pppCacheUnLoadShape(shapeIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
 			}
 		}
@@ -1286,7 +1286,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
+inline void pppCacheLoadModel(_pppDataHead* head, short* modelList)
 {
 	short i;
 	short modelCount = *modelList++;
@@ -1367,7 +1367,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (Game.m_currentSceneId != 7)
 	{
-		pppCacheLoadModel(modelIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
+		pppCacheLoadModel(((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead, modelIndices);
 		pppCacheLoadShape(shapeIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
 
 		pppMngSt->m_mapTexLoaded = 1;

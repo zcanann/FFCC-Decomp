@@ -6,14 +6,6 @@
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
-STATIC_ASSERT(offsetof(pppPointRApOffsets, m_srcOffset) == 0x0);
-STATIC_ASSERT(offsetof(pppPointRApOffsets, m_stateOffset) == 0x4);
-
-static inline pppPointRApOffsets* GetPointRApOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<pppPointRApOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80060d20
@@ -25,8 +17,8 @@ static inline pppPointRApOffsets* GetPointRApOffsets(_pppCtrlTable* ctrlTable)
  */
 void pppPointRAp(_pppPObject* pObject, pppPointRApStep* step, _pppCtrlTable* ctrlTable)
 {
-    pppPointRApOffsets* ctrlData = GetPointRApOffsets(ctrlTable);
-    u8* state = pObject->m_workArea + ctrlData->m_stateOffset;
+    int* ctrlData = ctrlTable->m_serializedDataOffsets;
+    u8* state = pObject->m_workArea + ctrlData[1];
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -34,7 +26,7 @@ void pppPointRAp(_pppPObject* pObject, pppPointRApStep* step, _pppCtrlTable* ctr
 
     if (state[1] == 0) {
         u32 createId = step->m_createProgramIndex;
-        Vec* srcPos = (Vec*)(pObject->m_workArea + ctrlData->m_srcOffset);
+        Vec* srcPos = (Vec*)(pObject->m_workArea + ctrlData[0]);
 
         if ((createId + 0x10000) == 0xFFFF) {
             return;
@@ -90,7 +82,7 @@ void pppPointRAp(_pppPObject* pObject, pppPointRApStep* step, _pppCtrlTable* ctr
  */
 void pppPointRApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-    pppPointRApOffsets* ctrlData = GetPointRApOffsets(ctrlTable);
-    u8* state = pObject->m_workArea + ctrlData->m_stateOffset;
+    int* ctrlData = ctrlTable->m_serializedDataOffsets;
+    u8* state = pObject->m_workArea + ctrlData[1];
     state[1] = 0;
 }

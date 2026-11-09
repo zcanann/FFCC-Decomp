@@ -81,6 +81,8 @@ inline float atan2f(float y, float x) { return (float)atan2(y, x); }
 inline float sinf(float x) { return sin(x); }
 inline float cosf(float x) { return cos(x); }
 inline float tanf(float x) { return tan(x); }
+inline float floorf(float x) { return floor(x); }
+inline float floor(float x) { return floorf(x); }
 
 extern inline float sqrtf(float x)
 {

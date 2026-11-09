@@ -12,16 +12,7 @@ typedef CChara::CMesh::CDisplayList EraseCharaPartsDisplayList;
 typedef CChara::CMesh::CRefData EraseCharaPartsMeshData;
 typedef CChara::CMesh EraseCharaPartsMesh;
 
-STATIC_ASSERT(sizeof(EraseCharaPartsDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(EraseCharaPartsDataOffsets, m_sourceColorOffset) == 0x0);
-STATIC_ASSERT(offsetof(EraseCharaPartsDataOffsets, m_callbackColorOffset) == 0x4);
-
 static void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-
-static inline EraseCharaPartsDataOffsets* GetEraseCharaPartsDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<EraseCharaPartsDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline u8* GetEraseCharaPartsWork(pppEraseCharaParts* eraseCharaParts, s32 offset)
 {
@@ -42,15 +33,15 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* eraseCharaParts, pppEraseCharaP
 {
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
-    EraseCharaPartsDataOffsets* offsets;
+    int* offsets;
     int sourceColorOffset;
     u8* callbackColor;
     u8* sourceColor;
 
     if (ppvUserStopPartF == 0) {
-        offsets = GetEraseCharaPartsDataOffsets(ctrl);
-        sourceColorOffset = offsets->m_sourceColorOffset;
-        callbackColor = GetEraseCharaPartsWork(eraseCharaParts, offsets->m_callbackColorOffset);
+        offsets = ctrl->m_serializedDataOffsets;
+        sourceColorOffset = offsets[0];
+        callbackColor = GetEraseCharaPartsWork(eraseCharaParts, offsets[1]);
         sourceColor = GetEraseCharaPartsWork(eraseCharaParts, sourceColorOffset);
         handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
         model = GetCharaModelPtr(handle);
@@ -97,14 +88,14 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, _pppCtrlTable*)
  */
 void pppConstructEraseCharaParts(pppEraseCharaParts* eraseCharaParts, _pppCtrlTable* ctrl)
 {
-    EraseCharaPartsDataOffsets* offsets;
+    int* offsets;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     u8* callbackColor;
     CGObject* owner;
 
-    offsets = GetEraseCharaPartsDataOffsets(ctrl);
-    callbackColor = GetEraseCharaPartsWork(eraseCharaParts, offsets->m_callbackColorOffset);
+    offsets = ctrl->m_serializedDataOffsets;
+    callbackColor = GetEraseCharaPartsWork(eraseCharaParts, offsets[1]);
     owner = ppvMng->m_owner;
     callbackColor[0] = 0x80;
     callbackColor[1] = 0x80;

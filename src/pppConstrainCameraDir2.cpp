@@ -10,14 +10,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(ConstrainCameraDir2DataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(ConstrainCameraDir2DataOffsets, m_valueOffset) == 0x0);
-
-static inline ConstrainCameraDir2DataOffsets* GetConstrainCameraDir2DataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<ConstrainCameraDir2DataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8016ca80
@@ -33,7 +25,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* constrainCameraDir, pppC
     if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
         float* value =
-            (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDir2DataOffsets(ctrl)->m_valueOffset);
+            (float*)(constrainCameraDir->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
         CalcGraphValue(constrainCameraDir, step->m_graphId, value[0], value[1], value[2], step->m_dataValIndex,
                        step->m_initWOrk, step->m_stepValue);
@@ -41,16 +33,16 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* constrainCameraDir, pppC
         if ((ppvIsLoopCalc != 1) && ((step->m_applyCameraInverse != 0 || step->m_applyPosition != 0))) {
             Vec resultPos;
             Vec cameraDir;
-            cameraDir.x = CameraPcs.m_directionX;
-            cameraDir.y = CameraPcs.m_directionY;
-            cameraDir.z = CameraPcs.m_directionZ;
+            cameraDir.x = CameraPcs.m_direction.x;
+            cameraDir.y = CameraPcs.m_direction.y;
+            cameraDir.z = CameraPcs.m_direction.z;
 
             Mtx cameraMtx;
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
-            float cameraPosX = CameraPcs.m_positionX;
-            float cameraPosY = CameraPcs.m_positionY;
-            float cameraPosZ = CameraPcs.m_positionZ;
+            float cameraPosX = CameraPcs.m_position.x;
+            float cameraPosY = CameraPcs.m_position.y;
+            float cameraPosZ = CameraPcs.m_position.z;
             float localX;
             float localY;
             float scale = ((CameraPcs.m_fov - 25.0f) / 25.0f) + 1.0f;

@@ -8,11 +8,6 @@ void* memset(void*, int, unsigned int);
 
 static const char s_ME_AppRequest_cpp[] = "ME_AppRequest.cpp";
 
-static inline CMemory::CStage* MaterialEditorStage()
-{
-    return MaterialEditorPcs.m_stage;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8004dce8
@@ -98,14 +93,14 @@ int CMaterialEditorPcs::SetRsdFlag()
 int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
 {
     RSDLISTITEM* listItem =
-        new (MaterialEditorStage(), const_cast<char*>(s_ME_AppRequest_cpp), 0x61) RSDLISTITEM;
+        new (MaterialEditorPcs.m_stage, const_cast<char*>(s_ME_AppRequest_cpp), 0x61) RSDLISTITEM;
     if (listItem == 0) {
         return 0;
     }
 
     memset(listItem, 0, 0x10);
     RSDITEM* rsdItem =
-        new (MaterialEditorStage(), const_cast<char*>(s_ME_AppRequest_cpp), 0x67) RSDITEM;
+        new (MaterialEditorPcs.m_stage, const_cast<char*>(s_ME_AppRequest_cpp), 0x67) RSDITEM;
     if (rsdItem == 0) {
         if (listItem != 0) {
             delete listItem;

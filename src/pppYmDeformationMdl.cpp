@@ -18,25 +18,16 @@ STATIC_ASSERT(offsetof(_pppPObject, m_workArea) == 0x80);
 
 typedef VYmDeformationMdl YmDeformationMdlState;
 
-STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_colorInfoOffset) == 0x4);
-STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_stateOffset) == 0x8);
-STATIC_ASSERT(sizeof(YmDeformationMdlDataOffsets) == 0xC);
-
-static inline YmDeformationMdlDataOffsets* DeformationMdlDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<YmDeformationMdlDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline YmDeformationMdlState* DeformationMdlState(pppYmDeformationMdl* object, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<YmDeformationMdlState*>(
-        object->m_workArea + DeformationMdlDataOffsets(ctrl)->m_stateOffset);
+        object->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline VColor* DeformationMdlColorInfo(pppYmDeformationMdl* object, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<VColor*>(
-        object->m_workArea + DeformationMdlDataOffsets(ctrl)->m_colorInfoOffset);
+        object->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
 static inline _pppEnvSt* DeformationMdlEnv()

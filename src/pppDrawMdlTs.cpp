@@ -21,24 +21,10 @@ STATIC_ASSERT(offsetof(PDrawMdlTs, m_texCoordAdd) == 0x14);
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_lightTarget) == 0x2C);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 
-STATIC_ASSERT(sizeof(DrawMdlTsDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(DrawMdlTsDataOffsets, m_colorWorkOffset) == 0x0);
-STATIC_ASSERT(offsetof(DrawMdlTsDataOffsets, m_texCoordOffset) == 0x8);
-
-static inline DrawMdlTsDataOffsets* PppDrawMdlTsDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<DrawMdlTsDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline f32* PppDrawMdlTsTexCoords(_pppPObject* obj, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<f32*>(obj->m_workArea + PppDrawMdlTsDataOffsets(ctrl)->m_texCoordOffset);
-}
-
 static inline pppCVECTOR* PppDrawMdlTsColor(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     VColor* colorWork =
-        reinterpret_cast<VColor*>(obj->m_workArea + PppDrawMdlTsDataOffsets(ctrl)->m_colorWorkOffset);
+        reinterpret_cast<VColor*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
     return &colorWork->m_color;
 }
@@ -66,7 +52,7 @@ inline void pppDrawDrawMdlTs0(_pppPObject* obj, PDrawMdlTs* data, _pppCtrlTable*
         data->m_colorUpdate,
         data->m_zWrite);
 
-    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
+    f32* texCoords = (f32*)(obj->m_workArea + ctrl->m_serializedDataOffsets[2]);
     MaterialMan.SetTexScroll(
         texCoords[0], texCoords[3], 0.0f, 0.0f);
 
@@ -103,7 +89,7 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
  */
 void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
 {
-    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
+    f32* texCoords = (f32*)(obj->m_workArea + ctrl->m_serializedDataOffsets[2]);
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -137,7 +123,7 @@ void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppC
  */
 void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
+    f32* texCoords = (f32*)(obj->m_workArea + ctrl->m_serializedDataOffsets[2]);
 
     texCoords[2] = texCoords[5] = 0.0f;
 }
@@ -153,7 +139,7 @@ void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
  */
 void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
+    f32* texCoords = (f32*)(obj->m_workArea + ctrl->m_serializedDataOffsets[2]);
 
     texCoords[0] = texCoords[1] = texCoords[2] = texCoords[3] = texCoords[4] = texCoords[5] = 0.0f;
 }

@@ -4,12 +4,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppColum.h"
 
-struct LensFlareDataOffsets {
-	s32 _unused0;
-	s32 m_colorWorkOffset;
-	s32 m_workOffset;
-};
-
 struct LensFlareWork {
 	u8 _pad00[0x10];
 	f32 m_projectedX;

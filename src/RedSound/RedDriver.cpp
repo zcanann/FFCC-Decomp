@@ -1,4 +1,3 @@
-#define FFCC_REDSOUND_REDDRIVER_CPP
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedEntry.h"
@@ -130,8 +129,8 @@ struct RedDriverSmallDataPrefixState {
     RedExecCommand* volatile p_ExecCommandOld;
     RedDmaRequest* volatile p_DmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
     RedDmaRequest* volatile p_DmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
-    RedSoundCONTROL* volatile p_SoundControlBuffer;
-    RedSoundCONTROL* volatile p_SoundControl;
+    RedSoundCONTROL* p_SoundControlBuffer;
+    RedSoundCONTROL* p_SoundControl;
     volatile int m_KeyOnEntry;
     RedKeyOnDATA* volatile p_KeyOnData;
     int m_SoundPlayMode;
@@ -903,8 +902,8 @@ static RedDmaRequest* volatile p_DmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
 #define RedDmaQueueOldGet(queue) (p_DmaControlOld[(queue)])
 #define RedDmaQueueOldSet(queue, request) (p_DmaControlOld[(queue)] = (request))
 #define RedDmaQueueOldRef(queue) (&p_DmaControlOld[(queue)])
-RedSoundCONTROL* volatile p_SoundControlBuffer;
-RedSoundCONTROL* volatile p_SoundControl;
+RedSoundCONTROL* p_SoundControlBuffer;
+RedSoundCONTROL* p_SoundControl;
 volatile int m_KeyOnEntry;
 RedKeyOnDATA* volatile p_KeyOnData;
 int m_SoundPlayMode;

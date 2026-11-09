@@ -20,28 +20,20 @@ STATIC_ASSERT(offsetof(LocationTitleParticle, m_color) == 0x0C);
 STATIC_ASSERT(offsetof(LocationTitleParticle, m_frame) == 0x10);
 STATIC_ASSERT(offsetof(LocationTitleParticle, m_shapeB) == 0x18);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
-STATIC_ASSERT(sizeof(LocationTitleDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(LocationTitleDataOffsets, m_workOffset) == 0x00);
-STATIC_ASSERT(offsetof(LocationTitleDataOffsets, m_colorOffset) == 0x04);
 
 static const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
-
-static inline LocationTitleDataOffsets* GetLocationTitleDataOffsets(pppLocationTitleOffsets* offsets)
-{
-    return reinterpret_cast<LocationTitleDataOffsets*>(offsets->m_serializedDataOffsets);
-}
 
 static inline LocationTitleWork* GetLocationTitleWork(pppLocationTitle* locationTitle, pppLocationTitleOffsets* offsets)
 {
     return reinterpret_cast<LocationTitleWork*>(
-        locationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_workOffset);
+        locationTitle->m_workArea + offsets->m_serializedDataOffsets[0]);
 }
 
 static inline VColor* GetLocationTitleColorBlock(
     pppLocationTitle* locationTitle, pppLocationTitleOffsets* offsets)
 {
     return reinterpret_cast<VColor*>(
-        locationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_colorOffset);
+        locationTitle->m_workArea + offsets->m_serializedDataOffsets[1]);
 }
 
 /*
@@ -173,9 +165,9 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
     }
 
     work = reinterpret_cast<LocationTitleWork*>(
-        pppLocationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_workOffset);
+        pppLocationTitle->m_workArea + offsets->m_serializedDataOffsets[0]);
     colorData = reinterpret_cast<VColor*>(
-        pppLocationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_colorOffset);
+        pppLocationTitle->m_workArea + offsets->m_serializedDataOffsets[1]);
     rand();
 
     if (step->m_dataValIndex == 0xFFFF) {

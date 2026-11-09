@@ -6,10 +6,6 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
-struct CallBackDistanceDataOffsets {
-    s32 m_distanceOffset;
-};
-
 struct pppCallBackDistanceStep {
     u32 m_unk0;
     f32 m_dataValIndex;

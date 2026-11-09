@@ -6,10 +6,6 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
-struct PppPointDataOffsets {
-    s32 m_pointOffset;
-};
-
 struct pppPointStep
 {
     s32 m_graphId;

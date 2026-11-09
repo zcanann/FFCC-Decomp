@@ -538,16 +538,6 @@ void CGraphic::_WaitDrawDone(char* file, int line)
     m_drawDoneCounter += 1;
 }
 
-static inline const char* GetOrderName(CSystem::COrder* order)
-{
-    return order ? order->m_debugName : "---";
-}
-
-static inline int GetOrderIndex(CSystem::COrder* order)
-{
-    return order ? order->m_insertIndex : -1;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800193c8
@@ -587,8 +577,8 @@ void CGraphic::Thread()
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
                 char drawSyncByte = drawSyncPart & 0xFF;
-                int orderIndex = GetOrderIndex(order);
-                const char* orderName = GetOrderName(order);
+                int orderIndex = order ? order->m_insertIndex : -1;
+                const char* orderName = order ? order->m_debugName : "---";
                 System.Printf("DrawDone(file = %s line = %d process = %s(%d) data = %d)が終了しません。\n", m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);
             }

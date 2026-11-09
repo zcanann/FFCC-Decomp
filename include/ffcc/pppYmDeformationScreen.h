@@ -17,12 +17,6 @@ struct VYmDeformationScreen {
     f32 m_values[5];
 };
 
-struct YmDeformationScreenDataOffsets {
-    s32 _unused0;
-    s32 _unused1;
-    s32 m_workOffset;
-};
-
 struct YmDeformationScreenStep {
     s32 m_graphId;
     s32 m_dataValIndex;

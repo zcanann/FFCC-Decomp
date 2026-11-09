@@ -8,10 +8,6 @@ struct _pppCtrlTable;
 class PVertexApAt;
 class PVertexApLc;
 
-struct VertexApAtDataOffsets {
-    s32 m_stateOffset;
-};
-
 void apea(_pppPObject*, PVertexApAt*, unsigned short);
 
 #ifdef __cplusplus

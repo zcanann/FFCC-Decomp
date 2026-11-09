@@ -393,7 +393,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	int hasFurMaterial = 0;
 	for (int i = 0; i < materialCount; i++) {
 		CMaterial* material = m_data->m_materialSet->m_materials[i];
-		if (material->IsFurEnabled()) {
+		if (material->m_singleTextureFlag != 0) {
 			hasFurMaterial = 1;
 			break;
 		}
@@ -527,14 +527,14 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		int displayCount = mesh->m_data->m_displayListCount - 1;
 		for (; displayCount >= 0; displayCount--, displayList++) {
 			CMaterial* material = m_data->m_materialSet->m_materials[displayList->m_material];
-			if (!material->IsFurEnabled()) {
+			if (material->m_singleTextureFlag == 0) {
 				continue;
 			}
 
 			TextureMan.SetTexture(GX_TEXMAP0, material->GetTexture(0));
 			int hasExtraTexture;
 			int extraTextureFormat;
-			if (material->GetTextureIndex(1) != -1) {
+			if (material->m_textureIndices[1] != -1) {
 				CTexture* extraTexture = material->GetTexture(1);
 				hasExtraTexture = 1;
 				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);
@@ -784,8 +784,8 @@ int CChara::CModel::PickFur(
 		return -1;
 	}
 
-	const float cursorX = Chara.MogFur().m_cursorX;
-	const float cursorY = Chara.MogFur().m_cursorY;
+	const float cursorX = Chara.m_sharedState.m_mogFur.m_cursorX;
+	const float cursorY = Chara.m_sharedState.m_mogFur.m_cursorY;
 	float hitU = 0.0f;
 	float hitV = 0.0f;
 	float nearestDepth = 10000000.0f;
@@ -826,7 +826,7 @@ int CChara::CModel::PickFur(
 		for (; displayCount >= 0; displayCount--, displayList++) {
 			CMaterial* material = m_data->m_materialSet->m_materials[displayList->m_material];
 			int paintableMaterial = 0;
-			CTexture* pickTexture = material->GetFurPickTexture();
+			CTexture* pickTexture = material->GetTexture(1);
 			if (pickTexture != 0 && pickTexture->m_format == GX_TF_RGB5A3) {
 				paintableMaterial = 1;
 			}
@@ -967,7 +967,7 @@ int CChara::CModel::PickFur(
 											outWorldPos->y = hitViewPos.y;
 											outWorldPos->z = hitViewPos.z;
 										}
-										if (!material->IsFurEnabled()) {
+										if (material->m_singleTextureFlag == 0) {
 											continue;
 										}
 										hitPaintable = paintableMaterial;
@@ -1057,7 +1057,7 @@ void CChara::CModel::InitMogFurTex()
  */
 void CChara::LoadFurTexBuffer(unsigned short* inTexels)
 {
-	memcpy(Chara.MogFur().m_texels, inTexels, 0x2000);
+	memcpy(Chara.m_sharedState.m_mogFur.m_texels, inTexels, 0x2000);
 	CalcMogScore();
 }
 
@@ -1072,7 +1072,7 @@ void CChara::LoadFurTexBuffer(unsigned short* inTexels)
  */
 void CChara::SaveFurTexBuffer(unsigned short* outTexels)
 {
-	memcpy(outTexels, Chara.MogFur().m_texels, 0x2000);
+	memcpy(outTexels, Chara.m_sharedState.m_mogFur.m_texels, 0x2000);
 }
 
 /*
@@ -1086,15 +1086,15 @@ void CChara::SaveFurTexBuffer(unsigned short* outTexels)
  */
 void CChara::InitFurTexBuffer()
 {
-	MogFurState& fur = MogFur();
+	MogFurState& fur = m_sharedState.m_mogFur;
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			Chara.MogFur().m_texels[y * 0x40 + x] = 0x7FFF;
+			Chara.m_sharedState.m_mogFur.m_texels[y * 0x40 + x] = 0x7FFF;
 		}
 	}
 
 	fur.m_dirty = 0;
-	Chara.MogFur().m_timestamp = System.GetCounter();
+	Chara.m_sharedState.m_mogFur.m_timestamp = System.GetCounter();
 	memset(fur.m_score, 0, 0x40);
 	CalcMogScore();
 }
@@ -1123,10 +1123,10 @@ inline void CChara::CModel::CopyFurTex(int loadFromTexture)
 	height = texture->m_height;
 	void* image = texture->m_imageData;
 	if (loadFromTexture != 0) {
-		memcpy(Chara.MogFur().m_texels, image, 0x2000);
+		memcpy(Chara.m_sharedState.m_mogFur.m_texels, image, 0x2000);
 	} else {
 		DCInvalidateRange(image, width * height * 2);
-		memcpy(image, Chara.MogFur().m_texels, 0x2000);
+		memcpy(image, Chara.m_sharedState.m_mogFur.m_texels, 0x2000);
 	}
 	DCFlushRange(image, width * height * 2);
 	GXInvalidateTexAll();
@@ -1146,9 +1146,9 @@ void CChara::ChangeMogMode(int mogMode)
 {
 	if (mogMode != 0) {
 		memset(&m_mogWork, 0, sizeof(m_mogWork));
-		MogFur().m_cursorX = 0x140;
-		MogFur().m_cursorY = 0xE0;
-		MogFur().m_dirty = 0;
+		m_sharedState.m_mogFur.m_cursorX = 0x140;
+		m_sharedState.m_mogFur.m_cursorY = 0xE0;
+		m_sharedState.m_mogFur.m_dirty = 0;
 		return;
 	}
 
@@ -1189,7 +1189,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	if (m_mogWork.m_frameCount == 0) {
 		messageId = 0;
 		for (int i = 0; i < 3; i++) {
-			m_mogWork.m_prevScore[i] = Chara.MogFur().m_score[i];
+			m_mogWork.m_prevScore[i] = Chara.m_sharedState.m_mogFur.m_score[i];
 		}
 	}
 
@@ -1228,10 +1228,10 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX += 10.0f * Pad.GetLeftStickX(0);
-	Chara.MogFur().m_cursorY -= 10.0f * Pad.GetLeftStickY(0);
+	Chara.m_sharedState.m_mogFur.m_cursorX += 10.0f * Pad.GetLeftStickX(0);
+	Chara.m_sharedState.m_mogFur.m_cursorY -= 10.0f * Pad.GetLeftStickY(0);
 
-	const int cursorXv = Chara.MogFur().m_cursorX;
+	const int cursorXv = Chara.m_sharedState.m_mogFur.m_cursorX;
 	int cursorXc;
 	if (cursorXv < 0) {
 		cursorXc = 0;
@@ -1241,8 +1241,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			cursorXc = cursorXv;
 		}
 	}
-	Chara.MogFur().m_cursorX = cursorXc;
-	const int cursorYv = Chara.MogFur().m_cursorY;
+	Chara.m_sharedState.m_mogFur.m_cursorX = cursorXc;
+	const int cursorYv = Chara.m_sharedState.m_mogFur.m_cursorY;
 	int cursorYc;
 	if (cursorYv < 0) {
 		cursorYc = 0;
@@ -1252,14 +1252,14 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			cursorYc = cursorYv;
 		}
 	}
-	Chara.MogFur().m_cursorY = cursorYc;
+	Chara.m_sharedState.m_mogFur.m_cursorY = cursorYc;
 
 	Mtx cameraMtx;
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
 	if ((heldButtons & 0x100) != 0) {
-		if (Chara.MogFur().m_trackedCommandIndex != Chara.MogFur().m_commandIndex) {
-			Chara.MogFur().m_trackedCommandIndex = Chara.MogFur().m_commandIndex;
+		if (Chara.m_sharedState.m_mogFur.m_trackedCommandIndex != Chara.m_sharedState.m_mogFur.m_commandIndex) {
+			Chara.m_sharedState.m_mogFur.m_trackedCommandIndex = Chara.m_sharedState.m_mogFur.m_commandIndex;
 			m_mogWork.m_pickTicks = 0;
 			Sound.StopSe(m_mogWork.m_loopSeHandle);
 			m_mogWork.m_loopSeHandle = 0;
@@ -1267,7 +1267,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		int eraseMode = 0;
 		int doPaint = 1;
 		_GXColor brushColor;
-		switch (Chara.MogFur().m_commandIndex) {
+		switch (Chara.m_sharedState.m_mogFur.m_commandIndex) {
 		case 0: {
 			brushColor = CColor(0xF, 4, 4, 2);
 			break;
@@ -1308,11 +1308,11 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			m_mogWork.m_pickTicks++;
 
 			for (int i = 0; i < 3; i++) {
-				if (m_mogWork.m_prevScore[i] + 5 <= Chara.MogFur().m_score[i]) {
-					m_mogWork.m_prevScore[i] = Chara.MogFur().m_score[i];
+				if (m_mogWork.m_prevScore[i] + 5 <= Chara.m_sharedState.m_mogFur.m_score[i]) {
+					m_mogWork.m_prevScore[i] = Chara.m_sharedState.m_mogFur.m_score[i];
 					messageId = 1;
-				} else if (m_mogWork.m_prevScore[i] - 5 > Chara.MogFur().m_score[i]) {
-					m_mogWork.m_prevScore[i] = Chara.MogFur().m_score[i];
+				} else if (m_mogWork.m_prevScore[i] - 5 > Chara.m_sharedState.m_mogFur.m_score[i]) {
+					m_mogWork.m_prevScore[i] = Chara.m_sharedState.m_mogFur.m_score[i];
 					messageId = 6;
 				}
 			}
@@ -1339,7 +1339,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				int seId = 0;
 				CColor particleColorObj(centerBefore);
 				_GXColor& particleColor = particleColorObj.color;
-				switch (Chara.MogFur().m_commandIndex) {
+				switch (Chara.m_sharedState.m_mogFur.m_commandIndex) {
 				case 0:
 					m_mogWork.m_offColorTicks = 0;
 					particleNo = 0x73;
@@ -1417,7 +1417,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					m_mogWork.m_eraseTicks++;
 				}
 
-				switch (Chara.MogFur().m_commandIndex) {
+				switch (Chara.m_sharedState.m_mogFur.m_commandIndex) {
 				case 0:
 				case 1:
 				case 2:
@@ -1429,7 +1429,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			}
 		}
 	} else {
-		switch (Chara.MogFur().m_commandIndex) {
+		switch (Chara.m_sharedState.m_mogFur.m_commandIndex) {
 		case 0:
 		case 1:
 		case 2:
@@ -1609,8 +1609,8 @@ void CChara::TimeMogFur()
 	int y, x;
 	const int frameCounter = static_cast<int>(System.GetCounter());
 
-	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
-		MogFur().m_timestamp = frameCounter;
+	if (m_sharedState.m_mogFur.m_timestamp + 0x1A5E0 < frameCounter) {
+		m_sharedState.m_mogFur.m_timestamp = frameCounter;
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf("|\n");
 		}
@@ -1622,8 +1622,8 @@ void CChara::TimeMogFur()
 		}
 	}
 
-	unsigned short* const texels = MogFur().m_texels;
-	memset(MogFur().m_score, 0, 0x40);
+	unsigned short* const texels = m_sharedState.m_mogFur.m_texels;
+	memset(m_sharedState.m_mogFur.m_score, 0, 0x40);
 
 	for (y = 0; y < 0x40; y++) {
 		for (x = 0; x < 0x40; x++) {

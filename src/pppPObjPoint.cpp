@@ -14,20 +14,6 @@ struct pppPObjPointWork {
     Vec* m_source;     // 0x10
 };
 
-STATIC_ASSERT(sizeof(PObjPointDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(PObjPointDataOffsets, m_workOffset) == 0x0);
-
-static inline PObjPointDataOffsets* GetPObjPointDataOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<PObjPointDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
-static inline pppPObjPointWork* GetPObjPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<pppPObjPointWork*>(
-        pObject->m_workArea + GetPObjPointDataOffsets(ctrlTable)->m_workOffset);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80060AEC
@@ -43,7 +29,8 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
         return;
     }
 
-    pppPObjPointWork* objPtr = GetPObjPointWork(pObject, ctrlTable);
+    pppPObjPointWork* objPtr = (pppPObjPointWork*)(
+        pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     if (step->m_graphId == pObject->m_graphId) {
         Vec* source = (step->m_createProgramIndex == -1)

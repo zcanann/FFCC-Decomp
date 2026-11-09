@@ -86,6 +86,9 @@ public:
     float CalcSafePos(int, CGObject*, Vec*);
     int Cross(int, Vec*, float*, Vec*, Vec*, float, int);
     void PutDropItem();
+    float GetModelAlpha();
+    int IsDisp();
+    int IsFirstDraw();
     virtual unsigned int IsDispRader();
     /*
      * --INFO--
@@ -138,7 +141,7 @@ public:
     };
     char m_ownerType;                 // 0x51
     unsigned char m_classWorkIndex;   // 0x52
-    unsigned char m_ownerSlot;        // 0x53
+    signed char m_ownerSlot;          // 0x53
     signed char m_moveMode;           // 0x54
     signed char m_moveModePrevious;   // 0x55
     unsigned char m_field_0x56;       // 0x56

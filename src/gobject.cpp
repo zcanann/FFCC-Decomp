@@ -1838,7 +1838,7 @@ void CGObject::onDraw()
         return;
     }
 
-    Mtx& posMtx = CameraPcs.CurrentCameraState().m_cameraMatrix;
+    Mtx& posMtx = CameraPcs.m_cameraMatrix;
 
     if (((CFlat.m_debugFlags & 0x1) != 0) && ((m_bgColMask & 0x1) != 0)) {
         Graphic.DrawSphere(posMtx,

@@ -8,10 +8,6 @@ struct _pppPObject;
 struct _pppCtrlTable;
 struct pppNoStep;
 
-struct KeLnsDataOffsets {
-	s32 m_workOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

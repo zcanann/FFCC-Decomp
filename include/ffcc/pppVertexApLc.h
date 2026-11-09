@@ -8,10 +8,6 @@ struct _pppCtrlTable;
 class PVertexApLc;
 struct Vec;
 
-struct VertexApLcDataOffsets {
-    s32 m_stateOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

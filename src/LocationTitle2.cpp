@@ -25,22 +25,8 @@ STATIC_ASSERT(offsetof(LocationTitle2Particle, m_scaleX) == 0x10);
 STATIC_ASSERT(offsetof(LocationTitle2Particle, m_frame) == 0x1C);
 STATIC_ASSERT(offsetof(LocationTitle2Particle, m_shape) == 0x22);
 STATIC_ASSERT(offsetof(LocationTitle2ColorBlock, m_color) == 0x08);
-STATIC_ASSERT(sizeof(LocationTitle2DataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_workOffset) == 0x00);
-STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_colorOffset) == 0x04);
 
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
-
-static inline LocationTitle2DataOffsets* GetLocationTitle2DataOffsets(pppLocationTitle2Offsets* offsets)
-{
-    return reinterpret_cast<LocationTitle2DataOffsets*>(offsets->m_serializedDataOffsets);
-}
-
-static inline LocationTitle2Work* GetLocationTitle2Work(pppLocationTitle2* locationTitle, pppLocationTitle2Offsets* offsets)
-{
-    return reinterpret_cast<LocationTitle2Work*>(
-        locationTitle->m_workArea + GetLocationTitle2DataOffsets(offsets)->m_workOffset);
-}
 
 /*
  * --INFO--
@@ -75,13 +61,14 @@ static inline void copyPolygonData(LocationTitle2Particle* dst, LocationTitle2Pa
  */
 extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
+    LocationTitle2Work* work;
     int graphId;
     pppShapeSt* shape;
     LocationTitle2Particle* particle;
     int graphFrame;
-    LocationTitle2Work* work;
 
-    work = GetLocationTitle2Work(locationTitle, unkC);
+    work = reinterpret_cast<LocationTitle2Work*>(
+        locationTitle->m_workArea + unkC->m_serializedDataOffsets[0]);
 
     if (unkB->m_dataValIndex == 0xFFFF) {
         return;
@@ -220,9 +207,9 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
     }
 
     work = reinterpret_cast<LocationTitle2Work*>(
-        locationTitle->m_workArea + GetLocationTitle2DataOffsets(unkC)->m_workOffset);
+        locationTitle->m_workArea + unkC->m_serializedDataOffsets[0]);
     colorData = reinterpret_cast<LocationTitle2ColorBlock*>(
-        locationTitle->m_workArea + GetLocationTitle2DataOffsets(unkC)->m_colorOffset);
+        locationTitle->m_workArea + unkC->m_serializedDataOffsets[1]);
     rand();
 
     if (unkB->m_dataValIndex == 0xFFFF) {
@@ -348,7 +335,8 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
  */
 extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Offsets* unkC)
 {
-    LocationTitle2Work* work = GetLocationTitle2Work(locationTitle, unkC);
+    LocationTitle2Work* work = reinterpret_cast<LocationTitle2Work*>(
+        locationTitle->m_workArea + unkC->m_serializedDataOffsets[0]);
 
     if (work->m_particles != 0) {
         pppMemFree(work->m_particles);
@@ -371,7 +359,8 @@ extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, ppp
     f32 value;
 
     value = 0.0f;
-    work = GetLocationTitle2Work(locationTitle, unkC);
+    work = reinterpret_cast<LocationTitle2Work*>(
+        locationTitle->m_workArea + unkC->m_serializedDataOffsets[0]);
     work->m_particles = 0;
     work->m_count = 0;
     work->m_cur = work->m_vel = work->m_acc = value;

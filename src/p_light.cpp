@@ -332,12 +332,12 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
 
-        eyePos.x = CameraPcs.m_positionX;
-        eyePos.y = CameraPcs.m_positionY;
-        eyePos.z = CameraPcs.m_positionZ;
-        eyeDir.x = CameraPcs.m_directionX;
-        eyeDir.y = CameraPcs.m_directionY;
-        eyeDir.z = CameraPcs.m_directionZ;
+        eyePos.x = CameraPcs.m_position.x;
+        eyePos.y = CameraPcs.m_position.y;
+        eyePos.z = CameraPcs.m_position.z;
+        eyeDir.x = CameraPcs.m_direction.x;
+        eyeDir.y = CameraPcs.m_direction.y;
+        eyeDir.z = CameraPcs.m_direction.z;
 
         PSMTXMultVec(cam, &eyePos, &transformedPos);
         GXInitLightPos(&m_mapLightObj, transformedPos.x, transformedPos.y, transformedPos.z);
@@ -477,9 +477,9 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     float dirZ;
 
     if (mode != 0) {
-        dirX = CameraPcs.m_directionX;
-        dirY = CameraPcs.m_directionY;
-        dirZ = CameraPcs.m_directionZ;
+        dirX = CameraPcs.m_direction.x;
+        dirY = CameraPcs.m_direction.y;
+        dirZ = CameraPcs.m_direction.z;
     } else {
         dirX = dir->x;
         dirY = dir->y;
@@ -723,9 +723,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
         C_MTXLookAt(lookAt, &eye, &up, &m_direction);
 
         Vec camPos;
-        camPos.x = CameraPcs.m_positionX;
-        camPos.y = CameraPcs.m_positionY;
-        camPos.z = CameraPcs.m_positionZ;
+        camPos.x = CameraPcs.m_position.x;
+        camPos.y = CameraPcs.m_position.y;
+        camPos.z = CameraPcs.m_position.z;
 
         Vec lightPos;
         PSVECSubtract(&m_targetPosition, &camPos, &lightPos);
@@ -956,9 +956,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             Mtx tmp;
             PSMTXCopy(mat, tmp);
             Vec camPos;
-            camPos.x = CameraPcs.m_positionX;
-            camPos.y = CameraPcs.m_positionY;
-            camPos.z = CameraPcs.m_positionZ;
+            camPos.x = CameraPcs.m_position.x;
+            camPos.y = CameraPcs.m_position.y;
+            camPos.z = CameraPcs.m_position.z;
             Vec objPos;
             objPos.x = tmp[0][3];
             objPos.y = tmp[1][3];
@@ -1011,8 +1011,8 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXScale(texMtx, 0.4f, 0.4f, 0.4f);
             PSMTXConcat(m_bumpTexMtx0, texMtx, m_bumpTexMtx0);
 
-            float camX = CameraPcs.m_positionX;
-            float camZ = CameraPcs.m_positionZ;
+            float camX = CameraPcs.m_position.x;
+            float camZ = CameraPcs.m_position.z;
             PSMTXIdentity(m_bumpTexMtx2);
 
             float half = 0.5f;

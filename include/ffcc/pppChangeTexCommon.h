@@ -14,12 +14,6 @@ struct ChangeTexDisplayListCopy {
 typedef CChara::CMesh::CRefData ChangeTexMeshData;
 typedef CChara::CMesh ChangeTexMeshRef;
 
-struct ChangeTexDataOffsets {
-    s32 _unused0;
-    s32 m_colorBlockOffset;
-    s32 m_workOffset;
-};
-
 struct ChangeTexStep {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -35,13 +29,5 @@ struct ChangeTexStep {
     };
     u8 _pad1[1];
 };
-
-static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
-{
-	model->SetCallbackContext(0, 0);
-	model->SetBeforeMeshLockEnvCallback(0);
-	model->SetDrawMeshDLCallback(0);
-	model->SetAfterDrawMeshCallback(0);
-}
 
 #endif // _FFCC_PPPCHANGETEXCOMMON_H_

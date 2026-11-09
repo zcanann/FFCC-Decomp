@@ -5,19 +5,6 @@
 #include "ffcc/pppPart.h"
 #include <dolphin/mtx.h>
 
-STATIC_ASSERT(sizeof(YmLookOnDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(YmLookOnDataOffsets, m_workOffset) == 0x0);
-
-static inline YmLookOnDataOffsets* GetYmLookOnDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<YmLookOnDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline CGObject** GetYmLookOnWork(pppYmLookOn* lookOn, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<CGObject**>(lookOn->m_workArea + GetYmLookOnDataOffsets(ctrl)->m_workOffset);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800d88c8
@@ -45,7 +32,7 @@ void pppFrameYmLookOn(pppYmLookOn* lookOn, struct pppYmLookOnStep* step, struct 
 
     pppMngSt = ppvMng;
     owner = pppMngSt->m_lookTarget;
-    work = GetYmLookOnWork(lookOn, ctrl);
+    work = (CGObject**)(lookOn->m_workArea + ctrl->m_serializedDataOffsets[0]);
     if (owner == nullptr) {
         if (*work == nullptr) {
             return;
@@ -106,5 +93,5 @@ void pppFrameYmLookOn(pppYmLookOn* lookOn, struct pppYmLookOnStep* step, struct 
  */
 void pppConstructYmLookOn(pppYmLookOn* lookOn, struct _pppCtrlTable* ctrl)
 {
-    *GetYmLookOnWork(lookOn, ctrl) = 0;
+    *(CGObject**)(lookOn->m_workArea + ctrl->m_serializedDataOffsets[0]) = 0;
 }

@@ -45,7 +45,7 @@ void CMapAnimRun::Calc(long frame)
     }
 
 runFrame:
-    CPtrArray<CMapAnim*>* mapAnimArray = &g_MapMng.GetMapAnimArray();
+    CPtrArray<CMapAnim*>* mapAnimArray = &g_MapMng.m_mapAnimArray;
     CMapAnim* mapAnim = (*mapAnimArray)[m_mapAnimIndex];
     mapAnim->Calc(m_currentFrame);
     if (++m_currentFrame > m_endFrame) {
@@ -143,7 +143,7 @@ inline CMapAnimKeyDt::CMapAnimKeyDt()
 inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAnim)
 {
     CChunkFile::CChunk chunk;
-    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &g_MapMng.GetMapAnimKeyDtArray();
+    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &g_MapMng.m_mapAnimKeyDtArray;
     int hasChunk;
 
     m_mapAnim = mapAnim;
@@ -151,7 +151,7 @@ inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAn
     while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(chunk))) != 0) {
         if (chunk.m_id == 0x4E494458) {
             int nodeIdx = static_cast<int>(chunkFile.Get4());
-            m_node = g_MapMng.GetMapObj(nodeIdx);
+            m_node = &g_MapMng.m_mapObjArray[nodeIdx];
         } else if (chunk.m_id == 0x5452414E) {
             CMapAnimKeyDt* keyData =
                 new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;

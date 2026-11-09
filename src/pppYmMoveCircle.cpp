@@ -18,36 +18,6 @@ struct pppYmMoveCircleWork {
     Vec m_center;
     u8 m_hasInit;
 };
-
-STATIC_ASSERT(sizeof(pppYmMoveCircleDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(pppYmMoveCircleDataOffsets, m_workOffset) == 0x0);
-
-static inline Vec* MoveCirclePreviousPosition(_pppMngSt* mng)
-{
-    return &mng->UserPosition();
-}
-
-static inline Vec* MoveCircleBasePosition(_pppMngSt* mng)
-{
-    return &mng->BasePosition();
-}
-
-static inline Vec* MoveCircleTargetPosition(_pppMngSt* mng)
-{
-    return &mng->m_paramVec0;
-}
-
-static inline pppYmMoveCircleDataOffsets* GetMoveCircleDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<pppYmMoveCircleDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline pppYmMoveCircleWork* GetMoveCircleWork(_pppPObject* object, _pppCtrlTable* ctrl)
-{
-    pppYmMoveCircleDataOffsets* offsets = GetMoveCircleDataOffsets(ctrl);
-    return reinterpret_cast<pppYmMoveCircleWork*>(object->m_workArea + offsets->m_workOffset);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800d160c
@@ -70,7 +40,7 @@ extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* 
         return;
     }
 
-    work = GetMoveCircleWork(basePtr, offsetData);
+    work = (pppYmMoveCircleWork*)(basePtr->m_workArea + offsetData->m_serializedDataOffsets[0]);
     pppMngSt = ppvMng;
 
     work->m_radiusStep += work->m_radiusStepStep;
@@ -110,7 +80,7 @@ extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* 
     nextPos.y = pppMngSt->m_position.y;
     nextPos.z += work->m_center.z;
 
-    pppCopyVector(*MoveCirclePreviousPosition(pppMngSt), pppMngSt->m_position);
+    pppCopyVector(pppMngSt->m_userPosition, pppMngSt->m_position);
     pppCopyVector(pppMngSt->m_position, nextPos);
 
     ppvMng->m_matrix.value[0][3] = nextPos.x;
@@ -137,14 +107,14 @@ extern "C" void pppConstructYmMoveCircle(_pppPObject* basePtr, _pppCtrlTable* of
     pppYmMoveCircleWork* work;
 
     pppMngSt = ppvMng;
-    offset = GetMoveCircleDataOffsets(offsetData)->m_workOffset;
+    offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)(basePtr->m_workArea + offset);
 
     tempUp.x = 1.0f;
     tempUp.y = 0.0f;
     tempUp.z = 0.0f;
 
-    PSVECSubtract(MoveCircleTargetPosition(pppMngSt), MoveCircleBasePosition(pppMngSt), &temp1);
+    PSVECSubtract(&pppMngSt->m_paramVec0, &pppMngSt->m_basePosition, &temp1);
     PSVECNormalize(&temp1, &temp1);
 
     work->m_angle = 57.29578f * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
@@ -156,6 +126,6 @@ extern "C" void pppConstructYmMoveCircle(_pppPObject* basePtr, _pppCtrlTable* of
 
     work->m_radius = work->m_radiusStep = work->m_radiusStepStep = 0.0f;
     work->m_angleStep = work->m_angleStepStep = work->m_angleStepStepStep = 0.0f;
-    pppCopyVector(work->m_center, *MoveCircleBasePosition(pppMngSt));
+    pppCopyVector(work->m_center, pppMngSt->m_basePosition);
     work->m_hasInit = 0;
 }

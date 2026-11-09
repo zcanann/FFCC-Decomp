@@ -36,27 +36,6 @@ struct KeShpTail3XAlphaWork {
 };
 STATIC_ASSERT(offsetof(KeShpTail3XAlphaWork, m_alpha) == 6);
 
-STATIC_ASSERT(sizeof(KeShpTail3XDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(KeShpTail3XDataOffsets, m_workOffset) == 0x0);
-STATIC_ASSERT(offsetof(KeShpTail3XDataOffsets, m_alphaWorkOffset) == 0x4);
-
-static inline KeShpTail3XDataOffsets* GetKeShpTail3XDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<KeShpTail3XDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline KeShpTail3XWork* GetKeShpTail3XWork(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<KeShpTail3XWork*>(
-        obj->m_object.m_workArea + GetKeShpTail3XDataOffsets(ctrl)->m_workOffset);
-}
-
-static inline KeShpTail3XAlphaWork* GetKeShpTail3XAlphaWork(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<KeShpTail3XAlphaWork*>(
-        obj->m_object.m_workArea + GetKeShpTail3XDataOffsets(ctrl)->m_alphaWorkOffset);
-}
-
 inline void S4ToF32(pppFVECTOR4* dest, s16* src)
 {
     dest->x = src[0] >> 7;
@@ -90,12 +69,12 @@ void pppKeShpTail3XDes(_pppPObjLink*, _pppCtrlTable*)
 void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
 {
     KeShpTail3XWork* work;
-    KeShpTail3XDataOffsets* offsets;
+    int* offsets;
     int i;
     float zero;
 
-    offsets = GetKeShpTail3XDataOffsets(ctrlTable);
-    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_object.m_workArea + offsets->m_workOffset);
+    offsets = ctrlTable->m_serializedDataOffsets;
+    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_object.m_workArea + offsets[0]);
     work->m_initialized = 0;
     work->m_head = 0;
     work->m_shapeFrame = 0;
@@ -138,19 +117,15 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     u16 rng;
     s32 shapeFrameCount;
     tagOAN3_SHAPE* shapeEntry;
+    float colorStepX;
+    float posY;
     float alphaMul;
     float xDiff;
     float yDiff;
     float zDiff;
     float wDiff;
-    float shapeScale;
     pppFVECTOR4 colorStart;
     pppFVECTOR4 colorEnd;
-    float segRemain;
-    float segCursor = 0.0f;
-    float posX;
-    float posY;
-    float colorStepX;
     float colorStepY;
     float colorStepZ;
     float colorStepW;
@@ -171,8 +146,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float segDy;
     float segDz;
     float invCountMinusOne;
-    float drawScale;
     float posZ;
+    float posX;
+    float drawScale;
     int life;
     s32 shapeFrameDuration;
     float nextBaseY;
@@ -182,10 +158,14 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float startX;
     float startY;
     float startZ;
+    float segRemain;
+    float segCursor = 0.0f;
+    float shapeScale;
     u8 zEnable;
     s32 dataValIndex;
 
-    work = GetKeShpTail3XWork(obj, ctrlTable);
+    work = (KeShpTail3XWork*)(
+        obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[0]);
     dataValIndex = step->m_dataValIndex;
     if (dataValIndex == 0xffff) {
         return;
@@ -194,7 +174,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     count = step->m_drawCount;
 
     invCountMinusOne = (float)(count - 1);
-    alphaMul = (float)GetKeShpTail3XAlphaWork(obj, ctrlTable)->m_alpha /
+    alphaMul = (float)((KeShpTail3XAlphaWork*)(
+        obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[1]))->m_alpha /
                16384.0f;
     S4ToF32(&colorStart, &work->m_values[0]);
     S4ToF32(&colorEnd, &work->m_values[4]);
@@ -232,11 +213,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     history = work->m_posHistory;
     currentIndex = work->m_head;
     posX = history[currentIndex].x;
-    posZ = history[currentIndex].z;
     posY = history[currentIndex].y;
-    startZ = posZ;
+    posZ = history[currentIndex].z;
     startX = posX;
     startY = posY;
+    startZ = posZ;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {
         nextIndex = 0;
@@ -275,7 +256,7 @@ draw_loop:
         {
             u32 shapeIdx = (u32)(life + rng) / shapeFrameDuration;
             shapeIdx %= (u32)shapeFrameCount;
-            shapeEntry = pppShapeFrame(shapeAnim, shapeIdx);
+            shapeEntry = (tagOAN3_SHAPE*)((u8*)shapeAnim + shapeAnim->m_frames[shapeIdx].m_shapeOffset);
         }
     }
 
@@ -332,6 +313,7 @@ draw_loop:
 
     pppSetBlendMode(step->m_blendMode);
     pppDrawShp(shapeEntry, ppvEnv->m_materialSetPtr, step->m_blendMode);
+    shapeScale = drawScale;
 
 update_step:
     count--;
@@ -406,7 +388,8 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step,
         return;
     }
 
-    work = GetKeShpTail3XWork(obj, ctrlTable);
+    work = (KeShpTail3XWork*)(
+        obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     if ((obj->m_object.m_graphId == 0) && (obj->m_object.m_field7D != 0)) {
         work->m_initialized = 1;

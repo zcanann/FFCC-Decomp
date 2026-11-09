@@ -21,8 +21,6 @@ STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_workPositions) == 0xC);
-STATIC_ASSERT(offsetof(ChangeTexDataOffsets, m_colorBlockOffset) == 0x4);
-STATIC_ASSERT(offsetof(ChangeTexDataOffsets, m_workOffset) == 0x8);
 STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_meshCount) == 0xC);
 STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_posQuant) == 0x34);
@@ -35,26 +33,8 @@ STATIC_ASSERT(offsetof(pppYmChangeTexState, m_context) == 0x24);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 STATIC_ASSERT(sizeof(GXColor) == 0x4);
 
-static inline ChangeTexDataOffsets* GetChangeTexDataOffsets(_pppCtrlTable* data)
-{
-	return reinterpret_cast<ChangeTexDataOffsets*>(data->m_serializedDataOffsets);
-}
-
-static inline pppYmChangeTexState* GetChangeTexState(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
-{
-	return reinterpret_cast<pppYmChangeTexState*>(
-	    ymChangeTex->m_workArea + GetChangeTexDataOffsets(data)->m_workOffset);
-}
-
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
-
-static inline void SetChangeTexModelCallbacks(CChara::CModel* model, pppYmChangeTexState* state, pppYmChangeTexStep* step)
-{
-	model->SetCallbackContext(state, step);
-	model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
-	model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
-}
 
 /*
  * --INFO--
@@ -118,17 +98,23 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	state->m_charaObj = ppvMng->m_owner;
 	state->m_context = ppvEnv;
-	SetChangeTexModelCallbacks(model0, state, step);
+	model0->SetCallbackContext(state, step);
+	model0->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
+	model0->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 	state->m_texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 
 	handle1 = GetCharaHandlePtr(state->m_charaObj, 1);
 	handle2 = GetCharaHandlePtr(state->m_charaObj, 2);
 	if ((handle1 != 0) && ((model = GetCharaModelPtr(handle1)), model != 0)) {
-		SetChangeTexModelCallbacks(model, state, step);
+		model->SetCallbackContext(state, step);
+		model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
+		model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 	}
 
 	if ((handle2 != 0) && ((model = GetCharaModelPtr(handle2)), model != 0)) {
-		SetChangeTexModelCallbacks(model, state, step);
+		model->SetCallbackContext(state, step);
+		model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
+		model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 	}
 
 	if (step->m_changeTex.m_mode == 0) {
@@ -264,13 +250,22 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 
 	if (handle0 != 0) {
 		model = GetCharaModelPtr(handle0);
-		ClearChangeTexModelCallbacks(model);
+		model->SetCallbackContext(0, 0);
+		model->SetBeforeMeshLockEnvCallback(0);
+		model->SetDrawMeshDLCallback(0);
+		model->SetAfterDrawMeshCallback(0);
 	}
 	if ((handle1 != 0) && ((model1 = GetCharaModelPtr(handle1)), model1 != 0)) {
-		ClearChangeTexModelCallbacks(model1);
+		model1->SetCallbackContext(0, 0);
+		model1->SetBeforeMeshLockEnvCallback(0);
+		model1->SetDrawMeshDLCallback(0);
+		model1->SetAfterDrawMeshCallback(0);
 	}
 	if ((handle2 != 0) && ((model2 = GetCharaModelPtr(handle2)), model2 != 0)) {
-		ClearChangeTexModelCallbacks(model2);
+		model2->SetCallbackContext(0, 0);
+		model2->SetBeforeMeshLockEnvCallback(0);
+		model2->SetDrawMeshDLCallback(0);
+		model2->SetAfterDrawMeshCallback(0);
 	}
 
 	displayListArrays = state->m_displayListArrays;
@@ -334,7 +329,8 @@ freeArrays:
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 {
 	float init = 0.0f;
-	pppYmChangeTexState* state = GetChangeTexState(ymChangeTex, data);
+	pppYmChangeTexState* state = (pppYmChangeTexState*)(
+	    ymChangeTex->m_workArea + data->m_serializedDataOffsets[2]);
 
 	state->m_value0 = init;
 	state->m_value1 = state->m_value2 = init;

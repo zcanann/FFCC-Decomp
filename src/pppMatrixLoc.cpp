@@ -3,14 +3,6 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
-STATIC_ASSERT(sizeof(MatrixLocDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(MatrixLocDataOffsets, m_translationOffset) == 0x0);
-
-static inline MatrixLocDataOffsets* GetMatrixLocDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<MatrixLocDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800652ac
@@ -24,8 +16,8 @@ void pppMatrixLoc(_pppPObject* target, pppNoStep* stepData, _pppCtrlTable* param
 {
     (void)stepData;
 
-    MatrixLocDataOffsets* offsetPtr = GetMatrixLocDataOffsets(param);
-    f32* posData = (f32*)(target->m_workArea + offsetPtr->m_translationOffset);
+    int* offsetPtr = param->m_serializedDataOffsets;
+    f32* posData = (f32*)(target->m_workArea + offsetPtr[0]);
 
     PSMTXIdentity(target->m_localMatrix.value);
     target->m_localMatrix.value[0][3] = posData[0];

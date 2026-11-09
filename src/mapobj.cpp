@@ -624,7 +624,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             } else {
                 animRun->m_animId = 0;
             }
-            g_MapMng.GetMapAnimRunArray().Add(animRun);
+            g_MapMng.m_mapAnimRunArray.Add(animRun);
             break;
         }
         case CHUNK_AMBI: {
@@ -692,7 +692,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             shadow->CalcBound();
 
-            g_MapMng.GetMapShadowArray().Add(shadow);
+            g_MapMng.m_mapShadowArray.Add(shadow);
             break;
         }
         case CHUNK_PRIO: {
@@ -1098,7 +1098,7 @@ void CMapObj::Calc()
                 float blend;
                 int key0;
                 int key1;
-                Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
+                Vec* outVerts = static_cast<CMapMesh*>(m_mapData)->m_vertices;
 
                 if (mime->m_keyFrame.Get(key0, key1, blend) != 0) {
                     Vec* src0 = reinterpret_cast<Vec*>(mime->m_vertexLists[key0]);

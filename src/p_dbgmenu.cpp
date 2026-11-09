@@ -176,16 +176,12 @@ void CDbgMenuPcs::calc()
 		case 0x65:
 			stackData[0].m_word = 0;
 			stackData[2].m_word = 0;
-			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)CFlat.m_gameFlags << 0x18) & 0xC0000000) >> 0x1f));
-			unsigned char gameFlags = ((int)(char)(flags >> 5) & 1U) << 7 | (CFlat.m_gameFlags & ~CFlatGameFlag_Shouki);
-			CFlat.m_gameFlags = gameFlags;
-			stackData[1].m_word = (s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f;
+			CFlat.m_gameFlagBits.m_flagBit7 = !CFlat.m_gameFlagBits.m_flagBit7;
+			stackData[1].m_word = CFlat.m_gameFlagBits.m_flagBit7;
 			CFlat.SystemCall(0, 1, 9, 3, stackData, 0);
 			break;
 		case 0x66:
-			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)(u8)CFlat.m_gameFlags << 0x1d) & 0xC0000000) >> 0x1f));
-			CFlat.m_gameFlags = (unsigned char)((((int)(char)(flags >> 5) << 2) & CFlatGameFlag_Mark) |
-			                                   (CFlat.m_gameFlags & ~CFlatGameFlag_Mark));
+			CFlat.m_gameFlagBits.m_flagBit2 = !CFlat.m_gameFlagBits.m_flagBit2;
 			break;
 		case 0x67:
 			m_dbgFlags ^= 1;
@@ -349,10 +345,10 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = CFlat.m_eventMask != 0;
 			break;
 		case 0x65:
-			menu->m_state = (s8)((s32)(((u32)(u8)CFlat.m_gameFlags << 0x18) & 0xC0000000) >> 0x1F) != 0;
+			menu->m_state = CFlat.m_gameFlagBits.m_flagBit7 != 0;
 			break;
 		case 0x66:
-			menu->m_state = (s8)((s32)(((u32)(u8)CFlat.m_gameFlags << 0x1C) & 0xC0000000) >> 0x1F) != 0;
+			menu->m_state = CFlat.m_gameFlagBits.m_flagBit3 != 0;
 			break;
 		case 0x67:
 			menu->m_state = (m_dbgFlags >> 0) & 1;

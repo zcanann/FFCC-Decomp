@@ -15,7 +15,6 @@ class CGObject;
 class CPad;
 class CColor;
 
-void dbgDrawSphere(float, float, float, float, unsigned char, unsigned char, unsigned char);
 
 class CFullScreenShadow
 {
@@ -35,12 +34,6 @@ public:
 class CCameraPcs : public CProcess
 {
 public:
-    class camdtst
-    {
-    public:
-        
-    };
-
     struct ViewerState
     {
         Vec m_position;
@@ -50,7 +43,7 @@ public:
         Vec m_scale;
     };
 
-    struct CameraState
+    struct camdtst
     {
         Mtx m_cameraMatrix;
         Mtx m_worldMapMatrix;
@@ -189,9 +182,9 @@ public:
      */
     void GetPosition(Vec* out)
     {
-        out->x = m_positionX;
-        out->y = m_positionY;
-        out->z = m_positionZ;
+        out->x = m_position.x;
+        out->y = m_position.y;
+        out->z = m_position.z;
     }
 
     /*
@@ -314,15 +307,15 @@ public:
     void SetZRotate(float zRotate) { m_zRotate = zRotate; }
     void SetPosition(Vec* position)
     {
-        m_positionX = position->x;
-        m_positionY = position->y;
-        m_positionZ = position->z;
+        m_position.x = position->x;
+        m_position.y = position->y;
+        m_position.z = position->z;
     }
     void SetRefPosition(Vec* position)
     {
-        m_targetX = position->x;
-        m_targetY = position->y;
-        m_targetZ = position->z;
+        m_target.x = position->x;
+        m_target.y = position->y;
+        m_target.z = position->z;
     }
     int IsAbsolute() { return m_isAbsolute; }
     void addWorldMap();
@@ -331,43 +324,25 @@ public:
     void SetWorldMapMatrix(float (*)[4]);
     void GetWorldMapMatrix(float (*)[4]);
     void GetWorldMapInverseMatrix(float (*)[4]);
-    CameraState& CurrentCameraState()
+    camdtst& CurrentCameraState()
     {
-        return *reinterpret_cast<CameraState*>(&m_cameraMatrix);
-    }
-    Vec& TargetVec()
-    {
-        return *reinterpret_cast<Vec*>(&m_targetX);
-    }
-    Vec& PositionVec()
-    {
-        return *reinterpret_cast<Vec*>(&m_positionX);
-    }
-    Vec& DirectionVec()
-    {
-        return *reinterpret_cast<Vec*>(&m_directionX);
+        return *reinterpret_cast<camdtst*>(&m_cameraMatrix);
     }
 
     Mtx m_cameraMatrix;
     Mtx m_worldMapMatrix; // 0x34
     Mtx m_cameraWorldMtx; // 0x64
     Mtx44 m_screenMatrix;
-    float m_targetX;
-    float m_targetY;
-    float m_targetZ;
-    float m_positionX;
-    float m_positionY;
-    float m_positionZ;
-    float m_directionX;
-    float m_directionY;
-    float m_directionZ;
+    Vec m_target;
+    Vec m_position;
+    Vec m_direction;
     float m_yaw;
     float m_fov;
     float m_nearZ;
     float m_farZ;
     float m_zRotate; // 0x108
-    CameraState m_savedCamera; // 0x10C
-    CameraState m_shadowCamera; // 0x214
+    camdtst m_savedCamera; // 0x10C
+    camdtst m_shadowCamera; // 0x214
     CFullScreenShadow m_fullScreenShadow; // 0x31C
     u8 m_fullScreenShadowEnabled; // 0x404
     u8 _pad405[0x408 - 0x405];

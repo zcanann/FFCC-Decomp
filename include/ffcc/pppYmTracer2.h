@@ -34,11 +34,6 @@ struct pppYmTracer2Step {
 
 typedef _pppPObject pppYmTracer2;
 
-struct YmTracer2DataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
 struct YmTracer2Polygon {
     Vec pos;
     f32 pad0;

@@ -31,24 +31,6 @@ STATIC_ASSERT(offsetof(pppBlurCharaWork, m_ownerObj) == 0x04);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_smallTexObj) == 0x08);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_savedLightAlpha) == 0x0C);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
-STATIC_ASSERT(sizeof(BlurCharaDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(BlurCharaDataOffsets, m_colorDataOffset) == 0x4);
-STATIC_ASSERT(offsetof(BlurCharaDataOffsets, m_texDataOffset) == 0x8);
-
-static inline BlurCharaDataOffsets* GetBlurCharaDataOffsets(const _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<BlurCharaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const _pppCtrlTable* ctrl) {
-    return (pppBlurCharaWork*)(blurChara->m_workArea + GetBlurCharaDataOffsets(ctrl)->m_texDataOffset);
-}
-
-static inline VColor* GetBlurColorData(pppBlurChara* blurChara, const _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VColor*>(
-        blurChara->m_workArea + GetBlurCharaDataOffsets(ctrl)->m_colorDataOffset);
-}
 
 static void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
@@ -64,8 +46,8 @@ static void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrlTable* ctrl)
 {
-    pppBlurCharaWork* work = GetBlurWork(blurChara, ctrl);
-    VColor* colorData = GetBlurColorData(blurChara, ctrl);
+    pppBlurCharaWork* work = (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    VColor* colorData = (VColor*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[1]);
     CTexture* texture = 0;
     CGObject* ownerObj;
     _GXTexObj smallBackTex;
@@ -108,12 +90,12 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
 
     PSMTXIdentity(identityMtx);
 
-    cameraPos.x = CameraPcs.m_positionX;
-    cameraPos.y = CameraPcs.m_positionY;
-    cameraPos.z = CameraPcs.m_positionZ;
-    cameraTarget.x = CameraPcs.m_targetX;
-    cameraTarget.y = CameraPcs.m_targetY;
-    cameraTarget.z = CameraPcs.m_targetZ;
+    cameraPos.x = CameraPcs.m_position.x;
+    cameraPos.y = CameraPcs.m_position.y;
+    cameraPos.z = CameraPcs.m_position.z;
+    cameraTarget.x = CameraPcs.m_target.x;
+    cameraTarget.y = CameraPcs.m_target.y;
+    cameraTarget.z = CameraPcs.m_target.z;
     cameraTarget.y = cameraPos.y = 0.0f;
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
     cameraDir.y = 0.0f;
@@ -230,7 +212,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrl
         return;
     }
 
-    work = GetBlurWork(blurChara, ctrl);
+    work = (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
     handle = GetCharaHandlePtr(ppvMng->m_lookTarget, 0);
     model = GetCharaModelPtr(handle);
 
@@ -262,7 +244,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrl
  */
 void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
 {
-    pppBlurCharaWork* work = GetBlurWork(blurChara, ctrl);
+    pppBlurCharaWork* work = (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(work->m_ownerObj, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
@@ -294,7 +276,7 @@ void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
  */
 void pppConstructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* ctrl)
 {
-    pppBlurCharaWork* work = GetBlurWork(blurChara, ctrl);
+    pppBlurCharaWork* work = (pppBlurCharaWork*)(blurChara->m_workArea + ctrl->m_serializedDataOffsets[2]);
     CGObject* ownerObj = ppvMng->m_lookTarget;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;

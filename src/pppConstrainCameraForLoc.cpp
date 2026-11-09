@@ -14,28 +14,19 @@ struct pppConstrainCameraForLocWork {
     _pppPObject* m_owner;
 };
 
-STATIC_ASSERT(sizeof(pppConstrainCameraForLocDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(pppConstrainCameraForLocDataOffsets, m_workOffset) == 0x8);
-
-static inline float CameraPosX() { return CameraPcs.m_positionX; }
-static inline float CameraPosY() { return CameraPcs.m_positionY; }
-static inline float CameraPosZ() { return CameraPcs.m_positionZ; }
-static inline float CameraDirX() { return CameraPcs.m_directionX; }
-static inline float CameraDirY() { return CameraPcs.m_directionY; }
-static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
+static inline float CameraPosX() { return CameraPcs.m_position.x; }
+static inline float CameraPosY() { return CameraPcs.m_position.y; }
+static inline float CameraPosZ() { return CameraPcs.m_position.z; }
+static inline float CameraDirX() { return CameraPcs.m_direction.x; }
+static inline float CameraDirY() { return CameraPcs.m_direction.y; }
+static inline float CameraDirZ() { return CameraPcs.m_direction.z; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
-
-static inline pppConstrainCameraForLocDataOffsets* GetConstrainCameraDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<pppConstrainCameraForLocDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 static inline pppConstrainCameraForLocWork* GetConstrainCameraWork(
     pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* ctrl)
 {
-    pppConstrainCameraForLocDataOffsets* offsets = GetConstrainCameraDataOffsets(ctrl);
     return reinterpret_cast<pppConstrainCameraForLocWork*>(
-        constrainCameraForLoc->m_workArea + offsets->m_workOffset);
+        constrainCameraForLoc->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* context, void*);

@@ -25,32 +25,12 @@ struct KeShpTail2XAlphaWork {
 };
 STATIC_ASSERT(offsetof(KeShpTail2XAlphaWork, m_alpha) == 6);
 
-STATIC_ASSERT(sizeof(KeShpTail2XDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(KeShpTail2XDataOffsets, m_workOffset) == 0x0);
-STATIC_ASSERT(offsetof(KeShpTail2XDataOffsets, m_alphaWorkOffset) == 0x4);
-
 inline void U8ToF32(pppFVECTOR4* dest, u8* src)
 {
     dest->x = src[0];
     dest->y = src[1];
     dest->z = src[2];
     dest->w = src[3];
-}
-
-static inline KeShpTail2XDataOffsets* GetKeShpTail2XDataOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<KeShpTail2XDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
-static inline KeShpTail2XWork* GetKeShpTail2XWork(_pppPObject* obj, _pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + GetKeShpTail2XDataOffsets(ctrlTable)->m_workOffset);
-}
-
-static inline KeShpTail2XAlphaWork* GetKeShpTail2XAlphaWork(_pppPObject* obj, _pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<KeShpTail2XAlphaWork*>(
-        obj->m_workArea + GetKeShpTail2XDataOffsets(ctrlTable)->m_alphaWorkOffset);
 }
 
 /*
@@ -64,7 +44,7 @@ static inline KeShpTail2XAlphaWork* GetKeShpTail2XAlphaWork(_pppPObject* obj, _p
  */
 void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-    KeShpTail2XWork* work = GetKeShpTail2XWork(obj, ctrlTable);
+    KeShpTail2XWork* work = (KeShpTail2XWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -85,7 +65,7 @@ void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  */
 void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-    KeShpTail2XWork* work = GetKeShpTail2XWork(obj, ctrlTable);
+    KeShpTail2XWork* work = (KeShpTail2XWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -162,7 +142,8 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
 
     count = step->m_drawCount;
     countMinusOne = (float)(count - 1);
-    alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, ctrlTable)->m_alpha / 16384.0f;
+    alphaMul = (float)((KeShpTail2XAlphaWork*)(
+        obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[1]))->m_alpha / 16384.0f;
     U8ToF32(&colorStart, &step->m_colorStartR);
     U8ToF32(&colorEnd, &step->m_colorEndR);
     colorStart.w *= alphaMul;
@@ -184,7 +165,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     }
 
     work = reinterpret_cast<KeShpTail2XWork*>(
-        obj->m_object.m_workArea + GetKeShpTail2XDataOffsets(ctrlTable)->m_workOffset);
+        obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[0]);
     shape = ppvEnv->m_shapeTablePtr[dataValIndex];
     pppShapeAnimData* shapeAnim = static_cast<pppShapeAnimData*>(shape->m_animData);
     {
@@ -353,7 +334,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCt
         return;
     }
 
-    work = GetKeShpTail2XWork(&obj->m_object, ctrlTable);
+    work = (KeShpTail2XWork*)(obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
     if (obj->m_object.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {

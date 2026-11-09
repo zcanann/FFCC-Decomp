@@ -7,14 +7,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(RandCVDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(RandCVDataOffsets, m_valueOffset) == 0x0);
-
-static inline RandCVDataOffsets* GetRandCVDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<RandCVDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline char randchar(char value, float scale)
 {
     return (char)((f32)value * scale - (f32)value);
@@ -45,12 +37,12 @@ void pppRandCV(_pppPObject* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
             value *= 2.0f;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandCVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         *valuePtr = value;
     } else if (in->index != basePtr->m_graphId) {
         return;
     } else {
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandCVDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     u8* targetColor = (in->colorOffset == -1) ? gPppDefaultValueBuffer : (basePtr->m_workArea + in->colorOffset);

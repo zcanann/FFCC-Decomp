@@ -3,15 +3,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(pppColAcceleDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(pppColAcceleDataOffsets, m_colorOffset) == 0x0);
-STATIC_ASSERT(offsetof(pppColAcceleDataOffsets, m_accelerationOffset) == 0x4);
-
-static inline pppColAcceleDataOffsets* GetColAcceleDataOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<pppColAcceleDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8005fdc4
@@ -23,8 +14,8 @@ static inline pppColAcceleDataOffsets* GetColAcceleDataOffsets(_pppCtrlTable* ct
  */
 void pppColAcceleCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-    pppColAcceleDataOffsets* offsets = GetColAcceleDataOffsets(ctrlTable);
-    pppColorDelta* accel = (pppColorDelta*)(object->m_workArea + offsets->m_accelerationOffset);
+    int* offsets = ctrlTable->m_serializedDataOffsets;
+    pppColorDelta* accel = (pppColorDelta*)(object->m_workArea + offsets[1]);
 
     accel->a = 0;
     accel->b = 0;
@@ -43,9 +34,9 @@ void pppColAcceleCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
  */
 void pppColAccele(_pppPObject* object, pppColAcceleStep* data, _pppCtrlTable* ctrlTable)
 {
-    pppColAcceleDataOffsets* offsets = GetColAcceleDataOffsets(ctrlTable);
-    int offset0 = offsets->m_colorOffset;
-    int offset1 = offsets->m_accelerationOffset;
+    int* offsets = ctrlTable->m_serializedDataOffsets;
+    int offset0 = offsets[0];
+    int offset1 = offsets[1];
     VColor* color = (VColor*)(object->m_workArea + offset0);
     int frameData;
     pppColorDelta* accel2 = (pppColorDelta*)(object->m_workArea + offset1);

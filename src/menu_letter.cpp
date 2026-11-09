@@ -1147,6 +1147,7 @@ void CMenuPcs::LetterDraw()
  */
 void CMenuPcs::LetterListDraw()
 {
+	int row;
 	SingleFadeEntry* panels = m_singleFadeState->entries;
 	CFont* font;
 	CCaravanWork::CLetterWork* letter;
@@ -1191,7 +1192,7 @@ void CMenuPcs::LetterListDraw()
 	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
 	int letterIndex;
 	float yf;
-	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
+	for (row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
 		letter = &caravanWork->m_letters[letterIndex];
 		yf = static_cast<float>(y);
 
@@ -1247,16 +1248,16 @@ void CMenuPcs::LetterListDraw()
 	const int iconX = static_cast<int>(iconXf);
 	const int iconTopRow = static_cast<int>(m_letterMenuState->topIndex);
 	int iconLetterIndex;
-	for (int row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
+	for (row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
 		if (caravanWork->m_letters[iconLetterIndex].m_attachValue != 0) {
 			DrawSingleIcon(caravanWork->m_letters[iconLetterIndex].m_attachmentClaimed ? 0x27 : 0x26, iconX, static_cast<int>(static_cast<float>(iconY)), 1.0f, 1, 1.0f);
 		}
 		iconY += 0x20;
 	}
 
-	const int cursorX = static_cast<int>(32.0f + static_cast<float>(static_cast<int>(System.GetCounter()) % 8));
-	const int cursorY = static_cast<int>(static_cast<float>(m_letterMenuState->listCursor * 0x20 + 0x60));
-	DrawCursor(cursorX, cursorY, 1.0f);
+	float cursorX = 32.0f;
+	cursorX += static_cast<float>(static_cast<int>(System.GetCounter()) % 8);
+	DrawCursor(static_cast<int>(cursorX), static_cast<int>(static_cast<float>(m_letterMenuState->listCursor * 0x20 + 0x60)), 1.0f);
 }
 
 /*
@@ -1938,11 +1939,15 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 
 	if (!(openRatio < 1.0)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x1));
+		x = x0 - 32.0f;
+		y = y0 - 16.0f;
 		MenuPcs.DrawRect(
-		    0, x0 - 32.0f, y0 - 16.0f,
+		    0, x, y,
 		    56.0f, 88.0f, 184.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		x = xw - 152.0f;
+		y = yh - 112.0f;
 		MenuPcs.DrawRect(
-		    0, xw - 152.0f, yh - 112.0f,
+		    0, x, y,
 		    184.0f, 144.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }

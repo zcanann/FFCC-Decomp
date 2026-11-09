@@ -47,6 +47,13 @@ public:
     int GetNumPolygonFromDL(void*, unsigned long);
     void GetDirectVector(Vec*, Vec*, Vec);
     void InitConstantRegister();
+    short ConvertEndian2(short value) { return __lhbrx(&value, 0); }
+    long ConvertEndian4(long value) { return __lwbrx(&value, 0); }
+    float ConvertEndianF4(float value)
+    {
+        long swapped = __lwbrx(&value, 0);
+        return *reinterpret_cast<float*>(&swapped);
+    }
     virtual void Init();
     virtual void Quit();
 };

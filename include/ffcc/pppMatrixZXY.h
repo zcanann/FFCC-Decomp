@@ -9,12 +9,6 @@ struct _pppCtrlTable;
 struct _pppPObject;
 struct pppNoStep;
 
-struct MatrixZXYDataOffsets {
-    s32 m_translationOffset;
-    s32 m_angleOffset;
-    s32 m_scaleOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -60,13 +60,6 @@ struct PYmMegaBirthShpTail3
     u8 m_padBA[2];
 };
 
-struct YmMegaBirthShpTail3DataOffsets
-{
-    s32 m_unusedOffset;
-    s32 m_colorOffset;
-    s32 m_workOffset;
-};
-
 
 #ifdef __cplusplus
 extern "C" {

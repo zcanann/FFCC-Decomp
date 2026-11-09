@@ -3,26 +3,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
-
-STATIC_ASSERT(sizeof(PppSclAcceleDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(PppSclAcceleDataOffsets, m_scaleOffset) == 0x0);
-STATIC_ASSERT(offsetof(PppSclAcceleDataOffsets, m_accelOffset) == 0x4);
-
-static inline PppSclAcceleDataOffsets* GetPppSclAcceleDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<PppSclAcceleDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline float* GetPppSclAcceleScale(_pppPObject* obj, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<float*>(obj->m_workArea + GetPppSclAcceleDataOffsets(ctrl)->m_scaleOffset);
-}
-
-static inline float* GetPppSclAcceleAccel(_pppPObject* obj, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<float*>(obj->m_workArea + GetPppSclAcceleDataOffsets(ctrl)->m_accelOffset);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80063150
@@ -33,7 +13,7 @@ static inline float* GetPppSclAcceleAccel(_pppPObject* obj, _pppCtrlTable* ctrl)
  * JP Size: TODO
  */
 void pppSclAcceleCon(_pppPObject* arg1, _pppCtrlTable* arg2){
-    float* accel = GetPppSclAcceleAccel(arg1, arg2);
+    float* accel = (float*)(arg1->m_workArea + arg2->m_serializedDataOffsets[1]);
 
     accel[0] = accel[1] = accel[2] = 0.0f;
 }
@@ -48,8 +28,8 @@ void pppSclAcceleCon(_pppPObject* arg1, _pppCtrlTable* arg2){
  * JP Size: TODO
  */
 void pppSclAccele(_pppPObject* arg1, PppSclAcceleStep* arg2, _pppCtrlTable* arg3){
-    float* scale = GetPppSclAcceleScale(arg1, arg3);
-    float* accel = GetPppSclAcceleAccel(arg1, arg3);
+    float* scale = (float*)(arg1->m_workArea + arg3->m_serializedDataOffsets[0]);
+    float* accel = (float*)(arg1->m_workArea + arg3->m_serializedDataOffsets[1]);
 
     if (ppvUserStopPartF != 0) {
         return;

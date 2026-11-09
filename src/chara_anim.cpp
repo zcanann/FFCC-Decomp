@@ -255,11 +255,11 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 					Memory.CopyToAMemorySync(
 					    m_bank,
-					    reinterpret_cast<void*>(Chara.AmemAnimSize() + Chara.GetAmemBaseAddress()),
+					    reinterpret_cast<void*>(Chara.m_amemAnimSize + reinterpret_cast<u32>(Chara.m_amemLoadStage->GetTop())),
 					    m_bankSize);
 
-					m_bankAddress = Chara.AmemAnimSize();
-					Chara.AmemAnimSize() += m_bankSize;
+					m_bankAddress = Chara.m_amemAnimSize;
+					Chara.m_amemAnimSize += m_bankSize;
 					if (m_bank != 0) {
 						delete static_cast<unsigned char*>(m_bank);
 						m_bank = 0;
@@ -345,7 +345,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 		Memory.SetGroup(anim->m_bank, 1);
 		Memory.CopyFromAMemorySync(anim->m_bank,
-		                           reinterpret_cast<void*>(anim->m_bankAddress + Chara.GetAmemBaseAddress()),
+		                           reinterpret_cast<void*>(anim->m_bankAddress + reinterpret_cast<u32>(Chara.m_amemLoadStage->GetTop())),
 		                           anim->m_bankSize);
 	}
 
@@ -366,8 +366,9 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	register float* outData = reinterpret_cast<float*>(srt);
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
+		int mode = flags & 3;
+		if (mode != 0) {
+			if (mode == 1) {
 				i2f_5(outData, inData);
 				inData++;
 			} else {
@@ -382,8 +383,9 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	}
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
+		int mode = flags & 3;
+		if (mode != 0) {
+			if (mode == 1) {
 				i2f_6(outData, inData);
 				inData++;
 			} else {
@@ -398,8 +400,9 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	}
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
+		int mode = flags & 3;
+		if (mode != 0) {
+			if (mode == 1) {
 				i2f_7(outData, inData);
 				inData++;
 			} else {

@@ -51,43 +51,8 @@ struct Mana2SetupBlock
     pppCVECTOR m_color;
 };
 
-STATIC_ASSERT(sizeof(Mana2DataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(Mana2DataOffsets, m_setupOffset) == 0x4);
-STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
-
 static void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
-
-static inline Mana2DataOffsets* GetMana2DataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<Mana2DataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline VMana2* GetMana2Work(pppMana2* mana, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VMana2*>(
-        reinterpret_cast<_pppPObject*>(mana)->m_workArea + GetMana2DataOffsets(ctrl)->m_workOffset);
-}
-
-static inline Mana2SetupBlock* GetMana2SetupBlock(pppMana2* mana, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<Mana2SetupBlock*>(
-        reinterpret_cast<_pppPObject*>(mana)->m_workArea + GetMana2DataOffsets(ctrl)->m_setupOffset);
-}
-
-static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
-{
-    model->SetCallbackContext(0, 0);
-    model->SetBeforeDrawCallback(0);
-    model->SetDrawMeshDLCallback(0);
-}
-
-static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2Step* step)
-{
-    model->SetCallbackContext(work, step);
-    model->SetBeforeDrawCallback(Mana2_BeforeDrawCallback);
-    model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
-}
 
 static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsigned short* indices, float waterScale);
 static int UpdateWaterMesh(VMana2* mana2);
@@ -982,8 +947,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
     }
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    mana2Work = GetMana2Work(pppMana2, ctrl);
-    Mana2SetupBlock* setupBlock = GetMana2SetupBlock(pppMana2, ctrl);
+    mana2Work = (VMana2*)(
+        ((_pppPObject*)pppMana2)->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    Mana2SetupBlock* setupBlock = (Mana2SetupBlock*)(
+        ((_pppPObject*)pppMana2)->m_workArea + ctrl->m_serializedDataOffsets[1]);
     if (gObject == NULL) {
         return;
     }
@@ -996,7 +963,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
         step->m_rippleLevel = 0;
     }
 
-    SetMana2ModelCallbacks(model, mana2Work, step);
+    model->SetCallbackContext(mana2Work, step);
+    model->SetBeforeDrawCallback(Mana2_BeforeDrawCallback);
+    model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 
     unsigned char reflectionAlpha = setupBlock->m_color.rgba[3];
     MaterialMan.SetReflectionAlpha(reflectionAlpha);
@@ -1004,7 +973,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
 
     if (reinterpret_cast<_pppPObject*>(pppMana2)->m_graphId == 0) {
         mana2Work->m_object = gObject;
-        SetMana2ModelCallbacks(model, mana2Work, step);
+        model->SetCallbackContext(mana2Work, step);
+        model->SetBeforeDrawCallback(Mana2_BeforeDrawCallback);
+        model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
         mana2Work->m_sourceTextures[0] = GetTextureFromRSD(step->m_sourceTextureIds[0], ppvEnv);
         mana2Work->m_sourceTextures[1] = GetTextureFromRSD(step->m_sourceTextureIds[1], ppvEnv);
         mana2Work->m_sourceTextures[2] = GetTextureFromRSD(step->m_sourceTextureIds[2], ppvEnv);
@@ -1200,7 +1171,8 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
     pppMana2Step* step;
     u32 i;
 
-    work = GetMana2Work(pppMana2, ctrl);
+    work = (VMana2*)(
+        ((_pppPObject*)pppMana2)->m_workArea + ctrl->m_serializedDataOffsets[2]);
     MaterialMan.SetStoneTexObj(0);
     MaterialMan.SetEnvTexObj(0);
 
@@ -1348,7 +1320,8 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
     CChara::CModel* model;
     VMana2* work;
 
-    work = GetMana2Work(pppMana2, ctrl);
+    work = (VMana2*)(
+        ((_pppPObject*)pppMana2)->m_workArea + ctrl->m_serializedDataOffsets[2]);
     gObject = (CGObject*)ppvMng->m_lookTarget;
     gObject->m_alphaTarget = 0.99999f;
 

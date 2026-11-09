@@ -810,9 +810,9 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 
 	objectFrame(object);
 
-	CStack result = pop(object);
+	int result = pop(object).m_int;
 	if (outArg != 0) {
-		*outArg = result;
+		outArg->m_int = result;
 	}
 	return 1;
 }
@@ -919,10 +919,10 @@ inline void CFlatRuntime::callCleanup(CFlatRuntime::CObject* object)
 	CStack returnValue;
 	CStack previousCodePos;
 
-	returnValue = pop(object);
+	returnValue.m_word = pop(object).m_word;
 	int packedFlags = pop(object).m_int;
 	int previousCallFlag = pop(object).m_int;
-	previousCodePos = pop(object);
+	previousCodePos.m_word = pop(object).m_word;
 	unsigned int* previousLocalBase = reinterpret_cast<unsigned int*>(pop(object).m_word);
 
 	object->m_sp = object->m_localBase;
@@ -1454,9 +1454,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			CFunc* func = m_funcs + (arg & 0xFFFF);
 
 			if ((static_cast<int>(arg) >> 16) >= 0) {
-				CClass* cls = m_classes;
-				cls += object->m_classIndex;
-				const int funcIndex = cls->m_functionTable[func->m_systemIndex];
+				const int funcIndex = m_classes[object->m_classIndex].m_functionTable[func->m_systemIndex];
 				if (funcIndex < 0) {
 					continue;
 				}

@@ -9,10 +9,6 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
-struct PppColorDataOffsets {
-    s32 m_workOffset;
-};
-
 struct VColor
 {
     s16 m_red;          // 0x0

@@ -42,19 +42,6 @@ STATIC_ASSERT(offsetof(CMapCylinder, m_bottom) == 0x00);
 STATIC_ASSERT(offsetof(CMapCylinder, m_axis) == 0x18);
 STATIC_ASSERT(offsetof(CMapCylinder, m_radius) == 0x24);
 STATIC_ASSERT(offsetof(CMapCylinder, m_bound) == 0x28);
-STATIC_ASSERT(sizeof(YmMeltDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(YmMeltDataOffsets, m_workOffset) == 0x0);
-STATIC_ASSERT(offsetof(YmMeltDataOffsets, m_colorWorkOffset) == 0x4);
-
-static inline YmMeltDataOffsets* GetYmMeltDataOffsets(PYmMeltDataOffsets* offsets)
-{
-    return reinterpret_cast<YmMeltDataOffsets*>(offsets->m_serializedDataOffsets);
-}
-
-static inline YmMeltWork* GetYmMeltWork(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
-{
-    return reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + GetYmMeltDataOffsets(offsets)->m_workOffset);
-}
 
 void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
 
@@ -97,9 +84,9 @@ void pppRenderYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offse
     float v0;
     float phaseLerp;
 
-    YmMeltDataOffsets* dataOffsets = GetYmMeltDataOffsets(offsets);
-    work = reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + dataOffsets->m_workOffset);
-    colorWork = reinterpret_cast<VColor*>(ymMelt->m_workArea + dataOffsets->m_colorWorkOffset);
+    int* dataOffsets = offsets->m_serializedDataOffsets;
+    work = reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + dataOffsets[0]);
+    colorWork = reinterpret_cast<VColor*>(ymMelt->m_workArea + dataOffsets[1]);
     s32 dataValIndex = ctrl->m_dataValIndex;
     if (dataValIndex == 0xFFFF) {
         return;
@@ -316,9 +303,9 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
         return;
     }
 
-    YmMeltDataOffsets* dataOffsets = GetYmMeltDataOffsets(offsets);
-    work = reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + dataOffsets->m_workOffset);
-    colorWork = reinterpret_cast<VColor*>(ymMelt->m_workArea + dataOffsets->m_colorWorkOffset);
+    int* dataOffsets = offsets->m_serializedDataOffsets;
+    work = reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + dataOffsets[0]);
+    colorWork = reinterpret_cast<VColor*>(ymMelt->m_workArea + dataOffsets[1]);
     gridCount = ctrl->m_gridSize + 1;
     vertexCount = gridCount * gridCount;
     matrixY = ppvMng->m_matrix.value[1][3];
@@ -387,7 +374,7 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
  */
 void pppDestructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
+    YmMeltWork* work = (YmMeltWork*)(ymMelt->m_workArea + offsets->m_serializedDataOffsets[0]);
 
     if (work->m_vertexData != nullptr) {
         pppMemFree(work->m_vertexData);
@@ -406,7 +393,7 @@ void pppDestructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 void pppConstructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
     f32 value = 0.0f;
-    YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
+    YmMeltWork* work = (YmMeltWork*)(ymMelt->m_workArea + offsets->m_serializedDataOffsets[0]);
 
     work->m_vertexData = 0;
     work->m_phaseOffset = 0;

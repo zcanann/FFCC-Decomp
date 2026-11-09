@@ -59,18 +59,6 @@ STATIC_ASSERT(offsetof(PppLightStep, m_attenFalloff) == 0x20);
 STATIC_ASSERT(offsetof(PppLightStep, m_targetIndex) == 0x44);
 STATIC_ASSERT(offsetof(PppLightStep, m_specularScale) == 0x4C);
 STATIC_ASSERT(offsetof(PppLightStep, m_type) == 0x58);
-STATIC_ASSERT(sizeof(PppLightDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(PppLightDataOffsets, m_workOffset) == 0x0);
-
-static inline PppLightDataOffsets* GetPppLightDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<PppLightDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
-static inline PppLightWork* GetPppLightWork(_pppPObject* object, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<PppLightWork*>(object->m_workArea + GetPppLightDataOffsets(ctrlTable)->m_workOffset);
-}
 
 /*
  * --INFO--
@@ -83,7 +71,7 @@ static inline PppLightWork* GetPppLightWork(_pppPObject* object, _pppCtrlTable* 
  */
 void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	PppLightWork* work = GetPppLightWork(object, ctrlTable);
+	PppLightWork* work = (PppLightWork*)(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 	float zero = 0.0f;
 	
 	*(int*)&work->color2R = 0;
@@ -106,7 +94,7 @@ void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
  */
 void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	PppLightWork* work = GetPppLightWork(object, ctrlTable);
+	PppLightWork* work = (PppLightWork*)(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 	float zero = 0.0f;
 	
 	*(int*)&work->color0R = 0;
@@ -134,8 +122,8 @@ void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 void pppLight(_pppPObject* object, PppLightStep* step, _pppCtrlTable* ctrlTable)
 {
 	if (ppvUserStopPartF == 0) {
-		PppLightDataOffsets* offsets = GetPppLightDataOffsets(ctrlTable);
-		PppLightWork* work = (PppLightWork*)(object->m_workArea + offsets->m_workOffset);
+		int* offsets = ctrlTable->m_serializedDataOffsets;
+		PppLightWork* work = (PppLightWork*)(object->m_workArea + offsets[0]);
 
 		if (ppvUserStopPartF != 0) {
 			goto create_light;

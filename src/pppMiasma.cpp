@@ -33,69 +33,14 @@ STATIC_ASSERT(sizeof(MiasmaFrameWork) == 0x18);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 STATIC_ASSERT(sizeof(MiasmaRadiusWork) == 0x04);
 
-STATIC_ASSERT(sizeof(MiasmaDataOffsets) == 0x10);
-STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_colorWorkOffset) == 0x4);
-STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_frameWorkOffset) == 0x8);
-STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_radiusWorkOffset) == 0xC);
-
-static inline MiasmaDataOffsets* GetMiasmaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<MiasmaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline MiasmaFrameWork* GetMiasmaFrameWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_frameWorkOffset);
+    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline VColor* GetMiasmaColorWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<VColor*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_colorWorkOffset);
-}
-
-static inline MiasmaRadiusWork* GetMiasmaRadiusWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_radiusWorkOffset);
-}
-
-static inline void _GXSetTevOrder(int stage, int texCoord, int texMap, int colorChannel)
-{
-    _GXSetTevOrder((_GXTevStageID)stage, (_GXTexCoordID)texCoord, (_GXTexMapID)texMap, (_GXChannelID)colorChannel);
-}
-
-static inline void _GXSetTevSwapMode(int stage, int rasSel, int texSel)
-{
-    _GXSetTevSwapMode((_GXTevStageID)stage, (_GXTevSwapSel)rasSel, (_GXTevSwapSel)texSel);
-}
-
-static inline void _GXSetTevSwapModeTable(int tevSwapSel, int red, int green, int blue, int alpha)
-{
-    _GXSetTevSwapModeTable((_GXTevSwapSel)tevSwapSel, (_GXTevColorChan)red, (_GXTevColorChan)green,
-                           (_GXTevColorChan)blue, (_GXTevColorChan)alpha);
-}
-
-static inline void _GXSetTevColorIn(int stage, int a, int b, int c, int d)
-{
-    _GXSetTevColorIn((_GXTevStageID)stage, (_GXTevColorArg)a, (_GXTevColorArg)b, (_GXTevColorArg)c,
-                     (_GXTevColorArg)d);
-}
-
-static inline void _GXSetTevColorOp(int stage, int op, int bias, int scale, int clamp, int reg)
-{
-    _GXSetTevColorOp((_GXTevStageID)stage, (_GXTevOp)op, (_GXTevBias)bias, (_GXTevScale)scale,
-                     (unsigned char)clamp, (_GXTevRegID)reg);
-}
-
-static inline void _GXSetTevAlphaIn(int stage, int a, int b, int c, int d)
-{
-    _GXSetTevAlphaIn((_GXTevStageID)stage, (_GXTevAlphaArg)a, (_GXTevAlphaArg)b, (_GXTevAlphaArg)c,
-                     (_GXTevAlphaArg)d);
-}
-
-static inline void _GXSetTevAlphaOp(int stage, int op, int bias, int scale, int clamp, int reg)
-{
-    _GXSetTevAlphaOp((_GXTevStageID)stage, (_GXTevOp)op, (_GXTevBias)bias, (_GXTevScale)scale,
-                     (unsigned char)clamp, (_GXTevRegID)reg);
+    return reinterpret_cast<VColor*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
 static inline float CalcSphereRadius(Vec* vertices, u16 count)
@@ -286,7 +231,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
     work = GetMiasmaFrameWork(pppMiasma, ctrl);
     colorWork = GetMiasmaColorWork(pppMiasma, ctrl);
-    radiusWork = GetMiasmaRadiusWork(pppMiasma, ctrl);
+    radiusWork = (MiasmaRadiusWork*)(pppMiasma->m_workArea + ctrl->m_serializedDataOffsets[3]);
     tevStage = 0;
     textureIndex = 0;
     model = (pppModelSt*)ppvEnv->m_mapMeshPtr[step->m_dataValIndex];
@@ -343,10 +288,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     slice = 0;
     maskOffset = sceneTexSize;
     do {
-        yPos = (float)slice * height;
-        yOffset = (int)yPos;
-
-        graphicPtr->GetBackBufferRect2(graphicPtr->m_scratchTextureBuffer, &backSceneTex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,
+        graphicPtr->GetBackBufferRect2(graphicPtr->m_scratchTextureBuffer, &backSceneTex, 0, yOffset = (int)(yPos = (float)slice * height), texWidth, texHeight, 0, GX_LINEAR,
                                        GX_TF_RGBA8, 0);
         GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
 
@@ -367,7 +309,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         pppSetDrawEnv(
             &drawColor, &pppMiasma->m_drawMatrix, 0.0f, 0, 0, 1, 0, 1, 1, 1);
 
-        _GXSetTevOrder(0, 0xFF, 0xFF, 4);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
         GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
         GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
@@ -400,11 +342,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         GXSetCullMode(GX_CULL_FRONT);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
         _GXSetTevColorIn(
-            0, 0xF, 0xF, 0xF, 0xC);
-        _GXSetTevColorOp(0, 0, 0, 2, 1, 0);
+            GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
+        _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
         _GXSetTevAlphaIn(
-            0, 7, 7, 7, 6);
-        _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
+            GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+        _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
 
         if (!isCameraInside) {
 #if defined(VERSION_GCCP01)
@@ -423,11 +365,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
         tevStage = 0;
         _GXSetTevColorIn(
-            0, 0xF, 0xF, 0xF, 0xC);
-        _GXSetTevColorOp(0, 0, 0, 2, 1, 0);
+            GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
+        _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
         _GXSetTevAlphaIn(
-            0, 7, 7, 7, 6);
-        _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
+            GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+        _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
 
 #if defined(VERSION_GCCP01)
         Graphic.SetDrawDoneDebugData(0x34);
@@ -479,11 +421,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             CreateScaleMatrix(pppMiasma, secondaryScale);
 
             _GXSetTevColorIn(
-                0, 0xF, 0xF, 0xF, 0xC);
-            _GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+                GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
+            _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
             _GXSetTevAlphaIn(
-                0, 7, 7, 7, 6);
-            _GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
+                GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+            _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
             if (!isCameraInside) {
 #if defined(VERSION_GCCP01)
@@ -502,11 +444,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             GXSetCullMode(GX_CULL_BACK);
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
             _GXSetTevColorIn(
-                0, 0xF, 0xF, 0xF, 0xC);
-            _GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+                GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
+            _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
             _GXSetTevAlphaIn(
-                0, 7, 7, 7, 6);
-            _GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
+                GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+            _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
 #if defined(VERSION_GCCP01)
             Graphic.SetDrawDoneDebugData(0x38);
@@ -546,57 +488,57 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             GXSetChanMatColor(GX_COLOR0A0, packedColor.color);
             GXSetNumTexGens(2);
             _GXSetTevSwapModeTable(
-                1, tevSwapChannel, tevSwapChannel, tevSwapChannel, tevSwapChannel);
+                GX_TEV_SWAP1, (_GXTevColorChan)tevSwapChannel, (_GXTevColorChan)tevSwapChannel, (_GXTevColorChan)tevSwapChannel, (_GXTevColorChan)tevSwapChannel);
 
             GXSetTevDirect(GX_TEVSTAGE0);
             GXLoadTexObj(&miasmaMaskTex, GX_TEXMAP0);
             GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-            _GXSetTevOrder(0, 0, 0, 4);
-            _GXSetTevSwapMode(0, 0, 1);
-            _GXSetTevColorIn(0, 0xF, 8, 0xC, 0xC);
-            _GXSetTevColorOp(0, 1, 0, 0, 1, 1);
-            _GXSetTevAlphaIn(0, 7, 4, 6, 6);
-            _GXSetTevAlphaOp(0, 1, 0, 0, 1, 1);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
+            _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_ONE, GX_CC_ONE);
+            _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+            _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_KONST, GX_CA_KONST);
+            _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
 
             GXSetTevDirect(GX_TEVSTAGE1);
             GXSetTevKColorSel(GX_TEVSTAGE1, GX_TEV_KCSEL_K0);
             GXSetTevKAlphaSel(GX_TEVSTAGE1, GX_TEV_KASEL_K0_A);
             GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-            _GXSetTevOrder(1, 0, 0, 4);
-            _GXSetTevSwapMode(1, 0, 1);
-            _GXSetTevColorIn(1, 2, 0xE, 0xE, 0xF);
-            _GXSetTevColorOp(1, 8, 0, 0, 1, 0);
-            _GXSetTevAlphaIn(1, 1, 6, 6, 7);
-            _GXSetTevAlphaOp(1, 8, 0, 0, 1, 0);
+            _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP1);
+            _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_C0, GX_CC_KONST, GX_CC_KONST, GX_CC_ZERO);
+            _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_A0, GX_CA_KONST, GX_CA_KONST, GX_CA_ZERO);
+            _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
             GXSetTevDirect(GX_TEVSTAGE2);
             GXSetTevKColorSel(GX_TEVSTAGE2, GX_TEV_KCSEL_K0);
             GXSetTevKAlphaSel(GX_TEVSTAGE2, GX_TEV_KASEL_K0_A);
             GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-            _GXSetTevOrder(2, 0, 0, 4);
-            _GXSetTevSwapMode(2, 0, 1);
-            _GXSetTevColorIn(2, 0xE, 2, 2, 0);
-            _GXSetTevColorOp(2, 8, 0, 0, 1, 0);
-            _GXSetTevAlphaIn(2, 6, 1, 1, 0);
-            _GXSetTevAlphaOp(2, 8, 0, 0, 1, 0);
+            _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP1);
+            _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_KONST, GX_CC_C0, GX_CC_C0, GX_CC_CPREV);
+            _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_KONST, GX_CA_A0, GX_CA_A0, GX_CA_APREV);
+            _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
             GXSetTevDirect(GX_TEVSTAGE3);
             GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-            _GXSetTevOrder(3, 0, 0, 4);
-            _GXSetTevSwapMode(3, 0, 1);
-            _GXSetTevColorIn(3, 0xF, 0, 10, 0xF);
-            _GXSetTevColorOp(3, 0, 0, 0, 1, 0);
-            _GXSetTevAlphaIn(3, 7, 0, 5, 7);
-            _GXSetTevAlphaOp(3, 0, 0, 0, 1, 0);
+            _GXSetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP1);
+            _GXSetTevColorIn(GX_TEVSTAGE3, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
+            _GXSetTevColorOp(GX_TEVSTAGE3, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            _GXSetTevAlphaIn(GX_TEVSTAGE3, GX_CA_ZERO, GX_CA_APREV, GX_CA_RASA, GX_CA_ZERO);
+            _GXSetTevAlphaOp(GX_TEVSTAGE3, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
             GXSetTevDirect(GX_TEVSTAGE4);
             GXLoadTexObj(&backSceneTex, GX_TEXMAP1);
-            _GXSetTevSwapMode(4, 0, 1);
-            _GXSetTevOrder(4, 1, 1, 4);
-            _GXSetTevColorIn(4, 0xF, 0xF, 0xF, 0);
-            _GXSetTevColorOp(4, 0, 0, 0, 1, 0);
-            _GXSetTevAlphaIn(4, 7, 4, 0, 7);
-            _GXSetTevAlphaOp(4, 0, 0, 0, 1, 0);
+            _GXSetTevSwapMode(GX_TEVSTAGE4, GX_TEV_SWAP0, GX_TEV_SWAP1);
+            _GXSetTevOrder(GX_TEVSTAGE4, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
+            _GXSetTevColorIn(GX_TEVSTAGE4, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+            _GXSetTevColorOp(GX_TEVSTAGE4, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            _GXSetTevAlphaIn(GX_TEVSTAGE4, GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV, GX_CA_ZERO);
+            _GXSetTevAlphaOp(GX_TEVSTAGE4, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
             GXSetNumTevStages(5);
 
             quadA.x = 0.0f;
@@ -620,10 +562,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             GXSetTevDirect(GX_TEVSTAGE0);
             GXLoadTexObj(&miasmaMaskTex, GX_TEXMAP0);
             GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-            _GXSetTevOrder(0, 0, 0, 4);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
             _GXSetTevSwapModeTable(
-                2, tevSwapChannel, tevSwapChannel, tevSwapChannel, tevSwapChannel);
-            _GXSetTevSwapMode(0, 0, 2);
+                GX_TEV_SWAP2, (_GXTevColorChan)tevSwapChannel, (_GXTevColorChan)tevSwapChannel, (_GXTevColorChan)tevSwapChannel, (_GXTevColorChan)tevSwapChannel);
+            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP2);
 
             pppInitBlendMode();
             pppSetBlendMode(1);
@@ -641,62 +583,62 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
                 GXLoadTexObj(&secondaryMaskTex, GX_TEXMAP1);
 
                 GXSetTevDirect(GX_TEVSTAGE0);
-                _GXSetTevOrder(0, 0, 0, 4);
+                _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-                _GXSetTevSwapMode(0, 0, 0);
-                _GXSetTevColorIn(0, 0xF, 10, 8, 0xF);
-                _GXSetTevColorOp(0, 0, 0, 0, 1, 0);
-                _GXSetTevAlphaIn(0, 7, 5, 4, 7);
-                _GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
+                _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+                _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+                _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+                _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
                 texGenCount = 1;
 
                 GXSetTevDirect(GX_TEVSTAGE1);
-                _GXSetTevOrder(1, 0, 1, 4);
-                _GXSetTevColorIn(1, 0xF, 8, 0xC, 0);
-                _GXSetTevColorOp(1, 1, 0, 0, 1, 0);
-                _GXSetTevAlphaIn(1, 7, 4, 6, 0);
-                _GXSetTevAlphaOp(1, 1, 0, 2, 1, 0);
+                _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR0A0);
+                _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_ONE, GX_CC_CPREV);
+                _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_TEXA, GX_CA_KONST, GX_CA_APREV);
+                _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
 
                 GXSetTevDirect(GX_TEVSTAGE2);
-                _GXSetTevOrder(2, 0, 1, 4);
-                _GXSetTevColorIn(2, 0xF, 0xB, 0, 0xF);
-                _GXSetTevColorOp(2, 0, 0, 0, 1, 0);
-                _GXSetTevAlphaIn(2, 7, 0, 5, 7);
+                _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR0A0);
+                _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_RASA, GX_CC_CPREV, GX_CC_ZERO);
+                _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_RASA, GX_CA_ZERO);
                 tevAlphaScale = 0;
                 if (step->m_miasma.m_alphaOpScale == 1) {
                     tevAlphaScale = 1;
                 } else if (step->m_miasma.m_alphaOpScale == 2) {
                     tevAlphaScale = 2;
                 }
-                _GXSetTevAlphaOp(2, 0, 0, tevAlphaScale, 1, 0);
+                _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, (_GXTevScale)tevAlphaScale, GX_TRUE, GX_TEVPREV);
                 tevStageCount = 3;
             } else {
                 GXSetTevDirect(GX_TEVSTAGE0);
                 GXLoadTexObj(&miasmaMaskTex, GX_TEXMAP0);
-                _GXSetTevOrder(0, 0, 0, 4);
+                _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-                _GXSetTevSwapMode(0, 0, 0);
-                _GXSetTevColorIn(0, 0xF, 0xF, 0xF, 10);
-                _GXSetTevColorOp(0, 0, 0, 0, 1, 0);
-                _GXSetTevAlphaIn(0, 7, 6, 4, 6);
-                _GXSetTevAlphaOp(0, 1, 0, 0, 1, 0);
+                _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+                _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+                _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_KONST);
+                _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
                 GXSetTevDirect(GX_TEVSTAGE1);
-                _GXSetTevOrder(1, 0, 0, 4);
-                _GXSetTevSwapMode(1, 0, 0);
-                _GXSetTevColorIn(1, 0xF, 0xF, 0xF, 0);
-                _GXSetTevColorOp(1, 0, 0, 0, 1, 0);
-                _GXSetTevAlphaIn(1, 7, 0, 4, 7);
-                _GXSetTevAlphaOp(1, 0, 0, 0, 1, 0);
+                _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+                _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+                _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+                _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_TEXA, GX_CA_ZERO);
+                _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
                 texGenCount = 1;
 
                 GXSetTevDirect(GX_TEVSTAGE2);
-                _GXSetTevSwapMode(2, 0, 0);
+                _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
                 GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-                _GXSetTevOrder(2, 1, 1, 4);
-                _GXSetTevColorIn(2, 0xF, 0xB, 0, 0xF);
-                _GXSetTevColorOp(2, 0, 0, 0, 1, 0);
-                _GXSetTevAlphaIn(2, 7, 0, 5, 7);
+                _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
+                _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_RASA, GX_CC_CPREV, GX_CC_ZERO);
+                _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_RASA, GX_CA_ZERO);
 
                 tevAlphaScale = 0;
                 if (step->m_miasma.m_alphaOpScale == 1) {
@@ -704,7 +646,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
                 } else if (step->m_miasma.m_alphaOpScale == 2) {
                     tevAlphaScale = 2;
                 }
-                _GXSetTevAlphaOp(2, 0, 0, tevAlphaScale, 1, 0);
+                _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, (_GXTevScale)tevAlphaScale, GX_TRUE, GX_TEVPREV);
                 tevStageCount = 3;
             }
 
@@ -725,7 +667,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
     Util.EndQuadEnv();
     pppInitBlendMode();
-    _GXSetTevSwapMode(0, 0, 0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     Graphic.SetViewport();
     Util.InitConstantRegister();
 }

@@ -19,8 +19,6 @@
 
 static const char s_pppEmission_cpp[] = "pppEmission.cpp";
 
-static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
-
 typedef CChara::CMesh::CDisplayList EmissionDisplayList;
 typedef CChara::CMesh::CRefData EmissionMeshData;
 typedef CChara::CMesh EmissionMeshRef;
@@ -63,26 +61,6 @@ STATIC_ASSERT(offsetof(EmissionState, m_scaleValue) == 0xC);
 STATIC_ASSERT(offsetof(EmissionState, m_fadeOutAlphaStep) == 0x1C);
 STATIC_ASSERT(sizeof(EmissionState) == 0x20);
 STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
-STATIC_ASSERT(sizeof(EmissionDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(EmissionDataOffsets, m_colorDataOffset) == 0x4);
-STATIC_ASSERT(offsetof(EmissionDataOffsets, m_stateOffset) == 0x8);
-
-static inline EmissionDataOffsets* GetEmissionDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<EmissionDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline EmissionState* GetEmissionState(pppEmission* emission, _pppCtrlTable* ctrl)
-{
-    EmissionDataOffsets* offsets = GetEmissionDataOffsets(ctrl);
-    return reinterpret_cast<EmissionState*>(emission->m_workArea + offsets->m_stateOffset);
-}
-
-static inline VColor* GetEmissionColorData(pppEmission* emission, _pppCtrlTable* ctrl)
-{
-    EmissionDataOffsets* offsets = GetEmissionDataOffsets(ctrl);
-    return reinterpret_cast<VColor*>(emission->m_workArea + offsets->m_colorDataOffset);
-}
 
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
 {
@@ -91,20 +69,6 @@ static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIn
 
 static void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
-
-static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, PEmission* step)
-{
-    model->SetCallbackContext(state, step);
-    model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
-    model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);
-}
-
-static inline void ClearEmissionModelCallbacks(CChara::CModel* model)
-{
-    model->SetCallbackContext(0, 0);
-    model->SetDrawMeshDLCallback(0);
-    model->SetAfterDrawMeshCallback(0);
-}
 
 /*
  * --INFO--
@@ -132,12 +96,14 @@ void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctr
         return;
     }
 
-    EmissionState* state = GetEmissionState(emission, ctrl);
-    VColor* color = GetEmissionColorData(emission, ctrl);
+    EmissionState* state = (EmissionState*)(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    VColor* color = (VColor*)(emission->m_workArea + ctrl->m_serializedDataOffsets[1]);
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
-    SetEmissionModelCallbacks(model, state, step);
+    model->SetCallbackContext(state, step);
+    model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
+    model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);
 
     float alphaScale = (float)color->m_color.rgba[3] / 255.0f;
     state->m_colorR = color->m_color.rgba[0];
@@ -243,11 +209,13 @@ void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctr
  */
 void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale;
-    EmissionState* state = GetEmissionState(emission, ctrl);
+    EmissionState* state = (EmissionState*)(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
-    ClearEmissionModelCallbacks(model);
+    model->SetCallbackContext(0, 0);
+    model->SetDrawMeshDLCallback(0);
+    model->SetAfterDrawMeshCallback(0);
 
     Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp), 0x118);
     EmissionParticle* particles = state->m_particles;
@@ -271,7 +239,7 @@ void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
  */
 void pppConstruct2Emission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
-    EmissionState* state = GetEmissionState(emission, ctrl);
+    EmissionState* state = (EmissionState*)(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
     state->m_scaleValue = state->m_scaleVelocity = state->m_scaleAccel = baseScale;
 }
 
@@ -286,7 +254,7 @@ void pppConstruct2Emission(pppEmission* emission, _pppCtrlTable* ctrl) {
  */
 void pppConstructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
-    EmissionState* state = GetEmissionState(emission, ctrl);
+    EmissionState* state = (EmissionState*)(emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
 
     state->m_texture = 0;
     state->m_colorR = 0x80;
@@ -340,7 +308,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* stateContext, v
                 scale += (float)i * state->m_scaleValue;
                 PSMTXScale(objMtx0, scale, scale, scale);
                 PSMTXConcat(meshMtx, objMtx0, objMtx0);
-                PSMTXCopy(CameraMatrix(), viewMtx0);
+                PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx0);
                 MaterialMan.SetObjMatrix(viewMtx0, objMtx0);
 
                 displayList = meshData->m_displayLists;
@@ -376,7 +344,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* stateContext, v
                 float scale = particle->m_scale;
                 PSMTXScale(objMtx1, scale, scale, scale);
                 PSMTXConcat(meshMtx, objMtx1, objMtx1);
-                PSMTXCopy(CameraMatrix(), viewMtx1);
+                PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx1);
                 PSMTXConcat(viewMtx1, objMtx1, objMtx1);
                 GXLoadPosMtxImm(objMtx1, 0);
 

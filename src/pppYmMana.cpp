@@ -15,9 +15,6 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(YmManaDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(YmManaDataOffsets, m_setupOffset) == 0x4);
-STATIC_ASSERT(offsetof(YmManaDataOffsets, m_workOffset) == 0x8);
 STATIC_ASSERT(offsetof(VYmMana, m_runtimeColor) == 0x38);
 STATIC_ASSERT(offsetof(VYmMana, m_displayListCopies) == 0x60);
 STATIC_ASSERT(offsetof(VYmMana, m_meshReflectionVec) == 0x64);
@@ -49,25 +46,6 @@ static void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, 
 static void Chara_DrawShadowMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void Mana_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
-
-static inline YmManaDataOffsets* GetYmManaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<YmManaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline void ClearManaModelCallbacks(CChara::CModel* model)
-{
-    model->SetCallbackContext(0, 0);
-    model->SetBeforeDrawCallback(0);
-    model->SetDrawMeshDLCallback(0);
-}
-
-static inline void SetManaModelCallbacks(CChara::CModel* model, void* work, pppYmManaStep* step)
-{
-    model->SetCallbackContext(work, step);
-    model->SetBeforeDrawCallback(Mana_BeforeDrawCallback);
-    model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
-}
 
 /*
  * --INFO--
@@ -438,8 +416,8 @@ static int RenderWaterMesh(VYmMana* mana)
     GXSetArray((GXAttr)0xD, texCoord0, 8);
     GXSetArray((GXAttr)0xE, texCoord1, 8);
     envTexture1 = mana->m_envTexture1;
-    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-    GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3C, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+    GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
     u8 alpha = mana->m_manaAlpha;
     blendColor.r = 0x80;
     blendColor.g = 0x80;
@@ -512,6 +490,7 @@ static int RenderWaterMesh(VYmMana* mana)
         GXTexCoord1x16(indexIt[3]);
         indexIt += 4;
     }
+    GXEnd();
 
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -697,7 +676,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
     CameraPcs.GetViewMatrix(savedCameraMtx);
     CameraPcs.GetProjectionMatrix(savedScreenMtx);
     float rectOrigin = 0.0f;
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, rectOrigin,
+    Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &sceneTexObj, rectOrigin,
                                rectOrigin, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = mana->m_object;
@@ -806,7 +785,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
                 owner->m_model->SetDrawShadowMeshDLCallback(0);
             }
 
-            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, captureIter, rectOrigin, rectOrigin, 0x80, 0x80,
+            Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), captureIter, rectOrigin, rectOrigin, 0x80, 0x80,
                                        captureBufferOffset, GX_LINEAR, GX_TF_RGB565, 0);
             captureBufferOffset += captureBufferStride;
             sourceIter++;
@@ -864,8 +843,7 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
     model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 
     if (Game.IsWorldMap()) {
-        GXSetViewport(savedViewport[0], savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4],
-                      savedViewport[5]);
+        GXSetViewportv(savedViewport);
     }
 }
 
@@ -914,9 +892,9 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
     }
 
     gObject = ppvMng->m_owner;
-    YmManaDataOffsets* serializedOffsets = GetYmManaDataOffsets(ctrl);
-    mana = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + serializedOffsets->m_workOffset);
-    setupArea = reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + serializedOffsets->m_setupOffset;
+    int* serializedOffsets = ctrl->m_serializedDataOffsets;
+    mana = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + serializedOffsets[2]);
+    setupArea = reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + serializedOffsets[1];
     if (gObject == NULL) {
         return;
     }
@@ -932,7 +910,9 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
         mana->m_attachedObject = gObject->m_attachOwner;
     }
 
-    SetManaModelCallbacks(model, mana, step);
+    model->SetCallbackContext(mana, step);
+    model->SetBeforeDrawCallback(Mana_BeforeDrawCallback);
+    model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 
     u8 manaAlpha = (u8)((float)setupArea[0xB] * gObject->m_currentAlpha);
     if (Game.IsWorldMap()) {
@@ -943,7 +923,9 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
 
     if (reinterpret_cast<_pppPObject*>(ymMana)->m_graphId == 0) {
         mana->m_object = gObject;
-        SetManaModelCallbacks(model, mana, step);
+        model->SetCallbackContext(mana, step);
+        model->SetBeforeDrawCallback(Mana_BeforeDrawCallback);
+        model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
         mana->m_sourceTextures[0] = GetTextureFromRSD(step->m_sourceTextureId0, ppvEnv);
         mana->m_sourceTextures[1] = GetTextureFromRSD(step->m_sourceTextureId1, ppvEnv);
         mana->m_sourceTextures[2] = GetTextureFromRSD(step->m_sourceTextureId2, ppvEnv);
@@ -1152,7 +1134,7 @@ void pppFrameYmMana(PYmMana* ymMana, pppYmManaStep* step, _pppCtrlTable* ctrl)
 void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
 {
     VYmMana* work =
-        reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + GetYmManaDataOffsets(ctrl)->m_workOffset);
+        reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + ctrl->m_serializedDataOffsets[2]);
     CGObject* gObject = work->m_object;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
@@ -1163,7 +1145,9 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
     gObject->DispCharaParts(1);
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    ClearManaModelCallbacks(model);
+    model->SetCallbackContext(0, 0);
+    model->SetBeforeDrawCallback(0);
+    model->SetDrawMeshDLCallback(0);
     Graphic._WaitDrawDone("pppYmMana.cpp", 0x2CE);
     MaterialMan.SetStoneTexObj(0);
     MaterialMan.SetEnvTexObj(0);
@@ -1307,8 +1291,8 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
  */
 void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* ctrl)
 {
-    YmManaDataOffsets* offsets = GetYmManaDataOffsets(ctrl);
-    s32 workOffset = offsets->m_workOffset;
+    int* offsets = ctrl->m_serializedDataOffsets;
+    s32 workOffset = offsets[2];
     VYmMana* work = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + workOffset);
     CGObject* gObject = ppvMng->m_owner;
     CCharaPcs::CHandle* handle;

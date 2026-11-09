@@ -31,24 +31,6 @@ struct Crystal2Work {
 };
 
 STATIC_ASSERT(sizeof(HSD_ImageBuffer) == 0x18);
-STATIC_ASSERT(sizeof(Crystal2DataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(Crystal2DataOffsets, m_colorBlockOffset) == 0x4);
-STATIC_ASSERT(offsetof(Crystal2DataOffsets, m_workOffset) == 0x8);
-
-static inline Crystal2DataOffsets* GetCrystal2DataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<Crystal2DataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline Crystal2Work* GetCrystal2Work(pppCrystal2* crystal, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<Crystal2Work*>(crystal->m_workArea + GetCrystal2DataOffsets(ctrl)->m_workOffset);
-}
-
-static inline VColor* GetCrystal2ColorBlock(pppCrystal2* crystal, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VColor*>(crystal->m_workArea + GetCrystal2DataOffsets(ctrl)->m_colorBlockOffset);
-}
 
 union Crystal2FloatBits {
     float value;
@@ -85,7 +67,245 @@ static inline float Crystal2SqrtPositive(float value)
     guess = 0.5 * guess * (3.0 - guess * guess * value);
     guess = 0.5 * guess * (3.0 - guess * guess * value);
 
+#ifdef VERSION_GCCJGC
+    volatile float result = (float)(value * guess);
+    return result;
+#else
     return (float)(value * guess);
+#endif
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32)
+{
+    u32 yTile = y >> 2;
+    u32 yFine = (y & 3) * 4;
+    u32 xFine = x & 3;
+    u8* pixel = imageBuffer->m_imageData +
+        yTile * ((imageBuffer->m_width & 0x1FFFFFFCU) << 3) +
+        (x & 0x1FFFFFFC) * 8 +
+        (xFine + yFine) * 2;
+
+    pixel[0] = (u8)intensity;
+    pixel[1] = (u8)alpha;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
+{
+    u32 y;
+    u32 x;
+    float magnitude;
+    float stepX;
+    float stepY;
+    float yCoord;
+    float xCoord;
+    float ySq;
+
+    stepX = 2.0f / (float)(imageBuffer->m_width - 1);
+    stepY = 2.0f / (float)(imageBuffer->m_height - 1);
+    yCoord = -1.0f;
+
+    for (y = 0; y < imageBuffer->m_height; y++) {
+        ySq = yCoord * yCoord;
+        xCoord = -1.0f;
+
+        for (x = 0; x < imageBuffer->m_width; x++) {
+            magnitude = xCoord * xCoord + ySq;
+            if (magnitude > 0.0f) {
+                magnitude = Crystal2SqrtPositive(magnitude);
+#ifndef VERSION_GCCJGC
+            } else if ((double)magnitude < 0.0) {
+                magnitude = NAN;
+            } else if (Crystal2FpClassify(magnitude) == 1) {
+                magnitude = NAN;
+#endif
+            }
+
+            if (magnitude > 1.0f) {
+                magnitude = 1.0f;
+            }
+
+            ImageBufferSetPixel_IA8(
+                imageBuffer, x, y,
+                __cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f)),
+                __cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f)), 0, 0);
+            xCoord += stepX;
+        }
+
+        yCoord += stepY;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013ef74
+ * PAL Size: 32b
+ * EN Address: 0x8013E208
+ * EN Size: 32b
+ * JP Address: 0x8013AE24
+ * JP Size: 32b
+ */
+void pppConstructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
+{
+    Crystal2Work* work = (Crystal2Work*)(pppCrystal2->m_workArea + ctrl->m_serializedDataOffsets[2]);
+
+    work->m_refractionMap = 0;
+    work->m_refractionTexObj = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013eeec
+ * PAL Size: 136b
+ * EN Address: 0x8013E180
+ * EN Size: 136b
+ * JP Address: 0x8013AD9C
+ * JP Size: 136b
+ */
+void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
+{
+    Crystal2Work* work = (Crystal2Work*)(pppCrystal2->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    HSD_ImageBuffer* textureInfo = work->m_refractionMap;
+
+    if (work->m_refractionTexObj != 0) {
+        pppMemFree(work->m_refractionTexObj);
+        work->m_refractionTexObj = 0;
+    }
+
+    if ((textureInfo != 0) && (textureInfo->m_imageData != 0)) {
+        pppMemFree(textureInfo->m_imageData);
+        textureInfo->m_imageData = 0;
+    }
+
+    if (textureInfo != 0) {
+        pppMemFree(textureInfo);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013eb50
+ * PAL Size: 924b
+ * EN Address: 0x8013DDE4
+ * EN Size: 924b
+ * JP Address: 0x8013AAB8
+ * JP Size: 740b
+ */
+void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlTable* ctrl)
+{
+#ifdef VERSION_GCCJGC
+    u32 yFine;
+    u32 x;
+    u32 xFine;
+    u32 y;
+    u32 yTile;
+#else
+    u32 x;
+    u32 y;
+    u32 yTile;
+#endif
+    Crystal2Work* work;
+    HSD_ImageBuffer* textureInfo;
+    u32 textureSize;
+    float magnitude;
+    float stepX;
+    float stepY;
+    float yCoord;
+    float xCoord;
+    float ySq;
+
+#ifndef VERSION_GCCJGC
+    u32 xFine;
+#endif
+    if (ppvUserStopPartF != 0) {
+        return;
+    }
+
+    work = (Crystal2Work*)(pppCrystal2->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    if ((step->m_crystal.m_refractionMode != 0) && (work->m_refractionMap == 0)) {
+        work->m_refractionMap = (HSD_ImageBuffer*)pppMemAlloc(
+            sizeof(HSD_ImageBuffer), ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xA8);
+
+        textureInfo = work->m_refractionMap;
+        textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+        textureInfo->m_imageData = (u8*)pppMemAlloc(
+            textureSize, ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xAD);
+        textureInfo->m_format = GX_TF_IA8;
+        textureInfo->m_width = 0x20;
+        textureInfo->m_height = 0x20;
+        textureInfo->m_imageCount = 0x100;
+        textureInfo->m_bufferSize = textureSize;
+
+        stepX = 2.0f / (float)(textureInfo->m_width - 1);
+        stepY = 2.0f / (float)(textureInfo->m_height - 1);
+        yCoord = -1.0f;
+
+        for (y = 0; y < (u32)textureInfo->m_height; y++) {
+            yTile = y >> 2;
+#ifdef VERSION_GCCJGC
+            yFine = (y & 3) * 4;
+#else
+            u32 yFine = (y & 3) * 4;
+#endif
+            ySq = yCoord * yCoord;
+            xCoord = -1.0f;
+
+            for (x = 0; x < (u32)textureInfo->m_width; x++) {
+                magnitude = xCoord * xCoord + ySq;
+
+                if (magnitude > 0.0f) {
+                    magnitude = Crystal2SqrtPositive(magnitude);
+#ifndef VERSION_GCCJGC
+                } else if ((double)magnitude < 0.0) {
+                    magnitude = NAN;
+                } else if (Crystal2FpClassify(magnitude) == 1) {
+                    magnitude = NAN;
+#endif
+                }
+
+                xFine = x & 3;
+                if (magnitude > 1.0f) {
+                    magnitude = 1.0f;
+                }
+
+                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
+                u8* pixel = textureInfo->m_imageData +
+                    yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
+                    (x & 0x1FFFFFFC) * 8 +
+                    (xFine + yFine) * 2;
+
+                pixel[0] = nx;
+                u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
+                xCoord += stepX;
+                pixel[1] = ny;
+            }
+
+            yCoord += stepY;
+        }
+
+        DCFlushRange(textureInfo->m_imageData, textureInfo->m_bufferSize);
+        work->m_refractionTexObj = (GXTexObj*)pppMemAlloc(
+            0x20, ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xB5);
+        GXInitTexObj(work->m_refractionTexObj, textureInfo->m_imageData, (u16)textureInfo->m_width,
+                     (u16)textureInfo->m_height, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
+    }
 }
 
 /*
@@ -100,8 +320,8 @@ static inline float Crystal2SqrtPositive(float value)
 void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlTable* ctrl)
 {
     s32 dataValIndex = step->m_dataValIndex;
-    Crystal2Work* work = GetCrystal2Work(pppCrystal2, ctrl);
-    VColor* colorBlock = GetCrystal2ColorBlock(pppCrystal2, ctrl);
+    Crystal2Work* work = (Crystal2Work*)(pppCrystal2->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    VColor* colorBlock = (VColor*)(pppCrystal2->m_workArea + ctrl->m_serializedDataOffsets[1]);
     pppModelSt* model;
     CTexture* sourceTex;
     _GXTexObj backTexObj;
@@ -112,9 +332,11 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
     Mtx drawMtx;
     Mtx lightMtx;
 
-    if (dataValIndex != 0xFFFF) {
+    int index = dataValIndex;
+    if (index != 0xFFFF) {
         sourceTex = 0;
-        model = (pppModelSt*)ppvEnv->m_mapMeshPtr[dataValIndex];
+        int meshIndex = dataValIndex;
+        model = (pppModelSt*)ppvEnv->m_mapMeshPtr[meshIndex];
         textureIndex = 0;
         ((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
         if (step->m_crystal.m_refractionMode == 0) {
@@ -193,147 +415,4 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
         pppDrawMesh(model, 0, 0);
         Util.DisableIndMtx();
     }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013eb50
- * PAL Size: 924b
- * EN Address: 0x8013DDE4
- * EN Size: 924b
- * JP Address: 0x8013AAB8
- * JP Size: 740b
- */
-void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlTable* ctrl)
-{
-    u32 x;
-    u32 y;
-    u32 yTile;
-    Crystal2Work* work;
-    HSD_ImageBuffer* textureInfo;
-    u32 textureSize;
-    float magnitude;
-    float stepX;
-    float stepY;
-    float yCoord;
-    float xCoord;
-    float ySq;
-
-    u32 xFine;
-    if (ppvUserStopPartF != 0) {
-        return;
-    }
-
-    work = (Crystal2Work*)(pppCrystal2->m_workArea + ctrl->m_serializedDataOffsets[2]);
-    if ((step->m_crystal.m_refractionMode != 0) && (work->m_refractionMap == 0)) {
-        work->m_refractionMap = (HSD_ImageBuffer*)pppMemAlloc(
-            sizeof(HSD_ImageBuffer), ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xA8);
-
-        textureInfo = work->m_refractionMap;
-        textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
-        textureInfo->m_imageData = (u8*)pppMemAlloc(
-            textureSize, ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xAD);
-        textureInfo->m_format = GX_TF_IA8;
-        textureInfo->m_width = 0x20;
-        textureInfo->m_height = 0x20;
-        textureInfo->m_imageCount = 0x100;
-        textureInfo->m_bufferSize = textureSize;
-
-        stepX = 2.0f / (float)(textureInfo->m_width - 1);
-        stepY = 2.0f / (float)(textureInfo->m_height - 1);
-        yCoord = -1.0f;
-
-        for (y = 0; y < (u32)textureInfo->m_height; y++) {
-            yTile = y >> 2;
-            u32 yFine = (y & 3) * 4;
-            ySq = yCoord * yCoord;
-            xCoord = -1.0f;
-
-            for (x = 0; x < (u32)textureInfo->m_width; x++) {
-#ifdef VERSION_GCCJGC
-                magnitude = sqrtf(xCoord * xCoord + ySq);
-#else
-                magnitude = xCoord * xCoord + ySq;
-
-                if (magnitude > 0.0f) {
-                    magnitude = Crystal2SqrtPositive(magnitude);
-                } else if ((double)magnitude < 0.0) {
-                    magnitude = NAN;
-                } else if (Crystal2FpClassify(magnitude) == 1) {
-                    magnitude = NAN;
-                }
-#endif
-
-                xFine = x & 3;
-                if (magnitude > 1.0f) {
-                    magnitude = 1.0f;
-                }
-
-                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
-                u8* pixel = textureInfo->m_imageData +
-                    yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
-                    (x & 0x1FFFFFFC) * 8 +
-                    (xFine + yFine) * 2;
-
-                pixel[0] = nx;
-                u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
-                xCoord += stepX;
-                pixel[1] = ny;
-            }
-
-            yCoord += stepY;
-        }
-
-        DCFlushRange(textureInfo->m_imageData, textureInfo->m_bufferSize);
-        work->m_refractionTexObj = (GXTexObj*)pppMemAlloc(
-            0x20, ppvEnv->m_stagePtr, "pppCrystal2.cpp", 0xB5);
-        GXInitTexObj(work->m_refractionTexObj, textureInfo->m_imageData, (u16)textureInfo->m_width,
-                     (u16)textureInfo->m_height, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013eeec
- * PAL Size: 136b
- * EN Address: 0x8013E180
- * EN Size: 136b
- * JP Address: 0x8013AD9C
- * JP Size: 136b
- */
-void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
-{
-    Crystal2Work* work = GetCrystal2Work(pppCrystal2, ctrl);
-    HSD_ImageBuffer* textureInfo = work->m_refractionMap;
-
-    if (work->m_refractionTexObj != 0) {
-        pppMemFree(work->m_refractionTexObj);
-        work->m_refractionTexObj = 0;
-    }
-
-    if ((textureInfo != 0) && (textureInfo->m_imageData != 0)) {
-        pppMemFree(textureInfo->m_imageData);
-        textureInfo->m_imageData = 0;
-    }
-
-    if (textureInfo != 0) {
-        pppMemFree(textureInfo);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013ef74
- * PAL Size: 32b
- * EN Address: 0x8013E208
- * EN Size: 32b
- * JP Address: 0x8013AE24
- * JP Size: 32b
- */
-void pppConstructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
-{
-    Crystal2Work* work = GetCrystal2Work(pppCrystal2, ctrl);
-
-    work->m_refractionMap = 0;
-    work->m_refractionTexObj = 0;
 }

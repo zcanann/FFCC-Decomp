@@ -6,11 +6,6 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
-struct pppColAcceleDataOffsets {
-    s32 m_colorOffset;
-    s32 m_accelerationOffset;
-};
-
 struct pppColorDelta
 {
     short r;

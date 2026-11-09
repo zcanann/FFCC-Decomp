@@ -7,14 +7,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(sizeof(SRandCVDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(SRandCVDataOffsets, m_stateOffset) == 0x0);
-
-static inline SRandCVDataOffsets* GetSRandCVDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<SRandCVDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline float randf(unsigned char flag)
 {
     float value = Math.RandF();
@@ -50,7 +42,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
     float* target;
 
     if (in->targetId == basePtr->m_graphId) {
-        target = (float*)(basePtr->m_workArea + GetSRandCVDataOffsets(ctrl)->m_stateOffset);
+        target = (float*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         target[0] = randf(in->useNormalDistribution);
         target[1] = randf(in->useNormalDistribution);
         target[2] = randf(in->useNormalDistribution);
@@ -59,7 +51,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
         if (in->targetId != basePtr->m_graphId) {
             return;
         }
-        target = (float*)(basePtr->m_workArea + GetSRandCVDataOffsets(ctrl)->m_stateOffset);
+        target = (float*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     s32 color_offset = in->sourceOffset;

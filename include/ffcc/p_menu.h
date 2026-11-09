@@ -521,7 +521,6 @@ public:
 
     CTexture* GetTexture(TEX tex) { return m_textures[tex]; }
     CMemory::CStage* GetStage(int);
-    McCtrl* GetMcCtrl() { return &m_mcCtrl; }
 
     void WmInit();
     void createWorld();
@@ -1078,7 +1077,7 @@ public:
     };
     union {
         int m_pad884;
-        void* m_goOutTransferWork;
+        Mc::SaveDat* m_goOutTransferWork;
     };
     union {
         unsigned char m_cmakeWorkActive;

@@ -27,6 +27,7 @@ public:
     int GetSlot();
     void SetDno(int);
     void SetSlot(int);
+    void SetMcAccessPos(int, int);
 
     int m_previousState;
     int m_state;

@@ -10,11 +10,6 @@ struct PppSclMoveInput {
     float m_scale[3];
 };
 
-struct PppSclMoveOffsets {
-    int m_scaleOffset;
-    int m_velocityOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

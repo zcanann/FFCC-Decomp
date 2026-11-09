@@ -35,19 +35,6 @@ STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
 STATIC_ASSERT(sizeof(RAIN_DATA) == 0x20);
 STATIC_ASSERT(sizeof(_pppCtrlTable) == 0x10);
 STATIC_ASSERT(offsetof(_pppCtrlTable, m_serializedDataOffsets) == 0xC);
-STATIC_ASSERT(sizeof(RainDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(RainDataOffsets, m_colorDataOffset) == 0x4);
-STATIC_ASSERT(offsetof(RainDataOffsets, m_workOffset) == 0x8);
-
-static inline RainDataOffsets* GetRainDataOffsets(_pppCtrlTable* data)
-{
-    return reinterpret_cast<RainDataOffsets*>(data->m_serializedDataOffsets);
-}
-
-static inline VRain* GetRainWork(pppRain* rain, _pppCtrlTable* data)
-{
-    return reinterpret_cast<VRain*>(rain->m_workArea + GetRainDataOffsets(data)->m_workOffset);
-}
 
 /*
  * --INFO--
@@ -137,9 +124,9 @@ void pppRenderRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
     float baseZ;
     Vec segment;
 
-    int workOffset = GetRainDataOffsets(data)->m_workOffset;
+    int workOffset = data->m_serializedDataOffsets[2];
     work = reinterpret_cast<VRain*>(rain->m_workArea + workOffset);
-    int colorOffset = GetRainDataOffsets(data)->m_colorDataOffset;
+    int colorOffset = data->m_serializedDataOffsets[1];
     colorData = reinterpret_cast<VColor*>(rain->m_workArea + colorOffset);
     pppSetBlendMode(pRain->m_blendMode);
     pppSetDrawEnv(
@@ -211,7 +198,7 @@ void pppFrameRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
         return;
     }
 
-    i = GetRainDataOffsets(data)->m_workOffset;
+    i = data->m_serializedDataOffsets[2];
     work = reinterpret_cast<VRain*>(rain->m_workArea + i);
     if (work->drops == 0) {
         work->drops = (RAIN_DATA*)pppMemAlloc(
@@ -253,9 +240,9 @@ void pppFrameRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
             posY = ppvCameraMatrix[1][3];
             posZ = ppvCameraMatrix[2][3];
         } else {
-            posX = CameraPcs.m_targetX;
-            posY = CameraPcs.m_targetY;
-            posZ = CameraPcs.m_targetZ;
+            posX = CameraPcs.m_target.x;
+            posY = CameraPcs.m_target.y;
+            posZ = CameraPcs.m_target.z;
         }
         ppvMng->m_matrix.value[0][3] = posX;
         ppvMng->m_matrix.value[1][3] = posY;
@@ -277,7 +264,7 @@ void pppDestructRain(pppRain* rain, _pppCtrlTable* data)
 {
     VRain* work;
 
-    work = GetRainWork(rain, data);
+    work = (VRain*)(rain->m_workArea + data->m_serializedDataOffsets[2]);
     if (work->drops != 0) {
         pppMemFree(work->drops);
         work->drops = 0;
@@ -299,7 +286,7 @@ void pppConstructRain(pppRain* rain, _pppCtrlTable* data)
     VRain* work;
 
     zero = 0.0f;
-    work = GetRainWork(rain, data);
+    work = (VRain*)(rain->m_workArea + data->m_serializedDataOffsets[2]);
     work->drops = 0;
     work->moveY = work->accelY = work->accelZ = zero;
 }

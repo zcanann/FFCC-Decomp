@@ -173,9 +173,7 @@ int CMenuPcs::MoneyCtrlCur()
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (0 <= (int)s_Money - (int)placeValue) {
-						gil = s_Money - placeValue;
-					}
+					gil = (0 <= (int)s_Money - (int)placeValue) ? s_Money - placeValue : gil;
 					s_Money = gil;
 					MoneySetPlace(1);
 					Sound.PlaySe(1, 0x40, 0x7F, 0);

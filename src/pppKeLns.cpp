@@ -4,19 +4,6 @@
 #include "ffcc/partMng.h"
 #include "dolphin/types.h"
 
-STATIC_ASSERT(sizeof(KeLnsDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(KeLnsDataOffsets, m_workOffset) == 0x0);
-
-static inline KeLnsDataOffsets* GetKeLnsDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<KeLnsDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
-static inline _KeLnsLp* GetKeLnsLoopWork(_pppPObject* object, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<_KeLnsLp*>(object->m_workArea + GetKeLnsDataOffsets(ctrlTable)->m_workOffset);
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -66,7 +53,7 @@ void pppKeLnsLpDraw(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTa
  */
 void pppKeLnsLpCon2(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	_KeLnsLp* keLnsLp = GetKeLnsLoopWork(object, ctrlTable);
+	_KeLnsLp* keLnsLp = (_KeLnsLp*)(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 	f32 zero = 0.0f;
 
 	keLnsLp->m_work8C = zero;
@@ -84,7 +71,7 @@ void pppKeLnsLpCon2(_pppPObject* object, _pppCtrlTable* ctrlTable)
  */
 void pppKeLnsLpCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	_KeLnsLp* keLnsLp = GetKeLnsLoopWork(object, ctrlTable);
+	_KeLnsLp* keLnsLp = (_KeLnsLp*)(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
 	KeLnsLp_Init(keLnsLp);
 	f32 zero = 0.0f;

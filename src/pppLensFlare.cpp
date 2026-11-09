@@ -15,24 +15,6 @@ STATIC_ASSERT(offsetof(LensFlareWork, m_viewPosition) == 0x20);
 STATIC_ASSERT(offsetof(LensFlareWork, m_shapeFrame1) == 0x2E);
 STATIC_ASSERT(offsetof(LensFlareWork, m_alpha) == 0x32);
 STATIC_ASSERT(offsetof(LensFlareWork, m_dot) == 0x34);
-STATIC_ASSERT(sizeof(LensFlareDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(LensFlareDataOffsets, m_colorWorkOffset) == 0x4);
-STATIC_ASSERT(offsetof(LensFlareDataOffsets, m_workOffset) == 0x8);
-
-static inline LensFlareDataOffsets* GetLensFlareDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<LensFlareDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
-static inline LensFlareWork* GetLensFlareWork(pppColum* obj, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<LensFlareWork*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_workOffset);
-}
-
-static inline VColor* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<VColor*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_colorWorkOffset);
-}
 
 /*
  * --INFO--
@@ -45,8 +27,8 @@ static inline VColor* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTa
  */
 void pppRenderLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTable)
 {
-	LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
-	VColor* colorWork = GetLensFlareColorWork(obj, ctrlTable);
+	LensFlareWork* work = (LensFlareWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+	VColor* colorWork = (VColor*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
 	s32 dataValIndex = step->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
@@ -106,8 +88,8 @@ void pppRenderLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTa
 void pppFrameLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTable)
 {
 	if (ppvUserStopPartF == 0) {
-		LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
-		VColor* colorWork = GetLensFlareColorWork(obj, ctrlTable);
+		LensFlareWork* work = (LensFlareWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+		VColor* colorWork = (VColor*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
 		u8 sourceAlpha = colorWork->m_color.rgba[3];
 		float worldX = ppvMng->m_matrix.value[0][3];
 		float worldY = ppvMng->m_matrix.value[1][3];
@@ -141,12 +123,12 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTab
 				  &work->m_projectedX, &work->m_projectedY, &work->m_projectedZ);
 
 		work->m_alpha = 0;
-		cameraPos.x = CameraPcs.m_positionX;
-		cameraPos.y = CameraPcs.m_positionY;
-		cameraPos.z = CameraPcs.m_positionZ;
-		cameraLookAt.x = CameraPcs.m_targetX;
-		cameraLookAt.y = CameraPcs.m_targetY;
-		cameraLookAt.z = CameraPcs.m_targetZ;
+		cameraPos.x = CameraPcs.m_position.x;
+		cameraPos.y = CameraPcs.m_position.y;
+		cameraPos.z = CameraPcs.m_position.z;
+		cameraLookAt.x = CameraPcs.m_target.x;
+		cameraLookAt.y = CameraPcs.m_target.y;
+		cameraLookAt.z = CameraPcs.m_target.z;
 		PSVECSubtract(&cameraLookAt, &cameraPos, &lookDir);
 
 		objectPos.x = ppvMng->m_matrix.value[0][3];
@@ -231,7 +213,7 @@ void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
  */
 void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
+	LensFlareWork* work = (LensFlareWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 
 	float initValue = 0.0f;
 

@@ -3,16 +3,6 @@
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include <dolphin/mtx.h>
 
-STATIC_ASSERT(sizeof(MatrixXYZDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(MatrixXYZDataOffsets, m_translationOffset) == 0x0);
-STATIC_ASSERT(offsetof(MatrixXYZDataOffsets, m_angleOffset) == 0x4);
-STATIC_ASSERT(offsetof(MatrixXYZDataOffsets, m_scaleOffset) == 0x8);
-
-static inline MatrixXYZDataOffsets* GetMatrixXYZDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<MatrixXYZDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80065398
@@ -25,10 +15,10 @@ static inline MatrixXYZDataOffsets* GetMatrixXYZDataOffsets(_pppCtrlTable* ctrl)
 void pppMatrixXYZ(_pppPObject* target, pppNoStep* stepData, _pppCtrlTable* param)
 {
     (void)stepData;
-    MatrixXYZDataOffsets* offsets = GetMatrixXYZDataOffsets(param);
-    pppIVECTOR4* angle = (pppIVECTOR4*)(target->m_workArea + offsets->m_angleOffset);
-    f32* translation = (f32*)(target->m_workArea + offsets->m_translationOffset);
-    f32* scale = (f32*)(target->m_workArea + offsets->m_scaleOffset);
+    int* offsets = param->m_serializedDataOffsets;
+    pppIVECTOR4* angle = (pppIVECTOR4*)(target->m_workArea + offsets[1]);
+    f32* translation = (f32*)(target->m_workArea + offsets[0]);
+    f32* scale = (f32*)(target->m_workArea + offsets[2]);
     Vec tempVec1;
     Vec tempVec2;
     Vec tempVec3;

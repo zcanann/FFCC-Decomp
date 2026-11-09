@@ -2,20 +2,6 @@
 #include "ffcc/pppPoint.h"
 #include "ffcc/partMng.h"
 
-
-STATIC_ASSERT(sizeof(PppPointDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(PppPointDataOffsets, m_pointOffset) == 0x0);
-
-static inline PppPointDataOffsets* GetPppPointDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<PppPointDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
-
-static inline float* GetPppPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<float*>(pObject->m_workArea + GetPppPointDataOffsets(ctrlTable)->m_pointOffset);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80065cd8
@@ -27,7 +13,7 @@ static inline float* GetPppPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTa
  */
 void pppPointCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-	float* dst = GetPppPointWork(pObject, ctrlTable);
+	float* dst = (float*)(pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
 	dst[0] = dst[1] = dst[2] = 0.0f;
 }
@@ -51,7 +37,7 @@ void pppPoint(_pppPObject* pObject, pppPointStep* step, _pppCtrlTable* ctrlTable
 		return;
 	}
 
-	float* dst = GetPppPointWork(pObject, ctrlTable);
+	float* dst = (float*)(pObject->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
 	dst[0] += step->m_x;
 	dst[1] += step->m_y;

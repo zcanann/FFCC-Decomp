@@ -17,16 +17,8 @@ STATIC_ASSERT(offsetof(pppColumFrameWork, m_values) == 0x08);
 STATIC_ASSERT(sizeof(pppColumFrameWork) == 0x0C);
 STATIC_ASSERT(offsetof(pppColumPositionWork, m_position) == 0x10);
 STATIC_ASSERT(offsetof(pppColumPositionWork, m_alpha) == 0x32);
-STATIC_ASSERT(sizeof(pppColumDataOffsets) == 0x10);
-STATIC_ASSERT(offsetof(pppColumDataOffsets, m_positionWorkOffset) == 0x08);
-STATIC_ASSERT(offsetof(pppColumDataOffsets, m_frameWorkOffset) == 0x0C);
 
 static const char s_pppColum_cpp[] = "pppColum.cpp";
-
-static inline pppColumDataOffsets* GetColumDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<pppColumDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
 
 /*
  * --INFO--
@@ -39,11 +31,11 @@ static inline pppColumDataOffsets* GetColumDataOffsets(_pppCtrlTable* ctrl)
  */
 void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
 {
-    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(ctrl);
+    int* serializedDataOffsets = ctrl->m_serializedDataOffsets;
     pppColumValue* values;
-    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets[3]);
     pppColumPositionWork* positionWork =
-        (pppColumPositionWork*)(column->m_workArea + serializedDataOffsets->m_positionWorkOffset);
+        (pppColumPositionWork*)(column->m_workArea + serializedDataOffsets[2]);
     int textureIndex = 0;
     pppCVECTOR color;
 
@@ -168,14 +160,14 @@ void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
  */
 void pppFrameColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
 {
-    pppColumDataOffsets* serializedDataOffsets;
+    int* serializedDataOffsets;
     pppColumValue* values;
     pppColumFrameWork* frameWork;
     int i;
 
     if (ppvUserStopPartF == 0) {
-        serializedDataOffsets = GetColumDataOffsets(ctrl);
-        frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
+        serializedDataOffsets = ctrl->m_serializedDataOffsets;
+        frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets[3]);
         if (frameWork->m_values == 0) {
             frameWork->m_values = (pppColumValue*)pppMemAlloc(
                 (unsigned long)step->m_count * 0xc, ppvEnv->m_stagePtr,
@@ -215,8 +207,8 @@ void pppFrameColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
  */
 void pppDestructColum(pppColum *column, _pppCtrlTable *ctrl)
 {
-    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(ctrl);
-    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
+    int* serializedDataOffsets = ctrl->m_serializedDataOffsets;
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets[3]);
 
     if (frameWork->m_values != 0) {
         pppMemFree(frameWork->m_values);
@@ -235,8 +227,8 @@ void pppDestructColum(pppColum *column, _pppCtrlTable *ctrl)
  */
 void pppConstructColum(pppColum *column, _pppCtrlTable *ctrl)
 {
-    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(ctrl);
-    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
+    int* serializedDataOffsets = ctrl->m_serializedDataOffsets;
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets[3]);
     frameWork->m_shapeC = 0;
     frameWork->m_shapeB = 0;
     frameWork->m_shapeA = 0;

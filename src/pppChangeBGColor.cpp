@@ -5,18 +5,11 @@
 #include "ffcc/ppp_linkage.h"
 
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
-STATIC_ASSERT(sizeof(ChangeBGColorDataOffsets) == 0x8);
-STATIC_ASSERT(offsetof(ChangeBGColorDataOffsets, m_colorWorkOffset) == 0x4);
-
-static inline ChangeBGColorDataOffsets* GetChangeBGColorDataOffsets(_pppCtrlTable* ctrlTable)
-{
-    return reinterpret_cast<ChangeBGColorDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
 
 static inline VColor* GetChangeBGColorWork(pppChangeBGColor* changeBGColor, _pppCtrlTable* ctrlTable)
 {
     return reinterpret_cast<VColor*>(
-        changeBGColor->m_workArea + GetChangeBGColorDataOffsets(ctrlTable)->m_colorWorkOffset);
+        changeBGColor->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
 }
 
 /*

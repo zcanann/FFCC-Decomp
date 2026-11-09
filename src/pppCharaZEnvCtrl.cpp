@@ -6,14 +6,6 @@
 
 static void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 
-STATIC_ASSERT(sizeof(CharaZEnvCtrlDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(CharaZEnvCtrlDataOffsets, m_workOffset) == 0x0);
-
-static inline CharaZEnvCtrlDataOffsets* GetCharaZEnvCtrlDataOffsets(_pppCtrlTable* ctrl)
-{
-	return reinterpret_cast<CharaZEnvCtrlDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8013e584
@@ -29,7 +21,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* obj, pppCharaZEnvCtrlStep* step, _p
 		return;
 	}
 
-	int dataOffset = GetCharaZEnvCtrlDataOffsets(ctrl)->m_workOffset;
+	int dataOffset = ctrl->m_serializedDataOffsets[0];
 	void* work = obj->m_workArea + dataOffset;
 	CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model = GetCharaModelPtr(handle);

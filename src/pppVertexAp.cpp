@@ -43,14 +43,6 @@ struct VertexApState
     u16 countdown;
 };
 
-STATIC_ASSERT(sizeof(VertexApDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(VertexApDataOffsets, m_stateOffset) == 0x0);
-
-static inline VertexApDataOffsets* GetVertexApDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VertexApDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 struct VertexApSource
 {
     u8 unk0[0x2C];
@@ -69,7 +61,7 @@ struct VertexApSource
 void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
 {
     VertexApData* data = (VertexApData*)dataRaw;
-    s32 stateOffset = GetVertexApDataOffsets(ctrl)->m_stateOffset;
+    s32 stateOffset = ctrl->m_serializedDataOffsets[0];
     VertexApState* state = (VertexApState*)(parent->m_workArea + stateOffset);
 
     if (ppvUserStopPartF != 0) {
@@ -225,7 +217,7 @@ functionEnd:
  */
 void pppVertexApCon(_pppPObject* pobj, _pppCtrlTable* ctrl)
 {
-    s32 offset = GetVertexApDataOffsets(ctrl)->m_stateOffset;
+    s32 offset = ctrl->m_serializedDataOffsets[0];
     u16* state = (u16*)(pobj->m_workArea + offset);
     state[0] = 0;
     state[1] = 0;

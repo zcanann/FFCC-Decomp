@@ -4,19 +4,85 @@
 #include "global.h"
 #include "dolphin/mtx.h"
 
+struct CMonAiAction
+{
+    unsigned short m_flags;
+    unsigned short m_minDist;
+    unsigned short m_maxDist;
+    unsigned short m_chance;
+    unsigned short m_type;
+    unsigned short m_group;
+    unsigned short m_range;
+    unsigned short m_changeStat;
+};
+
+STATIC_ASSERT(sizeof(CMonAiAction) == 0x10);
+
+struct CRomData
+{
+    unsigned short m_unk000[0x4E];
+    unsigned short m_monsterParams0[4];      // 0x09C
+    unsigned short m_monsterParams1[14];     // 0x0A4
+    unsigned short m_unk0C0[4];
+    unsigned short m_colRange;               // 0x0C8
+    unsigned short m_viewAngle;              // 0x0CA
+    unsigned short m_territoryRange;         // 0x0CC
+    unsigned short m_attackRange;            // 0x0CE
+    unsigned short m_unk0D0[2];
+    unsigned short m_moveSpeed;              // 0x0D4
+    unsigned short m_approachRange;          // 0x0D6
+    unsigned short m_unk0D8[3];
+    unsigned short m_elementResistances[11]; // 0x0DE
+    unsigned short m_shoukiDamageInterval;   // 0x0F4
+    unsigned short m_unk0F6[3];
+    unsigned short m_kind;                   // 0x0FC
+    unsigned short m_flags;                  // 0x0FE
+    unsigned short m_aiRomBase;              // 0x100
+    unsigned short m_aiFlags;                // 0x102
+    unsigned short m_alertMode;              // 0x104
+    unsigned short m_targetMode;             // 0x106
+    unsigned short m_actionSelect;           // 0x108
+    unsigned short m_actionKind;             // 0x10A
+    unsigned short m_aiType;                 // 0x10C
+    unsigned short m_unk10E;
+    CMonAiAction m_actions[8];               // 0x110
+    unsigned short m_seBank;                 // 0x190
+    unsigned short m_seBase;                 // 0x192
+    unsigned short m_magicCastBonus;         // 0x194
+    unsigned short m_chargeCastBonus;        // 0x196
+    unsigned short m_power;                  // 0x198
+    unsigned short m_combatParam0;           // 0x19A
+    unsigned short m_combatParam1;           // 0x19C
+    unsigned short m_dieParticle;            // 0x19E
+    unsigned short m_animPoint0;             // 0x1A0
+    unsigned short m_animPoint1;             // 0x1A2
+    unsigned short m_hitParticle;            // 0x1A4
+    unsigned short m_hitSe;                  // 0x1A6
+    unsigned short m_repopParticleCount;     // 0x1A8
+    unsigned short m_iceParticleCount;       // 0x1AA
+    unsigned short m_undeadWeaponCount;      // 0x1AC
+    unsigned short m_undeadParticleCount;    // 0x1AE
+    unsigned short m_turnFactor;             // 0x1B0
+    unsigned short m_hitMask;                // 0x1B2
+    unsigned short m_scale;                  // 0x1B4
+    unsigned short m_moveLimitFrame;         // 0x1B6
+    unsigned short m_escapeFrame;            // 0x1B8
+    unsigned short m_chaseFrame;             // 0x1BA
+    unsigned short m_attackMoveFrame;        // 0x1BC
+    unsigned short m_stepSe;                 // 0x1BE
+};
+
+STATIC_ASSERT(sizeof(CRomData) == 0x1C0);
+STATIC_ASSERT(offsetof(CRomData, m_monsterParams0) == 0x9C);
+STATIC_ASSERT(offsetof(CRomData, m_colRange) == 0xC8);
+STATIC_ASSERT(offsetof(CRomData, m_elementResistances) == 0xDE);
+STATIC_ASSERT(offsetof(CRomData, m_kind) == 0xFC);
+STATIC_ASSERT(offsetof(CRomData, m_actions) == 0x110);
+STATIC_ASSERT(offsetof(CRomData, m_seBank) == 0x190);
+STATIC_ASSERT(offsetof(CRomData, m_stepSe) == 0x1BE);
+
 struct CRomWork
 {
-    enum
-    {
-        DataHalfwordCount = (0x1D0 - 0x10) / sizeof(unsigned short),
-        ElementResistanceOffset = 0x6F,
-        EnemyKindOffset = 0x7E,
-        EnemyFlagsOffset = 0x7F,
-        ShoukiDamageIntervalOffset = 0x7A,
-        MonsterParams0Offset = 0x4E,
-        MonsterParams1Offset = 0x52,
-    };
-
     unsigned short m_id;
     unsigned short m_param1;
     unsigned short m_param2;
@@ -25,18 +91,12 @@ struct CRomWork
     unsigned short m_magic;
     unsigned short m_defense;
     unsigned short m_reserved0E;
-    unsigned short m_data[DataHalfwordCount];
-
-    unsigned short* Data() { return m_data; }
-    const unsigned short* Data() const { return m_data; }
-    unsigned short* ElementResistances() { return m_data + ElementResistanceOffset; }
-    const unsigned short* ElementResistances() const { return m_data + ElementResistanceOffset; }
-    unsigned short* MonsterParams0() { return m_data + MonsterParams0Offset; }
-    unsigned short* MonsterParams1() { return m_data + MonsterParams1Offset; }
+    CRomData m_data;
 };
 
 STATIC_ASSERT(sizeof(CRomWork) == 0x1D0);
 STATIC_ASSERT(offsetof(CRomWork, m_data) == 0x10);
+
 struct CRomLetterWork
 {
     unsigned short Word(int index) const { return reinterpret_cast<const unsigned short*>(this)[index]; }
@@ -92,7 +152,7 @@ public:
     unsigned short m_strength;              // 0x001E
     unsigned short m_magic;                 // 0x0020
     unsigned short m_defense;               // 0x0022
-    unsigned short* m_romWork;              // 0x0024
+    CRomData* m_romWork;                    // 0x0024
     unsigned short* RomStatusBlock() { return m_elementResistances; }
     unsigned short m_elementResistances[RomStatusBlockHalfwordCount]; // 0x0028
     unsigned short m_statusTimers[39];      // 0x003E

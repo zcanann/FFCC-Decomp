@@ -23,11 +23,6 @@ inline int CSystem::GetErrorLevel()
 }
 
 namespace {
-static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
-{
-	return &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemIdx];
-}
-
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)((unsigned char*)Game.m_battleParams + offset)) * 0.01f) +
@@ -81,9 +76,9 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_strength = romWork->m_strength;
 	m_magic = romWork->m_magic;
 	m_defense = romWork->m_defense;
-	m_romWork = romWork->Data();
+	m_romWork = &romWork->m_data;
 
-	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers, 0, sizeof(m_statusTimers));
 	for (int i = 0; i < 16; i++) {
 		m_statusValues[i] = 0xFFFF;
@@ -260,7 +255,7 @@ void CCaravanWork::LoadFinished()
 	}
 
 	m_baseDataIndex = (m_id / 100) - 1;
-	m_romWork = Game.m_charaRomTable[m_baseDataIndex].m_data;
+	m_romWork = &Game.m_charaRomTable[m_baseDataIndex].m_data;
 }
 
 /*
@@ -284,8 +279,8 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_strength = romWork->m_strength;
 	m_magic = romWork->m_magic;
 	m_defense = romWork->m_defense;
-	m_romWork = romWork->Data();
-	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	m_romWork = &romWork->m_data;
+	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers, 0, sizeof(m_statusTimers));
 	for (int i = 0; i < 16; i++) {
 		m_statusValues[i] = 0xFFFF;
@@ -879,15 +874,16 @@ int CCaravanWork::GetFoodRank(int foodIdx)
  */
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
+	int i;
 	int cmpValue;
 	int letterIdx;
 	int excludeFlag;
-	int bit1;
-	int bit2;
-	int bit0;
+	int val1;
+	int val2;
+	int val0;
 	int foundCount = 0;
 
-	for (int i = 0; i < maxResults; i++) {
+	for (i = 0; i < maxResults; i++) {
 		romLetterWork[i] = 0;
 	}
 
@@ -1315,13 +1311,13 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		int sysVal1 = Game.m_gameWork.m_timerA;
 		int sysVal2 = Game.m_gameWork.m_scriptGlobalTime;
 		int sysVal3 = Game.m_gameWork.m_frameCounter;
-		for (int i = 0; i < 4; i++) {
+		for (i = 0; i < 4; i++) {
 			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
-			const int sourceType = (cmpType >> 11) & 3;
+			val1 = (cmpType >> 11) & 3;
 
-			if (sourceType != 3) {
+			if (val1 != 3) {
 				const int sourceIdx = cmpType & 0x7FF;
-				switch (sourceType) {
+				switch (val1) {
 				case 0:
 					switch (sourceIdx) {
 					case 0:
@@ -1384,91 +1380,91 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 
 		{
-			for (int i = 0; i < 8; i++) {
-				const unsigned short evtRule = curLetter->m_eventRules[i];
-				const int sourceType = (evtRule >> 11) & 3;
+			for (i = 0; i < 8; i++) {
+				condBits = curLetter->m_eventRules[i];
+				const int sourceType = (condBits >> 11) & 3;
 
 				if (sourceType == 3) {
 					continue;
 				}
 
-				int sourceIdx = evtRule & 0x7FF;
+				int sourceIdx = condBits & 0x7FF;
 
 				switch (sourceType) {
 				case 1:
-					bit0 = Game.GetEvtFlag(sourceIdx);
-					bit1 = Game.GetEvtFlag(sourceIdx + 1);
-					bit2 = Game.GetEvtFlag(sourceIdx + 2);
+					val0 = Game.GetEvtFlag(sourceIdx);
+					val1 = Game.GetEvtFlag(sourceIdx + 1);
+					val2 = Game.GetEvtFlag(sourceIdx + 2);
 					break;
 				case 2:
-					bit0 = GetEvtFlag(sourceIdx);
-					bit1 = GetEvtFlag(sourceIdx + 1);
-					bit2 = GetEvtFlag(sourceIdx + 2);
+					val0 = GetEvtFlag(sourceIdx);
+					val1 = GetEvtFlag(sourceIdx + 1);
+					val2 = GetEvtFlag(sourceIdx + 2);
 					break;
 				}
 
-				switch ((evtRule >> 13) & 7) {
+				switch ((condBits >> 13) & 7) {
 				case 0:
-					if (bit0 != 0) {
+					if (val0 != 0) {
 						goto NextLetter;
 					}
 					break;
 				case 1:
-					if (bit0 == 0) {
+					if (val0 == 0) {
 						goto NextLetter;
 					}
 					break;
 				case 2:
-					if (bit0 != 0) {
+					if (val0 != 0) {
 						goto NextLetter;
 					}
-					if (bit1 != 0) {
+					if (val1 != 0) {
 						goto NextLetter;
 					}
-					if (bit2 == 0) {
+					if (val2 == 0) {
 						break;
 					}
 					goto NextLetter;
 				case 3:
-					if (bit0 != 0) {
+					if (val0 != 0) {
 						break;
 					}
-					if (bit1 != 0) {
+					if (val1 != 0) {
 						break;
 					}
-					if (bit2 == 0) {
+					if (val2 == 0) {
 						goto NextLetter;
 					}
 					break;
 				case 4:
-					if (bit1 != 0) {
+					if (val1 != 0) {
 						goto NextLetter;
 					}
-					if (bit2 == 0) {
+					if (val2 == 0) {
 						break;
 					}
 					goto NextLetter;
 				case 5:
-					if (bit1 != 0) {
+					if (val1 != 0) {
 						goto NextLetter;
 					}
-					if (bit2 != 0) {
+					if (val2 != 0) {
 						break;
 					}
 					goto NextLetter;
 				case 6:
-					if (bit1 == 0) {
+					if (val1 == 0) {
 						goto NextLetter;
 					}
-					if (bit2 == 0) {
+					if (val2 == 0) {
 						break;
 					}
 					goto NextLetter;
 				case 7:
-					if (bit1 == 0) {
+					if (val1 == 0) {
 						goto NextLetter;
 					}
-					if (bit2 == 0) {
+					if (val2 == 0) {
 						goto NextLetter;
 					}
 					break;
@@ -1477,20 +1473,19 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 
 		if (foundCount == maxResults) {
-			int i;
 			int minPriority = 0xFFFF;
-			int replaceIndex = 0;
+			val1 = 0;
 			for (i = 0; i < maxResults; i++) {
 				const int priority = romLetterWork[i]->m_priorityFlags & 0xF00;
 				if (priority < minPriority) {
 					minPriority = priority;
-					replaceIndex = i;
+					val1 = i;
 				}
 			}
 
 			const int curPriority = curLetter->m_priorityFlags & 0xF00;
 			if (minPriority < curPriority) {
-				romLetterWork[replaceIndex] = curLetter;
+				romLetterWork[val1] = curLetter;
 			}
 		} else {
 			romLetterWork[foundCount++] = curLetter;
@@ -1692,7 +1687,7 @@ inline void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int&
 		if (artifactIndex < kPermanentArtifactCount || includeTemp != 0) {
 			int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex];
 			if (artifactId > 0) {
-				SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
+				SItemFlatRow* artifactData = &((SItemFlatRow*)Game.m_itemTable)[artifactId];
 				unsigned short value = artifactData->m_value;
 				switch (artifactData->m_kind) {
 				case 0x9F:
@@ -1734,7 +1729,7 @@ void CCaravanWork::CalcStatus()
 	int itemType;
 	CRomWork* baseData = &Game.m_charaRomTable[m_baseDataIndex];
 
-	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
 	m_baseStrength = m_strength = baseData->m_strength;
 	m_baseMagic = m_magic = baseData->m_magic;
@@ -1811,7 +1806,7 @@ void CCaravanWork::CalcStatus()
 		int equipSlot = m_equipment[equipIdx];
 		if (equipSlot >= 0) {
 			itemIdx = m_inventoryItems[equipSlot];
-			itemType = GetItemDataPtr(itemIdx)->m_kind;
+			itemType = ((SItemFlatRow*)Game.m_itemTable)[itemIdx].m_kind;
 
 			if (itemType == 1) {
 				int weaponRef;
@@ -1822,7 +1817,7 @@ void CCaravanWork::CalcStatus()
 				}
 			}
 
-			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)->m_value;
+			unsigned short itemValue = (short)((SItemFlatRow*)Game.m_itemTable)[itemIdx].m_value;
 			if (itemType != 0x45) {
 				if (itemType < 0x45) {
 					if (itemType == 1) {
@@ -1843,7 +1838,7 @@ void CCaravanWork::CalcStatus()
 			m_defense += itemValue;
 			m_baseDefense += itemValue;
 		apply_effect:
-			int itemEffect = GetItemDataPtr(itemIdx)->m_attribute;
+			int itemEffect = ((SItemFlatRow*)Game.m_itemTable)[itemIdx].m_attribute;
 			unsigned short effectValue = itemValue;
 			switch (itemEffect) {
 			case 1:
@@ -2371,7 +2366,7 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 {
 	int reset = 0;
 	int weaponItem = GetCmdListItem(weaponIdx);
-	if ((0 < weaponItem) && (GetItemDataPtr(weaponItem)->m_kind == 1)) {
+	if ((0 < weaponItem) && (((SItemFlatRow*)Game.m_itemTable)[weaponItem].m_kind == 1)) {
 		return;
 	}
 
@@ -2604,17 +2599,17 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	m_strength = romWork->m_strength;
 	m_magic = romWork->m_magic;
 	m_defense = romWork->m_defense;
-	m_romWork = romWork->Data();
+	m_romWork = &romWork->m_data;
 
-	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers, 0, sizeof(m_statusTimers));
 	for (int i = 0; i < 16; i++) {
 		m_statusValues[i] = 0xFFFF;
 	}
 	m_hp = m_maxHp;
 
-	memcpy(unk_0xac, romWork->MonsterParams0(), 8);
-	memcpy(unk_0xb4, romWork->MonsterParams1(), 0x1C);
+	memcpy(unk_0xac, romWork->m_data.m_monsterParams0, 8);
+	memcpy(unk_0xb4, romWork->m_data.m_monsterParams1, 0x1C);
 	memset(m_actionItems, 0, sizeof(m_actionItems));
 	memset(m_actionAnimations, 0, sizeof(m_actionAnimations));
 
@@ -2663,7 +2658,7 @@ void CMonWork::CalcStatus()
 {
 	CRomWork* baseData = &Game.m_enemyRomTable[m_baseDataIndex];
 
-	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
 	m_strength = baseData->m_strength;
 	m_magic = baseData->m_magic;

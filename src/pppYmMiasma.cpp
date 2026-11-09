@@ -66,19 +66,6 @@ void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);
 void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 
-STATIC_ASSERT(sizeof(YmMiasmaDataOffsets) == 0xC);
-STATIC_ASSERT(offsetof(YmMiasmaDataOffsets, m_workOffset) == 0x8);
-
-static inline YmMiasmaDataOffsets* GetYmMiasmaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<YmMiasmaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline VYmMiasma* YmMiasmaWork(_pppPObject* object, _pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<VYmMiasma*>(object->m_workArea + GetYmMiasmaDataOffsets(ctrl)->m_workOffset);
-}
-
 static inline void RenderParticleInline(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
@@ -144,7 +131,7 @@ static inline void RenderParticleInline(_pppPObject* pppPObject, PYmMiasma* pYmM
  */
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaRenderStep* step, _pppCtrlTable* ctrl)
 {
-    VYmMiasma* work = YmMiasmaWork(pppYmMiasma, ctrl);
+    VYmMiasma* work = (VYmMiasma*)(pppYmMiasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
     PARTICLE_DATA* particleData = work->m_particles;
     int i;
 
@@ -178,7 +165,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtr
         return;
     }
 
-    work = YmMiasmaWork(pppYmMiasma, ctrl);
+    work = (VYmMiasma*)(pppYmMiasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
 
     if (step->m_graphId == pppYmMiasma->m_graphId) {
         work->m_radius = work->m_radius + step->m_radiusDelta;
@@ -269,7 +256,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtr
  */
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
-    VYmMiasma* work = YmMiasmaWork(pppYmMiasma, ctrl);
+    VYmMiasma* work = (VYmMiasma*)(pppYmMiasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
     PARTICLE_DATA* particles = work->m_particles;
 
     if (particles != 0) {
@@ -288,7 +275,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
  */
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
-    VYmMiasma* work = YmMiasmaWork(pppYmMiasma, ctrl);
+    VYmMiasma* work = (VYmMiasma*)(pppYmMiasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
     float zero = 0.0f;
 
     work->m_radius = 0.0f;
@@ -307,7 +294,7 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
-    VYmMiasma* work = YmMiasmaWork(pppYmMiasma, ctrl);
+    VYmMiasma* work = (VYmMiasma*)(pppYmMiasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
     const float zero = 0.0f;
     const float one = 1.0f;
 
@@ -348,7 +335,7 @@ inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTIC
  */
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    VYmMiasma* vData = YmMiasmaWork(pppPObject, pppCtrlTable);
+    VYmMiasma* vData = (VYmMiasma*)(pppPObject->m_workArea + pppCtrlTable->m_serializedDataOffsets[2]);
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
     s16 frameCount;
     s16 decayCount;

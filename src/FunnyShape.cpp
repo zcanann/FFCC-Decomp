@@ -28,52 +28,27 @@ const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
 const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
 
 namespace {
-static inline s16 S16At(const u8* p, u32 offset)
-{
-    return *reinterpret_cast<const s16*>(p + offset);
-}
-
 static inline s32 Div16Floor(s16 x)
 {
     return x / 16;
 }
-
-static inline FS_Animation* AnimData(CFunnyShape* self)
-{
-    return static_cast<FS_Animation*>(self->m_anm.anmData);
 }
 
-static inline u32 ShapeFlags(CFunnyShape* self)
-{
-    return self->m_displayCurrent.flags;
-}
-
-static inline s16 ShapeCount(CFunnyShape* self)
-{
-    return self->m_displayCurrent.unk28;
-}
-
-static inline s16 ShapeRange(CFunnyShape* self)
-{
-    return self->m_displayCurrent.unk2A;
-}
-}
-
-#define FS_ROTATE_SHAPE_X(dst, xOffset, yOffset)                                    \
+#define FS_ROTATE_SHAPE_X(dst, index)                                              \
     {                                                                              \
         const float s = static_cast<float>(sin(angle));                            \
         cosA = static_cast<float>(cos(angle));                                     \
-        const float cx = static_cast<float>(Div16Floor(S16At(entry, xOffset)));    \
-        const float cy = static_cast<float>(Div16Floor(S16At(entry, yOffset)));    \
+        const float cx = static_cast<float>(Div16Floor(quad->vertex[index][0]));    \
+        const float cy = static_cast<float>(Div16Floor(quad->vertex[index][1]));    \
         dst = cx * cosA - cy * s;                                                  \
     }
 
-#define FS_ROTATE_SHAPE_Y(dst, xOffset, yOffset)                                    \
+#define FS_ROTATE_SHAPE_Y(dst, index)                                              \
     {                                                                              \
         const float c = static_cast<float>(cos(angle));                            \
         sinA = static_cast<float>(sin(angle));                                     \
-        const float cx = static_cast<float>(Div16Floor(S16At(entry, xOffset)));    \
-        const float cy = static_cast<float>(Div16Floor(S16At(entry, yOffset)));    \
+        const float cx = static_cast<float>(Div16Floor(quad->vertex[index][0]));    \
+        const float cy = static_cast<float>(Div16Floor(quad->vertex[index][1]));    \
         dst = cx * sinA + cy * c;                                                  \
     }
 
@@ -128,10 +103,10 @@ inline void CFunnyShape::SetDefaultStage()
  */
 void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle)
 {
-    const u8* shapeData = reinterpret_cast<const u8*>(shape);
+    const FS_tagOAN3_QUAD* quad;
+    const FS_tagOAN3_SPRITE* sprite;
 
-    for (s32 i = 0; i < *reinterpret_cast<const s16*>(shapeData + 2); i++) {
-        const u8* entry;
+    for (s32 i = 0; i < shape->count; i++) {
         GXColor color;
         float tex[4][2];
         float pos[4][3];
@@ -140,10 +115,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float u1;
         float v1;
 
-        if ((*reinterpret_cast<const s16*>(shapeData) & 8) != 0) {
-            entry = shapeData + 0x10;
-            entry = entry + i * 0x2C;
-            const u8 texIndex = entry[0x28];
+        if ((shape->flags & 8) != 0) {
+            quad = reinterpret_cast<const FS_tagOAN3_QUAD*>(shape + 1);
+            quad = quad + i;
+            const u8 texIndex = quad->texIndex;
             const s8 numTex = m_textureCount;
             float sinA;
             float cosA;
@@ -155,7 +130,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 GXLoadTexObj(m_texObjData[texIndex], GX_TEXMAP0);
             }
 
-            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0xC);
+            const u8 blendMode = quad->blendMode;
             if (blendMode == 0x48) {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 0x42) {
@@ -164,7 +139,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
-            if ((ShapeFlags(this) & 0x100) == 0) {
+            if ((m_displayCurrent.flags & 0x100) == 0) {
                 angle = 0.0f;
             }
 
@@ -176,14 +151,14 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             float ry2;
             float rx3;
             float ry3;
-            FS_ROTATE_SHAPE_X(rx0, 0x10, 0x12);
-            FS_ROTATE_SHAPE_Y(ry0, 0x10, 0x12);
-            FS_ROTATE_SHAPE_X(rx1, 0x14, 0x16);
-            FS_ROTATE_SHAPE_Y(ry1, 0x14, 0x16);
-            FS_ROTATE_SHAPE_X(rx2, 0x18, 0x1A);
-            FS_ROTATE_SHAPE_Y(ry2, 0x18, 0x1A);
-            FS_ROTATE_SHAPE_X(rx3, 0x1C, 0x1E);
-            FS_ROTATE_SHAPE_Y(ry3, 0x1C, 0x1E);
+            FS_ROTATE_SHAPE_X(rx0, 0);
+            FS_ROTATE_SHAPE_Y(ry0, 0);
+            FS_ROTATE_SHAPE_X(rx1, 1);
+            FS_ROTATE_SHAPE_Y(ry1, 1);
+            FS_ROTATE_SHAPE_X(rx2, 2);
+            FS_ROTATE_SHAPE_Y(ry2, 2);
+            FS_ROTATE_SHAPE_X(rx3, 3);
+            FS_ROTATE_SHAPE_Y(ry3, 3);
 
             if (min.x > rx0) {
                 min.x = rx0;
@@ -241,10 +216,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             GXSetViewport(min.x * viewportScale + offset.x, min.y * viewportScale + offset.y, viewportW,
                           viewportH, 0.0f, 1.0f);
 
-            const s16 texX = S16At(entry, 0x20);
-            const s16 texY = S16At(entry, 0x22);
-            const s16 texW = S16At(entry, 0x24);
-            const s16 texH = S16At(entry, 0x26);
+            const s16 texX = quad->texX;
+            const s16 texY = quad->texY;
+            const s16 texW = quad->texW;
+            const s16 texH = quad->texH;
             u0 = static_cast<float>(texX) / 4096.0f;
             v0 = 1.0f - static_cast<float>(texY) / 4096.0f;
             u1 = u0 + static_cast<float>(texW) / 4096.0f;
@@ -273,18 +248,18 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             pos[1][1] = invPadH * (ry1 - viewMaxY);
             pos[2][1] = invPadH * (ry3 - viewMaxY);
             pos[3][1] = invPadH * (ry2 - viewMaxY);
-            memcpy(&color, entry + 0x8, sizeof(color));
-            color = *reinterpret_cast<const GXColor*>(entry + 0x8);
+            memcpy(&color, &quad->color, sizeof(color));
+            color = quad->color;
         } else {
-            entry = shapeData + 0x10;
-            entry = entry + i * 0x24;
-            const u8 texIndex = entry[0x20];
+            sprite = reinterpret_cast<const FS_tagOAN3_SPRITE*>(shape + 1);
+            sprite = sprite + i;
+            const u8 texIndex = sprite->texIndex;
             const s8 numTex = m_textureCount;
             if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(m_texObjData[texIndex], GX_TEXMAP0);
             }
 
-            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0xC);
+            const u8 blendMode = sprite->blendMode;
             if (blendMode == 0x48) {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 0x42) {
@@ -293,20 +268,20 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
-            s32 h = Div16Floor(S16At(entry, 0x16));
-            s32 w = Div16Floor(S16At(entry, 0x14));
-            s32 y0 = Div16Floor(S16At(entry, 0x12));
-            s32 x0 = Div16Floor(S16At(entry, 0x10));
+            s32 h = Div16Floor(sprite->bottom);
+            s32 w = Div16Floor(sprite->right);
+            s32 y0 = Div16Floor(sprite->top);
+            s32 x0 = Div16Floor(sprite->left);
             w -= x0;
             h -= y0;
             GXSetViewport(offset.x + static_cast<float>(x0 * 2), offset.y + static_cast<float>(y0 * 2),
                           static_cast<float>(w * 2), static_cast<float>(h * 2),
                           0.0f, 1.0f);
 
-            const s16 texX = S16At(entry, 0x18);
-            const s16 texY = S16At(entry, 0x1A);
-            const s16 texW = S16At(entry, 0x1C);
-            const s16 texH = S16At(entry, 0x1E);
+            const s16 texX = sprite->texX;
+            const s16 texY = sprite->texY;
+            const s16 texW = sprite->texW;
+            const s16 texH = sprite->texH;
             u0 = static_cast<float>(texX) / 4096.0f;
             v0 = 1.0f - static_cast<float>(texY) / 4096.0f;
             u1 = u0 + static_cast<float>(texW) / 4096.0f;
@@ -332,8 +307,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             pos[3][0] = -1.0f;
             pos[3][1] = -1.0f;
             pos[3][2] = 0.0f;
-            memcpy(&color, entry + 0x8, sizeof(color));
-            color = *reinterpret_cast<const GXColor*>(entry + 0x8);
+            memcpy(&color, &sprite->color, sizeof(color));
+            color = sprite->color;
         }
 
         DCStoreRange(&color, 4);
@@ -537,7 +512,7 @@ void CFunnyShape::RenderTexture()
  */
 void CFunnyShape::Render()
 {
-    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
+    if ((m_textureCount == 0) || (static_cast<FS_Animation*>(m_anm.anmData) == 0)) {
         return;
     }
 
@@ -545,8 +520,8 @@ void CFunnyShape::Render()
 
     CFunnyShapeAnmWork* work;
     s32 count;
-    if ((ShapeFlags(this) & 0x80) != 0) {
-        count = ShapeCount(this);
+    if ((m_displayCurrent.flags & 0x80) != 0) {
+        count = m_displayCurrent.unk28;
     } else {
         count = 1;
     }
@@ -560,7 +535,7 @@ void CFunnyShape::Render()
         posCopy.x += work->x;
         posCopy.y += work->y;
 
-        FS_Animation* animData = AnimData(this);
+        FS_Animation* animData = static_cast<FS_Animation*>(m_anm.anmData);
         const FS_Animation::Frame* frameData = reinterpret_cast<const FS_Animation::Frame*>(animData + 1);
         s16 frame = work->frame;
         frameData += frame;
@@ -582,30 +557,30 @@ void CFunnyShape::Render()
  */
 void CFunnyShape::Update()
 {
-    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
+    if ((m_textureCount == 0) || (static_cast<FS_Animation*>(m_anm.anmData) == 0)) {
         return;
     }
 
     CFunnyShapeAnmWork* work = m_anmWork;
-    const bool noSpread = ((ShapeFlags(this) & 0x80) == 0);
-    for (s32 i = 0; i < ShapeCount(this); i++) {
+    const bool noSpread = (m_displayCurrent.flags & 0x80) == 0;
+    for (s32 i = 0; i < m_displayCurrent.unk28; i++) {
         work->delay = static_cast<s16>(work->delay - 0x200);
         if (work->delay <= 0) {
             work->frame = static_cast<s16>(work->frame + 1);
-            if (work->frame >= AnimData(this)->frameCount) {
+            if (work->frame >= (static_cast<FS_Animation*>(m_anm.anmData))->frameCount) {
                 work->frame = 0;
 
                 s32 r = rand();
-                work->x = static_cast<float>(r % ShapeRange(this));
+                work->x = static_cast<float>(r % m_displayCurrent.unk2A);
 
                 r = rand();
-                work->y = static_cast<float>(r % ShapeRange(this));
+                work->y = static_cast<float>(r % m_displayCurrent.unk2A);
                 work->z = 0.0f;
                 work->delay = 0x200;
                 work->viewportX = work->viewportY = 0.0f;
 
                 r = rand();
-                work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
+                work->angle = static_cast<float>(r % 360);
                 work->angle = (3.14f * work->angle) / 180.0f;
 
                 r = rand();
@@ -624,7 +599,7 @@ void CFunnyShape::Update()
                 }
             }
 
-            const FS_Animation::Frame* frameData = reinterpret_cast<const FS_Animation::Frame*>(AnimData(this) + 1);
+            const FS_Animation::Frame* frameData = reinterpret_cast<const FS_Animation::Frame*>((static_cast<FS_Animation*>(m_anm.anmData)) + 1);
             s16 frame = work->frame;
             frameData += frame;
             work->delay = frameData->delay;
@@ -649,24 +624,22 @@ void CFunnyShape::Update()
  */
 void CFunnyShape::InitAnmWork()
 {
-    const bool noSpread = (ShapeFlags(this) & 0x80) == 0;
+    const bool noSpread = (m_displayCurrent.flags & 0x80) == 0;
     CFunnyShapeAnmWork* work = m_anmWork;
 
     for (s32 i = 0; i < 0x200; i++) {
         work->index = i;
-        work->animData = AnimData(this);
+        work->animData = static_cast<FS_Animation*>(m_anm.anmData);
 
         s32 r = rand();
-        work->x = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
+        work->x = static_cast<float>(r % m_displayCurrent.unk2A);
 
         r = rand();
-        work->y = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
+        work->y = static_cast<float>(r % m_displayCurrent.unk2A);
         work->z = 0.0f;
 
         r = rand();
-        const s16 shapeCount = AnimData(this)->frameCount;
-        const s32 shapeDiv = r / shapeCount;
-        work->frame = static_cast<s16>(r - shapeDiv * shapeCount);
+        work->frame = static_cast<s16>(r % (static_cast<FS_Animation*>(m_anm.anmData))->frameCount);
         work->delay = 0x200;
         work->viewportX = work->viewportY = 0.0f;
 

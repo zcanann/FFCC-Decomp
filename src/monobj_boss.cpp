@@ -29,43 +29,6 @@ extern "C" Vec gLichTeleportPoints[] = {
     {132.0f, 0.0f, -38.0f},
 };
 
-struct LichBossWork {
-    int m_lichTeleportIndex;
-    Vec m_lichTeleportVec;
-    union {
-        u8 m_lichFlags;
-        struct {
-            s8 m_lichBit80 : 1;
-            s8 m_lichBit40 : 1;
-            u8 m_lichRest : 6;
-        } lichBits;
-    };
-};
-
-struct MeteoParasiteCBossWork {
-    CChara::CNode* m_nodes[14];
-    CGObject* m_rotObjects[12];
-    CGPrgObj* m_objs[4];
-    union {
-        int m_coreIndex;
-        int m_index;
-    };
-    union {
-        u8 m_coreFlags;
-        u8 m_flags;
-        struct {
-            s8 m_bit80 : 1;
-            s8 m_meteo3 : 1;
-            u8 m_rest : 6;
-        } bits;
-    };
-    u8 m_pad7D[3];
-    int m_coreMode;
-    union {
-        int m_coreWait;
-        int m_wait;
-    };
-};
 STATIC_ASSERT(offsetof(LichBossWork, m_lichFlags) == 0x10);
 STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_rotObjects) == 0x38);
 STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_objs) == 0x68);
@@ -73,10 +36,21 @@ STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_coreIndex) == 0x78);
 STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_coreFlags) == 0x7C);
 STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_coreMode) == 0x80);
 STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_coreWait) == 0x84);
+STATIC_ASSERT(sizeof(MeteoParasiteCBossWork) == sizeof(CGMonObj::m_boss));
 
-struct DuctBossWork {
-    u8 m_pad00[0x38];
-    CGMonObj* m_objs[3];
+struct TetsukyojinBossWork {
+    int m_hitCount;
+    Vec m_attackVec;
+};
+
+struct GoblinKingBossWork {
+    int m_teleportIndex;
+    Vec m_teleportVec;
+};
+
+struct OrcKingBossWork {
+    int m_active;
+    int m_timer;
 };
 
 struct LKShooterBossWork {
@@ -118,23 +92,13 @@ struct GolemBossWork {
 STATIC_ASSERT(offsetof(GolemBossWork, m_moveAngle) == 0x10);
 
 struct GiantCrabBossWork {
-    u8 m_pad00[4];
+    int m_damaged;
     int m_step;
     Vec m_moveTarget;
 };
 STATIC_ASSERT(offsetof(GiantCrabBossWork, m_step) == 0x04);
 STATIC_ASSERT(offsetof(GiantCrabBossWork, m_moveTarget) == 0x08);
 
-struct MeteoParasiteCGameFlags {
-    union {
-        u8 m_flags;
-        struct {
-            s8 m_pad : 2;
-            s8 m_bit5 : 1;
-            u8 m_rest : 5;
-        } bits;
-    };
-};
 
 /*
  * --INFO--
@@ -649,10 +613,9 @@ void CGMonObj::damagedFuncDuct()
 	putParticle((m_charaModelHandle->GetPdtId() << 8) | 2, 0, this, 1.0f, 0);
 
 	if (m_scriptHandle->m_hp == 0) {
-		CGObject* bossObj = *reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x68);
-		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
-		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
-		int dispIndex = model->GetDispIndex(nodes[slot + 2]);
+		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
+		CChara::CModel* model = work->m_objs[0]->m_charaModelHandle->m_model;
+		int dispIndex = model->GetDispIndex(work->m_nodes[slot + 2]);
 		model->m_meshVisibleMask &= ~(1 << dispIndex);
 	}
 }
@@ -669,8 +632,9 @@ void CGMonObj::damagedFuncDuct()
 void CGMonObj::initFinishedFuncDuct()
 {
 	initFinishedFuncDefault();
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 	const int slot = m_scriptHandle->m_baseDataIndex - 0x8E;
-	reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x38)[slot] = this;
+	work->m_rotObjects[slot] = this;
 }
 
 /*
@@ -709,12 +673,12 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
 	case 0x85:
 		return -2;
 	case 0x86:
-		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == 1 && m_actionBranch == 1) {
+		if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex == 1 && m_actionBranch == 1) {
 			return -1;
 		}
 		return -2;
 	case 0x87:
-		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == 2 && m_actionBranch < 2) {
+		if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex == 2 && m_actionBranch < 2) {
 			return -1;
 		}
 		return -2;
@@ -899,7 +863,7 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
 	case 0x87:
 		switch (stat) {
 		case 0x67: {
-			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74);
+			CGMonObj* meteoC = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_objs[3];
 			if (meteoC->m_actionBranch == 1) {
 				setActionParam(-13);
 			} else {
@@ -954,7 +918,7 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 
 	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 	int objIndex = scriptKind - 0x85;
-	work->m_objs[objIndex] = reinterpret_cast<CGPrgObj*>(this);
+	work->m_objs[objIndex] = this;
 
 	if (work->bits.m_meteo3 != 0) {
 		SetAnimSlot(scriptKind == 0x87 ? 0x0D : 0x0E, 0);
@@ -1020,7 +984,7 @@ void CGMonObj::logicFuncMeteoParasiteC()
  */
 int CGMonObj::calcBranchFuncMeteoParasiteC(int)
 {
-	return *reinterpret_cast<int*>(CGMonObj::m_boss + 0x78);
+	return reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex;
 }
 
 /*
@@ -1095,7 +1059,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 			    ->changeStat(0x65, 0, 0);
 			reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x25, 0, 0);
 			CFlat.m_bossState = CFlat.m_bossState + 1;
-			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlat.m_gameFlags)->bits.m_bit5 = 1;
+			CFlat.m_gameFlagBits.m_flagBit5 = 1;
 		} else if (isLoopAnim() != 0) {
 			SetAnimSlot(0, 0);
 			changeStat(0, 0, 0);
@@ -1137,11 +1101,11 @@ void CGMonObj::damagedFuncMeteoParasiteC()
 		    ((work->m_coreIndex == 1) &&
 		     (m_scriptHandle->m_hp <
 		      (m_scriptHandle->m_maxHp / 3)))) {
-			*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) = 0;
+			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreDamage = 0;
 			changeStat(0x66, 0, 0);
 			m_bgColMask &= 0xFFF7FFFF;
-		} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) >= 0x32) {
-			*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) = 0;
+		} else if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreDamage >= 0x32) {
+			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreDamage = 0;
 			changeStat(0x67, 0, 0);
 			m_bgColMask &= 0xFFF7FFFF;
 		}
@@ -1160,12 +1124,12 @@ void CGMonObj::damagedFuncMeteoParasiteC()
 void CGMonObj::initFinishedFuncMeteoParasiteC()
 {
 	initFinishedFuncDefault();
-	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74) = this;
+	reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_objs[3] = this;
 
 	if (strcmp(Game.m_currentScriptName, "meteo_3") == 0) {
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 = 1;
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_index = 3;
-		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(m_scriptHandle) + 0x1C) = 1;
+		m_scriptHandle->m_hp = 1;
 		SetAnimSlot(0x35, 0);
 		reqAnim(0x35, 1, 0);
 		PlayAnim(0x35, 1, 0, -1, -1, 0);
@@ -1415,7 +1379,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 
 			PSVECNormalize(&attackVec, &attackVec);
 			PSVECScale(&attackVec, &attackVec, 130.0f - m_capsuleHalfHeight);
-			*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4) = attackVec;
+			reinterpret_cast<TetsukyojinBossWork*>(CGMonObj::m_boss)->m_attackVec = attackVec;
 
 			CVector delta = reinterpret_cast<CVector&>(attackVec) - m_worldPosition;
 			attackVec.x = delta.x;
@@ -1441,7 +1405,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.Clear();
 			m_moveWork.m_flags = 0x2410;
 
-			m_moveWork.m_targetPos = -CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
+			m_moveWork.m_targetPos = -CVector(reinterpret_cast<TetsukyojinBossWork*>(CGMonObj::m_boss)->m_attackVec);
 			m_moveWork.m_speed = 2.5f;
 			m_moveWork.m_limitFrame =
 			    static_cast<int>((2.0f * (130.0f - m_capsuleHalfHeight)) / 2.5f);
@@ -1455,9 +1419,9 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		if ((CFlat.m_bossState != 0) && (m_stateFrame == MON_FRAMES(0x2D, 0x25))) {
 			int flatCount = CFlat.m_bossState;
 			if (flatCount >= 1) {
-				if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
-				    ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
-					*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
+				if (((flatCount == 1) && (reinterpret_cast<TetsukyojinBossWork*>(CGMonObj::m_boss)->m_hitCount >= 0x14)) ||
+				    ((flatCount > 1) && (reinterpret_cast<TetsukyojinBossWork*>(CGMonObj::m_boss)->m_hitCount >= 5))) {
+					reinterpret_cast<TetsukyojinBossWork*>(CGMonObj::m_boss)->m_hitCount = 0;
 					DispCharaParts(1);
 
 					int pdtNo = m_charaModelHandle->GetPdtId();
@@ -1593,7 +1557,7 @@ void CGMonObj::frameStatFuncLich()
 		endPSlotBit(0x800);
 		if (reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0) {
 			int pdtNo = m_charaModelHandle->GetPdtId();
-			putParticle((pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x590),
+			putParticle((pdtNo << 8) | 0x1D, m_particleSlots[11],
 			                    reinterpret_cast<CGObject*>(this), 1.0f, 0);
 		}
 		reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 0;
@@ -2106,7 +2070,8 @@ void CGMonObj::frameStatFuncGoblinKing()
 	switch (m_lastStateId) {
 	case 100:
 		teleport(0, 0xd, MON_FRAMES(0xA, 8), MON_FRAMES(0x50, 0x42), 0xa03e, 0xa03f, 3, 4, 5, gGoblinKingTeleportPoints,
-		         *reinterpret_cast<int*>(CGMonObj::m_boss), *reinterpret_cast<Vec*>(CGMonObj::m_boss + 4));
+		         reinterpret_cast<GoblinKingBossWork*>(CGMonObj::m_boss)->m_teleportIndex,
+		         reinterpret_cast<GoblinKingBossWork*>(CGMonObj::m_boss)->m_teleportVec);
 		break;
 	}
 	return;
@@ -2190,29 +2155,29 @@ void CGMonObj::moveFrameFuncOrcKing()
  */
 void CGMonObj::alwaysFuncOrcKing()
 {
-	if (*reinterpret_cast<int*>(CGMonObj::m_boss) == 0) {
+	if (reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_active == 0) {
 		return;
 	}
 
-	if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 0x3C) {
+	if (reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_timer == 0x3C) {
 		m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
 		int pdtNo = m_charaModelHandle->GetPdtId();
 		putParticle(
 			(pdtNo << 8) | 0x1D, m_particleSlots[11],
 			reinterpret_cast<CGObject*>(this), 1.0f, 0);
-	} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
+	} else if (reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_timer == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
 		CGMonObj* monObj = CFlat.FindGMonObjFirst();
 		while (monObj != 0) {
 			reinterpret_cast<CGCharaObj*>(monObj)->addHp(-reinterpret_cast<CGObject*>(monObj)->m_scriptHandle->m_maxHp, 0);
 			monObj = CFlat.FindGMonObjNext(monObj);
 		}
 		playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
-		*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
+		reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_active = 0;
 		CFlat.m_bossState = 1;
 	}
 
-	if (*reinterpret_cast<int*>(CGMonObj::m_boss) != 0) {
-		*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) += 1;
+	if (reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_active != 0) {
+		reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_timer += 1;
 	}
 }
 
@@ -2262,7 +2227,7 @@ void CGMonObj::frameStatFuncOrcKing()
 				}
 				monObj = CFlat.FindGMonObjNext(monObj);
 			}
-			*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
+			reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_active = 1;
 		}
 
 		m_actionBranch = m_actionBranch + 1;
@@ -2423,7 +2388,7 @@ void CGMonObj::frameStatFuncGolem()
 				reinterpret_cast<GolemBossWork*>(m_boss)->m_moveAngle = m_rotTargetY + turnOffset;
 			}
 			unsigned short scriptScale =
-			    m_scriptHandle->m_romWork[0x6A];
+			    m_scriptHandle->m_romWork->m_moveSpeed;
 			float moveSpeed =
 			    m_pushScale *
 			    (0.01f * static_cast<float>(scriptScale) + 1.0e-7f);
@@ -2604,7 +2569,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 			reqAnim(animId, 0, 0);
 			u16 scriptScale =
-			    m_scriptHandle->m_romWork[0x6A];
+			    m_scriptHandle->m_romWork->m_moveSpeed;
 			float moveMagnitude =
 			    m_pushScale *
 			    (0.01f * (float)scriptScale + 1.0e-7f);
@@ -2668,8 +2633,8 @@ void CGMonObj::logicFuncGiantCrab()
 {
 	int nextState = -1;
 
-	if (*reinterpret_cast<int*>(CGMonObj::m_boss) != 0) {
-		*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
+	if (reinterpret_cast<GiantCrabBossWork*>(CGMonObj::m_boss)->m_damaged != 0) {
+		reinterpret_cast<GiantCrabBossWork*>(CGMonObj::m_boss)->m_damaged = 0;
 		if ((m_actionBranch == 0 && static_cast<unsigned int>(Math.Rand(10)) < 1) ||
 		    (m_actionBranch == 1 && static_cast<unsigned int>(Math.Rand(10)) < 2) ||
 		    (m_actionBranch == 2 && static_cast<unsigned int>(Math.Rand(10)) < 3)) {
@@ -2695,7 +2660,7 @@ void CGMonObj::logicFuncGiantCrab()
  */
 void CGMonObj::damagedFuncGiantCrab()
 {
-	*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
+	reinterpret_cast<GiantCrabBossWork*>(CGMonObj::m_boss)->m_damaged = 1;
 
 	switch (m_actionBranch) {
 	case 0: {

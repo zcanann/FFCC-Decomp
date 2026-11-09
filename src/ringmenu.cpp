@@ -202,11 +202,11 @@ void CRingMenu::onCalc()
 		if (partyObj != 0) {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 			int currentCmd = (Game.m_gameWork.IsMogStage())
-			                     ? Chara.MogFur().m_commandIndex
+			                     ? Chara.m_sharedState.m_mogFur.m_commandIndex
 			                     : caravanWork->GetIdxCmdList();
 
 			int* trackedCmd = (Game.m_gameWork.IsMogStage() & 0xFF)
-			                      ? &Chara.MogFur().m_trackedCommandIndex
+			                      ? &Chara.m_sharedState.m_mogFur.m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 
 			int next;
@@ -433,17 +433,31 @@ void CRingMenu::onDraw()
 	posMainY = 192.0f + glowOffset;
 
 	for (int group = 2; group >= 0; group--) {
+#ifdef VERSION_GCCJGC
 		float posY;
 		float posX;
 		float buttonAlpha;
 		float textX0;
-		float textY0;
+		float textY2;
 		float drawX;
 		float drawY;
 		float textY1;
-		float textY2;
+		float textY0;
 		float textX2;
 		float textX1;
+#else
+		float textX0;
+		float textY0;
+		float textX1;
+		float textY1;
+		float textY2;
+		float buttonAlpha;
+		float drawY;
+		float textX2;
+		float drawX;
+		float posX;
+		float posY;
+#endif
 
 		if (group == 2) {
 			posX = 16.0f + (((m_menuIndex & 1) != 0) ? posAltX : posLeft);
@@ -509,7 +523,7 @@ void CRingMenu::onDraw()
 			if (partyObj != 0) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 				int cmdIndex = (Game.m_gameWork.IsMogStage())
-				                   ? Chara.MogFur().m_commandIndex
+				                   ? Chara.m_sharedState.m_mogFur.m_commandIndex
 				                   : caravanWork->GetIdxCmdList();
 
 				CFont* font = MenuPcs.GetFont23();
@@ -576,9 +590,10 @@ void CRingMenu::onDraw()
 		textX1 = 56.0f + drawX;
 		textY1 = 3.0f + drawY;
 #else
-		textX0 += 20.0f;
+		float offsetX = 20.0f;
+		textX0 += offsetX;
 		textY0 = (5.0f + drawY) - 4.0f;
-		textX1 = (56.0f + drawX) + 20.0f;
+		textX1 = (56.0f + drawX) + offsetX;
 		textY1 = (3.0f + drawY) - 4.0f;
 #endif
 		textY2 = 6.0f + drawY;
@@ -671,9 +686,7 @@ void CRingMenu::onDraw()
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 					if ((caravanWork != 0)
-					    && (static_cast<signed char>(
-					            static_cast<int>((static_cast<unsigned int>(CFlat.m_gameFlags) << 30) & 0xC0000000) >> 31)
-					        == 0)) {
+					    && (CFlat.m_gameFlagBits.m_flagBit1 == 0)) {
 						fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
 						const float barY = 20.0f + textY;
@@ -694,10 +707,9 @@ void CRingMenu::onDraw()
 								blink = 0.0f;
 							}
 
+							float barX = textX2 - static_cast<float>((caravanWork->GetNumCmdList() * 8) / 2);
 							MenuPcs.DrawRect(3,
-								4.0f +
-									((textX2 - static_cast<float>((caravanWork->GetNumCmdList() * 8) / 2)) +
-									 static_cast<float>(i * 8)),
+								4.0f + (barX + static_cast<float>(i * 8)),
 								barY, 8.0f, 8.0f,
 #ifdef VERSION_GCCJGC
 								8.0f * (13.0f + blink), 0.0f,

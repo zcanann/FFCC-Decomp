@@ -9,14 +9,7 @@
 
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frameCount) == 0x6);
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frames) == 0x10);
-STATIC_ASSERT(offsetof(ShapeRuntimeData, shapeDataOffset) == 0x0);
-STATIC_ASSERT(offsetof(ShapeRuntimeData, posDataOffset) == 0x4);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
-
-static inline ShapeRuntimeData* GetDrawShapeRuntimeData(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<ShapeRuntimeData*>(ctrlTable->m_serializedDataOffsets);
-}
 
 /*
  * --INFO--
@@ -28,9 +21,9 @@ static inline ShapeRuntimeData* GetDrawShapeRuntimeData(_pppCtrlTable* ctrlTable
  * JP Size: TODO
  */
 void pppDrawShape(_pppPObject* object, ShapeControlData* data, _pppCtrlTable* ctrlTable){
-	ShapeRuntimeData* runtimeData = GetDrawShapeRuntimeData(ctrlTable);
-	ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
-	VColor* posData = (VColor*)(object->m_workArea + runtimeData->posDataOffset);
+	int* runtimeData = ctrlTable->m_serializedDataOffsets;
+	ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData[0]);
+	VColor* posData = (VColor*)(object->m_workArea + runtimeData[1]);
 	s32 type = data->type;
 	if (type == 0xFFFF) {
 		return;
@@ -74,8 +67,8 @@ void pppCalcShape(_pppPObject* object, ShapeControlData* data, _pppCtrlTable* ct
 		return;
 	}
 
-	ShapeRuntimeData* runtimeData = GetDrawShapeRuntimeData(ctrlTable);
-	ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
+	int* runtimeData = ctrlTable->m_serializedDataOffsets;
+	ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData[0]);
 	s32 type = data->type;
 	if (type == 0xFFFF) {
 		return;
@@ -120,8 +113,8 @@ void pppCalcShape(_pppPObject* object, ShapeControlData* data, _pppCtrlTable* ct
  */
 void pppDrawShapeConstruct(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	ShapeRuntimeData* runtimeData = GetDrawShapeRuntimeData(ctrlTable);
-	ShapeState* targetPtr = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
+	int* runtimeData = ctrlTable->m_serializedDataOffsets;
+	ShapeState* targetPtr = (ShapeState*)(object->m_workArea + runtimeData[0]);
 
 	targetPtr->currentId = 0;
 	targetPtr->counter = 0;

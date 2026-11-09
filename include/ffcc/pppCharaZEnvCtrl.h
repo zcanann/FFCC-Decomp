@@ -9,10 +9,6 @@ struct _pppPObject;
 
 typedef _pppPObject pppCharaZEnvCtrl;
 
-struct CharaZEnvCtrlDataOffsets {
-	s32 m_workOffset;
-};
-
 struct pppCharaZEnvCtrlStep
 {
     s32 m_graphId;

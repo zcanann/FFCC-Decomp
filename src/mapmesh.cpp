@@ -17,78 +17,6 @@ static const float kMapMeshInitialMaxBound = -10000000000.0f;
 
 static CMemory::CStage* g_pStage;
 
-namespace {
-static inline void AddMeshDataBase(void*& ptr, void* base)
-{
-    ptr = reinterpret_cast<void*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(Vec*& ptr, void* base)
-{
-    ptr = reinterpret_cast<Vec*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(S16Vec*& ptr, void* base)
-{
-    ptr = reinterpret_cast<S16Vec*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(CMapMeshUvPair*& ptr, void* base)
-{
-    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(GXColor*& ptr, void* base)
-{
-    ptr = reinterpret_cast<GXColor*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void AddMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
-{
-    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
-}
-
-static inline void SubMeshDataBase(void*& ptr, void* base)
-{
-    ptr = reinterpret_cast<void*>(static_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(Vec*& ptr, void* base)
-{
-    ptr = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(S16Vec*& ptr, void* base)
-{
-    ptr = reinterpret_cast<S16Vec*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(CMapMeshUvPair*& ptr, void* base)
-{
-    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(GXColor*& ptr, void* base)
-{
-    ptr = reinterpret_cast<GXColor*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline void SubMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
-{
-    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
-}
-
-static inline unsigned int Align32(unsigned int value)
-{
-    return (value + 0x1F) & ~0x1FU;
-}
-
-static inline CMemory::CStage*& MapMeshAllocStage()
-{
-    return g_pStage;
-}
-}
-
 /*
  * --INFO--
  * PAL Address: TODO
@@ -356,28 +284,28 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
-            workSize = Align32(workSize);
+            workSize = (workSize + 0x1F) & ~0x1FU;
             workSize += chunk.m_size;
             break;
         case 0x4E4F524D:
-            workSize = Align32(workSize);
+            workSize = (workSize + 0x1F) & ~0x1FU;
             workSize += chunk.m_size;
             break;
         case 0x4E425420:
-            workSize = Align32(workSize);
+            workSize = (workSize + 0x1F) & ~0x1FU;
             workSize += chunk.m_size;
             break;
         case 0x434F4C52:
-            workSize = Align32(workSize);
+            workSize = (workSize + 0x1F) & ~0x1FU;
             workSize += chunk.m_size;
             break;
         case 0x55562020:
-            workSize = Align32(workSize);
+            workSize = (workSize + 0x1F) & ~0x1FU;
             workSize += chunk.m_size;
             break;
         case 0x444C4844:
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
-            workSize = Align32(workSize);
+            workSize = (workSize + 0x1F) & ~0x1FU;
             workSize += static_cast<unsigned int>(m_displayListCount) * 0x10U;
             reader.PushChunk();
             while (reader.GetNextChunk(chunk)) {
@@ -385,8 +313,8 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                 case 0x444C5354:
                     reader.Align(0x20);
                     if (chunk.m_arg0 != 0) {
-                        workSize = Align32(workSize);
-                        workSize += Align32(chunk.m_arg0);
+                        workSize = (workSize + 0x1F) & ~0x1FU;
+                        workSize += (chunk.m_arg0 + 0x1F) & ~0x1FU;
                     }
                     reader.Align(0x20);
                     break;
@@ -397,10 +325,10 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         }
     }
     reader.PopChunk();
-    workSize = Align32(workSize);
+    workSize = (workSize + 0x1F) & ~0x1FU;
 
     reader = chunkFile;
-    MapMeshAllocStage() = stage;
+    g_pStage = stage;
     unsigned char* cursor;
     int offset;
     int dlIndex;
@@ -408,11 +336,11 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
-            m_meshData = new (MapMeshAllocStage(), const_cast<char*>(s_mapmesh_cpp), 0x13A) unsigned char[workSize];
+            m_meshData = new (g_pStage, const_cast<char*>(s_mapmesh_cpp), 0x13A) unsigned char[workSize];
 
             cursor = reinterpret_cast<unsigned char*>(m_meshData);
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
-            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+            cursor = reinterpret_cast<unsigned char*>((((reinterpret_cast<unsigned int>(cursor)) + 0x1F) & ~0x1FU));
             m_vertices = reinterpret_cast<Vec*>(cursor);
             cursor += chunk.m_size;
             m_bound.m_min.x = m_bound.m_min.y = m_bound.m_min.z = kMapMeshInitialMinBound;
@@ -438,7 +366,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             break;
         case 0x4E4F524D:
             m_normalCount = static_cast<unsigned short>(chunk.m_size / 6);
-            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+            cursor = reinterpret_cast<unsigned char*>((((reinterpret_cast<unsigned int>(cursor)) + 0x1F) & ~0x1FU));
             m_normals = reinterpret_cast<S16Vec*>(cursor);
             cursor += chunk.m_size;
 
@@ -450,7 +378,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             break;
         case 0x434F4C52:
             m_colorCount = static_cast<unsigned short>(chunk.m_size >> 2);
-            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+            cursor = reinterpret_cast<unsigned char*>((((reinterpret_cast<unsigned int>(cursor)) + 0x1F) & ~0x1FU));
             m_colors = reinterpret_cast<GXColor*>(cursor);
             cursor += chunk.m_size;
 
@@ -468,7 +396,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             break;
         case 0x55562020:
             m_uvCount = static_cast<unsigned short>(chunk.m_size >> 2);
-            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+            cursor = reinterpret_cast<unsigned char*>((((reinterpret_cast<unsigned int>(cursor)) + 0x1F) & ~0x1FU));
             m_uvPairs = reinterpret_cast<CMapMeshUvPair*>(cursor);
             cursor += chunk.m_size;
 
@@ -483,10 +411,10 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
             if (usePreallocated != 0) {
                 m_displayListData =
-                    new (MapMeshAllocStage(), const_cast<char*>(s_mapmesh_cpp), 0x1D5) unsigned char[workSize];
+                    new (g_pStage, const_cast<char*>(s_mapmesh_cpp), 0x1D5) unsigned char[workSize];
                 cursor = reinterpret_cast<unsigned char*>(m_displayListData);
             } else {
-                cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                cursor = reinterpret_cast<unsigned char*>((((reinterpret_cast<unsigned int>(cursor)) + 0x1F) & ~0x1FU));
             }
             m_drawEntries = reinterpret_cast<CMapMeshDrawEntry*>(cursor);
 
@@ -508,7 +436,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                     reader.Align(0x20);
                     entry->m_displayList = 0;
                     if (entry->m_size != 0) {
-                        cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                        cursor = reinterpret_cast<unsigned char*>((((reinterpret_cast<unsigned int>(cursor)) + 0x1F) & ~0x1FU));
                         entry->m_displayList = cursor;
                         if (usePreallocated != 0) {
                             entry->m_displayListOffset = reinterpret_cast<unsigned int>(entry->m_displayList) -
@@ -518,10 +446,10 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                                                          reinterpret_cast<unsigned int>(m_meshData);
                         }
 
-                        cursor += Align32(chunk.m_arg0);
-                        memset(entry->m_displayList, 0, Align32(entry->m_size));
+                        cursor += (chunk.m_arg0 + 0x1F) & ~0x1FU;
+                        memset(entry->m_displayList, 0, ((entry->m_size + 0x1F) & ~0x1FU));
                         reader.Get(entry->m_displayList, entry->m_size);
-                        DCFlushRange(entry->m_displayList, Align32(entry->m_size));
+                        DCFlushRange(entry->m_displayList, ((entry->m_size + 0x1F) & ~0x1FU));
                     }
                     reader.Align(0x20);
                     break;
@@ -570,12 +498,12 @@ void CMapMesh::Off2Ptr()
     int i = 0;
     offset = 0;
 
-    AddMeshDataBase(m_vertices, m_meshData);
-    AddMeshDataBase(m_normals, m_meshData);
-    AddMeshDataBase(m_nbt, m_meshData);
-    AddMeshDataBase(m_uvPairs, m_meshData);
-    AddMeshDataBase(m_colors, m_meshData);
-    AddMeshDataBase(m_drawEntries, m_meshData);
+    m_vertices = (Vec*)((u32)m_vertices + (u32)m_meshData);
+    m_normals = (S16Vec*)((u32)m_normals + (u32)m_meshData);
+    m_nbt = (void*)((u32)m_nbt + (u32)m_meshData);
+    m_uvPairs = (CMapMeshUvPair*)((u32)m_uvPairs + (u32)m_meshData);
+    m_colors = (GXColor*)((u32)m_colors + (u32)m_meshData);
+    m_drawEntries = (CMapMeshDrawEntry*)((u32)m_drawEntries + (u32)m_meshData);
 
     for (; i < static_cast<int>(static_cast<unsigned short>(m_displayListCount)); i++) {
         entry = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset);
@@ -599,12 +527,12 @@ void CMapMesh::Ptr2Off()
         return;
     }
 
-    SubMeshDataBase(m_vertices, m_meshData);
-    SubMeshDataBase(m_normals, m_meshData);
-    SubMeshDataBase(m_nbt, m_meshData);
-    SubMeshDataBase(m_uvPairs, m_meshData);
-    SubMeshDataBase(m_colors, m_meshData);
-    SubMeshDataBase(m_drawEntries, m_meshData);
+    m_vertices = (Vec*)((u32)m_vertices - (u32)m_meshData);
+    m_normals = (S16Vec*)((u32)m_normals - (u32)m_meshData);
+    m_nbt = (void*)((u32)m_nbt - (u32)m_meshData);
+    m_uvPairs = (CMapMeshUvPair*)((u32)m_uvPairs - (u32)m_meshData);
+    m_colors = (GXColor*)((u32)m_colors - (u32)m_meshData);
+    m_drawEntries = (CMapMeshDrawEntry*)((u32)m_drawEntries - (u32)m_meshData);
 }
 
 /*

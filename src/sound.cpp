@@ -1031,7 +1031,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 
     if (se3D->m_lineIndex >= 0) {
         lineHit = m_lines[se3D->m_lineIndex].Calc(
-            &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<Vec*>(&CameraPcs.m_targetX),
+            &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<Vec*>(&CameraPcs.m_target.x),
             se3D->m_farDistance);
         if (lineHit != 0) {
             PSMTXMultVec(CameraPcs.GetViewMatrix(), &nearestPoint, &nearestPoint);
@@ -1074,7 +1074,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         }
 
         PSMTXMultVec(CameraPcs.GetViewMatrix(), &se3D->m_position, &nearestPoint);
-        scaledDistSq = distScale * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs.m_targetX), &se3D->m_position);
+        scaledDistSq = distScale * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs.m_target.x), &se3D->m_position);
         scaledFarSq = distScale * (se3D->m_farDistance * (se3D->m_farDistance * distScale));
         if (scaledDistSq < scaledFarSq) {
             float scaledNearSq = distScale * (se3D->m_nearDistance * (se3D->m_nearDistance * distScale));

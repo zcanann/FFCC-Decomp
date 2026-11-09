@@ -8,10 +8,6 @@ struct _pppPObject;
 
 typedef _pppPObject pppConformBGNormal;
 
-struct ConformBgNormalDataOffsets {
-    s32 m_stateOffset;
-};
-
 struct pppConformBGNormalStep {
     u32 m_unk0;
     f32 m_dataValIndex;

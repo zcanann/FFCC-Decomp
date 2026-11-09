@@ -157,15 +157,10 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 		CGPartyObj::m_ghostWork.counters[1]++;
 		CGPartyObj::m_ghostWork.counters[2]++;
 		System.Printf("\x90\xD4=%d/%d \x97\xCE=%d/%d \x90\xC2=%d/%d\n",
-		    CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
-		    CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
-		    CGPartyObj::m_ghostWork.counters[2], Chara.MogFur().m_radarLevel[2]);
+		    CGPartyObj::m_ghostWork.counters[0], Chara.m_sharedState.m_mogFur.m_radarLevel[0],
+		    CGPartyObj::m_ghostWork.counters[1], Chara.m_sharedState.m_mogFur.m_radarLevel[1],
+		    CGPartyObj::m_ghostWork.counters[2], Chara.m_sharedState.m_mogFur.m_radarLevel[2]);
 	}
-}
-
-static inline bool isMenuPcsCommandBusy()
-{
-	return MenuPcs.m_mode != 0;
 }
 
 static inline bool isFrameInterval(int frame, int interval)
@@ -626,7 +621,7 @@ void CGPartyObj::onFrameAlways()
 
 	PartyObjOverlay& party = m_partyData;
 	if (party.target != nullptr &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(party.target) + 0x38)) << 24) & 0xC0000000) >> 31) != 0)) {
+	    (party.target->m_flagBits.m_deleteFlag != 0)) {
 		party.target = 0;
 	}
 
@@ -829,7 +824,7 @@ void CGPartyObj::onFramePostCalc()
  */
 void CGPartyObj::command()
 {
-	if (isMenuPcsCommandBusy()) {
+	if (MenuPcs.m_mode != 0) {
 		return;
 	}
 
@@ -1011,7 +1006,7 @@ void CGPartyObj::command()
 			}
 			if (cmdDir != 0) {
 				Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
-				int& charaCommand = Chara.MogFur().m_commandIndex;
+				int& charaCommand = Chara.m_sharedState.m_mogFur.m_commandIndex;
 				int adjusted = charaCommand + cmdDir;
 				charaCommand = adjusted;
 				if (adjusted < 0) {
@@ -1021,7 +1016,7 @@ void CGPartyObj::command()
 				}
 				charaCommand = adjusted;
 			}
-			const int charaCommand = Chara.MogFur().m_commandIndex;
+			const int charaCommand = Chara.m_sharedState.m_mogFur.m_commandIndex;
 			ringCommand = charaCommand + 0x1E;
 			ringCommandArg = charaCommand;
 		}
@@ -1297,7 +1292,7 @@ void CGPartyObj::shouki()
 				addHp(healCount, static_cast<CGPrgObj*>(0));
 			}
 		} else if (m_unk688 == 2) {
-			unsigned int damageInterval = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_romWork[CRomWork::ShoukiDamageIntervalOffset];
+			unsigned int damageInterval = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_romWork->m_shoukiDamageInterval;
 			if ((reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectFlags & 0x2000) != 0) {
 				damageInterval += Game.m_battleParams[4];
 			}
@@ -2143,7 +2138,7 @@ void CGPartyObj::checkTargetParticle()
 		maxRange = 0.0f;
 		if (m_lastStateId == 2) {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-			unsigned int vNode = work->m_romWork[0xCD];
+			unsigned int vNode = work->m_romWork->m_combatParam0;
 			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			unsigned int vItem = rows[m_itemId].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
@@ -2156,7 +2151,7 @@ void CGPartyObj::checkTargetParticle()
 			maxRange += base + static_cast<float>(vFlag);
 		} else {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-			unsigned int vNode = work->m_romWork[0xCE];
+			unsigned int vNode = work->m_romWork->m_combatParam1;
 			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			unsigned int vItem = rows[m_itemId].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
@@ -2846,7 +2841,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		break;
 	case 0x17:
 		if (kind == 1 &&
-		    (source->m_scriptHandle->m_romWork[0x7F] & 4) != 0) {
+		    (source->m_scriptHandle->m_romWork->m_flags & 4) != 0) {
 			addValue = stageAdd;
 		}
 		break;
@@ -3700,9 +3695,9 @@ static inline int stageWeather()
  */
 static inline int magicReady()
 {
-	if (CGPartyObj::m_ghostWork.counters[0] >= Chara.MogFur().m_radarLevel[0] ||
-	    CGPartyObj::m_ghostWork.counters[1] >= Chara.MogFur().m_radarLevel[1] ||
-	    CGPartyObj::m_ghostWork.counters[2] >= Chara.MogFur().m_radarLevel[2]) {
+	if (CGPartyObj::m_ghostWork.counters[0] >= Chara.m_sharedState.m_mogFur.m_radarLevel[0] ||
+	    CGPartyObj::m_ghostWork.counters[1] >= Chara.m_sharedState.m_mogFur.m_radarLevel[1] ||
+	    CGPartyObj::m_ghostWork.counters[2] >= Chara.m_sharedState.m_mogFur.m_radarLevel[2]) {
 		return 1;
 	}
 	return 0;
@@ -3722,7 +3717,7 @@ static inline int chooseMagic()
 	int count = 0;
 	int i;
 	for (i = 0; i < 3; i++) {
-		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
+		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.m_sharedState.m_mogFur.m_radarLevel[i]) {
 			count++;
 		}
 	}
@@ -3730,7 +3725,7 @@ static inline int chooseMagic()
 	int pick = Math.Rand(count);
 	count = 0;
 	for (i = 0; i < 3; i++) {
-		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.MogFur().m_radarLevel[i]) {
+		if (CGPartyObj::m_ghostWork.counters[i] >= Chara.m_sharedState.m_mogFur.m_radarLevel[i]) {
 			if (count == pick) {
 				return i;
 			}
@@ -3772,7 +3767,7 @@ static inline void decMagic(int slotSel)
 static inline int calcWeightMax()
 {
 	int weather = stageWeather();
-	float rate = static_cast<float>(Chara.MogFur().m_alphaScore) / 100.0f;
+	float rate = static_cast<float>(Chara.m_sharedState.m_mogFur.m_alphaScore) / 100.0f;
 	float scale;
 	switch (weather) {
 	default:
@@ -3923,9 +3918,9 @@ void CGPartyObj::ghostPartyMog()
 		CGPartyObj::m_ghostWork.state = 1;
 	} else {
 		int exceeded;
-		if (static_cast<int>(CGPartyObj::m_ghostWork.counters[0]) >= Chara.MogFur().m_radarLevel[0] ||
-		    static_cast<int>(CGPartyObj::m_ghostWork.counters[1]) >= Chara.MogFur().m_radarLevel[1] ||
-		    static_cast<int>(CGPartyObj::m_ghostWork.counters[2]) >= Chara.MogFur().m_radarLevel[2]) {
+		if (static_cast<int>(CGPartyObj::m_ghostWork.counters[0]) >= Chara.m_sharedState.m_mogFur.m_radarLevel[0] ||
+		    static_cast<int>(CGPartyObj::m_ghostWork.counters[1]) >= Chara.m_sharedState.m_mogFur.m_radarLevel[1] ||
+		    static_cast<int>(CGPartyObj::m_ghostWork.counters[2]) >= Chara.m_sharedState.m_mogFur.m_radarLevel[2]) {
 			exceeded = 1;
 		} else {
 			exceeded = 0;
@@ -3963,14 +3958,14 @@ void CGPartyObj::ghostPartyMog()
 			case 0:
 				break;
 			case 1:
-				if (Chara.MogFur().m_alphaScore < 0x32) {
+				if (Chara.m_sharedState.m_mogFur.m_alphaScore < 0x32) {
 					CGPartyObj::m_ghostWork.state = 5;
-				} else if (Chara.MogFur().m_alphaScore >= 0x5F) {
+				} else if (Chara.m_sharedState.m_mogFur.m_alphaScore >= 0x5F) {
 					CGPartyObj::m_ghostWork.state = 4;
 				}
 				break;
 			case 2:
-				if (Chara.MogFur().m_alphaScore < 0x32) {
+				if (Chara.m_sharedState.m_mogFur.m_alphaScore < 0x32) {
 					CGPartyObj::m_ghostWork.state = 6;
 				}
 				break;
@@ -4286,9 +4281,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		    IsKindOf(0x6D) && (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 			int weightMax = calcWeightMax();
 
-			sprintf(text, "%d/%d %d/%d %d/%d", CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
-			        CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
-			        CGPartyObj::m_ghostWork.counters[2], Chara.MogFur().m_radarLevel[2]);
+			sprintf(text, "%d/%d %d/%d %d/%d", CGPartyObj::m_ghostWork.counters[0], Chara.m_sharedState.m_mogFur.m_radarLevel[0],
+			        CGPartyObj::m_ghostWork.counters[1], Chara.m_sharedState.m_mogFur.m_radarLevel[1],
+			        CGPartyObj::m_ghostWork.counters[2], Chara.m_sharedState.m_mogFur.m_radarLevel[2]);
 
 			float curY = y;
 			float width = static_cast<float>(font->GetWidth(text));
@@ -4300,7 +4295,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			y = y - lineH;
 
 			sprintf(text, "%d/%d a=%d", CGPartyObj::m_ghostWork.pressure,
-			        weightMax, Chara.MogFur().m_alphaScore);
+			        weightMax, Chara.m_sharedState.m_mogFur.m_alphaScore);
 
 			float curY2 = y;
 			width = static_cast<float>(font->GetWidth(text));
@@ -4309,10 +4304,10 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			font->SetPosZ(z);
 			font->Draw(text);
 		} else {
-			unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-			sprintf(text, "%d %d %d %d %d %d", work[0xBA4], *reinterpret_cast<unsigned short*>(work + 0xBC4),
-			        *reinterpret_cast<unsigned short*>(work + 0xBC6), *reinterpret_cast<unsigned short*>(work + 0xBC8),
-			        *reinterpret_cast<unsigned short*>(work + 0xBCA), *reinterpret_cast<unsigned short*>(work + 0xBCC));
+			CCaravanWork* work = SAFE_CAST_CARAVAN_WORK(m_scriptHandle);
+			sprintf(text, "%d %d %d %d %d %d", work->m_bonusCondition, work->m_artifactRelated[0],
+			        work->m_artifactRelated[1], work->m_artifactRelated[2],
+			        work->m_artifactRelated[3], work->m_artifactRelated[4]);
 
 			float curY3 = y;
 			float width = static_cast<float>(font->GetWidth(text));

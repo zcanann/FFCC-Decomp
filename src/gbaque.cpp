@@ -543,8 +543,10 @@ inline void GbaQueue::ChgMoneyData(int channel, unsigned int data)
 inline void GbaQueue::ChgEquipPosData(int channel, unsigned int data)
 {
 	char* dataBytes = reinterpret_cast<char*>(&data);
+	int equipKind = dataBytes[1];
+	int equipPos = dataBytes[2];
 
-	Game.m_scriptFoodBase[channel]->ChgEquipPos(dataBytes[1], dataBytes[2]);
+	Game.m_scriptFoodBase[channel]->ChgEquipPos(equipKind, equipPos);
 }
 
 /*
@@ -556,8 +558,10 @@ inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
 {
 	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
 	short value = *reinterpret_cast<short*>(dataBytes + 2);
+	int cmdIndex = dataBytes[1];
+	short swapped = __lhbrx(&value, 0);
 
-	Game.m_scriptFoodBase[channel]->ChgCmdLst(dataBytes[1], static_cast<short>(__lhbrx(&value, 0)));
+	Game.m_scriptFoodBase[channel]->ChgCmdLst(cmdIndex, swapped);
 }
 
 /*
@@ -1420,7 +1424,7 @@ void GbaQueue::LoadEnemyStat()
 			} else {
 				const CRomWork* enemyData = &Game.m_enemyRomTable[
 				    Game.m_monWorkRefs[i]->m_baseDataIndex];
-				const unsigned int enemyKind = enemyData->m_data[CRomWork::EnemyKindOffset];
+				const unsigned int enemyKind = enemyData->m_data.m_kind;
 
 				if (enemyKind == 10) {
 					localEnemyData[i].m_kind = 1;
@@ -4251,7 +4255,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					}
 				}
 
-				const int enemyFlags = enemyData->m_data[CRomWork::EnemyFlagsOffset] & 5;
+				const int enemyFlags = enemyData->m_data.m_flags & 5;
 				if (enemyFlags == 5) {
 					localScouterInfo[i].m_traits[0] = 0;
 				} else if ((enemyFlags & 4) != 0) {
@@ -4260,12 +4264,12 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					localScouterInfo[i].m_traits[0] = 2;
 				} else {
 					{
-						const unsigned short form0 = enemyData->ElementResistances()[1];
-						if ((form0 == 0) && (enemyData->ElementResistances()[2] == 0) &&
-						    (enemyData->ElementResistances()[3] == 0)) {
+						const unsigned short form0 = enemyData->m_data.m_elementResistances[1];
+						if ((form0 == 0) && (enemyData->m_data.m_elementResistances[2] == 0) &&
+						    (enemyData->m_data.m_elementResistances[3] == 0)) {
 							localScouterInfo[i].m_traits[0] = 3;
-						} else if ((form0 == 3) && (enemyData->ElementResistances()[2] == 3) &&
-						           (enemyData->ElementResistances()[3] == 3)) {
+						} else if ((form0 == 3) && (enemyData->m_data.m_elementResistances[2] == 3) &&
+						           (enemyData->m_data.m_elementResistances[3] == 3)) {
 							if (enemyData->m_defense == 0x10) {
 								localScouterInfo[i].m_traits[0] = 0xE;
 							} else {
@@ -4278,35 +4282,35 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 								localScouterInfo[i].m_traits[0] = 5;
 								statusCount = 1;
 							}
-							if ((enemyData->ElementResistances()[1] == 3) && (statusCount < 3)) {
+							if ((enemyData->m_data.m_elementResistances[1] == 3) && (statusCount < 3)) {
 								localScouterInfo[i].m_traits[statusCount] = 6;
 								statusCount++;
 							}
-							if ((enemyData->ElementResistances()[2] == 0) && (statusCount < 3)) {
+							if ((enemyData->m_data.m_elementResistances[2] == 0) && (statusCount < 3)) {
 								localScouterInfo[i].m_traits[statusCount] = 7;
 								statusCount++;
 							}
-							if ((enemyData->ElementResistances()[2] == 3) && (statusCount < 3)) {
+							if ((enemyData->m_data.m_elementResistances[2] == 3) && (statusCount < 3)) {
 								localScouterInfo[i].m_traits[statusCount] = 8;
 								statusCount++;
 							}
-							if ((enemyData->ElementResistances()[3] == 0) && (statusCount < 3)) {
+							if ((enemyData->m_data.m_elementResistances[3] == 0) && (statusCount < 3)) {
 								localScouterInfo[i].m_traits[statusCount] = 9;
 								statusCount++;
 							}
-							if ((enemyData->ElementResistances()[3] == 3) && (statusCount < 3)) {
+							if ((enemyData->m_data.m_elementResistances[3] == 3) && (statusCount < 3)) {
 								localScouterInfo[i].m_traits[statusCount] = 10;
 								statusCount++;
 							}
-							if ((enemyData->ElementResistances()[4] == 0) && (statusCount < 3)) {
+							if ((enemyData->m_data.m_elementResistances[4] == 0) && (statusCount < 3)) {
 								localScouterInfo[i].m_traits[statusCount] = 11;
 								statusCount++;
 							}
-							if ((enemyData->ElementResistances()[5] == 0) && (statusCount < 3)) {
+							if ((enemyData->m_data.m_elementResistances[5] == 0) && (statusCount < 3)) {
 								localScouterInfo[i].m_traits[statusCount] = 12;
 								statusCount++;
 							}
-							if ((enemyData->ElementResistances()[6] == 3) && (statusCount < 3)) {
+							if ((enemyData->m_data.m_elementResistances[6] == 3) && (statusCount < 3)) {
 								localScouterInfo[i].m_traits[statusCount] = 13;
 							}
 						}
@@ -4454,9 +4458,9 @@ int GbaQueue::GetHitEInfo(int channel)
  */
 bool GbaQueue::IsSingleMode(int channel)
 {
-	OSWaitSemaphore(accessSemaphores + channel);
+	BlockSem(channel);
 	bool isSingle = m_singleMode == 1;
-	OSSignalSemaphore(accessSemaphores + channel);
+	ReleaseSem(channel);
 	return isSingle;
 }
 

@@ -25,7 +25,7 @@ void pppParMoveMatrix(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrl
 	Mtx scaleMtx;
 
 	pppMngSt = ppvMng;
-	Vec* previousPosition = &pppMngSt->UserPosition();
+	Vec* previousPosition = &pppMngSt->m_userPosition;
 	Vec* position = &pppMngSt->m_position;
 	PSVECSubtract(previousPosition, position, &moveDelta);
 

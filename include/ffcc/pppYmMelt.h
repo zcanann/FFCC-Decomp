@@ -14,11 +14,6 @@ struct PYmMelt;
 typedef _pppCtrlTable PYmMeltDataOffsets;
 typedef _pppPObject pppYmMelt;
 
-struct YmMeltDataOffsets {
-    s32 m_workOffset;
-    s32 m_colorWorkOffset;
-};
-
 struct VERTEX_DATA
 {
     Vec m_position;

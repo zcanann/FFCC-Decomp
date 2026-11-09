@@ -95,20 +95,6 @@ enum
     MenuFaceTexture = MenuBattleTextureStart + 2
 };
 
-static inline void ReleaseRefObject(void* object)
-{
-    CRef* ref = reinterpret_cast<CRef*>(object);
-    ref->Release();
-}
-
-static inline void ReleaseRefSlot(void** slot)
-{
-    if (*slot != nullptr) {
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80097760
@@ -829,8 +815,14 @@ void CMenuPcs::onScriptChanging(char* script)
     }
 
     memset(&m_battleHud, 0, sizeof(m_battleHud));
-    ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[2]));
-    ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[3]));
+    if (m_fonts[2] != 0) {
+        m_fonts[2]->Release();
+        m_fonts[2] = 0;
+    }
+    if (m_fonts[3] != 0) {
+        m_fonts[3]->Release();
+        m_fonts[3] = 0;
+    }
 }
 
 /*

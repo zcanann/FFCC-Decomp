@@ -17,25 +17,16 @@
 
 static int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
-STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_colorInfoOffset) == 0x4);
-STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_stateOffset) == 0x8);
-STATIC_ASSERT(sizeof(YmDeformationShpDataOffsets) == 0xC);
-
-static inline YmDeformationShpDataOffsets* DeformationShpDataOffsets(_pppCtrlTable* ctrl)
-{
-	return reinterpret_cast<YmDeformationShpDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 static inline VYmDeformationShp* DeformationShpState(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
 {
 	return reinterpret_cast<VYmDeformationShp*>(
-		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_stateOffset);
+		object->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline VColor* DeformationShpColorInfo(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
 {
 	return reinterpret_cast<VColor*>(
-		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_colorInfoOffset);
+		object->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
 inline void calcScreenPos(Vec4d& out, Vec pos, Mtx drawMtx, Mtx44 screenMtx)
@@ -241,7 +232,7 @@ inline void SetUpIndWarp(VYmDeformationShp* state)
 void pppRenderYmDeformationShp(pppYmDeformationShp* object, pppYmDeformationShpStep* step, _pppCtrlTable* ctrl)
 {
 	VYmDeformationShp* state = reinterpret_cast<VYmDeformationShp*>(
-		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_stateOffset);
+		object->m_workArea + ctrl->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	Vec2d uvs[4];
 	Mtx identityMtx;
@@ -408,11 +399,11 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 
 	texScaleX = 1.0f / (float)width;
 	texScaleY = 1.0f / (float)height;
-	texOffsetX = screenPos[minXIndex].x;
-	texOffsetX -= (float)left;
+	texOffsetX = screenPos[minXIndex].x - (float)left;
 	texOffsetX = texScaleX * texOffsetX;
 	offsetX = texPos[minXIndex].x - texOffsetX;
-	texOffsetY = texScaleY * (screenPos[minYIndex].y - (float)top);
+	texOffsetY = screenPos[minYIndex].y;
+	texOffsetY = texScaleY * (texOffsetY - (float)top);
 	offsetY = texPos[minYIndex].y - texOffsetY;
 
 	if (originalLeft < 0) {
@@ -453,8 +444,8 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 
 	PSMTXConcat(texMtx, object->m_drawMatrix.value, texMtx);
 	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX3x4);
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0);
+	GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
 	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 	GXLoadTexObj(state->m_backBuffer, GX_TEXMAP0);
 
@@ -464,6 +455,7 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 		GXTexCoord2f32(uvs[i].x, uvs[i].y);
 		GXTexCoord2f32(uvs[i].x, uvs[i].y);
 	}
+	GXEnd();
 
 	return 1;
 }

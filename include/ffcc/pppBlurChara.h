@@ -8,12 +8,6 @@ struct _pppPObject;
 
 typedef _pppPObject pppBlurChara;
 
-struct BlurCharaDataOffsets {
-    s32 _unused0;
-    s32 m_colorDataOffset;
-    s32 m_texDataOffset;
-};
-
 struct pppBlurCharaStep {
     s32 m_graphId;
     u8 m_afterDrawPass;

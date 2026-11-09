@@ -11,14 +11,6 @@ struct _pppFilterSerializedData {
     _GXColor m_color;
 };
 
-STATIC_ASSERT(sizeof(pppFilterDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(pppFilterDataOffsets, m_serializedDataOffset) == 0x0);
-
-static inline pppFilterDataOffsets* GetFilterDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<pppFilterDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8015a788
@@ -30,7 +22,7 @@ static inline pppFilterDataOffsets* GetFilterDataOffsets(_pppCtrlTable* ctrl)
  */
 void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterStep* step, _pppCtrlTable* ctrl)
 {
-    int serializedOffset = GetFilterDataOffsets(ctrl)->m_serializedDataOffset;
+    int serializedOffset = ctrl->m_serializedDataOffsets[0];
     _pppFilterSerializedData* serializedData =
         (_pppFilterSerializedData*)(pppFilterObj->m_workArea + serializedOffset);
 

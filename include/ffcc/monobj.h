@@ -310,7 +310,7 @@ public:
     int m_chaseTimer;             // 0x6DC
     union {
         int m_unk6E0;             // 0x6E0
-        unsigned char* m_bind;    // 0x6E0
+        CChara::CNode* m_bind;    // 0x6E0
     };
     short m_aiState;              // 0x6E4
     short m_aiStatePrev;          // 0x6E6

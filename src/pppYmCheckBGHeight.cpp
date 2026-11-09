@@ -61,9 +61,9 @@ void pppFrameYmCheckBGHeight(pppYmCheckBGHeight* obj, pppYmCheckBGHeightStep* st
         }
 
         pppMngSt->m_position.y = finalY;
-        pppMngSt->BasePosition().y = finalY;
+        pppMngSt->m_basePosition.y = finalY;
         pppMngSt->m_paramVec0.y = finalY;
-        pppMngSt->UserPosition().y = finalY;
+        pppMngSt->m_userPosition.y = finalY;
 
         ppvMng->m_matrix.value[0][3] = pppMngSt->m_position.x;
         ppvMng->m_matrix.value[1][3] = pppMngSt->m_position.y;

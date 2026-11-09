@@ -24,10 +24,6 @@ struct pppScreenQuakeStep {
 
 typedef _pppPObject pppScreenQuake;
 
-struct ScreenQuakeDataOffsets {
-    s32 m_workOffset;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -33,26 +33,6 @@ STATIC_ASSERT(offsetof(CoronaWork, m_alphaScale) == 0x8);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_projected) == 0x10);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_viewPosition) == 0x20);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_alpha) == 0x32);
-STATIC_ASSERT(sizeof(CoronaDataOffsets) == 0x10);
-STATIC_ASSERT(offsetof(CoronaDataOffsets, m_vecWorkOffset) == 0x8);
-STATIC_ASSERT(offsetof(CoronaDataOffsets, m_workOffset) == 0xC);
-
-static inline CoronaDataOffsets* GetCoronaDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<CoronaDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline CoronaWork* GetCoronaWork(_pppPObject* object, _pppCtrlTable* ctrl)
-{
-    CoronaDataOffsets* offsets = GetCoronaDataOffsets(ctrl);
-    return reinterpret_cast<CoronaWork*>(object->m_workArea + offsets->m_workOffset);
-}
-
-static inline CoronaVecWork* GetCoronaVecWork(_pppPObject* object, _pppCtrlTable* ctrl)
-{
-    CoronaDataOffsets* offsets = GetCoronaDataOffsets(ctrl);
-    return reinterpret_cast<CoronaVecWork*>(object->m_workArea + offsets->m_vecWorkOffset);
-}
 
 /*
  * --INFO--
@@ -77,8 +57,8 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
     float scale;
     float distScale;
 
-    work = GetCoronaWork(object, ctrl);
-    vecWork = GetCoronaVecWork(object, ctrl);
+    work = (CoronaWork*)(object->m_workArea + ctrl->m_serializedDataOffsets[3]);
+    vecWork = (CoronaVecWork*)(object->m_workArea + ctrl->m_serializedDataOffsets[2]);
 
     shapeId = data->m_dataValIndex;
     if (shapeId == 0xFFFF) {
@@ -142,7 +122,7 @@ void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
         return;
     }
 
-    work = GetCoronaWork(object, ctrl);
+    work = (CoronaWork*)(object->m_workArea + ctrl->m_serializedDataOffsets[3]);
     work->m_alphaScaleVelocity = work->m_alphaScaleVelocity + work->m_alphaScaleAccel;
     work->m_alphaScale = work->m_alphaScale + work->m_alphaScaleVelocity;
 
@@ -186,7 +166,7 @@ void pppDestructCorona(_pppPObject*, _pppCtrlTable*)
 void pppConstructCorona(_pppPObject* object, _pppCtrlTable* ctrl)
 {
     float initValue = 0.0f;
-    CoronaWork* work = GetCoronaWork(object, ctrl);
+    CoronaWork* work = (CoronaWork*)(object->m_workArea + ctrl->m_serializedDataOffsets[3]);
     work->m_shapeFrame2 = 0;
     work->m_shapeFrame1 = 0;
     work->m_shapeFrame0 = 0;

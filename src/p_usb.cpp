@@ -1,4 +1,5 @@
 #include "ffcc/p_usb.h"
+#include "ffcc/util.h"
 
 #include "ffcc/usb.h"
 
@@ -35,11 +36,6 @@ CProcessCallbackTable CUSBPcs::m_table = {
         {static_cast<CProcessCallback>(&CUSBPcs::func), 0x12, 0},
     },
 };
-
-static inline unsigned int Swap32(unsigned int x)
-{
-    return __lwbrx((void*)&x, 0);
-}
 
 /*
  * --INFO--
@@ -224,11 +220,11 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     packet = reinterpret_cast<CDataHeader*>(raw);
     packet->m_packetSize = packetSize;
     packet->m_packetType = 4;
-    packet->m_packetCode = Swap32((unsigned int)code);
-    packet->m_elementCount = Swap32((unsigned int)elemCount);
-    packet->m_dataSize = Swap32(payloadSize);
-    packet->m_reserved2C = Swap32(0);
-    packet->m_payloadSize = Swap32(payloadSize);
+    packet->m_packetCode = Util.ConvertEndian4(code);
+    packet->m_elementCount = Util.ConvertEndian4(elemCount);
+    packet->m_dataSize = Util.ConvertEndian4(payloadSize);
+    packet->m_reserved2C = Util.ConvertEndian4(0);
+    packet->m_payloadSize = Util.ConvertEndian4(payloadSize);
     memcpy(packet + 1, src, payloadSize);
 
     connected = USB.IsConnected();
@@ -241,8 +237,8 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
             unsigned char[(packet->m_packetSize + 0x1F) & ~0x1F]);
         memcpy(dstBuffer, packet, (packet->m_packetSize + 0x1F) & ~0x1F);
 
-        dstBuffer->m_packetType = Swap32(packet->m_packetType);
-        dstBuffer->m_packetSize = Swap32(packet->m_packetSize);
+        dstBuffer->m_packetType = Util.ConvertEndian4(packet->m_packetType);
+        dstBuffer->m_packetSize = Util.ConvertEndian4(packet->m_packetSize);
 
         DCFlushRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);
         DCInvalidateRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);

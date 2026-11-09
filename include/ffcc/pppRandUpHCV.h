@@ -6,10 +6,6 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
-struct RandUpHCVDataOffsets {
-    s32 m_valueOffset;
-};
-
 struct RandUpHCVParams {
     s32 targetId;
     s32 sourceOffset;

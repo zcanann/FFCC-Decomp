@@ -4,7 +4,45 @@
 #include "ffcc/FS_USB_Process.h"
 #include "ffcc/pppVec.h"
 
-class FS_tagOAN3_SHAPE;
+struct FS_tagOAN3_SPRITE
+{
+    u8 unk00[8];       // 0x00
+    GXColor color;     // 0x08
+    u8 blendMode;      // 0x0C
+    u8 unk0D[3];       // 0x0D
+    s16 left;          // 0x10
+    s16 top;           // 0x12
+    s16 right;         // 0x14
+    s16 bottom;        // 0x16
+    s16 texX;          // 0x18
+    s16 texY;          // 0x1A
+    s16 texW;          // 0x1C
+    s16 texH;          // 0x1E
+    u8 texIndex;       // 0x20
+    u8 unk21[3];       // 0x21
+};
+
+struct FS_tagOAN3_QUAD
+{
+    u8 unk00[8];       // 0x00
+    GXColor color;     // 0x08
+    u8 blendMode;      // 0x0C
+    u8 unk0D[3];       // 0x0D
+    s16 vertex[4][2];  // 0x10
+    s16 texX;          // 0x20
+    s16 texY;          // 0x22
+    s16 texW;          // 0x24
+    s16 texH;          // 0x26
+    u8 texIndex;       // 0x28
+    u8 unk29[3];       // 0x29
+};
+
+struct FS_tagOAN3_SHAPE
+{
+    s16 flags;         // 0x00
+    s16 count;         // 0x02
+    u8 unk04[0xC];     // 0x04
+};
 
 struct CFunnyShapeAnmWork
 {

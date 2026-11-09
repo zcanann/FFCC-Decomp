@@ -299,24 +299,8 @@ public:
     {
         return m_unkA6;
     }
-    short GetTextureIndex(int index) const
-    {
-        return m_textureIndices[index];
-    }
-    int IsFurEnabled() const
-    {
-        return m_singleTextureFlag != 0;
-    }
-    CTexture* GetFurPickTexture()
-    {
-        return m_textureData.m_textures[1];
-    }
-    CTexture* GetFurTexture(int index)
-    {
-        return m_textureData.m_textures[index + 2];
-    }
     void SetTag(int);
-    void AddTextureIdx(CChunkFile&);
+    void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
     {
         m_materialColor = *reinterpret_cast<GXColor*>(&rgba);
@@ -329,12 +313,8 @@ public:
     {
         return m_textureData.m_textures[index];
     }
-    CTexScroll* GetTexScroll(int index)
-    {
-        return &m_textureData.m_texScroll[index];
-    }
 
-private:
+public:
     friend class CTexAnimSet;
 
     char m_name[0x10];                    // 0x008
@@ -384,6 +364,7 @@ public:
     unsigned long GetFreeMaterielIdx();
     void Create(CChunkFile&, CTextureSet*, CMaterialMan::TEV_BIT, CLightPcs::CBumpLight*);
     void SetTextureSet(CTextureSet*);
+    void SetTexture(unsigned long, unsigned long, CTexture*);
     void Calc();
     unsigned int FindTexName(char*, long*);
     void CacheLoadTexture(int, CAmemCacheSet*);

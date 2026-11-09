@@ -21,17 +21,10 @@ static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
 typedef pppLaserWorkBase pppYmLaserWork;
 
-STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_colorBlockOffset) == 0x4);
-STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_workOffset) == 0x8);
 STATIC_ASSERT(offsetof(CMapCylinder, m_bottom) == 0x0);
 STATIC_ASSERT(offsetof(CMapCylinder, m_axis) == 0x18);
 STATIC_ASSERT(offsetof(CMapCylinder, m_radius) == 0x24);
 STATIC_ASSERT(offsetof(CMapCylinder, m_bound) == 0x28);
-
-static inline pppLaserDataOffsets* GetYmLaserDataOffsets(_pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<pppLaserDataOffsets*>(ctrlTable->m_serializedDataOffsets);
-}
 
 STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
 
@@ -48,7 +41,7 @@ STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 randArg = 6.2831855f;
-	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
+	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 
 	work->m_length = 0.0f;
 	work->m_halfWidth = work->m_graphValue2 = work->m_graphValue3 = 0.0f;
@@ -75,7 +68,7 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
  */
 extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
+	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 
 	work->m_halfWidth = work->m_graphValue2 = work->m_graphValue3 = 0.0f;
 	work->m_lengthStep = work->m_graphValue0 = work->m_graphValue1 = 0.0f;
@@ -95,7 +88,7 @@ extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable
  */
 extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
+	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 	void* stage = work->m_points;
 
 	if (stage != 0) {
@@ -125,7 +118,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 	int i;
 
 	if ((ppvUserStopPartF == 0) && (step->m_stepValue != 0xFFFF)) {
-	work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(data)->m_workOffset);
+	work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + data->m_serializedDataOffsets[2]);
 	emptyHistory = 0;
 
 	if (work->m_points == 0) {
@@ -270,8 +263,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
  */
 extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlTable* data)
 {
-	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(data)->m_workOffset);
-	VColor* colorData = reinterpret_cast<VColor*>(laser->m_workArea + GetYmLaserDataOffsets(data)->m_colorBlockOffset);
+	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + data->m_serializedDataOffsets[2]);
+	VColor* colorData = reinterpret_cast<VColor*>(laser->m_workArea + data->m_serializedDataOffsets[1]);
 	s32 dataValIndex = step->m_dataValIndex;
 	u32 count;
 	s32 i;

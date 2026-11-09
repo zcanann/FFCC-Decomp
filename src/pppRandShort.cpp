@@ -7,14 +7,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-STATIC_ASSERT(sizeof(RandShortDataOffsets) == 0x4);
-STATIC_ASSERT(offsetof(RandShortDataOffsets, m_valueOffset) == 0x0);
-
-static inline RandShortDataOffsets* GetRandShortDataOffsets(_pppCtrlTable* ctrl)
-{
-    return reinterpret_cast<RandShortDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8006249c
@@ -41,14 +33,14 @@ void pppRandShort(_pppPObject* basePtr, RandShortParams* in, _pppCtrlTable* ctrl
             value *= 2.0f;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandShortDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
         *valuePtr = value;
     } else {
         if (in->targetId != baseState) {
             return;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + GetRandShortDataOffsets(ctrl)->m_valueOffset);
+        valuePtr = (f32*)(basePtr->m_workArea + ctrl->m_serializedDataOffsets[0]);
     }
 
     s16* target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(basePtr->m_workArea + in->sourceOffset);

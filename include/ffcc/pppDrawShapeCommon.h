@@ -5,11 +5,6 @@
 
 #include <dolphin/types.h>
 
-struct ShapeRuntimeData {
-    u32 shapeDataOffset;
-    u32 posDataOffset;
-};
-
 struct ShapeState {
     u16 value;
     u16 counter;

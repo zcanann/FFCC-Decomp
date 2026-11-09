@@ -16,14 +16,12 @@ public:
 		int m_codeOffset : 20;
 	};
 
-	struct CStack
+	union CStack
 	{
-		union {
-			u32 m_word;
-			s32 m_int;
-			float m_float;
-			CCodeIndex m_codeIndex;
-		};
+		u32 m_word;
+		s32 m_int;
+		float m_float;
+		CCodeIndex m_codeIndex;
 	};
 
 	class CClass
@@ -147,8 +145,8 @@ public:
 	virtual void onDeleteObject(CFlatRuntime::CObject*) {}
 	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&) { return 0; }
 	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&) { return 0; }
-	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int) { return &m_nullVal; }
-	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int) { return &m_nullVal; }
+	virtual CFlatRuntime::CStack* onSystemVal(CFlatRuntime::CObject*, int) { return &m_nullVal; }
+	virtual CFlatRuntime::CStack* onClassSystemVal(CFlatRuntime::CObject*, int) { return &m_nullVal; }
 	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int) {}
 	virtual void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int) {}
 	virtual CFlatRuntime::CObject* getFreeObject(int) { return 0; }
@@ -229,7 +227,7 @@ public:
         u32 m_previousCodePos;      // 0x0968
         CCodeIndex m_previousCodeIndex;
     };
-    CVal m_nullVal;                 // 0x096C
+    CStack m_nullVal;               // 0x096C
     int m_0x970;                    // 0x0970
     int m_0x974;                    // 0x0974
     CStackBlock m_stackBlocks;        // 0x0978

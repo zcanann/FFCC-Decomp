@@ -6,10 +6,6 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
-struct LerpPosDataOffsets {
-    s32 m_historyOffset;
-};
-
 struct pppLerpPosStep {
     u8 m_pad[4];
     u8 m_dataValIndex;

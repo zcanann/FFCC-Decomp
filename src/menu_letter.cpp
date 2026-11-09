@@ -1151,6 +1151,7 @@ void CMenuPcs::LetterListDraw()
 	SingleFadeEntry* panels = m_singleFadeState->entries;
 	CFont* font;
 	CCaravanWork::CLetterWork* letter;
+	int iconY;
 	CCaravanWork* caravanWork;
 
 	if ((static_cast<char>(s_OpenClose) != 0) && (static_cast<char>(m_singleMenuCtrlResetFlag) == '\0')) {
@@ -1189,6 +1190,7 @@ void CMenuPcs::LetterListDraw()
 	caravanWork = Game.m_scriptFoodBase[0];
 
 	int y = 0x60;
+	int pageMark;
 	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
 	int letterIndex;
 	float yf;
@@ -1231,7 +1233,7 @@ void CMenuPcs::LetterListDraw()
 	DrawInit();
 
 	s16 topVal = m_letterMenuState->topIndex;
-	int pageMark = 0;
+	pageMark = 0;
 	if (topVal != 0) {
 		pageMark |= 1;
 	}
@@ -1243,7 +1245,7 @@ void CMenuPcs::LetterListDraw()
 		LetterDrawPageMark(pageMark);
 	}
 
-	int iconY = 0x5B;
+	iconY = 0x5B;
 	float iconXf = 536.0f;
 	const int iconX = static_cast<int>(iconXf);
 	const int iconTopRow = static_cast<int>(m_letterMenuState->topIndex);
@@ -1853,6 +1855,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	}
 
 	innerX = 32.0f + x0;
+	float x;
 	double innerW = w - 64.0;
 	float innerWf = static_cast<float>(innerW);
 	float y = y0;
@@ -1873,7 +1876,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0xE));
 	float innerY = 32.0f + y0;
 	double innerH = h - 64.0;
-	float x = x0;
+	x = x0;
 	float innerHf = static_cast<float>(innerH);
 	for (i = 0; i < 2; ++i) {
 		flip = 0;

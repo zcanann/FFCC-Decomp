@@ -1362,7 +1362,9 @@ int CMapMng::ReadMid(char* mapName)
     CChunkFile chunkFile;
     chunkFile.SetBuf(filePtr);
 
+    CMapObj* mapObjBase;
     CMapObj* nextMapObj = m_mapObjArray;
+    mapObjBase = g_MapMng.m_mapObjArray;
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
@@ -1409,7 +1411,7 @@ int CMapMng::ReadMid(char* mapName)
                     goto octtreeFound;
                 }
                 nextMapObj++;
-            } while (nextMapObj - g_MapMng.m_mapObjArray < m_mapObjCount);
+            } while (nextMapObj - mapObjBase < m_mapObjCount);
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_read_mid_ground_error));
             }

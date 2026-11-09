@@ -141,12 +141,12 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     Vec pos;
     Vec zeroVecB;
     Vec seg;
+    float posZ;
     float nextBaseX;
     float segDx;
     float segDy;
     float segDz;
     float invCountMinusOne;
-    float posZ;
     float posX;
     float drawScale;
     int life;

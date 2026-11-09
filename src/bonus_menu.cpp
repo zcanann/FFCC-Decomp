@@ -2091,13 +2091,12 @@ void CMenuPcs::CalcSelectOpenAnim()
 #endif
 	int partySlot;
 	int idx;
-	int i;
 	CMenuPcs::Sprt2* sprite;
 	CMenuPcs::Sprt2* artiBase;
+	int i;
 	CMenuPcs::Sprt2* artiFrame;
 	CMenuPcs::Sprt2* framePanel;
 	int work;
-	CCharaPcs::CHandle* handle;
 	int frame;
 	int doneCount;
 	int activePartyCount;
@@ -2386,6 +2385,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 	}
 
 	Mtx scaleMtx;
+	CCharaPcs::CHandle* handle;
 	Mtx rotZMtx;
 	Vec srcVec;
 	Vec dstVec;
@@ -2496,6 +2496,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 	int idx;
 	CMenuPcs::Sprt2* sprite;
+	CFont* font;
 	int activePartyCount;
 	int doubleCount;
 	int modelIndex;
@@ -2590,7 +2591,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	DrawBonusChkMark(artiSprite->alpha);
 
 	DrawInit();
-	CFont* font = this->m_fonts[0];
+	font = this->m_fonts[0];
 	font->SetMargin(1.0f);
 	font->SetShadow(1);
 	font->SetScale(0.7300000190734863f);

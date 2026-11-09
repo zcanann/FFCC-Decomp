@@ -704,18 +704,13 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
         C_MTXPerspective(projectionMtx, 90.0f, 1.0f, 1.0f,
                          100000.0f);
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
-        GXTexObj* sourceIter = sourceTexObjs;
-        GXTexObj* captureIter = captureTexObjs;
-        char* compareName = Game.m_currentScriptName;
-        i = 0;
-
-        for (; i < 6; i++) {
+        for (i = 0; i < 6; i++) {
             cameraPos = centerPos;
             cameraUp.x = 0.0f;
             cameraUp.y = 1.0f;
             cameraUp.z = 0.0f;
 
-            s32 nameCompare = strcmp("ruin_2", compareName);
+            s32 nameCompare = strcmp("ruin_2", Game.m_currentScriptName);
             if (nameCompare == 0) {
                 if (i == 0) {
                     cameraPos.z -= 1.0f;
@@ -763,33 +758,32 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
             Graphic.SetViewport();
             GXSetScissor(rectOrigin, rectOrigin, 0x80, 0x80);
             Util.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f,
-                                    sourceIter, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+                                    &sourceTexObjs[i], 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
             GXSetScissor(rectOrigin, rectOrigin, 0x80, 0x80);
             CameraPcs.SetViewMatrix(lookAtMtx);
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
-            if ((gObject->m_weaponNodeFlagBits.m_attached != 0 || gObject->m_attachOwner != NULL) &&
-                gObject->m_attachOwner->m_charaModelHandle != NULL) {
+            if (gObject->m_weaponNodeFlagBits.m_attached != 0 || gObject->m_attachOwner != NULL) {
                 CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
-                CChara::CModel* ownerModel = owner->m_model;
+                if (owner != NULL) {
+                    CChara::CModel* ownerModel = owner->m_model;
 
-                ownerModel->SetCallbackContext(mana, step);
-                owner->m_model->SetBeforeDrawShadowLockEnvCallback(Mana_BeforeDrawShadowLockEnvCallback);
-                owner->m_model->SetDrawShadowMeshDLCallback(Chara_DrawShadowMeshDLCallback);
-                owner->Draw(1);
-                ownerModel = owner->m_model;
-                ownerModel->SetCallbackContext(0, 0);
-                owner->m_model->SetBeforeDrawShadowLockEnvCallback(0);
-                owner->m_model->SetDrawShadowMeshDLCallback(0);
+                    ownerModel->SetCallbackContext(mana, step);
+                    owner->m_model->SetBeforeDrawShadowLockEnvCallback(Mana_BeforeDrawShadowLockEnvCallback);
+                    owner->m_model->SetDrawShadowMeshDLCallback(Chara_DrawShadowMeshDLCallback);
+                    owner->Draw(1);
+                    ownerModel = owner->m_model;
+                    ownerModel->SetCallbackContext(0, 0);
+                    owner->m_model->SetBeforeDrawShadowLockEnvCallback(0);
+                    owner->m_model->SetDrawShadowMeshDLCallback(0);
+                }
             }
 
-            Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), captureIter, rectOrigin, rectOrigin, 0x80, 0x80,
+            Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &captureTexObjs[i], rectOrigin, rectOrigin, 0x80, 0x80,
                                        captureBufferOffset, GX_LINEAR, GX_TF_RGB565, 0);
             captureBufferOffset += captureBufferStride;
-            sourceIter++;
-            captureIter++;
         }
 
         CameraPcs.SetViewMatrix(savedCameraMtx);

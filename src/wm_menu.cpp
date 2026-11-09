@@ -8642,8 +8642,9 @@ nextListEntry:
 		const McListInfo* const slotData = &m_wmCharaState[slot];
 		slotY = static_cast<float>(rowSlopeD * static_cast<double>(slot) + rowBaseD);
 		if (slotData->m_isBroken == 0 && slotData->m_hasData != 0) {
+			float capX;
 			float rowY = 40.0f + slotY;
-			float capX = FLOAT_80331468;
+			capX = FLOAT_80331468;
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcCharacterFrameTexture));
 			MenuPcs.DrawRect(0, FLOAT_80331468, rowY, 24.0f, 40.0f,
 			         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -9552,6 +9553,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	innerW = static_cast<double>(w) - 64.0;
 	float yy = y0;
 	float innerWf = static_cast<float>(innerW);
+	float innerHf;
 	for (i = 0; i < 2; i++) {
 		uvFlag = 0;
 		if (i != 0) {
@@ -9564,7 +9566,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 1 : kMcWindowTextureBase + 2));
 	float innerY = 32.0f + y0;
 	double innerH = static_cast<double>(h) - 64.0;
-	float innerHf = static_cast<float>(innerH);
+	innerHf = static_cast<float>(innerH);
 	float xx = x0;
 	for (i = 0; i < 2; i++) {
 		uvFlag = 0;

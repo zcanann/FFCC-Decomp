@@ -506,12 +506,11 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
         octaveAdjust -= 1;
     }
 
-    noteIndex = (pitchValue >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK;
-    pitchOutput = noteIndex / REDSOUND_NOTES_PER_OCTAVE;
-    octaveAdjust += pitchOutput;
+    noteIndex = (u16)((pitchValue >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK);
+    octaveAdjust += noteIndex / REDSOUND_NOTES_PER_OCTAVE;
     noteIndex %= REDSOUND_NOTES_PER_OCTAVE;
     pitchOutput = RedTonePitchGet(noteIndex) >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
-    pitchOutput *= RedFinePitchGet(pitchValue & REDSOUND_PITCH_FINE_MASK);
+    pitchOutput *= RedFinePitchGet((pitchValue << 2) & (REDSOUND_PITCH_FINE_MASK << 2));
     pitchOutput >>= REDSOUND_FIXED_SHIFT;
 
     if (fineTune != 0) {
@@ -1219,9 +1218,10 @@ static void _PitchExecute(RedVoiceDATA* voice)
         pitchWork = (pitchWork < REDSOUND_PITCH_MOD_DEPTH_SPLIT)
                         ? (pitchWork + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE
                         : ((pitchWork & REDSOUND_PAN_BYTE_MASK) + 1) * REDSOUND_PITCH_MOD_DEEP_SCALE;
-        pitchWork = pitchWork + voice->m_track->m_keyTranspose + voice->m_track->m_pitchBend;
-        basePitch = RedVoiceIsPlaying(voice) ? voice->m_basePitch + voice->m_track->m_pitch
-                                             : voice->m_basePitch + RedMusicPitchControlGetValue();
+        pitchWork = voice->m_track->m_keyTranspose + voice->m_track->m_pitchBend + pitchWork;
+        basePitch = RedVoiceStateIsPlaying(voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK)
+                        ? voice->m_basePitch + voice->m_track->m_pitch
+                        : voice->m_basePitch + RedMusicPitchControlGetValue();
         pitchWork = PitchCompute(basePitch, pitchWork, voice->m_waveData->m_pitch, voice->m_track->m_fineTune);
 
         pitchWork -= voice->m_pitch;

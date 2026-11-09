@@ -8216,10 +8216,11 @@ void CMenuPcs::CalcMainMenuSub()
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
+				float d1;
 				float d0 = -modelMtx[0][3] * (static_cast<double>(n) / 20.0);
 				d0 *= (static_cast<double>(n) / 20.0);
 				modelMtx[0][3] += d0;
-				float d1 = -0.2 - modelMtx[1][3] * (static_cast<double>(n) / 20.0);
+				d1 = -0.2 - modelMtx[1][3] * (static_cast<double>(n) / 20.0);
 				d1 *= (static_cast<double>(n) / 20.0);
 				modelMtx[1][3] += d1;
 				float d2 = 51.5 - modelMtx[2][3];
@@ -8503,6 +8504,7 @@ void CMenuPcs::DrawMCList()
 	int slot;
 	int slotOff;
 	short state = m_wmWorldState->m_mainState;
+	double mapX;
 	float digitX;
 
 	if ((state == 2 || state == 3) && m_wmWorldState->m_subState != 0) {
@@ -8628,7 +8630,6 @@ nextListEntry:
 	double rowSlope = 88.0;
 	float mapOffsetX = 496.0f;
 	double rowBaseD;
-	double mapX;
 	float slotY;
 	double rowSlopeD;
 	mapX = 8.0 + static_cast<double>(mapOffsetX);
@@ -9516,6 +9517,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	float h = static_cast<float>(heightPx);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	float innerX;
 	GXColor color;
 	color.r = 0xFF;
 	color.g = 0xFF;
@@ -9546,7 +9548,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 2 : kMcWindowTextureBase + 1));
-	float innerX = 32.0f + x0;
+	innerX = 32.0f + x0;
 	innerW = static_cast<double>(w) - 64.0;
 	float yy = y0;
 	float innerWf = static_cast<float>(innerW);

@@ -1749,6 +1749,7 @@ void CMenuPcs::DrawSingWin(short mode)
     innerW = static_cast<double>(w) - 64.0;
     float yy = y0;
     float innerWf = static_cast<float>(innerW);
+    float innerHf;
     for (i = 0; i < 2; i++) {
         uvFlag = 0;
         if (i != 0) {
@@ -1761,7 +1762,7 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x40)));
     float innerY = 32.0f + y0;
     innerH = static_cast<double>(h) - 64.0;
-    float innerHf = static_cast<float>(innerH);
+    innerHf = static_cast<float>(innerH);
     float xx = x0;
     for (i = 0; i < 2; i++) {
         uvFlag = 0;

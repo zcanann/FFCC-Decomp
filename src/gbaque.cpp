@@ -1495,7 +1495,7 @@ void GbaQueue::LoadMapItemStat()
 					localMapItems[numMapItems].m_kind = 4;
 				} else {
 					const SItemFlatRow* itemRow = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable);
-					itemRow += dropItemCode;
+					itemRow = static_cast<const SItemFlatRow*>(itemRow + dropItemCode);
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
 					const int itemStage = itemRow->m_stage;
 					if (itemStage >= bossStageLimit) {

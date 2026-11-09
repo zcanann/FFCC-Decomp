@@ -1228,9 +1228,13 @@ def generate_build_ninja(
                 check_path_case(obj.src_path)
                 c_build(obj, obj.src_path)
 
-        # Check if all compiler versions exist
+        # Check if all compiler versions exist (a compiler that a pre-compile
+        # step derives is built by ninja before anything uses it)
+        derived_compilers = {os.path.normpath(p) for p in pre_compile_outputs}
         for mw_version in used_compiler_versions:
             mw_path = compilers / mw_version / "mwcceppc.exe"
+            if os.path.normpath(mw_path) in derived_compilers:
+                continue
             if config.compilers_path and not os.path.exists(mw_path):
                 sys.exit(f"Compiler {mw_path} does not exist")
 
@@ -1650,6 +1654,8 @@ def generate_objdiff_config(
         "GC/2.0": "mwcc_247_92",
         "GC/2.0p1": "mwcc_247_92p1",
         "GC/2.5": "mwcc_247_105",
+        # GC/2.5 plus FFCC's kss alias correction (docs/compiler_baseline.md)
+        "GC/2.5a": "mwcc_247_105",
         "GC/2.6": "mwcc_247_107",
         "GC/2.7": "mwcc_247_108",
         "GC/3.0a3": "mwcc_41_51213",

@@ -48,9 +48,7 @@ void pppRandIV(_pppPObject* basePtr, RandIVParams* in, _pppCtrlTable* ctrl)
     }
 
     s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(basePtr->m_workArea + in->sourceOffset);
-    f32 scale = *valuePtr;
-
-    target[0] += randint(in->blend[0], scale);
-    target[1] += randint(in->blend[1], scale);
-    target[2] += randint(in->blend[2], scale);
+    target[0] += randint(in->blend[0], *valuePtr);
+    target[1] += randint(in->blend[1], *valuePtr);
+    target[2] += randint(in->blend[2], *valuePtr);
 }

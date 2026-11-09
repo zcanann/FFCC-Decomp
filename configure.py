@@ -513,8 +513,8 @@ config.libs = [
     ]),
     {
         "lib": "Game",
-        # Japanese compatibility baseline; provenance: docs/compiler_baseline.md.
-        "mw_version": "GC/2.0p1k" if config.version == "GCCJGC" else "GC/2.5",
+        # Regional compatibility baselines; provenance: docs/compiler_baseline.md.
+        "mw_version": "GC/2.0p1k" if config.version == "GCCJGC" else "GC/2.5a",
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
@@ -702,28 +702,28 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppPointRAp.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRain.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandChar.cpp"),
-            Object(Equivalent, "pppRandCV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandCV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandDownChar.cpp"),
-            Object(Equivalent, "pppRandDownCV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandDownCV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandDownFloat.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppRandDownFV.cpp"),
-            Object(Equivalent, "pppRandDownHCV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandDownFV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandDownHCV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandDownInt.cpp"),
-            Object(Equivalent, "pppRandDownIV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandDownIV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandDownShort.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandFloat.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppRandFV.cpp"),
-            Object(Equivalent, "pppRandHCV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandFV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandHCV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandInt.cpp"),
-            Object(Equivalent, "pppRandIV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandIV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandShort.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpChar.cpp"),
-            Object(Equivalent, "pppRandUpCV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpCV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpFloat.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppRandUpFV.cpp"),
-            Object(Equivalent, "pppRandUpHCV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpFV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpHCV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpInt.cpp"),
-            Object(Equivalent, "pppRandUpIV.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpIV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpShort.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRyjMegaBirth.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRyjMegaBirthModel.cpp"),
@@ -1362,6 +1362,9 @@ FFCC_COMPILER_H = "GC/2.0p1h"
 FFCC_COMPILER_I = "GC/2.0p1i"
 FFCC_COMPILER_J = "GC/2.0p1j"
 JP_GAME_COMPILER = "GC/2.0p1k"
+# PAL and USA game compiler: GC/2.5a, derived from the stock GC/2.5 by
+# tools/patch_compiler_pal.py (guarded by the SHA-1 of its input and output).
+PAL_GAME_COMPILER = "GC/2.5a"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
     {
@@ -1397,6 +1400,12 @@ config.custom_build_rules = [
     {
         "name": "patch_compiler_ffcc4",
         "command": "$python tools/patch_compiler_ffcc4.py $out",
+        "description": "PATCH $out",
+        "restat": True,
+    },
+    {
+        "name": "patch_compiler_pal",
+        "command": "$python tools/patch_compiler_pal.py $out",
         "description": "PATCH $out",
         "restat": True,
     },
@@ -1454,6 +1463,14 @@ config.custom_build_steps = {
                 _compilers_dir / FFCC_COMPILER_J / "mwcceppc.exe",
                 Path("tools") / "patch_compiler_ffcc4.py",
             ],
+        },
+        {
+            "outputs": [_compilers_dir / PAL_GAME_COMPILER / "mwcceppc.exe"],
+            "rule": "patch_compiler_pal",
+            "implicit": [
+                Path("tools") / "patch_compiler_pal.py",
+            ]
+            + ([_compilers_dir] if config.compilers_path is None else []),
         },
     ]
 }

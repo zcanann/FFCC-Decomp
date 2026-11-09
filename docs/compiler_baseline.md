@@ -1,7 +1,8 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1k for Japan.
-GC/2.0p1k is derived during the build from the bundled GC/2.0p1 (see below).
+The Game library uses GC/2.5a for PAL and USA, and GC/2.0p1k for Japan.
+GC/2.5a is derived during the build from the bundled GC/2.5, and GC/2.0p1k
+from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -232,3 +233,68 @@ partial losses. It is not adopted, for these reasons:
 - `pppFrameYmCheckBGHeight` would also need a source reorder that holds only
   under this predicate (it scores 90 without it). That would tune source to the
   candidate compiler.
+
+## PAL and USA game compiler: GC/2.5a (kss)
+
+`tools/patch_compiler_pal.py` derives GC/2.5a from the bundled stock GC/2.5
+(`539c0b31d51510cd076755bc64c0c39c3d0f364e` to
+`9cf46cd73d0aa756865fd0b29182802759b1aceb`). Stock GC 2.5, 2.6 and 2.7 produce
+byte-identical objects for every PAL and USA game unit, and GC/2.0 only loses
+functions, so no stock version reproduces the behaviour below. It was located
+by rebuilding all game units with source-built variants of GC 2.5 (the mweppc
+decompilation, whose clang build is byte-identical to stock on all 269 PAL
+units) and then ported to the stock binary.
+
+- `kss`: in Alias.c's `operand_alias`, a store whose base register has several
+  reaching definitions, some with an alias and some without, keeps the alias
+  of the definitions that have one when that alias is a single static object
+  (whole or part, not a local). Stock GC 2.5 makes every such access
+  worst_case. Loads, and stores into locals, are unchanged.
+
+Typical case: the `pppRand*` vector randomizers select
+`target = (offset == -1) ? (T*)gPppDefaultValueBuffer : (T*)(work + offset)`
+and then store each channel through `target`, reading `*valuePtr` for every
+channel. Retail loads `*valuePtr` once and keeps it in a register across the
+stores, while the channel loads of `target` stay below the preceding store.
+Stock GC 2.5 reloads `*valuePtr` after every store, so the matching source
+had to cache it in a `scale` local, which numbers its register before the
+int-to-float constant and leaves an FPR swap in all nine `CV`, `HCV` and `IV`
+functions. This is a narrower form of the Japanese `ksa` clause: `ksa` keeps the
+access's own alias for loads and stores alike, which in PAL also hoists the
+`target` loads above the stores.
+
+The patch adds an executable section `.ffpatch` after `.reloc` (no existing
+section, VA or RVA moves) with three position-independent stubs, and
+redirects three spots of `operand_alias` (0x512700) to them: the counter
+initialisation, the per-definition test after `address_def_alias`, and the
+epilogue. The redirected bytes carry no base relocation, and the stubs read
+`worst_case_ptr` PC-relatively, so the derived compiler survives a rebase.
+
+Measured over every PAL and USA game unit (scored like `report.json`):
+
+| compiler, source | PAL exact functions | USA exact functions |
+| --- | --- | --- |
+| GC/2.5, staging source | 3066 | 3061 |
+| GC/2.5a, staging source | 3066 (+0 / -0, objects byte-identical) | 3061 (+0 / -0, no function changes) |
+| GC/2.5, per-channel `pppRand*` source | 3063 | 3058 |
+| GC/2.5a, per-channel `pppRand*` source | 3075 (+9 / -0 vs staging) | 3070 (+9 / -0) |
+
+Controls on PAL, staging source: the JP clause `ksa` on every access is
++0 / -18 (`gpmCol`, `pppLight`, `pppCreatePObject`, `pppMemAlloc`,
+`pppMemAllocNoReport`, `loadData`, the `pppRandFV` and `pppSRand*` families),
+and with the per-channel source it leaves the nine `pppRand*` at 90-96
+because the `target` loads move above the stores; `ksa` on stores only is
++0 / -1 (`CMenuPcs::loadData`, a store into a local array through a mixed
+base) and matches all nine; stores to statics only (`kss`) is +0 / -0 and
+matches all nine. The binary port and the source-built `kss` compiler produce
+byte-identical objects for all 269 PAL units.
+
+The same per-channel source is also the Japanese retail source: with the
+unchanged GC/2.0p1k it matches all nine vector randomizers and the
+`pppRandFV`, `pppRandUpFV` and `pppRandDownFV` functions, whose PAL-tuned
+`scale`/`x` locals had left Japan at 99.6. Together: PAL +9, USA +9 and Japan
++12 exact functions, no partial score lower in any region, and the twelve
+units link in all three regions. The three DOL checksums pass.
+
+When building with `--compilers`, derive the compiler once before configuring
+(`python tools/patch_compiler_pal.py build/compilers`), as for GC/2.0p1k.

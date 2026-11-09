@@ -687,7 +687,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixYZX.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixZXY.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixZYX.cpp"),
-            Object(NonMatching, "pppMiasma.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMiasma.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMove.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParHitSph.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01"), "pppParHitSphMat.cpp"),

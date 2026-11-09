@@ -185,8 +185,6 @@ void pppConstructMiasma(pppMiasma* pppMiasma, _pppCtrlTable* ctrl)
 void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTable* ctrl)
 {
     pppCVECTOR drawColor;
-    int texHeight;
-    int texWidth;
     Vec quadA;
     MiasmaRadiusWork* radiusWork;
     float width;
@@ -194,10 +192,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     Mtx44 screenMtx;
     Vec quadB;
     float yPos;
-    u32 scissorWidth;
-    CGraphic* graphicPtr;
-    int maskOffset;
-    int secondaryOffset;
     int textureIndex;
     pppModelSt* model;
     Vec cameraPos;
@@ -220,7 +214,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     float secondaryScale;
     GXTexObj secondaryMaskTex;
     GXColor stepColor;
-    u32 scissorHeight;
     MiasmaFrameWork* work;
     int texGenCount;
     int yOffset;
@@ -279,18 +272,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         isCameraInside = 1;
     }
 
-    graphicPtr = &Graphic;
-    texHeight = height;
-    texWidth = width;
-    scissorHeight = height;
-    scissorWidth = width;
-    secondaryOffset = sceneTexSize + maskTexSize;
-    slice = 0;
-    maskOffset = sceneTexSize;
-    do {
-        graphicPtr->GetBackBufferRect2(graphicPtr->m_scratchTextureBuffer, &backSceneTex, 0, yOffset = (int)(yPos = (float)slice * height), texWidth, texHeight, 0, GX_LINEAR,
+    for (slice = 0; slice < 2; slice++) {
+        Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &backSceneTex, 0, yOffset = (int)(yPos = (float)slice * height), (int)width, (int)height, 0, GX_LINEAR,
                                        GX_TF_RGBA8, 0);
-        GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
+        GXSetScissor(0, (u32)yPos, (u32)width, (u32)height);
 
         if (isCameraInside) {
             drawColor.rgba[0] = 0xFF;
@@ -379,7 +364,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         Graphic.SetDrawDoneDebugData(0x35);
 #endif
 
-        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &miasmaMaskTex, 0, yOffset, texWidth, texHeight, maskOffset,
+        Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &miasmaMaskTex, 0, yOffset, (int)width, (int)height, sceneTexSize,
                                    GX_LINEAR, GX_CTF_R8, 0);
         if (step->m_miasma.m_useSecondaryMask != 0) {
             if (isCameraInside) {
@@ -458,8 +443,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             Graphic.SetDrawDoneDebugData(0x39);
 #endif
 
-            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &secondaryMaskTex, 0, yOffset, texWidth, texHeight,
-                                       secondaryOffset, GX_LINEAR, GX_CTF_R8, 0);
+            Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &secondaryMaskTex, 0, yOffset, (int)width, (int)height,
+                                       sceneTexSize + maskTexSize, GX_LINEAR, GX_CTF_R8, 0);
         }
 
         Graphic.SetViewport();
@@ -662,8 +647,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         }
 
         Util.InitConstantRegister();
-        slice++;
-    } while (slice < 2);
+    }
 
     Util.EndQuadEnv();
     pppInitBlendMode();

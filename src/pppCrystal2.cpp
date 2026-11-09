@@ -332,9 +332,11 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
     Mtx drawMtx;
     Mtx lightMtx;
 
-    if (dataValIndex != 0xFFFF) {
+    int index = dataValIndex;
+    if (index != 0xFFFF) {
         sourceTex = 0;
-        model = (pppModelSt*)ppvEnv->m_mapMeshPtr[dataValIndex];
+        int meshIndex = dataValIndex;
+        model = (pppModelSt*)ppvEnv->m_mapMeshPtr[meshIndex];
         textureIndex = 0;
         ((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
         if (step->m_crystal.m_refractionMode == 0) {

@@ -375,11 +375,13 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
 	CrystalWork* work = (CrystalWork*)(pppCrystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
 	VColor* colorBlock = (VColor*)(pppCrystal->m_workArea + ctrl->m_serializedDataOffsets[1]);
 
-	if (dataValIndex == 0xFFFF) {
+	int index = dataValIndex;
+	if (index == 0xFFFF) {
 		return;
 	}
 
-	pppModelSt* model = (pppModelSt*)ppvEnv->m_mapMeshPtr[dataValIndex];
+	int meshIndex = dataValIndex;
+	pppModelSt* model = (pppModelSt*)ppvEnv->m_mapMeshPtr[meshIndex];
 	CTexture* indirectTex = 0;
 	int texSlot = 0;
 	CTexture* baseTex = static_cast<CTexture*>(((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, texSlot));

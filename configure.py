@@ -475,7 +475,7 @@ def RedSoundLib(objects: List[Object]) -> Dict[str, Any]:
         # PAL MAP ownership attributes these units to RedSound.a rather than
         # the main game archive, so keep their shared flags at the library level.
         "lib": "RedSound",
-        "mw_version": "GC/2.0p1g",
+        "mw_version": "GC/2.0p3",
         "cflags": redsound_cflags,
         "progress_category": "redsound",
         "objects": objects,
@@ -514,7 +514,7 @@ config.libs = [
     {
         "lib": "Game",
         # Japanese compatibility baseline; provenance: docs/compiler_baseline.md.
-        "mw_version": "GC/2.0p1k" if config.version == "GCCJGC" else "GC/2.5",
+        "mw_version": "GC/2.0p3" if config.version == "GCCJGC" else "GC/2.5",
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
@@ -690,7 +690,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMiasma.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMove.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParHitSph.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppParHitSphMat.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParHitSphMat.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParMatrix.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParMoveLine.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParMoveMatrix.cpp", cflags=cflags_game_cpp_exceptions),
@@ -760,7 +760,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmBreath.cpp", cflags=cflags_game_cpp_exceptions),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmCallBack.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmChangeTex.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppYmCheckBGHeight.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmCheckBGHeight.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDeformationMdl.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDeformationScreen.cpp"),
             Object(NonMatching, "pppYmDeformationShp.cpp"),
@@ -773,7 +773,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMegaBirthShpTail3.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMelt.cpp", cflags=cflags_game),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMiasma.cpp", cflags=cflags_game),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppYmMoveCircle.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMoveCircle.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMoveParabola.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmTraceMove.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmTracer.cpp"),
@@ -1350,110 +1350,29 @@ config.progress_report_args = [
     # "--config", "functionRelocDiffs=data_value",
 ]
 
-# Japanese game compiler: GC/2.0p1k, derived during the build from the stock
-# GC/2.0p1 by tools/patch_compiler.py (2.0p1a) and tools/patch_compiler_rw.py
-# (2.0p1b..g), both imported from the BFBB decomp, then by
-# tools/patch_compiler_ffcc.py (2.0p1h), tools/patch_compiler_ffcc2.py
-# (2.0p1i), tools/patch_compiler_ffcc3.py (2.0p1j) and
-# tools/patch_compiler_ffcc4.py (2.0p1k). Every step is guarded by the SHA-1 of
-# its input and output. See docs/compiler_baseline.md.
-BFBB_COMPILER = "GC/2.0p1g"
-FFCC_COMPILER_H = "GC/2.0p1h"
-FFCC_COMPILER_I = "GC/2.0p1i"
-FFCC_COMPILER_J = "GC/2.0p1j"
-JP_GAME_COMPILER = "GC/2.0p1k"
+# Japanese game and RedSound compiler: GC/2.0p3, doldecomp/mweppc's GC_2_0p3
+# (GameCube 2.0 built from the decompiled compiler source with the alias rules
+# of BFBB's 2.0p2 and FFCC Japan's own), installed from a pinned mweppc release
+# by tools/download_mweppc.py. See docs/compiler_baseline.md.
+JP_GAME_COMPILER = "GC/2.0p3"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
     {
-        "name": "patch_compiler",
-        "command": "$python tools/patch_compiler.py $out",
-        "description": "PATCH $out",
-        "restat": True,
-    },
-    {
-        "name": "patch_compiler_rw",
-        "command": "$python tools/patch_compiler_rw.py $out",
-        "description": "PATCH $out",
-        "restat": True,
-    },
-    {
-        "name": "patch_compiler_ffcc",
-        "command": "$python tools/patch_compiler_ffcc.py $out",
-        "description": "PATCH $out",
-        "restat": True,
-    },
-    {
-        "name": "patch_compiler_ffcc2",
-        "command": "$python tools/patch_compiler_ffcc2.py $out",
-        "description": "PATCH $out",
-        "restat": True,
-    },
-    {
-        "name": "patch_compiler_ffcc3",
-        "command": "$python tools/patch_compiler_ffcc3.py $out",
-        "description": "PATCH $out",
-        "restat": True,
-    },
-    {
-        "name": "patch_compiler_ffcc4",
-        "command": "$python tools/patch_compiler_ffcc4.py $out",
-        "description": "PATCH $out",
+        "name": "download_mweppc",
+        "command": "$python tools/download_mweppc.py $out",
+        "description": "DOWNLOAD $out",
         "restat": True,
     },
 ]
 config.custom_build_steps = {
     "pre-compile": [
         {
-            "outputs": [_compilers_dir / "GC/2.0p1a" / "mwcceppc.exe"],
-            "rule": "patch_compiler",
+            "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
+            "rule": "download_mweppc",
             "implicit": [
-                Path("tools") / "patch_compiler.py",
-                Path("tools") / "aliaspatch_link.py",
-                Path("tools") / "aliaspatch_asm.py",
-                Path("tools") / "aliaspatch_blob.py",
+                Path("tools") / "download_mweppc.py",
             ]
             + ([_compilers_dir] if config.compilers_path is None else []),
-        },
-        {
-            "outputs": [_compilers_dir / BFBB_COMPILER / "mwcceppc.exe"],
-            "rule": "patch_compiler_rw",
-            "implicit": [
-                _compilers_dir / "GC/2.0p1a" / "mwcceppc.exe",
-                Path("tools") / "patch_compiler_rw.py",
-                Path("tools") / "patch_compiler.py",
-            ],
-        },
-        {
-            "outputs": [_compilers_dir / FFCC_COMPILER_H / "mwcceppc.exe"],
-            "rule": "patch_compiler_ffcc",
-            "implicit": [
-                _compilers_dir / BFBB_COMPILER / "mwcceppc.exe",
-                Path("tools") / "patch_compiler_ffcc.py",
-            ],
-        },
-        {
-            "outputs": [_compilers_dir / FFCC_COMPILER_I / "mwcceppc.exe"],
-            "rule": "patch_compiler_ffcc2",
-            "implicit": [
-                _compilers_dir / FFCC_COMPILER_H / "mwcceppc.exe",
-                Path("tools") / "patch_compiler_ffcc2.py",
-            ],
-        },
-        {
-            "outputs": [_compilers_dir / FFCC_COMPILER_J / "mwcceppc.exe"],
-            "rule": "patch_compiler_ffcc3",
-            "implicit": [
-                _compilers_dir / FFCC_COMPILER_I / "mwcceppc.exe",
-                Path("tools") / "patch_compiler_ffcc3.py",
-            ],
-        },
-        {
-            "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
-            "rule": "patch_compiler_ffcc4",
-            "implicit": [
-                _compilers_dir / FFCC_COMPILER_J / "mwcceppc.exe",
-                Path("tools") / "patch_compiler_ffcc4.py",
-            ],
         },
     ]
 }

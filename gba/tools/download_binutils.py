@@ -41,8 +41,8 @@ def wanted(name: str) -> bool:
         stem = leaf[:-4] if leaf.endswith(".exe") else leaf
         return stem in {f"arm-none-eabi-{t}" for t in TOOLS} or leaf.endswith(".dll")
     if parts[1] == "libexec":
-        # cpp runs cc1 -E.
-        return leaf in ("cc1", "cc1.exe") or leaf.endswith(".dll")
+        # cpp runs cc1 -E. macOS builds keep their shared libraries here (rpath ../libexec).
+        return leaf in ("cc1", "cc1.exe") or leaf.endswith((".dll", ".dylib"))
     return leaf.endswith((".dll", ".so")) or ".so." in leaf or leaf.endswith(".dylib")
 
 

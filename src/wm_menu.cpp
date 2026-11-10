@@ -8504,7 +8504,6 @@ void CMenuPcs::DrawMCList()
 	int slot;
 	int slotOff;
 	short state = m_wmWorldState->m_mainState;
-	double mapX;
 	float digitX;
 
 	if ((state == 2 || state == 3) && m_wmWorldState->m_subState != 0) {
@@ -8632,7 +8631,6 @@ nextListEntry:
 	double rowBaseD;
 	float slotY;
 	double rowSlopeD;
-	mapX = 8.0 + static_cast<double>(mapOffsetX);
 #ifndef VERSION_GCCJGC
 	const int language = Game.m_gameWork.GetLanguage();
 #endif
@@ -8880,7 +8878,7 @@ nextListEntry:
 			const unsigned char* mapInfo = s_LocTex[slotData->m_scriptGlobalTime];
 			SetTextureLoc(mapInfo[0]);
 			MenuPcs.DrawRect(0,
-			         static_cast<float>(mapX),
+			         static_cast<float>(8.0 + static_cast<double>(mapOffsetX)),
 			         static_cast<float>(8.0 + static_cast<double>(slotY)),
 			         128.0f, 128.0f,
 			         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[1])) << 7),

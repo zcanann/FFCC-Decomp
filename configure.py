@@ -1362,8 +1362,9 @@ FFCC_COMPILER_H = "GC/2.0p1h"
 FFCC_COMPILER_I = "GC/2.0p1i"
 FFCC_COMPILER_J = "GC/2.0p1j"
 JP_GAME_COMPILER = "GC/2.0p1k"
-# PAL and USA game compiler: GC/2.5a, derived from the stock GC/2.5 by
-# tools/patch_compiler_pal.py (guarded by the SHA-1 of its input and output).
+# PAL and USA game compiler: GC/2.5a, doldecomp/mweppc's GC_2_5a (GC 2.5 with
+# FFCC's kss alias rule), installed from a pinned mweppc release by
+# tools/download_mweppc.py. See docs/compiler_baseline.md.
 PAL_GAME_COMPILER = "GC/2.5a"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
@@ -1404,9 +1405,9 @@ config.custom_build_rules = [
         "restat": True,
     },
     {
-        "name": "patch_compiler_pal",
-        "command": "$python tools/patch_compiler_pal.py $out",
-        "description": "PATCH $out",
+        "name": "download_mweppc",
+        "command": "$python tools/download_mweppc.py $out",
+        "description": "DOWNLOAD $out",
         "restat": True,
     },
 ]
@@ -1466,9 +1467,9 @@ config.custom_build_steps = {
         },
         {
             "outputs": [_compilers_dir / PAL_GAME_COMPILER / "mwcceppc.exe"],
-            "rule": "patch_compiler_pal",
+            "rule": "download_mweppc",
             "implicit": [
-                Path("tools") / "patch_compiler_pal.py",
+                Path("tools") / "download_mweppc.py",
             ]
             + ([_compilers_dir] if config.compilers_path is None else []),
         },

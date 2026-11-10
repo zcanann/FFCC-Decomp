@@ -1,8 +1,9 @@
 # Regional game compiler baseline
 
 The Game library uses GC/2.5a for PAL and USA, and GC/2.0p1k for Japan.
-GC/2.5a is derived during the build from the bundled GC/2.5, and GC/2.0p1k
-from the bundled GC/2.0p1 (see below).
+GC/2.5a is mweppc's source-built GC 2.5 variant, downloaded from a pinned
+doldecomp/mweppc release, and GC/2.0p1k is derived during the build from the
+bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -236,14 +237,19 @@ partial losses. It is not adopted, for these reasons:
 
 ## PAL and USA game compiler: GC/2.5a (kss)
 
-`tools/patch_compiler_pal.py` derives GC/2.5a from the bundled stock GC/2.5
-(`539c0b31d51510cd076755bc64c0c39c3d0f364e` to
-`9cf46cd73d0aa756865fd0b29182802759b1aceb`). Stock GC 2.5, 2.6 and 2.7 produce
-byte-identical objects for every PAL and USA game unit, and GC/2.0 only loses
-functions, so no stock version reproduces the behaviour below. It was located
-by rebuilding all game units with source-built variants of GC 2.5 (the mweppc
-decompilation, whose clang build is byte-identical to stock on all 269 PAL
-units) and then ported to the stock binary.
+GC/2.5a is `GC_2_5a` of [mweppc](https://github.com/doldecomp/mweppc), the
+decompilation of the GameCube compilers: GC 2.5 built from its source with the
+one rule below, added by
+[doldecomp/mweppc#3](https://github.com/doldecomp/mweppc/pull/3).
+`tools/download_mweppc.py` installs it from mweppc's release archive, pinned by
+URL and SHA-256 (`RELEASE`), into `<compilers>/GC/2.5a`. Like mweppc's
+`GC_2_0p2` for BFBB, it is not an original binary.
+
+Stock GC 2.5, 2.6 and 2.7 produce byte-identical objects for every PAL and USA
+game unit, and GC/2.0 only loses functions, so no stock version reproduces the
+behaviour below. It was located by rebuilding all game units with source-built
+variants of GC 2.5 (mweppc's clang build of stock 2.5 is byte-identical to the
+bundled GC/2.5 on all 269 PAL units).
 
 - `kss`: in Alias.c's `operand_alias`, a store whose base register has several
   reaching definitions, some with an alias and some without, keeps the alias
@@ -263,19 +269,12 @@ functions. This is a narrower form of the Japanese `ksa` clause: `ksa` keeps the
 access's own alias for loads and stores alike, which in PAL also hoists the
 `target` loads above the stores.
 
-The patch adds an executable section `.ffpatch` after `.reloc` (no existing
-section, VA or RVA moves) with three position-independent stubs, and
-redirects three spots of `operand_alias` (0x512700) to them: the counter
-initialisation, the per-definition test after `address_def_alias`, and the
-epilogue. The redirected bytes carry no base relocation, and the stubs read
-`worst_case_ptr` PC-relatively, so the derived compiler survives a rebase.
-
 Measured over every PAL and USA game unit (scored like `report.json`):
 
 | compiler, source | PAL exact functions | USA exact functions |
 | --- | --- | --- |
 | GC/2.5, staging source | 3066 | 3061 |
-| GC/2.5a, staging source | 3066 (+0 / -0, objects byte-identical) | 3061 (+0 / -0, no function changes) |
+| GC/2.5a, staging source | 3066 (+0 / -0, objects byte-identical) | 3061 (+0 / -0, objects byte-identical) |
 | GC/2.5, per-channel `pppRand*` source | 3063 | 3058 |
 | GC/2.5a, per-channel `pppRand*` source | 3075 (+9 / -0 vs staging) | 3070 (+9 / -0) |
 
@@ -286,8 +285,9 @@ and with the per-channel source it leaves the nine `pppRand*` at 90-96
 because the `target` loads move above the stores; `ksa` on stores only is
 +0 / -1 (`CMenuPcs::loadData`, a store into a local array through a mixed
 base) and matches all nine; stores to statics only (`kss`) is +0 / -0 and
-matches all nine. The binary port and the source-built `kss` compiler produce
-byte-identical objects for all 269 PAL units.
+matches all nine. An earlier binary patch of the bundled GC/2.5 with the same
+rule produced byte-identical objects to mweppc's GC_2_5a for all PAL and USA
+units, on both sources.
 
 The same per-channel source is also the Japanese retail source: with the
 unchanged GC/2.0p1k it matches all nine vector randomizers and the
@@ -296,5 +296,6 @@ unchanged GC/2.0p1k it matches all nine vector randomizers and the
 +12 exact functions, no partial score lower in any region, and the twelve
 units link in all three regions. The three DOL checksums pass.
 
-When building with `--compilers`, derive the compiler once before configuring
-(`python tools/patch_compiler_pal.py build/compilers`), as for GC/2.0p1k.
+Ninja installs GC/2.5a before the first game unit is compiled, also into a
+directory given with `--compilers`; `python tools/download_mweppc.py
+<compilers>` does the same by hand.

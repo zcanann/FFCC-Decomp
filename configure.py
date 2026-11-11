@@ -582,7 +582,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_equip.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_favo.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_item.cpp"),
-            Object(NonMatching, "menu_letter.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
+            Object(Matching, "menu_letter.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_lst.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_money.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_tmparti.cpp"),

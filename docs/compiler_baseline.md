@@ -1,7 +1,9 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1k for Japan.
-GC/2.0p1k is derived during the build from the bundled GC/2.0p1 (see below).
+The Game library uses GC/2.5a for PAL and USA, and GC/2.0p1k for Japan.
+GC/2.5a is mweppc's source-built GC 2.5 variant, downloaded from a pinned
+doldecomp/mweppc release, and GC/2.0p1k is derived during the build from the
+bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -232,3 +234,68 @@ partial losses. It is not adopted, for these reasons:
 - `pppFrameYmCheckBGHeight` would also need a source reorder that holds only
   under this predicate (it scores 90 without it). That would tune source to the
   candidate compiler.
+
+## PAL and USA game compiler: GC/2.5a (kss)
+
+GC/2.5a is `GC_2_5a` of [mweppc](https://github.com/doldecomp/mweppc), the
+decompilation of the GameCube compilers: GC 2.5 built from its source with the
+one rule below, added by
+[doldecomp/mweppc#3](https://github.com/doldecomp/mweppc/pull/3).
+`tools/download_mweppc.py` installs it from mweppc's release archive, pinned by
+URL and SHA-256 (`RELEASE`), into `<compilers>/GC/2.5a`. Like mweppc's
+`GC_2_0p2` for BFBB, it is not an original binary.
+
+Stock GC 2.5, 2.6 and 2.7 produce byte-identical objects for every PAL and USA
+game unit, and GC/2.0 only loses functions, so no stock version reproduces the
+behaviour below. It was located by rebuilding all game units with source-built
+variants of GC 2.5 (mweppc's clang build of stock 2.5 is byte-identical to the
+bundled GC/2.5 on all 269 PAL units).
+
+- `kss`: in Alias.c's `operand_alias`, a store whose base register has several
+  reaching definitions, some with an alias and some without, keeps the alias
+  of the definitions that have one when that alias is a single static object
+  (whole or part, not a local). Stock GC 2.5 makes every such access
+  worst_case. Loads, and stores into locals, are unchanged.
+
+Typical case: the `pppRand*` vector randomizers select
+`target = (offset == -1) ? (T*)gPppDefaultValueBuffer : (T*)(work + offset)`
+and then store each channel through `target`, reading `*valuePtr` for every
+channel. Retail loads `*valuePtr` once and keeps it in a register across the
+stores, while the channel loads of `target` stay below the preceding store.
+Stock GC 2.5 reloads `*valuePtr` after every store, so the matching source
+had to cache it in a `scale` local, which numbers its register before the
+int-to-float constant and leaves an FPR swap in all nine `CV`, `HCV` and `IV`
+functions. This is a narrower form of the Japanese `ksa` clause: `ksa` keeps the
+access's own alias for loads and stores alike, which in PAL also hoists the
+`target` loads above the stores.
+
+Measured over every PAL and USA game unit (scored like `report.json`):
+
+| compiler, source | PAL exact functions | USA exact functions |
+| --- | --- | --- |
+| GC/2.5, staging source | 3066 | 3061 |
+| GC/2.5a, staging source | 3066 (+0 / -0, objects byte-identical) | 3061 (+0 / -0, objects byte-identical) |
+| GC/2.5, per-channel `pppRand*` source | 3063 | 3058 |
+| GC/2.5a, per-channel `pppRand*` source | 3075 (+9 / -0 vs staging) | 3070 (+9 / -0) |
+
+Controls on PAL, staging source: the JP clause `ksa` on every access is
++0 / -18 (`gpmCol`, `pppLight`, `pppCreatePObject`, `pppMemAlloc`,
+`pppMemAllocNoReport`, `loadData`, the `pppRandFV` and `pppSRand*` families),
+and with the per-channel source it leaves the nine `pppRand*` at 90-96
+because the `target` loads move above the stores; `ksa` on stores only is
++0 / -1 (`CMenuPcs::loadData`, a store into a local array through a mixed
+base) and matches all nine; stores to statics only (`kss`) is +0 / -0 and
+matches all nine. An earlier binary patch of the bundled GC/2.5 with the same
+rule produced byte-identical objects to mweppc's GC_2_5a for all PAL and USA
+units, on both sources.
+
+The same per-channel source is also the Japanese retail source: with the
+unchanged GC/2.0p1k it matches all nine vector randomizers and the
+`pppRandFV`, `pppRandUpFV` and `pppRandDownFV` functions, whose PAL-tuned
+`scale`/`x` locals had left Japan at 99.6. Together: PAL +9, USA +9 and Japan
++12 exact functions, no partial score lower in any region, and the twelve
+units link in all three regions. The three DOL checksums pass.
+
+Ninja installs GC/2.5a before the first game unit is compiled, also into a
+directory given with `--compilers`; `python tools/download_mweppc.py
+<compilers>` does the same by hand.

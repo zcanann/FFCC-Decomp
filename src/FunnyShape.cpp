@@ -151,6 +151,14 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             float ry2;
             float rx3;
             float ry3;
+            float viewportW;
+            float viewportH;
+            float viewMaxX;
+            float viewMaxY;
+            float padW;
+            float padH;
+            float invPadW;
+            float invPadH;
             FS_ROTATE_SHAPE_X(rx0, 0);
             FS_ROTATE_SHAPE_Y(ry0, 0);
             FS_ROTATE_SHAPE_X(rx1, 1);
@@ -211,8 +219,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             float viewportScale = 2.0f;
-            const float viewportW = viewportScale * (max.x - min.x);
-            const float viewportH = viewportScale * (max.y - min.y);
+            viewportW = viewportScale * (max.x - min.x);
+            viewportH = viewportScale * (max.y - min.y);
             GXSetViewport(min.x * viewportScale + offset.x, min.y * viewportScale + offset.y, viewportW,
                           viewportH, 0.0f, 1.0f);
 
@@ -229,12 +237,12 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             tex[0][0] = tex[3][0] = u1;
             tex[1][1] = tex[0][1] = v1;
 
-            const float padW = viewportW / 2.0f / 2.0f;
-            const float viewMaxX = max.x - padW;
-            const float padH = viewportH / 2.0f / 2.0f;
-            const float viewMaxY = max.y - padH;
-            const float invPadH = 1.0f / padH;
-            const float invPadW = -(1.0f / padW);
+            padW = viewportW / 2.0f / 2.0f;
+            viewMaxX = max.x - padW;
+            padH = viewportH / 2.0f / 2.0f;
+            viewMaxY = max.y - padH;
+            invPadH = 1.0f / padH;
+            invPadW = -(1.0f / padW);
 
             pos[0][2] = 0.0f;
             pos[1][2] = 0.0f;

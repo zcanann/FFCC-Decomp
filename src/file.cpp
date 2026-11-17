@@ -199,8 +199,8 @@ void CFile::Init()
 #ifndef VERSION_GCCJGC
     m_isDiskError = 0;
 #endif
-    m_readBuffer = new (m_allocStage, s_fileCpp, FileReadBufferAllocationLine) unsigned char[0x100000];
-    m_handlePool = new (m_allocStage, s_fileCpp, FileHandlePoolAllocationLine) CHandle[0x80];
+    m_readBuffer = new (m_allocStage, "file.cpp", FileReadBufferAllocationLine) unsigned char[0x100000];
+    m_handlePool = new (m_allocStage, "file.cpp", FileHandlePoolAllocationLine) CHandle[0x80];
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
@@ -321,7 +321,7 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 
     if (handle == 0 && (unsigned int)System.m_execParam >= 1)
 	{
-        System.Printf(s_openWarnFmt,, path);
+        System.Printf("CFile::Read \203I\201[\203v\203\223\202\305\202\253\202\334\202\271\202\361\201B%s\n", path);
     }
 
     return handle;
@@ -366,12 +366,12 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
         {
             if ((unsigned int)System.m_execParam >= 2)
             {
-                System.Printf(s_queueWarnTargetFmt,, inFlight->m_name, fileHandle->m_name);
+                System.Printf("\033[7;31m\223\307\202\335\215\236\202\335\222\206\202\251\201A\223\307\202\335\215\236\202\335\214\343\203N\203\215\201[\203Y\202\263\202\352\202\304\202\242\202\310\202\242\203t\203@\203C\203\213A\202\306\201A\223\257\212\372\223\307\202\335\215\236\202\335B\202\252\215\254\215\335\202\265\202\334\202\265\202\275\201B\n\203v\203\215\203O\203\211\203\200\202\251\203X\203N\203\212\203v\203g\202\311\226\342\221\350\202\252\202\240\202\350\202\334\202\267\201B\nA\202\360\203o\203b\203t\203@\202\251\202\347\215\355\217\234\202\265\215\304\223x\203L\203\205\201[\203C\203\223\203O\202\265\202\304\201AB\202\360\223\307\202\335\215\236\202\335\202\334\202\267\201B\nA=%s\nB=%s\033[0m\n", inFlight->m_name, fileHandle->m_name);
             }
         }
         else if ((unsigned int)System.m_execParam >= 3)
         {
-            System.Printf(s_queueWarnAnyFmt,, inFlight->m_name);
+            System.Printf("\223\307\202\335\215\236\202\335\222\206\202\251\201A\223\307\202\335\215\236\202\335\214\343\203N\203\215\201[\203Y\202\263\202\352\202\304\202\242\202\310\202\242\203t\203@\203C\203\213\202\252\202\240\202\350\202\334\202\265\202\275\201B\n\210\323\220}\223I\202\310\203u\203\215\203b\203N\202\310\202\314\202\305\201A\226\342\221\350\202\315\202\240\202\350\202\334\202\271\202\361\201B\n\203o\203b\203t\203@\202\251\202\347\215\355\217\234\202\265\215\304\223x\203L\203\205\201[\203C\203\223\203O\202\265\202\334\202\267\201B\n%s\n", inFlight->m_name);
         }
 
         inFlight->m_completionStatus = 1;
@@ -394,7 +394,7 @@ void CFile::Read(CFile::CHandle* fileHandle)
 	u32 readSize = (fileHandle->m_chunkSize + 0x1FU) & ~0x1FU;
 	if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
 	{
-		System.Printf(s_readWarnFmt,, fileHandle->m_name, readSize);
+		System.Printf("CFile.kick: \203T\203C\203Y\202\252\203o\203b\203t\203@\202\360\211z\202\246\202\334\202\265\202\275\201B%s(%dbyte)\n", fileHandle->m_name, readSize);
 	}
 	DVDReadAsyncPrio(&fileHandle->m_dvdFileInfo, m_readBuffer, readSize, fileHandle->m_currentOffset, 0, 2);
 	fileHandle->m_nextOffset = fileHandle->m_currentOffset + readSize;
@@ -493,7 +493,7 @@ void CFile::Close(CFile::CHandle* fileHandle)
 {
 	if ((fileHandle->m_completionStatus == 2) && (2 <= (unsigned int)System.m_execParam))
 	{
-		System.Printf(s_closeWarnFmt,, fileHandle->m_name);
+		System.Printf("\223\307\202\335\215\236\202\335\223r\222\206\202\305close\202\265\202\334\202\265\202\275\201B%s\n", fileHandle->m_name);
 	}
 
 	DVDClose(&fileHandle->m_dvdFileInfo);
@@ -584,7 +584,7 @@ inline void CFile::readASync(CFile::CHandle* handle)
 
     if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
     {
-        System.Printf(s_readWarnFmt,, handle->m_name, readSize);
+        System.Printf("CFile.kick: \203T\203C\203Y\202\252\203o\203b\203t\203@\202\360\211z\202\246\202\334\202\265\202\275\201B%s(%dbyte)\n", handle->m_name, readSize);
     }
 
     DVDReadAsyncPrio(&handle->m_dvdFileInfo, m_readBuffer, readSize, handle->m_currentOffset, 0, 2);
@@ -677,7 +677,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 retry:
         if ((unsigned int)System.m_execParam >= 1)
         {
-            System.Printf(s_drawErrorFmt,, errorCode);
+            System.Printf("CFile::drawError: %d\n", errorCode);
         }
 
         int usingFallbackFont = 0;
@@ -694,7 +694,7 @@ retry:
             return;
         }
 
-        Graphic._WaitDrawDone(s_fileCpp, FileErrorDrawBeginLine);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDrawBeginLine);
 
         int hasScratchTexture = Graphic.IsAvailableTempBuffer();
         bool useScratch = false;
@@ -786,10 +786,10 @@ retry:
             GXCopyDisp(Graphic.GetFrameBuffer(), GX_FALSE);
         }
 
-        Graphic._WaitDrawDone(s_fileCpp, FileErrorCopyLine);
+        Graphic._WaitDrawDone("file.cpp", FileErrorCopyLine);
         Graphic.SetStdDispCopySrc();
         Graphic.SetStdDispCopyDst();
-        Graphic._WaitDrawDone(s_fileCpp, FileErrorDisplayLine);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDisplayLine);
         VIWaitForRetrace();
         Sound.PauseDiscError(1);
         VISetBlack(FALSE);
@@ -819,7 +819,7 @@ retry:
             GXCopyDisp(Graphic.GetFrameBuffer(), GX_FALSE);
         }
 
-        Graphic._WaitDrawDone(s_fileCpp, FileErrorDrawEndLine);
+        Graphic._WaitDrawDone("file.cpp", FileErrorDrawEndLine);
         m_fatalDiskErrorFlag = 0;
 
         while (true)

@@ -80,26 +80,7 @@ void CFlatRuntime::Quit()
  */
 void CFlatRuntime::Destroy()
 {
-	CObject* object = m_objectSentinel.m_next;
-
-	while (object != &m_objectSentinel) {
-		CObject* const next = object->m_next;
-
-		object->m_previous->m_next = next;
-		object->m_next->m_previous = object->m_previous;
-
-		object->m_freeListNode->m_previous->m_next = object->m_freeListNode->m_next;
-		object->m_freeListNode->m_next->m_previous = object->m_freeListNode->m_previous;
-
-		object->m_freeListNode->m_next = m_freeStackBlocks.m_next;
-		m_freeStackBlocks.m_next = object->m_freeListNode;
-
-		object->m_flagBits.m_constructFlag = 0;
-
-		onDeleteObject(object);
-
-		object = next;
-	}
+	AfterFrame(1);
 
 	if (m_permanentVarDefs != 0) {
 		delete[] m_permanentVarDefs;
@@ -191,7 +172,7 @@ void CFlatRuntime::clear()
 		m_stackBlockPool[idx].m_next = (idx == 143) ? &m_freeStackBlocks : &m_stackBlockPool[idx + 1];
 	}
 
-	memset(&m_performance, 0, sizeof(m_performance));
+	ResetPerformance();
 }
 
 /*
@@ -1175,16 +1156,15 @@ void CFlatRuntime::systemVal(CFlatRuntime::CObject*, int, int)
  */
 inline void CFlatRuntime::setSystemVal(CFlatRuntime::CObject* object, int mode)
 {
-	unsigned int* sp = object->m_sp;
-	unsigned int* top = sp - 1;
-	int valIndex;
-	object->m_sp = top;
-	const u32 systemValue = sp[-2];
-	valIndex = static_cast<int>(systemValue) >> 13;
+	unsigned int* top = --object->m_sp;
+	CStack* value = reinterpret_cast<CStack*>(top);
+	const u32 systemValue = top[-1];
+	const int valIndex = static_cast<int>(systemValue) >> 13;
 	if (((systemValue >> 12) & 1) != 0) {
-		onSetClassSystemVal(valIndex, reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF)), reinterpret_cast<CStack*>(top), mode);
+		CObject* classObject = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
+		onSetClassSystemVal(valIndex, classObject, value, mode);
 	} else {
-		onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), mode);
+		onSetSystemVal(valIndex, value, mode);
 	}
 }
 

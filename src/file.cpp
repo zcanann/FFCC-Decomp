@@ -23,70 +23,129 @@
 #include <string.h>
 
 #ifndef VERSION_GCCJGC
+extern "C" __declspec(section ".rodata") const char s_cManager[] = "CManager";
+extern "C" __declspec(section ".rodata") const char s_drawErrorFmt[] = "CFile::drawError: %d\n";
+extern "C" __declspec(section ".rodata") const char s_fileCpp[] = "file.cpp";
+extern "C" __declspec(section ".rodata") const char s_readWarnFmt[0x38] = "CFile.kick: \203T\203C\203Y\202\252\203o\203b\203t\203@\202\360\211z\202\246\202\334\202\265\202\275\201B%s(%dbyte)\n";
+extern "C" __declspec(section ".rodata") const char s_closeWarnFmt[0x24] = "\223\307\202\335\215\236\202\335\223r\222\206\202\305close\202\265\202\334\202\265\202\275\201B%s\n";
+extern "C" __declspec(section ".rodata") const char s_queueWarnTargetFmt[0xd4] = "\033[7;31m\223\307\202\335\215\236\202\335\222\206\202\251\201A\223\307\202\335\215\236\202\335\214\343\203N\203\215\201[\203Y\202\263\202\352\202\304\202\242\202\310\202\242\203t\203@\203C\203\213A\202\306\201A\223\257\212\372\223\307\202\335\215\236\202\335B\202\252\215\254\215\335\202\265\202\334\202\265\202\275\201B\n\203v\203\215\203O\203\211\203\200\202\251\203X\203N\203\212\203v\203g\202\311\226\342\221\350\202\252\202\240\202\350\202\334\202\267\201B\nA\202\360\203o\203b\203t\203@\202\251\202\347\215\355\217\234\202\265\215\304\223x\203L\203\205\201[\203C\203\223\203O\202\265\202\304\201AB\202\360\223\307\202\335\215\236\202\335\202\334\202\267\201B\nA=%s\nB=%s\033[0m\n";
+extern "C" __declspec(section ".rodata") const char s_queueWarnAnyFmt[0xa0] = "\223\307\202\335\215\236\202\335\222\206\202\251\201A\223\307\202\335\215\236\202\335\214\343\203N\203\215\201[\203Y\202\263\202\352\202\304\202\242\202\310\202\242\203t\203@\203C\203\213\202\252\202\240\202\350\202\334\202\265\202\275\201B\n\210\323\220}\223I\202\310\203u\203\215\203b\203N\202\310\202\314\202\305\201A\226\342\221\350\202\315\202\240\202\350\202\334\202\271\202\361\201B\n\203o\203b\203t\203@\202\251\202\347\215\355\217\234\202\265\215\304\223x\203L\203\205\201[\203C\203\223\203O\202\265\202\334\202\267\201B\n%s\n";
+extern "C" __declspec(section ".rodata") const char s_openWarnFmt[] = "CFile::Read \203I\201[\203v\203\223\202\305\202\253\202\334\202\271\202\361\201B%s\n";
+
+#ifndef VERSION_GCCJGC
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorJp0[] = "\203f\203B\203X\203N\202\360\223\307\202\337\202\334\202\271\202\361\202\305\202\265\202\275\201B";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorJp1[] = "\202\255\202\355\202\265\202\255\202\315\201A\226{\221\314\202\314\216\346\210\265\220\340\226\276\217\221\202\360\202\250\223\307\202\335\202\255\202\276\202\263\202\242\201B";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorEn0[] = "The Game Disc could not be read.";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorEn1[] = "Please read the Nintendo GameCube Instruction";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorEn2[] = "Booklet for more information.";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorDe0[] = "Diese Game Disc kann nicht gelesen werden.";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorDe1[] = "Bitte lesen Sie die Bedienungsanleitung des";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorDe2[] = "Nintendo GameCube, um weitere Informationen zu erhalten.";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorIt0[] = "Impossibile leggere il disco di gioco.";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorIt1[] = "Consulta il manuale di istruzioni del Nintendo GameCube";
+#ifdef VERSION_GCCE01
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorIt2[] = " per ulteriori indicazioni.";
+#else
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorIt2[] = "per ulteriori indicazioni.";
+#endif
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorFr0[] = "La lecture du disque a \351chou\351.";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorFr1[] = "Veuillez vous r\351f\351rer au manuel d'instructions";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorFr2[] = "Nintendo GameCube pour de plus amples informations.";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorEs0[] = "No se puede leer el disco.";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorEs1[] = "Consulta el manual de instrucciones de";
+extern "C" __declspec(section ".rodata") const char s_diskReadErrorEs2[] = "Nintendo GameCube para obtener m\341s informaci\363n.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenJp0[] = "\203f\203B\203X\203N\203J\203o\201[\202\252\212J\202\242\202\304\202\242\202\334\202\267\201B";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenJp1[] = "\203Q\201[\203\200\202\360\221\261\202\257\202\351\217\352\215\207\202\315\201A\203f\203B\203X\203N\203J\203o\201[\202\360\225\302\202\337\202\304\202\255\202\276\202\263\202\242\201B";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenEn0[] = "The Disc Cover is open.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenEn1[] = "If you want to continue the game,";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenEn2[] = "please close the Disc Cover.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenDe0[] = "Der Disc-Deckel ist ge\366ffnet.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenDe1[] = "Bitte den Disc-Deckel schlie\337en,";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenDe2[] = "um mit dem Spiel fortzufahren.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenIt0[] = "Il coperchio del disco \350 aperto.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenIt1[] = "Se vuoi proseguire nel gioco,";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenIt2[] = "chiudi il coperchio del disco.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenFr0[] = "Le couvercle est ouvert.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenFr1[] = "Pour continuer \340 jouer,";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenFr2[] = "veuillez fermer le couvercle.";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenEs0[] = "La tapa est\341 abierta. ";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenEs1[] = "Si quieres seguir jugando,";
+extern "C" __declspec(section ".rodata") const char s_discCoverOpenEs2[] = "debes cerrar la tapa.";
+extern "C" __declspec(section ".rodata") const char s_wrongDiscJp0[] = "\203t\203@\203C\203i\203\213\203t\203@\203\223\203^\203W\201[\201E\203N\203\212\203X\203^\203\213\203N\203\215\203j\203N\203\213\202\314\203f\203B\203X\203N\202\360";
+extern "C" __declspec(section ".rodata") const char s_wrongDiscJp1[] = "\203Z\203b\203g\202\265\202\304\202\255\202\276\202\263\202\242\201B";
+extern "C" __declspec(section ".rodata") const char s_wrongDiscEn0[] = "Please insert the FINAL FANTASY";
+extern "C" __declspec(section ".rodata") const char s_wrongDiscEn1[] = "Crystal Chronicles Game Disc.";
+extern "C" __declspec(section ".rodata") const char s_wrongDiscDe0[] = "Bitte legen Sie die FINAL FANTASY";
+#ifdef VERSION_GCCE01
+extern "C" __declspec(section ".rodata") const char s_wrongDiscDe1[] = "Crystal Chronicles Disc ein.";
+#else
+extern "C" __declspec(section ".rodata") const char s_wrongDiscDe1[] = "Crystal Chronicles-Disc ein.";
+#endif
+extern "C" __declspec(section ".rodata") const char s_wrongDiscIt0[] = "Inserisci il disco di gioco ";
+#ifdef VERSION_GCCE01
+extern "C" __declspec(section ".rodata") const char s_wrongDiscIt1[] = "FINAL FANTASY Crystal Chronicles";
+#else
+extern "C" __declspec(section ".rodata") const char s_wrongDiscIt1[] = "FINAL FANTASY Crystal Chronicles.";
+#endif
+extern "C" __declspec(section ".rodata") const char s_wrongDiscFr0[] = "Veuillez ins\351rer le disque";
+extern "C" __declspec(section ".rodata") const char s_wrongDiscEs0[] = "Coloca el disco de";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorJp0[] = "\203G\203\211\201[\202\252\224\255\220\266\202\265\202\334\202\265\202\275\201B";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorJp1[] = "\226{\221\314\202\314\203p\203\217\201[\203{\203^\203\223\202\360\211\237\202\265\202\304\201A\223d\214\271\202\360\202n\202e\202e\202\311\202\265\201A";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorJp2[] = "\226{\221\314\202\314\216\346\210\265\220\340\226\276\217\221\202\314\216w\216\246\202\311\217]\202\301\202\304\211\272\202\263\202\242\201B";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorEn0[] = "An error has occurred.";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorEn1[] = "Turn the power off and refer to the Nintendo GameCube";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorEn2[] = "Instruction Booklet for further instructions.";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorDe0[] = "Ein Fehler ist aufgetreten.";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorDe1[] = "Bitte schalten Sie den Nintendo GameCube aus und lesen Sie die";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorDe2[] = " Bedienungsanleitung,um weitere Informationen zu erhalten.";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorIt0[] = "Si \350 verificato un errore.";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorIt1[] = "Spegni e consulta il manuale di istruzioni del";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorIt2[] = "Nintendo GameCube per ulteriori indicazioni.";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorFr0[] = "Une erreur est survenue.";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorFr1[] = "Eteignez la console et r\351f\351rez-vous au manuel d'instructions";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorEs0[] = "Se ha producido un error.";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorEs1[] = "Apaga la consola y consulta el manual de instrucciones ";
+extern "C" __declspec(section ".rodata") const char s_fatalErrorEs2[] = "de Nintendo GameCube para obtener m\341s informaci\363n.";
+#endif // VERSION_GCCJGC
+
+
+#endif // VERSION_GCCJGC
+
+#ifndef VERSION_GCCJGC
 static const char* l_tError[4][6][3] = {
     {
-        {"\203f\203B\203X\203N\202\360\223\307\202\337\202\334\202\271\202\361\202\305\202\265\202\275\201B", "\202\255\202\355\202\265\202\255\202\315\201A\226{\221\314\202\314\216\346\210\265\220\340\226\276\217\221\202\360\202\250\223\307\202\335\202\255\202\276\202\263\202\242\201B", ""},
-        {"The Game Disc could not be read.", "Please read the Nintendo GameCube Instruction", "Booklet for more information."},
-        {"Diese Game Disc kann nicht gelesen werden.", "Bitte lesen Sie die Bedienungsanleitung des", "Nintendo GameCube, um weitere Informationen zu erhalten."},
-        {"Impossibile leggere il disco di gioco.", "Consulta il manuale di istruzioni del Nintendo GameCube",
-#ifdef VERSION_GCCE01
-         " per ulteriori indicazioni."},
-#else
-         "per ulteriori indicazioni."},
-#endif
-        {"La lecture du disque a \351chou\351.", "Veuillez vous r\351f\351rer au manuel d'instructions", "Nintendo GameCube pour de plus amples informations."},
-        {"No se puede leer el disco.", "Consulta el manual de instrucciones de", "Nintendo GameCube para obtener m\341s informaci\363n."},
+        {s_diskReadErrorJp0, s_diskReadErrorJp1, ""},
+        {s_diskReadErrorEn0, s_diskReadErrorEn1, s_diskReadErrorEn2},
+        {s_diskReadErrorDe0, s_diskReadErrorDe1, s_diskReadErrorDe2},
+        {s_diskReadErrorIt0, s_diskReadErrorIt1, s_diskReadErrorIt2},
+        {s_diskReadErrorFr0, s_diskReadErrorFr1, s_diskReadErrorFr2},
+        {s_diskReadErrorEs0, s_diskReadErrorEs1, s_diskReadErrorEs2},
     },
     {
-        {"\203f\203B\203X\203N\203J\203o\201[\202\252\212J\202\242\202\304\202\242\202\334\202\267\201B", "\203Q\201[\203\200\202\360\221\261\202\257\202\351\217\352\215\207\202\315\201A\203f\203B\203X\203N\203J\203o\201[\202\360\225\302\202\337\202\304\202\255\202\276\202\263\202\242\201B", ""},
-        {"The Disc Cover is open.", "If you want to continue the game,", "please close the Disc Cover."},
-        {"Der Disc-Deckel ist ge\366ffnet.", "Bitte den Disc-Deckel schlie\337en,", "um mit dem Spiel fortzufahren."},
-        {"Il coperchio del disco \350 aperto.", "Se vuoi proseguire nel gioco,", "chiudi il coperchio del disco."},
-        {"Le couvercle est ouvert.", "Pour continuer \340 jouer,", "veuillez fermer le couvercle."},
-        {"La tapa est\341 abierta. ", "Si quieres seguir jugando,", "debes cerrar la tapa."},
+        {s_discCoverOpenJp0, s_discCoverOpenJp1, ""},
+        {s_discCoverOpenEn0, s_discCoverOpenEn1, s_discCoverOpenEn2},
+        {s_discCoverOpenDe0, s_discCoverOpenDe1, s_discCoverOpenDe2},
+        {s_discCoverOpenIt0, s_discCoverOpenIt1, s_discCoverOpenIt2},
+        {s_discCoverOpenFr0, s_discCoverOpenFr1, s_discCoverOpenFr2},
+        {s_discCoverOpenEs0, s_discCoverOpenEs1, s_discCoverOpenEs2},
     },
     {
-        {"\203t\203@\203C\203i\203\213\203t\203@\203\223\203^\203W\201[\201E\203N\203\212\203X\203^\203\213\203N\203\215\203j\203N\203\213\202\314\203f\203B\203X\203N\202\360", "\203Z\203b\203g\202\265\202\304\202\255\202\276\202\263\202\242\201B", ""},
-        {"Please insert the FINAL FANTASY", "Crystal Chronicles Game Disc.", ""},
-        {"Bitte legen Sie die FINAL FANTASY",
-#ifdef VERSION_GCCE01
-         "Crystal Chronicles Disc ein.",
-#else
-         "Crystal Chronicles-Disc ein.",
-#endif
-         ""},
-        {"Inserisci il disco di gioco ",
-#ifdef VERSION_GCCE01
-         "FINAL FANTASY Crystal Chronicles",
-#else
-         "FINAL FANTASY Crystal Chronicles.",
-#endif
-         ""},
-        {"Veuillez ins\351rer le disque",
-#ifdef VERSION_GCCE01
-         "FINAL FANTASY Crystal Chronicles",
-#else
-         "FINAL FANTASY Crystal Chronicles.",
-#endif
-         ""},
-        {"Coloca el disco de",
-#ifdef VERSION_GCCE01
-         "FINAL FANTASY Crystal Chronicles",
-#else
-         "FINAL FANTASY Crystal Chronicles.",
-#endif
-         ""},
+        {s_wrongDiscJp0, s_wrongDiscJp1, ""},
+        {s_wrongDiscEn0, s_wrongDiscEn1, ""},
+        {s_wrongDiscDe0, s_wrongDiscDe1, ""},
+        {s_wrongDiscIt0, s_wrongDiscIt1, ""},
+        {s_wrongDiscFr0, s_wrongDiscIt1, ""},
+        {s_wrongDiscEs0, s_wrongDiscIt1, ""},
     },
     {
-        {"\203G\203\211\201[\202\252\224\255\220\266\202\265\202\334\202\265\202\275\201B", "\226{\221\314\202\314\203p\203\217\201[\203{\203^\203\223\202\360\211\237\202\265\202\304\201A\223d\214\271\202\360\202n\202e\202e\202\311\202\265\201A", "\226{\221\314\202\314\216\346\210\265\220\340\226\276\217\221\202\314\216w\216\246\202\311\217]\202\301\202\304\211\272\202\263\202\242\201B"},
-        {"An error has occurred.", "Turn the power off and refer to the Nintendo GameCube", "Instruction Booklet for further instructions."},
-        {"Ein Fehler ist aufgetreten.", "Bitte schalten Sie den Nintendo GameCube aus und lesen Sie die", " Bedienungsanleitung,um weitere Informationen zu erhalten."},
-        {"Si \350 verificato un errore.", "Spegni e consulta il manuale di istruzioni del", "Nintendo GameCube per ulteriori indicazioni."},
-        {"Une erreur est survenue.", "Eteignez la console et r\351f\351rez-vous au manuel d'instructions", "Nintendo GameCube pour de plus amples informations."},
-        {"Se ha producido un error.", "Apaga la consola y consulta el manual de instrucciones ", "de Nintendo GameCube para obtener m\341s informaci\363n."},
+        {s_fatalErrorJp0, s_fatalErrorJp1, s_fatalErrorJp2},
+        {s_fatalErrorEn0, s_fatalErrorEn1, s_fatalErrorEn2},
+        {s_fatalErrorDe0, s_fatalErrorDe1, s_fatalErrorDe2},
+        {s_fatalErrorIt0, s_fatalErrorIt1, s_fatalErrorIt2},
+        {s_fatalErrorFr0, s_fatalErrorFr1, s_diskReadErrorFr2},
+        {s_fatalErrorEs0, s_fatalErrorEs1, s_fatalErrorEs2},
     },
 };
-
 #endif
 
 enum {
@@ -140,8 +199,8 @@ void CFile::Init()
 #ifndef VERSION_GCCJGC
     m_isDiskError = 0;
 #endif
-    m_readBuffer = new (m_allocStage, "file.cpp", FileReadBufferAllocationLine) unsigned char[0x100000];
-    m_handlePool = new (m_allocStage, "file.cpp", FileHandlePoolAllocationLine) CHandle[0x80];
+    m_readBuffer = new (m_allocStage, s_fileCpp, FileReadBufferAllocationLine) unsigned char[0x100000];
+    m_handlePool = new (m_allocStage, s_fileCpp, FileHandlePoolAllocationLine) CHandle[0x80];
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
@@ -262,7 +321,7 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 
     if (handle == 0 && (unsigned int)System.m_execParam >= 1)
 	{
-        System.Printf("CFile::Read \203I\201[\203v\203\223\202\305\202\253\202\334\202\271\202\361\201B%s\n", path);
+        System.Printf(s_openWarnFmt,, path);
     }
 
     return handle;
@@ -307,12 +366,12 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
         {
             if ((unsigned int)System.m_execParam >= 2)
             {
-                System.Printf("\033[7;31m\223\307\202\335\215\236\202\335\222\206\202\251\201A\223\307\202\335\215\236\202\335\214\343\203N\203\215\201[\203Y\202\263\202\352\202\304\202\242\202\310\202\242\203t\203@\203C\203\213A\202\306\201A\223\257\212\372\223\307\202\335\215\236\202\335B\202\252\215\254\215\335\202\265\202\334\202\265\202\275\201B\n\203v\203\215\203O\203\211\203\200\202\251\203X\203N\203\212\203v\203g\202\311\226\342\221\350\202\252\202\240\202\350\202\334\202\267\201B\nA\202\360\203o\203b\203t\203@\202\251\202\347\215\355\217\234\202\265\215\304\223x\203L\203\205\201[\203C\203\223\203O\202\265\202\304\201AB\202\360\223\307\202\335\215\236\202\335\202\334\202\267\201B\nA=%s\nB=%s\033[0m\n", inFlight->m_name, fileHandle->m_name);
+                System.Printf(s_queueWarnTargetFmt,, inFlight->m_name, fileHandle->m_name);
             }
         }
         else if ((unsigned int)System.m_execParam >= 3)
         {
-            System.Printf("\223\307\202\335\215\236\202\335\222\206\202\251\201A\223\307\202\335\215\236\202\335\214\343\203N\203\215\201[\203Y\202\263\202\352\202\304\202\242\202\310\202\242\203t\203@\203C\203\213\202\252\202\240\202\350\202\334\202\265\202\275\201B\n\210\323\220}\223I\202\310\203u\203\215\203b\203N\202\310\202\314\202\305\201A\226\342\221\350\202\315\202\240\202\350\202\334\202\271\202\361\201B\n\203o\203b\203t\203@\202\251\202\347\215\355\217\234\202\265\215\304\223x\203L\203\205\201[\203C\203\223\203O\202\265\202\334\202\267\201B\n%s\n", inFlight->m_name);
+            System.Printf(s_queueWarnAnyFmt,, inFlight->m_name);
         }
 
         inFlight->m_completionStatus = 1;
@@ -335,7 +394,7 @@ void CFile::Read(CFile::CHandle* fileHandle)
 	u32 readSize = (fileHandle->m_chunkSize + 0x1FU) & ~0x1FU;
 	if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
 	{
-		System.Printf("CFile.kick: \203T\203C\203Y\202\252\203o\203b\203t\203@\202\360\211z\202\246\202\334\202\265\202\275\201B%s(%dbyte)\n", fileHandle->m_name, readSize);
+		System.Printf(s_readWarnFmt,, fileHandle->m_name, readSize);
 	}
 	DVDReadAsyncPrio(&fileHandle->m_dvdFileInfo, m_readBuffer, readSize, fileHandle->m_currentOffset, 0, 2);
 	fileHandle->m_nextOffset = fileHandle->m_currentOffset + readSize;
@@ -434,7 +493,7 @@ void CFile::Close(CFile::CHandle* fileHandle)
 {
 	if ((fileHandle->m_completionStatus == 2) && (2 <= (unsigned int)System.m_execParam))
 	{
-		System.Printf("\223\307\202\335\215\236\202\335\223r\222\206\202\305close\202\265\202\334\202\265\202\275\201B%s\n", fileHandle->m_name);
+		System.Printf(s_closeWarnFmt,, fileHandle->m_name);
 	}
 
 	DVDClose(&fileHandle->m_dvdFileInfo);
@@ -525,7 +584,7 @@ inline void CFile::readASync(CFile::CHandle* handle)
 
     if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
     {
-        System.Printf("CFile.kick: \203T\203C\203Y\202\252\203o\203b\203t\203@\202\360\211z\202\246\202\334\202\265\202\275\201B%s(%dbyte)\n", handle->m_name, readSize);
+        System.Printf(s_readWarnFmt,, handle->m_name, readSize);
     }
 
     DVDReadAsyncPrio(&handle->m_dvdFileInfo, m_readBuffer, readSize, handle->m_currentOffset, 0, 2);
@@ -618,7 +677,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 retry:
         if ((unsigned int)System.m_execParam >= 1)
         {
-            System.Printf("CFile::drawError: %d\n", errorCode);
+            System.Printf(s_drawErrorFmt,, errorCode);
         }
 
         int usingFallbackFont = 0;
@@ -635,7 +694,7 @@ retry:
             return;
         }
 
-        Graphic._WaitDrawDone("file.cpp", FileErrorDrawBeginLine);
+        Graphic._WaitDrawDone(s_fileCpp, FileErrorDrawBeginLine);
 
         int hasScratchTexture = Graphic.IsAvailableTempBuffer();
         bool useScratch = false;
@@ -727,10 +786,10 @@ retry:
             GXCopyDisp(Graphic.GetFrameBuffer(), GX_FALSE);
         }
 
-        Graphic._WaitDrawDone("file.cpp", FileErrorCopyLine);
+        Graphic._WaitDrawDone(s_fileCpp, FileErrorCopyLine);
         Graphic.SetStdDispCopySrc();
         Graphic.SetStdDispCopyDst();
-        Graphic._WaitDrawDone("file.cpp", FileErrorDisplayLine);
+        Graphic._WaitDrawDone(s_fileCpp, FileErrorDisplayLine);
         VIWaitForRetrace();
         Sound.PauseDiscError(1);
         VISetBlack(FALSE);
@@ -760,7 +819,7 @@ retry:
             GXCopyDisp(Graphic.GetFrameBuffer(), GX_FALSE);
         }
 
-        Graphic._WaitDrawDone("file.cpp", FileErrorDrawEndLine);
+        Graphic._WaitDrawDone(s_fileCpp, FileErrorDrawEndLine);
         m_fatalDiskErrorFlag = 0;
 
         while (true)

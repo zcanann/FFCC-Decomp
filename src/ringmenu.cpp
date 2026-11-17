@@ -43,6 +43,20 @@ static void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, fl
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::SetTlut(CMenuPcs::TEX tex, _GXColor* tlut)
+{
+	m_textures[tex]->SetExternalTlut(tlut, 1);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800a5350
  * PAL Size: 60b
  * EN Address: TODO
@@ -278,7 +292,7 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 	float textHeight;
 	int waveDirection;
 	float clampedAlpha;
-	const char* commandLabel;
+	char* commandLabel;
 	double waveX;
 	float waveY;
 	float textWidth;
@@ -323,8 +337,8 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 		font->SetTlut(4);
 	}
 
-	waveX = static_cast<double>(30.0f * static_cast<float>(sin(static_cast<double>(angle))));
-	waveSinY = static_cast<float>(sin(static_cast<double>(angle)));
+	waveX = static_cast<double>(30.0f * sinf(angle));
+	waveSinY = sinf(angle);
 	reverseDir = false;
 	if ((state == 0) || (state == 3)) {
 		reverseDir = true;
@@ -341,18 +355,16 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 	font->SetScale(static_cast<float>(0.8f - 0.25 * __fabs(angle)));
 	textWidth = static_cast<float>(font->GetWidth(commandLabel));
 	unclampedAlpha = static_cast<float>(1.0 - 0.5 * __fabs(angle));
-	textHeight = static_cast<float>(font->m_glyphHeight) * font->scaleY;
+	textHeight = font->GetHeight();
 
 	clampedAlpha = (unclampedAlpha < 0.0f) ? 0.0f : ((1.0f < unclampedAlpha) ? 1.0f : unclampedAlpha);
 
 	alphaProduct = 255.0f * alphaScale;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF,
-		static_cast<unsigned char>(alphaProduct * clampedAlpha)).color);
-	font->SetPosX(static_cast<float>(waveX) +
-		((64.0f + posX) - textWidth / 2.0f));
-	font->SetPosY(10.0f +
-		(waveY + ((4.0f + posY) - textHeight / 2.0f)));
-	font->SetPosZ(0.0f);
+		static_cast<unsigned char>(alphaProduct * clampedAlpha)));
+	font->SetPos(static_cast<float>(waveX) +
+		((64.0f + posX) - textWidth / 2.0f), 10.0f +
+		(waveY + ((4.0f + posY) - textHeight / 2.0f)), 0.0f);
 	font->Draw(commandLabel);
 }
 
@@ -394,11 +406,29 @@ void CRingMenu::onDraw()
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE));
-	sin(static_cast<double>((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f));
+	float gbaAnimRaw = sinf((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f);
+	float gbaAnim = gbaAnimRaw;
+	if (m_gbaConnectedFlag == 1) {
+		gbaAnim = 1.0f - gbaAnimRaw;
+	}
+
+	int posXInt = 0x30;
+	if ((m_menuIndex & 1) != 0) {
+		posXInt = 0x250;
+	}
+	float gbaX = static_cast<float>(posXInt);
+
+	int posYInt = 0x30;
+	if ((m_menuIndex & 2) != 0) {
+		posYInt = 400;
+	}
+	float gbaY = static_cast<float>(posYInt);
+
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
+	float sizePulse = 0.25f * (1.0f - gbaAnim) + 1.0f;
 	float cycleRaw = 0.05f * static_cast<float>(m_commonFrameCounter);
-	cycleRaw = static_cast<float>(fmod(static_cast<double>(cycleRaw), 2.0));
+	cycleRaw = fmodf(cycleRaw, 2.0f);
 	float cycle;
 	if (cycleRaw > 1.0f) {
 		cycle = 2.0f - cycleRaw;
@@ -406,8 +436,10 @@ void CRingMenu::onDraw()
 		cycle = cycleRaw;
 	}
 	float cycleAngle = 3.1415927410125732f * cycle;
-	sin(static_cast<double>(cycleAngle));
-	sin(static_cast<double>(-1.5707963705062866f + cycleAngle));
+	float sinA = sinf(cycleAngle);
+	float sinB = sinf(-1.5707963705062866f + cycleAngle);
+	float orbitX = 5.0f * (sizePulse * sinB);
+	float orbitY = 10.0f * (sizePulse * sinA);
 
 	const float pulse = sin(static_cast<double>(1.5707963705062866f * showScale));
 
@@ -605,7 +637,7 @@ void CRingMenu::onDraw()
 			}
 
 			const int timer = m_buttonTimers[group][button];
-			const char* label;
+			char* label;
 			if ((buttonValue & 0x8000) != 0) {
 				label = Game.GetShortItemName(buttonValue & ~0x8000);
 			} else {
@@ -649,10 +681,10 @@ void CRingMenu::onDraw()
 			const float width = font->GetWidth(label);
 			if ((group == 2) && (m_battleCommands[0][0] >= 0)) {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF,
-					static_cast<unsigned char>(0.35f * (showScale * (255.0f * fade * transitionScale)))).color);
+					static_cast<unsigned char>(0.35f * (showScale * (255.0f * fade * transitionScale)))));
 			} else {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF,
-					static_cast<unsigned char>(showScale * (255.0f * fade * transitionScale))).color);
+					static_cast<unsigned char>(showScale * (255.0f * fade * transitionScale))));
 			}
 
 			float textY;
@@ -794,8 +826,7 @@ void CRingMenu::drawGBA()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	sizePulse = 0.25f * (1.0f - gbaAnim) + 1.0f;
-	cycleRaw = static_cast<float>(fmod(static_cast<double>(0.05f * static_cast<float>(m_commonFrameCounter)),
-	                                   2.0));
+	cycleRaw = fmodf(0.05f * static_cast<float>(m_commonFrameCounter), 2.0f);
 	if (cycleRaw > 1.0f) {
 		cycle = 2.0f - cycleRaw;
 	} else {
@@ -984,14 +1015,10 @@ void CRingMenu::DrawIcon()
 
 	Vec viewPos;
 	Vec4d clipPos;
-	Vec viewInput;
 	CVector worldPos = CVector(partyObj->m_worldPosition) +
 		CVector(0.0f, 0.5f * partyObj->unk_0x188, 0.0f);
 
-	viewInput.x = worldPos.x;
-	viewInput.y = worldPos.y;
-	viewInput.z = worldPos.z;
-	PSMTXMultVec(cameraMtx, &viewInput, &viewPos);
+	PSMTXMultVec(cameraMtx, worldPos, &viewPos);
 	viewPos.z = (viewPos.z < -50.0f) ? viewPos.z : -50.0f;
 
 	Mtx44 screenMtx;
@@ -1016,7 +1043,7 @@ void CRingMenu::DrawIcon()
 	                     : ((0.875f < clipPos.y) ? 0.875f : clipPos.y);
 	clipPos.y = clampedY;
 
-	float angle = static_cast<float>(atan2(static_cast<double>(clipPos.x), static_cast<double>(clipPos.y)));
+	float angle = atan2f(clipPos.x, clipPos.y);
 
 	float posX = 320.0f * clipPos.x + 320.0f;
 	float posY = 224.0f - 224.0f * clipPos.y;
@@ -1047,12 +1074,7 @@ void CRingMenu::DrawIcon()
 	int uInt = iconCol % 8 * 0x30;
 	int vInt = iconCol / 8 * 0x30;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_FACE));
-	void* tlut = MenuPcs.m_externalFontTlut;
-	CTexture* iconTexture = MenuPcs.m_textures[RING_TEX_FACE];
-	if (caravanWork->m_hp != 0) {
-		tlut = 0;
-	}
-	iconTexture->SetExternalTlut(tlut, 1);
+	MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(RING_TEX_FACE), (caravanWork->m_hp != 0) ? 0 : MenuPcs.GetFaceTlut());
 	GXSetTevDirect(GX_TEVSTAGE2);
 	_GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_ONE, GX_CC_RASA);
 	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_KONST, GX_CA_ZERO);

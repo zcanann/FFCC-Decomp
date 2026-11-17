@@ -2073,7 +2073,7 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
  * JP Address: 0x8009D67C
  * JP Size: 128b
  */
-const char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
+char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
 {
 	int weaponType = GetWeaponAttrib(cmdListIdx);
 	if (weaponType >= 0 && weaponType < 3) {
@@ -2081,9 +2081,9 @@ const char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
 		return MenuPcs.GetSkillStr(weaponType);
 #else
 #ifdef VERSION_GCCJGC
-		static const char* pMagicCharge[] = { "ファイアけん", "ブリザドけん", "サンダーけん" };
+		static char* pMagicCharge[] = { "ファイアけん", "ブリザドけん", "サンダーけん" };
 #else
-		static const char* pMagicCharge[] = { "Flamestrike", "Icestrike", "Thunderstrike" };
+		static char* pMagicCharge[] = { "Flamestrike", "Icestrike", "Thunderstrike" };
 #endif
 		return pMagicCharge[weaponType];
 #endif

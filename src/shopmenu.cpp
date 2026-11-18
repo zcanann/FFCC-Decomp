@@ -1842,14 +1842,14 @@ void CShopMenu::DrawMake()
     font->SetMargin(1.0f);
 
     int makeGil = getMakeGil(getItemNo(m_selectedIndex));
-    DrawDecScale(makeGil, 0x13, 0x100, 180.0f, -4.0f, 1.5f, 1, 1, 0x12);
+    DrawDecScale(makeGil, 0x13, 0x100, 180.0f, 0.0f, 1.5f, 0, 1, 0x12);
     int gilTlut;
     if (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex))) {
         gilTlut = 0x14;
     } else {
         gilTlut = 2;
     }
-    DrawDecScale(m_caravanWork->GetGil(), gilTlut, 0x1E2, 180.0f, -4.0f, 1.5f, 1, 1, 0x12);
+    DrawDecScale(m_caravanWork->GetGil(), gilTlut, 0x1E2, 180.0f, 0.0f, 1.5f, 0, 1, 0x12);
 
     font->SetScale(1.0f);
     _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 258.0f, 188.0f, 0x19, 0x12);
@@ -1905,9 +1905,9 @@ void CShopMenu::DrawMake()
         _drawNoShadowFont(headerFont, "/", 390.0f, rowY, 0x1B, 0x12);
 
         int ownedCount = getItemHaveCnt(recipeMaterial.m_itemNo[i]);
-        DrawDec(recipeMaterial.m_count[i], 0x1B, 0x168, rowY, -3.0f, 0, 1, 0x12);
+        DrawDec(recipeMaterial.m_count[i], 0x1B, 0x168, rowY, 1.0f, 0, 1, 0x12);
         int ownedTlut = (ownedCount >= recipeMaterial.m_count[i]) ? 0x1B : 2;
-        DrawDec(ownedCount, ownedTlut, 0x1CC, rowY, -3.0f, 1, 1, 0x12);
+        DrawDec(ownedCount, ownedTlut, 0x1CC, rowY, 1.0f, 2, 1, 0x12);
         rowY += 0x1E;
     }
     MenuPcs.DrawInit();
@@ -1981,7 +1981,7 @@ void CShopMenu::DrawMake()
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
     float makeMarginW = FLOAT_80332E10;
-    DrawDecScale(makeGil, 0x13, FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
+    DrawDecScale(makeGil, 0x13, FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332E18, -2.0f, FLOAT_80332d8c, 0, 1, 0x12);
 
     x = FLOAT_80332E1C - gilUnitWidth - FLOAT_80332d5c;
     int gilTlut;
@@ -1990,7 +1990,7 @@ void CShopMenu::DrawMake()
     } else {
         gilTlut = 2;
     }
-    DrawDecScale(m_caravanWork->GetGil(), gilTlut, x, FLOAT_80332E18, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
+    DrawDecScale(m_caravanWork->GetGil(), gilTlut, x, FLOAT_80332E18, -2.0f, FLOAT_80332d8c, 0, 1, 0x12);
 
     font->SetScale(FLOAT_80332d28);
     font->DrawInit();
@@ -2054,8 +2054,6 @@ void CShopMenu::DrawMake()
     int rowY = 300;
     CMenuPcs::MaterialInfo recipeMaterial;
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
-    float makeMarginScale = 1.0f;
-    float makeMarginBase = -4.0f;
     for (int i = 0; i < 3; i++) {
         if (recipeMaterial.m_itemNo[i] <= 0) {
             break;
@@ -2067,7 +2065,7 @@ void CShopMenu::DrawMake()
         headerFont->SetScale(FLOAT_80332d28);
         _drawNoShadowFont(headerFont, const_cast<char*>(s_Slash_80332d84), FLOAT_80332E3C, rowY, 0x1B, 0x12);
 
-        x = DrawDec(recipeMaterial.m_count[i], 0x1B, 372, rowY, makeMarginW * makeMarginScale + makeMarginBase, 0, 1,
+        x = DrawDec(recipeMaterial.m_count[i], 0x1B, 372, rowY, makeMarginW, 0, 1,
                     0x12);
 
         headerFont->DrawInit();
@@ -2087,7 +2085,7 @@ void CShopMenu::DrawMake()
 
         makeMarginW = FLOAT_80332E10;
         int ownedTlut = (ownedCount >= recipeMaterial.m_count[i]) ? 0x1B : 2;
-        DrawDec(ownedCount, ownedTlut, 452, rowY, FLOAT_80332d64, 1, 1, 0x12);
+        DrawDec(ownedCount, ownedTlut, 452, rowY, -2.0f, 2, 1, 0x12);
         rowY += 0x1E;
     }
     MenuPcs.DrawInit();
@@ -2678,8 +2676,8 @@ void CShopMenu::DrawBuySellInfo()
         totalGil = 0;
     }
 
-    DrawDecScale(totalGil, 0x13, 0x120, 336.0f, -4.0f, 1.5f, 1, 1, 0x12);
-    DrawDecScale(m_caravanWork->m_gil, 0x14, 0x212, 336.0f, -4.0f, 1.5f, 1, 1, 0x12);
+    DrawDecScale(totalGil, 0x13, 0x120, 336.0f, 0.0f, 1.5f, 0, 1, 0x12);
+    DrawDecScale(m_caravanWork->m_gil, 0x14, 0x212, 336.0f, 0.0f, 1.5f, 0, 1, 0x12);
 
     font->SetScale(1.0f);
     _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 290.0f, 344.0f, 0x19, 0x12);
@@ -2731,11 +2729,11 @@ void CShopMenu::DrawBuySellInfo()
 
     float rightPrice = FLOAT_80332d88 - unitWidth;
     x = rightPrice - FLOAT_80332d5c;
-    DrawDecScale(totalGil, 0x13, x, FLOAT_80332d90, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
+    DrawDecScale(totalGil, 0x13, x, FLOAT_80332d90, -2.0f, FLOAT_80332d8c, 0, 1, 0x12);
 
     float rightMoney = FLOAT_80332d94 - unitWidth;
     x = rightMoney - FLOAT_80332d5c;
-    DrawDecScale(m_caravanWork->m_gil, 0x14, x, FLOAT_80332d90, FLOAT_80332d64, FLOAT_80332d8c, 1, 1, 0x12);
+    DrawDecScale(m_caravanWork->m_gil, 0x14, x, FLOAT_80332d90, -2.0f, FLOAT_80332d8c, 0, 1, 0x12);
 
     font->DrawInit();
 #ifdef VERSION_GCCE01
@@ -2792,7 +2790,7 @@ void CShopMenu::DrawItemInfo0()
 
     if (CheckSell(m_selectedIndex)) {
         font->SetMargin(1.0f);
-        DrawDec(getBuySellGil(itemNo), 0x1B, 0xD2, 136.0f, -3.0f, 0, 1, 0x12);
+        DrawDec(getBuySellGil(itemNo), 0x1B, 0xD2, 136.0f, 1.0f, 0, 1, 0x12);
         font->SetMargin(1.0f);
         _drawNoShadowFont(font, "\x83\x4D\x83\x8B", 214.0f, 136.0f, 0x19, 0x12);
     } else {
@@ -2812,8 +2810,8 @@ void CShopMenu::DrawItemInfo0()
     if ((m_subMode == 1) && (m_listType == 0)) {
         _drawNoShadowFont(font, "\x82\xA9\x82\xA4\x82\xA9\x82\xB8", 90.0f, 172.0f, 0x18, 0x12);
         _drawNoShadowFont(font, "\x81\x7E", 182.0f, 172.0f, 0x18, 0x12);
-        DrawDec(m_quantity / 10, 4, 0xDE, 172.0f, -3.0f, 0, 1, 0x12);
-        DrawDec(m_quantity % 10, 4, 0xF2, 172.0f, -3.0f, 0, 1, 0x12);
+        DrawDec(m_quantity / 10, 4, 0xDE, 172.0f, 1.0f, 0, 1, 0x12);
+        DrawDec(m_quantity % 10, 4, 0xF2, 172.0f, 1.0f, 0, 1, 0x12);
 
         if (m_subMode == 1) {
             drawShapeSeqScale(0x12, 0, 0xEA - m_figureMode * 0x14, 0xD4, 0.5f, 0.5f, 0xFF);
@@ -2865,7 +2863,7 @@ void CShopMenu::DrawItemInfo0()
         float rightX = FLOAT_80332d3c - unitWidth;
         amountRightX = static_cast<int>(rightX - FLOAT_80332d5c);
 
-        DrawDec(getBuySellGil(itemNo), 0x1B, amountRightX, FLOAT_80332d68, FLOAT_80332d64, 0, 1, 0x12);
+        DrawDec(getBuySellGil(itemNo), 0x1B, amountRightX, FLOAT_80332d68, -2.0f, 0, 1, 0x12);
 
         font->SetMargin(FLOAT_80332d28);
         _drawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightX)), FLOAT_80332d68, 0x19, 0x12);
@@ -2887,9 +2885,9 @@ void CShopMenu::DrawItemInfo0()
 
     if ((m_subMode == 1) && (m_listType == 0)) {
 #ifdef VERSION_GCCE01
-        int countRightX = DrawDec(m_quantity, 4, 0x118, FLOAT_80332d6c, FLOAT_80332d34, 1, 1, 0x12);
+        int countRightX = DrawDec(m_quantity, 4, 0x118, FLOAT_80332d6c, -1.0f, 2, 1, 0x12);
 #else
-        int countRightX = DrawDec(m_quantity, 4, 0x108, FLOAT_80332d6c, FLOAT_80332d34, 1, 1, 0x12);
+        int countRightX = DrawDec(m_quantity, 4, 0x108, FLOAT_80332d6c, -1.0f, 2, 1, 0x12);
 #endif
 
         font->DrawInit();
@@ -2953,7 +2951,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int attrX, int attrY, int
         _drawNoShadowFont(font, label, static_cast<float>(x), static_cast<float>(y), 0x18, 0x12);
         _drawNoShadowFont(font, "\x81\x46", static_cast<float>(colonX), static_cast<float>(y), 0x18, 0x12);
 
-        DrawDec(statValue, 0x1A, x + 0xB8, static_cast<float>(y), -1.0f, 0, 1, 0x12);
+        DrawDec(statValue, 0x1A, x + 0xB8, static_cast<float>(y), 3.0f, 0, 1, 0x12);
 
         font->SetMargin(4.0f);
         if ((statType == 1) && (attr >= 1)) {
@@ -3058,7 +3056,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
 #else
         posX = x + 0x108;
 #endif
-        DrawDec(statValue, 0x1A, posX, static_cast<float>(y), FLOAT_80332d34, 0, 1, 0x12);
+        DrawDec(statValue, 0x1A, posX, static_cast<float>(y), -1.0f, 0, 1, 0x12);
 
         font->DrawInit();
         font->SetMargin(FLOAT_80332d28);
@@ -3198,21 +3196,37 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
  * Address:	TODO
  * Size:	TODO
  */
-inline int CShopMenu::DrawDec(int value, int tlut, int x, float y, float margin, int zeroPad, int fixed, int flags)
+inline int CShopMenu::DrawDec(int value, int tlut, int x, float y, float margin, int digits, int fixed, int flags)
 {
+    float scale = 1.0f;
     CFont* font = MenuPcs.GetFont22();
     font->SetShadow(1);
-    font->SetScale(1.0f);
+    font->SetScale(scale);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
     font->SetFixed(fixed);
-    font->SetMargin(margin);
+    font->SetMargin(margin * scale + -4.0f);
 
     char buffer[64];
-    if (zeroPad != 0) {
-        sprintf(buffer, "%02d", value);
-    } else {
+    switch (digits) {
+    case 0:
         sprintf(buffer, "%d", value);
+        break;
+    case 1:
+        sprintf(buffer, "%01d", value);
+        break;
+    case 2:
+        sprintf(buffer, "%02d", value);
+        break;
+    case 3:
+        sprintf(buffer, "%03d", value);
+        break;
+    case 4:
+        sprintf(buffer, "%04d", value);
+        break;
+    default:
+        sprintf(buffer, "%d", value);
+        break;
     }
     x -= font->GetWidth(buffer);
     MenuPcs.DrawNoShadowFont(font, buffer, static_cast<float>(x), y, tlut, flags);
@@ -3225,23 +3239,44 @@ inline int CShopMenu::DrawDec(int value, int tlut, int x, float y, float margin,
  * Address:	TODO
  * Size:	TODO
  */
-inline void CShopMenu::DrawDecScale(int value, int tlut, int x, float y, float margin, float scaleY, int shadow, int fixed,
+inline int CShopMenu::DrawDecScale(int value, int tlut, int x, float y, float margin, float scaleY, int digits, int fixed,
                                      int flags)
 {
+    float scale = 1.0f;
     CFont* font = MenuPcs.GetFont22();
-    font->SetShadow(shadow);
-    font->SetScaleX(1.0f);
+    font->SetShadow(1);
+    font->SetScaleX(scale);
     font->SetScaleY(scaleY);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
     font->SetFixed(fixed);
-    font->SetMargin(margin);
+    font->SetMargin(margin * scale + -4.0f);
 
     char buffer[64];
-    sprintf(buffer, "%d", value);
+    switch (digits) {
+    case 0:
+        sprintf(buffer, "%d", value);
+        break;
+    case 1:
+        sprintf(buffer, "%01d", value);
+        break;
+    case 2:
+        sprintf(buffer, "%02d", value);
+        break;
+    case 3:
+        sprintf(buffer, "%03d", value);
+        break;
+    case 4:
+        sprintf(buffer, "%04d", value);
+        break;
+    default:
+        sprintf(buffer, "%d", value);
+        break;
+    }
     x -= font->GetWidth(buffer);
     MenuPcs.DrawNoShadowFont(font, buffer, static_cast<float>(x), y, tlut, flags);
     MenuPcs.DrawInit();
+    return x;
 }
 
 /*

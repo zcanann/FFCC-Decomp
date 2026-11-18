@@ -6653,6 +6653,7 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 void CMenuPcs::CalcCharaSelect()
 {
 	int i;
+	CCaravanWork* work;
 
 	unsigned short padRepeat[4];
 	unsigned short padTrig[4];
@@ -6822,10 +6823,10 @@ void CMenuPcs::CalcCharaSelect()
 		for (i = readyMask = 0; i < 4; i++) {
 			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 			if (entry.m_connected != 0) {
-				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
+				work = &Game.m_caravanWorkArr[entry.m_currentSlot];
 				readyMask |= 1 << i;
 				connectedCount++;
-				if (entry.m_confirmed != 0 && work.m_caravanLocalFlags != 0) {
+				if (entry.m_confirmed != 0 && work->m_caravanLocalFlags != 0) {
 					locallyConfirmedCount++;
 				}
 			}
@@ -6915,8 +6916,8 @@ void CMenuPcs::CalcCharaSelect()
 
 			if (((*pRep) & 0x006F) == 0) {
 				const int trig = (*pTrig);
-				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
-				if ((trig & 0x0100) != 0 && work.m_shopBusyFlag != 0) {
+				work = &Game.m_caravanWorkArr[entry.m_currentSlot];
+				if ((trig & 0x0100) != 0 && work->m_shopBusyFlag != 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else if ((trig & 0x0100) != 0 && entry.m_confirmed == 0) {
 					const int charaId = m_wm.m_charaModelData[currentSlot].m_modelNo;
@@ -6951,7 +6952,7 @@ void CMenuPcs::CalcCharaSelect()
 							}
 						}
 						if (other >= 4) {
-							if (work.m_caravanLocalFlags != 0) {
+							if (work->m_caravanLocalFlags != 0) {
 								if (Game.m_gameWork.m_menuStageMode != 0) {
 									Sound.PlaySe(4, 0x40, 0x7F, 0);
 								} else if (connectedCount == locallyConfirmedCount + 1) {
@@ -7850,7 +7851,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	GbaCMakeInfo info;
 	GbaQue.GetCMakeInfo(channel, &info);
 
-	const int caravanSlot = static_cast<int>(static_cast<signed char>(info.m_playerSlot));
+	int caravanSlot = info.m_playerSlot;
 	const int gender = (info.m_charaType >> 7) ? 1 : 0;
 	int modelNo = GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, gender);
 
@@ -7866,7 +7867,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
 	caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
 	caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
-	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
+	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) ? 1 : 0);
 	caravanWork.m_id = static_cast<unsigned short>(
 	    GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, (info.m_charaType >> 7) ? 1 : 0));
 	for (int favorite = 0; favorite < 8; favorite++) {
@@ -8626,19 +8627,14 @@ nextListEntry:
 		return;
 	}
 
-	double rowSlope = 88.0;
 	float mapOffsetX = 496.0f;
-	double rowBaseD;
 	float slotY;
-	double rowSlopeD;
 #ifndef VERSION_GCCJGC
 	const int language = Game.m_gameWork.GetLanguage();
 #endif
-	rowSlopeD = rowSlope;
-	rowBaseD = 24.0;
 	for (slot = 0; slot < kMcListCount; slot++) {
 		const McListInfo* const slotData = &m_wmCharaState[slot];
-		slotY = static_cast<float>(rowSlopeD * static_cast<double>(slot) + rowBaseD);
+		slotY = static_cast<float>(88.0 * static_cast<double>(slot) + 24.0);
 		if (slotData->m_isBroken == 0 && slotData->m_hasData != 0) {
 			float capX;
 			float rowY = 40.0f + slotY;

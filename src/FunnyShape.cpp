@@ -72,7 +72,7 @@ inline void CFunnyShape::SetDefaultStage()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCCLR, GX_LO_COPY);
     GXLoadTexObj(m_texObjData[0], GX_TEXMAP0);
@@ -151,6 +151,14 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             float ry2;
             float rx3;
             float ry3;
+            float viewportW;
+            float viewportH;
+            float viewMaxX;
+            float viewMaxY;
+            float padW;
+            float padH;
+            float invPadW;
+            float invPadH;
             FS_ROTATE_SHAPE_X(rx0, 0);
             FS_ROTATE_SHAPE_Y(ry0, 0);
             FS_ROTATE_SHAPE_X(rx1, 1);
@@ -211,8 +219,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             float viewportScale = 2.0f;
-            const float viewportW = viewportScale * (max.x - min.x);
-            const float viewportH = viewportScale * (max.y - min.y);
+            viewportW = viewportScale * (max.x - min.x);
+            viewportH = viewportScale * (max.y - min.y);
             GXSetViewport(min.x * viewportScale + offset.x, min.y * viewportScale + offset.y, viewportW,
                           viewportH, 0.0f, 1.0f);
 
@@ -221,31 +229,33 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const s16 texW = quad->texW;
             const s16 texH = quad->texH;
             u0 = static_cast<float>(texX) / 4096.0f;
-            v0 = 1.0f - static_cast<float>(texY) / 4096.0f;
-            u1 = u0 + static_cast<float>(texW) / 4096.0f;
-            v1 = v0 - static_cast<float>(texH) / 4096.0f;
+            v0 = static_cast<float>(texY) / 4096.0f;
+            u1 = static_cast<float>(texW) / 4096.0f;
+            v1 = static_cast<float>(texH) / 4096.0f;
+            u1 = u0 + u1;
+            v0 = 1.0f - v0;
+            v1 = v0 - v1;
             tex[1][0] = tex[2][0] = u0;
             tex[3][1] = tex[2][1] = v0;
             tex[0][0] = tex[3][0] = u1;
             tex[1][1] = tex[0][1] = v1;
 
-            const float padW = viewportW / 2.0f / 2.0f;
-            const float viewMaxX = max.x - padW;
-            const float padH = viewportH / 2.0f / 2.0f;
-            const float viewMaxY = max.y - padH;
-            const float invPadH = 1.0f / padH;
-            const float invPadW = -(1.0f / padW);
-
+            padW = viewportW / 2.0f / 2.0f;
+            viewMaxX = max.x - padW;
+            padH = viewportH / 2.0f / 2.0f;
+            viewMaxY = max.y - padH;
+            invPadH = 1.0f / padH;
             pos[0][2] = 0.0f;
             pos[1][2] = 0.0f;
             pos[2][2] = 0.0f;
             pos[3][2] = 0.0f;
+            pos[0][1] = invPadH * (ry0 - viewMaxY);
+            pos[1][1] = invPadH * (ry1 - viewMaxY);
+            invPadW = -(1.0f / padW);
             pos[0][0] = invPadW * (rx0 - viewMaxX);
             pos[1][0] = invPadW * (rx1 - viewMaxX);
             pos[2][0] = invPadW * (rx3 - viewMaxX);
             pos[3][0] = invPadW * (rx2 - viewMaxX);
-            pos[0][1] = invPadH * (ry0 - viewMaxY);
-            pos[1][1] = invPadH * (ry1 - viewMaxY);
             pos[2][1] = invPadH * (ry3 - viewMaxY);
             pos[3][1] = invPadH * (ry2 - viewMaxY);
             memcpy(&color, &quad->color, sizeof(color));
@@ -283,9 +293,12 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const s16 texW = sprite->texW;
             const s16 texH = sprite->texH;
             u0 = static_cast<float>(texX) / 4096.0f;
-            v0 = 1.0f - static_cast<float>(texY) / 4096.0f;
-            u1 = u0 + static_cast<float>(texW) / 4096.0f;
-            v1 = v0 - static_cast<float>(texH) / 4096.0f;
+            v0 = static_cast<float>(texY) / 4096.0f;
+            u1 = static_cast<float>(texW) / 4096.0f;
+            v1 = static_cast<float>(texH) / 4096.0f;
+            u1 = u0 + u1;
+            v0 = 1.0f - v0;
+            v1 = v0 - v1;
             tex[0][0] = u0;
             tex[0][1] = v0;
             tex[1][0] = u1;
@@ -439,7 +452,7 @@ void CFunnyShape::RenderTexture()
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
     GXSetNumChans(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     GXColor chanColor = kFunnyShapeTextureChanColor;
     GXSetChanAmbColor(GX_COLOR0, chanColor);
     GXColor matColor = chanColor;

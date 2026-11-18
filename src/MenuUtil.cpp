@@ -1814,6 +1814,11 @@ void CMenuPcs::DrawOptionMenu()
 		specialRowCos = std::cosf(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle));
 #endif
 
+		const Vec2d* pp3;
+		int textXi;
+		const Vec2d* pp4;
+		int textXi2;
+		char* txt;
 		leftXi = 0;
 		for (int i = 0; i < 4; i++, leftXi = 0) {
 			CTexture* cursorPanel = m_wmOptionTextureSet->GetTexture(4);
@@ -1862,9 +1867,9 @@ void CMenuPcs::DrawOptionMenu()
 			                        pp2->y + static_cast<float>(i * 0x28), 40.0f, 24.0f,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-			const Vec2d* pp3 = &pts[leftXi + 3];
+			pp3 = &pts[leftXi + 3];
 			int step1 = static_cast<int>(24.0f + (static_cast<float>(i * 0x40 + 0x280) - pp3->x));
-			int textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
+			textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
 			if (m_specialModeFlags[i] == 0) {
 				Util.CalcUV(uv0.x, uv0.y, 0, i * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 				Util.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
@@ -1872,20 +1877,20 @@ void CMenuPcs::DrawOptionMenu()
 				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 #ifdef VERSION_GCCJGC
-				const Vec2d* pp4 = &pts[leftXi + 4];
-				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				pp4 = &pts[leftXi + 4];
+				textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				DrawOptionLabel(this, textXi2 + 8,
 				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(i * 0x28))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
 #elif defined(VERSION_GCCE01)
-				const Vec2d* pp4 = &pts[leftXi + 4];
-				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				pp4 = &pts[leftXi + 4];
+				textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				DrawFont(textXi2 + 8, static_cast<int>(-4.0f + (4.0f + (pp4->y + static_cast<float>(i * 0x28)))),
 				         color, 7, OPT_MES(18), 1.0f, 1.0f);
 #else
-				char* txt = OPT_MES(18);
-				const Vec2d* pp4 = &pts[leftXi + 4];
-				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				txt = OPT_MES(18);
+				pp4 = &pts[leftXi + 4];
+				textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				float tw = GetFontWidth(txt, 1.0f, 1.0f);
 				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                          2.0 + textXi2)),
@@ -1902,7 +1907,7 @@ void CMenuPcs::DrawOptionMenu()
 				DrawFont(textXi + 8, static_cast<int>(-4.0f + (4.0f + (pp3->y + static_cast<float>(i * 0x28)))),
 				         color, 7, OPT_MES(19), 1.0f, 1.0f);
 #else
-				char* txt = OPT_MES(19);
+				txt = OPT_MES(19);
 				float tw = GetFontWidth(txt, 1.0f, 1.0f);
 				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                          2.0 + textXi)),

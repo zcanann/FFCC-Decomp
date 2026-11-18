@@ -54,7 +54,7 @@ Skip setup unless the repo is not already prepared.
 ```sh
 python3 configure.py --version GCCP01
 ninja
-python3 tools/download_tool.py objdiff-cli tools/objdiff-cli --tag v3.6.1
+python3 tools/download_tool.py objdiff-cli tools/objdiff-cli --tag v3.8.2
 tools/objdiff-cli --version
 ```
 

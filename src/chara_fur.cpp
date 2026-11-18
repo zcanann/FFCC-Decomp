@@ -500,8 +500,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				Mtx shadowTexMtx;
 				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
 				GXLoadTexMtxImm(shadowTexMtx, shadowTexMtxId, GX_MTX3x4);
-				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowTexMap), GX_TG_MTX3x4, GX_TG_POS,
-				                  shadowTexMtxId, GX_FALSE, GX_PTIDENTITY);
+				GXSetTexCoordGen(static_cast<GXTexCoordID>(shadowTexMap), GX_TG_MTX3x4, GX_TG_POS, shadowTexMtxId);
 			}
 		}
 
@@ -582,8 +581,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				int tevStageCount = tevStage + 1;
 				if (hasExtraTexture == 0) {
 					GXSetNumTexGens(static_cast<u8>(shadowCount + 2));
-					GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
-					GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, GX_PTIDENTITY);
+					GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+					GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
 				} else {
 					GXSetTevDirect(static_cast<GXTevStageID>(tevStageCount));
 					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStageCount), GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -609,9 +608,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 					_GXSetTevOrder(static_cast<GXTevStageID>(tevStageCount), GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR_NULL);
 					tevStageCount++;
 					GXSetNumTexGens(static_cast<u8>(shadowCount + 3));
-					GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
-					GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, GX_PTIDENTITY);
-					GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+					GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+					GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+					GXSetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 				}
 				GXSetNumTevStages(static_cast<u8>(tevStageCount));
 			}

@@ -425,12 +425,12 @@ void CRingMenu::onDraw()
 	posAltX = 472.0f + glowOffset;
 	posLeft = -glowOffset;
 	posAltY = 256.0f + glowOffset;
+	posMainY = 192.0f + glowOffset;
 #ifdef VERSION_GCCJGC
 	posMainX = posAltX;
 #else
 	posMainX = posAltX - 40.0f;
 #endif
-	posMainY = 192.0f + glowOffset;
 
 	for (int group = 2; group >= 0; group--) {
 #ifdef VERSION_GCCJGC

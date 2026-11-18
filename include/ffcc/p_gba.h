@@ -24,6 +24,8 @@ public:
     virtual void onMapChanged(int, int, int);
     virtual void onScriptChanging(char*);
 
+    CMemory::CStage* GetStage() { return m_stage; }
+
     CMemory::CStage* m_stage;
 
     static CProcessCallbackTable m_table;

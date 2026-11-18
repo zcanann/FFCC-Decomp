@@ -600,9 +600,9 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		waveHead->m_loadSize = REDSOUND_WAVE_FIXED_REGION_SIZE;
 	}
 
+	int aramAddress;
 	int aramRangeStart;
 	int aramRangeEnd;
-	int aramAddress;
 	if ((waveNo >= REDSOUND_WAVE_LARGE_RANGE_BEGIN) && (waveNo < REDSOUND_WAVE_LARGE_RANGE_END)) {
 		aramRangeStart = REDSOUND_WAVE_LARGE_REGION_OFFSET;
 		aramRangeEnd = aramRangeStart + REDSOUND_WAVE_LARGE_REGION_SIZE;
@@ -616,7 +616,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		aramRangeEnd = aramRangeStart + REDSOUND_WAVE_DEFAULT_REGION_SIZE;
 	}
 
-	do {
+	for (;;) {
 		RedHistoryBANK* allocatedWaveBank;
 		if (waveBankNo < 0) {
 			allocatedWaveBank = RedEntryWaveHistoryGetBegin(this);
@@ -632,43 +632,46 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 			}
 		}
 
-		if ((allocatedWaveBank < RedEntryWaveBankGetEnd(this)) &&
-		    ((aramAddress = RedNewA(waveHead->m_loadSize, aramRangeStart, aramRangeEnd)) != 0)) {
-			int waveCopySize = waveHead->m_tableCount;
-			waveCopySize *= REDSOUND_WAVE_TABLE_ENTRY_SIZE;
-			waveCopySize += REDSOUND_WAVE_TABLE_ALIGN - 1;
-			waveCopySize &= REDSOUND_WAVE_TABLE_ALIGN_MASK;
-			waveCopySize += RedWaveHeadGetToneSize(waveHead);
-			waveCopySize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
-			RedWaveHeadWD* copiedWaveHead = (RedWaveHeadWD*)RedNew(waveCopySize);
-			if (copiedWaveHead != 0) {
-				allocatedWaveBank->m_waveHead = copiedWaveHead;
-				allocatedWaveBank->m_size = waveCopySize;
-				waveHead->m_aramAddress = aramAddress;
-				allocatedWaveBank->m_id = waveNo;
-				waveHead->m_waveNo = (short)waveNo;
-				if (waveBankNo < 0) {
-					WaveHistoryAdd(REDSOUND_HISTORY_MOST_RECENT);
-					allocatedWaveBank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
-				} else {
-					allocatedWaveBank->m_historyNo = REDSOUND_HISTORY_UNUSED;
+		if (allocatedWaveBank < RedEntryWaveBankGetEnd(this)) {
+			aramAddress = RedNewA(waveHead->m_loadSize, aramRangeStart, aramRangeEnd);
+			if (aramAddress != 0) {
+				int waveCopySize = waveHead->m_tableCount;
+				waveCopySize *= REDSOUND_WAVE_TABLE_ENTRY_SIZE;
+				waveCopySize += REDSOUND_WAVE_TABLE_ALIGN - 1;
+				waveCopySize &= REDSOUND_WAVE_TABLE_ALIGN_MASK;
+				waveCopySize += RedWaveHeadGetToneSize(waveHead);
+				waveCopySize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
+				RedWaveHeadWD* copiedWaveHead = (RedWaveHeadWD*)RedNew(waveCopySize);
+				if (copiedWaveHead != 0) {
+					allocatedWaveBank->m_waveHead = copiedWaveHead;
+					allocatedWaveBank->m_size = waveCopySize;
+					waveHead->m_aramAddress = aramAddress;
+					allocatedWaveBank->m_id = waveNo;
+					waveHead->m_waveNo = (short)waveNo;
+					if (waveBankNo < 0) {
+						WaveHistoryAdd(REDSOUND_HISTORY_MOST_RECENT);
+						allocatedWaveBank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
+					} else {
+						allocatedWaveBank->m_historyNo = REDSOUND_HISTORY_UNUSED;
+					}
+					memcpy(copiedWaveHead, waveHead, waveCopySize);
+					break;
 				}
-				memcpy(copiedWaveHead, waveHead, waveCopySize);
-				goto success;
+				RedDeleteA((void*)aramAddress);
 			}
-			RedDeleteA((void*)aramAddress);
 		}
-	} while (WaveOldClear(aramRangeStart, aramRangeEnd) != 0);
 
-	if (RedReportPrintIsEnabled()) {
-		OSReport(sRedEntryNoWaveMemoryFreeAreaFmt, sRedEntryLogPrefix, sRedEntryErrorColor, (int)waveHead->m_waveNo,
-		         waveHead->m_waveSize, sRedEntryResetColor);
-		fflush(__files + 1);
+		if (WaveOldClear(aramRangeStart, aramRangeEnd) == 0) {
+			if (RedReportPrintIsEnabled()) {
+				OSReport(sRedEntryNoWaveMemoryFreeAreaFmt, sRedEntryLogPrefix, sRedEntryErrorColor, (int)waveHead->m_waveNo,
+				         waveHead->m_waveSize, sRedEntryResetColor);
+				fflush(__files + 1);
+			}
+
+			return REDSOUND_WAVE_ADD_FAILED;
+		}
 	}
 
-	return REDSOUND_WAVE_ADD_FAILED;
-
-success:
 	return aramAddress;
 }
 /*
@@ -1487,7 +1490,8 @@ void CRedEntry::DisplaySePlayInfo()
 					         seBlockSequenceNo, displayWaveNo);
 					fflush(__files + 1);
 				} else {
-					data = (u8*)SearchSeSepBank(seTrack->m_seSepId)->m_seSepHead;
+					data = (u8*)SearchSeSepBank(seTrack->m_seSepId);
+					data = (u8*)((RedHistoryBANK*)data)->m_seSepHead;
 					displayWaveNo = RedSeSepGetWaveNo((RedSeSepHEAD*)data);
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
 					         (seTrack - *seTrackBasePtr) + REDSOUND_SE_VOICE_BASE_INDEX, seTrack->m_seSepId, displayWaveNo);

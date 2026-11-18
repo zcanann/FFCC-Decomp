@@ -329,7 +329,7 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 	float texScaleX;
 	float texScaleY;
 	float texOffsetX;
-	float texOffsetY;
+	float work;
 	float offsetX;
 	float offsetY;
 	int i;
@@ -401,10 +401,11 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 	texScaleY = 1.0f / (float)height;
 	texOffsetX = screenPos[minXIndex].x - (float)left;
 	texOffsetX = texScaleX * texOffsetX;
-	offsetX = texPos[minXIndex].x - texOffsetX;
-	texOffsetY = screenPos[minYIndex].y;
-	texOffsetY = texScaleY * (texOffsetY - (float)top);
-	offsetY = texPos[minYIndex].y - texOffsetY;
+	work = texPos[minXIndex].x;
+	offsetX = work - texOffsetX;
+	work = screenPos[minYIndex].y - (float)top;
+	offsetY = texScaleY * work;
+	offsetY = texPos[minYIndex].y - offsetY;
 
 	if (originalLeft < 0) {
 		if (640 < (originalLeft + originalWidth)) {
@@ -435,8 +436,8 @@ static int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state,
 					maxIndex = i;
 				}
 			}
-			texOffsetY = texScaleY * (((float)originalTop + (float)originalHeight) - screenPos[maxIndex].y);
-			texMtx[1][2] = texMtx[1][2] + (texPos[maxIndex].y + texOffsetY - 1.0f);
+			work = texScaleY * (((float)originalTop + (float)originalHeight) - screenPos[maxIndex].y);
+			texMtx[1][2] = texMtx[1][2] + (texPos[maxIndex].y + work - 1.0f);
 		}
 	} else {
 		texMtx[1][2] = texMtx[1][2] + offsetY;

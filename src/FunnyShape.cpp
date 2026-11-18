@@ -72,7 +72,7 @@ inline void CFunnyShape::SetDefaultStage()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCCLR, GX_LO_COPY);
     GXLoadTexObj(m_texObjData[0], GX_TEXMAP0);
@@ -439,7 +439,7 @@ void CFunnyShape::RenderTexture()
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
     GXSetNumChans(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     GXColor chanColor = kFunnyShapeTextureChanColor;
     GXSetChanAmbColor(GX_COLOR0, chanColor);
     GXColor matColor = chanColor;

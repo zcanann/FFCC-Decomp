@@ -475,7 +475,7 @@ def RedSoundLib(objects: List[Object]) -> Dict[str, Any]:
         # PAL MAP ownership attributes these units to RedSound.a rather than
         # the main game archive, so keep their shared flags at the library level.
         "lib": "RedSound",
-        "mw_version": "GC/2.0p3",
+        "mw_version": "GC/2.0ffcc",
         "cflags": redsound_cflags,
         "progress_category": "redsound",
         "objects": objects,
@@ -514,7 +514,7 @@ config.libs = [
     {
         "lib": "Game",
         # Japanese compatibility baseline; provenance: docs/compiler_baseline.md.
-        "mw_version": "GC/2.0p3" if config.version == "GCCJGC" else "GC/2.5",
+        "mw_version": "GC/2.0ffcc" if config.version == "GCCJGC" else "GC/2.5",
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
@@ -1350,16 +1350,16 @@ config.progress_report_args = [
     # "--config", "functionRelocDiffs=data_value",
 ]
 
-# Japanese game and RedSound compiler: GC/2.0p3, doldecomp/mweppc's GC_2_0p3
-# (GameCube 2.0 built from the decompiled compiler source with the alias rules
-# of BFBB's 2.0p2 and FFCC Japan's own), installed from a pinned mweppc release
-# by tools/download_mweppc.py. See docs/compiler_baseline.md.
-JP_GAME_COMPILER = "GC/2.0p3"
+# Japanese game and RedSound compiler: GC/2.0ffcc, GC_2_0ffcc of
+# PrimeDecomp/mwcc-tools' gc2 (GameCube 2.0 built from the decompiled compiler
+# source with the alias rules of BFBB's 2.0p2 and FFCC Japan's own), installed
+# by tools/download_mwcc_tools.py. See docs/compiler_baseline.md.
+JP_GAME_COMPILER = "GC/2.0ffcc"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
     {
-        "name": "download_mweppc",
-        "command": "$python tools/download_mweppc.py $out",
+        "name": "download_mwcc_tools",
+        "command": "$python tools/download_mwcc_tools.py $out",
         "description": "DOWNLOAD $out",
         "restat": True,
     },
@@ -1368,9 +1368,9 @@ config.custom_build_steps = {
     "pre-compile": [
         {
             "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
-            "rule": "download_mweppc",
+            "rule": "download_mwcc_tools",
             "implicit": [
-                Path("tools") / "download_mweppc.py",
+                Path("tools") / "download_mwcc_tools.py",
             ]
             + ([_compilers_dir] if config.compilers_path is None else []),
         },

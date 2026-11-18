@@ -7097,15 +7097,8 @@ void CMenuPcs::DrawCharaName()
 	unsigned int activeMask;
 	unsigned int confirmedMask;
 	CFont* font;
-	float xBase;
-#ifdef VERSION_GCCJGC
-	double xOffsetDefault;
-#endif
-	float alphaF;
 	float y;
-#ifndef VERSION_GCCJGC
-	double xOffsetDefault;
-#endif
+	float xBase;
 	float fade;
 #ifdef VERSION_GCCJGC
 	static const char* STR_TBL[] = {"\x82\xC8\x82\xB5", "\x83\x4C\x83\x83\x83\x89\x83\x81\x83\x43\x83\x4E\x92\x86"};
@@ -7173,17 +7166,14 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	DrawInit();
 
-	alphaF = FLOAT_80331458 * fade;
 	GXColor shade;
 	shade.r = 0xFF;
 	shade.g = 0xFF;
 	shade.b = 0xFF;
-	shade.a = static_cast<unsigned char>(static_cast<int>(alphaF));
+	shade.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fade));
 	GXSetChanMatColor(GX_COLOR0A0, shade);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterNamePlateTexture));
 	float plateW = 64.0f;
-	xOffsetDefault =
-	    -(2.0 * static_cast<double>(plateW) - 144.0);
 	for (i = 0; i < 2; i++) {
 		y = 10.0f + static_cast<float>(i * 0xB8);
 		y += 130.0f;
@@ -7195,21 +7185,21 @@ void CMenuPcs::DrawCharaName()
 			if ((confirmedMask & (1u << slot)) != 0) {
 				const char* const text = reinterpret_cast<const char*>(
 				    Game.m_caravanWorkArr[slot].m_name);
-				xBase = 32.0f + static_cast<float>(j * 0x90);
+				float x = 32.0f + static_cast<float>(j * 0x90);
 				float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
 				if (width / 2.0 > plateW) {
 					width += 8.0;
 					scale = static_cast<float>(width / 2.0 / plateW);
-					xBase = static_cast<float>((144.0f - width) / 2.0 + xBase);
+					x = static_cast<float>((144.0f - width) / 2.0 + x);
 				} else {
-					xBase = static_cast<float>(xOffsetDefault / 2.0 + xBase);
+					x = static_cast<float>((144.0 - 2.0 * plateW) / 2.0 + x);
 				}
 				MenuPcs.DrawRect(
-				    0, xBase, y, 64.0f, 32.0f,
+				    0, x, y, 64.0f, 32.0f,
 				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, FLOAT_803313dc);
 				MenuPcs.DrawRect(
-				    8, 64.0f * scale + xBase, y,
+				    8, 64.0f * scale + x, y,
 				                                64.0f, 32.0f, FLOAT_803313dc, FLOAT_803313dc,
 				                                scale, FLOAT_803313e8, FLOAT_803313dc);
 			}
@@ -7221,7 +7211,7 @@ void CMenuPcs::DrawCharaName()
 	font->SetShadow(1);
 	font->SetScale(0.8999999761581421f);
 	font->DrawInit();
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, FLOAT_80331458 * fade).color);
 
 	for (i = 0; i < 2; i++) {
 		y = 10.0f + static_cast<float>(i * 0xB8);

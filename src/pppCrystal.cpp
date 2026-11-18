@@ -415,8 +415,8 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
 		texH = CRYSTAL_REFRACTION_SIZE;
 	}
 	else {
-		texW = (float)indirectTex->m_width;
-		texH = (float)indirectTex->m_height;
+		texW = (float)indirectTex->GetWidth();
+		texH = (float)indirectTex->GetHeight();
 	}
 
 	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
@@ -432,7 +432,7 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
 			lightMtx, CRYSTAL_SCENE_FOVY, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
 	} else {
 		C_MTXLightPerspective(
-			lightMtx, CameraPcs.m_fov, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
+			lightMtx, CameraPcs.GetFov(), CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
 	}
 
 	GXLoadTexMtxImm(texMtx.value, 0x40, GX_MTX3x4);
@@ -443,7 +443,7 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
 	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP0, GX_COLOR_NULL);
 	_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-	GXLoadTexObj(&baseTex->m_texObj, GX_TEXMAP2);
+	GXLoadTexObj(baseTex->GetTexObj(), GX_TEXMAP2);
 	GXSetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 	_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR0A0);
 	_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_TEXC, GX_CC_RASA, GX_CC_ZERO);
@@ -459,7 +459,7 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
 	if (step->m_crystal.m_refractionMode == 1) {
 		GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
 	} else {
-		GXLoadTexObj(&indirectTex->m_texObj, GX_TEXMAP1);
+		GXLoadTexObj(indirectTex->GetTexObj(), GX_TEXMAP1);
 	}
 	GXSetNumIndStages(1);
 	GXSetIndTexOrder((GXIndTexStageID)0, (GXTexCoordID)0, (GXTexMapID)1);

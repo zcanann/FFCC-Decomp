@@ -6653,6 +6653,7 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 void CMenuPcs::CalcCharaSelect()
 {
 	int i;
+	CCaravanWork* work;
 
 	unsigned short padRepeat[4];
 	unsigned short padTrig[4];
@@ -6822,10 +6823,10 @@ void CMenuPcs::CalcCharaSelect()
 		for (i = readyMask = 0; i < 4; i++) {
 			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 			if (entry.m_connected != 0) {
-				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
+				work = &Game.m_caravanWorkArr[entry.m_currentSlot];
 				readyMask |= 1 << i;
 				connectedCount++;
-				if (entry.m_confirmed != 0 && work.m_caravanLocalFlags != 0) {
+				if (entry.m_confirmed != 0 && work->m_caravanLocalFlags != 0) {
 					locallyConfirmedCount++;
 				}
 			}
@@ -6915,8 +6916,8 @@ void CMenuPcs::CalcCharaSelect()
 
 			if (((*pRep) & 0x006F) == 0) {
 				const int trig = (*pTrig);
-				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
-				if ((trig & 0x0100) != 0 && work.m_shopBusyFlag != 0) {
+				work = &Game.m_caravanWorkArr[entry.m_currentSlot];
+				if ((trig & 0x0100) != 0 && work->m_shopBusyFlag != 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else if ((trig & 0x0100) != 0 && entry.m_confirmed == 0) {
 					const int charaId = m_wm.m_charaModelData[currentSlot].m_modelNo;
@@ -6951,7 +6952,7 @@ void CMenuPcs::CalcCharaSelect()
 							}
 						}
 						if (other >= 4) {
-							if (work.m_caravanLocalFlags != 0) {
+							if (work->m_caravanLocalFlags != 0) {
 								if (Game.m_gameWork.m_menuStageMode != 0) {
 									Sound.PlaySe(4, 0x40, 0x7F, 0);
 								} else if (connectedCount == locallyConfirmedCount + 1) {
@@ -7096,15 +7097,8 @@ void CMenuPcs::DrawCharaName()
 	unsigned int activeMask;
 	unsigned int confirmedMask;
 	CFont* font;
-	float xBase;
-#ifdef VERSION_GCCJGC
-	double xOffsetDefault;
-#endif
-	float alphaF;
 	float y;
-#ifndef VERSION_GCCJGC
-	double xOffsetDefault;
-#endif
+	float xBase;
 	float fade;
 #ifdef VERSION_GCCJGC
 	static const char* STR_TBL[] = {"\x82\xC8\x82\xB5", "\x83\x4C\x83\x83\x83\x89\x83\x81\x83\x43\x83\x4E\x92\x86"};
@@ -7172,17 +7166,14 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	DrawInit();
 
-	alphaF = FLOAT_80331458 * fade;
 	GXColor shade;
 	shade.r = 0xFF;
 	shade.g = 0xFF;
 	shade.b = 0xFF;
-	shade.a = static_cast<unsigned char>(static_cast<int>(alphaF));
+	shade.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fade));
 	GXSetChanMatColor(GX_COLOR0A0, shade);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kCharacterNamePlateTexture));
 	float plateW = 64.0f;
-	xOffsetDefault =
-	    -(2.0 * static_cast<double>(plateW) - 144.0);
 	for (i = 0; i < 2; i++) {
 		y = 10.0f + static_cast<float>(i * 0xB8);
 		y += 130.0f;
@@ -7194,21 +7185,21 @@ void CMenuPcs::DrawCharaName()
 			if ((confirmedMask & (1u << slot)) != 0) {
 				const char* const text = reinterpret_cast<const char*>(
 				    Game.m_caravanWorkArr[slot].m_name);
-				xBase = 32.0f + static_cast<float>(j * 0x90);
+				float x = 32.0f + static_cast<float>(j * 0x90);
 				float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
 				if (width / 2.0 > plateW) {
 					width += 8.0;
 					scale = static_cast<float>(width / 2.0 / plateW);
-					xBase = static_cast<float>((144.0f - width) / 2.0 + xBase);
+					x = static_cast<float>((144.0f - width) / 2.0 + x);
 				} else {
-					xBase = static_cast<float>(xOffsetDefault / 2.0 + xBase);
+					x = static_cast<float>((144.0 - 2.0 * plateW) / 2.0 + x);
 				}
 				MenuPcs.DrawRect(
-				    0, xBase, y, 64.0f, 32.0f,
+				    0, x, y, 64.0f, 32.0f,
 				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, FLOAT_803313dc);
 				MenuPcs.DrawRect(
-				    8, 64.0f * scale + xBase, y,
+				    8, 64.0f * scale + x, y,
 				                                64.0f, 32.0f, FLOAT_803313dc, FLOAT_803313dc,
 				                                scale, FLOAT_803313e8, FLOAT_803313dc);
 			}
@@ -7220,7 +7211,7 @@ void CMenuPcs::DrawCharaName()
 	font->SetShadow(1);
 	font->SetScale(0.8999999761581421f);
 	font->DrawInit();
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaF).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, FLOAT_80331458 * fade).color);
 
 	for (i = 0; i < 2; i++) {
 		y = 10.0f + static_cast<float>(i * 0xB8);
@@ -7850,7 +7841,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	GbaCMakeInfo info;
 	GbaQue.GetCMakeInfo(channel, &info);
 
-	const int caravanSlot = static_cast<int>(static_cast<signed char>(info.m_playerSlot));
+	int caravanSlot = info.m_playerSlot;
 	const int gender = (info.m_charaType >> 7) ? 1 : 0;
 	int modelNo = GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, gender);
 
@@ -7866,7 +7857,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
 	caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
 	caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
-	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
+	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) ? 1 : 0);
 	caravanWork.m_id = static_cast<unsigned short>(
 	    GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, (info.m_charaType >> 7) ? 1 : 0));
 	for (int favorite = 0; favorite < 8; favorite++) {
@@ -8504,7 +8495,6 @@ void CMenuPcs::DrawMCList()
 	int slot;
 	int slotOff;
 	short state = m_wmWorldState->m_mainState;
-	double mapX;
 	float digitX;
 
 	if ((state == 2 || state == 3) && m_wmWorldState->m_subState != 0) {
@@ -8627,20 +8617,14 @@ nextListEntry:
 		return;
 	}
 
-	double rowSlope = 88.0;
 	float mapOffsetX = 496.0f;
-	double rowBaseD;
 	float slotY;
-	double rowSlopeD;
-	mapX = 8.0 + static_cast<double>(mapOffsetX);
 #ifndef VERSION_GCCJGC
 	const int language = Game.m_gameWork.GetLanguage();
 #endif
-	rowSlopeD = rowSlope;
-	rowBaseD = 24.0;
 	for (slot = 0; slot < kMcListCount; slot++) {
 		const McListInfo* const slotData = &m_wmCharaState[slot];
-		slotY = static_cast<float>(rowSlopeD * static_cast<double>(slot) + rowBaseD);
+		slotY = static_cast<float>(88.0 * static_cast<double>(slot) + 24.0);
 		if (slotData->m_isBroken == 0 && slotData->m_hasData != 0) {
 			float capX;
 			float rowY = 40.0f + slotY;
@@ -8880,7 +8864,7 @@ nextListEntry:
 			const unsigned char* mapInfo = s_LocTex[slotData->m_scriptGlobalTime];
 			SetTextureLoc(mapInfo[0]);
 			MenuPcs.DrawRect(0,
-			         static_cast<float>(mapX),
+			         static_cast<float>(8.0 + static_cast<double>(mapOffsetX)),
 			         static_cast<float>(8.0 + static_cast<double>(slotY)),
 			         128.0f, 128.0f,
 			         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[1])) << 7),
@@ -9376,8 +9360,8 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 
 	float u1;
 	float v1;
-	float u0 = tx;
 	float v0 = ty;
+	float u0 = tx;
 
 	if ((flags & 8) != 0) {
 		u1 = u0 + FLOAT_80331434;
@@ -9405,21 +9389,23 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 	}
 
 	Vec out[4];
+	float x1 = x + wS;
+	float y1 = y + h;
 
 	out[0].x = x;
 	out[0].y = y;
 	out[0].z = z;
 
-	out[1].x = x + wS;
+	out[1].x = x1;
 	out[1].y = y;
 	out[1].z = z;
 
 	out[2].x = x;
-	out[2].y = y + h;
+	out[2].y = y1;
 	out[2].z = z;
 
-	out[3].x = x + wS;
-	out[3].y = y + h;
+	out[3].x = x1;
+	out[3].y = y1;
 	out[3].z = z;
 
 	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
@@ -9440,6 +9426,7 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		}
 		GXTexCoord2f32(uu, vv);
 	}
+	GXEnd();
 }
 
 /*

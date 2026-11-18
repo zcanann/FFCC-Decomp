@@ -998,14 +998,19 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     int usedSize = 0;
     int usedCount = 0;
     int freeCount = 0;
+    int i;
+    int blockTail;
+    int showFree;
+    int showUsed;
+    int useFlag;
+    int freeFlag;
+    int size;
+    int top;
 
     if (m_allocationMode == 2) {
-        int showFree = flag & 1;
-        int blockTail;
-        int i;
-        int showUsed = flag & 2;
-        int size;
-        int top = m_heapTop;
+        showFree = flag & 1;
+        showUsed = flag & 2;
+        top = m_heapTop;
 
         for (i = 0; i <= m_blockCount; i++, node++) {
             blockTail = (m_blockCount == i) ? m_heapBottom : reinterpret_cast<int>(node->m_prev);
@@ -1036,9 +1041,11 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             }
         }
     } else {
+        useFlag = flag & 2;
+        freeFlag = flag & 1;
         while ((node->m_flags & 2) == 0) {
             if ((group == static_cast<unsigned long>(-1)) || (group == node->m_defaultParam)) {
-                if ((((node->m_flags & 4) != 0) && ((flag & 2) != 0)) || (((node->m_flags & 4) == 0) && ((flag & 1) != 0))) {
+                if ((((node->m_flags & 4) != 0) && (useFlag != 0)) || (((node->m_flags & 4) == 0) && (freeFlag != 0))) {
                     int line = ((node->m_flags & 4) != 0) ? node->m_line : 0;
                     const char* source = ((node->m_flags & 4) != 0) ? node->m_source : "";
                     int level = ((node->m_flags & 4) != 0) ? node->m_level : 0;

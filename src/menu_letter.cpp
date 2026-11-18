@@ -27,7 +27,7 @@ typedef unsigned short u16;
 #endif
 
 static short s_SelLetter = 0;
-static unsigned char s_OpenClose = 0;
+static char s_OpenClose = 0;
 static signed char s_ReplyMax = 0;
 static signed char s_ReplyPos = 0;
 static signed char s_Attach = 0;
@@ -233,9 +233,9 @@ inline void CMenuPcs::LetterInit0()
 	entry->startFrame = 0;
 	entry->duration = 10;
 
-	int count = m_singleFadeState->count;
+	index = m_singleFadeState->count;
 	entry = m_singleFadeState->entries;
-	for (int i = 0; i < count; ++i, ++entry) {
+	for (int i = 0; i < index; ++i, ++entry) {
 		entry->elapsed = 0;
 		entry->alpha = 1.0f;
 	}
@@ -426,7 +426,7 @@ int CMenuPcs::LetterCtrl()
 				if (action == 1) {
 					state->mode = 2;
 				} else if (action == 2) {
-					state->choiceCursor = static_cast<u16>(done);
+					state->choiceCursor = 0;
 					m_letterMenuState->mode = 3;
 				}
 				m_letterMenuState->step = 0;
@@ -1147,20 +1147,25 @@ void CMenuPcs::LetterDraw()
  */
 void CMenuPcs::LetterListDraw()
 {
-	int row;
-	SingleFadeEntry* panels = m_singleFadeState->entries;
 	CFont* font;
+	float y;
+	int subjectNo;
 	CCaravanWork::CLetterWork* letter;
-	int iconY;
+	SingleFadeEntry* panels = m_singleFadeState->entries;
+	int tlut;
+	char* npcName;
+	int iconTopRow;
+	int row;
+	char* menuTitle;
+	int pageMark;
+	int topRow;
+	s16 topVal;
 	CCaravanWork* caravanWork;
 
-	if ((static_cast<char>(s_OpenClose) != 0) && (static_cast<char>(m_singleMenuCtrlResetFlag) == '\0')) {
-		DrawSingleCrescent(1.0f,
-			static_cast<float>(1.0 - static_cast<double>(panels[0].alpha)));
-		DrawSingleStat(
-			static_cast<float>(1.0 - static_cast<double>(panels[0].alpha)));
-		DrawSingleHelpWim(
-			static_cast<float>(1.0 - static_cast<double>(panels[0].alpha)));
+	if ((s_OpenClose != 0) && (m_singleMenuCtrlResetFlag == 0)) {
+		DrawSingleCrescent(1.0f, static_cast<float>(1.0 - panels[0].alpha));
+		DrawSingleStat(static_cast<float>(1.0 - panels[0].alpha));
+		DrawSingleHelpWim(static_cast<float>(1.0 - panels[0].alpha));
 	}
 
 	if (m_singleFadeState->count == 1) {
@@ -1177,28 +1182,21 @@ void CMenuPcs::LetterListDraw()
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * panels[1].alpha)));
 
-	char* menuTitle = GetMenuStr(0x1D);
+	menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((640.0f - font->GetWidth(menuTitle)) / 2.0);
 	DrawShadowFont(font, menuTitle, titleX, 40.0f, 0x18, 0x12);
 
-	if (static_cast<double>(panels[1].alpha) < 1.0) {
+	if (panels[1].alpha < 1.0) {
 		return;
 	}
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
 	caravanWork = Game.m_scriptFoodBase[0];
+	topRow = m_letterMenuState->topIndex;
+	for (row = 0; row < 9 && topRow + row < caravanWork->m_letterCount; ++row) {
+		letter = &caravanWork->m_letters[topRow + row];
 
-	int y = 0x60;
-	int pageMark;
-	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
-	int letterIndex;
-	float yf;
-	for (row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
-		letter = &caravanWork->m_letters[letterIndex];
-		yf = static_cast<float>(y);
-
-		int tlut;
 		if (!letter->m_opened) {
 			tlut = 9;
 		} else if (letter->m_replySent) {
@@ -1209,57 +1207,55 @@ void CMenuPcs::LetterListDraw()
 
 		font->SetTlut(tlut);
 
-		char* subject = Game.GetLetterSubject(letter->m_messageType);
+		subjectNo = letter->m_messageType;
+		y = static_cast<float>(row * 32 + 96);
+		FFCC_ASSERT(0 <= subjectNo && subjectNo < Game.m_cFlatDataArr[1].GetTable(5).m_numEntries);
+		char* subject = Game.GetLetterSubject(subjectNo);
 		font->SetPosX(64.0f);
 #ifdef VERSION_GCCJGC
-		font->SetPosY(yf);
+		font->SetPosY(y);
 #else
-		font->SetPosY(yf - 4.0f);
+		font->SetPosY(y - 4.0f);
 #endif
 		font->Draw(subject);
 
-		char* npcName = Game.m_cFlatDataArr[1].GetTable(2).m_strings[letter->m_senderId];
+		npcName = Game.GetNPCName(letter->m_senderId);
 		font->SetPosX(352.0f);
 #ifdef VERSION_GCCJGC
-		font->SetPosY(static_cast<float>(y));
+		font->SetPosY(static_cast<float>(row * 32 + 96));
 #else
-		font->SetPosY(static_cast<float>(y) - 4.0f);
+		font->SetPosY(static_cast<float>(row * 32 + 96) - 4.0f);
 #endif
 		font->Draw(npcName);
-
-		y += 0x20;
 	}
 
 	DrawInit();
 
-	s16 topVal = m_letterMenuState->topIndex;
+	topVal = m_letterMenuState->topIndex;
 	pageMark = 0;
 	if (topVal != 0) {
 		pageMark |= 1;
 	}
 	if (topVal + 9 < caravanWork->m_letterCount) {
-		pageMark = pageMark | 2;
+		pageMark |= 2;
 	}
 
 	if (pageMark != 0) {
 		LetterDrawPageMark(pageMark);
 	}
 
-	iconY = 0x5B;
 	float iconXf = 536.0f;
 	const int iconX = static_cast<int>(iconXf);
-	const int iconTopRow = static_cast<int>(m_letterMenuState->topIndex);
-	int iconLetterIndex;
-	for (row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
-		if (caravanWork->m_letters[iconLetterIndex].m_attachValue != 0) {
-			DrawSingleIcon(caravanWork->m_letters[iconLetterIndex].m_attachmentClaimed ? 0x27 : 0x26, iconX, static_cast<int>(static_cast<float>(iconY)), 1.0f, 1, 1.0f);
+	iconTopRow = m_letterMenuState->topIndex;
+	for (row = 0; row < 9 && iconTopRow + row < caravanWork->m_letterCount; ++row) {
+		if (caravanWork->m_letters[iconTopRow + row].m_attachValue != 0) {
+			DrawSingleIcon(caravanWork->m_letters[iconTopRow + row].m_attachmentClaimed ? 0x27 : 0x26, iconX, static_cast<int>(static_cast<float>(row * 32 + 91)), 1.0f, 1, 1.0f);
 		}
-		iconY += 0x20;
 	}
 
 	float cursorX = 32.0f;
 	cursorX += static_cast<float>(static_cast<int>(System.GetCounter()) % 8);
-	DrawCursor(static_cast<int>(cursorX), static_cast<int>(static_cast<float>(m_letterMenuState->listCursor * 0x20 + 0x60)), 1.0f);
+	DrawCursor(static_cast<int>(cursorX), static_cast<int>(static_cast<float>(m_letterMenuState->listCursor * 32 + 96)), 1.0f);
 }
 
 /*
@@ -1273,9 +1269,10 @@ void CMenuPcs::LetterListDraw()
  */
 void CMenuPcs::LetterMessDraw()
 {
-	CCaravanWork* caravanWork;
 	s16 mode;
+	char* srcText;
 	SingleFadeEntry* panel;
+	CCaravanWork* caravanWork;
 	float x0, y0;
 	float x1, y1;
 	float u, v;
@@ -1284,7 +1281,7 @@ void CMenuPcs::LetterMessDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	caravanWork = GetLetterCaravanWork();
+	caravanWork = Game.m_scriptFoodBase[0];
 	panel = m_singleFadeState->entries;
 	mode = m_letterMenuState->previousMode;
 
@@ -1313,7 +1310,7 @@ void CMenuPcs::LetterMessDraw()
 	}
 
 	SingleFadeState* animState = m_singleFadeState;
-	CFont* font = m_fonts[0];
+	CFont* font = GetFont22();
 #ifdef VERSION_GCCJGC
 	font->SetMargin(2.0f);
 	font->SetShadow(0);
@@ -1329,7 +1326,7 @@ void CMenuPcs::LetterMessDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * animState->entries[0].alpha)));
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
-	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x535, 0x52F, 0x49B)) char[kLetterTextScratchSize];
+	srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x535, 0x52F, 0x49B)) char[kLetterTextScratchSize];
 	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x537, 0x531, 0x49D)) char[kLetterTextScratchSize];
 
 	memset(srcText, 0, kLetterTextScratchSize);
@@ -1345,6 +1342,7 @@ void CMenuPcs::LetterMessDraw()
 	int y;
 	int i = 0;
 	int itemSel;
+	int cursorOfs;
 #ifdef VERSION_GCCJGC
 	y = 0x60;
 #else
@@ -1423,9 +1421,9 @@ void CMenuPcs::LetterMessDraw()
 			if (mode == 4) {
 				x0 += 8.0f;
 			}
-			itemSel = m_letterMenuState->choiceCursor;
-			itemSel *= SingWinMessHeight();
-			y0 = static_cast<float>(m_menuWindowInfo->y + 0x20 + itemSel);
+			cursorOfs = m_letterMenuState->choiceCursor;
+			cursorOfs *= SingWinMessHeight();
+			y0 = static_cast<float>(m_menuWindowInfo->y + 0x20 + cursorOfs);
 		}
 
 		int frameAnim = static_cast<int>(System.GetCounter()) % 8;
@@ -1484,11 +1482,14 @@ int CMenuPcs::LetterCtrlCur()
 			if ((cursor < 8) && (cursor < letterCount - 1)) {
 				m_letterMenuState->listCursor = cursor + 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
-			} else if (cursor + m_letterMenuState->topIndex < letterCount - 1) {
-				m_letterMenuState->topIndex = m_letterMenuState->topIndex + 1;
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
-				Sound.PlaySe(4, 0x40, 0x7F, 0);
+				cursor = m_letterMenuState->topIndex + cursor;
+				if (cursor < letterCount - 1) {
+					m_letterMenuState->topIndex = m_letterMenuState->topIndex + 1;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				}
 			}
 		}
 
@@ -1632,7 +1633,7 @@ int CMenuPcs::LetterCtrlCur()
 			if (curReply >= maxReply - 1) {
 				m_letterMenuState->action = -1;
 			} else {
-				s_ReplyPos = static_cast<u8>(curReply);
+				s_ReplyPos = curReply;
 			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x65E, 0x658, 0x5C0)) char[kLetterTextScratchSize];
 			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), MENU_LETTER_LINE(0x660, 0x65A, 0x5C2)) char[kLetterTextScratchSize];
 			memset(srcText, 0, kLetterTextScratchSize);
@@ -1776,35 +1777,32 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 {
 	unsigned long flip;
 	int i;
-	float xw;
-	float yh;
-	float x0;
-	float y0;
-	float h;
-	float x1;
+	float barY;
+	float barX;
+	float segH;
+	float innerW;
+	float edgeY;
+	float px;
+	float py;
 	float w;
-	float y1;
 	float innerX;
+	float x;
 
-	double decoX1;
-	float barY1;
 	if (openRatio <= 0.0f) {
 		return;
 	}
 
-	w = 480.0f * openRatio;
-	float left = 288.0f - static_cast<float>(w / 2.0);
-	w = 64.0 + w;
-	float top = 72.0f;
-	int leftPx = static_cast<int>(static_cast<double>(left) - 0.5);
-	int topPx = static_cast<int>(static_cast<double>(top) - 0.5);
-	int widthPx = static_cast<int>(w - 1.0);
-	float height = 336.0f;
-	int heightPx = static_cast<int>(static_cast<double>(height) - 1.0);
-	x0 = static_cast<float>(leftPx);
-	y0 = static_cast<float>(topPx);
-	w = static_cast<float>(widthPx);
-	h = static_cast<float>(heightPx);
+	float left = 480.0f * openRatio;
+	float width = left;
+	left = left / 2.0;
+	left = 288.0f - left;
+	width = 64.0 + width;
+	float y = 72.0f;
+	float h = 336.0f;
+	x = static_cast<float>(static_cast<int>(left - 0.5));
+	y = static_cast<float>(static_cast<int>(y - 0.5));
+	w = static_cast<float>(static_cast<int>(width - 1.0));
+	h = static_cast<float>(static_cast<int>(h - 1.0));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
@@ -1813,11 +1811,6 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	white.b = 0xFF;
 	white.a = 0xFF;
 	GXSetChanMatColor(GX_COLOR0A0, white);
-
-	xw = x0 + w;
-	yh = y0 + h;
-	x1 = xw - 32.0f;
-	y1 = yh - 32.0f;
 
 	for (i = 0; i < 4; ++i) {
 		int tex;
@@ -1832,125 +1825,113 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 			tex = kLetterTexBase + 0x11;
 		}
 
-		float x;
-		float y;
 		if ((i & 1) != 0) {
-			x = x1;
+			px = (x + w) - 32.0f;
 			if (i == 1) {
 				flip |= 8;
 			}
 		} else {
-			x = x0;
+			px = x;
 		}
 		if ((i & 2) != 0) {
-			y = y1;
+			py = (y + h) - 32.0f;
 		} else {
-			y = y0;
+			py = y;
 		}
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(
-		    flip, x, y, 32.0f, 32.0f,
+		    flip, px, py, 32.0f, 32.0f,
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 
-	innerX = 32.0f + x0;
-	float x;
-	double innerW = w - 64.0;
-	float innerWf = static_cast<float>(innerW);
-	float y = y0;
+	innerX = 32.0f + x;
+	innerW = static_cast<float>(w - 64.0);
+	edgeY = y;
 	for (i = 0; i < 2; ++i) {
 		int tex = kLetterTexBase + 0xD;
 		if (i != 0) {
 			tex = kLetterTexBase + 0x10;
 		}
 		if (i != 0) {
-			y = y1;
+			edgeY = (y + h) - 32.0f;
 		}
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(
-		    0, innerX, y, innerWf, 32.0f,
+		    0, innerX, edgeY, innerW, 32.0f,
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0xE));
-	float innerY = 32.0f + y0;
-	double innerH = h - 64.0;
-	x = x0;
-	float innerHf = static_cast<float>(innerH);
+	float innerY = 32.0f + y;
+	px = x;
+	float innerH = static_cast<float>(h - 64.0);
 	for (i = 0; i < 2; ++i) {
 		flip = 0;
 		if (i != 0) {
-			x = x1;
+			px = (x + w) - 32.0f;
 			flip |= 8;
 		}
 		MenuPcs.DrawRect(
-		    flip, x, innerY, 32.0f, innerHf,
+		    flip, px, innerY, 32.0f, innerH,
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x12));
 	MenuPcs.DrawRect(
-	    flip, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH),
+	    flip, innerX, innerY, static_cast<float>(w - 64.0), static_cast<float>(h - 64.0),
 	    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x13));
-	float decoX = xw - 16.0f;
-	decoX1 = 8.0 + decoX;
-	double decoY1 = 8.0 + (yh - 24.0f);
 	for (i = 0; i < 4; ++i) {
 		flip = 0;
-		float dx;
-		float dy;
 		if ((i & 1) != 0) {
-			dx = static_cast<float>(decoX1);
+			px = static_cast<float>(8.0 + ((x + w) - 16.0f));
 		} else {
-			dx = x0 - 8.0f;
+			px = x - 8.0f;
 		}
 		if ((i & 2) != 0) {
-			dy = static_cast<float>(decoY1);
+			py = static_cast<float>(8.0 + ((y + h) - 24.0f));
 			flip |= 4;
 		} else {
-			dy = static_cast<float>(y0 - 8.0);
+			py = static_cast<float>(y - 8.0);
 		}
 		MenuPcs.DrawRect(
-		    flip, dx, dy, 16.0f, 24.0f,
+		    flip, px, py, 16.0f, 24.0f,
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x14));
-	float barX = x0 - 8.0f;
-	float barX1 = 8.0f + decoX;
-	float barY0 = static_cast<float>((24.0 + y0) - 8.0);
-	barY1 = barY0 + static_cast<float>(h - 32.0);
+	barX = x - 8.0f;
+	barY = static_cast<float>((24.0 + y) - 8.0);
 	for (i = 0; i < 2; ++i) {
 		if (i != 0) {
-			barX = barX1;
+			barX = 8.0f + ((x + w) - 16.0f);
 		}
-		float by = barY0;
-		while (by < barY1) {
-			float seg = barY1 - by;
-			if (seg >= 24.0) {
-				seg = 24.0f;
+		float segY = barY;
+		while (segY < barY + static_cast<float>(h - 32.0)) {
+			segH = (barY + static_cast<float>(h - 32.0)) - segY;
+			if (segH >= 24.0) {
+				segH = 24.0f;
 			}
 			MenuPcs.DrawRect(
-			    0, barX, by, 16.0f, seg,
+			    0, barX, segY, 16.0f, segH,
 			    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-			by = by + seg;
+			segY += segH;
 		}
 	}
 
 	if (!(openRatio < 1.0)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x1));
-		x = x0 - 32.0f;
-		y = y0 - 16.0f;
+		px = x - 32.0f;
+		py = y - 16.0f;
 		MenuPcs.DrawRect(
-		    0, x, y,
+		    0, px, py,
 		    56.0f, 88.0f, 184.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-		x = xw - 152.0f;
-		y = yh - 112.0f;
+		px = (x + w) - 152.0f;
+		py = (y + h) - 112.0f;
 		MenuPcs.DrawRect(
-		    0, x, y,
+		    0, px, py,
 		    184.0f, 144.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }
@@ -1986,16 +1967,16 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::LetterDrawPageMark(int pageMark)
+void CMenuPcs::LetterDrawPageMark(int pageMark)
 {
 	float markX = 592.0f;
 	float markY = 160.0f;
 	const int absPhase = abs(static_cast<int>(System.GetCounter()) % 0x14 - 10);
-	const float markScale = static_cast<float>(0.7 + 0.03 * static_cast<double>(absPhase));
+	const float markScale = static_cast<float>(0.7 + 0.03 * absPhase);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	const int alpha = static_cast<int>(255.0f * static_cast<float>(0.5 + 0.05 * static_cast<double>(absPhase)));
+	const int alpha = static_cast<int>(255.0f * static_cast<float>(0.5 + 0.05 * absPhase));
 	GXColor markColor;
 	markColor.r = 0xFF;
 	markColor.g = 0xFF;

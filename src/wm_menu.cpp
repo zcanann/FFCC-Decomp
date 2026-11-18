@@ -9374,8 +9374,8 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 
 	float u1;
 	float v1;
-	float u0 = tx;
 	float v0 = ty;
+	float u0 = tx;
 
 	if ((flags & 8) != 0) {
 		u1 = u0 + FLOAT_80331434;
@@ -9403,21 +9403,23 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 	}
 
 	Vec out[4];
+	float x1 = x + wS;
+	float y1 = y + h;
 
 	out[0].x = x;
 	out[0].y = y;
 	out[0].z = z;
 
-	out[1].x = x + wS;
+	out[1].x = x1;
 	out[1].y = y;
 	out[1].z = z;
 
 	out[2].x = x;
-	out[2].y = y + h;
+	out[2].y = y1;
 	out[2].z = z;
 
-	out[3].x = x + wS;
-	out[3].y = y + h;
+	out[3].x = x1;
+	out[3].y = y1;
 	out[3].z = z;
 
 	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
@@ -9438,6 +9440,7 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		}
 		GXTexCoord2f32(uu, vv);
 	}
+	GXEnd();
 }
 
 /*

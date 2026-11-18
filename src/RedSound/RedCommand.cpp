@@ -855,6 +855,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_tracks = track;
 
 	RedMusicTrackBlock* musicTrackBlock;
+	int musicTrackBlockSize = 0;
 	unsigned int trackNo;
 	if (musicHead->m_reverbKind != 0) {
 		trackNo = ((int)musicHead->m_reverbKind - 1U) & REDSOUND_REVERB_MODE_INDEX_MASK;
@@ -881,7 +882,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	trackNo = 0;
 	track = music->m_tracks;
 	do {
-		int musicTrackBlockSize = RedMusicTrackBlockGetSize(musicTrackBlock);
+		musicTrackBlockSize = RedMusicTrackBlockGetSize(musicTrackBlock);
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;
 		musicTrackBlock = RedMusicTrackBlockGetCommandBlock(musicTrackBlock);

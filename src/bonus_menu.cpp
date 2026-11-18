@@ -23,6 +23,11 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
+inline int CSystem::GetErrorLevel()
+{
+	return m_execParam;
+}
+
 #if defined(VERSION_GCCJGC)
 #define BONUS_LINE(line, usLine, jpLine) (jpLine)
 #elif defined(VERSION_GCCE01)
@@ -593,7 +598,7 @@ void CMenuPcs::drawBonus()
 	Util.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
 
 #ifndef VERSION_GCCJGC
-	if ((unsigned int)System.m_execParam >= 1) {
+	if (System.GetErrorLevel() >= 1U) {
 		System.Printf("draw Bonus (%d)\n", (int)this->m_bonusState->m_phase);
 	}
 #endif
@@ -1209,7 +1214,7 @@ void CMenuPcs::DrawResultOpenAnim()
 			for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 				sprite = &m_bonusAnim->sprites[i];
 				if (sprite->kind == -1) {
-					font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
+					font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)));
 
 					int partyIndex = modelIndex % activePartyCount;
 					int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
@@ -1543,7 +1548,7 @@ void CMenuPcs::DrawResultCountAnim()
 	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];
 		if (sprite->kind == -1) {
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
 			int partyIndex = modelIndex % activePartyCount;
 			int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
@@ -2019,7 +2024,7 @@ void CMenuPcs::DrawResultCloseAnim()
 		for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 			sprite = &m_bonusAnim->sprites[i];
 			if (sprite->kind == -1) {
-				font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)));
 
 				int partyIndex = modelIndex % activePartyCount;
 				int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
@@ -2091,13 +2096,12 @@ void CMenuPcs::CalcSelectOpenAnim()
 #endif
 	int partySlot;
 	int idx;
-	int i;
 	CMenuPcs::Sprt2* sprite;
 	CMenuPcs::Sprt2* artiBase;
+	int i;
 	CMenuPcs::Sprt2* artiFrame;
 	CMenuPcs::Sprt2* framePanel;
 	int work;
-	CCharaPcs::CHandle* handle;
 	int frame;
 	int doneCount;
 	int activePartyCount;
@@ -2386,6 +2390,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 	}
 
 	Mtx scaleMtx;
+	CCharaPcs::CHandle* handle;
 	Mtx rotZMtx;
 	Vec srcVec;
 	Vec dstVec;
@@ -2432,13 +2437,13 @@ void CMenuPcs::CalcSelectOpenAnim()
 					angle = (float)(45.0 * (double)work);
 				} else {
 					int last = sprite->timer - 1;
-					float step;
+					float range;
 					if (last <= fcvIndex) {
-						step = (s_AnimX[2] - s_AnimX[1]) / (float)fcvIndex;
-						srcVec.x = s_AnimX[2] - step * (float)last;
+						range = s_AnimX[2] - s_AnimX[1];
+						srcVec.x = s_AnimX[2] - (float)last * (range / (float)fcvIndex);
 					} else {
-						step = (s_AnimX[1] - s_AnimX[0]) / ((float)phase - (float)fcvIndex);
-						srcVec.x = s_AnimX[1] - step * (float)(last - fcvIndex);
+						range = s_AnimX[1] - s_AnimX[0];
+						srcVec.x = s_AnimX[1] - (range / ((float)phase - (float)fcvIndex)) * (float)(last - fcvIndex);
 					}
 					angle = (float)((-90.0) + (double)(rate * (float)last));
 				}
@@ -2494,17 +2499,19 @@ void CMenuPcs::DrawSelectOpenAnim()
 		return;
 	}
 
-	int idx;
-	CMenuPcs::Sprt2* sprite;
-	int activePartyCount;
+	CFont* font;
 	int doubleCount;
 	int modelIndex;
 	int textIndex;
 	int i;
 	int kind;
 	int lastKind;
+	int k;
 	float lineY;
 	CMenuPcs::Sprt2* artiSprite;
+	int activePartyCount;
+	int idx;
+	CMenuPcs::Sprt2* sprite;
 
 	activePartyCount = s_Rinfo->m_partyCount;
 
@@ -2590,7 +2597,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	DrawBonusChkMark(artiSprite->alpha);
 
 	DrawInit();
-	CFont* font = this->m_fonts[0];
+	font = GetFont22();
 	font->SetMargin(1.0f);
 	font->SetShadow(1);
 	font->SetScale(0.7300000190734863f);
@@ -2598,43 +2605,40 @@ void CMenuPcs::DrawSelectOpenAnim()
 	font->DrawInit();
 
 	char text[256];
-	{
-		int i;
-		for (i = textIndex = 0; i < (int)m_bonusAnim->header.count && textIndex < activePartyCount; i++) {
-			sprite = &m_bonusAnim->sprites[i];
-			if (sprite->kind != -1) {
-				continue;
-			}
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
-
-			for (int j = 0; j < activePartyCount; j++) {
-				if (textIndex == s_Rinfo->m_party[j].m_rank) {
-					idx = j;
-					break;
-				}
-			}
-			int partySlot = s_Rinfo->m_party[idx].m_partySlot;
-			if (textIndex < activePartyCount) {
-				CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
-				strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
-			}
-
-			float x = (float)sprite->x + sprite->motionX;
-			float y = (float)sprite->y + sprite->motionY;
-#ifndef VERSION_GCCJGC
-			if (textIndex < activePartyCount) {
-				y -= 4.0f;
-			}
-#endif
-			font->SetPosX(x);
-#ifdef VERSION_GCCJGC
-			font->SetPosY(y);
-#else
-			font->SetPosY(y - 4.0f);
-#endif
-			font->Draw(text);
-			textIndex++;
+	for (k = textIndex = 0; k < (int)m_bonusAnim->header.count && textIndex < activePartyCount; k++) {
+		sprite = &m_bonusAnim->sprites[k];
+		if (sprite->kind != -1) {
+			continue;
 		}
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)));
+
+		for (int j = 0; j < activePartyCount; j++) {
+			if (textIndex == s_Rinfo->m_party[j].m_rank) {
+				idx = j;
+				break;
+			}
+		}
+		int partySlot = s_Rinfo->m_party[idx].m_partySlot;
+		if (textIndex < activePartyCount) {
+			CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
+			strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
+		}
+
+		float x = (float)sprite->x + sprite->motionX;
+		float y = (float)sprite->y + sprite->motionY;
+#ifndef VERSION_GCCJGC
+		if (textIndex < activePartyCount) {
+			y -= 4.0f;
+		}
+#endif
+		font->SetPosX(x);
+#ifdef VERSION_GCCJGC
+		font->SetPosY(y);
+#else
+		font->SetPosY(y - 4.0f);
+#endif
+		font->Draw(text);
+		textIndex++;
 	}
 
 	if (this->m_bonusState->m_phase == 4
@@ -2648,7 +2652,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 			}
 		}
 
-		font = this->m_fonts[1];
+		font = GetFontWorld();
 		font->SetMargin(1.0f);
 		font->SetShadow(0);
 #ifdef VERSION_GCCP01
@@ -2658,7 +2662,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font->SetScale(0.9f);
 #endif
 		font->DrawInit();
-		font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 
 		float centerY = (float)((double)sprite->y + (double)(float)sprite->h / 2.0);
 		float centerX = (float)((double)sprite->x + (double)(float)sprite->w / 2.0);
@@ -2673,12 +2677,12 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font->Draw(title);
 
 		char* source = new (MenuPcs.m_menuStage, "bonus_menu.cpp", kSourceAllocLine) char[0x200];
-		if ((source == 0) && ((unsigned int)System.m_execParam >= 1)) {
+		if ((source == 0) && (System.GetErrorLevel() >= 1U)) {
 			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", kSourceErrorLine);
 		}
 		memset(source, 0, 0x200);
 		char* converted = new (MenuPcs.m_menuStage, "bonus_menu.cpp", kConvertedAllocLine) char[0x200];
-		if ((converted == 0) && ((unsigned int)System.m_execParam >= 1)) {
+		if ((converted == 0) && (System.GetErrorLevel() >= 1U)) {
 			System.Printf("%s(%d): Error: memory allocation error\n", "bonus_menu.cpp", kConvertedErrorLine);
 		}
 		memset(converted, 0, 0x200);

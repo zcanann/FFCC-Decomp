@@ -214,7 +214,7 @@ extern RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_
 extern u32 t_TonePitch[REDSOUND_NOTES_PER_OCTAVE];
 #define RedTonePitchGet(index) (t_TonePitch[(index)])
 extern int t_FinePitch[REDSOUND_PITCH_FINE_COUNT];
-#define RedFinePitchGet(index) (t_FinePitch[(index)])
+#define RedFinePitchGet(offset) (*(int*)((char*)t_FinePitch + (offset)))
 extern int t_KeySignatureIndex[REDSOUND_KEY_SIGNATURE_INDEX_COUNT];
 #define RedKeySignatureIndexGet(index) (t_KeySignatureIndex[(index)])
 extern signed char t_KeySignatureData[REDSOUND_KEY_SIGNATURE_DATA_COUNT];
@@ -263,7 +263,7 @@ extern int m_SoundPlayMode;
 extern volatile int m_SoundMasterControl;
 #define RedSoundMasterControlGet() (m_SoundMasterControl)
 #define RedSoundMasterControlSet(control) (m_SoundMasterControl = (control))
-extern volatile int m_ReportPrint;
+extern int m_ReportPrint;
 #define RedReportPrintGet() (m_ReportPrint)
 #define RedReportPrintSet(value) (m_ReportPrint = (value))
 #define RedReportPrintIsEnabled() (RedReportPrintGet() != REDSOUND_REPORT_PRINT_OFF)
@@ -345,7 +345,7 @@ extern RedTrackDATA* p_EditorTrack;
 #define RedEditorTrackSet(track) (p_EditorTrack = (track))
 extern OSThread m_MusicSkipThread;
 extern u8* volatile p_MusicSkipThreadStack;
-extern volatile int m_MusicSkipComplete;
+extern int m_MusicSkipComplete;
 #define RedMusicSkipCompleteGet() (m_MusicSkipComplete)
 #define RedMusicSkipCompleteSet(status) (m_MusicSkipComplete = (status))
 #define RedMusicSkipIsComplete() (RedMusicSkipCompleteGet() != REDSOUND_MUSIC_SKIP_NOT_COMPLETE)

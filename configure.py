@@ -187,7 +187,7 @@ if not config.non_matching:
 config.binutils_tag = "2.42-1"
 config.compilers_tag = "20250812"
 config.dtk_tag = "v1.8.3"
-config.objdiff_tag = "v3.6.1"
+config.objdiff_tag = "v3.8.2"
 config.sjiswrap_tag = "v1.2.2"
 config.wibo_tag = "1.0.3"
 
@@ -499,8 +499,8 @@ config.warn_missing_source = False
 config.libs = [
     RedSoundLib([
         Object(NonMatching, "RedSound/RedCommand.cpp", cflags=redsound_unit_cflags("RedCommand")),
-        Object(NonMatching, "RedSound/RedDriver.cpp", cflags=redsound_unit_cflags("RedDriver")),
-        Object(NonMatching, "RedSound/RedEntry.cpp", cflags=redsound_unit_cflags("RedEntry")),
+        Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "RedSound/RedDriver.cpp", cflags=redsound_unit_cflags("RedDriver")),
+        Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "RedSound/RedEntry.cpp", cflags=redsound_unit_cflags("RedEntry")),
         Object(NonMatching, "RedSound/RedExecute.cpp", cflags=redsound_unit_cflags("RedExecute")),
         Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "RedSound/RedMemory.cpp", cflags=redsound_unit_cflags("RedMemory")),
         Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "RedSound/RedMidiCtrl.cpp", cflags=redsound_unit_cflags("RedMidiCtrl")),
@@ -582,7 +582,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_equip.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_favo.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_item.cpp"),
-            Object(NonMatching, "menu_letter.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01"), "menu_letter.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_lst.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_money.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "menu_tmparti.cpp"),
@@ -687,7 +687,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixYZX.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixZXY.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMatrixZYX.cpp"),
-            Object(NonMatching, "pppMiasma.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMiasma.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMove.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParHitSph.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01"), "pppParHitSphMat.cpp"),
@@ -763,12 +763,12 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01"), "pppYmCheckBGHeight.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDeformationMdl.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDeformationScreen.cpp"),
-            Object(NonMatching, "pppYmDeformationShp.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDeformationShp.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDrawMdlTexAnm.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmEnv.cpp", extra_cflags=["-char unsigned", "-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmLaser.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmLookOn.cpp"),
-            Object(NonMatching, "pppYmMana.cpp", extra_cflags=["-str reuse,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01"), "pppYmMana.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMegaBirthShpTail2.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMegaBirthShpTail3.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMelt.cpp", cflags=cflags_game),
@@ -788,7 +788,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "stopwatch.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "system.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "textureman.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "textureman.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(
                 MatchingFor("GCCP01", "GCCE01", "GCCJGC"),
                 "THPDraw.cpp",

@@ -875,12 +875,11 @@ int CCaravanWork::GetFoodRank(int foodIdx)
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
 	int i;
+	int j;
 	int cmpValue;
 	int letterIdx;
 	int excludeFlag;
-	int val1;
-	int val2;
-	int val0;
+	int evtFlag[3];
 	int foundCount = 0;
 
 	for (i = 0; i < maxResults; i++) {
@@ -1307,30 +1306,31 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedLinkValueConditions:
 
-		int sysVal0 = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
-		int sysVal1 = Game.m_gameWork.m_timerA;
-		int sysVal2 = Game.m_gameWork.m_scriptGlobalTime;
-		int sysVal3 = Game.m_gameWork.m_frameCounter;
+		int sysVal[4];
+		sysVal[0] = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
+		sysVal[1] = Game.m_gameWork.m_timerA;
+		sysVal[2] = Game.m_gameWork.m_scriptGlobalTime;
+		sysVal[3] = Game.m_gameWork.m_frameCounter;
 		for (i = 0; i < 4; i++) {
 			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
-			val1 = (cmpType >> 11) & 3;
+			const int srcType = (cmpType >> 11) & 3;
 
-			if (val1 != 3) {
+			if (srcType != 3) {
 				const int sourceIdx = cmpType & 0x7FF;
-				switch (val1) {
+				switch (srcType) {
 				case 0:
 					switch (sourceIdx) {
 					case 0:
-						cmpValue = sysVal0;
+						cmpValue = sysVal[0];
 						break;
 					case 1:
-						cmpValue = sysVal1;
+						cmpValue = sysVal[1];
 						break;
 					case 2:
-						cmpValue = sysVal2;
+						cmpValue = sysVal[2];
 						break;
 					case 3:
-						cmpValue = sysVal3;
+						cmpValue = sysVal[3];
 						break;
 					}
 					break;
@@ -1380,8 +1380,8 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 
 		{
-			for (i = 0; i < 8; i++) {
-				condBits = curLetter->m_eventRules[i];
+			for (j = 0; j < 8; j++) {
+				condBits = curLetter->m_eventRules[j];
 				const int sourceType = (condBits >> 11) & 3;
 
 				if (sourceType == 3) {
@@ -1392,79 +1392,79 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 				switch (sourceType) {
 				case 1:
-					val0 = Game.GetEvtFlag(sourceIdx);
-					val1 = Game.GetEvtFlag(sourceIdx + 1);
-					val2 = Game.GetEvtFlag(sourceIdx + 2);
+					evtFlag[0] = Game.GetEvtFlag(sourceIdx);
+					evtFlag[1] = Game.GetEvtFlag(sourceIdx + 1);
+					evtFlag[2] = Game.GetEvtFlag(sourceIdx + 2);
 					break;
 				case 2:
-					val0 = GetEvtFlag(sourceIdx);
-					val1 = GetEvtFlag(sourceIdx + 1);
-					val2 = GetEvtFlag(sourceIdx + 2);
+					evtFlag[0] = GetEvtFlag(sourceIdx);
+					evtFlag[1] = GetEvtFlag(sourceIdx + 1);
+					evtFlag[2] = GetEvtFlag(sourceIdx + 2);
 					break;
 				}
 
 				switch ((condBits >> 13) & 7) {
 				case 0:
-					if (val0 != 0) {
+					if (evtFlag[0] != 0) {
 						goto NextLetter;
 					}
 					break;
 				case 1:
-					if (val0 == 0) {
+					if (evtFlag[0] == 0) {
 						goto NextLetter;
 					}
 					break;
 				case 2:
-					if (val0 != 0) {
+					if (evtFlag[0] != 0) {
 						goto NextLetter;
 					}
-					if (val1 != 0) {
+					if (evtFlag[1] != 0) {
 						goto NextLetter;
 					}
-					if (val2 == 0) {
+					if (evtFlag[2] == 0) {
 						break;
 					}
 					goto NextLetter;
 				case 3:
-					if (val0 != 0) {
+					if (evtFlag[0] != 0) {
 						break;
 					}
-					if (val1 != 0) {
+					if (evtFlag[1] != 0) {
 						break;
 					}
-					if (val2 == 0) {
+					if (evtFlag[2] == 0) {
 						goto NextLetter;
 					}
 					break;
 				case 4:
-					if (val1 != 0) {
+					if (evtFlag[1] != 0) {
 						goto NextLetter;
 					}
-					if (val2 == 0) {
+					if (evtFlag[2] == 0) {
 						break;
 					}
 					goto NextLetter;
 				case 5:
-					if (val1 != 0) {
+					if (evtFlag[1] != 0) {
 						goto NextLetter;
 					}
-					if (val2 != 0) {
+					if (evtFlag[2] != 0) {
 						break;
 					}
 					goto NextLetter;
 				case 6:
-					if (val1 == 0) {
+					if (evtFlag[1] == 0) {
 						goto NextLetter;
 					}
-					if (val2 == 0) {
+					if (evtFlag[2] == 0) {
 						break;
 					}
 					goto NextLetter;
 				case 7:
-					if (val1 == 0) {
+					if (evtFlag[1] == 0) {
 						goto NextLetter;
 					}
-					if (val2 == 0) {
+					if (evtFlag[2] == 0) {
 						goto NextLetter;
 					}
 					break;
@@ -1474,18 +1474,18 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		if (foundCount == maxResults) {
 			int minPriority = 0xFFFF;
-			val1 = 0;
+			int minIdx = 0;
 			for (i = 0; i < maxResults; i++) {
 				const int priority = romLetterWork[i]->m_priorityFlags & 0xF00;
 				if (priority < minPriority) {
 					minPriority = priority;
-					val1 = i;
+					minIdx = i;
 				}
 			}
 
 			const int curPriority = curLetter->m_priorityFlags & 0xF00;
 			if (minPriority < curPriority) {
-				romLetterWork[val1] = curLetter;
+				romLetterWork[minIdx] = curLetter;
 			}
 		} else {
 			romLetterWork[foundCount++] = curLetter;
@@ -2073,7 +2073,7 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
  * JP Address: 0x8009D67C
  * JP Size: 128b
  */
-const char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
+char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
 {
 	int weaponType = GetWeaponAttrib(cmdListIdx);
 	if (weaponType >= 0 && weaponType < 3) {
@@ -2081,9 +2081,9 @@ const char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
 		return MenuPcs.GetSkillStr(weaponType);
 #else
 #ifdef VERSION_GCCJGC
-		static const char* pMagicCharge[] = { "ファイアけん", "ブリザドけん", "サンダーけん" };
+		static char* pMagicCharge[] = { "ファイアけん", "ブリザドけん", "サンダーけん" };
 #else
-		static const char* pMagicCharge[] = { "Flamestrike", "Icestrike", "Thunderstrike" };
+		static char* pMagicCharge[] = { "Flamestrike", "Icestrike", "Thunderstrike" };
 #endif
 		return pMagicCharge[weaponType];
 #endif

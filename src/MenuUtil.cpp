@@ -1305,25 +1305,27 @@ void CMenuPcs::DrawOptionMenu()
 	CTexture* panel = m_wmOptionTextures[10];
 	w = static_cast<float>(panel->GetWidth());
 	h = static_cast<float>(panel->GetHeight());
-	Util.RenderTextureQuad(336.0f, 88.0f, w, h, panel, 0, 0, &color,
+	int panelX = 336;
+	int panelY = 88;
+	Util.RenderTextureQuad(panelX, panelY, w, h, panel, 0, 0, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = 0.0f;
 	uv0.y = 1.0f;
 	uv1.x = 1.0f;
 	uv1.y = 0.0f;
-	Util.RenderTextureQuad(336.0f, 88.0f + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	Util.RenderTextureQuad(panelX, panelY + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = 1.0f;
 	uv0.y = 0.0f;
 	uv1.x = 0.0f;
 	uv1.y = 1.0f;
-	Util.RenderTextureQuad(336.0f + w, 88.0f, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	Util.RenderTextureQuad(panelX + w, panelY, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = 1.0f;
 	uv0.y = 1.0f;
 	uv1.x = 0.0f;
 	uv1.y = 0.0f;
-	Util.RenderTextureQuad(336.0f + w, 88.0f + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	Util.RenderTextureQuad(panelX + w, panelY + h, w, h, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	CTexture* cursor = m_textures[0];
@@ -1423,14 +1425,11 @@ void CMenuPcs::DrawOptionMenu()
 #ifdef VERSION_GCCJGC
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 189.0f }, { 496.0f, 189.0f } };
 #else
-		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 0.0f }, { 496.0f, 0.0f } };
+		int textY = 185;
+		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, textY }, { 496.0f, textY } };
 #endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
 		rightXi = static_cast<int>(w / 2.0f + row.rightIcon.x - 472.0f);
-#ifndef VERSION_GCCJGC
-		row.leftText.y = 185.0f;
-		row.rightText.y = 185.0f;
-#endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideHeight = sideTexture->GetHeight();
 		unsigned int sideWidth = sideTexture->GetWidth();
@@ -1526,14 +1525,11 @@ void CMenuPcs::DrawOptionMenu()
 #ifdef VERSION_GCCJGC
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 189.0f }, { 488.0f, 189.0f } };
 #else
-		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 0.0f }, { 488.0f, 0.0f } };
+		int textY = 185;
+		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, textY }, { 488.0f, textY } };
 #endif
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
 		rightXi = static_cast<int>(w / 2.0f + row.rightIcon.x - 472.0f);
-#ifndef VERSION_GCCJGC
-		row.leftText.y = 185.0f;
-		row.rightText.y = 185.0f;
-#endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideHeight = sideTexture->GetHeight();
 		unsigned int sideWidth = sideTexture->GetWidth();
@@ -1623,27 +1619,23 @@ void CMenuPcs::DrawOptionMenu()
 		break;
 	}
 	case 2: {
-		MenuOptionMeterLayout pos = { { 0.0f, 0.0f }, { 0.0f, 0.0f },
-		                             { 0.0f, 0.0f }, { 0.0f, 0.0f },
-		                             { 0.0f, 0.0f }, { 0.0f, 0.0f }, { 508.0f, 0.0f } };
-		pos.leftIcon.x = 348.0f;
-		pos.leftIcon.y = 192.0f;
-		pos.rightIcon.x = 556.0f;
-		pos.rightIcon.y = 184.0f;
-		pos.leftArrow.x = 336.0f;
-		pos.leftArrow.y = 190.0f;
-		pos.rightArrow.x = 587.0f;
-		pos.rightArrow.y = 190.0f;
-		pos.bar.x = 372.0f;
-		pos.bar.y = 196.0f;
-		pos.minLabel.x = 372.0f;
 #ifdef VERSION_GCCJGC
-		pos.minLabel.y = 172.0f;
-		pos.maxLabel.y = 172.0f;
+		int labelY = 172;
 #else
-		pos.minLabel.y = 168.0f;
-		pos.maxLabel.y = 168.0f;
+		int labelY = 168;
 #endif
+		int leftIconX = 348;
+		int leftIconY = 192;
+		int rightIconX = 556;
+		int rightIconY = 184;
+		int leftArrowX = 336;
+		int arrowY = 190;
+		int rightArrowX = 587;
+		int barX = 372;
+		int barY = 196;
+		MenuOptionMeterLayout pos = { { leftIconX, leftIconY }, { rightIconX, rightIconY },
+		                             { leftArrowX, arrowY }, { rightArrowX, arrowY },
+		                             { barX, barY }, { barX, labelY }, { 508.0f, labelY } };
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
 		rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
@@ -1712,27 +1704,23 @@ void CMenuPcs::DrawOptionMenu()
 		break;
 	}
 	case 3: {
-		MenuOptionMeterLayout pos = { { 0.0f, 0.0f }, { 0.0f, 0.0f },
-		                             { 0.0f, 0.0f }, { 0.0f, 0.0f },
-		                             { 0.0f, 0.0f }, { 0.0f, 0.0f }, { 508.0f, 0.0f } };
-		pos.leftIcon.x = 348.0f;
-		pos.leftIcon.y = 192.0f;
-		pos.rightIcon.x = 556.0f;
-		pos.rightIcon.y = 184.0f;
-		pos.leftArrow.x = 336.0f;
-		pos.leftArrow.y = 190.0f;
-		pos.rightArrow.x = 587.0f;
-		pos.rightArrow.y = 190.0f;
-		pos.bar.x = 372.0f;
-		pos.bar.y = 196.0f;
-		pos.minLabel.x = 372.0f;
 #ifdef VERSION_GCCJGC
-		pos.minLabel.y = 172.0f;
-		pos.maxLabel.y = 172.0f;
+		int labelY = 172;
 #else
-		pos.minLabel.y = 168.0f;
-		pos.maxLabel.y = 168.0f;
+		int labelY = 168;
 #endif
+		int leftIconX = 348;
+		int leftIconY = 192;
+		int rightIconX = 556;
+		int rightIconY = 184;
+		int leftArrowX = 336;
+		int arrowY = 190;
+		int rightArrowX = 587;
+		int barX = 372;
+		int barY = 196;
+		MenuOptionMeterLayout pos = { { leftIconX, leftIconY }, { rightIconX, rightIconY },
+		                             { leftArrowX, arrowY }, { rightArrowX, arrowY },
+		                             { barX, barY }, { barX, labelY }, { 508.0f, labelY } };
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
 		rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
@@ -1826,6 +1814,11 @@ void CMenuPcs::DrawOptionMenu()
 		specialRowCos = std::cosf(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle));
 #endif
 
+		const Vec2d* pp3;
+		int textXi;
+		const Vec2d* pp4;
+		int textXi2;
+		char* txt;
 		leftXi = 0;
 		for (int i = 0; i < 4; i++, leftXi = 0) {
 			CTexture* cursorPanel = m_wmOptionTextureSet->GetTexture(4);
@@ -1874,9 +1867,9 @@ void CMenuPcs::DrawOptionMenu()
 			                        pp2->y + static_cast<float>(i * 0x28), 40.0f, 24.0f,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-			const Vec2d* pp3 = &pts[leftXi + 3];
+			pp3 = &pts[leftXi + 3];
 			int step1 = static_cast<int>(24.0f + (static_cast<float>(i * 0x40 + 0x280) - pp3->x));
-			int textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
+			textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
 			if (m_specialModeFlags[i] == 0) {
 				Util.CalcUV(uv0.x, uv0.y, 0, i * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 				Util.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
@@ -1884,20 +1877,20 @@ void CMenuPcs::DrawOptionMenu()
 				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 #ifdef VERSION_GCCJGC
-				const Vec2d* pp4 = &pts[leftXi + 4];
-				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				pp4 = &pts[leftXi + 4];
+				textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				DrawOptionLabel(this, textXi2 + 8,
 				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(i * 0x28))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
 #elif defined(VERSION_GCCE01)
-				const Vec2d* pp4 = &pts[leftXi + 4];
-				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				pp4 = &pts[leftXi + 4];
+				textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				DrawFont(textXi2 + 8, static_cast<int>(-4.0f + (4.0f + (pp4->y + static_cast<float>(i * 0x28)))),
 				         color, 7, OPT_MES(18), 1.0f, 1.0f);
 #else
-				char* txt = OPT_MES(18);
-				const Vec2d* pp4 = &pts[leftXi + 4];
-				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
+				txt = OPT_MES(18);
+				pp4 = &pts[leftXi + 4];
+				textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				float tw = GetFontWidth(txt, 1.0f, 1.0f);
 				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                          2.0 + textXi2)),
@@ -1914,7 +1907,7 @@ void CMenuPcs::DrawOptionMenu()
 				DrawFont(textXi + 8, static_cast<int>(-4.0f + (4.0f + (pp3->y + static_cast<float>(i * 0x28)))),
 				         color, 7, OPT_MES(19), 1.0f, 1.0f);
 #else
-				char* txt = OPT_MES(19);
+				txt = OPT_MES(19);
 				float tw = GetFontWidth(txt, 1.0f, 1.0f);
 				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                          2.0 + textXi)),

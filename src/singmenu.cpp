@@ -1713,6 +1713,7 @@ void CMenuPcs::DrawSingWin(short mode)
     float h = static_cast<float>(heightPx);
 
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+    float innerX;
     _GXColor white;
     white.r = 0xFF;
     white.g = 0xFF;
@@ -1722,6 +1723,7 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x3F)));
     float x1 = x0 + w - 32.0f;
     float y1 = y0 + h - 32.0f;
+    double innerH;
     unsigned long uvFlag;
     for (i = 0; i < 4; i++) {
         uvFlag = 0;
@@ -1743,10 +1745,11 @@ void CMenuPcs::DrawSingWin(short mode)
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x41)));
-    float innerX = 32.0f + x0;
+    innerX = 32.0f + x0;
     innerW = static_cast<double>(w) - 64.0;
     float yy = y0;
     float innerWf = static_cast<float>(innerW);
+    float innerHf;
     for (i = 0; i < 2; i++) {
         uvFlag = 0;
         if (i != 0) {
@@ -1758,8 +1761,8 @@ void CMenuPcs::DrawSingWin(short mode)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(SINGMENU_TEX_ID(0x40)));
     float innerY = 32.0f + y0;
-    double innerH = static_cast<double>(h) - 64.0;
-    float innerHf = static_cast<float>(innerH);
+    innerH = static_cast<double>(h) - 64.0;
+    innerHf = static_cast<float>(innerH);
     float xx = x0;
     for (i = 0; i < 2; i++) {
         uvFlag = 0;

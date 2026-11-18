@@ -119,8 +119,8 @@ struct RedTickHistory;
 struct RedDriverSmallDataPrefixState {
     int m_RedMasterTime;
     volatile int m_SequencialID;
-    volatile int m_ThreadControl;
-    volatile int m_ThreadExecute;
+    int m_ThreadControl;
+    int m_ThreadExecute;
     int m_SoundMode;
     RedTickHistory* volatile p_Tick;
     u8* volatile p_ZeroData;
@@ -135,7 +135,7 @@ struct RedDriverSmallDataPrefixState {
     RedKeyOnDATA* volatile p_KeyOnData;
     int m_SoundPlayMode;
     int m_SoundMasterControl;
-    volatile int m_ReportPrint;
+    int m_ReportPrint;
     int m_MusicFastSpeed;
     volatile int m_MusicSkipLine;
     int m_MusicKeySignature;
@@ -160,7 +160,7 @@ struct RedDriverSmallDataPrefixState {
     u8* volatile p_DmaExecuteThreadStack;
     volatile int m_DMAStatus;
     u8* volatile p_MusicSkipThreadStack;
-    volatile int m_MusicSkipComplete;
+    int m_MusicSkipComplete;
     RedReverbDepth* volatile p_ReverbDepth;
     int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 };
@@ -371,8 +371,8 @@ struct RedDriverSmallDataTailState {
     RedDriverSmallDataPrefixState m_prefix;
     CRedMemory c_RedMemory;
     u8 m_redMemoryAlignPadding[REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE];
-    volatile int m_DMAExecute;
-    volatile int m_DMAInThread;
+    int m_DMAExecute;
+    int m_DMAInThread;
     int m_SilentWave;
 };
 
@@ -865,16 +865,16 @@ static volatile int m_SequencialID;
 #define RedSequencialIDGet() (m_SequencialID)
 #define RedSequencialIDSet(id) (m_SequencialID = (id))
 #define RedSequencialIDInc() (m_SequencialID++)
-static volatile int m_ThreadControl;
+static int m_ThreadControl;
 #define RedThreadControlGet() (m_ThreadControl)
 #define RedThreadControlSet(control) (m_ThreadControl = (control))
 #define RedThreadControlIsRunning() (RedThreadControlGet() != REDSOUND_THREAD_CONTROL_STOP)
-static volatile int m_ThreadExecute;
+static int m_ThreadExecute;
 #define RedThreadExecuteGet() (m_ThreadExecute)
 #define RedThreadExecuteSet(flags) (m_ThreadExecute = (flags))
 #define RedThreadExecuteAdd(flags) (m_ThreadExecute = m_ThreadExecute | (flags))
 #define RedThreadExecuteRemove(flags) (m_ThreadExecute = m_ThreadExecute & ~(flags))
-static volatile int m_SoundMode;
+static int m_SoundMode;
 #define RedSoundModeGet() (m_SoundMode)
 #define RedSoundModeSet(mode) (m_SoundMode = (mode))
 static RedTickHistory* volatile p_Tick;
@@ -908,7 +908,7 @@ volatile int m_KeyOnEntry;
 RedKeyOnDATA* volatile p_KeyOnData;
 int m_SoundPlayMode;
 volatile int m_SoundMasterControl;
-volatile int m_ReportPrint;
+int m_ReportPrint;
 volatile int m_MusicFastSpeed;
 volatile int m_MusicSkipLine;
 volatile int m_MusicKeySignature;
@@ -958,7 +958,7 @@ static volatile int m_DMAStatus;
 u8* volatile p_MusicSkipThreadStack;
 #define RedMusicSkipThreadStackGet() (p_MusicSkipThreadStack)
 #define RedMusicSkipThreadStackSet(stack) (p_MusicSkipThreadStack = (stack))
-volatile int m_MusicSkipComplete;
+int m_MusicSkipComplete;
 RedReverbDepth* volatile p_ReverbDepth;
 unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 static RedDmaRequest m_DmaControl[REDSOUND_DMA_CONTROL_ENTRY_COUNT];
@@ -983,8 +983,8 @@ OSThread m_MusicSkipThread;
 OSSemaphore m_MusicSkipSemaphore;
 RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 CRedMemory c_RedMemory;
-static volatile int m_DMAExecute;
-static volatile int m_DMAInThread;
+static int m_DMAExecute;
+static int m_DMAInThread;
 #define RedDmaExecuteGet() (m_DMAExecute)
 #define RedDmaExecuteSet(status) (m_DMAExecute = (status))
 #define RedDmaThreadStateGet() (m_DMAInThread)

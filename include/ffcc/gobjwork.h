@@ -269,7 +269,7 @@ public:
     int IsUseCmdList(int);
     unsigned int IsSelectedCmdList(int);
     int GetMagicCharge(int, int&, int&);
-    const char* GetCmdListItemName(int);
+    char* GetCmdListItemName(int);
     int GetWeaponAttrib(int);
     int GetCmdListItem(int);
     int SearchCombiTop(int);

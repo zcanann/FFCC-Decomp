@@ -1551,10 +1551,7 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	GbaPInfo localPlayerData[4];
 	unsigned char packet[0xC];
 	unsigned char nearbyMask;
-	short baseX;
-	short baseZ;
-	const GbaPInfo* player;
-	const GbaPInfo* basePlayer;
+	unsigned char* p;
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -1571,42 +1568,33 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	packet[4] = 0x51;
 	packet[8] = 0x91;
 
-	player = localPlayerData;
-	basePlayer = &player[channel];
-
 	nearbyMask = 0;
 	for (i = 0; i < 4; i++) {
 		if (i == channel) {
 			nearbyMask |= (1 << i);
-		} else if (player->m_active != 0) {
-			int px = player->m_mapPosition[0];
-			const int dx = px - basePlayer->m_mapPosition[0];
-
-			if (dx >= -0x50 && dx <= 0x50) {
-				int pz = player->m_mapPosition[1];
-				const int dz = pz - basePlayer->m_mapPosition[1];
-
-				if (dz >= -0x40 && dz <= 0x40) {
+		} else if (localPlayerData[i].m_active != 0) {
+			if (localPlayerData[i].m_mapPosition[0] - localPlayerData[channel].m_mapPosition[0] >= -0x50 &&
+			    localPlayerData[i].m_mapPosition[0] - localPlayerData[channel].m_mapPosition[0] <= 0x50) {
+				if (localPlayerData[i].m_mapPosition[1] - localPlayerData[channel].m_mapPosition[1] >= -0x40 &&
+				    localPlayerData[i].m_mapPosition[1] - localPlayerData[channel].m_mapPosition[1] <= 0x40) {
 					nearbyMask |= (1 << i);
 				}
 			}
 		}
-
-		player++;
 	}
 
-	baseX = localPlayerData[channel].m_mapPosition[0];
-	baseZ = localPlayerData[channel].m_mapPosition[1];
-
-	packet[1] = nearbyMask;
-	packet[2] = static_cast<unsigned char>(localPlayerData[0].m_mapPosition[0] - baseX);
-	packet[3] = static_cast<unsigned char>(localPlayerData[0].m_mapPosition[1] - baseZ);
-	packet[5] = static_cast<unsigned char>(localPlayerData[1].m_mapPosition[0] - baseX);
-	packet[6] = static_cast<unsigned char>(localPlayerData[1].m_mapPosition[1] - baseZ);
-	packet[7] = static_cast<unsigned char>(localPlayerData[2].m_mapPosition[0] - baseX);
-	packet[9] = static_cast<unsigned char>(localPlayerData[2].m_mapPosition[1] - baseZ);
-	packet[10] = static_cast<unsigned char>(localPlayerData[3].m_mapPosition[0] - baseX);
-	packet[11] = static_cast<unsigned char>(localPlayerData[3].m_mapPosition[1] - baseZ);
+	p = packet + 1;
+	*p++ = nearbyMask;
+	*p++ = static_cast<unsigned char>(localPlayerData[0].m_mapPosition[0] - localPlayerData[channel].m_mapPosition[0]);
+	*p++ = static_cast<unsigned char>(localPlayerData[0].m_mapPosition[1] - localPlayerData[channel].m_mapPosition[1]);
+	p++;
+	*p++ = static_cast<unsigned char>(localPlayerData[1].m_mapPosition[0] - localPlayerData[channel].m_mapPosition[0]);
+	*p++ = static_cast<unsigned char>(localPlayerData[1].m_mapPosition[1] - localPlayerData[channel].m_mapPosition[1]);
+	*p++ = static_cast<unsigned char>(localPlayerData[2].m_mapPosition[0] - localPlayerData[channel].m_mapPosition[0]);
+	p++;
+	*p++ = static_cast<unsigned char>(localPlayerData[2].m_mapPosition[1] - localPlayerData[channel].m_mapPosition[1]);
+	*p++ = static_cast<unsigned char>(localPlayerData[3].m_mapPosition[0] - localPlayerData[channel].m_mapPosition[0]);
+	*p++ = static_cast<unsigned char>(localPlayerData[3].m_mapPosition[1] - localPlayerData[channel].m_mapPosition[1]);
 
 	memcpy(outData, packet, sizeof(packet));
 }

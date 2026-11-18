@@ -1973,8 +1973,10 @@ void CMenuPcs::DrawUniteList()
 		float x = static_cast<float>((static_cast<float>(entry->width) - width) / 2.0 +
 		                             static_cast<double>(entry->x));
 		if (topX != entry->x) {
-			const float target = static_cast<float>(entry->x + entry->width - 0x18) - width;
-			x = (target - x) * static_cast<float>(__fabs(static_cast<double>(topX - entry->x)) / 64.0) + x;
+			float offset = static_cast<float>(entry->x + entry->width - 0x18) - width;
+			offset -= x;
+			const float rate = static_cast<float>(__fabs(static_cast<double>(topX - entry->x)) / 64.0);
+			x += rate * offset;
 		}
 
 		drawY = static_cast<float>(entry->y + 3);

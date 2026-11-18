@@ -544,10 +544,9 @@ int CMenuPcs::LetterClose()
 	s_OpenClose = 1;
 	int allFinished = LetterLstClose();
 	if (allFinished && SingGetLetterAttachflg() >= 0) {
-		LetterMenuState* state2 = m_letterMenuState;
-		s_BackUpCur[0] = state2->listCursor;
-		s_BackUpCur[1] = state2->choiceCursor;
-		s_BackUpTopPos = s_SelLetter - s_BackUpCur[0];
+		s_BackUpCur[0] = m_letterMenuState->listCursor;
+		s_BackUpCur[1] = m_letterMenuState->choiceCursor;
+		s_BackUpTopPos = s_SelLetter - m_letterMenuState->listCursor;
 	}
 
 	return allFinished;

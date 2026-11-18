@@ -1228,9 +1228,13 @@ def generate_build_ninja(
                 check_path_case(obj.src_path)
                 c_build(obj, obj.src_path)
 
-        # Check if all compiler versions exist
+        # Check if all compiler versions exist (a compiler that a pre-compile
+        # step derives or downloads is built by ninja before anything uses it)
+        derived_compilers = {os.path.normpath(p) for p in pre_compile_outputs}
         for mw_version in used_compiler_versions:
             mw_path = compilers / mw_version / "mwcceppc.exe"
+            if os.path.normpath(mw_path) in derived_compilers:
+                continue
             if config.compilers_path and not os.path.exists(mw_path):
                 sys.exit(f"Compiler {mw_path} does not exist")
 

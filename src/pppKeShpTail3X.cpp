@@ -223,11 +223,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
         nextIndex = 0;
     }
     nextBaseX = history[nextIndex].x;
-    nextBaseZ = history[nextIndex].z;
     segDx = nextBaseX - posX;
     nextBaseY = history[nextIndex].y;
-    segDz = nextBaseZ - posZ;
     segDy = nextBaseY - posY;
+    nextBaseZ = history[nextIndex].z;
+    segDz = nextBaseZ - posZ;
     zeroVecA.z = 0.0f;
     zeroVecA.y = 0.0f;
     zeroVecA.x = 0.0f;
@@ -335,9 +335,9 @@ advance_segment:
     if (segRemain >= trailStep) {
         float ratio = segCursor / segLen;
         posX = segDx * ratio + startX;
+        posY = segDy * ratio + startY;
         posZ = segDz * ratio + startZ;
         segCursor += trailStep;
-        posY = segDy * ratio + startY;
         segRemain -= trailStep;
         goto draw_loop;
     }

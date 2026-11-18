@@ -1654,8 +1654,8 @@ def generate_objdiff_config(
         "GC/2.0": "mwcc_247_92",
         "GC/2.0p1": "mwcc_247_92p1",
         "GC/2.5": "mwcc_247_105",
-        # mweppc's GC 2.5a: GC/2.5 plus FFCC's kss alias rule (docs/compiler_baseline.md)
-        "GC/2.5a": "mwcc_247_105",
+        # mwcc-tools' GC 2.5ffcc: GC/2.5 plus FFCC's kss alias rule (docs/compiler_baseline.md)
+        "GC/2.5ffcc": "mwcc_247_105",
         "GC/2.6": "mwcc_247_107",
         "GC/2.7": "mwcc_247_108",
         "GC/3.0a3": "mwcc_41_51213",

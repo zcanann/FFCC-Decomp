@@ -514,7 +514,7 @@ config.libs = [
     {
         "lib": "Game",
         # Regional compatibility baselines; provenance: docs/compiler_baseline.md.
-        "mw_version": "GC/2.0p1k" if config.version == "GCCJGC" else "GC/2.5a",
+        "mw_version": "GC/2.0p1k" if config.version == "GCCJGC" else "GC/2.5ffcc",
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
@@ -1362,10 +1362,10 @@ FFCC_COMPILER_H = "GC/2.0p1h"
 FFCC_COMPILER_I = "GC/2.0p1i"
 FFCC_COMPILER_J = "GC/2.0p1j"
 JP_GAME_COMPILER = "GC/2.0p1k"
-# PAL and USA game compiler: GC/2.5a, doldecomp/mweppc's GC_2_5a (GC 2.5 with
-# FFCC's kss alias rule), installed from a pinned mweppc release by
-# tools/download_mweppc.py. See docs/compiler_baseline.md.
-PAL_GAME_COMPILER = "GC/2.5a"
+# PAL and USA game compiler: GC/2.5ffcc, GC_2_5ffcc of PrimeDecomp/mwcc-tools'
+# gc2 (GC 2.5 with FFCC's kss alias rule), installed by
+# tools/download_mwcc_tools.py. See docs/compiler_baseline.md.
+PAL_GAME_COMPILER = "GC/2.5ffcc"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
     {
@@ -1405,8 +1405,8 @@ config.custom_build_rules = [
         "restat": True,
     },
     {
-        "name": "download_mweppc",
-        "command": "$python tools/download_mweppc.py $out",
+        "name": "download_mwcc_tools",
+        "command": "$python tools/download_mwcc_tools.py $out",
         "description": "DOWNLOAD $out",
         "restat": True,
     },
@@ -1467,9 +1467,9 @@ config.custom_build_steps = {
         },
         {
             "outputs": [_compilers_dir / PAL_GAME_COMPILER / "mwcceppc.exe"],
-            "rule": "download_mweppc",
+            "rule": "download_mwcc_tools",
             "implicit": [
-                Path("tools") / "download_mweppc.py",
+                Path("tools") / "download_mwcc_tools.py",
             ]
             + ([_compilers_dir] if config.compilers_path is None else []),
         },

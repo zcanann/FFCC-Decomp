@@ -678,7 +678,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 {
     CChunkFile::CChunk chunk;
     CTexture* texture;
-    unsigned long index;
+    long index;
 
     if (append == 0) {
         m_textureArray.ReleaseAndRemoveAll();
@@ -693,7 +693,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 
             if (texture->m_name[0] != 0) {
                 index = Find(texture->m_name);
-                if ((int)index >= 0) {
+                if (index >= 0) {
                     if (amemCacheSet != 0) {
                         amemCacheSet->DestroyCache(static_cast<int>(texture->m_cacheId));
                         amemCacheSet->AmemPrev();
@@ -707,9 +707,9 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
             }
 
             if (append != 0) {
-                for (index = 0; (unsigned int)index < (unsigned int)m_textureArray.GetSize(); index++) {
-                    if (m_textureArray[index] == 0) {
-                        m_textureArray.SetAt(index, texture);
+                for (int i = 0; i < m_textureArray.GetSize(); i++) {
+                    if (m_textureArray[i] == 0) {
+                        m_textureArray.SetAt(i, texture);
                         goto next_chunk;
                     }
                 }

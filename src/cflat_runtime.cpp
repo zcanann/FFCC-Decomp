@@ -924,15 +924,18 @@ inline void CFlatRuntime::callCleanup(CFlatRuntime::CObject* object)
 	int previousCallFlag = pop(object).m_int;
 	previousCodePos.m_word = pop(object).m_word;
 	unsigned int* previousLocalBase = reinterpret_cast<unsigned int*>(pop(object).m_word);
+	int waitCounter = packedFlags >> 16;
+	int requestPending = (packedFlags >> 15) & 1;
+	int argCount = static_cast<s16>(packedFlags & 0xFFFF);
 
 	object->m_sp = object->m_localBase;
 	push(object, &returnValue, 0);
 	object->m_localBase = previousLocalBase;
 	object->m_codeIndex = previousCodePos.m_codeIndex;
 	object->m_flagBits.m_callFlag = static_cast<s8>(previousCallFlag);
-	object->m_waitCounter = packedFlags >> 16;
-	object->m_requestPending = (packedFlags >> 15) & 1;
-	object->m_argCount = static_cast<s16>(packedFlags);
+	object->m_waitCounter = waitCounter;
+	object->m_requestPending = requestPending;
+	object->m_argCount = argCount;
 }
 
 /*

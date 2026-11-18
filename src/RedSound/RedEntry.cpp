@@ -1487,7 +1487,8 @@ void CRedEntry::DisplaySePlayInfo()
 					         seBlockSequenceNo, displayWaveNo);
 					fflush(__files + 1);
 				} else {
-					data = (u8*)SearchSeSepBank(seTrack->m_seSepId)->m_seSepHead;
+					data = (u8*)SearchSeSepBank(seTrack->m_seSepId);
+					data = (u8*)((RedHistoryBANK*)data)->m_seSepHead;
 					displayWaveNo = RedSeSepGetWaveNo((RedSeSepHEAD*)data);
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
 					         (seTrack - *seTrackBasePtr) + REDSOUND_SE_VOICE_BASE_INDEX, seTrack->m_seSepId, displayWaveNo);

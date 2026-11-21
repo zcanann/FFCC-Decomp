@@ -231,7 +231,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             u0 = static_cast<float>(texX) / 4096.0f;
             v0 = static_cast<float>(texY) / 4096.0f;
             u1 = static_cast<float>(texW) / 4096.0f;
-            v1 = static_cast<float>(texH) / 4096.0f;
+            v1 = static_cast<float>(texH);
+            v1 /= 4096.0f;
             u1 = u0 + u1;
             v0 = 1.0f - v0;
             v1 = v0 - v1;

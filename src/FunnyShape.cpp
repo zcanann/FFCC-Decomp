@@ -531,31 +531,22 @@ void CFunnyShape::Render()
 
     SetDefaultStage();
 
-    CFunnyShapeAnmWork* work;
-    s32 count;
-    if ((m_displayCurrent.flags & 0x80) != 0) {
-        count = m_displayCurrent.unk28;
-    } else {
-        count = 1;
-    }
-
-    work = m_anmWork;
+    s32 count = ((m_displayCurrent.flags & 0x80) != 0) ? m_displayCurrent.unk28 : 1;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d posCopy;
         posCopy.x = 320.0f;
         posCopy.y = 224.0f;
-        posCopy.x += work->x;
-        posCopy.y += work->y;
+        posCopy.x += m_anmWork[i].x;
+        posCopy.y += m_anmWork[i].y;
 
         FS_Animation* animData = static_cast<FS_Animation*>(m_anm.anmData);
         const FS_Animation::Frame* frameData = reinterpret_cast<const FS_Animation::Frame*>(animData + 1);
-        s16 frame = work->frame;
+        s16 frame = m_anmWork[i].frame;
         frameData += frame;
         FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(
             reinterpret_cast<u8*>(animData) + frameData->shapeOffset);
-        RenderShape(shape, posCopy, work->angle);
-        work++;
+        RenderShape(shape, posCopy, m_anmWork[i].angle);
     }
 }
 
@@ -574,55 +565,46 @@ void CFunnyShape::Update()
         return;
     }
 
-    CFunnyShapeAnmWork* work = m_anmWork;
     const bool noSpread = (m_displayCurrent.flags & 0x80) == 0;
     for (s32 i = 0; i < m_displayCurrent.unk28; i++) {
-        work->delay = static_cast<s16>(work->delay - 0x200);
-        if (work->delay <= 0) {
-            work->frame = static_cast<s16>(work->frame + 1);
-            if (work->frame >= (static_cast<FS_Animation*>(m_anm.anmData))->frameCount) {
-                work->frame = 0;
+        m_anmWork[i].delay = static_cast<s16>(m_anmWork[i].delay - 0x200);
+        if (m_anmWork[i].delay <= 0) {
+            m_anmWork[i].frame = static_cast<s16>(m_anmWork[i].frame + 1);
+            if (m_anmWork[i].frame >= (static_cast<FS_Animation*>(m_anm.anmData))->frameCount) {
+                m_anmWork[i].frame = 0;
 
-                s32 r = rand();
-                work->x = static_cast<float>(r % m_displayCurrent.unk2A);
+                m_anmWork[i].x = static_cast<float>(rand() % m_displayCurrent.unk2A);
+                m_anmWork[i].y = static_cast<float>(rand() % m_displayCurrent.unk2A);
+                m_anmWork[i].z = 0.0f;
+                m_anmWork[i].delay = 0x200;
+                m_anmWork[i].viewportX = m_anmWork[i].viewportY = 0.0f;
 
-                r = rand();
-                work->y = static_cast<float>(r % m_displayCurrent.unk2A);
-                work->z = 0.0f;
-                work->delay = 0x200;
-                work->viewportX = work->viewportY = 0.0f;
+                m_anmWork[i].angle = static_cast<float>(rand() % 360);
+                m_anmWork[i].angle = (3.14f * m_anmWork[i].angle) / 180.0f;
 
-                r = rand();
-                work->angle = static_cast<float>(r % 360);
-                work->angle = (3.14f * work->angle) / 180.0f;
-
-                r = rand();
-                if ((r % 2) != 0) {
-                    work->x *= -1.0f;
+                if ((rand() % 2) != 0) {
+                    m_anmWork[i].x *= -1.0f;
                 }
 
-                r = rand();
-                if ((r % 2) != 0) {
-                    work->y *= -1.0f;
+                if ((rand() % 2) != 0) {
+                    m_anmWork[i].y *= -1.0f;
                 }
 
                 if (noSpread != 0) {
-                    work->frame = 0;
-                    work->x = work->y = 0.0f;
+                    m_anmWork[i].frame = 0;
+                    m_anmWork[i].x = m_anmWork[i].y = 0.0f;
                 }
             }
 
             const FS_Animation::Frame* frameData = reinterpret_cast<const FS_Animation::Frame*>((static_cast<FS_Animation*>(m_anm.anmData)) + 1);
-            s16 frame = work->frame;
+            s16 frame = m_anmWork[i].frame;
             frameData += frame;
-            work->delay = frameData->delay;
+            m_anmWork[i].delay = frameData->delay;
         }
 
         if (noSpread != 0) {
             return;
         }
-
-        work++;
     }
 }
 

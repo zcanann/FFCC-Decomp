@@ -506,7 +506,7 @@ void CRingMenu::onDraw()
 
 		if (group == 2) {
 			CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
-			buttonAlpha = static_cast<float>(static_cast<int>((partyObj->m_partyData.commandMode & 9) != 0));
+			buttonAlpha = (partyObj->m_partyData.commandMode & 9) ? 1 : 0;
 		}
 
 		if (0.0f == buttonAlpha) {

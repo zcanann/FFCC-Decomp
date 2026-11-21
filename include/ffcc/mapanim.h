@@ -50,6 +50,10 @@ public:
     void ReadOtmAnimNode(CChunkFile&, CMapAnim*);
     void Interp(int);
     void interp(Vec* out, CMapAnimKey* keys, int trackCount, int frameInLoop);
+    CMapObj* GetMapObj()
+    {
+        return m_node;
+    }
 };
 
 typedef CPtrArray<CMapAnimNode*> CMapAnimNodeArray;

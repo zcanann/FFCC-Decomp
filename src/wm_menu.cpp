@@ -8595,8 +8595,7 @@ nextListEntry:
 	colors[0].b = 0xFF;
 	colors[0].a = 0xFF;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), colors[0]);
-	short separatorSub = m_wmWorldState->m_subState;
-	if (separatorSub != 0 && separatorSub > 1 &&
+	if (m_wmWorldState->m_subState != 0 && m_wmWorldState->m_subState > 1 &&
 	    m_wmWorldState->m_mainState == 2) {
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kWorldFrameTexture));
@@ -8699,7 +8698,8 @@ nextListEntry:
 				} else if (language != 5) {
 					n += 0x20;
 				}
-				digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(n) * digitScale)) / 2);
+				n *= digitScale;
+				digitX += static_cast<float>((0x20 - n) / 2);
 #endif
 				for (digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 					if (digitCount == 1) {

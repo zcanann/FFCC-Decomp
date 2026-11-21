@@ -8209,13 +8209,13 @@ void CMenuPcs::CalcMainMenuSub()
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
 				float d1;
 				float d0 = -modelMtx[0][3] * (static_cast<double>(n) / 20.0);
-				d0 *= (static_cast<double>(n) / 20.0);
+				d0 = d0 * (static_cast<double>(n) / 20.0);
 				modelMtx[0][3] += d0;
 				d1 = -0.2 - modelMtx[1][3] * (static_cast<double>(n) / 20.0);
-				d1 *= (static_cast<double>(n) / 20.0);
+				d1 = d1 * (static_cast<double>(n) / 20.0);
 				modelMtx[1][3] += d1;
 				float d2 = 51.5 - modelMtx[2][3];
-				d2 *= (static_cast<double>(n) / 20.0);
+				d2 = d2 * (static_cast<double>(n) / 20.0);
 				modelMtx[2][3] += d2;
 			}
 

@@ -626,7 +626,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppCallBackDistance.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppChangeBGColor.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppChangeTex.cpp", extra_cflags=["-str reuse,readonly"]),
-            Object(NonMatching, "pppCharaBreak.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppCharaBreak.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppCharaZEnvCtrl.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppColAccele.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppColMove.cpp"),

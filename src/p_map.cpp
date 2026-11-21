@@ -40,12 +40,6 @@ inline void MTXConcatVec(Mtx src, Vec* trans, Mtx dst)
     MTXConcat(src, m, dst);
 }
 
-class CRelProfile
-{
-public:
-    ~CRelProfile();
-};
-
 inline CMapPcs::CMapPcs()
 {
 }

@@ -295,10 +295,6 @@ public:
     {
         return m_textureCount;
     }
-    unsigned char GetMaterialId() const
-    {
-        return m_unkA6;
-    }
     void SetTag(int);
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
@@ -405,6 +401,15 @@ public:
     CMaterial* GetMaterial(long index)
     {
         return m_materials[index];
+    }
+    CMaterial* GetMaterialID(unsigned char materialId)
+    {
+        for (int i = 0; i < m_materials.GetSize(); i++) {
+            if ((m_materials[i] != 0) && (materialId == m_materials[i]->m_unkA6)) {
+                return m_materials[i];
+            }
+        }
+        return 0;
     }
 };
 

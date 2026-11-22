@@ -154,12 +154,16 @@ void CGoOutMenu::SetMemCardSaveBuff(void* buffer)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: 0x8018B42C
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::GetMemCardResult()
+int CGoOutMenu::GetMemCardResult()
 {
-	// TODO
+    return m_memCardResult;
 }
 
 /*
@@ -540,7 +544,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
     m_modeFrame = 0;
     switch (mode) {
     case 1: {
-        m_cursorChoice = kConfirmationDefault;
+        InitSelectYesNo();
 #ifdef VERSION_GCCJGC
         if (prevMainMode == 3U) {
             m_cursorChoice = 1;
@@ -685,12 +689,16 @@ inline unsigned char CGoOutMenu::SelectYesNo(int cursorX, int cursorY, int curso
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 12b
+ * EN Address: 0x8018C198
+ * EN Size: 12b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGoOutMenu::InitSelectYesNo()
 {
-	// TODO
+    m_cursorChoice = kConfirmationDefault;
 }
 
 /*

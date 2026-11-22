@@ -115,9 +115,9 @@ extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
 extern void* ppvHookFuncTbl;
 unsigned char gPppDefaultValueBuffer[0x40] = {0};
-int gPppHeapUseRateWords[3] = {0, 0, 0};
 extern int ppvEmptyLoop;
 }
+ProcSpdSt g_hpMem = {0, 0, 0};
 CPartMng PartMng;
 static PPPCREATEPARAM g_dcp;
 static const char s_partMng_cpp[] = "partMng.cpp";
@@ -167,6 +167,11 @@ enum PppChunkId {
  */
 inline pppShapeSt::pppShapeSt()
 {
+    Init();
+}
+
+inline void pppShapeSt::Init()
+{
     m_refCount = 0;
     m_inUse = 0;
     m_animData = 0;
@@ -205,6 +210,11 @@ inline pppShapeSt::~pppShapeSt()
  * JP Size: TODO
  */
 inline pppModelSt::pppModelSt()
+{
+    Init();
+}
+
+inline void pppModelSt::Init()
 {
     m_refCount = 0;
     m_isUsed = 0;
@@ -246,7 +256,7 @@ void CPartMng::Create()
     C_MTXPerspective(ppvScreenMatrix, 33.3f, 0.93333334f, 0.125f, 10000.0f);
     PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
-    memset(m_unk235A8, 0, 0x108);
+    initGraphicSystem();
 
     m_editorFlags[2] = 0;
     m_editorFlags[1] = 0;
@@ -298,13 +308,7 @@ void CPartMng::Create()
 
     for (int i = 0; i < 0x180; i++) {
         m_pppMng[i].m_baseTime = -0x1000;
-        m_pppMng[i].m_soundEffectData.m_soundEffectHandle = -1;
-        m_pppMng[i].m_soundEffectData.m_soundEffectSlot = -1;
-        m_pppMng[i].m_soundEffectData.m_soundEffectStopFlag = 0;
-        m_pppMng[i].m_soundEffectData.m_soundEffectKind = 1;
-        m_pppMng[i].m_soundEffectData.m_soundEffectStartFrame = 0;
-        m_pppMng[i].m_soundEffectData.m_soundEffectStartedOnce = 0;
-        m_pppMng[i].m_soundEffectData.m_soundEffectFadeFrames = 30;
+        m_pppMng[i].m_soundEffectData.Init();
     }
 
     for (int i = 0; i < 0x20; i++) {
@@ -391,7 +395,7 @@ inline void pppShapeSt::Release()
  */
 inline CParModelSet::CParModelSet()
 {
-    for (int i = 0; i < 0x100; i++) {
+    for (int i = 0; i < GetNumModel(); i++) {
         m_models[i].m_isUsed = 0;
     }
 }
@@ -407,10 +411,9 @@ inline CParModelSet::CParModelSet()
  */
 inline CParModelSet::~CParModelSet()
 {
-    for (unsigned int i = 0; i < 0x100; i++) {
-        pppModelSt* model = &m_models[i];
-        if (model->m_isUsed != 0) {
-            model->Release();
+    for (unsigned int i = 0; i < GetNumModel(); i++) {
+        if (m_models[i].m_isUsed != 0) {
+            m_models[i].Release();
         }
     }
 }
@@ -426,7 +429,7 @@ inline CParModelSet::~CParModelSet()
  */
 inline CParShapeSet::CParShapeSet()
 {
-    for (int i = 0; i < 0x100; i++) {
+    for (int i = 0; i < GetNumShape(); i++) {
         m_shapes[i].m_inUse = 0;
     }
 }
@@ -442,10 +445,9 @@ inline CParShapeSet::CParShapeSet()
  */
 inline CParShapeSet::~CParShapeSet()
 {
-    for (unsigned int i = 0; i < 0x100; i++) {
-        pppShapeSt* shape = &m_shapes[i];
-        if (shape->m_inUse != 0) {
-            shape->Release();
+    for (unsigned int i = 0; i < GetNumShape(); i++) {
+        if (m_shapes[i].m_inUse != 0) {
+            m_shapes[i].Release();
         }
     }
 }
@@ -560,7 +562,7 @@ void CPartMng::pppDumpMngSt()
  */
 void CPartMng::pppAmemCacheClear()
 {
-	// TODO
+    ppvAmemCacheSet.CacheClear();
 }
 
 /*
@@ -570,7 +572,6 @@ void CPartMng::pppAmemCacheClear()
  */
 void CPartMng::pppAmemCacheCountStart()
 {
-	// TODO
 }
 
 /*
@@ -580,7 +581,6 @@ void CPartMng::pppAmemCacheCountStart()
  */
 void CPartMng::pppAmemCacheCountEnd()
 {
-	// TODO
 }
 
 /*
@@ -750,6 +750,7 @@ inline void CPartMng::drawLine(int x0, int y0, int x1, int y1, _GXColor& color)
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32((float)x0, (float)y0, z);
     GXPosition3f32((float)x1, (float)y1, z);
+    GXEnd();
 }
 
 /*
@@ -943,7 +944,7 @@ void CPartMng::pppGet2Dpos()
  */
 void CPartMng::drawStart()
 {
-	// TODO
+    m_debugCounter = 0;
 }
 
 /*
@@ -951,9 +952,13 @@ void CPartMng::drawStart()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::setProcSpeed(ProcSpdSt*, int)
+void CPartMng::setProcSpeed(ProcSpdSt* procSpd, int value)
 {
-	// TODO
+    procSpd->m_current = value;
+    if ((procSpd->m_holdCount-- == 0) || (procSpd->m_current > procSpd->m_max)) {
+        procSpd->m_max = procSpd->m_current;
+        procSpd->m_holdCount = m_unk16C << 1;
+    }
 }
 
 /*
@@ -967,11 +972,7 @@ void CPartMng::setProcSpeed(ProcSpdSt*, int)
  */
 void CPartMng::drawEnd()
 {
-    gPppHeapUseRateWords[0] = pppHeapUseRate(ppvEnv->m_stagePtr);
-    if ((gPppHeapUseRateWords[2]-- == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
-        gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
-        gPppHeapUseRateWords[2] = m_unk16C << 1;
-    }
+    setProcSpeed(&g_hpMem, pppHeapUseRate(ppvEnv->m_stagePtr));
 }
 
 /*
@@ -981,7 +982,7 @@ void CPartMng::drawEnd()
  */
 void CPartMng::initGraphicSystem()
 {
-	// TODO
+    memset(m_unk235A8, 0, 0x108);
 }
 
 /*
@@ -1159,9 +1160,7 @@ inline void CPartMng::InitMaterialSet()
 {
     if (m_textureSet == 0) {
         m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x447, 0x447, 0x43D)) CTextureSet;
-        CTextureSet* textureSet = m_textureSet;
-        textureSet->m_textureArray.SetDefaultSize(0x180);
-        textureSet->m_textureArray.SetGrow(0);
+        m_textureSet->SetDefaultSize(0x180, 0);
     }
 
     if (m_materialSet == 0) {
@@ -2180,7 +2179,7 @@ void CPartMng::pppEditPartCalc()
                 if (i == 0) {
                     m_editorFlags[2] = 1;
                 }
-                gPppHeapUseRateWords[1] = 0;
+                g_hpMem.m_max = 0;
             }
             continue;
 
@@ -2213,7 +2212,7 @@ void CPartMng::pppEditPartCalc()
             pppSetFpMatrix(mng);
             _pppCalcPart(mng);
             if (mng->m_mode != 0 && mng->m_currentFrame == mng->m_lifeEnd) {
-                gPppHeapUseRateWords[1] = 0;
+                g_hpMem.m_max = 0;
             }
             _pppDeadPart(mng);
             if (mng->m_isFinished != 0 || mng->m_hitBgFlag != 0) {
@@ -2226,7 +2225,7 @@ void CPartMng::pppEditPartCalc()
                 if (i == 0) {
                     m_editorFlags[2] = 1;
                 }
-                gPppHeapUseRateWords[1] = 0;
+                g_hpMem.m_max = 0;
             }
             continue;
 
@@ -2289,26 +2288,6 @@ checkCull:
     }
 }
 
-static inline void pppDrawPass(CPartMng* manager, unsigned char drawMode)
-{
-    Mtx invCamera;
-    Vec cameraPos;
-
-    PSMTXInverse(ppvCameraMatrix, invCamera);
-    cameraPos.x = invCamera[0][3];
-    cameraPos.y = invCamera[1][3];
-    cameraPos.z = invCamera[2][3];
-
-    for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* mng = &manager->m_pppMng[i];
-        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
-            && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0
-            && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
-            manager->pppDrawPppMngSt(cameraPos, mng);
-        }
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8005b5b4
@@ -2325,7 +2304,7 @@ void CPartMng::pppEditDrawShadow()
     }
 
     if (m_editProgramData[0] != 0 && m_editDrawMode <= 3) {
-        pppDrawPass(this, 3);
+        pppDrawPrio(3);
     }
 
     ppvScreenMatrix[2][3] = ppvScreenMatrixZbuff;
@@ -2354,11 +2333,11 @@ void CPartMng::pppEditDraw()
     Vec viewPos;
     if (m_editProgramData[0] != 0) {
         if (m_editDrawMode <= 3) {
-            pppDrawPass(this, 8);
-            pppDrawPass(this, 4);
+            pppDrawPrio(8);
+            pppDrawPrio(4);
             pppDraw();
-            pppDrawPass(this, 6);
-            pppDrawPass(this, 7);
+            pppDrawPrio(6);
+            pppDrawPrio(7);
         } else {
             for (int i = 0; i < m_editParticleCount; i++) {
                 _pppMngSt* mng = &m_pppMng[i];
@@ -2373,7 +2352,7 @@ void CPartMng::pppEditDraw()
                     ppvDrawMng.AddPrimOt(0x3ff, mng);
                     if (mng->m_mode != 0
                         && mng->m_currentFrame == mng->m_lifeEnd) {
-                        gPppHeapUseRateWords[1] = 0;
+                        g_hpMem.m_max = 0;
                     }
                 }
             }
@@ -2402,12 +2381,12 @@ void CPartMng::pppEditDraw()
 void CPartMng::pppEditPartDrawAfter()
 {
     if (ppvSysStopPartF == 0) {
-        m_debugCounter = 0;
+        drawStart();
         if (m_editProgramData[0] != 0
             && m_editDrawMode <= 3) {
-            pppDrawPass(this, 5);
-            pppDrawPass(this, 6);
-            pppDrawPass(this, 7);
+            pppDrawPrio(5);
+            pppDrawPrio(6);
+            pppDrawPrio(7);
         }
     }
 
@@ -2664,7 +2643,7 @@ void CPartMng::pppDraw()
     Vec partPos;
     Vec cameraDelta;
 
-    m_debugCounter = 0;
+    drawStart();
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
     cameraPos.y = invCamera[1][3];
@@ -2731,13 +2710,8 @@ void CPartMng::pppDraw()
  */
 void CPartMng::pppPartDrawAfter()
 {
-    pppDrawPass(this, 5);
-
-    gPppHeapUseRateWords[0] = pppHeapUseRate(ppvEnv->m_stagePtr);
-    if ((gPppHeapUseRateWords[2]-- == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
-        gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
-        gPppHeapUseRateWords[2] = m_unk16C << 1;
-    }
+    pppDrawPrio(5);
+    drawEnd();
 }
 
 /*
@@ -2918,10 +2892,10 @@ void CPartMng::LoadPartNoSyncCalc()
  */
 int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode, void* readBuffer, int readBufferSize)
 {
-    CTextureSet* textureSet;
     CMaterialSet* materialSet;
 
-    ppvAmemCacheSet.CacheClear();
+    pppAmemCacheClear();
+    pppAmemCacheCountStart();
     PartPcs.m_usbStreamState.m_stageLoad->setDefaultParam(pdtSlotIndex);
 
     char* path = g_StrTmp;
@@ -2949,9 +2923,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
 
     if (m_textureSet == 0) {
         m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0xC10, 0xC10, 0xC03)) CTextureSet;
-        textureSet = m_textureSet;
-        textureSet->m_textureArray.SetDefaultSize(0x180);
-        textureSet->m_textureArray.SetGrow(0);
+        m_textureSet->SetDefaultSize(0x180, 0);
     }
 
     if (m_materialSet == 0) {
@@ -2981,6 +2953,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     m_materialSet->SetPartFromTextureSet(m_textureSet, pdtSlotIndex);
     m_materialSet->SetTextureSet(m_textureSet);
     PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
+    pppAmemCacheCountEnd();
     return 1;
 }
 
@@ -3376,13 +3349,7 @@ PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
     g_dcp.m_paramC = 1.0f;
     g_dcp.m_paramD = 1.0f;
     g_dcp.m_enable = 0;
-    g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
-    g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;
-    g_dcp.m_soundEffectParams.m_soundEffectStopFlag = 0;
-    g_dcp.m_soundEffectParams.m_soundEffectKind = 1;
-    g_dcp.m_soundEffectParams.m_soundEffectStartFrame = 0;
-    g_dcp.m_soundEffectParams.m_soundEffectStartedOnce = 0;
-    g_dcp.m_soundEffectParams.m_soundEffectFadeFrames = 0x1e;
+    g_dcp.m_soundEffectParams.Init();
     return &g_dcp;
 }
 
@@ -3623,10 +3590,9 @@ int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam,
 int CPartMng::pppGetFreeSlot()
 {
     int slot = m_mngStCount;
-    int nextSlot = slot + 1;
-    m_mngStCount = nextSlot;
+    m_mngStCount = slot + 1;
 
-    if (nextSlot >= 0x7fffffff) {
+    if (slot + 1 >= 0x7fffffff) {
         m_mngStCount = 0x10;
     }
 
@@ -3782,9 +3748,9 @@ void CPartMng::pppShowIdx(short index, unsigned char visible)
 void CPartMng::pppFieldShowFpNo(short fieldNo, unsigned char visible)
 {
     for (int i = 0; i < 0x180; i++) {
-        if (m_pppMng[i].m_baseTime != -0x1000 && m_pppMng[i].m_kind == 0 &&
-            m_pppMng[i].m_nodeIndex == fieldNo) {
-            m_pppMng[i].m_slotVisible = visible;
+        _pppMngSt* pppMngSt = &m_pppMng[i];
+        if (pppMngSt->m_baseTime != -0x1000 && pppMngSt->m_kind == 0 && pppMngSt->m_nodeIndex == fieldNo) {
+            pppMngSt->m_slotVisible = visible;
         }
     }
 }
@@ -3802,9 +3768,8 @@ void CPartMng::pppFieldEndFpNo(short fieldNo)
 {
     for (int i = 0; i < 0x180; i++) {
         _pppMngSt* pppMngSt = &m_pppMng[i];
-        int baseTime = pppMngSt->m_baseTime;
-        if ((baseTime != -0x1000) && (pppMngSt->m_kind == 0) && (pppMngSt->m_nodeIndex == fieldNo)) {
-            if (baseTime < 0) {
+        if ((pppMngSt->m_baseTime != -0x1000) && (pppMngSt->m_kind == 0) && (pppMngSt->m_nodeIndex == fieldNo)) {
+            if (pppMngSt->m_baseTime < 0) {
                 pppMngSt->m_particleEnded = 1;
                 pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
             } else {
@@ -3969,13 +3934,10 @@ void CPartMng::pppDeleteAll()
 {
     for (int i = 0; i < 0x180; i++) {
         _pppMngSt* pppMngSt = &m_pppMng[i];
-        int baseTime = pppMngSt->m_baseTime;
-        if (baseTime != -0x1000) {
-            if (baseTime < 0) {
+        if (pppMngSt->m_baseTime != -0x1000) {
+            if (pppMngSt->m_baseTime < 0) {
                 pppMngSt->m_hitBgFlag = 1;
-                pppStopSe(
-                    pppMngSt,
-                    &pppMngSt->m_soundEffectData);
+                pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
             } else {
                 pppMngSt->m_baseTime = -0x1000;
             }
@@ -4017,19 +3979,4 @@ void CPartMng::pppDestroyAll()
  */
 inline _pppMngSt::_pppMngSt()
 {
-    PPPSEST* soundEffectData = &m_soundEffectData;
-    PPPIFPARAM* hitParams = &m_hitParams;
-
-    soundEffectData->m_soundEffectHandle = -1;
-    soundEffectData->m_soundEffectSlot = -1;
-    soundEffectData->m_soundEffectStopFlag = 0;
-    soundEffectData->m_soundEffectKind = 1;
-    soundEffectData->m_soundEffectStartFrame = 0;
-    soundEffectData->m_soundEffectStartedOnce = 0;
-    soundEffectData->m_soundEffectFadeFrames = 30;
-
-    hitParams->m_particleIndex = 0;
-    hitParams->m_classId = 0;
-    hitParams->m_hitObjectCount = 0;
-    hitParams->m_hitFlags = 0;
 }

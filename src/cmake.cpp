@@ -369,14 +369,6 @@ inline int GetCharaCnt(char* text)
  */
 void CMenuPcs::CalcSingCMake()
 {
-    short down;
-    short repeat;
-    int done;
-    CCaravanWork* caravanWork;
-    int slot;
-    int modelNo;
-    int baseDataIndex;
-    short animWait;
     int result;
 
     if (m_cmakeState->m_initialized == 0) {
@@ -438,68 +430,7 @@ void CMenuPcs::CalcSingCMake()
         if (m_cmakeState->m_mode == 0) {
             result = CmakeResultOpen();
         } else if (m_cmakeState->m_mode == 1) {
-            down = Pad.GetButtonDown(0);
-            repeat = Pad.GetButtonRepeat(0);
-
-            if (repeat == 0) {
-                done = 0;
-            } else {
-                if ((repeat & 3) != 0) {
-                    m_cmakeState->m_select ^= 1;
-                    Sound.PlaySe(1, 0x40, 0x7F, 0);
-                }
-                if ((repeat & 3) == 0) {
-                    if ((down & 0x100) != 0) {
-                        if (m_cmakeState->m_select == 0) {
-                            m_cmakeState->m_resultDir = 1;
-                            m_wmCharaAnimState[m_singleCmakeSlot].m_nextAnimIndex = 3;
-
-                            slot = static_cast<int>(m_singleCmakeSlot);
-                            modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
-                                static_cast<int>(s_CmakeInfo.m_gender));
-                            m_wm.m_charaModelData[slot].m_modelNo = modelNo;
-
-                            m_wm.m_charaSelectData->m_confirmed = 1;
-                            caravanWork = &Game.m_caravanWorkArr[slot];
-                            caravanWork->LoadInit();
-                            caravanWork->m_shopState = 1;
-                            caravanWork->unk_0x3a8 = 0x101;
-                            caravanWork->m_jobType = static_cast<int>(s_CmakeInfo.m_job);
-                            memset(caravanWork->m_name, 0, 0x11);
-                            strcpy(reinterpret_cast<char*>(caravanWork->m_name), s_CmakeInfo.m_name);
-                            caravanWork->m_tribeId = static_cast<unsigned short>(s_CmakeInfo.m_tribe);
-                            caravanWork->m_appearanceVariant = static_cast<unsigned short>(s_CmakeInfo.m_hair);
-                            caravanWork->m_genderFlag = static_cast<unsigned short>(s_CmakeInfo.m_gender);
-                            caravanWork->m_id = static_cast<unsigned short>(modelNo);
-                            baseDataIndex =
-                                static_cast<int>(caravanWork->m_genderFlag) +
-                                static_cast<int>(caravanWork->m_tribeId) * 2;
-                            caravanWork->Init(
-                                baseDataIndex,
-                                &Game.m_charaRomTable[baseDataIndex],
-                                static_cast<int>(caravanWork->m_appearanceVariant));
-                            caravanWork->LoadFinished();
-                            CallWorldParam(0, slot, 0);
-                            animWait = static_cast<short>(static_cast<int>(GetMaxAnimWait()));
-                            m_cmakeState->m_stepTimer = animWait;
-                        } else {
-                            m_cmakeState->m_resultDir = -1;
-                        }
-                        Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-                        done = 1;
-                        goto case5_out;
-                    }
-                    if ((down & 0x200) != 0) {
-                        m_cmakeState->m_resultDir = -1;
-                        Sound.PlaySe(3, 0x40, 0x7F, 0);
-                        done = 1;
-                        goto case5_out;
-                    }
-                }
-                done = 0;
-            }
-        case5_out:
-            result = done;
+            result = CmakeResultCtrl();
         } else {
             result = CmakeResultClose();
         }
@@ -537,7 +468,7 @@ void CMenuPcs::DrawSingCMake()
     case 0:
         CmakeDraw();
         if (m_cmakeState->m_resultFlag != 0 && m_cmakeState->m_mode == 0) {
-            m_cmakeState->m_step = m_cmakeState->m_step + 1;
+            m_cmakeState->m_step++;
             m_cmakeState->m_frame = 0;
             m_cmakeState->m_resultFlag = 0;
             m_cmakeState->m_selectionInitialized = 0;
@@ -568,46 +499,39 @@ void CMenuPcs::DrawSingCMake()
         break;
     }
 
-    if (m_cmakeState->m_resultFlag == 0) {
-        return;
-    }
-
-    if (m_cmakeState->m_mode < 2) {
-        m_cmakeState->m_mode++;
-        goto resetFrame;
-    }
-
-    s_OldMenu = static_cast<int>(m_cmakeState->m_step);
-
-    if (m_cmakeState->m_step == 6) {
-        m_cmakeState->m_step = static_cast<short>(m_cmakeState->m_select + 1);
-    } else if (m_cmakeState->m_resultDir < 0) {
-        if (m_cmakeState->m_step != 0) {
-            if (m_cmakeState->m_step != 5) {
-                m_cmakeState->m_step = static_cast<short>(m_cmakeState->m_step - 1);
+    if (m_cmakeState->m_resultFlag != 0) {
+        if (m_cmakeState->m_mode < 2) {
+            m_cmakeState->m_mode++;
+        } else {
+            s_OldMenu = m_cmakeState->m_step;
+            if (m_cmakeState->m_step == 6) {
+                m_cmakeState->m_step = m_cmakeState->m_select + 1;
+            } else if (m_cmakeState->m_resultDir < 0) {
+                if (m_cmakeState->m_step != 0) {
+                    if (m_cmakeState->m_step != 5) {
+                        m_cmakeState->m_step--;
+                    } else {
+                        m_cmakeState->m_step++;
+                    }
+                }
+            } else if (m_cmakeState->m_step != 5) {
+                m_cmakeState->m_step++;
             } else {
-                m_cmakeState->m_step = static_cast<short>(m_cmakeState->m_step + 1);
+                m_cmakeState->m_step = 0;
+                m_cmakeState->m_mode = 2;
+                goto end;
             }
+            if (m_cmakeState->m_step == 0) {
+                m_cmakeState->m_mode = 2;
+            } else {
+                m_cmakeState->m_mode = 0;
+            }
+        end:
+            m_cmakeState->m_selectionInitialized = 0;
         }
-    } else if (m_cmakeState->m_step != 5) {
-        m_cmakeState->m_step = static_cast<short>(m_cmakeState->m_step + 1);
-    } else {
-        m_cmakeState->m_step = 0;
-        m_cmakeState->m_mode = 2;
-        goto initSelection;
+        m_cmakeState->m_frame = 0;
+        m_menuWindowInfo->state = 3;
     }
-
-    if (m_cmakeState->m_step == 0) {
-        m_cmakeState->m_mode = 2;
-    } else {
-        m_cmakeState->m_mode = 0;
-    }
-
-initSelection:
-    m_cmakeState->m_selectionInitialized = 0;
-resetFrame:
-    m_cmakeState->m_frame = 0;
-    m_menuWindowInfo->state = 3;
 }
 
 /*
@@ -1342,16 +1266,19 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
  */
 inline int CMenuPcs::CmakeOpen()
 {
+    int ret;
     CalcWMFrame0(m_cmakeState->m_frame - 10);
     if (m_cmakeState->m_frame >= 10) {
         m_cmakeState->m_select = 0;
         m_cmakeState->m_row = 0;
         m_cmakeState->m_table = 0;
         m_cmakeState->m_subSelect = 0;
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -1379,12 +1306,15 @@ inline int CMenuPcs::CmakeCtrl()
  */
 inline int CMenuPcs::CmakeClose()
 {
+    int ret;
     CalcWMFrame0(-m_cmakeState->m_frame);
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -1428,11 +1358,14 @@ inline void CMenuPcs::CmakeDraw()
  */
 inline int CMenuPcs::CmakeNameOpen()
 {
+    int ret;
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -1620,14 +1553,17 @@ int CMenuPcs::CmakeNameCtrl()
  */
 inline int CMenuPcs::CmakeNameClose()
 {
+    int ret;
     if (m_cmakeState->m_frame >= 10) {
         if (m_cmakeState->m_resultDir < 0) {
             ChgModel(static_cast<int>(m_singleCmakeSlot), -1, -1, -1);
         }
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -1730,15 +1666,18 @@ void CMenuPcs::CmakeNameDraw()
  */
 inline int CMenuPcs::CmakeSexOpen()
 {
+    int ret;
     if (m_cmakeState->m_selectionInitialized == 0) {
         m_cmakeState->m_select = 0;
         m_cmakeState->m_selectionInitialized = 1;
     }
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -1790,11 +1729,14 @@ inline int CMenuPcs::CmakeSexCtrl()
  */
 inline int CMenuPcs::CmakeSexClose()
 {
+    int ret;
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -1903,6 +1845,7 @@ void CMenuPcs::CmakeSexDraw()
  */
 inline int CMenuPcs::CmakeTribeOpen()
 {
+    int ret;
     if (m_cmakeState->m_selectionInitialized == 0) {
         m_cmakeState->m_select = 0;
         m_cmakeState->m_row = 0;
@@ -1910,10 +1853,12 @@ inline int CMenuPcs::CmakeTribeOpen()
         m_cmakeState->m_selectionInitialized = 1;
     }
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -2031,11 +1976,14 @@ int CMenuPcs::CmakeTribeCtrl()
  */
 inline int CMenuPcs::CmakeTribeClose()
 {
+    int ret;
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -2181,15 +2129,18 @@ void CMenuPcs::CmakeTribeDraw()
  */
 inline int CMenuPcs::CmakeJobOpen()
 {
+    int ret;
     if (m_cmakeState->m_selectionInitialized == 0) {
         m_cmakeState->m_select = 0;
         m_cmakeState->m_selectionInitialized = 1;
     }
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -2295,11 +2246,14 @@ int CMenuPcs::CmakeJobCtrl()
  */
 inline int CMenuPcs::CmakeJobClose()
 {
+    int ret;
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -2396,15 +2350,18 @@ void CMenuPcs::CmakeJobDraw()
  */
 inline int CMenuPcs::CmakeResultOpen()
 {
+    int ret;
     if (m_cmakeState->m_selectionInitialized == 0) {
         m_cmakeState->m_select = 0;
         m_cmakeState->m_selectionInitialized = 1;
     }
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -2435,10 +2392,7 @@ inline int CMenuPcs::CmakeResultCtrl()
                 m_cmakeState->m_resultDir = 1;
                 m_wmCharaAnimState[m_singleCmakeSlot].m_nextAnimIndex = 3;
                 SetSingMakeChara();
-                {
-                    short animWait = static_cast<short>(static_cast<int>(GetMaxAnimWait()));
-                    m_cmakeState->m_stepTimer = animWait;
-                }
+                m_cmakeState->m_stepTimer = GetMaxAnimWait();
             } else {
                 m_cmakeState->m_resultDir = -1;
             }
@@ -2465,16 +2419,17 @@ inline int CMenuPcs::CmakeResultCtrl()
  */
 inline int CMenuPcs::CmakeResultClose()
 {
-    if (static_cast<int>(m_cmakeState->m_stepTimer) != 0) {
-        m_cmakeState->m_stepTimer =
-            static_cast<short>(m_cmakeState->m_stepTimer - 1);
-        return 0;
+    int ret;
+    if (m_cmakeState->m_stepTimer != 0) {
+        m_cmakeState->m_stepTimer--;
+        ret = 0;
+    } else if (m_cmakeState->m_frame >= 10) {
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    if (m_cmakeState->m_frame >= 10) {
-        return 1;
-    }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -2654,15 +2609,18 @@ void CMenuPcs::CmakeResultDraw()
  */
 inline int CMenuPcs::CmakeResultOpen1()
 {
+    int ret;
     if (m_cmakeState->m_selectionInitialized == 0) {
         m_cmakeState->m_select = 0;
         m_cmakeState->m_selectionInitialized = 1;
     }
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -2684,17 +2642,15 @@ inline int CMenuPcs::CmakeResultCtrl1()
     }
 
     if ((repeat & 0x8) != 0) {
-        if (static_cast<int>(m_cmakeState->m_select) != 0) {
-            m_cmakeState->m_select =
-                static_cast<short>(m_cmakeState->m_select - 1);
+        if (m_cmakeState->m_select != 0) {
+            m_cmakeState->m_select--;
         } else {
             m_cmakeState->m_select = 3;
         }
         Sound.PlaySe(1, 0x40, 0x7F, 0);
     } else if ((repeat & 0x4) != 0) {
         if (m_cmakeState->m_select < 3) {
-            m_cmakeState->m_select =
-                static_cast<short>(m_cmakeState->m_select + 1);
+            m_cmakeState->m_select++;
         } else {
             m_cmakeState->m_select = 0;
         }
@@ -2728,11 +2684,14 @@ inline int CMenuPcs::CmakeResultCtrl1()
  */
 inline int CMenuPcs::CmakeResultClose1()
 {
+    int ret;
     if (m_cmakeState->m_frame >= 10) {
-        return 1;
+        ret = 1;
+    } else {
+        m_cmakeState->m_frame++;
+        ret = 0;
     }
-    m_cmakeState->m_frame++;
-    return 0;
+    return ret;
 }
 
 /*
@@ -2893,20 +2852,25 @@ void CMenuPcs::CmakeResultDraw1()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
-inline void CMenuPcs::CmakeVillageOpen()
+inline unsigned short CMenuPcs::CmakeVillageOpen()
 {
-    m_wmResetRequest = 1;
-    createVillageMenu();
+    CmakeMenuState* villageWork = static_cast<CmakeMenuState*>(m_cmakeVillageWork);
+    unsigned short ret;
+    if (villageWork->m_frame >= 10) {
+        ret = 1;
+    } else {
+        villageWork->m_frame++;
+        ret = 0;
+    }
+    return ret;
 }
-#endif
 
 /*
  * --INFO--
@@ -3055,10 +3019,17 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmakeVillageClose()
+inline unsigned short CMenuPcs::CmakeVillageClose()
 {
-    m_wmResetRequest = 0;
-    destroyVillageMenu();
+    CmakeMenuState* villageWork = static_cast<CmakeMenuState*>(m_cmakeVillageWork);
+    unsigned short ret;
+    if (villageWork->m_frame >= 10) {
+        ret = 1;
+    } else {
+        villageWork->m_frame++;
+        ret = 0;
+    }
+    return ret;
 }
 
 /*
@@ -3141,14 +3112,13 @@ void CMenuPcs::CmakeVillageDraw()
  */
 inline void CMenuPcs::SetSingMakeChara()
 {
-    CCaravanWork* caravanWork;
     int slot = static_cast<int>(m_singleCmakeSlot);
     int modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
         static_cast<int>(s_CmakeInfo.m_gender));
     m_wm.m_charaModelData[slot].m_modelNo = modelNo;
 
-    caravanWork = &Game.m_caravanWorkArr[slot];
     m_wm.m_charaSelectData->m_confirmed = 1;
+    CCaravanWork* caravanWork = &Game.m_caravanWorkArr[slot];
     caravanWork->LoadInit();
     caravanWork->m_shopState = 1;
     caravanWork->unk_0x3a8 = 0x101;
@@ -3172,22 +3142,43 @@ inline void CMenuPcs::SetSingMakeChara()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 340b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 inline void CMenuPcs::createVillageMenu()
 {
-    if (m_menuResultCode == 0) {
-        m_wmResetRequest = 1;
-        calcVillageMenu();
+    if (m_menuResultCode == 0 && m_wmResetRequest != 0) {
+        if (Game.m_gameWork.m_menuStageMode == 0) {
+#ifdef VERSION_GCCJGC
+            loadFont(2, const_cast<char*>(s_cmakeSubfontPath), 4, -1);
+#else
+            char path[128];
+            sprintf(path, "dvd/%smenu/subfont.fnt", Game.GetLangString());
+            loadFont(2, path, 4, -1);
+#endif
+        }
+
+        loadTexture(PTR_s_world2, 8, 1, s_cmakeWorldTextureTable, CMAKE_TEX_VILLAGE_CRYSTAL, CMAKE_VILLAGE_TEXTURE_COUNT, 3);
+
+        CMemory::CStage* stage = MenuPcs.m_menuStage;
+        void*& villageWork = m_cmakeVillageWork;
+#ifdef VERSION_GCCJGC
+        const int allocationLine = 0xC17;
+#elif defined(VERSION_GCCE01)
+        const int allocationLine = 0xCB1;
+#else
+        const int allocationLine = 0xCB3;
+#endif
+        villageWork = operator new(0x48, stage, const_cast<char*>(CMAKE_SOURCE_NAME), allocationLine);
+        memset(villageWork, 0, 0x48);
+        strcpy(s_CmakeInfo.m_name, Game.m_gameWork.m_townName);
+        m_menuResultCode = 1;
     }
 }
-#endif
 
 /*
  * --INFO--
@@ -3202,19 +3193,17 @@ void CMenuPcs::destroyVillageMenu()
 {
     if (m_menuResultCode != 0) {
         if (Game.m_gameWork.m_menuStageMode == 0) {
-            CFont*& font = m_fonts[CMAKE_FONT_VILLAGE];
-            if (font != 0) {
-                font->Release();
-                font = 0;
+            if (m_fonts[CMAKE_FONT_VILLAGE] != 0) {
+                m_fonts[CMAKE_FONT_VILLAGE]->Release();
+                m_fonts[CMAKE_FONT_VILLAGE] = 0;
             }
         }
 
         freeTexture(8, 1, CMAKE_TEX_VILLAGE_CRYSTAL, CMAKE_VILLAGE_TEXTURE_COUNT);
 
-        void*& villageWork = m_cmakeVillageWork;
-        if (villageWork != nullptr) {
-            operator delete(villageWork);
-            villageWork = nullptr;
+        if (m_cmakeVillageWork) {
+            operator delete(m_cmakeVillageWork);
+            m_cmakeVillageWork = 0;
         }
 
         m_menuResultCode = 0;
@@ -3233,75 +3222,22 @@ void CMenuPcs::destroyVillageMenu()
 void CMenuPcs::calcVillageMenu()
 {
     if (m_wmResetRequest != 0 && m_menuResultCode == 0) {
-        if (m_menuResultCode == 0 && m_wmResetRequest != 0) {
-            if (Game.m_gameWork.m_menuStageMode == 0) {
-#ifdef VERSION_GCCJGC
-                loadFont(2, const_cast<char*>(s_cmakeSubfontPath), 4, -1);
-#else
-                char path[128];
-                sprintf(path, "dvd/%smenu/subfont.fnt", Game.GetLangString());
-                loadFont(2, path, 4, -1);
-#endif
-            }
-
-            loadTexture(PTR_s_world2, 8, 1, s_cmakeWorldTextureTable, CMAKE_TEX_VILLAGE_CRYSTAL, CMAKE_VILLAGE_TEXTURE_COUNT, 3);
-
-            CMemory::CStage* stage = MenuPcs.m_menuStage;
-            void*& villageWork = m_cmakeVillageWork;
-#ifdef VERSION_GCCJGC
-            const int allocationLine = 0xC17;
-#elif defined(VERSION_GCCE01)
-            const int allocationLine = 0xCB1;
-#else
-            const int allocationLine = 0xCB3;
-#endif
-            villageWork = operator new(0x48, stage, const_cast<char*>(CMAKE_SOURCE_NAME), allocationLine);
-            memset(villageWork, 0, 0x48);
-            strcpy(s_CmakeInfo.m_name, Game.m_gameWork.m_townName);
-            m_menuResultCode = 1;
-        }
+        createVillageMenu();
     }
 
-    short active = m_menuResultCode;
-    if (active != 0) {
-        if (m_wmResetRequest == 0 && active != 0) {
-            if (active != 0) {
-                if (Game.m_gameWork.m_menuStageMode == 0) {
-                    CFont*& font = m_fonts[CMAKE_FONT_VILLAGE];
-                    if (font != 0) {
-                        font->Release();
-                        font = 0;
-                    }
-                }
-
-                freeTexture(8, 1, CMAKE_TEX_VILLAGE_CRYSTAL, CMAKE_VILLAGE_TEXTURE_COUNT);
-                void*& villageWork = m_cmakeVillageWork;
-                if (villageWork != nullptr) {
-                    operator delete(villageWork);
-                    villageWork = nullptr;
-                }
-                m_menuResultCode = 0;
-            }
+    if (m_menuResultCode != 0) {
+        if (m_wmResetRequest == 0 && m_menuResultCode != 0) {
+            destroyVillageMenu();
         } else {
             CmakeMenuState* villageWork = static_cast<CmakeMenuState*>(m_cmakeVillageWork);
-            unsigned short result = 0;
-            short& mode = villageWork->m_mode;
-            short& frame = villageWork->m_frame;
+            unsigned short result;
 
-            if (mode == 0) {
-                if (frame >= 10) {
-                    result = 1;
-                } else {
-                    frame = frame + 1;
-                    result = 0;
-                }
-            } else if (mode == 1) {
+            if (villageWork->m_mode == 0) {
+                result = CmakeVillageOpen();
+            } else if (villageWork->m_mode == 1) {
                 result = CmakeVillageCtrl();
-            } else if (frame >= 10) {
-                result = 1;
             } else {
-                frame = frame + 1;
-                result = 0;
+                result = CmakeVillageClose();
             }
 
             villageWork->m_resultFlag = static_cast<short>(result);
@@ -3324,9 +3260,8 @@ void CMenuPcs::drawVillageMenu()
         CmakeMenuState* villageWork = static_cast<CmakeMenuState*>(m_cmakeVillageWork);
         CmakeVillageDraw();
         if (villageWork->m_resultFlag != 0) {
-            short& mode = villageWork->m_mode;
-            if (mode < 2) {
-                mode = mode + 1;
+            if (villageWork->m_mode < 2) {
+                villageWork->m_mode++;
             } else {
                 m_wmResetRequest = 0;
                 CallWorldParam(10, 0, 0);
@@ -3351,7 +3286,7 @@ void CMenuPcs::CalcSingleCMakeChara()
     WmWorldObjInfo* modelWork = m_wm.m_worldObjData + slot + 0x20;
 
     if (GetCmakeCharaHandle(this, slot)->m_model == nullptr ||
-        GetCmakeCharaHandle(this, slot)->m_model->m_texSet == nullptr) {
+        GetCmakeCharaHandle(this, slot)->m_model->GetTextureSet() == nullptr) {
         modelWork->m_active = 0;
         return;
     }

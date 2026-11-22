@@ -153,7 +153,6 @@ public:
     unsigned short m_magic;                 // 0x0020
     unsigned short m_defense;               // 0x0022
     CRomData* m_romWork;                    // 0x0024
-    unsigned short* RomStatusBlock() { return m_elementResistances; }
     unsigned short m_elementResistances[RomStatusBlockHalfwordCount]; // 0x0028
     unsigned short m_statusTimers[39];      // 0x003E
     unsigned short m_statusValues[16];      // 0x008C-0xAB
@@ -246,16 +245,8 @@ public:
     int GetTotalBonus()
     {
         int bonus = m_artifactRelated[3] + m_artifactRelated[4];
-        int total;
-        if (bonus < 0) {
-            total = 0;
-        } else {
-            total = 100;
-            if (bonus <= 100) {
-                total = bonus;
-            }
-        }
-        return total;
+        bonus = (bonus < 0) ? 0 : ((bonus > 100) ? 100 : bonus);
+        return bonus;
     }
     int GetTotalBonus2()
     {
@@ -307,7 +298,14 @@ public:
            kPermanentArtifactStart = kInventoryCapacity,
            kTemporaryArtifactStart = kPermanentArtifactStart + kPermanentArtifactCount,
            kItemSlotCount = kInventoryCapacity + kArtifactCount };
-    short m_inventoryItems[kItemSlotCount];     // 0x00B6: inventory, permanent artifacts, temporary artifacts
+    union {
+        short m_inventoryItems[kItemSlotCount]; // 0x00B6: inventory, permanent artifacts, temporary artifacts
+        struct {
+            short m_items[kInventoryCapacity];             // 0x00B6
+            short m_artifacts[kPermanentArtifactCount];    // 0x0136
+            short m_tmpArtifacts[kTemporaryArtifactCount]; // 0x01F6
+        } m_itemView;
+    };
     unsigned char m_treasureFlags;              // 0x01FE
     unsigned char m_moneyFlags;                 // 0x01FF
     int m_gil;                                  // 0x0200
@@ -414,12 +412,8 @@ inline void CCaravanWork::SetEvtFlag(int evtFlagIndex, int value)
  */
 inline int CCaravanWork::GetEvtFlag(int evtFlagIndex)
 {
-    int byteIndex = evtFlagIndex / 8;
-    unsigned char value = m_evtFlags[byteIndex];
-    int mask = 1 << (evtFlagIndex % 8);
-    unsigned int flag = value & mask;
-
-    if (flag != 0) {
+    unsigned char value = m_evtFlags[evtFlagIndex / 8];
+    if ((value & (1 << (evtFlagIndex % 8))) != 0) {
         return 1;
     }
     return 0;

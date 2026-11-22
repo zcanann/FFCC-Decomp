@@ -292,14 +292,13 @@ void CGMonObj::logicFuncLastBoss()
 	int nextState = -1;
 
 	if (m_actionBranch == 2) {
-		int& timer = reinterpret_cast<LastBossWork*>(m_boss)->m_phaseTimer;
-		timer += 1;
-		if (timer >= 10) {
+		reinterpret_cast<LastBossWork*>(m_boss)->m_phaseTimer += 1;
+		if (reinterpret_cast<LastBossWork*>(m_boss)->m_phaseTimer >= 10) {
 			m_actionBranch = 3;
 			nextState = 0x65;
 			m_unk6C8 = 0;
 			m_bgColMask &= 0xFFF7FFFF;
-			timer = 0;
+			reinterpret_cast<LastBossWork*>(m_boss)->m_phaseTimer = 0;
 		}
 	}
 
@@ -476,13 +475,13 @@ void CGMonObj::changeStatFuncLastBoss(int stat)
  */
 void CGMonObj::damagedFuncLastBoss()
 {
-	int& timer = reinterpret_cast<LastBossWork*>(m_boss)->m_phaseTimer;
-	if (timer >= 100 && m_actionBranch == 0) {
+	LastBossWork* work = reinterpret_cast<LastBossWork*>(m_boss);
+	if (work->m_phaseTimer >= 100 && m_actionBranch == 0) {
 		m_actionBranch = 1;
 		m_unk6C8 = 0;
 		changeStat(100, 0, 0);
 		m_bgColMask &= 0xFFF7FFFF;
-		timer = 0;
+		work->m_phaseTimer = 0;
 	}
 }
 
@@ -576,12 +575,11 @@ void CGMonObj::changeStatFuncRamoe(int stat)
  */
 void CGMonObj::logicFuncRamoe()
 {
-	unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
 	int activeCount = 0;
 	int nextState = -1;
 
-	for (int i = 1; i < 0x40; scriptWork++, i++) {
-		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(scriptWork[0xC5D0 / 4]);
+	for (int i = 1; i < 0x40; i++) {
+		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(Game.m_monObjects[i]);
 		if (monObj != 0 && (monObj->m_lastStateId != 9 || monObj->m_subState != 2)) {
 			activeCount++;
 		}
@@ -735,9 +733,8 @@ void CGMonObj::logicFuncMeteoParasite()
 void CGMonObj::frameStatFuncMeteoParasite()
 {
 	int scriptKind = m_scriptHandle->m_baseDataIndex;
-	int state = m_lastStateId;
 
-	switch (state) {
+	switch (m_lastStateId) {
 	case 100:
 		if (m_stateFrame == 0) {
 			reqAnim(10, 0, 0);
@@ -812,8 +809,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 
 			MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 			for (int i = 0; i < 12; i++) {
-				float angle = 2.0f * (3.1415927f * static_cast<float>(i + 3)) / 12.0f;
-				work->m_rotObjects[i]->m_rotTargetY = angle + aaa;
+				work->m_rotObjects[i]->m_rotTargetY = 2.0f * (3.1415927f * static_cast<float>(i + 3)) / 12.0f + aaa;
 			}
 
 			aaa += 0.01f;
@@ -858,8 +854,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
  */
 void CGMonObj::changeStatFuncMeteoParasite(int stat)
 {
-	int scriptKind = m_scriptHandle->m_baseDataIndex;
-	switch (scriptKind) {
+	switch (m_scriptHandle->m_baseDataIndex) {
 	case 0x87:
 		switch (stat) {
 		case 0x67: {
@@ -937,8 +932,10 @@ void CGMonObj::initFinishedFuncMeteoParasite()
  */
 int CGMonObj::attackCheckFuncMeteoParasiteC(int)
 {
-	const int branch = m_actionBranch;
-	return (((branch - 1) | (1 - branch)) >> 31) - 1;
+	if (m_actionBranch != 1) {
+		return -2;
+	}
+	return -1;
 }
 
 /*
@@ -998,8 +995,7 @@ int CGMonObj::calcBranchFuncMeteoParasiteC(int)
  */
 void CGMonObj::frameStatFuncMeteoParasiteC()
 {
-	int state = m_lastStateId;
-	switch (state) {
+	switch (m_lastStateId) {
 	case 0x65:
 		if (m_subState == 0) {
 			if (m_subFrame == 0) {
@@ -1019,7 +1015,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 				m_bgColMask |= 0x80000;
 			}
 		}
-		return;
+		break;
 	case 0x67: {
 		int subState = m_subState;
 		if (subState == 0) {
@@ -1049,7 +1045,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 				m_unk6C8 = 0;
 			}
 		}
-		return;
+		break;
 	}
 	case 0x66:
 		if (m_stateFrame == 0) {
@@ -1058,26 +1054,25 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 			    ->m_objs[reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex]
 			    ->changeStat(0x65, 0, 0);
 			reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x25, 0, 0);
-			CFlat.m_bossState = CFlat.m_bossState + 1;
+			CFlat.m_bossState++;
 			CFlat.m_gameFlagBits.m_flagBit5 = 1;
 		} else if (isLoopAnim() != 0) {
 			SetAnimSlot(0, 0);
 			changeStat(0, 0, 0);
 			m_actionBranch = 0;
 			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreWait = MON_FRAMES(0x1C2, 0x177);
-			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex =
-			    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 1;
+			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex++;
 			if (3 <= reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex) {
 				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex = 0;
 			}
 			m_unk6C8 = 0;
 		}
-		return;
+		break;
 	case 0x68:
 		if (m_stateFrame == 0) {
 			reqAnim(0x35, 1, 0);
 		}
-		return;
+		break;
 	}
 }
 
@@ -1092,13 +1087,11 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
  */
 void CGMonObj::damagedFuncMeteoParasiteC()
 {
-	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
-
-	if (work->bits.m_meteo3 == 0) {
-		if (((work->m_coreIndex == 0) &&
+	if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
+		if (((reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex == 0) &&
 		     (m_scriptHandle->m_hp <
 		      ((m_scriptHandle->m_maxHp * 2) / 3))) ||
-		    ((work->m_coreIndex == 1) &&
+		    ((reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex == 1) &&
 		     (m_scriptHandle->m_hp <
 		      (m_scriptHandle->m_maxHp / 3)))) {
 			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreDamage = 0;
@@ -1215,8 +1208,7 @@ void CGMonObj::changeStatFuncMolbol(int stat)
  */
 void CGMonObj::damagedFuncWifeLamia()
 {
-	CGObjWork* script = m_scriptHandle;
-	if (script->m_hp <= 1) {
+	if (m_scriptHandle->m_hp <= 1) {
 		ClearAllSta();
 		m_bgColMask &= 0xFFF7FFFF;
 		changeStat(100, 0, 0);
@@ -1242,11 +1234,7 @@ void CGMonObj::frameStatFuncWifeLamia()
 				m_moveWork.Clear();
 				m_moveWork.m_flags = 0x10022;
 
-				const CVector& attackOffset =
-				    CVector(-172.0f, 3.41f, -73.0f);
-				m_moveWork.m_targetPos.x = attackOffset.x;
-				m_moveWork.m_targetPos.y = attackOffset.y;
-				m_moveWork.m_targetPos.z = attackOffset.z;
+				m_moveWork.m_targetPos = CVector(-172.0f, 3.41f, -73.0f);
 				m_moveWork.m_speed = 2.5f;
 				m_moveWork.m_range = m_bodyEllipsoidRadius;
 			}
@@ -1335,14 +1323,10 @@ void CGMonObj::damagedFuncGigasLoad()
  */
 int CGMonObj::calcBranchFuncTetsukyojin(int)
 {
-	const int branch = m_actionBranch;
-	int positive;
-	if (branch >= 1) {
-		positive = 1;
-	} else {
-		positive = 0;
+	if (m_actionBranch >= 1) {
+		return 1;
 	}
-	return positive;
+	return 0;
 }
 
 /*
@@ -1358,9 +1342,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 {
 	Vec attackVec;
 	CFlatRuntime::CStack stack[3];
-	const int state = m_lastStateId;
-
-	switch (state) {
+	switch (m_lastStateId) {
 	case 100:
 		if (m_stateFrame == 0) {
 			CVector partyPos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
@@ -1399,7 +1381,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.m_changeStat = 0x67;
 		}
 		moveFrame();
-		return;
+		break;
 	case 0x67:
 		if (m_stateFrame == MON_FRAMES(0x14, 0x10)) {
 			m_moveWork.Clear();
@@ -1414,7 +1396,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			moveFrame();
 		}
 		statAttack();
-		return;
+		break;
 	case 0x65:
 		if ((CFlat.m_bossState != 0) && (m_stateFrame == MON_FRAMES(0x2D, 0x25))) {
 			int flatCount = CFlat.m_bossState;
@@ -1438,7 +1420,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			}
 		}
 		statAttack();
-		return;
+		break;
 	case 0x66:
 		if (CFlat.m_bossState >= 1) {
 			if ((m_actionBranch == 1) && (m_stateFrame == 0)) {
@@ -1459,10 +1441,9 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		} else {
 			changeStat(0, 0, 0);
 		}
-		return;
+		break;
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801311a0
@@ -1474,17 +1455,14 @@ void CGMonObj::frameStatFuncTetsukyojin()
  */
 void CGMonObj::cancelStatFuncTetsukyojin()
 {
-	const int state = m_lastStateId;
-	switch (state) {
+	switch (m_lastStateId) {
 	case 0x66:
 		m_bgColMask |= 0xC0002;
-		return;
+		break;
 	case 100:
 	case 0x67:
 		moveCancel();
-		return;
-	default:
-		return;
+		break;
 	}
 }
 
@@ -1526,8 +1504,7 @@ void CGMonObj::changeStatFuncTetsukyojin(int stat)
  */
 int CGMonObj::calcBranchFuncLich(int)
 {
-	const int flatFlags = CFlat.m_bossState;
-	return ((flatFlags >> 1) & 1) ^ 1;
+	return (CFlat.m_bossState & 2) ? 0 : 1;
 }
 
 /*
@@ -1556,15 +1533,12 @@ void CGMonObj::frameStatFuncLich()
 	if (reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 != 0) {
 		endPSlotBit(0x800);
 		if (reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0) {
-			int pdtNo = m_charaModelHandle->GetPdtId();
-			putParticle((pdtNo << 8) | 0x1D, m_particleSlots[11],
-			                    reinterpret_cast<CGObject*>(this), 1.0f, 0);
+			putParticle((m_charaModelHandle->GetPdtId() << 8) | 0x1D, m_particleSlots[11], reinterpret_cast<CGObject*>(this), 1.0f, 0);
 		}
 		reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 0;
 	}
 
-	const int stat = m_lastStateId;
-	switch (stat) {
+	switch (m_lastStateId) {
 	case 100:
 		teleport(1, 0x0E, MON_FRAMES(0x32, 0x29), MON_FRAMES(0x78, 100), 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, gLichTeleportPoints,
 		         reinterpret_cast<LichBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex,
@@ -1705,9 +1679,7 @@ int CGMonObj::calcBranchFuncDragonZombie(int)
  */
 void CGMonObj::frameStatFuncDragonZombie()
 {
-	int state = m_lastStateId;
-
-	switch (state) {
+	switch (m_lastStateId) {
 	case 100:
 		statAttack();
 		break;
@@ -1734,8 +1706,7 @@ void CGMonObj::frameStatFuncDragonZombie()
  */
 void CGMonObj::cancelStatFuncDragonZombie()
 {
-	const int state = m_lastStateId;
-	switch (state) {
+	switch (m_lastStateId) {
 	case 100:
 		SetAnimSlot(0x0E, 0);
 		SetAnimSlot(0x13, 4);
@@ -1967,9 +1938,7 @@ void CGMonObj::frameStatFuncSaw()
 			if (m_subFrame == 0) {
 				reqAnim(10, 0, 0);
 
-				int pdtNo = m_charaModelHandle->GetPdtId();
-
-				putParticle(pdtNo << 8, m_particleSlots[0], reinterpret_cast<CGObject*>(this), 1.0f, 0x1C52C);
+				putParticle(m_charaModelHandle->GetPdtId() << 8, m_particleSlots[0], reinterpret_cast<CGObject*>(this), 1.0f, 0x1C52C);
 				playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
 				m_moveWork.Clear();
 				m_moveWork.m_flags = 0x1402;
@@ -2106,14 +2075,10 @@ void CGMonObj::cancelStatFuncGoblinKing()
  */
 int CGMonObj::calcBranchFuncOrcKing(int)
 {
-	CGObjWork* script = m_scriptHandle;
-	int branch = 0;
-	if (script->m_hp < (script->m_maxHp / 5)) {
-		branch = 2;
-	} else {
-		branch = calcBranchFuncDefault(1);
+	if (m_scriptHandle->m_hp < m_scriptHandle->m_maxHp / 5) {
+		return 2;
 	}
-	return branch;
+	return calcBranchFuncDefault(1);
 }
 
 /*
@@ -2161,10 +2126,7 @@ void CGMonObj::alwaysFuncOrcKing()
 
 	if (reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_timer == 0x3C) {
 		m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
-		int pdtNo = m_charaModelHandle->GetPdtId();
-		putParticle(
-			(pdtNo << 8) | 0x1D, m_particleSlots[11],
-			reinterpret_cast<CGObject*>(this), 1.0f, 0);
+		putParticle((m_charaModelHandle->GetPdtId() << 8) | 0x1D, m_particleSlots[11], reinterpret_cast<CGObject*>(this), 1.0f, 0);
 	} else if (reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_timer == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
 		CGMonObj* monObj = CFlat.FindGMonObjFirst();
 		while (monObj != 0) {
@@ -2180,7 +2142,6 @@ void CGMonObj::alwaysFuncOrcKing()
 		reinterpret_cast<OrcKingBossWork*>(CGMonObj::m_boss)->m_timer += 1;
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801322dc
@@ -2192,28 +2153,19 @@ void CGMonObj::alwaysFuncOrcKing()
  */
 void CGMonObj::frameStatFuncOrcKing()
 {
-
 	switch (m_lastStateId) {
 	case 100:
 		if (m_actionBranch == 0) {
-			int pdtNo = m_charaModelHandle->GetPdtId();
-
-			putParticle((pdtNo << 8) | 0x18, m_particleSlots[10], this, 1.0f, 0x8CC0);
+			putParticle((m_charaModelHandle->GetPdtId() << 8) | 0x18, m_particleSlots[10], this, 1.0f, 0x8CC0);
 			reqAnim(0xF, 0, 0);
 			SetAnimSlot(0x10, 0);
 			SetAnimSlot(0x15, 4);
 		} else if (m_actionBranch == 0x96) {
-			int pdtNo = m_charaModelHandle->GetPdtId();
-
-			putParticle((pdtNo << 8) | 0x19, m_particleSlots[11], this, 1.0f, 0x8CC1);
+			putParticle((m_charaModelHandle->GetPdtId() << 8) | 0x19, m_particleSlots[11], this, 1.0f, 0x8CC1);
 		} else if (m_actionBranch == 300) {
-			int pdtNo = m_charaModelHandle->GetPdtId();
-
-			putParticle((pdtNo << 8) | 0x1A, m_particleSlots[11], this, 1.0f, 0x8CC2);
+			putParticle((m_charaModelHandle->GetPdtId() << 8) | 0x1A, m_particleSlots[11], this, 1.0f, 0x8CC2);
 		} else if (m_actionBranch == 0x1C2) {
-			int pdtNo = m_charaModelHandle->GetPdtId();
-
-			putParticle((pdtNo << 8) | 0x1B, m_particleSlots[11], this, 1.0f, 0x8CC3);
+			putParticle((m_charaModelHandle->GetPdtId() << 8) | 0x1B, m_particleSlots[11], this, 1.0f, 0x8CC3);
 		} else if (m_actionBranch == 600) {
 			endPSlotBit(0xC00);
 			m_bgColMask &= 0xFFF7FFFF;
@@ -2234,7 +2186,6 @@ void CGMonObj::frameStatFuncOrcKing()
 		break;
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x80132538
@@ -2264,8 +2215,7 @@ void CGMonObj::cancelStatFuncOrcKing()
  */
 void CGMonObj::frameStatFuncArmstrong()
 {
-	int state = m_lastStateId;
-	switch (state) {
+	switch (m_lastStateId) {
 	case 100:
 		if (m_stateFrame == 0) {
 			enableDamageCol(0);
@@ -2409,19 +2359,17 @@ void CGMonObj::frameStatFuncGolem()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma bool off
 int CGMonObj::calcBranchFuncGolem(int)
 {
 	if (m_actionBranch == 1) {
 		return 2;
 	}
 
-	CGObjWork* script = m_scriptHandle;
-	return static_cast<unsigned int>(
-	           __cntlzw(script->m_hp >= static_cast<int>(static_cast<unsigned int>(script->m_maxHp) >> 1))) >>
-	       5;
+	if (m_scriptHandle->m_hp < m_scriptHandle->m_maxHp / 2) {
+		return 1;
+	}
+	return 0;
 }
-#pragma bool on
 
 /*
  * --INFO--
@@ -2455,8 +2403,7 @@ void CGMonObj::changeStatFuncGolem(int stat)
  */
 void CGMonObj::damagedFuncGolem()
 {
-	CGObjWork* script = m_scriptHandle;
-	if (script->m_hp == 0) {
+	if (m_scriptHandle->m_hp == 0) {
 		DispCharaParts(7);
 	}
 }

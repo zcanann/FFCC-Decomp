@@ -7860,9 +7860,10 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) ? 1 : 0);
 	caravanWork.m_id = static_cast<unsigned short>(
 	    GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, (info.m_charaType >> 7) ? 1 : 0));
+	unsigned char nibble;
+	int v;
 	for (int favorite = 0; favorite < 8; favorite++) {
-		unsigned char nibble = info.m_favorite[favorite >> 1];
-		int v;
+		nibble = info.m_favorite[favorite >> 1];
 		if ((favorite & 1) != 0) {
 			v = (nibble >> 4) & 0x0F;
 		} else {

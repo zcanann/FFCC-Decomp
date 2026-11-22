@@ -22,20 +22,6 @@ inline int CSystem::GetErrorLevel()
 	return m_execParam;
 }
 
-namespace {
-static inline float GetStatusMultiplier(int offset)
-{
-	return ((float)(*(unsigned short*)((unsigned char*)Game.m_battleParams + offset)) * 0.01f) +
-		   0.0000001f;
-}
-
-static inline float GetStatusMultiplier(int offset, int index)
-{
-	return ((float)((unsigned short*)((unsigned char*)Game.m_battleParams + offset))[index] * 0.01f) +
-		   0.0000001f;
-}
-}
-
 STATIC_ASSERT(offsetof(CRomLetterWork, m_priorityFlags) == 0x06);
 STATIC_ASSERT(offsetof(CRomLetterWork, m_personalConditions) == 0x18);
 STATIC_ASSERT(offsetof(CRomLetterWork, m_linkConditions) == 0x1A);
@@ -78,7 +64,7 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_defense = romWork->m_defense;
 	m_romWork = &romWork->m_data;
 
-	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(m_elementResistances, m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers, 0, sizeof(m_statusTimers));
 	for (int i = 0; i < 16; i++) {
 		m_statusValues[i] = 0xFFFF;
@@ -98,15 +84,15 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 inline void CGObjWork::CalcStatus()
 {
 	if (m_statusTimers[6] != 0) {
-		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
-		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
+		m_strength = (unsigned short)((float)m_strength * (((float)Game.m_battleParams[0x1C] * 0.01f) + 0.0000001f));
+		m_magic = (unsigned short)((float)m_magic * (((float)Game.m_battleParams[0x1C] * 0.01f) + 0.0000001f));
+		m_defense = (unsigned short)((float)m_defense * (((float)Game.m_battleParams[0x1C] * 0.01f) + 0.0000001f));
 	}
 	if (m_statusTimers[1] != 0) {
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
+		m_defense = (unsigned short)((float)m_defense * (((float)Game.m_battleParams[0x1F] * 0.01f) + 0.0000001f));
 	}
 	if (m_statusTimers[3] != 0) {
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
+		m_defense = (unsigned short)((float)m_defense * (((float)Game.m_battleParams[0x22] * 0.01f) + 0.0000001f));
 	}
 }
 
@@ -121,21 +107,7 @@ inline void CGObjWork::CalcStatus()
  */
 CCaravanWork::CCaravanWork()
 {
-	m_shopState = 0;
-	unk_0x3a8 = 0;
-	m_jobType = 0;
-	m_objType = 0;
-	m_joybusCaravanId = -1;
-	sprintf((char*)m_name, "\x81\x69\x82\xC8\x82\xDC\x82\xA6\x82\xC8\x82\xB5\x81\x6A");
-	m_letterMeta[0] = 0xFFFF;
-	m_letterMeta[1] = 0xFFFF;
-	m_letterMeta[2] = 0xFFFF;
-	m_letterMeta[3] = 0xFFFF;
-	m_letterMeta[4] = 0xFFFF;
-	m_letterMeta[5] = 0xFFFF;
-	m_letterMeta[6] = 0xFFFF;
-	m_letterMeta[7] = 0xFFFF;
-	clearCaravanWork();
+	LoadInit();
 }
 
 /*
@@ -213,14 +185,9 @@ void CCaravanWork::LoadInit()
 	m_objType = 0;
 	m_joybusCaravanId = -1;
 	sprintf((char*)m_name, "\x81\x69\x82\xC8\x82\xDC\x82\xA6\x82\xC8\x82\xB5\x81\x6A");
-	m_letterMeta[0] = 0xFFFF;
-	m_letterMeta[1] = 0xFFFF;
-	m_letterMeta[2] = 0xFFFF;
-	m_letterMeta[3] = 0xFFFF;
-	m_letterMeta[4] = 0xFFFF;
-	m_letterMeta[5] = 0xFFFF;
-	m_letterMeta[6] = 0xFFFF;
-	m_letterMeta[7] = 0xFFFF;
+	for (int i = 0; i < 8; i++) {
+		m_letterMeta[i] = 0xFFFF;
+	}
 	clearCaravanWork();
 }
 
@@ -269,40 +236,13 @@ void CCaravanWork::LoadFinished()
  */
 void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	int value = 0;
-
-	m_baseDataIndex = baseDataIndex;
-	m_id = romWork->m_id + idOffset;
-	m_param1 = romWork->m_param1;
-	m_param2 = romWork->m_param2;
-	m_maxHp = romWork->m_maxHp;
-	m_strength = romWork->m_strength;
-	m_magic = romWork->m_magic;
-	m_defense = romWork->m_defense;
-	m_romWork = &romWork->m_data;
-	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
-	memset(m_statusTimers, 0, sizeof(m_statusTimers));
-	for (int i = 0; i < 16; i++) {
-		m_statusValues[i] = 0xFFFF;
-	}
-	m_hp = m_maxHp;
+	CGObjWork::Init(baseDataIndex, romWork, idOffset);
 	m_shopState = 1;
-
-	value = (int)m_id - 100;
-	m_tribeId = value / 200;
-
-	value = (int)m_id - 100;
-	m_genderFlag = (value / 100) & 1;
+	m_tribeId = (m_id - 100) / 200;
+	m_genderFlag = ((m_id - 100) / 100) & 1;
 
 	clearCaravanWork();
-	m_bonusCondition = 0;
-	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
-	m_artifactRelated[3] = Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex]
-								.m_entries[8]
-								.m_values[1];
-	m_artifactRelated[4] = Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex]
-								.m_entries[8]
-								.m_values[2];
+	SetBonusCondition(0);
 }
 
 /*
@@ -319,10 +259,10 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 	m_bonusCondition = static_cast<unsigned char>(bonusCondition);
 	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
 	m_artifactRelated[3] =
-		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[bonusCondition + 8]
+		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entryView.m_bonusEntries[bonusCondition]
 			.m_values[1];
 	m_artifactRelated[4] =
-		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[bonusCondition + 8]
+		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entryView.m_bonusEntries[bonusCondition]
 			.m_values[2];
 }
 
@@ -383,8 +323,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	m_letters[0].m_tempVars[2] = itemC;
 	m_letters[0].m_tempVars[3] = itemD;
 
-	int nextCount = m_letterCount + 1;
-	m_letterCount = (nextCount < 100) ? nextCount : 100;
+	m_letterCount = (m_letterCount + 1 < 100) ? m_letterCount + 1 : 100;
 
 	GbaQue.SetAddLetter(m_joybusCaravanId);
 }
@@ -408,10 +347,10 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
 	for (int i = 0; i < 4; i++) {
-		CMes::m_tempVar[i] = m_letters[letterIdx].m_tempVars[i];
+		CMes::SetTempValue(i, m_letters[letterIdx].m_tempVars[i]);
 	}
-	CMes::m_tempVar[4] = m_letters[letterIdx].m_messageType;
-	CMes::m_tempVar[5] = m_letters[letterIdx].m_senderId;
+	CMes::SetTempValue(4, m_letters[letterIdx].m_messageType);
+	CMes::SetTempValue(5, m_letters[letterIdx].m_senderId);
 
 	int money;
 	if (m_letters[letterIdx].m_attachmentIsGil) {
@@ -419,7 +358,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	} else {
 		money = m_letters[letterIdx].m_attachValue;
 	}
-	CMes::m_tempVar[6] = money;
+	CMes::SetTempValue(6, money);
 
 	int gil;
 	if (m_letters[letterIdx].m_attachmentIsGil) {
@@ -427,9 +366,9 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	} else {
 		gil = 0;
 	}
-	CMes::m_tempVar[7] = gil;
+	CMes::SetTempValue(7, gil);
 
-	CMes::m_tempVar[8] = m_saveSlot;
+	CMes::SetTempValue(8, m_saveSlot);
 
 	m_letters[letterIdx].m_opened = 1;
 }
@@ -570,7 +509,7 @@ void CCaravanWork::ChgEquipPos(int idx, int equip)
  */
 int CCaravanWork::CanAddComList(int count)
 {
-	for (int i = 2; i < (short)m_numCmdListSlots; i++) {
+	for (int i = 2; i < m_numCmdListSlots; i++) {
 		if ((m_commandListInventorySlotRef[i] == -1) && (--count == 0)) {
 			break;
 		}
@@ -670,7 +609,7 @@ void CCaravanWork::SetArtifact(int artifactIndex, int enabled)
 	if (enabled != 0) {
 		artifact = artifactIndex + 0x9F;
 	}
-	m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex] = (unsigned short)artifact;
+	m_itemView.m_artifacts[artifactIndex] = (unsigned short)artifact;
 }
 
 /*
@@ -686,17 +625,10 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
 {
 	int emptySlots = 0;
 
-	if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 0] == -1) {
-		emptySlots++;
-	}
-	if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 1] == -1) {
-		emptySlots++;
-	}
-	if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 2] == -1) {
-		emptySlots++;
-	}
-	if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 3] == -1) {
-		emptySlots++;
+	for (int i = 0; i < 4; i++) {
+		if (m_itemView.m_tmpArtifacts[i] == -1) {
+			emptySlots++;
+		}
 	}
 
 	return (numItems <= emptySlots);
@@ -714,8 +646,7 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
 int CCaravanWork::FindItem(int itemId)
 {
 	for (int itemIdx = 0; itemIdx < kInventoryCapacity; itemIdx++) {
-		short item = m_inventoryItems[itemIdx];
-		if (item != -1 && item == itemId) {
+		if (m_inventoryItems[itemIdx] != -1 && m_inventoryItems[itemIdx] == itemId) {
 			return itemIdx;
 		}
 	}
@@ -785,8 +716,8 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
 int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
 {
     for (int i = 0; i < 4; i++) {
-        if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] == -1) {
-            m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] = (short)itemId;
+        if (m_itemView.m_tmpArtifacts[i] == -1) {
+            m_itemView.m_tmpArtifacts[i] = (short)itemId;
             Joybus.SetTmpArti(m_joybusCaravanId, i, itemId);
             if (outIndex != 0) {
                 *outIndex = i;
@@ -814,7 +745,7 @@ int CCaravanWork::CanAddGil(int gilAmount)
 	if ((totalGil >= 0) && (totalGil <= 99999999)) {
 		canAdd = 1;
 	}
-	return canAdd != 0;
+	return (canAdd != 0) ? 1 : 0;
 }
 
 /*
@@ -1729,7 +1660,7 @@ void CCaravanWork::CalcStatus()
 	int itemType;
 	CRomWork* baseData = &Game.m_charaRomTable[m_baseDataIndex];
 
-	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(m_elementResistances, m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
 	m_baseStrength = m_strength = baseData->m_strength;
 	m_baseMagic = m_magic = baseData->m_magic;
@@ -1955,7 +1886,9 @@ void CCaravanWork::ValidCmdList(int cmdListIdx)
  */
 int CCaravanWork::GetIdxCmdList()
 {
-	return m_currentCmdListIndex;
+	int idx = m_currentCmdListIndex;
+	ValidCmdList(idx);
+	return idx;
 }
 
 /*
@@ -1969,6 +1902,7 @@ int CCaravanWork::GetIdxCmdList()
  */
 void CCaravanWork::SetIdxCmdList(int cmdListIdx)
 {
+	ValidCmdList(cmdListIdx);
 	m_currentCmdListIndex = cmdListIdx;
 }
 
@@ -1983,10 +1917,10 @@ void CCaravanWork::SetIdxCmdList(int cmdListIdx)
  */
 int CCaravanWork::IsUseCmdList(int cmdListIdx)
 {
-	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
+	ValidCmdList(cmdListIdx);
 	unsigned char isInvalid = 0;
 
-	if ((cmdListIdx >= 2) && (slotRef == -1)) {
+	if ((cmdListIdx >= 2) && (m_commandListInventorySlotRef[cmdListIdx] == -1)) {
 		isInvalid = 1;
 	}
 	return isInvalid ? 0 : 1;
@@ -2108,8 +2042,7 @@ int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 	int result = -1;
 
 	if (GetMagicCharge(cmdListIdx, cmdTopIdx, itemCmdListIdx) != 0) {
-		short cmdId = m_commandListExtra[cmdTopIdx];
-		switch (cmdId) {
+		switch (m_commandListExtra[cmdTopIdx]) {
 		case 0x207:
 			result = 0;
 			break;
@@ -2364,7 +2297,6 @@ void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
  */
 void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 {
-	int reset = 0;
 	int weaponItem = GetCmdListItem(weaponIdx);
 	if ((0 < weaponItem) && (((SItemFlatRow*)Game.m_itemTable)[weaponItem].m_kind == 1)) {
 		return;
@@ -2591,22 +2523,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 {
 	int stageRank;
 
-	m_baseDataIndex = baseDataIndex;
-	m_id = romWork->m_id;
-	m_param1 = romWork->m_param1;
-	m_param2 = romWork->m_param2;
-	m_maxHp = romWork->m_maxHp;
-	m_strength = romWork->m_strength;
-	m_magic = romWork->m_magic;
-	m_defense = romWork->m_defense;
-	m_romWork = &romWork->m_data;
-
-	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
-	memset(m_statusTimers, 0, sizeof(m_statusTimers));
-	for (int i = 0; i < 16; i++) {
-		m_statusValues[i] = 0xFFFF;
-	}
-	m_hp = m_maxHp;
+	CGObjWork::Init(baseDataIndex, romWork, 0);
 
 	memcpy(unk_0xac, romWork->m_data.m_monsterParams0, 8);
 	memcpy(unk_0xb4, romWork->m_data.m_monsterParams1, 0x1C);
@@ -2624,7 +2541,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	}
 
 	if (stageRank > 0) {
-		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(0x44, stageRank));
+		m_maxHp = (unsigned short)((float)m_maxHp * (((float)Game.m_battleParams[0x22 + stageRank] * 0.01f) + 0.0000001f));
 	}
 
 	int numPlayer = Game.m_gameWork.GetNumPlayer();
@@ -2633,7 +2550,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	}
 
 	if (numPlayer > 1) {
-		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(0x5E, numPlayer));
+		m_maxHp = (unsigned short)((float)m_maxHp * (((float)Game.m_battleParams[0x2F + numPlayer] * 0.01f) + 0.0000001f));
 	}
 
 	if ((static_cast<int>(Game.m_gameWork.m_scriptSysVal0) == 1) &&
@@ -2658,7 +2575,7 @@ void CMonWork::CalcStatus()
 {
 	CRomWork* baseData = &Game.m_enemyRomTable[m_baseDataIndex];
 
-	memcpy(RomStatusBlock(), m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(m_elementResistances, m_romWork->m_elementResistances, RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
 	m_strength = baseData->m_strength;
 	m_magic = baseData->m_magic;
@@ -2676,9 +2593,9 @@ void CMonWork::CalcStatus()
 	}
 
 	if (stageRank > 0) {
-		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x48, stageRank));
-		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x4C, stageRank));
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x50, stageRank));
+		m_strength = (unsigned short)((float)m_strength * (((float)Game.m_battleParams[0x24 + stageRank] * 0.01f) + 0.0000001f));
+		m_magic = (unsigned short)((float)m_magic * (((float)Game.m_battleParams[0x26 + stageRank] * 0.01f) + 0.0000001f));
+		m_defense = (unsigned short)((float)m_defense * (((float)Game.m_battleParams[0x28 + stageRank] * 0.01f) + 0.0000001f));
 	}
 
 	CGObjWork::CalcStatus();

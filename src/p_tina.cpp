@@ -986,8 +986,8 @@ void CPartPcs::drawAfterViewer()
 		(double)g_par_draw_prof.GetMax());
 	Graphic.Printf(
 		"hpm=%.3f%%  max=%.3f%%",
-		(double)((float)gPppHeapUseRateWords[0] / 100.0f),
-		(double)((float)gPppHeapUseRateWords[1] / 100.0f));
+		(double)((float)g_hpMem.m_current / 100.0f),
+		(double)((float)g_hpMem.m_max / 100.0f));
 }
 
 unsigned char g_IsCheckDrawDone;

@@ -2098,9 +2098,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 	int idx;
 	CMenuPcs::Sprt2* sprite;
 	CMenuPcs::Sprt2* artiBase;
-	int i;
+	int y;
 	CMenuPcs::Sprt2* artiFrame;
 	CMenuPcs::Sprt2* framePanel;
+	int i;
 	int work;
 	int frame;
 	int doneCount;
@@ -2167,8 +2168,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 			artiBase->depth = 1.0f;
 		}
 
-		int y = 0x28;
-		for (i = 0; i < activePartyCount; i++) {
+		i = 0;
+		y = 0x28;
+		for (; i < activePartyCount; i++) {
 			for (int j = 0; activePartyCount > j; j++) {
 				if (i == s_Rinfo->m_party[j].m_rank) {
 					partySlot = s_Rinfo->m_party[j].m_partySlot;
@@ -2190,8 +2192,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			spr->motionY = 0.0f;
 			spr->targetX = (float)spr->x + spr->motionX;
 			spr->targetY = (float)spr->y + spr->motionY;
-			y += 0x60;
 			spr->flags = 1;
+			y += 0x60;
 		}
 
 		idx += activePartyCount;

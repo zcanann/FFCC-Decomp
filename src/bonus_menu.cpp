@@ -3372,7 +3372,8 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
-	color.a = (unsigned char)(255.0f * alpha);
+	float a = 255.0f * alpha;
+	color.a = (unsigned char)a;
 	const float corner = 32.0f;
 	const float texScale = 1.0f;
 
@@ -3469,11 +3470,13 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			int mask = (signed char)s_Rinfo->m_selectedArtifactMask;
 			mask |= (signed char)s_Rinfo->m_missingArtifactMask;
 			mask |= s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
-			gray *= (mask & (1 << i)) != 0 ? 0.7f : 1.0f;
+			float scale = (mask & (1 << i)) != 0 ? 0.7f : 1.0f;
+			gray *= scale;
 			color.r = (unsigned char)gray;
 			color.g = (unsigned char)gray;
 			color.b = (unsigned char)gray;
-			color.a = (unsigned char)(alpha * 255.0f);
+			float a = alpha * 255.0f;
+			color.a = (unsigned char)a;
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 		MenuPcs.DrawRect(0, s_Base->m_artifactPositions[i].x, s_Base->m_artifactPositions[i].y, width, height,
@@ -3518,9 +3521,11 @@ inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
 			}
 			float offsetX = 28.0f;
 			float offsetY = 20.0f;
+			float w = 56.0f;
+			float h = 64.0f;
 			float x = s_Base->m_artifactPositions[i].x + offsetX;
 			float y = s_Base->m_artifactPositions[i].y + offsetY;
-			MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+			MenuPcs.DrawRect(0, x, y, w, h, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 		}
 	}
 }

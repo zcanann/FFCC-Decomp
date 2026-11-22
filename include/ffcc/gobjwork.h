@@ -245,16 +245,8 @@ public:
     int GetTotalBonus()
     {
         int bonus = m_artifactRelated[3] + m_artifactRelated[4];
-        int total;
-        if (bonus < 0) {
-            total = 0;
-        } else {
-            total = 100;
-            if (bonus <= 100) {
-                total = bonus;
-            }
-        }
-        return total;
+        bonus = (bonus < 0) ? 0 : ((bonus > 100) ? 100 : bonus);
+        return bonus;
     }
     int GetTotalBonus2()
     {

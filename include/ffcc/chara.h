@@ -2,12 +2,11 @@
 #define _FFCC_CHARA_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/ref.h"
 #include "ffcc/vector.h"
 
 #include <dolphin/mtx.h>
-
-struct Vec2d;
 
 class CChunkFile;
 class CGObject;
@@ -441,6 +440,7 @@ public:
 			m_afterDrawMeshCallback = callback;
 		}
 		CTexAnimSet* GetTexAnimSet() { return m_texAnimSet; }
+		void ResetDynamics() { m_flags10CBits.m_flag10C_80 = 1; }
 		void GetLookAt(Vec2d*);
 		void SetLookAt(Vec2d*);
 		float GetGlobalChest() { return m_twistAngle; }
@@ -487,8 +487,7 @@ public:
 		CTexAnimSet* m_texAnimSet;
 		u16 m_blendCur;
 		u16 m_blendMax;
-		float m_chestTilt;
-		float m_chestAmp;
+		Vec2d m_lookAt;
 		void* m_callbackContext;
 		void* m_callbackParam;
 		BeforeCalcMatrixCallback m_beforeCalcMatrixCallback;

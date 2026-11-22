@@ -168,6 +168,7 @@ public:
     }
     void SetNextScriptNewGame() { m_nextScriptFlags = 1; }
     int IsWorldMap() { return m_currentMapId == 0x21; }
+    CMemory::CStage* GetMemoryStage() { return m_mainStage; }
     int IsPartyExist(int);
     char* GetItemName(int);
     char* GetItemArt(int);

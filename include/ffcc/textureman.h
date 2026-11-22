@@ -70,6 +70,7 @@ public:
         return 0;
     }
 
+    void Set(_GXTexMapID);
     int CheckName(char*);
     void SetExternalTlut(void*, int);
     static void FlushExternalTlut(void*, int);

@@ -528,7 +528,7 @@ config.libs = [
                 "cflat_r2system.cpp",
                 extra_cflags=["-str reuse,nopool,readonly", "-use_lmw_stmw on", "-inline auto,deferred"],
             ),
-            Object(NonMatching, "cflat_runtime.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_runtime.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_runtime2.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(
                 MatchingFor("GCCP01", "GCCE01", "GCCJGC"),

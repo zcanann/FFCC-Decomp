@@ -67,14 +67,9 @@ struct GoOutMenuState
  */
 inline void McCtrl::SetMcAccessPos(int cardChannel, int saveIndex)
 {
-    m_previousState = 0;
-    m_state = 0;
-    m_lastResult = 0;
-    m_iteration = 0;
-    m_userBuffer = 0;
-    m_createFlag = 0;
-    m_cardChannel = cardChannel;
-    m_saveIndex = saveIndex;
+    Init();
+    SetSlot(cardChannel);
+    SetDno(saveIndex);
 }
 
 /*
@@ -100,20 +95,25 @@ static int getFreeCaravanIdx(Mc::SaveDat* saveData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: 0x8018B2CC
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGoOutMenu::CharaSelClose()
 {
-	// TODO
+    MenuPcs.m_goOutState->m_resultDir = -1;
+    MenuPcs.m_goOutState->m_waitFrames = 10;
 }
 
 /*
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8018B2F8
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -121,7 +121,7 @@ inline void CGoOutMenu::SetMemCardSlot(int cardChannel, int saveIndex)
 {
     m_cardChannel = cardChannel;
     m_saveIndex = saveIndex;
-    MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+    MenuPcs.m_mcCtrl.SetSlot(cardChannel);
 }
 
 /*
@@ -140,12 +140,16 @@ inline void CGoOutMenu::SetMemCardProc(unsigned char proc)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: 0x8018B424
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::SetMemCardSaveBuff(void*)
+void CGoOutMenu::SetMemCardSaveBuff(void* buffer)
 {
-	// TODO
+    m_memCardBuffer = buffer;
 }
 
 /*
@@ -822,8 +826,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
 	case 1:
 		m_watchCardDisconnect = 0;
-        MenuPcs.m_goOutState->m_resultDir = -1;
-        MenuPcs.m_goOutState->m_waitFrames = 10;
+        CharaSelClose();
 		break;
     case 0xC:
         if (m_currentMessage >= 0) {
@@ -938,7 +941,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         }
 
         SetMemCardSlot(m_accessCardChannel, m_accessSaveIndex);
-        m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
+        SetMemCardSaveBuff(MenuPcs.m_goOutTransferSaveData);
         SetMemCardProc(2);
         {
 #ifdef VERSION_GCCJGC
@@ -966,7 +969,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_saveIndex = odekakeSaveIndex;
         MenuPcs.m_mcCtrl.m_cardChannel = odekakeCardChannel;
     }
-        m_memCardBuffer = MenuPcs.m_goOutTransferWork;
+        SetMemCardSaveBuff(MenuPcs.m_goOutTransferWork);
         SetMemCardProc(2);
         {
 #ifdef VERSION_GCCJGC

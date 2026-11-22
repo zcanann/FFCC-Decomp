@@ -260,7 +260,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             pos[2][1] = invPadH * (ry3 - viewMaxY);
             pos[3][1] = invPadH * (ry2 - viewMaxY);
             memcpy(&color, &quad->color, sizeof(color));
-            color = quad->color;
+            color.r = quad->color.r;
+            color.g = quad->color.g;
+            color.b = quad->color.b;
+            color.a = quad->color.a;
         } else {
             sprite = reinterpret_cast<const FS_tagOAN3_SPRITE*>(shape + 1);
             sprite = sprite + i;
@@ -322,7 +325,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             pos[3][1] = -1.0f;
             pos[3][2] = 0.0f;
             memcpy(&color, &sprite->color, sizeof(color));
-            color = sprite->color;
+            color.r = sprite->color.r;
+            color.g = sprite->color.g;
+            color.b = sprite->color.b;
+            color.a = sprite->color.a;
         }
 
         DCStoreRange(&color, 4);

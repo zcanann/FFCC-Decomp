@@ -186,7 +186,7 @@ void CGoOutMenu::CalcMemCardProc()
  * JP Size: 1108b
  */
 
-void CGoOutMenu::SetState3(short pending)
+inline void CGoOutMenu::SetState3(short pending)
 {
     MenuPcs.m_menuWindowInfo->state = 3;
     MenuPcs.m_goOutState->m_animFrame = 0;
@@ -1905,7 +1905,7 @@ inline void CGoOutMenu::DrawDel()
  * JP Size: 2552b
  */
 
-void CGoOutMenu::InitGoOutReset()
+inline void CGoOutMenu::InitGoOutReset()
 {
     MenuPcs.m_goOutReset.m_resetFlag = 0;
     MenuPcs.m_menuWindowInfo->state = 3;

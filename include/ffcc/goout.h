@@ -44,7 +44,7 @@ public:
     bool HitCanncel();
     void Init();
     void Destroy();
-    void InitGoOutReset();
+    inline void InitGoOutReset();
 
     void SetGoOutMode(unsigned char);
     void CalcGoOut();
@@ -57,7 +57,7 @@ public:
     void Draw();
     void InitMemCardProc();
     void EndMemCardProc();
-    void SetState3(short);
+    inline void SetState3(short);
 
 
 private:

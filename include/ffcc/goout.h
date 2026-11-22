@@ -44,6 +44,8 @@ public:
     bool HitCanncel();
     void Init();
     void Destroy();
+    void InitGoOutReset();
+
     void SetGoOutMode(unsigned char);
     void CalcGoOut();
     void DrawGoOut();

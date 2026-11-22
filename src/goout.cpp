@@ -1904,6 +1904,37 @@ inline void CGoOutMenu::DrawDel()
  * JP Address: 0x80162C28
  * JP Size: 2552b
  */
+
+void CGoOutMenu::InitGoOutReset()
+{
+    MenuPcs.m_goOutReset.m_resetFlag = 0;
+    MenuPcs.m_menuWindowInfo->state = 3;
+    m_currentMessage = -1;
+    m_pendingMessage = -1;
+    m_menuStringSlot = 0;
+    SetMainMode(1);
+    MenuPcs.m_goOutTransferSaveData =
+        static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferSaveAllocLine));
+    MenuPcs.m_goOutTransferWork =
+        static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferWorkAllocLine));
+    MenuPcs.m_goOutTransferWorkActive = 0;
+    MenuPcs.m_goOutUnknown888 = 0;
+    MenuPcs.m_goOutSaveLoadMode = 0;
+    MenuPcs.m_goOutUnknown88A = 0;
+    WinMessEntry* winMessage = MenuPcs.GetWinMess(kTransferWindowBase);
+    winMessage->m_lineCount = 0;
+    for (int i = 0; i < kTransferInitializedIds; i++) {
+        winMessage->m_messageIds[i] = i + kTransferMessageBase;
+    }
+    winMessage = MenuPcs.GetWinMess(kTransferWindowBase + 1);
+    winMessage->m_lineCount = 0;
+    for (int i = 0; i < kTransferInitializedIds; i++) {
+        winMessage->m_messageIds[i] = i + kTransferMessageBase + 10;
+    }
+    MenuPcs.m_menuWindowInfo->state = 3;
+    m_messageState = 1;
+}
+
 void CGoOutMenu::Calc()
 {
     unsigned short input;
@@ -1913,33 +1944,7 @@ void CGoOutMenu::Calc()
     m_drawCursor = 0;
 
     if (MenuPcs.m_goOutReset.m_resetFlag != 0) {
-        MenuPcs.m_goOutReset.m_resetFlag = 0;
-        MenuPcs.m_menuWindowInfo->state = 3;
-        m_currentMessage = -1;
-        m_pendingMessage = -1;
-        m_menuStringSlot = 0;
-        SetMainMode(1);
-        MenuPcs.m_goOutTransferSaveData =
-            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferSaveAllocLine));
-        MenuPcs.m_goOutTransferWork =
-            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferWorkAllocLine));
-        MenuPcs.m_goOutTransferWorkActive = 0;
-        MenuPcs.m_goOutUnknown888 = 0;
-        MenuPcs.m_goOutSaveLoadMode = 0;
-        MenuPcs.m_goOutUnknown88A = 0;
-        WinMessEntry* winMessage = MenuPcs.GetWinMess(kTransferWindowBase);
-        winMessage->m_lineCount = 0;
-        // Japanese retail initializes 16 IDs across adjacent 20-byte descriptors.
-        for (int i = 0; i < kTransferInitializedIds; i++) {
-            winMessage->m_messageIds[i] = i + kTransferMessageBase;
-        }
-        winMessage = MenuPcs.GetWinMess(kTransferWindowBase + 1);
-        winMessage->m_lineCount = 0;
-        for (int i = 0; i < kTransferInitializedIds; i++) {
-            winMessage->m_messageIds[i] = i + kTransferMessageBase + 10;
-        }
-        MenuPcs.m_menuWindowInfo->state = 3;
-        m_messageState = 1;
+        InitGoOutReset();
     }
 
     if (m_messageCloseMode == 0) {

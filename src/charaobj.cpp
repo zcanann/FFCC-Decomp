@@ -160,10 +160,7 @@ static __inline SCharaItemRow* CharaObjItemTable()
 	return reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 }
 
-static __inline float CharaObjGetStatusMultiplier(int index)
-{
-	return (static_cast<float>(Game.m_battleParams[index]) * 0.01f) + 1.0e-07f;
-}
+#define CharaObjGetStatusMultiplier(idx) ((static_cast<float>(Game.m_battleParams[idx]) * 0.01f) + 1.0e-07f)
 
 /*
  * --INFO--

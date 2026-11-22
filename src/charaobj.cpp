@@ -2170,10 +2170,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		hasParticle = 0;
 		goto checkParticle;
 	}
-	{
-		SCharaItemRow* entryRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-		particleEntry = entryRows[effectId].m_particleEntries[effectArg0];
-	}
+	particleEntry = rows[effectId].m_particleEntries[effectArg0];
 	if (particleEntry == 0xFFFF) {
 		hasParticle = 0;
 		goto checkParticle;

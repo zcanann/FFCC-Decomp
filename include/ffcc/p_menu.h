@@ -552,9 +552,7 @@ public:
     void calcWorld();
     void calcSingleMenu();
     void calcVillageMenu();
-#ifndef VERSION_GCCP01
     void createVillageMenu();
-#endif
     void CalcMainMenu();
     void CalcDiaryMenu();
     void CalcMCardMenu();
@@ -761,9 +759,9 @@ public:
     int CmakeResultCtrl1();
     int CmakeResultClose1();
     void CmakeResultDraw1();
-    void CmakeVillageOpen();
+    unsigned short CmakeVillageOpen();
     unsigned short CmakeVillageCtrl();
-    void CmakeVillageClose();
+    unsigned short CmakeVillageClose();
     void CmakeVillageDraw();
     void SetSingMakeChara();
     void CalcSingleCMakeChara();

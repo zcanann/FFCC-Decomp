@@ -16,6 +16,11 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h>
 
+inline int CSystem::GetErrorLevel()
+{
+	return m_execParam;
+}
+
 // Disc-path constants for the dead-stripped CGame::SetGbaSP method.
 static const char s_dvd_gba_801E3058[] = "dvd/gba/";
 static const char s_ffcc_cli_bin_801E3060[] = "ffcc_cli.bin";
@@ -343,7 +348,7 @@ inline int CMenuPcs::GetLongHelpString(CFont* font, int firstLine, int lineMax)
 	}
 
 	char* temp = new (stage, "MenuUtil.cpp", 0x8C) char[0x200];
-	if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+	if ((temp == nullptr) && (System.GetErrorLevel() >= 1U)) {
 		System.Printf("%s(%d): Error: memory allocation error\n", "MenuUtil.cpp", 0x8E);
 	}
 	for (int line = firstLine; line < firstLine + lineMax; line++) {
@@ -734,13 +739,13 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 #ifdef VERSION_GCCE01
 		temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
 		            "MenuUtil.cpp", 0x231) char[0x200];
-		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+		if ((temp == nullptr) && (System.GetErrorLevel() >= 1U)) {
 			System.Printf("%s(%d): Error: memory allocation error\n", "MenuUtil.cpp", 0x233);
 		}
 #else
 		temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
 		            "MenuUtil.cpp", 0x23D) char[0x200];
-		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+		if ((temp == nullptr) && (System.GetErrorLevel() >= 1U)) {
 			System.Printf("%s(%d): Error: memory allocation error\n", "MenuUtil.cpp", 0x23F);
 		}
 #endif
@@ -867,17 +872,17 @@ void CMenuPcs::SetCrystalCageAttr()
  * --INFO--
  * PAL Address: 0x80179e28
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8019B3C0
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMenuPcs::SetManaWaterEffect()
 {
-	int partNo = m_effectWork[5].m_partNo;
+	EffectInfo* effect = &m_effectWork[5];
 
-	if (partNo != -1) {
-		PartMng.pppDeletePart(partNo);
+	if (effect->m_partNo != -1) {
+		PartMng.pppDeletePart(effect->m_partNo);
 	}
 
 	BindEffect(5, Game.m_gameWork.m_timerA + 0x13, -1);
@@ -1974,17 +1979,15 @@ void CMenuPcs::BindMcObj(int slotNo)
 				BindEffect(slot + 0x11, iconType + 0x16, -1);
 			}
 
-			unsigned int flags = entry->m_flags;
-
-			if ((flags & 1) != 0) {
+			if ((entry->m_flags & 1) != 0) {
 				iconType = 0;
-			} else if ((flags & 2) != 0) {
+			} else if ((entry->m_flags & 2) != 0) {
 				iconType = 1;
-			} else if ((flags & 4) != 0) {
+			} else if ((entry->m_flags & 4) != 0) {
 				iconType = 2;
-			} else if ((flags & 8) != 0) {
+			} else if ((entry->m_flags & 8) != 0) {
 				iconType = 3;
-			} else if ((flags & 0x10) != 0) {
+			} else if ((entry->m_flags & 0x10) != 0) {
 				iconType = 4;
 			}
 

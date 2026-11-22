@@ -371,7 +371,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     }
 
 complete:
-    g_pLight->m_bumpShade[3] = 0xFF;
+    SetSpecularAlpha(0xFF);
     m_noFreeMergeMask = 0;
 }
 
@@ -524,8 +524,7 @@ void CCharaPcs::calc()
 
     while (m_handleList != handle) {
         CHandle* next = handle->m_next;
-        handle->m_shadowTexturePtr = 0;
-        handle->loadModelASyncFrame();
+        handle->Calc();
         handle = next;
     }
 }
@@ -538,20 +537,13 @@ void CCharaPcs::calc()
 void CCharaPcs::calcAfter()
 {
     Chara.FlipDBuffer();
+    ReleaseUnusedAnimBank();
 
     for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
-        CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
+        CLoadAnim* loadAnim = m_loadAnims[i];
         CChara::CAnim* anim = loadAnim->m_anim;
         if (anim->GetRef() == 1) {
-            anim->ReleaseBank();
-        }
-    }
-
-    for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
-        CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
-        const int bankRefCount = loadAnim->m_anim->GetRef();
-        if (bankRefCount == 1) {
-            loadAnim->m_anim->AddHistory();
+            anim->AddHistory();
         }
     }
 }
@@ -575,8 +567,12 @@ void CCharaPcs::ReleaseAllAnimBank()
  */
 void CCharaPcs::ReleaseUnusedAnimBank()
 {
+    CLoadAnim* loadAnim;
+    CChara::CAnim* anim;
+
     for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
-        CChara::CAnim* anim = m_loadAnims[static_cast<unsigned long>(i)]->m_anim;
+        loadAnim = m_loadAnims[i];
+        anim = loadAnim->m_anim;
         if (anim->GetRef() == 1) {
             anim->ReleaseBank();
         }
@@ -684,10 +680,9 @@ void CCharaPcs::InitEnv(int envMode)
 int CCharaPcs::GetNumTexShadow()
 {
     int count = 0;
-    CHandle* head = m_handleList;
-    CHandle* current = head->m_next;
+    CHandle* current = m_handleList->m_next;
 
-    while (head != current) {
+    while (m_handleList != current) {
         if (((current->m_flags & 0x200) != 0) && (current->m_shadowTexturePtr != 0)) {
             count++;
         }
@@ -749,9 +744,7 @@ void CCharaPcs::draw()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
-            handle->draw(0, 1);
-        }
+        handle->Draw(0);
         handle = handle->m_next;
     }
 }
@@ -768,9 +761,7 @@ void CCharaPcs::drawBefore()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
-            handle->draw(3, 1);
-        }
+        handle->Draw(3);
         handle = handle->m_next;
     }
 }
@@ -816,9 +807,7 @@ void CCharaPcs::drawMakeTexShadow()
 
     handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
-            handle->draw(2, 1);
-        }
+        handle->Draw(2);
         handle = handle->m_next;
     }
 
@@ -845,9 +834,7 @@ void CCharaPcs::drawShadow()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
-            handle->draw(1, 1);
-        }
+        handle->Draw(1);
         handle = handle->m_next;
     }
 }
@@ -1511,6 +1498,7 @@ void CCharaPcs::drawOverlap()
         GXPosition3f32(width, zero, depth);
         GXPosition3f32(zero, height, depth);
         GXPosition3f32(width, height, depth);
+        GXEnd();
     }
 
     CameraPcs.GetProjectionMatrix(projectionMtx);
@@ -1527,9 +1515,7 @@ void CCharaPcs::drawOverlap()
 
     CHandle* handle = m_handleList->m_next;
     while (m_handleList != handle) {
-        if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
-            handle->draw(0, 1);
-        }
+        handle->Draw(0);
         handle = handle->m_next;
     }
 
@@ -1567,6 +1553,7 @@ void CCharaPcs::drawOverlap()
         GXPosition3f32(width, zero, zero);
         GXPosition3f32(zero, height, zero);
         GXPosition3f32(width, height, zero);
+        GXEnd();
     }
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
@@ -1575,7 +1562,7 @@ void CCharaPcs::drawOverlap()
     PSMTXScale(texMtx, 1.0f / 640.0f, 1.0f / 448.0f, 1.0f);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
     GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
@@ -1596,6 +1583,7 @@ void CCharaPcs::drawOverlap()
         GXTexCoord2u16(0, 0x1C0);
         GXPosition3f32(width, height, zero);
         GXTexCoord2u16(0x280, 0x1C0);
+        GXEnd();
     }
 
     CameraPcs.GetProjectionMatrix(projectionMtx);
@@ -2101,17 +2089,14 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
     if (m_model == 0) {
         return 0;
     }
-    if (m_currentAnimIndex == animIndex && forceSet == 0) {
-        goto fail;
-    }
-
-    {
+    if (m_currentAnimIndex != animIndex || forceSet != 0) {
         CChara::CAnim* anim;
         if (animIndex == -1) {
             anim = 0;
+        } else if (m_animSlot[animIndex] != 0) {
+            anim = m_animSlot[animIndex]->m_anim;
         } else {
-            CLoadAnim* loadAnim = m_animSlot[animIndex];
-            anim = loadAnim != 0 ? loadAnim->m_anim : 0;
+            anim = 0;
         }
 
         if (anim == 0) {
@@ -2125,8 +2110,6 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
         m_currentAnimIndex = animIndex;
         return 1;
     }
-
-fail:
     return 0;
 }
 
@@ -2137,7 +2120,8 @@ fail:
  */
 void CCharaPcs::CHandle::Calc()
 {
-	// TODO
+    m_shadowTexturePtr = 0;
+    loadModelASyncFrame();
 }
 
 /*
@@ -2147,13 +2131,12 @@ void CCharaPcs::CHandle::Calc()
  */
 void CCharaPcs::CHandle::Draw(int drawPass)
 {
-	unsigned int dbgMenuFlags = DbgMenuPcs.GetDbgFlag();
-	if ((dbgMenuFlags & 0x8000) != 0) {
-		if ((drawPass == 4) && ((m_flags & 0x10000) != 0)) {
-			draw(3, 0);
-		}
-		draw(drawPass, (4U - drawPass | drawPass - 4U) >> 0x1F);
-	}
+    if ((DbgMenuPcs.GetDbgFlag() & 0x8000) != 0) {
+        if ((drawPass == 4) && ((m_flags & 0x10000) != 0)) {
+            draw(3, 0);
+        }
+        draw(drawPass, drawPass == 4 ? 0 : 1);
+    }
 }
 
 /*

@@ -41,6 +41,23 @@
 
 extern "C" char* strstr(const char*, const char*);
 
+namespace std {
+inline char* strchr(char* str, int c)
+{
+	return ::strchr(str, c);
+}
+
+inline char* strrchr(char* str, int c)
+{
+	return ::strrchr(str, c);
+}
+
+inline char* strstr(char* str, const char* sub)
+{
+	return ::strstr(str, sub);
+}
+}
+
 #ifdef VERSION_GCCJGC
 #define WM_TEXTURE_START 21
 #define WM_TEXTURE_COUNT 44
@@ -2888,9 +2905,7 @@ void CMenuPcs::CalcGoOutSelCharInit()
  */
 void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
 {
-	WmCharaAnimState* const menuCharaAnims = m_wmCharaAnimState;
-
-	menuCharaAnims[charaIndex].m_nextAnimIndex = animIndex;
+	m_wmCharaAnimState[charaIndex].m_nextAnimIndex = animIndex;
 }
 
 /*
@@ -4920,17 +4935,9 @@ void CMenuPcs::RestoreProjection()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::DrawObj(int kind)
+inline void CMenuPcs::DrawObj(int index)
 {
-	if (kind == 0) {
-		DrawChara();
-	} else if (kind == 1) {
-		DrawMcObj();
-		RestoreProjection();
-	} else {
-		DrawWMFrame();
-		DrawFukidashi();
-	}
+	m_wm.m_handles[index]->Draw(5);
 }
 
 /*
@@ -5488,7 +5495,7 @@ void CMenuPcs::DrawFukidashi()
 	int twoLines = nameWidth > (double)(float)textW ? 1 : 0;
 	if (twoLines != 0) {
 		strcpy(tempBuf, nameBuffer);
-		char* spacePos = strrchr(tempBuf, 0x20);
+		char* spacePos = std::strrchr(tempBuf, 0x20);
 		if (spacePos != NULL) {
 			*spacePos = 0;
 			strcpy(secondLine, spacePos + 1);
@@ -5593,7 +5600,7 @@ inline int CMenuPcs::ChkPlaceLength(char* text)
 inline void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 {
 	strcpy(left, text);
-	char* space = strrchr(left, ' ');
+	char* space = std::strrchr(left, ' ');
 	if (space != 0) {
 		*space = '\0';
 		strcpy(right, space + 1);
@@ -5618,7 +5625,7 @@ inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFo
 	right[0] = '\0';
 	const char* searchPos = text;
 	for (;;) {
-		const char* space = strchr(searchPos, ' ');
+		const char* space = std::strchr((char*)searchPos, ' ');
 		if (space == 0) {
 			break;
 		}
@@ -6633,7 +6640,8 @@ void CMenuPcs::DrawChara()
  */
 int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 {
-	int result = modelNo * 200 + 100;
+	int result = 0;
+	result = modelNo * 200 + 100;
 	if (baseType != 0) {
 		result += 100;
 	}
@@ -7965,7 +7973,7 @@ void CMenuPcs::SetAnim(int anim)
 void CMenuPcs::DrawCursor(int x, int y, float scale)
 {
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	unsigned char alpha = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * scale));
+	unsigned char alpha = FLOAT_80331458 * scale;
 	GXColor color;
 	color.r = 0xFF;
 	color.g = 0xFF;
@@ -8371,7 +8379,7 @@ void CMenuPcs::DrawMainMenuSub()
 
 		SetProjection(drawOrder[orderIndex]);
 		SetLight(0);
-		m_wm.m_handles[drawOrder[orderIndex]]->Draw(5);
+		DrawObj(drawOrder[orderIndex]);
 		DrawInit();
 
 		GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
@@ -9715,18 +9723,18 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 #else
 			if (messType == 0) {
 				char* slotText;
-				if (winType != 0 && (slotText = strstr(textBuf, s_SlotStr[languageIndex])) != 0) {
+				if (winType != 0 && (slotText = std::strstr(textBuf, s_SlotStr[languageIndex])) != 0) {
 					int len = strlen(s_SlotStr[languageIndex]);
 					slotText[len - 1] += m_mcCtrl.m_cardChannel;
 				} else {
-					char* marker = strstr(textBuf, lbl_80331400);
+					char* marker = std::strstr(textBuf, lbl_80331400);
 					if (marker != 0) {
 						marker[0] += 2;
 						marker[1] += 2;
 					}
 				}
 			} else {
-				char* dataText = strstr(textBuf, s_DataStr[languageIndex]);
+				char* dataText = std::strstr(textBuf, s_DataStr[languageIndex]);
 				if (dataText != 0) {
 					int len = strlen(s_DataStr[languageIndex]);
 					dataText[len - 1] += m_mcCtrl.m_saveIndex;
@@ -9952,7 +9960,8 @@ void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat* outSave)
 	MemoryCardMan.CreateMcBuff();
 	MemoryCardMan.MakeSaveData();
 	MemoryCardMan.DecodeData();
-	memcpy(outSave, MemoryCardMan.GetMcBuffer(), 0x8BD0);
+	char* buf = MemoryCardMan.GetMcBuffer();
+	memcpy(outSave, buf, 0x8BD0);
 	MemoryCardMan.DestroyMcBuff();
 }
 
@@ -9968,7 +9977,8 @@ void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat* outSave)
 void CMenuPcs::SetCaravanWork(Mc::SaveDat* saveDat)
 {
 	MemoryCardMan.CreateMcBuff();
-	memcpy(MemoryCardMan.GetMcBuffer(), saveDat, 0x8BD0);
+	char* buf = MemoryCardMan.GetMcBuffer();
+	memcpy(buf, saveDat, 0x8BD0);
 	Game.LoadInit();
 	MemoryCardMan.SetLoadData();
 	Game.LoadFinished();

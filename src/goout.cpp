@@ -185,25 +185,31 @@ void CGoOutMenu::CalcMemCardProc()
  * JP Address: 0x801668A8
  * JP Size: 1108b
  */
+
+void CGoOutMenu::SetState3(short pending)
+{
+    MenuPcs.m_menuWindowInfo->state = 3;
+    MenuPcs.m_goOutState->m_animFrame = 0;
+    m_currentMessage = -1;
+    m_messageTimer = 0;
+    m_messageState = 1;
+    if (m_currentMessage >= 0) {
+        MenuPcs.m_menuWindowInfo->state = 2;
+        MenuPcs.m_goOutState->m_animFrame = 0;
+    }
+    m_messageWindowOpen = 0;
+    m_pendingMessage = pending;
+    m_messageCloseMode = 0;
+    m_pendingMessageTimer = 0;
+}
+
 unsigned char CGoOutMenu::SetMemCardError()
 {
     switch (m_memCardResult) {
     case 1:
         return 0;
     case -2:
-        MenuPcs.m_menuWindowInfo->state = 3;
-        MenuPcs.m_goOutState->m_animFrame = 0;
-        m_currentMessage = -1;
-        m_messageTimer = 0;
-        m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 2;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetState3(2);
         break;
     case -999:
         if (m_lastMemCardProc == 1) {
@@ -230,85 +236,25 @@ unsigned char CGoOutMenu::SetMemCardError()
 #endif
             break;
         } else if (m_lastMemCardProc == 3) {
-            MenuPcs.m_menuWindowInfo->state = 3;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-            m_currentMessage = -1;
-            m_messageTimer = 0;
-            m_messageState = 1;
-            if (m_currentMessage >= 0) {
-                MenuPcs.m_menuWindowInfo->state = 2;
-                MenuPcs.m_goOutState->m_animFrame = 0;
-            }
-            m_messageWindowOpen = 0;
-            m_pendingMessage = 0xd;
-            m_messageCloseMode = 0;
-            m_pendingMessageTimer = 0;
+            SetState3(0xd);
             break;
         } else if (m_lastMemCardProc == 2) {
-            MenuPcs.m_menuWindowInfo->state = 3;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-            m_currentMessage = -1;
-            m_messageTimer = 0;
-            m_messageState = 1;
-            if (m_currentMessage >= 0) {
-                MenuPcs.m_menuWindowInfo->state = 2;
-                MenuPcs.m_goOutState->m_animFrame = 0;
-            }
-            m_messageWindowOpen = 0;
-            m_pendingMessage = 0xf;
-            m_messageCloseMode = 0;
-            m_pendingMessageTimer = 0;
+            SetState3(0xf);
             break;
         }
         // fall through
     case -1:
     case -3:
-        MenuPcs.m_menuWindowInfo->state = 3;
-        MenuPcs.m_goOutState->m_animFrame = 0;
-        m_currentMessage = -1;
-        m_messageTimer = 0;
-        m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 1;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetState3(1);
         break;
     case -4:
         if (m_lastMemCardProc == 1) {
             goto setLoadFailedMessage;
         }
-        MenuPcs.m_menuWindowInfo->state = 3;
-        MenuPcs.m_goOutState->m_animFrame = 0;
-        m_currentMessage = -1;
-        m_messageTimer = 0;
-        m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 0x13;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetState3(0x13);
         break;
     case -5:
-        MenuPcs.m_menuWindowInfo->state = 3;
-        MenuPcs.m_goOutState->m_animFrame = 0;
-        m_currentMessage = -1;
-        m_messageTimer = 0;
-        m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 3;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetState3(3);
         break;
     case -13:
     case -6:

@@ -55,6 +55,8 @@ public:
     void Draw();
     void InitMemCardProc();
     void EndMemCardProc();
+    void SetState3(short);
+
 
 private:
     unsigned char m_lastMemCardProc;

@@ -665,7 +665,7 @@ void CCameraPcs::destroyChara()
  */
 void CCameraPcs::calcChara()
 {
-    unsigned short padButtons;
+    int padButtons;
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;
@@ -1407,7 +1407,7 @@ void CCameraPcs::destroyMaterialEditor()
  */
 void CCameraPcs::calcMaterialEditor()
 {
-    unsigned short padButtons;
+    int padButtons;
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;
@@ -1495,7 +1495,7 @@ void CCameraPcs::destroyFunnyShape()
  */
 void CCameraPcs::calcFunnyShape()
 {
-    unsigned short padButtons;
+    int padButtons;
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;

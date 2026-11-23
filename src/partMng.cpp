@@ -1963,16 +1963,7 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.b = m_editClearColor[2];
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
-
-        unsigned char fogEnable = m_editFogEnable;
-        float fogNear;
-        float fogFar = m_editFogFar;
-        fogNear = m_editFogNear;
-        unsigned char fogG;
-        unsigned char fogB = m_editFogColor[2];
-        fogG = m_editFogColor[1];
-        unsigned char fogR = m_editFogColor[0];
-        pppSetFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
+        pppSetFog(m_editFogEnable, m_editFogColor[0], m_editFogColor[1], m_editFogColor[2], m_editFogNear, m_editFogFar);
 
         ppvSysGoPartF = 1;
         break;
@@ -1999,16 +1990,7 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.b = m_editClearColor[2];
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
-
-        unsigned char fogEnable = m_editFogEnable;
-        float fogNear;
-        float fogFar = m_editFogFar;
-        fogNear = m_editFogNear;
-        unsigned char fogG;
-        unsigned char fogB = m_editFogColor[2];
-        fogG = m_editFogColor[1];
-        unsigned char fogR = m_editFogColor[0];
-        pppSetFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
+        pppSetFog(m_editFogEnable, m_editFogColor[0], m_editFogColor[1], m_editFogColor[2], m_editFogNear, m_editFogFar);
 
         ppvSysGoPartF = 1;
         break;

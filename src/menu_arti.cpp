@@ -251,8 +251,7 @@ void CMenuPcs::ArtiDraw()
 				colors[0].b = 0xFF;
 				colors[0].a = (u8)(255.0f * itemAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-				float uvScale = entry->scale;
-				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
+				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->scale, entry->scale, 0.0f);
 			}
 		}
 	}

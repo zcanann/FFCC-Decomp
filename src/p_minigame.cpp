@@ -1420,7 +1420,8 @@ void CMiniGamePcs::calc()
             char managerFile[256];
             char managerSpFile[256];
 
-            sprintf(managerFile, "%s/mgr%02d.bin", "dvd/minigame/mgr", m_managerIndex);
+            int idx = m_managerIndex;
+            sprintf(managerFile, "%s/mgr%02d.bin", "dvd/minigame/mgr", idx);
             sprintf(managerSpFile, "%s/mgrsp%02d.bin", "dvd/minigame/mgr", m_managerIndex);
 
             if ((unsigned int)System.m_execParam >= 3)

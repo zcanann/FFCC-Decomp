@@ -320,6 +320,18 @@ void CGoOutMenu::SetMenu(short message, long timer)
  * JP Address: 0x80166760
  * JP Size: 328b
  */
+inline void CGoOutMenu::SetMenuFromIdx(short idx, long timer)
+{
+    if (m_currentMessage >= 0) {
+        MenuPcs.m_menuWindowInfo->state = 2;
+        MenuPcs.m_goOutState->m_animFrame = 0;
+    }
+    m_messageWindowOpen = 0;
+    m_pendingMessage = idx;
+    m_messageCloseMode = 0;
+    m_pendingMessageTimer = timer;
+}
+
 void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 {
     va_list args;
@@ -356,15 +368,7 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     va_end(args);
 
     messageIndex = m_menuStringSlot + kTransferWindowBase;
-    if (m_currentMessage >= 0) {
-        MenuPcs.m_menuWindowInfo->state = 2;
-        MenuPcs.m_goOutState->m_animFrame = 0;
-    }
-
-    m_messageWindowOpen = 0;
-    m_pendingMessage = messageIndex;
-    m_messageCloseMode = 0;
-    m_pendingMessageTimer = timer;
+    SetMenuFromIdx(messageIndex, timer);
 }
 
 /*
@@ -501,14 +505,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         }
 #endif
         MenuPcs.ChgAllModel();
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 0x1e;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetMenuFromIdx(0x1e, 0);
         unk_0x14 = 0;
         break;
     }

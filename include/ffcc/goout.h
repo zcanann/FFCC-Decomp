@@ -32,6 +32,7 @@ public:
     void CalcMemCardProc();
     unsigned char SetMemCardError();
     void SetMenu(short, long);
+    inline void SetMenuFromIdx(short, long);
     void SetMenuStr(long, int, ...);
     void CalcMenu();
     void DrawMenu();

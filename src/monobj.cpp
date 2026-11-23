@@ -104,6 +104,11 @@ static inline void CGMonObj_ChaseTarget(CGMonObj* monObj)
 	CGMonObj_MoveToTarget(monObj, speedScale);
 }
 
+static inline float CGMonObj_GetMoveSpeedScale(CGMonObj* monObj)
+{
+	return monObj->m_pushScale * (0.01f * static_cast<float>(monObj->m_scriptHandle->m_romWork->m_moveSpeed) + 0.0000001f);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8011A4CC
@@ -705,9 +710,7 @@ void CGMonObj::onFrameStat()
 			Vec src = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 			Vec delta;
 			PSVECSubtract(&src, &m_worldPosition, &delta);
-			float speedScale = m_pushScale *
-				(0.01f * static_cast<float>(m_scriptHandle->m_romWork->m_moveSpeed) + 0.0000001f);
-			MoveVector(&delta, speedScale, 1, 1, 0, 1);
+			MoveVector(&delta, CGMonObj_GetMoveSpeedScale(this), 1, 1, 0, 1);
 		} else {
 			changeStat(0, 0, 0);
 		}
@@ -722,9 +725,7 @@ void CGMonObj::onFrameStat()
 		}
 		Vec delta;
 		PSVECSubtract(&m_homePosition, &m_worldPosition, &delta);
-		float speedScale = m_pushScale *
-			(0.01f * static_cast<float>(m_scriptHandle->m_romWork->m_moveSpeed) + 0.0000001f);
-		MoveVector(&delta, speedScale, 1, 1, 0, 1);
+		MoveVector(&delta, CGMonObj_GetMoveSpeedScale(this), 1, 1, 0, 1);
 		break;
 	}
 

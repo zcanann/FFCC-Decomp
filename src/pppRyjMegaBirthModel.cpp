@@ -544,20 +544,22 @@ static void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel
 
     particleData->m_age = particleData->m_age + 1;
 
-    if ((particleData->m_fadeInFrames != 0) && (particleData->m_age <= particleData->m_fadeInFrames)) {
+    {
         float fadeAlpha = (float)alpha;
-        float fadeFrameCount = (float)(unsigned int)particleData->m_fadeInFrames;
-        float particleAlpha = particleData->m_alphaFade;
-
-        particleData->m_alphaFade = particleAlpha - fadeAlpha / fadeFrameCount;
-    }
-
-    if ((particleData->m_fadeOutFrames != 0) && (particleData->m_life <= particleData->m_fadeOutFrames)) {
-        float fadeAlpha = (float)alpha;
-        float fadeFrameCount = (float)(unsigned int)pRyjMegaBirthModel->m_fadeInFrames;
-        float particleAlpha = particleData->m_alphaFade;
-
-        particleData->m_alphaFade = particleAlpha + fadeAlpha / fadeFrameCount;
+        float particleAlpha;
+        float fadeFrameCount;
+        if ((particleData->m_fadeInFrames != 0) && (particleData->m_age <= particleData->m_fadeInFrames)) {
+            fadeAlpha = (float)alpha;
+            fadeFrameCount = (float)(unsigned int)particleData->m_fadeInFrames;
+            particleAlpha = particleData->m_alphaFade;
+            particleData->m_alphaFade = particleAlpha - fadeAlpha / fadeFrameCount;
+        }
+        if ((particleData->m_fadeOutFrames != 0) && (particleData->m_life <= particleData->m_fadeOutFrames)) {
+            fadeAlpha = (float)alpha;
+            fadeFrameCount = (float)(unsigned int)pRyjMegaBirthModel->m_fadeInFrames;
+            particleAlpha = particleData->m_alphaFade;
+            particleData->m_alphaFade = particleAlpha + fadeAlpha / fadeFrameCount;
+        }
     }
 }
 

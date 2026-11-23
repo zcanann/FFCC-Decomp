@@ -2670,7 +2670,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 		float centerX = (float)((double)sprite->x + (double)(float)sprite->w / 2.0);
 		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
 		char* title = Game.GetShortItemName(idx);
-		font->SetPosX((float)(centerX - font->GetWidth(title) / 2.0));
+		float titleW = font->GetWidth(title);
+		font->SetPosX((float)(centerX - titleW / 2.0));
 #ifdef VERSION_GCCJGC
 		font->SetPosY(centerY - 44.0f);
 #else
@@ -2706,7 +2707,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 			if (lineText == 0) {
 				break;
 			}
-			font->SetPosX((float)(centerX - font->GetWidth(lineText) / 2.0));
+			float lineW = font->GetWidth(lineText);
+			font->SetPosX((float)(centerX - lineW / 2.0));
 #ifdef VERSION_GCCJGC
 			font->SetPosY(lineY);
 #else

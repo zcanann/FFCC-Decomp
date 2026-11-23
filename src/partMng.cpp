@@ -1519,15 +1519,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
 
-        m_pppMng[0].m_position.x = payloadFloats[0];
-        m_pppMng[0].m_position.y = payloadFloats[1];
-        m_pppMng[0].m_position.z = payloadFloats[2];
-        m_pppMng[0].m_rotation.x = payloadWords[4];
-        m_pppMng[0].m_rotation.y = payloadWords[5];
-        m_pppMng[0].m_rotation.z = payloadWords[6];
-        m_pppMng[0].m_scale.x = payloadFloats[8];
-        m_pppMng[0].m_scale.y = payloadFloats[9];
-        m_pppMng[0].m_scale.z = payloadFloats[0xA];
+        m_pppMng[0].m_position = *reinterpret_cast<Vec*>(&payloadFloats[0]);
+        m_pppMng[0].m_rotation = *reinterpret_cast<pppIVECTOR3*>(&payloadWords[4]);
+        m_pppMng[0].m_scale = *reinterpret_cast<Vec*>(&payloadFloats[8]);
         m_pppMng[0].m_basePosition.x = payloadFloats[0x10];
         m_pppMng[0].m_basePosition.y = payloadFloats[0x11];
         m_pppMng[0].m_basePosition.z = payloadFloats[0x12];

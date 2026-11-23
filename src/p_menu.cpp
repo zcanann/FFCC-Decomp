@@ -1187,7 +1187,7 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
  */
 void CMenuPcs::SetColor(CColor& color)
 {
-    GXSetChanMatColor(GX_COLOR0A0, color.color);
+    GXSetChanMatColor(GX_COLOR0A0, color);
 }
 
 /*

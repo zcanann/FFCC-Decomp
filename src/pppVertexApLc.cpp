@@ -60,6 +60,11 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
     VertexApLcData* data = (VertexApLcData*)dataRaw;
     s32 stateOffset = ctrl->m_serializedDataOffsets[0];
     VertexApLcState* state = (VertexApLcState*)(parent->m_workArea + stateOffset);
+    Vec pos;
+    u32 cid;
+    Vec* vertex;
+    _pppPDataVal* childData;
+    _pppPObject* child;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -93,15 +98,14 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                 u16* vertexIndices = entry->vertexIndices;
                 state->index++;
                 u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
+                vertex = &points[vertexIndex];
+                pos.x = vertex->x;
+                pos.y = vertex->y;
+                pos.z = vertex->z;
 
-                if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
-                    s32 childId = data->childId;
-                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
+                cid = data->childId;
+                if ((cid + 0x10000) != 0xFFFF) {
+                    childData = ppvMng->m_pppPDataVals + cid;
 
                     if (childData == 0) {
                         child = 0;
@@ -111,9 +115,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                     }
 
                     Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
-                    dst->x = x;
-                    dst->y = y;
-                    dst->z = z;
+                    *dst = pos;
                 }
             }
             break;
@@ -124,15 +126,14 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                 int outValue = (int)(randValue * maxValue);
                 u16* vertexIndices = entry->vertexIndices;
                 u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
+                vertex = &points[vertexIndex];
+                pos.x = vertex->x;
+                pos.y = vertex->y;
+                pos.z = vertex->z;
 
-                if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
-                    s32 childId = data->childId;
-                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
+                cid = data->childId;
+                if ((cid + 0x10000) != 0xFFFF) {
+                    childData = ppvMng->m_pppPDataVals + cid;
 
                     if (childData == 0) {
                         child = 0;
@@ -142,9 +143,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                     }
 
                     Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
-                    dst->x = x;
-                    dst->y = y;
-                    dst->z = z;
+                    *dst = pos;
                 }
             }
             break;

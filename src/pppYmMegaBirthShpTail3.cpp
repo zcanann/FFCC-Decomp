@@ -143,8 +143,8 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, _pppCtrlTab
  */
 void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, _pppCtrlTable* ctrlTable)
 {
-    int workOffset = ctrlTable->m_serializedDataOffsets[2];
-    VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(object->m_workArea + workOffset);
+    VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(
+        object->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 
     if (work->m_particles != 0) {
         pppMemFree(work->m_particles);
@@ -829,7 +829,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
     _PARTICLE_DATA* particle;
     _PARTICLE_WMAT* wmats;
     _PARTICLE_COLOR* colors;
-    tagOAN3_SHAPE* shape;
+    void* shape;
     pppShapeAnimData* shapeAnim;
     u32 i;
     float colorStepR;
@@ -976,8 +976,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
                     {
                         u32 shapeIdx = (particleShapeFrame + workRand) / shapeFrameStep;
                         shapeIdx %= shapeFrameCount;
-                        shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) +
-                                                                 shapeAnim->m_frames[shapeIdx].m_shapeOffset);
+                        shape = reinterpret_cast<u8*>(shapeAnim) + shapeAnim->m_frames[shapeIdx].m_shapeOffset;
                     }
 
                     pppUnitMatrix(drawMtx);
@@ -1018,7 +1017,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
                         amb.a = 0x7F;
                     }
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
-                    pppDrawShp(shape, ppvEnv->m_materialSetPtr, step->m_blendMode);
+                    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shape), ppvEnv->m_materialSetPtr, step->m_blendMode);
 
                 update_step:
                     colorStart.x -= colorStepR;

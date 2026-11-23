@@ -1047,15 +1047,13 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     m_nameIndex = nameIndex;
     m_mes.Set(script, flags & 0x20);
 
-    float two = 2.0f;
     m_windowWidth = 2.0f * m_marginX + m_mes.GetWidth();
-    m_windowHeight = two * m_marginY + m_mes.GetHeight();
+    m_windowHeight = 2.0f * m_marginY + m_mes.GetHeight();
 
     if (m_menuIndex >= 4) {
         if ((flags & 8) != 0) {
-            float half = 0.5f;
             m_baseX = -(0.5f * m_windowWidth - m_baseX);
-            m_baseY = -(half * m_windowHeight - m_baseY);
+            m_baseY = -(0.5f * m_windowHeight - m_baseY);
         } else if ((flags & 0x8000) != 0) {
             m_baseX -= m_windowWidth;
         }

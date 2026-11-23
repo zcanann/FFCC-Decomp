@@ -15,3 +15,17 @@ onDraw__8CMesMenuFv	onDraw pulse sinf->sin	99.68478
 onDraw__8CMesMenuFv	onDraw cursorWave sinf->sin	100.0
 onDraw__8CMesMenuFv	onDraw sinY sinf->sin	99.9791
 onDraw__8CMesMenuFv	onDraw sinX sinf->sin	99.98258
+Create__8CMesMenuFv	Create remove m_windowScale	99.96517
+Create__8CMesMenuFv	Create remove m_fromScriptPosition	99.96413
+Create__8CMesMenuFv	Create remove m_flags	99.96447
+Create__8CMesMenuFv	Create remove m_heartValue	99.96482
+Create__8CMesMenuFv	Create remove defaultValue reassignment	100.0
+Create__8CMesMenuFv	Create change defaultValue init to 0	100.0
+Create__8CMesMenuFv	Create remove m_nameIndex in Create	99.96064
+Open__8CMesMenuFPciiiiii	Open remove m_closeReason=0	99.928246
+Open__8CMesMenuFPciiiiii	Open remove m_active=1	99.65587
+Open__8CMesMenuFPciiiiii	Open remove two var	100.0
+Open__8CMesMenuFPciiiiii	Open remove half var	100.0
+Open__8CMesMenuFPciiiiii	Open remove two var (float two)	100.0
+Open__8CMesMenuFPciiiiii	Open remove half var	100.0
+Open__8CMesMenuFPciiiiii	Open remove both two+half (-4)	100.0

@@ -870,8 +870,7 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
     particle->m_direction.y *= params->m_directionScaleY;
     particle->m_direction.z *= params->m_directionScaleZ;
 
-    Vec directionNorm = particle->m_direction;
-    pppNormalize(particle->m_direction, directionNorm);
+    pppNormalize(particle->m_direction, particle->m_direction);
 
     if (0.0f != params->m_spawnOffset) {
         PSVECScale(&particle->m_direction, &particle->m_position, params->m_spawnOffset);

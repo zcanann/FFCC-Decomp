@@ -1,0 +1,9 @@
+BirthParticle	remove angle second conversion (<<15/180) -> Birth O0 1676 delta +4, O4 97.365	97.365
+IsDeadGroupBreath	short slot loop -> O0 132 exact, O4 99.632	99.632
+get_rand	unsigned int x=(unsigned int)RandF() -> O0 56 exact, O4 100.000	100.000
+UpdateAllParticle	inline SearchIndex+IsDead -> O0 1284 delta +88, O4 99.166	99.166
+pppRenderYmBreath	static_cast nullptr args -> O0 1516 delta +148 same	100.000
+BirthParticle	get_rand helper with float range/spread -> Birth O0 1616 delta -56, get_rand O0 136 delta +80	same
+IsDeadGroupBreath	split OR into two ifs int loop -> O0 128 delta -4, O4 99.870	99.870
+pppFrameYmBreath	checked ghidra vs source no change	same
+BirthParticle	pppNormalize self (remove directionNorm copy) -> O0 1832 delta 160 (was 184), O4 100.000	100.000

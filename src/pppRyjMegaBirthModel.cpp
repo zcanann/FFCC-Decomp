@@ -274,15 +274,15 @@ static void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, P
     }
 }
 
-static inline s8 alloc_check(VRyjMegaBirthModel* work, PRyjMegaBirthModel* params)
+static inline signed char alloc_check(VRyjMegaBirthModel* work, PRyjMegaBirthModel* params)
 {
-    if (work->m_particleBlock == NULL) {
+    if (!work->m_particleBlock) {
         return 0;
     }
-    if ((params->m_enableWorldMatrix != 0) && (work->m_worldMatrixBlock == NULL)) {
+    if (params->m_enableWorldMatrix && !work->m_worldMatrixBlock) {
         return 0;
     }
-    if ((params->m_enableParticleColor != 0) && (work->m_colorBlock == NULL)) {
+    if (params->m_enableParticleColor && !work->m_colorBlock) {
         return 0;
     }
     return 1;

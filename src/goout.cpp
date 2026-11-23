@@ -196,14 +196,7 @@ unsigned char CGoOutMenu::SetMemCardError()
         m_currentMessage = -1;
         m_messageTimer = 0;
         m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 2;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetMenu(2, 0);
         break;
     case -999:
         if (m_lastMemCardProc == 1) {
@@ -235,14 +228,7 @@ unsigned char CGoOutMenu::SetMemCardError()
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
-            if (m_currentMessage >= 0) {
-                MenuPcs.m_menuWindowInfo->state = 2;
-                MenuPcs.m_goOutState->m_animFrame = 0;
-            }
-            m_messageWindowOpen = 0;
-            m_pendingMessage = 0xd;
-            m_messageCloseMode = 0;
-            m_pendingMessageTimer = 0;
+            SetMenu(0xd, 0);
             break;
         } else if (m_lastMemCardProc == 2) {
             MenuPcs.m_menuWindowInfo->state = 3;
@@ -250,14 +236,7 @@ unsigned char CGoOutMenu::SetMemCardError()
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
-            if (m_currentMessage >= 0) {
-                MenuPcs.m_menuWindowInfo->state = 2;
-                MenuPcs.m_goOutState->m_animFrame = 0;
-            }
-            m_messageWindowOpen = 0;
-            m_pendingMessage = 0xf;
-            m_messageCloseMode = 0;
-            m_pendingMessageTimer = 0;
+            SetMenu(0xf, 0);
             break;
         }
         // fall through
@@ -268,14 +247,7 @@ unsigned char CGoOutMenu::SetMemCardError()
         m_currentMessage = -1;
         m_messageTimer = 0;
         m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 1;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetMenu(1, 0);
         break;
     case -4:
         if (m_lastMemCardProc == 1) {
@@ -286,14 +258,7 @@ unsigned char CGoOutMenu::SetMemCardError()
         m_currentMessage = -1;
         m_messageTimer = 0;
         m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 0x13;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetMenu(0x13, 0);
         break;
     case -5:
         MenuPcs.m_menuWindowInfo->state = 3;
@@ -301,14 +266,7 @@ unsigned char CGoOutMenu::SetMemCardError()
         m_currentMessage = -1;
         m_messageTimer = 0;
         m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 3;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetMenu(3, 0);
         break;
     case -13:
     case -6:
@@ -358,7 +316,6 @@ void CGoOutMenu::SetMenu(short message, long timer)
         MenuPcs.m_goOutState->m_animFrame = 0;
     }
 
-    m_messageState = 1;
     m_messageWindowOpen = 0;
     m_pendingMessage = message;
     m_messageCloseMode = 0;
@@ -410,15 +367,7 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     va_end(args);
 
     messageIndex = m_menuStringSlot + kTransferWindowBase;
-    if (m_currentMessage >= 0) {
-        MenuPcs.m_menuWindowInfo->state = 2;
-        MenuPcs.m_goOutState->m_animFrame = 0;
-    }
-
-    m_messageWindowOpen = 0;
-    m_pendingMessage = messageIndex;
-    m_messageCloseMode = 0;
-    m_pendingMessageTimer = timer;
+    SetMenu(messageIndex, timer);
 }
 
 /*
@@ -555,14 +504,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         }
 #endif
         MenuPcs.ChgAllModel();
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuPcs.m_goOutState->m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 0x1e;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
+        SetMenu(0x1e, 0);
         unk_0x14 = 0;
         break;
     }
@@ -750,12 +692,32 @@ inline bool CGoOutMenu::HitCanncel()
  */
 inline void CGoOutMenu::Init()
 {
-    memset(this, 0, sizeof(*this));
-    m_memCardResult = -1;
-    m_returnGoOutMode = -1;
-    m_pendingMessage = -1;
+    MenuPcs.m_goOutReset.m_resetFlag = 0;
+    MenuPcs.m_menuWindowInfo->state = 3;
     m_currentMessage = -1;
+    m_pendingMessage = -1;
     m_menuStringSlot = 0;
+    SetMainMode(1);
+    MenuPcs.m_goOutTransferSaveData =
+        static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferSaveAllocLine));
+    MenuPcs.m_goOutTransferWork =
+        static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferWorkAllocLine));
+    MenuPcs.m_goOutTransferWorkActive = 0;
+    MenuPcs.m_goOutUnknown888 = 0;
+    MenuPcs.m_goOutSaveLoadMode = 0;
+    MenuPcs.m_goOutUnknown88A = 0;
+    WinMessEntry* winMessage = MenuPcs.GetWinMess(kTransferWindowBase);
+    winMessage->m_lineCount = 0;
+    // Japanese retail initializes 16 IDs across adjacent 20-byte descriptors.
+    for (int i = 0; i < kTransferInitializedIds; i++) {
+        winMessage->m_messageIds[i] = i + kTransferMessageBase;
+    }
+    winMessage = MenuPcs.GetWinMess(kTransferWindowBase + 1);
+    winMessage->m_lineCount = 0;
+    for (int i = 0; i < kTransferInitializedIds; i++) {
+        winMessage->m_messageIds[i] = i + kTransferMessageBase + 10;
+    }
+    MenuPcs.m_menuWindowInfo->state = 3;
     m_messageState = 1;
 }
 
@@ -1967,33 +1929,7 @@ void CGoOutMenu::Calc()
     m_drawCursor = 0;
 
     if (MenuPcs.m_goOutReset.m_resetFlag != 0) {
-        MenuPcs.m_goOutReset.m_resetFlag = 0;
-        MenuPcs.m_menuWindowInfo->state = 3;
-        m_currentMessage = -1;
-        m_pendingMessage = -1;
-        m_menuStringSlot = 0;
-        SetMainMode(1);
-        MenuPcs.m_goOutTransferSaveData =
-            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferSaveAllocLine));
-        MenuPcs.m_goOutTransferWork =
-            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferWorkAllocLine));
-        MenuPcs.m_goOutTransferWorkActive = 0;
-        MenuPcs.m_goOutUnknown888 = 0;
-        MenuPcs.m_goOutSaveLoadMode = 0;
-        MenuPcs.m_goOutUnknown88A = 0;
-        WinMessEntry* winMessage = MenuPcs.GetWinMess(kTransferWindowBase);
-        winMessage->m_lineCount = 0;
-        // Japanese retail initializes 16 IDs across adjacent 20-byte descriptors.
-        for (int i = 0; i < kTransferInitializedIds; i++) {
-            winMessage->m_messageIds[i] = i + kTransferMessageBase;
-        }
-        winMessage = MenuPcs.GetWinMess(kTransferWindowBase + 1);
-        winMessage->m_lineCount = 0;
-        for (int i = 0; i < kTransferInitializedIds; i++) {
-            winMessage->m_messageIds[i] = i + kTransferMessageBase + 10;
-        }
-        MenuPcs.m_menuWindowInfo->state = 3;
-        m_messageState = 1;
+        Init();
     }
 
     if (m_messageCloseMode == 0) {

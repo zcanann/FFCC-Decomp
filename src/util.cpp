@@ -528,15 +528,13 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetChanMatColor(GX_COLOR0A0, white);
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
-    float x2 = x + width;
-    float y2 = y + height;
     Vec pos0;
     Vec pos1;
     pos0.x = x;
     pos0.y = y;
     pos0.z = -0.9999999f;
-    pos1.x = x2;
-    pos1.y = y2;
+    pos1.x = x + width;
+    pos1.y = y + height;
     pos1.z = -0.9999999f;
 
     GXSetColorUpdate(GX_FALSE);
@@ -580,15 +578,13 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumChans(1);
 
-    float x2 = x + width;
-    float y2 = y + height;
     Vec pos0;
     Vec pos1;
     pos0.x = x;
     pos0.y = y;
     pos0.z = 0.0f;
-    pos1.x = x2;
-    pos1.y = y2;
+    pos1.x = x + width;
+    pos1.y = y + height;
     pos1.z = 0.0f;
     RenderQuadNoTex(pos0, pos1, color);
 
@@ -639,15 +635,13 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
     }
 
-    x2 = x + width;
-    y2 = y + height;
     Vec pos0;
     Vec pos1;
     pos0.x = x;
     pos0.y = y;
     pos0.z = 0.0f;
-    pos1.x = x2;
-    pos1.y = y2;
+    pos1.x = x + width;
+    pos1.y = y + height;
     pos1.z = 0.0f;
 
     if (color != 0) {
@@ -710,15 +704,13 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
         SetPaletteEnv(texture);
     }
 
-    x2 = x + width;
-    y2 = y + height;
     Vec pos0;
     Vec pos1;
     pos0.x = x;
     pos0.y = y;
     pos0.z = 0.0f;
-    pos1.x = x2;
-    pos1.y = y2;
+    pos1.x = x + width;
+    pos1.y = y + height;
     pos1.z = 0.0f;
 
     if (color != 0) {

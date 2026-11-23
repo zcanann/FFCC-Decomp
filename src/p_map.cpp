@@ -374,9 +374,7 @@ void CMapPcs::calc()
     Mtx44 screenMtx;
 
     g_MapMng.LoadMapNoSyncCalc();
-    g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
-    g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
-    g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
+    g_MapMng.m_cameraPosition = CameraPcs.m_position;
 
     if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));

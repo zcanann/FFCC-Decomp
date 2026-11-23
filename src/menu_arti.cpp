@@ -413,10 +413,9 @@ int CMenuPcs::ArtiClose()
  */
 int CMenuPcs::ArtiCtrl()
 {
-	ArtiState* state = m_artiState;
 	int result;
 
-	state->prevSelection = state->currentSelection;
+	m_artiState->prevSelection = m_artiState->currentSelection;
 	result = ArtiCtrlCur();
 	if (result != 0) {
 		ArtiInit1();

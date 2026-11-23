@@ -81,8 +81,7 @@ inline void GbaThreadSleep(long long ticks)
     MiniGameAlarm alarm;
     OSCreateAlarm(&alarm.alarm);
     OSSetAlarmTag(&alarm.alarm, 1);
-    OSThread* currentThread = OSGetCurrentThread();
-    alarm.thread = currentThread;
+    alarm.thread = OSGetCurrentThread();
     BOOL interruptLevel = OSDisableInterrupts();
     OSSetAlarm(&alarm.alarm, ticks, GbaThreadAlarmHandler);
     OSSuspendThread(alarm.thread);

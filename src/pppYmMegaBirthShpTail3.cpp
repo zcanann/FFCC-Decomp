@@ -176,6 +176,7 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
 {
     float spread = (float)pYmMegaBirthShpTail3->m_spread;
     float spreadRange = 2.0f * spread;
+    float r0, r1, r2, r3, r4;
 
     memset(particleData, 0, sizeof(_PARTICLE_DATA));
     if (particleWMat != 0) {
@@ -244,35 +245,34 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
             }
             case 3:
             {
-                float rand1 = Math.RandF();
-                float rand2 = Math.RandF();
-                scale = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-                scale = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (scale * rand1);
+                r0 = Math.RandF();
+                r1 = Math.RandF();
+                scale = pYmMegaBirthShpTail3->m_spawnRange * r1;
+                scale = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (scale * r0);
                 break;
             }
             case 4:
             {
-                float rand1 = Math.RandF();
-                float rand2 = Math.RandF();
-                float rand3 = Math.RandF();
-                float rand4 = Math.RandF();
-                scale = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-                scale = rand4 * (rand3 * (scale * rand1));
+                r0 = Math.RandF();
+                r1 = Math.RandF();
+                r2 = Math.RandF();
+                r3 = Math.RandF();
+                scale = pYmMegaBirthShpTail3->m_spawnRange * r1;
+                scale = r3 * (r2 * (scale * r0));
                 break;
             }
             case 5:
             {
-                float rand1 = Math.RandF();
-                float rand2 = Math.RandF();
-                float rand3 = Math.RandF();
-                scale = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-                scale = pYmMegaBirthShpTail3->m_spawnRange - 0.5f * (rand3 * (scale * rand1));
+                r0 = Math.RandF();
+                r1 = Math.RandF();
+                r2 = Math.RandF();
+                scale = pYmMegaBirthShpTail3->m_spawnRange * r1;
+                scale = pYmMegaBirthShpTail3->m_spawnRange - 0.5f * (r2 * (scale * r0));
                 break;
             }
             }
 
-            Vec velocity = particleData->m_direction;
-            pppScaleVectorXYZ(particleData->m_position, velocity, scale);
+            pppScaleVectorXYZ(particleData->m_position, particleData->m_direction, scale);
         }
         break;
     }
@@ -286,10 +286,6 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
         float speedRandHalf = 0.5f * pYmMegaBirthShpTail3->m_spawnRange;
 
         {
-        float rand1;
-        float rand2;
-        float rand3;
-        float rand4;
         switch (pYmMegaBirthShpTail3->m_randType) {
         default:
             particleData->m_position.x = pYmMegaBirthShpTail3->m_spawnRange * Math.RandF();
@@ -317,63 +313,63 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
             particleData->m_position.z -= speedRandHalf;
             break;
         case 3:
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.x = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (rand2 * rand1);
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.x = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (r1 * r0);
             particleData->m_position.x -= speedRandHalf;
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.y = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (rand2 * rand1);
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.y = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (r1 * r0);
             particleData->m_position.y -= speedRandHalf;
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.z = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (rand2 * rand1);
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.z = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (r1 * r0);
             particleData->m_position.z -= speedRandHalf;
             break;
         case 4:
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand3 = Math.RandF();
-            rand4 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.x = rand4 * (rand3 * (rand2 * rand1));
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r2 = Math.RandF();
+            r3 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.x = r3 * (r2 * (r1 * r0));
             particleData->m_position.x -= speedRandHalf;
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand3 = Math.RandF();
-            rand4 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.y = rand4 * (rand3 * (rand2 * rand1));
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r2 = Math.RandF();
+            r3 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.y = r3 * (r2 * (r1 * r0));
             particleData->m_position.y -= speedRandHalf;
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand3 = Math.RandF();
-            rand4 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.z = rand4 * (rand3 * (rand2 * rand1));
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r2 = Math.RandF();
+            r3 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.z = r3 * (r2 * (r1 * r0));
             particleData->m_position.z -= speedRandHalf;
             break;
         case 5:
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand3 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.x = pYmMegaBirthShpTail3->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r2 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.x = pYmMegaBirthShpTail3->m_spawnRange - 0.5f * (r2 * (r1 * r0));
             particleData->m_position.x -= speedRandHalf;
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand3 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.y = pYmMegaBirthShpTail3->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r2 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.y = pYmMegaBirthShpTail3->m_spawnRange - 0.5f * (r2 * (r1 * r0));
             particleData->m_position.y -= speedRandHalf;
-            rand1 = Math.RandF();
-            rand2 = Math.RandF();
-            rand3 = Math.RandF();
-            rand2 = pYmMegaBirthShpTail3->m_spawnRange * rand2;
-            particleData->m_position.z = pYmMegaBirthShpTail3->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
+            r0 = Math.RandF();
+            r1 = Math.RandF();
+            r2 = Math.RandF();
+            r1 = pYmMegaBirthShpTail3->m_spawnRange * r1;
+            particleData->m_position.z = pYmMegaBirthShpTail3->m_spawnRange - 0.5f * (r2 * (r1 * r0));
             particleData->m_position.z -= speedRandHalf;
             break;
         }
@@ -400,9 +396,6 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
             }
 
             {
-                float vx;
-                float vy;
-                float vz;
                 float sampleT;
 
                 switch (pYmMegaBirthShpTail3->m_randType) {
@@ -417,9 +410,9 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
                     vYmMegaBirthShpTail3->m_pathIndex = sampleIndex + 1;
 
                     Vec* pathVec = &pathBase[indices[sampleIndex]];
-                    vx = pathVec->x;
-                    vy = pathVec->y;
-                    vz = pathVec->z;
+                    r0 = pathVec->x;
+                    r1 = pathVec->y;
+                    r2 = pathVec->z;
                     goto path_store;
                 }
                 case 1:
@@ -428,36 +421,36 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
                     break;
                 case 2:
                 {
-                    float r0 = Math.RandF();
-                    float r1 = Math.RandF();
-                    float r2 = Math.RandF();
+                    r0 = Math.RandF();
+                    r1 = Math.RandF();
+                    r2 = Math.RandF();
                     sampleT = r2 * (r1 * r0);
                     break;
                 }
                 case 3:
                 {
-                    float r0 = Math.RandF();
-                    float r1 = Math.RandF();
-                    float r2 = Math.RandF();
+                    r0 = Math.RandF();
+                    r1 = Math.RandF();
+                    r2 = Math.RandF();
                     sampleT = static_cast<float>(1.0 - (r2 * (r1 * r0)));
                     break;
                 }
                 case 4:
                 {
-                    float r0 = Math.RandF();
-                    float r1 = Math.RandF();
-                    float r2 = Math.RandF();
-                    float r3 = Math.RandF();
+                    r0 = Math.RandF();
+                    r1 = Math.RandF();
+                    r2 = Math.RandF();
+                    r3 = Math.RandF();
                     sampleT = r3 * (r2 * (r1 * r0));
                     break;
                 }
                 case 5:
                 {
-                    float r0 = Math.RandF();
-                    float r1 = Math.RandF();
-                    float r2 = Math.RandF();
-                    float r3 = Math.RandF();
-                    float r4 = Math.RandF();
+                    r0 = Math.RandF();
+                    r1 = Math.RandF();
+                    r2 = Math.RandF();
+                    r3 = Math.RandF();
+                    r4 = Math.RandF();
                     sampleT = static_cast<float>(1.0 - (r4 * (r3 * (r2 * (r1 * r0)))));
                     break;
                 }
@@ -470,19 +463,18 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
 
                     int sampleIndex = (int)(sampleT * (float)pathInfo->m_vertexCount);
                     Vec* pathVec = &pathBase[pathInfo->m_vertexIndices[sampleIndex]];
-                    vx = pathVec->x;
-                    vy = pathVec->y;
-                    vz = pathVec->z;
+                    r0 = pathVec->x;
+                    r1 = pathVec->y;
+                    r2 = pathVec->z;
                 }
                 path_store:
 
-                particleData->m_position.x = vx * pYmMegaBirthShpTail3->m_spawnScale.x;
-                particleData->m_position.y = vy * pYmMegaBirthShpTail3->m_spawnScale.y;
-                particleData->m_position.z = vz * pYmMegaBirthShpTail3->m_spawnScale.z;
+                particleData->m_position.x = r0 * pYmMegaBirthShpTail3->m_spawnScale.x;
+                particleData->m_position.y = r1 * pYmMegaBirthShpTail3->m_spawnScale.y;
+                particleData->m_position.z = r2 * pYmMegaBirthShpTail3->m_spawnScale.z;
 
                 if ((pYmMegaBirthShpTail3->m_spawnMode == 8) || (pYmMegaBirthShpTail3->m_spawnMode == 9)) {
-                    Vec velocity = particleData->m_position;
-                    pppNormalize(particleData->m_direction, velocity);
+                    pppNormalize(particleData->m_direction, particleData->m_position);
                 }
             }
         }

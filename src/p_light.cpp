@@ -69,18 +69,15 @@ void CLightPcs::Init()
     m_mapLightColor[0].b = 0x3F;
     m_mapLightColor[0].a = 0xFF;
 
-    float lightRange = -1.0f;
-    float lightParam = 0.0f;
-
     for (int i = 0; i < 3; i++) {
         unsigned char color = (i == 0) ? 0x3F : 0;
         m_mapLightColor[i + 1].r = color;
         m_mapLightColor[i + 1].g = color;
         m_mapLightColor[i + 1].b = color;
         m_mapLightColor[i + 1].a = 0xFF;
-        m_mapLightParams[i].x = lightParam;
-        m_mapLightParams[i].y = lightParam;
-        m_mapLightParams[i].z = lightRange;
+        m_mapLightParams[i].x = 0.0f;
+        m_mapLightParams[i].y = 0.0f;
+        m_mapLightParams[i].z = -1.0f;
     }
 }
 

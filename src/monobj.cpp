@@ -1565,7 +1565,10 @@ void CGMonObj::aiTargetAttackRomMon(int classId)
  */
 void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, int* hitPartyIndex)
 {
-	if (hitScale != NULL) {
+	FFCC_ASSERT(flags >= 0);
+	FFCC_ASSERT(distance >= 0.0f);
+	FFCC_ASSERT(hitScale != NULL || hitPartyIndex != NULL);
+		if (hitScale != NULL) {
 		*hitScale = 1.0f;
 	}
 	if (hitPartyIndex != NULL) {

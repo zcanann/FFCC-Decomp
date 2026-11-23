@@ -90,17 +90,6 @@ STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_cullMode) == 0x13D);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_lightTarget) == 0x13F);
 STATIC_ASSERT(sizeof(PRyjMegaBirthModel) == 0x140);
 
-static inline void wrap_particle_rotation_triplet_s32(s32* rotation)
-{
-    for (s32 i = 0; i < 3; i++) {
-        if (rotation[i] >= 0x8000) {
-            while (rotation[i] >= 0x8000) { rotation[i] -= 0x10000; }
-        } else if (rotation[i] < -0x8000) {
-            while (rotation[i] >= 0x8000) { rotation[i] += 0x10000; }
-        }
-    }
-}
-
 static inline float get_rand()
 {
     float r = Math.RandF();
@@ -491,7 +480,13 @@ static void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel
         particleData->m_rotationVelocity[2] += pRyjMegaBirthModel->m_rotationAcceleration[2];
     }
 
-    wrap_particle_rotation_triplet_s32(particleData->m_rotation);
+    for (s32 i = 0; i < 3; i++) {
+        if (particleData->m_rotation[i] >= 0x8000) {
+            while (particleData->m_rotation[i] >= 0x8000) { particleData->m_rotation[i] -= 0x10000; }
+        } else if (particleData->m_rotation[i] < -0x8000) {
+            while (particleData->m_rotation[i] >= 0x8000) { particleData->m_rotation[i] += 0x10000; }
+        }
+    }
 
     particleData->m_scale.x = particleData->m_scale.x + particleData->m_scaleVelocity.x;
     particleData->m_scale.y = particleData->m_scale.y + particleData->m_scaleVelocity.y;

@@ -784,8 +784,8 @@ inline void CMenuPcs::EquipInit0()
 	caravanWork = Game.m_scriptFoodBase[0];
 	entry = m_equipList->entries;
 	for (i = 0; i < m_equipList->count; i++) {
-		entry->alpha = alpha;
-		entry->scale = alpha;
+		entry->alpha = (float)(double)alpha;
+		entry->scale = (float)(double)alpha;
 		entry++;
 	}
 
@@ -1010,7 +1010,7 @@ void CMenuPcs::EquipInit1()
 	listEntry = &m_equipList->entries[m_equipList->count];
 	for (k = n; k > 0; k--) {
 		listEntry->step = 0;
-		listEntry->alpha = alpha;
+		listEntry->alpha = (float)(double)alpha;
 		listEntry++;
 	}
 }

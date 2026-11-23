@@ -248,7 +248,10 @@ public:
         return m_cameraMatrix;
     }
 
+    Vec* GetPosition() { return &m_position; }
+    Vec* GetRefPosition() { return &m_target; }
     float GetFov() { return m_fov; }
+    float GetZRotate() { return m_zRotate; }
     int GetFullScreenShadowEnable() { return m_fullScreenShadowEnabled; }
 
     // Chara

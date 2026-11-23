@@ -328,14 +328,15 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable
 #endif
 				}
 
-				xFine = x & 3;
 				if (magnitude > maxMagnitude) {
 					magnitude = maxMagnitude;
 				}
 
 				double modulation = fmod(magnitude, 0.2f);
 				magnitude = modulationScale * (magnitude * (float)modulation);
-				u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * coordScale + coordOffset));
+				xFine = x & 3;
+				u32 nx = xCoord * magnitude * coordScale + coordOffset;
+				FFCC_ASSERT(x < textureInfo->m_width && y < textureInfo->m_height);
 				u8* pixel = textureInfo->m_imageData +
 					yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
 					(x & 0x1FFFFFFC) * 8 +

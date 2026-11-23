@@ -1237,13 +1237,8 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedLinkValueConditions:
 
-		int sysVal[4];
-		sysVal[0] = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
-		sysVal[1] = Game.m_gameWork.m_timerA;
-		sysVal[2] = Game.m_gameWork.m_scriptGlobalTime;
-		sysVal[3] = Game.m_gameWork.m_frameCounter;
 		for (i = 0; i < 4; i++) {
-			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
+			unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
 			const int srcType = (cmpType >> 11) & 3;
 
 			if (srcType != 3) {
@@ -1252,16 +1247,16 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				case 0:
 					switch (sourceIdx) {
 					case 0:
-						cmpValue = sysVal[0];
+						cmpValue = Game.m_gameWork.m_scriptSysVal0;
 						break;
 					case 1:
-						cmpValue = sysVal[1];
+						cmpValue = Game.m_gameWork.m_timerA;
 						break;
 					case 2:
-						cmpValue = sysVal[2];
+						cmpValue = Game.m_gameWork.m_scriptGlobalTime;
 						break;
 					case 3:
-						cmpValue = sysVal[3];
+						cmpValue = Game.m_gameWork.m_frameCounter;
 						break;
 					}
 					break;

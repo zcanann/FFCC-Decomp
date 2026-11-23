@@ -134,9 +134,8 @@ CProfile g_par_draw_prof("no name");
  */
 void CPartPcs::Init()
 {
-	CUSBStreamDataState* usbStream = &m_usbStreamState;
-	usbStream->m_fieldLoadReq = 0;
-	usbStream->m_printFreeOnNext = 0;
+	m_usbStreamState.m_fieldLoadReq = 0;
+	m_usbStreamState.m_printFreeOnNext = 0;
 }
 
 /*
@@ -164,8 +163,7 @@ void CPartPcs::Quit()
  */
 void CPartPcs::onScriptChanging(char*)
 {
-	CUSBStreamDataState* usbStream = &m_usbStreamState;
-	usbStream->m_fieldLoadReq = 0;
+	m_usbStreamState.m_fieldLoadReq = 0;
 }
 
 /*
@@ -208,57 +206,23 @@ static unsigned char pppNotAllocAmemCacheRmem(unsigned long)
  */
 static unsigned int pppFreeMngStPrioForData()
 {
+	int i;
 	_pppMngSt* selectedMngSt = 0;
-	char* partMngBase = reinterpret_cast<char*>(&PartMng);
-	_pppMngSt* currentMngSt = ppvMng;
-	int selectedPrio = 1;
-	unsigned int selectedPrioTime;
-	int index = 0;
-	for (int i = 0xc0; i != 0; i--) {
-		CPartMng* partMng = reinterpret_cast<CPartMng*>(partMngBase);
-		_pppMngSt* candidateA = partMng->m_pppMng;
-		if (candidateA != currentMngSt && candidateA->m_baseTime != -0x1000 &&
-		    candidateA->m_kind != 0) {
-			unsigned char prioA = candidateA->m_prio;
-			if (prioA > 1) {
-				if (selectedPrio < prioA) {
-					selectedPrioTime = candidateA->m_prioTime;
-					selectedPrio = prioA;
-					selectedMngSt = candidateA;
-				} else if (selectedPrio == prioA) {
-					unsigned int prioTimeA = candidateA->m_prioTime;
-					if ((int)selectedPrioTime < (int)prioTimeA) {
-						selectedPrioTime = prioTimeA;
-						selectedMngSt = candidateA;
-					}
-				}
+	int prio = 1;
+	int prioTime;
+
+	for (i = 0; i < 0x180; i++) {
+		_pppMngSt* pppMngSt = &PartMng.m_pppMng[i];
+		if (pppMngSt != ppvMng && pppMngSt->m_baseTime != -0x1000 && pppMngSt->m_kind != 0 && pppMngSt->m_prio > 1) {
+			if (prio < pppMngSt->m_prio) {
+				prioTime = pppMngSt->m_prioTime;
+				prio = pppMngSt->m_prio;
+				selectedMngSt = pppMngSt;
+			} else if (prio == pppMngSt->m_prio && prioTime < pppMngSt->m_prioTime) {
+				prioTime = pppMngSt->m_prioTime;
+				selectedMngSt = pppMngSt;
 			}
 		}
-
-		char* nextPartMngBase = partMngBase + sizeof(_pppMngSt);
-		_pppMngSt* candidateB = &partMng->m_pppMng[1];
-		partMngBase = nextPartMngBase;
-		partMng = reinterpret_cast<CPartMng*>(partMngBase);
-		if (candidateB != currentMngSt && candidateB->m_baseTime != -0x1000 &&
-		    candidateB->m_kind != 0) {
-			unsigned char prioB = candidateB->m_prio;
-			if (prioB > 1) {
-				if (selectedPrio < prioB) {
-					selectedPrioTime = candidateB->m_prioTime;
-					selectedPrio = prioB;
-					selectedMngSt = candidateB;
-				} else if (selectedPrio == prioB) {
-					unsigned int prioTimeB = candidateB->m_prioTime;
-					if ((int)selectedPrioTime < (int)prioTimeB) {
-						selectedPrioTime = prioTimeB;
-						selectedMngSt = candidateB;
-					}
-				}
-			}
-		}
-
-		partMngBase = reinterpret_cast<char*>(partMng) + sizeof(_pppMngSt);
-		index++;
 	}
 
 	if (selectedMngSt == 0) {
@@ -266,16 +230,16 @@ static unsigned int pppFreeMngStPrioForData()
 	}
 
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(g_MsgFlashy, index);
+		System.Printf(g_MsgFlashy);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
 		char* pdtName = PartMng.m_pdtSlots[selectedMngSt->m_kind].m_name;
 		System.Printf(
 			"  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n",
-			(unsigned int)selectedMngSt->m_prioTime,
-			(unsigned int)selectedMngSt->m_prio,
-			(int)selectedMngSt->m_kind,
-			(int)selectedMngSt->m_nodeIndex,
+			selectedMngSt->m_prioTime,
+			selectedMngSt->m_prio,
+			selectedMngSt->m_kind,
+			selectedMngSt->m_nodeIndex,
 			pdtName);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
@@ -286,7 +250,7 @@ static unsigned int pppFreeMngStPrioForData()
 	}
 
 	Graphic._WaitDrawDone("p_tina.cpp", 0xfc);
-	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(selectedMngSt));
+	_pppAllFreePObject(selectedMngSt);
 	return 1;
 }
 
@@ -329,26 +293,18 @@ static unsigned char pppAmemRefCntError(unsigned long)
  */
 inline void CPartPcs::create0()
 {
-    CUSBStreamDataState* usb = &m_usbStreamState;
-    CMemory::CStage* stage;
-
-    usb->m_freePtr = 0;
-    usb->m_stageExtra = 0;
-    usb->m_blockOnFrame = 0;
-    usb->m_miruraEventActive = 0;
-    usb->m_disableShokiDraw = 0;
+    m_usbStreamState.m_freePtr = 0;
+    m_usbStreamState.m_stageExtra = 0;
+    m_usbStreamState.m_blockOnFrame = 0;
+    m_usbStreamState.m_miruraEventActive = 0;
+    m_usbStreamState.m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
-        stage = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = 0;
+        m_usbStreamState.m_stageDefault = m_usbStreamState.m_stageLoad = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
+        m_usbStreamState.m_stageAmem = 0;
     } else {
-        stage = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        stage = Memory.CreateStage(0x400000, "CPartPcs.amem", 2);
-        usb->m_stageAmem = stage;
+        m_usbStreamState.m_stageDefault = m_usbStreamState.m_stageLoad = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
+        m_usbStreamState.m_stageAmem = Memory.CreateStage(0x400000, "CPartPcs.amem", 2);
     }
 
     ppvAmemCacheSet.Init(
@@ -422,43 +378,8 @@ void CPartPcs::createLoad()
  */
 void CPartPcs::createViewer()
 {
-    CUSBStreamDataState* usb = &m_usbStreamState;
-    CMemory::CStage* stage;
-
     USBPcs.IsBigAlloc(1);
-    usb->m_freePtr = 0;
-    usb->m_stageExtra = 0;
-    usb->m_blockOnFrame = 0;
-    usb->m_miruraEventActive = 0;
-    usb->m_disableShokiDraw = 0;
-
-    if ((int)Game.m_currentSceneId == 7) {
-        stage = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = 0;
-    } else {
-        stage = Memory.CreateStage(0x180000, "CPartPcs.dat", 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        stage = Memory.CreateStage(0x400000, "CPartPcs.amem", 2);
-        usb->m_stageAmem = stage;
-    }
-
-    ppvAmemCacheSet.Init(
-        "CPartPcs",
-        PartPcs.m_usbStreamState.m_stageLoad,
-        PartPcs.m_usbStreamState.m_stageAmem,
-        0x400,
-        pppNotAllocAmemCacheRmem,
-        0,
-        pppAmemDeletePmng,
-        0,
-        pppAmemRefCntError,
-        0);
-
-    ::memset(&PartMng, 0, 0x23FD8);
-    PartMng.Create();
+    create0();
     m_usbStreamData.CreateBuffer();
 }
 
@@ -473,26 +394,24 @@ void CPartPcs::createViewer()
  */
 void CPartPcs::destroy()
 {
-    CUSBStreamDataState* usb = &m_usbStreamState;
-
     USBPcs.IsBigAlloc(0);
     PartMng.Destroy();
 
-    if (usb->m_stageAmem != 0) {
-        Memory.DestroyStage(usb->m_stageAmem);
+    if (m_usbStreamState.m_stageAmem != 0) {
+        Memory.DestroyStage(m_usbStreamState.m_stageAmem);
     }
 
     ppvAmemCacheSet.AssertCache();
     ppvAmemCacheSet.Destroy();
 
-    Memory.DestroyStage(usb->m_stageDefault);
+    Memory.DestroyStage(m_usbStreamState.m_stageDefault);
 
-    if (usb->m_freePtr != 0) {
-        Memory.Free(usb->m_freePtr);
+    if (m_usbStreamState.m_freePtr != 0) {
+        Memory.Free(m_usbStreamState.m_freePtr);
     }
 
-    if (usb->m_stageExtra != 0) {
-        Memory.DestroyStage(usb->m_stageExtra);
+    if (m_usbStreamState.m_stageExtra != 0) {
+        Memory.DestroyStage(m_usbStreamState.m_stageExtra);
     }
 }
 

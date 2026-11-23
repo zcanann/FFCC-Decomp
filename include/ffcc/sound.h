@@ -52,12 +52,6 @@ public:
     int IsStereo() { return m_redSound.GetSoundMode() ? 0 : 1; }
     void SetBgmMasterVolume(int);
     void SetSeMasterVolume(int);
-    int DMAEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
-                 RedDmaCallback callback, void* callbackData)
-    {
-        return m_redSound.DMAEntry(flags, direction, mainMemory, aramMemory, size, callback, callbackData);
-    }
-    int DMACheck(int id) { return m_redSound.DMACheck(id); }
     int GetBgmMasterVolume() { return m_bgmMasterVolume; }
     int GetSeMasterVolume() { return m_seMasterVolume; }
     /*
@@ -128,7 +122,6 @@ public:
     void AddNoFreeWave(int);
     void WaitASync();
 
-private:
     CMemory::CStage* m_stage;
     CRedSound m_redSound;
     unsigned char* m_aramBuffer;

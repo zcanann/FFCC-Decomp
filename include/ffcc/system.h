@@ -82,6 +82,8 @@ public:
     int GetNumOrder() { return m_orderCount; }
     int GetIdxCurrentOrder() { return m_currentOrderIndex; }
     unsigned int GetCounter() { return m_frameCounter; }
+    int GetSpeed() { return m_scenegraphStepMode; }
+    int IsDraw() { return (m_scenegraphStepMode == 1) ? ((m_frameCounter & 3) == 0) : 1; }
     int GetErrorLevel();
     int IsGdev();
     static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);

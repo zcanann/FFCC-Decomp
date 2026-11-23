@@ -129,49 +129,24 @@ void CLine<PointCount>::Draw()
         return;
     }
 
-    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
+    GXBegin(GX_LINESTRIP, GX_VTXFMT0, pointCount);
     for (u32 i = 0; i < pointCount; i++) {
-        float x;
-        float y;
-        float z;
-        z = points[i].z;
-        y = points[i].y;
-        x = points[i].x;
-        GXWGFifo.f32 = x;
-        GXWGFifo.f32 = y;
-        GXWGFifo.f32 = z;
+        GXPosition3f32(points[i].x, points[i].y, points[i].z);
     }
+    GXEnd();
 
-    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
+    GXBegin(GX_LINESTRIP, GX_VTXFMT0, pointCount);
     for (u32 i = 0; i < pointCount; i++) {
-        float x = points[i].x;
-        float y = 5.0f + points[i].y;
-        float z = points[i].z;
-        GXWGFifo.f32 = x;
-        GXWGFifo.f32 = y;
-        GXWGFifo.f32 = z;
+        GXPosition3f32(points[i].x, 5.0f + points[i].y, points[i].z);
     }
+    GXEnd();
 
-    GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((pointCount & 0x7FFF) << 1));
+    GXBegin(GX_LINES, GX_VTXFMT0, pointCount * 2);
     for (u32 i = 0; i < pointCount; i++) {
-        float x;
-        float y;
-        float z;
-        z = points[i].z;
-        y = points[i].y;
-        x = points[i].x;
-        GXWGFifo.f32 = x;
-        GXWGFifo.f32 = y;
-        GXWGFifo.f32 = z;
-        {
-            float raisedY = 5.0f + points[i].y;
-            float raisedZ = points[i].z;
-            float raisedX = points[i].x;
-            GXWGFifo.f32 = raisedX;
-            GXWGFifo.f32 = raisedY;
-            GXWGFifo.f32 = raisedZ;
-        }
+        GXPosition3f32(points[i].x, points[i].y, points[i].z);
+        GXPosition3f32(points[i].x, 5.0f + points[i].y, points[i].z);
     }
+    GXEnd();
 }
 
 template <int PointCount>

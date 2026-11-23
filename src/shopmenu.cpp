@@ -2862,6 +2862,7 @@ void CShopMenu::DrawItemInfo0()
         float unitWidth = font->GetWidth(unitText);
         float rightX = FLOAT_80332d3c - unitWidth;
         amountRightX = static_cast<int>(rightX - FLOAT_80332d5c);
+        FFCC_ASSERT(m_listType == 0 || m_listType == 1);
 
         DrawDec(getBuySellGil(itemNo), 0x1B, amountRightX, FLOAT_80332d68, -2.0f, 0, 1, 0x12);
 

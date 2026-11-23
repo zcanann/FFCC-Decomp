@@ -3,6 +3,7 @@
 
 #include "ffcc/manager.h"
 #include <dolphin/types.h>
+#include <dolphin/os/OSMemory.h>
 
 class CMemory;
 class CAmemCache;
@@ -61,7 +62,7 @@ public:
         void drawHeapTitle(int);
         int GetHeapUnuse();
         void heapInfo(unsigned long&, unsigned long&, unsigned long&);
-        void GetTail();
+        void* GetTail() { return reinterpret_cast<void*>(m_heapBottom); }
         void* GetTop() { return reinterpret_cast<void*>(m_heapTop); }
     };
 
@@ -90,8 +91,9 @@ public:
     void SetDefaultGroup(int group) { m_defaultGroup = group; }
     int GetHeapWalkerLevel() const { return m_heapWalkerLevel; }
     int GetDefaultGroup() const { return m_defaultGroup; }
-    void CopyToAMemory(void*, void*, unsigned long);
-    void CopyFromAMemory(void*, void*, unsigned long);
+    int CanUseDebugMemory() { return OSGetConsoleSimulatedMemSize() == 0x3000000; }
+    int CopyToAMemory(void*, void*, unsigned long);
+    int CopyFromAMemory(void*, void*, unsigned long);
     void CopyToAMemorySync(void*, void*, unsigned long);
     void CopyFromAMemorySync(void*, void*, unsigned long);
     int IsCopyCompleted(int);
@@ -177,7 +179,7 @@ public:
     void RefCnt0Up(int);
     void AmemSetLock();
     void AmemGetLock();
-    void AmemAlloc(int);
+    void* AmemAlloc(int);
     void AmemPrev();
     short GetFree();
     int GetData(short, char*, int);

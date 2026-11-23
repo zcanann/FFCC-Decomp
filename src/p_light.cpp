@@ -399,9 +399,7 @@ void CLightPcs::SetAmbient(_GXColor color)
 void CLightPcs::SetAmbientAlpha(float alpha)
 {
     static _GXColor color;
-    float alphaScale = 255.0f;
-    float scaled = alphaScale * alpha;
-    color.a = (u8)(int)scaled;
+    color.a = (u8)(255.0f * alpha);
     GXSetChanAmbColor((GXChannelID)2, color);
 }
 

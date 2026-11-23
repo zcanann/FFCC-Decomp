@@ -231,9 +231,7 @@ static inline void SetViewerStartPos(int viewerMode, char* mapName)
             }
         }
         cameraPos.y += 1.0f;
-        CameraPcs.m_position.x = cameraPos.x;
-        CameraPcs.m_position.y = cameraPos.y;
-        CameraPcs.m_position.z = cameraPos.z;
+        CameraPcs.SetPosition(&cameraPos);
     }
 }
 

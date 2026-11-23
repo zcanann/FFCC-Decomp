@@ -1010,15 +1010,13 @@ void CMesMenu::onScriptChanged(char*, int)
  */
 void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int itemIndex, int nameIndex)
 {
-    float zero;
     unsigned int menuIndex;
     bool alignRight;
     float yPos;
 
-    zero = 0.0f;
 #ifdef VERSION_GCCP01
     m_offsetY = 0.0f;
-    m_offsetX = zero;
+    m_offsetX = 0.0f;
 #endif
     m_active = 1;
     m_closeReason = 0;

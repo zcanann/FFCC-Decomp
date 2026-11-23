@@ -472,9 +472,11 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     float dirZ;
 
     if (mode != 0) {
-        dirX = CameraPcs.m_direction.x;
-        dirY = CameraPcs.m_direction.y;
-        dirZ = CameraPcs.m_direction.z;
+        Vec dirVec;
+        CameraPcs.GetDirection(&dirVec);
+        dirX = dirVec.x;
+        dirY = dirVec.y;
+        dirZ = dirVec.z;
     } else {
         dirX = dir->x;
         dirY = dir->y;
@@ -717,9 +719,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
         C_MTXLookAt(lookAt, &eye, &up, &m_direction);
 
         Vec camPos;
-        camPos.x = CameraPcs.m_position.x;
-        camPos.y = CameraPcs.m_position.y;
-        camPos.z = CameraPcs.m_position.z;
+        CameraPcs.GetVector(&camPos);
 
         Vec lightPos;
         PSVECSubtract(&m_targetPosition, &camPos, &lightPos);

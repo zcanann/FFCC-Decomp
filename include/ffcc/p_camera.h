@@ -187,6 +187,20 @@ public:
         out->z = m_position.z;
     }
 
+    void GetVector(Vec* out)
+    {
+        out->x = m_position.x;
+        out->y = m_position.y;
+        out->z = m_position.z;
+    }
+
+    void GetDirection(Vec* out)
+    {
+        out->x = m_direction.x;
+        out->y = m_direction.y;
+        out->z = m_direction.z;
+    }
+
     /*
      * --INFO--
      * PAL Address: UNUSED

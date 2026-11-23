@@ -10,6 +10,10 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
+namespace std {
+float fmodf(float x, float y);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80044a9c
@@ -103,14 +107,8 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
  */
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
-    unsigned int texAnimIndex;
-    unsigned int texAnimCount;
-
-    for (texAnimIndex = 0;
-         ((texAnimCount = static_cast<unsigned int>(m_texAnims.GetSize())), texAnimIndex < texAnimCount);
-         texAnimIndex = texAnimIndex + 1) {
-        CTexAnim* texAnim = m_texAnims[texAnimIndex];
-        texAnim->AttachMaterialSet(materialSet);
+    for (unsigned int i = 0; i < m_texAnims.GetSize(); i++) {
+        m_texAnims[i]->AttachMaterialSet(materialSet);
     }
 }
 
@@ -183,31 +181,8 @@ void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
  */
 void CTexAnimSet::SetTexGen()
 {
-    const float zero = 0.0f;
-
-    for (unsigned int i = 0; i < static_cast<unsigned int>(m_texAnims.GetSize()); i++) {
-        CTexAnim* texAnim = m_texAnims[i];
-        CMaterial* material = texAnim->m_refData->m_material;
-
-        if (material != 0) {
-            float y = texAnim->m_texGen.y;
-            int index = texAnim->m_refData->m_texSrtIndex;
-            float x = texAnim->m_texGen.x;
-            material->m_textureData.m_texScroll[index].m_u0 = x;
-            material->m_textureData.m_texScroll[index].m_v0 = y;
-            material->m_textureData.m_texScroll[index].m_u1 = zero;
-            material->m_textureData.m_texScroll[index].m_v1 = zero;
-            if (zero == material->m_textureData.m_texScroll[index].m_u1) {
-                material->m_textureData.m_texScroll[index].m_type0 = 0;
-            } else {
-                material->m_textureData.m_texScroll[index].m_type0 = 1;
-            }
-            if (zero == material->m_textureData.m_texScroll[index].m_v1) {
-                material->m_textureData.m_texScroll[index].m_type1 = 0;
-            } else {
-                material->m_textureData.m_texScroll[index].m_type1 = 1;
-            }
-        }
+    for (unsigned int i = 0; i < m_texAnims.GetSize(); i++) {
+        m_texAnims[i]->SetTexGen();
     }
 }
 
@@ -241,9 +216,8 @@ CTexAnim::CTexAnim()
  */
 CTexAnim::~CTexAnim()
 {
-    CRef* refData = m_refData;
-    if (refData != 0) {
-        refData->Release();
+    if (m_refData != 0) {
+        m_refData->Release();
         m_refData = 0;
     }
 }
@@ -260,14 +234,12 @@ CTexAnim::~CTexAnim()
 void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
-    CRef* ref = m_refData;
 
-    if (ref != 0) {
-        ref->Release();
+    if (m_refData != 0) {
+        m_refData->Release();
         m_refData = 0;
     }
-    CTexAnim::CRefData* refData = new (stage, "texanim.cpp", 0xD3) CTexAnim::CRefData;
-    m_refData = refData;
+    m_refData = new (stage, "texanim.cpp", 0xD3) CRefData;
     m_refData->m_texAnimSeqs.SetStage(stage);
 
     chunkFile.PushChunk();
@@ -308,9 +280,7 @@ CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
     copy->m_seqIndex = m_seqIndex;
     copy->m_frame = m_frame;
     copy->m_mode = m_mode;
-    copy->m_texGen.x = m_texGen.x;
-    copy->m_texGen.y = m_texGen.y;
-    copy->m_texGen.z = m_texGen.z;
+    copy->m_texGen = m_texGen;
 
     return copy;
 }
@@ -326,18 +296,17 @@ CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
  */
 void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
 {
-    int materialIndex;
-    CMaterial* material = m_refData->m_material;
-
-    if (material != 0) {
-        material->Release();
+    if (m_refData->m_material != 0) {
+        m_refData->m_material->Release();
         m_refData->m_material = 0;
     }
 
-    if ((materialSet != 0) && ((materialIndex = materialSet->Find(m_refData->m_name)), materialIndex >= 0)) {
-        material = materialSet->m_materials[materialIndex];
-        m_refData->m_material = material;
-        m_refData->m_material->AddRef();
+    if (materialSet != 0) {
+        int materialIndex = materialSet->Find(m_refData->m_name);
+        if (materialIndex >= 0) {
+            m_refData->m_material = materialSet->GetMaterial(materialIndex);
+            m_refData->m_material->AddRef();
+        }
     }
 }
 
@@ -360,14 +329,14 @@ void CTexAnim::AddFrame(float frameStep)
 
         if (m_mode != -3) {
             m_frame = m_frame + frameStep;
-            if ((float)seq->m_totalFrames <= m_frame) {
+            if ((float)seq->GetTotalFrame() <= m_frame) {
                 if (m_mode == -1) {
-                    m_frame = (float)seq->m_totalFrames;
+                    m_frame = (float)seq->GetTotalFrame();
                 } else if (m_mode >= 0) {
                     m_seqIndex = m_mode;
                     m_mode = -2;
                 }
-                m_frame = m_frame - (float)seq->m_totalFrames;
+                m_frame = m_frame - (float)seq->GetTotalFrame();
             }
         }
     }
@@ -384,11 +353,9 @@ void CTexAnim::AddFrame(float frameStep)
  */
 int CTexAnim::Find(char* name)
 {
-    unsigned long idx;
-    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(m_refData->m_texAnimSeqs.GetSize()); i++) {
-        CTexAnimSeq* seq = m_refData->m_texAnimSeqs[idx];
-        if (strcmp(name, seq->m_name) == 0) {
-            return static_cast<int>(i);
+    for (int i = 0; i < m_refData->m_texAnimSeqs.GetSize(); i++) {
+        if (strcmp(name, m_refData->m_texAnimSeqs[i]->GetName()) == 0) {
+            return i;
         }
     }
 
@@ -422,25 +389,8 @@ void CTexAnim::Change(int seqIndex, float frame, CTexAnimSet::ANIM_TYPE mode)
  */
 void CTexAnim::SetTexGen()
 {
-    const float zero = 0.0f;
-    CMaterial* material = m_refData->m_material;
-
-    if (material != 0) {
-        CTexScroll* texScroll = &material->m_textureData.m_texScroll[m_refData->m_texSrtIndex];
-        texScroll->m_u0 = m_texGen.x;
-        texScroll->m_v0 = m_texGen.y;
-        texScroll->m_u1 = zero;
-        texScroll->m_v1 = zero;
-        if (zero == texScroll->m_u1) {
-            texScroll->m_type0 = 0;
-        } else {
-            texScroll->m_type0 = 1;
-        }
-        if (zero == texScroll->m_v1) {
-            texScroll->m_type1 = 0;
-        } else {
-            texScroll->m_type1 = 1;
-        }
+    if (m_refData->m_material != 0) {
+        m_refData->m_material->SetTexScroll(m_refData->m_texSrtIndex, m_texGen.x, m_texGen.y, 0.0f, 0.0f);
     }
 }
 
@@ -499,11 +449,8 @@ CTexAnim::CRefData::CRefData()
  */
 CTexAnim::CRefData::~CRefData()
 {
-    CRef* material = m_material;
-    if (material != 0) {
-        if (--material->refCount == 0) {
-            delete material;
-        }
+    if (m_material != 0) {
+        m_material->Release();
         m_material = 0;
     }
     m_texAnimSeqs.ReleaseAndRemoveAll();
@@ -565,7 +512,7 @@ void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             chunkFile.Get4();
             m_interp = (char)chunkFile.Get4();
             m_chin = (char)chunkFile.Get4();
-            m_e1 = strcmp(m_name, "e1") == 0;
+            m_e1 = (strcmp(m_name, "e1") == 0) ? 1 : 0;
             continue;
         }
         case 'KEY ':
@@ -583,6 +530,20 @@ void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80050610
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::fmodf(float x, float y)
+{
+    return (float)fmod((double)x, (double)y);
+}
+
+/*
+ * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 464b
  * EN Address: 0x800503A4
@@ -592,7 +553,7 @@ void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
  */
 void CTexAnimSeq::Interp(float frame, Vec& texGen)
 {
-    float currentFrame = (float)fmod((double)frame, (double)(float)m_totalFrames);
+    float currentFrame = std::fmodf(frame, (float)m_totalFrames);
     unsigned int keyCount = m_keyCount;
     CTexAnimKey* keys = m_keys;
     unsigned int keyIndex = 0;

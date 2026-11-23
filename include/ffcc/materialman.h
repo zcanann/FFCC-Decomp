@@ -309,6 +309,32 @@ public:
     {
         return m_textureData.m_textures[index];
     }
+    /*
+     * --INFO--
+     * PAL Address: TODO
+     * PAL Size: TODO
+     * EN Address: 0x80050644
+     * EN Size: 172b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SetTexScroll(int index, float u0, float v0, float u1, float v1)
+    {
+        m_textureData.m_texScroll[index].m_u0 = u0;
+        m_textureData.m_texScroll[index].m_v0 = v0;
+        m_textureData.m_texScroll[index].m_u1 = u1;
+        m_textureData.m_texScroll[index].m_v1 = v1;
+        if (0.0f == m_textureData.m_texScroll[index].m_u1) {
+            m_textureData.m_texScroll[index].m_type0 = 0;
+        } else {
+            m_textureData.m_texScroll[index].m_type0 = 1;
+        }
+        if (0.0f == m_textureData.m_texScroll[index].m_v1) {
+            m_textureData.m_texScroll[index].m_type1 = 0;
+        } else {
+            m_textureData.m_texScroll[index].m_type1 = 1;
+        }
+    }
 
 public:
     friend class CTexAnimSet;

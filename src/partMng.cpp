@@ -1015,6 +1015,18 @@ inline void CPartMng::allFreeFPrim()
  * JP Address: TODO
  * JP Size: TODO
  */
+
+static inline void initMngDefaults(_pppMngSt& mng)
+{
+    mng.m_bindNode = 0;
+    mng.m_objHitMask = 0xFFFFFFFF;
+    mng.m_cylinderAttribute = 0xFFFFFFFF;
+    mng.m_paramA = 0;
+    mng.m_hitBgFlag = 0;
+    mng.m_slotVisible = 1;
+    mng.m_ownerFacing = 1;
+    mng.m_owner = 0;
+}
 void CPartMng::SetFp()
 {
     int i;
@@ -1055,14 +1067,7 @@ void CPartMng::SetFp()
         m_pppMng[i].m_fpBillboard = fp->m_fpBillboard;
         m_pppMng[i].m_prio = fp->m_prio;
         m_pppMng[i].m_mapObjIndex = fp->m_mapObjIndex;
-        m_pppMng[i].m_bindNode = 0;
-        m_pppMng[i].m_objHitMask = 0xFFFFFFFF;
-        m_pppMng[i].m_cylinderAttribute = 0xFFFFFFFF;
-        m_pppMng[i].m_paramA = 0;
-        m_pppMng[i].m_hitBgFlag = 0;
-        m_pppMng[i].m_slotVisible = 1;
-        m_pppMng[i].m_ownerFacing = 1;
-        m_pppMng[i].m_owner = 0;
+        initMngDefaults(m_pppMng[i]);
 
         int mode = m_pppMng[i].m_matrixMode;
         switch (mode) {

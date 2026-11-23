@@ -1093,10 +1093,7 @@ void CCameraPcs::drawShadowBegin()
             m_target.y = m_fullScreenShadowPosition.y;
 
             depth = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
-            float h = m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z;
-            if (depth < h) {
-                depth = h;
-            }
+            if (depth < m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z) depth = m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z;
             m_fullScreenShadow.m_span = 0.5f * depth;
         } else if (m_shadowAuto == 2) {
             m_target.x = m_fullScreenShadowPosition.x;
@@ -1166,11 +1163,7 @@ void CCameraPcs::drawShadowBegin()
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);
     GXSetColorUpdate(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);
-    {
-        float vpXY = 2.0f;
-        float vpWH = 476.0f;
-        GXSetViewport(vpXY, vpXY, vpWH, vpWH, 0.0f, 1.0f);
-    }
+    GXSetViewport(2.0f, 2.0f, 476.0f, 476.0f, 0.0f, 1.0f);
     GXSetScissor(2, 2, 0x1DC, 0x1DC);
     _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_NOOP);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);

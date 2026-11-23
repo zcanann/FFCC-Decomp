@@ -32,7 +32,6 @@ public:
     void CalcMemCardProc();
     unsigned char SetMemCardError();
     void SetMenu(short, long);
-    inline void SetMenuFromIdx(short, long);
     void SetMenuStr(long, int, ...);
     void CalcMenu();
     void DrawMenu();
@@ -45,8 +44,6 @@ public:
     bool HitCanncel();
     void Init();
     void Destroy();
-    inline void InitGoOutReset();
-
     void SetGoOutMode(unsigned char);
     void CalcGoOut();
     void DrawGoOut();
@@ -58,8 +55,6 @@ public:
     void Draw();
     void InitMemCardProc();
     void EndMemCardProc();
-    inline void SetState3(short);
-
 
 private:
     unsigned char m_lastMemCardProc;

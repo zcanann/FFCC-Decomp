@@ -1039,15 +1039,9 @@ void CPartMng::SetFp()
         m_pppMng[i].m_nodeIndex = static_cast<short>(i);
         m_pppMng[i].m_cullRadius = fp->m_cullRadius;
         m_pppMng[i].m_cullYOffset = fp->m_cullYOffset;
-        m_pppMng[i].m_position.x = fp->m_position.x;
-        m_pppMng[i].m_position.y = fp->m_position.y;
-        m_pppMng[i].m_position.z = fp->m_position.z;
-        m_pppMng[i].m_rotation.x = fp->m_rotation.x;
-        m_pppMng[i].m_rotation.y = fp->m_rotation.y;
-        m_pppMng[i].m_rotation.z = fp->m_rotation.z;
-        m_pppMng[i].m_scale.x = fp->m_scale.x;
-        m_pppMng[i].m_scale.y = fp->m_scale.y;
-        m_pppMng[i].m_scale.z = fp->m_scale.z;
+        m_pppMng[i].m_position = fp->m_position;
+        m_pppMng[i].m_rotation = fp->m_rotation;
+        m_pppMng[i].m_scale = fp->m_scale;
         m_pppMng[i].m_userFloat0 = m_pppMng[i].m_userFloat1 = m_pppMng[i].m_scaleFactor = m_pppMng[i].m_ownerScale = 1.0f;
         m_pppMng[i].m_useOwnerScaleSign = 0;
         m_pppMng[i].m_matrixMode = fp->m_matrixMode;

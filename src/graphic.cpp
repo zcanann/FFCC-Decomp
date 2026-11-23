@@ -141,10 +141,7 @@ void CGraphic::Init()
 
     m_fogStart = m_fogEnd = 0.0f;
 
-    m_defaultCopyClearColor.r = m_fogColor.r;
-    m_defaultCopyClearColor.g = m_fogColor.g;
-    m_defaultCopyClearColor.b = m_fogColor.b;
-    m_defaultCopyClearColor.a = m_fogColor.a;
+    m_defaultCopyClearColor = m_fogColor;
     memset(&m_drawDoneWaiting, 0, 0x10);
 
     OSCreateThread(&m_thread, reinterpret_cast<void* (*)(void*)>(checkThread), nullptr, m_threadStack + 0x4000, 0x4000, 1, 1);
@@ -180,13 +177,7 @@ void CGraphic::Init()
     m_savedFrameBuffer = new (m_graphicStage, "graphic.cpp", GraphicSavedBufferLine) u8[savedBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
-#ifdef VERSION_GCCJGC
-    u32 scratchBufferSize = (((m_renderMode->fbWidth + 0xF) & 0xFFF0) * m_renderMode->xfbHeight * 2) + 0x46000;
-#else
-    u32 scratchBufferSize = (((m_renderMode->fbWidth + 0xF) & 0xFFF0) * m_renderMode->efbHeight * 2) + 0x46000;
-#endif
-    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, "graphic.cpp", GraphicTempBufferLine, 0);
-    memset(m_scratchTextureBuffer, 0, 0x46004);
+    CreateTempBuffer();
 
     m_fifoBuffer = new (m_graphicStage, "graphic.cpp", GraphicFifoLine) u8[kGraphicFifoSize];
 
@@ -237,13 +228,7 @@ void CGraphic::Init()
     m_blurBufferIndex = 0;
     m_blurTextureCount = 0;
     GXCopyDisp(m_frameBuffer, GX_TRUE);
-    m_drawDoneFile = "graphic.cpp";
-    m_drawDoneLine = GraphicInitDrawDoneLine;
-    m_drawDoneWaiting = 1;
-    GXSetDrawDone();
-    GXWaitDrawDone();
-    m_drawDoneWaiting = 0;
-    m_drawDoneCounter += 1;
+    _WaitDrawDone("graphic.cpp", GraphicInitDrawDoneLine);
     VIFlush();
 }
 
@@ -258,23 +243,20 @@ void CGraphic::Init()
  */
 void CGraphic::Quit()
 {
-    if (m_savedFrameBuffer != nullptr) {
+    if (m_savedFrameBuffer) {
         delete[] reinterpret_cast<u8*>(m_savedFrameBuffer);
         m_savedFrameBuffer = nullptr;
     }
-    if (m_frameBuffer != nullptr) {
+    if (m_frameBuffer) {
         delete[] reinterpret_cast<u8*>(m_frameBuffer);
         m_frameBuffer = nullptr;
     }
-    if (m_scratchTextureBuffer != nullptr) {
-        delete[] reinterpret_cast<u8*>(m_scratchTextureBuffer);
-        m_scratchTextureBuffer = nullptr;
-    }
-    if (m_sphereDisplayList != nullptr) {
+    DestroyTempBuffer();
+    if (m_sphereDisplayList) {
         delete[] reinterpret_cast<u8*>(m_sphereDisplayList);
         m_sphereDisplayList = nullptr;
     }
-    if (m_fifoBuffer != nullptr) {
+    if (m_fifoBuffer) {
         delete[] reinterpret_cast<u8*>(m_fifoBuffer);
         m_fifoBuffer = nullptr;
     }
@@ -290,14 +272,13 @@ void CGraphic::Quit()
  */
 int CGraphic::GetProgressive()
 {
-    u32 mode = VIGetDTVStatus();
-    if (mode != 0) {
-        mode = OSGetProgressiveMode();
-        mode = (static_cast<unsigned int>(__cntlzw(1 - mode)) >> 5) + 1;
-    } else {
-        mode = 0;
+    if (VIGetDTVStatus() != 0) {
+        if (OSGetProgressiveMode() == 1) {
+            return 2;
+        }
+        return 1;
     }
-    return mode;
+    return 0;
 }
 
 /*
@@ -422,14 +403,13 @@ void CGraphic::BeginFrame()
 {
     GXSetZMode((GXBool)1, GX_LEQUAL, (GXBool)1);
     GXSetColorUpdate((GXBool)1);
-    GXRenderModeObj* renderMode = m_renderMode;
-    u16 width = renderMode->fbWidth;
-    u16 height = renderMode->efbHeight;
+    u16 width = m_renderMode->fbWidth;
+    u16 height = m_renderMode->efbHeight;
     GXSetViewport(0.0f, 0.0f, (f32)width, (f32)height, 0.0f, 1.0f);
     GXInvalidateVtxCache();
     GXInvalidateTexAll();
 
-    u16 buttons = Pad.GetDebugButtonDown(0);
+    int buttons = Pad.GetDebugButtonDown(0);
 
     if ((buttons & 2) != 0) {
         m_debugStringVisible = !m_debugStringVisible;
@@ -461,9 +441,7 @@ void CGraphic::EndFrame()
  */
 void CGraphic::SetDrawDoneDebugData(signed char drawDoneId)
 {
-    unsigned int token = (unsigned int)System.GetIdxCurrentOrder() << 8;
-    token = (token & 0xFFFFFF00) | (u8)drawDoneId;
-    GXSetDrawSync(token);
+    GXSetDrawSync((System.GetIdxCurrentOrder() << 8) | (u8)drawDoneId);
 }
 
 #ifdef VERSION_GCCP01
@@ -493,8 +471,7 @@ void CGraphic::SetDrawDoneDebugDataPartControl(int partControl)
  */
 static void wakeup(OSAlarm* alarm, OSContext*)
 {
-    GraphicSleepAlarm* sleepAlarm = reinterpret_cast<GraphicSleepAlarm*>(alarm);
-    OSResumeThread(sleepAlarm->thread);
+    OSResumeThread(reinterpret_cast<GraphicSleepAlarm*>(alarm)->thread);
 }
 
 /*
@@ -655,13 +632,12 @@ void CGraphic::Flip()
             m_displayCopyEnabled = 0;
         }
 
-        if (System.m_scenegraphStepMode != 1) {
-            int retraceCount = VIGetRetraceCount();
-            if ((u32)(retraceCount - m_lastRetraceCount) > 1) {
+        if (System.GetSpeed() != 1) {
+            if ((u32)(VIGetRetraceCount() - m_lastRetraceCount) > 1) {
                 m_frameRateOver = 1;
             } else {
                 m_frameRateOver = 0;
-                while ((u32)((retraceCount = VIGetRetraceCount()) - m_lastRetraceCount) < 2) {
+                while ((u32)(VIGetRetraceCount() - m_lastRetraceCount) < 2) {
                     VIWaitForRetrace();
                 }
             }
@@ -669,13 +645,7 @@ void CGraphic::Flip()
 
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXCopyDisp(m_frameBuffer, GX_TRUE);
-        m_drawDoneFile = "graphic.cpp";
-        m_drawDoneLine = GraphicFlipDrawDoneLine;
-        m_drawDoneWaiting = 1;
-        GXSetDrawDone();
-        GXWaitDrawDone();
-        m_drawDoneWaiting = 0;
-        m_drawDoneCounter += 1;
+        _WaitDrawDone("graphic.cpp", GraphicFlipDrawDoneLine);
         VIFlush();
 
         m_fifoIndex = 1 - m_fifoIndex;
@@ -688,13 +658,7 @@ void CGraphic::Flip()
 
     m_lastRetraceCount = VIGetRetraceCount();
 
-    int frameReady;
-    if (System.m_scenegraphStepMode == 1) {
-        frameReady = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
-    } else {
-        frameReady = 1;
-    }
-    m_frameReady = frameReady;
+    m_frameReady = System.IsDraw();
 }
 
 /*
@@ -717,9 +681,7 @@ void CGraphic::Printf(char* fmt, ...)
 
         m_debugStringPositions[m_debugStringCount].x = -1;
         m_debugStringPositions[m_debugStringCount].y = -1;
-        int index = m_debugStringCount;
-        m_debugStringCount = index + 1;
-        strcpy(m_debugStrings[index], buffer);
+        strcpy(m_debugStrings[m_debugStringCount++], buffer);
     }
 }
 
@@ -743,9 +705,7 @@ void CGraphic::Printf(unsigned long x, unsigned long y, char* fmt, ...)
 
         m_debugStringPositions[m_debugStringCount].x = static_cast<short>(x);
         m_debugStringPositions[m_debugStringCount].y = static_cast<short>(y);
-        int index = m_debugStringCount;
-        m_debugStringCount = index + 1;
-        strcpy(m_debugStrings[index], buffer);
+        strcpy(m_debugStrings[m_debugStringCount++], buffer);
     }
 }
 
@@ -760,59 +720,13 @@ void CGraphic::Printf(unsigned long x, unsigned long y, char* fmt, ...)
  */
 void CGraphic::DrawDebugString()
 {
-    Mtx model;
-    Mtx44 proj;
-    Mtx texMtx;
-    GXTexObj texObj;
-
-    GXRenderModeObj* renderMode = m_renderMode;
-    C_MTXOrtho(proj,
-               0.0f,
-#ifdef VERSION_GCCJGC
-               static_cast<float>(renderMode->xfbHeight),
-#else
-               static_cast<float>(renderMode->efbHeight),
-#endif
-               0.0f,
-               static_cast<float>(renderMode->fbWidth),
-               0.0f,
-               -100.0f);
-    GXSetProjection(proj, GX_ORTHOGRAPHIC);
-
-    PSMTXIdentity(model);
-    GXLoadPosMtxImm(model, 0);
-    GXSetCurrentMtx(0);
-
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
-    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
-    _GXSetAlphaCompare(GX_GEQUAL, 0, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetNumChans(0);
-    GXSetNumTevStages(1);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-
-    PSMTXIdentity(model);
-    GXLoadPosMtxImm(model, 0);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetCurrentMtx(0);
-
-    GXInitTexObj(&texObj, m_tDebugFont, 0x40, 0x60, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    GXLoadTexObj(&texObj, GX_TEXMAP0);
-
-    PSMTXScale(texMtx, 0.015625f, 0.010416667f, 1.0f);
-    GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
-    GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
+    InitDebugString();
 
     for (u32 i = 0; i < static_cast<u32>(m_debugStringCount); ++i) {
-        s16 xCell = m_debugStringPositions[i].x;
-
-        if (xCell == -1) {
+        if (m_debugStringPositions[i].x == -1) {
             DrawDebugStringDirect(0x10, i * 0xC + 0x10, m_debugStrings[i], 0xC);
         } else {
-            s16 yCell = m_debugStringPositions[i].y;
-            DrawDebugStringDirect(static_cast<u32>(xCell * 0xC + 0x10), static_cast<u32>(yCell * 0xC + 0x10), m_debugStrings[i], 0xC);
+            DrawDebugStringDirect(m_debugStringPositions[i].x * 0xC + 0x10, m_debugStringPositions[i].y * 0xC + 0x10, m_debugStrings[i], 0xC);
         }
     }
 }
@@ -869,7 +783,7 @@ void CGraphic::InitDebugString()
     PSMTXScale(texMtx, 0.015625f, 0.010416667f, 1.0f);
     GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
     GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E);
 }
 
 /*
@@ -918,30 +832,16 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
                 tx = (glyph % 8) * 16;
                 ty = (glyph / 8) * 16;
 
-                GXWGFifo.s16 = px;
-                GXWGFifo.u16 = y;
-                GXWGFifo.s16 = 0;
-                GXWGFifo.s16 = tx;
-                GXWGFifo.s16 = ty;
-
-                GXWGFifo.s16 = (s16)(charSize + px);
-                GXWGFifo.s16 = (s16)y;
-                GXWGFifo.s16 = 0;
-                GXWGFifo.s16 = (s16)(tx + 0x10);
-                GXWGFifo.s16 = ty;
-
-                GXWGFifo.s16 = (s16)(charSize + px);
-                GXWGFifo.s16 = (s16)(y + charSize);
-                GXWGFifo.s16 = 0;
-                GXWGFifo.s16 = (s16)(tx + 0x10);
-                GXWGFifo.s16 = (s16)(ty + 0x10);
-
-                GXWGFifo.s16 = px;
-                GXWGFifo.s16 = (s16)(y + charSize);
-                GXWGFifo.s16 = 0;
-                GXWGFifo.s16 = tx;
-                GXWGFifo.s16 = (s16)(ty + 0x10);
+                GXPosition3s16(px, y, 0);
+                GXTexCoord2s16(tx, ty);
+                GXPosition3s16(charSize + px, y, 0);
+                GXTexCoord2s16(tx + 0x10, ty);
+                GXPosition3s16(charSize + px, y + charSize, 0);
+                GXTexCoord2s16(tx + 0x10, ty + 0x10);
+                GXPosition3s16(px, y + charSize, 0);
+                GXTexCoord2s16(tx, ty + 0x10);
             }
+            GXEnd();
             count = 0;
         }
 
@@ -998,8 +898,7 @@ void CGraphic::DrawSphere(float (*mtx)[4], Vec* pos, float scale, _GXColor* colo
     PSMTXConcat(mtx, sphereMtx, sphereMtx);
     GXLoadPosMtxImm(sphereMtx, 0);
     GXSetChanMatColor((GXChannelID)4, *color);
-    GXSetLineWidth(8, GX_TO_ZERO);
-    GXCallDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
+    DrawSphere();
 }
 
 /*
@@ -1022,8 +921,7 @@ void CGraphic::DrawSphere(float (*mtx)[4], Vec* pos, Vec* scale, _GXColor* color
     PSMTXConcat(mtx, sphereMtx, sphereMtx);
     GXLoadPosMtxImm(sphereMtx, 0);
     GXSetChanMatColor((GXChannelID)4, *color);
-    GXSetLineWidth(8, GX_TO_ZERO);
-    GXCallDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
+    DrawSphere();
 }
 
 /*
@@ -1052,8 +950,7 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
     GXLoadPosMtxImm(mtx, 0);
     GXSetChanMatColor((GXChannelID)4, color);
     GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetLineWidth(8, GX_TO_ZERO);
-    GXCallDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
+    DrawSphere();
 }
 
 /*
@@ -1076,13 +973,13 @@ void CGraphic::makeSphere()
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (3.1415927f * (float)(ring + 1)) / 6.0f;
-        float x = -1.0f * (float)cos(pitch);
-        float radius = -1.0f * (float)sin(pitch);
+        float x = -1.0f * cosf(pitch);
+        float radius = -1.0f * sinf(pitch);
 
         for (int seg = 0; seg < 8; seg++) {
             vertices[vertexCount][0] = x;
-            vertices[vertexCount][1] = radius * (float)sin(0.7853982f * (float)seg);
-            float cosine = (float)cos(0.7853982f * (float)seg);
+            vertices[vertexCount][1] = radius * sinf(0.7853982f * (float)seg);
+            float cosine = cosf(0.7853982f * (float)seg);
             vertices[vertexCount++][2] = radius * cosine;
         }
     }
@@ -1115,6 +1012,7 @@ void CGraphic::makeSphere()
             GXPosition3f32(v[1], v[0], v[2]);
         }
     }
+    GXEnd();
 
     m_sphereDisplayListSize = GXEndDisplayList();
     DCFlushRange(m_sphereDisplayList, m_sphereDisplayListSize);
@@ -1149,10 +1047,8 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
 
     CameraPcs.GetViewMatrix(cameraMtx);
     GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
-    _GXColor materialColor = color;
-    GXSetChanMatColor(GX_COLOR0A0, materialColor);
-    _GXColor ambientColor = color;
-    GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    GXSetChanAmbColor(GX_COLOR0A0, color);
 
     GXBegin(GX_LINES, GX_VTXFMT7, 0x18);
     GXPosition3f32(bound.m_min.x, bound.m_min.y, bound.m_min.z);
@@ -1179,6 +1075,7 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
     GXPosition3f32(bound.m_min.x, bound.m_max.y, bound.m_max.z);
     GXPosition3f32(bound.m_max.x, bound.m_max.y, bound.m_min.z);
     GXPosition3f32(bound.m_max.x, bound.m_max.y, bound.m_max.z);
+    GXEnd();
 }
 
 /*
@@ -1245,8 +1142,7 @@ void CGraphic::CopySaveFrameBuffer()
     GXCopyTex(m_savedFrameBuffer, GX_FALSE);
     GXPixModeSync();
     GXInitTexObj(&m_smallBackTexObj, m_savedFrameBuffer, 0x280, 0x1C0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    float zero = 0.0f;
-    GXInitTexObjLOD(&m_smallBackTexObj, GX_NEAR, GX_NEAR, zero, zero, zero, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&m_smallBackTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
 /*
@@ -1444,6 +1340,7 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 	GXPosition3f32(pos1.x, pos2.y, pos1.z);
 	GXColor1u32(*reinterpret_cast<u32*>(&color3));
 	GXTexCoord2f32(tex0, tex1);
+	GXEnd();
 }
 
 /*
@@ -1466,6 +1363,7 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
 	GXColor1u32(*reinterpret_cast<u32*>(&color4));
 	GXPosition3f32(pos1.x, pos2.y, pos1.z);
 	GXColor1u32(*reinterpret_cast<u32*>(&color3));
+	GXEnd();
 }
 
 /*
@@ -1614,7 +1512,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 		GXSetTevDirect(GX_TEVSTAGE0);
 		GXLoadTexObj(&backBufferTex, GX_TEXMAP0);
-		GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+		GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 		_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		GXSetTevKColorSel(GX_TEVSTAGE0, (GXTevKColorSel)kColorSel);
@@ -1631,7 +1529,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 		GXSetTevDirect(GX_TEVSTAGE1);
 		GXLoadTexObj(&smallBackTex, GX_TEXMAP1);
-		GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, 0x7D);
+		GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
 		_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
 		_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
@@ -1717,7 +1615,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     GXSetNumTevStages(1);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
     _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
@@ -1848,7 +1746,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetTevDirect(GX_TEVSTAGE0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
     _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
@@ -1892,7 +1790,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
 
     if (m_blurDelayCounter < textureDelay) {
         m_blurDelayCounter += 1;
-    } else if (System.m_scenegraphStepMode != 2) {
+    } else if (System.GetSpeed() != 2) {
         CreateSmallBackTexture(m_savedFrameBuffer, &texObj, 0x140, 0xE0, GX_LINEAR, GX_TF_RGBA8,
                                static_cast<unsigned long>(m_blurBufferIndex) * 0x46000);
         m_blurDelayCounter = 0;
@@ -2034,7 +1932,7 @@ void CGraphic::drawSphereMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* 
     GXInitLightDir(&lightObj, 0.0f, 0.0f, -1.0f);
     GXLoadLightObjImm(&lightObj, GX_LIGHT0);
 
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, 0x1E, GX_FALSE, GX_PTIDENTITY);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, 0x1E);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
@@ -2100,7 +1998,7 @@ void CGraphic::DrawBlurScreen(unsigned char alpha, float scale)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetTevDirect(GX_TEVSTAGE0);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
     _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
@@ -2160,7 +2058,7 @@ void CGraphic::CreateTempBuffer()
  */
 void CGraphic::DestroyTempBuffer()
 {
-	if (m_scratchTextureBuffer != nullptr) {
+	if (m_scratchTextureBuffer) {
 		delete[] reinterpret_cast<u8*>(m_scratchTextureBuffer);
 		m_scratchTextureBuffer = nullptr;
 	}

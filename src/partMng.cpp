@@ -1064,7 +1064,7 @@ void CPartMng::SetFp()
         m_pppMng[i].m_ownerFacing = 1;
         m_pppMng[i].m_owner = 0;
 
-        unsigned char mode = m_pppMng[i].m_matrixMode;
+        int mode = m_pppMng[i].m_matrixMode;
         switch (mode) {
         case 2:
         case 4:

@@ -249,8 +249,7 @@ void CMenuPcs::ArtiDraw()
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
-				float colorMax = 255.0f;
-				colors[0].a = (u8)(colorMax * itemAlpha);
+				colors[0].a = (u8)(255.0f * itemAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				float uvScale = entry->scale;
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
@@ -272,8 +271,7 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	for (i = 0; i < 8; i++) {
-		float colorMax = 255.0f;
-		u8 alpha = (u8)(colorMax * entry->alpha);
+		u8 alpha = (u8)(255.0f * entry->alpha);
 		menuIndex = i + m_artiState->scrollOffset;
 		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha));
 
@@ -496,6 +494,7 @@ void CMenuPcs::ArtiInit1()
 	int index;
 	ArtiOpenAnim* entry;
 
+	alpha = 1.0f;
 	index = 0;
 	entry = &m_artiList->entries[index++];
 	entry->tex = kArtiPanelTexture;
@@ -514,49 +513,16 @@ void CMenuPcs::ArtiInit1()
 	entry->tex = kArtiPanelTexture;
 	entry->startFrame = 7;
 	entry->duration = 5;
-	entry = &m_artiList->entries[index++];
-	entry->flags = 2;
-	entry->tex = kArtiRowTexture;
-	entry->startFrame = 0;
-	entry->duration = 5;
-	entry = &m_artiList->entries[index++];
-	entry->flags = 2;
-	entry->tex = kArtiRowTexture;
-	entry->startFrame = 0;
-	entry->duration = 5;
-	entry = &m_artiList->entries[index++];
-	entry->flags = 2;
-	entry->tex = kArtiRowTexture;
-	entry->startFrame = 0;
-	entry->duration = 5;
-	entry = &m_artiList->entries[index++];
-	entry->flags = 2;
-	entry->tex = kArtiRowTexture;
-	alpha = 1.0f;
-	entry->startFrame = 0;
-	entry->duration = 5;
-	entry = &m_artiList->entries[index++];
-	entry->flags = 2;
-	entry->tex = kArtiRowTexture;
-	entry->startFrame = 0;
-	entry->duration = 5;
-	entry = &m_artiList->entries[index++];
-	entry->flags = 2;
-	entry->tex = kArtiRowTexture;
-	entry->startFrame = 0;
-	entry->duration = 5;
-	entry = &m_artiList->entries[index++];
-	entry->flags = 2;
-	entry->tex = kArtiRowTexture;
-	entry->startFrame = 0;
-	entry->duration = 5;
-	entry = &m_artiList->entries[index];
-	entry->flags = 2;
-	entry->tex = kArtiRowTexture;
-	entry->startFrame = 0;
-	entry->duration = 5;
+	for (int i = 0; i < 8; i++) {
+		entry = &m_artiList->entries[index++];
+		entry->flags = 2;
+		entry->tex = kArtiRowTexture;
+		entry->startFrame = 0;
+		entry->duration = 5;
+	}
 	entry = m_artiList->entries;
-	for (index = m_artiList->count; index > 0; index--) {
+	int cnt = m_artiList->count;
+	for (index = cnt; index > 0; index--) {
 		entry->step = 0;
 		entry->alpha = alpha;
 		entry++;
@@ -592,12 +558,9 @@ void CMenuPcs::ArtiInit()
 	entry->y = 0x28;
 	entry->w = 0x78;
 	entry->h = 0x108;
-	float titleAlpha = 128.0f;
-	float titleScale = 8.0f;
-	float one = 1.0f;
-	entry->u = titleAlpha;
-	entry->v = titleScale;
-	entry->scale = one;
+	entry->u = 128.0f;
+	entry->v = 8.0f;
+	entry->scale = 1.0f;
 	entry->startFrame = 5;
 	entry->duration = 5;
 
@@ -609,7 +572,7 @@ void CMenuPcs::ArtiInit()
 	entry->h = 0x30;
 	entry->u = 0.0f;
 	entry->v = 0.0f;
-	entry->scale = one;
+	entry->scale = 1.0f;
 	entry->startFrame = 0;
 	entry->duration = 5;
 

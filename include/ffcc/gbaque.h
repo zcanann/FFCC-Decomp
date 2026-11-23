@@ -298,6 +298,7 @@ private:
     char m_playModeFlags;             // 0x2D60
     char m_startBonusFlags;           // 0x2D61
     unsigned char _pad2D62[0x2];      // 0x2D62
+    friend void InitClearMem5(GbaQueue*);
 };
 
 extern GbaQueue GbaQue;

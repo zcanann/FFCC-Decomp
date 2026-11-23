@@ -173,15 +173,20 @@ GbaQueue::~GbaQueue()
  * JP Address: TODO
  * JP Size: TODO
  */
+inline void InitClearMem5(GbaQueue* self)
+{
+	memset(self->m_queue, 0, sizeof(self->m_queue));
+	memset(self->m_queueCount, 0, sizeof(self->m_queueCount));
+	memset(self->m_queueFull, 0, sizeof(self->m_queueFull));
+	memset(self->m_playerData, 0, kGbaQueuePlayerDataBlockBytes);
+	memset(self->m_playerHistory, 0, sizeof(self->m_playerHistory));
+}
+
 void GbaQueue::Init()
 {
 	int i;
 
-	memset(m_queue, 0, sizeof(m_queue));
-	memset(m_queueCount, 0, sizeof(m_queueCount));
-	memset(m_queueFull, 0, sizeof(m_queueFull));
-	memset(m_playerData, 0, kGbaQueuePlayerDataBlockBytes);
-	memset(m_playerHistory, 0, sizeof(m_playerHistory));
+	InitClearMem5(this);
 	memset(m_enemies, 0, sizeof(m_enemies));
 	memset(m_enemyHistory, 0, sizeof(m_enemyHistory));
 	memset(m_mapItems, 0, sizeof(m_mapItems));

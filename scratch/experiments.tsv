@@ -8,3 +8,10 @@ onCalc__8CMesMenuFv	onCalc both sin->sinf	100.0
 DrawHeart__8CMesMenuFffff	DrawHeart sin->sinf	100.0
 Create__8CMesMenuFv	Create window 0.0f literal vs defaultValue	100.0
 Open__8CMesMenuFPciiiiii	Open remove zero var	100.0
+CalcHeart__8CMesMenuFv	CalcHeart loop style to match onCalc (outside value, heartIndex)	100.0
+onCalc__8CMesMenuFv	onCalc extract to CalcHeart after unifying style	100.0
+onDraw__8CMesMenuFv	onDraw all sinf->sin	99.44967
+onDraw__8CMesMenuFv	onDraw pulse sinf->sin	99.68478
+onDraw__8CMesMenuFv	onDraw cursorWave sinf->sin	100.0
+onDraw__8CMesMenuFv	onDraw sinY sinf->sin	99.9791
+onDraw__8CMesMenuFv	onDraw sinX sinf->sin	99.98258

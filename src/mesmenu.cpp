@@ -587,7 +587,7 @@ void CMesMenu::onDraw()
                 MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
                 MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
 
-                float cursorWave = sinf(1.5707964f * (1.0f - stateBlend) + 1.5707964f);
+                float cursorWave = sin(1.5707964f * (1.0f - stateBlend) + 1.5707964f);
                 int iconMenuIndex = m_menuIndex;
                 int signX = -32;
                 if ((iconMenuIndex & 1) != 0) {

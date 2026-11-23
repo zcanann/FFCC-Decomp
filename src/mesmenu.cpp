@@ -977,14 +977,11 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
  */
 void CMesMenu::onScriptChanging(char*)
 {
-    int menuIndex;
-
     m_mes.Set(0, 0);
     m_state = 4;
     m_active = 0;
-    menuIndex = m_menuIndex;
-    if (menuIndex < 4) {
-        MenuPcs.GetRingMenu(menuIndex)->SetFade(1);
+    if (m_menuIndex < 4) {
+        MenuPcs.GetRingMenu(m_menuIndex)->SetFade(1);
     }
 }
 

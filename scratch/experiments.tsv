@@ -1,3 +1,4 @@
 Create__8CMesMenuFv	remove redundant defaultValue=0 in Create	100.0
 CalcHeart__8CMesMenuFv	change unsigned int value to int in CalcHeart tail	100.0
 onScriptChanging__8CMesMenuFPc	remove temp menuIndex var	100.0
+onScriptChanging__8CMesMenuFPc	remove temp menuIndex var (direct member access)	100.0

@@ -3188,6 +3188,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 	System.Printf("\x83{\x81[\x83i\x83X\x83" "C\x83\x93\x83" "f\x83" "b\x83N\x83X\x8D\xC5\x91\xE5=%d\n", bonusCount);
 
+	if (System.GetCounter() == 0) chosenCount = 0;
 	chosenCount = 0;
 	bossArtifacts = &Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
 

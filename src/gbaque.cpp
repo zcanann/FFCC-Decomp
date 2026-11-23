@@ -1120,7 +1120,8 @@ void GbaQueue::SetRadarType()
 	}
 
 #ifndef VERSION_GCCJGC
-	for (i = 0; i < 4; i++) {
+	i = 0;
+	do {
 		OSWaitSemaphore(accessSemaphores + i);
 		const int oldMode = m_radarMode;
 		const int mask = 1 << i;
@@ -1131,7 +1132,8 @@ void GbaQueue::SetRadarType()
 			m_chgRadarMode = static_cast<char>(m_chgRadarMode | mask);
 		}
 		OSSignalSemaphore(accessSemaphores + i);
-	}
+		i++;
+	} while (i < 4);
 #endif
 }
 

@@ -1197,6 +1197,13 @@ inline void GbaQueue::LoadAllStat()
  * JP Address: TODO
  * JP Size: TODO
  */
+inline void CopyLetterMeta(GbaPInfo* dst, CCaravanWork* cw)
+{
+	for (int j = 0; j < 8; j++) {
+		dst->m_letterMeta[j] = static_cast<unsigned char>(cw->m_letterMeta[j]);
+	}
+}
+
 void GbaQueue::LoadPlayerStat()
 {
 	unsigned char localNames[kGbaQueueCaravanNameBlockBytes];
@@ -1250,9 +1257,7 @@ void GbaQueue::LoadPlayerStat()
 					localPlayerStat[i].m_progress = (pv > 0xFF) ? 0xFF : pv;
 				}
 
-				for (int j = 0; j < 8; j++) {
-					localPlayerStat[i].m_letterMeta[j] = static_cast<unsigned char>(caravanWork->m_letterMeta[j]);
-				}
+				CopyLetterMeta(&localPlayerStat[i], caravanWork);
 
 				{
 					const int saveSlot = caravanWork->m_saveSlot;

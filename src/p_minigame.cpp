@@ -1748,17 +1748,21 @@ next_player:
                     unsigned int masked = word & 0xFFFF00;
                     if ((word & 0x8000) != 0)
                     {
-                        PadCodeProc(i, ChgHL16(masked >> 8));
+                        unsigned short code = ChgHL16(masked >> 8);
+                        PadCodeProc(i, code);
                     }
                     m_broadcastWords[i] = (i + 0x40) * 0x1000000;
                     m_broadcastWords[i] |= masked;
-                    m_broadcastWords[i] |= CalcCrc(m_broadcastWords[i]) & 0xFF;
+                    unsigned long crcTmp = CalcCrc(m_broadcastWords[i]);
+                    m_broadcastWords[i] |= crcTmp & 0xFF;
                     i++;
                 } while (i < 4);
 
                 m_broadcastWords[4] = 0x44000000;
-                m_broadcastWords[4] |= ChgHL16(m_statusCode) << 8;
-                m_broadcastWords[4] |= CalcCrc(m_broadcastWords[4]) & 0xFF;
+                unsigned short swapped = ChgHL16(m_statusCode);
+                m_broadcastWords[4] |= swapped << 8;
+                unsigned long crc3 = CalcCrc(m_broadcastWords[4]);
+                m_broadcastWords[4] |= crc3 & 0xFF;
                 i = 0;
                 do
                 {

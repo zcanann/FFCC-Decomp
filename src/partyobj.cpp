@@ -2590,7 +2590,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		return;
 	}
 
-	int currentAdd;
+	int currentAdd = 0;
 	int currentSub;
 	unsigned int stageAdd;
 	unsigned int stageSub;
@@ -3954,7 +3954,8 @@ void CGPartyObj::gpmMove()
 	}
 	CGPartyObj::m_ghostWork.carrySpeed *= 0.95f;
 
-	pressureLimit = calcWeightMax();
+	int wmax = calcWeightMax();
+	pressureLimit = wmax;
 	if (0.5f < CGPartyObj::m_ghostWork.carrySpeed) {
 		int delta = -2;
 		if (m_partyData.carryObject != nullptr) {

@@ -156,24 +156,19 @@ void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* of
 {
     VRyjMegaBirthModel* work =
         reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
-    float value1;
-    float value0;
-
     memset(&work->m_accelerationAxis, 0, sizeof(work->m_accelerationAxis));
     work->m_particleBlock = 0;
-    value0 = 0.0f;
     work->m_worldMatrixBlock = 0;
-    value1 = 30.0f;
     work->m_colorBlock = 0;
     work->m_numParticles = 0;
     work->m_emitTimer = 10000;
     work->m_unused1E = 0;
-    work->m_previousPosition.x = value0;
-    work->m_previousPosition.y = value1;
-    work->m_previousPosition.z = value0;
-    work->m_currentPosition.x = value0;
-    work->m_currentPosition.y = value1;
-    work->m_currentPosition.z = value0;
+    work->m_previousPosition.x = 0.0f;
+    work->m_previousPosition.y = 30.0f;
+    work->m_previousPosition.z = 0.0f;
+    work->m_currentPosition.x = 0.0f;
+    work->m_currentPosition.y = 30.0f;
+    work->m_currentPosition.z = 0.0f;
 }
 
 /*

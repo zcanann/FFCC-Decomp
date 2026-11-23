@@ -205,8 +205,7 @@ inline JoyBus::JoyBus()
 unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 {
     while (--len >= 0) {
-        int value = *crc;
-        *crc = static_cast<unsigned short>((value << 8) ^ s_CrcTbl[static_cast<unsigned char>(value >> 8) ^ *data++]);
+        *crc = static_cast<unsigned short>((*crc << 8) ^ s_CrcTbl[static_cast<unsigned char>(*crc >> 8) ^ *data++]);
     }
 
     return static_cast<unsigned short>(~static_cast<unsigned short>(*crc));
@@ -240,27 +239,18 @@ inline void JoyBus::Init()
     m_mapId = 0xFF;
     m_stageId = 0xFF;
 
+    for (int i = 0; i < 4; i++)
     {
-        int i = 0;
-        unsigned char zeroB = (unsigned char)i;
-        unsigned int zeroW = (unsigned int)i;
-
-        for (; i < 4; i++)
-        {
-            m_threadParams[i].m_gbaStatus = 1;
-            m_threadParams[i].m_padType = 0x40;
-
-            m_cmdCount[i] = zeroW;
-            m_secCmdCount[i] = zeroW;
-
-            OSInitSemaphore(&m_accessSemaphores[i], 1);
-
-            m_ctrlModeArr[i] = zeroB;
-            m_nextModeTypeArr[i] = zeroB;
-            m_modeXArr[i] = zeroB;
-            m_stateCodeArr[i] = 0xFF;
-            m_stateFlagArr[i] = zeroB;
-        }
+        m_threadParams[i].m_gbaStatus = 1;
+        m_threadParams[i].m_padType = 0x40;
+        m_cmdCount[i] = 0;
+        m_secCmdCount[i] = 0;
+        OSInitSemaphore(&m_accessSemaphores[i], 1);
+        m_ctrlModeArr[i] = 0;
+        m_nextModeTypeArr[i] = 0;
+        m_modeXArr[i] = 0;
+        m_stateCodeArr[i] = 0xFF;
+        m_stateFlagArr[i] = 0;
     }
 }
 
@@ -2843,7 +2833,8 @@ void JoyBus::ThreadInit()
     m_threadInitFlag = 0;
     m_threadRunningMask = 0;
 
-    for (int i = 0; i < 4; i++)
+    int i;
+    for (i = 0; i < 4; i++)
     {
         m_threadParams[i].m_portIndex = i;
         m_threadParams[i].m_gbaStatus = 1;

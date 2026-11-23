@@ -122,11 +122,11 @@ inline void MiniGameFileRead(char* path, void* destination, unsigned long& size)
     CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
     if (handle != 0)
     {
-        size = handle->GetLength();
+        size = File.GetLength(handle);
         handle->Read();
         handle->SyncCompleted();
         void* buffer = File.m_readBuffer;
-        handle->Close();
+        File.Close(handle);
         memcpy(destination, buffer, size);
     }
 }

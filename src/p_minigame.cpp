@@ -105,7 +105,8 @@ static inline bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
  */
 inline unsigned short ChgHL16(unsigned short value)
 {
-    return (value << 8) | (value >> 8);
+    unsigned short tmp = value;
+    return (tmp << 8) | (tmp >> 8);
 }
 
 /*
@@ -545,9 +546,10 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
  * JP Address: TODO
  * JP Size: TODO
  */
-static void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext*)
+static void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext* context)
 {
-    OSResumeThread(reinterpret_cast<MiniGameAlarm*>(alarm)->thread);
+    MiniGameAlarm* mgAlarm = reinterpret_cast<MiniGameAlarm*>(alarm);
+    OSResumeThread(mgAlarm->thread);
 }
 
 /*

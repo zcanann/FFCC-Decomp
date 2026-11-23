@@ -280,12 +280,13 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
 #endif
                 }
 
-                xFine = x & 3;
                 if (magnitude > 1.0f) {
                     magnitude = 1.0f;
                 }
 
-                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
+                xFine = x & 3;
+                u32 nx = xCoord * magnitude * 127.0f + 128.0f;
+                FFCC_ASSERT(x < textureInfo->m_width && y < textureInfo->m_height);
                 u8* pixel = textureInfo->m_imageData +
                     yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
                     (x & 0x1FFFFFFC) * 8 +

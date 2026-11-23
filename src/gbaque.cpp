@@ -636,7 +636,8 @@ inline void GbaQueue::CMakeEnd(int channel, unsigned int value)
 	int retry;
 
 	for (retry = 0; retry < 10; retry++) {
-		if (Joybus.SetMType(channel, 4) == 0) {
+		int ret = Joybus.SetMType(channel, 4);
+		if (ret == 0) {
 			break;
 		}
 	}
@@ -1887,20 +1888,16 @@ unsigned int GbaQueue::GetScrFlg()
 	int result;
 	int i;
 
-	i = 0;
-	do {
+	for (i = 0; i < 4; i++) {
 		OSWaitSemaphore(&accessSemaphores[i]);
-		i++;
-	} while (i < 4);
+	}
 
 	state = m_scrInitEnd;
 	result = state != 0 ? 1 : 0;
 
-	i = 0;
-	do {
+	for (i = 0; i < 4; i++) {
 		OSSignalSemaphore(&accessSemaphores[i]);
-		i++;
-	} while (i < 4);
+	}
 
 	return result;
 }
@@ -3289,7 +3286,8 @@ inline void GbaQueue::ShopEnd(int channel)
 	ClrShopFlg(channel);
 
 	for (int retry = 0; retry < 10; retry++) {
-		if (Joybus.SetMType(channel, 0) == 0) {
+		int ret = Joybus.SetMType(channel, 0);
+		if (ret == 0) {
 			break;
 		}
 	}
@@ -3307,7 +3305,8 @@ inline void GbaQueue::SmithEnd(int channel)
 	ClrSmithFlg(channel);
 
 	for (int retry = 0; retry < 10; retry++) {
-		if (Joybus.SetMType(channel, 0) == 0) {
+		int ret = Joybus.SetMType(channel, 0);
+		if (ret == 0) {
 			break;
 		}
 	}

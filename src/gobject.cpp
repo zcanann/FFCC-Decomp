@@ -1228,10 +1228,7 @@ inline void CGObject::bgShadeCollision()
  */
 void CGObject::hit()
 {
-    const bool hasModel =
-        (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
-        (m_charaModelHandle->m_model != (CChara::CModel*)0);
-    if (!hasModel) {
+    if (!IsHChara()) {
         return;
     }
     for (int i = 0; i < 8; i++) {
@@ -1844,7 +1841,7 @@ void CGObject::copy()
 {
     bool hasModel = false;
 
-    if ((m_charaModelHandle != (CCharaPcs::CHandle*)0) && (m_charaModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (!hasModel) {
@@ -1857,7 +1854,7 @@ void CGObject::copy()
     m_charaModelHandle->m_fogBlend = m_worldParam;
     hasModel = false;
 
-    if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1868,7 +1865,7 @@ void CGObject::copy()
     }
 
     hasModel = false;
-    if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1882,7 +1879,7 @@ void CGObject::copy()
         m_charaModelHandle->m_flags &= 0xFFFFFFFE;
         hasModel = false;
 
-        if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1890,7 +1887,7 @@ void CGObject::copy()
         }
 
         hasModel = false;
-        if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1902,7 +1899,7 @@ void CGObject::copy()
         m_charaModelHandle->m_flags &= 0xFFFFFFFB;
         hasModel = false;
 
-        if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1910,7 +1907,7 @@ void CGObject::copy()
         }
 
         hasModel = false;
-        if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (!hasModel) {
@@ -1925,7 +1922,7 @@ void CGObject::copy()
     m_charaModelHandle->m_worldPosY = m_worldPosition.y;
     hasModel = false;
 
-    if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1934,7 +1931,7 @@ void CGObject::copy()
     }
 
     hasModel = false;
-    if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (!hasModel) {

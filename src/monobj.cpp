@@ -2291,7 +2291,9 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	int groupCount[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
+		FFCC_ASSERT(actionIndex >= 0 && actionIndex < 8);
 		int actionFlags = MON_AI_DATA(this)->m_actions[actionIndex].m_flags;
+		FFCC_ASSERT(actionIndex < 8);
 		if (actionFlags == 0xFFFF) {
 			if (actionIndex == 0) {
 				return -2;
@@ -2376,6 +2378,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	if (selectorType == 1) {
+		FFCC_ASSERT(selectorType == 1);
 		int count;
 		for (;;) {
 			int cursor = m_unk6CC;
@@ -2389,6 +2392,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			}
 		}
 
+		FFCC_ASSERT(count > 0);
 		int pick = Math.Rand(count);
 		int seen = 0;
 		for (int i = 0; i < 8; i++) {

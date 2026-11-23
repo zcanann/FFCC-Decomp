@@ -46,6 +46,20 @@ struct VertexApLcSource
     Vec* points;
 };
 
+
+static inline void apea(_pppPObject* parent, PVertexApLc* dataRaw, Vec* pos)
+{
+    VertexApLcData* data = (VertexApLcData*)dataRaw;
+    u32 childId = data->childId;
+    if ((childId + 0x10000) != 0xFFFF) {
+        _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
+        _pppPObject* child;
+        if (childData == 0) { child = 0; } else { child = pppCreatePObject(ppvMng, childData); child->m_link.m_previous = &parent->m_link; }
+        *(Vec*)(child->m_workArea + data->childPosOffset) = *pos;
+    }
+}
+
+
 /*
  * --INFO--
  * PAL Address: 0x80064ce8  
@@ -93,7 +107,6 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                 if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
-
                 u16 outValue = state->index;
                 u16* vertexIndices = entry->vertexIndices;
                 state->index++;
@@ -102,21 +115,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                 pos.x = vertex->x;
                 pos.y = vertex->y;
                 pos.z = vertex->z;
-
-                cid = data->childId;
-                if ((cid + 0x10000) != 0xFFFF) {
-                    childData = ppvMng->m_pppPDataVals + cid;
-
-                    if (childData == 0) {
-                        child = 0;
-                    } else {
-                        child = pppCreatePObject(ppvMng, childData);
-                        child->m_link.m_previous = &parent->m_link;
-                    }
-
-                    Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
-                    *dst = pos;
-                }
+                apea(parent, dataRaw, &pos);
             }
             break;
         case 1:
@@ -130,21 +129,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                 pos.x = vertex->x;
                 pos.y = vertex->y;
                 pos.z = vertex->z;
-
-                cid = data->childId;
-                if ((cid + 0x10000) != 0xFFFF) {
-                    childData = ppvMng->m_pppPDataVals + cid;
-
-                    if (childData == 0) {
-                        child = 0;
-                    } else {
-                        child = pppCreatePObject(ppvMng, childData);
-                        child->m_link.m_previous = &parent->m_link;
-                    }
-
-                    Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
-                    *dst = pos;
-                }
+                apea(parent, dataRaw, &pos);
             }
             break;
         }
@@ -154,6 +139,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
 
     state->countdown--;
 }
+
 
 /*
  * --INFO--

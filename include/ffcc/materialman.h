@@ -30,6 +30,7 @@ class CTexScroll
 public:
     CTexScroll();
     ~CTexScroll();
+    void Calc();
 
     unsigned char m_type0;
     unsigned char m_type1;

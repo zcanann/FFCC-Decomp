@@ -2274,8 +2274,7 @@ void CMaterialMan::SetTexScroll(float u0, float v0, float u1, float v1)
  */
 void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMtx)[4], long flags)
 {
-    int cameraEnable = CameraPcs.m_fullScreenShadowEnabled;
-    if (cameraEnable != 0) {
+    if (CameraPcs.GetFullScreenShadowEnable()) {
         m_curEnvTevBit |= 0x80;
 
         PSMTXConcat(shadow.m_shadowTexMtx, viewMtx, m_fullScreenShadowMtx0);
@@ -2369,7 +2368,7 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shad
     for (long i = 0; i < static_cast<unsigned int>(g_MapMng.m_mapShadowArray.GetSize()); i++) {
         CMapShadow* shadow = g_MapMng.m_mapShadowArray[i];
 
-        if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
+        if (shadow->m_targetEnabled[target] == 0) {
             continue;
         }
 
@@ -2405,7 +2404,7 @@ void CMaterialMan::SetPosition(
         for (long i = 0; i < static_cast<unsigned int>(g_MapMng.m_mapShadowArray.GetSize()); i++) {
             CMapShadow* shadow = g_MapMng.m_mapShadowArray[i];
 
-            if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
+            if (shadow->m_targetEnabled[target] == 0) {
                 continue;
             }
 
@@ -2474,7 +2473,7 @@ void CMaterialMan::SetPosition(
         for (long i = 0; i < static_cast<unsigned int>(g_MapMng.m_mapShadowArray.GetSize()); i++) {
             CMapShadow* shadow = g_MapMng.m_mapShadowArray[i];
 
-            if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
+            if (shadow->m_targetEnabled[target] == 0) {
                 continue;
             }
 
@@ -2619,7 +2618,7 @@ void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, floa
     for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
 
-        if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
+        if (shadow->m_targetEnabled[target] == 0) {
             continue;
         }
 
@@ -2850,17 +2849,15 @@ inline void CMaterialMan::ErrorTexMapIdCur()
 inline CTexScroll::~CTexScroll()
 {
     if (m_type0 == 2) {
-        CMapKeyFrame* keyFrame = m_uKeyFrame;
-        if (keyFrame != 0) {
-            delete keyFrame;
+        if (m_uKeyFrame != 0) {
+            delete m_uKeyFrame;
             m_uKeyFrame = 0;
         }
     }
 
     if (m_type1 == 2) {
-        CMapKeyFrame* keyFrame = m_vKeyFrame;
-        if (keyFrame != 0) {
-            delete keyFrame;
+        if (m_vKeyFrame != 0) {
+            delete m_vKeyFrame;
             m_vKeyFrame = 0;
         }
     }
@@ -2899,10 +2896,9 @@ CMaterial::CMaterial()
     m_fogEnable = 1;
     m_materialType = 0;
     m_shadowKColorId = 0;
-    m_textureData.m_textures[0] = 0;
-    m_textureData.m_textures[1] = 0;
-    m_textureData.m_textures[2] = 0;
-    m_textureData.m_textures[3] = 0;
+    for (int i = 0; i < 4; i++) {
+        m_textureData.m_textures[i] = 0;
+    }
     m_texShiftU = 0;
     m_texShiftV = 0;
     m_unk36 = 0;
@@ -2959,7 +2955,7 @@ void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
  */
 int CMaterial::Set(_GXTexMapID texMapId)
 {
-    register int curTexMap = texMapId;
+    int curTexMap = texMapId;
     Mtx texMtx;
     PSMTXIdentity(texMtx);
 
@@ -2975,53 +2971,51 @@ int CMaterial::Set(_GXTexMapID texMapId)
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
         if ((m_textureData.m_textures[i] != 0) &&
             ((m_singleTextureFlag == 0) || (i <= 0))) {
-            TextureMan.SetTexture(static_cast<_GXTexMapID>(curTexMap), m_textureData.m_textures[i]);
+            m_textureData.m_textures[i]->Set(static_cast<_GXTexMapID>(curTexMap));
             curTexMap++;
 
-            if ((m_textureData.m_texScroll[i].m_u0 != 0.0f) ||
-                ((m_textureData.m_texScroll[i].m_v0 != 0.0f) || hasDualScroll)) {
+            CTexScroll* texScroll = &m_textureData.m_texScroll[i];
+
+            if ((texScroll->m_u0 != 0.0f) ||
+                ((texScroll->m_v0 != 0.0f) || hasDualScroll)) {
                 if (i == 0) {
-                    MaterialMan.m_curEnvTevBit |= 0x20;
-                    MaterialMan.m_texScroll0TexMtx = MaterialMan.m_texMtxCur;
-                    MaterialMan.m_texScroll0TexCoord = MaterialMan.m_texCoordIdCur;
-                    texMtx[0][3] = m_textureData.m_texScroll[i].m_u0;
-                    texMtx[1][3] = m_textureData.m_texScroll[i].m_v0;
-                    GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
-                    int texMtx0 = MaterialMan.m_texMtxCur;
-                    int texCoord0 = MaterialMan.m_texCoordIdCur;
-                    MaterialMan.m_texMtxCur += 3;
-                    MaterialMan.m_texCoordIdCur += 1;
-                    GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(texCoord0),
-                        GX_TG_MTX2x4,
-                        GX_TG_TEX0,
-                        texMtx0,
-                        GX_FALSE,
-                        0x7D);
+                    MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x20));
+                    MaterialMan.m_texScroll0TexMtx = MaterialMan.GetTexMtxCur();
+                    MaterialMan.m_texScroll0TexCoord = MaterialMan.GetTexCoordIdCur();
+                    texMtx[0][3] = texScroll->m_u0;
+                    texMtx[1][3] = texScroll->m_v0;
+                    GXLoadTexMtxImm(texMtx, MaterialMan.GetTexMtxCur(), GX_MTX2x4);
+                    GXSetTexCoordGen(static_cast<GXTexCoordID>(MaterialMan.IncTexCoordIdCur()), GX_TG_MTX2x4, GX_TG_TEX0,
+                                     MaterialMan.IncTexMtxCur());
                 } else {
-                    MaterialMan.m_curEnvTevBit |= 0x40;
-                    MaterialMan.m_texScroll1TexMtx = MaterialMan.m_texMtxCur;
-                    MaterialMan.m_texScroll1TexCoord = MaterialMan.m_texCoordIdCur;
-                    texMtx[0][3] = m_textureData.m_texScroll[i].m_u0;
-                    texMtx[1][3] = m_textureData.m_texScroll[i].m_v0;
-                    GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
-                    int texMtx1 = MaterialMan.m_texMtxCur;
-                    int texCoord1 = MaterialMan.m_texCoordIdCur;
-                    MaterialMan.m_texMtxCur += 3;
-                    MaterialMan.m_texCoordIdCur += 1;
-                    GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(texCoord1),
-                        GX_TG_MTX2x4,
-                        GX_TG_TEX1,
-                        texMtx1,
-                        GX_FALSE,
-                        0x7D);
+                    MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x40));
+                    MaterialMan.m_texScroll1TexMtx = MaterialMan.GetTexMtxCur();
+                    MaterialMan.m_texScroll1TexCoord = MaterialMan.GetTexCoordIdCur();
+                    texMtx[0][3] = texScroll->m_u0;
+                    texMtx[1][3] = texScroll->m_v0;
+                    GXLoadTexMtxImm(texMtx, MaterialMan.GetTexMtxCur(), GX_MTX2x4);
+                    GXSetTexCoordGen(static_cast<GXTexCoordID>(MaterialMan.IncTexCoordIdCur()), GX_TG_MTX2x4, GX_TG_TEX1,
+                                     MaterialMan.IncTexMtxCur());
                 }
             }
         }
     }
 
     return curTexMap;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x8004EEB4
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CTexture::Set(_GXTexMapID texMapId)
+{
+    TextureMan.SetTexture(texMapId, this);
 }
 
 /*
@@ -3035,8 +3029,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
  */
 inline void CMaterial::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 {
-    for (int i = 0; i < GetNumTexture(); i++) {
-        CTexture* texture = GetTexture(i);
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
+        CTexture* texture = m_textureData.m_textures[i];
         if (texture != 0) {
             texture->CacheLoadTexture(amemCacheSet);
         }
@@ -3054,8 +3048,8 @@ inline void CMaterial::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
  */
 inline void CMaterial::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
 {
-    for (int i = 0; i < GetNumTexture(); i++) {
-        CTexture* texture = GetTexture(i);
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
+        CTexture* texture = m_textureData.m_textures[i];
         if (texture != 0) {
             texture->CacheUnLoadTexture(amemCacheSet);
         }
@@ -3473,7 +3467,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                         if (texture != 0) {
                             isIntensity = true;
                             texture->AddRef();
-                            unsigned int format = material->m_textureData.m_textures[i]->m_format;
+                            unsigned int format = material->m_textureData.m_textures[i]->GetFormat();
                             if ((format != 9) && (format != 8)) {
                                 isIntensity = false;
                             }
@@ -3518,6 +3512,42 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 256b
+ * EN Address: 0x8004CC04
+ * EN Size: 304b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CTexScroll::Calc()
+{
+    if (m_type0 == 1) {
+        m_u0 = m_u0 + m_u1;
+        if (m_u0 > 1.0f) {
+            m_u0 = m_u0 - 1.0f;
+        } else if (m_u0 < 0.0f) {
+            m_u0 += 1.0f;
+        }
+    } else if (m_type0 == 2) {
+        m_u0 = m_uKeyFrame->Get();
+        m_uKeyFrame->Calc();
+    }
+
+    if (m_type1 == 1) {
+        m_v0 = m_v0 + m_v1;
+        if (m_v0 > 1.0f) {
+            m_v0 = m_v0 - 1.0f;
+        } else if (m_v0 < 0.0f) {
+            m_v0 += 1.0f;
+        }
+    } else if (m_type1 == 2) {
+        m_v0 = m_vKeyFrame->Get();
+        m_vKeyFrame->Calc();
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003C8D0
  * PAL Size: 352b
  * EN Address: 0x8004E598
@@ -3532,35 +3562,9 @@ void CMaterialSet::Calc()
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
-            int i = 0;
-            do {
-                CTexScroll* texScroll = &material->m_textureData.m_texScroll[i];
-                if (texScroll->m_type0 == 1) {
-                    texScroll->m_u0 = texScroll->m_u0 + texScroll->m_u1;
-                    if (texScroll->m_u0 > 1.0f) {
-                        texScroll->m_u0 = texScroll->m_u0 - 1.0f;
-                    } else if (texScroll->m_u0 < 0.0f) {
-                        texScroll->m_u0 += 1.0f;
-                    }
-                } else if (texScroll->m_type0 == 2) {
-                    texScroll->m_u0 = texScroll->m_uKeyFrame->Get();
-                    texScroll->m_uKeyFrame->Calc();
-                }
-
-                if (texScroll->m_type1 == 1) {
-                    texScroll->m_v0 = texScroll->m_v0 + texScroll->m_v1;
-                    if (texScroll->m_v0 > 1.0f) {
-                        texScroll->m_v0 = texScroll->m_v0 - 1.0f;
-                    } else if (texScroll->m_v0 < 0.0f) {
-                        texScroll->m_v0 += 1.0f;
-                    }
-                } else if (texScroll->m_type1 == 2) {
-                    texScroll->m_v0 = texScroll->m_vKeyFrame->Get();
-                    texScroll->m_vKeyFrame->Calc();
-                }
-
-                i++;
-            } while (i < 4);
+            for (int i = 0; i < 4; i++) {
+                material->m_textureData.m_texScroll[i].Calc();
+            }
         }
 
         materialIndex++;
@@ -3584,7 +3588,8 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             for (int slot = 0; slot < static_cast<int>(material->m_textureCount); slot++) {
-                if (material->m_textureData.m_textures[slot]->CheckName(textureName)) {
+                CTexture* texture = material->m_textureData.m_textures[slot];
+                if (texture->CheckName(textureName)) {
                     if (textureIndexOut != 0) {
                         *textureIndexOut = slot;
                     }

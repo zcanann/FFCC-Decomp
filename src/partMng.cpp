@@ -1027,6 +1027,14 @@ static inline void initMngDefaults(_pppMngSt& mng)
     mng.m_ownerFacing = 1;
     mng.m_owner = 0;
 }
+
+static inline void setCull(_pppMngSt& mng, float cullDist)
+{
+    mng.m_cullRadiusSq = cullDist;
+    if (mng.m_cullRadiusSq > 0.0) {
+        mng.m_cullRadiusSq *= mng.m_cullRadiusSq;
+    }
+}
 void CPartMng::SetFp()
 {
     int i;
@@ -1044,10 +1052,7 @@ void CPartMng::SetFp()
         m_pppMng[i].m_baseTime = fp->m_autoCreateMarker;
 #endif
 
-        m_pppMng[i].m_cullRadiusSq = fp->m_cullDistance;
-        if (m_pppMng[i].m_cullRadiusSq > 0.0) {
-            m_pppMng[i].m_cullRadiusSq *= m_pppMng[i].m_cullRadiusSq;
-        }
+        setCull(m_pppMng[i], fp->m_cullDistance);
         m_pppMng[i].m_nodeIndex = static_cast<short>(i);
         m_pppMng[i].m_cullRadius = fp->m_cullRadius;
         m_pppMng[i].m_cullYOffset = fp->m_cullYOffset;

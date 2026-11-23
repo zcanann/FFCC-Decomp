@@ -604,8 +604,6 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
     GXColor white;
-    float x2;
-    float y2;
 
     BeginQuadEnv();
 
@@ -670,8 +668,6 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
     GXColor white;
-    float x2;
-    float y2;
 
     BeginQuadEnv();
 

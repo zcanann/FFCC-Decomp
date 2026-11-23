@@ -857,9 +857,7 @@ static int FindIntersection(const Vec& start, const Vec& direction, const CMapCy
 
 cylinder_body:
     {
-        const f32 vxSq = localDirection.x * localDirection.x;
-        const f32 vySq = localDirection.y * localDirection.y;
-        const f32 radialA = vxSq + vySq;
+        const f32 radialA = localDirection.x * localDirection.x + localDirection.y * localDirection.y;
         f32 radialB = px * localDirection.x + py * localDirection.y;
         f32 radialC = (px * px + py * py) - radiusSq;
         disc = radialB * radialB - radialA * radialC;

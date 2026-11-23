@@ -713,7 +713,10 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         }
 
         work->m_tailScaleDirection = param->m_tailDirection;
-        pppNormalize(work->m_tailScaleDirection, work->m_tailScaleDirection);
+        {
+            Vec tmp = work->m_tailScaleDirection;
+            pppNormalize(work->m_tailScaleDirection, tmp);
+        }
     }
 
     if (alloc_check(work, param)) {

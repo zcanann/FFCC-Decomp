@@ -2026,7 +2026,8 @@ void CGPartyObj::checkTargetParticle()
 		if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    leader->m_comboState != 0) {
 			CVector toLeaderTarget = CVector(m_comboCenter) - CVector(leader->m_comboCenter);
-			if (PSVECMag(toLeaderTarget) > 10.0f) {
+			float mag = PSVECMag(toLeaderTarget);
+			if (mag > 10.0f) {
 				input.x = toLeaderTarget.x;
 				input.z = toLeaderTarget.z;
 			}
@@ -2034,7 +2035,7 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	if (input.x != 0.0f || input.z != 0.0f) {
-		float maxRange;
+		float maxRange = 0.0f;
 
 		party.flags.flag20 = 1;
 		input.Normalize();
@@ -2054,9 +2055,9 @@ void CGPartyObj::checkTargetParticle()
 		maxRange = 0.0f;
 		if (m_lastStateId == 2) {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-			unsigned int vNode = work->m_romWork->m_combatParam0;
+			unsigned short vNode = work->m_romWork->m_combatParam0;
 			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
-			unsigned int vItem = rows[m_itemId].m_field30;
+			unsigned short vItem = rows[m_itemId].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
 			if ((work->m_equipEffectFlags & 0x4000) != 0) {
@@ -2067,9 +2068,9 @@ void CGPartyObj::checkTargetParticle()
 			maxRange += base + static_cast<float>(vFlag);
 		} else {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-			unsigned int vNode = work->m_romWork->m_combatParam1;
+			unsigned short vNode = work->m_romWork->m_combatParam1;
 			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
-			unsigned int vItem = rows[m_itemId].m_field30;
+			unsigned short vItem = rows[m_itemId].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
 			if ((work->m_equipEffectFlags & 0x8000) != 0) {

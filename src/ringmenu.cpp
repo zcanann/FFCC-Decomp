@@ -704,9 +704,7 @@ void CRingMenu::onDraw()
 				break;
 			}
 
-			font->SetPosX(textX);
-			font->SetPosY(textY);
-			font->SetPosZ(0.0f);
+			font->SetPos(textX, textY, 0.0f);
 			if (group != 2) {
 				font->Draw(label);
 			}

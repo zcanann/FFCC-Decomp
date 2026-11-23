@@ -35,3 +35,60 @@ DrawHeart__8CMesMenuFffff	DrawHeart both use z	98.7325
 DrawHeart__8CMesMenuFffff	DrawHeart split floats	100.0
 DrawHeart__8CMesMenuFffff	DrawHeart separate pulseSinScale	None
 DrawHeart__8CMesMenuFffff	DrawHeart loop condition simplify	100.0
+close__8CMesMenuFi	close m_closeReason->closeReason	99.639496
+close__8CMesMenuFi	close add m_closeReason=closeReason	99.51585
+close__8CMesMenuFi	close stack[0] m_menuIndex -> menuIndex param	99.51585
+close__8CMesMenuFi	close SystemCall 0,1,3,2 -> 0,1,3,1	99.998955
+global	float 0.0f -> 0.f (first occ)	100.0
+global	float 0.0f -> 0 (first occ)	100.0
+global	float 0.0f -> 0.0 (first occ)	100.0
+global	float 1.0f -> 1.f (first occ)	100.0
+global	float 1.0f -> 1 (first occ)	100.0
+global	float 1.0f -> 1.0 (first occ)	100.0
+global	m_menuIndex <4 -> <=3 (first occ)	99.99373
+global	m_menuIndex <4 -> <4U (first occ)	99.9373
+global	m_menuIndex >=4 -> >3 (first occ)	99.99791
+global	Create int x 0x10->16	100.0
+global	Create int y 0x18->24	100.0
+global	Create x 0x270->624	100.0
+global	Create y 0x1B0->432	100.0
+global	Create m_baseX cast	100.0
+global	Create m_baseY cast	100.0
+global	Create defaultValue 0.0f->0	100.0
+global	Create m_active=0->false	100.0
+global	Create m_state=4->0x4	100.0
+global	DrawHeart pulseSinScale 3.1415927f->3.14159f	99.97736
+global	DrawHeart heartZero 0.0f->0.f	100.0
+global	DrawHeart heartBaseX += -> heartBaseX = heartBaseX +	100.0
+global	onDraw tCut static->const	99.384186
+global	onDraw iconFrame 3->0x3	100.0
+global	onDraw System.GetCounter &6 -> & 6	100.0
+global	Open m_active=1->true	100.0
+global	Open m_closeReason=0->false	100.0
+global	Open margin 24.0f->24.f	100.0
+global	Open marginX 16.0f->16.f	100.0
+global	close m_mes.Set 0,0->0	fail
+global	close SystemCall 0,1,3,2->0,1,3,0x2	100.0
+global	onScriptChanging m_mes.Set	100.0
+onCalc	onCalc stageBit &1 -> &0x1	100.0
+onCalc	onCalc desiredStageFlag ?1:0 -> !!stageBit	100.0
+onCalc	onCalc m_menuIndex>=1 && <4 -> m_menuIndex>0 && <4	99.99791
+onCalc	onCalc m_stateTimerMax < m_stateTimer -> m_stateTimer > m_stateTimerMax	99.99756
+global	onCalc if Game.m_gameWork.m_menuStageMode !=0 -> ==1	99.99791
+global	onCalc stageBit &1 -> &0x01	100.0
+global	onCalc stageBit &2 -> &0x02	100.0
+global	onCalc m_stageFadeTimer 0x10->16	100.0
+global	onCalc timer &~ -> timer = timer>0?timer-1:0	99.85893
+global	onDraw m_menuIndex <4 -> <=3	99.99791
+global	onDraw Game.m_gameWork.m_menuStageMode !=0 -> ==0	99.99826
+global	onDraw stageBlend 16.0f->16.f	100.0
+global	onDraw stageBlend 1.0f->1.f	100.0
+global	DrawHeart pulseSinScale 3.1415927f->3.14159265f	100.0
+global	DrawHeart heartBaseY 12.0f->12.f	100.0
+global	Open m_windowWidth 2.0f->2.f	100.0
+global	Open m_windowWidth 296.0f->296.f	100.0
+global	CloseRequest m_state <=1 -> <2	99.99582
+global	CloseRequest m_flags &0x40 -> &64	100.0
+global	Create m_active=0 -> =false	100.0
+global	Create m_state=4 -> =0x4	100.0
+global	onCalc sin -1.5707964f+3.1415927f -> M_PI	100.0

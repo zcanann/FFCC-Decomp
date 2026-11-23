@@ -1411,8 +1411,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
  */
 void CMapObj::GetHitFaceNormal(Vec* out)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-    mapHit->GetHitFaceNormal(out);
+    reinterpret_cast<CMapHit*>(m_mapData)->GetHitFaceNormal(out);
     PSMTXMultVecSR(m_worldMtx, out, out);
 }
 
@@ -1427,8 +1426,7 @@ void CMapObj::GetHitFaceNormal(Vec* out)
  */
 int CMapObj::CalcHitSlide(Vec* out, float y)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-    int hit = mapHit->CalcHitSlide(out, y);
+    int hit = reinterpret_cast<CMapHit*>(m_mapData)->CalcHitSlide(out, y);
     PSMTXMultVecSR(m_worldMtx, out, out);
     return hit;
 }
@@ -1444,8 +1442,7 @@ int CMapObj::CalcHitSlide(Vec* out, float y)
  */
 void CMapObj::CalcHitPosition(Vec* out)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-    mapHit->CalcHitPosition(out);
+    reinterpret_cast<CMapHit*>(m_mapData)->CalcHitPosition(out);
     PSMTXMultVec(m_worldMtx, out, out);
 }
 

@@ -552,9 +552,9 @@ static void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpT
           VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     s32 alpha = vColor->m_color.rgba[3];
-    u8 frameWindow;
-    u8 fadeOutFrames;
-    u8 historyIndex;
+    unsigned int frameWindow;
+    unsigned int fadeOutFrames;
+    int historyIndex;
     u16 frameIndex;
     pppShapeAnimData* shapeAnim;
     pppShapeAnimFrame* frameEntry;

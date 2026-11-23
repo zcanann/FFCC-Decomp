@@ -215,9 +215,7 @@ void CUtil::SetOrthoEnv()
  */
 int CUtil::GetNoise(unsigned char noise)
 {
-    float maxNoise = (float)(noise * 2);
-    float minNoise = (float)(noise >> 1);
-    return (int)(maxNoise * Math.RandF() - minNoise);
+    return (int)(Math.RandF() * (noise * 2) - (noise >> 1));
 }
 
 /*
@@ -391,7 +389,6 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
  */
 void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
-    u32* colorPtr = reinterpret_cast<u32*>(&color);
     float u1;
     float v1;
     float u2;
@@ -410,7 +407,6 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-#ifdef VERSION_GCCJGC
     GXPosition3f32(pos1.x, pos1.y, pos1.z);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
     GXTexCoord2f32(u1, v1);
@@ -430,50 +426,6 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     GXColor1u32(*reinterpret_cast<u32*>(&color));
     GXTexCoord2f32(u1, v2);
     GXTexCoord2f32(u1, v2);
-#else
-    f32 x2;
-    f32 x1 = pos1.x;
-    f32 y1 = pos1.y;
-    GXWGFifo.f32 = x1;
-    f32 z1 = pos1.z;
-    GXWGFifo.f32 = y1;
-    u32 rgba = *colorPtr;
-    GXWGFifo.f32 = z1;
-    x2 = pos2.x;
-    GXWGFifo.u32 = rgba;
-    f32 y2 = pos2.y;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v1;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y1;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v1;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-
-    GXWGFifo.f32 = x1;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
-#endif
 }
 
 /*

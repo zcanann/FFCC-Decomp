@@ -1155,8 +1155,7 @@ void CLightPcs::CLight::Set(CLightPcs::CLight* light)
     if (m_range < 0.0f) {
         m_range = -m_range;
     }
-    float range = m_range / 2.0f;
-    m_range = range * m_radius;
+    m_range = m_range / 2.0f * m_radius;
 
     m_targetEnable[3] = 1;
     m_targetEnable[2] = 1;

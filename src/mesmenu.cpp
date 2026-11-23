@@ -917,7 +917,7 @@ void CMesMenu::CalcHeart()
         m_heartDropTimers[i + 3] = value & ~((int)value >> 0x1F);
     }
 
-    unsigned int value = m_foodShakeTimer - 1;
+    int value = m_foodShakeTimer - 1;
     m_foodShakeTimer = value & ~((int)value >> 0x1F);
 }
 

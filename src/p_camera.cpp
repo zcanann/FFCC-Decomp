@@ -785,15 +785,12 @@ void CCameraPcs::calcMap()
 
     buttons = Pad.GetButton(0);
 
-    stickH = Pad.GetRightStickX(0);
-    stickH = 0.017453292519943295f * (stickH / 0.125f);
+    stickH = Pad.GetRightStickX(0) / 0.125f * 0.017453292519943295f;
 
     stickV = Pad.GetRightStickY(0);
     stickV = -(0.017453292519943295f * (stickV / 0.125f));
 
-    triggerL = Pad.GetLeftStickX(0);
-
-    m_fov += triggerL;
+    m_fov += Pad.GetLeftStickX(0);
     m_mapRotX += stickV;
     m_mapRotY -= stickH;
 

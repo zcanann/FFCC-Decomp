@@ -29,3 +29,9 @@ Open__8CMesMenuFPciiiiii	Open remove half var	100.0
 Open__8CMesMenuFPciiiiii	Open remove two var (float two)	100.0
 Open__8CMesMenuFPciiiiii	Open remove half var	100.0
 Open__8CMesMenuFPciiiiii	Open remove both two+half (-4)	100.0
+DrawHeart__8CMesMenuFffff	DrawHeart use z for last param (first rect)	99.136536
+DrawHeart__8CMesMenuFffff	DrawHeart use z for second rect	99.39847
+DrawHeart__8CMesMenuFffff	DrawHeart both use z	98.7325
+DrawHeart__8CMesMenuFffff	DrawHeart split floats	100.0
+DrawHeart__8CMesMenuFffff	DrawHeart separate pulseSinScale	None
+DrawHeart__8CMesMenuFffff	DrawHeart loop condition simplify	100.0

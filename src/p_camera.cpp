@@ -1022,9 +1022,8 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         if (!(clipBound.m_min.z > -400.0f)) {
             continue;
         }
-        float negMinZ = -clipBound.m_min.z;
-        float ratioX = (clipBound.m_max.x - clipBound.m_min.x) / negMinZ;
-        float ratioY = (clipBound.m_max.y - clipBound.m_min.y) / negMinZ;
+        float ratioX = (clipBound.m_max.x - clipBound.m_min.x) / -clipBound.m_min.z;
+        float ratioY = (clipBound.m_max.y - clipBound.m_min.y) / -clipBound.m_min.z;
         if (ratioX > 0.2f) {
             // proceed
         } else if (!(ratioY > 0.2f)) {

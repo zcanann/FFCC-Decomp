@@ -2400,12 +2400,9 @@ void CGObject::boundCheck()
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-        float clipLimit;
-        float oneF;
-        float zero;
-        zero = 0.0f;
-        oneF = 1.0f;
-        clipLimit = -1.0f;
+        float clipLimit = -1.0f;
+        float oneF = 1.0f;
+        float zero = 0.0f;
 
         clipMask = 0x1F;
         s32 i = 0;
@@ -2816,8 +2813,7 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     m_animExtraIndex = static_cast<short>(param4);
     m_collisionPushTimer = static_cast<short>(param5);
 
-    signed char shieldFlag = static_cast<signed char>(param3);
-    m_shieldNodeFlagBits.m_bit02 = shieldFlag;
+    m_shieldNodeFlagBits.m_bit02 = static_cast<signed char>(param3);
 
     if (animData != 0) {
         m_shieldNodeFlagBits.m_bit80 = 1;

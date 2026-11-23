@@ -7,3 +7,4 @@ BirthParticle	get_rand helper with float range/spread -> Birth O0 1616 delta -56
 IsDeadGroupBreath	split OR into two ifs int loop -> O0 128 delta -4, O4 99.870	99.870
 pppFrameYmBreath	checked ghidra vs source no change	same
 BirthParticle	pppNormalize self (remove directionNorm copy) -> O0 1832 delta 160 (was 184), O4 100.000	100.000
+BirthParticle	use 0.0f literal instead of zero var for scaleRandomRange -> O0 1832->1816 delta 160->144, O4 100.000	100.000

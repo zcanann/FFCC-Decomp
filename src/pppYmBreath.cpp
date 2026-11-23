@@ -958,9 +958,8 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
         particle->m_rotationVelocityY += particle->m_rotationAccelY;
     }
 
-    float zero = 0.0f;
     particle->m_scale = params->m_groupSpeed;
-    if (zero != params->m_scaleRandomRange) {
+    if (0.0f != params->m_scaleRandomRange) {
         float rand = Math.RandF();
         float scaledRange = params->m_scaleRandomRange * 2.0f;
         particle->m_scale += scaledRange * rand - params->m_scaleRandomRange;

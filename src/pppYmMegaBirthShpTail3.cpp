@@ -246,8 +246,7 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShp
             case 3:
             {
                 r0 = Math.RandF();
-                r1 = Math.RandF();
-                scale = pYmMegaBirthShpTail3->m_spawnRange * r1;
+                scale = pYmMegaBirthShpTail3->m_spawnRange * Math.RandF();
                 scale = pYmMegaBirthShpTail3->m_spawnRange - 0.7f * (scale * r0);
                 break;
             }

@@ -3772,6 +3772,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 void CGPartyObj::gpmCol()
 {
 	CGPartyObj* leader = Game.m_partyObjArr[0];
+	int leaderIdx = 0;
 	GhostPartyWork& ghostWork = m_ghostWork;
 	int& activeTrailCount = ghostWork.activeTrailCount;
 	Vec* trailBase = ghostWork.trailPositions;

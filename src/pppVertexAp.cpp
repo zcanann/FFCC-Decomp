@@ -12,14 +12,14 @@ struct VertexApSource; struct VertexApEnv { u8 unk0[0x8]; VertexApSource** sourc
 struct VertexApData { u8 unk0[0x4]; s16 entryIndex; u8 spawnCount; u8 spawnDelay; u8 mode; u8 useWorldMtx; u8 unkA[0x2]; u32 childId; u32 childPosOffset; };
 struct VertexApState { u16 index; u16 countdown; };
 struct VertexApSource { u8 unk0[0x2C]; Vec* points; };
-static inline void apea(_pppPObject* parent, PVertexAp* dataRaw, f32 x, f32 y, f32 z) {
+static inline void apea(_pppPObject* parent, PVertexAp* dataRaw, Vec* vec) {
     VertexApData* data = (VertexApData*)dataRaw;
     if ((data->childId + 0x10000) != 0xFFFF) {
         s32 childId = data->childId;
         _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
         Vec pos; Vec* outPos; _pppPObject* child;
         if (childData == 0) { child = 0; } else { child = pppCreatePObject(ppvMng, childData); child->m_link.m_previous = &parent->m_link; }
-        pos.x = x; pos.y = y; pos.z = z;
+        pos.x = vec->x; pos.y = vec->y; pos.z = vec->z;
         PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
         outPos = (Vec*)(child->m_workArea + data->childPosOffset);
         if (data->useWorldMtx == 0) { outPos->x = pos.x; outPos->y = pos.y; outPos->z = pos.z; } else { PSMTXMultVec(ppvMng->m_matrix.value, &pos, outPos); }
@@ -51,12 +51,12 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
         case 0: goto mode0Dispatch;
         mode0Body: {
                 if (state->index >= entry->maxValue) { state->index = 0; }
-                u16 outValue = state->index; u16* vertexIndices = entry->vertexIndices; state->index++; u16 vertexIndex = vertexIndices[outValue]; Vec* vertex = &points[vertexIndex]; f32 x = vertex->x; f32 y = vertex->y; f32 z = vertex->z; apea(parent, dataRaw, x, y, z);
+                u16* vertexIndices = entry->vertexIndices; u16 outValue = state->index++; u16 vertexIndex = vertexIndices[outValue]; Vec* vertex = &points[vertexIndex]; f32 x = vertex->x; f32 y = vertex->y; f32 z = vertex->z; Vec v; v.x=x; v.y=y; v.z=z; apea(parent, dataRaw, &v);
             }
         mode0Test: if (count-- != 0) { goto mode0Body; } goto setCountdown;
         case 1: goto mode1Dispatch;
         mode1Body: {
-                f32 randValue = Math.RandF(); f32 maxValue = (f32)entry->maxValue; int outValue = (int)(randValue * maxValue); u16* vertexIndices = entry->vertexIndices; u16 vertexIndex = vertexIndices[outValue]; Vec* vertex = &points[vertexIndex]; f32 x = vertex->x; f32 y = vertex->y; f32 z = vertex->z; apea(parent, dataRaw, x, y, z);
+                f32 randValue = Math.RandF(); f32 maxValue = (f32)entry->maxValue; int outValue = (int)(randValue * maxValue); u16* vertexIndices = entry->vertexIndices; u16 vertexIndex = vertexIndices[outValue]; Vec* vertex = &points[vertexIndex]; f32 x = vertex->x; f32 y = vertex->y; f32 z = vertex->z; Vec v; v.x=x; v.y=y; v.z=z; apea(parent, dataRaw, &v);
             }
         mode1Test: if (count-- != 0) { goto mode1Body; } goto setCountdown;
         }

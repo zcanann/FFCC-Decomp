@@ -828,6 +828,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
     pppFVECTOR4 colorStart;
     pppFVECTOR4 colorEnd;
     pppFMATRIX drawMtx;
+    Vec _scaleCache = ppvMng->m_scale; (void)_scaleCache;
     Vec zeroVec;
     Vec seg;
     pppFVECTOR4 camPos;

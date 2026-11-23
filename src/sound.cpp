@@ -235,9 +235,7 @@ void CSound::Realloc(int isMinMemoryMode)
 float CSound::GetPerformance()
 {
     unsigned int programTime = m_redSound.GetProgramTime();
-    float numer = (float)(programTime / 0xF);
-    float denom = (float)(((OS_TIMER_CLOCK / 125000) * 0x8235) >> 3);
-    return 100.0f * (numer / denom);
+    return 100.0f * ((float)(programTime / 0xF) / (float)(((OS_TIMER_CLOCK / 125000) * 0x8235) >> 3));
 }
 
 /*

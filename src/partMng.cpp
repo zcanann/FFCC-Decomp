@@ -1035,6 +1035,21 @@ static inline void setCull(_pppMngSt& mng, float cullDist)
         mng.m_cullRadiusSq *= mng.m_cullRadiusSq;
     }
 }
+
+static inline void setMngFlags(_pppMngSt& mng, _pppFieldParticleData* fp)
+{
+    mng.m_matrixMode = fp->m_matrixMode;
+    mng.m_drawVariant = fp->m_drawVariant;
+    mng.m_rotationOrder = fp->m_rotationOrder;
+    mng.m_drawPass = fp->m_drawPass;
+    mng.m_drawSubType = fp->m_drawSubType;
+    mng.m_ownerFlagsInitialized = fp->m_ownerFlagsInitialized;
+    mng.m_nodeScaleInitialized = fp->m_nodeScaleInitialized;
+    mng.m_fieldF2 = 1;
+    mng.m_fpBillboard = fp->m_fpBillboard;
+    mng.m_prio = fp->m_prio;
+    mng.m_mapObjIndex = fp->m_mapObjIndex;
+}
 void CPartMng::SetFp()
 {
     int i;
@@ -1061,17 +1076,7 @@ void CPartMng::SetFp()
         m_pppMng[i].m_scale = fp->m_scale;
         m_pppMng[i].m_userFloat0 = m_pppMng[i].m_userFloat1 = m_pppMng[i].m_scaleFactor = m_pppMng[i].m_ownerScale = 1.0f;
         m_pppMng[i].m_useOwnerScaleSign = 0;
-        m_pppMng[i].m_matrixMode = fp->m_matrixMode;
-        m_pppMng[i].m_drawVariant = fp->m_drawVariant;
-        m_pppMng[i].m_rotationOrder = fp->m_rotationOrder;
-        m_pppMng[i].m_drawPass = fp->m_drawPass;
-        m_pppMng[i].m_drawSubType = fp->m_drawSubType;
-        m_pppMng[i].m_ownerFlagsInitialized = fp->m_ownerFlagsInitialized;
-        m_pppMng[i].m_nodeScaleInitialized = fp->m_nodeScaleInitialized;
-        m_pppMng[i].m_fieldF2 = 1;
-        m_pppMng[i].m_fpBillboard = fp->m_fpBillboard;
-        m_pppMng[i].m_prio = fp->m_prio;
-        m_pppMng[i].m_mapObjIndex = fp->m_mapObjIndex;
+        setMngFlags(m_pppMng[i], fp);
         initMngDefaults(m_pppMng[i]);
 
         int mode = m_pppMng[i].m_matrixMode;

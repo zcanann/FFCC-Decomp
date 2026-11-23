@@ -348,7 +348,7 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     float u1;
     float v1;
 
-    if (uv1 == NULL || uv2 == NULL) {
+    if (uv1 == 0 || uv2 == 0) {
         u0 = 0.0f;
         u1 = 1.0f;
         v0 = u0;
@@ -394,7 +394,7 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     float u2;
     float v2;
 
-    if (uv1 == NULL || uv2 == NULL) {
+    if (uv1 == 0 || uv2 == 0) {
         u1 = 0.0f;
         v1 = u1;
         u2 = 1.0f;

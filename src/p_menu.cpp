@@ -282,9 +282,8 @@ void CMenuPcs::destroy()
 
     freeTexture(0, 2, 0, MenuCommonTextureCount);
 
-    CFont* font = m_fonts[0];
-    if (font != nullptr) {
-        font->Release();
+    if (m_fonts[0] != 0) {
+        m_fonts[0]->Release();
         m_fonts[0] = 0;
     }
 
@@ -1498,9 +1497,7 @@ void CMenuPcs::drawBattle()
  */
 void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
 {
-    const int mode = m_mode;
-
-    if ((mode != 2) && (mode != 1)) {
+    if ((m_mode != 2) && (m_mode != 1)) {
         destroySingleMenu();
     }
 

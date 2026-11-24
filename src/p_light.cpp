@@ -119,9 +119,11 @@ int CLightPcs::GetTable(unsigned long index)
  */
 void CLightPcs::create()
 {
-    for (int i = 0; i < 0x20; i++) {
-        m_bumpLights[0][i].m_hasTexture = 0;
-        m_bumpLights[0][i].m_textureData = 0;
+    for (int t = 0; t < 4; t++) {
+        for (int i = 0; i < 8; i++) {
+            m_bumpLights[t][i].m_hasTexture = 0;
+            m_bumpLights[t][i].m_textureData = 0;
+        }
     }
 }
 

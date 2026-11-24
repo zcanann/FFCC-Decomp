@@ -1728,12 +1728,9 @@ void CMes::Set(char* text, int param)
 #ifdef VERSION_GCCJGC
 	mMaxWidth = mMaxHeight = 0.0f;
 #else
-	mMaxHeight = 0.0f;
-	mMaxWidth = 0.0f;
+	mMaxWidth = mMaxHeight = 0.0f;
 #endif
-	mCounter = 0;
-	mFlagCursor = 0;
-	mFlagCount = 0;
+	mFlagCount = mFlagCursor = mCounter = 0;
 	mRubyEnabled = 0;
 	mFontCount = param;
 #ifdef VERSION_GCCJGC
@@ -1754,9 +1751,7 @@ void CMes::Set(char* text, int param)
 		float lineZero = 0.0f;
 
 		while (mWaitActive == 0) {
-			mCounter = 0;
-			mFlagCursor = 0;
-			mFlagCount = 0;
+			mFlagCount = mFlagCursor = mCounter = 0;
 #ifdef VERSION_GCCJGC
 			mCurrentX = mCurrentY = 0.0f;
 			mLineWidth = mLineHeight = 0.0f;
@@ -1831,8 +1826,7 @@ CMes::CMes()
 {
 	mText = 0;
 	mCounter = 0;
-	mFlagCursor = 0;
-	mFlagCount = 0;
+	mFlagCount = mFlagCursor = 0;
 	mTlutBase = 0;
 	mShadow = 1;
 	memset(mFlagVars, 0, sizeof(mFlagVars));

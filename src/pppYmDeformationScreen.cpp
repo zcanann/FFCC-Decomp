@@ -155,6 +155,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 	GXColor1u32(*(u32*)color.rgba);
 	GXTexCoord2f32(zero, one);
 	GXTexCoord2f32(zero, texV);
+	GXEnd();
 
 	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 224, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
@@ -184,6 +185,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 		GXTexCoord2f32(bottomZero, bottomOne);
 		GXTexCoord2f32(bottomZero, texV);
 	}
+	GXEnd();
 
 	Util.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);

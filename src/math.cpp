@@ -273,14 +273,10 @@ float CMath::RandF()
  */
 int CMath::RandPM(unsigned long max)
 {
-    unsigned int value;
-
     if (max == 0) {
         return 0;
     }
-
-    value = (unsigned int)rand() * 0xFFFE - 0x7FFF;
-    return (int)(value % max);
+    return (int)(((unsigned int)rand() * 0xFFFE - 0x7FFF) % max);
 }
 
 /*

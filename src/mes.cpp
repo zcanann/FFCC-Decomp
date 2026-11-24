@@ -954,9 +954,7 @@ void CMes::Draw()
 #ifdef VERSION_GCCJGC
 					font->SetScale(glyph->m_scale);
 #else
-					float glyphScaleY = 0.01f * (float)glyph->m_scaleY;
-					font->SetScaleX(0.01f * (float)glyph->m_scaleX);
-					font->SetScaleY(glyphScaleY);
+					font->SetScale(0.01f * (float)glyph->m_scaleX, 0.01f * (float)glyph->m_scaleY);
 #endif
 					font->SetAlign(1);
 					font->Draw(glyph->m_char);

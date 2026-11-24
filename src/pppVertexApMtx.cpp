@@ -227,8 +227,7 @@ functionEnd:
  */
 void pppVertexApMtxCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-	s32 offset = ctrl->m_serializedDataOffsets[0];
-	u16* state = (u16*)(obj->m_workArea + offset);
+	u16* state = (u16*)(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
 
 	state[0] = 0;
 	state[1] = 0;

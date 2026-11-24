@@ -836,7 +836,6 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
     pppFMATRIX rotMtx ATTRIBUTE_ALIGN(8);
     float spread;
     float range;
-    u8 flags;
 
     spread = (float)(unsigned int)pYmBreath->m_spread;
     range = spread * 2.0f;
@@ -889,12 +888,11 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
 
     if (params->m_angleFlags != 0) {
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
-        flags = params->m_angleFlags;
-        if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+        if (((params->m_angleFlags & 1) != 0) && ((params->m_angleFlags & 2) != 0)) {
             if (0.5 < Math.RandF()) {
                 particle->m_angleRandom *= -1.0f;
             }
-        } else if ((flags & 2) != 0) {
+        } else if ((params->m_angleFlags & 2) != 0) {
             particle->m_angleRandom *= -1.0f;
         }
     }

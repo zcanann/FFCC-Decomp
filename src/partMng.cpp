@@ -1015,6 +1015,7 @@ inline void CPartMng::allFreeFPrim()
  * JP Address: TODO
  * JP Size: TODO
  */
+
 void CPartMng::SetFp()
 {
     int i;
@@ -1039,15 +1040,9 @@ void CPartMng::SetFp()
         m_pppMng[i].m_nodeIndex = static_cast<short>(i);
         m_pppMng[i].m_cullRadius = fp->m_cullRadius;
         m_pppMng[i].m_cullYOffset = fp->m_cullYOffset;
-        m_pppMng[i].m_position.x = fp->m_position.x;
-        m_pppMng[i].m_position.y = fp->m_position.y;
-        m_pppMng[i].m_position.z = fp->m_position.z;
-        m_pppMng[i].m_rotation.x = fp->m_rotation.x;
-        m_pppMng[i].m_rotation.y = fp->m_rotation.y;
-        m_pppMng[i].m_rotation.z = fp->m_rotation.z;
-        m_pppMng[i].m_scale.x = fp->m_scale.x;
-        m_pppMng[i].m_scale.y = fp->m_scale.y;
-        m_pppMng[i].m_scale.z = fp->m_scale.z;
+        m_pppMng[i].m_position = fp->m_position;
+        m_pppMng[i].m_rotation = fp->m_rotation;
+        m_pppMng[i].m_scale = fp->m_scale;
         m_pppMng[i].m_userFloat0 = m_pppMng[i].m_userFloat1 = m_pppMng[i].m_scaleFactor = m_pppMng[i].m_ownerScale = 1.0f;
         m_pppMng[i].m_useOwnerScaleSign = 0;
         m_pppMng[i].m_matrixMode = fp->m_matrixMode;
@@ -1525,29 +1520,20 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
 
-        m_pppMng[0].m_position.x = payloadFloats[0];
-        m_pppMng[0].m_position.y = payloadFloats[1];
-        m_pppMng[0].m_position.z = payloadFloats[2];
-        m_pppMng[0].m_rotation.x = payloadWords[4];
-        m_pppMng[0].m_rotation.y = payloadWords[5];
-        m_pppMng[0].m_rotation.z = payloadWords[6];
-        m_pppMng[0].m_scale.x = payloadFloats[8];
-        m_pppMng[0].m_scale.y = payloadFloats[9];
-        m_pppMng[0].m_scale.z = payloadFloats[0xA];
-        {
-            float* mngF = reinterpret_cast<float*>(m_pppMng);
-            mngF[0x58 / 4] = payloadFloats[0x10];
-            mngF[0x5C / 4] = payloadFloats[0x11];
-            mngF[0x60 / 4] = payloadFloats[0x12];
-            mngF[0x68 / 4] = payloadFloats[0x14];
-            mngF[0x6C / 4] = payloadFloats[0x15];
-            mngF[0x70 / 4] = payloadFloats[0x16];
-            ppvChrScl[0] = payloadFloats[0xC];
-            ppvChrScl[1] = payloadFloats[0xD];
-            ppvChrScl[2] = payloadFloats[0xE];
-            mngF[0x54 / 4] = payloadFloats[0x17];
-            mngF[0x64 / 4] = payloadFloats[0x18];
-        }
+        m_pppMng[0].m_position = *reinterpret_cast<Vec*>(&payloadFloats[0]);
+        m_pppMng[0].m_rotation = *reinterpret_cast<pppIVECTOR3*>(&payloadWords[4]);
+        m_pppMng[0].m_scale = *reinterpret_cast<Vec*>(&payloadFloats[8]);
+        m_pppMng[0].m_basePosition.x = payloadFloats[0x10];
+        m_pppMng[0].m_basePosition.y = payloadFloats[0x11];
+        m_pppMng[0].m_basePosition.z = payloadFloats[0x12];
+        m_pppMng[0].m_paramVec0.x = payloadFloats[0x14];
+        m_pppMng[0].m_paramVec0.y = payloadFloats[0x15];
+        m_pppMng[0].m_paramVec0.z = payloadFloats[0x16];
+        ppvChrScl[0] = payloadFloats[0xC];
+        ppvChrScl[1] = payloadFloats[0xD];
+        ppvChrScl[2] = payloadFloats[0xE];
+        m_pppMng[0].m_movementScale = payloadFloats[0x17];
+        m_pppMng[0].m_hitScale = payloadFloats[0x18];
         m_pppMng[0].m_hitBgFlag = 0;
         return;
     case 0x1B:
@@ -1978,16 +1964,7 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.b = m_editClearColor[2];
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
-
-        unsigned char fogEnable = m_editFogEnable;
-        float fogNear;
-        float fogFar = m_editFogFar;
-        fogNear = m_editFogNear;
-        unsigned char fogG;
-        unsigned char fogB = m_editFogColor[2];
-        fogG = m_editFogColor[1];
-        unsigned char fogR = m_editFogColor[0];
-        pppSetFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
+        pppSetFog(m_editFogEnable, m_editFogColor[0], m_editFogColor[1], m_editFogColor[2], m_editFogNear, m_editFogFar);
 
         ppvSysGoPartF = 1;
         break;
@@ -2014,16 +1991,7 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.b = m_editClearColor[2];
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
-
-        unsigned char fogEnable = m_editFogEnable;
-        float fogNear;
-        float fogFar = m_editFogFar;
-        fogNear = m_editFogNear;
-        unsigned char fogG;
-        unsigned char fogB = m_editFogColor[2];
-        fogG = m_editFogColor[1];
-        unsigned char fogR = m_editFogColor[0];
-        pppSetFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
+        pppSetFog(m_editFogEnable, m_editFogColor[0], m_editFogColor[1], m_editFogColor[2], m_editFogNear, m_editFogFar);
 
         ppvSysGoPartF = 1;
         break;

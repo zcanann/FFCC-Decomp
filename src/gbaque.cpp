@@ -1239,9 +1239,14 @@ void GbaQueue::LoadPlayerStat()
 				{
 					const int saveSlot = caravanWork->m_saveSlot;
 					localPlayerStat[i].m_saveSlot = static_cast<signed char>(saveSlot);
-					for (int j = 0; j < 8; j++) {
-						localPlayerStat[i].m_compatibility[j] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12 + j]);
-					}
+					localPlayerStat[i].m_compatibility[0] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
+					localPlayerStat[i].m_compatibility[1] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
+					localPlayerStat[i].m_compatibility[2] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x14]);
+					localPlayerStat[i].m_compatibility[3] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
+					localPlayerStat[i].m_compatibility[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
+					localPlayerStat[i].m_compatibility[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
+					localPlayerStat[i].m_compatibility[6] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x18]);
+					localPlayerStat[i].m_compatibility[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x19]);
 					for (int j = 0; j < 8; j++) {
 						localPlayerStat[i].m_compatibility[8 + j] = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][j];
 					}

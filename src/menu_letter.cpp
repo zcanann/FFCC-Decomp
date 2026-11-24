@@ -1987,10 +1987,12 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
  */
 void CMenuPcs::LetterDrawPageMark(int pageMark)
 {
+	FFCC_ASSERT(pageMark >= 0 && pageMark <= 3);
 	float markX = 592.0f;
 	float markY = 160.0f;
 	const int absPhase = abs(static_cast<int>(System.GetCounter()) % 0x14 - 10);
 	const float markScale = static_cast<float>(0.7 + 0.03 * absPhase);
+	FFCC_ASSERT(markScale >= 0.7f && markScale <= 1.0f);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 

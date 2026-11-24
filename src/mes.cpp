@@ -1442,12 +1442,8 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x35:
 		{
-			float scale = 0.01f * (float)GET_2(text);
-			mScaleY = scale;
-			mScaleX = scale;
-			float tagScaleY = mScaleY;
-			font->SetScaleX(mScaleX);
-			font->SetScaleY(tagScaleY);
+			mScaleX = mScaleY = 0.01f * (float)GET_2(text);
+			font->SetScale(mScaleX, mScaleY);
 			break;
 		}
 		case 0x1A:

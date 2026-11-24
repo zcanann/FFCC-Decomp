@@ -17,11 +17,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-static inline VYmDeformationScreen* GetYmDeformationScreenWork(pppYmDeformationScreen* obj, s32 offset)
-{
-	return reinterpret_cast<VYmDeformationScreen*>(obj->m_workArea + offset);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8009159C
@@ -31,10 +26,34 @@ static inline VYmDeformationScreen* GetYmDeformationScreenWork(pppYmDeformationS
  * JP Address: 0x80090994
  * JP Size: 1728b
  */
+
+static inline void SetUpIndWarp(VYmDeformationScreen* work)
+{
+	float indMtx[2][3];
+	Mtx rot;
+
+	GXSetNumIndStages(1);
+	GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD0, GX_TEXMAP1);
+	GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
+	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
+
+	if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
+		work->m_angle = 1;
+	}
+
+	PSMTXRotRad(rot, 'z', 0.017453292f * (float)work->m_angle);
+	indMtx[0][0] = rot[0][0] * work->m_scale;
+	indMtx[0][1] = rot[0][1] * work->m_scale;
+	indMtx[0][2] = 0.0f;
+	indMtx[1][0] = rot[1][0] * work->m_scale;
+	indMtx[1][1] = rot[1][1] * work->m_scale;
+	indMtx[1][2] = 0.0f;
+	GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+}
+
 void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationScreenStep* step, _pppCtrlTable* param3)
 {
-	VYmDeformationScreen* work = GetYmDeformationScreenWork(
-		param1, param3->m_serializedDataOffsets[2]);
+	VYmDeformationScreen* work = reinterpret_cast<VYmDeformationScreen*>(param1->m_workArea + param3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	GXTexObj backTexObj;
 	Mtx identity;
@@ -58,8 +77,8 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 		ppvEnv->m_materialSetPtr, textureIndex);
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_AND);
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+	GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
 	color.rgba[0] = 0x40;
 	color.rgba[1] = 0x40;
 	color.rgba[2] = 0x40;
@@ -103,26 +122,10 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
-		GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+		GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 
 		depth = work->m_depth;
-		GXSetNumIndStages(1);
-		GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD0, GX_TEXMAP1);
-		GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
-		GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
-
-		if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
-			work->m_angle = 1;
-		}
-
-		PSMTXRotRad(rot, 'z', 0.017453292f * (float)work->m_angle);
-		indMtx[0][0] = rot[0][0] * work->m_scale;
-		indMtx[0][1] = rot[0][1] * work->m_scale;
-		indMtx[0][2] = 0.0f;
-		indMtx[1][0] = rot[1][0] * work->m_scale;
-		indMtx[1][1] = rot[1][1] * work->m_scale;
-		indMtx[1][2] = 0.0f;
-		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+		SetUpIndWarp(work);
 	}
 
 	texU = (float)(0x280 / texture->m_width);
@@ -210,7 +213,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationSc
 
 	if (ppvUserStopPartF == 0) {
 		serializedDataOffsets = param3->m_serializedDataOffsets;
-		work = GetYmDeformationScreenWork(param1, serializedDataOffsets[2]);
+		work = reinterpret_cast<VYmDeformationScreen*>(param1->m_workArea + serializedDataOffsets[2]);
 
 		CalcGraphValue(
 			param1, step->m_graphId, work->m_scale, work->m_values[0],
@@ -292,8 +295,7 @@ void pppDestructYmDeformationScreen(pppYmDeformationScreen*, _pppCtrlTable*)
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
 	float zero = 0.0f;
-	VYmDeformationScreen* work = GetYmDeformationScreenWork(
-		obj, param2->m_serializedDataOffsets[2]);
+	VYmDeformationScreen* work = reinterpret_cast<VYmDeformationScreen*>(obj->m_workArea + param2->m_serializedDataOffsets[2]);
 
 	work->m_scale = work->m_values[0] = work->m_values[1] = zero;
 	work->m_values[2] = work->m_values[3] = work->m_values[4] = zero;
@@ -313,8 +315,7 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable*
 	short angle = 0;
 	char direction = 1;
 	float zero = 0.0f;
-	VYmDeformationScreen* work = GetYmDeformationScreenWork(
-		obj, param2->m_serializedDataOffsets[2]);
+	VYmDeformationScreen* work = reinterpret_cast<VYmDeformationScreen*>(obj->m_workArea + param2->m_serializedDataOffsets[2]);
 
 	work->m_angle = angle;
 	work->m_direction = direction;

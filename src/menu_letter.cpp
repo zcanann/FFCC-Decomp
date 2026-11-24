@@ -571,6 +571,7 @@ inline int CMenuPcs::LetterLstOpen()
 	int done;
 	int count;
 	int frame;
+	FFCC_ASSERT(m_singleFadeState != nullptr);
 
 	done = 0;
 	m_letterMenuState->frame = m_letterMenuState->frame + 1;

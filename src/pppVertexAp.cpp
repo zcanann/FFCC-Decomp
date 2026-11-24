@@ -112,8 +112,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
         entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
-            VertexApSource* src = env->sourceTable[entry->vertexSetIndex];
-            points = src->points;
+            points = env->sourceTable[entry->vertexSetIndex]->points;
         }
 
         count = data->spawnCount;

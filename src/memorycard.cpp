@@ -1673,16 +1673,7 @@ int CMemoryCardMan::DummyLoad()
 {
     int result;
 
-    // Begin mount
-    m_opDoneFlag = 0;
-    m_state = 1;
-
-    result = CARDMountAsync(0, m_mountWorkArea, &Detach, &Attach);
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-    m_result = result;
+    McMount(0);
 
     // Busy wait for async completion
     while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)

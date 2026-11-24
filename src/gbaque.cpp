@@ -237,26 +237,13 @@ void GbaQueue::Init()
 	m_cmdNumFlags = 0;
 	m_playModeFlags = 0xF;
 	m_startBonusFlags = 0;
-	m_maskSendState[0] = static_cast<signed char>(0xFF);
-	m_pendingMoney[0] = 0;
-	m_moneyState[0] = 0;
-	m_compatibilityFlg[0] = 0;
-	m_radarType[0] = 1;
-	m_maskSendState[1] = static_cast<signed char>(0xFF);
-	m_pendingMoney[1] = 0;
-	m_moneyState[1] = 0;
-	m_compatibilityFlg[1] = 0;
-	m_radarType[1] = 1;
-	m_maskSendState[2] = static_cast<signed char>(0xFF);
-	m_pendingMoney[2] = 0;
-	m_moneyState[2] = 0;
-	m_compatibilityFlg[2] = 0;
-	m_radarType[2] = 1;
-	m_maskSendState[3] = static_cast<signed char>(0xFF);
-	m_pendingMoney[3] = 0;
-	m_moneyState[3] = 0;
-	m_compatibilityFlg[3] = 0;
-	m_radarType[3] = 1;
+	for (i = 0; i < 4; i++) {
+		m_maskSendState[i] = static_cast<signed char>(0xFF);
+		m_pendingMoney[i] = 0;
+		m_moneyState[i] = 0;
+		m_compatibilityFlg[i] = 0;
+		m_radarType[i] = 1;
+	}
 }
 
 /*

@@ -2089,7 +2089,7 @@ void CGPartyObj::checkTargetParticle()
 		move = CVector(m_comboCenter) - CVector(m_comboTarget);
 		int iter = 4;
 		do {
-			float radius;
+			float radius = 0.0f;
 			if (isGhostPartyTargetMode(this)) {
 				radius = 3.0f;
 			} else {

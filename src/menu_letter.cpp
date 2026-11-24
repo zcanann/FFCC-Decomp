@@ -939,6 +939,9 @@ inline int CMenuPcs::LetterAttachWinClose()
 namespace {
 static inline void LetterConfirmBuildTitle(char lines[][0x80], int& lineCount, CCaravanWork* cw, int languageId, CMenuPcs* menu)
 {
+#ifdef VERSION_GCCJGC
+	(void)languageId; (void)menu;
+#else
 	switch (languageId) {
 	case 2: {
 		const char* title = Game.GetNPCName(cw->m_letters[s_SelLetter].m_senderId);
@@ -973,9 +976,13 @@ static inline void LetterConfirmBuildTitle(char lines[][0x80], int& lineCount, C
 	}
 	}
 	lineCount++;
+#endif
 }
 static inline void LetterConfirmBuildReply(char lines[][0x80], int& lineCount, int languageId, CMenuPcs* menu)
 {
+#ifdef VERSION_GCCJGC
+	(void)languageId; (void)menu;
+#else
 	switch (languageId) {
 	case 2:
 		sprintf(lines[lineCount], s_letterItemInfoFmt, menu->GetMenuStr(0x23), s_ReplyStr, menu->GetMenuStr(0x24), menu->GetMenuStr(0x27));
@@ -990,6 +997,7 @@ static inline void LetterConfirmBuildReply(char lines[][0x80], int& lineCount, i
 		break;
 	}
 	lineCount++;
+#endif
 }
 } // namespace
 

@@ -294,11 +294,10 @@ void pppDestructYmDeformationScreen(pppYmDeformationScreen*, _pppCtrlTable*)
  */
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
-	float zero = 0.0f;
 	VYmDeformationScreen* work = reinterpret_cast<VYmDeformationScreen*>(obj->m_workArea + param2->m_serializedDataOffsets[2]);
 
-	work->m_scale = work->m_values[0] = work->m_values[1] = zero;
-	work->m_values[2] = work->m_values[3] = work->m_values[4] = zero;
+	work->m_scale = work->m_values[0] = work->m_values[1] = 0.0f;
+	work->m_values[2] = work->m_values[3] = work->m_values[4] = 0.0f;
 }
 
 /*
@@ -312,13 +311,10 @@ void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable
  */
 void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
-	short angle = 0;
-	char direction = 1;
-	float zero = 0.0f;
 	VYmDeformationScreen* work = reinterpret_cast<VYmDeformationScreen*>(obj->m_workArea + param2->m_serializedDataOffsets[2]);
 
-	work->m_angle = angle;
-	work->m_direction = direction;
-	work->m_scale = work->m_values[0] = work->m_values[1] = zero;
-	work->m_values[2] = work->m_values[3] = work->m_values[4] = zero;
+	work->m_angle = 0;
+	work->m_direction = 1;
+	work->m_scale = work->m_values[0] = work->m_values[1] = 0.0f;
+	work->m_values[2] = work->m_values[3] = work->m_values[4] = 0.0f;
 }

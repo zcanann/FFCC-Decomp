@@ -40,10 +40,6 @@ void CMaterialEditorPcs::Init()
     m_viewerLightColors[0].b = 0x7f;
     m_viewerLightColors[0].a = 0xff;
 
-    float one = 1.0f;
-    float minusOne = -1.0f;
-    float zero = 0.0f;
-
     for (int i = 0; i < 3; i++) {
         u8 shade = (i == 0) ? 0x3f : 0;
 
@@ -52,14 +48,14 @@ void CMaterialEditorPcs::Init()
         m_viewerLightColors[i + 1].b = shade;
         m_viewerLightColors[i + 1].a = 0xff;
 
-        m_viewerLightDirs[i].x = zero;
-        m_viewerLightDirs[i].y = zero;
-        m_viewerLightDirs[i].z = minusOne;
+        m_viewerLightDirs[i].x = 0.0f;
+        m_viewerLightDirs[i].y = 0.0f;
+        m_viewerLightDirs[i].z = -1.0f;
     }
 
-    m_viewerSrtPosition.x = m_viewerSrtPosition.y = m_viewerSrtPosition.z = zero;
-    m_viewerSrtRotation.x = m_viewerSrtRotation.y = m_viewerSrtRotation.z = zero;
-    m_viewerSrtScale.x = m_viewerSrtScale.y = m_viewerSrtScale.z = one;
+    m_viewerSrtPosition.x = m_viewerSrtPosition.y = m_viewerSrtPosition.z = 0.0f;
+    m_viewerSrtRotation.x = m_viewerSrtRotation.y = m_viewerSrtRotation.z = 0.0f;
+    m_viewerSrtScale.x = m_viewerSrtScale.y = m_viewerSrtScale.z = 1.0f;
     m_rsdItem = 0;
 
     textureIndex = 0;

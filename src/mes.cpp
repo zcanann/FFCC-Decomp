@@ -469,17 +469,13 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			case 0x3D:
 			{
 				char* q = (char*)op + 4;
-				int countIdx = GET_1(&q);
-				int count = (unsigned short)CMes::m_tempVar[countIdx];
-				Game.MakeArtItemName(out, value, count);
+				Game.MakeArtItemName(out, value, (unsigned short)CMes::m_tempVar[GET_1(&q)]);
 				break;
 			}
 			case 0x3F:
 			{
 				char* q = (char*)op + 4;
-				int countIdx = GET_1(&q);
-				int count = (unsigned short)CMes::m_tempVar[countIdx];
-				Game.MakeNumItemName(out, value, count);
+				Game.MakeNumItemName(out, value, (unsigned short)CMes::m_tempVar[GET_1(&q)]);
 				break;
 			}
 			case 0x1D:

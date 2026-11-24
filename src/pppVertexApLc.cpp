@@ -46,6 +46,20 @@ struct VertexApLcSource
     Vec* points;
 };
 
+
+static inline void apea(_pppPObject* parent, PVertexApLc* dataRaw, Vec* pos)
+{
+    VertexApLcData* data = (VertexApLcData*)dataRaw;
+    u32 childId = data->childId;
+    if ((childId + 0x10000) != 0xFFFF) {
+        _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
+        _pppPObject* child;
+        if (childData == 0) { child = 0; } else { child = pppCreatePObject(ppvMng, childData); child->m_link.m_previous = &parent->m_link; }
+        *(Vec*)(child->m_workArea + data->childPosOffset) = *pos;
+    }
+}
+
+
 /*
  * --INFO--
  * PAL Address: 0x80064ce8  
@@ -60,6 +74,11 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
     VertexApLcData* data = (VertexApLcData*)dataRaw;
     s32 stateOffset = ctrl->m_serializedDataOffsets[0];
     VertexApLcState* state = (VertexApLcState*)(parent->m_workArea + stateOffset);
+    Vec pos;
+    u32 cid;
+    Vec* vertex;
+    _pppPDataVal* childData;
+    _pppPObject* child;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -88,33 +107,15 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                 if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
-
                 u16 outValue = state->index;
                 u16* vertexIndices = entry->vertexIndices;
                 state->index++;
                 u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
-
-                if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
-                    s32 childId = data->childId;
-                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
-
-                    if (childData == 0) {
-                        child = 0;
-                    } else {
-                        child = pppCreatePObject(ppvMng, childData);
-                        child->m_link.m_previous = &parent->m_link;
-                    }
-
-                    Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
-                    dst->x = x;
-                    dst->y = y;
-                    dst->z = z;
-                }
+                vertex = &points[vertexIndex];
+                pos.x = vertex->x;
+                pos.y = vertex->y;
+                pos.z = vertex->z;
+                apea(parent, dataRaw, &pos);
             }
             break;
         case 1:
@@ -124,28 +125,11 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
                 int outValue = (int)(randValue * maxValue);
                 u16* vertexIndices = entry->vertexIndices;
                 u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
-
-                if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
-                    s32 childId = data->childId;
-                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
-
-                    if (childData == 0) {
-                        child = 0;
-                    } else {
-                        child = pppCreatePObject(ppvMng, childData);
-                        child->m_link.m_previous = &parent->m_link;
-                    }
-
-                    Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
-                    dst->x = x;
-                    dst->y = y;
-                    dst->z = z;
-                }
+                vertex = &points[vertexIndex];
+                pos.x = vertex->x;
+                pos.y = vertex->y;
+                pos.z = vertex->z;
+                apea(parent, dataRaw, &pos);
             }
             break;
         }
@@ -155,6 +139,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
 
     state->countdown--;
 }
+
 
 /*
  * --INFO--

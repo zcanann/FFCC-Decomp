@@ -233,7 +233,7 @@ partial losses. It is not adopted, for these reasons:
   under this predicate (it scores 90 without it). That would tune source to the
   candidate compiler.
 
-## GC/2.0p1l: the scheduler's alias rules of GC_2_0ffcc
+## GC/2.0p1l: 2.0p2's scheduler alias rules plus two FFCC rules
 
 `tools/patch_compiler_ffcc6.py` derives GC/2.0p1l from GC/2.0p1k
 (`abeb8e6e85568dd4e904e26ae3ca55b5b2cc5bcd` to
@@ -241,17 +241,13 @@ partial losses. It is not adopted, for these reasons:
 executable section, `.ffcc6`, appended after `.sbpatch` (the x86 source is kept
 in the script). GC/2.0p1l is the Japanese game compiler.
 
-PrimeDecomp/mwcc-tools builds `GC_2_0ffcc` from source: BFBB's source-level
-`GC_2_0p2` plus four alias rules measured on FFCC Japan, `ksa` and `pwcp` (the
-two this chain already had) and two new ones. Rebuilding every Japanese game
-unit (268) with that compiler, 265 objects equal GC/2.0p1k's and nine differ,
-only in functions it improves. The same compiler differences are what the
-earlier "write-after-read mirror of e3ns" candidate was approximating: the
-chain emulates BFBB's behaviours clause by clause, but `GC_2_0p2` states them
-as two alias rules, and the chain never had the second one. GC/2.0p1l ports the
-rules `GC_2_0ffcc` has and the chain lacks:
+The chain emulates BFBB's GC 2.0p2 behaviours clause by clause, but 2.0p2
+states them as alias rules in two places, and the chain never had the second
+(the scheduler's own alias query). That gap is what the earlier
+"write-after-read mirror of e3ns" candidate was approximating. GC/2.0p1l adds
+2.0p2's rules the chain lacks and two FFCC rules of our own:
 
-- `gather`: `gather_instruction_alias` (0x5123B0) begins with `GC_2_0p2`'s two
+- `gather`: `gather_instruction_alias` (0x5123B0) begins with 2.0p2's two
   pre-rules, a write that is a direct small-data access to a global that is
   not a safe const gets the `worst_case` alias (value numbering forgets other
   globals after it), and so does a load of a floating-point `@` literal in
@@ -266,12 +262,12 @@ rules `GC_2_0ffcc` has and the chain lacks:
   with the chain's clauses and `pwcp`, answers the rest.
 
 The last two rules (loads of `const` small data and loads of part of a small
-literal) are `GC_2_0ffcc`'s new ones; the others are `GC_2_0p2`'s own, which
+literal) are FFCC's; the others are 2.0p2's own, which
 the chain's clauses only approximated. The chain's clauses (`e3ns`, `c3a`,
 `dsl`, BFBB's) stay: the new answers are added to theirs, not substituted.
 
-Rebuilding every Japanese game unit with GC/2.0p1l and with the source-built
-`GC_2_0ffcc` (macOS clang build), same source: all 268 objects are
+The patch was checked against a source-level implementation of the same rules
+in a decompiled 2.0p2 compiler: all 268 Japanese game objects are
 byte-identical. Against GC/2.0p1k, with the current staging source plus the
 `LetterClose` and `pppFrameYmCheckBGHeight` simplifications that only the new
 compiler needs, Japan gains 14 exact functions and lowers none:

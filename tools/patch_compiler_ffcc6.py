@@ -2,12 +2,11 @@
 """Derive GC/2.0p1l, the Japanese game compiler, from GC/2.0p1k.
 
 GC/2.0p1k is BFBB's GC/2.0p1g binary-patch chain plus FFCC's own corrections
-(tools/patch_compiler_ffcc{,2,3,4}.py). PrimeDecomp/mwcc-tools' source-built
-GC_2_0ffcc (BFBB's source-level GC_2_0p2 plus four alias rules) compiles the
-same Japanese game units to more exact functions. Its scheduler asks
-may_alias_scheduling(a, b) where the 2.0p1 chain asks may_alias(a, b), and its
-gather_instruction_alias starts with two rules the chain lacks. This patch has
-two hooks:
+(tools/patch_compiler_ffcc{,2,3,4}.py). The chain emulates BFBB's GC 2.0p2
+clause by clause, but 2.0p2's scheduler asks may_alias_scheduling(a, b) where
+2.0p1 asks may_alias(a, b), and its gather_instruction_alias starts with two
+rules the chain lacks. This patch adds those, plus two FFCC rules of our own
+that Japan needs. It has two hooks:
 
   gather  gather_instruction_alias (0x5123B0) first applies 2.0p2's two rules
           to pcode->alias: a write that is a direct small-data access (alias
@@ -20,12 +19,12 @@ two hooks:
   sched   the scheduler's three dependency-graph queries (serialize_store
           twice, findsuccessors once; VA 0x5081F2, 0x50836B and 0x5083A0,
           formerly calls of may_alias) call a new routine that answers as
-          GC_2_0ffcc's may_alias_scheduling:
+          2.0p2's may_alias_scheduling, extended:
           1. is_small_data_load(a) with is_direct_small_data_store(b), in
              either order, may alias.
           2. is_pointer_like_load: a load that is a direct small-data access
-             (also of a const global, GC_2_0ffcc's first new rule) or a load of
-             any part (not only the whole, its second new rule) of a non-float
+             (also of a const global, FFCC's first rule) or a load of
+             any part (not only the whole, FFCC's second rule) of a non-float
              '@' object through an Addr16 operand is queried as a worst_case
              access.
           3. The stock may_alias (0x511FC0, with the chain's clauses, including

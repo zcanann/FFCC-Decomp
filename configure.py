@@ -1356,7 +1356,7 @@ config.progress_report_args = [
 # tools/patch_compiler_ffcc.py (2.0p1h), tools/patch_compiler_ffcc2.py
 # (2.0p1i), tools/patch_compiler_ffcc3.py (2.0p1j),
 # tools/patch_compiler_ffcc4.py (2.0p1k) and tools/patch_compiler_ffcc6.py
-# (2.0p1l, which compiles like mwcc-tools' source-built GC_2_0ffcc). Every step
+# (2.0p1l). Every step
 # is guarded by the SHA-1 of its input and output. See
 # docs/compiler_baseline.md.
 BFBB_COMPILER = "GC/2.0p1g"

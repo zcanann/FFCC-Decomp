@@ -791,10 +791,13 @@ inline int CMenuPcs::LetterItemWinClose()
 int CMenuPcs::LetterReplyWinOpen()
 {
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+	FFCC_ASSERT(caravanWork != nullptr);
+	FFCC_ASSERT(s_SelLetter >= 0);
 	char* srcText;
 	char* workText;
 #ifndef VERSION_GCCJGC
 	int languageId = Game.m_gameWork.m_languageId;
+	FFCC_ASSERT(languageId >= 1 && languageId <= 5);
 #endif
 	if (m_letterMenuState->dialogInitialized == '\0') {
 		char lines[8][0x80];

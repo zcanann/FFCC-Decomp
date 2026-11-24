@@ -46,10 +46,8 @@ void pppRandCV(_pppPObject* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
     }
 
     u8* targetColor = (in->colorOffset == -1) ? gPppDefaultValueBuffer : (basePtr->m_workArea + in->colorOffset);
-    f32 scale = *valuePtr;
-    
-    targetColor[0] += randchar(in->delta[0], scale);
-    targetColor[1] += randchar(in->delta[1], scale);
-    targetColor[2] += randchar(in->delta[2], scale);
-    targetColor[3] += randchar(in->delta[3], scale);
+    targetColor[0] += randchar(in->delta[0], *valuePtr);
+    targetColor[1] += randchar(in->delta[1], *valuePtr);
+    targetColor[2] += randchar(in->delta[2], *valuePtr);
+    targetColor[3] += randchar(in->delta[3], *valuePtr);
 }

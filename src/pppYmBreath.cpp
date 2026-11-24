@@ -259,8 +259,6 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
 {
     YmBreathParticleGroup* debugGroupData;
     PYmBreath* params = pYmBreath;
-    int workOffset;
-    int colorOffset;
     VYmBreath* work;
     VColor* color;
     PARTICLE_DATA* particle;
@@ -284,10 +282,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
     pppFMATRIX viewMtx;
     Mtx drawMtx;
 
-    workOffset = offsets->m_serializedDataOffsets[0];
-    colorOffset = offsets->m_serializedDataOffsets[1];
-    work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + workOffset);
-    color = reinterpret_cast<VColor*>(ymBreath->m_workArea + colorOffset);
+    work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + offsets->m_serializedDataOffsets[0]);
+    color = reinterpret_cast<VColor*>(ymBreath->m_workArea + offsets->m_serializedDataOffsets[1]);
     particle = work->m_particleData;
     matrixList = work->m_particleWmats;
     particleColor = work->m_particleColors;

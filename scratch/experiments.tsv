@@ -9,3 +9,4 @@ pppFrameYmBreath	checked ghidra vs source no change	same
 BirthParticle	pppNormalize self (remove directionNorm copy) -> O0 1832 delta 160 (was 184), O4 100.000	100.000
 BirthParticle	use 0.0f literal instead of zero var for scaleRandomRange -> O0 1832->1816 delta 160->144, O4 100.000	100.000
 BirthParticle	remove flags local (use params->m_angleFlags directly) -> O0 1816->1812 delta 144->140, O4 100.000	100.000
+pppRenderYmBreath	remove workOffset/colorOffset temps (direct offsets) -> O0 1516->1500 delta 148->132, O4 100.000	100.000

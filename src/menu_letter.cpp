@@ -306,13 +306,10 @@ inline void CMenuPcs::LetterInit4()
  */
 int CMenuPcs::LetterOpen()
 {
-	int attachMode;
-
 	s_OpenClose = 1;
 	if (m_letterMenuState->initialized == '\0') {
 		LetterInit();
-		attachMode = SingGetLetterAttachflg();
-		if (attachMode >= 0) {
+		if (SingGetLetterAttachflg() >= 0) {
 			LetterInit3();
 			m_letterMenuState->listCursor = static_cast<s16>(s_BackUpCur[0]);
 			m_letterMenuState->choiceCursor = static_cast<s16>(s_BackUpCur[1]);
@@ -334,8 +331,7 @@ int CMenuPcs::LetterOpen()
 	}
 	int allFinished = LetterLstOpen();
 	if (allFinished) {
-		attachMode = SingGetLetterAttachflg();
-		if (attachMode >= 0) {
+		if (SingGetLetterAttachflg() >= 0) {
 			m_letterMenuState->step = 0;
 			m_letterMenuState->mode = 1;
 			LetterInit1();

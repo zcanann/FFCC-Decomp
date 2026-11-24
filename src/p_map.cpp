@@ -116,7 +116,7 @@ inline CRelProfile::~CRelProfile()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void mapInitDrawEnv()
+static void mapInitDrawEnv()
 {
     GXSetColorUpdate(GX_TRUE);
     GXSetAlphaUpdate(GX_FALSE);
@@ -231,9 +231,7 @@ static inline void SetViewerStartPos(int viewerMode, char* mapName)
             }
         }
         cameraPos.y += 1.0f;
-        CameraPcs.m_position.x = cameraPos.x;
-        CameraPcs.m_position.y = cameraPos.y;
-        CameraPcs.m_position.z = cameraPos.z;
+        CameraPcs.SetPosition(&cameraPos);
     }
 }
 
@@ -376,9 +374,7 @@ void CMapPcs::calc()
     Mtx44 screenMtx;
 
     g_MapMng.LoadMapNoSyncCalc();
-    g_MapMng.m_cameraPosition.x = CameraPcs.m_position.x;
-    g_MapMng.m_cameraPosition.y = CameraPcs.m_position.y;
-    g_MapMng.m_cameraPosition.z = CameraPcs.m_position.z;
+    g_MapMng.m_cameraPosition = CameraPcs.m_position;
 
     if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
@@ -493,19 +489,7 @@ void CMapPcs::drawBefore()
         g_MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_FRONT);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        mapInitDrawEnv();
 
         g_MapMng.DrawBefore();
 
@@ -546,19 +530,7 @@ void CMapPcs::draw()
         g_MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_FRONT);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        mapInitDrawEnv();
 
         g_MapMng.Draw();
 
@@ -600,19 +572,7 @@ void CMapPcs::drawBeforeViewer()
         g_MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_FRONT);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        mapInitDrawEnv();
 
         g_MapMng.DrawBefore();
 
@@ -654,19 +614,7 @@ void CMapPcs::drawViewer()
         g_MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(g_MapMng.m_fogEnable, 0);
 
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_FRONT);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        mapInitDrawEnv();
 
         g_MapMng.Draw();
 
@@ -701,19 +649,7 @@ void CMapPcs::drawAfter()
             CameraPcs.GetViewMatrix(cameraMtx);
             CameraPcs.GetProjectionMatrix(screenMtx);
 
-            GXSetColorUpdate(GX_TRUE);
-            GXSetAlphaUpdate(GX_FALSE);
-            GXSetCullMode(GX_CULL_FRONT);
-            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-            _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            mapInitDrawEnv();
 
             g_MapMng.DrawAfter();
 
@@ -751,19 +687,7 @@ void CMapPcs::drawAfterViewer()
             CameraPcs.GetViewMatrix(cameraMtx);
             CameraPcs.GetProjectionMatrix(screenMtx);
 
-            GXSetColorUpdate(GX_TRUE);
-            GXSetAlphaUpdate(GX_FALSE);
-            GXSetCullMode(GX_CULL_FRONT);
-            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-
-            _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            mapInitDrawEnv();
 
             g_MapMng.DrawAfter();
 

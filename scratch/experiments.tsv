@@ -1,0 +1,76 @@
+MakeArtItemName	direct_inline (remove helper, strlen ternary)	100.0
+MakeArtItemName	sep_var_strlen (strlen + sep var)	100.0
+MakeArtItemName	hasSep_int (helper int)	same
+MakeArtItemName	no_sep_var (helper no sep var)	99.49
+MakeArtItemName	hasSep_to_ternary	99.49
+MakeArtItemName	prefix0_sep_var	99.30
+MakeArtItemName	prefix0_no_lang	98.95
+MakeArtItemName	GameNameRow_style	99.79
+MakeArtItemName	direct_strlen_ternary	100.0
+Create	no_buffer (strcpy directly)	99.525
+Create	buf32	99.99
+Create	memcpy	99.71
+Create	strcpy_both	99.69
+InitNewGame_CGameWork	memset_this	99.89
+InitNewGame_CGameWork	loop_wm	98.27
+InitNewGame_CGameWork	no_tepa	99.18
+InitNewGame_CGameWork	sizeof_minus7	same
+CBound_Reset	direct literal assign (remove float locals)	100.0
+MakeArtItemName	hasSep_bool O0 delta +48 O0_ours 228 -> O4 100.00
+MakeArtItemName	direct_ternary_strlen O0 delta +80 O0_ours 260 -> O4 100.00
+MakeArtItemName	prefix_star O0 delta +80 O0_ours 260 -> O4 99.30
+MakeArtItemName	prefix0 O0 delta +80 O0_ours 260 -> O4 99.30
+MakeArtItemName	no_sep_var_direct O0 delta +76 O0_ours 256 -> O4 100.00
+MakeArtItemName	cached_lang_prefix_star O0 delta +84 O0_ours 264 -> O4 99.28
+MakeArtItemName	if_else O0 delta +36 O0_ours 216 -> O4 99.45
+MakeArtItemName	helper_cached_lang O0 delta +48 O0_ours 228 -> O4 100.00
+MakeArtItemName	combo_strlen_cached O0 delta +88 O0_ours 268 -> O4 100.00
+MakeArtItemName	combo_strlen_cached O0 delta +84 O0_ours 264 -> O4 99.79
+MakeArtItemName	combo_*prefi_cached O0 delta +88 O0_ours 268 -> O4 99.30
+MakeArtItemName	combo_prefix_cached O0 delta +88 O0_ours 268 -> O4 99.30
+MakeArtItemName	combo_prefix_cached O0 delta +84 O0_ours 264 -> O4 99.28
+MakeArtItemName	combo_prefix_cached O0 delta +88 O0_ours 268 -> O4 99.30
+MakeArtItemName	combo_prefix_cached O0 delta +84 O0_ours 264 -> O4 99.28
+MakeArtItemName	direct_sprintf_*prefi O0 delta +76 O0_ours 256 -> O4 99.30
+Create	direct_strcpy O0 delta +16 O0_ours 180 -> O4 99.6980
+Create	if_else O0 delta +4 O0_ours 168 -> O4 99.7192
+Create	newGameFlag_not0_else O0 delta +16 O0_ours 180 -> O4 100.0000
+Create	startName0 O0 delta +16 O0_ours 180 -> O4 99.8648
+Create	reorder_flags O0 delta +16 O0_ours 180 -> O4 99.8265
+Create	direct_cast_no_buf O0 delta +4 O0_ours 168 -> O4 99.7933
+InitNewGame_CGameWork	single_memset delta +28 ours 132 -> O4 98.4326
+InitNewGame_CGameWork	wm_before_assign delta +28 ours 132 -> O4 98.4326
+InitNewGame_CGameWork	town_ternary_no_ternary delta +24 ours 128 -> O4 98.7562
+InitNewGame_CGameWork	no_chalice delta +20 ours 124 -> O4 99.8336
+InitNewGame_CGameWork	reorder_assign delta +28 ours 132 -> O4 99.9842
+Create	buf_128 O0 delta +16 ours 180 -> O4 99.9958
+Create	buf_64 O0 delta +16 ours 180 -> O4 99.9958
+Create	buf_260 O0 delta +16 ours 180 -> O4 100.0000
+Create	buf_512 O0 delta +16 ours 180 -> O4 99.9958
+Create	buf_255 O0 delta +16 ours 180 -> O4 100.0000
+Create	buf_257 O0 delta +16 ours 180 -> O4 100.0000
+Create	flag_true O0 delta +16 ours 180 -> O4 100.0000
+Create	flag_0x1 O0 delta +16 ours 180 -> O4 100.0000
+Create	cast_m_nextScript =  O0 delta +16 ours 180 -> O4 100.0000
+Create	cast_memcpy(&m_nextS O0 delta +20 ours 184 -> O4 99.7105
+Create	cast_strcpy(m_nextSc O0 delta +16 ours 180 -> O4 99.6980
+Create	first_if_strlen(m_s O0 delta +16 ours 180 -> O4 100.0000
+Create	first_if_m_startScr O0 delta +16 ours 180 -> O4 99.8648
+Create	first_if_m_startScr O0 delta +16 ours 180 -> O4 99.8648
+Create	second_if_not O0 delta +16 ours 180 -> O4 100.0000
+Create	second_if_eq_false O0 delta +16 ours 180 -> O4 100.0000
+Create	second_if_ne O0 delta +16 ours 180 -> O4 99.9975
+Create	combo_buf260_direct O0 delta +16 ours 180 -> O4 100.0000
+Create	no_buf_Ccast O0 delta +4 ours 168 -> O4 99.7933
+Create	uchar_buf O0 delta +16 ours 180 -> O4 100.0000
+InitNewGame_CGameWork	loop_clear O0 delta +52 ours 156 -> O4 88.5878
+InitNewGame_CGameWork	wm_loop_i O0 delta +56 ours 160 -> O4 98.2733
+InitNewGame_CGameWork	wm_loop_u O0 delta +56 ours 160 -> O4 98.2733
+InitNewGame_CGameWork	town_if_else O0 delta +24 ours 128 -> O4 98.7562
+InitNewGame_CGameWork	town_switch O0 delta +28 ours 132 -> O4 98.5566
+InitNewGame_CGameWork	town_strcpy_both O0 delta +40 ours 144 -> O4 99.6464
+InitNewGame_CGameWork	chalice_before_script O0 delta +28 ours 132 -> O4 99.9842
+InitNewGame_CGameWork	script_assign_true O0 delta +28 ours 132 -> O4 100.0000
+InitNewGame_CGameWork	no_town O0 delta -4 ours 100 -> O4 99.1826
+InitNewGame_CGameWork	memset_this O0 delta +12 ours 116 -> O4 99.2949
+InitNewGame_CGameWork	two_memsets_swapped O0 delta +28 ours 132 -> O4 99.9775

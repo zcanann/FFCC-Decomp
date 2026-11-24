@@ -167,6 +167,8 @@ public:
         }
         return 1;
     }
+    void InitAmem(void* mapPtr, unsigned long mapSize, unsigned char mode);
+    void SetViewPos(Vec& pos);
     CMapObj* SearchChildMapObj(CMapObj*, CMapObj*);
     CMapObj* SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE);
     void AttachMapHit(CMapHit*, char*);

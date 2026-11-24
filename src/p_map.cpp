@@ -26,6 +26,34 @@
  * JP Address: TODO
  * JP Size: TODO
  */
+inline void CMapMng::InitAmem(void* mapPtr, unsigned long mapSize, unsigned char mode)
+{
+    m_asyncLoadState.m_mapLoadStart = mapPtr;
+    m_asyncLoadState.m_mapLoadCursor = mapPtr;
+    m_asyncLoadState.m_mapLoadSize = mapSize;
+    m_asyncLoadState.m_asyncReadIndex = 0;
+    m_asyncLoadState.m_asyncOpenIndex = 0;
+    if (mapSize != 0) {
+        if (mode == 1) {
+            m_asyncLoadState.m_mapReadMode = 2;
+        } else if (mode == 2) {
+            m_asyncLoadState.m_mapReadMode = 3;
+            for (int i = 0; i < 0x10; i++) {
+                m_asyncLoadState.m_asyncHandles[i] = 0;
+            }
+        } else {
+            m_asyncLoadState.m_mapReadMode = 1;
+        }
+    } else {
+        m_asyncLoadState.m_mapReadMode = 0;
+    }
+}
+
+inline void CMapMng::SetViewPos(Vec& pos)
+{
+    m_cameraPosition = pos;
+}
+
 inline void MTXConcatVec(Mtx src, Vec* trans, Mtx dst)
 {
     static Mtx m = {
@@ -203,12 +231,7 @@ void CMapPcs::create()
  */
 void CMapPcs::createViewer()
 {
-    m_viewerMode = 0;
-    m_drawEnabled = 1;
-    m_useStoredViewMtx = 0;
-
-    g_MapMng.Create();
-
+    create();
     m_viewerMode = 1;
 }
 
@@ -261,25 +284,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         g_MapMng.SetDrawRangeMapObj(1000000000.0f);
     }
 
-    g_MapMng.m_asyncLoadState.m_mapLoadStart = mapPtr;
-    g_MapMng.m_asyncLoadState.m_mapLoadCursor = mapPtr;
-    g_MapMng.m_asyncLoadState.m_mapLoadSize = mapSize;
-    g_MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
-    g_MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
-    if (mapSize != 0) {
-        if (mode == 1) {
-            g_MapMng.m_asyncLoadState.m_mapReadMode = 2;
-        } else if (mode == 2) {
-            g_MapMng.m_asyncLoadState.m_mapReadMode = 3;
-            for (int i = 0; i < 0x10; i++) {
-                g_MapMng.m_asyncLoadState.m_asyncHandles[i] = 0;
-            }
-        } else {
-            g_MapMng.m_asyncLoadState.m_mapReadMode = 1;
-        }
-    } else {
-        g_MapMng.m_asyncLoadState.m_mapReadMode = 0;
-    }
+    g_MapMng.InitAmem(mapPtr, mapSize, mode);
 
     g_MapMng.ReadMtx(mapPath);
     g_MapMng.ReadMpl(mapPath);
@@ -374,7 +379,7 @@ void CMapPcs::calc()
     Mtx44 screenMtx;
 
     g_MapMng.LoadMapNoSyncCalc();
-    g_MapMng.m_cameraPosition = CameraPcs.m_position;
+    g_MapMng.SetViewPos(CameraPcs.m_position);
 
     if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
@@ -390,12 +395,7 @@ void CMapPcs::calc()
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
         g_MapMng.SetDrawRangeOctTree(1000000000.0f);
         g_MapMng.SetDrawRangeMapObj(1000000000.0f);
-        g_MapMng.m_asyncLoadState.m_mapLoadStart = 0;
-        g_MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
-        g_MapMng.m_asyncLoadState.m_mapLoadSize = 0;
-        g_MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
-        g_MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
-        g_MapMng.m_asyncLoadState.m_mapReadMode = 0;
+        g_MapMng.InitAmem(0, 0, 0);
         g_MapMng.ReadMtx(m_mapName);
         g_MapMng.ReadMpl(m_mapName);
         g_MapMng.ReadOtm(m_mapName);

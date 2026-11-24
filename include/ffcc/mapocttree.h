@@ -68,11 +68,8 @@ public:
 	 */
 	void Reset()
 	{
-		float max = -10000000000.0f;
-		float min = 10000000000.0f;
-
-		m_min.x = m_min.y = m_min.z = min;
-		m_max.x = m_max.y = m_max.z = max;
+		m_min.x = m_min.y = m_min.z = 10000000000.0f;
+		m_max.x = m_max.y = m_max.z = -10000000000.0f;
 	}
 	/*
 	 * --INFO--

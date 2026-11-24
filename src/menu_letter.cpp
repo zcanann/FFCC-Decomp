@@ -280,6 +280,7 @@ inline void CMenuPcs::LetterInit3()
  */
 inline void CMenuPcs::LetterInit4()
 {
+	FFCC_ASSERT(m_singleFadeState != nullptr);
 	int index = 0;
 	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
 	entry->tex = 0;

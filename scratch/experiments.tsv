@@ -2,3 +2,4 @@ Reset__6CBoundFv	direct assignment vs named float locals	100.0
 copy__8CGObjectFv	bool hasModel variants (manual vs IsH vs bool)	99.81
 boundCheck__8CGObjectFv	tried removing zero/oneF/clipLimit locals	100.0
 CalcSphereNearPos__8CGObjectFffR3Vec	static const vs manual up variants	100.0
+boundCheck__8CGObjectFv	drop oneF local use literal 1.0f O0 632 exact O4 100.0	100.0

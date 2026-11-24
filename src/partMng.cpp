@@ -296,6 +296,7 @@ void CPartMng::Create()
     m_modelSet = 0;
     m_shapeSet = 0;
 
+#ifdef __OPTIMIZE__
     for (int i = 0; i < 0x80; i++) {
         m_editDataBuffers[i] = 0;
     }
@@ -305,6 +306,13 @@ void CPartMng::Create()
     for (int i = 0; i < 0x80; i++) {
         m_editProgramData[i] = 0;
     }
+#else
+    for (int i = 0; i < 0x80; i++) {
+        m_editDataBuffers[i] = 0;
+        m_editTextBuffers[i] = 0;
+        m_editProgramData[i] = 0;
+    }
+#endif
 
     for (int i = 0; i < 0x180; i++) {
         m_pppMng[i].m_baseTime = -0x1000;
@@ -746,10 +754,16 @@ inline void CPartMng::drawLine(int x0, int y0, int x1, int y1, _GXColor& color)
 {
     GXSetChanAmbColor((GXChannelID)4, color);
     GXSetChanMatColor((GXChannelID)4, color);
+#ifdef __OPTIMIZE__
     float z = 0.0f;
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32((float)x0, (float)y0, z);
     GXPosition3f32((float)x1, (float)y1, z);
+#else
+    GXBegin(GX_LINES, GX_VTXFMT5, 2);
+    GXPosition3f32((float)x0, (float)y0, 0.0f);
+    GXPosition3f32((float)x1, (float)y1, 0.0f);
+#endif
     GXEnd();
 }
 
@@ -888,7 +902,7 @@ void CPartMng::render3Dcursor()
  */
 static inline void Screen2world(Vec& screenPos, Vec& worldPos)
 {
-    Mtx invCamera;
+    Mtx invCamera ATTRIBUTE_ALIGN(8);
     Vec viewPos;
     float viewZ = ppvScreenMatrix0[2][3] / (screenPos.z + ppvScreenMatrix0[2][2]);
     viewPos.x = viewZ * (screenPos.x / ppvScreenMatrix0[0][0]);
@@ -909,6 +923,7 @@ static inline void Screen2world(Vec& screenPos, Vec& worldPos)
  */
 void CPartMng::pppGet2Dpos()
 {
+#ifdef __OPTIMIZE__
     u32 zAtPixel;
     Vec worldPos;
     Vec screenPos;
@@ -921,7 +936,6 @@ void CPartMng::pppGet2Dpos()
         if ((x >= 0) && (x < 0x27E) && (y >= 0) && (y < 0x1BE)) {
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x2A2, 0x2A2, 0x2A1));
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), &zAtPixel);
-
             screenPos.x = (float)m_editorCursorX / 320.0f;
             screenPos.y = -(float)m_editorCursorY / 224.0f;
             screenPos.z = (float)((int)zAtPixel - 0xFFFFFF) / 16777216.0f;
@@ -935,6 +949,26 @@ void CPartMng::pppGet2Dpos()
         }
         m_cursorRequest = 0;
     }
+#else
+    u32 zAtPixel;
+    Vec worldPos;
+    Vec screenPos;
+
+    if (m_cursorRequest != 0) {
+        int x = m_editorCursorX + 0x140;
+        int y = m_editorCursorY + 0xE0;
+        if ((x >= 0) && (x < 0x27E) && (y >= 0) && (y < 0x1BE)) {
+            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x2A2, 0x2A2, 0x2A1));
+            GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), &zAtPixel);
+            screenPos.x = (float)m_editorCursorX / 320.0f;
+            screenPos.y = -(float)m_editorCursorY / 224.0f;
+            screenPos.z = (float)((int)zAtPixel - 0xFFFFFF) / 16777216.0f;
+            Screen2world(screenPos, worldPos);
+            USBPcs.SendDataCode(0x60, &worldPos, 1, 0xC);
+        }
+        m_cursorRequest = 0;
+    }
+#endif
 }
 
 /*
@@ -1186,10 +1220,14 @@ inline void CPartMng::ReadTex(CChunkFile& chunkFile)
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 'TXID':
+#ifdef __OPTIMIZE__
             InitMaterialSet();
             m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, 0, 0, 0);
             m_materialSet->SetPartFromTextureSet(m_textureSet, 0);
             m_materialSet->SetTextureSet(m_textureSet);
+#else
+            m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, 0, 0, 0);
+#endif
             break;
         }
     }
@@ -1462,6 +1500,37 @@ static inline char* CheckSum(char* packet, unsigned long code, unsigned long pac
  * JP Address: TODO
  * JP Size: TODO
  */
+
+struct EditCameraMatrix {
+    int m_words[12];
+};
+struct EditEnvBlock {
+    int m_words[0x38];
+};
+static inline void pppDataRcv_SetupCommon(CPartMng* partMng, char* payload, float* payloadFloats) {
+    partMng->m_pppEnvSt.m_mapMeshPtr = reinterpret_cast<CMapMesh**>(partMng->m_editModelSlots);
+    partMng->m_pppEnvSt.m_shapeTablePtr = partMng->m_editShapeSlots;
+    partMng->m_pppEnvSt.m_shapeGroupPtr = partMng->m_editShapeGroups;
+    *reinterpret_cast<EditCameraMatrix*>(partMng->m_editCameraMatrix) = *reinterpret_cast<EditCameraMatrix*>(payload);
+    partMng->m_editCameraDepthScale = payloadFloats[0xC];
+    partMng->m_unk74 = payloadFloats[0xD];
+    *reinterpret_cast<EditEnvBlock*>(partMng->m_editEnvBlock) = *reinterpret_cast<EditEnvBlock*>(payload + 0x38);
+    partMng->m_editClearColor[0] = payload[0x118];
+    partMng->m_editClearColor[1] = payload[0x119];
+    partMng->m_editClearColor[2] = payload[0x11A];
+    partMng->m_editClearColor[3] = payload[0x11B];
+    partMng->m_editFogEnable = payload[0x11C];
+    partMng->m_editFogColor[0] = payload[0x11D];
+    partMng->m_editFogColor[1] = payload[0x11E];
+    partMng->m_editFogColor[2] = payload[0x11F];
+    partMng->m_editFogNear = *reinterpret_cast<float*>(payload + 0x120);
+    partMng->m_editFogFar = *reinterpret_cast<float*>(payload + 0x124);
+    partMng->m_editDeltaTime = *reinterpret_cast<int*>(payload + 0x128);
+    partMng->m_unk16C = *reinterpret_cast<int*>(payload + 0x12C);
+    partMng->m_unk170 = *reinterpret_cast<int*>(payload + 0x130);
+    partMng->m_editDrawMode = *reinterpret_cast<int*>(payload + 0x134);
+}
+
 void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packetSize)
 {
 
@@ -1471,13 +1540,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     if (payload == 0) {
         return;
     }
-
-    struct EditCameraMatrix {
-        int m_words[12];
-    };
-    struct EditEnvBlock {
-        int m_words[0x38];
-    };
 
     switch (code) {
     case 4:
@@ -1549,29 +1611,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
 
         m_lastEnvCmd = 1;
-        m_pppEnvSt.m_mapMeshPtr = reinterpret_cast<CMapMesh**>(m_editModelSlots);
-        m_pppEnvSt.m_shapeTablePtr = m_editShapeSlots;
-        m_pppEnvSt.m_shapeGroupPtr = m_editShapeGroups;
-        *reinterpret_cast<EditCameraMatrix*>(m_editCameraMatrix) =
-            *reinterpret_cast<EditCameraMatrix*>(payload);
-        m_editCameraDepthScale = payloadFloats[0xC];
-        m_unk74 = payloadFloats[0xD];
-        *reinterpret_cast<EditEnvBlock*>(m_editEnvBlock) =
-            *reinterpret_cast<EditEnvBlock*>(payload + 0x38);
-        m_editClearColor[0] = payload[0x118];
-        m_editClearColor[1] = payload[0x119];
-        m_editClearColor[2] = payload[0x11A];
-        m_editClearColor[3] = payload[0x11B];
-        m_editFogEnable = payload[0x11C];
-        m_editFogColor[0] = payload[0x11D];
-        m_editFogColor[1] = payload[0x11E];
-        m_editFogColor[2] = payload[0x11F];
-        m_editFogNear = *reinterpret_cast<float*>(payload + 0x120);
-        m_editFogFar = *reinterpret_cast<float*>(payload + 0x124);
-        m_editDeltaTime = *reinterpret_cast<int*>(payload + 0x128);
-        m_unk16C = *reinterpret_cast<int*>(payload + 0x12C);
-        m_unk170 = *reinterpret_cast<int*>(payload + 0x130);
-        m_editDrawMode = *reinterpret_cast<int*>(payload + 0x134);
+        pppDataRcv_SetupCommon(this, payload, payloadFloats);
 
         m_pppMng[0].m_userFloat0 = m_pppMng[0].m_userFloat1 = m_pppMng[0].m_scaleFactor = m_pppMng[0].m_ownerScale = 1.0f;
         m_pppMng[0].m_useOwnerScaleSign = 0;
@@ -1588,29 +1628,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
 
         m_lastEnvCmd = 2;
-        m_pppEnvSt.m_mapMeshPtr = reinterpret_cast<CMapMesh**>(m_editModelSlots);
-        m_pppEnvSt.m_shapeTablePtr = m_editShapeSlots;
-        m_pppEnvSt.m_shapeGroupPtr = m_editShapeGroups;
-        *reinterpret_cast<EditCameraMatrix*>(m_editCameraMatrix) =
-            *reinterpret_cast<EditCameraMatrix*>(payload);
-        m_editCameraDepthScale = payloadFloats[0xC];
-        m_unk74 = payloadFloats[0xD];
-        *reinterpret_cast<EditEnvBlock*>(m_editEnvBlock) =
-            *reinterpret_cast<EditEnvBlock*>(payload + 0x38);
-        m_editClearColor[0] = payload[0x118];
-        m_editClearColor[1] = payload[0x119];
-        m_editClearColor[2] = payload[0x11A];
-        m_editClearColor[3] = payload[0x11B];
-        m_editFogEnable = payload[0x11C];
-        m_editFogColor[0] = payload[0x11D];
-        m_editFogColor[1] = payload[0x11E];
-        m_editFogColor[2] = payload[0x11F];
-        m_editFogNear = *reinterpret_cast<float*>(payload + 0x120);
-        m_editFogFar = *reinterpret_cast<float*>(payload + 0x124);
-        m_editDeltaTime = *reinterpret_cast<int*>(payload + 0x128);
-        m_unk16C = *reinterpret_cast<int*>(payload + 0x12C);
-        m_unk170 = *reinterpret_cast<int*>(payload + 0x130);
-        m_editDrawMode = *reinterpret_cast<int*>(payload + 0x134);
+        pppDataRcv_SetupCommon(this, payload, payloadFloats);
 
         ppvChrScl[2] = 1.0f;
         ppvChrScl[1] = 1.0f;

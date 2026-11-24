@@ -259,9 +259,11 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationSc
 				cameraY = ppvCameraMatrix[1][3];
 				cameraZ = ppvCameraMatrix[2][3];
 			} else {
-				cameraX = CameraPcs.m_target.x;
-				cameraY = CameraPcs.m_target.y;
-				cameraZ = CameraPcs.m_target.z;
+				Vec refPos;
+				CameraPcs.GetRefPosition(&refPos);
+				cameraX = refPos.x;
+				cameraY = refPos.y;
+				cameraZ = refPos.z;
 			}
 			ppvMng->m_matrix.value[0][3] = cameraX;
 			ppvMng->m_matrix.value[1][3] = cameraY;

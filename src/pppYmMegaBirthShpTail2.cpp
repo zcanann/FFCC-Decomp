@@ -552,9 +552,9 @@ static void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpT
           VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     s32 alpha = vColor->m_color.rgba[3];
-    u8 frameWindow;
-    u8 fadeOutFrames;
-    u8 historyIndex;
+    unsigned int frameWindow;
+    unsigned int fadeOutFrames;
+    int historyIndex;
     u16 frameIndex;
     pppShapeAnimData* shapeAnim;
     pppShapeAnimFrame* frameEntry;
@@ -713,7 +713,10 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         }
 
         work->m_tailScaleDirection = param->m_tailDirection;
-        pppNormalize(work->m_tailScaleDirection, work->m_tailScaleDirection);
+        {
+            Vec tmp = work->m_tailScaleDirection;
+            pppNormalize(work->m_tailScaleDirection, tmp);
+        }
     }
 
     if (alloc_check(work, param)) {

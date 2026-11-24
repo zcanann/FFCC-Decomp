@@ -69,18 +69,15 @@ void CLightPcs::Init()
     m_mapLightColor[0].b = 0x3F;
     m_mapLightColor[0].a = 0xFF;
 
-    float lightRange = -1.0f;
-    float lightParam = 0.0f;
-
     for (int i = 0; i < 3; i++) {
         unsigned char color = (i == 0) ? 0x3F : 0;
         m_mapLightColor[i + 1].r = color;
         m_mapLightColor[i + 1].g = color;
         m_mapLightColor[i + 1].b = color;
         m_mapLightColor[i + 1].a = 0xFF;
-        m_mapLightParams[i].x = lightParam;
-        m_mapLightParams[i].y = lightParam;
-        m_mapLightParams[i].z = lightRange;
+        m_mapLightParams[i].x = 0.0f;
+        m_mapLightParams[i].y = 0.0f;
+        m_mapLightParams[i].z = -1.0f;
     }
 }
 
@@ -399,9 +396,7 @@ void CLightPcs::SetAmbient(_GXColor color)
 void CLightPcs::SetAmbientAlpha(float alpha)
 {
     static _GXColor color;
-    float alphaScale = 255.0f;
-    float scaled = alphaScale * alpha;
-    color.a = (u8)(int)scaled;
+    color.a = (u8)(255.0f * alpha);
     GXSetChanAmbColor((GXChannelID)2, color);
 }
 
@@ -608,8 +603,7 @@ void CLightPcs::SetPart(CLightPcs::TARGET target, void* part, unsigned char mode
 
     for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
         if ((light->m_targetEnable[target] != 0) && (light->m_part == part)) {
-            _GXColor lightColor = light->m_targetColor[target];
-            GXInitLightColor(&light->m_gxLightObj, lightColor);
+            GXInitLightColor(&light->m_gxLightObj, light->m_targetColor[target]);
             GXLoadLightObjImm(&light->m_gxLightObj, (GXLightID)(1 << m_loadedLightCount));
 
             if (light->m_specularMode != 0) {
@@ -782,38 +776,33 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         float dInv = 0.8f;
         float dW = -2.0f;
-        u32 y = 0;
-        do {
+        for (u32 y = 0; y < 0x20; y++) {
             GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 0x42);
 
-            float fy = (float)y;
-            float dFactor = 2.0f;
-            float dHalf = 1.0f;
             for (u32 x = 0; x < 0x21; x++) {
                 Vec pos;
                 Vec nrm;
 
-                pos.x = (dFactor * fy) / 32.0f - dHalf;
-                pos.y = (dFactor * (float)x) / 32.0f - dHalf;
+                pos.x = (2.0f * (float)y) / 32.0f - 1.0f;
+                pos.y = (2.0f * (float)x) / 32.0f - 1.0f;
                 nrm.x = pos.x / dInv;
                 nrm.y = pos.y / dInv;
                 nrm.z = pos.y * pos.y + pos.x * pos.x;
-                nrm.z = nrm.z < dHalf ? sqrtf(dHalf - nrm.z) : 0.0f;
+                nrm.z = nrm.z < 1.0f ? sqrtf(1.0f - nrm.z) : 0.0f;
 
                 GXPosition3f32(pos.x, pos.y, dW);
                 GXNormal3f32(nrm.x, nrm.y, nrm.z);
 
-                pos.x = (dFactor * (float)(y + 1)) / 32.0f - dHalf;
+                pos.x = (2.0f * (float)(y + 1)) / 32.0f - 1.0f;
                 nrm.x = pos.x / dInv;
                 nrm.z = pos.y * pos.y + pos.x * pos.x;
-                nrm.z = nrm.z < dHalf ? sqrtf(dHalf - nrm.z) : 0.0f;
+                nrm.z = nrm.z < 1.0f ? sqrtf(1.0f - nrm.z) : 0.0f;
 
                 GXPosition3f32(pos.x, pos.y, dW);
                 GXNormal3f32(nrm.x, nrm.y, nrm.z);
             }
 
-            y++;
-        } while (y < 0x20);
+        }
 
         GXSetTexCopySrc(0, 0, 0x40, 0x40);
         GXSetTexCopyDst((unsigned short)0x40, (unsigned short)0x40, (GXTexFmt)3, (unsigned char)0);
@@ -1015,20 +1004,17 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             float camZ = CameraPcs.m_position.z;
             PSMTXIdentity(m_bumpTexMtx2);
 
-            float half = 0.5f;
-            float zero = 0.0f;
-            float scrollScale = 0.005f;
-            m_bumpTexMtx2[0][0] = scrollScale;
-            m_bumpTexMtx2[1][2] = scrollScale;
-            m_bumpTexMtx2[2][1] = m_bumpTexMtx2[1][1] = m_bumpTexMtx2[2][2] = zero;
+            m_bumpTexMtx2[0][0] = 0.005f;
+            m_bumpTexMtx2[1][2] = 0.005f;
+            m_bumpTexMtx2[2][1] = m_bumpTexMtx2[1][1] = m_bumpTexMtx2[2][2] = 0.0f;
             m_bumpTexMtx2[0][3] =
-                -(scrollScale * (camX + bump->m_offsetX) - half);
+                -(0.005f * (camX + bump->m_offsetX) - 0.5f);
             m_bumpTexMtx2[1][3] =
-                -(scrollScale * (camZ + bump->m_offsetZ) - half);
-            m_bumpTexMtx2[2][3] = zero;
+                -(0.005f * (camZ + bump->m_offsetZ) - 0.5f);
+            m_bumpTexMtx2[2][3] = 0.0f;
             m_bumpIndTexMtx[0][0] = m_bumpIndTexMtx[1][1] = 0.4f;
             m_bumpIndTexMtx[0][1] = m_bumpIndTexMtx[0][2] =
-                m_bumpIndTexMtx[1][0] = m_bumpIndTexMtx[1][2] = zero;
+                m_bumpIndTexMtx[1][0] = m_bumpIndTexMtx[1][2] = 0.0f;
         }
     }
 }
@@ -1169,8 +1155,7 @@ void CLightPcs::CLight::Set(CLightPcs::CLight* light)
     if (m_range < 0.0f) {
         m_range = -m_range;
     }
-    float range = m_range / 2.0f;
-    m_range = range * m_radius;
+    m_range = m_range / 2.0f * m_radius;
 
     m_targetEnable[3] = 1;
     m_targetEnable[2] = 1;

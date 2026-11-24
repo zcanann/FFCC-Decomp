@@ -49,44 +49,6 @@ struct VertexApMtxSource
 	Vec* points;
 };
 
-static inline void apea(_pppPObject* parent, PVertexApMtx* dataRaw, Vec* vec)
-{
-	VertexApMtxData* data = (VertexApMtxData*)dataRaw;
-	if ((data->childId + 0x10000) != 0xFFFF) {
-		s32 childId = data->childId;
-		_pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
-		Vec pos;
-		Vec worldPos;
-		Mtx* outMtx;
-		_pppPObject* child;
-
-		if (childData == 0) {
-			child = 0;
-		} else {
-			child = pppCreatePObject(ppvMng, childData);
-			child->m_link.m_previous = &parent->m_link;
-		}
-
-		pos.x = vec->x;
-		pos.y = vec->y;
-		pos.z = vec->z;
-		PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
-		outMtx = (Mtx*)(child->m_workArea + data->childMtxOffset);
-		if (data->useWorldMtx == 0) {
-			PSMTXIdentity(*outMtx);
-			(*outMtx)[0][3] = pos.x;
-			(*outMtx)[1][3] = pos.y;
-			(*outMtx)[2][3] = pos.z;
-		} else {
-			PSMTXCopy(ppvMng->m_matrix.value, *outMtx);
-			PSMTXMultVec(ppvMng->m_matrix.value, &pos, &worldPos);
-			(*outMtx)[0][3] = worldPos.x;
-			(*outMtx)[1][3] = worldPos.y;
-			(*outMtx)[2][3] = worldPos.z;
-		}
-	}
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800de360
@@ -140,11 +102,43 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, _pppCtrlTable* c
 				state->index++;
 				u16 vertexIndex = vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];
-				Vec pos;
-				pos.x = vertex->x;
-				pos.y = vertex->y;
-				pos.z = vertex->z;
-				apea(parent, dataRaw, &pos);
+				f32 x = vertex->x;
+				f32 y = vertex->y;
+				f32 z = vertex->z;
+
+				if ((data->childId + 0x10000) != 0xFFFF) {
+					s32 childId = data->childId;
+					_pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
+					Vec worldPos;
+					Vec pos;
+					Mtx* outMtx;
+					_pppPObject* child;
+
+					if (childData == 0) {
+						child = 0;
+					} else {
+						child = pppCreatePObject(ppvMng, childData);
+						child->m_link.m_previous = &parent->m_link;
+					}
+
+					pos.x = x;
+					pos.y = y;
+					pos.z = z;
+					PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+					outMtx = (Mtx*)(child->m_workArea + data->childMtxOffset);
+					if (data->useWorldMtx == 0) {
+						PSMTXIdentity(*outMtx);
+						(*outMtx)[0][3] = pos.x;
+						(*outMtx)[1][3] = pos.y;
+						(*outMtx)[2][3] = pos.z;
+					} else {
+						PSMTXCopy(ppvMng->m_matrix.value, *outMtx);
+						PSMTXMultVec(ppvMng->m_matrix.value, &pos, &worldPos);
+						(*outMtx)[0][3] = worldPos.x;
+						(*outMtx)[1][3] = worldPos.y;
+						(*outMtx)[2][3] = worldPos.z;
+					}
+				}
 			}
 		mode0Test:
 			if (count-- != 0) {
@@ -161,11 +155,43 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, _pppCtrlTable* c
 				u16* vertexIndices = entry->vertexIndices;
 				u16 vertexIndex = vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];
-				Vec pos;
-				pos.x = vertex->x;
-				pos.y = vertex->y;
-				pos.z = vertex->z;
-				apea(parent, dataRaw, &pos);
+				f32 x = vertex->x;
+				f32 y = vertex->y;
+				f32 z = vertex->z;
+
+				if ((data->childId + 0x10000) != 0xFFFF) {
+					s32 childId = data->childId;
+					_pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
+					Vec worldPos;
+					Vec pos;
+					Mtx* outMtx;
+					_pppPObject* child;
+
+					if (childData == 0) {
+						child = 0;
+					} else {
+						child = pppCreatePObject(ppvMng, childData);
+						child->m_link.m_previous = &parent->m_link;
+					}
+
+					pos.x = x;
+					pos.y = y;
+					pos.z = z;
+					PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+					outMtx = (Mtx*)(child->m_workArea + data->childMtxOffset);
+					if (data->useWorldMtx == 0) {
+						PSMTXIdentity(*outMtx);
+						(*outMtx)[0][3] = pos.x;
+						(*outMtx)[1][3] = pos.y;
+						(*outMtx)[2][3] = pos.z;
+					} else {
+						PSMTXCopy(ppvMng->m_matrix.value, *outMtx);
+						PSMTXMultVec(ppvMng->m_matrix.value, &pos, &worldPos);
+						(*outMtx)[0][3] = worldPos.x;
+						(*outMtx)[1][3] = worldPos.y;
+						(*outMtx)[2][3] = worldPos.z;
+					}
+				}
 			}
 		mode1Test:
 			if (count-- != 0) {

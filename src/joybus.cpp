@@ -167,30 +167,7 @@ inline JoyBus::JoyBus()
     strcpy(m_pathBuf, JoyBusConst::DVD_DIR);
     strcat(m_pathBuf, JoyBusConst::CLIENT_FILE);
 
-    memset(m_threadStacks, 0, sizeof(m_threadStacks));
-    memset(m_stageFlags, 0, sizeof(m_stageFlags));
-    memset(m_cmdQueueData, 0, sizeof(m_cmdQueueData));
-    memset(m_recvQueueEntriesArr, 0, sizeof(m_recvQueueEntriesArr));
-    memset(m_threadParams, 0, sizeof(m_threadParams));
-    memset(m_perThreadTemp, 0, sizeof(m_perThreadTemp));
-    memset(m_recvBuffer, 0, sizeof(m_recvBuffer));
-
-    m_mapId = 0xFF;
-    m_stageId = 0xFF;
-
-    for (int i = 0; i < 4; i++)
-    {
-        m_threadParams[i].m_gbaStatus = 1;
-        m_threadParams[i].m_padType = 0x40;
-        m_cmdCount[i] = 0;
-        m_secCmdCount[i] = 0;
-        OSInitSemaphore(&m_accessSemaphores[i], 1);
-        m_ctrlModeArr[i] = 0;
-        m_nextModeTypeArr[i] = 0;
-        m_modeXArr[i] = 0;
-        m_stateCodeArr[i] = 0xFF;
-        m_stateFlagArr[i] = 0;
-    }
+    Init();
 }
 
 /*
@@ -263,6 +240,24 @@ inline void JoyBus::Init()
  * JP Address: 0x800AFEA4
  * JP Size: 932b
  */
+int JoyBus::CalcDataPacketCnt(int totalSize)
+{
+    int blocks = totalSize / 0x2FD;
+    int rem = totalSize % 0x2FD;
+    if (rem != 0)
+        blocks++;
+    if (blocks == 0)
+        blocks = 1;
+    return blocks;
+}
+
+void JoyBus::InitPpos()
+{
+    for (int i = 0; i < 4; i++)
+        m_threadParams[i].m_pposCounter = 0;
+    m_pposWordIndex[0] = 0;
+}
+
 void JoyBus::CreateInit()
 {
 #ifdef VERSION_GCCJGC
@@ -3002,9 +2997,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
         return 0;
     }
 
-    bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-    if (isSingle && (int)threadParam->m_portIndex != 1)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
@@ -3095,9 +3088,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
         return 0;
 	}
 
-    bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-    if (isSingle != 0 && (int)threadParam->m_portIndex != 1)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }

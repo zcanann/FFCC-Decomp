@@ -99,6 +99,7 @@ public:
     int SendChkCrc(ThreadParam* threadParam, int, unsigned short, unsigned int*);
     int SendCancel(ThreadParam* threadParam);
 
+    int CalcDataPacketCnt(int totalSize);
     int SendDataFile(ThreadParam* threadParam);
     int SendMBase(ThreadParam* threadParam);
     int SendMapNo(ThreadParam* threadParam);

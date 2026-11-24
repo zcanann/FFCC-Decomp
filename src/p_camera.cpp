@@ -670,7 +670,6 @@ void CCameraPcs::calcChara()
     Mtx mtxB;
     Mtx mtxA;
     Vec targetPos;
-    float stick;
 
     C_MTXPerspective(m_screenMatrix, m_fov, 1.3333334f, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
@@ -679,24 +678,12 @@ void CCameraPcs::calcChara()
         m_viewerOverride = 0;
     } else {
         padButtons = Pad.GetButton(4);
-
-        stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
-        m_viewer.m_position.y += stick;
-
-        stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
-        m_viewer.m_position.y -= stick;
-
-        stick = Pad.GetLeftStickX(4);
-        m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
-
-        stick = Pad.GetLeftStickY(4);
-        m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
-
-        stick = Pad.GetTriggerLeft(4);
-        m_viewer.m_distance = -((5.0f * stick) - m_viewer.m_distance);
-
-        stick = Pad.GetTriggerRight(4);
-        m_viewer.m_distance = 5.0f * stick + m_viewer.m_distance;
+        m_viewer.m_position.y += ((padButtons & 4) != 0) ? 0.5f : 0.0f;
+        m_viewer.m_position.y -= ((padButtons & 8) != 0) ? 0.5f : 0.0f;
+        m_viewer.m_rotY += 0.2f * Pad.GetLeftStickX(4);
+        m_viewer.m_rotX -= 0.2f * Pad.GetLeftStickY(4);
+        m_viewer.m_distance -= 5.0f * Pad.GetTriggerLeft(4);
+        m_viewer.m_distance += 5.0f * Pad.GetTriggerRight(4);
     }
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -1400,30 +1387,17 @@ void CCameraPcs::calcMaterialEditor()
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;
-    float stick;
 
     C_MTXPerspective(m_screenMatrix, 33.3f, 1.3333334f, 0.125f, 375.0f);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     padButtons = Pad.GetButton(4);
-
-    stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
-    m_viewer.m_position.y += stick;
-
-    stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
-    m_viewer.m_position.y -= stick;
-
-    stick = Pad.GetLeftStickX(4);
-    m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
-
-    stick = Pad.GetLeftStickY(4);
-    m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
-
-    stick = Pad.GetTriggerLeft(4);
-    m_viewer.m_distance = -((2.0f * stick) - m_viewer.m_distance);
-
-    stick = Pad.GetTriggerRight(4);
-    m_viewer.m_distance = 2.0f * stick + m_viewer.m_distance;
+    m_viewer.m_position.y += ((padButtons & 8) != 0) ? 0.5f : 0.0f;
+    m_viewer.m_position.y -= ((padButtons & 4) != 0) ? 0.5f : 0.0f;
+    m_viewer.m_rotY += 0.2f * Pad.GetLeftStickX(4);
+    m_viewer.m_rotX -= 0.2f * Pad.GetLeftStickY(4);
+    m_viewer.m_distance -= 2.0f * Pad.GetTriggerLeft(4);
+    m_viewer.m_distance += 2.0f * Pad.GetTriggerRight(4);
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
     PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
@@ -1488,30 +1462,17 @@ void CCameraPcs::calcFunnyShape()
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;
-    float stick;
 
     C_MTXPerspective(m_screenMatrix, 33.3f, 1.3333334f, 0.125f, 3000.0f);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     padButtons = Pad.GetButton(4);
-
-    stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
-    m_viewer.m_position.y += stick;
-
-    stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
-    m_viewer.m_position.y -= stick;
-
-    stick = Pad.GetLeftStickX(4);
-    m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
-
-    stick = Pad.GetLeftStickY(4);
-    m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
-
-    stick = Pad.GetTriggerLeft(4);
-    m_viewer.m_distance = -((2.0f * stick) - m_viewer.m_distance);
-
-    stick = Pad.GetTriggerRight(4);
-    m_viewer.m_distance = 2.0f * stick + m_viewer.m_distance;
+    m_viewer.m_position.y += ((padButtons & 8) != 0) ? 0.5f : 0.0f;
+    m_viewer.m_position.y -= ((padButtons & 4) != 0) ? 0.5f : 0.0f;
+    m_viewer.m_rotY += 0.2f * Pad.GetLeftStickX(4);
+    m_viewer.m_rotX -= 0.2f * Pad.GetLeftStickY(4);
+    m_viewer.m_distance -= 2.0f * Pad.GetTriggerLeft(4);
+    m_viewer.m_distance += 2.0f * Pad.GetTriggerRight(4);
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
     PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);

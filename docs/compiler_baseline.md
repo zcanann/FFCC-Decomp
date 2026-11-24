@@ -1,8 +1,8 @@
 # Regional game compiler baseline
 
 The Game library uses GC/2.5ffcc for PAL and USA, and GC/2.0p1k for Japan.
-GC/2.5ffcc is a source-built GC 2.5 variant from PrimeDecomp/mwcc-tools, and GC/2.0p1k is derived during the build from the
-bundled GC/2.0p1 (see below).
+GC/2.5ffcc is derived during the build from the bundled GC/2.5, and GC/2.0p1k
+from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -236,17 +236,23 @@ partial losses. It is not adopted, for these reasons:
 
 ## PAL and USA game compiler: GC/2.5ffcc (kss)
 
-GC/2.5ffcc is `GC_2_5ffcc` of [mwcc-tools](https://github.com/PrimeDecomp/mwcc-tools)'
-`gc2/`, the decompilation of the GameCube 2.x compilers (formerly mweppc): GC
-2.5 built from its source with the one rule below, added by
-[PrimeDecomp/mwcc-tools#3](https://github.com/PrimeDecomp/mwcc-tools/pull/3).
-Like its `GC_2_0p2` for BFBB, it is not an original binary.
-`tools/download_mwcc_tools.py` installs it into `<compilers>/GC/2.5ffcc`.
-mwcc-tools does not publish its gc2 compilers yet, so the script's pinned
-`RELEASE` (URL and SHA-256) is unset: until it is set, build the compiler with
-mwcc-tools (in `gc2/`: `python configure.py --version GC_2_5ffcc && ninja`) and
-copy `build/GC_2_5ffcc/clang/mwcceppc.exe` there. The script keeps a compiler
-that is already in place and otherwise stops the build with these instructions.
+`tools/patch_compiler_ffcc5.py` derives GC/2.5ffcc from the stock GC/2.5
+(`539c0b31d51510cd076755bc64c0c39c3d0f364e` to
+`fc8966c312fe2dc4fef7800937dd00725520cf4e`). It reproduces `GC_2_5ffcc` of
+[mwcc-tools](https://github.com/PrimeDecomp/mwcc-tools)' `gc2/`, the
+decompilation of the GameCube 2.x compilers, whose `PATCH_FFCC` code in
+`gc2/src/optimizer/Alias.c` ([PrimeDecomp/mwcc-tools#3](https://github.com/PrimeDecomp/mwcc-tools/pull/3))
+is the readable form of the rule. The SDK and middleware keep stock GC/2.5.
+
+Three hooks into `operand_alias` (VA 0x512700), all other bytes stock: the
+count/skipped initialisation at 0x512709 (the free stack slot `[esp]` is the
+skipped flag), the NULL-and-write test after the `address_def_alias` call at
+0x512778 (jump to stub B at 0x60F000, 41 bytes) and the function exit at
+0x5128D5 (jump to stub C at 0x60F040, 62 bytes). The stubs are in a new `.ffcc5`
+section appended after `.reloc` and are position independent. The x86 is kept
+as comments in the script. The patched compiler produces byte-identical objects
+to the mwcc-tools build for all 268 PAL game units under five flag sets, and
+for the eleven per-channel `pppRand*` sources that the rule changes.
 
 Stock GC 2.5, 2.6 and 2.7 produce byte-identical objects for every PAL and USA
 game unit, and GC/2.0 only loses functions, so no stock version reproduces the
@@ -288,9 +294,8 @@ and with the per-channel source it leaves the nine `pppRand*` at 90-96
 because the `target` loads move above the stores; `ksa` on stores only is
 +0 / -1 (`CMenuPcs::loadData`, a store into a local array through a mixed
 base) and matches all nine; stores to statics only (`kss`) is +0 / -0 and
-matches all nine. An earlier binary patch of the bundled GC/2.5 with the same
-rule produced byte-identical objects to the source-built compiler for all PAL and USA
-units, on both sources.
+matches all nine. The binary patch and the source-built compiler produce byte-identical objects
+for all PAL and USA units, on both sources.
 
 The same per-channel source is also the Japanese retail source: with the
 unchanged GC/2.0p1k it matches all nine vector randomizers and the
@@ -299,6 +304,6 @@ unchanged GC/2.0p1k it matches all nine vector randomizers and the
 +12 exact functions, no partial score lower in any region, and the twelve
 units link in all three regions. The three DOL checksums pass.
 
-Ninja runs that step before the first game unit is compiled, also for a
-directory given with `--compilers`; `python tools/download_mwcc_tools.py
+Ninja runs the patch step before the first game unit is compiled, also for a
+directory given with `--compilers`; `python tools/patch_compiler_ffcc5.py
 <compilers>/GC/2.5ffcc/mwcceppc.exe` does the same by hand.

@@ -74,3 +74,89 @@ InitNewGame_CGameWork	script_assign_true O0 delta +28 ours 132 -> O4 100.0000
 InitNewGame_CGameWork	no_town O0 delta -4 ours 100 -> O4 99.1826
 InitNewGame_CGameWork	memset_this O0 delta +12 ours 116 -> O4 99.2949
 InitNewGame_CGameWork	two_memsets_swapped O0 delta +28 ours 132 -> O4 99.9775
+MakeArtItemName	no_helper_ternary O0=244 delta=+64 O4=98.9850
+MakeArtItemName	weak_helper O0=228 delta=+48 O4=100.0000
+MakeArtItemName	macro_helper O0=244 delta=+64 O4=98.9850
+MakeArtItemName	bool_param O0=244 delta=+64 O4=100.0000
+MakeArtItemName	array_tbl O0=228 delta=+48 O4=99.6173
+MakeArtItemName	bool_local O0=228 delta=+48 O4=100.0000
+MakeArtItemName	int_local O0=228 delta=+48 O4=100.0000
+MakeArtItemName	no_helper_bool_local O0=244 delta=+64 O4=98.9850
+MakeArtItemName	int_both O0=220 delta=+40 O4=99.8503
+MakeArtItemName	single_line_cond O0=224 delta=+44 O4=100.0000
+MakeArtItemName	bool_local single_line_base O0=224 delta=+44 O4=100.0000
+MakeArtItemName	int_local single_line_base O0=224 delta=+44 O4=100.0000
+MakeArtItemName	helper_int single_line_base O0=224 delta=+44 O4=100.0000
+MakeArtItemName	helper_bool_single single_line_base O0=240 delta=+60 O4=100.0000
+MakeArtItemName	hasSep_int_0 single_line_base O0=224 delta=+44 O4=100.0000
+MakeArtItemName	no_helper_direct single_line_base O0=224 delta=+44 O4=100.0000
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.524956 O0_Create=(164, 168, 4) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.524956 O0_Create=(164, 168, 4) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.524956 O0_Create=(164, 168, 4) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.524956 O0_Create=(164, 168, 4) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.524956 O0_Create=(164, 168, 4) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.79326 O0_Create=(164, 168, 4) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.78952 O0_Create=(164, 224, 60) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.79326 O0_Create=(164, 168, 4) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=100.0 O0_Create=(164, 180, 16) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.52122 O0_Create=(164, 224, 60) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=100.0 O0_Create=(164, 180, 16) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.52122 O0_Create=(164, 224, 60) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=100.0 O0_Create=(164, 180, 16) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=99.43802 O0_Create=(164, 236, 72) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.52122 O0_Create=(164, 224, 60) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.79326 O0_Create=(164, 168, 4) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.79326 O0_Create=(164, 168, 4) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.524956 O0_Create=(164, 168, 4) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=100.0 O0_Create=(164, 180, 16) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.79326 O0_Create=(164, 168, 4) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46381 O0_Create=(164, 228, 64) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=99.43802 O0_Create=(164, 236, 72) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(m_n O4=99.524956 O0_Create=(164, 168, 4) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.79326 O0_Create=(164, 168, 4) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=100.0 O0_Create=(164, 180, 16) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=100.0 O0_Create=(164, 180, 16) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.78952 O0_Create=(164, 224, 60) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46381 O0_Create=(164, 228, 64) 
+Create	buf=    CNextScr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        m_nextScri O4=99.78952 O0_Create=(164, 224, 60) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=99.43802 O0_Create=(164, 236, 72) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        memcpy(m_n O4=99.46755 O0_Create=(164, 172, 8) 
+Create	buf=    char scr flag=m_nextSc change=ChangeMap(m_ assign=        strcpy(scr O4=99.43802 O0_Create=(164, 236, 72) 
+InitNewGame	memset_marker, memset_wm, script, chalice, strcpy|    strcpy(m_townNam O4=100.0 O0_Init=(104, 132, 28)
+InitNewGame	memset_marker, memset_wm, script, chalice, strcpy|    if (m_languageId O4=97.403496 O0_Init=(104, 132, 28)
+InitNewGame	memset_marker, script, chalice, memset_wm, strcpy|    strcpy(m_townNam O4=98.28786 O0_Init=(104, 160, 56)
+InitNewGame	memset_marker, memset_wm, strcpy, script, chalice|    strcpy(m_townNam O4=97.65557 O0_Init=(104, 100, -4)
+InitNewGame	memset_marker, memset_wm, strcpy, script, chalice|    if (m_languageId O4=96.508316 O0_Init=(104, 156, 52)
+InitNewGame	memset_marker, memset_wm, strcpy, script, chalice|    memcpy(m_townNam O4=97.61772 O0_Init=(104, 140, 36)
+InitNewGame	memset_marker, memset_wm, strcpy, script, chalice|    if (m_languageId O4=97.09235 O0_Init=(104, 128, 24)
+InitNewGame	memset_marker, script, chalice, memset_wm, strcpy|    strcpy(m_townNam O4=98.49376 O0_Init=(104, 128, 24)
+InitNewGame	memset_wm, memset_marker, script, chalice, strcpy|    memcpy(m_townNam O4=99.10982 O0_Init=(104, 120, 16)
+InitNewGame	memset_wm, memset_marker, script, chalice, strcpy|    if (m_languageId O4=97.97421 O0_Init=(104, 112, 8)
+InitNewGame	memset_wm, memset_marker, script, chalice, strcpy|    strcpy(m_townNam O4=98.50166 O0_Init=(104, 84, -20)
+InitNewGame	memset_marker, memset_wm, script, chalice, strcpy|    if (m_languageId O4=97.403496 O0_Init=(104, 156, 52)
+InitNewGame	memset_wm, memset_marker, script, chalice, strcpy|    strcpy(m_townNam O4=99.28452 O0_Init=(104, 116, 12)
+InitNewGame	memset_wm, memset_marker, script, chalice, strcpy|    strcpy(m_townNam O4=99.28452 O0_Init=(104, 116, 12)
+InitNewGame	memset_marker, memset_wm, strcpy, script, chalice|    strcpy(m_townNam O4=97.79243 O0_Init=(104, 136, 32)
+InitNewGame	memset_marker, memset_wm, script, chalice, strcpy|    memcpy(m_townNam O4=99.825294 O0_Init=(104, 136, 32)
+InitNewGame	memset_marker, script, chalice, memset_wm, strcpy|    if (m_languageId O4=97.419304 O0_Init=(104, 156, 52)
+InitNewGame	memset_marker, memset_wm, script, chalice, strcpy|    strcpy(m_townNam O4=98.27329 O0_Init=(104, 136, 32)
+InitNewGame	memset_marker, script, chalice, memset_wm, strcpy|    strcpy(m_townNam O4=98.152245 O0_Init=(104, 100, -4)
+InitNewGame	memset_marker, memset_wm, script, chalice, strcpy|    memcpy(m_townNam O4=98.09859 O0_Init=(104, 164, 60)
+InitNewGame	memset_wm, memset_marker, script, chalice, strcpy|    if (m_languageId O4=97.97421 O0_Init=(104, 112, 8)
+InitNewGame	memset_marker, script, chalice, memset_wm, strcpy|    memcpy(m_townNam O4=98.25541 O0_Init=(104, 136, 32)
+InitNewGame	memset_marker, memset_wm, script, chalice, strcpy|    if (m_languageId O4=98.75624 O0_Init=(104, 128, 24)
+InitNewGame	memset_marker, script, chalice, memset_wm, strcpy|    strcpy(m_townNam O4=98.49376 O0_Init=?
+InitNewGame	memset_wm, memset_marker, script, chalice, strcpy|    if (m_languageId O4=97.97421 O0_Init=(104, 112, 8)
+InitNewGame	memset_marker, script, chalice, memset_wm, strcpy|    strcpy(m_townNam O4=98.43261 O0_Init=(104, 132, 28)
+InitNewGame	memset_marker, memset_wm, strcpy, script, chalice|    memcpy(m_townNam O4=97.92804 O0_Init=(104, 136, 32)
+InitNewGame	memset_wm, memset_marker, script, chalice, strcpy|    memcpy(m_townNam O4=99.10982 O0_Init=(104, 120, 16)
+InitNewGame	memset_marker, memset_wm, strcpy, script, chalice|    strcpy(m_townNam O4=97.558235 O0_Init=(104, 128, 24)
+InitNewGame	memset_marker, memset_wm, strcpy, script, chalice|    strcpy(m_townNam O4=97.79243 O0_Init=(104, 160, 56)

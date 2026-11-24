@@ -87,21 +87,7 @@ void CMaterialEditorPcs::Init()
  */
 void CMaterialEditorPcs::Quit()
 {
-    unsigned int textureIndex;
-    CMaterialEditorPcs* textureSlot = this;
-    m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
-
-    do {
-        MemFree(textureSlot->m_textureData[0]);
-        MemFree(textureSlot->m_tlutData[0]);
-        MemFree(textureSlot->m_texObj[0]);
-        MemFree(textureSlot->m_tlutObj0[0]);
-        MemFree(textureSlot->m_tlutObj1[0]);
-        MemFree(textureSlot->m_textureHeader[0]);
-        textureIndex += 1;
-        textureSlot = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<char*>(textureSlot) + sizeof(void*));
-    } while (textureIndex < 0x10);
-
+    ClearTextureData();
     if (m_rsdItem != 0) {
         MemFree(m_rsdItem);
     }
@@ -132,7 +118,6 @@ void CMaterialEditorPcs::createViewer()
 {
     CMemory::CStage* stage = Memory.CreateStage(0x200000, "CMaterialEditorPcs", 0);
     GXColor clear;
-    float one;
 
     m_stage = stage;
     USBPcs.IsBigAlloc(1);
@@ -147,9 +132,8 @@ void CMaterialEditorPcs::createViewer()
     m_displayTextureEnabled = 0;
     memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 
-    one = 1.0f;
     m_usbTransform.m_modelMatrix[0][0] = m_usbTransform.m_modelMatrix[1][1] =
-        m_usbTransform.m_modelMatrix[2][2] = m_usbTransform.m_modelMatrix[3][3] = one;
+        m_usbTransform.m_modelMatrix[2][2] = m_usbTransform.m_modelMatrix[3][3] = 1.0f;
 
     PSMTXIdentity(m_unkMatrix.value);
     m_usbStream.CreateBuffer();
@@ -177,21 +161,7 @@ void CMaterialEditorPcs::destroyViewer()
 
     m_usbStream.DeleteBuffer();
     MemFree(m_rsdItem);
-
-    unsigned int textureIndex;
-    CMaterialEditorPcs* textureSlot = this;
-    m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
-    do {
-        MemFree(textureSlot->m_textureData[0]);
-        MemFree(textureSlot->m_tlutData[0]);
-        MemFree(textureSlot->m_texObj[0]);
-        MemFree(textureSlot->m_tlutObj0[0]);
-        MemFree(textureSlot->m_tlutObj1[0]);
-        MemFree(textureSlot->m_textureHeader[0]);
-        textureIndex += 1;
-        textureSlot = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<char*>(textureSlot) + sizeof(void*));
-    } while (textureIndex < 0x10);
-
+    ClearTextureData();
     Memory.DestroyStage(m_stage);
 }
 /*

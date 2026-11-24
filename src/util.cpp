@@ -215,9 +215,7 @@ void CUtil::SetOrthoEnv()
  */
 int CUtil::GetNoise(unsigned char noise)
 {
-    float maxNoise = (float)(noise * 2);
-    float minNoise = (float)(noise >> 1);
-    return (int)(maxNoise * Math.RandF() - minNoise);
+    return (int)(Math.RandF() * (noise * 2) - (noise >> 1));
 }
 
 /*
@@ -350,7 +348,7 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     float u1;
     float v1;
 
-    if (uv1 == NULL || uv2 == NULL) {
+    if (uv1 == 0 || uv2 == 0) {
         u0 = 0.0f;
         u1 = 1.0f;
         v0 = u0;
@@ -391,13 +389,12 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
  */
 void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
-    u32* colorPtr = reinterpret_cast<u32*>(&color);
     float u1;
     float v1;
     float u2;
     float v2;
 
-    if (uv1 == NULL || uv2 == NULL) {
+    if (uv1 == 0 || uv2 == 0) {
         u1 = 0.0f;
         v1 = u1;
         u2 = 1.0f;
@@ -410,7 +407,6 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-#ifdef VERSION_GCCJGC
     GXPosition3f32(pos1.x, pos1.y, pos1.z);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
     GXTexCoord2f32(u1, v1);
@@ -430,50 +426,6 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     GXColor1u32(*reinterpret_cast<u32*>(&color));
     GXTexCoord2f32(u1, v2);
     GXTexCoord2f32(u1, v2);
-#else
-    f32 x2;
-    f32 x1 = pos1.x;
-    f32 y1 = pos1.y;
-    GXWGFifo.f32 = x1;
-    f32 z1 = pos1.z;
-    GXWGFifo.f32 = y1;
-    u32 rgba = *colorPtr;
-    GXWGFifo.f32 = z1;
-    x2 = pos2.x;
-    GXWGFifo.u32 = rgba;
-    f32 y2 = pos2.y;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v1;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y1;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v1;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-
-    GXWGFifo.f32 = x1;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
-#endif
 }
 
 /*
@@ -576,15 +528,13 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetChanMatColor(GX_COLOR0A0, white);
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
-    float x2 = x + width;
-    float y2 = y + height;
     Vec pos0;
     Vec pos1;
     pos0.x = x;
     pos0.y = y;
     pos0.z = -0.9999999f;
-    pos1.x = x2;
-    pos1.y = y2;
+    pos1.x = x + width;
+    pos1.y = y + height;
     pos1.z = -0.9999999f;
 
     GXSetColorUpdate(GX_FALSE);
@@ -628,15 +578,13 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumChans(1);
 
-    float x2 = x + width;
-    float y2 = y + height;
     Vec pos0;
     Vec pos1;
     pos0.x = x;
     pos0.y = y;
     pos0.z = 0.0f;
-    pos1.x = x2;
-    pos1.y = y2;
+    pos1.x = x + width;
+    pos1.y = y + height;
     pos1.z = 0.0f;
     RenderQuadNoTex(pos0, pos1, color);
 
@@ -656,8 +604,6 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
     GXColor white;
-    float x2;
-    float y2;
 
     BeginQuadEnv();
 
@@ -687,15 +633,13 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
     }
 
-    x2 = x + width;
-    y2 = y + height;
     Vec pos0;
     Vec pos1;
     pos0.x = x;
     pos0.y = y;
     pos0.z = 0.0f;
-    pos1.x = x2;
-    pos1.y = y2;
+    pos1.x = x + width;
+    pos1.y = y + height;
     pos1.z = 0.0f;
 
     if (color != 0) {
@@ -724,8 +668,6 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
     GXColor white;
-    float x2;
-    float y2;
 
     BeginQuadEnv();
 
@@ -758,15 +700,13 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
         SetPaletteEnv(texture);
     }
 
-    x2 = x + width;
-    y2 = y + height;
     Vec pos0;
     Vec pos1;
     pos0.x = x;
     pos0.y = y;
     pos0.z = 0.0f;
-    pos1.x = x2;
-    pos1.y = y2;
+    pos1.x = x + width;
+    pos1.y = y + height;
     pos1.z = 0.0f;
 
     if (color != 0) {

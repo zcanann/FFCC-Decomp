@@ -238,11 +238,8 @@ partial losses. It is not adopted, for these reasons:
 
 `tools/patch_compiler_ffcc5.py` derives GC/2.5ffcc from the stock GC/2.5
 (`539c0b31d51510cd076755bc64c0c39c3d0f364e` to
-`fc8966c312fe2dc4fef7800937dd00725520cf4e`). It reproduces `GC_2_5ffcc` of
-[mwcc-tools](https://github.com/PrimeDecomp/mwcc-tools)' `gc2/`, the
-decompilation of the GameCube 2.x compilers, whose `PATCH_FFCC` code in
-`gc2/src/optimizer/Alias.c` ([PrimeDecomp/mwcc-tools#3](https://github.com/PrimeDecomp/mwcc-tools/pull/3))
-is the readable form of the rule. The SDK and middleware keep stock GC/2.5.
+`fc8966c312fe2dc4fef7800937dd00725520cf4e`) by adding one alias rule, `kss`
+(below). The SDK and middleware keep stock GC/2.5.
 
 Three hooks into `operand_alias` (VA 0x512700), all other bytes stock: the
 count/skipped initialisation at 0x512709 (the free stack slot `[esp]` is the
@@ -250,9 +247,10 @@ skipped flag), the NULL-and-write test after the `address_def_alias` call at
 0x512778 (jump to stub B at 0x60F000, 41 bytes) and the function exit at
 0x5128D5 (jump to stub C at 0x60F040, 62 bytes). The stubs are in a new `.ffcc5`
 section appended after `.reloc` and are position independent. The x86 is kept
-as comments in the script. The patched compiler produces byte-identical objects
-to the mwcc-tools build for all 268 PAL game units under five flag sets, and
-for the eleven per-channel `pppRand*` sources that the rule changes.
+as comments in the script. The patch was checked against a source-level
+implementation of the same rule in a decompiled GC 2.5: byte-identical objects
+for all 268 PAL game units under five flag sets, and for the eleven
+per-channel `pppRand*` sources that the rule changes.
 
 Stock GC 2.5, 2.6 and 2.7 produce byte-identical objects for every PAL and USA
 game unit, and GC/2.0 only loses functions, so no stock version reproduces the
@@ -294,7 +292,7 @@ and with the per-channel source it leaves the nine `pppRand*` at 90-96
 because the `target` loads move above the stores; `ksa` on stores only is
 +0 / -1 (`CMenuPcs::loadData`, a store into a local array through a mixed
 base) and matches all nine; stores to statics only (`kss`) is +0 / -0 and
-matches all nine. The binary patch and the source-built compiler produce byte-identical objects
+matches all nine. The binary patch and the source-level implementation produce byte-identical objects
 for all PAL and USA units, on both sources.
 
 The same per-channel source is also the Japanese retail source: with the

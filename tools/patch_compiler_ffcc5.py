@@ -6,8 +6,7 @@ that has an unanalysable reaching definition. GC/2.5's operand_alias (the
 alias of a register operand, the union over its reaching address defs) counts a
 reaching def whose address_def_alias is NULL as "unknown" and widens the whole
 result to the worst-case pointer alias. FFCC's compiler does this differently
-for stores, as in PrimeDecomp/mwcc-tools' PATCH_FFCC build of
-gc2/src/optimizer/Alias.c:
+for stores:
 
   in the loop over reaching defs, if address_def_alias(def) is NULL and the
   instruction is a write (pcode->flags & fIsWrite), the def is skipped: it is

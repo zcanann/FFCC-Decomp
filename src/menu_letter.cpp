@@ -940,6 +940,63 @@ inline int CMenuPcs::LetterAttachWinClose()
 	return done;
 }
 
+namespace {
+static inline void LetterConfirmBuildTitle(char lines[][0x80], int& lineCount, CCaravanWork* cw, int languageId, CMenuPcs* menu)
+{
+	switch (languageId) {
+	case 2: {
+		const char* title = Game.GetNPCName(cw->m_letters[s_SelLetter].m_senderId);
+		sprintf(lines[lineCount], "%s%s", title, menu->GetMenuStr(0x26));
+		break;
+	}
+#ifdef VERSION_GCCE01
+	case 3:
+#endif
+	case 4: {
+		const char* title = Game.GetNPCName(cw->m_letters[s_SelLetter].m_senderId);
+		sprintf(lines[lineCount], "%s%s%s", menu->GetMenuStr(0x26), title, menu->GetMenuStr(0x25));
+		break;
+	}
+#ifndef VERSION_GCCE01
+	case 3: {
+		const char* title = Game.GetNPCName(cw->m_letters[s_SelLetter].m_senderId);
+		sprintf(lines[lineCount], "%s%s", menu->GetMenuStr(0x26), title);
+		break;
+	}
+#endif
+	case 5: {
+		const char* title = Game.GetNPCName(cw->m_letters[s_SelLetter].m_senderId);
+		sprintf(lines[lineCount], "%s %s.", menu->GetMenuStr(0x26), title);
+		break;
+	}
+	case 1:
+	default: {
+		const char* title = Game.GetNPCName(cw->m_letters[s_SelLetter].m_senderId);
+		sprintf(lines[lineCount], "%s %s%s", menu->GetMenuStr(0x25), title, menu->GetMenuStr(0x26));
+		break;
+	}
+	}
+	lineCount++;
+}
+static inline void LetterConfirmBuildReply(char lines[][0x80], int& lineCount, int languageId, CMenuPcs* menu)
+{
+	switch (languageId) {
+	case 2:
+		sprintf(lines[lineCount], s_letterItemInfoFmt, menu->GetMenuStr(0x23), s_ReplyStr, menu->GetMenuStr(0x24), menu->GetMenuStr(0x27));
+		break;
+	case 3:
+		sprintf(lines[lineCount], s_pctspctspctspcts, menu->GetMenuStr(0x25), menu->GetMenuStr(0x23), s_ReplyStr, menu->GetMenuStr(0x24));
+		break;
+	case 1:
+	case 4:
+	default:
+		sprintf(lines[lineCount], "%s%s%s", menu->GetMenuStr(0x23), s_ReplyStr, menu->GetMenuStr(0x24));
+		break;
+	}
+	lineCount++;
+}
+} // namespace
+
 /*
  * --INFO--
  * PAL Address: 0x80165B84
@@ -983,63 +1040,8 @@ int CMenuPcs::LetterConfirmOpen()
 		}
 #else
 		int lineCount = 0;
-		switch (languageId) {
-		case 2: {
-			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].m_senderId);
-			sprintf(lines[lineCount], "%s%s", title, GetMenuStr(0x26));
-			break;
-		}
-#ifdef VERSION_GCCE01
-		case 3:
-#endif
-		case 4: {
-			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].m_senderId);
-			sprintf(lines[lineCount], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
-			break;
-		}
-#ifndef VERSION_GCCE01
-		case 3: {
-			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].m_senderId);
-			sprintf(lines[lineCount], "%s%s", GetMenuStr(0x26), title);
-			break;
-		}
-#endif
-		case 5: {
-			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].m_senderId);
-			sprintf(lines[lineCount], "%s %s.", GetMenuStr(0x26), title);
-			break;
-		}
-		case 1:
-		default: {
-			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].m_senderId);
-			sprintf(lines[lineCount], "%s %s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
-			break;
-		}
-		}
-		lineCount++;
-
-		switch (languageId) {
-		case 2:
-			sprintf(lines[lineCount], s_letterItemInfoFmt,
-			        GetMenuStr(0x23),
-			        s_ReplyStr,
-			        GetMenuStr(0x24),
-			        GetMenuStr(0x27));
-			break;
-		case 3:
-			sprintf(lines[lineCount], s_pctspctspctspcts,
-			        GetMenuStr(0x25),
-			        GetMenuStr(0x23),
-			        s_ReplyStr,
-			        GetMenuStr(0x24));
-			break;
-		case 1:
-		case 4:
-		default:
-			sprintf(lines[lineCount], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
-			break;
-		}
-		lineCount++;
+		LetterConfirmBuildTitle(lines, lineCount, caravanWork, languageId, this);
+		LetterConfirmBuildReply(lines, lineCount, languageId, this);
 
 		if (s_Attach != 2) {
 			switch (languageId) {

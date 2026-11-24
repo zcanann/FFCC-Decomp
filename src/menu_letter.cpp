@@ -1288,8 +1288,11 @@ void CMenuPcs::LetterMessDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	caravanWork = Game.m_scriptFoodBase[0];
+	FFCC_ASSERT(caravanWork != nullptr);
+	FFCC_ASSERT(s_SelLetter >= 0);
 	panel = m_singleFadeState->entries;
 	mode = m_letterMenuState->previousMode;
+	FFCC_ASSERT(mode >= 0 && mode <= 5);
 
 	for (int i = 0; i < m_singleFadeState->count; ++i, ++panel) {
 		int tex = panel->tex;

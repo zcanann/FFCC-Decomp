@@ -816,8 +816,7 @@ void CMemoryCardMan::SetMcIconImage()
     m_cardStat.offsetIconTlut = 0x2840;
     m_cardStat.offsetIconTlut = 0x2A40;
 
-    size_t titleLen = strlen(CardConst::MC_COMMENT);
-    memcpy(saveBuffer, CardConst::MC_COMMENT, titleLen);
+    memcpy(saveBuffer, CardConst::MC_COMMENT, strlen(CardConst::MC_COMMENT));
 }
 
 /*
@@ -1492,11 +1491,7 @@ int CMemoryCardMan::DummySave()
                 System.Printf("McFormat(%d) error(%d)\n", 0, m_result);
             }
 
-            result = CARDUnmount(0);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 2;
-            m_currentSlot = 0xFF;
+            McUnmount(0);
 
             return m_result;
         }
@@ -1511,11 +1506,7 @@ int CMemoryCardMan::DummySave()
             System.Printf("McMount(%d) error(%d)\n", 0, m_result);
         }
 
-        result = CARDUnmount(0);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 2;
-        m_currentSlot = 0xFF;
+        McUnmount(0);
 
         return m_result;
     }
@@ -1538,11 +1529,7 @@ int CMemoryCardMan::DummySave()
                 System.Printf("McCreate(%d) error(%d)\n", 0, m_result);
             }
 
-            result = CARDUnmount(0);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 2;
-            m_currentSlot = 0xFF;
+            McUnmount(0);
 
             return m_result;
         }

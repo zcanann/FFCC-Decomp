@@ -621,6 +621,7 @@ inline int CMenuPcs::LetterLstOpen()
 inline int CMenuPcs::LetterLstClose()
 {
 	LetterMenuState* state = m_letterMenuState;
+	FFCC_ASSERT(state != nullptr);
 	state->frame = state->frame + 1;
 
 	SingleFadeEntry* entry = m_singleFadeState->entries;

@@ -695,6 +695,21 @@ inline int CMenuPcs::LetterMessClose()
  * JP Address: TODO
  * JP Size: TODO
  */
+namespace {
+static inline void LetterItemWinBuildGilInfo(char* info, int gil, int lang, CMenuPcs* menu)
+{
+#ifdef VERSION_GCCJGC
+	(void)info; (void)gil; (void)lang; (void)menu;
+#else
+	if (lang == 2) {
+		sprintf(info, "%d %s%s", gil, menu->GetMenuStr(4), menu->GetMenuStr(0x22));
+	} else {
+		sprintf(info, s_pctspctd_pcts_801DEE20, menu->GetMenuStr(0x22), gil, menu->GetMenuStr(4));
+	}
+#endif
+}
+} // namespace
+
 inline int CMenuPcs::LetterItemWinOpen()
 {
 #ifndef VERSION_GCCJGC
@@ -718,17 +733,7 @@ inline int CMenuPcs::LetterItemWinOpen()
 #else
 		if (caravanWork->m_letters[s_SelLetter].m_attachmentIsGil) {
 			int gil = caravanWork->m_letters[s_SelLetter].m_attachValue * 100;
-			if (lang == 2) {
-				sprintf(info, "%d %s%s",
-				        gil,
-				        GetMenuStr(4),
-				        GetMenuStr(0x22));
-			} else {
-				sprintf(info, s_pctspctd_pcts_801DEE20,
-				        GetMenuStr(0x22),
-				        gil,
-				        GetMenuStr(4));
-			}
+			LetterItemWinBuildGilInfo(info, gil, lang, this);
 		} else {
 			int value = caravanWork->m_letters[s_SelLetter].m_attachValue;
 			if (lang == 2) {

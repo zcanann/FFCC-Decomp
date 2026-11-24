@@ -237,26 +237,13 @@ void GbaQueue::Init()
 	m_cmdNumFlags = 0;
 	m_playModeFlags = 0xF;
 	m_startBonusFlags = 0;
-	m_maskSendState[0] = static_cast<signed char>(0xFF);
-	m_pendingMoney[0] = 0;
-	m_moneyState[0] = 0;
-	m_compatibilityFlg[0] = 0;
-	m_radarType[0] = 1;
-	m_maskSendState[1] = static_cast<signed char>(0xFF);
-	m_pendingMoney[1] = 0;
-	m_moneyState[1] = 0;
-	m_compatibilityFlg[1] = 0;
-	m_radarType[1] = 1;
-	m_maskSendState[2] = static_cast<signed char>(0xFF);
-	m_pendingMoney[2] = 0;
-	m_moneyState[2] = 0;
-	m_compatibilityFlg[2] = 0;
-	m_radarType[2] = 1;
-	m_maskSendState[3] = static_cast<signed char>(0xFF);
-	m_pendingMoney[3] = 0;
-	m_moneyState[3] = 0;
-	m_compatibilityFlg[3] = 0;
-	m_radarType[3] = 1;
+	for (i = 0; i < 4; i++) {
+		m_maskSendState[i] = static_cast<signed char>(0xFF);
+		m_pendingMoney[i] = 0;
+		m_moneyState[i] = 0;
+		m_compatibilityFlg[i] = 0;
+		m_radarType[i] = 1;
+	}
 }
 
 /*
@@ -1115,7 +1102,8 @@ void GbaQueue::SetRadarType()
 	}
 
 #ifndef VERSION_GCCJGC
-	for (i = 0; i < 4; i++) {
+	i = 0;
+	do {
 		OSWaitSemaphore(accessSemaphores + i);
 		const int oldMode = m_radarMode;
 		const int mask = 1 << i;
@@ -1126,7 +1114,8 @@ void GbaQueue::SetRadarType()
 			m_chgRadarMode = static_cast<char>(m_chgRadarMode | mask);
 		}
 		OSSignalSemaphore(accessSemaphores + i);
-	}
+		i++;
+	} while (i < 4);
 #endif
 }
 
@@ -1251,29 +1240,16 @@ void GbaQueue::LoadPlayerStat()
 					const int saveSlot = caravanWork->m_saveSlot;
 					localPlayerStat[i].m_saveSlot = static_cast<signed char>(saveSlot);
 					localPlayerStat[i].m_compatibility[0] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
-					unsigned char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
-					unsigned char l1 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][1];
 					localPlayerStat[i].m_compatibility[1] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
-					unsigned char l2 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][2];
-					unsigned char l3 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][3];
 					localPlayerStat[i].m_compatibility[2] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x14]);
-					unsigned char l4 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][4];
-					unsigned char l5 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][5];
 					localPlayerStat[i].m_compatibility[3] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
-					unsigned char l6 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][6];
-					unsigned char l7 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][7];
 					localPlayerStat[i].m_compatibility[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
 					localPlayerStat[i].m_compatibility[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
 					localPlayerStat[i].m_compatibility[6] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x18]);
 					localPlayerStat[i].m_compatibility[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x19]);
-					localPlayerStat[i].m_compatibility[8] = l0;
-					localPlayerStat[i].m_compatibility[9] = l1;
-					localPlayerStat[i].m_compatibility[10] = l2;
-					localPlayerStat[i].m_compatibility[11] = l3;
-					localPlayerStat[i].m_compatibility[12] = l4;
-					localPlayerStat[i].m_compatibility[13] = l5;
-					localPlayerStat[i].m_compatibility[14] = l6;
-					localPlayerStat[i].m_compatibility[15] = l7;
+					for (int j = 0; j < 8; j++) {
+						localPlayerStat[i].m_compatibility[8 + j] = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][j];
+					}
 				}
 
 				localPlayerStat[i].m_strength[0] = static_cast<unsigned char>(caravanWork->m_strength > 99 ? 99 : caravanWork->m_strength);

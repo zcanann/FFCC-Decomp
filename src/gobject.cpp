@@ -1228,10 +1228,7 @@ inline void CGObject::bgShadeCollision()
  */
 void CGObject::hit()
 {
-    const bool hasModel =
-        (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
-        (m_charaModelHandle->m_model != (CChara::CModel*)0);
-    if (!hasModel) {
+    if (!IsHChara()) {
         return;
     }
     for (int i = 0; i < 8; i++) {
@@ -1844,7 +1841,7 @@ void CGObject::copy()
 {
     bool hasModel = false;
 
-    if ((m_charaModelHandle != (CCharaPcs::CHandle*)0) && (m_charaModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (!hasModel) {
@@ -1857,7 +1854,7 @@ void CGObject::copy()
     m_charaModelHandle->m_fogBlend = m_worldParam;
     hasModel = false;
 
-    if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1868,7 +1865,7 @@ void CGObject::copy()
     }
 
     hasModel = false;
-    if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1882,7 +1879,7 @@ void CGObject::copy()
         m_charaModelHandle->m_flags &= 0xFFFFFFFE;
         hasModel = false;
 
-        if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1890,7 +1887,7 @@ void CGObject::copy()
         }
 
         hasModel = false;
-        if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1902,7 +1899,7 @@ void CGObject::copy()
         m_charaModelHandle->m_flags &= 0xFFFFFFFB;
         hasModel = false;
 
-        if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1910,7 +1907,7 @@ void CGObject::copy()
         }
 
         hasModel = false;
-        if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (!hasModel) {
@@ -1925,7 +1922,7 @@ void CGObject::copy()
     m_charaModelHandle->m_worldPosY = m_worldPosition.y;
     hasModel = false;
 
-    if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1934,7 +1931,7 @@ void CGObject::copy()
     }
 
     hasModel = false;
-    if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (!hasModel) {
@@ -2400,12 +2397,9 @@ void CGObject::boundCheck()
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-        float clipLimit;
-        float oneF;
-        float zero;
-        zero = 0.0f;
-        oneF = 1.0f;
-        clipLimit = -1.0f;
+        float clipLimit = -1.0f;
+        float oneF = 1.0f;
+        float zero = 0.0f;
 
         clipMask = 0x1F;
         s32 i = 0;
@@ -2816,8 +2810,7 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     m_animExtraIndex = static_cast<short>(param4);
     m_collisionPushTimer = static_cast<short>(param5);
 
-    signed char shieldFlag = static_cast<signed char>(param3);
-    m_shieldNodeFlagBits.m_bit02 = shieldFlag;
+    m_shieldNodeFlagBits.m_bit02 = static_cast<signed char>(param3);
 
     if (animData != 0) {
         m_shieldNodeFlagBits.m_bit80 = 1;

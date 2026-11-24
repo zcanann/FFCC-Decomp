@@ -645,13 +645,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 m_vertices[i].z = chunkFile.GetF4();
 
                 Vec* v = &m_vertices[i];
-                m_bound.m_min.x = (m_bound.m_min.x < v->x) ? m_bound.m_min.x : v->x;
-                m_bound.m_min.y = (m_bound.m_min.y < v->y) ? m_bound.m_min.y : v->y;
-                m_bound.m_min.z = (m_bound.m_min.z < v->z) ? m_bound.m_min.z : v->z;
-
-                m_bound.m_max.x = (m_bound.m_max.x > v->x) ? m_bound.m_max.x : v->x;
-                m_bound.m_max.y = (m_bound.m_max.y > v->y) ? m_bound.m_max.y : v->y;
-                m_bound.m_max.z = (m_bound.m_max.z > v->z) ? m_bound.m_max.z : v->z;
+                m_bound.Add(v);
             }
 
             m_bound.m_min.x -= kMapHitUnitScale;
@@ -723,14 +717,8 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 for (int i = 0; i < face.m_vertexCount; i++) {
                     face.m_vertexIndices[i] = chunkFile.Get2();
 
-                    const Vec& v = m_vertices[face.m_vertexIndices[i]];
-                    face.m_bound.m_min.x = (face.m_bound.m_min.x < v.x) ? face.m_bound.m_min.x : v.x;
-                    face.m_bound.m_min.y = (face.m_bound.m_min.y < v.y) ? face.m_bound.m_min.y : v.y;
-                    face.m_bound.m_min.z = (face.m_bound.m_min.z < v.z) ? face.m_bound.m_min.z : v.z;
-
-                    face.m_bound.m_max.x = (face.m_bound.m_max.x > v.x) ? face.m_bound.m_max.x : v.x;
-                    face.m_bound.m_max.y = (face.m_bound.m_max.y > v.y) ? face.m_bound.m_max.y : v.y;
-                    face.m_bound.m_max.z = (face.m_bound.m_max.z > v.z) ? face.m_bound.m_max.z : v.z;
+                    Vec* v = &m_vertices[face.m_vertexIndices[i]];
+                    face.m_bound.Add(v);
                 }
 
                 face.m_radiusScale *= radiusScale;
@@ -857,9 +845,7 @@ static int FindIntersection(const Vec& start, const Vec& direction, const CMapCy
 
 cylinder_body:
     {
-        const f32 vxSq = localDirection.x * localDirection.x;
-        const f32 vySq = localDirection.y * localDirection.y;
-        const f32 radialA = vxSq + vySq;
+        const f32 radialA = localDirection.x * localDirection.x + localDirection.y * localDirection.y;
         f32 radialB = px * localDirection.x + py * localDirection.y;
         f32 radialC = (px * px + py * py) - radiusSq;
         disc = radialB * radialB - radialA * radialC;

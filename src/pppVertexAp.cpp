@@ -95,6 +95,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
     VertexApData* data = (VertexApData*)dataRaw;
     s32 stateOffset = ctrl->m_serializedDataOffsets[0];
     VertexApState* state = (VertexApState*)(parent->m_workArea + stateOffset);
+    Vec v;
+    Vec* vertex;
 
     if (ppvUserStopPartF != 0) {
         goto exitStub;
@@ -131,8 +133,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
                 u16* vertexIndices = entry->vertexIndices;
                 u16 outValue = state->index++;
                 u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                Vec v;
+                vertex = &points[vertexIndex];
                 v.x = vertex->x;
                 v.y = vertex->y;
                 v.z = vertex->z;
@@ -152,8 +153,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
                 int outValue = (int)(randValue * maxValue);
                 u16* vertexIndices = entry->vertexIndices;
                 u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                Vec v;
+                vertex = &points[vertexIndex];
                 v.x = vertex->x;
                 v.y = vertex->y;
                 v.z = vertex->z;

@@ -8,8 +8,6 @@ struct _pppCtrlTable;
 class PVertexAp;
 struct Vec;
 
-void apea(_pppPObject*, PVertexAp*, Vec*);
-
 #ifdef __cplusplus
 extern "C" {
 #endif

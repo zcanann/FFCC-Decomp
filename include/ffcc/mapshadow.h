@@ -17,12 +17,16 @@ class CTexture;
 class CMapShadow
 {
 public:
-    enum TARGET
+    enum TYPE
 	{
 		TODO,
 	};
+	enum TARGET
+	{
+		TODO2,
+	};
 	
-    CMapShadow()
+    CMapShadow(TYPE type)
     {
         m_enabled = 1;
         m_materialIndex = 0;

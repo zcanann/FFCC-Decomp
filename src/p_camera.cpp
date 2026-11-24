@@ -165,38 +165,23 @@ int CCameraPcs::GetTable(unsigned long tableIndex)
  */
 void CCameraPcs::create()
 {
-    float value5c = 240.0f;
-    float value18 = 3.1415927f;
-    float zero = 0.0f;
-    float valueb0 = 0.61086524f;
-
-    m_target.x = m_target.y = m_target.z = zero;
-
-    float valueb4 = 25.0f;
-    m_yaw = value18;
-
-    float value8c = 10.0f;
-    m_distance = value5c;
-
-    float valueb8 = 10000.0f;
-    m_pitch = valueb0;
-    m_fov = valueb4;
-    m_nearZ = value8c;
-    m_farZ = valueb8;
+    m_target.x = m_target.y = m_target.z = 0.0f;
+    m_yaw = 3.1415927f;
+    m_distance = 240.0f;
+    m_pitch = 0.61086524f;
+    m_fov = 25.0f;
+    m_nearZ = 10.0f;
+    m_farZ = 10000.0f;
     m_isAbsolute = 0;
-
     PSMTXIdentity(m_worldMapMatrix);
-
-    valueb4 = 10000.0f;
     m_fullScreenShadowDepth = -1.0f;
-    value18 = 0.0f;
-    m_fullScreenShadowCamLen = valueb4;
+    m_fullScreenShadowCamLen = 10000.0f;
     m_shadowAuto = 1;
     m_fromScript = 0;
     m_quake.m_state = 0;
     m_quake.m_keepMoving = 0;
-    m_quake.m_positionAmplitude.x = m_quake.m_positionAmplitude.y = m_quake.m_positionAmplitude.z = value18;
-    m_quake.m_jitterAmplitude.x = m_quake.m_jitterAmplitude.y = m_quake.m_jitterAmplitude.z = value18;
+    m_quake.m_positionAmplitude.x = m_quake.m_positionAmplitude.y = m_quake.m_positionAmplitude.z = 0.0f;
+    m_quake.m_jitterAmplitude.x = m_quake.m_jitterAmplitude.y = m_quake.m_jitterAmplitude.z = 0.0f;
     m_quake.m_startTimer = 0;
     m_quake.m_startDuration = 0;
     m_quake.m_endTimer = 0;
@@ -242,17 +227,13 @@ void CCameraPcs::onScriptChanging(char*)
  */
 void CCameraPcs::onScriptChanged(char*, int fromScript)
 {
-    MtxPtr mathMtx = Math.m_localMtx;
+    PSMTXCopy(Math.m_localMtx, m_worldMapMatrix);
+    PSMTXInverse(Math.m_localMtx, m_cameraWorldMtx);
 
-    PSMTXCopy(mathMtx, m_worldMapMatrix);
-    PSMTXInverse(mathMtx, m_cameraWorldMtx);
-
-    float refValue = 100.0f;
-    float zero;
-    m_target.x = m_target.y = m_target.z = zero = 0.0f;
-    m_position.x = zero;
-    m_position.y = refValue;
-    m_position.z = refValue;
+    m_target.x = m_target.y = m_target.z = 0.0f;
+    m_position.x = 0.0f;
+    m_position.y = 100.0f;
+    m_position.z = 100.0f;
 
     if (fromScript != 0) {
         m_isAbsolute = 1;
@@ -637,27 +618,7 @@ void CCameraPcs::calcViewerCameraMatrix(float (*) [4], const SRT*)
  */
 void CCameraPcs::SetViewerSRT(const SRT* srt)
 {
-    u32* dst = reinterpret_cast<u32*>(&m_viewer);
-    const u32* src = reinterpret_cast<const u32*>(srt);
-    u32 value1;
-    u32 value0 = *src++;
-    value1 = *src;
-    dst[0] = value0;
-    u32 value2 = src[1];
-    dst[1] = value1;
-    value1 = src[2];
-    dst[2] = value2;
-    value2 = src[3];
-    dst[3] = value1;
-    value1 = src[4];
-    dst[4] = value2;
-    u32 value3 = src[5];
-    dst[5] = value1;
-    value2 = src[6];
-    dst[6] = value3;
-    value1 = src[7];
-    dst[7] = value2;
-    dst[8] = value1;
+    *reinterpret_cast<SRT*>(&m_viewer) = *srt;
     m_viewerOverride = 1;
 }
 
@@ -672,22 +633,15 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
  */
 void CCameraPcs::createChara()
 {
-    float farZ = 10000.0f;
-    float nearZ = 10.0f;
-    float fov = 25.0f;
-    float fifty = 50.0f;
-    float negTen = -10.0f;
-    float one = 1.0f;
-    float zero = 0.0f;
     m_viewerOverride = 0;
-    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = zero;
-    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = zero;
-    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = one;
-    m_viewer.m_position.y = negTen;
-    m_viewer.m_distance = fifty;
-    m_fov = fov;
-    m_nearZ = nearZ;
-    m_farZ = farZ;
+    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = 0.0f;
+    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = 0.0f;
+    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = 1.0f;
+    m_viewer.m_position.y = -10.0f;
+    m_viewer.m_distance = 50.0f;
+    m_fov = 25.0f;
+    m_nearZ = 10.0f;
+    m_farZ = 10000.0f;
 }
 
 /*
@@ -711,7 +665,7 @@ void CCameraPcs::destroyChara()
  */
 void CCameraPcs::calcChara()
 {
-    unsigned short padButtons;
+    int padButtons;
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;
@@ -781,27 +735,14 @@ void CCameraPcs::calcChara()
  */
 void CCameraPcs::createMap()
 {
-    float farZ;
-    float nearZ;
-    float fov;
-    float pitch;
-    float distance;
-    float zero;
-
-    zero = 0.0f;
-    distance = 240.0f;
-    pitch = 0.61086524f;
-    fov = 25.0f;
-    nearZ = 10.0f;
-    farZ = 10000.0f;
-    m_mapRotX = m_mapRotY = m_mapRotZ = zero;
-    m_position.x = m_position.y = m_position.z = zero;
-    m_yaw = zero;
-    m_distance = distance;
-    m_pitch = pitch;
-    m_fov = fov;
-    m_nearZ = nearZ;
-    m_farZ = farZ;
+    m_mapRotX = m_mapRotY = m_mapRotZ = 0.0f;
+    m_position.x = m_position.y = m_position.z = 0.0f;
+    m_yaw = 0.0f;
+    m_distance = 240.0f;
+    m_pitch = 0.61086524f;
+    m_fov = 25.0f;
+    m_nearZ = 10.0f;
+    m_farZ = 10000.0f;
 }
 
 /*
@@ -844,15 +785,12 @@ void CCameraPcs::calcMap()
 
     buttons = Pad.GetButton(0);
 
-    stickH = Pad.GetRightStickX(0);
-    stickH = 0.017453292519943295f * (stickH / 0.125f);
+    stickH = Pad.GetRightStickX(0) / 0.125f * 0.017453292519943295f;
 
     stickV = Pad.GetRightStickY(0);
     stickV = -(0.017453292519943295f * (stickV / 0.125f));
 
-    triggerL = Pad.GetLeftStickX(0);
-
-    m_fov += triggerL;
+    m_fov += Pad.GetLeftStickX(0);
     m_mapRotX += stickV;
     m_mapRotY -= stickH;
 
@@ -1084,9 +1022,8 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         if (!(clipBound.m_min.z > -400.0f)) {
             continue;
         }
-        float negMinZ = -clipBound.m_min.z;
-        float ratioX = (clipBound.m_max.x - clipBound.m_min.x) / negMinZ;
-        float ratioY = (clipBound.m_max.y - clipBound.m_min.y) / negMinZ;
+        float ratioX = (clipBound.m_max.x - clipBound.m_min.x) / -clipBound.m_min.z;
+        float ratioY = (clipBound.m_max.y - clipBound.m_min.y) / -clipBound.m_min.z;
         if (ratioX > 0.2f) {
             // proceed
         } else if (!(ratioY > 0.2f)) {
@@ -1156,10 +1093,7 @@ void CCameraPcs::drawShadowBegin()
             m_target.y = m_fullScreenShadowPosition.y;
 
             depth = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
-            float h = m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z;
-            if (depth < h) {
-                depth = h;
-            }
+            if (depth < m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z) depth = m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z;
             m_fullScreenShadow.m_span = 0.5f * depth;
         } else if (m_shadowAuto == 2) {
             m_target.x = m_fullScreenShadowPosition.x;
@@ -1229,11 +1163,7 @@ void CCameraPcs::drawShadowBegin()
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);
     GXSetColorUpdate(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);
-    {
-        float vpXY = 2.0f;
-        float vpWH = 476.0f;
-        GXSetViewport(vpXY, vpXY, vpWH, vpWH, 0.0f, 1.0f);
-    }
+    GXSetViewport(2.0f, 2.0f, 476.0f, 476.0f, 0.0f, 1.0f);
     GXSetScissor(2, 2, 0x1DC, 0x1DC);
     _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_NOOP);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
@@ -1433,15 +1363,12 @@ void CCameraPcs::drawShadowEndAll()
  */
 void CCameraPcs::createMaterialEditor()
 {
-    float negThirty = -30.0f;
-    float one = 1.0f;
-    float zero = 0.0f;
     m_viewerOverride = 0;
-    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = zero;
-    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = zero;
-    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = one;
-    m_viewer.m_position.y = zero;
-    m_viewer.m_position.z = negThirty;
+    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = 0.0f;
+    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = 0.0f;
+    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = 1.0f;
+    m_viewer.m_position.y = 0.0f;
+    m_viewer.m_position.z = -30.0f;
 }
 
 /*
@@ -1469,7 +1396,7 @@ void CCameraPcs::destroyMaterialEditor()
  */
 void CCameraPcs::calcMaterialEditor()
 {
-    unsigned short padButtons;
+    int padButtons;
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;
@@ -1524,15 +1451,12 @@ void CCameraPcs::calcMaterialEditor()
  */
 void CCameraPcs::createFunnyShape()
 {
-    float negThirty = -30.0f;
-    float one = 1.0f;
-    float zero = 0.0f;
     m_viewerOverride = 0;
-    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = zero;
-    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = zero;
-    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = one;
-    m_viewer.m_position.y = zero;
-    m_viewer.m_position.z = negThirty;
+    m_viewer.m_position.x = m_viewer.m_position.y = m_viewer.m_position.z = 0.0f;
+    m_viewer.m_rotX = m_viewer.m_rotY = m_viewer.m_distance = 0.0f;
+    m_viewer.m_scale.x = m_viewer.m_scale.y = m_viewer.m_scale.z = 1.0f;
+    m_viewer.m_position.y = 0.0f;
+    m_viewer.m_position.z = -30.0f;
 }
 
 /*
@@ -1560,7 +1484,7 @@ void CCameraPcs::destroyFunnyShape()
  */
 void CCameraPcs::calcFunnyShape()
 {
-    unsigned short padButtons;
+    int padButtons;
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;

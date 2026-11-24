@@ -18,7 +18,22 @@ public:
 #ifndef FFCC_MAPKEYFRAME_NO_DESTRUCTOR
     ~CMapKeyFrame()
     {
-        Destroy();
+        if (m_junTable != 0) {
+            delete m_junTable;
+            m_junTable = 0;
+        }
+        if (m_keyFrame != 0) {
+            delete m_keyFrame;
+            m_keyFrame = 0;
+        }
+        if (m_keyValue != 0) {
+            delete m_keyValue;
+            m_keyValue = 0;
+        }
+        if (m_splineTable != 0) {
+            delete m_splineTable;
+            m_splineTable = 0;
+        }
     }
 #endif
 

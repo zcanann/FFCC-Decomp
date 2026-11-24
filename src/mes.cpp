@@ -469,17 +469,13 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			case 0x3D:
 			{
 				char* q = (char*)op + 4;
-				int countIdx = GET_1(&q);
-				int count = (unsigned short)CMes::m_tempVar[countIdx];
-				Game.MakeArtItemName(out, value, count);
+				Game.MakeArtItemName(out, value, (unsigned short)CMes::m_tempVar[GET_1(&q)]);
 				break;
 			}
 			case 0x3F:
 			{
 				char* q = (char*)op + 4;
-				int countIdx = GET_1(&q);
-				int count = (unsigned short)CMes::m_tempVar[countIdx];
-				Game.MakeNumItemName(out, value, count);
+				Game.MakeNumItemName(out, value, (unsigned short)CMes::m_tempVar[GET_1(&q)]);
 				break;
 			}
 			case 0x1D:
@@ -958,9 +954,7 @@ void CMes::Draw()
 #ifdef VERSION_GCCJGC
 					font->SetScale(glyph->m_scale);
 #else
-					float glyphScaleY = 0.01f * (float)glyph->m_scaleY;
-					font->SetScaleX(0.01f * (float)glyph->m_scaleX);
-					font->SetScaleY(glyphScaleY);
+					font->SetScale(0.01f * (float)glyph->m_scaleX, 0.01f * (float)glyph->m_scaleY);
 #endif
 					font->SetAlign(1);
 					font->Draw(glyph->m_char);
@@ -1446,12 +1440,8 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x35:
 		{
-			float scale = 0.01f * (float)GET_2(text);
-			mScaleY = scale;
-			mScaleX = scale;
-			float tagScaleY = mScaleY;
-			font->SetScaleX(mScaleX);
-			font->SetScaleY(tagScaleY);
+			mScaleX = mScaleY = 0.01f * (float)GET_2(text);
+			font->SetScale(mScaleX, mScaleY);
 			break;
 		}
 		case 0x1A:
@@ -1728,12 +1718,9 @@ void CMes::Set(char* text, int param)
 #ifdef VERSION_GCCJGC
 	mMaxWidth = mMaxHeight = 0.0f;
 #else
-	mMaxHeight = 0.0f;
-	mMaxWidth = 0.0f;
+	mMaxWidth = mMaxHeight = 0.0f;
 #endif
-	mCounter = 0;
-	mFlagCursor = 0;
-	mFlagCount = 0;
+	mFlagCount = mFlagCursor = mCounter = 0;
 	mRubyEnabled = 0;
 	mFontCount = param;
 #ifdef VERSION_GCCJGC
@@ -1754,9 +1741,7 @@ void CMes::Set(char* text, int param)
 		float lineZero = 0.0f;
 
 		while (mWaitActive == 0) {
-			mCounter = 0;
-			mFlagCursor = 0;
-			mFlagCount = 0;
+			mFlagCount = mFlagCursor = mCounter = 0;
 #ifdef VERSION_GCCJGC
 			mCurrentX = mCurrentY = 0.0f;
 			mLineWidth = mLineHeight = 0.0f;
@@ -1831,8 +1816,7 @@ CMes::CMes()
 {
 	mText = 0;
 	mCounter = 0;
-	mFlagCursor = 0;
-	mFlagCount = 0;
+	mFlagCount = mFlagCursor = 0;
 	mTlutBase = 0;
 	mShadow = 1;
 	memset(mFlagVars, 0, sizeof(mFlagVars));

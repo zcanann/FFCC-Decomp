@@ -1474,9 +1474,10 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			continue;
 		case 0x0B: {
 			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
-			CClass* cls = m_classes;
-			cls += newObject->m_activeClassIndex;
-			CFunc* func = m_funcs + cls->m_functionTable[0];
+			const s32* functionTable = m_classes[newObject->m_activeClassIndex].m_functionTable;
+			const int funcIndex = functionTable[0];
+			FFCC_ASSERT(0 <= funcIndex && funcIndex < m_funcCount);
+			CFunc* func = m_funcs + funcIndex;
 
 			for (int i = 0; i < func->m_argCount; i++) {
 				newObject->m_sp[i] = object->m_sp[i - func->m_argCount];

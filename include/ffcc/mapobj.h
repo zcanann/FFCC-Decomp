@@ -177,6 +177,22 @@ public:
     {
         m_calcMtxPending = m_localMtxDirty = 1;
     }
+    void SetCameraSemiTrans(float nearRange, float farRange, float minAlpha, float maxAlpha, float fadeRange)
+    {
+        m_cameraSemiTransNear = nearRange;
+        m_cameraSemiTransFar = farRange;
+        m_cameraSemiTransFadeRange = fadeRange;
+        m_cameraSemiTransMinAlpha = minAlpha;
+        m_cameraSemiTransMaxAlpha = maxAlpha;
+        if (m_mapData != 0 && m_octTreeIndex != -1) {
+            m_cameraSemiTransMinAlpha = 1.0e15f;
+            m_cameraSemiTransMaxAlpha = -1.0f;
+            m_drawPriority = 2;
+            m_cameraSemiTransActive = 1;
+        }
+        m_cameraSemiTransAlpha = m_cameraSemiTransTargetAlpha = 0x4000;
+        m_cameraSemiTransStep = 0;
+    }
     void SetCameraSemiTransAlpha(int alpha, int frameCount)
     {
         m_cameraSemiTransTargetAlpha = static_cast<short>(alpha << 7);

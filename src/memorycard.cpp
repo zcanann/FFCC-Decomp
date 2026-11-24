@@ -276,12 +276,12 @@ void CMemoryCardMan::Init()
  */
 void CMemoryCardMan::Quit()
 {
-  m_currentSlot = -1;
+  m_currentSlot = 0xFF;
 
-  if (m_mountWorkArea != (void*)nullptr)
+  if (m_mountWorkArea != 0)
   {
     delete[] m_mountWorkArea;
-    m_mountWorkArea = (void*)nullptr;
+    m_mountWorkArea = 0;
   }
 
   Memory.DestroyStage(m_stage);
@@ -410,7 +410,7 @@ void Attach(long currentSlot, long result)
     if (result != 0)
         return;
 
-    MemoryCardMan.SetMountChan(currentSlot);
+    MemoryCardMan.m_currentSlot = currentSlot;
 }
 
 /*
@@ -664,10 +664,10 @@ void CMemoryCardMan::CreateMcBuff()
  */
 void CMemoryCardMan::DestroyMcBuff()
 {
-  if (m_saveBuffer != (char*)nullptr)
+  if (m_saveBuffer != 0)
   {
     delete[] m_saveBuffer;
-	m_saveBuffer = (char*)nullptr;
+    m_saveBuffer = 0;
   }
 }
 
@@ -733,7 +733,7 @@ void CMemoryCardMan::McEnd()
  */
 void CMemoryCardMan::SetMcIconImage()
 {
-    if (m_saveBuffer == (char*)nullptr)
+    if (m_saveBuffer == 0)
     {
         CreateMcBuff();
     }
@@ -781,7 +781,7 @@ void CMemoryCardMan::SetMcIconImage()
     m_cardStat.commentAddr = 0;
     m_cardStat.iconAddr    = 0x40;
 
-    m_cardStat.bannerFormat = (m_cardStat.bannerFormat & ~0x03) | 0x02; // lower 2 bits = 2
+    m_cardStat.bannerFormat = (m_cardStat.bannerFormat & ~0x03) | 0x02;
 
     m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x0003) | 0x0001;
     m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x0003) | 0x0002;
@@ -1423,9 +1423,14 @@ void CMemoryCardMan::SetLoadData()
  */
 unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
-    unsigned char* data = saveData == 0 ? reinterpret_cast<unsigned char*>(m_saveBuffer)
-                                       : reinterpret_cast<unsigned char*>(saveData);
-    unsigned int crc = 0xFFFFFFFF;
+    unsigned char* data;
+    unsigned int crc;
+    if (saveData == 0) {
+        data = (unsigned char*)m_saveBuffer;
+    } else {
+        data = (unsigned char*)saveData;
+    }
+    crc = 0xFFFFFFFF;
     Crc32(0x1C, data, &crc);
     Crc32(0x8BB0, data + 0x20, &crc);
     return ~crc;

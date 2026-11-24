@@ -49,6 +49,38 @@ struct VertexApSource
     Vec* points;
 };
 
+static inline void apea(_pppPObject* parent, PVertexAp* dataRaw, Vec* vec)
+{
+    VertexApData* data = (VertexApData*)dataRaw;
+    if ((data->childId + 0x10000) != 0xFFFF) {
+        s32 childId = data->childId;
+        _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
+        Vec pos;
+        Vec* outPos;
+        _pppPObject* child;
+
+        if (childData == 0) {
+            child = 0;
+        } else {
+            child = pppCreatePObject(ppvMng, childData);
+            child->m_link.m_previous = &parent->m_link;
+        }
+
+        pos.x = vec->x;
+        pos.y = vec->y;
+        pos.z = vec->z;
+        PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+        outPos = (Vec*)(child->m_workArea + data->childPosOffset);
+        if (data->useWorldMtx == 0) {
+            outPos->x = pos.x;
+            outPos->y = pos.y;
+            outPos->z = pos.z;
+        } else {
+            PSMTXMultVec(ppvMng->m_matrix.value, &pos, outPos);
+        }
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800647e0
@@ -63,6 +95,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
     VertexApData* data = (VertexApData*)dataRaw;
     s32 stateOffset = ctrl->m_serializedDataOffsets[0];
     VertexApState* state = (VertexApState*)(parent->m_workArea + stateOffset);
+    Vec v;
+    Vec* vertex;
 
     if (ppvUserStopPartF != 0) {
         goto exitStub;
@@ -80,8 +114,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
         entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
-            VertexApSource* src = env->sourceTable[entry->vertexSetIndex];
-            points = src->points;
+            points = env->sourceTable[entry->vertexSetIndex]->points;
         }
 
         count = data->spawnCount;
@@ -91,48 +124,20 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
             goto setCountdown;
         case 0:
             goto mode0Dispatch;
-        mode0Body: {
+        mode0Body:
+            {
                 if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
-                u16 outValue = state->index;
                 u16* vertexIndices = entry->vertexIndices;
-                state->index++;
+                u16 outValue = state->index++;
                 u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
-
-                if ((data->childId + 0x10000) != 0xFFFF) {
-                    s32 childId = data->childId;
-                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
-                    Vec pos;
-                    Vec* outPos;
-                    _pppPObject* child;
-
-                    if (childData == 0) {
-                        child = 0;
-                    } else {
-                        child = pppCreatePObject(ppvMng, childData);
-                        child->m_link.m_previous = &parent->m_link;
-                    }
-
-                    pos.x = x;
-                    pos.y = y;
-                    pos.z = z;
-                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
-                    outPos = (Vec*)(child->m_workArea + data->childPosOffset);
-
-                    if (data->useWorldMtx == 0) {
-                        outPos->x = pos.x;
-                        outPos->y = pos.y;
-                        outPos->z = pos.z;
-                    } else {
-                        PSMTXMultVec(ppvMng->m_matrix.value, &pos, outPos);
-                    }
-                }
+                vertex = &points[vertexIndex];
+                v.x = vertex->x;
+                v.y = vertex->y;
+                v.z = vertex->z;
+                apea(parent, dataRaw, &v);
             }
         mode0Test:
             if (count-- != 0) {
@@ -141,47 +146,18 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
             goto setCountdown;
         case 1:
             goto mode1Dispatch;
-        mode1Init:
-            goto mode1Test;
-        mode1Body: {
+        mode1Body:
+            {
                 f32 randValue = Math.RandF();
                 f32 maxValue = (f32)entry->maxValue;
                 int outValue = (int)(randValue * maxValue);
                 u16* vertexIndices = entry->vertexIndices;
                 u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
-
-                if ((data->childId + 0x10000) != 0xFFFF) {
-                    s32 childId = data->childId;
-                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
-                    Vec pos;
-                    Vec* outPos;
-                    _pppPObject* child;
-
-                    if (childData == 0) {
-                        child = 0;
-                    } else {
-                        child = pppCreatePObject(ppvMng, childData);
-                        child->m_link.m_previous = &parent->m_link;
-                    }
-
-                    pos.x = x;
-                    pos.y = y;
-                    pos.z = z;
-                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
-                    outPos = (Vec*)(child->m_workArea + data->childPosOffset);
-
-                    if (data->useWorldMtx == 0) {
-                        outPos->x = pos.x;
-                        outPos->y = pos.y;
-                        outPos->z = pos.z;
-                    } else {
-                        PSMTXMultVec(ppvMng->m_matrix.value, &pos, outPos);
-                    }
-                }
+                vertex = &points[vertexIndex];
+                v.x = vertex->x;
+                v.y = vertex->y;
+                v.z = vertex->z;
+                apea(parent, dataRaw, &v);
             }
         mode1Test:
             if (count-- != 0) {
@@ -219,6 +195,7 @@ void pppVertexApCon(_pppPObject* pobj, _pppCtrlTable* ctrl)
 {
     s32 offset = ctrl->m_serializedDataOffsets[0];
     u16* state = (u16*)(pobj->m_workArea + offset);
+
     state[0] = 0;
     state[1] = 0;
 }

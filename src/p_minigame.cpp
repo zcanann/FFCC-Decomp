@@ -81,8 +81,7 @@ inline void GbaThreadSleep(long long ticks)
     MiniGameAlarm alarm;
     OSCreateAlarm(&alarm.alarm);
     OSSetAlarmTag(&alarm.alarm, 1);
-    OSThread* currentThread = OSGetCurrentThread();
-    alarm.thread = currentThread;
+    alarm.thread = OSGetCurrentThread();
     BOOL interruptLevel = OSDisableInterrupts();
     OSSetAlarm(&alarm.alarm, ticks, GbaThreadAlarmHandler);
     OSSuspendThread(alarm.thread);
@@ -105,7 +104,8 @@ static inline bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
  */
 inline unsigned short ChgHL16(unsigned short value)
 {
-    return (value << 8) | (value >> 8);
+    unsigned short tmp = value;
+    return (tmp << 8) | (tmp >> 8);
 }
 
 /*
@@ -122,11 +122,11 @@ inline void MiniGameFileRead(char* path, void* destination, unsigned long& size)
     CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
     if (handle != 0)
     {
-        size = handle->GetLength();
+        size = File.GetLength(handle);
         handle->Read();
         handle->SyncCompleted();
         void* buffer = File.m_readBuffer;
-        handle->Close();
+        File.Close(handle);
         memcpy(destination, buffer, size);
     }
 }
@@ -545,9 +545,10 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
  * JP Address: TODO
  * JP Size: TODO
  */
-static void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext*)
+static void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext* context)
 {
-    OSResumeThread(reinterpret_cast<MiniGameAlarm*>(alarm)->thread);
+    MiniGameAlarm* mgAlarm = reinterpret_cast<MiniGameAlarm*>(alarm);
+    OSResumeThread(mgAlarm->thread);
 }
 
 /*
@@ -1419,7 +1420,8 @@ void CMiniGamePcs::calc()
             char managerFile[256];
             char managerSpFile[256];
 
-            sprintf(managerFile, "%s/mgr%02d.bin", "dvd/minigame/mgr", m_managerIndex);
+            int idx = m_managerIndex;
+            sprintf(managerFile, "%s/mgr%02d.bin", "dvd/minigame/mgr", idx);
             sprintf(managerSpFile, "%s/mgrsp%02d.bin", "dvd/minigame/mgr", m_managerIndex);
 
             if ((unsigned int)System.m_execParam >= 3)
@@ -1747,17 +1749,21 @@ next_player:
                     unsigned int masked = word & 0xFFFF00;
                     if ((word & 0x8000) != 0)
                     {
-                        PadCodeProc(i, ChgHL16(masked >> 8));
+                        unsigned short code = ChgHL16(masked >> 8);
+                        PadCodeProc(i, code);
                     }
                     m_broadcastWords[i] = (i + 0x40) * 0x1000000;
                     m_broadcastWords[i] |= masked;
-                    m_broadcastWords[i] |= CalcCrc(m_broadcastWords[i]) & 0xFF;
+                    unsigned long crcTmp = CalcCrc(m_broadcastWords[i]);
+                    m_broadcastWords[i] |= crcTmp & 0xFF;
                     i++;
                 } while (i < 4);
 
                 m_broadcastWords[4] = 0x44000000;
-                m_broadcastWords[4] |= ChgHL16(m_statusCode) << 8;
-                m_broadcastWords[4] |= CalcCrc(m_broadcastWords[4]) & 0xFF;
+                unsigned short swapped = ChgHL16(m_statusCode);
+                m_broadcastWords[4] |= swapped << 8;
+                unsigned long crc3 = CalcCrc(m_broadcastWords[4]);
+                m_broadcastWords[4] |= crc3 & 0xFF;
                 i = 0;
                 do
                 {

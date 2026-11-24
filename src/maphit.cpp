@@ -645,13 +645,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 m_vertices[i].z = chunkFile.GetF4();
 
                 Vec* v = &m_vertices[i];
-                m_bound.m_min.x = (m_bound.m_min.x < v->x) ? m_bound.m_min.x : v->x;
-                m_bound.m_min.y = (m_bound.m_min.y < v->y) ? m_bound.m_min.y : v->y;
-                m_bound.m_min.z = (m_bound.m_min.z < v->z) ? m_bound.m_min.z : v->z;
-
-                m_bound.m_max.x = (m_bound.m_max.x > v->x) ? m_bound.m_max.x : v->x;
-                m_bound.m_max.y = (m_bound.m_max.y > v->y) ? m_bound.m_max.y : v->y;
-                m_bound.m_max.z = (m_bound.m_max.z > v->z) ? m_bound.m_max.z : v->z;
+                m_bound.Add(v);
             }
 
             m_bound.m_min.x -= kMapHitUnitScale;
@@ -723,14 +717,8 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 for (int i = 0; i < face.m_vertexCount; i++) {
                     face.m_vertexIndices[i] = chunkFile.Get2();
 
-                    const Vec& v = m_vertices[face.m_vertexIndices[i]];
-                    face.m_bound.m_min.x = (face.m_bound.m_min.x < v.x) ? face.m_bound.m_min.x : v.x;
-                    face.m_bound.m_min.y = (face.m_bound.m_min.y < v.y) ? face.m_bound.m_min.y : v.y;
-                    face.m_bound.m_min.z = (face.m_bound.m_min.z < v.z) ? face.m_bound.m_min.z : v.z;
-
-                    face.m_bound.m_max.x = (face.m_bound.m_max.x > v.x) ? face.m_bound.m_max.x : v.x;
-                    face.m_bound.m_max.y = (face.m_bound.m_max.y > v.y) ? face.m_bound.m_max.y : v.y;
-                    face.m_bound.m_max.z = (face.m_bound.m_max.z > v.z) ? face.m_bound.m_max.z : v.z;
+                    Vec* v = &m_vertices[face.m_vertexIndices[i]];
+                    face.m_bound.Add(v);
                 }
 
                 face.m_radiusScale *= radiusScale;
@@ -857,12 +845,9 @@ static int FindIntersection(const Vec& start, const Vec& direction, const CMapCy
 
 cylinder_body:
     {
-        const f32 vy = localDirection.y;
-        const f32 radialC = (px * px + py * py) - radiusSq;
-        const f32 radialB = px * localDirection.x + py * vy;
-        const f32 vxSq = localDirection.x * localDirection.x;
-        const f32 vySq = vy * vy;
-        const f32 radialA = vxSq + vySq;
+        const f32 radialA = localDirection.x * localDirection.x + localDirection.y * localDirection.y;
+        f32 radialB = px * localDirection.x + py * localDirection.y;
+        f32 radialC = (px * px + py * py) - radiusSq;
         disc = radialB * radialB - radialA * radialC;
         if (disc < 0.0) {
             return 0;
@@ -896,14 +881,14 @@ cylinder_body:
             return 0;
         }
 
-        f32 capC = (pz * pz) + radialC;
-        f32 capB = (pz * localDirection.z) + radialB;
-        disc = capB * capB - capC;
+        radialC += pz * pz;
+        radialB += pz * localDirection.z;
+        disc = radialB * radialB - radialC;
         if (disc > 0.0) {
             disc = sqrtf(disc);
             f32 t;
             f32 z;
-            t = -capB - disc;
+            t = -radialB - disc;
             z = (t * localDirection.z) + pz;
             if (z <= 0.0) {
                 outT = t * tScale;
@@ -913,7 +898,7 @@ cylinder_body:
                 return 0;
             }
 
-            t = -capB + disc;
+            t = -radialB + disc;
             z = (t * localDirection.z) + pz;
             if (z <= 0.0) {
                 outT = t * tScale;
@@ -923,7 +908,7 @@ cylinder_body:
                 return 0;
             }
         } else if (disc == 0.0) {
-            const f32 t = -capB;
+            const f32 t = -radialB;
             if ((t * localDirection.z) + pz <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
@@ -933,13 +918,13 @@ cylinder_body:
             }
         }
 
-        capB = capB - (localDirection.z * axisLen);
-        disc = capB * capB - (f32)(axisLen * -((2.0 * pz) - axisLen) + capC);
+        radialB -= localDirection.z * axisLen;
+        disc = radialB * radialB - (f32)(axisLen * -((2.0 * pz) - axisLen) + radialC);
         if (disc > 0.0) {
             disc = sqrtf(disc);
             f32 t;
             f32 z;
-            t = -capB - disc;
+            t = -radialB - disc;
             z = (t * localDirection.z) + pz;
             if (z >= axisLen) {
                 outT = t * tScale;
@@ -949,7 +934,7 @@ cylinder_body:
                 return 0;
             }
 
-            t = -capB + disc;
+            t = -radialB + disc;
             z = (t * localDirection.z) + pz;
             if (z >= axisLen) {
                 outT = t * tScale;
@@ -959,7 +944,7 @@ cylinder_body:
                 return 0;
             }
         } else if (disc == 0.0) {
-            const f32 t = -capB;
+            const f32 t = -radialB;
             if ((t * localDirection.z) + pz >= axisLen) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {

@@ -259,8 +259,6 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
 {
     YmBreathParticleGroup* debugGroupData;
     PYmBreath* params = pYmBreath;
-    int workOffset;
-    int colorOffset;
     VYmBreath* work;
     VColor* color;
     PARTICLE_DATA* particle;
@@ -284,10 +282,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
     pppFMATRIX viewMtx;
     Mtx drawMtx;
 
-    workOffset = offsets->m_serializedDataOffsets[0];
-    colorOffset = offsets->m_serializedDataOffsets[1];
-    work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + workOffset);
-    color = reinterpret_cast<VColor*>(ymBreath->m_workArea + colorOffset);
+    work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + offsets->m_serializedDataOffsets[0]);
+    color = reinterpret_cast<VColor*>(ymBreath->m_workArea + offsets->m_serializedDataOffsets[1]);
     particle = work->m_particleData;
     matrixList = work->m_particleWmats;
     particleColor = work->m_particleColors;
@@ -836,7 +832,6 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
     pppFMATRIX rotMtx ATTRIBUTE_ALIGN(8);
     float spread;
     float range;
-    u8 flags;
 
     spread = (float)(unsigned int)pYmBreath->m_spread;
     range = spread * 2.0f;
@@ -870,8 +865,7 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
     particle->m_direction.y *= params->m_directionScaleY;
     particle->m_direction.z *= params->m_directionScaleZ;
 
-    Vec directionNorm = particle->m_direction;
-    pppNormalize(particle->m_direction, directionNorm);
+    pppNormalize(particle->m_direction, particle->m_direction);
 
     if (0.0f != params->m_spawnOffset) {
         PSVECScale(&particle->m_direction, &particle->m_position, params->m_spawnOffset);
@@ -890,12 +884,11 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
 
     if (params->m_angleFlags != 0) {
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
-        flags = params->m_angleFlags;
-        if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+        if (((params->m_angleFlags & 1) != 0) && ((params->m_angleFlags & 2) != 0)) {
             if (0.5 < Math.RandF()) {
                 particle->m_angleRandom *= -1.0f;
             }
-        } else if ((flags & 2) != 0) {
+        } else if ((params->m_angleFlags & 2) != 0) {
             particle->m_angleRandom *= -1.0f;
         }
     }
@@ -959,9 +952,8 @@ static void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBrea
         particle->m_rotationVelocityY += particle->m_rotationAccelY;
     }
 
-    float zero = 0.0f;
     particle->m_scale = params->m_groupSpeed;
-    if (zero != params->m_scaleRandomRange) {
+    if (0.0f != params->m_scaleRandomRange) {
         float rand = Math.RandF();
         float scaledRange = params->m_scaleRandomRange * 2.0f;
         particle->m_scale += scaledRange * rand - params->m_scaleRandomRange;

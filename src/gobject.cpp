@@ -162,12 +162,135 @@ static inline float ClampFloat(float value, float minValue, float maxValue)
     return value;
 }
 
+namespace std {
+float atan2(float y, float x);
+float sinf(float x);
+float cosf(float x);
+float acosf(float x);
+float atan2f(float y, float x);
+float fmodf(float x, float y);
+float tan(float x);
+float tanf(float x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80043E60
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::atan2f(float y, float x)
+{
+    return (float)::atan2((double)y, (double)x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8008DE24
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::atan2(float y, float x)
+{
+    return std::atan2f(y, x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80020024
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::sinf(float x)
+{
+    return (float)sin((double)x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80020050
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::cosf(float x)
+{
+    return (float)cos((double)x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80025374
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::acosf(float x)
+{
+    return (float)acos((double)x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80050610
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::fmodf(float x, float y)
+{
+    return (float)fmod((double)x, (double)y);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80093098
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::tanf(float x)
+{
+    return (float)::tan((double)x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80093070
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float std::tan(float x)
+{
+    return std::tanf(x);
+}
+
 static inline float WrapAnimFrame(float value, float span)
 {
     if (value < 0.0f) {
-        return (span - 1.0f) - fmodf(-value, span);
+        return (span - 1.0f) - std::fmodf(-value, span);
     }
-    return fmodf(value, span);
+    return std::fmodf(value, span);
 }
 
 inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
@@ -210,13 +333,18 @@ inline unsigned long CMapPcs::GetHitGrpBit()
     return g_MapMng.m_mapIdGrpArray[gMapHitFace->m_groupIndex].m_mask;
 }
 
-namespace std {
-float atan2(float y, float x);
-}
-
-inline float std::atan2(float y, float x)
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8001A8C4
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CSystem::GetErrorLevel()
 {
-    return atan2f(y, x);
+    return m_execParam;
 }
 
 inline void VECLerp(Vec* a, Vec* b, Vec* out, float t)
@@ -629,13 +757,13 @@ void CGObject::move()
                     Vec cross;
                     PSVECNormalize(&m_worldPosition, &worldPosNorm);
                     float upDot = PSVECDotProduct(&worldUp, &worldPosNorm);
-                    PSMTXRotRad(pitchMtx, 'x', acosf(upDot));
+                    PSMTXRotRad(pitchMtx, 'x', std::acosf(upDot));
                     PSMTXConcat(yawMtx, pitchMtx, yawMtx);
 
                     PSVECNormalize(&m_groundHitOffset, &moveNorm);
                     PSMTXMultVec(yawMtx, &tangent, &tangent);
                     float tanDot = PSVECDotProduct(&tangent, &moveNorm);
-                    float targetRot = acosf(tanDot);
+                    float targetRot = std::acosf(tanDot);
 
                     PSVECCrossProduct(&tangent, &moveNorm, &cross);
                     if (PSVECDotProduct(&worldPosNorm, &cross) < 0.0f) {
@@ -686,9 +814,9 @@ void CGObject::objectCollision()
 
     self.obj = this;
     PSVECAdd(&m_worldPosition, &m_groundHitOffset, &self.basePos);
-    self.capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
+    self.capsuleOffset.x = m_bodyEllipsoidOffset * -std::sinf(m_rotBaseY);
     self.capsuleOffset.y = 0.0f;
-    self.capsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
+    self.capsuleOffset.z = m_bodyEllipsoidOffset * -std::cosf(m_rotBaseY);
     PSVECAdd(&self.basePos, &self.capsuleOffset, &self.capsulePos);
 
     if ((m_bgColMask & 0x10000) != 0) {
@@ -710,9 +838,9 @@ void CGObject::objectCollision()
         Vec scratch;
         info.obj = other;
         PSVECAdd(&other->m_worldPosition, &other->m_groundHitOffset, &info.basePos);
-        info.capsuleOffset.x = other->m_bodyEllipsoidOffset * -sinf(other->m_rotBaseY);
+        info.capsuleOffset.x = other->m_bodyEllipsoidOffset * -std::sinf(other->m_rotBaseY);
         info.capsuleOffset.y = 0.0f;
-        info.capsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
+        info.capsuleOffset.z = other->m_bodyEllipsoidOffset * -std::cosf(other->m_rotBaseY);
         PSVECAdd(&info.basePos, &info.capsuleOffset, &info.capsulePos);
 
         const float capsuleDistance = PSVECDistance(&info.capsulePos, &self.capsulePos);
@@ -842,7 +970,7 @@ void CGObject::bgCollision()
     {
         MapPcs.IsHitFaceFlag(1);
 
-        if (Game.m_currentMapId == 0x21)
+        if (Game.IsWorldMap())
         {
             bgWorldCollision();
         }
@@ -928,7 +1056,7 @@ void CGObject::bgNormalCollision()
         if (groupIndex != 0) {
             m_lastBgGroup = static_cast<char>(groupIndex);
         }
-        MapPcs.GetHitFaceNormal(&HitFaceNormal());
+        MapPcs.GetHitFaceNormal(&m_hitFaceNormal);
     }
 
     if (MapPcs.CalcHitSlide(&move, 0.5f) != 0) {
@@ -1011,7 +1139,7 @@ void CGObject::bgWorldCollision()
             if (groupIndex != 0) {
                 m_lastBgGroup = static_cast<char>(groupIndex);
             }
-            MapPcs.GetHitFaceNormal(&HitFaceNormal());
+            MapPcs.GetHitFaceNormal(&m_hitFaceNormal);
         }
     }
 }
@@ -1100,10 +1228,7 @@ inline void CGObject::bgShadeCollision()
  */
 void CGObject::hit()
 {
-    const bool hasModel =
-        (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
-        (m_charaModelHandle->m_model != (CChara::CModel*)0);
-    if (!hasModel) {
+    if (!IsHChara()) {
         return;
     }
     for (int i = 0; i < 8; i++) {
@@ -1170,7 +1295,7 @@ void CGObject::hit()
                     continue;
                 }
 
-                if ((static_cast<unsigned short>(GetCID()) & 0x2D) == 0x2D) {
+                if (IsKindOf(0x2D)) {
                     CFlatRuntime::CStack stackIn[7];
                     stackIn[0].m_word = static_cast<u32>(attackIndex);
                     stackIn[1].m_word = static_cast<u32>(other->m_particleId);
@@ -1234,8 +1359,7 @@ inline int CGObject::IsHWeapon()
  */
 inline void CChara::CModel::GetLookAt(Vec2d* lookAt)
 {
-    lookAt->x = m_chestTilt;
-    lookAt->y = m_chestAmp;
+    *lookAt = m_lookAt;
 }
 
 /*
@@ -1249,8 +1373,7 @@ inline void CChara::CModel::GetLookAt(Vec2d* lookAt)
  */
 inline void CChara::CModel::SetLookAt(Vec2d* lookAt)
 {
-    m_chestTilt = lookAt->x;
-    m_chestAmp = lookAt->y;
+    m_lookAt = *lookAt;
 }
 
 /*
@@ -1315,11 +1438,11 @@ void CGObject::update()
     if (Game.m_currentMapId == 0x21) {
         Mtx tempMtx;
 
-        PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
+        PSMTXRotRad(modelMtx, 'y', std::atan2f(m_worldPosition.x, m_worldPosition.z));
         Vec mapUp = {0.0f, 1.0f, 0.0f};
         Vec worldNorm;
         PSVECNormalize(&m_worldPosition, &worldNorm);
-        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
+        PSMTXRotRad(tempMtx, 'x', std::acosf(PSVECDotProduct(&mapUp, &worldNorm)));
         PSMTXConcat(modelMtx, tempMtx, modelMtx);
 
         PSMTXRotRad(tempMtx, 'y', m_rotBaseY);
@@ -1353,8 +1476,8 @@ void CGObject::update()
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
             srt.m_rotation.y = 3.1415927f - cameraYaw;
-            srt.m_rotation.y += 0.5f * cosf(0.5f * m_swayTarget.x);
-            srt.m_position.y += 1.0f + sinf(m_swayTarget.x);
+            srt.m_rotation.y += 0.5f * std::cosf(0.5f * m_swayTarget.x);
+            srt.m_position.y += 1.0f + std::sinf(m_swayTarget.x);
             m_swayTarget.x += 0.1f;
         }
 
@@ -1405,7 +1528,7 @@ void CGObject::update()
             PSVECNormalize(&m_swayDirection, &swayDir);
             const float swayDot = PSVECDotProduct(&swayDir, CVector(0.0f, 1.0f, 0.0f));
             if (swayDot < 0.9999f) {
-                const float negSwayAngle = -acosf(swayDot);
+                const float negSwayAngle = -std::acosf(swayDot);
                 Vec swayAxis;
                 PSVECCrossProduct(&swayDir, CVector(0.0f, 1.0f, 0.0f), &swayAxis);
                 PSMTXRotAxisRad(rotScratch, &swayAxis, negSwayAngle);
@@ -1417,7 +1540,7 @@ void CGObject::update()
                 modelMtx[1][3] = CVector(0.0f, 0.0f, 0.0f).y;
                 modelMtx[2][3] = CVector(0.0f, 0.0f, 0.0f).z;
                 PSMTXConcat(rotScratch, modelMtx, modelMtx);
-                const float swayTan = tan(negSwayAngle);
+                const float swayTan = std::tan(negSwayAngle);
                 const float swayTanScaled = 2.0f * swayTan;
                 mtx1 -= swayTanScaled;
                 modelMtx[0][3] = mtx0;
@@ -1429,8 +1552,8 @@ void CGObject::update()
             const float swayRx = m_swayTarget.z;
             float swayClamp = swayDot < 1.0f ? swayDot : 1.0f;
             swayClamp = swayClamp < 0.0f ? 0.0f : swayClamp;
-            const float swaySin = sinf(swayClamp);
-            const float swayCos = cosf(swayClamp);
+            const float swaySin = std::sinf(swayClamp);
+            const float swayCos = std::cosf(swayClamp);
             m_swayTarget.x = swayCos * swayRy - swaySin * swayRx;
             m_swayTarget.z = swaySin * swayRy + swayCos * swayRx;
             m_swayTarget.x *= 0.9f;
@@ -1492,7 +1615,7 @@ void CGObject::update()
 
             const float lookDistance = PSVECMag(&lookDelta);
             if (0.0f != lookDistance) {
-                const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
+                const float targetYaw = std::atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
                 if (fabs(yawDelta) < 1.5707964f) {
                     const float pitchDelta = (float)atan2(lookDelta.y, lookDistance);
@@ -1568,11 +1691,11 @@ void CGObject::update()
             float frameStep;
             if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
                 float turnRate;
-                if (m_charaModelHandle->m_model->m_anim != 0) {
-                    const unsigned short frameCount = m_charaModelHandle->m_model->m_anim->m_frameCount;
+                if (m_charaModelHandle->m_model->GetAnim() != 0) {
+                    const unsigned short frameCount = m_charaModelHandle->m_model->GetAnim()->GetTotalFrame();
                     turnRate = static_cast<float>(frameCount) / static_cast<float>(m_turnAnimFrames);
                 } else {
-                    if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+                    if (System.GetErrorLevel() >= 2U) {
                         System.Printf("\203\136\201\133\203\223\203\202\201\133\203\126\203\207\203\223"
                                       "\202\315\202\240\202\350\202\334\202\271\202\361\201\102\012");
                     }
@@ -1718,7 +1841,7 @@ void CGObject::copy()
 {
     bool hasModel = false;
 
-    if ((m_charaModelHandle != (CCharaPcs::CHandle*)0) && (m_charaModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (!hasModel) {
@@ -1731,7 +1854,7 @@ void CGObject::copy()
     m_charaModelHandle->m_fogBlend = m_worldParam;
     hasModel = false;
 
-    if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1742,7 +1865,7 @@ void CGObject::copy()
     }
 
     hasModel = false;
-    if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1756,7 +1879,7 @@ void CGObject::copy()
         m_charaModelHandle->m_flags &= 0xFFFFFFFE;
         hasModel = false;
 
-        if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1764,7 +1887,7 @@ void CGObject::copy()
         }
 
         hasModel = false;
-        if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1776,7 +1899,7 @@ void CGObject::copy()
         m_charaModelHandle->m_flags &= 0xFFFFFFFB;
         hasModel = false;
 
-        if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (hasModel) {
@@ -1784,7 +1907,7 @@ void CGObject::copy()
         }
 
         hasModel = false;
-        if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+        if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
             hasModel = true;
         }
         if (!hasModel) {
@@ -1799,7 +1922,7 @@ void CGObject::copy()
     m_charaModelHandle->m_worldPosY = m_worldPosition.y;
     hasModel = false;
 
-    if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_weaponModelHandle != 0) && (m_weaponModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (hasModel) {
@@ -1808,7 +1931,7 @@ void CGObject::copy()
     }
 
     hasModel = false;
-    if ((m_shieldModelHandle != (CCharaPcs::CHandle*)0) && (m_shieldModelHandle->m_model != (CChara::CModel*)0)) {
+    if ((m_shieldModelHandle != 0) && (m_shieldModelHandle->m_model != 0)) {
         hasModel = true;
     }
     if (!hasModel) {
@@ -1849,9 +1972,9 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
         CVector capsuleOffset;
         if (0.0f != m_bodyEllipsoidOffset) {
-            capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
+            capsuleOffset.x = m_bodyEllipsoidOffset * -std::sinf(m_rotBaseY);
             capsuleOffset.y = 0.0f;
-            capsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
+            capsuleOffset.z = m_bodyEllipsoidOffset * -std::cosf(m_rotBaseY);
         } else {
             capsuleOffset.z = 0.0f;
             capsuleOffset.y = 0.0f;
@@ -1909,6 +2032,7 @@ void CGObject::onDraw()
             GXBegin(GX_LINES, GX_VTXFMT0, 2);
             GXPosition3f32(collider->m_previousWorldPosition.x, collider->m_previousWorldPosition.y, collider->m_previousWorldPosition.z);
             GXPosition3f32(collider->m_worldPosition.x, collider->m_worldPosition.y, collider->m_worldPosition.z);
+            GXEnd();
         }
     }
 
@@ -1955,20 +2079,15 @@ void CGObject::CancelMove(int moveType)
  */
 void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode, int useFacing, int flagA, int flagB)
 {
-    const signed char moveModeFlag = static_cast<signed char>(moveMode);
-    const signed char useFacingFlag = static_cast<signed char>(useFacing);
-    const signed char flagAValue = static_cast<signed char>(flagA);
-    const signed char flagBValue = static_cast<signed char>(flagB);
-
     m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
     m_weaponNodeFlagAll.m_bits1.m_bit10 = 0;
-    m_turnFrames = static_cast<u32>(turnFrames);
+    m_turnFrames = turnFrames;
     m_moveTarget = *moveVec;
     m_moveTimer = moveTimer;
-    m_weaponNodeFlagBits.m_unk02 = moveModeFlag;
-    m_weaponNodeFlagAll.m_bits1.m_bit08 = useFacingFlag;
-    m_weaponNodeFlagAll.m_bits1.m_bit02 = flagAValue;
-    m_weaponNodeFlagAll.m_bits1.m_bit04 = flagBValue;
+    m_weaponNodeFlagBits.m_unk02 = moveMode;
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = useFacing;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = flagA;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = flagB;
 }
 
 /*
@@ -1982,18 +2101,14 @@ void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode,
  */
 void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int useFacing, int flagA, int flagB)
 {
-    const signed char useFacingFlag = static_cast<signed char>(useFacing);
-    const signed char flagAValue = static_cast<signed char>(flagA);
-    const signed char flagBValue = static_cast<signed char>(flagB);
-
     m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
     m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
-    m_turnFrames = static_cast<u32>(turnFrames);
+    m_turnFrames = turnFrames;
     m_moveTarget = *moveVec;
     m_moveTimer = moveTimer;
-    m_weaponNodeFlagAll.m_bits1.m_bit08 = useFacingFlag;
-    m_weaponNodeFlagAll.m_bits1.m_bit02 = flagAValue;
-    m_weaponNodeFlagAll.m_bits1.m_bit04 = flagBValue;
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = useFacing;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = flagA;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = flagB;
 }
 
 /*
@@ -2008,23 +2123,8 @@ void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int use
 void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
 {
     Vec unitVec;
-    const float mag = PSVECMag(moveVec);
-    if (0.0f == mag) {
-        unitVec.x = 0.0f;
-        unitVec.y = 0.0f;
-        unitVec.z = 0.0f;
-    } else {
-        PSVECScale(moveVec, &unitVec, 1.0f / mag);
-    }
-
-    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
-    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget = unitVec;
-    m_moveTimer = moveTimer;
-    m_weaponNodeFlagAll.m_bits1.m_bit08 = 1;
-    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
-    m_weaponNodeFlagAll.m_bits1.m_bit04 = 1;
+    VECNormalizeZero(moveVec, &unitVec);
+    MoveVector(&unitVec, moveTimer, turnFrames, 1, 0, 1);
 }
 
 /*
@@ -2039,23 +2139,8 @@ void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
 void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
 {
     Vec unitVec;
-    const float mag = PSVECMag(moveVec);
-    if (0.0f == mag) {
-        unitVec.x = 0.0f;
-        unitVec.y = 0.0f;
-        unitVec.z = 0.0f;
-    } else {
-        PSVECScale(moveVec, &unitVec, 1.0f / mag);
-    }
-
-    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
-    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget = unitVec;
-    m_moveTimer = moveTimer;
-    m_weaponNodeFlagAll.m_bits1.m_bit08 = 0;
-    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
-    m_weaponNodeFlagAll.m_bits1.m_bit04 = 0;
+    VECNormalizeZero(moveVec, &unitVec);
+    MoveVector(&unitVec, moveTimer, turnFrames, 0, 0, 0);
 }
 
 /*
@@ -2069,22 +2154,12 @@ void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
  */
 void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-    const float cosY0 = static_cast<float>(cos(rotY));
-    const float sinX = static_cast<float>(sin(rotX));
-    const float sinY = static_cast<float>(sin(rotY));
-    const float cosY1 = static_cast<float>(cos(rotY));
-    const float cosX = static_cast<float>(cos(rotX));
+    Vec moveVec;
 
-    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
-    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget.x = sinX * cosY0;
-    m_moveTarget.y = sinY;
-    m_moveTarget.z = cosX * cosY1;
-    m_moveTimer = moveTimer;
-    m_weaponNodeFlagAll.m_bits1.m_bit08 = 1;
-    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
-    m_weaponNodeFlagAll.m_bits1.m_bit04 = 1;
+    moveVec.x = std::sinf(rotX) * std::cosf(rotY);
+    moveVec.y = std::sinf(rotY);
+    moveVec.z = std::cosf(rotX) * std::cosf(rotY);
+    MoveVector(&moveVec, moveTimer, turnFrames, 1, 0, 1);
 }
 
 /*
@@ -2098,22 +2173,12 @@ void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFr
  */
 void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-    const float cosY0 = static_cast<float>(cos(rotY));
-    const float sinX = static_cast<float>(sin(rotX));
-    const float sinY = static_cast<float>(sin(rotY));
-    const float cosY1 = static_cast<float>(cos(rotY));
-    const float cosX = static_cast<float>(cos(rotX));
+    Vec moveVec;
 
-    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
-    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget.x = sinX * cosY0;
-    m_moveTarget.y = sinY;
-    m_moveTarget.z = cosX * cosY1;
-    m_moveTimer = moveTimer;
-    m_weaponNodeFlagAll.m_bits1.m_bit08 = 0;
-    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
-    m_weaponNodeFlagAll.m_bits1.m_bit04 = 0;
+    moveVec.x = std::sinf(rotX) * std::cosf(rotY);
+    moveVec.y = std::sinf(rotY);
+    moveVec.z = std::cosf(rotX) * std::cosf(rotY);
+    MoveVector(&moveVec, moveTimer, turnFrames, 0, 0, 0);
 }
 
 /*
@@ -2217,30 +2282,16 @@ CGObject* CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, 
  */
 void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
 {
-    bool hasModel = false;
-    CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
-
-    if ((handle != 0) && (handle->m_model != 0)) {
-        hasModel = true;
-    }
-
-    if (hasModel) {
-        int nodeIndex = handle->m_model->SearchNode(nodeName);
+    if (owner->IsHChara()) {
+        int nodeIndex = owner->m_charaModelHandle->m_model->SearchNode(nodeName);
         if (nodeIndex >= 0) {
             m_weaponNodeFlagBits.m_attached = true;
-
             m_attachOwner = owner;
             m_attachNode = nodeIndex;
-            m_attachLocal.x = attachLocal->x;
-            m_attachLocal.y = attachLocal->y;
-            m_attachLocal.z = attachLocal->z;
-
+            m_attachLocal = *attachLocal;
             if ((m_worldParamA != 0x24) && (m_worldParamB != 0x125)) {
-                float rotY = m_rotBaseY - owner->m_rotBaseY;
-                m_rotTargetY = rotY;
-                m_rotBaseY = rotY;
+                m_rotBaseY = m_rotTargetY = m_rotBaseY - owner->m_rotBaseY;
             }
-
             m_moveMode = m_moveModePrevious;
         }
     }
@@ -2258,13 +2309,12 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
 void CGObject::Detach()
 {
     if (m_weaponNodeFlagBits.m_attached != 0) {
-        CChara::CNode* node = &m_attachOwner->m_charaModelHandle->m_model->m_nodes[m_attachNode];
+        CChara::CNode* node = m_attachOwner->m_charaModelHandle->m_model->GetNode(m_attachNode);
 
-        m_worldPosition.x = node->m_mtx[0][3];
-        m_worldPosition.y = node->m_mtx[1][3];
-        m_worldPosition.z = node->m_mtx[2][3];
+        m_worldPosition.x = node->GetWorldMatrix()[0][3];
+        m_worldPosition.y = node->GetWorldMatrix()[1][3];
+        m_worldPosition.z = node->GetWorldMatrix()[2][3];
         PSVECAdd(&m_worldPosition, &m_attachOwner->m_worldPosition, &m_worldPosition);
-
         float rotY = m_rotBaseY + m_attachOwner->m_rotBaseY;
         m_rotTargetY = rotY;
         m_rotBaseY = rotY;
@@ -2284,15 +2334,9 @@ void CGObject::Detach()
  */
 void CGObject::DispCharaParts(int showParts)
 {
-    CCharaPcs::CHandle* handle = m_charaModelHandle;
-    bool hasModel = false;
-    if (handle != 0 && handle->m_model != 0) {
-        hasModel = true;
+    if (IsHChara()) {
+        m_charaModelHandle->m_model->m_meshVisibleMask = showParts;
     }
-    if (!hasModel) {
-        return;
-    }
-    handle->m_model->m_meshVisibleMask = showParts;
 }
 
 /*
@@ -2303,13 +2347,9 @@ void CGObject::DispCharaParts(int showParts)
 void CGObject::SetAttackCol(int hitIndex, char* nodeName, float radius, Vec* position)
 {
     if (IsHChara()) {
-        int nodeIndex = m_charaModelHandle->m_model->SearchNode(nodeName);
-
-        m_attackColliders[hitIndex].m_nodeIndex = nodeIndex;
+        m_attackColliders[hitIndex].m_nodeIndex = m_charaModelHandle->m_model->SearchNode(nodeName);
         m_attackColliders[hitIndex].m_radius = radius;
-        m_attackColliders[hitIndex].m_localPosition.x = position->x;
-        m_attackColliders[hitIndex].m_localPosition.y = position->y;
-        m_attackColliders[hitIndex].m_localPosition.z = position->z;
+        m_attackColliders[hitIndex].m_localPosition = *position;
     }
 }
 
@@ -2321,14 +2361,10 @@ void CGObject::SetAttackCol(int hitIndex, char* nodeName, float radius, Vec* pos
 void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float horizontalRadius, float verticalRadius, Vec* position)
 {
     if (IsHChara()) {
-        int nodeIndex = m_charaModelHandle->m_model->SearchNode(nodeName);
-
-        m_damageColliders[colliderIndex].m_nodeIndex = nodeIndex;
+        m_damageColliders[colliderIndex].m_nodeIndex = m_charaModelHandle->m_model->SearchNode(nodeName);
         m_damageColliders[colliderIndex].m_horizontalRadius = horizontalRadius;
         m_damageColliders[colliderIndex].m_verticalRadius = verticalRadius;
-        m_damageColliders[colliderIndex].m_localPosition.x = position->x;
-        m_damageColliders[colliderIndex].m_localPosition.y = position->y;
-        m_damageColliders[colliderIndex].m_localPosition.z = position->z;
+        m_damageColliders[colliderIndex].m_localPosition = *position;
     }
 }
 
@@ -2361,12 +2397,9 @@ void CGObject::boundCheck()
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-        float clipLimit;
-        float oneF;
-        float zero;
-        zero = 0.0f;
-        oneF = 1.0f;
-        clipLimit = -1.0f;
+        float clipLimit = -1.0f;
+        float oneF = 1.0f;
+        float zero = 0.0f;
 
         clipMask = 0x1F;
         s32 i = 0;
@@ -2498,11 +2531,9 @@ void CGObject::SetClassWork(int ownerType, int workIndex)
  */
 void CGObject::SetTexAnim(char* name)
 {
-    CTexAnimSet* texAnimSet;
-
     if (IsHChara()) {
-        texAnimSet = m_charaModelHandle->m_model->GetTexAnimSet();
-        if (texAnimSet != (CTexAnimSet*)0) {
+        CTexAnimSet* texAnimSet = m_charaModelHandle->m_model->GetTexAnimSet();
+        if (texAnimSet != 0) {
             texAnimSet->Change(name, 0.0f, (CTexAnimSet::ANIM_TYPE)-2);
         }
     }
@@ -2570,7 +2601,7 @@ void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant,
         m_charaModelHandle = 0;
     }
 
-    m_charaModelHandle = new (Game.m_mainStage, "gobject.cpp", GOBJECT_LINE(0xA01, 0xA01, 0x9F3)) CCharaPcs::CHandle;
+    m_charaModelHandle = new (Game.GetMemoryStage(), "gobject.cpp", GOBJECT_LINE(0xA01, 0xA01, 0x9F3)) CCharaPcs::CHandle;
     m_charaModelHandle->Add();
     m_charaModelHandle->LoadModel(kind, modelId, variant, 0, -1, 0, arg3);
 }
@@ -2592,15 +2623,15 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
     }
 
     if (itemId > 0) {
-        m_weaponModelHandle = new (Game.m_mainStage, "gobject.cpp", GOBJECT_LINE(0xA11, 0xA11, 0xA03)) CCharaPcs::CHandle;
+        m_weaponModelHandle = new (Game.GetMemoryStage(), "gobject.cpp", GOBJECT_LINE(0xA11, 0xA11, 0xA03)) CCharaPcs::CHandle;
         m_weaponModelHandle->Add();
-
-        const unsigned long textureVariant = (m_ownerType == 0)
-            ? reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag
-            : 0;
-
-        m_weaponModelHandle->LoadModel(
-            4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant), textureVariant, -1, 0, 1);
+        unsigned long textureVariant;
+        if (m_ownerType == 0) {
+            textureVariant = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag;
+        } else {
+            textureVariant = 0;
+        }
+        m_weaponModelHandle->LoadModel(4, itemId, itemVariant, textureVariant, -1, 0, 1);
         m_weaponAttachNode =
             m_charaModelHandle->m_model->SearchNode("r_item");
     }
@@ -2623,14 +2654,15 @@ void CGObject::LoadShield(int itemId)
     }
 
     if (itemId > 0) {
-        m_shieldModelHandle = new (Game.m_mainStage, "gobject.cpp", GOBJECT_LINE(0xA23, 0xA23, 0xA15)) CCharaPcs::CHandle;
+        m_shieldModelHandle = new (Game.GetMemoryStage(), "gobject.cpp", GOBJECT_LINE(0xA23, 0xA23, 0xA15)) CCharaPcs::CHandle;
         m_shieldModelHandle->Add();
-
-        const unsigned long textureVariant = (m_ownerType == 0)
-            ? reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag
-            : 0;
-
-        m_shieldModelHandle->LoadModel(4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
+        unsigned long textureVariant;
+        if (m_ownerType == 0) {
+            textureVariant = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag;
+        } else {
+            textureVariant = 0;
+        }
+        m_shieldModelHandle->LoadModel(4, itemId, 0, textureVariant, -1, 0, 1);
         m_shieldAttachNodeIndex =
             m_charaModelHandle->m_model->SearchNode("l_item2");
     }
@@ -2778,8 +2810,7 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     m_animExtraIndex = static_cast<short>(param4);
     m_collisionPushTimer = static_cast<short>(param5);
 
-    signed char shieldFlag = static_cast<signed char>(param3);
-    m_shieldNodeFlagBits.m_bit02 = shieldFlag;
+    m_shieldNodeFlagBits.m_bit02 = static_cast<signed char>(param3);
 
     if (animData != 0) {
         m_shieldNodeFlagBits.m_bit80 = 1;
@@ -2879,7 +2910,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 void CGObject::ResetDynamics()
 {
     if (IsHChara()) {
-        m_charaModelHandle->m_model->m_flags10CBits.m_flag10C_80 = true;
+        m_charaModelHandle->m_model->ResetDynamics();
     }
 }
 
@@ -3036,9 +3067,8 @@ void CGObject::PutDropItem()
     s32 dropCount = 0;
 
     for (int i = 0; i < 4; i++) {
-        s16 rawDropCode = m_dropItemCodes[i];
-        if (rawDropCode > 0) {
-            s32 dropCode = rawDropCode;
+        if (m_dropItemCodes[i] > 0) {
+            s32 dropCode = m_dropItemCodes[i];
             int createMode;
             if ((dropCode & 0xC000) == 0x4000) {
                 dropCode &= ~0xC000;
@@ -3093,7 +3123,7 @@ int CGObject::Cross(int hitMask, Vec* position, float* outDistance, Vec* move, V
  */
 unsigned int CGObject::IsDispRader()
 {
-    return m_displayFlags & 1;
+    return (m_displayFlags & 1) ? 1 : 0;
 }
 
 /*

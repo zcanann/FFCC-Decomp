@@ -60,11 +60,11 @@ STATIC_ASSERT(sizeof(EquipOpenAnimList) == 0x1008);
 bool CMenuPcs::ChkEquipActive(int index)
 {
 	int item;
-	int equipIndex;
+	s16 equipIndex;
 	bool active;
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-	int entryCount = entries[0];
+	s16 entryCount = entries[0];
 	s16* itemEntries = entries + 1;
 	equipIndex = m_equipState->selected[0];
 
@@ -773,17 +773,19 @@ int CMenuPcs::EquipClose()
  */
 inline void CMenuPcs::EquipInit0()
 {
+	float alpha;
 	int i;
 	EquipOpenAnim* entry;
 	int idx;
 	int itemCount;
 	CCaravanWork* caravanWork;
 
+	alpha = 1.0f;
 	caravanWork = Game.m_scriptFoodBase[0];
 	entry = m_equipList->entries;
 	for (i = 0; i < m_equipList->count; i++) {
-		entry->alpha = 1.0f;
-		entry->scale = 1.0f;
+		entry->alpha = (float)(double)alpha;
+		entry->scale = (float)(double)alpha;
 		entry++;
 	}
 
@@ -1003,11 +1005,12 @@ void CMenuPcs::EquipInit1()
 	}
 
 	m_equipList->listEnd = i;
+	float alpha = 0.0f;
 	n = (int)m_equipList->listEnd - (int)m_equipList->count;
 	listEntry = &m_equipList->entries[m_equipList->count];
 	for (k = n; k > 0; k--) {
 		listEntry->step = 0;
-		listEntry->alpha = 0.0f;
+		listEntry->alpha = (float)(double)alpha;
 		listEntry++;
 	}
 }

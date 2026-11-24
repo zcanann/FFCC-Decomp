@@ -436,7 +436,7 @@ void CChara::CModel::Init()
 	m_meshVisibleMask = 0xFFFFFFFF;
 	m_animStart = 0.0f;
 	m_animEnd = 0.0f;
-	m_chestTilt = m_chestAmp = 0.0f;
+	m_lookAt.x = m_lookAt.y = 0.0f;
 	m_lightAlpha = 1.0f;
 	m_callbackContext = 0;
 	m_callbackParam = 0;
@@ -996,12 +996,12 @@ void CChara::CModel::calcMatrix()
 					float tiltScale;
 					if (nodeIndex == m_data->m_chest2NodeIndex) {
 						tiltScale = 0.5f;
-						srt.m_rotation.y -= m_chestTilt * tiltScale;
+						srt.m_rotation.y -= m_lookAt.x * tiltScale;
 					} else {
 						tiltScale = 0.25f;
-						srt.m_rotation.x += m_chestTilt * tiltScale;
+						srt.m_rotation.x += m_lookAt.x * tiltScale;
 					}
-					srt.m_rotation.z += m_chestAmp * tiltScale;
+					srt.m_rotation.z += m_lookAt.y * tiltScale;
 				} else if (nodeIndex == m_data->m_chest1NodeIndex && m_texAnimSet != 0) {
 					srt.m_rotation.z += m_texAnimSet->GetChin();
 				}

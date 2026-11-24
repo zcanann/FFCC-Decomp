@@ -117,29 +117,7 @@ void CGMonObj::onCreate()
 {
 	CGCharaObj::onCreate();
 
-	m_targetPartyIndex = -1;
-	m_aiState = 0;
-	m_aiStatePrev = 0;
-	m_unk6C8 = 0;
-	m_unk6CC = 0;
-	m_actionBranch = 0;
-	m_unk6B8 = 0;
-	m_unk6B9 = 0;
-	m_unk6BA = 0;
-	m_unk6BC = 0;
-	m_unk6BD = 0;
-	m_unk6BE = 0;
-	m_attackDelay = 0;
-	m_aliveFrames = 0;
-	m_unk6BF = 0;
-	m_unk6C0 = 0;
-	m_unk6C2 = 0;
-	m_unk6C3 = 0;
-	m_chaseState = 0;
-	m_chaseTimer = 0;
-	m_chaseDirty = 0;
-	m_stepSeHandle = 0;
-	m_moveWork.Clear();
+	resetWork();
 	m_unk6E0 = 0;
 	m_unk6C1 = 0;
 }
@@ -273,7 +251,7 @@ void CGMonObj::undeadOff()
 
 	setUndeadEffect(m_weaponNodeFlagBits.m_prg, 0);
 
-	if (m_scriptHandle->m_romWork->m_kind == 0xB) {
+	if (SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_kind == 0xB) {
 		SetTexAnim("u0");
 	}
 
@@ -295,7 +273,7 @@ void CGMonObj::undeadOn()
 	int classId = m_scriptHandle->m_baseDataIndex;
 	setUndeadEffect(m_weaponNodeFlagBits.m_prg, 1);
 
-	if (m_scriptHandle->m_romWork->m_kind == 0xB) {
+	if (SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_kind == 0xB) {
 		SetTexAnim("u1");
 	}
 
@@ -327,8 +305,7 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 			m_rotTargetY = targetRot;
 		} else {
 			float delta = Math.DstRot(targetRot, m_homeRotY);
-			float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
-			m_rotTargetY = m_homeRotY + clamped;
+			m_rotTargetY = m_homeRotY + (delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta));
 		}
 	}
 }
@@ -677,8 +654,7 @@ inline int CGMonObj::isValidTarget()
 inline void CGMonObj::seKiduki()
 {
 	if (m_unk6B8 == 0) {
-		CGObjWork* scriptHandle = m_scriptHandle;
-		playSe3D(scriptHandle->m_romWork->m_seBase + scriptHandle->m_romWork->m_seBank * 1000 + Math.Rand(3), 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+		playSe3D(SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_seBase + SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_seBank * 1000 + Math.Rand(3), 0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
 		m_unk6B8 = 1;
 	}
 }
@@ -1391,26 +1367,21 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
 	CGCharaObj::onDrawDebug(font, posX, posY, posZ);
 
-	if ((static_cast<signed char>((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31)) != 0) &&
+	if ((m_weaponNodeFlagBits.m_prg != 0) &&
 			(CFlat.m_centerState == 0) &&
 		((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[0x100];
 		int aiMasked = m_groupTag & 0x7FFF;
-		sprintf(text, "%d %c %d %c", m_scriptHandle->m_saveSlot,
+		sprintf(text, "%d %c %d %c", SAFE_CAST_MON_WORK(m_scriptHandle)->m_saveSlot,
 		        aiMasked == 0 ? '-' : aiMasked + 0x40,
 		        m_chaseState, m_targetPartyIndex >= 0 ? m_targetPartyIndex + '0' : '-');
 		font->SetPos(posX - font->GetWidth(text) * 0.5f, posY, posZ);
 		font->Draw(text);
 		posY -= font->GetHeight();
 
-		int targetDist;
-		if (m_targetPartyIndex >= 0) {
-			targetDist = static_cast<int>(m_partyDistance[m_targetPartyIndex]);
-		} else {
-			targetDist = 0;
-		}
+		int targetDist = (m_targetPartyIndex >= 0) ? static_cast<int>(m_partyDistance[m_targetPartyIndex]) : 0;
 
-		int chaseRange = static_cast<int>(static_cast<float>(m_scriptHandle->m_romWork->m_territoryRange));
+		int chaseRange = static_cast<int>(static_cast<float>(SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_territoryRange));
 		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &m_worldPosition));
 		sprintf(text, "%d %d/%d", targetDist, spawnDist, chaseRange);
 		font->SetPos(posX - font->GetWidth(text) * 0.5f, posY, posZ);
@@ -1539,7 +1510,7 @@ inline void CGMonObj::link(CGPartyObj* party, CGMonObj* other)
 	other->m_targetPartyIndex = SAFE_CAST_CARAVAN_WORK(party->m_scriptHandle)->m_joybusCaravanId;
 	other->m_unk6BD = 1;
 
-	int otherClassId = other->m_scriptHandle->m_baseDataIndex;
+	int otherClassId = SAFE_CAST_MON_WORK(other->m_scriptHandle)->m_baseDataIndex;
 	if (other->m_chaseState != 4) {
 		other->mlSet(2);
 	} else if ((other->m_actionBranch == 0) && (otherClassId == 0x55)) {
@@ -2108,7 +2079,7 @@ inline void CGMonObj::mlAway()
  */
 inline void CGMonObj::mlWaiting()
 {
-	if (m_scriptHandle->m_romWork->m_aiType == 1) {
+	if (SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_aiType == 1) {
 		moveCancel();
 	}
 	if (m_chaseTimer == 0) {
@@ -3016,7 +2987,7 @@ void CGMonObj::InitFinished()
 void CGMonObj::initFinishedFuncDefault()
 {
 	// Script value is authored in centi-units.
-	m_turnFactor = 0.01f * static_cast<float>(m_scriptHandle->m_romWork->m_turnFactor);
+	m_turnFactor = 0.01f * static_cast<float>(SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_turnFactor);
 
 	CCharaPcs::CHandle* handle = m_charaModelHandle;
 	if (handle != NULL) {
@@ -3024,17 +2995,17 @@ void CGMonObj::initFinishedFuncDefault()
 		if (model != NULL) {
 			int nodeIdx = model->SearchNode("head");
 			if (nodeIdx >= 0) {
-				m_bind = m_charaModelHandle->m_model->m_nodes + nodeIdx;
+				m_bind = m_charaModelHandle->m_model->GetNode(nodeIdx);
 			}
 		}
 	}
 
-	int animPoint = m_scriptHandle->m_romWork->m_animPoint0;
+	int animPoint = SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_animPoint0;
 	if (animPoint != 0xFFFF) {
 		AddAnimPoint(1, animPoint, 0xB);
 	}
 
-	animPoint = m_scriptHandle->m_romWork->m_animPoint1;
+	animPoint = SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_animPoint1;
 	if (animPoint != 0xFFFF) {
 		AddAnimPoint(1, animPoint, 0xA);
 	}
@@ -3094,7 +3065,7 @@ void CGMonObj::setFlyEffect(int, int)
  */
 inline void CGMonObj::setUndeadEffect(int weaponMode, int enabled)
 {
-	int isUndead = m_scriptHandle->m_romWork->m_kind == 0xB;
+	int isUndead = SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_kind == 0xB;
 	if (!isUndead) {
 		weaponMode = 1;
 	}
@@ -3127,12 +3098,7 @@ inline void CGMonObj::setUndeadEffect(int weaponMode, int enabled)
 unsigned int CGMonObj::IsDispRader()
 {
 	unsigned char result = 0;
-	int isDispRader = CGObject::IsDispRader();
-	if (isDispRader != 0 &&
-	    static_cast<signed char>(
-	        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) &
-	                         0xC0000000) >>
-	        31) != 0) {
+	if (static_cast<int>(CGObject::IsDispRader()) != 0 && m_weaponNodeFlagBits.m_prg != 0) {
 		result = 1;
 	}
 	return result;
@@ -3154,16 +3120,18 @@ void CGMonObj::setRepop(int mode)
 	int classId = scriptHandle->m_baseDataIndex;
 
 	int spawnIndex = scriptHandle->m_saveSlot;
-	int option;
-	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
-		u64 bit = 1ULL << spawnIndex;
-		if ((CFlat.m_spawnBits[option] & bit) != 0) {
-			scriptHandle->m_hp = 0;
-			m_bgColMask = 0;
-			m_displayFlags = 0;
-			m_weaponNodeFlagBits.m_unk10 = 0;
-			changeStat(0x28, 0, 0);
-			return;
+	if (mode != 0) {
+		int option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue));
+		if (option < 9) {
+			u64 bit = 1ULL << spawnIndex;
+			if ((CFlat.m_spawnBits[option] & bit) != 0) {
+				scriptHandle->m_hp = 0;
+				m_bgColMask = 0;
+				m_displayFlags = 0;
+				m_weaponNodeFlagBits.m_unk10 = 0;
+				changeStat(0x28, 0, 0);
+				return;
+			}
 		}
 	}
 
@@ -3594,8 +3562,7 @@ void CGMonObj::onChangePrg(int value)
 {
 	if ((m_weaponNodeFlagBits.m_prg != value) &&
 		(m_scriptHandle->m_romWork->m_kind == 0xB)) {
-		int enabled = m_unk6BA == 0;
-		setUndeadEffect(value, enabled);
+		setUndeadEffect(value, m_unk6BA == 0);
 	}
 	CGCharaObj::onChangePrg(value);
 }
@@ -3610,7 +3577,7 @@ void CGMonObj::onChangePrg(int value)
  */
 inline void CGMonObj::footSe()
 {
-	unsigned short stepSeRaw = m_scriptHandle->m_romWork->m_stepSe;
+	unsigned short stepSeRaw = SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork->m_stepSe;
 	int stepSeId;
 	if (stepSeRaw == 0xFFFF) {
 		stepSeId = 0;

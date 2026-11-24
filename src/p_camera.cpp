@@ -1049,7 +1049,7 @@ void CCameraPcs::drawShadowBegin()
 
     GXInvalidateTexAll();
 
-    camdtst& cur = CurrentCameraState();
+    camdtst& cur = *reinterpret_cast<camdtst*>(&m_cameraMatrix);
     m_savedCamera = cur;
     m_shadowCamera = cur;
 
@@ -1146,7 +1146,7 @@ void CCameraPcs::drawShadowBegin()
     g_shadow_refpos.y = m_shadowCamera.m_target.y;
     g_shadow_refpos.z = m_shadowCamera.m_target.z;
 
-    CurrentCameraState() = m_shadowCamera;
+    *reinterpret_cast<camdtst*>(&m_cameraMatrix) = m_shadowCamera;
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);
     GXSetColorUpdate(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);
@@ -1280,7 +1280,7 @@ void CCameraPcs::drawShadowEnd()
     GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[0], GX_NEAR, GX_NEAR, 0.0f,
                     0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 
-    CurrentCameraState() = m_savedCamera;
+    *reinterpret_cast<camdtst*>(&m_cameraMatrix) = m_savedCamera;
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
     GraphicPcs.setViewport();
 }
@@ -1336,7 +1336,7 @@ void CCameraPcs::drawShadowEndAll()
         return;
     }
 
-    CurrentCameraState() = m_savedCamera;
+    *reinterpret_cast<camdtst*>(&m_cameraMatrix) = m_savedCamera;
 }
 
 /*

@@ -1797,6 +1797,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	if (openRatio <= 0.0f) {
 		return;
 	}
+	FFCC_ASSERT(openRatio >= 0.0f && openRatio <= 1.0f);
 
 	float left = 480.0f * openRatio;
 	float width = left;
@@ -1809,6 +1810,9 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	y = static_cast<float>(static_cast<int>(y - 0.5));
 	w = static_cast<float>(static_cast<int>(width - 1.0));
 	h = static_cast<float>(static_cast<int>(h - 1.0));
+	FFCC_ASSERT(w >= 0.0f);
+	FFCC_ASSERT(h >= 0.0f);
+	FFCC_ASSERT(left >= 0.0f);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;

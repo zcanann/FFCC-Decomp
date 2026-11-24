@@ -168,6 +168,8 @@ public:
     }
     void SetNextScriptNewGame() { m_nextScriptFlags = 1; }
     int IsWorldMap() { return m_currentMapId == 0x21; }
+    CMemory::CStage* GetMemoryStage() { return m_mainStage; }
+    CMemory::CStage* GetDebugMemoryStage() { return m_debugStage; }
     int IsPartyExist(int);
     char* GetItemName(int);
     char* GetItemArt(int);
@@ -262,12 +264,8 @@ public:
 
 inline int CGame::GetEvtFlag(int evtFlagIndex)
 {
-    int byteIndex = evtFlagIndex / 8;
-    unsigned char value = m_gameWork.m_eventFlags[byteIndex];
-    int mask = 1 << (evtFlagIndex % 8);
-    unsigned int flag = value & mask;
-
-    if (flag != 0) {
+    unsigned char value = m_gameWork.m_eventFlags[evtFlagIndex / 8];
+    if ((value & (1 << (evtFlagIndex % 8))) != 0) {
         return 1;
     }
     return 0;

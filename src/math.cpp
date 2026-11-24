@@ -280,8 +280,7 @@ int CMath::RandPM(unsigned long max)
     }
 
     value = (unsigned int)rand() * 0xFFFE - 0x7FFF;
-    unsigned int quotient = value / max;
-    return (int)(value - quotient * max);
+    return (int)(value % max);
 }
 
 /*
@@ -313,9 +312,7 @@ float CMath::RandFPM(float scale)
  */
 void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
 {
-    s_f_vpos.x = viewPos.x;
-    s_f_vpos.y = viewPos.y;
-    s_f_vpos.z = viewPos.z;
+    s_f_vpos = viewPos;
     PSMTXCopy(viewMatrix, s_f_lvmtx);
 }
 

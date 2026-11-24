@@ -637,7 +637,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_LSDW: {
             CMapShadow* shadow =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x241) CMapShadow();
+                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x241) CMapShadow(static_cast<CMapShadow::TYPE>(0));
             shadow->m_yFilterMode = 0;
 
             if (chunk.m_version == 4) {
@@ -1011,6 +1011,7 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
         _GXColor c0 = colors[key0];
         _GXColor c1 = colors[key1];
 
+
         c0.r = static_cast<unsigned char>(
             c0.r + ((blendRate * (static_cast<int>(c1.r) - static_cast<int>(c0.r))) >> 8));
         c0.g = static_cast<unsigned char>(
@@ -1191,8 +1192,7 @@ void CMapObj::SetDrawEnv()
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
-    _GXColor lightColor = s_mapObjLightColor;
-    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, s_mapObjLightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
                               m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
                               static_cast<unsigned char>(m_cameraSemiTransAlpha >> 7));
 }
@@ -1411,8 +1411,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
  */
 void CMapObj::GetHitFaceNormal(Vec* out)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-    mapHit->GetHitFaceNormal(out);
+    reinterpret_cast<CMapHit*>(m_mapData)->GetHitFaceNormal(out);
     PSMTXMultVecSR(m_worldMtx, out, out);
 }
 
@@ -1427,8 +1426,7 @@ void CMapObj::GetHitFaceNormal(Vec* out)
  */
 int CMapObj::CalcHitSlide(Vec* out, float y)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-    int hit = mapHit->CalcHitSlide(out, y);
+    int hit = reinterpret_cast<CMapHit*>(m_mapData)->CalcHitSlide(out, y);
     PSMTXMultVecSR(m_worldMtx, out, out);
     return hit;
 }
@@ -1444,8 +1442,7 @@ int CMapObj::CalcHitSlide(Vec* out, float y)
  */
 void CMapObj::CalcHitPosition(Vec* out)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-    mapHit->CalcHitPosition(out);
+    reinterpret_cast<CMapHit*>(m_mapData)->CalcHitPosition(out);
     PSMTXMultVec(m_worldMtx, out, out);
 }
 

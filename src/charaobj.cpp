@@ -160,10 +160,7 @@ static __inline SCharaItemRow* CharaObjItemTable()
 	return reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 }
 
-static __inline float CharaObjGetStatusMultiplier(int index)
-{
-	return (static_cast<float>(Game.m_battleParams[index]) * 0.01f) + 1.0e-07f;
-}
+#define CharaObjGetStatusMultiplier(idx) ((static_cast<float>(Game.m_battleParams[idx]) * 0.01f) + 1.0e-07f)
 
 /*
  * --INFO--
@@ -2173,10 +2170,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		hasParticle = 0;
 		goto checkParticle;
 	}
-	{
-		SCharaItemRow* entryRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-		particleEntry = entryRows[effectId].m_particleEntries[effectArg0];
-	}
+	particleEntry = rows[effectId].m_particleEntries[effectArg0];
 	if (particleEntry == 0xFFFF) {
 		hasParticle = 0;
 		goto checkParticle;

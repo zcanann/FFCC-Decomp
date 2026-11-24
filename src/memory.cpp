@@ -112,10 +112,10 @@ unsigned int CheckSum(void* data, int size)
 {
     unsigned char* bytes = reinterpret_cast<unsigned char*>(data);
     unsigned int checksum = 0x12345678;
-    int i;
 
-    for (i = size; i != 0; i--) {
+    while (size != 0) {
         checksum += *bytes++;
+        size--;
     }
 
     return checksum;
@@ -226,7 +226,7 @@ void CMemory::Init()
 
     CMode* modePtr = m_modes;
     for (int pass = 0; pass < 3; pass++, modePtr++) {
-        if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+        if ((pass != 1) || CanUseDebugMemory()) {
             CMode& modeData = *modePtr;
             if ((pass == 0) || (pass == 1)) {
                 unsigned int arenaHi = reinterpret_cast<unsigned int>(OSGetArenaHi());
@@ -289,7 +289,7 @@ void CMemory::Quit()
 
     CMode* modeData = m_modes;
     for (int pass = 0; pass < 3; pass++, modeData++) {
-        if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+        if ((pass != 1) || CanUseDebugMemory()) {
             CStage* listHead = &modeData->m_activeList;
             CStage* stage = listHead->m_next;
 
@@ -323,9 +323,7 @@ void CMemory::Quit()
  */
 void CMemory::Frame()
 {
-    unsigned short trigger = Pad.GetDebugButtonDown(0);
-
-    if ((trigger & 0x200) != 0) {
+    if ((Pad.GetDebugButtonDown(0) & 0x200) != 0) {
         m_heapWalkerVisible = !m_heapWalkerVisible;
     }
 }
@@ -432,11 +430,11 @@ void CMemory::Draw()
 
         CMode* modeData = m_modes;
         int y = 0x20;
-        int unuseTotalKB = 0;
         int useTotalKB = 0;
+        int unuseTotalKB = 0;
 
         for (int mode = 0; mode < 3; mode++, modeData++) {
-            if (((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) && (mode != 2)) {
+            if (((mode != 1) || CanUseDebugMemory()) && (mode != 2)) {
                 CMemory::CStage* head = &modeData->m_activeList;
                 CMemory::CStage* stage = head->m_next;
                 while (stage != head) {
@@ -445,10 +443,10 @@ void CMemory::Draw()
                     } else {
                         stage->drawHeapTitle(y);
                         if (mode == 0) {
-                            useTotalKB += static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop) >> 10;
-                            unuseTotalKB +=
-                                static_cast<unsigned int>(stage->m_next->m_heapTop - stage->m_heapBottom) >>
-                                10;
+                            unsigned int kb = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop) >> 10;
+                            useTotalKB += kb;
+                            kb = static_cast<unsigned int>(stage->m_next->m_heapTop - stage->m_heapBottom) >> 10;
+                            unuseTotalKB += kb;
                         }
                     }
                     y += 0xC;
@@ -533,7 +531,7 @@ inline void CMemory::CStage::initBlock()
 CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode)
 {
 
-    if ((mode == 1) && (OSGetConsoleSimulatedMemSize() != 0x3000000)) {
+    if ((mode == 1) && !CanUseDebugMemory()) {
         return (CMemory::CStage*)nullptr;
     }
 
@@ -676,22 +674,32 @@ void CMemory::DecHeapWalkerLevel()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 208b
+ * EN Address: 0x8002654C
+ * EN Size: 280b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CopyToAMemory(void*, void*, unsigned long)
+int CMemory::CopyToAMemory(void* source, void* dest, unsigned long size)
 {
-	// TODO
+    return Sound.m_redSound.DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
+                                     static_cast<int>(size), 0, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 208b
+ * EN Address: 0x80026664
+ * EN Size: 280b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CopyFromAMemory(void*, void*, unsigned long)
+int CMemory::CopyFromAMemory(void* source, void* dest, unsigned long size)
 {
-	// TODO
+    return Sound.m_redSound.DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
+                                     static_cast<int>(size), 0, 0);
 }
 
 /*
@@ -706,8 +714,7 @@ void CMemory::CopyFromAMemory(void*, void*, unsigned long)
 void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
     int dmaId;
-    dmaId = Sound.DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
-                           static_cast<int>(size), 0, 0);
+    dmaId = CopyToAMemory(source, dest, size);
     CStopWatch watch(const_cast<char*>("no name"));
     watch.Start();
     while (!IsCopyCompleted(dmaId)) {
@@ -729,8 +736,7 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
     int dmaId;
-    dmaId = Sound.DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
-                           static_cast<int>(size), 0, 0);
+    dmaId = CopyFromAMemory(source, dest, size);
     CStopWatch watch(const_cast<char*>("no name"));
     watch.Start();
     while (!IsCopyCompleted(dmaId)) {
@@ -773,7 +779,7 @@ void CMemory::CStage::quitBlock()
  */
 inline int CMemory::IsCopyCompleted(int dmaId)
 {
-    return Sound.DMACheck(dmaId) == 0;
+    return Sound.m_redSound.DMACheck(dmaId) == 0;
 }
 
 /*
@@ -886,12 +892,17 @@ void CMemory::CStage::resDefaultParam()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: 0x80026F1C
+ * EN Size: 28b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CStage::setParam(void*, unsigned long)
+void CMemory::CStage::setParam(void* ptr, unsigned long param)
 {
-	// TODO
+    CBlock* block = reinterpret_cast<CBlock*>(ptr) - 1;
+    block->m_defaultParam = param;
 }
 
 /*
@@ -1315,12 +1326,32 @@ void CAmemCache::Destroy(CMemory::CStage* stage)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 524b
+ * EN Address: 0x800282A8
+ * EN Size: 324b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCache::SetData(void*, int)
+void CAmemCache::SetData(void* src, int size)
 {
-	// TODO
+    m_cacheData = 0;
+    m_size = size;
+
+    m_checksum = static_cast<int>(CheckSum(src, m_size));
+
+    if (m_dmaCopy == 0) {
+        memcpy(m_workData, src, static_cast<unsigned long>(m_size));
+    } else {
+        int dmaId = Memory.CopyToAMemory(src, m_workData, m_size);
+        CStopWatch watch(const_cast<char*>("no name"));
+        watch.Start();
+        while (!Memory.IsCopyCompleted(dmaId)) {
+            watch.Stop();
+            watch.Get();
+            watch.Start();
+        }
+    }
 }
 
 /*
@@ -1357,10 +1388,11 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CSt
         m_cacheTable = 0;
     } else {
         m_cacheCount = cacheCount;
-        unsigned long start = stage->m_heapTop;
-        m_amemStart = start;
-        m_amemCursor = start;
-        m_amemEnd = stage->m_heapBottom;
+        void* top = stage->GetTop();
+        m_amemStart = reinterpret_cast<unsigned long>(top);
+        m_amemCursor = reinterpret_cast<unsigned long>(top);
+        void* tail = stage->GetTail();
+        m_amemEnd = reinterpret_cast<unsigned long>(tail);
         m_amemLock = 0;
 
         m_cacheTable = new (rStage, "memory.cpp", 0x787) CAmemCache[m_cacheCount];
@@ -1392,7 +1424,7 @@ void CAmemCacheSet::SetRStage(CMemory::CStage* stage)
  */
 void CAmemCacheSet::Destroy()
 {
-    if (m_cacheTable != nullptr) {
+    if (m_cacheTable != 0) {
         delete[] m_cacheTable;
         m_cacheTable = 0;
     }
@@ -1449,12 +1481,18 @@ void CAmemCacheSet::AmemGetLock()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 116b
+ * EN Address: 0x80028770
+ * EN Size: 156b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::AmemAlloc(int)
+void* CAmemCacheSet::AmemAlloc(int size)
 {
-	// TODO
+    m_amemPrev = m_amemCursor;
+    m_amemCursor += size;
+    return reinterpret_cast<void*>(m_amemPrev);
 }
 
 /*
@@ -1510,11 +1548,10 @@ inline int CAmemCache::GetData(CMemory::CStage* rStage, char* source, int line)
             if (m_cacheData == 0) {
                 return 0;
             } else {
-                int dmaId = Sound.DMAEntry(0, 1, reinterpret_cast<int>(m_cacheData),
-                                           reinterpret_cast<int>(m_workData), m_size, 0, 0);
+                int dmaId = Memory.CopyFromAMemory(m_cacheData, m_workData, m_size);
                 CStopWatch watch(const_cast<char*>("no name"));
                 watch.Start();
-                while (Sound.DMACheck(dmaId) != 0) {
+                while (!Memory.IsCopyCompleted(dmaId)) {
                     watch.Stop();
                     if (watch.Get() >= 9000.0f) {
                         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
@@ -1585,55 +1622,18 @@ short CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dma
     entry.m_refCount = 0;
 
     if (dmaCopy != 0) {
-        m_amemPrev = m_amemCursor;
-        m_amemCursor += allocSize;
-        entry.m_workData = reinterpret_cast<void*>(m_amemPrev);
-        entry.m_cacheData = 0;
-        entry.m_size = static_cast<int>(allocSize);
-
-        entry.m_checksum = static_cast<int>(CheckSum(src, entry.m_size));
-
-        if (entry.m_dmaCopy == 0) {
-            memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
-        } else {
-            int dmaId = Sound.DMAEntry(0, 0, reinterpret_cast<int>(src),
-                                       reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-            CStopWatch watch(const_cast<char*>("no name"));
-            watch.Start();
-            while (Sound.DMACheck(dmaId) != 0) {
-                watch.Stop();
-                watch.Get();
-                watch.Start();
-            }
-        }
+        entry.m_workData = AmemAlloc(allocSize);
+        entry.SetData(src, allocSize);
     } else {
-        while (true) {
+        for (;;) {
             entry.m_workData = m_rStage->alloc(allocSize, const_cast<char*>("memory.cpp"), 0x807, 1);
-            if (entry.m_workData != 0) {
+            if (entry.m_workData != nullptr) {
                 break;
             }
             AmemFreeLowPrio(allocSize);
         }
 
-        entry.m_cacheData = 0;
-        entry.m_size = static_cast<int>(allocSize);
-
-        entry.m_checksum = static_cast<int>(CheckSum(src, entry.m_size));
-
-        if (entry.m_dmaCopy == 0) {
-            memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
-        } else {
-            int dmaId = Sound.DMAEntry(0, 0, reinterpret_cast<int>(src),
-                                       reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-            CStopWatch watch(const_cast<char*>("no name"));
-            watch.Start();
-            while (Sound.DMACheck(dmaId) != 0) {
-                watch.Stop();
-                watch.Get();
-                watch.Start();
-            }
-        }
-
+        entry.SetData(src, allocSize);
         DCFlushRange(entry.m_workData, allocSize);
     }
 
@@ -1812,9 +1812,8 @@ void CAmemCacheSet::CacheClear()
         CAmemCache& entry = m_cacheTable[i];
 
         if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
-            void* data = entry.m_cacheData;
-            if (data != 0) {
-                m_stage->free(data);
+            if (entry.m_cacheData != nullptr) {
+                m_stage->free(entry.m_cacheData);
                 entry.m_cacheData = 0;
             }
         }
@@ -1851,7 +1850,8 @@ void CAmemCacheSet::CalcPrio()
  */
 int CAmemCacheSet::AmemGetFreeSize()
 {
-    return static_cast<int>(m_amemEnd - m_amemCursor);
+    int size = m_amemEnd - m_amemCursor;
+    return size;
 }
 
 /*
@@ -1884,11 +1884,8 @@ void CAmemCacheSet::RefCnt0Up(int index)
 void CAmemCacheSet::RefCnt0Clear()
 {
     for (int i = 0; i < m_cacheCount; i++) {
-        CAmemCache& entry = cacheEntryAt(this, i);
-        entry.m_refCnt0 = entry.m_refCount;
+        m_cacheTable[i].m_refCnt0 = 0;
     }
-
-    s_RefCnt0Compare = 0;
 }
 
 /*
@@ -2018,15 +2015,5 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
         heapTotal += reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node);
         node = node->m_next;
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CMemory::CStage::GetTail()
-{
-	// TODO
 }
 

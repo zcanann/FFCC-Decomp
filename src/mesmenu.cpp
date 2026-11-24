@@ -587,7 +587,7 @@ void CMesMenu::onDraw()
                 MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
                 MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
 
-                float cursorWave = sinf(1.5707964f * (1.0f - stateBlend) + 1.5707964f);
+                float cursorWave = sin(1.5707964f * (1.0f - stateBlend) + 1.5707964f);
                 int iconMenuIndex = m_menuIndex;
                 int signX = -32;
                 if ((iconMenuIndex & 1) != 0) {
@@ -917,7 +917,7 @@ void CMesMenu::CalcHeart()
         m_heartDropTimers[i + 3] = value & ~((int)value >> 0x1F);
     }
 
-    unsigned int value = m_foodShakeTimer - 1;
+    int value = m_foodShakeTimer - 1;
     m_foodShakeTimer = value & ~((int)value >> 0x1F);
 }
 
@@ -942,7 +942,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         float heartBaseY = 12.0f + y;
         float heartZero = 0.0f, pulseBase = 0.8f, pulseAmp = 0.2f, pulseOne = 1.0f, pulseTimerScale = 0.0625f;
 
-        for (int heartIndex = 0; heartIndex < (int)((unsigned int)scriptFood->m_maxHp >> 1); heartIndex++) {
+        for (int heartIndex = 0; heartIndex < scriptFood->m_maxHp / 2; heartIndex++) {
             int heartValue = m_heartValue - heartIndex * 0xC;
             float heartSin = (float)sin(pulseSinScale * (pulseOne - (float)m_heartGrowTimers[heartIndex] * pulseTimerScale));
             float heartPulse = pulseAmp * heartSin + pulseOne;
@@ -977,14 +977,11 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
  */
 void CMesMenu::onScriptChanging(char*)
 {
-    int menuIndex;
-
     m_mes.Set(0, 0);
     m_state = 4;
     m_active = 0;
-    menuIndex = m_menuIndex;
-    if (menuIndex < 4) {
-        MenuPcs.GetRingMenu(menuIndex)->SetFade(1);
+    if (m_menuIndex < 4) {
+        MenuPcs.GetRingMenu(m_menuIndex)->SetFade(1);
     }
 }
 
@@ -1013,15 +1010,13 @@ void CMesMenu::onScriptChanged(char*, int)
  */
 void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int itemIndex, int nameIndex)
 {
-    float zero;
     unsigned int menuIndex;
     bool alignRight;
     float yPos;
 
-    zero = 0.0f;
 #ifdef VERSION_GCCP01
     m_offsetY = 0.0f;
-    m_offsetX = zero;
+    m_offsetX = 0.0f;
 #endif
     m_active = 1;
     m_closeReason = 0;
@@ -1052,15 +1047,13 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     m_nameIndex = nameIndex;
     m_mes.Set(script, flags & 0x20);
 
-    float two = 2.0f;
     m_windowWidth = 2.0f * m_marginX + m_mes.GetWidth();
-    m_windowHeight = two * m_marginY + m_mes.GetHeight();
+    m_windowHeight = 2.0f * m_marginY + m_mes.GetHeight();
 
     if (m_menuIndex >= 4) {
         if ((flags & 8) != 0) {
-            float half = 0.5f;
             m_baseX = -(0.5f * m_windowWidth - m_baseX);
-            m_baseY = -(half * m_windowHeight - m_baseY);
+            m_baseY = -(0.5f * m_windowHeight - m_baseY);
         } else if ((flags & 0x8000) != 0) {
             m_baseX -= m_windowWidth;
         }

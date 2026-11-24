@@ -235,9 +235,7 @@ void CSound::Realloc(int isMinMemoryMode)
 float CSound::GetPerformance()
 {
     unsigned int programTime = m_redSound.GetProgramTime();
-    float numer = (float)(programTime / 0xF);
-    float denom = (float)(((OS_TIMER_CLOCK / 125000) * 0x8235) >> 3);
-    return 100.0f * (numer / denom);
+    return 100.0f * ((float)(programTime / 0xF) / (float)(((OS_TIMER_CLOCK / 125000) * 0x8235) >> 3));
 }
 
 /*
@@ -1148,13 +1146,11 @@ inline CSound::CSe3D* CSound::searchSe3D(int se3dHandle)
  */
 int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistance, int fadeFrames)
 {
-    int volumeValue;
     CSe3D* se;
     int loopCount;
     int slot;
     int volume;
     int pan;
-    int panValue;
 
     if (soundId < 0) {
         System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
@@ -1184,28 +1180,8 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
         se->m_volume = static_cast<u8>(volume);
         se->m_pan = static_cast<u8>(pan);
         se->m_group = -1;
-        volumeValue = volume;
-        panValue = pan;
 
-        if (soundId < 0) {
-            System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
-            slot = -1;
-        } else if (soundId < 4000) {
-            int bank = soundId / 1000;
-            slot = m_redSound.SePlay(bank, soundId % 1000, panValue,
-                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-            if (fadeFrames != 0) {
-                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
-            }
-        } else {
-            slot = m_redSound.SePlay(-1, soundId, panValue,
-                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-            if (fadeFrames != 0) {
-                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
-            }
-        }
-
-        se->m_playId = slot;
+        se->m_playId = PlaySe(soundId, pan, volume, fadeFrames);
         return se->m_handle;
     }
 
@@ -1223,13 +1199,11 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
  */
 int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float farDistance, int fadeFrames)
 {
-    int volumeValue;
     CSe3D* se;
     int loopCount;
     int slot;
     int volume;
     int pan;
-    int panValue;
 
     if (soundId < 0) {
         System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
@@ -1258,28 +1232,8 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
         se->m_volume = static_cast<u8>(volume);
         se->m_pan = static_cast<u8>(pan);
         se->m_group = -1;
-        volumeValue = volume;
-        panValue = pan;
 
-        if (soundId < 0) {
-            System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
-            slot = -1;
-        } else if (soundId < 4000) {
-            int bank = soundId / 1000;
-            slot = m_redSound.SePlay(bank, soundId % 1000, panValue,
-                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-            if (fadeFrames != 0) {
-                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
-            }
-        } else {
-            slot = m_redSound.SePlay(-1, soundId, panValue,
-                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-            if (fadeFrames != 0) {
-                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
-            }
-        }
-
-        se->m_playId = slot;
+        se->m_playId = PlaySe(soundId, pan, volume, fadeFrames);
         return se->m_handle;
     }
 

@@ -196,6 +196,7 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
 
     if (textureInfo != 0) {
         pppMemFree(textureInfo);
+        textureInfo = 0;
     }
 }
 
@@ -280,12 +281,13 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
 #endif
                 }
 
-                xFine = x & 3;
                 if (magnitude > 1.0f) {
                     magnitude = 1.0f;
                 }
 
-                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
+                xFine = x & 3;
+                u32 nx = xCoord * magnitude * 127.0f + 128.0f;
+                FFCC_ASSERT(x < textureInfo->m_width && y < textureInfo->m_height);
                 u8* pixel = textureInfo->m_imageData +
                     yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
                     (x & 0x1FFFFFFC) * 8 +
@@ -349,7 +351,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
         }
 
         pppSetBlendMode(0);
-        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
+        Graphic.GetBackBufferRect2(Graphic.GetTmpFrameBuffer(), &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
                                    (_GXTexFmt)4, 0);
         pppSetDrawEnv(
             &colorBlock->m_color, &pppCrystal2->m_drawMatrix, step->m_arg3,
@@ -371,16 +373,16 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
             PSMTXConcat(ppvCameraMatrix, cameraMtx, tmpMtx);
         } else {
             f32 perspectiveScale = step->m_perspectiveScale;
-            C_MTXLightPerspective(lightMtx, CameraPcs.m_fov, 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f,
+            C_MTXLightPerspective(lightMtx, CameraPcs.GetFov(), 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f,
                                   0.5f);
-            PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
+            PSMTXConcat(CameraPcs.GetViewMatrix(), cameraMtx, tmpMtx);
         }
         PSMTXConcat(lightMtx, tmpMtx, drawMtx);
         PSMTXInverse(tmpMtx, normalMtx);
         PSMTXTranspose(normalMtx, normalMtx);
 
         if (step->m_crystal.m_refractionMode == 0) {
-            GXLoadTexObj(&sourceTex->m_texObj, GX_TEXMAP1);
+            GXLoadTexObj(sourceTex->GetTexObj(), GX_TEXMAP1);
         } else {
             GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
         }
@@ -398,7 +400,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x21, GX_TRUE, 0x40);
         GXLoadTexObj(&backTexObj, GX_TEXMAP0);
         GXLoadTexMtxImm(drawMtx, 0x1E, GX_MTX3x4);
-        GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
+        GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX3x4, GX_TG_POS, 0x1E);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP0, GX_COLOR0A0);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_ONE, GX_CC_RASC);

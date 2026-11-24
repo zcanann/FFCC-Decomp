@@ -9,6 +9,29 @@
 
 struct Vec;
 
+class CRelStopWatch
+{
+public:
+    CRelStopWatch()
+    {
+    }
+    ~CRelStopWatch()
+    {
+    }
+    void Start()
+    {
+    }
+    void Stop()
+    {
+    }
+};
+
+class CRelProfile : public CRelStopWatch
+{
+public:
+    ~CRelProfile();
+};
+
 class CMapPcs : public CProcess
 {
 public:
@@ -63,5 +86,8 @@ public:
 extern CMapPcs MapPcs;
 extern unsigned int g_mapStage;
 extern unsigned int g_mapSection;
+extern CRelProfile g_hit_prof;
+extern CRelProfile g_map_calc_prof;
+extern CRelProfile g_map_draw_prof;
 
 #endif // _FFCC_P_MAP_H_

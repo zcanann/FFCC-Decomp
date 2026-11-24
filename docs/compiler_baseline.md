@@ -1,89 +1,9 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0ffcc for Japan. The
-RedSound library uses GC/2.0ffcc in all three regions. GC/2.0ffcc is
-`GC_2_0ffcc` of PrimeDecomp/mwcc-tools' `gc2/`, built from the decompiled
-compiler source and installed by `tools/download_mwcc_tools.py` (see below). SDK and middleware selections are independent. These are
-compatibility baselines, not identification of the original retail compiler
-binaries.
-
-## Japanese game compiler: GC/2.0ffcc (mwcc-tools)
-
-GC/2.0ffcc replaces GC/2.0p1k, the end of a chain of binary patches of the
-bundled GC/2.0p1 described in the sections below. The `gc2/` tree of
-[mwcc-tools](https://github.com/PrimeDecomp/mwcc-tools) (the decompilation of
-the GameCube 2.x compilers, formerly mweppc) already models BFBB's retail
-compiler at source level as `GC_2_0p2` (GameCube 2.0 with its own alias rules,
-measured on BFBB). `GC_2_0ffcc` is `GC_2_0p2` plus four rules measured on FFCC
-Japan, each written as C in its alias analysis
-([PrimeDecomp/mwcc-tools#4](https://github.com/PrimeDecomp/mwcc-tools/pull/4)):
-
-- `ksa` (from GC/2.0p1i): an access keeps its own alias when another
-  reaching definition of its base register has none.
-- `pwcp` (from GC/2.0p1i): a `worst_case` store, such as a prologue register
-  save, is ordered before a load of a stack-passed parameter.
-- a direct small-data load is treated as a load through a pointer even when
-  the global is `const` (2.0p2 exempts constants). Witness:
-  `CMenuPcs::SetWorldParam`, whose `WMDATA_CHG_AREA` load stays below the
-  stores into `this`.
-- a load of part of a small literal (a local aggregate's initialiser) is
-  treated like a load of a whole one. Witness: `CChara::CModel::DrawFur`, whose
-  `{0, 0}` initialiser copies stay below the first array's stores.
-
-FFCC's other patch clauses are covered by 2.0p2's own rules and never change
-a scheduling answer on top of it: `e3ns` and `c3a` (2.0p2 gives every
-floating-point literal load the `worst_case` alias), `dsl`, `dsls` and `dslu`
-(2.0p2 gives a direct small-data store the `worst_case` alias). An instrumented
-build confirmed that none of them fires on any Japanese unit.
-
-Rebuilding every Japanese game unit (3081 functions) with each compiler, on
-otherwise unchanged source:
-
-| compiler | exact functions | vs GC/2.0p1k |
-| --- | --- | --- |
-| GC/2.0 | 2380 | +0 / -622 |
-| GC/2.0p1 | 2766 | +0 / -236 |
-| GC/2.0p1g | 2959 | +0 / -43 |
-| GC/2.0p1k | 3002 | |
-| GC_2_0p2 | 2994 | +10 / -18 |
-| GC_2_0ffcc | 3014 | +12 / -0 |
-
-Against GC_2_0p2 the four rules are +13 / -0, +5 / -0, +1 / -0 and +1 / -0.
-265 of the 274 Japanese objects are byte-identical to GC/2.0p1k's. The nine
-others differ only where GC/2.0ffcc is closer to retail: it matches
-`CalcResultOpenAnim`, `makeFurTex`, `DrawFur`, `GbaQueue::LoadEnemyStat`,
-`LoadMapItemStat` and `LoadPlayerStat`, `CheckHitFaceCylinder`,
-`CMapPcs::drawAfter` and `drawAfterViewer`, `pppParHitSphMat`,
-`pppConstructYmMoveCircle` and `SetWorldParam`, and improves `LoadMapObj`
-(77.66 to 93.32), `PickFur` and `CalcMainMenuSub`. No function declines.
-The two functions of the write-after-read candidate below are among them, with
-no FFCC-specific rule. The eight RedSound units give byte-identical objects
-with GC/2.0p1g and GC/2.0ffcc in every region. PAL and USA are unaffected.
-
-Switching each of the source's remaining 2.0 behaviours to 2.5's on top of
-GC/2.0ffcc, one `#if VERSION` at a time, gains no Japanese function. Forcing the
-PAL/USA arm of every regional `#if` chain into the Japanese build gains none
-either, so no regional chain collapses because of the new compiler.
-
-Two functions were written to fit GC/2.0p1k and now use the plain form that
-matches in every region: `CMenuPcs::LetterClose` reads
-`m_letterMenuState->listCursor` again for `s_BackUpTopPos` (the direct
-small-data store to `s_BackUpCur` makes the Japanese compiler reload
-`m_letterMenuState`), and `pppFrameYmCheckBGHeight` reads `ppvMng` first.
-
-With the compiler switch and these two changes, the Japanese report gains 14
-exact functions, 25,320 exact code bytes and 1,488 exact data bytes, with no
-function lower; `pppParHitSphMat`, `pppYmCheckBGHeight` and
-`pppYmMoveCircle` now link in Japan. PAL and USA reports are unchanged, and
-all three DOL checksums pass.
-
-`tools/download_mwcc_tools.py` installs the compiler into
-`<compilers>/GC/2.0ffcc` as a ninja pre-compile step. mwcc-tools does not
-publish its gc2 compilers yet, so the script's pinned `RELEASE` (URL and
-SHA-256) is unset: until it is set, build the compiler with mwcc-tools (in
-`gc2/`: `python configure.py --version GC_2_0ffcc && ninja`) and copy
-`build/GC_2_0ffcc/clang/mwcceppc.exe` there. The script keeps a compiler that
-is already in place and otherwise stops the build with these instructions.
+The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1l for Japan.
+GC/2.0p1l is derived during the build from the bundled GC/2.0p1 (see below).
+SDK and middleware selections are independent. These are compatibility
+baselines, not identification of the original retail compiler binaries.
 
 ## Provenance
 
@@ -133,14 +53,6 @@ This establishes a useful regional compatibility choice. It does not establish
 the provenance of the original compiler or explain every remaining mismatch.
 Continue investigating types, layout, source expressions and linkage before
 attributing residual differences to the compiler.
-
-## History: the GC/2.0p1a..k patch chain
-
-The sections below record how the Japanese baseline was derived before
-GC/2.0ffcc. Their scripts (`tools/patch_compiler.py`,
-`tools/patch_compiler_rw.py`, `tools/patch_compiler_ffcc*.py` and
-`tools/aliaspatch_*.py`) were removed when GC/2.0ffcc replaced them; the x86
-research source of each FFCC clause is in their git history.
 
 ## Japanese game compiler: GC/2.0p1g
 
@@ -320,3 +232,53 @@ partial losses. It is not adopted, for these reasons:
 - `pppFrameYmCheckBGHeight` would also need a source reorder that holds only
   under this predicate (it scores 90 without it). That would tune source to the
   candidate compiler.
+
+## GC/2.0p1l: the scheduler's alias rules of GC_2_0ffcc
+
+`tools/patch_compiler_ffcc6.py` derives GC/2.0p1l from GC/2.0p1k
+(`abeb8e6e85568dd4e904e26ae3ca55b5b2cc5bcd` to
+`bfccb4b31e5d12fa7fac79ffa2f5ffa1e8a99588`) with four edits and 700 bytes of new code in a new
+executable section, `.ffcc6`, appended after `.sbpatch` (the x86 source is kept
+in the script). GC/2.0p1l is the Japanese game compiler.
+
+PrimeDecomp/mwcc-tools builds `GC_2_0ffcc` from source: BFBB's source-level
+`GC_2_0p2` plus four alias rules measured on FFCC Japan, `ksa` and `pwcp` (the
+two this chain already had) and two new ones. Rebuilding every Japanese game
+unit (268) with that compiler, 265 objects equal GC/2.0p1k's and nine differ,
+only in functions it improves. The same compiler differences are what the
+earlier "write-after-read mirror of e3ns" candidate was approximating: the
+chain emulates BFBB's behaviours clause by clause, but `GC_2_0p2` states them
+as two alias rules, and the chain never had the second one. GC/2.0p1l ports the
+rules `GC_2_0ffcc` has and the chain lacks:
+
+- `gather`: `gather_instruction_alias` (0x5123B0) begins with `GC_2_0p2`'s two
+  pre-rules, a write that is a direct small-data access to a global that is
+  not a safe const gets the `worst_case` alias (value numbering forgets other
+  globals after it), and so does a load of a floating-point `@` literal in
+  inline data. A hook in front of the function applies them to `pcode->alias`
+  and then runs the stock code.
+- `sched`: the scheduler's three dependency queries (`serialize_store` twice,
+  `findsuccessors` once) call `may_alias_scheduling` instead of `may_alias`: a
+  load of small data and a direct small-data store to `worst_case` may alias
+  whichever comes first; a load that is a direct small-data access (also of a
+  `const` global) or a load of any part of a non-float `@` object through an
+  Addr16 operand is queried as a `worst_case` access; the stock `may_alias`,
+  with the chain's clauses and `pwcp`, answers the rest.
+
+The last two rules (loads of `const` small data and loads of part of a small
+literal) are `GC_2_0ffcc`'s new ones; the others are `GC_2_0p2`'s own, which
+the chain's clauses only approximated. The chain's clauses (`e3ns`, `c3a`,
+`dsl`, BFBB's) stay: the new answers are added to theirs, not substituted.
+
+Rebuilding every Japanese game unit with GC/2.0p1l and with the source-built
+`GC_2_0ffcc` (macOS clang build), same source: all 268 objects are
+byte-identical. Against GC/2.0p1k, with the current staging source plus the
+`LetterClose` and `pppFrameYmCheckBGHeight` simplifications that only the new
+compiler needs, Japan gains 14 exact functions and lowers none:
+`CalcResultOpenAnim`, `makeFurTex`, `DrawFur`, `GbaQueue::LoadPlayerStat`,
+`LoadEnemyStat`, `LoadMapItemStat`, `CheckHitFaceCylinder`,
+`CMapPcs::drawAfter`, `drawAfterViewer`, `pppParHitSphMat`,
+`pppConstructYmMoveCircle`, `pppFrameYmCheckBGHeight`, `SetWorldParam` and
+`LetterClose`; `LoadMapObj`, `PickFur` and `CalcMainMenuSub` improve. `maphit`,
+`pppParHitSphMat`, `pppYmCheckBGHeight` and `pppYmMoveCircle` become complete
+Japanese units. PAL and USA (GC/2.5) are unaffected.

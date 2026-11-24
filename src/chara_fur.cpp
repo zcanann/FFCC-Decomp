@@ -1085,16 +1085,15 @@ void CChara::SaveFurTexBuffer(unsigned short* outTexels)
  */
 void CChara::InitFurTexBuffer()
 {
-	MogFurState& fur = m_sharedState.m_mogFur;
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
 			Chara.m_sharedState.m_mogFur.m_texels[y * 0x40 + x] = 0x7FFF;
 		}
 	}
 
-	fur.m_dirty = 0;
+	m_sharedState.m_mogFur.m_dirty = 0;
 	Chara.m_sharedState.m_mogFur.m_timestamp = System.GetCounter();
-	memset(fur.m_score, 0, 0x40);
+	memset(m_sharedState.m_mogFur.m_score, 0, 0x40);
 	CalcMogScore();
 }
 
@@ -1151,10 +1150,9 @@ void CChara::ChangeMogMode(int mogMode)
 		return;
 	}
 
-	int& mogSoundHandle = m_mogWork.m_loopSeHandle;
-	if (mogSoundHandle != 0) {
-		Sound.StopSe(mogSoundHandle);
-		mogSoundHandle = 0;
+	if (m_mogWork.m_loopSeHandle != 0) {
+		Sound.StopSe(m_mogWork.m_loopSeHandle);
+		m_mogWork.m_loopSeHandle = 0;
 	}
 }
 

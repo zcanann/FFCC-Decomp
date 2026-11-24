@@ -69,10 +69,9 @@ STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 STATIC_ASSERT(sizeof(CFlatLayerResource) * kFlatLayerResourceCount == 0x60);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_layerResources) == 0x1770);
 
-static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
+inline int CSystem::GetErrorLevel()
 {
-	object->m_isActiveBits.active = 0;
-	object->m_particleId = particleId;
+	return m_execParam;
 }
 
 namespace {
@@ -146,36 +145,33 @@ CFlatRuntime2::CFlatRuntime2()
 	memset(m_spawnBits, 0, sizeof(m_spawnBits));
 
 	for (int i = 0; i < 0x28; i++) {
-		InitFlatObjectSlot(&m_objBase[i], static_cast<u16>(i + 1));
+		m_objBase[i].m_isActiveBits.active = 0;
+		m_objBase[i].m_particleId = i + 1;
 	}
 
-	CGQuadObj* quadObj = reinterpret_cast<CGQuadObj*>(m_objQuad);
 	for (int i = 0; i < 0x18; i++) {
-		InitFlatObjectSlot(quadObj, static_cast<u16>((i + 1) | 0x100));
-		quadObj++;
+		m_objQuad[i].m_isActiveBits.active = 0;
+		m_objQuad[i].m_particleId = (i + 1) | 0x100;
 	}
 
-	CGObject* gObj = reinterpret_cast<CGObject*>(m_obj);
 	for (int i = 0; i < 0x38; i++) {
-		InitFlatObjectSlot(gObj, static_cast<u16>((i + 1) | 0x200));
-		gObj++;
+		m_obj[i].m_isActiveBits.active = 0;
+		m_obj[i].m_particleId = (i + 1) | 0x200;
 	}
 
-	InitFlatObjectSlot(&m_objParty[0], 0x301);
-	InitFlatObjectSlot(&m_objParty[1], 0x302);
-	InitFlatObjectSlot(&m_objParty[2], 0x303);
-	InitFlatObjectSlot(&m_objParty[3], 0x304);
-
-	CGMonObj* monObj = reinterpret_cast<CGMonObj*>(m_objMon);
-	for (int i = 0; i < kFlatMonObjCount; i++) {
-		InitFlatObjectSlot(monObj, static_cast<u16>((i + 1) | 0x400));
-		monObj++;
+	for (int i = 0; i < 4; i++) {
+		m_objParty[i].m_isActiveBits.active = 0;
+		m_objParty[i].m_particleId = (i + 1) | 0x300;
 	}
 
-	u8* itemObjBytes = reinterpret_cast<u8*>(m_objItem);
+	for (int i = 0; i < 0x40; i++) {
+		m_objMon[i].m_isActiveBits.active = 0;
+		m_objMon[i].m_particleId = (i + 1) | 0x400;
+	}
+
 	for (int i = 0; i < 0x20; i++) {
-		InitFlatObjectSlot(reinterpret_cast<CGItemObj*>(itemObjBytes), static_cast<u16>((i + 1) | 0x500));
-		itemObjBytes += 0x57C;
+		m_objItem[i].m_isActiveBits.active = 0;
+		m_objItem[i].m_particleId = (i + 1) | 0x500;
 	}
 }
 
@@ -200,7 +196,7 @@ CFlatRuntime2::~CFlatRuntime2()
  */
 CMemory::CStage* CFlatRuntime2::getStage()
 {
-	return Game.m_mainStage;
+	return Game.GetMemoryStage();
 }
 
 /*
@@ -214,7 +210,7 @@ CMemory::CStage* CFlatRuntime2::getStage()
  */
 CMemory::CStage* CFlatRuntime2::getDebugStage()
 {
-	return Game.m_debugStage;
+	return Game.GetDebugMemoryStage();
 }
 
 /*
@@ -438,17 +434,16 @@ void* CFlatRuntime2::intToClass(int classId)
  */
 inline CGBaseObj* CFlatRuntime2::FindGBaseObjFirst()
 {
-	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = m_objectSentinel.m_next->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(1)) {
 					return reinterpret_cast<CGBaseObj*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -465,17 +460,16 @@ inline CGBaseObj* CFlatRuntime2::FindGBaseObjFirst()
  */
 inline CGBaseObj* CFlatRuntime2::FindGBaseObjNext(CGBaseObj* gObject)
 {
-	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = gObject->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(1)) {
 					return reinterpret_cast<CGBaseObj*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -621,7 +615,7 @@ int CFlatRuntime2::Load(char* fileName)
 	}
 
 	resetChangeScript();
-	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+	if (System.GetErrorLevel() >= 3U) {
 		System.Printf("\x83\x58\x83\x4e\x83\x8a\x83\x76\x83\x67\x93\xc7\x82\xdd\x8d\x9e" "\x82\xdd\x8f\x49\x97\xb9\n");
 	}
 	return 1;
@@ -638,17 +632,16 @@ int CFlatRuntime2::Load(char* fileName)
  */
 CGObject* CFlatRuntime2::FindGObjFirst()
 {
-	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = m_objectSentinel.m_next->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(5)) {
 					return reinterpret_cast<CGObject*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -665,17 +658,16 @@ CGObject* CFlatRuntime2::FindGObjFirst()
  */
 CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
 {
-	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = gObject->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(5)) {
 					return reinterpret_cast<CGObject*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -692,17 +684,16 @@ CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
  */
 CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
 {
-	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = m_objectSentinel.m_next->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 3) == 3) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(3)) {
 					return reinterpret_cast<CGQuadObj*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -719,17 +710,16 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
  */
 CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
 {
-	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gQuadObj)->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = gQuadObj->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 3) == 3) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(3)) {
 					return reinterpret_cast<CGQuadObj*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -746,17 +736,16 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
  */
 CGMonObj* CFlatRuntime2::FindGMonObjFirst()
 {
-	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = m_objectSentinel.m_next->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0xAD) == 0xAD) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(0xAD)) {
 					return reinterpret_cast<CGMonObj*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -773,17 +762,16 @@ CGMonObj* CFlatRuntime2::FindGMonObjFirst()
  */
 CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
 {
-	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gMonObj)->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = gMonObj->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0xAD) == 0xAD) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(0xAD)) {
 					return reinterpret_cast<CGMonObj*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -800,17 +788,16 @@ CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
  */
 CGItemObj* CFlatRuntime2::FindGItemObjFirst()
 {
-	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = m_objectSentinel.m_next->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0x1D) == 0x1D) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(0x1D)) {
 					return reinterpret_cast<CGItemObj*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -827,17 +814,16 @@ CGItemObj* CFlatRuntime2::FindGItemObjFirst()
  */
 CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 {
-	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gItemObj)->m_next;
+	CFlatRuntime::CObject* object;
 
-	while (object != &m_objectSentinel) {
+	for (object = gItemObj->m_next; object != &m_objectSentinel; object = object->m_next) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0x1D) == 0x1D) {
+				if (reinterpret_cast<CGBaseObj*>(object)->IsKindOf(0x1D)) {
 					return reinterpret_cast<CGItemObj*>(object);
 				}
 			}
 		}
-		object = object->m_next;
 	}
 
 	return 0;
@@ -858,17 +844,14 @@ void CFlatRuntime2::Destroy()
 	m_flatData.Destroy();
 
 	for (int i = 0; i < 8; i++) {
-		CFlatLayerResource* layer = &m_layerResources[i];
-		CFile::CHandle* fileHandle = layer->m_fileHandle;
-		if (fileHandle != 0) {
-			fileHandle->Close();
-			layer->m_fileHandle = 0;
+		if (m_layerResources[i].m_fileHandle != 0) {
+			m_layerResources[i].m_fileHandle->Close();
+			m_layerResources[i].m_fileHandle = 0;
 		}
 
-		CTextureSet* textureSet = layer->m_textureSet;
-		if (textureSet != 0) {
-			delete textureSet;
-			layer->m_textureSet = 0;
+		if (m_layerResources[i].m_textureSet != 0) {
+			delete m_layerResources[i].m_textureSet;
+			m_layerResources[i].m_textureSet = 0;
 		}
 	}
 }
@@ -887,29 +870,20 @@ void CFlatRuntime2::Calc()
 	u8* runtime = reinterpret_cast<u8*>(this);
 
 	for (int i = 0; i < 8; i++) {
-		CFlatLayerResource* layer = &m_layerResources[i];
-		CFile::CHandle* fileHandle = layer->m_fileHandle;
-		if (fileHandle == 0) {
-			continue;
-		}
-
-		if (fileHandle->IsCompleted()) {
-			CTextureSet* textureSet = layer->m_textureSet;
-			if (textureSet != 0) {
-				delete textureSet;
-				layer->m_textureSet = 0;
+		if (m_layerResources[i].m_fileHandle != 0 && m_layerResources[i].m_fileHandle->IsCompleted()) {
+			if (m_layerResources[i].m_textureSet != 0) {
+				delete m_layerResources[i].m_textureSet;
+				m_layerResources[i].m_textureSet = 0;
 			}
 
-			textureSet = new (getStage(), "cflat_runtime2.cpp", 0x335) CTextureSet;
-			layer->m_textureSet = textureSet;
-			void* readBuffer = File.GetBuffer();
-			layer->m_textureSet->Create(
-				readBuffer,
-				GET_CHARA_ALLOC_STAGE_S(layer->m_allocStage, Game.m_mainStage),
+			m_layerResources[i].m_textureSet = new (getStage(), "cflat_runtime2.cpp", 0x335) CTextureSet;
+			m_layerResources[i].m_textureSet->Create(
+				File.GetBuffer(),
+				GET_CHARA_ALLOC_STAGE_S(m_layerResources[i].m_allocStage, Game.GetMemoryStage()),
 				0, 0, 0, 0);
 
-			layer->m_fileHandle->Close();
-			layer->m_fileHandle = 0;
+			m_layerResources[i].m_fileHandle->Close();
+			m_layerResources[i].m_fileHandle = 0;
 		}
 	}
 
@@ -924,65 +898,58 @@ void CFlatRuntime2::Calc()
 
 		u32* saveData = new (getStage(), "cflat_runtime2.cpp", 0x36F) u32[0x3FF];
 
-		u32 header[8];
-		reinterpret_cast<float*>(header)[0] = Util.ConvertEndianF4(CameraPcs.m_position.x);
-		reinterpret_cast<float*>(header)[1] = Util.ConvertEndianF4(CameraPcs.m_position.y);
-		reinterpret_cast<float*>(header)[2] = Util.ConvertEndianF4(CameraPcs.m_position.z);
-		reinterpret_cast<float*>(header)[3] = Util.ConvertEndianF4(CameraPcs.m_target.x);
-		reinterpret_cast<float*>(header)[4] = Util.ConvertEndianF4(CameraPcs.m_target.y);
-		reinterpret_cast<float*>(header)[5] = Util.ConvertEndianF4(CameraPcs.m_target.z);
-		reinterpret_cast<float*>(header)[6] = Util.ConvertEndianF4(CameraPcs.m_fov);
-		reinterpret_cast<float*>(header)[7] = Util.ConvertEndianF4((180.0f * CameraPcs.m_zRotate) / 3.1415927f);
+		struct CCam {
+			Vec pos;
+			Vec ref;
+			float fov;
+			float zRotate;
+		};
+		struct CObj {
+			unsigned long id;
+			Vec pos;
+			float rotY;
+			float unk;
+			float radius;
+		};
 
-		u32* objectData = saveData + 8;
+		CCam cam;
+		cam.pos.x = Util.ConvertEndianF4(CameraPcs.GetPosition()->x);
+		cam.pos.y = Util.ConvertEndianF4(CameraPcs.GetPosition()->y);
+		cam.pos.z = Util.ConvertEndianF4(CameraPcs.GetPosition()->z);
+		cam.ref.x = Util.ConvertEndianF4(CameraPcs.GetRefPosition()->x);
+		cam.ref.y = Util.ConvertEndianF4(CameraPcs.GetRefPosition()->y);
+		cam.ref.z = Util.ConvertEndianF4(CameraPcs.GetRefPosition()->z);
+		cam.fov = Util.ConvertEndianF4(CameraPcs.GetFov());
+		cam.zRotate = Util.ConvertEndianF4((180.0f * CameraPcs.GetZRotate()) / 3.1415927f);
+		*reinterpret_cast<CCam*>(saveData) = cam;
 
-		saveData[0] = header[0];
-		saveData[1] = header[1];
-		saveData[2] = header[2];
-		saveData[3] = header[3];
-		saveData[4] = header[4];
-		saveData[5] = header[5];
-		reinterpret_cast<float*>(saveData)[6] = reinterpret_cast<float*>(header)[6];
-		reinterpret_cast<float*>(saveData)[7] = reinterpret_cast<float*>(header)[7];
-
-		u32 record[7];
+		CObj* objData = reinterpret_cast<CObj*>(saveData + 8);
+		CObj obj;
 
 		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			if (object->m_charaModelHandle == 0) {
 				continue;
 			}
 
-			record[0] = Util.ConvertEndian4(object->m_particleId);
+			obj.id = Util.ConvertEndian4(object->m_particleId);
 
 			Vec pos = object->m_worldPosition;
 			if (object->m_weaponNodeFlagBits.m_attached != 0) {
 				PSVECAdd(&pos, &object->m_attachOwner->m_worldPosition, &pos);
 			}
 
-			reinterpret_cast<float*>(record)[1] = Util.ConvertEndianF4(pos.x);
-			reinterpret_cast<float*>(record)[2] = Util.ConvertEndianF4(pos.y);
-			reinterpret_cast<float*>(record)[3] = Util.ConvertEndianF4(pos.z);
-			reinterpret_cast<float*>(record)[4] = Util.ConvertEndianF4(object->m_rotBaseY);
-			reinterpret_cast<float*>(record)[5] = Util.ConvertEndianF4(object->unk_0x188);
-			reinterpret_cast<float*>(record)[6] = Util.ConvertEndianF4(object->m_bodyEllipsoidRadius);
-			objectData[0] = record[0];
-			objectData[1] = record[1];
-			objectData[2] = record[2];
-			objectData[3] = record[3];
-			reinterpret_cast<float*>(objectData)[4] = reinterpret_cast<float*>(record)[4];
-			reinterpret_cast<float*>(objectData)[5] = reinterpret_cast<float*>(record)[5];
-			reinterpret_cast<float*>(objectData)[6] = reinterpret_cast<float*>(record)[6];
-			objectData += 7;
+			obj.pos.x = Util.ConvertEndianF4(pos.x);
+			obj.pos.y = Util.ConvertEndianF4(pos.y);
+			obj.pos.z = Util.ConvertEndianF4(pos.z);
+			obj.rotY = Util.ConvertEndianF4(object->m_rotBaseY);
+			obj.unk = Util.ConvertEndianF4(object->unk_0x188);
+			obj.radius = Util.ConvertEndianF4(object->m_bodyEllipsoidRadius);
+			*objData = obj;
+			objData++;
 		}
 
-		record[0] = Util.ConvertEndian4(0xFFFFFFFF);
-		objectData[0] = record[0];
-		objectData[1] = record[1];
-		objectData[2] = record[2];
-		objectData[3] = record[3];
-		reinterpret_cast<float*>(objectData)[4] = reinterpret_cast<float*>(record)[4];
-		reinterpret_cast<float*>(objectData)[5] = reinterpret_cast<float*>(record)[5];
-		reinterpret_cast<float*>(objectData)[6] = reinterpret_cast<float*>(record)[6];
+		obj.id = Util.ConvertEndian4(0xFFFFFFFF);
+		*objData = obj;
 		delete[] saveData;
 	}
 
@@ -1188,9 +1155,7 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 		m_debugDrawCCEntries[m_debugDrawCCCount].m_flagBits.m_bit7 = bit7;
 		m_debugDrawCCEntries[m_debugDrawCCCount].m_flagBits.m_bit6 = bit6;
 
-		const int index = m_debugDrawCCCount;
-		m_debugDrawCCCount = index + 1;
-		m_debugDrawCCEntries[index].m_radius = radius;
+		m_debugDrawCCEntries[m_debugDrawCCCount++].m_radius = radius;
 		return;
 	}
 
@@ -1294,9 +1259,8 @@ done:
  */
 void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 {
-	CTextureSet* textureSet = m_layerResources[layerNo].m_textureSet;
-	if (textureSet != 0) {
-		delete textureSet;
+	if (m_layerResources[layerNo].m_textureSet != 0) {
+		delete m_layerResources[layerNo].m_textureSet;
 		m_layerResources[layerNo].m_textureSet = 0;
 	}
 
@@ -1312,12 +1276,10 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 		fileHandle->Read();
 		fileHandle->SyncCompleted();
 
-		textureSet = new (getStage(), "cflat_runtime2.cpp", 0x4F4) CTextureSet;
-		m_layerResources[layerNo].m_textureSet = textureSet;
-		void* readBuffer = File.GetBuffer();
+		m_layerResources[layerNo].m_textureSet = new (getStage(), "cflat_runtime2.cpp", 0x4F4) CTextureSet;
 		m_layerResources[layerNo].m_textureSet->Create(
-			readBuffer,
-			GET_CHARA_ALLOC_STAGE_S(CharaPcs.m_charaAllocStage, Game.m_mainStage),
+			File.GetBuffer(),
+			GET_CHARA_ALLOC_STAGE_S(CharaPcs.GetCharaAllocStage(), Game.GetMemoryStage()),
 			0, 0, 0, 0);
 
 		fileHandle->Close();
@@ -1331,7 +1293,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
  */
 unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
 {
-	return static_cast<unsigned int>(__cntlzw(reinterpret_cast<int>(m_layerResources[layerNo].m_fileHandle))) >> 5;
+	return (m_layerResources[layerNo].m_fileHandle == 0) ? 1 : 0;
 }
 
 /*
@@ -1345,15 +1307,13 @@ unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
  */
 void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 {
-	CFile::CHandle* fileHandle = m_layerResources[layerNo].m_fileHandle;
-	if (fileHandle != 0) {
-		fileHandle->Close();
+	if (m_layerResources[layerNo].m_fileHandle != 0) {
+		m_layerResources[layerNo].m_fileHandle->Close();
 		m_layerResources[layerNo].m_fileHandle = 0;
 	}
 
-	CTextureSet* textureSet = m_layerResources[layerNo].m_textureSet;
-	if (textureSet != 0) {
-		delete textureSet;
+	if (m_layerResources[layerNo].m_textureSet != 0) {
+		delete m_layerResources[layerNo].m_textureSet;
 		m_layerResources[layerNo].m_textureSet = 0;
 	}
 
@@ -1369,7 +1329,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 		m_layerResources[layerNo].m_fileHandle->ReadASync();
 	}
 
-	m_layerResources[layerNo].m_allocStage = CharaPcs.m_charaAllocStage;
+	m_layerResources[layerNo].m_allocStage = CharaPcs.GetCharaAllocStage();
 }
 
 /*
@@ -1427,13 +1387,12 @@ void CFlatRuntime2::drawLayer(
 
 	TextureMan.SetTexture(GX_TEXMAP0, texture);
 
-	const float texW = static_cast<float>(static_cast<unsigned int>(texture->m_width));
-	const float texH = static_cast<float>(static_cast<unsigned int>(texture->m_height));
+	const float texW = static_cast<float>(texture->GetWidth());
+	const float texH = static_cast<float>(texture->GetHeight());
 	PSMTXScale(texMtx, 1.0f / texW, 1.0f / texH, 1.0f);
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 	GXSetNumTexGens(1);
-	GXSetTexCoordGen2(
-		GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
 
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -1469,8 +1428,7 @@ void CFlatRuntime2::drawLayer(
 		GXTexCoord2s16(texU, v1);
 	} else {
 		GXSetNumTexGens(2);
-		GXSetTexCoordGen2(
-			GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+		GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
 		GXClearVtxDesc();
 		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 		GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
@@ -1545,7 +1503,7 @@ void CFlatRuntime2::drawLayer(
 	GXSetProjection(ortho, GX_PERSPECTIVE);
 
 	} else {
-		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+		if (System.GetErrorLevel() >= 2U) {
 			System.Printf("layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n", textureName);
 		}
 	}
@@ -1562,26 +1520,10 @@ void CFlatRuntime2::drawLayer(
  */
 void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 {
-	m_particleWork = PPPCREATEPARAM();
-
-	m_particleWork.m_enable = 1;
-	m_particleWorkNoHi = workNo >> 8;
-	m_particleWork.m_paramA = 0;
-	m_particleWorkNoLo = static_cast<unsigned int>(workNo) & 0xFF;
-	m_particleWorkPos.x = pos.x;
-	m_particleWorkPos.y = pos.y;
-	m_particleWorkPos.z = pos.z;
-	m_particleWorkRotation.y = 0.0f;
-	m_particleWork.m_positionOffsetPtr = &m_particleWorkPos;
-	m_particleWork.m_rotationPtr = &m_particleWorkRotation;
-	m_particleWorkScale.z = scale;
-	m_particleWorkScale.y = scale;
-	m_particleWorkScale.x = scale;
-	m_particleWork.m_scalePtr = &m_particleWorkScale;
-
-	PartMng.pppCreate(
-		m_particleWorkNoHi, m_particleWorkNoLo,
-		&m_particleWork, 1);
+	ResetParticleWork(workNo, 0);
+	SetParticleWorkPos(pos, 0.0f);
+	SetParticleWorkScale(scale);
+	PutParticleWork();
 }
 
 /*
@@ -1645,9 +1587,7 @@ void CFlatRuntime2::SetParticleWorkNo(int workNo)
  */
 void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
 {
-	m_particleWorkPos.x = vec.x;
-	m_particleWorkPos.y = vec.y;
-	m_particleWorkPos.z = vec.z;
+	m_particleWorkPos = vec;
 	m_particleWorkRotation.y = 180.0f * angle / 3.1415927f;
 	m_particleWork.m_positionOffsetPtr = &m_particleWorkPos;
 	m_particleWork.m_rotationPtr = &m_particleWorkRotation;
@@ -1664,9 +1604,7 @@ void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
  */
 void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
 {
-	m_particleWorkTarget.x = vec.x;
-	m_particleWorkTarget.y = vec.y;
-	m_particleWorkTarget.z = vec.z;
+	m_particleWorkTarget = vec;
 	m_particleWork.m_extraPositionPtr = &m_particleWorkTarget;
 }
 
@@ -1681,18 +1619,10 @@ void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
  */
 void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
 {
-	Vec* target = &m_particleWorkTarget;
-	float cosAngle2 = static_cast<float>(cos(angle2));
-	float sinAngle1 = static_cast<float>(sin(angle1));
-	m_particleWorkTarget.x = sinAngle1 * cosAngle2 + m_particleWorkPos.x;
-
-	float sinAngle2 = static_cast<float>(sin(angle2));
-	m_particleWorkTarget.y = m_particleWorkPos.y + sinAngle2;
-
-	cosAngle2 = static_cast<float>(cos(angle2));
-	float cosAngle1 = static_cast<float>(cos(angle1));
-	m_particleWorkTarget.z = cosAngle1 * cosAngle2 + m_particleWorkPos.z;
-	m_particleWork.m_extraPositionPtr = target;
+	m_particleWorkTarget.x = sinf(angle1) * cosf(angle2) + m_particleWorkPos.x;
+	m_particleWorkTarget.y = m_particleWorkPos.y + sinf(angle2);
+	m_particleWorkTarget.z = cosf(angle1) * cosf(angle2) + m_particleWorkPos.z;
+	m_particleWork.m_extraPositionPtr = &m_particleWorkTarget;
 }
 
 /*
@@ -1781,15 +1711,8 @@ void CFlatRuntime2::SetParticleWorkBind(CFlatRuntime::CObject* object)
  */
 void CFlatRuntime2::SetParticleWorkParam(int paramNo, CFlatRuntime::CObject* object)
 {
-	short paramId;
-
 	m_particleWork.m_hitParams.m_particleIndex = paramNo;
-	if (object != 0) {
-		paramId = object->m_particleId;
-	} else {
-		paramId = 0;
-	}
-	m_particleWork.m_hitParams.m_classId = paramId;
+	m_particleWork.m_hitParams.m_classId = (object != 0) ? object->m_particleId : 0;
 }
 
 /*
@@ -1865,13 +1788,9 @@ void CFlatRuntime2::DeleteParticleSlot(int slotNo, int forceDelete)
  */
 void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
 {
-	PPPIFPARAM* ifDt = PartMng.pppGetIfDt(static_cast<short>(slotNo));
-	short particleId;
-	u8 count = ifDt->m_hitObjectCount;
-	if (count < 0x10) {
-		particleId = object->m_particleId;
-		ifDt->m_hitObjectCount = static_cast<u8>(count + 1);
-		ifDt->m_hitObjectIds[count] = particleId;
+	PPPIFPARAM* ifDt = PartMng.pppGetIfDt(slotNo);
+	if (ifDt->m_hitObjectCount < 0x10) {
+		ifDt->m_hitObjectIds[ifDt->m_hitObjectCount++] = object->m_particleId;
 	}
 }
 
@@ -1991,7 +1910,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	}
 
 	case 0x17:
-	Pad.m_stickDigitalThreshold = static_cast<int>(controlValue);
+		Pad.SetAnalogDepth(controlValue);
 		break;
 
 	case 0x18:
@@ -2078,8 +1997,6 @@ void CFlatRuntime2::resetSpawnBit(int spawnBit)
  */
 void CFlatRuntime2::resetChangeScript()
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
-
 	m_initAllFinishedFlag = 0;
 	m_padInputDisableMask = 0;
 	m_centerState = 0;
@@ -2105,9 +2022,9 @@ void CFlatRuntime2::resetChangeScript()
 	m_gameFlagBits.m_flagBit1 = 0;
 	m_gameFlagBits.m_flagBit3 = 0;
 	m_gameFlagBits.m_flagBit0 = 0;
-	Pad.m_stickDigitalThreshold = 1;
+	Pad.ResetAnalogDepth();
 	GraphicPcs.m_screenFade[1].m_mode = 0;
-	CameraPcs.m_shadowAuto = 1;
+	CameraPcs.SetShadowAuto(1);
 	AStar.reset();
 }
 
@@ -2123,5 +2040,5 @@ void CFlatRuntime2::resetChangeScript()
 void CFlatRuntime2::ResetNewGame()
 {
 	resetChangeScript();
-	memset(m_spawnBits, 0, sizeof(m_spawnBits));
+	resetSpawnBit(-1);
 }

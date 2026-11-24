@@ -30,6 +30,7 @@ class CTexScroll
 public:
     CTexScroll();
     ~CTexScroll();
+    void Calc();
 
     unsigned char m_type0;
     unsigned char m_type1;
@@ -295,10 +296,6 @@ public:
     {
         return m_textureCount;
     }
-    unsigned char GetMaterialId() const
-    {
-        return m_unkA6;
-    }
     void SetTag(int);
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
@@ -312,6 +309,32 @@ public:
     CTexture* GetTexture(int index)
     {
         return m_textureData.m_textures[index];
+    }
+    /*
+     * --INFO--
+     * PAL Address: TODO
+     * PAL Size: TODO
+     * EN Address: 0x80050644
+     * EN Size: 172b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SetTexScroll(int index, float u0, float v0, float u1, float v1)
+    {
+        m_textureData.m_texScroll[index].m_u0 = u0;
+        m_textureData.m_texScroll[index].m_v0 = v0;
+        m_textureData.m_texScroll[index].m_u1 = u1;
+        m_textureData.m_texScroll[index].m_v1 = v1;
+        if (0.0f == m_textureData.m_texScroll[index].m_u1) {
+            m_textureData.m_texScroll[index].m_type0 = 0;
+        } else {
+            m_textureData.m_texScroll[index].m_type0 = 1;
+        }
+        if (0.0f == m_textureData.m_texScroll[index].m_v1) {
+            m_textureData.m_texScroll[index].m_type1 = 0;
+        } else {
+            m_textureData.m_texScroll[index].m_type1 = 1;
+        }
     }
 
 public:
@@ -405,6 +428,15 @@ public:
     CMaterial* GetMaterial(long index)
     {
         return m_materials[index];
+    }
+    CMaterial* GetMaterialID(unsigned char materialId)
+    {
+        for (int i = 0; i < m_materials.GetSize(); i++) {
+            if ((m_materials[i] != 0) && (materialId == m_materials[i]->m_unkA6)) {
+                return m_materials[i];
+            }
+        }
+        return 0;
     }
 };
 

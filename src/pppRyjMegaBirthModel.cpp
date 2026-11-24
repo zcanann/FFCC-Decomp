@@ -90,17 +90,6 @@ STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_cullMode) == 0x13D);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_lightTarget) == 0x13F);
 STATIC_ASSERT(sizeof(PRyjMegaBirthModel) == 0x140);
 
-static inline void wrap_particle_rotation_triplet_s32(s32* rotation)
-{
-    for (s32 i = 0; i < 3; i++) {
-        if (rotation[i] >= 0x8000) {
-            while (rotation[i] >= 0x8000) { rotation[i] -= 0x10000; }
-        } else if (rotation[i] < -0x8000) {
-            while (rotation[i] >= 0x8000) { rotation[i] += 0x10000; }
-        }
-    }
-}
-
 static inline float get_rand()
 {
     float r = Math.RandF();
@@ -156,24 +145,19 @@ void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* of
 {
     VRyjMegaBirthModel* work =
         reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
-    float value1;
-    float value0;
-
     memset(&work->m_accelerationAxis, 0, sizeof(work->m_accelerationAxis));
     work->m_particleBlock = 0;
-    value0 = 0.0f;
     work->m_worldMatrixBlock = 0;
-    value1 = 30.0f;
     work->m_colorBlock = 0;
     work->m_numParticles = 0;
     work->m_emitTimer = 10000;
     work->m_unused1E = 0;
-    work->m_previousPosition.x = value0;
-    work->m_previousPosition.y = value1;
-    work->m_previousPosition.z = value0;
-    work->m_currentPosition.x = value0;
-    work->m_currentPosition.y = value1;
-    work->m_currentPosition.z = value0;
+    work->m_previousPosition.x = 0.0f;
+    work->m_previousPosition.y = 30.0f;
+    work->m_previousPosition.z = 0.0f;
+    work->m_currentPosition.x = 0.0f;
+    work->m_currentPosition.y = 30.0f;
+    work->m_currentPosition.z = 0.0f;
 }
 
 /*
@@ -290,15 +274,15 @@ static void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, P
     }
 }
 
-static inline s8 alloc_check(VRyjMegaBirthModel* work, PRyjMegaBirthModel* params)
+static inline signed char alloc_check(VRyjMegaBirthModel* work, PRyjMegaBirthModel* params)
 {
-    if (work->m_particleBlock == NULL) {
+    if (!work->m_particleBlock) {
         return 0;
     }
-    if ((params->m_enableWorldMatrix != 0) && (work->m_worldMatrixBlock == NULL)) {
+    if (params->m_enableWorldMatrix && !work->m_worldMatrixBlock) {
         return 0;
     }
-    if ((params->m_enableParticleColor != 0) && (work->m_colorBlock == NULL)) {
+    if (params->m_enableParticleColor && !work->m_colorBlock) {
         return 0;
     }
     return 1;
@@ -496,7 +480,13 @@ static void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel
         particleData->m_rotationVelocity[2] += pRyjMegaBirthModel->m_rotationAcceleration[2];
     }
 
-    wrap_particle_rotation_triplet_s32(particleData->m_rotation);
+    for (s32 i = 0; i < 3; i++) {
+        if (particleData->m_rotation[i] >= 0x8000) {
+            while (particleData->m_rotation[i] >= 0x8000) { particleData->m_rotation[i] -= 0x10000; }
+        } else if (particleData->m_rotation[i] < -0x8000) {
+            while (particleData->m_rotation[i] >= 0x8000) { particleData->m_rotation[i] += 0x10000; }
+        }
+    }
 
     particleData->m_scale.x = particleData->m_scale.x + particleData->m_scaleVelocity.x;
     particleData->m_scale.y = particleData->m_scale.y + particleData->m_scaleVelocity.y;
@@ -554,20 +544,22 @@ static void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel
 
     particleData->m_age = particleData->m_age + 1;
 
-    if ((particleData->m_fadeInFrames != 0) && (particleData->m_age <= particleData->m_fadeInFrames)) {
+    {
         float fadeAlpha = (float)alpha;
-        float fadeFrameCount = (float)(unsigned int)particleData->m_fadeInFrames;
-        float particleAlpha = particleData->m_alphaFade;
-
-        particleData->m_alphaFade = particleAlpha - fadeAlpha / fadeFrameCount;
-    }
-
-    if ((particleData->m_fadeOutFrames != 0) && (particleData->m_life <= particleData->m_fadeOutFrames)) {
-        float fadeAlpha = (float)alpha;
-        float fadeFrameCount = (float)(unsigned int)pRyjMegaBirthModel->m_fadeInFrames;
-        float particleAlpha = particleData->m_alphaFade;
-
-        particleData->m_alphaFade = particleAlpha + fadeAlpha / fadeFrameCount;
+        float particleAlpha;
+        float fadeFrameCount;
+        if ((particleData->m_fadeInFrames != 0) && (particleData->m_age <= particleData->m_fadeInFrames)) {
+            fadeAlpha = (float)alpha;
+            fadeFrameCount = (float)(unsigned int)particleData->m_fadeInFrames;
+            particleAlpha = particleData->m_alphaFade;
+            particleData->m_alphaFade = particleAlpha - fadeAlpha / fadeFrameCount;
+        }
+        if ((particleData->m_fadeOutFrames != 0) && (particleData->m_life <= particleData->m_fadeOutFrames)) {
+            fadeAlpha = (float)alpha;
+            fadeFrameCount = (float)(unsigned int)pRyjMegaBirthModel->m_fadeInFrames;
+            particleAlpha = particleData->m_alphaFade;
+            particleData->m_alphaFade = particleAlpha + fadeAlpha / fadeFrameCount;
+        }
     }
 }
 
@@ -770,73 +762,52 @@ static void birth(
 
             switch (speedMode) {
             default:
-                t = particleData->m_matrix[0][3];
-                rowPos.x = t;
-                t = particleData->m_matrix[1][3];
-                rowPos.y = t;
-                t = particleData->m_matrix[2][3];
-                rowPos.z = t;
+                rowPos.x = particleData->m_matrix[0][3];
+                rowPos.y = particleData->m_matrix[1][3];
+                rowPos.z = particleData->m_matrix[2][3];
                 rowPos.x = params->m_speed * Math.RandF();
                 rowPos.x -= halfSpeed;
                 rowPos.y = params->m_speed * Math.RandF();
                 rowPos.y -= halfSpeed;
                 rowPos.z = params->m_speed * Math.RandF();
                 rowPos.z -= halfSpeed;
-                t = rowPos.x;
-                particleData->m_matrix[0][3] = t;
-                t = rowPos.y;
-                particleData->m_matrix[1][3] = t;
-                t = rowPos.z;
-                particleData->m_matrix[2][3] = t;
+                particleData->m_matrix[0][3] = rowPos.x;
+                particleData->m_matrix[1][3] = rowPos.y;
+                particleData->m_matrix[2][3] = rowPos.z;
                 break;
             case 1:
                 (void)Math.RandF();
-                t = particleData->m_matrix[0][3];
-                rowPos.x = t;
-                t = particleData->m_matrix[1][3];
-                rowPos.y = t;
-                t = particleData->m_matrix[2][3];
-                rowPos.z = t;
+                rowPos.x = particleData->m_matrix[0][3];
+                rowPos.y = particleData->m_matrix[1][3];
+                rowPos.z = particleData->m_matrix[2][3];
                 rowPos.x = params->m_speed * Math.RandF();
                 rowPos.x -= halfSpeed;
                 rowPos.y = params->m_speed * Math.RandF();
                 rowPos.y -= halfSpeed;
                 rowPos.z = params->m_speed * Math.RandF();
                 rowPos.z -= halfSpeed;
-                t = rowPos.x;
-                particleData->m_matrix[0][3] = t;
-                t = rowPos.y;
-                particleData->m_matrix[1][3] = t;
-                t = rowPos.z;
-                particleData->m_matrix[2][3] = t;
+                particleData->m_matrix[0][3] = rowPos.x;
+                particleData->m_matrix[1][3] = rowPos.y;
+                particleData->m_matrix[2][3] = rowPos.z;
                 break;
             case 2:
-                t = particleData->m_matrix[0][3];
-                rowPos.x = t;
-                t = particleData->m_matrix[1][3];
-                rowPos.y = t;
-                t = particleData->m_matrix[2][3];
-                rowPos.z = t;
+                rowPos.x = particleData->m_matrix[0][3];
+                rowPos.y = particleData->m_matrix[1][3];
+                rowPos.z = particleData->m_matrix[2][3];
                 rowPos.x = params->m_speed * Math.RandF() * Math.RandF();
                 rowPos.x -= halfSpeed;
                 rowPos.y = params->m_speed * Math.RandF() * Math.RandF();
                 rowPos.y -= halfSpeed;
                 rowPos.z = params->m_speed * Math.RandF() * Math.RandF();
                 rowPos.z -= halfSpeed;
-                t = rowPos.x;
-                particleData->m_matrix[0][3] = t;
-                t = rowPos.y;
-                particleData->m_matrix[1][3] = t;
-                t = rowPos.z;
-                particleData->m_matrix[2][3] = t;
+                particleData->m_matrix[0][3] = rowPos.x;
+                particleData->m_matrix[1][3] = rowPos.y;
+                particleData->m_matrix[2][3] = rowPos.z;
                 break;
             case 3:
-                t = particleData->m_matrix[0][3];
-                rowPos.x = t;
-                t = particleData->m_matrix[1][3];
-                rowPos.y = t;
-                t = particleData->m_matrix[2][3];
-                rowPos.z = t;
+                rowPos.x = particleData->m_matrix[0][3];
+                rowPos.y = particleData->m_matrix[1][3];
+                rowPos.z = particleData->m_matrix[2][3];
                 r3 = Math.RandF();
                 r2 = Math.RandF();
                 r2 = params->m_speed * r2;
@@ -852,20 +823,14 @@ static void birth(
                 r2 = params->m_speed * r2;
                 rowPos.z = params->m_speed - 0.7f * (r2 * r3);
                 rowPos.z -= halfSpeed;
-                t = rowPos.x;
-                particleData->m_matrix[0][3] = t;
-                t = rowPos.y;
-                particleData->m_matrix[1][3] = t;
-                t = rowPos.z;
-                particleData->m_matrix[2][3] = t;
+                particleData->m_matrix[0][3] = rowPos.x;
+                particleData->m_matrix[1][3] = rowPos.y;
+                particleData->m_matrix[2][3] = rowPos.z;
                 break;
             case 4:
-                t = particleData->m_matrix[0][3];
-                rowPos.x = t;
-                t = particleData->m_matrix[1][3];
-                rowPos.y = t;
-                t = particleData->m_matrix[2][3];
-                rowPos.z = t;
+                rowPos.x = particleData->m_matrix[0][3];
+                rowPos.y = particleData->m_matrix[1][3];
+                rowPos.z = particleData->m_matrix[2][3];
                 r1 = Math.RandF();
                 r2 = Math.RandF();
                 r3 = Math.RandF();
@@ -887,20 +852,14 @@ static void birth(
                 r2 = params->m_speed * r2;
                 rowPos.z = r4 * (r3 * (r2 * r1));
                 rowPos.z -= halfSpeed;
-                t = rowPos.x;
-                particleData->m_matrix[0][3] = t;
-                t = rowPos.y;
-                particleData->m_matrix[1][3] = t;
-                t = rowPos.z;
-                particleData->m_matrix[2][3] = t;
+                particleData->m_matrix[0][3] = rowPos.x;
+                particleData->m_matrix[1][3] = rowPos.y;
+                particleData->m_matrix[2][3] = rowPos.z;
                 break;
             case 5:
-                t = particleData->m_matrix[0][3];
-                rowPos.x = t;
-                t = particleData->m_matrix[1][3];
-                rowPos.y = t;
-                t = particleData->m_matrix[2][3];
-                rowPos.z = t;
+                rowPos.x = particleData->m_matrix[0][3];
+                rowPos.y = particleData->m_matrix[1][3];
+                rowPos.z = particleData->m_matrix[2][3];
                 r2 = Math.RandF();
                 r3 = Math.RandF();
                 r1 = Math.RandF();
@@ -919,12 +878,9 @@ static void birth(
                 r3 = params->m_speed * r3;
                 rowPos.z = params->m_speed - 0.5f * (r1 * (r3 * r2));
                 rowPos.z -= halfSpeed;
-                t = rowPos.x;
-                particleData->m_matrix[0][3] = t;
-                t = rowPos.y;
-                particleData->m_matrix[1][3] = t;
-                t = rowPos.z;
-                particleData->m_matrix[2][3] = t;
+                particleData->m_matrix[0][3] = rowPos.x;
+                particleData->m_matrix[1][3] = rowPos.y;
+                particleData->m_matrix[2][3] = rowPos.z;
                 break;
             }
 
@@ -1020,12 +976,9 @@ static void birth(
                 vz = pathVec->z;
             }
         have_vec:
-            t = particleData->m_matrix[0][3];
-            rowPos.x = t;
-            t = particleData->m_matrix[1][3];
-            rowPos.y = t;
-            t = particleData->m_matrix[2][3];
-            rowPos.z = t;
+            rowPos.x = particleData->m_matrix[0][3];
+            rowPos.y = particleData->m_matrix[1][3];
+            rowPos.z = particleData->m_matrix[2][3];
             rowPos.x = vx * params->m_directionScale.x;
             rowPos.y = vy * params->m_directionScale.y;
             rowPos.z = vz * params->m_directionScale.z;

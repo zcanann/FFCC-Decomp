@@ -790,19 +790,17 @@ done_insert:
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void pppCacheUnLoadModel(_pppDataHead* head, short* modelList)
+inline void pppCacheUnLoadModel(short* modelList, _pppDataHead* pppDataHead)
 {
-	short i = 0;
 	short modelCount = *modelList;
 	modelList++;
-	while (i < modelCount)
+	short i;
+	_pppDataHead* const head = pppDataHead;
+	for (i = 0; i < modelCount; i++)
 	{
-		short modelIndex = *modelList;
-		modelList++;
-		pppModelSt* model = head->m_models[modelIndex];
+		pppModelSt* model = head->m_models[*modelList++];
 		ppvAmemCacheSet.Release(model->m_cacheId);
 		model->pppCacheUnLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
-		i++;
 	}
 }
 
@@ -884,7 +882,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				long* pdt = chunk->m_pdt;
 				short* modelIndices = (short*)((u8*)pdt + pdt[4]);
 				short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
-				pppCacheUnLoadModel(((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead, modelIndices);
+				pppCacheUnLoadModel(modelIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
 				pppCacheUnLoadShape(shapeIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
 			}
 		}
@@ -1263,10 +1261,12 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void pppCacheLoadModel(_pppDataHead* head, short* modelList)
+inline void pppCacheLoadModel(short* modelList, _pppDataHead* pppDataHead)
 {
+	short modelCount = *modelList;
+	modelList++;
 	short i;
-	short modelCount = *modelList++;
+	_pppDataHead* const head = pppDataHead;
 	for (i = 0; i < modelCount; i++)
 	{
 		pppModelSt* mapMesh = head->m_models[*modelList++];
@@ -1293,10 +1293,13 @@ inline void pppCacheLoadModel(_pppDataHead* head, short* modelList)
  */
 void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 {
-	int shapeCount = *shapeList++;
-	for (short i = 0; i < shapeCount; i++)
+	short shapeCount = *shapeList;
+	shapeList++;
+	short i;
+	_pppDataHead* const head = pppDataHead;
+	for (i = 0; i < shapeCount; i++)
 	{
-		pppCacheLoadShapeTexture(pppDataHead->m_shapes[*shapeList++], PartMng.m_materialSet);
+		pppCacheLoadShapeTexture(head->m_shapes[*shapeList++], PartMng.m_materialSet);
 	}
 }
 
@@ -1343,7 +1346,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (Game.m_currentSceneId != 7)
 	{
-		pppCacheLoadModel(((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead, modelIndices);
+		pppCacheLoadModel(modelIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
 		pppCacheLoadShape(shapeIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
 
 		pppMngSt->m_mapTexLoaded = 1;

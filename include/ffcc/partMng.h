@@ -29,6 +29,17 @@ struct _PARTICLE_WMAT
 
 struct PPPSEST
 {
+    PPPSEST() { Init(); }
+    void Init()
+    {
+        m_soundEffectSlot = m_soundEffectHandle = -1;
+        m_soundEffectStopFlag = 0;
+        m_soundEffectKind = 1;
+        m_soundEffectStartFrame = 0;
+        m_soundEffectStartedOnce = 0;
+        m_soundEffectFadeFrames = 30;
+    }
+
     int m_soundEffectSlot;                  // 0x0
     unsigned char m_soundEffectStopFlag;    // 0x4
     unsigned char m_soundEffectKind;        // 0x5
@@ -49,6 +60,7 @@ struct pppShapeSt
 
     pppShapeSt();
     ~pppShapeSt();
+    void Init();
     void Release();
     void AddRef() { m_refCount++; }
     void SetUse() { m_refCount = 0; m_inUse = 1; }
@@ -65,6 +77,7 @@ struct pppModelSt : public CMapMesh
 
     pppModelSt();
     ~pppModelSt();
+    void Init();
     void Release();
     void AddRef() { m_refCount++; }
     void SetUse() { m_refCount = 0; m_isUsed = 1; }
@@ -116,6 +129,14 @@ public:
 
 struct PPPIFPARAM
 {
+    PPPIFPARAM()
+    {
+        m_particleIndex = 0;
+        m_classId = 0;
+        m_hitObjectCount = 0;
+        m_hitFlags = 0;
+    }
+
     int m_particleIndex;            // 0x0
     short m_classId;                // 0x4
     unsigned char m_hitObjectCount; // 0x6
@@ -146,17 +167,6 @@ struct PPPCREATEPARAM
 
 inline PPPCREATEPARAM::PPPCREATEPARAM()
 {
-    m_soundEffectParams.m_soundEffectHandle = -1;
-    m_soundEffectParams.m_soundEffectSlot = -1;
-    m_soundEffectParams.m_soundEffectStopFlag = 0;
-    m_soundEffectParams.m_soundEffectKind = 1;
-    m_soundEffectParams.m_soundEffectStartFrame = 0;
-    m_soundEffectParams.m_soundEffectStartedOnce = 0;
-    m_soundEffectParams.m_soundEffectFadeFrames = 30;
-    m_hitParams.m_particleIndex = 0;
-    m_hitParams.m_classId = 0;
-    m_hitParams.m_hitObjectCount = 0;
-    m_hitParams.m_hitFlags = 0;
     m_positionOffsetPtr = 0;
     m_rotationPtr = 0;
     m_scalePtr = 0;
@@ -173,7 +183,14 @@ inline PPPCREATEPARAM::PPPCREATEPARAM()
 
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
-extern int gPppHeapUseRateWords[3];
+struct ProcSpdSt
+{
+    int m_current;   // 0x0
+    int m_max;       // 0x4
+    int m_holdCount; // 0x8
+};
+
+extern ProcSpdSt g_hpMem;
 
 struct _PARTICLE_COLOR
 {
@@ -452,7 +469,7 @@ public:
 
     void pppGet2Dpos();
     void drawStart();
-    void setProcSpeed(struct ProcSpdSt*, int);
+    void setProcSpeed(ProcSpdSt*, int);
     void drawEnd();
 
     void initGraphicSystem();

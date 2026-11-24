@@ -3,32 +3,11 @@
 
 #include "ffcc/p_menu.h"
 
-struct CmdListEntry {
-	short x;
-	short y;
-	short width;
-	short height;
-	float u;
-	float v;
-	float alpha;
-	float scale;
-	int unk_18;
-	int tex;
-	int timer;
-	int startFrame;
-	int duration;
-	unsigned int flags;
-	float dx;
-	float dy;
-	float targetX;
-	float targetY;
-};
-
 struct CmdListStorage {
 	short count;
 	short listEnd;
 	unsigned char pad_0004[4];
-	CmdListEntry entries[64];
+	CMenuPcs::Sprt2 entries[64];
 };
 
 struct CmdState {

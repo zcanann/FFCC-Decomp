@@ -70,6 +70,7 @@ public:
         return 0;
     }
 
+    void Set(_GXTexMapID);
     int CheckName(char*);
     void SetExternalTlut(void*, int);
     static void FlushExternalTlut(void*, int);
@@ -116,6 +117,11 @@ public:
     void ReleaseTextureIdx(int, CAmemCacheSet*);
     CTexture* GetTexture(long index) { return m_textureArray[static_cast<unsigned long>(index)]; }
     int GetNumTexture() { return m_textureArray.GetSize(); }
+    void SetDefaultSize(int defaultSize, int growCapacity)
+    {
+        m_textureArray.SetDefaultSize(defaultSize);
+        m_textureArray.SetGrow(growCapacity);
+    }
 
     CPtrArray<CTexture*> m_textureArray;
 };

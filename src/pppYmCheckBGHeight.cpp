@@ -27,10 +27,10 @@ void pppFrameYmCheckBGHeight(pppYmCheckBGHeight* obj, pppYmCheckBGHeightStep* st
     float bottomZ;
 
     if (ppvUserStopPartF == 0) {
+        pppMngSt = ppvMng;
         zero = 0.0f;
         probeLength = -2000.0f;
         direction.x = zero;
-        pppMngSt = ppvMng;
         direction.y = probeLength;
         direction.z = zero;
 

@@ -1,7 +1,8 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1k for Japan.
-GC/2.0p1k is derived during the build from the bundled GC/2.0p1 (see below).
+The Game library uses GC/2.5ffcc for PAL and USA, and GC/2.0p1l for Japan.
+GC/2.5ffcc is derived during the build from the bundled GC/2.5, and GC/2.0p1l
+from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -232,3 +233,121 @@ partial losses. It is not adopted, for these reasons:
 - `pppFrameYmCheckBGHeight` would also need a source reorder that holds only
   under this predicate (it scores 90 without it). That would tune source to the
   candidate compiler.
+
+## GC/2.0p1l: 2.0p2's scheduler alias rules plus two FFCC rules
+
+`tools/patch_compiler_ffcc6.py` derives GC/2.0p1l from GC/2.0p1k
+(`abeb8e6e85568dd4e904e26ae3ca55b5b2cc5bcd` to
+`bfccb4b31e5d12fa7fac79ffa2f5ffa1e8a99588`) with four edits and 700 bytes of new code in a new
+executable section, `.ffcc6`, appended after `.sbpatch` (the x86 source is kept
+in the script). GC/2.0p1l is the Japanese game compiler.
+
+The chain emulates BFBB's GC 2.0p2 behaviours clause by clause, but 2.0p2
+states them as alias rules in two places, and the chain never had the second
+(the scheduler's own alias query). That gap is what the earlier
+"write-after-read mirror of e3ns" candidate was approximating. GC/2.0p1l adds
+2.0p2's rules the chain lacks and two FFCC rules of our own:
+
+- `gather`: `gather_instruction_alias` (0x5123B0) begins with 2.0p2's two
+  pre-rules, a write that is a direct small-data access to a global that is
+  not a safe const gets the `worst_case` alias (value numbering forgets other
+  globals after it), and so does a load of a floating-point `@` literal in
+  inline data. A hook in front of the function applies them to `pcode->alias`
+  and then runs the stock code.
+- `sched`: the scheduler's three dependency queries (`serialize_store` twice,
+  `findsuccessors` once) call `may_alias_scheduling` instead of `may_alias`: a
+  load of small data and a direct small-data store to `worst_case` may alias
+  whichever comes first; a load that is a direct small-data access (also of a
+  `const` global) or a load of any part of a non-float `@` object through an
+  Addr16 operand is queried as a `worst_case` access; the stock `may_alias`,
+  with the chain's clauses and `pwcp`, answers the rest.
+
+The last two rules (loads of `const` small data and loads of part of a small
+literal) are FFCC's; the others are 2.0p2's own, which
+the chain's clauses only approximated. The chain's clauses (`e3ns`, `c3a`,
+`dsl`, BFBB's) stay: the new answers are added to theirs, not substituted.
+
+The patch was checked against a source-level implementation of the same rules
+in a decompiled 2.0p2 compiler: all 268 Japanese game objects are
+byte-identical. Against GC/2.0p1k, with the current staging source plus the
+`LetterClose` and `pppFrameYmCheckBGHeight` simplifications that only the new
+compiler needs, Japan gains 14 exact functions and lowers none:
+`CalcResultOpenAnim`, `makeFurTex`, `DrawFur`, `GbaQueue::LoadPlayerStat`,
+`LoadEnemyStat`, `LoadMapItemStat`, `CheckHitFaceCylinder`,
+`CMapPcs::drawAfter`, `drawAfterViewer`, `pppParHitSphMat`,
+`pppConstructYmMoveCircle`, `pppFrameYmCheckBGHeight`, `SetWorldParam` and
+`LetterClose`; `LoadMapObj`, `PickFur` and `CalcMainMenuSub` improve. `maphit`,
+`pppParHitSphMat`, `pppYmCheckBGHeight` and `pppYmMoveCircle` become complete
+Japanese units. PAL and USA (GC/2.5) are unaffected.
+
+## PAL and USA game compiler: GC/2.5ffcc (kss)
+
+`tools/patch_compiler_ffcc5.py` derives GC/2.5ffcc from the stock GC/2.5
+(`539c0b31d51510cd076755bc64c0c39c3d0f364e` to
+`fc8966c312fe2dc4fef7800937dd00725520cf4e`) by adding one alias rule, `kss`
+(below). The SDK and middleware keep stock GC/2.5.
+
+Three hooks into `operand_alias` (VA 0x512700), all other bytes stock: the
+count/skipped initialisation at 0x512709 (the free stack slot `[esp]` is the
+skipped flag), the NULL-and-write test after the `address_def_alias` call at
+0x512778 (jump to stub B at 0x60F000, 41 bytes) and the function exit at
+0x5128D5 (jump to stub C at 0x60F040, 62 bytes). The stubs are in a new `.ffcc5`
+section appended after `.reloc` and are position independent. The x86 is kept
+as comments in the script. The patch was checked against a source-level
+implementation of the same rule in a decompiled GC 2.5: byte-identical objects
+for all 268 PAL game units under five flag sets, and for the eleven
+per-channel `pppRand*` sources that the rule changes.
+
+Stock GC 2.5, 2.6 and 2.7 produce byte-identical objects for every PAL and USA
+game unit, and GC/2.0 only loses functions, so no stock version reproduces the
+behaviour below. It was located by rebuilding all game units with source-built
+variants of GC 2.5 (the clang build of stock 2.5 from that source is byte-identical to the
+bundled GC/2.5 on all 269 PAL units).
+
+- `kss`: in Alias.c's `operand_alias`, a store whose base register has several
+  reaching definitions, some with an alias and some without, keeps the alias
+  of the definitions that have one when that alias is a single static object
+  (whole or part, not a local). Stock GC 2.5 makes every such access
+  worst_case. Loads, and stores into locals, are unchanged.
+
+Typical case: the `pppRand*` vector randomizers select
+`target = (offset == -1) ? (T*)gPppDefaultValueBuffer : (T*)(work + offset)`
+and then store each channel through `target`, reading `*valuePtr` for every
+channel. Retail loads `*valuePtr` once and keeps it in a register across the
+stores, while the channel loads of `target` stay below the preceding store.
+Stock GC 2.5 reloads `*valuePtr` after every store, so the matching source
+had to cache it in a `scale` local, which numbers its register before the
+int-to-float constant and leaves an FPR swap in all nine `CV`, `HCV` and `IV`
+functions. This is a narrower form of the Japanese `ksa` clause: `ksa` keeps the
+access's own alias for loads and stores alike, which in PAL also hoists the
+`target` loads above the stores.
+
+Measured over every PAL and USA game unit (scored like `report.json`):
+
+| compiler, source | PAL exact functions | USA exact functions |
+| --- | --- | --- |
+| GC/2.5, staging source | 3066 | 3061 |
+| GC/2.5ffcc, staging source | 3066 (+0 / -0, objects byte-identical) | 3061 (+0 / -0, objects byte-identical) |
+| GC/2.5, per-channel `pppRand*` source | 3063 | 3058 |
+| GC/2.5ffcc, per-channel `pppRand*` source | 3075 (+9 / -0 vs staging) | 3070 (+9 / -0) |
+
+Controls on PAL, staging source: the JP clause `ksa` on every access is
++0 / -18 (`gpmCol`, `pppLight`, `pppCreatePObject`, `pppMemAlloc`,
+`pppMemAllocNoReport`, `loadData`, the `pppRandFV` and `pppSRand*` families),
+and with the per-channel source it leaves the nine `pppRand*` at 90-96
+because the `target` loads move above the stores; `ksa` on stores only is
++0 / -1 (`CMenuPcs::loadData`, a store into a local array through a mixed
+base) and matches all nine; stores to statics only (`kss`) is +0 / -0 and
+matches all nine. The binary patch and the source-level implementation produce byte-identical objects
+for all PAL and USA units, on both sources.
+
+The same per-channel source is also the Japanese retail source: with the
+unchanged GC/2.0p1k it matches all nine vector randomizers and the
+`pppRandFV`, `pppRandUpFV` and `pppRandDownFV` functions, whose PAL-tuned
+`scale`/`x` locals had left Japan at 99.6. Together: PAL +9, USA +9 and Japan
++12 exact functions, no partial score lower in any region, and the twelve
+units link in all three regions. The three DOL checksums pass.
+
+Ninja runs the patch step before the first game unit is compiled, also for a
+directory given with `--compilers`; `python tools/patch_compiler_ffcc5.py
+<compilers>/GC/2.5ffcc/mwcceppc.exe` does the same by hand.

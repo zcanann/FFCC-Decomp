@@ -105,7 +105,8 @@ static inline bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
 inline unsigned short ChgHL16(unsigned short value)
 {
     unsigned short tmp = value;
-    return (tmp << 8) | (tmp >> 8);
+    tmp = (tmp << 8) | (tmp >> 8);
+    return tmp;
 }
 
 /*

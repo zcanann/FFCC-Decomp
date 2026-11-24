@@ -670,7 +670,6 @@ void CCameraPcs::calcChara()
     Mtx mtxB;
     Mtx mtxA;
     Vec targetPos;
-    float stick;
 
     C_MTXPerspective(m_screenMatrix, m_fov, 1.3333334f, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
@@ -679,24 +678,12 @@ void CCameraPcs::calcChara()
         m_viewerOverride = 0;
     } else {
         padButtons = Pad.GetButton(4);
-
-        stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
-        m_viewer.m_position.y += stick;
-
-        stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
-        m_viewer.m_position.y -= stick;
-
-        stick = Pad.GetLeftStickX(4);
-        m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
-
-        stick = Pad.GetLeftStickY(4);
-        m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
-
-        stick = Pad.GetTriggerLeft(4);
-        m_viewer.m_distance = -((5.0f * stick) - m_viewer.m_distance);
-
-        stick = Pad.GetTriggerRight(4);
-        m_viewer.m_distance = 5.0f * stick + m_viewer.m_distance;
+        m_viewer.m_position.y += ((padButtons & 4) != 0) ? 0.5f : 0.0f;
+        m_viewer.m_position.y -= ((padButtons & 8) != 0) ? 0.5f : 0.0f;
+        m_viewer.m_rotY += 0.2f * Pad.GetLeftStickX(4);
+        m_viewer.m_rotX -= 0.2f * Pad.GetLeftStickY(4);
+        m_viewer.m_distance -= 5.0f * Pad.GetTriggerLeft(4);
+        m_viewer.m_distance += 5.0f * Pad.GetTriggerRight(4);
     }
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -1062,16 +1049,13 @@ void CCameraPcs::drawShadowBegin()
 
     GXInvalidateTexAll();
 
-    camdtst& cur = CurrentCameraState();
+    camdtst& cur = *reinterpret_cast<camdtst*>(&m_cameraMatrix);
     m_savedCamera = cur;
     m_shadowCamera = cur;
 
     if (Game.m_currentSceneId == 3) {
-        float stickX = Pad.GetLeftStickX(1);
-        m_fullScreenShadow.m_rotY += 0.017453292f * (4.0f * stickX);
-
-        float stickY = Pad.GetLeftStickY(1);
-        m_fullScreenShadow.m_rotX += 0.017453292f * (2.0f * stickY);
+        m_fullScreenShadow.m_rotY += 0.017453292f * (4.0f * Pad.GetLeftStickX(1));
+        m_fullScreenShadow.m_rotX += 0.017453292f * (2.0f * Pad.GetLeftStickY(1));
     }
 
     PSMTXRotRad(rotX, 'x', -m_fullScreenShadow.m_rotX);
@@ -1111,13 +1095,11 @@ void CCameraPcs::drawShadowBegin()
             m_fullScreenShadow.m_span = depth * m_fullScreenShadow.m_scale;
         }
 
-        float currentDepth = m_fullScreenShadowDepth;
-        if (currentDepth < 0.0f) {
+        if (m_fullScreenShadowDepth < 0.0f) {
             m_fullScreenShadowDepth = depth;
         } else {
-            depth -= currentDepth;
-            float blended = depth / 4.0f;
-            m_fullScreenShadowDepth = currentDepth + blended;
+            float blended = (depth - m_fullScreenShadowDepth) / 4.0f;
+            m_fullScreenShadowDepth += blended;
         }
     } else {
         m_fullScreenShadow.m_span = 100.0f;
@@ -1159,7 +1141,7 @@ void CCameraPcs::drawShadowBegin()
     g_shadow_refpos.y = m_shadowCamera.m_target.y;
     g_shadow_refpos.z = m_shadowCamera.m_target.z;
 
-    CurrentCameraState() = m_shadowCamera;
+    *reinterpret_cast<camdtst*>(&m_cameraMatrix) = m_shadowCamera;
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);
     GXSetColorUpdate(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);
@@ -1293,7 +1275,7 @@ void CCameraPcs::drawShadowEnd()
     GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[0], GX_NEAR, GX_NEAR, 0.0f,
                     0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 
-    CurrentCameraState() = m_savedCamera;
+    *reinterpret_cast<camdtst*>(&m_cameraMatrix) = m_savedCamera;
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
     GraphicPcs.setViewport();
 }
@@ -1349,7 +1331,7 @@ void CCameraPcs::drawShadowEndAll()
         return;
     }
 
-    CurrentCameraState() = m_savedCamera;
+    *reinterpret_cast<camdtst*>(&m_cameraMatrix) = m_savedCamera;
 }
 
 /*
@@ -1400,30 +1382,17 @@ void CCameraPcs::calcMaterialEditor()
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;
-    float stick;
 
     C_MTXPerspective(m_screenMatrix, 33.3f, 1.3333334f, 0.125f, 375.0f);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     padButtons = Pad.GetButton(4);
-
-    stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
-    m_viewer.m_position.y += stick;
-
-    stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
-    m_viewer.m_position.y -= stick;
-
-    stick = Pad.GetLeftStickX(4);
-    m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
-
-    stick = Pad.GetLeftStickY(4);
-    m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
-
-    stick = Pad.GetTriggerLeft(4);
-    m_viewer.m_distance = -((2.0f * stick) - m_viewer.m_distance);
-
-    stick = Pad.GetTriggerRight(4);
-    m_viewer.m_distance = 2.0f * stick + m_viewer.m_distance;
+    m_viewer.m_position.y += ((padButtons & 8) != 0) ? 0.5f : 0.0f;
+    m_viewer.m_position.y -= ((padButtons & 4) != 0) ? 0.5f : 0.0f;
+    m_viewer.m_rotY += 0.2f * Pad.GetLeftStickX(4);
+    m_viewer.m_rotX -= 0.2f * Pad.GetLeftStickY(4);
+    m_viewer.m_distance -= 2.0f * Pad.GetTriggerLeft(4);
+    m_viewer.m_distance += 2.0f * Pad.GetTriggerRight(4);
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
     PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
@@ -1488,30 +1457,17 @@ void CCameraPcs::calcFunnyShape()
     Mtx mtxInv;
     Mtx mtxB;
     Mtx mtxA;
-    float stick;
 
     C_MTXPerspective(m_screenMatrix, 33.3f, 1.3333334f, 0.125f, 3000.0f);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     padButtons = Pad.GetButton(4);
-
-    stick = ((padButtons & 8) != 0) ? 0.5f : 0.0f;
-    m_viewer.m_position.y += stick;
-
-    stick = ((padButtons & 4) != 0) ? 0.5f : 0.0f;
-    m_viewer.m_position.y -= stick;
-
-    stick = Pad.GetLeftStickX(4);
-    m_viewer.m_rotY = 0.2f * stick + m_viewer.m_rotY;
-
-    stick = Pad.GetLeftStickY(4);
-    m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
-
-    stick = Pad.GetTriggerLeft(4);
-    m_viewer.m_distance = -((2.0f * stick) - m_viewer.m_distance);
-
-    stick = Pad.GetTriggerRight(4);
-    m_viewer.m_distance = 2.0f * stick + m_viewer.m_distance;
+    m_viewer.m_position.y += ((padButtons & 8) != 0) ? 0.5f : 0.0f;
+    m_viewer.m_position.y -= ((padButtons & 4) != 0) ? 0.5f : 0.0f;
+    m_viewer.m_rotY += 0.2f * Pad.GetLeftStickX(4);
+    m_viewer.m_rotX -= 0.2f * Pad.GetLeftStickY(4);
+    m_viewer.m_distance -= 2.0f * Pad.GetTriggerLeft(4);
+    m_viewer.m_distance += 2.0f * Pad.GetTriggerRight(4);
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
     PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);

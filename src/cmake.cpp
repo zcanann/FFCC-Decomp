@@ -548,12 +548,11 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     const bool widePage = (page == 0);
@@ -603,12 +602,11 @@ inline void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     int frameH = (x == 0.0f) ? 0x150 : 0x180;
@@ -653,12 +651,11 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((m_menuResultCode != 0) ? CMAKE_TEX_VILLAGE_WORLD28 : CMAKE_TEX_WORLD28));
@@ -951,12 +948,11 @@ inline void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(CMAKE_TEX_WORLD40));
     MenuPcs.DrawRect(
@@ -1752,7 +1748,6 @@ void CMenuPcs::CmakeSexDraw()
 {
     CmakeMenuState* state = m_cmakeState;
     int frame = static_cast<int>(state->m_frame) - 1;
-    float a255;
     float alpha;
     if (frame < 0) {
         frame = 0;
@@ -1772,7 +1767,6 @@ void CMenuPcs::CmakeSexDraw()
     DrawSingleCMakeChara(1.0f);
 
     SetCmakeBlendMatColor(alpha);
-    a255 = 255.0f * alpha;
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((m_menuResultCode != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     float sexW = 256.0f;
     float sexH = 162.4615478515625f;
@@ -1794,7 +1788,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
 #ifdef VERSION_GCCP01
     float labelWidth = 0.0f;
@@ -1999,7 +1993,6 @@ void CMenuPcs::CmakeTribeDraw()
 {
     CmakeMenuState* state = m_cmakeState;
     int frame = static_cast<int>(state->m_frame) - 1;
-    float a255;
     float alpha;
     if (frame < 0) {
         frame = 0;
@@ -2020,7 +2013,6 @@ void CMenuPcs::CmakeTribeDraw()
     DrawSingleCMakeChara(1.0f);
 
     SetCmakeBlendMatColor(alpha);
-    a255 = 255.0f * alpha;
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((m_menuResultCode != 0) ? CMAKE_TEX_VILLAGE_WORLD27 : CMAKE_TEX_WORLD27));
     float boxW = 416.0f;
     float boxH = 240.0f;
@@ -2044,7 +2036,7 @@ void CMenuPcs::CmakeTribeDraw()
     font->SetShadow(0);
     font->SetScale(1.0f);
     font->DrawInit();
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
 
     for (i = 0; i < 4; i++) {
         txt = GetTribeStr(i);
@@ -2063,7 +2055,7 @@ void CMenuPcs::CmakeTribeDraw()
     font->SetShadow(1);
     font->SetScale(1.0f);
     font->DrawInit();
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)));
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)));
     font->SetTlut(6);
 
     hairBase = m_cmakeState->m_select * 8;
@@ -2723,7 +2715,6 @@ void CMenuPcs::CmakeResultDraw1()
     } else {
         alpha = static_cast<float>(-(0.1 * static_cast<double>(frame) - 1.0));
     }
-    float popupAlpha = (m_cmakeState->m_mode == 0) ? 1.0f : alpha;
 
     DrawWMFrame0(1, 1.0f);
 

@@ -2398,7 +2398,6 @@ void CGObject::boundCheck()
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         float clipLimit = -1.0f;
-        float oneF = 1.0f;
         float zero = 0.0f;
 
         clipMask = 0x1F;
@@ -2416,7 +2415,7 @@ void CGObject::boundCheck()
                 break;
             }
 
-            const float invW = oneF / clipPos.w;
+            const float invW = 1.0f / clipPos.w;
             clipPos.x *= invW;
             clipPos.y *= invW;
 
@@ -2426,10 +2425,10 @@ void CGObject::boundCheck()
             if (clipPos.y > clipLimit) {
                 clipMask &= 0xFFFFFFFD;
             }
-            if (clipPos.x < oneF) {
+            if (clipPos.x < 1.0f) {
                 clipMask &= 0xFFFFFFFB;
             }
-            if (clipPos.y < oneF) {
+            if (clipPos.y < 1.0f) {
                 clipMask &= 0xFFFFFFF7;
             }
         } while ((clipMask != 0) && (++i < 8));

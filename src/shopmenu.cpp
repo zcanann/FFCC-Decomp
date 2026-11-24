@@ -731,11 +731,10 @@ inline void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned ch
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     for (int i = 0; i < shape->m_shapeCount; i++) {
-        tagOAN3_SHAPE_ENTRY* entry = &shape->m_entries[i];
         if (blendMode == 0xFF) {
-            pppSetBlendMode(entry->m_blendMode);
+            pppSetBlendMode(shape->m_entries[i].m_blendMode);
         }
-        GXCallDisplayList(entry->m_displayList, 0x60);
+        GXCallDisplayList(shape->m_entries[i].m_displayList, 0x60);
     }
 }
 

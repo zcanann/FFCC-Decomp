@@ -134,7 +134,6 @@ void CMesMenu::Create()
         if ((m_menuIndex & 2) != 0) {
             y = 0x1B0;
         }
-        defaultValue = 0.0f;
         m_baseY = (float)y;
         m_windowWidth = defaultValue;
         m_windowHeight = defaultValue;

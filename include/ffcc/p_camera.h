@@ -251,7 +251,12 @@ public:
     Vec* GetPosition() { return &m_position; }
     Vec* GetRefPosition() { return &m_target; }
     void GetRefPosition(Vec* out) {
-        *out = m_target;
+        double x = m_target.x;
+        double y = m_target.y;
+        double z = m_target.z;
+        out->x = (float)x;
+        out->y = (float)y;
+        out->z = (float)z;
     }
     float GetFov() { return m_fov; }
     float GetZRotate() { return m_zRotate; }

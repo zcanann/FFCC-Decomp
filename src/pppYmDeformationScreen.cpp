@@ -158,7 +158,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 
 	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 224, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
-	depth = work->m_depth;
+	float depth2 = work->m_depth;
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	{
 		float bottomQuadBottom = 448.0f;
@@ -167,19 +167,19 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationS
 		float bottomMiddleY = 224.0f;
 		float bottomZero = 0.0f;
 
-		GXPosition3f32(bottomZero, bottomMiddleY, depth);
+		GXPosition3f32(bottomZero, bottomMiddleY, depth2);
 		GXColor1u32(*(u32*)color.rgba);
 		GXTexCoord2f32(bottomZero, bottomZero);
 		GXTexCoord2f32(bottomZero, bottomZero);
-		GXPosition3f32(bottomRight, bottomMiddleY, depth);
+		GXPosition3f32(bottomRight, bottomMiddleY, depth2);
 		GXColor1u32(*(u32*)color.rgba);
 		GXTexCoord2f32(bottomOne, bottomZero);
 		GXTexCoord2f32(texU, bottomZero);
-		GXPosition3f32(bottomRight, bottomQuadBottom, depth);
+		GXPosition3f32(bottomRight, bottomQuadBottom, depth2);
 		GXColor1u32(*(u32*)color.rgba);
 		GXTexCoord2f32(bottomOne, bottomOne);
 		GXTexCoord2f32(texU, texV);
-		GXPosition3f32(bottomZero, bottomQuadBottom, depth);
+		GXPosition3f32(bottomZero, bottomQuadBottom, depth2);
 		GXColor1u32(*(u32*)color.rgba);
 		GXTexCoord2f32(bottomZero, bottomOne);
 		GXTexCoord2f32(bottomZero, texV);

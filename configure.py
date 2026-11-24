@@ -514,7 +514,7 @@ config.libs = [
     {
         "lib": "Game",
         # Regional compatibility baselines; provenance: docs/compiler_baseline.md.
-        "mw_version": "GC/2.0p1k" if config.version == "GCCJGC" else "GC/2.5ffcc",
+        "mw_version": "GC/2.0p1l" if config.version == "GCCJGC" else "GC/2.5ffcc",
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
@@ -562,7 +562,7 @@ config.libs = [
             Object(NonMatching, "manager.cpp"),
             Object(NonMatching, "map.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapanim.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
-            Object(MatchingFor("GCCP01", "GCCE01"), "maphit.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "maphit.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "maplight.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapmesh.cpp", extra_cflags=["-sdata 8"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapobj.cpp", extra_cflags=["-RTTI on", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
@@ -690,7 +690,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMiasma.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppMove.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParHitSph.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppParHitSphMat.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParHitSphMat.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParMatrix.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParMoveLine.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppParMoveMatrix.cpp", cflags=cflags_game_cpp_exceptions),
@@ -760,7 +760,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmBreath.cpp", cflags=cflags_game_cpp_exceptions),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmCallBack.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmChangeTex.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppYmCheckBGHeight.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmCheckBGHeight.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDeformationMdl.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDeformationScreen.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmDeformationShp.cpp"),
@@ -773,7 +773,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMegaBirthShpTail3.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMelt.cpp", cflags=cflags_game),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMiasma.cpp", cflags=cflags_game),
-            Object(MatchingFor("GCCP01", "GCCE01"), "pppYmMoveCircle.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMoveCircle.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmMoveParabola.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmTraceMove.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppYmTracer.cpp"),
@@ -1350,18 +1350,21 @@ config.progress_report_args = [
     # "--config", "functionRelocDiffs=data_value",
 ]
 
-# Japanese game compiler: GC/2.0p1k, derived during the build from the stock
+# Japanese game compiler: GC/2.0p1l, derived during the build from the stock
 # GC/2.0p1 by tools/patch_compiler.py (2.0p1a) and tools/patch_compiler_rw.py
 # (2.0p1b..g), both imported from the BFBB decomp, then by
 # tools/patch_compiler_ffcc.py (2.0p1h), tools/patch_compiler_ffcc2.py
-# (2.0p1i), tools/patch_compiler_ffcc3.py (2.0p1j) and
-# tools/patch_compiler_ffcc4.py (2.0p1k). Every step is guarded by the SHA-1 of
-# its input and output. See docs/compiler_baseline.md.
+# (2.0p1i), tools/patch_compiler_ffcc3.py (2.0p1j),
+# tools/patch_compiler_ffcc4.py (2.0p1k) and tools/patch_compiler_ffcc6.py
+# (2.0p1l). Every step
+# is guarded by the SHA-1 of its input and output. See
+# docs/compiler_baseline.md.
 BFBB_COMPILER = "GC/2.0p1g"
 FFCC_COMPILER_H = "GC/2.0p1h"
 FFCC_COMPILER_I = "GC/2.0p1i"
 FFCC_COMPILER_J = "GC/2.0p1j"
-JP_GAME_COMPILER = "GC/2.0p1k"
+FFCC_COMPILER_K = "GC/2.0p1k"
+JP_GAME_COMPILER = "GC/2.0p1l"
 # PAL and USA game compiler: GC/2.5ffcc, GC 2.5 with FFCC's kss alias rule,
 # derived during the build from the stock GC/2.5 by
 # tools/patch_compiler_ffcc5.py (same SHA-1 guards). See docs/compiler_baseline.md.
@@ -1407,6 +1410,12 @@ config.custom_build_rules = [
     {
         "name": "patch_compiler_ffcc5",
         "command": "$python tools/patch_compiler_ffcc5.py $out",
+        "description": "PATCH $out",
+        "restat": True,
+    },
+    {
+        "name": "patch_compiler_ffcc6",
+        "command": "$python tools/patch_compiler_ffcc6.py $out",
         "description": "PATCH $out",
         "restat": True,
     },
@@ -1458,7 +1467,7 @@ config.custom_build_steps = {
             ],
         },
         {
-            "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
+            "outputs": [_compilers_dir / FFCC_COMPILER_K / "mwcceppc.exe"],
             "rule": "patch_compiler_ffcc4",
             "implicit": [
                 _compilers_dir / FFCC_COMPILER_J / "mwcceppc.exe",
@@ -1471,6 +1480,14 @@ config.custom_build_steps = {
             "implicit": [
                 _compilers_dir / "GC/2.5" / "mwcceppc.exe",
                 Path("tools") / "patch_compiler_ffcc5.py",
+            ],
+        },
+        {
+            "outputs": [_compilers_dir / JP_GAME_COMPILER / "mwcceppc.exe"],
+            "rule": "patch_compiler_ffcc6",
+            "implicit": [
+                _compilers_dir / FFCC_COMPILER_K / "mwcceppc.exe",
+                Path("tools") / "patch_compiler_ffcc6.py",
             ],
         },
     ]

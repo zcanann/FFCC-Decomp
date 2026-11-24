@@ -1,7 +1,7 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5ffcc for PAL and USA, and GC/2.0p1k for Japan.
-GC/2.5ffcc is derived during the build from the bundled GC/2.5, and GC/2.0p1k
+The Game library uses GC/2.5ffcc for PAL and USA, and GC/2.0p1l for Japan.
+GC/2.5ffcc is derived during the build from the bundled GC/2.5, and GC/2.0p1l
 from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
@@ -233,6 +233,52 @@ partial losses. It is not adopted, for these reasons:
 - `pppFrameYmCheckBGHeight` would also need a source reorder that holds only
   under this predicate (it scores 90 without it). That would tune source to the
   candidate compiler.
+
+## GC/2.0p1l: 2.0p2's scheduler alias rules plus two FFCC rules
+
+`tools/patch_compiler_ffcc6.py` derives GC/2.0p1l from GC/2.0p1k
+(`abeb8e6e85568dd4e904e26ae3ca55b5b2cc5bcd` to
+`bfccb4b31e5d12fa7fac79ffa2f5ffa1e8a99588`) with four edits and 700 bytes of new code in a new
+executable section, `.ffcc6`, appended after `.sbpatch` (the x86 source is kept
+in the script). GC/2.0p1l is the Japanese game compiler.
+
+The chain emulates BFBB's GC 2.0p2 behaviours clause by clause, but 2.0p2
+states them as alias rules in two places, and the chain never had the second
+(the scheduler's own alias query). That gap is what the earlier
+"write-after-read mirror of e3ns" candidate was approximating. GC/2.0p1l adds
+2.0p2's rules the chain lacks and two FFCC rules of our own:
+
+- `gather`: `gather_instruction_alias` (0x5123B0) begins with 2.0p2's two
+  pre-rules, a write that is a direct small-data access to a global that is
+  not a safe const gets the `worst_case` alias (value numbering forgets other
+  globals after it), and so does a load of a floating-point `@` literal in
+  inline data. A hook in front of the function applies them to `pcode->alias`
+  and then runs the stock code.
+- `sched`: the scheduler's three dependency queries (`serialize_store` twice,
+  `findsuccessors` once) call `may_alias_scheduling` instead of `may_alias`: a
+  load of small data and a direct small-data store to `worst_case` may alias
+  whichever comes first; a load that is a direct small-data access (also of a
+  `const` global) or a load of any part of a non-float `@` object through an
+  Addr16 operand is queried as a `worst_case` access; the stock `may_alias`,
+  with the chain's clauses and `pwcp`, answers the rest.
+
+The last two rules (loads of `const` small data and loads of part of a small
+literal) are FFCC's; the others are 2.0p2's own, which
+the chain's clauses only approximated. The chain's clauses (`e3ns`, `c3a`,
+`dsl`, BFBB's) stay: the new answers are added to theirs, not substituted.
+
+The patch was checked against a source-level implementation of the same rules
+in a decompiled 2.0p2 compiler: all 268 Japanese game objects are
+byte-identical. Against GC/2.0p1k, with the current staging source plus the
+`LetterClose` and `pppFrameYmCheckBGHeight` simplifications that only the new
+compiler needs, Japan gains 14 exact functions and lowers none:
+`CalcResultOpenAnim`, `makeFurTex`, `DrawFur`, `GbaQueue::LoadPlayerStat`,
+`LoadEnemyStat`, `LoadMapItemStat`, `CheckHitFaceCylinder`,
+`CMapPcs::drawAfter`, `drawAfterViewer`, `pppParHitSphMat`,
+`pppConstructYmMoveCircle`, `pppFrameYmCheckBGHeight`, `SetWorldParam` and
+`LetterClose`; `LoadMapObj`, `PickFur` and `CalcMainMenuSub` improve. `maphit`,
+`pppParHitSphMat`, `pppYmCheckBGHeight` and `pppYmMoveCircle` become complete
+Japanese units. PAL and USA (GC/2.5) are unaffected.
 
 ## PAL and USA game compiler: GC/2.5ffcc (kss)
 

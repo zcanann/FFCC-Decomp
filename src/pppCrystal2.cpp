@@ -196,6 +196,7 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* ctrl)
 
     if (textureInfo != 0) {
         pppMemFree(textureInfo);
+        textureInfo = 0;
     }
 }
 

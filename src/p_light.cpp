@@ -803,7 +803,6 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 GXPosition3f32(pos.x, pos.y, dW);
                 GXNormal3f32(nrm.x, nrm.y, nrm.z);
             }
-
         }
 
         GXSetTexCopySrc(0, 0, 0x40, 0x40);

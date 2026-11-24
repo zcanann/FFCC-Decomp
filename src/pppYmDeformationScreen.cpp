@@ -17,16 +17,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-/*
- * --INFO--
- * PAL Address: 0x8009159C
- * PAL Size: 1604b
- * EN Address: 0x80090F38
- * EN Size: 1604b
- * JP Address: 0x80090994
- * JP Size: 1728b
- */
-
 static inline void SetUpIndWarp(VYmDeformationScreen* work)
 {
 	float indMtx[2][3];
@@ -51,6 +41,15 @@ static inline void SetUpIndWarp(VYmDeformationScreen* work)
 	GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8009159C
+ * PAL Size: 1604b
+ * EN Address: 0x80090F38
+ * EN Size: 1604b
+ * JP Address: 0x80090994
+ * JP Size: 1728b
+ */
 void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationScreenStep* step, _pppCtrlTable* param3)
 {
 	VYmDeformationScreen* work = reinterpret_cast<VYmDeformationScreen*>(param1->m_workArea + param3->m_serializedDataOffsets[2]);

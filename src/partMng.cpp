@@ -1015,7 +1015,6 @@ inline void CPartMng::allFreeFPrim()
  * JP Address: TODO
  * JP Size: TODO
  */
-
 void CPartMng::SetFp()
 {
     int i;

@@ -3123,15 +3123,15 @@ void CGMonObj::setRepop(int mode)
 	if (mode != 0) {
 		int option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue));
 		if (option < 9) {
-		u64 bit = 1ULL << spawnIndex;
-		if ((CFlat.m_spawnBits[option] & bit) != 0) {
-			scriptHandle->m_hp = 0;
-			m_bgColMask = 0;
-			m_displayFlags = 0;
-			m_weaponNodeFlagBits.m_unk10 = 0;
-			changeStat(0x28, 0, 0);
-			return;
-		}
+			u64 bit = 1ULL << spawnIndex;
+			if ((CFlat.m_spawnBits[option] & bit) != 0) {
+				scriptHandle->m_hp = 0;
+				m_bgColMask = 0;
+				m_displayFlags = 0;
+				m_weaponNodeFlagBits.m_unk10 = 0;
+				changeStat(0x28, 0, 0);
+				return;
+			}
 		}
 	}
 

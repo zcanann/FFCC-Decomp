@@ -205,8 +205,7 @@ inline JoyBus::JoyBus()
 unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 {
     while (--len >= 0) {
-        int value = *crc;
-        *crc = static_cast<unsigned short>((value << 8) ^ s_CrcTbl[static_cast<unsigned char>(value >> 8) ^ *data++]);
+        *crc = static_cast<unsigned short>((*crc << 8) ^ s_CrcTbl[static_cast<unsigned char>(*crc >> 8) ^ *data++]);
     }
 
     return static_cast<unsigned short>(~static_cast<unsigned short>(*crc));
@@ -240,27 +239,18 @@ inline void JoyBus::Init()
     m_mapId = 0xFF;
     m_stageId = 0xFF;
 
+    for (int i = 0; i < 4; i++)
     {
-        int i = 0;
-        unsigned char zeroB = (unsigned char)i;
-        unsigned int zeroW = (unsigned int)i;
-
-        for (; i < 4; i++)
-        {
-            m_threadParams[i].m_gbaStatus = 1;
-            m_threadParams[i].m_padType = 0x40;
-
-            m_cmdCount[i] = zeroW;
-            m_secCmdCount[i] = zeroW;
-
-            OSInitSemaphore(&m_accessSemaphores[i], 1);
-
-            m_ctrlModeArr[i] = zeroB;
-            m_nextModeTypeArr[i] = zeroB;
-            m_modeXArr[i] = zeroB;
-            m_stateCodeArr[i] = 0xFF;
-            m_stateFlagArr[i] = zeroB;
-        }
+        m_threadParams[i].m_gbaStatus = 1;
+        m_threadParams[i].m_padType = 0x40;
+        m_cmdCount[i] = 0;
+        m_secCmdCount[i] = 0;
+        OSInitSemaphore(&m_accessSemaphores[i], 1);
+        m_ctrlModeArr[i] = 0;
+        m_nextModeTypeArr[i] = 0;
+        m_modeXArr[i] = 0;
+        m_stateCodeArr[i] = 0xFF;
+        m_stateFlagArr[i] = 0;
     }
 }
 
@@ -2843,7 +2833,8 @@ void JoyBus::ThreadInit()
     m_threadInitFlag = 0;
     m_threadRunningMask = 0;
 
-    for (int i = 0; i < 4; i++)
+    int i;
+    for (i = 0; i < 4; i++)
     {
         m_threadParams[i].m_portIndex = i;
         m_threadParams[i].m_gbaStatus = 1;
@@ -3511,9 +3502,8 @@ int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
  */
 inline int JoyBus::WriteInitialCode(ThreadParam* threadParam)
 {
-    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (singleMode && (int)threadParam->m_portIndex != 1)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
@@ -3539,9 +3529,7 @@ inline int JoyBus::WriteInitialCode(ThreadParam* threadParam)
         return (int)threadParam->m_gbaStatus;
     }
 
-    singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-    if (singleMode && (int)threadParam->m_portIndex != 1)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
@@ -3572,9 +3560,8 @@ inline int JoyBus::ReadContext(ThreadParam* threadParam)
 {
     unsigned int ctxData;
 
-    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (singleMode && (int)threadParam->m_portIndex != 1)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
@@ -3621,9 +3608,8 @@ inline int JoyBus::ReadHostId(ThreadParam* threadParam)
 {
     unsigned int timeValue;
 
-    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (singleMode && (int)threadParam->m_portIndex != 1)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
@@ -3662,9 +3648,8 @@ inline int JoyBus::ReadHostId(ThreadParam* threadParam)
  */
 inline int JoyBus::WriteHostId(ThreadParam* threadParam)
 {
-    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (singleMode && (int)threadParam->m_portIndex != 1)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
@@ -3729,9 +3714,8 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
 {
     unsigned int word;
 
-    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (singleMode && (int)threadParam->m_portIndex != 1)
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
@@ -3799,9 +3783,7 @@ inline int JoyBus::InitialCode(ThreadParam* threadParam)
 
         ResetQueue(threadParam);
 
-        bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-        if (singleMode && (int)threadParam->m_portIndex != 1)
+        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_gbaStatus = 0;
         }
@@ -5885,7 +5867,7 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
         threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
-    return threadParam->m_gbaStatus;
+    return (int)threadParam->m_gbaStatus;
 }
 
 /*

@@ -1166,7 +1166,9 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
         char* prefix = itemTable[itemIndex * 5];
         char* name = itemTable[itemIndex * 5 + 1];
 
-        if (strlen(prefix) != 0 && m_gameWork.m_languageId != 3 && m_gameWork.m_languageId != 4) hasSeparator = 1;
+        if (strlen(prefix) != 0 && m_gameWork.m_languageId != 3 && m_gameWork.m_languageId != 4) {
+            hasSeparator = 1;
+        }
 
         const char* separator = GetArtSeparator(hasSeparator);
 
@@ -1191,7 +1193,9 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
     char* prefix = itemTable[itemIndex].m_artPrefix;
     char* itemName = itemTable[itemIndex].m_artName;
 
-    if (strlen(prefix) != 0 && m_gameWork.m_languageId != 3 && m_gameWork.m_languageId != 4) hasSeparator = 1;
+    if (strlen(prefix) != 0 && m_gameWork.m_languageId != 3 && m_gameWork.m_languageId != 4) {
+        hasSeparator = 1;
+    }
 
     const char* separator = GetArtSeparator(hasSeparator);
 
@@ -1233,7 +1237,9 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
         char* prefix = monTable[monIndex * 5];
         char* name = monTable[monIndex * 5 + 1];
 
-        if (strlen(prefix) != 0 && m_gameWork.m_languageId != 3 && m_gameWork.m_languageId != 4) hasSeparator = 1;
+        if (strlen(prefix) != 0 && m_gameWork.m_languageId != 3 && m_gameWork.m_languageId != 4) {
+            hasSeparator = 1;
+        }
 
         const char* separator = GetArtSeparator(hasSeparator);
 
@@ -1258,7 +1264,9 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
     char* prefix = monTable[monIndex].m_artPrefix;
     char* monName = monTable[monIndex].m_artName;
 
-    if (strlen(prefix) != 0 && m_gameWork.m_languageId != 3 && m_gameWork.m_languageId != 4) hasSeparator = 1;
+    if (strlen(prefix) != 0 && m_gameWork.m_languageId != 3 && m_gameWork.m_languageId != 4) {
+        hasSeparator = 1;
+    }
 
     const char* separator = GetArtSeparator(hasSeparator);
 

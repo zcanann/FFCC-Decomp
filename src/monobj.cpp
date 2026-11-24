@@ -305,8 +305,7 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 			m_rotTargetY = targetRot;
 		} else {
 			float delta = Math.DstRot(targetRot, m_homeRotY);
-			float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
-			m_rotTargetY = m_homeRotY + clamped;
+			m_rotTargetY = m_homeRotY + (delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta));
 		}
 	}
 }
@@ -3121,8 +3120,9 @@ void CGMonObj::setRepop(int mode)
 	int classId = scriptHandle->m_baseDataIndex;
 
 	int spawnIndex = scriptHandle->m_saveSlot;
-	int option;
-	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
+	if (mode != 0) {
+		int option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue));
+		if (option < 9) {
 		u64 bit = 1ULL << spawnIndex;
 		if ((CFlat.m_spawnBits[option] & bit) != 0) {
 			scriptHandle->m_hp = 0;
@@ -3131,6 +3131,7 @@ void CGMonObj::setRepop(int mode)
 			m_weaponNodeFlagBits.m_unk10 = 0;
 			changeStat(0x28, 0, 0);
 			return;
+		}
 		}
 	}
 

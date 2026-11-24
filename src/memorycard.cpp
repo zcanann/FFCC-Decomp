@@ -690,9 +690,7 @@ void CMemoryCardMan::McEnd()
 
         do
         {
-            int result = CARDUnmount(chan);
-
-            m_result = result;
+            m_result = CARDUnmount(chan);
             m_opDoneFlag = 1;
             m_state = 2;
             m_currentSlot = 0xFF;
@@ -1466,8 +1464,6 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
  */
 int CMemoryCardMan::DummySave()
 {
-    int result;
-
     McMount(0);
 
     // Busy-wait for async completion
@@ -1618,13 +1614,7 @@ int CMemoryCardMan::DummySave()
         }
 
         McClose();
-
-        result = CARDUnmount(0);
-        m_result = result;
-        m_opDoneFlag = 1;
-
-        m_state = 2;
-        m_currentSlot = 0xFF;
+        McUnmount(0);
 
         if (m_saveBuffer != 0)
         {
@@ -1714,12 +1704,7 @@ int CMemoryCardMan::DummyLoad()
         }
 
         McClose();
-
-        result = CARDUnmount(0);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 2;
-        m_currentSlot = 0xFF;
+        McUnmount(0);
 
         if (m_saveBuffer != 0)
         {
@@ -1731,12 +1716,7 @@ int CMemoryCardMan::DummyLoad()
     }
 
     McClose();
-
-    result = CARDUnmount(0);
-    m_result = result;
-    m_opDoneFlag = 1;
-    m_state = 2;
-    m_currentSlot = 0xFF;
+    McUnmount(0);
 
     Game.LoadInit();
     SetLoadData();

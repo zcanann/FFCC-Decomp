@@ -146,6 +146,7 @@ inline void CMenuPcs::LetterInit()
  */
 inline void CMenuPcs::LetterInit2()
 {
+	FFCC_ASSERT(m_singleFadeState != nullptr);
 	int index = 0;
 	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
 	entry->startFrame = 0;

@@ -1054,11 +1054,8 @@ void CCameraPcs::drawShadowBegin()
     m_shadowCamera = cur;
 
     if (Game.m_currentSceneId == 3) {
-        float stickX = Pad.GetLeftStickX(1);
-        m_fullScreenShadow.m_rotY += 0.017453292f * (4.0f * stickX);
-
-        float stickY = Pad.GetLeftStickY(1);
-        m_fullScreenShadow.m_rotX += 0.017453292f * (2.0f * stickY);
+        m_fullScreenShadow.m_rotY += 0.017453292f * (4.0f * Pad.GetLeftStickX(1));
+        m_fullScreenShadow.m_rotX += 0.017453292f * (2.0f * Pad.GetLeftStickY(1));
     }
 
     PSMTXRotRad(rotX, 'x', -m_fullScreenShadow.m_rotX);
@@ -1098,13 +1095,11 @@ void CCameraPcs::drawShadowBegin()
             m_fullScreenShadow.m_span = depth * m_fullScreenShadow.m_scale;
         }
 
-        float currentDepth = m_fullScreenShadowDepth;
-        if (currentDepth < 0.0f) {
+        if (m_fullScreenShadowDepth < 0.0f) {
             m_fullScreenShadowDepth = depth;
         } else {
-            depth -= currentDepth;
-            float blended = depth / 4.0f;
-            m_fullScreenShadowDepth = currentDepth + blended;
+            float blended = (depth - m_fullScreenShadowDepth) / 4.0f;
+            m_fullScreenShadowDepth += blended;
         }
     } else {
         m_fullScreenShadow.m_span = 100.0f;

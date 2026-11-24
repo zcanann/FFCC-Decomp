@@ -305,8 +305,7 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 			m_rotTargetY = targetRot;
 		} else {
 			float delta = Math.DstRot(targetRot, m_homeRotY);
-			float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
-			m_rotTargetY = m_homeRotY + clamped;
+			m_rotTargetY = m_homeRotY + (delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta));
 		}
 	}
 }

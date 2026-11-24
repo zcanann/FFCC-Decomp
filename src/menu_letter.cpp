@@ -359,9 +359,14 @@ int CMenuPcs::LetterCtrl()
 	done = s_OpenClose = 0;
 
 	LetterMenuState* state = m_letterMenuState;
+	FFCC_ASSERT(state != nullptr);
+	FFCC_ASSERT(s_SelLetter >= 0);
 	s16 phase = state->step;
+	FFCC_ASSERT(phase >= 0 && phase <= 2);
 	if (phase == 0) {
 		s16 mode = state->mode;
+		FFCC_ASSERT(mode >= 0 && mode <= 5);
+		FFCC_ASSERT(s_Attach <= 2);
 		if (mode == 0) {
 			int listOpenFinished = LetterLstOpen();
 			if (listOpenFinished) {

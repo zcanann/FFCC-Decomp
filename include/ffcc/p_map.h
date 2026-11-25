@@ -12,12 +12,6 @@ struct Vec;
 class CRelStopWatch
 {
 public:
-    CRelStopWatch()
-    {
-    }
-    ~CRelStopWatch()
-    {
-    }
     void Start()
     {
     }

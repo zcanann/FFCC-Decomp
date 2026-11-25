@@ -10,7 +10,7 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/mapanim.h"
 #include "ffcc/maplight.h"
-#include "ffcc/ptrarray.h"
+#include "ffcc/ptrarray_decl.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

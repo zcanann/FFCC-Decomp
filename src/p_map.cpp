@@ -1,4 +1,4 @@
-#include "ffcc/ptrarray.h"
+#include "ffcc/ptrarray_decl.h"
 #include "ffcc/p_map.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
@@ -116,7 +116,7 @@ inline CRelProfile::~CRelProfile()
  * JP Address: TODO
  * JP Size: TODO
  */
-static void mapInitDrawEnv()
+static inline void mapInitDrawEnv()
 {
     GXSetColorUpdate(GX_TRUE);
     GXSetAlphaUpdate(GX_FALSE);

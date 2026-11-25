@@ -3229,9 +3229,9 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			}
 
 			chosenBonus[chosenCount++] = bonusIndex;
-
+			int bonusCond = bossArtifacts->m_bonusConditions[bonusIndex];
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)
-			    ->SetBonusCondition(bossArtifacts->m_bonusConditions[bonusIndex]);
+			    ->SetBonusCondition(bonusCond);
 			if (System.GetErrorLevel() >= 3U) {
 				System.Printf("party%d \x83{\x81[\x83i\x83Xidx=%d \x92\x86\x90g=%d\n", slot, bonusIndex,
 				    bossArtifacts->m_bonusConditions[bonusIndex]);
@@ -4103,7 +4103,9 @@ void CGPartyObj::gpmMove()
 		if (newSpeed < 0.0f) {
 			newSpeed = 0.0f;
 		} else {
-			float speedLimit = speedScale * (m_moveBaseSpeed * Game.m_partyObjArr[0]->m_pushScale);
+			float baseSpeed = m_moveBaseSpeed;
+			float pushScale = Game.m_partyObjArr[0]->m_pushScale;
+			float speedLimit = speedScale * (baseSpeed * pushScale);
 			newSpeed = speedLimit < newSpeed ? speedLimit : newSpeed;
 		}
 		CGPartyObj::m_ghostWork.carrySpeed = newSpeed;

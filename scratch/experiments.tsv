@@ -237,3 +237,5 @@ command_rand3_named	2026-11-24T23:31:59.320279	loop/partyobj-20261124-192500	GCC
 command_targetParam_named	2026-11-24T23:33:57.475846	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	command targetParam named: o0 -528->-516 (+12 total +40) O4 same
 command_targ_ptr_named	2026-11-24T23:34:40.455226	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	command targ ptr named: o0 -516->-508 (+8 total +48) O4 same, plausible but gap huge
 ctp_leaderCenter_named	2026-11-24T23:39:04.522856	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.997	99.997	None	None	0	0	ctp leaderCenter named: o0 -328->-332 (-4) O4 99.997, not O4-safe, revert
+gpmMove_baseSpeed_pushScale_named	2026-11-24T23:40:58.531083	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	gpmMove baseSpeed+pushScale named: o0 -188->-164 (+24) O4 same, plausible
+setbonus_bonusCond_named	2026-11-24T23:42:10.685464	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	SetBonusCondition bonusCond named: o0 -244->-240 (+4) O4 same

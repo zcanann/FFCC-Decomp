@@ -1372,6 +1372,11 @@ PAL_GAME_COMPILER = "GC/2.5ffcc"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
     {
+        "name": "fix_materialman_eh",
+        "command": "$python tools/fix_materialman_eh.py $in $obj $out",
+        "description": "FIX $out",
+    },
+    {
         "name": "fix_graphic_eh",
         "command": "$python tools/fix_graphic_eh.py $in $obj $out",
         "description": "FIX $out",
@@ -1427,6 +1432,12 @@ config.custom_build_rules = [
 ]
 config.custom_build_steps = {
     "post-compile": [
+        {
+            "inputs": [Path(f"build/{config.version}/src/materialman.o")],
+            "outputs": [Path(f"build/{config.version}/src/materialman.o.fixed")],
+            "rule": "fix_materialman_eh",
+            "variables": {"obj": f"build/{config.version}/obj/materialman.o"},
+        },
         {
             "inputs": [Path(f"build/{config.version}/src/graphic.o")],
             "outputs": [Path(f"build/{config.version}/src/graphic.o.fixed")],

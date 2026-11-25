@@ -5,7 +5,7 @@
 import json, sys, subprocess, re
 unit = sys.argv[1]; only = sys.argv[2] if len(sys.argv) > 2 else None
 def diff(sym):
-    out = subprocess.run(['./tools/objdiff-cli','diff','-p','.','-u',unit,sym,'-o','-','--format','json'],
+    out = subprocess.run(['build/tools/objdiff-cli','diff','-p','.','-u',unit,sym,'-o','-','--format','json'],
                          capture_output=True, text=True)
     if out.returncode != 0: return None
     return json.loads(out.stdout)

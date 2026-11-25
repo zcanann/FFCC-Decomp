@@ -3012,8 +3012,7 @@ void CMenuPcs::DrawMainMenu()
 	if (m_wmWorldState->m_mainState >= 1 && m_wmWorldState->m_mainState <= 3) {
 		const int tileState = m_wmWorldState->m_mainState;
 		float tileAlpha;
-		int __p14 = tileState;
-		if (__p14 == 1) {
+		if (tileState == 1) {
 			tileAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		} else if (tileState == 2) {
 			tileAlpha = FLOAT_803313e8;
@@ -3028,7 +3027,7 @@ void CMenuPcs::DrawMainMenu()
 	RestoreProjection();
 
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
-		const int helpState =  (int)(unsigned int)(m_wmWorldState->m_mainState);
+		const int helpState = m_wmWorldState->m_mainState;
 		float helpAlpha;
 		if (helpState == 1) {
 			helpAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));

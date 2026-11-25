@@ -533,7 +533,7 @@ void CMapMng::Destroy()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void* CMapMng::MapFileRead(char* path, unsigned long& size)
+void* CMapMng::MapFileRead(char* path, unsigned long& size)
 {
     void* filePtr;
 

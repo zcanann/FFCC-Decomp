@@ -266,9 +266,7 @@ void CGCharaObj::onChangeStat(int state)
  */
 void CGCharaObj::onCancelStat(int)
 {
-	int state = m_lastStateId;
-
-	switch (state) {
+	switch (m_lastStateId) {
 		case 0x12:
 			endPSlotBit(1);
 			break;
@@ -1457,7 +1455,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	}
 
 	int hpValue = m_scriptHandle->m_hp;
-	int next = hpValue;
+	int next;
 
 	if (hpValue != 0 && delta < 0) {
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
@@ -2644,9 +2642,8 @@ int CGCharaObj::calcCastTime(int itemId)
 		castScale = 1.0f;
 	}
 
-	SCharaItemRow* typeRows = castRows;
-	int itemType = typeRows[itemId].m_actionType;
-	int itemNo = typeRows[itemId].m_effect;
+	int itemType = castRows[itemId].m_actionType;
+	int itemNo = castRows[itemId].m_effect;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		int castBonus = m_scriptHandle->m_romWork->m_magicCastBonus;
@@ -3022,8 +3019,7 @@ next_link:
  */
 inline int CGCharaObj::scCheckItem(CCombi2Set* set, CGCharaObj* object, int lastSlot)
 {
-    SCharaItemRow* items = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-    int kind = items[object->m_itemId].m_effect;
+    int kind = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable)[object->m_itemId].m_effect;
     if ((lastSlot && kind == 0x1F8 && set->m_item == 0x1F8) || object->m_itemId == set->m_item) {
         return 1;
     }

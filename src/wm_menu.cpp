@@ -1381,32 +1381,25 @@ void CMenuPcs::calcWorld()
 
 	WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
 	worldObj[1].m_viewportX = 0;
-	const float kZero = FLOAT_803313dc;
 	worldObj[1].m_viewportY = 0;
-	float cameraZ = 100.0f;
 	worldObj[1].m_viewportWidth = 0x280;
-	const float kScale = FLOAT_803315d4;
 	worldObj[1].m_viewportHeight = 0x1C0;
-	const float kPosY = -0.20000000298023224f;
-	worldObj[1].m_cameraPosition.x = kZero;
-	const float kPosZ = 51.5f;
-	worldObj[1].m_cameraPosition.y = kZero;
-	const float kRotX = 35.79999923706055f;
-	worldObj[1].m_cameraPosition.z = cameraZ;
-	float degToRad = 0.01745329238474369f;
+	worldObj[1].m_cameraPosition.x = FLOAT_803313dc;
+	worldObj[1].m_cameraPosition.y = FLOAT_803313dc;
+	worldObj[1].m_cameraPosition.z = 100.0f;
 	worldObj[1].m_active = 1;
-	worldObj[1].m_transform.m_scale.x = kScale;
-	worldObj[1].m_transform.m_scale.y = kScale;
-	worldObj[1].m_transform.m_scale.z = kScale;
-	worldObj[1].m_transform.m_position.x = kZero;
-	worldObj[1].m_transform.m_position.y = kPosY;
-	worldObj[1].m_transform.m_position.z = kPosZ;
-	worldObj[1].m_transform.m_rotation.x = kRotX;
-	worldObj[1].m_transform.m_rotation.y = kZero;
-	worldObj[1].m_transform.m_rotation.z = kZero;
+	worldObj[1].m_transform.m_scale.x = FLOAT_803315d4;
+	worldObj[1].m_transform.m_scale.y = FLOAT_803315d4;
+	worldObj[1].m_transform.m_scale.z = FLOAT_803315d4;
+	worldObj[1].m_transform.m_position.x = FLOAT_803313dc;
+	worldObj[1].m_transform.m_position.y = -0.20000000298023224f;
+	worldObj[1].m_transform.m_position.z = 51.5f;
+	worldObj[1].m_transform.m_rotation.x = 35.79999923706055f;
+	worldObj[1].m_transform.m_rotation.y = FLOAT_803313dc;
+	worldObj[1].m_transform.m_rotation.z = FLOAT_803313dc;
 
 	Mtx matrix;
-	PSMTXRotRad(matrix, 'x', degToRad * worldObj[1].m_transform.m_rotation.x);
+	PSMTXRotRad(matrix, 'x', 0.01745329238474369f * worldObj[1].m_transform.m_rotation.x);
 	matrix[0][3] = worldObj[1].m_transform.m_position.x;
 	matrix[1][3] = worldObj[1].m_transform.m_position.y;
 	matrix[2][3] = worldObj[1].m_transform.m_position.z;
@@ -3019,7 +3012,8 @@ void CMenuPcs::DrawMainMenu()
 	if (m_wmWorldState->m_mainState >= 1 && m_wmWorldState->m_mainState <= 3) {
 		const int tileState = m_wmWorldState->m_mainState;
 		float tileAlpha;
-		if (tileState == 1) {
+		int __p14 = tileState;
+		if (__p14 == 1) {
 			tileAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		} else if (tileState == 2) {
 			tileAlpha = FLOAT_803313e8;
@@ -3034,7 +3028,7 @@ void CMenuPcs::DrawMainMenu()
 	RestoreProjection();
 
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
-		const int helpState = m_wmWorldState->m_mainState;
+		const int helpState =  (int)(unsigned int)(m_wmWorldState->m_mainState);
 		float helpAlpha;
 		if (helpState == 1) {
 			helpAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));

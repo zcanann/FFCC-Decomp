@@ -2,6 +2,7 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
+#include "ffcc/p_map.h"
 #include "ffcc/mapobj.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/materialman.h"
@@ -108,14 +109,12 @@ void CMapShadow::Init()
 	float width;
 	float height;
 	CMaterial* material;
-	CMaterialSet* materialSet;
 
-	materialSet = g_MapMng.m_materialSet;
-	material = materialSet->m_materials[m_materialIndex];
+	material = CMapPcs::GetMapMaterial(m_materialIndex);
 	CTexture* texture = material->GetTexture(0);
 	width = (float)texture->m_width;
 	height = (float)texture->m_height;
-	m_materialMode = texture->m_wrapMode;
+	m_materialMode = texture->GetWrapMode();
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,

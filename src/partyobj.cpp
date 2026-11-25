@@ -2597,7 +2597,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	int addValue;
 	int subValue;
 	int bonusSlot;
-	bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
+	bonusSlot = SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_bonusCondition;
 	subValue = 0;
 	addValue = 0;
 	currentAdd = SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_artifactRelated[3];
@@ -2638,7 +2638,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 4:
 	case 6:
 		if (kind == 4) {
-			int item = *reinterpret_cast<unsigned short*>(Game.m_itemTable + value * 0x48);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
+			int item = rows[value].m_kind;
 			if ((bonusSlot == 4 && item == 0x100) || (bonusSlot == 6 && item == 400)) {
 				addValue = stageAdd;
 			} else if (bonusSlot == 2) {
@@ -2667,7 +2668,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 3:
 	case 0xE:
 		if (kind == 5) {
-			int item = *reinterpret_cast<unsigned short*>(Game.m_itemTable + value * 0x48);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
+			int item = rows[value].m_kind;
 			if ((bonusSlot == 0xE && (item == 0x17D || item == 0x186)) ||
 			    (bonusSlot == 3 && item != 0x17D && item != 0x186)) {
 				addValue = stageAdd;

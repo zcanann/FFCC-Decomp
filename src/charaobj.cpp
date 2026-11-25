@@ -1455,7 +1455,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	}
 
 	int hpValue = m_scriptHandle->m_hp;
-	int next = hpValue;
+	int next;
 
 	if (hpValue != 0 && delta < 0) {
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&

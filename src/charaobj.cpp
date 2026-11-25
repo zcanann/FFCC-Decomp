@@ -266,9 +266,7 @@ void CGCharaObj::onChangeStat(int state)
  */
 void CGCharaObj::onCancelStat(int)
 {
-	int state = m_lastStateId;
-
-	switch (state) {
+	switch (m_lastStateId) {
 		case 0x12:
 			endPSlotBit(1);
 			break;

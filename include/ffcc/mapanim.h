@@ -1,7 +1,7 @@
 #ifndef _FFCC_MAPANIM_H_
 #define _FFCC_MAPANIM_H_
 
-#include "ffcc/ptrarray.h"
+#include "ffcc/ptrarray_decl.h"
 #include "dolphin/mtx.h"
 
 class CChunkFile;

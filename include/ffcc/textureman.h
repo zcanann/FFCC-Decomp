@@ -26,6 +26,7 @@ public:
     unsigned int GetHeight() { return m_height; }
     GXTexObj* GetTexObj() { return &m_texObj; }
     void SetWrapMode(GXTexWrapMode wrapMode) { m_wrapMode = wrapMode; }
+    int GetWrapMode() { return m_wrapMode; }
     void* GetRefBuffer() { return m_imageData; }
     void SetFormat(unsigned long format) { m_format = format; }
 

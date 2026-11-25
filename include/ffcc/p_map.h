@@ -6,6 +6,8 @@
 
 #include "ffcc/system.h"
 #include "ffcc/maplight.h"
+#include "ffcc/map.h"
+#include "ffcc/materialman.h"
 
 struct Vec;
 
@@ -36,6 +38,11 @@ class CMapPcs : public CProcess
 {
 public:
     static CProcessCallbackTable m_table[3];
+
+    static CMaterial* GetMapMaterial(long index)
+    {
+        return g_MapMng.m_materialSet->m_materials[index];
+    }
 
     CMapPcs();
 

@@ -1,4 +1,4 @@
-#include "ffcc/ptrarray.h"
+#include "ffcc/ptrarray_decl.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/chara.h"
 #include "ffcc/color.h"

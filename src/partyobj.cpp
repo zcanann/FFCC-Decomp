@@ -2436,11 +2436,13 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			m_partyData.carryObject = object;
 			rotTarget(reinterpret_cast<CGPrgObj*>(m_partyData.carryObject));
 			changeStat(0x0B, 0, 0);
-			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, 0, PARTY_CARRY_ANIM(this, m_carryAnim2, m_carryAnim0));
+			const int anim = PARTY_CARRY_ANIM(this, m_carryAnim2, m_carryAnim0);
+			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, 0, anim);
 		}
 	} else if ((carryType == 1 || carryType == 2) && m_partyData.carryObject != nullptr) {
 		if (forceMode != 0) {
-			if (m_lastStateId == 0x0B) {
+			const bool wasCarrying = m_lastStateId == 0x0B;
+			if (wasCarrying) {
 				changeStat(0, 0, 0);
 			}
 			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, 0);
@@ -2448,7 +2450,8 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			setIdleMotion();
 		} else {
 			changeStat((carryType == 1) ? 0x0C : 0x0D, 0, 0);
-			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, PARTY_CARRY_ANIM(this, m_carryAnim3, m_carryAnim1));
+			const int anim = PARTY_CARRY_ANIM(this, m_carryAnim3, m_carryAnim1);
+			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, anim);
 			m_partyData.carryObject = (CGObject*)0;
 		}
 	}

@@ -442,27 +442,7 @@ void CRingMenu::onDraw()
 	float orbitY = 10.0f * (sizePulse * sinA);
 
 	const float pulse = sin(static_cast<double>(1.5707963705062866f * showScale));
-
-	float posLeft;
-	float posAltY;
-	float posMainX;
-	float posMainY;
-	float alphaScaleBase;
-	float iconAlphaScale;
-	float posAltX;
-
 	const float glowOffset = 32.0f * (1.0f - pulse);
-	alphaScaleBase = 255.0f * showScale * transitionScale;
-	iconAlphaScale = showScale * transitionScale;
-	posAltX = 472.0f + glowOffset;
-	posLeft = -glowOffset;
-	posAltY = 256.0f + glowOffset;
-	posMainY = 192.0f + glowOffset;
-#ifdef VERSION_GCCJGC
-	posMainX = posAltX;
-#else
-	posMainX = posAltX - 40.0f;
-#endif
 
 	for (int group = 2; group >= 0; group--) {
 #ifdef VERSION_GCCJGC
@@ -492,11 +472,15 @@ void CRingMenu::onDraw()
 #endif
 
 		if (group == 2) {
-			posX = 16.0f + (((m_menuIndex & 1) != 0) ? posAltX : posLeft);
-			posY = 80.0f + (((m_menuIndex & 2) != 0) ? posAltY : posLeft);
+			posX = 16.0f + (((m_menuIndex & 1) != 0) ? 472.0f + glowOffset : -glowOffset);
+			posY = 80.0f + (((m_menuIndex & 2) != 0) ? 256.0f + glowOffset : -glowOffset);
 		} else {
-			posX = 40.0f + (((m_menuIndex & 1) != 0) ? posMainX : posLeft);
-			posY = 96.0f + (((m_menuIndex & 2) != 0) ? posMainY : posLeft);
+#ifdef VERSION_GCCJGC
+			posX = 40.0f + (((m_menuIndex & 1) != 0) ? 472.0f + glowOffset : -glowOffset);
+#else
+			posX = 40.0f + (((m_menuIndex & 1) != 0) ? 472.0f + glowOffset - 40.0f : -glowOffset);
+#endif
+			posY = 96.0f + (((m_menuIndex & 2) != 0) ? 192.0f + glowOffset : -glowOffset);
 		}
 
 		buttonAlpha = static_cast<float>(m_buttonTimers[group][2]) / 8.0f;
@@ -514,7 +498,7 @@ void CRingMenu::onDraw()
 		}
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE2));
-		MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase)));
+		MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * (255.0f * showScale * transitionScale))));
 
 #ifdef VERSION_GCCJGC
 		const float labelWidth = 104.0f;
@@ -599,7 +583,7 @@ void CRingMenu::onDraw()
 				                ? (prev1 + 4) % 5
 				                : caravanWork->GetNextCmdListIdx(prev1, -1);
 
-				labelAlpha *= iconAlphaScale;
+				labelAlpha *= showScale * transitionScale;
 				drawCommand(m_menuIndex, font, posX, posY, caravanWork, prev2, scroll - 2.0f, labelAlpha);
 				drawCommand(m_menuIndex, font, posX, posY, caravanWork, prev1, scroll - 1.0f, labelAlpha);
 				int next1 = (Game.m_gameWork.IsMogStage())
@@ -610,7 +594,7 @@ void CRingMenu::onDraw()
 				                : caravanWork->GetNextCmdListIdx(next1, 1);
 				drawCommand(m_menuIndex, font, posX, posY, caravanWork, next2, 2.0f + scroll, labelAlpha);
 				drawCommand(m_menuIndex, font, posX, posY, caravanWork, next1, 1.0f + scroll, labelAlpha);
-				drawCommand(m_menuIndex, font, posX, posY, caravanWork, cmdIndex, scroll, iconAlphaScale);
+				drawCommand(m_menuIndex, font, posX, posY, caravanWork, cmdIndex, scroll, showScale * transitionScale);
 				MenuPcs.DrawInit();
 			}
 		}

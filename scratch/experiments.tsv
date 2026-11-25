@@ -9,3 +9,18 @@ SetMemCardError__10CGoOutMenuFv	factor 6 SetMenu via SetErrorWindow helper	100.0
 SetMemCardError__10CGoOutMenuFv	factor 6 SetMenu via non-inline SetErrorWindow	100.0
 SetMemCardError__10CGoOutMenuFv	restored baseline	100.0
 SetMemCardError__10CGoOutMenuFv	factor 6 duplicated 5-line error-window blocks via SetErrorWindow helper: +352 -> +80 (saves 272B at -O0), O4 100.0 DOL ok	100.0
+Calc__10CGoOutMenuFv	baseline Calc +588 SetMemCardError +80	100.0
+Calc__10CGoOutMenuFv	Calc tail replaced with CalcMenu() call	99.686295
+Calc__10CGoOutMenuFv	Calc tail short order y,x -> x,y	99.99914
+Calc__10CGoOutMenuFv	Calc GetWinSize cast short -> unsigned short	99.9667
+Calc__10CGoOutMenuFv	Calc timer remaining temp -> helper call	99.9667
+Calc__10CGoOutMenuFv	restored baseline after calc sweep	100.0
+SetMenuForceClose__10CGoOutMenuFv	baseline +20	100.0
+SetMenuForceClose__10CGoOutMenuFv	SetMenuForceClose remove guard	100.0
+SetMenuForceClose__10CGoOutMenuFv	SetMenuForceClose check m_pendingMessage vs m_currentMessage	99.995705
+SetMenuForceClose__10CGoOutMenuFv	SetMenuForceClose unsigned short check	99.29093
+SetMenuForceClose__10CGoOutMenuFv	dummy	100.0
+SetMenuForceClose__10CGoOutMenuFv	restored	100.0
+Calc__10CGoOutMenuFv	Calc tail timer -> helper call (helper now unconditional)	99.87645
+Calc__10CGoOutMenuFv	restored	100.0
+SetMenuForceClose__10CGoOutMenuFv	remove guard if (m_currentMessage>=0) -> unconditional: +20 -> +8 at -O0, O4 100% DOL ok	100.0

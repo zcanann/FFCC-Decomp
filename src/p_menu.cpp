@@ -562,6 +562,11 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
 void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
     int currentMode;
+    FFCC_ASSERT(mode >= static_cast<CMenuPcs::MENUMODE>(-1) && mode <= static_cast<CMenuPcs::MENUMODE>(2));
+    FFCC_ASSERT(m_mode >= -1 && m_mode <= 2);
+    FFCC_ASSERT(mode != static_cast<CMenuPcs::MENUMODE>(-2));
+    FFCC_ASSERT(currentMode >= -1);
+    FFCC_ASSERT(currentMode <= 2);
 
     if (m_mode != static_cast<int>(mode)) {
         Graphic._WaitDrawDone("p_menu.cpp", MenuDrawDoneLine);

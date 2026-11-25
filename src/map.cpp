@@ -1,4 +1,5 @@
 #include "ffcc/map.h"
+#include "ffcc/ptrarray.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"

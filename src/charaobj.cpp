@@ -3019,8 +3019,7 @@ next_link:
  */
 inline int CGCharaObj::scCheckItem(CCombi2Set* set, CGCharaObj* object, int lastSlot)
 {
-    SCharaItemRow* items = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
-    int kind = items[object->m_itemId].m_effect;
+    int kind = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable)[object->m_itemId].m_effect;
     if ((lastSlot && kind == 0x1F8 && set->m_item == 0x1F8) || object->m_itemId == set->m_item) {
         return 1;
     }

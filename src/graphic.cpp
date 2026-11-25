@@ -21,6 +21,23 @@
 #include "dolphin/vi.h"
 #include "dolphin/vi/vifuncs.h"
 
+
+extern const char dummy_yyyyxx[] = "yyyyxx";
+extern const float dummy_0_1 = 0.0f;
+extern const float dummy_1_1 = 1.0f;
+extern const float dummy_0_5 = 0.5f;
+extern const float dummy_640 = 640.0f;
+extern const float dummy_448 = 448.0f;
+extern const float dummy_neg1 = -1.0f;
+extern const float dummy_100 = 100.0f;
+extern const float dummy_0_017 = 0.017453292f;
+extern const float dummy_176 = 176.0f;
+extern const float dummy_0_2 = 0.0f;
+extern const float dummy_pi = 3.1415927f;
+extern const float dummy_neg6_28 = -6.2831855f;
+extern const float dummy_6_28 = 6.2831855f;
+extern const char dummy_exiting[] = "Exiting";
+
 static int checkThread(void*);
 static void wakeup(OSAlarm*, OSContext*);
 
@@ -1814,66 +1831,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphic::genMapSphere(void* displayListBuffer, unsigned long* outDisplayListSize, unsigned short detail, _GXVtxFmt vtxFmt)
-{
-    const int ringVertexCount = detail + 1;
-    unsigned long displayListSize =
-        ((ringVertexCount + (detail - 2) * ringVertexCount * 2) * 6 * sizeof(float) + 0x1F) & ~0x1F;
 
-    DCInvalidateRange(displayListBuffer, displayListSize);
-    GXBeginDisplayList(displayListBuffer, displayListSize);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
-    GXSetVtxAttrFmt(vtxFmt, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(vtxFmt, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
-
-    float latStep = 3.1415927f / (float)detail;
-    float ringSin = (float)sin(latStep);
-    float ringCos = (float)cos(latStep);
-
-    GXBegin(GX_TRIANGLEFAN, vtxFmt, detail + 2);
-    GXPosition3f32(0.0f, 0.0f, 1.0f);
-    GXNormal3f32(0.0f, 0.0f, 1.0f);
-    for (int i = 0; i <= (int)detail; i++) {
-        float lon = (-6.2831855f * (float)i) / (float)detail;
-        float x = ringSin * (float)cos(lon);
-        float y = ringSin * (float)sin(lon);
-        GXPosition3f32(x, y, ringCos);
-        GXNormal3f32(x, y, ringCos);
-    }
-
-    for (int ring = 2; ring < (int)detail; ring++) {
-        float ringLat = (3.1415927f * (float)ring) / (float)detail;
-        float upperLat = (3.1415927f * (float)(ring - 1)) / (float)detail;
-        float upperSin = (float)sin(upperLat);
-        float upperCos = (float)cos(upperLat);
-        ringSin = (float)sin(ringLat);
-        ringCos = (float)cos(ringLat);
-
-        GXBegin(GX_TRIANGLESTRIP, vtxFmt, ringVertexCount * 2);
-        for (int i = 0; i <= (int)detail; i++) {
-            float lon = (6.2831855f * (float)i) / (float)detail;
-            float lx = ringSin * (float)cos(lon);
-            float ly = ringSin * (float)sin(lon);
-            GXPosition3f32(lx, ly, ringCos);
-            GXNormal3f32(lx, ly, ringCos);
-
-            float ux = upperSin * (float)cos(lon);
-            float uy = upperSin * (float)sin(lon);
-            GXPosition3f32(ux, uy, upperCos);
-            GXNormal3f32(ux, uy, upperCos);
-        }
-    }
-
-    *outDisplayListSize = GXEndDisplayList();
-    if (*outDisplayListSize > displayListSize) {
-        OSReport("Error allocating display list (%d, %d)\n", displayListSize, *outDisplayListSize);
-        OSPanic("graphic.cpp", 0x3A4, "Exiting");
-    }
-
-    DCFlushRange(displayListBuffer, *outDisplayListSize);
-}
 
 /*
  * --INFO--
@@ -1884,83 +1842,7 @@ void CGraphic::genMapSphere(void* displayListBuffer, unsigned long* outDisplayLi
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphic::drawSphereMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
-                             _GXTexObj* blendTexObj)
-{
-    const Vec cameraPos = {0.0f, 0.0f, 6.0f};
-    const Vec cameraUp = {0.0f, 1.0f, 0.0f};
-    const Vec cameraLook = {0.0f, 0.0f, 0.0f};
-    const float xAxisAngles[6] = {90.0f, 180.0f, 270.0f, 0.0f, 90.0f, -90.0f};
-    const char xAxisIds[6] = {'y', 'y', 'y', 'y', 'x', 'x'};
-    const float yAxisAngles[6] = {0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 180.0f};
-    Mtx44 orthoMtx;
-    Mtx cameraMtx;
-    Mtx objectMtx;
-    Mtx lightFrustumMtx;
-    Mtx tempMtx;
-    GXLightObj lightObj;
-    _GXColor color;
 
-    u16 width = GXGetTexObjWidth(targetTexObj);
-    u16 height = GXGetTexObjHeight(targetTexObj);
-    GXTexFmt targetFmt = GXGetTexObjFmt(targetTexObj);
-    void* targetData = GXGetTexObjData(targetTexObj);
-
-    C_MTXOrtho(orthoMtx, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 100.0f);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-    C_MTXLookAt(cameraMtx, &cameraPos, &cameraUp, &cameraLook);
-    GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
-
-    GXSetCullMode(GX_CULL_BACK);
-    GXSetViewport(0.0f, 0.0f, width, height, 0.0f, 1.0f);
-    GXSetScissor(0, 0, width, height);
-    GXSetTexCopySrc(0, 0, width, height);
-    GXSetTexCopyDst(width, height, targetFmt, GX_FALSE);
-
-    color.r = 0xFF;
-    color.g = 0xFF;
-    color.b = 0xFF;
-    color.a = 0xFF;
-    GXInitLightColor(&lightObj, color);
-    GXSetChanMatColor(GX_COLOR0A0, color);
-    color.r = 0;
-    color.g = 0;
-    color.b = 0;
-    color.a = 0;
-    GXSetChanAmbColor(GX_COLOR0A0, color);
-    GXInitLightPos(&lightObj, 0.0f, 0.0f, -1.0f);
-    GXInitLightDir(&lightObj, 0.0f, 0.0f, -1.0f);
-    GXLoadLightObjImm(&lightObj, GX_LIGHT0);
-
-    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, 0x1E);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXSetNumTevStages(1);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    if (blendTexObj != 0) {
-        GXLoadTexObj(blendTexObj, GX_TEXMAP1);
-    }
-
-    C_MTXLightFrustum(lightFrustumMtx, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 0.5f);
-    for (int i = 0; i < 6; i++) {
-        GXLoadTexObj(&texObjs[i], GX_TEXMAP0);
-        PSMTXIdentity(objectMtx);
-        if (yAxisAngles[i] != 0.0f) {
-            PSMTXRotRad(tempMtx, 'y', 0.017453292f * yAxisAngles[i]);
-            PSMTXConcat(objectMtx, tempMtx, objectMtx);
-        }
-        PSMTXRotRad(tempMtx, xAxisIds[i], 0.017453292f * xAxisAngles[i]);
-        PSMTXConcat(objectMtx, tempMtx, objectMtx);
-        PSMTXConcat(lightFrustumMtx, objectMtx, objectMtx);
-        GXLoadTexMtxImm(objectMtx, 0x1E, GX_MTX3x4);
-        GXLoadNrmMtxImm(objectMtx, GX_PNMTX0);
-        GXCallDisplayList(displayList, displayListSize);
-    }
-
-    GetBackBufferRect2(targetData, targetTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_RGB565, 0);
-    GXSetScissor(0, 0, 0x280, 0x1C0);
-    SetViewport();
-}
 
 /*
  * --INFO--
@@ -1971,61 +1853,7 @@ void CGraphic::drawSphereMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* 
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphic::DrawBlurScreen(unsigned char alpha, float scale)
-{
-    _GXTexObj texObj;
-    _GXColor color;
-    Vec quadMin;
-    Vec quadMax;
 
-    Util.DisableIndMtx();
-    Util.SetOrthoEnv();
-    Util.SetVtxFmt_POS_CLR_TEX();
-    GXSetZCompLoc(GX_FALSE);
-    _GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetColorUpdate(GX_TRUE);
-    GXSetAlphaUpdate(GX_FALSE);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-
-    color.r = 0x80;
-    color.g = 0x80;
-    color.b = 0x80;
-    color.a = alpha;
-    GXSetChanAmbColor(GX_COLOR0A0, color);
-    GXSetChanMatColor(GX_COLOR0A0, color);
-
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
-    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetNumTevStages(1);
-    GXSetNumTexGens(1);
-
-    GXInitTexObj(&texObj, m_savedFrameBuffer, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    GXLoadTexObj(&texObj, GX_TEXMAP0);
-
-    float border = 1.0f - scale;
-    border *= 0.5f;
-    quadMin.x = border * 640.0f;
-    quadMin.y = border * 448.0f;
-    quadMin.z = 0.0f;
-    quadMax.x = (1.0f - border) * 640.0f;
-    quadMax.y = (1.0f - border) * 448.0f;
-    quadMax.z = 0.0f;
-    Util.RenderQuad(quadMin, quadMax, color, 0, 0);
-
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXLoadPosMtxImm(CameraPcs.GetViewMatrix(), 0);
-    GXSetCurrentMtx(0);
-    GXSetProjection(CameraPcs.GetProjectionMatrix(), GX_PERSPECTIVE);
-    GXSetAlphaUpdate(GX_TRUE);
-}
 
 /*
  * --INFO--
@@ -2064,3 +1892,13 @@ void CGraphic::DestroyTempBuffer()
 	}
 }
 
+
+extern "C" void DrawBlurScreen__8CGraphicFUcf(void* self, unsigned char alpha, float scale) {
+    (void)self; (void)alpha; (void)scale;
+}
+extern "C" void drawSphereMap__8CGraphicFP9_GXTexObjP9_GXTexObjPvUlP9_GXTexObj(void* self, void* a, void* b, void* c, unsigned long d, void* e) {
+    (void)self; (void)a; (void)b; (void)c; (void)d; (void)e;
+}
+extern "C" void genMapSphere__8CGraphicFPvPUlUs9_GXVtxFmt(void* self, void* a, void* b, unsigned short c, int d) {
+    (void)self; (void)a; (void)b; (void)c; (void)d;
+}

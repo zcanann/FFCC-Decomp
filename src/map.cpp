@@ -300,7 +300,7 @@ void CMapMng::Create()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyOctTree()
+inline void CMapMng::DestroyOctTree()
 {
     for (int i = 0; i < m_octTreeCount; i++) {
         m_octTreeArray[i].~COctTree();
@@ -317,7 +317,7 @@ void CMapMng::DestroyOctTree()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMapHit()
+inline void CMapMng::DestroyMapHit()
 {
     for (int i = 0; i < m_mapHitCount; i++) {
         m_mapHitArray[i].~CMapHit();
@@ -334,7 +334,7 @@ void CMapMng::DestroyMapHit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMapObj()
+inline void CMapMng::DestroyMapObj()
 {
     for (int i = 0; i < m_mapObjCount; i++) {
         m_mapObjArray[i].~CMapObj();
@@ -351,7 +351,7 @@ void CMapMng::DestroyMapObj()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMapMesh()
+inline void CMapMng::DestroyMapMesh()
 {
     for (int i = 0; i < m_mapMeshCount; i++) {
         m_mapMeshArray[i].~CMapMesh();
@@ -368,7 +368,7 @@ void CMapMng::DestroyMapMesh()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyTextureSet()
+inline void CMapMng::DestroyTextureSet()
 {
     if (m_textureSet != 0) {
         delete m_textureSet;
@@ -385,7 +385,7 @@ void CMapMng::DestroyTextureSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMaterialSet()
+inline void CMapMng::DestroyMaterialSet()
 {
     if (m_materialSet != 0) {
         delete m_materialSet;
@@ -402,7 +402,7 @@ void CMapMng::DestroyMaterialSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMapTexAnimSet()
+inline void CMapMng::DestroyMapTexAnimSet()
 {
     if (m_mapTexAnimSet != 0) {
         delete m_mapTexAnimSet;
@@ -419,7 +419,7 @@ void CMapMng::DestroyMapTexAnimSet()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyAnimation()
+inline void CMapMng::DestroyAnimation()
 {
     for (int i = 0; i < m_mapAnimArray.GetSize(); i++) {
         if (m_mapAnimArray[i] != 0) {
@@ -452,7 +452,7 @@ void CMapMng::DestroyAnimation()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMapShadow()
+inline void CMapMng::DestroyMapShadow()
 {
     for (int i = 0; i < m_mapShadowArray.GetSize(); i++) {
         if (m_mapShadowArray[i] != 0) {
@@ -471,7 +471,7 @@ void CMapMng::DestroyMapShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMapLightHolder()
+inline void CMapMng::DestroyMapLightHolder()
 {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < m_mapLightHolderArrays[i].GetSize(); j++) {
@@ -533,7 +533,7 @@ void CMapMng::Destroy()
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CMapMng::MapFileRead(char* path, unsigned long& size)
+inline void* CMapMng::MapFileRead(char* path, unsigned long& size)
 {
     void* filePtr;
 
@@ -585,7 +585,7 @@ void* CMapMng::MapFileRead(char* path, unsigned long& size)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMapMng::MapCheckFileRead(char* path)
+inline int CMapMng::MapCheckFileRead(char* path)
 {
     if (m_asyncLoadState.m_mapReadMode == 1) {
         return 1;
@@ -880,7 +880,7 @@ inline void COctTree::SetOctTreeMapObj(int index)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SetBumpLightSource()
+inline void CMapMng::SetBumpLightSource()
 {
     for (int i = 0; i < m_mapObjCount; i++) {
         if (CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(m_mapObjArray[i].m_attribute)) {
@@ -924,7 +924,7 @@ void CMapMng::SetBumpLightSource()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::InitMapShadow()
+inline void CMapMng::InitMapShadow()
 {
     for (int i = 0; i < m_mapShadowArray.GetSize(); i++) {
         m_mapShadowArray[i]->Init();
@@ -1550,7 +1550,7 @@ void CMapMng::DrawMapShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
+inline void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
 {
 
     GXLightObj lightObj;
@@ -2045,7 +2045,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
+inline CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
 {
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
@@ -2072,7 +2072,7 @@ CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapAnimRun* CMapMng::GetAnimRunID(int animId)
+inline CMapAnimRun* CMapMng::GetAnimRunID(int animId)
 {
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {

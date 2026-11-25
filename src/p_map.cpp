@@ -1,4 +1,4 @@
-#include "ffcc/ptrarray_decl.h"
+#include "ffcc/ptrarray.h"
 #include "ffcc/p_map.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"

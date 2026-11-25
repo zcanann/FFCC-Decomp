@@ -44,11 +44,13 @@ T CPtrArray<T>::GetAt(unsigned long index)
     return m_items[index];
 }
 
+#ifndef FFCC_PTRARRAY_NO_OPERATOR_VC
 template <class T>
 T CPtrArray<T>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#endif
 
 template <class T>
 void CPtrArray<T>::SetAt(unsigned long index, T item)

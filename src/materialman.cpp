@@ -1,3 +1,4 @@
+#define FFCC_PTRARRAY_NO_OPERATOR_VC
 #include "ffcc/ptrarray.h"
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"

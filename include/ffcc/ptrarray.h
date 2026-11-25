@@ -47,7 +47,7 @@ T CPtrArray<T>::GetAt(unsigned long index)
 template <class T>
 T CPtrArray<T>::operator[](unsigned long index)
 {
-    return GetAt(index);
+    return m_items[index];
 }
 
 template <class T>

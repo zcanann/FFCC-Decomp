@@ -684,9 +684,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             memset(work->m_wmats, 0, work->m_maxParticles * sizeof(_PARTICLE_WMAT));
         }
 
-        work->m_tailScaleDirection.x = param->m_tailDirection.x;
-        work->m_tailScaleDirection.y = param->m_tailDirection.y;
-        work->m_tailScaleDirection.z = param->m_tailDirection.z;
+        work->m_tailScaleDirection = param->m_tailDirection;
         pppNormalize(work->m_tailScaleDirection, work->m_tailScaleDirection);
     }
 
@@ -908,10 +906,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
             countMinusOne = (float)(count - 1);
             alphaMul = (float)colorWork->m_alpha / 16384.0f;
             S4ToF32(&colorStart, work->m_colorStart);
-            colorEnd.x = work->m_colorEnd[0] >> 7;
-            colorEnd.y = work->m_colorEnd[1] >> 7;
-            colorEnd.z = work->m_colorEnd[2] >> 7;
-            colorEnd.w = work->m_colorEnd[3] >> 7;
+            S4ToF32(&colorEnd, work->m_colorEnd);
             colorStart.w *= alphaMul;
             colorEnd.w *= alphaMul;
             diffA = colorStart.w - colorEnd.w;

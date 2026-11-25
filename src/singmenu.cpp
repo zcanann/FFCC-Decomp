@@ -396,7 +396,7 @@ void CMenuPcs::SingMenuInit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingMenuEnd()
+inline void CMenuPcs::SingMenuEnd()
 {
     Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
     Graphic._WaitDrawDone("singmenu.cpp", SINGMENU_LINE(0x62B, 0x626, 0x5CC));
@@ -1061,7 +1061,7 @@ void CMenuPcs::SingleCalcFadeIn()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingleDrawFadeIn()
+inline void CMenuPcs::SingleDrawFadeIn()
 {
     SingleFadeEntry* entry;
     int i;
@@ -1152,7 +1152,7 @@ void CMenuPcs::SingleCalcFadeOut()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingleDrawFadeOut()
+inline void CMenuPcs::SingleDrawFadeOut()
 {
     SingleDrawFadeIn();
 }

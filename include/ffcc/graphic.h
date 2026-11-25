@@ -96,9 +96,9 @@ public:
 
     void InitBlurParameter();
     void RenderBlur(int, unsigned char, unsigned char, unsigned char, unsigned char, short);
-    void genMapSphere(void*, unsigned long*, unsigned short, _GXVtxFmt);
-    void drawSphereMap(_GXTexObj*, _GXTexObj*, void*, unsigned long, _GXTexObj*);
-    void DrawBlurScreen(unsigned char, float);
+    void genMapSphere(void* a, unsigned long* b, unsigned short c, _GXVtxFmt d) {}
+    void drawSphereMap(_GXTexObj* a, _GXTexObj* b, void* c, unsigned long d, _GXTexObj* e) {}
+    void DrawBlurScreen(unsigned char a, float b) {}
 
     void CreateTempBuffer();
     void DestroyTempBuffer();

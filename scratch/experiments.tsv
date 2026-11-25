@@ -1,9 +1,12 @@
-birth	static inline get_rand single-site wrapper	same
-birth	static get_rand 3-site factor birth 4304->4288 get_rand 32 vs MAP 56	same
-pppRender	Ghidra audit render missing 584B segment logic	same
-pppRender	birth systematic pattern check vs shpTail3 and RyjMegaBirth	same
-birth	get_rand all Math.RandF->get_rand birth 4304->3712 (-592) get_rand 56 exact	same
 birth	get_noise inline vs static O0 136 vs O4 extab tradeoff kept get_rand only	same
+birth	get_rand all Math.RandF->get_rand birth 4304->3712 (-592) get_rand 56 exact	same
+birth	static get_rand 3-site factor birth 4304->4288 get_rand 32 vs MAP 56	same
+birth	static inline get_rand single-site wrapper	same
+birth	Vec velocity temps remove pppScaleVectorXYZ/pNormalize direct args birth 3712->3664 (-48)	same
 calc	calc u8/u16/uint sweep unsigned int closest 880 vs 872 +8	same
-pppRender	render single float local and count int compare no O0 change	same
+pppRender	birth systematic pattern check vs shpTail3 and RyjMegaBirth	same
+pppRender	Ghidra audit render missing 584B segment logic	same
 pppRender	inline U8ToF32 2 sites direct r/g/b/a assign render 1920->2152 (+232) toward MAP 2504	same
+pppRender	render single float local and count int compare no O0 change	same
+birth	history pppCopyVector loop -> memset birth 3664->3576 (-88) but O4 99.09% regress	same
+pppRender	colorStart/End split temps render 2152->2216 (-352->-288) but O4 96.98% regress when combined with history	same

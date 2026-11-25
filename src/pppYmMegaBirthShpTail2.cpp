@@ -273,8 +273,7 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
             }
             }
 
-            Vec velocity = particleData->m_direction;
-            pppScaleVectorXYZ(particleData->m_position, velocity, scale);
+            pppScaleVectorXYZ(particleData->m_position, particleData->m_direction, scale);
         }
         break;
     }
@@ -480,8 +479,7 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
                 particleData->m_position.z = vz * pYmMegaBirthShpTail2->m_spawnScale.z;
 
                 if ((pYmMegaBirthShpTail2->m_spawnMode == 8) || (pYmMegaBirthShpTail2->m_spawnMode == 9)) {
-                    Vec velocity = particleData->m_position;
-                    pppNormalize(particleData->m_direction, velocity);
+                    pppNormalize(particleData->m_direction, particleData->m_position);
                 }
             }
         }

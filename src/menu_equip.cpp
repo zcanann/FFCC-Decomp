@@ -445,9 +445,7 @@ void CMenuPcs::EquipDraw()
 	item = m_equipList->entries;
 	for (i = 0; i < 4; i++, item++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			iconY = (int)((float)(item->y + 6) - 1.0f);
-			iconX = (int)(float)(item->x + item->w - 0x10);
-			DrawSingleIcon(caravanWork->m_inventoryItems[caravanWork->m_equipment[i]], iconX, iconY,
+			DrawSingleIcon(caravanWork->m_inventoryItems[caravanWork->m_equipment[i]], (int)(float)(item->x + item->w - 0x10), (int)((float)(item->y + 6) - 1.0f),
 			               item->alpha, 0, 1.0f);
 		}
 	}
@@ -640,9 +638,7 @@ void CMenuPcs::EquipDraw()
 			if (listIdx >= 1) {
 				entry = letter[listIdx];
 				if (entry >= 0) {
-					iconY = (int)((float)(iconItem->y + 6) - 1.0f);
-					iconX = (int)(float)(iconItem->x + iconItem->w - 0x10);
-					DrawSingleIcon(caravanWork->m_inventoryItems[entry], iconX, iconY,
+					DrawSingleIcon(caravanWork->m_inventoryItems[entry], (int)(float)(iconItem->x + iconItem->w - 0x10), (int)((float)(iconItem->y + 6) - 1.0f),
 					               item->alpha, 0, 1.0f);
 				}
 			}

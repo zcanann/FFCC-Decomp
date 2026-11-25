@@ -2644,9 +2644,8 @@ int CGCharaObj::calcCastTime(int itemId)
 		castScale = 1.0f;
 	}
 
-	SCharaItemRow* typeRows = castRows;
-	int itemType = typeRows[itemId].m_actionType;
-	int itemNo = typeRows[itemId].m_effect;
+	int itemType = castRows[itemId].m_actionType;
+	int itemNo = castRows[itemId].m_effect;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		int castBonus = m_scriptHandle->m_romWork->m_magicCastBonus;

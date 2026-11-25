@@ -908,7 +908,10 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
             countMinusOne = (float)(count - 1);
             alphaMul = (float)colorWork->m_alpha / 16384.0f;
             S4ToF32(&colorStart, work->m_colorStart);
-            S4ToF32(&colorEnd, work->m_colorEnd);
+            colorEnd.x = work->m_colorEnd[0] >> 7;
+            colorEnd.y = work->m_colorEnd[1] >> 7;
+            colorEnd.z = work->m_colorEnd[2] >> 7;
+            colorEnd.w = work->m_colorEnd[3] >> 7;
             colorStart.w *= alphaMul;
             colorEnd.w *= alphaMul;
             diffA = colorStart.w - colorEnd.w;

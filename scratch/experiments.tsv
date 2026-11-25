@@ -13,3 +13,6 @@ pppRenderYmMegaBirthShpTail3	u32 i -> u16 (O0 -688->-684, O4 99.38)	99.38935
 pppRenderYmMegaBirthShpTail3	float segLen -> double (O0 -688->-676, O4 99.53)	99.53168
 pppRenderYmMegaBirthShpTail3	float t -> double (O0 -688->-676, O4 99.77)	99.77962
 pppRenderYmMegaBirthShpTail3	float curX -> double (O0 -688->-676, O4 99.78)	99.78053
+pppRenderYmMegaBirthShpTail3	S4ToF32 one inlined (O0 -688->-540, O4 100.0)	100.0
+pppRenderYmMegaBirthShpTail3	S4ToF32 both inlined (O0 -688->-392, O4 100.0) but S4 missing (total 1772)	100.0
+pppRenderYmMegaBirthShpTail3	S4ToF32 both inlined + dummy if(0) (O0 -392, S4 kept, O4 100) - rejected as padding	100.0

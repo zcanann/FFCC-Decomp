@@ -809,7 +809,8 @@ void CGPartyObj::command()
 			ringCommand = 9;
 		} else {
 			const int itemId = caravan->GetCurCmdListItem();
-			const int itemKind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
+			SCfdItemRow* cmdRows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
+			const int itemKind = cmdRows[itemId].m_kind;
 			switch (itemKind) {
 			case 1:
 			case 0xDF:
@@ -822,7 +823,8 @@ void CGPartyObj::command()
 				break;
 			}
 		}
-		ringCommandArg = caravan->GetIdxCmdList();
+		const int ringArg = caravan->GetIdxCmdList();
+		ringCommandArg = ringArg;
 	}
 
 	if ((m_weaponNodeFlagBits.m_prg != 0) && (m_unk63CBits.m_bit80 != 0) &&
@@ -834,7 +836,9 @@ void CGPartyObj::command()
 		}
 
 		if (party.target != nullptr) {
-			switch (party.target->m_worldParamA) {
+			CGObject* targ = party.target;
+			int targetParam = targ->m_worldParamA;
+			switch (targetParam) {
 			case 0xCC:
 				secondaryAvailable = true;
 				secondaryCommand = 6;
@@ -1031,11 +1035,13 @@ void CGPartyObj::command()
 			}
 
 			const int itemId = caravan->GetCmdListItem(cmdIdx);
-			const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
+			SCfdItemRow* cmdRows2 = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
+			const unsigned short itemKind = cmdRows2[itemId].m_kind;
 			switch (itemKind) {
 			case 0x100:
 				if (itemId == 0x103) {
-					if (static_cast<unsigned int>(Math.Rand(3)) == 0) {
+					int rand3 = Math.Rand(3);
+					if (static_cast<unsigned int>(rand3) == 0) {
 						ClearAllSta();
 						setSta(0x1B, 900);
 						caravan->DelCmdListAndItem(party.unk6BC, 1);

@@ -1,0 +1,239 @@
+id	timestamp	branch	region	unit	measure	fuzzy_before	fuzzy_after	extab_before	extab_after	extabindex_before	extabindex_after	note
+0	2026-11-24T21:14:00.452174	loop/partyobj-20261124-192500	GCCP01	main/partyobj	baseline	100.0	100.0	464	464	696	696	initial baseline
+iskindof_m_classIndex	2026-11-24T21:14:59.372906	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.45007	464	440	696	660	IsKindOf variant iskindof_m_classIndex has_iskindof=False
+iskindof_GetCID_no_cast	2026-11-24T21:15:00.793272	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.752975	464	464	696	696	IsKindOf variant iskindof_GetCID_no_cast has_iskindof=True
+iskindof_GetCID_eq	2026-11-24T21:15:02.199551	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.5326	464	464	696	696	IsKindOf variant iskindof_GetCID_eq has_iskindof=True
+iskindof_decl_only	2026-11-24T21:15:03.623436	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.16935	464	456	696	684	IsKindOf variant iskindof_decl_only has_iskindof=False
+SC-empty	2026-11-24T21:19:31.484413	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.2	464	456	696	684	statCarry test:  hasSC=False hasSH=True hasSJ=True
+SC-reqAnim	2026-11-24T21:19:32.964228	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.274155	464	464	696	696	statCarry test: if (m_stateFrame == 0) { reqAnim(0x0D, 0 hasSC=True hasSH=True hasSJ=True
+SC-playSe3D	2026-11-24T21:19:34.438942	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.285866	464	464	696	696	statCarry test: if (m_stateFrame == 0) { playSe3D(0x22,  hasSC=True hasSH=True hasSJ=True
+SC-setIdle	2026-11-24T21:19:35.937305	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.02532	464	464	696	696	statCarry test: if (isLoopAnim() != 0) { setIdleMotion() hasSC=True hasSH=True hasSJ=True
+SC-changeStat	2026-11-24T21:19:37.413301	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.28491	464	464	696	696	statCarry test: if (isLoopAnim() != 0) { changeStat(0,0, hasSC=True hasSH=True hasSJ=True
+SC-extraMove	2026-11-24T21:19:38.885860	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.22846	464	456	696	684	statCarry test: m_extraMoveVec.x = 0.0f; hasSC=False hasSH=True hasSJ=True
+SC-CancelMove	2026-11-24T21:19:40.358629	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.22799	464	464	696	696	statCarry test: CancelMove(1); hasSC=True hasSH=True hasSJ=True
+SC-IsKindOf	2026-11-24T21:19:41.952849	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.2476	464	464	696	696	statCarry test: if (IsKindOf(0x6D)) {} hasSC=True hasSH=True hasSJ=True
+SC-throw	2026-11-24T21:30:44.014239	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	98.9148	98.9148	456	456	684	684	statCarry throw()
+IK-throw	2026-11-24T21:30:46.085632	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	98.9148	94.44893	456	1092	684	684	IsKindOf throw()
+IK_int	2026-11-24T21:32:40.321227	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	464	696	696	IsKindOf sig IK_int IK=True
+IK_uint	2026-11-24T21:32:41.776492	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.92575	464	464	696	696	IsKindOf sig IK_uint IK=True
+IK_ushort_ref	2026-11-24T21:32:43.182757	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.91623	464	464	696	696	IsKindOf sig IK_ushort_ref IK=True
+IK_bool	2026-11-24T21:32:44.561260	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	464	696	696	IsKindOf sig IK_bool IK=True
+IK_const	2026-11-24T21:32:45.127461	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	464	696	696	IsKindOf sig IK_const IK=True
+IK_noexcept	2026-11-24T21:32:46.494067	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	95.52556	464	1100	696	696	IsKindOf sig IK_noexcept IK=True
+IK_always_inline	2026-11-24T21:32:47.050138	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	95.52556	464	1100	696	696	IsKindOf sig IK_always_inline IK=True
+c_cast	2026-11-24T21:33:10.412813	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	464	696	696	cast variant c_cast IK=True
+no_cast_and	2026-11-24T21:33:11.785440	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.752975	464	464	696	696	cast variant no_cast_and IK=True
+m_classIndex_c_cast	2026-11-24T21:33:13.159810	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.45007	464	440	696	696	cast variant m_classIndex_c_cast IK=False
+m_classIndex_no_cast	2026-11-24T21:33:14.565994	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.28691	464	440	696	696	cast variant m_classIndex_no_cast IK=False
+GetCID_direct	2026-11-24T21:33:16.001228	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.752975	464	464	696	696	cast variant GetCID_direct IK=True
+GetCID_throw	2026-11-24T21:33:40.502121	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	464	696	696	GetCID throw() IK=True SC=True
+GetCID_ushort	2026-11-24T21:36:15.337212	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	464	696	696	GetCID ushort IK=True
+IK_hardcode	2026-11-24T21:37:36.873024	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.99924	464	464	696	696	return (static_cast<unsigned s IK=True
+IK_no_cid	2026-11-24T21:37:38.290017	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.53223	464	464	696	696	return GetCID() == 0x6D; IK=True
+IK_m_classIndex_hardcode	2026-11-24T21:37:39.649049	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.28615	464	440	696	696	return (m_classIndex & 0x6D) = IK=False
+IK_GetCID_no_cast	2026-11-24T21:37:41.017603	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.752975	464	464	696	696	return (GetCID() & cid) == cid IK=True
+IK_GetCID_c_cast	2026-11-24T21:37:42.397987	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	464	696	696	return ((unsigned short)GetCID IK=True
+IK_m_classIndex	2026-11-24T21:37:43.767157	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.28691	464	440	696	696	return (m_classIndex & cid) == IK=False
+helper_GetCID	2026-11-24T21:38:09.154293	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.28691	464	464	696	696	helper GetCID IK=True SC=True
+pragma_off	2026-11-24T21:38:27.833888	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	464	696	696	pragma off IK=True
+IK_bool	2026-11-24T21:42:47.448498	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	bool IK=True
+combo_bool_mclass_inline	2026-11-24T21:43:30.525052	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	bool+m_classIndex+inline IK=True SC=False
+bool_decl_inline	2026-11-24T21:44:38.257457	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	bool decl+inline IK=True SC=False
+int_decl_inline	2026-11-24T21:45:04.152846	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	int decl+inline IK=True SC=False
+helper_inline_mclass	2026-11-24T21:45:55.230421	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	helper inline m_classIndex {'IsKindOf': True, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_bool	2026-11-24T21:47:14.742674	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	bool IK=True
+bool_nocast_inline	2026-11-24T21:47:43.241736	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	bool nocast inline IK=True SC=False
+out_of_line_inline	2026-11-24T21:48:29.516282	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	out_of_line+inline IK=True SC=False
+macro_inline	2026-11-24T21:49:55.028958	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	464	696	696	macro inline IK=True SC=True
+IK_int_GetCID_noinline_nohelper	2026-11-24T21:52:15.615568	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	464	696	696	IK_int_GetCID inline=False helper=False has={'IsKindOf': True, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_GetCID_noinline_helper	2026-11-24T21:52:17.383031	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	464	696	696	IK_int_GetCID inline=False helper=True has={'IsKindOf': True, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_GetCID_inline_nohelper	2026-11-24T21:52:19.123306	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	440	696	696	IK_int_GetCID inline=True helper=False has={'IsKindOf': True, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_GetCID_inline_helper	2026-11-24T21:52:20.850130	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	100.0	464	440	696	696	IK_int_GetCID inline=True helper=True has={'IsKindOf': True, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_bool_GetCID_noinline_nohelper	2026-11-24T21:52:22.590052	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	464	696	696	IK_bool_GetCID inline=False helper=False has={'IsKindOf': True, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_bool_GetCID_noinline_helper	2026-11-24T21:52:24.324526	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	464	696	696	IK_bool_GetCID inline=False helper=True has={'IsKindOf': True, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_bool_GetCID_inline_nohelper	2026-11-24T21:52:26.069296	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	IK_bool_GetCID inline=True helper=False has={'IsKindOf': True, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_bool_GetCID_inline_helper	2026-11-24T21:52:27.797734	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	99.985245	464	440	696	696	IK_bool_GetCID inline=True helper=True has={'IsKindOf': True, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_mclass_noinline_nohelper	2026-11-24T21:52:29.548270	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.28691	464	440	696	696	IK_int_mclass inline=False helper=False has={'IsKindOf': False, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': False, 'enableDamageCol': False}
+IK_int_mclass_noinline_helper	2026-11-24T21:52:31.279192	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.01095	464	456	696	696	IK_int_mclass inline=False helper=True has={'IsKindOf': False, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_mclass_inline_nohelper	2026-11-24T21:52:33.009888	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.28691	464	416	696	696	IK_int_mclass inline=True helper=False has={'IsKindOf': False, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': False, 'enableDamageCol': False}
+IK_int_mclass_inline_helper	2026-11-24T21:52:34.740960	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.01095	464	432	696	696	IK_int_mclass inline=True helper=True has={'IsKindOf': False, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_bool_mclass_noinline_nohelper	2026-11-24T21:52:36.455170	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.28691	464	440	696	696	IK_bool_mclass inline=False helper=False has={'IsKindOf': False, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': False, 'enableDamageCol': False}
+IK_bool_mclass_noinline_helper	2026-11-24T21:52:38.177108	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.01095	464	456	696	696	IK_bool_mclass inline=False helper=True has={'IsKindOf': False, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_bool_mclass_inline_nohelper	2026-11-24T21:52:39.911850	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	97.28691	464	416	696	696	IK_bool_mclass inline=True helper=False has={'IsKindOf': False, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': False, 'enableDamageCol': False}
+IK_bool_mclass_inline_helper	2026-11-24T21:52:41.658540	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.01095	464	432	696	696	IK_bool_mclass inline=True helper=True has={'IsKindOf': False, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_decl_noinline_nohelper	2026-11-24T21:52:43.390388	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.16935	464	456	696	696	IK_int_decl inline=False helper=False has={'IsKindOf': False, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_decl_noinline_helper	2026-11-24T21:52:45.125377	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	456	696	696	IK_int_decl inline=False helper=True has={'IsKindOf': False, 'statCarry': True, 'statHide': True, 'statJump': True, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_decl_inline_nohelper	2026-11-24T21:52:46.899888	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.16935	464	432	696	696	IK_int_decl inline=True helper=False has={'IsKindOf': False, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_int_decl_inline_helper	2026-11-24T21:52:48.659585	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	IK_int_decl inline=True helper=True has={'IsKindOf': False, 'statCarry': False, 'statHide': False, 'statJump': False, 'CheckGameOver': True, 'enableDamageCol': True}
+IK_body_return (st	2026-11-24T21:54:03.601202	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (static_cast<unsigned short>(GetCID()) & cid) == cid; IK=False extab_match=99.30556
+IK_body_return (Ge	2026-11-24T21:54:04.496171	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (GetCID() & cid) == cid; IK=False extab_match=99.30556
+IK_body_return (m_	2026-11-24T21:54:05.396137	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (m_classIndex & cid) == cid; IK=False extab_match=99.30556
+IK_body_return Get	2026-11-24T21:54:06.292650	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return GetCID() == cid; IK=False extab_match=99.30556
+IK_body_return m_c	2026-11-24T21:54:07.189924	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return m_classIndex == cid; IK=False extab_match=99.30556
+IK_body_return (Ge	2026-11-24T21:54:08.090415	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (GetCID() & 0x6D) == 0x6D; IK=False extab_match=99.30556
+IK_body_return tru	2026-11-24T21:54:08.988119	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return true; IK=False extab_match=99.30556
+IK_body_return fal	2026-11-24T21:54:09.898707	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return false; IK=False extab_match=99.30556
+IK_body_return cid	2026-11-24T21:54:10.836252	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return cid == 0x6D; IK=False extab_match=99.30556
+cast_return (st	2026-11-24T21:55:18.776613	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (static_cast<unsigned short>(GetCID()) & cid) == cid; IK=False extab_match=99.30556
+cast_return (Ge	2026-11-24T21:55:19.671108	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (GetCID() & cid) == cid; IK=False extab_match=99.30556
+cast_return (st	2026-11-24T21:55:20.624993	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (static_cast<int>(GetCID()) & cid) == cid; IK=False extab_match=99.30556
+cast_return (st	2026-11-24T21:55:21.553127	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (static_cast<unsigned int>(GetCID()) & cid) == cid; IK=False extab_match=99.30556
+cast_return ((u	2026-11-24T21:55:22.449354	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return ((unsigned short)GetCID() & cid) == cid; IK=False extab_match=99.30556
+cast_return (Ge	2026-11-24T21:55:23.357915	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (GetCID() & static_cast<int>(cid)) == cid; IK=False extab_match=99.30556
+cast_return (m_	2026-11-24T21:55:24.253652	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (m_classIndex & cid) == cid; IK=False extab_match=99.30556
+cast_return (Ge	2026-11-24T21:55:25.157004	loop/partyobj-20261124-192500	GCCP01	main/partyobj	EH	100.0	98.32004	464	432	696	696	return (GetCID() & 0x6D) == 0x6D; IK=False extab_match=99.30556
+command_o0_dummy_0	2026-11-24T22:08:44.088458	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-556	-556	0	0	command dummy 0 o0 delta -556
+command_o0_dummy_10	2026-11-24T22:08:45.747126	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-556	-556	0	0	command dummy 10 o0 delta -556
+command_o0_dummy_50	2026-11-24T22:08:47.421424	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-556	-556	0	0	command dummy 50 o0 delta -556
+command_o0_dummy_100	2026-11-24T22:08:49.126597	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-556	-556	0	0	command dummy 100 o0 delta -556
+command_o0_dummy_140	2026-11-24T22:08:50.783521	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-556	-556	0	0	command dummy 140 o0 delta -556
+command_o0_dummy_200	2026-11-24T22:08:52.437860	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-556	-556	0	0	command dummy 200 o0 delta -556
+command_volatile_10	2026-11-24T22:10:54.900056	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	None	None	0	0	command volatile 10 o0 delta None
+command_volatile_50	2026-11-24T22:10:56.021141	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	None	None	0	0	command volatile 50 o0 delta None
+command_volatile_100	2026-11-24T22:10:57.153464	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	None	None	0	0	command volatile 100 o0 delta None
+checkTarget_CVector_dummy	2026-11-24T22:15:26.143149	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.6118	99.6118	-228	-228	0	0	checkTarget CVector dummy o0 delta -228
+checkTarget_CVector_1	2026-11-24T22:16:38.171880	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.94041	99.94041	-312	-312	0	0	checkTarget CVector 1 o0 delta -312
+checkTarget_CVector_2	2026-11-24T22:16:39.820885	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.90062	99.90062	-296	-296	0	0	checkTarget CVector 2 o0 delta -296
+checkTarget_CVector_3	2026-11-24T22:16:41.487669	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.86254	99.86254	-280	-280	0	0	checkTarget CVector 3 o0 delta -280
+checkTarget_CVector_5	2026-11-24T22:16:43.151272	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.786385	99.786385	-248	-248	0	0	checkTarget CVector 5 o0 delta -248
+checkTarget_CVector_10	2026-11-24T22:16:44.846751	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.596	99.596	-168	-168	0	0	checkTarget CVector 10 o0 delta -168
+gpmMove_CVector_1	2026-11-24T22:17:27.284814	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.94089	99.94089	-172	-172	0	0	gpmMove CVector 1 o0 delta -172
+gpmMove_CVector_2	2026-11-24T22:17:28.989358	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.90281	99.90281	-156	-156	0	0	gpmMove CVector 2 o0 delta -156
+gpmMove_CVector_3	2026-11-24T22:17:30.651856	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.86473	99.86473	-140	-140	0	0	gpmMove CVector 3 o0 delta -140
+gpmMove_CVector_5	2026-11-24T22:17:32.399312	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.788574	99.788574	-100	-100	0	0	gpmMove CVector 5 o0 delta -100
+gpmMove_if_false_1	2026-11-24T22:17:54.910518	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-188	-188	0	0	gpmMove if(false) CVector 1 o0 delta -188
+gpmMove_if_false_5	2026-11-24T22:17:56.590293	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-188	-188	0	0	gpmMove if(false) CVector 5 o0 delta -188
+gpmMove_if_false_10	2026-11-24T22:17:58.253321	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	-188	-188	0	0	gpmMove if(false) CVector 10 o0 delta -188
+onFrameStat_no_CVector	2026-11-24T22:18:28.554550	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	452	452	0	0	onFrameStat without CVector diff o0 delta 452
+onFrameStat_no_gbaParty	2026-11-24T22:18:58.569838	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	98.890526	98.890526	84	84	0	0	onFrameStat without gbaParty o0 delta 84
+SetBonus_radarBonus	2026-11-24T22:22:03.551735	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.98239	99.98239	-228	-228	0	0	SetBonus radarBonus o0 delta -228
+SetBonus_dead	2026-11-24T22:23:03.292940	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93375	99.93375	-204	-204	0	0	SetBonus dead o0 delta -204
+SetBonus_full_dead	2026-11-24T22:23:28.080868	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.8277	99.8277	-212	-212	0	0	SetBonus full dead o0 delta -212
+command_if_chain	2026-11-24T22:29:59.111826	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	-580	-580	0	0	command if-chain o0 delta -580
+changeWeapon_CVector_1	2026-11-24T22:31:30.755601	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.685196	99.685196	-24	-24	0	0	changeWeapon CVector 1 o0 delta -24
+changeWeapon_CVector_2	2026-11-24T22:31:32.581909	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.45673	99.45673	-8	-8	0	0	changeWeapon CVector 2 o0 delta -8
+changeWeapon_CVector_3	2026-11-24T22:31:34.415492	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.22827	99.22827	8	8	0	0	changeWeapon CVector 3 o0 delta 8
+changeWeapon_CVector_5	2026-11-24T22:31:36.264999	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	98.77135	98.77135	40	40	0	0	changeWeapon CVector 5 o0 delta 40
+changeWeapon_CVector_10	2026-11-24T22:31:38.121287	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	97.629036	97.629036	120	120	0	0	changeWeapon CVector 10 o0 delta 120
+changeWeapon_int_dummy_1	2026-11-24T22:32:29.981943	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	97.95631	97.95631	4	4	0	0	changeWeapon int dummy 1 o0 delta 4
+changeWeapon_int_dummy_2	2026-11-24T22:32:31.647305	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	97.95631	97.95631	4	4	0	0	changeWeapon int dummy 2 o0 delta 4
+changeWeapon_int_dummy_4	2026-11-24T22:32:33.316442	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	97.95631	97.95631	4	4	0	0	changeWeapon int dummy 4 o0 delta 4
+changeWeapon_int_dummy_8	2026-11-24T22:32:34.992908	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	97.95631	97.95631	4	4	0	0	changeWeapon int dummy 8 o0 delta 4
+bonus_CVector_1	2026-11-24T22:33:42.689009	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	97.95631	97.95631	None	None	0	0	bonus CVector 1 o0 delta None
+bonus_CVector_2	2026-11-24T22:33:43.797475	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	97.95631	97.95631	None	None	0	0	bonus CVector 2 o0 delta None
+bonus_CVector_3	2026-11-24T22:33:44.897554	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	97.95631	97.95631	None	None	0	0	bonus CVector 3 o0 delta None
+SetBonus_chosen5	2026-11-24T22:34:56.071894	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.99943	99.99943	-244	-244	0	0	SetBonus chosenBonus[5] o0 delta -244
+carry_anim_local	2026-11-24T22:40:42	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -16 (size 964) o4_same=True
+carry_ghost_cmp	2026-11-24T22:40:43	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -40 (size 940) o4_same=False
+carry_item_local	2026-11-24T22:40:43	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_switch	2026-11-24T22:40:44	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -40 (size 940) o4_same=True
+carry_early_return	2026-11-24T22:40:45	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -44 (size 936) o4_same=False
+carry_anim2_local	2026-11-24T22:41:28	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim2_local_item	2026-11-24T22:41:28	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim2_local_item_all	2026-11-24T22:41:28	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim2_local_item_all_head	2026-11-24T22:41:29	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim_ushort	2026-11-24T22:41:29	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim_decl_top	2026-11-24T22:41:29	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim_if_chain	2026-11-24T22:41:30	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim2_local	2026-11-24T22:41:36	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim2_local_item	2026-11-24T22:41:36	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim2_local_item_all	2026-11-24T22:41:36	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim2_local_item_all_head	2026-11-24T22:41:37	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim_ushort	2026-11-24T22:41:37	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim_decl_top	2026-11-24T22:41:37	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim_if_chain	2026-11-24T22:41:38	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	compile failed
+carry_anim2_local	2026-11-24T22:41:45	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -16 (size 964) o4_same=True
+carry_anim2_local_item	2026-11-24T22:41:46	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +0 (size 980) o4_same=False
+carry_anim2_local_item_all	2026-11-24T22:41:47	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +12 (size 992) o4_same=False
+carry_anim2_local_item_all_head	2026-11-24T22:41:48	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +12 (size 992) o4_same=False
+carry_anim_ushort	2026-11-24T22:41:49	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -16 (size 964) o4_same=False
+carry_anim_decl_top	2026-11-24T22:41:50	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -20 (size 960) o4_same=True
+carry_anim_if_chain	2026-11-24T22:41:51	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -288 (size 692) o4_same=False
+carry_was_carrying	2026-11-24T22:42:58	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +4 (size 984) o4_same=True
+carry_next_stat	2026-11-24T22:42:59	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -12 (size 968) o4_same=True
+carry_force_item_local	2026-11-24T22:43:00	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -12 (size 968) o4_same=True
+carry_prg_local	2026-11-24T22:43:01	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -12 (size 968) o4_same=True
+carry_stat_local	2026-11-24T22:43:02	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -16 (size 964) o4_same=True
+carry_obj_local	2026-11-24T22:43:03	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -16 (size 964) o4_same=True
+carry_anim_nonconst	2026-11-24T22:43:03	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -16 (size 964) o4_same=True
+carry_idle_local	2026-11-24T22:43:04	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -12 (size 968) o4_same=True
+carry_ghost_bool	2026-11-24T22:43:48	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -8 (size 972) o4_same=False
+carry_ghost_bool_was_bconst	2026-11-24T22:43:49	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +16 (size 996) o4_same=False
+carry_anim_was_bconst	2026-11-24T22:43:50	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +4 (size 984) o4_same=True
+carry_anim_was_bplain	2026-11-24T22:43:51	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +4 (size 984) o4_same=True
+carry_anim_was_iconst	2026-11-24T22:43:51	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +4 (size 984) o4_same=True
+carry_anim_was_iplain	2026-11-24T22:43:52	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +4 (size 984) o4_same=True
+bonus_o0_baseline	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	-20	0	0	baseline o0 delta -20 (MAP 1616 -> ours 1596)
+bonus_o0_A1_slot_member	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	-16	0	0	bonusSlot via SAFE_CAST->m_bonusCondition o0 delta -16 (alone: insufficient)
+bonus_o0_A2_curAdd_reread	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	-8	0	0	re-read m_artifactRelated[3] instead of top local: o0 delta -8, rejected (duplicate read, implausible source)
+bonus_o0_A3_curSub_reread	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	-8	0	0	re-read m_artifactRelated[4] instead of top local: o0 delta -8, rejected (duplicate read, implausible source)
+bonus_o0_A4_item_flatrow2	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	-4	0	0	SItemFlatRow named rows local at both item reads: o0 delta -4 (alone: insufficient)
+bonus_o0_A6_slot_flatrow	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	0	0	0	m_bonusCondition + SItemFlatRow rows: o0 delta 0
+bonus_o0_B3_item_cfd2	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	-4	0	0	SCfdItemRow named rows local at both item reads: o0 delta -4 (alone: insufficient)
+bonus_o0_B4_slot_only	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	-16	0	0	m_bonusCondition alone: o0 delta -16
+bonus_o0_B1_slot_cfdrow_CHOSEN	2026-11-24T22:43:55.642463	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	-20	0	0	0	CHOSEN: m_bonusCondition + SCfdItemRow rows[value].m_kind at both item reads; o0 delta 0, O4 .text/extab/extabindex/.data byte-identical to HEAD
+carry_anim_holding	2026-11-24T22:44:33	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +4 (size 984) o4_same=False
+carry_ifelse_anim	2026-11-24T22:44:34	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -280 (size 700) o4_same=False
+carry_ifelse_anim_holding	2026-11-24T22:44:35	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -260 (size 720) o4_same=False
+carry_anim_holding_was	2026-11-24T22:44:36	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +28 (size 1008) o4_same=False
+carry_anim_top_uninit	2026-11-24T22:45:35	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -24 (size 956) o4_same=True
+carry_anim_prevstat	2026-11-24T22:45:36	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -16 (size 964) o4_same=True
+carry_anim_forceitem	2026-11-24T22:45:37	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta -12 (size 968) o4_same=True
+carry_anim_top_was	2026-11-24T22:45:38	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.93194	99.93194	None	None	0	0	carry o0 delta +8 (size 988) o4_same=False
+carry_o0_CHOSEN	2026-11-24T22:49:52	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	None	None	0	0	CHOSEN: named const int anim for PARTY_CARRY_ANIM in both non-force branches + const bool wasCarrying for the m_lastStateId test; o0 delta -40 -> +4 (940 -> 984), whole partyobj.o .text byte-identical at -O4 (carry 1620 B / 100%, unit 100%)
+baseline	2026-11-24T22:54:39	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+arr5	2026-11-24T22:54:40	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=False
+dedup_index	2026-11-24T22:54:41	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+dedup_for	2026-11-24T22:54:42	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+dedup_found	2026-11-24T22:54:43	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -220 (size 536) o4=1280 o4_same=False
+arr5_dedup_index	2026-11-24T22:54:44	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=False
+arr5_dedup_found	2026-11-24T22:54:45	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -220 (size 536) o4=1280 o4_same=False
+rand_radar_inline	2026-11-24T22:54:46	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -224 (size 532) o4=1160 o4_same=True
+rand_radar_if	2026-11-24T22:54:47	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -232 (size 524) o4=1170 o4_same=False
+gpm_retail_speed	2026-11-24T22:58:51	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2304 delta -228 o4_same=False
+gpm_follow_named	2026-11-24T22:58:52	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2360 delta -172 o4_same=True
+gpm_vec_carrydir	2026-11-24T22:58:53	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2368 delta -164 o4_same=False
+gpm_pressure_named	2026-11-24T22:58:54	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2352 delta -180 o4_same=True
+gpm_movedir_named	2026-11-24T22:58:55	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2344 delta -188 o4_same=True
+gpm_identity	2026-11-24T23:04:44	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2344 delta -188 o4_same=True
+gpm_pressure_direct	2026-11-24T23:04:45	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2368 delta -164 o4_same=False
+gpm_speed_stores	2026-11-24T23:04:46	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2320 delta -212 o4_same=False
+gpm_base_speed_named	2026-11-24T23:04:46	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2360 delta -172 o4_same=True
+gpm_magic_range	2026-11-24T23:04:47	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2368 delta -164 o4_same=True
+gpm_carry_local	2026-11-24T23:04:48	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2340 delta -192 o4_same=False
+gpm_leader_state	2026-11-24T23:04:49	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2340 delta -192 o4_same=False
+gpm_body_radius	2026-11-24T23:04:50	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2348 delta -184 o4_same=False
+A2_expand_party	2026-11-24T23:07:16	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -172 (size 584) o4=1284 o4_same=False
+A3_expand_count	2026-11-24T23:07:17	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -236 (size 520) o4=1280 o4_same=False
+arr5	2026-11-24T23:08:54	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=False
+dedup_dowhile	2026-11-24T23:08:55	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+switch_dead_slot_lt0	2026-11-24T23:08:56	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -232 (size 524) o4=1280 o4_same=False
+switch_ifchain	2026-11-24T23:08:57	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -252 (size 504) o4=1152 o4_same=False
+switch_dead_if0	2026-11-24T23:08:58	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+radar_inline	2026-11-24T23:08:59	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -224 (size 532) o4=1160 o4_same=True
+radar_inline_plus_arr5	2026-11-24T23:09:00	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -224 (size 532) o4=1160 o4_same=False
+count_decl_init	2026-11-24T23:09:01	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+chosen_inc_split	2026-11-24T23:09:01	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -248 (size 508) o4=1156 o4_same=False
+slot_decl_top	2026-11-24T23:09:02	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+rand_ulong	2026-11-24T23:09:03	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+radar_inline_rand_ulong	2026-11-24T23:09:04	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -224 (size 532) o4=1160 o4_same=True
+printf_errorlevel_local	2026-11-24T23:09:05	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -240 (size 516) o4=1160 o4_same=False
+gpm_limit_voidinit	2026-11-24T23:09:20	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2296 delta -236 o4_same=False
+gpm_speed_scale_voidinit	2026-11-24T23:09:21	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2340 delta -192 o4_same=False
+gpm_mood_timer_if	2026-11-24T23:09:22	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2336 delta -196 o4_same=False
+gpm_carryspeed_named	2026-11-24T23:09:23	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2352 delta -180 o4_same=True
+A1_expand_artifact	2026-11-24T23:09:37	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -208 (size 548) o4=1288 o4_same=False
+A4_expand_art_party	2026-11-24T23:09:38	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -136 (size 620) o4=1316 o4_same=False
+A5_expand_all	2026-11-24T23:09:39	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -128 (size 628) o4=1334 o4_same=False
+radar_inline	2026-11-24T23:10:04	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -224 (size 532) o4=1160 o4_same=True
+work_local	2026-11-24T23:10:15	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	compile failed
+gpm_combo_o4safe	2026-11-24T23:10:15	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100.0	100.0	2532	None	0	0	gpmMove o0 size 2388 delta -144 o4_same=True
+nullptr_wrapper	2026-11-24T23:10:16	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -244 (size 512) o4=1160 o4_same=True
+work_local	2026-11-24T23:10:53	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	setbonus o0 delta -240 (size 516) o4=1170 o4_same=False
+command_scfd_1	2026-11-24T23:24:01.973992	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	command SCfdItemRow 1/5: o0 -556->-548 (+8) O4 100/69.318 same, plausible
+command_scfd_2	2026-11-24T23:24:19.239226	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	command SCfdItemRow 2/5: o0 -548->-540 (+8 total +16) O4 same
+command_ringArg_named	2026-11-24T23:28:40.045299	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	command ringArg named: o0 -540->-536 (+4 total +20) O4 same
+command_rand3_named	2026-11-24T23:31:59.320279	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	command rand3 named: o0 -536->-528 (+8 total +28) O4 same
+command_targetParam_named	2026-11-24T23:33:57.475846	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	command targetParam named: o0 -528->-516 (+12 total +40) O4 same
+command_targ_ptr_named	2026-11-24T23:34:40.455226	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	command targ ptr named: o0 -516->-508 (+8 total +48) O4 same, plausible but gap huge
+ctp_leaderCenter_named	2026-11-24T23:39:04.522856	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.997	99.997	None	None	0	0	ctp leaderCenter named: o0 -328->-332 (-4) O4 99.997, not O4-safe, revert

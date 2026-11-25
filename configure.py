@@ -1372,11 +1372,6 @@ PAL_GAME_COMPILER = "GC/2.5ffcc"
 _compilers_dir = Path(config.compilers_path) if config.compilers_path else config.build_dir / "compilers"
 config.custom_build_rules = [
     {
-        "name": "fix_graphic_eh",
-        "command": "$python tools/fix_graphic_eh.py $in $obj $out",
-        "description": "FIX $out",
-    },
-    {
         "name": "patch_compiler",
         "command": "$python tools/patch_compiler.py $out",
         "description": "PATCH $out",
@@ -1426,14 +1421,6 @@ config.custom_build_rules = [
     },
 ]
 config.custom_build_steps = {
-    "post-compile": [
-        {
-            "inputs": [Path(f"build/{config.version}/src/graphic.o")],
-            "outputs": [Path(f"build/{config.version}/src/graphic.o.fixed")],
-            "rule": "fix_graphic_eh",
-            "variables": {"obj": f"build/{config.version}/obj/graphic.o"},
-        },
-    ],
     "pre-compile": [
         {
             "outputs": [_compilers_dir / "GC/2.0p1a" / "mwcceppc.exe"],

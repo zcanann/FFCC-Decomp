@@ -45,8 +45,7 @@ void CMapAnimRun::Calc(long frame)
     }
 
 runFrame:
-    CPtrArray<CMapAnim*>* mapAnimArray = &g_MapMng.m_mapAnimArray;
-    CMapAnim* mapAnim = (*mapAnimArray)[m_mapAnimIndex];
+    CMapAnim* mapAnim = g_MapMng.m_mapAnimArray[m_mapAnimIndex];
     mapAnim->Calc(m_currentFrame);
     if (++m_currentFrame > m_endFrame) {
         if (m_loop != 0) {

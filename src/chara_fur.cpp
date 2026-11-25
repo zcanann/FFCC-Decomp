@@ -843,9 +843,11 @@ int CChara::CModel::PickFur(
 					int vertexIndex = 0;
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
 						while (count--) {
-							register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
 							register const S16Vec2d* uvPtr = mesh->m_data->m_uvs;
-							register int uvOff = indices[3] * sizeof(*uvPtr);
+							register int posOff = indices[0] * sizeof(S16Vec);
+							register const S16Vec* positions = mesh->m_workPositions;
+							register const S16Vec* posPtr;
+							register int uvOff = indices[3] * sizeof(S16Vec2d);
 							Vec localPos;
 							Vec2d curUV;
 							register Vec* localPosPtr = &localPos;
@@ -854,6 +856,7 @@ int CChara::CModel::PickFur(
 							register float uvST;
 							register float posZ;
 							asm {
+								add posPtr, positions, posOff
 								psq_l posXY, 0(posPtr), 0, 5
 								psq_lx uvST, uvPtr, uvOff, 0, 7
 								psq_l posZ, 4(posPtr), 1, 5

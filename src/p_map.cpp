@@ -116,7 +116,7 @@ inline CRelProfile::~CRelProfile()
  * JP Address: TODO
  * JP Size: TODO
  */
-static void mapInitDrawEnv()
+static inline void mapInitDrawEnv()
 {
     GXSetColorUpdate(GX_TRUE);
     GXSetAlphaUpdate(GX_FALSE);

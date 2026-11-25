@@ -1436,23 +1436,23 @@ void CMenuPcs::DrawOptionMenu()
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
 		rightXi = static_cast<int>(w / 2.0f + row.rightIcon.x - 472.0f);
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
-		unsigned int sideHeight = sideTexture->GetHeight();
-		unsigned int sideWidth = sideTexture->GetWidth();
-
+		float sideW = static_cast<float>(sideTexture->GetWidth());
+		h = static_cast<float>(sideTexture->GetHeight());
 		uv0.x = 0.0f;
 		uv0.y = 0.0f;
-		w = static_cast<float>(sideWidth) / 2.0f;
-		h = static_cast<float>(sideHeight);
+		w = sideW / 2.0f;
 		uv1.x = 0.5f;
 		uv1.y = 1.0f;
-		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
+		leftXi = static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x);
+		Util.RenderTextureQuad(static_cast<float>(leftXi),
 		                        row.leftIcon.y, w, h, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 		uv0.x = 0.5f;
 		uv0.y = 0.0f;
 		uv1.x = 1.0f;
 		uv1.y = 1.0f;
-		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
+		rightXi = static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x));
+		Util.RenderTextureQuad(static_cast<float>(rightXi),
 		                        row.rightIcon.y, w, h, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1536,23 +1536,23 @@ void CMenuPcs::DrawOptionMenu()
 		leftXi = static_cast<int>(472.0f - row.leftIcon.x);
 		rightXi = static_cast<int>(w / 2.0f + row.rightIcon.x - 472.0f);
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
-		unsigned int sideHeight = sideTexture->GetHeight();
-		unsigned int sideWidth = sideTexture->GetWidth();
-
+		float sideW = static_cast<float>(sideTexture->GetWidth());
+		h = static_cast<float>(sideTexture->GetHeight());
 		uv0.x = 0.0f;
 		uv0.y = 0.0f;
-		w = static_cast<float>(sideWidth) / 2.0f;
-		h = static_cast<float>(sideHeight);
+		w = sideW / 2.0f;
 		uv1.x = 0.5f;
 		uv1.y = 1.0f;
-		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
+		leftXi = static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x);
+		Util.RenderTextureQuad(static_cast<float>(leftXi),
 		                        row.leftIcon.y, w, h, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 		uv0.x = 0.5f;
 		uv0.y = 0.0f;
 		uv1.x = 1.0f;
 		uv1.y = 1.0f;
-		Util.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
+		rightXi = static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x));
+		Util.RenderTextureQuad(static_cast<float>(rightXi),
 		                        row.rightIcon.y, w, h, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 

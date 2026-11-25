@@ -895,7 +895,7 @@ void CMenuPcs::loadData()
 
 	for (unsigned int i = 0;
 	     i < static_cast<unsigned int>(m_wmOptionTextureSet->m_textureArray.GetSize()); i++) {
-		m_wmOptionTextures[i] = m_wmOptionTextureSet->m_textureArray.GetAt(i);
+		m_wmOptionTextures[i] = m_wmOptionTextureSet->GetTexture(i);
 	}
 
 	GetOptionData();

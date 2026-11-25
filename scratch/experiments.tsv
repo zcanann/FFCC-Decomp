@@ -1,0 +1,10 @@
+birth	remove r0..r4 top-level locals to block scope	same
+pppFrameYmMegaBirthShpTail3	Vec tmp for tailScaleDirection normalize (O0 -40 -> -16, O4 100.0 -> 99.57)	99.5716
+pppFrameYmMegaBirthShpTail3	try three-float temps for normalize (O0 -40 -> +32)	99.57
+birth	try moving r0..r4 into case blocks (build failed, undefined r0)	same
+calc	try u32->int loop counter for calc_particle	same
+calc	unsigned int fadeTime -> int (O0 796->796 delta 0 but O4 99.67)	99.6786
+calc	unsigned short fadeTime2 + unsigned int fadeInFrames (O0 792->796 delta 0, O4 100.0)	100.0
+calc_particle	worldMat !=0 -> !=nullptr (O0 292->296 delta 0, O4 100.0)	100.0
+calc_particle	swap emitInterval order (O0 -4, O4 99.99)	99.992
+pppFrameYmMegaBirthShpTail3	tmp Vec for tailScale O0 -40->-16 O4 99.57	99.5716

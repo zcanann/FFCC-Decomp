@@ -9,3 +9,7 @@ calc_particle	worldMat !=0 -> !=nullptr (O0 292->296 delta 0, O4 100.0)	100.0
 calc_particle	swap emitInterval order (O0 -4, O4 99.99)	99.992
 pppFrameYmMegaBirthShpTail3	tmp Vec for tailScale O0 -40->-16 O4 99.57	99.5716
 pppFrameYmMegaBirthShpTail3	component-wise assign tailScaleDirection (O0 -40->-28, O4 100.0)	100.0
+pppRenderYmMegaBirthShpTail3	u32 i -> u16 (O0 -688->-684, O4 99.38)	99.38935
+pppRenderYmMegaBirthShpTail3	float segLen -> double (O0 -688->-676, O4 99.53)	99.53168
+pppRenderYmMegaBirthShpTail3	float t -> double (O0 -688->-676, O4 99.77)	99.77962
+pppRenderYmMegaBirthShpTail3	float curX -> double (O0 -688->-676, O4 99.78)	99.78053

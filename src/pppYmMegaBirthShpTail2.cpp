@@ -879,8 +879,14 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
             lastIndex = particle->m_historyCount - 1;
             countMinusOne = (float)(count - 1);
             alphaMul = (float)colorWork->m_alpha / 16384.0f;
-            U8ToF32(&colorStart, (u8*)&step->m_colorStart);
-            U8ToF32(&colorEnd, (u8*)&step->m_colorEnd);
+            colorStart.x = step->m_colorStart.r;
+            colorStart.y = step->m_colorStart.g;
+            colorStart.z = step->m_colorStart.b;
+            colorStart.w = step->m_colorStart.a;
+            colorEnd.x = step->m_colorEnd.r;
+            colorEnd.y = step->m_colorEnd.g;
+            colorEnd.z = step->m_colorEnd.b;
+            colorEnd.w = step->m_colorEnd.a;
             colorStart.w *= alphaMul;
             colorEnd.w *= alphaMul;
             diffA = colorStart.w - colorEnd.w;

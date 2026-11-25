@@ -6,3 +6,4 @@ birth	get_rand all Math.RandF->get_rand birth 4304->3712 (-592) get_rand 56 exac
 birth	get_noise inline vs static O0 136 vs O4 extab tradeoff kept get_rand only	same
 calc	calc u8/u16/uint sweep unsigned int closest 880 vs 872 +8	same
 pppRender	render single float local and count int compare no O0 change	same
+pppRender	inline U8ToF32 2 sites direct r/g/b/a assign render 1920->2152 (+232) toward MAP 2504	same

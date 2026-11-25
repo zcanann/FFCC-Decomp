@@ -1,3 +1,4 @@
+#define FFCC_MAPKEYFRAME_NO_DESTRUCTOR
 #include "ffcc/mapobj.h"
 
 #include "ffcc/ptrarray.h"
@@ -84,6 +85,9 @@ inline CMapObjAtrMime::~CMapObjAtrMime()
         delete m_vertexLists;
         m_vertexLists = 0;
     }
+    if (&m_keyFrame != 0) {
+        m_keyFrame.Destroy();
+    }
 }
 
 /*
@@ -97,6 +101,12 @@ inline CMapObjAtrMime::~CMapObjAtrMime()
  */
 inline CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
 {
+    if (&m_altColorKeyFrame != 0) {
+        m_altColorKeyFrame.Destroy();
+    }
+    if (&m_colorKeyFrame != 0) {
+        m_colorKeyFrame.Destroy();
+    }
 }
 
 /*
@@ -110,6 +120,12 @@ inline CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
  */
 inline CMapObjAtrPointLight::~CMapObjAtrPointLight()
 {
+    if (&m_altColorKeyFrame != 0) {
+        m_altColorKeyFrame.Destroy();
+    }
+    if (&m_colorKeyFrame != 0) {
+        m_colorKeyFrame.Destroy();
+    }
 }
 
 /*

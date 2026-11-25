@@ -2208,7 +2208,8 @@ void CGPartyObj::onStatMagic()
 			if (m_itemId == 0x103) {
 				m_comboCenter = m_worldPosition;
 				m_comboTarget = m_comboCenter;
-				switch (Math.Rand(4)) {
+				int rand4 = Math.Rand(4);
+				switch (rand4) {
 				case 0:
 					m_itemId = 0x230;
 					break;

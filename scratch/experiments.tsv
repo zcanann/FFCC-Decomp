@@ -239,3 +239,5 @@ command_targ_ptr_named	2026-11-24T23:34:40.455226	loop/partyobj-20261124-192500	
 ctp_leaderCenter_named	2026-11-24T23:39:04.522856	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.997	99.997	None	None	0	0	ctp leaderCenter named: o0 -328->-332 (-4) O4 99.997, not O4-safe, revert
 gpmMove_baseSpeed_pushScale_named	2026-11-24T23:40:58.531083	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	gpmMove baseSpeed+pushScale named: o0 -188->-164 (+24) O4 same, plausible
 setbonus_bonusCond_named	2026-11-24T23:42:10.685464	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	SetBonusCondition bonusCond named: o0 -244->-240 (+4) O4 same
+onStatMagic_rand4_named	2026-11-24T23:45:55.395703	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	100	100	None	None	0	0	onStatMagic rand4 named: o0 -132->-128 (+4) O4 same
+ghostPartyMog_exceeded_inline	2026-11-24T23:47:41.031839	loop/partyobj-20261124-192500	GCCP01	main/partyobj	o0	99.952	99.952	None	None	0	0	ghostPartyMog exceeded inline: o0 +68->+48 (-20) O4 99.952/38.864, not O4-safe, revert

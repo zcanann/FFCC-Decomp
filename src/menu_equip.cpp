@@ -434,7 +434,7 @@ void CMenuPcs::EquipDraw()
 			colors[0].r = 0xff;
 			colors[0].g = 0xff;
 			colors[0].b = 0xff;
-			colors[0].a = (u8)(int)(255.0f * item->alpha);
+			colors[0].a = (u8)(255 * item->alpha);
 			GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 			scale = item->scale;
@@ -569,7 +569,7 @@ void CMenuPcs::EquipDraw()
 					colors[0].r = 0xff;
 					colors[0].g = 0xff;
 					colors[0].b = 0xff;
-					colors[0].a = (u8)(int)(255.0f * alpha);
+					colors[0].a = (u8)(255 * alpha);
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 					scale = item->scale;
 					MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, 0.0f);

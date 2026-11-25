@@ -1,7 +1,6 @@
 #ifndef _FFCC_ASTAR_H_
 #define _FFCC_ASTAR_H_
 
-#include "ffcc/map.h"
 #include "ffcc/maphit.h"
 
 #include <dolphin/mtx.h>

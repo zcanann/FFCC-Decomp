@@ -875,7 +875,8 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
             shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) +
                                                      shapeAnim->m_frames[particle->m_drawFrame].m_shapeOffset);
             lastIndex = particle->m_historyCount - 1;
-            countMinusOne = (float)(count - 1);
+            int _c = count - 1;
+            countMinusOne = (float)_c;
             alphaMul = (float)colorWork->m_alpha / 16384.0f;
             colorStart.x = step->m_colorStart.r;
             colorStart.y = step->m_colorStart.g;

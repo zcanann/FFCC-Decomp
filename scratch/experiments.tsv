@@ -10,3 +10,11 @@ pppRender	inline U8ToF32 2 sites direct r/g/b/a assign render 1920->2152 (+232) 
 pppRender	render single float local and count int compare no O0 change	same
 birth	history pppCopyVector loop -> memset birth 3664->3576 (-88) but O4 99.09% regress	same
 pppRender	colorStart/End split temps render 2152->2216 (-352->-288) but O4 96.98% regress when combined with history	same
+birth	spread int temp try - compile fail O4 regress	same
+birth	angles cast order no delta	same
+birth	angles s32 vs int no delta	same
+birth	birth scale direct Vec temp +24 regress	same
+pppRender	countMinusOne split int _c count-1 countMinusOne (float)_c render 2152->2160 (+8) O4 ok	same
+pppRender	alphaMul split no delta	same
+pppRender	scaleStep split no delta	same
+pppRender	startIndex split no delta	same

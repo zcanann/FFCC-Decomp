@@ -18,3 +18,5 @@ pppRender	countMinusOne split int _c count-1 countMinusOne (float)_c render 2152
 pppRender	alphaMul split no delta	same
 pppRender	scaleStep split no delta	same
 pppRender	startIndex split no delta	same
+pppRender	countMinusOne split int _c count-1 (float)_c render 2152->2160 (+8) O4 ok dup	same
+birth	birth remaining +404 and render -344 sweep candidates no further O4-safe gain	same

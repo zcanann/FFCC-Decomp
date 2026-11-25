@@ -455,6 +455,9 @@ void CFile::ReadASync(CFile::CHandle* fileHandle)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCJGC
+inline
+#endif
 void CFile::Write(CFile::CHandle* fileHandle, void* buffer, unsigned long size)
 {
 	if (2 <= (unsigned int)System.m_execParam)
@@ -472,6 +475,9 @@ void CFile::Write(CFile::CHandle* fileHandle, void* buffer, unsigned long size)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCJGC
+inline
+#endif
 void CFile::Write(char* path, void* buffer, unsigned long size)
 {
 	if (2 <= (unsigned int)System.m_execParam)

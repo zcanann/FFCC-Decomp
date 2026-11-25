@@ -2357,9 +2357,13 @@ void CMapMng::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wr
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::ShowMapObj(int, int)
+void CMapMng::ShowMapObj(int index, int show)
 {
-	// TODO
+    if (show != 0) {
+        m_mapObjArray[index].m_showFlags |= 1;
+    } else {
+        m_mapObjArray[index].m_showFlags &= 0xFE;
+    }
 }
 
 /*
@@ -2386,9 +2390,13 @@ void CMapMng::ShowMapObjID(int id, int show)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::ShowMapObjChild(int, int)
+void CMapMng::ShowMapObjChild(int index, int show)
 {
-	// TODO
+    if (show != 0) {
+        m_mapObjArray[index].m_showFlags |= 1;
+    } else {
+        m_mapObjArray[index].m_showFlags &= 0xFE;
+    }
 }
 
 /*

@@ -590,9 +590,9 @@ static void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpT
         }
     }
 
-    unsigned int fadeTime2 = particleData->m_fadeOutFrames;
+    unsigned short fadeTime2 = (unsigned short)particleData->m_fadeOutFrames;
     if (fadeTime2 != 0 && particleData->m_life <= static_cast<int>(fadeTime2)) {
-        unsigned char fadeInFrames = pYmMegaBirthShpTail3->m_fadeOutFrames;
+        unsigned int fadeInFrames = pYmMegaBirthShpTail3->m_fadeOutFrames;
         particleData->m_alphaFade = particleData->m_alphaFade +
             (float)alpha / (float)fadeInFrames;
         if (particleData->m_alphaFade > 127.0f) {
@@ -634,7 +634,7 @@ static inline void calc_particle(_pppPObject* pObject, VYmMegaBirthShpTail3* wor
                 }
             }
 
-            if (worldMat != 0) {
+            if (worldMat != nullptr) {
                 worldMat = worldMat + 1;
             }
             if (particleColor != 0) {

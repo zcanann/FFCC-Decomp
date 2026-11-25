@@ -71,7 +71,6 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
     KeShpTail3XWork* work;
     int* offsets;
     int i;
-    float zero;
 
     offsets = ctrlTable->m_serializedDataOffsets;
     work = reinterpret_cast<KeShpTail3XWork*>(obj->m_object.m_workArea + offsets[0]);
@@ -87,14 +86,11 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
     memset(&work->m_values[16], 0, 8);
     memset(&work->m_values[20], 0, 8);
 
-    zero = 0.0f;
-    i = 0;
-    do {
+    for (i = 0; i < 0x1c; i++) {
         s32 rnd = rand();
         work->m_angles[i] = (s16)(rnd - (rnd / 0x168) * 0x168);
-        work->m_posHistory[i].x = work->m_posHistory[i].y = work->m_posHistory[i].z = zero;
-        i++;
-    } while (i < 0x1c);
+        work->m_posHistory[i].x = work->m_posHistory[i].y = work->m_posHistory[i].z = 0.0f;
+    }
 }
 
 /*

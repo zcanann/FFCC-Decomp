@@ -720,8 +720,8 @@ void CMenuPcs::CmdDraw()
 				}
 			}
 
-			const float textW = static_cast<float>(font->GetWidth(text));
-			x = static_cast<double>(entry->x) + ((static_cast<float>(entry->w) - textW) / 2.0);
+			t = static_cast<float>(font->GetWidth(text));
+			x = static_cast<double>(entry->x) + ((static_cast<float>(entry->w) - t) / 2.0);
 			y = static_cast<float>(entry->y + 3);
 			font->SetPosX(x);
 #ifdef VERSION_GCCJGC
@@ -771,22 +771,12 @@ void CMenuPcs::CmdDraw()
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->kind));
 
-					colors[0].r = 0xFF;
-					colors[0].g = 0xFF;
-					colors[0].b = 0xFF;
-					colors[0].a = 0xFF;
-					colors[1].r = 0xFF;
-					colors[1].g = 0xFF;
-					colors[1].b = 0xFF;
-					colors[1].a = 0xFF;
-					colors[2].r = 0xFF;
-					colors[2].g = 0xFF;
-					colors[2].b = 0xFF;
-					colors[2].a = 0xFF;
-					colors[3].r = 0xFF;
-					colors[3].g = 0xFF;
-					colors[3].b = 0xFF;
-					colors[3].a = 0xFF;
+					for (i = 0; i < 4; i++) {
+						colors[i].r = 0xFF;
+						colors[i].g = 0xFF;
+						colors[i].b = 0xFF;
+						colors[i].a = 0xFF;
+					}
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 					w = entry->alpha * w;
@@ -955,9 +945,9 @@ void CMenuPcs::CmdDraw()
 	if ((cmdMode == 1) && (m_cmdState->phase == 1)) {
 		entry = &m_cmdList->entries[m_cmdList->count];
 		letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		const float mark = CalcListPos(m_cmdState->scrollTop, letterBuf[0], 1);
-		if (mark > 0.0f) {
-			DrawListPosMark(static_cast<float>(entry->x), static_cast<float>(entry->y), mark);
+		t = CalcListPos(m_cmdState->scrollTop, letterBuf[0], 1);
+		if (t > 0.0f) {
+			DrawListPosMark(static_cast<float>(entry->x), static_cast<float>(entry->y), t);
 		}
 	}
 
@@ -984,7 +974,11 @@ void CMenuPcs::CmdDraw()
 		font->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * entry->alpha)));
 
-		choices = (1.0 == static_cast<double>(entry->depth)) ? 2 : 3;
+		if (1.0 == static_cast<double>(entry->depth)) {
+			choices = 2;
+		} else {
+			choices = 3;
+		}
 		for (choice = 0; choice < choices; choice++) {
 			char* text;
 			if (choice == 0) {
@@ -1015,18 +1009,17 @@ void CMenuPcs::CmdDraw()
 	    ((cmdMode != 0) && (m_cmdState->phase == 1))) {
 
 		if ((cmdMode == 0) || (cmdMode == 3)) {
-			s32 index = m_cmdState->selected[cmdMode];
-			if (!(caravan->m_commandListExtra[index] == 0)) {
-				s32 uniteIdx;
-				for (uniteIdx = 0; uniteIdx < s_ucnt; uniteIdx++) {
-					if (s_UniteTop[uniteIdx] == index) {
+			idx = m_cmdState->selected[cmdMode];
+			if (!(caravan->m_commandListExtra[idx] == 0)) {
+				for (i = 0; i < s_ucnt; i++) {
+					if (s_UniteTop[i] == idx) {
 						break;
 					}
 				}
-				entry = &m_cmdList->entries[m_cmdList->listEnd + uniteIdx];
+				entry = &m_cmdList->entries[m_cmdList->listEnd + i];
 				cursorOnUnite = true;
 			} else {
-				entry = &m_cmdList->entries[index];
+				entry = &m_cmdList->entries[idx];
 			}
 		} else if (cmdMode == 1) {
 			for (idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
@@ -1099,9 +1092,9 @@ void CMenuPcs::CmdDraw()
 		helpAlpha = static_cast<int>(255.0f * m_cmdList->entries[0].alpha);
 	}
 
-	float helpY = 352.0f;
+	y = 352.0f;
 	DrawHelpMessage(
-	    helpId, font, static_cast<int>(320.0f - w / 2), static_cast<int>(helpY),
+	    helpId, font, static_cast<int>(320.0f - w / 2), static_cast<int>(y),
 	    CColor(0xFF, 0xFF, 0xFF, helpAlpha), 10,
 	    1.0f, 3.0f);
 }
@@ -1139,19 +1132,17 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		cmdCount = caravanWork->m_numCmdListSlots;
 
 		if ((hold & 8) != 0) {
-			CmdState* row = m_cmdState;
-			if (row->selected[mode] > 2) {
-				row->selected[mode]--;
+			if (m_cmdState->selected[mode] > 2) {
+				m_cmdState->selected[mode]--;
 			} else {
-				row->selected[mode] = static_cast<s16>(cmdCount - 1);
+				m_cmdState->selected[mode] = static_cast<s16>(cmdCount - 1);
 			}
 
-			CmdState* row2 = m_cmdState;
-			cursor = row2->selected[mode];
+			cursor = m_cmdState->selected[mode];
 			if (caravanWork->m_commandListExtra[cursor] < 0) {
 				for (int k = 1; k < 3; k++) {
 					if (caravanWork->m_commandListExtra[cursor - k] >= 0) {
-						row2->selected[mode] = static_cast<s16>(cursor - k);
+						m_cmdState->selected[mode] = static_cast<s16>(cursor - k);
 						break;
 					}
 				}
@@ -1159,25 +1150,22 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		} else {
 			if ((hold & 4) != 0) {
-				CmdState* row = m_cmdState;
-				if (row->selected[mode] < cmdCount - 1) {
-					row->selected[mode]++;
+				if (m_cmdState->selected[mode] < cmdCount - 1) {
+					m_cmdState->selected[mode]++;
 				} else {
-					row->selected[mode] = 2;
+					m_cmdState->selected[mode] = 2;
 				}
 
-				CmdState* row2 = m_cmdState;
-				cursor = row2->selected[mode];
+				cursor = m_cmdState->selected[mode];
 				if (caravanWork->m_commandListExtra[cursor] < 0) {
 					for (int k = 1; k < 3; k++) {
 						if (caravanWork->m_commandListExtra[cursor + k] >= 0) {
-							row2->selected[mode] = static_cast<s16>(cursor + k);
+							m_cmdState->selected[mode] = static_cast<s16>(cursor + k);
 							break;
 						}
 					}
-					CmdState* row3 = m_cmdState;
-					if (row3->selected[mode] > cmdCount - 1) {
-						row3->selected[mode] = 2;
+					if (m_cmdState->selected[mode] > cmdCount - 1) {
+						m_cmdState->selected[mode] = 2;
 					}
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -1217,20 +1205,18 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		int itemCount = static_cast<int>(reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0))[0]);
 
 		if (!((hold & 8) == 0)) {
-			CmdState* sv1 = m_cmdState;
-			CmdState* row = sv1;
-			if (!(row->selected[mode] == 0)) {
-				row->selected[mode]--;
+			if (!(m_cmdState->selected[mode] == 0)) {
+				m_cmdState->selected[mode]--;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
 				if (itemCount <= 8) {
-					row->selected[mode] = static_cast<s16>(itemCount - 1);
+					m_cmdState->selected[mode] = static_cast<s16>(itemCount - 1);
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else if (!(sv1->scrollTop == 0)) {
-					sv1->scrollTop--;
+				} else if (!(m_cmdState->scrollTop == 0)) {
+					m_cmdState->scrollTop--;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				} else {
-					sv1->scrollTop = static_cast<s16>(itemCount - 1);
+					m_cmdState->scrollTop = static_cast<s16>(itemCount - 1);
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
@@ -1302,8 +1288,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			}
 		}
 	} else if (mode == 2) {
-		CmdListStorage* cmdList = m_cmdList;
-		Sprt2* panel = &cmdList->entries[cmdList->listEnd + 3];
+		Sprt2* panel = &m_cmdList->entries[m_cmdList->listEnd + 3];
 		int maxPos;
 		if (1.0 == static_cast<double>(panel->depth)) {
 			maxPos = 2;
@@ -1312,20 +1297,18 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		}
 
 		if (!((hold & 8) == 0)) {
-			CmdState* row = m_cmdState;
-			if (!(row->selected[mode] == 0)) {
-				row->selected[mode]--;
+			if (!(m_cmdState->selected[mode] == 0)) {
+				m_cmdState->selected[mode]--;
 			} else {
-				row->selected[mode] = static_cast<s16>(maxPos - 1);
+				m_cmdState->selected[mode] = static_cast<s16>(maxPos - 1);
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		} else {
 			if ((hold & 4) != 0) {
-				CmdState* row = m_cmdState;
-				if (row->selected[mode] < maxPos - 1) {
-					row->selected[mode]++;
+				if (m_cmdState->selected[mode] < maxPos - 1) {
+					m_cmdState->selected[mode]++;
 				} else {
-					row->selected[mode] = 0;
+					m_cmdState->selected[mode] = 0;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
@@ -1350,8 +1333,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	} else {
 		if ((hold & 0xC) != 0) {
 			int cmdCount;
-			CmdState* const sv0 = m_cmdState;
-			const int selected = sv0->selected[0];
+			const int selected = m_cmdState->selected[0];
 			int prev = selected - 1;
 			while (prev > 2) {
 				if (caravanWork->m_commandListExtra[prev] >= 0) {
@@ -1369,11 +1351,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				next++;
 			}
 
-			CmdState* row = sv0;
-			if (row->selected[mode] == prev) {
-				row->selected[mode] = static_cast<s16>(next);
+			if (m_cmdState->selected[mode] == prev) {
+				m_cmdState->selected[mode] = static_cast<s16>(next);
 			} else {
-				row->selected[mode] = static_cast<s16>(prev);
+				m_cmdState->selected[mode] = static_cast<s16>(prev);
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}

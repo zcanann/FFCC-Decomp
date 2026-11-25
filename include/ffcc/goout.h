@@ -55,7 +55,6 @@ public:
     void Draw();
     void InitMemCardProc();
     void EndMemCardProc();
-    void SetErrorWindow(int msg);
 
 private:
     unsigned char m_lastMemCardProc;

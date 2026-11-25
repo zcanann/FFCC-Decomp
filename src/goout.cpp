@@ -185,24 +185,18 @@ void CGoOutMenu::CalcMemCardProc()
  * JP Address: 0x801668A8
  * JP Size: 1108b
  */
-
-inline void CGoOutMenu::SetErrorWindow(int msg)
-{
-    MenuPcs.m_menuWindowInfo->state = 3;
-    MenuPcs.m_goOutState->m_animFrame = 0;
-    m_currentMessage = -1;
-    m_messageTimer = 0;
-    m_messageState = 1;
-    SetMenu(msg, 0);
-}
-
 unsigned char CGoOutMenu::SetMemCardError()
 {
     switch (m_memCardResult) {
     case 1:
         return 0;
     case -2:
-        SetErrorWindow(2);
+        MenuPcs.m_menuWindowInfo->state = 3;
+        MenuPcs.m_goOutState->m_animFrame = 0;
+        m_currentMessage = -1;
+        m_messageTimer = 0;
+        m_messageState = 1;
+        SetMenu(2, 0);
         break;
     case -999:
         if (m_lastMemCardProc == 1) {
@@ -248,16 +242,31 @@ unsigned char CGoOutMenu::SetMemCardError()
         // fall through
     case -1:
     case -3:
-        SetErrorWindow(1);
+        MenuPcs.m_menuWindowInfo->state = 3;
+        MenuPcs.m_goOutState->m_animFrame = 0;
+        m_currentMessage = -1;
+        m_messageTimer = 0;
+        m_messageState = 1;
+        SetMenu(1, 0);
         break;
     case -4:
         if (m_lastMemCardProc == 1) {
             goto setLoadFailedMessage;
         }
-        SetErrorWindow(0x13);
+        MenuPcs.m_menuWindowInfo->state = 3;
+        MenuPcs.m_goOutState->m_animFrame = 0;
+        m_currentMessage = -1;
+        m_messageTimer = 0;
+        m_messageState = 1;
+        SetMenu(0x13, 0);
         break;
     case -5:
-        SetErrorWindow(3);
+        MenuPcs.m_menuWindowInfo->state = 3;
+        MenuPcs.m_goOutState->m_animFrame = 0;
+        m_currentMessage = -1;
+        m_messageTimer = 0;
+        m_messageState = 1;
+        SetMenu(3, 0);
         break;
     case -13:
     case -6:

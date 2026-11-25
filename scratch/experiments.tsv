@@ -24,3 +24,15 @@ SetMenuForceClose__10CGoOutMenuFv	restored	100.0
 Calc__10CGoOutMenuFv	Calc tail timer -> helper call (helper now unconditional)	99.87645
 Calc__10CGoOutMenuFv	restored	100.0
 SetMenuForceClose__10CGoOutMenuFv	remove guard if (m_currentMessage>=0) -> unconditional: +20 -> +8 at -O0, O4 100% DOL ok	100.0
+small	baseline small gaps	100.0
+SelectYesNo	SelectYesNo explicit int ternary	100.0
+SelectYesNo	SelectYesNo explicit xor	100.0
+SetGoOutMode	SetGoOutMode dummy local	100.0
+SetMainMode	SetMainMode param unsigned char -> int	100.0
+small	restored baseline	100.0
+SetMainMode	SetMainMode m_modeFrame cast unsigned	100.0
+Init__10CGoOutMenuFv	Init extra comment	100.0
+SelectYesNo__10CGoOutMenuFiii	SelectYesNo GetButtonDown int cast	100.0
+SetDelMode__10CGoOutMenuFUc	SetDelMode noop comment	100.0
+CalcDel__10CGoOutMenuFv	CalcDel temp variable	100.0
+small	restored after exhaust	100.0

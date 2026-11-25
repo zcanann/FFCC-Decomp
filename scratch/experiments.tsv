@@ -8,3 +8,4 @@ calc	unsigned short fadeTime2 + unsigned int fadeInFrames (O0 792->796 delta 0, 
 calc_particle	worldMat !=0 -> !=nullptr (O0 292->296 delta 0, O4 100.0)	100.0
 calc_particle	swap emitInterval order (O0 -4, O4 99.99)	99.992
 pppFrameYmMegaBirthShpTail3	tmp Vec for tailScale O0 -40->-16 O4 99.57	99.5716
+pppFrameYmMegaBirthShpTail3	component-wise assign tailScaleDirection (O0 -40->-28, O4 100.0)	100.0

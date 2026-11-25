@@ -96,34 +96,22 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
         if (m_keyFrame.IsRun() != 0) {
             int keyFrameIndex;
             int keyFrameIndexNext;
-            int reachedFrame = m_keyFrame.Get(keyFrameIndex, keyFrameIndexNext, frame);
-
-            if (reachedFrame != 0) {
-                const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                CTexture* texture = textureSet->m_textureArray[textureIndex];
-                materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot), texture);
+            if (m_keyFrame.Get(keyFrameIndex, keyFrameIndexNext, frame) != 0) {
+                materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot), textureSet->m_textureArray[m_frameTable[keyFrameIndex]]);
 
                 if (m_usesBlendTexture != 0) {
-                    const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    CTexture* nextTexture = textureSet->m_textureArray[nextTextureIndex];
-                    materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
+                    materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot + 1), textureSet->m_textureArray[m_frameTable[keyFrameIndexNext]]);
                     char blendValue = static_cast<char>(kMapTexAnimBlendScale * frame);
                     CMaterial* material = materialSet->m_materials[static_cast<unsigned long>(m_materialIndex)];
-                    material->m_shadowKColorId = blendValue;
-                    material->m_tevBit |= 0x8000;
+                    material->SetTexBlendRate(blendValue);
                 }
             } else {
-                const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                CTexture* texture = textureSet->m_textureArray[textureIndex];
-                materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot), texture);
+                materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot), textureSet->m_textureArray[m_frameTable[keyFrameIndex]]);
 
                 if (m_usesBlendTexture != 0) {
-                    const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    CTexture* nextTexture = textureSet->m_textureArray[nextTextureIndex];
-                    materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
+                    materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot + 1), textureSet->m_textureArray[m_frameTable[keyFrameIndexNext]]);
                     CMaterial* material = materialSet->m_materials[static_cast<unsigned long>(m_materialIndex)];
-                    material->m_shadowKColorId = 0;
-                    material->m_tevBit |= 0x8000;
+                    material->SetTexBlendRate(0);
                 }
             }
 
@@ -134,8 +122,7 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 
     frame = m_currentFrame;
     const int frameIndex = static_cast<int>(frame);
-    const unsigned short textureIndex = m_frameTable[frameIndex & 0xFFFF];
-    materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot), textureSet->m_textureArray[textureIndex]);
+    materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot), textureSet->m_textureArray[m_frameTable[frameIndex & 0xFFFF]]);
 
     m_currentFrame = m_currentFrame + m_frameStep;
     if (m_currentFrame >= static_cast<float>(m_endFrame)) {
@@ -152,12 +139,9 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
             nextFrame = 0;
         }
 
-        const unsigned short nextTextureIndex = m_frameTable[static_cast<unsigned short>(nextFrame)];
-        materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot + 1), textureSet->m_textureArray[nextTextureIndex]);
+        materialSet->SetTexture(static_cast<unsigned long>(m_materialIndex), static_cast<unsigned long>(m_textureSlot + 1), textureSet->m_textureArray[m_frameTable[static_cast<unsigned short>(nextFrame)]]);
         CMaterial* material = materialSet->m_materials[static_cast<unsigned long>(m_materialIndex)];
-        material->m_shadowKColorId =
-            static_cast<char>(kMapTexAnimBlendScale * (frame - static_cast<float>(static_cast<unsigned short>(frameIndex))));
-        material->m_tevBit |= 0x8000;
+        material->SetTexBlendRate(static_cast<char>(kMapTexAnimBlendScale * (frame - static_cast<float>(static_cast<unsigned short>(frameIndex)))));
     }
 }
 

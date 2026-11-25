@@ -283,6 +283,11 @@ public:
     {
         m_tevBit |= static_cast<unsigned long>(tevBit);
     }
+    void SetTexBlendRate(int rate)
+    {
+        m_shadowKColorId = rate;
+        m_tevBit |= 0x8000;
+    }
     /*
      * --INFO--
      * PAL Address: TODO

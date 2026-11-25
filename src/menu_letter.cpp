@@ -146,6 +146,7 @@ inline void CMenuPcs::LetterInit()
  */
 inline void CMenuPcs::LetterInit2()
 {
+	FFCC_ASSERT(m_singleFadeState != nullptr);
 	int index = 0;
 	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
 	entry->startFrame = 0;
@@ -279,6 +280,7 @@ inline void CMenuPcs::LetterInit3()
  */
 inline void CMenuPcs::LetterInit4()
 {
+	FFCC_ASSERT(m_singleFadeState != nullptr);
 	int index = 0;
 	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
 	entry->tex = 0;
@@ -359,9 +361,14 @@ int CMenuPcs::LetterCtrl()
 	done = s_OpenClose = 0;
 
 	LetterMenuState* state = m_letterMenuState;
+	FFCC_ASSERT(state != nullptr);
+	FFCC_ASSERT(s_SelLetter >= 0);
 	s16 phase = state->step;
+	FFCC_ASSERT(phase >= 0 && phase <= 2);
 	if (phase == 0) {
 		s16 mode = state->mode;
+		FFCC_ASSERT(mode >= 0 && mode <= 5);
+		FFCC_ASSERT(s_Attach <= 2);
 		if (mode == 0) {
 			int listOpenFinished = LetterLstOpen();
 			if (listOpenFinished) {
@@ -563,6 +570,7 @@ inline int CMenuPcs::LetterLstOpen()
 	int done;
 	int count;
 	int frame;
+	FFCC_ASSERT(m_singleFadeState != nullptr);
 
 	done = 0;
 	m_letterMenuState->frame = m_letterMenuState->frame + 1;
@@ -612,6 +620,7 @@ inline int CMenuPcs::LetterLstOpen()
 inline int CMenuPcs::LetterLstClose()
 {
 	LetterMenuState* state = m_letterMenuState;
+	FFCC_ASSERT(state != nullptr);
 	state->frame = state->frame + 1;
 
 	SingleFadeEntry* entry = m_singleFadeState->entries;
@@ -785,10 +794,13 @@ inline int CMenuPcs::LetterItemWinClose()
 int CMenuPcs::LetterReplyWinOpen()
 {
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+	FFCC_ASSERT(caravanWork != nullptr);
+	FFCC_ASSERT(s_SelLetter >= 0);
 	char* srcText;
 	char* workText;
 #ifndef VERSION_GCCJGC
 	int languageId = Game.m_gameWork.m_languageId;
+	FFCC_ASSERT(languageId >= 1 && languageId <= 5);
 #endif
 	if (m_letterMenuState->dialogInitialized == '\0') {
 		char lines[8][0x80];
@@ -1277,8 +1289,11 @@ void CMenuPcs::LetterMessDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	caravanWork = Game.m_scriptFoodBase[0];
+	FFCC_ASSERT(caravanWork != nullptr);
+	FFCC_ASSERT(s_SelLetter >= 0);
 	panel = m_singleFadeState->entries;
 	mode = m_letterMenuState->previousMode;
+	FFCC_ASSERT(mode >= 0 && mode <= 5);
 
 	for (int i = 0; i < m_singleFadeState->count; ++i, ++panel) {
 		int tex = panel->tex;
@@ -1786,6 +1801,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	if (openRatio <= 0.0f) {
 		return;
 	}
+	FFCC_ASSERT(openRatio >= 0.0f && openRatio <= 1.0f);
 
 	float left = 480.0f * openRatio;
 	float width = left;
@@ -1798,6 +1814,9 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	y = static_cast<float>(static_cast<int>(y - 0.5));
 	w = static_cast<float>(static_cast<int>(width - 1.0));
 	h = static_cast<float>(static_cast<int>(h - 1.0));
+	FFCC_ASSERT(w >= 0.0f);
+	FFCC_ASSERT(h >= 0.0f);
+	FFCC_ASSERT(left >= 0.0f);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
@@ -1964,10 +1983,12 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
  */
 inline void CMenuPcs::LetterDrawPageMark(int pageMark)
 {
+	FFCC_ASSERT(pageMark >= 0 && pageMark <= 3);
 	float markX = 592.0f;
 	float markY = 160.0f;
 	const int absPhase = abs(static_cast<int>(System.GetCounter()) % 0x14 - 10);
 	const float markScale = static_cast<float>(0.7 + 0.03 * absPhase);
+	FFCC_ASSERT(markScale >= 0.7f && markScale <= 1.0f);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 

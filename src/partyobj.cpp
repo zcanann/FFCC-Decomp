@@ -809,7 +809,8 @@ void CGPartyObj::command()
 			ringCommand = 9;
 		} else {
 			const int itemId = caravan->GetCurCmdListItem();
-			const int itemKind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
+			SCfdItemRow* cmdRows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
+			const int itemKind = cmdRows[itemId].m_kind;
 			switch (itemKind) {
 			case 1:
 			case 0xDF:
@@ -822,7 +823,8 @@ void CGPartyObj::command()
 				break;
 			}
 		}
-		ringCommandArg = caravan->GetIdxCmdList();
+		const int ringArg = caravan->GetIdxCmdList();
+		ringCommandArg = ringArg;
 	}
 
 	if ((m_weaponNodeFlagBits.m_prg != 0) && (m_unk63CBits.m_bit80 != 0) &&
@@ -834,7 +836,9 @@ void CGPartyObj::command()
 		}
 
 		if (party.target != nullptr) {
-			switch (party.target->m_worldParamA) {
+			CGObject* targ = party.target;
+			int targetParam = targ->m_worldParamA;
+			switch (targetParam) {
 			case 0xCC:
 				secondaryAvailable = true;
 				secondaryCommand = 6;
@@ -1031,11 +1035,13 @@ void CGPartyObj::command()
 			}
 
 			const int itemId = caravan->GetCmdListItem(cmdIdx);
-			const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
+			SCfdItemRow* cmdRows2 = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
+			const unsigned short itemKind = cmdRows2[itemId].m_kind;
 			switch (itemKind) {
 			case 0x100:
 				if (itemId == 0x103) {
-					if (static_cast<unsigned int>(Math.Rand(3)) == 0) {
+					int rand3 = Math.Rand(3);
+					if (static_cast<unsigned int>(rand3) == 0) {
 						ClearAllSta();
 						setSta(0x1B, 900);
 						caravan->DelCmdListAndItem(party.unk6BC, 1);
@@ -2202,7 +2208,8 @@ void CGPartyObj::onStatMagic()
 			if (m_itemId == 0x103) {
 				m_comboCenter = m_worldPosition;
 				m_comboTarget = m_comboCenter;
-				switch (Math.Rand(4)) {
+				int rand4 = Math.Rand(4);
+				switch (rand4) {
 				case 0:
 					m_itemId = 0x230;
 					break;
@@ -2436,11 +2443,13 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			m_partyData.carryObject = object;
 			rotTarget(reinterpret_cast<CGPrgObj*>(m_partyData.carryObject));
 			changeStat(0x0B, 0, 0);
-			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, 0, PARTY_CARRY_ANIM(this, m_carryAnim2, m_carryAnim0));
+			const int anim = PARTY_CARRY_ANIM(this, m_carryAnim2, m_carryAnim0);
+			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, 0, anim);
 		}
 	} else if ((carryType == 1 || carryType == 2) && m_partyData.carryObject != nullptr) {
 		if (forceMode != 0) {
-			if (m_lastStateId == 0x0B) {
+			const bool wasCarrying = m_lastStateId == 0x0B;
+			if (wasCarrying) {
 				changeStat(0, 0, 0);
 			}
 			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, 0);
@@ -2448,7 +2457,8 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			setIdleMotion();
 		} else {
 			changeStat((carryType == 1) ? 0x0C : 0x0D, 0, 0);
-			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, PARTY_CARRY_ANIM(this, m_carryAnim3, m_carryAnim1));
+			const int anim = PARTY_CARRY_ANIM(this, m_carryAnim3, m_carryAnim1);
+			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, anim);
 			m_partyData.carryObject = (CGObject*)0;
 		}
 	}
@@ -2597,7 +2607,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	int addValue;
 	int subValue;
 	int bonusSlot;
-	bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
+	bonusSlot = SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_bonusCondition;
 	subValue = 0;
 	addValue = 0;
 	currentAdd = SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_artifactRelated[3];
@@ -2638,7 +2648,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 4:
 	case 6:
 		if (kind == 4) {
-			int item = *reinterpret_cast<unsigned short*>(Game.m_itemTable + value * 0x48);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
+			int item = rows[value].m_kind;
 			if ((bonusSlot == 4 && item == 0x100) || (bonusSlot == 6 && item == 400)) {
 				addValue = stageAdd;
 			} else if (bonusSlot == 2) {
@@ -2667,7 +2678,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 3:
 	case 0xE:
 		if (kind == 5) {
-			int item = *reinterpret_cast<unsigned short*>(Game.m_itemTable + value * 0x48);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
+			int item = rows[value].m_kind;
 			if ((bonusSlot == 0xE && (item == 0x17D || item == 0x186)) ||
 			    (bonusSlot == 3 && item != 0x17D && item != 0x186)) {
 				addValue = stageAdd;
@@ -3218,9 +3230,9 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			}
 
 			chosenBonus[chosenCount++] = bonusIndex;
-
+			int bonusCond = bossArtifacts->m_bonusConditions[bonusIndex];
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)
-			    ->SetBonusCondition(bossArtifacts->m_bonusConditions[bonusIndex]);
+			    ->SetBonusCondition(bonusCond);
 			if (System.GetErrorLevel() >= 3U) {
 				System.Printf("party%d \x83{\x81[\x83i\x83Xidx=%d \x92\x86\x90g=%d\n", slot, bonusIndex,
 				    bossArtifacts->m_bonusConditions[bonusIndex]);
@@ -4092,7 +4104,9 @@ void CGPartyObj::gpmMove()
 		if (newSpeed < 0.0f) {
 			newSpeed = 0.0f;
 		} else {
-			float speedLimit = speedScale * (m_moveBaseSpeed * Game.m_partyObjArr[0]->m_pushScale);
+			float baseSpeed = m_moveBaseSpeed;
+			float pushScale = Game.m_partyObjArr[0]->m_pushScale;
+			float speedLimit = speedScale * (baseSpeed * pushScale);
 			newSpeed = speedLimit < newSpeed ? speedLimit : newSpeed;
 		}
 		CGPartyObj::m_ghostWork.carrySpeed = newSpeed;

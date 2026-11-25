@@ -150,11 +150,9 @@ void CDbgMenuPcs::destroy()
  */
 void CDbgMenuPcs::calc()
 {
-	unsigned short padInput;
+	int padInput;
 	unsigned int flags;
 	unsigned int padOffset;
-	int menuPtr;
-	int cursorPtr;
 	CFlatRuntime::CStack stackData[3];
 
 	if (m_rootMenuNode.m_firstChild == 0) {

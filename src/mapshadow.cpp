@@ -14,10 +14,10 @@
  * --INFO--
  * PAL Address: 0x8004c71c
  * PAL Size: 236b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C510
+ * EN Size: 236b
+ * JP Address: 0x8004BF74
+ * JP Size: 236b
  */
 void CMapShadowInsertOctTree(CMapShadow::TARGET target, COctTree& octTree)
 {
@@ -47,10 +47,10 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET target, COctTree& octTree)
  * --INFO--
  * PAL Address: 0x8004c808
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C5FC
+ * EN Size: 192b
+ * JP Address: 0x8004C060
+ * JP Size: 192b
  */
 void CMapShadow::Draw()
 {
@@ -78,10 +78,10 @@ void CMapShadow::Draw()
  * --INFO--
  * PAL Address: 0x8004c8c8
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C6BC
+ * EN Size: 84b
+ * JP Address: 0x8004C120
+ * JP Size: 84b
  */
 void CMapShadow::Calc()
 {
@@ -99,10 +99,10 @@ void CMapShadow::Calc()
  * --INFO--
  * PAL Address: 0x8004c91c
  * PAL Size: 236b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * EN Address: 0x8004C710
+ * EN Size: 236b
+ * JP Address: 0x8004C174
+ * JP Size: 240b
  */
 void CMapShadow::Init()
 {

@@ -1962,7 +1962,7 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::LetterDrawPageMark(int pageMark)
+inline void CMenuPcs::LetterDrawPageMark(int pageMark)
 {
 	float markX = 592.0f;
 	float markY = 160.0f;

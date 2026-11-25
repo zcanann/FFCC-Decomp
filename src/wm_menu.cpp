@@ -1381,32 +1381,25 @@ void CMenuPcs::calcWorld()
 
 	WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
 	worldObj[1].m_viewportX = 0;
-	const float kZero = FLOAT_803313dc;
 	worldObj[1].m_viewportY = 0;
-	float cameraZ = 100.0f;
 	worldObj[1].m_viewportWidth = 0x280;
-	const float kScale = FLOAT_803315d4;
 	worldObj[1].m_viewportHeight = 0x1C0;
-	const float kPosY = -0.20000000298023224f;
-	worldObj[1].m_cameraPosition.x = kZero;
-	const float kPosZ = 51.5f;
-	worldObj[1].m_cameraPosition.y = kZero;
-	const float kRotX = 35.79999923706055f;
-	worldObj[1].m_cameraPosition.z = cameraZ;
-	float degToRad = 0.01745329238474369f;
+	worldObj[1].m_cameraPosition.x = FLOAT_803313dc;
+	worldObj[1].m_cameraPosition.y = FLOAT_803313dc;
+	worldObj[1].m_cameraPosition.z = 100.0f;
 	worldObj[1].m_active = 1;
-	worldObj[1].m_transform.m_scale.x = kScale;
-	worldObj[1].m_transform.m_scale.y = kScale;
-	worldObj[1].m_transform.m_scale.z = kScale;
-	worldObj[1].m_transform.m_position.x = kZero;
-	worldObj[1].m_transform.m_position.y = kPosY;
-	worldObj[1].m_transform.m_position.z = kPosZ;
-	worldObj[1].m_transform.m_rotation.x = kRotX;
-	worldObj[1].m_transform.m_rotation.y = kZero;
-	worldObj[1].m_transform.m_rotation.z = kZero;
+	worldObj[1].m_transform.m_scale.x = FLOAT_803315d4;
+	worldObj[1].m_transform.m_scale.y = FLOAT_803315d4;
+	worldObj[1].m_transform.m_scale.z = FLOAT_803315d4;
+	worldObj[1].m_transform.m_position.x = FLOAT_803313dc;
+	worldObj[1].m_transform.m_position.y = -0.20000000298023224f;
+	worldObj[1].m_transform.m_position.z = 51.5f;
+	worldObj[1].m_transform.m_rotation.x = 35.79999923706055f;
+	worldObj[1].m_transform.m_rotation.y = FLOAT_803313dc;
+	worldObj[1].m_transform.m_rotation.z = FLOAT_803313dc;
 
 	Mtx matrix;
-	PSMTXRotRad(matrix, 'x', degToRad * worldObj[1].m_transform.m_rotation.x);
+	PSMTXRotRad(matrix, 'x', 0.01745329238474369f * worldObj[1].m_transform.m_rotation.x);
 	matrix[0][3] = worldObj[1].m_transform.m_position.x;
 	matrix[1][3] = worldObj[1].m_transform.m_position.y;
 	matrix[2][3] = worldObj[1].m_transform.m_position.z;
@@ -5053,24 +5046,21 @@ void CMenuPcs::CalcFukidashi()
 	int bitIdx;
 
 	m_wm.m_bubbleData->m_sprites[0].m_x = m_wmBubbleX;
-	float bubbleTexV = FLOAT_803313dc;
 	m_wm.m_bubbleData->m_sprites[0].m_y = m_wmBubbleY;
 	m_wm.m_bubbleData->m_sprites[0].m_width = 0xF0;
 	m_wm.m_bubbleData->m_sprites[0].m_height = 0xC4;
-	m_wm.m_bubbleData->m_sprites[0].m_v = bubbleTexV;
+	m_wm.m_bubbleData->m_sprites[0].m_v = 0.0f;
 	if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 		m_wm.m_bubbleData->m_sprites[0].m_u = FLOAT_803313dc;
 	} else {
 		m_wm.m_bubbleData->m_sprites[0].m_u = 240.0f;
 	}
 
-	float panelTexU = 480.0f;
 	if ((m_wmIconFlags & 0x3F0) != 0) {
 		m_wm.m_bubbleData->m_sprites[1].m_width = 0x50;
-		float panelTexV = FLOAT_803313dc;
 		m_wm.m_bubbleData->m_sprites[1].m_height = 0x48;
-		m_wm.m_bubbleData->m_sprites[1].m_u = panelTexU;
-		m_wm.m_bubbleData->m_sprites[1].m_v = panelTexV;
+		m_wm.m_bubbleData->m_sprites[1].m_u = 480.0f;
+		m_wm.m_bubbleData->m_sprites[1].m_v = 0.0f;
 		m_wm.m_bubbleData->m_sprites[1].m_y = m_wm.m_bubbleData->m_sprites[0].m_y + 0x1C;
 		if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 			m_wm.m_bubbleData->m_sprites[1].m_y = m_wm.m_bubbleData->m_sprites[1].m_y + 0x10;
@@ -5085,12 +5075,11 @@ void CMenuPcs::CalcFukidashi()
 		}
 	}
 
-	float iconTexUV = FLOAT_803313dc;
 	if ((m_wmIconFlags & 0x1FF) != 0) {
 		m_wm.m_bubbleData->m_sprites[2].m_width = 0x20;
 		m_wm.m_bubbleData->m_sprites[2].m_height = 0x20;
-		m_wm.m_bubbleData->m_sprites[2].m_u = iconTexUV;
-		m_wm.m_bubbleData->m_sprites[2].m_v = iconTexUV;
+		m_wm.m_bubbleData->m_sprites[2].m_u = 0.0f;
+		m_wm.m_bubbleData->m_sprites[2].m_v = 0.0f;
 
 		m_wm.m_bubbleData->m_sprites[3] = m_wm.m_bubbleData->m_sprites[2];
 
@@ -5726,9 +5715,8 @@ void CMenuPcs::CalcWMFrame()
 		digitCount = 3;
 	}
 
-	float fE8 = FLOAT_803313e8;
-	m_wm.m_frameData->m_yearSprites[0].m_scale = fE8;
-	m_wm.m_frameData->m_yearSprites[1].m_scale = fE8;
+	m_wm.m_frameData->m_yearSprites[0].m_scale = 1.0f;
+	m_wm.m_frameData->m_yearSprites[1].m_scale = 1.0f;
 
 	if (digitCount == 3) {
 		totalWidth = s_YearWTbl[10];

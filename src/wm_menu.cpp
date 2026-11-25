@@ -5715,9 +5715,8 @@ void CMenuPcs::CalcWMFrame()
 		digitCount = 3;
 	}
 
-	float fE8 = FLOAT_803313e8;
-	m_wm.m_frameData->m_yearSprites[0].m_scale = fE8;
-	m_wm.m_frameData->m_yearSprites[1].m_scale = fE8;
+	m_wm.m_frameData->m_yearSprites[0].m_scale = 1.0f;
+	m_wm.m_frameData->m_yearSprites[1].m_scale = 1.0f;
 
 	if (digitCount == 3) {
 		totalWidth = s_YearWTbl[10];

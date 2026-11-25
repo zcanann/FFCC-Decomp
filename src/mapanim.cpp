@@ -1,5 +1,4 @@
 #include "ffcc/mapanim.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"

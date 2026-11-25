@@ -60,6 +60,7 @@ inline void CMenuPcs::SetTlut(CMenuPcs::TEX tex, _GXColor* tlut)
 inline void CMesMenu::close(int closeReason)
 {
     CFlatRuntime::CStack stack[2];
+    m_closeReason = closeReason;
 
     m_mes.Set(0, 0);
     stack[0].m_word = m_menuIndex;

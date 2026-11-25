@@ -5046,24 +5046,21 @@ void CMenuPcs::CalcFukidashi()
 	int bitIdx;
 
 	m_wm.m_bubbleData->m_sprites[0].m_x = m_wmBubbleX;
-	float bubbleTexV = FLOAT_803313dc;
 	m_wm.m_bubbleData->m_sprites[0].m_y = m_wmBubbleY;
 	m_wm.m_bubbleData->m_sprites[0].m_width = 0xF0;
 	m_wm.m_bubbleData->m_sprites[0].m_height = 0xC4;
-	m_wm.m_bubbleData->m_sprites[0].m_v = bubbleTexV;
+	m_wm.m_bubbleData->m_sprites[0].m_v = 0.0f;
 	if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 		m_wm.m_bubbleData->m_sprites[0].m_u = FLOAT_803313dc;
 	} else {
 		m_wm.m_bubbleData->m_sprites[0].m_u = 240.0f;
 	}
 
-	float panelTexU = 480.0f;
 	if ((m_wmIconFlags & 0x3F0) != 0) {
 		m_wm.m_bubbleData->m_sprites[1].m_width = 0x50;
-		float panelTexV = FLOAT_803313dc;
 		m_wm.m_bubbleData->m_sprites[1].m_height = 0x48;
-		m_wm.m_bubbleData->m_sprites[1].m_u = panelTexU;
-		m_wm.m_bubbleData->m_sprites[1].m_v = panelTexV;
+		m_wm.m_bubbleData->m_sprites[1].m_u = 480.0f;
+		m_wm.m_bubbleData->m_sprites[1].m_v = 0.0f;
 		m_wm.m_bubbleData->m_sprites[1].m_y = m_wm.m_bubbleData->m_sprites[0].m_y + 0x1C;
 		if (m_wmBubbleType == 2 || m_wmBubbleType == 3) {
 			m_wm.m_bubbleData->m_sprites[1].m_y = m_wm.m_bubbleData->m_sprites[1].m_y + 0x10;
@@ -5078,12 +5075,11 @@ void CMenuPcs::CalcFukidashi()
 		}
 	}
 
-	float iconTexUV = FLOAT_803313dc;
 	if ((m_wmIconFlags & 0x1FF) != 0) {
 		m_wm.m_bubbleData->m_sprites[2].m_width = 0x20;
 		m_wm.m_bubbleData->m_sprites[2].m_height = 0x20;
-		m_wm.m_bubbleData->m_sprites[2].m_u = iconTexUV;
-		m_wm.m_bubbleData->m_sprites[2].m_v = iconTexUV;
+		m_wm.m_bubbleData->m_sprites[2].m_u = 0.0f;
+		m_wm.m_bubbleData->m_sprites[2].m_v = 0.0f;
 
 		m_wm.m_bubbleData->m_sprites[3] = m_wm.m_bubbleData->m_sprites[2];
 

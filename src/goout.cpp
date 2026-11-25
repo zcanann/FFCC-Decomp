@@ -441,11 +441,8 @@ inline void CGoOutMenu::DrawMenu()
  */
 void CGoOutMenu::SetMenuForceClose()
 {
-    if (m_currentMessage >= 0) {
-        MenuPcs.m_menuWindowInfo->state = 2;
-        MenuPcs.m_goOutState->m_animFrame = 0;
-    }
-
+    MenuPcs.m_menuWindowInfo->state = 2;
+    MenuPcs.m_goOutState->m_animFrame = 0;
     m_messageWindowOpen = 0;
     m_pendingMessage = -1;
     m_messageCloseMode = 0;

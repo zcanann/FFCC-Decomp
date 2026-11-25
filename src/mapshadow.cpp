@@ -1,6 +1,5 @@
 
 #include "ffcc/mapshadow.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/mapobj.h"

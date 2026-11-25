@@ -6,6 +6,7 @@
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"
+#include "ffcc/ptrarray.h"
 
 #include <dolphin/gx.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>

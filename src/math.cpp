@@ -686,7 +686,6 @@ int CMath::CrossCheckEllipseCapsule(Vec* outPos, float* outT, Vec* origin, Vec* 
 void CMath::CalcSpline(Vec* outPos, Vec* p0, Vec* p1, Vec* p2, Vec* p3,
                       float scaleA, float scaleB, float scaleC, float t, float scale)
 {
-    float scaleAB = scaleA + scaleB;
     float tSquared = t * t;
     float tCubed = tSquared * t;
     Vec4d coeffs;
@@ -705,7 +704,7 @@ void CMath::CalcSpline(Vec* outPos, Vec* p0, Vec* p1, Vec* p2, Vec* p3,
     control[2][2] = p2->z;
     control[3][2] = 1.0f;
 
-    float t0 = (scaleAB == 0.0f) ? 0.0f : scaleA / scaleAB;
+    float t0 = ((scaleA + scaleB) == 0.0f) ? 0.0f : scaleA / (scaleA + scaleB);
 
     Vec tangent;
     Vec tmp;
@@ -718,8 +717,7 @@ void CMath::CalcSpline(Vec* outPos, Vec* p0, Vec* p1, Vec* p2, Vec* p3,
     control[2][1] = tangent.z;
     control[3][1] = 1.0f;
 
-    float scaleBC = scaleB + scaleC;
-    float t1 = (scaleBC == 0.0f) ? 0.0f : scaleB / scaleBC;
+    float t1 = ((scaleB + scaleC) == 0.0f) ? 0.0f : scaleB / (scaleB + scaleC);
 
     PSVECSubtract(p3, p2, &tangent);
     PSVECSubtract(p2, p1, &tmp);
@@ -836,15 +834,10 @@ float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondD
         low--;
     }
 
-    float x0 = x[low];
-    float sd0 = secondDerivatives[low];
-    float sd1 = secondDerivatives[low + 1];
-    float y0 = y[low];
-    float dt = t - x0;
-    float dx = x[low + 1] - x0;
-    float cubic = 3.0f * sd0 + (dt * (sd1 - sd0)) / dx;
+    float dt = t - x[low];
+    float dx = x[low + 1] - x[low];
 
-    return (dt * cubic + ((y[low + 1] - y0) / dx - dx * (2.0f * sd0 + sd1))) * dt + y0;
+    return (dt * (3.0f * secondDerivatives[low] + (dt * (secondDerivatives[low + 1] - secondDerivatives[low])) / dx) + ((y[low + 1] - y[low]) / dx - dx * (2.0f * secondDerivatives[low] + secondDerivatives[low + 1]))) * dt + y[low];
 }
 
 /*

@@ -152,21 +152,19 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[1][0] = cy * sz;
     rot[2][0] = -sy;
     rot[0][0] = cy * cz;
-    rot[0][1] = cz * sxsy - (cx * sz);
-    rot[1][1] = sz * sxsy + (cx * cz);
+    rot[0][1] = cz * sxsy - cx * sz;
+    rot[1][1] = sz * sxsy + cx * cz;
     rot[2][1] = sx * cy;
-    zRotZ = cx * cy;
-    zRotX = cz * cxsy + (sx * sz);
-    zRotY = sz * cxsy - (sx * cz);
-    rot[0][2] = zRotX;
-    rot[1][2] = zRotY;
-    rot[2][2] = zRotZ;
+    rot[0][2] = cz * cxsy + sx * sz;
+    rot[1][2] = sz * cxsy - sx * cz;
+    rot[2][2] = cx * cy;
     rot[0][3] = srt->m_position.x;
     rot[1][3] = srt->m_position.y;
     rot[2][3] = srt->m_position.z;
 
     PSMTXConcat(rot, out, out);
 }
+
 
 /*
  * --INFO--

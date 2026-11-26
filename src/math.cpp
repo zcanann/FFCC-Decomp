@@ -323,8 +323,6 @@ void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
  */
 int CBound::CheckFrustum0(CBound& outBound)
 {
-    float maxInit;
-    float minInit;
     int xIndex;
     unsigned int clipMask;
     unsigned int outsideMask;
@@ -334,10 +332,7 @@ int CBound::CheckFrustum0(CBound& outBound)
     Vec vertex;
     Vec transformed;
 
-    maxInit = 10000000000.0f;
-    minInit = -10000000000.0f;
-    outBound.m_min.x = outBound.m_min.y = outBound.m_min.z = maxInit;
-    outBound.m_max.x = outBound.m_max.y = outBound.m_max.z = minInit;
+    outBound.Reset();
 
     if ((s_f_vpos.x <= m_max.x) && (s_f_vpos.y <= m_max.y) && (s_f_vpos.z <= m_max.z) &&
         (s_f_vpos.x >= m_min.x) && (s_f_vpos.y >= m_min.y) && (s_f_vpos.z >= m_min.z)) {
@@ -355,12 +350,7 @@ int CBound::CheckFrustum0(CBound& outBound)
                     vertex.z = (zIndex == 0) ? m_min.z : m_max.z;
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                    outBound.m_min.x = outBound.m_min.x < transformed.x ? outBound.m_min.x : transformed.x;
-                    outBound.m_min.y = outBound.m_min.y < transformed.y ? outBound.m_min.y : transformed.y;
-                    outBound.m_min.z = outBound.m_min.z < transformed.z ? outBound.m_min.z : transformed.z;
-                    outBound.m_max.x = outBound.m_max.x > transformed.x ? outBound.m_max.x : transformed.x;
-                    outBound.m_max.y = outBound.m_max.y > transformed.y ? outBound.m_max.y : transformed.y;
-                    outBound.m_max.z = outBound.m_max.z > transformed.z ? outBound.m_max.z : transformed.z;
+                    outBound.Add(&transformed);
                 }
             }
         }
@@ -398,7 +388,6 @@ int CBound::CheckFrustum0(CBound& outBound)
                     } else {
                         clipMask = 0x10;
                     }
-                    viewZ = transformed.z;
                     if (transformed.y > -viewZ) {
                         clipMask = (unsigned char)(clipMask | 0x14);
                     } else if (transformed.y < viewZ) {
@@ -412,7 +401,6 @@ int CBound::CheckFrustum0(CBound& outBound)
                     } else {
                         clipMask = 0;
                     }
-                    viewZ = transformed.z;
                     if (transformed.y > -viewZ) {
                         clipMask = (unsigned char)(clipMask | 4);
                     } else if (transformed.y < viewZ) {
@@ -431,6 +419,7 @@ int CBound::CheckFrustum0(CBound& outBound)
 
     return (unsigned char)outsideMask == 0 ? 2 : 1;
 }
+
 
 /*
  * --INFO--

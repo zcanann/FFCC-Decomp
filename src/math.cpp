@@ -152,21 +152,19 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[1][0] = cy * sz;
     rot[2][0] = -sy;
     rot[0][0] = cy * cz;
-    rot[0][1] = cz * sxsy - (cx * sz);
-    rot[1][1] = sz * sxsy + (cx * cz);
+    rot[0][1] = cz * sxsy - cx * sz;
+    rot[1][1] = sz * sxsy + cx * cz;
     rot[2][1] = sx * cy;
-    zRotZ = cx * cy;
-    zRotX = cz * cxsy + (sx * sz);
-    zRotY = sz * cxsy - (sx * cz);
-    rot[0][2] = zRotX;
-    rot[1][2] = zRotY;
-    rot[2][2] = zRotZ;
+    rot[0][2] = cz * cxsy + sx * sz;
+    rot[1][2] = sz * cxsy - sx * cz;
+    rot[2][2] = cx * cy;
     rot[0][3] = srt->m_position.x;
     rot[1][3] = srt->m_position.y;
     rot[2][3] = srt->m_position.z;
 
     PSMTXConcat(rot, out, out);
 }
+
 
 /*
  * --INFO--
@@ -187,8 +185,6 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
     float cosZ;
     float sinXSinY;
     float cosXSinY;
-    float* matrix = &out[0][0];
-
     sinX = (float)sin((double)srt->m_rotation.x);
     cosX = (float)cos((double)srt->m_rotation.x);
     sinY = (float)sin((double)srt->m_rotation.y);
@@ -198,19 +194,20 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
 
     sinXSinY = sinX * sinY;
     cosXSinY = cosX * sinY;
-    matrix[0] = cosY * cosZ;
-    matrix[4] = cosY * sinZ;
-    matrix[8] = -sinY;
-    matrix[1] = cosZ * sinXSinY - cosX * sinZ;
-    matrix[5] = sinZ * sinXSinY + cosX * cosZ;
-    matrix[9] = sinX * cosY;
-    matrix[2] = cosZ * cosXSinY + sinX * sinZ;
-    matrix[6] = sinZ * cosXSinY - sinX * cosZ;
-    matrix[10] = cosX * cosY;
-    matrix[3] = srt->m_position.x;
-    matrix[7] = srt->m_position.y;
-    matrix[11] = srt->m_position.z;
+    out[0][0] = cosY * cosZ;
+    out[1][0] = cosY * sinZ;
+    out[2][0] = -sinY;
+    out[0][1] = cosZ * sinXSinY - cosX * sinZ;
+    out[1][1] = sinZ * sinXSinY + cosX * cosZ;
+    out[2][1] = sinX * cosY;
+    out[0][2] = cosZ * cosXSinY + sinX * sinZ;
+    out[1][2] = sinZ * cosXSinY - sinX * cosZ;
+    out[2][2] = cosX * cosY;
+    out[0][3] = srt->m_position.x;
+    out[1][3] = srt->m_position.y;
+    out[2][3] = srt->m_position.z;
 }
+
 
 /*
  * --INFO--
@@ -323,8 +320,6 @@ void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
  */
 int CBound::CheckFrustum0(CBound& outBound)
 {
-    float maxInit;
-    float minInit;
     int xIndex;
     unsigned int clipMask;
     unsigned int outsideMask;
@@ -334,10 +329,7 @@ int CBound::CheckFrustum0(CBound& outBound)
     Vec vertex;
     Vec transformed;
 
-    maxInit = 10000000000.0f;
-    minInit = -10000000000.0f;
-    outBound.m_min.x = outBound.m_min.y = outBound.m_min.z = maxInit;
-    outBound.m_max.x = outBound.m_max.y = outBound.m_max.z = minInit;
+    outBound.Reset();
 
     if ((s_f_vpos.x <= m_max.x) && (s_f_vpos.y <= m_max.y) && (s_f_vpos.z <= m_max.z) &&
         (s_f_vpos.x >= m_min.x) && (s_f_vpos.y >= m_min.y) && (s_f_vpos.z >= m_min.z)) {
@@ -355,12 +347,7 @@ int CBound::CheckFrustum0(CBound& outBound)
                     vertex.z = (zIndex == 0) ? m_min.z : m_max.z;
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                    outBound.m_min.x = outBound.m_min.x < transformed.x ? outBound.m_min.x : transformed.x;
-                    outBound.m_min.y = outBound.m_min.y < transformed.y ? outBound.m_min.y : transformed.y;
-                    outBound.m_min.z = outBound.m_min.z < transformed.z ? outBound.m_min.z : transformed.z;
-                    outBound.m_max.x = outBound.m_max.x > transformed.x ? outBound.m_max.x : transformed.x;
-                    outBound.m_max.y = outBound.m_max.y > transformed.y ? outBound.m_max.y : transformed.y;
-                    outBound.m_max.z = outBound.m_max.z > transformed.z ? outBound.m_max.z : transformed.z;
+                    outBound.Add(&transformed);
                 }
             }
         }
@@ -398,7 +385,6 @@ int CBound::CheckFrustum0(CBound& outBound)
                     } else {
                         clipMask = 0x10;
                     }
-                    viewZ = transformed.z;
                     if (transformed.y > -viewZ) {
                         clipMask = (unsigned char)(clipMask | 0x14);
                     } else if (transformed.y < viewZ) {
@@ -412,7 +398,6 @@ int CBound::CheckFrustum0(CBound& outBound)
                     } else {
                         clipMask = 0;
                     }
-                    viewZ = transformed.z;
                     if (transformed.y > -viewZ) {
                         clipMask = (unsigned char)(clipMask | 4);
                     } else if (transformed.y < viewZ) {
@@ -431,6 +416,7 @@ int CBound::CheckFrustum0(CBound& outBound)
 
     return (unsigned char)outsideMask == 0 ? 2 : 1;
 }
+
 
 /*
  * --INFO--

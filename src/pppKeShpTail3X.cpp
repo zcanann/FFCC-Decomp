@@ -401,11 +401,13 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step,
             initPos.z = outMatrix.value[2][3];
         }
 
-        pppCopyVector(historyPos, initPos);
+        Vec tmp0 = initPos;
+        pppCopyVector(historyPos, tmp0);
         Vec* history = work->m_posHistory;
         s32 i = 0x1c;
         do {
-            pppCopyVector(*history, historyPos);
+            Vec tmp = historyPos;
+            pppCopyVector(*history, tmp);
             history++;
             i--;
         } while (i > 0);
@@ -427,7 +429,8 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step,
         pos.z = outMatrix.value[2][3];
     }
 
-    pppCopyVector(work->m_posHistory[work->m_head], pos);
+    Vec tmp2 = pos;
+    pppCopyVector(work->m_posHistory[work->m_head], tmp2);
 
     work->m_values[8] += work->m_values[0xc];
     work->m_values[0] += work->m_values[8];

@@ -446,7 +446,6 @@ void CGoOutMenu::SetMenuForceClose()
     m_messageWindowOpen = 0;
     m_pendingMessage = -1;
     m_messageCloseMode = 0;
-    m_pendingMessageTimer = 0;
 }
 
 /*

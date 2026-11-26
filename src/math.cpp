@@ -185,8 +185,6 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
     float cosZ;
     float sinXSinY;
     float cosXSinY;
-    float* matrix = &out[0][0];
-
     sinX = (float)sin((double)srt->m_rotation.x);
     cosX = (float)cos((double)srt->m_rotation.x);
     sinY = (float)sin((double)srt->m_rotation.y);
@@ -196,19 +194,20 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
 
     sinXSinY = sinX * sinY;
     cosXSinY = cosX * sinY;
-    matrix[0] = cosY * cosZ;
-    matrix[4] = cosY * sinZ;
-    matrix[8] = -sinY;
-    matrix[1] = cosZ * sinXSinY - cosX * sinZ;
-    matrix[5] = sinZ * sinXSinY + cosX * cosZ;
-    matrix[9] = sinX * cosY;
-    matrix[2] = cosZ * cosXSinY + sinX * sinZ;
-    matrix[6] = sinZ * cosXSinY - sinX * cosZ;
-    matrix[10] = cosX * cosY;
-    matrix[3] = srt->m_position.x;
-    matrix[7] = srt->m_position.y;
-    matrix[11] = srt->m_position.z;
+    out[0][0] = cosY * cosZ;
+    out[1][0] = cosY * sinZ;
+    out[2][0] = -sinY;
+    out[0][1] = cosZ * sinXSinY - cosX * sinZ;
+    out[1][1] = sinZ * sinXSinY + cosX * cosZ;
+    out[2][1] = sinX * cosY;
+    out[0][2] = cosZ * cosXSinY + sinX * sinZ;
+    out[1][2] = sinZ * cosXSinY - sinX * cosZ;
+    out[2][2] = cosX * cosY;
+    out[0][3] = srt->m_position.x;
+    out[1][3] = srt->m_position.y;
+    out[2][3] = srt->m_position.z;
 }
+
 
 /*
  * --INFO--
